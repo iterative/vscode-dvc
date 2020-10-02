@@ -1,0 +1,15 @@
+{
+	"private": true,
+	"workspaces": [
+		"./extension",
+		"./webview"
+	],
+	"scripts": {
+		"build": "yarn build-ui && yarn build-extension",
+		"build-ui": "yarn workspace dvc-vscode-webview build",
+		"build-extension": "yarn workspace dvc-integration build"
+	},
+	"devDependencies": {
+		"prettier": "^1.19.1"
+	}
+}

@@ -1,0 +1,77 @@
+{
+	"name": "dvc-integration",
+	"private": true,
+	"displayName": "DVC Integration",
+	"description": "",
+	"publisher": "todo-dvc",
+	"icon": "docs/logo.drawio.png",
+	"version": "0.1.0",
+	"engines": {
+		"vscode": "^1.46.0"
+	},
+	"readme": "./README.md",
+	"activationEvents": [
+		"*",
+		"onWebviewPanel:dvc-view"
+	],
+	"repository": {
+		"url": "https://github.com/iterative/vscode-dvc"
+	},
+	"main": "./dist/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"title": "DVC: Push",
+				"command": "dvc-integration.push"
+			},
+			{
+				"title": "DVC: Show Webview",
+				"command": "dvc-integration.showWebview"
+			}
+		],
+		"configuration": {
+			"title": "DVC",
+			"properties": {}
+		},
+		"menus": {
+			"scm/resourceState/context": [
+				{
+					"command": "dvc-integration.push",
+					"group": "inline"
+				}
+			]
+		},
+		"views": {
+			"explorer": [
+				{
+					"id": "dvc-tree-view",
+					"name": "DVC Tree View"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"dev": "shx rm -rf dist && tsc -watch -p ./",
+		"build": "yarn build-webpack && yarn package",
+		"build-webpack": "webpack --mode production",
+		"package": "vsce package --yarn",
+		"pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
+		"vscode:prepublish": ""
+	},
+	"dependencies": {
+		"@hediet/std": "^0.6.0",
+		"@hediet/node-reload": "^0.7.3"
+	},
+	"devDependencies": {
+		"copy-webpack-plugin": "^5.1.1",
+		"@types/copy-webpack-plugin": "^5.0.0",
+		"@types/node": "^13.7.4",
+		"@types/vscode": "1.46.0",
+		"tslint": "^6.0.0",
+		"typescript": "^3.8.2",
+		"webpack": "^4.41.6",
+		"webpack-cli": "^3.3.11",
+		"ts-loader": "^6.2.1",
+		"shx": "^0.3.2"
+	}
+}
