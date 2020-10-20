@@ -19,7 +19,7 @@ export class DvcWebviewManager {
 			window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
 				deserializeWebviewPanel: async (panel, state) => {
 					DvcWebview.restore(panel, this.config, PrivateSymbol).then(
-						view => {
+						(view) => {
 							this.addView(view);
 						}
 					);
@@ -99,7 +99,7 @@ export class DvcWebview {
 		webviewPanel.onDidDispose(() => {
 			this._disposer.dispose();
 		});
-		webviewPanel.webview.onDidReceiveMessage(arg => {
+		webviewPanel.webview.onDidReceiveMessage((arg) => {
 			this.handleMessage(arg as MessageFromWebview);
 		});
 

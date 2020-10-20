@@ -31,7 +31,7 @@ registerUpdateReconciler(module);
 
 export function activate(context: ExtensionContext) {
 	context.subscriptions.push(
-		hotRequireExportedFn(module, Extension, Extension => new Extension())
+		hotRequireExportedFn(module, Extension, (Extension) => new Extension())
 	);
 }
 
