@@ -41,11 +41,20 @@
 				}
 			]
 		},
-		"views": {
-			"explorer": [
+		"viewsContainers": {
+			"activitybar": [
 				{
-					"id": "dvc-tree-view",
-					"name": "DVC Tree View"
+					"id": "dvc-container",
+					"title": "DVC",
+					"icon": "media/dvc-monochrome.svg"
+				}
+			]
+		},
+		"views": {
+			"dvc-container": [
+				{
+					"id": "dvc-tree",
+					"name": "Commands"
 				}
 			]
 		}
