@@ -1,5 +1,5 @@
 import { exec } from "child_process";
-import { promisify } from "util";
+import { promisify, inspect } from "util";
 import { stat, accessSync } from "fs";
 import * as path from "path";
 const execPromise = promisify(exec);
@@ -9,7 +9,9 @@ interface DVCExtensionOptions {
 	cwd: string;
 }
 
-export const inferDefaultOptions = async (cwd: string) => {
+export const inferDefaultOptions: (
+	cwd: string
+) => Promise<DVCExtensionOptions> = async (cwd) => {
 	const envDvcPath = path.resolve(cwd || ".", ".env", "bin", "dvc");
 	let bin;
 	try {
@@ -32,11 +34,47 @@ const execCommand: (
 		cwd,
 	});
 
-export const getTableData = async (options?: any) => {
-	const { stdout, stderr } = await execCommand(
-		options,
-		"exp show --show-json"
-	);
-	const experimentsTableJson = JSON.parse(String(stdout));
-	return experimentsTableJson;
+interface Experiment {
+	sha: "baseline" | string;
+	timestamp: Date;
+	params: Record<string, string>;
+	metrics: Record<string, string>;
+	queued: boolean;
+	label: string;
+	name?: string;
+	checkpoint_tip?: string;
+}
+
+interface ExperimentsRepo {
+	sha: "workspace" | string;
+	experiments: Experiment[];
+}
+
+interface AllExperiments {
+	workspace: ExperimentsRepo;
+	experiments: ExperimentsRepo[];
+}
+
+const buildTableDataItem = (sha: string, data: any) => {
+	return {
+		...data,
+		label: data.name || sha,
+		sha,
+	};
+};
+
+export const getTableData: (
+	options: DVCExtensionOptions
+) => Promise<AllExperiments> = async (options) => {
+	const { stdout } = await execCommand(options, "exp show --show-json");
+	const originalOutput = JSON.parse(String(stdout));
+	const { workspace, ...rest } = originalOutput;
+	const processedRest = Object.entries(rest)
+		.sort()
+		.map(([sha, value]) => buildTableDataItem(sha, value));
+	const result = {
+		workspace: buildTableDataItem("workspace", workspace),
+		experiments: processedRest,
+	};
+	return result;
 };
