@@ -9,8 +9,6 @@ const testDvcDirectory = path.resolve(
 	"example-get-started"
 );
 
-console.log({ extensionDirectory, testDvcDirectory });
-
 const testOptions = inferDefaultOptions(testDvcDirectory);
 
 test("Options on the base non-.env repo defaults to dvc on PATH", async () => {
