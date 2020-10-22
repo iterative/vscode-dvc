@@ -1,10 +1,25 @@
 import * as webpack from "webpack";
-import path = require("path");
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
-import CopyPlugin = require("copy-webpack-plugin");
 import { readFileSync } from "fs";
+import path = require("path");
+import CopyPlugin = require("copy-webpack-plugin");
 
 const r = (file: string) => path.resolve(__dirname, file);
+
+function includeDependency(location: string) {
+	const content = readFileSync(path.join(location, "package.json"), {
+		encoding: "utf8",
+	});
+	const pkgName = JSON.parse(content).name;
+
+	return new CopyPlugin([
+		{
+			from: location,
+			to: r(`./dist/node_modules/${pkgName}`),
+			ignore: ["**/node_modules/**/*"],
+		},
+	]);
+}
 
 module.exports = {
 	target: "node",
@@ -42,18 +57,3 @@ module.exports = {
 	},
 	plugins: [new CleanWebpackPlugin(), includeDependency(r("../webview/"))],
 } as webpack.Configuration;
-
-function includeDependency(location: string) {
-	const content = readFileSync(path.join(location, "package.json"), {
-		encoding: "utf8",
-	});
-	const pkgName = JSON.parse(content).name;
-
-	return new CopyPlugin([
-		{
-			from: location,
-			to: r(`./dist/node_modules/${pkgName}`),
-			ignore: ["**/node_modules/**/*"],
-		},
-	]);
-}

@@ -1,5 +1,5 @@
-import { getTableData, inferDefaultOptions } from "./DvcReader";
 import * as path from "path";
+import { getTableData, inferDefaultOptions } from "./DvcReader";
 
 const extensionDirectory = path.resolve(__dirname, "..");
 const testDvcDirectory = path.resolve(

@@ -1,75 +1,28 @@
 import { window, ViewColumn, WebviewPanel, Uri } from "vscode";
 import { Disposable } from "@hediet/std/disposable";
+import * as dvcVscodeWebview from "dvc-vscode-webview";
+import { Deferred } from "@hediet/std/synchronization";
+import { autorun } from "mobx";
+import { Config } from "./Config";
 import {
 	MessageFromWebview,
 	MessageToWebview,
 	WindowWithWebviewData,
 } from "./webviewContract";
-import { Config } from "./Config";
-import * as dvcVscodeWebview from "dvc-vscode-webview";
-import { Deferred } from "@hediet/std/synchronization";
-import { autorun } from "mobx";
-
-export class DvcWebviewManager {
-	private readonly openedWebviews = new Set<DvcWebview>();
-	public readonly dispose = Disposable.fn();
-
-	constructor(private readonly config: Config) {
-		this.dispose.track(
-			window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
-				deserializeWebviewPanel: async (panel, state) => {
-					DvcWebview.restore(panel, this.config, PrivateSymbol).then(
-						(view) => {
-							this.addView(view);
-						}
-					);
-				},
-			})
-		);
-
-		this.dispose.track({
-			dispose: () => {
-				for (const panel of this.openedWebviews) {
-					panel.dispose();
-				}
-			},
-		});
-	}
-
-	public async createNew(): Promise<DvcWebview> {
-		const view = await DvcWebview.create(this.config, PrivateSymbol);
-		this.addView(view);
-		return view;
-	}
-
-	private addView(view: DvcWebview) {
-		this.openedWebviews.add(view);
-		view.onDidDispose(() => {
-			this.openedWebviews.delete(view);
-		});
-	}
-}
-
-// To restrict access to internal functions
-const PrivateSymbol = Symbol();
 
 export class DvcWebview {
 	public static viewKey = "dvc-view";
 
 	public static async restore(
 		webviewPanel: WebviewPanel,
-		config: Config,
-		privateSymbol: typeof PrivateSymbol
+		config: Config
 	): Promise<DvcWebview> {
 		const view = new DvcWebview(webviewPanel, config);
-		await view["initialized"];
+		await view.initialized;
 		return view;
 	}
 
-	public static async create(
-		config: Config,
-		privateSymbol: typeof PrivateSymbol
-	): Promise<DvcWebview> {
+	public static async create(config: Config): Promise<DvcWebview> {
 		const webviewPanel = window.createWebviewPanel(
 			DvcWebview.viewKey,
 			"DVC View",
@@ -81,13 +34,14 @@ export class DvcWebview {
 			}
 		);
 		const view = new DvcWebview(webviewPanel, config);
-		await view["initialized"];
+		await view.initialized;
 		return view;
 	}
 
 	private readonly _disposer = Disposable.fn();
 
 	private readonly _initialized = new Deferred();
+
 	protected readonly initialized = this._initialized.promise;
 
 	public readonly onDidDispose = this.webviewPanel.onDidDispose;
@@ -108,9 +62,9 @@ export class DvcWebview {
 		this._disposer.track({
 			dispose: autorun(async () => {
 				// Update theme changes
-				const theme = config.theme;
+				const { theme } = config;
 				await this.initialized; // Read all mobx dependencies before await
-				this.sendMessage({ kind: "setTheme", theme: theme });
+				this.sendMessage({ kind: "setTheme", theme });
 			}),
 		});
 	}
@@ -189,12 +143,49 @@ export class DvcWebview {
 				this._initialized.resolve();
 				return;
 			default:
-				const nvr: never = message.kind; // change this to just `= message;` if necessary.
 				console.error("Unexpected message", message);
 		}
 	}
 
 	public showMessage(message: string): void {
 		this.sendMessage({ kind: "showMessage", message });
+	}
+}
+export class DvcWebviewManager {
+	private readonly openedWebviews = new Set<DvcWebview>();
+
+	public readonly dispose = Disposable.fn();
+
+	constructor(private readonly config: Config) {
+		this.dispose.track(
+			window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
+				deserializeWebviewPanel: async (panel) => {
+					DvcWebview.restore(panel, this.config).then((view) => {
+						this.addView(view);
+					});
+				},
+			})
+		);
+
+		this.dispose.track({
+			dispose: () => {
+				for (const panel of this.openedWebviews) {
+					panel.dispose();
+				}
+			},
+		});
+	}
+
+	public async createNew(): Promise<DvcWebview> {
+		const view = await DvcWebview.create(this.config);
+		this.addView(view);
+		return view;
+	}
+
+	private addView(view: DvcWebview) {
+		this.openedWebviews.add(view);
+		view.onDidDispose(() => {
+			this.openedWebviews.delete(view);
+		});
 	}
 }

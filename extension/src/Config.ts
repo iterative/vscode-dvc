@@ -11,7 +11,8 @@ export class Config {
 	public get theme(): "light" | "dark" {
 		if (this._vsCodeTheme.kind === ColorThemeKind.Light) {
 			return "light";
-		} else if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
+		}
+		if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
 			return "dark";
 		}
 		return "light";

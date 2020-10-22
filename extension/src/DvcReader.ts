@@ -1,8 +1,6 @@
-import { exec } from "child_process";
-import { promisify, inspect } from "util";
-import { stat, accessSync } from "fs";
+import { accessSync } from "fs";
 import * as path from "path";
-const execPromise = promisify(exec);
+import { execPromise } from "./util";
 
 interface DVCExtensionOptions {
 	bin: string;
@@ -42,7 +40,7 @@ interface Experiment {
 	queued: boolean;
 	label: string;
 	name?: string;
-	checkpoint_tip?: string;
+	checkpointTip?: string;
 }
 
 interface ExperimentsRepo {
