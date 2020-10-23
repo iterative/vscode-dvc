@@ -15,6 +15,24 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"type": "npm",
+			"label": "npm: dev - webview",
+			"script": "dev",
+			"isBackground": true,
+			"presentation": {
+				"reveal": "never"
+			},
+			"path": "webview/"
+		},
+		{
+			"label": "npm: dev - all",
+			"isBackground": true,
+			"dependsOn": [
+				"npm: dev - extension",
+				"npm: dev - webview"
+			]
 		}
 	]
 }
