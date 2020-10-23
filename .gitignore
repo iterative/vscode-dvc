@@ -81,6 +81,3 @@ typings/
 
 dist/
 out/
-
-# Demo submodule
-demo/example-get-started/
