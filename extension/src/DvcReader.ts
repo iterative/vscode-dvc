@@ -48,7 +48,7 @@ interface ExperimentsRepo {
 	experiments: Experiment[];
 }
 
-interface AllExperiments {
+export interface AllExperiments {
 	workspace: ExperimentsRepo;
 	experiments: ExperimentsRepo[];
 }

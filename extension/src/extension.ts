@@ -19,11 +19,9 @@ import {
 	getReloadCount,
 } from "@hediet/node-reload";
 
-import { inspect } from "util";
-
 import { Config } from "./Config";
 import { DvcWebviewManager } from "./DvcWebviewManager";
-import { getTableData, inferDefaultOptions } from "./DvcReader";
+import { getTableData, inferDefaultOptions, AllExperiments } from "./DvcReader";
 
 if (process.env.HOT_RELOAD) {
 	enableHotReload({ entryModule: module, loggingEnabled: true });
@@ -31,14 +29,43 @@ if (process.env.HOT_RELOAD) {
 
 registerUpdateReconciler(module);
 
+const updateInterval = 3000;
+
 export class Extension {
 	public readonly dispose = Disposable.fn();
 
 	private readonly config = new Config();
 
+	private promisedCachedTable: Promise<AllExperiments> | null = null;
+
+	private lastTableUpdate: number | null = null;
+
 	private readonly manager = this.dispose.track(
 		new DvcWebviewManager(this.config)
 	);
+
+	private async updateCachedTable() {
+		const { workspaceFolders } = workspace;
+		if (!workspaceFolders)
+			throw new Error(
+				"There are no folders in the Workspace to operate on!"
+			);
+		const options = await inferDefaultOptions(
+			workspaceFolders[0].uri.fsPath
+		);
+		this.promisedCachedTable = getTableData(options);
+		this.lastTableUpdate = Date.now();
+		return this.promisedCachedTable;
+	}
+
+	private async getCachedTable() {
+		if (
+			!this.lastTableUpdate ||
+			Date.now() - this.lastTableUpdate >= updateInterval
+		)
+			await this.updateCachedTable();
+		return this.promisedCachedTable;
+	}
 
 	constructor() {
 		if (getReloadCount(module) > 0) {
@@ -52,19 +79,10 @@ export class Extension {
 			commands.registerCommand(
 				"dvc-integration.showWebview",
 				async () => {
-					const { workspaceFolders } = workspace;
-					if (!workspaceFolders)
-						throw new Error(
-							"The Webview needs a Workspace folder!"
-						);
-					const options = await inferDefaultOptions(
-						workspaceFolders[0].uri.fsPath
-					);
-					const tableData = await getTableData(options);
-					const m = await this.manager.createNew();
-					m.showMessage(
-						inspect(tableData, { depth: null, colors: true })
-					);
+					const managerInstance = await this.manager.createNew();
+					const tableData = await this.getCachedTable();
+					const payload = JSON.stringify(tableData)
+					managerInstance.showMessage(payload);
 				}
 			)
 		);
