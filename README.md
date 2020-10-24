@@ -2,6 +2,10 @@
 
 An extension for VS Code that provides support for experiment tracking, file management, and pipelines
 
+# Trying the extension
+
+If you'd like to try the extension without installing, [download and install the .vsix](https://github.com/iterative/vscode-dvc/blob/master/extension/dvc-integration-0.1.0.vsix)
+
 # Dev-Setup
 
 -   Install VS Code, nodejs and yarn
