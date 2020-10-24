@@ -31,8 +31,8 @@ export function getVsCodeApi<
 	const api = w.vscodeApi;
 
 	return {
-		getState: api.getState.bind(api),
-		setState: api.setState.bind(api),
+		getState: () => api.getState(),
+		setState: arg => api.setState(arg),
 		postMessage: api.postMessage,
 		addMessageHandler: handler => {
 			const listener = (event: MessageEvent) => {
