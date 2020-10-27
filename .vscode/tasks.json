@@ -11,10 +11,7 @@
 				"reveal": "never"
 			},
 			"path": "extension/",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
+			"group": "build"
 		},
 		{
 			"type": "npm",
@@ -24,7 +21,8 @@
 			"presentation": {
 				"reveal": "never"
 			},
-			"path": "webview/"
+			"path": "webview/",
+			"group": "build"
 		},
 		{
 			"label": "npm: dev - all",
@@ -32,7 +30,11 @@
 			"dependsOn": [
 				"npm: dev - extension",
 				"npm: dev - webview"
-			]
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		}
 	]
 }
