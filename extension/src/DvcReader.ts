@@ -7,6 +7,32 @@ interface DVCExtensionOptions {
 	cwd: string;
 }
 
+type DVCExperimentId = "baseline" | string;
+type DataFileDict = Record<string, Record<string, string | number>>;
+export interface DVCExperiment {
+	id: string;
+	name?: string;
+	timestamp: Date;
+	params: DataFileDict;
+	metrics: DataFileDict;
+	queued: boolean;
+	checkpoint_tip: string;
+}
+type DVCExperimentJSONOutput = Omit<DVCExperiment, "id">
+
+type DVCCommitId = "workspace" | string;
+type DVCExperimentsCommitJSONOutput = Record<DVCExperimentId, DVCExperimentJSONOutput>;
+export interface DVCExperimentsCommit {
+	id: DVCExperimentId;
+	experiments: DVCExperiment[];
+}
+
+type DVCExperimentsRepoJSONOutput = Record<
+	DVCCommitId,
+	DVCExperimentsCommitJSONOutput
+>;
+export type DVCExperimentsRepo = DVCExperimentsCommit[];
+
 export const inferDefaultOptions: (
 	cwd: string
 ) => Promise<DVCExtensionOptions> = async (cwd) => {
@@ -32,47 +58,19 @@ const execCommand: (
 		cwd,
 	});
 
-interface Experiment {
-	sha: "baseline" | string;
-	timestamp: Date;
-	params: Record<string, string>;
-	metrics: Record<string, string>;
-	queued: boolean;
-	label: string;
-	name?: string;
-	checkpointTip?: string;
-}
-
-interface ExperimentsRepo {
-	sha: "workspace" | string;
-	experiments: Experiment[];
-}
-
-export interface AllExperiments {
-	workspace: ExperimentsRepo;
-	experiments: ExperimentsRepo[];
-}
-
-const buildTableDataItem = (sha: string, data: any) => {
-	return {
-		...data,
-		label: data.name || sha,
-		sha,
-	};
-};
-
 export const getTableData: (
 	options: DVCExtensionOptions
-) => Promise<AllExperiments> = async (options) => {
+) => Promise<DVCExperimentsRepo> = async (options) => {
 	const { stdout } = await execCommand(options, "exp show --show-json");
-	const originalOutput = JSON.parse(String(stdout));
-	const { workspace, ...rest } = originalOutput;
-	const processedRest = Object.entries(rest)
-		.sort()
-		.map(([sha, value]) => buildTableDataItem(sha, value));
-	const result = {
-		workspace: buildTableDataItem("workspace", workspace),
-		experiments: processedRest,
-	};
-	return result;
+	return Object.entries(
+		JSON.parse(String(stdout)) as DVCExperimentsRepoJSONOutput
+	).map(([commitId, commitData]) => ({
+		id: commitId,
+		experiments: Object.entries(commitData).map(
+			([experimentId, experimentData]) => ({
+				id: experimentId,
+				...experimentData,
+			})
+		),
+	}));
 };
