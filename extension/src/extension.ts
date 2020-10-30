@@ -21,7 +21,11 @@ import {
 
 import { Config } from "./Config";
 import { DvcWebviewManager } from "./DvcWebviewManager";
-import { getTableData, inferDefaultOptions, AllExperiments } from "./DvcReader";
+import {
+	getExperiments,
+	inferDefaultOptions,
+	DVCExperiment,
+} from "./DvcReader";
 
 if (process.env.HOT_RELOAD) {
 	enableHotReload({ entryModule: module, loggingEnabled: true });
@@ -36,7 +40,7 @@ export class Extension {
 
 	private readonly config = new Config();
 
-	private promisedCachedTable: Promise<AllExperiments> | null = null;
+	private promisedCachedTable: Promise<DVCExperiment[]> | null = null;
 
 	private lastTableUpdate: number | null = null;
 
@@ -46,14 +50,14 @@ export class Extension {
 
 	private async updateCachedTable() {
 		const { workspaceFolders } = workspace;
-		if (!workspaceFolders)
+		if (!workspaceFolders || workspaceFolders.length === 0)
 			throw new Error(
 				"There are no folders in the Workspace to operate on!"
 			);
-		const options = await inferDefaultOptions(
+		const dvcReaderOptions = await inferDefaultOptions(
 			workspaceFolders[0].uri.fsPath
 		);
-		this.promisedCachedTable = getTableData(options);
+		this.promisedCachedTable = getExperiments(dvcReaderOptions);
 		this.lastTableUpdate = Date.now();
 		return this.promisedCachedTable;
 	}
@@ -81,8 +85,7 @@ export class Extension {
 				async () => {
 					const managerInstance = await this.manager.createNew();
 					const tableData = await this.getCachedTable();
-					const payload = JSON.stringify(tableData)
-					managerInstance.showMessage(payload);
+					managerInstance.showExperiments(tableData);
 				}
 			)
 		);

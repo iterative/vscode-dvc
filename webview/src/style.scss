@@ -15,3 +15,23 @@ body {
 
 	background-color: var(--vscode-editor-background);
 }
+
+.experiments {
+	ul {
+		padding-left: 1rem;
+	}
+	summary {
+		white-space: nowrap;
+		cursor: pointer;
+		h2, h3 {
+			margin: 0.25em;
+			white-space: nowrap;
+			display: inline-block;
+		}
+	}
+	td, th {
+		border: 1px solid var(--vscode-editor-foreground);
+		white-space: nowrap;
+		padding: 0.25rem;
+	}
+}

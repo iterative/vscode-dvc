@@ -6,12 +6,13 @@ import {
 import { observable, action, computed, when, runInAction, autorun } from "mobx";
 import { getVsCodeApi } from "./VsCodeApi";
 import { Disposable } from "@hediet/std/disposable";
+import { DVCExperiment } from "dvc-integration/src/DvcReader";
 
 declare const window: Window & WindowWithWebviewData;
 declare let __webpack_public_path__: string;
 
 interface PersistedModelState {
-	message?: string;
+	experiments: DVCExperiment[] | null;
 }
 
 export class Model {
@@ -21,7 +22,7 @@ export class Model {
 	public theme: "dark" | "light" = "light";
 
 	@observable
-	public message: string | undefined;
+	public experiments: DVCExperiment[] | null = null;
 
 	private readonly vsCodeApi = getVsCodeApi<
 		PersistedModelState,
@@ -37,7 +38,7 @@ export class Model {
 		this.theme = data.theme;
 
 		this.dispose.track(
-			this.vsCodeApi.addMessageHandler(message =>
+			this.vsCodeApi.addMessageHandler((message) =>
 				this.handleMessage(message)
 			)
 		);
@@ -59,12 +60,12 @@ export class Model {
 
 	private getState(): PersistedModelState {
 		return {
-			message: this.message,
+			experiments: this.experiments,
 		};
 	}
 
 	private setState(state: PersistedModelState) {
-		this.message = state.message;
+		this.experiments = state.experiments;
 	}
 
 	private sendMessage(message: MessageFromWebview): void {
@@ -76,8 +77,8 @@ export class Model {
 			case "setTheme":
 				this.theme = message.theme;
 				return;
-			case "showMessage":
-				this.message = message.message;
+			case "showExperiments":
+				this.experiments = message.data;
 				return;
 			default:
 				const nvr: never = message;

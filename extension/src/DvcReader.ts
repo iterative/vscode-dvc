@@ -8,30 +8,38 @@ interface DVCExtensionOptions {
 }
 
 type DVCExperimentId = "baseline" | string;
-type DataFileDict = Record<string, Record<string, string | number>>;
-export interface DVCExperiment {
-	id: string;
+export interface DataFileDict {
+	[name: string]: string | DataFileDict;
+}
+export interface DataFilesDict {
+	[filename: string]: DataFileDict;
+}
+interface DVCExperimentCore {
 	name?: string;
 	timestamp: Date;
-	params: DataFileDict;
-	metrics: DataFileDict;
+	params: DataFilesDict;
+	metrics: DataFilesDict;
 	queued: boolean;
+}
+export interface DVCExperiment extends DVCExperimentCore {
+	experimentId: DVCExperimentId;
+	commitId: DVCCommitId;
+	checkpointTip: string;
+}
+interface DVCExperimentJSONOutput extends DVCExperimentCore {
 	checkpoint_tip: string;
 }
-type DVCExperimentJSONOutput = Omit<DVCExperiment, "id">
 
 type DVCCommitId = "workspace" | string;
-type DVCExperimentsCommitJSONOutput = Record<DVCExperimentId, DVCExperimentJSONOutput>;
-export interface DVCExperimentsCommit {
-	id: DVCExperimentId;
-	experiments: DVCExperiment[];
-}
+type DVCExperimentsCommitJSONOutput = Record<
+	DVCExperimentId,
+	DVCExperimentJSONOutput
+>;
 
 type DVCExperimentsRepoJSONOutput = Record<
 	DVCCommitId,
 	DVCExperimentsCommitJSONOutput
 >;
-export type DVCExperimentsRepo = DVCExperimentsCommit[];
 
 export const inferDefaultOptions: (
 	cwd: string
@@ -58,19 +66,31 @@ const execCommand: (
 		cwd,
 	});
 
-export const getTableData: (
+export const getExperiments: (
 	options: DVCExtensionOptions
-) => Promise<DVCExperimentsRepo> = async (options) => {
+) => Promise<DVCExperiment[]> = async (options) => {
 	const { stdout } = await execCommand(options, "exp show --show-json");
-	return Object.entries(
+	const experiments = Object.entries(
 		JSON.parse(String(stdout)) as DVCExperimentsRepoJSONOutput
-	).map(([commitId, commitData]) => ({
-		id: commitId,
-		experiments: Object.entries(commitData).map(
-			([experimentId, experimentData]) => ({
-				id: experimentId,
-				...experimentData,
-			})
-		),
-	}));
+	).reduce<DVCExperiment[]>(
+		(acc, [commitId, commitData]) => [
+			...acc,
+			...Object.entries(commitData).map(
+				([
+					experimentId,
+					{ checkpoint_tip: checkpointTip, ...experiment },
+				]) => {
+					return {
+						experimentId,
+						commitId,
+						...experiment,
+						checkpointTip,
+					};
+				}
+			),
+		],
+		[]
+	);
+
+	return experiments;
 };
