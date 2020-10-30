@@ -32,9 +32,9 @@ export function getVsCodeApi<
 
 	return {
 		getState: () => api.getState(),
-		setState: arg => api.setState(arg),
+		setState: (arg) => api.setState(arg),
 		postMessage: api.postMessage,
-		addMessageHandler: handler => {
+		addMessageHandler: (handler) => {
 			const listener = (event: MessageEvent) => {
 				if (event.source === window) {
 					return;

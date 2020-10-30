@@ -12,7 +12,7 @@ module.exports = {
 		path: r("dist"),
 		filename: "[name].js",
 		chunkFilename: "[name]-[hash].js",
-		devtoolModuleFilenameTemplate: info => {
+		devtoolModuleFilenameTemplate: (info) => {
 			let result = info.absoluteResourcePath.replace(/\\/g, "/");
 			if (!result.startsWith("file:")) {
 				// Some paths already start with the file scheme.

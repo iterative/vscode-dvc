@@ -9,7 +9,7 @@ import {
 	DataFilesDict,
 	DataFileDict,
 } from "dvc-integration/src/DvcReader";
-import dayjs from "../dayjs"
+import dayjs from "../dayjs";
 import { Column, useTable } from "react-table";
 
 const recursivelyBuildColumnsFromObject: (
@@ -17,17 +17,20 @@ const recursivelyBuildColumnsFromObject: (
 	parents?: string[]
 ) => Column<any>[] = (data, parents = []) => {
 	return Object.entries(data).map(([fieldName, value]) => {
-		const currentPath = [...parents, fieldName.replace(/\./gm, '\\.')]
+		const currentPath = [...parents, fieldName.replace(/\./gm, "\\.")];
 		const base: {
 			Header: string;
 			accessor: string;
 			columns?: Column<any>[];
 		} = {
 			Header: fieldName,
-			accessor: currentPath.join('.'),
+			accessor: currentPath.join("."),
 		};
 		if (typeof value === "object") {
-			base.columns = recursivelyBuildColumnsFromObject(value, currentPath);
+			base.columns = recursivelyBuildColumnsFromObject(
+				value,
+				currentPath
+			);
 		}
 		return base;
 	});
@@ -51,7 +54,10 @@ const buildInferredColumn: (def: {
 	};
 };
 
-const TruncatedCell = ({ value }: { value: string }) => value.length > 12 ? `${value.slice(0, 4)}...${value.slice(value.length - 4)}` : value
+const TruncatedCell = ({ value }: { value: string }) =>
+	value.length > 12
+		? `${value.slice(0, 4)}...${value.slice(value.length - 4)}`
+		: value;
 
 const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 	experiments,
@@ -75,7 +81,8 @@ const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 			{
 				Header: "Time",
 				accessor: "timestamp",
-				Cell: ({ value }: { value: string }) => value ? dayjs(value).fromNow() : ""
+				Cell: ({ value }: { value: string }) =>
+					value ? dayjs(value).fromNow() : "",
 			},
 			buildInferredColumn({
 				Header: "Params",
@@ -140,8 +147,8 @@ export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
 					{experiments ? (
 						<ExperimentsTable experiments={experiments} />
 					) : (
-							<p>Loading experiments...</p>
-						)}
+						<p>Loading experiments...</p>
+					)}
 				</div>
 			);
 		} catch (e) {
