@@ -12,19 +12,23 @@ import {
 import dayjs from "../dayjs";
 import { Column, useTable } from "react-table";
 
+const arrayAccessor: <T = string>(
+	pathArray: string[]
+) => (originalRow: any) => T = (pathArray) => (originalRow) =>
+	pathArray.reduce((acc, cur) => acc[cur], originalRow);
+
 const recursivelyBuildColumnsFromObject: (
 	data: DataFileDict,
 	parents?: string[]
 ) => Column<any>[] = (data, parents = []) => {
 	return Object.entries(data).map(([fieldName, value]) => {
-		const currentPath = [...parents, fieldName.replace(/\./gm, "\\.")];
-		const base: {
-			Header: string;
-			accessor: string;
+		const currentPath = [...parents, fieldName];
+		const base: Column<any> & {
 			columns?: Column<any>[];
 		} = {
 			Header: fieldName,
-			accessor: currentPath.join("."),
+			id: currentPath.join("___"),
+			accessor: arrayAccessor(currentPath),
 		};
 		if (typeof value === "object") {
 			base.columns = recursivelyBuildColumnsFromObject(
