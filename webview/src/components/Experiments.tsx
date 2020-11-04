@@ -65,7 +65,7 @@ const TruncatedCell = ({ value }: { value: string }) =>
 		? `${value.slice(0, 4)}...${value.slice(value.length - 4)}`
 		: value;
 
-const Nothing = <i>Nothing</i>;
+const Blank = <i>Blank</i>;
 
 export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 	experiments,
@@ -88,7 +88,7 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 				Header: "Time",
 				accessor: "timestamp",
 				Cell: ({ value }: { value: string }) =>
-					value ? dayjs(value).fromNow() : Nothing,
+					value ? dayjs(value).fromNow() : Blank,
 			},
 			buildInferredColumn({
 				Header: "Params",
@@ -129,7 +129,7 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 			defaultColumn: {
 				Cell: (instance: any) => {
 					console.log(instance);
-					return instance.value === "" ? Nothing : instance.value;
+					return instance.value === "" ? Blank : instance.value;
 				},
 			},
 		},
