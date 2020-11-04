@@ -8,7 +8,6 @@ import {
 	useGroupBy,
 	useExpanded,
 	useSortBy,
-	TableInstance,
 } from "react-table";
 import cx from "classnames";
 
@@ -76,7 +75,6 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 				Header: "Commit",
 				accessor: "commitId",
 				Cell: TruncatedCell,
-				expanded: true,
 			},
 			{
 				Header: "Experiment",
@@ -88,7 +86,7 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 				Header: "Time",
 				accessor: "timestamp",
 				Cell: ({ value }: { value: string }) =>
-					value ? dayjs(value).fromNow() : Blank,
+					value === "" ? Blank : value && dayjs(value).fromNow(),
 			},
 			buildInferredColumn({
 				Header: "Params",
@@ -116,6 +114,7 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 		getTableProps,
 		getTableBodyProps,
 		prepareRow,
+		toggleAllRowsExpanded,
 		groupedColumns,
 		sortedColumns,
 		headerGroups,
@@ -156,6 +155,10 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 			});
 		}
 	);
+
+	React.useEffect(() => {
+		toggleAllRowsExpanded(true);
+	}, []);
 
 	return (
 		<div>
