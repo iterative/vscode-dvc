@@ -46,8 +46,8 @@ import {
 	UseSortByInstanceProps,
 	UseSortByOptions,
 	UseSortByState,
-    HeaderGroup,
-    Column
+	HeaderGroup,
+	Column,
 } from "react-table";
 
 declare module "react-table" {
@@ -56,8 +56,7 @@ declare module "react-table" {
 	export interface HeaderGroup<D extends Record<string, unknown>>
 		extends HeaderGroup {}
 
-	export interface Column<D extends Record<string, unknown>>
-		extends Column {}
+	export interface Column<D extends Record<string, unknown>> extends Column {}
 
 	export interface TableOptions<
 		D extends Record<string, unknown>
@@ -93,9 +92,9 @@ declare module "react-table" {
 			UseRowSelectInstanceProps<D>,
 			UseRowStateInstanceProps<D>,
 			UseSortByInstanceProps<D> {
-				sortedColumns: ColumnInstance<D>[],
-				groupedColumns: ColumnInstance<D>[]
-			}
+		sortedColumns: ColumnInstance<D>[];
+		groupedColumns: ColumnInstance<D>[];
+	}
 
 	export interface TableState<
 		D extends Record<string, unknown> = Record<string, unknown>
