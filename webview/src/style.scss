@@ -34,4 +34,14 @@ body {
 		white-space: nowrap;
 		padding: 0.25rem;
 	}
+	.grouped-column-cell {
+		background-color: var(--vscode-button-background);
+	}
+	.grouped-cell, .grouped-heading {
+		transition: 0.2s all;
+		background-color: var(--vscode-button-background);
+		&:hover {
+			background-color: var(--vscode-button-hoverBackground);
+		}
+	}
 }
