@@ -8,20 +8,46 @@ import {
 	useGroupBy,
 	useExpanded,
 	useSortBy,
+	useFlexLayout,
 } from "react-table";
 import cx from "classnames";
+
+interface ObjectEntriesWithParents {
+	skippedKeys: string[];
+	entries: [string, any][];
+}
+
+export const getBranchingEntries: (
+	input: Record<string, any>,
+	skippedKeys?: string[]
+) => ObjectEntriesWithParents = (input, skippedKeys = []) => {
+	const entries = Object.entries(input);
+	if (entries.length === 1) {
+		const [key, value] = entries[0];
+		const newPath = [...skippedKeys, key];
+		if (typeof value === "object") {
+			return getBranchingEntries(value, newPath);
+		}
+	}
+	return {
+		skippedKeys: skippedKeys,
+		entries: entries,
+	};
+};
 
 const arrayAccessor: <T = string>(
 	pathArray: string[]
 ) => (originalRow: any) => T = (pathArray) => (originalRow) =>
 	pathArray.reduce((acc, cur) => acc[cur], originalRow);
 
-const recursivelyBuildColumnsFromObject: (
-	data: DataFileDict,
+const buildColumnsFromSampleObject: (
+	data: Record<string, any>,
 	parents?: string[]
-) => Column<any>[] = (data, parents = []) => {
-	return Object.entries(data).map(([fieldName, value]) => {
-		const currentPath = [...parents, fieldName];
+) => Column<any>[] = (data, oldParents = []) => {
+	const { skippedKeys, entries } = getBranchingEntries(data);
+	const newParents = [...oldParents, ...skippedKeys];
+	return entries.map(([fieldName, value]) => {
+		const currentPath = [...newParents, fieldName];
 		const base: Column<any> & {
 			columns?: Column<any>[];
 		} = {
@@ -33,29 +59,29 @@ const recursivelyBuildColumnsFromObject: (
 			return {
 				...base,
 				disableSortBy: true,
-				columns: recursivelyBuildColumnsFromObject(value, currentPath),
+				columns: buildColumnsFromSampleObject(value, currentPath),
 			};
 		}
 		return base;
 	});
 };
 
-const buildInferredColumn: (def: {
+const buildNestedColumnFromExperiments: (def: {
 	Header: string;
 	experiments: DVCExperiment[];
 	accessor: keyof DVCExperiment;
-}) => Column<DVCExperiment> | null = ({ Header, accessor, experiments }) => {
-	if (!experiments || experiments.length <= 0) {
-		return null;
-	}
+}) => Column<DVCExperiment> = ({ Header, accessor, experiments }) => {
 	return {
 		Header,
 		accessor,
 		disableSortBy: true,
-		columns: recursivelyBuildColumnsFromObject(
-			experiments[0][accessor] as DataFileDict,
-			[accessor]
-		),
+		columns:
+			!experiments || experiments.length === 0
+				? []
+				: buildColumnsFromSampleObject(
+						experiments[0][accessor] as DataFileDict,
+						[accessor]
+				  ),
 	};
 };
 
@@ -88,12 +114,12 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 				Cell: ({ value }: { value: string }) =>
 					value === "" ? Blank : value && dayjs(value).fromNow(),
 			},
-			buildInferredColumn({
+			buildNestedColumnFromExperiments({
 				Header: "Params",
 				accessor: "params",
 				experiments,
 			}),
-			buildInferredColumn({
+			buildNestedColumnFromExperiments({
 				Header: "Metrics",
 				accessor: "metrics",
 				experiments,
@@ -102,11 +128,26 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 				Header: "Queued",
 				accessor: "queued",
 			},
-		].filter(Boolean) as ColumnInstance<DVCExperiment>[];
+		] as ColumnInstance<DVCExperiment>[];
 	}, [experiments]);
 	const initialState = React.useMemo(
 		() => ({
 			groupBy: ["commitId"],
+		}),
+		[]
+	);
+	const defaultColumn: Partial<Column<DVCExperiment>> = React.useMemo(
+		() => ({
+			width: 120,
+			Cell: ({ value }: { value?: string | number }) => {
+				return value === ""
+					? Blank
+					: typeof value === "number"
+					? value.toLocaleString(undefined, {
+							maximumFractionDigits: 2,
+					  })
+					: value;
+			},
 		}),
 		[]
 	);
@@ -115,30 +156,31 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 		getTableBodyProps,
 		prepareRow,
 		toggleAllRowsExpanded,
+		flatHeaders,
+		headers,
+		columns: instanceColumns,
 		groupedColumns,
 		sortedColumns,
 		headerGroups,
 		rows,
-	} = useTable(
+	} = useTable<DVCExperiment>(
 		{
 			columns,
 			data: experiments,
 			initialState,
 			isMultiSortEvent: () => true,
-			defaultColumn: {
-				Cell: (instance: any) => {
-					console.log(instance);
-					return instance.value === "" ? Blank : instance.value;
-				},
-			},
+			defaultColumn,
 		},
 		useGroupBy,
 		useSortBy,
 		useExpanded,
+		useFlexLayout,
 		(hooks) => {
 			hooks.useInstance.push((instance) => {
-				const { allColumns } = instance;
-				const [groupedColumns, sortedColumns] = allColumns.reduce<
+				const { headerGroups } = instance;
+				const [groupedColumns, sortedColumns] = (headerGroups[
+					headerGroups.length - 1
+				].headers as ColumnInstance<DVCExperiment>[]).reduce<
 					[
 						ColumnInstance<DVCExperiment>[],
 						ColumnInstance<DVCExperiment>[]
@@ -160,52 +202,107 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 		toggleAllRowsExpanded(true);
 	}, []);
 
+	const ColumnOptionSelector: React.FC<{
+		label: string;
+		columns: ColumnInstance<DVCExperiment>[];
+		Button: React.FC<ColumnInstance<DVCExperiment>>;
+	}> = ({ label, columns, Button }) => (
+		<div>
+			<h3>{label}</h3>
+			<div>
+				{columns.map((column) => (
+					<Button key={column.id} {...column} />
+				))}
+			</div>
+		</div>
+	);
+
+	const lastHeaderGroupIndex = headerGroups.length - 1;
+	const lastHeaderGroup = headerGroups[lastHeaderGroupIndex];
+
 	return (
 		<div>
 			{sortedColumns.length > 0 && (
-				<div>
-					<b>Sorts: </b>
-					{sortedColumns.map(
-						({ getSortByToggleProps, render, isSortedDesc }) => (
-							<button {...getSortByToggleProps()}>
-								{render("Header")} (
-								{isSortedDesc ? "DESC" : "ASC"})
-							</button>
-						)
+				<ColumnOptionSelector
+					label="Sorts"
+					columns={sortedColumns}
+					Button={({
+						getSortByToggleProps,
+						render,
+						isSortedDesc,
+					}) => (
+						<button {...getSortByToggleProps()}>
+							{render("Header")} ({isSortedDesc ? "DESC" : "ASC"})
+						</button>
 					)}
-				</div>
+				/>
 			)}
 			{groupedColumns.length > 0 && (
-				<div>
-					<b>Grouped by: </b>
-					{groupedColumns.map(({ getGroupByToggleProps, render }) => (
+				<ColumnOptionSelector
+					label="Groups"
+					columns={groupedColumns}
+					Button={({ getGroupByToggleProps, render }) => (
 						<button {...getGroupByToggleProps()}>
 							{render("Header")}
 						</button>
-					))}
-				</div>
+					)}
+				/>
 			)}
-			<table {...getTableProps()}>
-				<thead>
-					{headerGroups.map((headerGroup) => (
-						<tr {...headerGroup.getHeaderGroupProps()}>
-							{headerGroup.headers.map((column) => (
-								<th
-									{...column.getHeaderProps(
-										column.getSortByToggleProps({
-											className: cx({
-												"grouped-heading":
-													column.isGrouped,
-											}),
-										})
-									)}
-								>
-									{column.render("Header")}
+			<div className="table" {...getTableProps()}>
+				<div className="thead">
+					{headerGroups
+						.slice(0, lastHeaderGroupIndex)
+						.map((headerGroup) => (
+							<div
+								className="tr"
+								{...headerGroup.getHeaderGroupProps({
+									className: "parent-headers-row",
+								})}
+							>
+								{headerGroup.headers.map((column) => (
+									<span
+										className="th"
+										{...column.getHeaderProps({
+											className: cx(
+												column.placeholderOf
+													? "placeholder-header-cell"
+													: "parent-header-cell",
+												{
+													"grouped-header":
+														column.isGrouped,
+												}
+											),
+										})}
+									>
+										<div>{column.render("Header")}</div>
+									</span>
+								))}
+							</div>
+						))}
+					<div
+						className="tr"
+						{...lastHeaderGroup.getHeaderGroupProps({
+							className: "headers-row",
+						})}
+					>
+						{lastHeaderGroup.headers.map((column) => (
+							<span
+								className="th"
+								{...column.getHeaderProps(
+									column.getSortByToggleProps({
+										className: cx({
+											"grouped-header": column.isGrouped,
+										}),
+									})
+								)}
+							>
+								<div>{column.render("Header")}</div>
+								<div>
 									<span>
 										{column.isSorted
 											? column.isSortedDesc
-												? " (DESC)"
-												: " (ASC)"
+												? " (^)"
+												: " (v)"
 											: ""}
 									</span>
 									{column.isGrouped ? (
@@ -217,28 +314,33 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 										</span>
 									) : column.canGroupBy ? (
 										// If the column can be grouped, let's add a toggle
-										<span
-											{...column.getGroupByToggleProps()}
-										>
+										<>
 											{" "}
-											<span>(grp)</span>
-										</span>
+											<span
+												{...column.getGroupByToggleProps()}
+											>
+												(G)
+											</span>
+										</>
 									) : null}
-								</th>
-							))}
-						</tr>
-					))}
-				</thead>
-				<tbody {...getTableBodyProps()}>
+								</div>
+							</span>
+						))}
+					</div>
+				</div>
+				<div className="tbody" {...getTableBodyProps()}>
 					{rows.map((row) => {
 						prepareRow(row);
 						return (
-							<tr {...row.getRowProps()}>
+							<div className="tr" {...row.getRowProps()}>
 								{row.cells.map((cell) => {
 									return (
-										<td
+										<div
+											className="td"
 											{...cell.getCellProps({
 												className: cx({
+													"group-placeholder":
+														cell.isPlaceholder,
 													"grouped-column-cell":
 														cell.column.isGrouped,
 													"grouped-cell":
@@ -263,14 +365,14 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 											) : cell.isPlaceholder ? null : (
 												cell.render("Cell")
 											)}
-										</td>
+										</div>
 									);
 								})}
-							</tr>
+							</div>
 						);
 					})}
-				</tbody>
-			</table>
+				</div>
+			</div>
 		</div>
 	);
 };

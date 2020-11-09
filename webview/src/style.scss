@@ -23,25 +23,48 @@ body {
 	summary {
 		white-space: nowrap;
 		cursor: pointer;
-		h2, h3 {
+		h2,
+		h3 {
 			margin: 0.25em;
 			white-space: nowrap;
 			display: inline-block;
 		}
 	}
-	td, th {
-		border: 1px solid var(--vscode-editor-foreground);
+	.td,
+	.th {
 		white-space: nowrap;
+	}
+	.td {
+		border: 1px solid var(--vscode-editor-foreground);
 		padding: 0.25rem;
+		font-size: 1.1rem;
+		text-align: center;
 	}
-	.grouped-column-cell {
-		background-color: var(--vscode-button-background);
-	}
-	.grouped-cell, .grouped-heading {
+	.grouped-cell,
+	.grouped-header {
 		transition: 0.2s all;
 		background-color: var(--vscode-button-background);
 		&:hover {
 			background-color: var(--vscode-button-hoverBackground);
 		}
+	}
+	.parent-header-cell {
+		border: 1px solid var(--vscode-foreground);
+		padding: 0.1rem 0.2rem;
+		font-size: 0.9rem;
+	}
+	.th, .td, .grouped-header, .grouped-column-cell {
+		border: 2px solid white;
+	}
+	.headers-row {
+		text-align: center;
+		font-weight: bold;
+		.th {
+			padding: 0.4rem 0.25rem;
+		}
+		font-size: 1.2rem;
+	}
+	.group-placeholder {
+		flex: 0 0 1rem;
 	}
 }
