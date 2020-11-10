@@ -36,7 +36,7 @@ type DVCExperimentsCommitJSONOutput = Record<
 	DVCExperimentJSONOutput
 >;
 
-type DVCExperimentsRepoJSONOutput = Record<
+export type DVCExperimentsRepoJSONOutput = Record<
 	DVCCommitId,
 	DVCExperimentsCommitJSONOutput
 >;
@@ -68,29 +68,7 @@ const execCommand: (
 
 export const getExperiments: (
 	options: DVCExtensionOptions
-) => Promise<DVCExperiment[]> = async (options) => {
+) => Promise<DVCExperimentsRepoJSONOutput> = async (options) => {
 	const { stdout } = await execCommand(options, "exp show --show-json");
-	const experiments = Object.entries(
-		JSON.parse(String(stdout)) as DVCExperimentsRepoJSONOutput
-	).reduce<DVCExperiment[]>(
-		(acc, [commitId, commitData]) => [
-			...acc,
-			...Object.entries(commitData).map(
-				([
-					experimentId,
-					{ checkpoint_tip: checkpointTip, ...experiment },
-				]) => {
-					return {
-						experimentId,
-						commitId,
-						...experiment,
-						checkpointTip,
-					};
-				}
-			),
-		],
-		[]
-	);
-
-	return experiments;
+	return JSON.parse(String(stdout));
 };

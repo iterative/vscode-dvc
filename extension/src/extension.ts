@@ -25,6 +25,7 @@ import {
 	getExperiments,
 	inferDefaultOptions,
 	DVCExperiment,
+	DVCExperimentsRepoJSONOutput,
 } from "./DvcReader";
 
 if (process.env.HOT_RELOAD) {
@@ -40,7 +41,7 @@ export class Extension {
 
 	private readonly config = new Config();
 
-	private promisedCachedTable: Promise<DVCExperiment[]> | null = null;
+	private promisedExperimentsData: Promise<DVCExperimentsRepoJSONOutput> | null = null;
 
 	private lastTableUpdate: number | null = null;
 
@@ -57,9 +58,9 @@ export class Extension {
 		const dvcReaderOptions = await inferDefaultOptions(
 			workspaceFolders[0].uri.fsPath
 		);
-		this.promisedCachedTable = getExperiments(dvcReaderOptions);
+		this.promisedExperimentsData = getExperiments(dvcReaderOptions);
 		this.lastTableUpdate = Date.now();
-		return this.promisedCachedTable;
+		return this.promisedExperimentsData;
 	}
 
 	private async getCachedTable() {
@@ -68,7 +69,7 @@ export class Extension {
 			Date.now() - this.lastTableUpdate >= updateInterval
 		)
 			await this.updateCachedTable();
-		return this.promisedCachedTable;
+		return this.promisedExperimentsData;
 	}
 
 	constructor() {

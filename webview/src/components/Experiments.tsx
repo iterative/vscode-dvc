@@ -1,5 +1,9 @@
 import * as React from "react";
-import { DVCExperiment, DataFileDict } from "dvc-integration/src/DvcReader";
+import {
+	DVCExperiment,
+	DataFileDict,
+	DVCExperimentsRepoJSONOutput,
+} from "dvc-integration/src/DvcReader";
 import dayjs from "../dayjs";
 import {
 	Column,
@@ -11,6 +15,28 @@ import {
 	useFlexLayout,
 } from "react-table";
 import cx from "classnames";
+
+const parseExperiments = (experimentsData: DVCExperimentsRepoJSONOutput) => {
+	return Object.entries(experimentsData).reduce<DVCExperiment[]>(
+		(acc, [commitId, commitData]) => [
+			...acc,
+			...Object.entries(commitData).map(
+				([
+					experimentId,
+					{ checkpoint_tip: checkpointTip, ...experiment },
+				]) => {
+					return {
+						experimentId,
+						commitId,
+						...experiment,
+						checkpointTip,
+					};
+				}
+			),
+		],
+		[]
+	);
+};
 
 interface ObjectEntriesWithParents {
 	skippedKeys: string[];
@@ -68,18 +94,18 @@ const buildColumnsFromSampleObject: (
 
 const buildNestedColumnFromExperiments: (def: {
 	Header: string;
-	experiments: DVCExperiment[];
+	data: DVCExperiment[];
 	accessor: keyof DVCExperiment;
-}) => Column<DVCExperiment> = ({ Header, accessor, experiments }) => {
+}) => Column<DVCExperiment> = ({ Header, accessor, data }) => {
 	return {
 		Header,
 		accessor,
 		disableSortBy: true,
 		columns:
-			!experiments || experiments.length === 0
+			!data || data.length === 0
 				? []
 				: buildColumnsFromSampleObject(
-						experiments[0][accessor] as DataFileDict,
+						data[0][accessor] as DataFileDict,
 						[accessor]
 				  ),
 	};
@@ -92,9 +118,12 @@ const TruncatedCell = ({ value }: { value: string }) =>
 
 const Blank = <i>Blank</i>;
 
-export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
-	experiments,
-}) => {
+export const ExperimentsTable: React.FC<{
+	experiments: DVCExperimentsRepoJSONOutput;
+}> = ({ experiments }) => {
+	const data = React.useMemo(() => parseExperiments(experiments), [
+		experiments,
+	]);
 	const columns = React.useMemo<ColumnInstance<DVCExperiment>[]>(() => {
 		return [
 			{
@@ -117,12 +146,12 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 			buildNestedColumnFromExperiments({
 				Header: "Params",
 				accessor: "params",
-				experiments,
+				data,
 			}),
 			buildNestedColumnFromExperiments({
 				Header: "Metrics",
 				accessor: "metrics",
-				experiments,
+				data,
 			}),
 			{
 				Header: "Queued",
@@ -156,9 +185,6 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 		getTableBodyProps,
 		prepareRow,
 		toggleAllRowsExpanded,
-		flatHeaders,
-		headers,
-		columns: instanceColumns,
 		groupedColumns,
 		sortedColumns,
 		headerGroups,
@@ -166,7 +192,7 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 	} = useTable<DVCExperiment>(
 		{
 			columns,
-			data: experiments,
+			data,
 			initialState,
 			isMultiSortEvent: () => true,
 			defaultColumn,
@@ -377,9 +403,9 @@ export const ExperimentsTable: React.FC<{ experiments: DVCExperiment[] }> = ({
 	);
 };
 
-const Experiments: React.FC<{ experiments: DVCExperiment[] | null }> = ({
-	experiments,
-}) => (
+const Experiments: React.FC<{
+	experiments: DVCExperimentsRepoJSONOutput | null;
+}> = ({ experiments }) => (
 	<div className="experiments">
 		<h1>Experiments</h1>
 		{experiments ? (

@@ -1,4 +1,4 @@
-import { DVCExperiment } from "./DvcReader";
+import { DVCExperimentsRepoJSONOutput } from "./DvcReader";
 
 export interface WindowWithWebviewData {
 	webviewData: {
@@ -20,5 +20,5 @@ export type MessageToWebview =
 	  }
 	| {
 			kind: "showExperiments";
-			data: DVCExperiment[] | null;
+			data: DVCExperimentsRepoJSONOutput | null;
 	  };

@@ -9,7 +9,7 @@ import {
 	MessageToWebview,
 	WindowWithWebviewData,
 } from "./webviewContract";
-import { DVCExperiment } from "./DvcReader";
+import { DVCExperiment, DVCExperimentsRepoJSONOutput } from "./DvcReader";
 
 export class DvcWebview {
 	public static viewKey = "dvc-view";
@@ -148,7 +148,7 @@ export class DvcWebview {
 		}
 	}
 
-	public showExperiments(data: DVCExperiment[] | null): void {
+	public showExperiments(data: DVCExperimentsRepoJSONOutput | null): void {
 		this.sendMessage({
 			kind: "showExperiments",
 			data,

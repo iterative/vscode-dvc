@@ -6,13 +6,13 @@ import {
 import { observable, action, computed, when, runInAction, autorun } from "mobx";
 import { getVsCodeApi } from "./VsCodeApi";
 import { Disposable } from "@hediet/std/disposable";
-import { DVCExperiment } from "dvc-integration/src/DvcReader";
+import { DVCExperimentsRepoJSONOutput } from "dvc-integration/src/DvcReader";
 
 declare const window: Window & WindowWithWebviewData;
 declare let __webpack_public_path__: string;
 
 interface PersistedModelState {
-	experiments: DVCExperiment[] | null;
+	experiments: DVCExperimentsRepoJSONOutput | null;
 }
 
 export class Model {
@@ -22,7 +22,7 @@ export class Model {
 	public theme: "dark" | "light" = "light";
 
 	@observable
-	public experiments: DVCExperiment[] | null = null;
+	public experiments: DVCExperimentsRepoJSONOutput | null = null;
 
 	private readonly vsCodeApi = getVsCodeApi<
 		PersistedModelState,
