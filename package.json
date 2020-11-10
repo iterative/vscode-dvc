@@ -5,6 +5,7 @@
 		"./webview"
 	],
 	"scripts": {
+		"format": "yarn workspace dvc-integration format; yarn workspace dvc-vscode-webview format",
 		"build": "yarn build-ui && yarn build-extension",
 		"build-ui": "yarn workspace dvc-vscode-webview build",
 		"build-extension": "yarn workspace dvc-integration build"
