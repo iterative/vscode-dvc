@@ -7,34 +7,34 @@ interface DVCExtensionOptions {
 	cwd: string;
 }
 
-type DVCExperimentId = "baseline" | string;
 export interface DataFileDict {
 	[name: string]: string | DataFileDict;
 }
 export interface DataFilesDict {
 	[filename: string]: DataFileDict;
 }
-interface DVCExperimentCore {
+interface DVCExperimentCommon {
 	name?: string;
 	timestamp: Date;
 	params: DataFilesDict;
 	metrics: DataFilesDict;
 	queued: boolean;
 }
-export interface DVCExperiment extends DVCExperimentCore {
-	experimentId: DVCExperimentId;
-	commitId: DVCCommitId;
+export interface DVCExperiment extends DVCExperimentCommon {
 	checkpointTip: string;
 }
-interface DVCExperimentJSONOutput extends DVCExperimentCore {
+export interface DVCExperimentWithSha extends DVCExperiment {
+	sha: string;
+}
+export interface DVCExperimentJSONOutput extends DVCExperimentCommon {
 	checkpoint_tip: string;
 }
 
 type DVCCommitId = "workspace" | string;
-type DVCExperimentsCommitJSONOutput = Record<
-	DVCExperimentId,
-	DVCExperimentJSONOutput
->;
+interface DVCExperimentsCommitJSONOutput
+	extends Record<string, DVCExperimentJSONOutput> {
+	baseline: DVCExperimentJSONOutput;
+}
 
 export type DVCExperimentsRepoJSONOutput = Record<
 	DVCCommitId,

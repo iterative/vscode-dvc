@@ -1,11 +1,14 @@
 import * as React from "react";
+const { useCallback, useMemo } = React;
 import {
 	DVCExperiment,
 	DataFileDict,
 	DVCExperimentsRepoJSONOutput,
+	DVCExperimentJSONOutput,
 } from "dvc-integration/src/DvcReader";
 import dayjs from "../dayjs";
 import {
+	Row,
 	Column,
 	ColumnInstance,
 	useTable,
@@ -16,24 +19,34 @@ import {
 } from "react-table";
 import cx from "classnames";
 
+interface DVCExperimentRow extends DVCExperiment {
+	subRows?: DVCExperimentRow[];
+}
+
+const parseExperimentJSONEntry: (
+	sha: string,
+	experiment: DVCExperimentJSONOutput
+) => DVCExperiment = (sha, { checkpoint_tip, ...rest }) => ({
+	...rest,
+	checkpointTip: checkpoint_tip,
+	sha,
+});
+
 const parseExperiments = (experimentsData: DVCExperimentsRepoJSONOutput) => {
-	return Object.entries(experimentsData).reduce<DVCExperiment[]>(
-		(acc, [commitId, commitData]) => [
-			...acc,
-			...Object.entries(commitData).map(
-				([
-					experimentId,
-					{ checkpoint_tip: checkpointTip, ...experiment },
-				]) => {
-					return {
-						experimentId,
-						commitId,
-						...experiment,
-						checkpointTip,
-					};
-				}
-			),
-		],
+	return Object.entries(experimentsData).reduce<DVCExperimentRow[]>(
+		(acc, [commitId, { baseline, ...childExperiments }]) => {
+			return [
+				...acc,
+				{
+					...parseExperimentJSONEntry(commitId, baseline),
+					subRows: Object.entries(
+						childExperiments
+					).map(([sha, experiment]) =>
+						parseExperimentJSONEntry(sha, experiment)
+					),
+				},
+			];
+		},
 		[]
 	);
 };
@@ -94,9 +107,9 @@ const buildColumnsFromSampleObject: (
 
 const buildNestedColumnFromExperiments: (def: {
 	Header: string;
-	data: DVCExperiment[];
-	accessor: keyof DVCExperiment;
-}) => Column<DVCExperiment> = ({ Header, accessor, data }) => {
+	data: DVCExperimentRow[];
+	accessor: keyof DVCExperimentRow;
+}) => Column<DVCExperimentRow> = ({ Header, accessor, data }) => {
 	return {
 		Header,
 		accessor,
@@ -121,21 +134,31 @@ const Blank = <i>Blank</i>;
 export const ExperimentsTable: React.FC<{
 	experiments: DVCExperimentsRepoJSONOutput;
 }> = ({ experiments }) => {
-	const data = React.useMemo(() => parseExperiments(experiments), [
-		experiments,
-	]);
-	const columns = React.useMemo<ColumnInstance<DVCExperiment>[]>(() => {
-		return [
-			{
-				Header: "Commit",
-				accessor: "commitId",
-				Cell: TruncatedCell,
+	const [initialState, defaultColumn] = useMemo(() => {
+		const initialState = {};
+		const defaultColumn: Partial<Column<DVCExperimentRow>> = {
+			Cell: ({ value }: { value?: string | number }) => {
+				return value === ""
+					? Blank
+					: typeof value === "number"
+					? value.toLocaleString(undefined, {
+							maximumFractionDigits: 2,
+					  })
+					: value;
 			},
+		};
+		return [initialState, defaultColumn];
+	}, []);
+
+	const [data, columns] = useMemo(() => {
+		const data = parseExperiments(experiments);
+		const columns = [
 			{
 				Header: "Experiment",
-				accessor: "experimentId",
+				accessor: (item: any) => item.name || item.sha,
 				Cell: TruncatedCell,
 				disableGroupBy: true,
+				width: 150,
 			},
 			{
 				Header: "Time",
@@ -157,39 +180,22 @@ export const ExperimentsTable: React.FC<{
 				Header: "Queued",
 				accessor: "queued",
 			},
-		] as ColumnInstance<DVCExperiment>[];
+		] as Column<DVCExperimentRow>[];
+		return [data, columns];
 	}, [experiments]);
-	const initialState = React.useMemo(
-		() => ({
-			groupBy: ["commitId"],
-		}),
-		[]
-	);
-	const defaultColumn: Partial<Column<DVCExperiment>> = React.useMemo(
-		() => ({
-			width: 120,
-			Cell: ({ value }: { value?: string | number }) => {
-				return value === ""
-					? Blank
-					: typeof value === "number"
-					? value.toLocaleString(undefined, {
-							maximumFractionDigits: 2,
-					  })
-					: value;
-			},
-		}),
-		[]
-	);
+
 	const {
 		getTableProps,
 		getTableBodyProps,
 		prepareRow,
 		toggleAllRowsExpanded,
+		state,
 		groupedColumns,
 		sortedColumns,
 		headerGroups,
 		rows,
-	} = useTable<DVCExperiment>(
+		toggleCommitUngroup,
+	} = useTable<DVCExperimentRow>(
 		{
 			columns,
 			data,
@@ -197,31 +203,58 @@ export const ExperimentsTable: React.FC<{
 			isMultiSortEvent: () => true,
 			defaultColumn,
 		},
+		(hooks) => {
+			hooks.stateReducers.push((state, action) => {
+				if (action.type === "set-ungrouped") {
+					return {
+						...state,
+						ungrouped: action.setting || !state.ungrouped,
+					};
+				}
+			});
+			hooks.useInstance.push(function ungroupByCommit(instance) {
+				const {
+					rows,
+					dispatch,
+					state: { ungrouped },
+				} = instance;
+				const toggleCommitUngroup = useCallback(
+					(setting) =>
+						dispatch({
+							type: "set-ungrouped",
+							setting,
+						}),
+					[dispatch]
+				);
+				Object.assign(instance, {
+					toggleCommitUngroup,
+				});
+				if (!ungrouped) return;
+				const ungroupedRows = rows.reduce<Row<DVCExperimentRow>[]>(
+					(acc, row) => {
+						if (row.subRows) {
+							const result = [
+								...acc,
+								{ ...row, subRows: [] },
+								...row.subRows,
+							].map((item, index) => ({ ...item, index }));
+							return result;
+						} else {
+							return [...acc, row];
+						}
+					},
+					[]
+				);
+				Object.assign(instance, {
+					preSortedRows: rows,
+					rows: ungroupedRows,
+				});
+			});
+		},
 		useGroupBy,
 		useSortBy,
 		useExpanded,
-		useFlexLayout,
-		(hooks) => {
-			hooks.useInstance.push((instance) => {
-				const { headerGroups } = instance;
-				const [groupedColumns, sortedColumns] = (headerGroups[
-					headerGroups.length - 1
-				].headers as ColumnInstance<DVCExperiment>[]).reduce<
-					[
-						ColumnInstance<DVCExperiment>[],
-						ColumnInstance<DVCExperiment>[]
-					]
-				>(
-					([groupedAcc, sortedAcc], column) => [
-						column.isGrouped ? [...groupedAcc, column] : groupedAcc,
-						column.isSorted ? [...sortedAcc, column] : sortedAcc,
-					],
-					[[], []]
-				);
-
-				Object.assign(instance, { groupedColumns, sortedColumns });
-			});
-		}
+		useFlexLayout
 	);
 
 	React.useEffect(() => {
@@ -230,8 +263,8 @@ export const ExperimentsTable: React.FC<{
 
 	const ColumnOptionSelector: React.FC<{
 		label: string;
-		columns: ColumnInstance<DVCExperiment>[];
-		Button: React.FC<ColumnInstance<DVCExperiment>>;
+		columns: ColumnInstance<DVCExperimentRow>[];
+		Button: React.FC<ColumnInstance<DVCExperimentRow>>;
 	}> = ({ label, columns, Button }) => (
 		<div>
 			<h3>{label}</h3>
@@ -248,32 +281,9 @@ export const ExperimentsTable: React.FC<{
 
 	return (
 		<div>
-			{sortedColumns.length > 0 && (
-				<ColumnOptionSelector
-					label="Sorts"
-					columns={sortedColumns}
-					Button={({
-						getSortByToggleProps,
-						render,
-						isSortedDesc,
-					}) => (
-						<button {...getSortByToggleProps()}>
-							{render("Header")} ({isSortedDesc ? "DESC" : "ASC"})
-						</button>
-					)}
-				/>
-			)}
-			{groupedColumns.length > 0 && (
-				<ColumnOptionSelector
-					label="Groups"
-					columns={groupedColumns}
-					Button={({ getGroupByToggleProps, render }) => (
-						<button {...getGroupByToggleProps()}>
-							{render("Header")}
-						</button>
-					)}
-				/>
-			)}
+			<button onClick={() => toggleCommitUngroup()}>
+				{state.ungrouped ? "Group" : "Ungroup"} by Commit
+			</button>
 			<div className="table" {...getTableProps()}>
 				<div className="thead">
 					{headerGroups
@@ -313,24 +323,21 @@ export const ExperimentsTable: React.FC<{
 					>
 						{lastHeaderGroup.headers.map((column) => (
 							<span
-								className="th"
-								{...column.getHeaderProps(
-									column.getSortByToggleProps({
-										className: cx({
-											"grouped-header": column.isGrouped,
-										}),
-									})
-								)}
+								{...column.getHeaderProps({
+									className: cx("th", {
+										"grouped-header": column.isGrouped,
+									}),
+								})}
 							>
 								<div>{column.render("Header")}</div>
 								<div>
-									<span>
+									<button {...column.getSortByToggleProps()}>
 										{column.isSorted
 											? column.isSortedDesc
-												? " (^)"
-												: " (v)"
-											: ""}
-									</span>
+												? "(DESC)"
+												: "(ASC)"
+											: "(sort)"}
+									</button>
 									{column.isGrouped ? (
 										<span
 											{...column.getGroupByToggleProps()}
@@ -338,16 +345,6 @@ export const ExperimentsTable: React.FC<{
 											{" "}
 											<span>(X)</span>
 										</span>
-									) : column.canGroupBy ? (
-										// If the column can be grouped, let's add a toggle
-										<>
-											{" "}
-											<span
-												{...column.getGroupByToggleProps()}
-											>
-												(G)
-											</span>
-										</>
 									) : null}
 								</div>
 							</span>
@@ -357,9 +354,50 @@ export const ExperimentsTable: React.FC<{
 				<div className="tbody" {...getTableBodyProps()}>
 					{rows.map((row) => {
 						prepareRow(row);
+						const [firstCell, ...cells] = row.cells;
 						return (
 							<div className="tr" {...row.getRowProps()}>
-								{row.cells.map((cell) => {
+								<div
+									className="td"
+									{...firstCell.getCellProps({
+										className: cx({
+											"group-placeholder":
+												firstCell.isPlaceholder,
+											"grouped-column-cell":
+												firstCell.column.isGrouped,
+											"grouped-cell": firstCell.isGrouped,
+										}),
+									})}
+								>
+									{firstCell.row.depth > 0 && (
+										<>{"-".repeat(firstCell.row.depth)} </>
+									)}
+									{firstCell.row.canExpand && (
+										<span
+											{...firstCell.row.getToggleRowExpandedProps()}
+										>
+											{firstCell.row.isExpanded
+												? "👇"
+												: "👉"}{" "}
+										</span>
+									)}
+									{firstCell.isGrouped ? (
+										<>
+											<span
+												{...row.getToggleRowExpandedProps()}
+											>
+												{row.isExpanded ? "👇" : "👉"}{" "}
+												{firstCell.render("Cell")} (
+												{row.subRows.length})
+											</span>
+										</>
+									) : firstCell.isAggregated ? (
+										firstCell.render("Aggregated")
+									) : firstCell.isPlaceholder ? null : (
+										firstCell.render("Cell")
+									)}
+								</div>
+								{cells.map((cell) => {
 									return (
 										<div
 											className="td"

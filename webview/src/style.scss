@@ -36,9 +36,10 @@ body {
 	}
 	.td {
 		border: 1px solid var(--vscode-editor-foreground);
-		padding: 0.25rem;
+		padding: 0.5rem;
 		font-size: 1.1rem;
 		text-align: center;
+		line-height: 2rem;
 	}
 	.grouped-cell,
 	.grouped-header {
