@@ -1,5 +1,5 @@
 import * as path from "path";
-import { getTableData, inferDefaultOptions } from "./DvcReader";
+import { getExperiments, inferDefaultOptions } from "./DvcReader";
 
 const extensionDirectory = path.resolve(__dirname, "..");
 const testDvcDirectory = path.resolve(
@@ -26,6 +26,6 @@ test("Options are properly inferred from the test repo", async () => {
 });
 
 test("Comparing a table in the test repo to a snapshot", async () => {
-	const tableData = await getTableData(await testOptions);
-	return expect(tableData).toMatchSnapshot();
+	const tableData = getExperiments(await testOptions);
+	return expect(await tableData).toMatchSnapshot();
 });

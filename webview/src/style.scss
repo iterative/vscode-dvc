@@ -2,6 +2,7 @@ html,
 body,
 .react-root {
 	height: 100%;
+	width: 100%;
 }
 
 body {
@@ -14,4 +15,70 @@ body {
 	padding: 0;
 
 	background-color: var(--vscode-editor-background);
+}
+
+.experiments {
+	margin: 1rem;
+	ul {
+		padding-left: 1rem;
+	}
+	.table {
+		overflow-x: auto;
+	}
+	.table,
+	.thead,
+	.tbody,
+	.tr {
+		width: 100%;
+	}
+	summary {
+		white-space: nowrap;
+		cursor: pointer;
+		h2,
+		h3 {
+			margin: 0.25em;
+			white-space: nowrap;
+			display: inline-block;
+		}
+	}
+	.tbody .tr:nth-child(2n) .td {
+		background-color: rgb(150, 150, 150, 0.15);
+	}
+	.td,
+	.th {
+		white-space: nowrap;
+	}
+	.td {
+		padding: 0.5rem;
+		font-size: 1.1rem;
+		text-align: center;
+		line-height: 2rem;
+	}
+	.experiment-cell {
+		text-align: left;
+		padding-left: 1rem;
+	}
+	.grouped-cell,
+	.grouped-header {
+		transition: 0.2s all;
+		background-color: var(--vscode-button-background);
+		&:hover {
+			background-color: var(--vscode-button-hoverBackground);
+		}
+	}
+	.parent-header-cell {
+		padding: 0.1rem 0.2rem;
+		font-size: 0.9rem;
+	}
+	.headers-row {
+		text-align: center;
+		font-weight: bold;
+		.th {
+			padding: 0.4rem 0.25rem;
+		}
+		font-size: 1.2rem;
+	}
+	.group-placeholder {
+		flex: 0 0 1rem;
+	}
 }

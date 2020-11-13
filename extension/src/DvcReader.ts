@@ -7,6 +7,40 @@ interface DVCExtensionOptions {
 	cwd: string;
 }
 
+export interface DataFileDict {
+	[name: string]: string | DataFileDict;
+}
+export interface DataFilesDict {
+	[filename: string]: DataFileDict;
+}
+interface DVCExperimentCommon {
+	name?: string;
+	timestamp: Date;
+	params: DataFilesDict;
+	metrics: DataFilesDict;
+	queued: boolean;
+}
+export interface DVCExperiment extends DVCExperimentCommon {
+	checkpointTip: string;
+}
+export interface DVCExperimentWithSha extends DVCExperiment {
+	sha: string;
+}
+export interface DVCExperimentJSONOutput extends DVCExperimentCommon {
+	checkpoint_tip: string;
+}
+
+type DVCCommitId = "workspace" | string;
+interface DVCExperimentsCommitJSONOutput
+	extends Record<string, DVCExperimentJSONOutput> {
+	baseline: DVCExperimentJSONOutput;
+}
+
+export type DVCExperimentsRepoJSONOutput = Record<
+	DVCCommitId,
+	DVCExperimentsCommitJSONOutput
+>;
+
 export const inferDefaultOptions: (
 	cwd: string
 ) => Promise<DVCExtensionOptions> = async (cwd) => {
@@ -32,47 +66,9 @@ const execCommand: (
 		cwd,
 	});
 
-interface Experiment {
-	sha: "baseline" | string;
-	timestamp: Date;
-	params: Record<string, string>;
-	metrics: Record<string, string>;
-	queued: boolean;
-	label: string;
-	name?: string;
-	checkpointTip?: string;
-}
-
-interface ExperimentsRepo {
-	sha: "workspace" | string;
-	experiments: Experiment[];
-}
-
-export interface AllExperiments {
-	workspace: ExperimentsRepo;
-	experiments: ExperimentsRepo[];
-}
-
-const buildTableDataItem = (sha: string, data: any) => {
-	return {
-		...data,
-		label: data.name || sha,
-		sha,
-	};
-};
-
-export const getTableData: (
+export const getExperiments: (
 	options: DVCExtensionOptions
-) => Promise<AllExperiments> = async (options) => {
+) => Promise<DVCExperimentsRepoJSONOutput> = async (options) => {
 	const { stdout } = await execCommand(options, "exp show --show-json");
-	const originalOutput = JSON.parse(String(stdout));
-	const { workspace, ...rest } = originalOutput;
-	const processedRest = Object.entries(rest)
-		.sort()
-		.map(([sha, value]) => buildTableDataItem(sha, value));
-	const result = {
-		workspace: buildTableDataItem("workspace", workspace),
-		experiments: processedRest,
-	};
-	return result;
+	return JSON.parse(String(stdout));
 };

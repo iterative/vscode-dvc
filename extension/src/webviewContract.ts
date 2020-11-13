@@ -1,3 +1,5 @@
+import { DVCExperimentsRepoJSONOutput } from "./DvcReader";
+
 export interface WindowWithWebviewData {
 	webviewData: {
 		publicPath: string;
@@ -17,6 +19,6 @@ export type MessageToWebview =
 			theme: "light" | "dark";
 	  }
 	| {
-			kind: "showMessage";
-			message: string;
+			kind: "showExperiments";
+			data: DVCExperimentsRepoJSONOutput | null;
 	  };
