@@ -2,6 +2,7 @@ html,
 body,
 .react-root {
 	height: 100%;
+	width: 100%;
 }
 
 body {
@@ -17,8 +18,18 @@ body {
 }
 
 .experiments {
+	margin: 1rem;
 	ul {
 		padding-left: 1rem;
+	}
+	.table {
+		overflow-x: auto;
+	}
+	.table,
+	.thead,
+	.tbody,
+	.tr {
+		width: 100%;
 	}
 	summary {
 		white-space: nowrap;
@@ -30,16 +41,22 @@ body {
 			display: inline-block;
 		}
 	}
+	.tbody .tr:nth-child(2n) .td {
+		background-color: rgb(150, 150, 150, 0.15);
+	}
 	.td,
 	.th {
 		white-space: nowrap;
 	}
 	.td {
-		border: 1px solid var(--vscode-editor-foreground);
 		padding: 0.5rem;
 		font-size: 1.1rem;
 		text-align: center;
 		line-height: 2rem;
+	}
+	.experiment-cell {
+		text-align: left;
+		padding-left: 1rem;
 	}
 	.grouped-cell,
 	.grouped-header {
@@ -50,12 +67,8 @@ body {
 		}
 	}
 	.parent-header-cell {
-		border: 1px solid var(--vscode-foreground);
 		padding: 0.1rem 0.2rem;
 		font-size: 0.9rem;
-	}
-	.th, .td, .grouped-header, .grouped-column-cell {
-		border: 2px solid white;
 	}
 	.headers-row {
 		text-align: center;
