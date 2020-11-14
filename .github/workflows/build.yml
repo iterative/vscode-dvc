@@ -1,3 +1,4 @@
+name: Build plugin
 on:
     push:
         branches:
@@ -23,19 +24,3 @@ jobs:
               with:
                   name: Built package
                   path: ./extension/dvc-integration-0.1.0.vsix
-    test_build:
-        strategy:
-            matrix:
-                os: [macos-latest, windows-latest]
-        runs-on: ${{ matrix.os }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              with:
-                  submodules: true
-            - name: Install Node.js
-              uses: actions/setup-node@v1
-              with:
-                  node-version: 10.x
-            - run: yarn install
-            - run: yarn build
