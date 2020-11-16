@@ -18,9 +18,9 @@ jobs:
               with:
                   node-version: 10.x
             - run: yarn install
-            - run: yarn build
+            - run: yarn build -o ./vscode-dvc.vsix
             - name: Upload
               uses: actions/upload-artifact@v2
               with:
                   name: Built package
-                  path: ./extension/dvc-integration-0.1.0.vsix
+                  path: ./extension/vscode-dvc.vsix
