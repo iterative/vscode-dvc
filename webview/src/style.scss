@@ -17,6 +17,64 @@ body {
 	background-color: var(--vscode-editor-background);
 }
 
+%bullet {
+	border-radius: 99px;
+	margin: 0 5px;
+}
+
+.queued-bullet {
+	@extend %bullet;
+	width: 9px;
+	height: 9px;
+	left: calc(50% - 9px / 2);
+	top: calc(50% - 9px / 2 + 0.5px);
+
+	/* vcs/bg-icon | process */
+	background: conic-gradient(
+		from 180deg at 50% 50%,
+		rgba(255, 255, 255, 0.5) 0deg,
+		rgba(255, 255, 255, 0) 180.31deg,
+		rgba(255, 255, 255, 0) 360deg
+	);
+
+	/* vsc/text | hover */
+	border: 1px solid #ffffff;
+	box-sizing: border-box;
+}
+
+.bullet {
+	@extend %bullet;
+	/* default */
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	line-height: 0;
+
+	/* vsc/text | muted */
+	background: rgba(255, 255, 255, 0.5);
+}
+
+%expandable-row-arrow {
+	width: 8px;
+	height: 8px;
+	margin: 0 4px;
+	display: inline-block;
+	border: 2px solid rgba(255, 255, 255, 0.21);
+	border-top: unset;
+	border-left: unset;
+	transition: 0.2s transform;
+}
+
+.expanded-row-arrow {
+	@extend %expandable-row-arrow;
+	transform: rotate(45deg);
+}
+
+.contracted-row-arrow {
+	@extend %expandable-row-arrow;
+	transform: rotate(-45deg);
+}
+
 .experiments {
 	margin: 1rem;
 	ul {
@@ -53,6 +111,9 @@ body {
 		font-size: 1.1rem;
 		text-align: center;
 		line-height: 2rem;
+		display: flex;
+		flex-flow: row nowrap;
+		align-items: center;
 	}
 	.experiment-cell {
 		text-align: left;

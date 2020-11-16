@@ -18,6 +18,7 @@ import {
 	useFlexLayout,
 	HeaderGroup,
 	TableInstance,
+	Cell,
 } from "react-table";
 import cx from "classnames";
 
@@ -192,6 +193,58 @@ const ParentHeaderGroup: React.FC<{
 	);
 };
 
+const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
+	cell,
+}) => {
+	const { row } = cell;
+	const baseFirstCellProps = cell.getCellProps({
+		className: cx("td", "experiment-cell", {
+			"group-placeholder": cell.isPlaceholder,
+			"grouped-column-cell": cell.column.isGrouped,
+			"grouped-cell": cell.isGrouped,
+		}),
+	});
+	const firstCellProps = row.canExpand
+		? row.getToggleRowExpandedProps({
+				...baseFirstCellProps,
+				className: cx(
+					baseFirstCellProps.className,
+					"expandable-experiment-cell",
+					row.isExpanded
+						? "expanded-experiment-cell"
+						: "contracted-experiment-cell"
+				),
+		  })
+		: baseFirstCellProps;
+	return (
+		<div {...firstCellProps}>
+			{row.depth > 0 && <>{"-".repeat(row.depth)} </>}
+			<span className="bullet" />
+			{row.canExpand && (
+				<span
+					className={
+						row.isExpanded
+							? "expanded-row-arrow"
+							: "contracted-row-arrow"
+					}
+				/>
+			)}
+			{cell.isGrouped ? (
+				<>
+					<span {...row.getToggleRowExpandedProps()}>
+						{row.isExpanded ? "👇" : "👉"} {cell.render("Cell")} (
+						{row.subRows.length})
+					</span>
+				</>
+			) : cell.isAggregated ? (
+				cell.render("Aggregated")
+			) : cell.isPlaceholder ? null : (
+				cell.render("Cell")
+			)}
+		</div>
+	);
+};
+
 const PrimaryHeaderGroup: React.FC<{
 	headerGroup: HeaderGroup<DVCExperimentRow>;
 }> = ({ headerGroup }) => (
@@ -231,18 +284,6 @@ const TableBody: React.FC<{
 			{rows.map((row) => {
 				prepareRow(row);
 				const [firstCell, ...cells] = row.cells;
-				const baseFirstCellProps = firstCell.getCellProps({
-					className: cx("td", "experiment-cell", {
-						"group-placeholder": firstCell.isPlaceholder,
-						"grouped-column-cell": firstCell.column.isGrouped,
-						"grouped-cell": firstCell.isGrouped,
-					}),
-				});
-				const firstCellProps = firstCell.row.canExpand
-					? firstCell.row.getToggleRowExpandedProps(
-							baseFirstCellProps
-					  )
-					: baseFirstCellProps;
 				return (
 					<div
 						{...row.getRowProps({
@@ -254,29 +295,7 @@ const TableBody: React.FC<{
 							),
 						})}
 					>
-						<div {...firstCellProps}>
-							{firstCell.row.depth > 0 && (
-								<>{"-".repeat(firstCell.row.depth)} </>
-							)}
-							{firstCell.row.canExpand && (
-								<span>
-									{firstCell.row.isExpanded ? "▼" : "▶"}{" "}
-								</span>
-							)}
-							{firstCell.isGrouped ? (
-								<>
-									<span {...row.getToggleRowExpandedProps()}>
-										{row.isExpanded ? "👇" : "👉"}{" "}
-										{firstCell.render("Cell")} (
-										{row.subRows.length})
-									</span>
-								</>
-							) : firstCell.isAggregated ? (
-								firstCell.render("Aggregated")
-							) : firstCell.isPlaceholder ? null : (
-								firstCell.render("Cell")
-							)}
-						</div>
+						<FirstCell cell={firstCell} />
 						{cells.map((cell) => {
 							return (
 								<div
@@ -490,7 +509,7 @@ export const ExperimentsTable: React.FC<{
 					{headerGroups
 						.slice(0, lastHeaderGroupIndex)
 						.map((headerGroup) => (
-							<ParentHeaderGroup headerGroup={headerGroup} />
+							<ParentHeaderGroup headerGroup={headerGroup} key={headerGroup.id} />
 						))}
 					<PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
 				</div>
