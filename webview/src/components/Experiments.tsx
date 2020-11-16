@@ -17,6 +17,7 @@ import {
 	useSortBy,
 	useFlexLayout,
 	HeaderGroup,
+	TableInstance,
 } from "react-table";
 import cx from "classnames";
 
@@ -222,6 +223,99 @@ const PrimaryHeaderGroup: React.FC<{
 	</div>
 );
 
+const TableBody: React.FC<{
+	instance: TableInstance<DVCExperimentRow>;
+}> = ({ instance: { rows, prepareRow, getTableBodyProps } }) => {
+	return (
+		<div className="tbody" {...getTableBodyProps()}>
+			{rows.map((row) => {
+				prepareRow(row);
+				const [firstCell, ...cells] = row.cells;
+				const baseFirstCellProps = firstCell.getCellProps({
+					className: cx("td", "experiment-cell", {
+						"group-placeholder": firstCell.isPlaceholder,
+						"grouped-column-cell": firstCell.column.isGrouped,
+						"grouped-cell": firstCell.isGrouped,
+					}),
+				});
+				const firstCellProps = firstCell.row.canExpand
+					? firstCell.row.getToggleRowExpandedProps(
+							baseFirstCellProps
+					  )
+					: baseFirstCellProps;
+				return (
+					<div
+						{...row.getRowProps({
+							className: cx(
+								"tr",
+								row.original.sha === "workspace"
+									? "workspace-row"
+									: "normal-row"
+							),
+						})}
+					>
+						<div {...firstCellProps}>
+							{firstCell.row.depth > 0 && (
+								<>{"-".repeat(firstCell.row.depth)} </>
+							)}
+							{firstCell.row.canExpand && (
+								<span>
+									{firstCell.row.isExpanded ? "▼" : "▶"}{" "}
+								</span>
+							)}
+							{firstCell.isGrouped ? (
+								<>
+									<span {...row.getToggleRowExpandedProps()}>
+										{row.isExpanded ? "👇" : "👉"}{" "}
+										{firstCell.render("Cell")} (
+										{row.subRows.length})
+									</span>
+								</>
+							) : firstCell.isAggregated ? (
+								firstCell.render("Aggregated")
+							) : firstCell.isPlaceholder ? null : (
+								firstCell.render("Cell")
+							)}
+						</div>
+						{cells.map((cell) => {
+							return (
+								<div
+									className="td"
+									{...cell.getCellProps({
+										className: cx({
+											"group-placeholder":
+												cell.isPlaceholder,
+											"grouped-column-cell":
+												cell.column.isGrouped,
+											"grouped-cell": cell.isGrouped,
+										}),
+									})}
+								>
+									{cell.isGrouped ? (
+										<>
+											<span
+												{...row.getToggleRowExpandedProps()}
+											>
+												{row.isExpanded ? "👇" : "👉"}{" "}
+												{cell.render("Cell")} (
+												{row.subRows.length})
+											</span>
+										</>
+									) : cell.isAggregated ? (
+										cell.render("Aggregated")
+									) : cell.isPlaceholder ? null : (
+										cell.render("Cell")
+									)}
+								</div>
+							);
+						})}
+					</div>
+				);
+			})}
+		</div>
+	);
+};
+
 export const ExperimentsTable: React.FC<{
 	experiments: DVCExperimentsRepoJSONOutput;
 }> = ({ experiments }) => {
@@ -278,18 +372,7 @@ export const ExperimentsTable: React.FC<{
 		return [data, columns];
 	}, [experiments]);
 
-	const {
-		getTableProps,
-		getTableBodyProps,
-		prepareRow,
-		toggleAllRowsExpanded,
-		columns: columnInstances,
-		toggleCommitUngroup,
-		headerGroups,
-		state,
-		rows,
-		sortedColumns,
-	} = useTable<DVCExperimentRow>(
+	const instance = useTable<DVCExperimentRow>(
 		{
 			columns,
 			data,
@@ -363,6 +446,16 @@ export const ExperimentsTable: React.FC<{
 		}
 	);
 
+	const {
+		getTableProps,
+		toggleAllRowsExpanded,
+		columns: columnInstances,
+		toggleCommitUngroup,
+		headerGroups,
+		state,
+		sortedColumns,
+	} = instance;
+
 	React.useEffect(() => {
 		toggleAllRowsExpanded(true);
 	}, []);
@@ -401,100 +494,7 @@ export const ExperimentsTable: React.FC<{
 						))}
 					<PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
 				</div>
-				<div className="tbody" {...getTableBodyProps()}>
-					{rows.map((row) => {
-						prepareRow(row);
-						const [firstCell, ...cells] = row.cells;
-						const baseFirstCellProps = firstCell.getCellProps({
-							className: cx("td", "experiment-cell", {
-								"group-placeholder": firstCell.isPlaceholder,
-								"grouped-column-cell":
-									firstCell.column.isGrouped,
-								"grouped-cell": firstCell.isGrouped,
-							}),
-						});
-						const firstCellProps = firstCell.row.canExpand
-							? firstCell.row.getToggleRowExpandedProps(
-									baseFirstCellProps
-							  )
-							: baseFirstCellProps;
-						return (
-							<div
-								{...row.getRowProps({
-									className: cx(
-										"tr",
-										row.original.sha === "workspace"
-											? "workspace-row"
-											: "normal-row"
-									),
-								})}
-							>
-								<div {...firstCellProps}>
-									{firstCell.row.depth > 0 && (
-										<>{"-".repeat(firstCell.row.depth)} </>
-									)}
-									{firstCell.row.canExpand && (
-										<span>
-											{firstCell.row.isExpanded
-												? "▼"
-												: "▶"}{" "}
-										</span>
-									)}
-									{firstCell.isGrouped ? (
-										<>
-											<span
-												{...row.getToggleRowExpandedProps()}
-											>
-												{row.isExpanded ? "👇" : "👉"}{" "}
-												{firstCell.render("Cell")} (
-												{row.subRows.length})
-											</span>
-										</>
-									) : firstCell.isAggregated ? (
-										firstCell.render("Aggregated")
-									) : firstCell.isPlaceholder ? null : (
-										firstCell.render("Cell")
-									)}
-								</div>
-								{cells.map((cell) => {
-									return (
-										<div
-											className="td"
-											{...cell.getCellProps({
-												className: cx({
-													"group-placeholder":
-														cell.isPlaceholder,
-													"grouped-column-cell":
-														cell.column.isGrouped,
-													"grouped-cell":
-														cell.isGrouped,
-												}),
-											})}
-										>
-											{cell.isGrouped ? (
-												<>
-													<span
-														{...row.getToggleRowExpandedProps()}
-													>
-														{row.isExpanded
-															? "👇"
-															: "👉"}{" "}
-														{cell.render("Cell")} (
-														{row.subRows.length})
-													</span>
-												</>
-											) : cell.isAggregated ? (
-												cell.render("Aggregated")
-											) : cell.isPlaceholder ? null : (
-												cell.render("Cell")
-											)}
-										</div>
-									);
-								})}
-							</div>
-						);
-					})}
-				</div>
+				<TableBody instance={instance} />
 			</div>
 		</div>
 	);
