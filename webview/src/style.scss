@@ -1,3 +1,7 @@
+html {
+	overflow: auto;
+}
+
 html,
 body,
 .react-root {
@@ -26,8 +30,7 @@ body {
 	@extend %bullet;
 	width: 9px;
 	height: 9px;
-	left: calc(50% - 9px / 2);
-	top: calc(50% - 9px / 2 + 0.5px);
+	margin: 0 6px;
 
 	/* vcs/bg-icon | process */
 	background: conic-gradient(
@@ -48,22 +51,31 @@ body {
 	display: inline-block;
 	width: 5px;
 	height: 5px;
+	margin: 0 10px;
 	line-height: 0;
 
 	/* vsc/text | muted */
 	background: rgba(255, 255, 255, 0.5);
 }
 
-%expandable-row-arrow {
-	position: relative;
+%row-arrow-base {
 	width: 8px;
 	height: 8px;
 	margin: 0 6px;
 	display: inline-block;
+}
+
+%expandable-row-arrow {
+	@extend %row-arrow-base;
+	position: relative;
 	border: 2px solid rgba(255, 255, 255, 0.21);
 	border-top: unset;
 	border-left: unset;
 	transition: transform 0.2s, right 0.2s, bottom 0.2s;
+}
+
+.row-arrow-placeholder {
+	@extend %row-arrow-base;
 }
 
 .expanded-row-arrow {
@@ -80,13 +92,14 @@ body {
 	bottom: 0;
 }
 
+$row-bg-color: var(--vscode-editor-background);
+$row-bg-alt-color: rgb(60, 60, 60, 1);
+
 .experiments {
 	margin: 1rem;
+	width: 100%;
 	ul {
 		padding-left: 1rem;
-	}
-	.table {
-		overflow-x: auto;
 	}
 	.table,
 	.thead,
@@ -104,8 +117,17 @@ body {
 			display: inline-block;
 		}
 	}
-	.tbody .tr:nth-child(2n) .td {
-		background-color: rgb(150, 150, 150, 0.15);
+
+	.depth-spacer {
+		width: 1rem;
+	}
+
+	.row-group {
+		border: 1px solid gray;
+		background-color: $row-bg-color;
+		.tr:nth-child(2n + 1) .td {
+			background-color: $row-bg-alt-color;
+		}
 	}
 	.td,
 	.th {

@@ -41,7 +41,6 @@ const ColumnOptionsRow: React.FC<{
 	return (
 		<div>
 			<div>
-				<span>{"-".repeat(column.depth)}</span>{" "}
 				<span>{column.Header}</span>
 				{column.canSort && (
 					<button {...column.getSortByToggleProps()}>
@@ -116,8 +115,14 @@ export const getBranchingEntries: (
 
 const arrayAccessor: <T = string>(
 	pathArray: string[]
-) => (originalRow: any) => T = (pathArray) => (originalRow) =>
-	pathArray.reduce((acc, cur) => acc[cur], originalRow);
+) => (originalRow: any) => T = (pathArray = []) => (originalRow) => {
+	let result = originalRow;
+	for (let i = 0; i < pathArray.length; i++) {
+		result = result[pathArray[i]];
+		if (result === undefined) return result;
+	}
+	return result;
+};
 
 const buildColumnsFromSampleObject: (
 	data: Record<string, any>,
@@ -160,8 +165,6 @@ const TruncatedCell = ({ value }: { value: string }) =>
 	value && value.length && value.length > 12
 		? `${value.slice(0, 4)}...${value.slice(value.length - 4)}`
 		: value;
-
-const Blank = <i>Blank</i>;
 
 const ParentHeaderGroup: React.FC<{
 	headerGroup: HeaderGroup<DVCExperimentRow>;
@@ -216,21 +219,21 @@ const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
 				),
 		  })
 		: baseFirstCellProps;
+
 	return (
 		<div {...firstCellProps}>
-			{row.depth > 0 && <>{"-".repeat(row.depth)} </>}
 			<span
 				className={row.original.queued ? "queued-bullet" : "bullet"}
 			/>
-			{row.canExpand && (
-				<span
-					className={
-						row.isExpanded
+			<span
+				className={
+					row.canExpand
+						? row.isExpanded
 							? "expanded-row-arrow"
 							: "contracted-row-arrow"
-					}
-				/>
-			)}
+						: "row-arrow-placeholder"
+				}
+			/>
 			{cell.isGrouped ? (
 				<>
 					<span {...row.getToggleRowExpandedProps()}>
@@ -278,64 +281,120 @@ const PrimaryHeaderGroup: React.FC<{
 	</div>
 );
 
-const TableBody: React.FC<{
+const TableRow: React.FC<{
+	row: Row<DVCExperimentRow>;
 	instance: TableInstance<DVCExperimentRow>;
-}> = ({ instance: { rows, prepareRow, getTableBodyProps } }) => {
-	return (
-		<div className="tbody" {...getTableBodyProps()}>
-			{rows.map((row) => {
-				prepareRow(row);
-				const [firstCell, ...cells] = row.cells;
+}> = ({ row, instance, instance: { prepareRow } }) => {
+	prepareRow(row);
+	const [firstCell, ...cells] = row.cells;
+	const baseRow = (
+		<div
+			{...row.getRowProps({
+				className: cx(
+					"tr",
+					row.original.sha === "workspace"
+						? "workspace-row"
+						: "normal-row"
+				),
+			})}
+		>
+			<FirstCell cell={firstCell} />
+			{cells.map((cell) => {
 				return (
 					<div
-						{...row.getRowProps({
-							className: cx(
-								"tr",
-								row.original.sha === "workspace"
-									? "workspace-row"
-									: "normal-row"
-							),
+						{...cell.getCellProps({
+							className: cx("td", {
+								"group-placeholder": cell.isPlaceholder,
+								"grouped-column-cell": cell.column.isGrouped,
+								"grouped-cell": cell.isGrouped,
+							}),
 						})}
 					>
-						<FirstCell cell={firstCell} />
-						{cells.map((cell) => {
-							return (
-								<div
-									className="td"
-									{...cell.getCellProps({
-										className: cx({
-											"group-placeholder":
-												cell.isPlaceholder,
-											"grouped-column-cell":
-												cell.column.isGrouped,
-											"grouped-cell": cell.isGrouped,
-										}),
-									})}
-								>
-									{cell.isGrouped ? (
-										<>
-											<span
-												{...row.getToggleRowExpandedProps()}
-											>
-												{row.isExpanded ? "👇" : "👉"}{" "}
-												{cell.render("Cell")} (
-												{row.subRows.length})
-											</span>
-										</>
-									) : cell.isAggregated ? (
-										cell.render("Aggregated")
-									) : cell.isPlaceholder ? null : (
-										cell.render("Cell")
-									)}
-								</div>
-							);
-						})}
+						{cell.isGrouped ? (
+							<>
+								<span {...row.getToggleRowExpandedProps()}>
+									{row.isExpanded ? "👇" : "👉"}{" "}
+									{cell.render("Cell")} ({row.subRows.length})
+								</span>
+							</>
+						) : cell.isAggregated ? (
+							cell.render("Aggregated")
+						) : cell.isPlaceholder ? null : (
+							cell.render("Cell")
+						)}
 					</div>
 				);
 			})}
 		</div>
 	);
+	return row.subRows && row.subRows.length > 0 ? (
+		<div
+			className={cx("tr", "row-group", {
+				"workspace-row-group": row.values.sha === "workspace",
+			})}
+		>
+			{baseRow}
+			{row.isExpanded &&
+				row.subRows.map((subRow) => (
+					<TableRow instance={instance} row={subRow} />
+				))}
+		</div>
+	) : (
+		baseRow
+	);
 };
+
+const TableBody: React.FC<{
+	instance: TableInstance<DVCExperimentRow>;
+}> = ({ instance, instance: { rows, getTableBodyProps } }) => {
+	return (
+		<div className="tbody" {...getTableBodyProps()}>
+			{rows.map((row) => {
+				return <TableRow row={row} instance={instance} key={row.id} />;
+			})}
+		</div>
+	);
+};
+
+function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
+	const {
+		rows,
+		dispatch,
+		state: { ungrouped },
+	} = instance;
+	const toggleCommitUngroup = useCallback(
+		(setting) =>
+			dispatch({
+				type: "set-ungrouped",
+				setting,
+			}),
+		[dispatch]
+	);
+	Object.assign(instance, {
+		preSortedRows: rows,
+		toggleCommitUngroup,
+	});
+	const ungroupedRows = React.useMemo(
+		() =>
+			rows.reduce<Row<DVCExperimentRow>[]>((acc, row) => {
+				if (row.subRows) {
+					const result = [
+						...acc,
+						{ ...row, subRows: [] },
+						...row.subRows,
+					].map((item, index) => ({ ...item, index }));
+					return result;
+				} else {
+					return [...acc, row];
+				}
+			}, []),
+		[rows]
+	);
+	if (!ungrouped) return;
+	Object.assign(instance, {
+		rows: ungroupedRows,
+	});
+}
 
 export const ExperimentsTable: React.FC<{
 	experiments: DVCExperimentsRepoJSONOutput;
@@ -344,8 +403,8 @@ export const ExperimentsTable: React.FC<{
 		const initialState = {};
 		const defaultColumn: Partial<Column<DVCExperimentRow>> = {
 			Cell: ({ value }: { value?: string | number }) => {
-				return value === ""
-					? Blank
+				return !value
+					? null
 					: typeof value === "number"
 					? value.toLocaleString(undefined, {
 							maximumFractionDigits: 2,
@@ -364,7 +423,7 @@ export const ExperimentsTable: React.FC<{
 				accessor: (item: any) => item.name || item.sha,
 				Cell: TruncatedCell,
 				disableGroupBy: true,
-				width: 150,
+				width: 175,
 			},
 			{
 				Header: "Timestamp",
@@ -396,6 +455,7 @@ export const ExperimentsTable: React.FC<{
 			initialState,
 			isMultiSortEvent: () => true,
 			defaultColumn,
+			expandSubRows: false,
 		},
 		(hooks) => {
 			hooks.stateReducers.push((state, action) => {
@@ -406,45 +466,7 @@ export const ExperimentsTable: React.FC<{
 					};
 				}
 			});
-			hooks.useInstance.push(function ungroupByCommit(instance) {
-				const {
-					rows,
-					dispatch,
-					state: { ungrouped },
-				} = instance;
-				const toggleCommitUngroup = useCallback(
-					(setting) =>
-						dispatch({
-							type: "set-ungrouped",
-							setting,
-						}),
-					[dispatch]
-				);
-				Object.assign(instance, {
-					preSortedRows: rows,
-					toggleCommitUngroup,
-				});
-				if (!ungrouped) return;
-				const ungroupedRows = React.useMemo(
-					() =>
-						rows.reduce<Row<DVCExperimentRow>[]>((acc, row) => {
-							if (row.subRows) {
-								const result = [
-									...acc,
-									{ ...row, subRows: [] },
-									...row.subRows,
-								].map((item, index) => ({ ...item, index }));
-								return result;
-							} else {
-								return [...acc, row];
-							}
-						}, []),
-					[rows]
-				);
-				Object.assign(instance, {
-					rows: ungroupedRows,
-				});
-			});
+			hooks.useInstance.push(ungroupByCommit);
 		},
 		useGroupBy,
 		useSortBy,
