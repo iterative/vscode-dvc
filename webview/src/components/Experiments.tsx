@@ -223,9 +223,6 @@ const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
 	return (
 		<div {...firstCellProps}>
 			<span
-				className={row.original.queued ? "queued-bullet" : "bullet"}
-			/>
-			<span
 				className={
 					row.canExpand
 						? row.isExpanded
@@ -233,6 +230,9 @@ const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
 							: "contracted-row-arrow"
 						: "row-arrow-placeholder"
 				}
+			/>
+			<span
+				className={row.original.queued ? "queued-bullet" : "bullet"}
 			/>
 			{cell.isGrouped ? (
 				<>
