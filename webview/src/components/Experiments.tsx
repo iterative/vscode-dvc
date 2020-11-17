@@ -219,7 +219,9 @@ const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
 	return (
 		<div {...firstCellProps}>
 			{row.depth > 0 && <>{"-".repeat(row.depth)} </>}
-			<span className="bullet" />
+			<span
+				className={row.original.queued ? "queued-bullet" : "bullet"}
+			/>
 			{row.canExpand && (
 				<span
 					className={
@@ -383,10 +385,6 @@ export const ExperimentsTable: React.FC<{
 				accessor: "metrics",
 				data,
 			}),
-			{
-				Header: "Queued",
-				accessor: "queued",
-			},
 		] as Column<DVCExperimentRow>[];
 		return [data, columns];
 	}, [experiments]);
@@ -509,7 +507,10 @@ export const ExperimentsTable: React.FC<{
 					{headerGroups
 						.slice(0, lastHeaderGroupIndex)
 						.map((headerGroup) => (
-							<ParentHeaderGroup headerGroup={headerGroup} key={headerGroup.id} />
+							<ParentHeaderGroup
+								headerGroup={headerGroup}
+								key={headerGroup.id}
+							/>
 						))}
 					<PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
 				</div>
