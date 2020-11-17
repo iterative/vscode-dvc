@@ -55,24 +55,29 @@ body {
 }
 
 %expandable-row-arrow {
+	position: relative;
 	width: 8px;
 	height: 8px;
-	margin: 0 4px;
+	margin: 0 6px;
 	display: inline-block;
 	border: 2px solid rgba(255, 255, 255, 0.21);
 	border-top: unset;
 	border-left: unset;
-	transition: 0.2s transform;
+	transition: transform 0.2s, right 0.2s, bottom 0.2s;
 }
 
 .expanded-row-arrow {
 	@extend %expandable-row-arrow;
 	transform: rotate(45deg);
+	right: 1px;
+	bottom: 2px;
 }
 
 .contracted-row-arrow {
 	@extend %expandable-row-arrow;
 	transform: rotate(-45deg);
+	right: 4px;
+	bottom: 0;
 }
 
 .experiments {
