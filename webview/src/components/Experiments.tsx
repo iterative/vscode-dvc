@@ -1,12 +1,10 @@
 import * as React from 'react'
-const { useCallback, useMemo } = React
 import {
   DataFileDict,
   DVCExperimentsRepoJSONOutput,
   DVCExperimentJSONOutput,
   DVCExperimentWithSha
 } from 'dvc-integration/src/DvcReader'
-import dayjs from '../dayjs'
 import {
   Row,
   Column,
@@ -19,6 +17,9 @@ import {
   HeaderGroup
 } from 'react-table'
 import cx from 'classnames'
+import dayjs from '../dayjs'
+
+const { useCallback, useMemo } = React
 
 interface DVCExperimentRow extends DVCExperimentWithSha {
   subRows?: DVCExperimentRow[]
@@ -99,8 +100,8 @@ export const getBranchingEntries: (
     }
   }
   return {
-    skippedKeys: skippedKeys,
-    entries: entries
+    skippedKeys,
+    entries
   }
 }
 
@@ -323,9 +324,8 @@ export const ExperimentsTable: React.FC<{
                   ...row.subRows
                 ].map((item, index) => ({ ...item, index }))
                 return result
-              } else {
-                return [...acc, row]
               }
+              return [...acc, row]
             }, []),
           [rows]
         )
@@ -469,7 +469,7 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments: DVCExperimentsRepoJSONOutput | null
+  experiments?: DVCExperimentsRepoJSONOutput | null
 }> = ({ experiments }) => (
   <div className="experiments">
     <h1>Experiments</h1>

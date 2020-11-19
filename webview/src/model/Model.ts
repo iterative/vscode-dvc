@@ -4,15 +4,15 @@ import {
   WindowWithWebviewData
 } from 'dvc-integration/src/webviewContract'
 import { observable, action, computed, when, runInAction, autorun } from 'mobx'
-import { getVsCodeApi } from './VsCodeApi'
 import { Disposable } from '@hediet/std/disposable'
 import { DVCExperimentsRepoJSONOutput } from 'dvc-integration/src/DvcReader'
+import { getVsCodeApi } from './VsCodeApi'
 
 declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  experiments: DVCExperimentsRepoJSONOutput | null
+  experiments?: DVCExperimentsRepoJSONOutput | null
 }
 
 export class Model {

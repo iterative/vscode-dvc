@@ -1,8 +1,8 @@
 import * as webpack from 'webpack'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import path = require('path')
 import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 
 const r = (file: string) => path.resolve(__dirname, file)
 
@@ -16,7 +16,7 @@ module.exports = {
       let result = info.absoluteResourcePath.replace(/\\/g, '/')
       if (!result.startsWith('file:')) {
         // Some paths already start with the file scheme.
-        result = 'file:///' + result
+        result = `file:///${result}`
       }
       return result
     }
