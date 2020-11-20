@@ -20,7 +20,7 @@ import {
 } from '@hediet/node-reload'
 
 import { Config } from './Config'
-import { DvcWebviewManager } from './DvcWebviewManager'
+import { DvcWebviewManager, DvcWebview } from './DvcWebviewManager'
 import {
   getExperiments,
   inferDefaultOptions,
@@ -41,11 +41,13 @@ export class Extension {
 
   private readonly config = new Config()
 
-  private promisedExperimentsData: Promise<
+  private experimentsDataPromise: Promise<
     DVCExperimentsRepoJSONOutput
   > | null = null
 
-  private lastTableUpdate: number | null = null
+  private lastTableUpdate?: number = undefined
+
+  private dvcWebview?: DvcWebview = undefined
 
   private readonly manager = this.dispose.track(
     new DvcWebviewManager(this.config)
@@ -82,9 +84,13 @@ export class Extension {
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
       commands.registerCommand('dvc-integration.showWebview', async () => {
-        const managerInstance = await this.manager.createNew()
-        const tableData = await this.getCachedTable()
-        managerInstance.showExperiments(tableData)
+        const dvcWebview = this.dispose.track(await this.manager.createNew())
+        try {
+          const tableData = await this.getCachedTable()
+          dvcWebview.showExperiments({ tableData })
+        } catch (e) {
+          dvcWebview.showExperiments({ errors: [e.toString()] })
+        }
       })
     )
 

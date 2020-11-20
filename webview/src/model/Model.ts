@@ -22,13 +22,15 @@ export class Model {
   public theme: 'dark' | 'light' = 'light'
 
   @observable
-  public experiments: DVCExperimentsRepoJSONOutput | null = null
+  public experiments?: DVCExperimentsRepoJSONOutput | null = null
 
   private readonly vsCodeApi = getVsCodeApi<
     PersistedModelState,
     MessageFromWebview,
     MessageToWebview
   >()
+
+  public errors?: Array<Error | string> = undefined
 
   constructor() {
     const data = window.webviewData
@@ -71,12 +73,13 @@ export class Model {
   }
 
   private handleMessage(message: MessageToWebview): void {
+    this.errors = message.errors || undefined
     switch (message.kind) {
       case 'setTheme':
         this.theme = message.theme
         return
       case 'showExperiments':
-        this.experiments = message.data
+        this.experiments = message.tableData
         return
       default:
         const nvr: never = message

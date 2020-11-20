@@ -148,10 +148,15 @@ export class DvcWebview {
     }
   }
 
-  public showExperiments(data: DVCExperimentsRepoJSONOutput | null): void {
+  public showExperiments(
+    payload: {
+      tableData?: DVCExperimentsRepoJSONOutput | null
+      errors?: Error[]
+    } = {}
+  ): void {
     this.sendMessage({
       kind: 'showExperiments',
-      data
+      ...payload
     })
   }
 }

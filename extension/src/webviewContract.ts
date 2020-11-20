@@ -13,12 +13,15 @@ export type MessageFromWebview = {
   kind: 'initialized'
 }
 
-export type MessageToWebview =
+export type MessageToWebview = {
+  errors?: Error[]
+} & (
   | {
       kind: 'setTheme'
       theme: 'light' | 'dark'
     }
   | {
       kind: 'showExperiments'
-      data: DVCExperimentsRepoJSONOutput | null
+      tableData?: DVCExperimentsRepoJSONOutput | null
     }
+)

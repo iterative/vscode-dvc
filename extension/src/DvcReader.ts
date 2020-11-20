@@ -69,6 +69,7 @@ const execCommand: (
 export const getExperiments: (
   options: DVCExtensionOptions
 ) => Promise<DVCExperimentsRepoJSONOutput> = async options => {
-  const { stdout } = await execCommand(options, 'exp show --show-json')
+  const output = await execCommand(options, 'exp show --show-json')
+  const { stdout } = output
   return JSON.parse(String(stdout))
 }
