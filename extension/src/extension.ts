@@ -60,9 +60,9 @@ export class Extension {
     const dvcReaderOptions = await inferDefaultOptions(
       workspaceFolders[0].uri.fsPath
     )
-    this.promisedExperimentsData = getExperiments(dvcReaderOptions)
+    this.experimentsDataPromise = getExperiments(dvcReaderOptions)
     this.lastTableUpdate = Date.now()
-    return this.promisedExperimentsData
+    return this.experimentsDataPromise
   }
 
   private async getCachedTable() {
@@ -71,7 +71,7 @@ export class Extension {
       Date.now() - this.lastTableUpdate >= updateInterval
     )
       await this.updateCachedTable()
-    return this.promisedExperimentsData
+    return this.experimentsDataPromise
   }
 
   constructor() {
