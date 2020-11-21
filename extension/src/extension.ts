@@ -20,11 +20,10 @@ import {
 } from '@hediet/node-reload'
 
 import { Config } from './Config'
-import { DvcWebviewManager, DvcWebview } from './DvcWebviewManager'
+import { DvcWebviewManager } from './DvcWebviewManager'
 import {
   getExperiments,
   inferDefaultOptions,
-  DVCExperiment,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
 
@@ -46,8 +45,6 @@ export class Extension {
   > | null = null
 
   private lastTableUpdate?: number = undefined
-
-  private dvcWebview?: DvcWebview = undefined
 
   private readonly manager = this.dispose.track(
     new DvcWebviewManager(this.config)

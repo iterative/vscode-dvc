@@ -6,9 +6,8 @@
   ],
   "scripts": {
     "format": "prettier --write './*.{json,md}'",
-    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}' && tsc --noEmit",
-    "format-all": "yarn format; yarn workspace dvc-integration format; yarn workspace dvc-vscode-webview format",
-    "lint-all": "yarn lint; yarn workspace dvc-integration lint; yarn workspace dvc-vscode-webview lint",
+    "format-all": "yarn format; yarn workspaces run format",
+    "lint-all": "yarn workspaces run lint",
     "build": "yarn build-ui && yarn build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "extension-dev-server": "yarn workspace dvc-integration dev",

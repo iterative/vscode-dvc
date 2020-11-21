@@ -35,6 +35,7 @@ export function hotComponent(
     }
 
     if (m.hot) {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       m.hot.accept(() => {})
     }
 

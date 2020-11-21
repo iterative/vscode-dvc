@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   DataFileDict,
   DVCExperimentsRepoJSONOutput,
-  DVCExperimentJSONOutput,
+  DVCExperiment,
   DVCExperimentWithSha
 } from 'dvc-integration/src/DvcReader'
 import {
@@ -27,10 +27,9 @@ interface DVCExperimentRow extends DVCExperimentWithSha {
 
 const parseExperimentJSONEntry: (
   sha: string,
-  experiment: DVCExperimentJSONOutput
-) => DVCExperimentWithSha = (sha, { checkpoint_tip, ...rest }) => ({
-  ...rest,
-  checkpointTip: checkpoint_tip,
+  experiment: DVCExperiment
+) => DVCExperimentWithSha = (sha, experiment) => ({
+  ...experiment,
   sha
 })
 
@@ -294,6 +293,7 @@ export const ExperimentsTable: React.FC<{
             ungrouped: action.setting || !state.ungrouped
           }
         }
+        return state
       })
       hooks.useInstance.push(function ungroupByCommit(instance) {
         const {
@@ -341,9 +341,9 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns } = instance
-        const sortedColumns: ColumnInstance<
-          DVCExperimentRow
-        >[] = allColumns.filter(column => column.isSorted)
+        const sortedColumns: ColumnInstance<DVCExperimentRow>[] = allColumns.filter(
+          column => column.isSorted
+        )
         Object.assign(instance, {
           sortedColumns
         })
