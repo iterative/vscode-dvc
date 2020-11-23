@@ -3,16 +3,17 @@ import {
   MessageToWebview,
   WindowWithWebviewData
 } from 'dvc-integration/src/webviewContract'
-import { observable, action, computed, when, runInAction, autorun } from 'mobx'
-import { getVsCodeApi } from './VsCodeApi'
+import { observable, autorun } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 import { DVCExperimentsRepoJSONOutput } from 'dvc-integration/src/DvcReader'
+import { getVsCodeApi } from './VsCodeApi'
 
 declare const window: Window & WindowWithWebviewData
+/* eslint-disable @typescript-eslint/no-unused-vars */
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  experiments: DVCExperimentsRepoJSONOutput | null
+  experiments?: DVCExperimentsRepoJSONOutput | null
 }
 
 export class Model {
@@ -22,13 +23,15 @@ export class Model {
   public theme: 'dark' | 'light' = 'light'
 
   @observable
-  public experiments: DVCExperimentsRepoJSONOutput | null = null
+  public experiments?: DVCExperimentsRepoJSONOutput | null = null
 
   private readonly vsCodeApi = getVsCodeApi<
     PersistedModelState,
     MessageFromWebview,
     MessageToWebview
   >()
+
+  public errors?: Array<Error | string> = undefined
 
   constructor() {
     const data = window.webviewData
@@ -71,14 +74,16 @@ export class Model {
   }
 
   private handleMessage(message: MessageToWebview): void {
+    this.errors = message.errors || undefined
     switch (message.kind) {
       case 'setTheme':
         this.theme = message.theme
         return
       case 'showExperiments':
-        this.experiments = message.data
+        this.experiments = message.tableData
         return
       default:
+        // eslint-disable-next-line
         const nvr: never = message
         console.error('Unexpected message', message)
     }

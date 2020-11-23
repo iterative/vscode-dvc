@@ -95,6 +95,12 @@ body {
 $row-bg-color: var(--vscode-editor-background);
 $row-bg-alt-color: rgb(60, 60, 60, 1);
 
+.error-message {
+  padding: 0.5rem;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-editor-foreground);
+}
+
 .experiments {
 	margin: 1rem;
 	width: 100%;

@@ -1,105 +1,105 @@
 {
-	"name": "dvc-integration",
-	"private": true,
-	"displayName": "DVC Integration",
-	"description": "",
-	"publisher": "todo-dvc",
-	"icon": "docs/logo.drawio.png",
-	"version": "0.1.0",
-	"engines": {
-		"vscode": "^1.46.0"
-	},
-	"readme": "./README.md",
-	"activationEvents": [
-		"*",
-		"onWebviewPanel:dvc-view"
-	],
-	"repository": {
-		"url": "https://github.com/iterative/vscode-dvc"
-	},
-	"main": "./dist/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"title": "DVC: Push",
-				"command": "dvc-integration.push"
-			},
-			{
-				"title": "DVC: Show Webview",
-				"command": "dvc-integration.showWebview"
-			}
-		],
-		"configuration": {
-			"title": "DVC",
-			"properties": {}
-		},
-		"menus": {
-			"scm/resourceState/context": [
-				{
-					"command": "dvc-integration.push",
-					"group": "inline"
-				}
-			]
-		},
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "dvc-container",
-					"title": "DVC",
-					"icon": "media/dvc-monochrome.svg"
-				}
-			]
-		},
-		"views": {
-			"dvc-container": [
-				{
-					"id": "dvc-tree",
-					"name": "Commands"
-				}
-			]
-		}
-	},
-	"scripts": {
-		"dev": "shx rm -rf dist && tsc -watch -p ./",
-		"build": "yarn build-webpack && yarn package",
-		"build-webpack": "webpack --mode production",
-		"package": "vsce package --yarn",
-		"pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
-		"format": "prettier --write '**/*.{js,ts,md}'",
-		"test": "jest src",
-		"lint": "eslint --cache --fix '**/*.{js,ts}' && tsc --noEmit",
-		"vscode:prepublish": ""
-	},
-	"dependencies": {
-		"@hediet/node-reload": "^0.7.3",
-		"@hediet/std": "^0.6.0",
-		"bufferutil": "^4.0.1",
-		"dayjs": "^1.9.4",
-		"mobx": "^6.0.1",
-		"utf-8-validate": "^5.0.2"
-	},
-	"devDependencies": {
-		"@types/copy-webpack-plugin": "^5.0.0",
-		"@types/jest": "^26.0.15",
-		"@types/node": "^13.7.4",
-		"@types/vscode": "1.46.0",
-		"@typescript-eslint/eslint-plugin": "^4.5.0",
-		"@typescript-eslint/parser": "^4.5.0",
-		"copy-webpack-plugin": "^5.1.1",
-		"eslint": "^7.11.0",
-		"eslint-config-airbnb-base": "^14.2.0",
-		"eslint-config-prettier": "^6.14.0",
-		"eslint-plugin-import": "^2.22.1",
-		"eslint-plugin-prettier": "^3.1.4",
-		"jest": "^26.6.0",
-		"prettier": "^2.1.2",
-		"shx": "^0.3.2",
-		"ts-jest": "^26.4.1",
-		"ts-loader": "^6.2.1",
-		"tslint": "^6.0.0",
-		"typescript": "^3.8.2",
-		"vsce": "^1.81.1",
-		"webpack": "^4.41.6",
-		"webpack-cli": "^3.3.11"
-	}
+  "name": "dvc-integration",
+  "private": true,
+  "displayName": "DVC Integration",
+  "description": "",
+  "publisher": "todo-dvc",
+  "icon": "docs/logo.drawio.png",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.46.0"
+  },
+  "readme": "./README.md",
+  "activationEvents": [
+    "*",
+    "onWebviewPanel:dvc-view"
+  ],
+  "repository": {
+    "url": "https://github.com/iterative/vscode-dvc"
+  },
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "title": "DVC: Push",
+        "command": "dvc-integration.push"
+      },
+      {
+        "title": "DVC: Show Webview",
+        "command": "dvc-integration.showWebview"
+      }
+    ],
+    "configuration": {
+      "title": "DVC",
+      "properties": {}
+    },
+    "menus": {
+      "scm/resourceState/context": [
+        {
+          "command": "dvc-integration.push",
+          "group": "inline"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dvc-container",
+          "title": "DVC",
+          "icon": "media/dvc-monochrome.svg"
+        }
+      ]
+    },
+    "views": {
+      "dvc-container": [
+        {
+          "id": "dvc-tree",
+          "name": "Commands"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "dev": "shx rm -rf dist && tsc -watch -p ./",
+    "build": "yarn build-webpack && yarn package",
+    "build-webpack": "webpack --mode production",
+    "package": "vsce package --yarn",
+    "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
+    "format": "prettier --write '**/*.{js,ts,md}'",
+    "test": "jest src",
+    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}' && tsc --noEmit",
+    "vscode:prepublish": ""
+  },
+  "dependencies": {
+    "@hediet/node-reload": "^0.7.3",
+    "@hediet/std": "^0.6.0",
+    "bufferutil": "^4.0.1",
+    "dayjs": "^1.9.4",
+    "mobx": "^6.0.1",
+    "utf-8-validate": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/copy-webpack-plugin": "^5.0.0",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^13.7.4",
+    "@types/vscode": "1.46.0",
+    "@typescript-eslint/eslint-plugin": "^4.5.0",
+    "@typescript-eslint/parser": "^4.5.0",
+    "copy-webpack-plugin": "^5.1.1",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.14.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^26.6.0",
+    "prettier": "^2.1.2",
+    "shx": "^0.3.2",
+    "ts-jest": "^26.4.1",
+    "ts-loader": "^6.2.1",
+    "tslint": "^6.0.0",
+    "typescript": "^3.8.2",
+    "vsce": "^1.81.1",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  }
 }

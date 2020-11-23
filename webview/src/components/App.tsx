@@ -7,11 +7,7 @@ import { Model } from '../model/Model'
 export class App extends React.Component {
   private readonly model = new Model()
 
-  constructor(props: any) {
-    super(props)
-  }
-
-  render() {
+  render(): JSX.Element {
     return <GUI model={this.model} />
   }
 }

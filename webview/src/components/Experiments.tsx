@@ -1,12 +1,10 @@
 import * as React from 'react'
-const { useCallback, useMemo } = React
 import {
   DataFileDict,
   DVCExperimentsRepoJSONOutput,
-  DVCExperimentJSONOutput,
+  DVCExperiment,
   DVCExperimentWithSha
 } from 'dvc-integration/src/DvcReader'
-import dayjs from '../dayjs'
 import {
   Row,
   Column,
@@ -16,11 +14,12 @@ import {
   useExpanded,
   useSortBy,
   useFlexLayout,
-  HeaderGroup,
-  TableInstance,
-  Cell
+  HeaderGroup
 } from 'react-table'
 import cx from 'classnames'
+import dayjs from '../dayjs'
+
+const { useCallback, useMemo } = React
 
 interface DVCExperimentRow extends DVCExperimentWithSha {
   subRows?: DVCExperimentRow[]
@@ -28,10 +27,9 @@ interface DVCExperimentRow extends DVCExperimentWithSha {
 
 const parseExperimentJSONEntry: (
   sha: string,
-  experiment: DVCExperimentJSONOutput
-) => DVCExperimentWithSha = (sha, { checkpoint_tip, ...rest }) => ({
-  ...rest,
-  checkpointTip: checkpoint_tip,
+  experiment: DVCExperiment
+) => DVCExperimentWithSha = (sha, experiment) => ({
+  ...experiment,
   sha
 })
 
@@ -41,7 +39,7 @@ const ColumnOptionsRow: React.FC<{
   return (
     <div>
       <div>
-        <span>{column.Header}</span>
+        <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
         {column.canSort && (
           <button {...column.getSortByToggleProps()}>
             Sort
@@ -101,21 +99,15 @@ export const getBranchingEntries: (
     }
   }
   return {
-    skippedKeys: skippedKeys,
-    entries: entries
+    skippedKeys,
+    entries
   }
 }
 
 const arrayAccessor: <T = string>(
   pathArray: string[]
-) => (originalRow: any) => T = (pathArray = []) => originalRow => {
-  let result = originalRow
-  for (let i = 0; i < pathArray.length; i++) {
-    result = result[pathArray[i]]
-    if (result === undefined) return result
-  }
-  return result
-}
+) => (originalRow: any) => T = pathArray => originalRow =>
+  pathArray.reduce((acc, cur) => acc[cur], originalRow)
 
 const buildColumnsFromSampleObject: (
   data: Record<string, any>,

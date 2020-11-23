@@ -1,7 +1,7 @@
-import Module = require('module')
 import { observer } from 'mobx-react'
 import * as React from 'react'
 import { observable, runInAction } from 'mobx'
+import Module = require('module')
 
 type ReactComponent<P = any> =
   | React.ComponentClass<P>
@@ -17,7 +17,7 @@ export function hotComponent(
 
     let result = allComponents.get(key)
     if (!result) {
-      result = observable({ component: component })
+      result = observable({ component })
       allComponents.set(key, result)
     } else {
       setTimeout(() => {
@@ -35,6 +35,7 @@ export function hotComponent(
     }
 
     if (m.hot) {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       m.hot.accept(() => {})
     }
 

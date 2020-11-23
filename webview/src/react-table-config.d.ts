@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import {
   UseColumnOrderInstanceProps,
   UseColumnOrderState,
@@ -53,10 +55,9 @@ import {
 declare module 'react-table' {
   // take this file as-is, or comment out the sections that don't apply to your plugin configuration
 
-  export interface HeaderGroup<D extends Record<string, unknown>>
-    extends HeaderGroup {}
+  export type HeaderGroup<D extends Record<string, unknown>> = HeaderGroup
 
-  export interface Column<D extends Record<string, unknown>> extends Column {}
+  export type Column<D extends Record<string, unknown>> = Column
 
   export interface TableOptions<
     D extends Record<string, unknown>

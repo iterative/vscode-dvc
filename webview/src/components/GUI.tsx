@@ -8,8 +8,18 @@ import Experiments from './Experiments'
 export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
     try {
-      const { experiments } = model
-      return <Experiments experiments={experiments} />
+      const { experiments, errors } = model
+      return (
+        <>
+          {errors &&
+            errors.map((error, i) => (
+              <div className="error-message" key={i}>
+                {error}
+              </div>
+            ))}
+          <Experiments experiments={experiments} />
+        </>
+      )
     } catch (e) {
       return <p>{e.toString()}</p>
     }

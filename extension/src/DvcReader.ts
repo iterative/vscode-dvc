@@ -26,14 +26,10 @@ export interface DVCExperiment extends DVCExperimentCommon {
 export interface DVCExperimentWithSha extends DVCExperiment {
   sha: string
 }
-export interface DVCExperimentJSONOutput extends DVCExperimentCommon {
-  checkpoint_tip: string
-}
 
 type DVCCommitId = 'workspace' | string
-interface DVCExperimentsCommitJSONOutput
-  extends Record<string, DVCExperimentJSONOutput> {
-  baseline: DVCExperimentJSONOutput
+interface DVCExperimentsCommitJSONOutput extends Record<string, DVCExperiment> {
+  baseline: DVCExperiment
 }
 
 export type DVCExperimentsRepoJSONOutput = Record<
@@ -66,9 +62,20 @@ const execCommand: (
     cwd
   })
 
+const camelRegex = /_(\w)/g
+const camelReplace = (_: string, letter: string) => letter.toUpperCase()
+function camelReviver(this: any, key: string, value: any) {
+  if (camelRegex.test(key)) {
+    this[key.replace(camelRegex, camelReplace)] = value
+    return undefined
+  }
+  return value
+}
+
 export const getExperiments: (
   options: DVCExtensionOptions
 ) => Promise<DVCExperimentsRepoJSONOutput> = async options => {
-  const { stdout } = await execCommand(options, 'exp show --show-json')
-  return JSON.parse(String(stdout))
+  const output = await execCommand(options, 'exp show --show-json')
+  const { stdout } = output
+  return JSON.parse(String(stdout), camelReviver)
 }
