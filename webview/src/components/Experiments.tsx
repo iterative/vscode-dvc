@@ -517,7 +517,7 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments: DVCExperimentsRepoJSONOutput | null
+  experiments?: DVCExperimentsRepoJSONOutput | null
 }> = ({ experiments }) => (
   <div className="experiments">
     <h1>Experiments</h1>
