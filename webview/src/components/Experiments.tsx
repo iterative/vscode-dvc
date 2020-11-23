@@ -363,9 +363,8 @@ function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
             ...row.subRows
           ].map((item, index) => ({ ...item, index }))
           return result
-        } else {
-          return [...acc, row]
         }
+        return [...acc, row]
       }, []),
     [rows]
   )
@@ -442,6 +441,7 @@ export const ExperimentsTable: React.FC<{
             ungrouped: action.setting || !state.ungrouped
           }
         }
+        return state
       })
       hooks.useInstance.push(ungroupByCommit)
     },
