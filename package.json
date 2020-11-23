@@ -1,16 +1,25 @@
 {
-	"private": true,
-	"workspaces": [
-		"./extension",
-		"./webview"
-	],
-	"scripts": {
-		"format": "yarn workspace dvc-integration format; yarn workspace dvc-vscode-webview format",
-		"build": "yarn build-ui && yarn build-extension",
-		"build-ui": "yarn workspace dvc-vscode-webview build",
-		"build-extension": "yarn workspace dvc-integration build"
-	},
-	"devDependencies": {
-		"prettier": "^1.19.1"
-	}
+  "private": true,
+  "workspaces": [
+    "./extension",
+    "./webview"
+  ],
+  "scripts": {
+    "format": "prettier --write './*.{json,md}'",
+    "format-all": "yarn format; yarn workspaces run format",
+    "lint-all": "yarn workspaces run lint",
+    "build": "yarn build-ui && yarn build-extension",
+    "build-ui": "yarn workspace dvc-vscode-webview build",
+    "extension-dev-server": "yarn workspace dvc-integration dev",
+    "webview-dev-server": "yarn workspace dvc-vscode-webview dev",
+    "dev-server": "run-p extension-dev-server webview-dev-server",
+    "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true code --extensionDevelopmentPath $PWD/extension demo/example-get-started --disable-extensions",
+    "build-extension": "yarn workspace dvc-integration build"
+  },
+  "devDependencies": {
+    "husky": "^5.0.1",
+    "lint-staged": "^10.5.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.1"
+  }
 }

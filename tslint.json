@@ -1,6 +1,6 @@
 {
-	"extends": "recommended",
-	"rules": {
-		"await-promise": true
-	}
+  "extends": "recommended",
+  "rules": {
+    "await-promise": true
+  }
 }

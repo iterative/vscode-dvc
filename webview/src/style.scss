@@ -17,6 +17,12 @@ body {
 	background-color: var(--vscode-editor-background);
 }
 
+.error-message {
+  padding: 0.5rem;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-editor-foreground);
+}
+
 .experiments {
 	margin: 1rem;
 	ul {
