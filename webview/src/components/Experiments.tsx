@@ -341,9 +341,9 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns } = instance
-        const sortedColumns: ColumnInstance<DVCExperimentRow>[] = allColumns.filter(
-          column => column.isSorted
-        )
+        const sortedColumns: ColumnInstance<
+          DVCExperimentRow
+        >[] = allColumns.filter(column => column.isSorted)
         Object.assign(instance, {
           sortedColumns
         })
