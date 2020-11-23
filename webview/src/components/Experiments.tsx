@@ -6,6 +6,8 @@ import {
   DVCExperimentWithSha
 } from 'dvc-integration/src/DvcReader'
 import {
+  Cell,
+  TableInstance,
   Row,
   Column,
   ColumnInstance,
