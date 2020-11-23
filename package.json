@@ -21,12 +21,5 @@
     "lint-staged": "^10.5.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1"
-  },
-  "lint-staged": {
-    "*.{json,md}": "prettier --write",
-    "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
-      "eslint --cache --fix"
-    ]
   }
 }
