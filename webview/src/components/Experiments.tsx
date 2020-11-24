@@ -357,7 +357,7 @@ function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
     preSortedRows: rows,
     toggleCommitUngroup
   })
-  const ungroupedRows = React.useMemo(
+  const ungroupedRows = useMemo(
     () =>
       rows.reduce<Row<DVCExperimentRow>[]>((acc, row) => {
         if (row.subRows) {
@@ -456,9 +456,10 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns } = instance
-        const sortedColumns: ColumnInstance<
-          DVCExperimentRow
-        >[] = allColumns.filter(column => column.isSorted)
+        const sortedColumns: ColumnInstance<DVCExperimentRow>[] = useMemo(
+          () => allColumns.filter(column => column.isSorted),
+          [allColumns]
+        )
         Object.assign(instance, {
           sortedColumns
         })
