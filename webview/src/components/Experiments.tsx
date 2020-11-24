@@ -21,7 +21,7 @@ import {
 import cx from 'classnames'
 import dayjs from '../dayjs'
 
-const { useCallback, useMemo } = React
+const { useCallback, useMemo, useEffect } = React
 
 interface DVCExperimentRow extends DVCExperimentWithSha {
   subRows?: DVCExperimentRow[]
@@ -175,6 +175,7 @@ const ParentHeaderGroup: React.FC<{
               }
             )
           })}
+          key={column.id}
         >
           <div>{column.render('Header')}</div>
         </span>
@@ -290,6 +291,7 @@ const TableRow: React.FC<{
                 'grouped-cell': cell.isGrouped
               })
             })}
+            key={`${cell.column.id}___${cell.row.id}`}
           >
             {cell.isGrouped ? (
               <>
@@ -474,8 +476,8 @@ export const ExperimentsTable: React.FC<{
     sortedColumns
   } = instance
 
-  React.useEffect(() => {
-    toggleAllRowsExpanded(true)
+  useEffect(() => {
+    toggleAllRowsExpanded()
   }, [])
 
   const lastHeaderGroupIndex = headerGroups.length - 1
@@ -489,7 +491,7 @@ export const ExperimentsTable: React.FC<{
           <div>Sorted by:</div>
           <div>
             {sortedColumns.map(column => (
-              <span>
+              <span key={column.id}>
                 {column.render('Header')} (
                 {column.isSortedDesc ? 'DESC' : 'ASC'})
               </span>
