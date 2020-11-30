@@ -27,6 +27,10 @@ interface DVCExperimentRow extends DVCExperimentWithSha {
   subRows?: DVCExperimentRow[]
 }
 
+interface InstanceProp {
+  instance: TableInstance<DVCExperimentRow>
+}
+
 const parseExperimentJSONEntry: (
   sha: string,
   experiment: DVCExperiment
@@ -40,24 +44,22 @@ const ColumnOptionsRow: React.FC<{
 }> = ({ column }) => {
   return (
     <div>
-      <div>
-        <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
-        {column.canSort && (
-          <button {...column.getSortByToggleProps()}>
-            Sort
-            {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
-          </button>
-        )}
-        {(!column.columns || column.columns.length === 0) && (
-          <button
-            onClick={() => {
-              column.toggleHidden()
-            }}
-          >
-            {column.isVisible ? 'Hide' : 'Show'}
-          </button>
-        )}
-      </div>
+      <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
+      {column.canSort && (
+        <button {...column.getSortByToggleProps()}>
+          Sort
+          {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
+        </button>
+      )}
+      {(!column.columns || column.columns.length === 0) && (
+        <button
+          onClick={() => {
+            column.toggleHidden()
+          }}
+        >
+          {column.isVisible ? 'Hide' : 'Show'}
+        </button>
+      )}
       {column.columns &&
         column.columns.map(childColumn => (
           <ColumnOptionsRow column={childColumn} key={childColumn.id} />
@@ -163,7 +165,7 @@ const ParentHeaderGroup: React.FC<{
       })}
     >
       {headerGroup.headers.map(column => (
-        <span
+        <div
           {...column.getHeaderProps({
             className: cx(
               'th',
@@ -178,7 +180,7 @@ const ParentHeaderGroup: React.FC<{
           key={column.id}
         >
           <div>{column.render('Header')}</div>
-        </span>
+        </div>
       ))}
     </div>
   )
@@ -240,13 +242,12 @@ const PrimaryHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<DVCExperimentRow>
 }> = ({ headerGroup }) => (
   <div
-    className="tr"
     {...headerGroup.getHeaderGroupProps({
-      className: 'headers-row'
+      className: cx('tr', 'headers-row')
     })}
   >
     {headerGroup.headers.map(header => (
-      <span
+      <div
         {...header.getHeaderProps(
           header.getSortByToggleProps({
             className: cx('th', {
@@ -260,26 +261,23 @@ const PrimaryHeaderGroup: React.FC<{
           {header.render('Header')}
           {header.isSorted && <span>{header.isSortedDesc ? '↓' : '↑'}</span>}
         </div>
-      </span>
+      </div>
     ))}
   </div>
 )
 
-const TableRow: React.FC<{
+interface RowProp {
   row: Row<DVCExperimentRow>
-  instance: TableInstance<DVCExperimentRow>
-}> = ({ row, instance, instance: { prepareRow } }) => {
+}
+
+const TableRow: React.FC<RowProp & InstanceProp> = ({
+  row,
+  instance: { prepareRow }
+}) => {
   prepareRow(row)
   const [firstCell, ...cells] = row.cells
-  const baseRow = (
-    <div
-      {...row.getRowProps({
-        className: cx(
-          'tr',
-          row.original.sha === 'workspace' ? 'workspace-row' : 'normal-row'
-        )
-      })}
-    >
+  return (
+    <div {...row.getRowProps({ className: cx('tr') })}>
       <FirstCell cell={firstCell} />
       {cells.map(cell => {
         return (
@@ -310,31 +308,44 @@ const TableRow: React.FC<{
       })}
     </div>
   )
-  return row.subRows && row.subRows.length > 0 ? (
+}
+
+const TableBody: React.FC<RowProp & InstanceProp> = ({ row, instance }) => {
+  return (
     <div
-      className={cx('tr', 'row-group', {
-        'workspace-row-group': row.values.sha === 'workspace'
+      {...instance.getTableBodyProps({
+        className: cx(
+          'row-group',
+          'tbody',
+          row.values.sha === 'workspace'
+            ? 'workspace-row-group'
+            : 'normal-row-group'
+        )
       })}
     >
-      {baseRow}
-      {row.isExpanded &&
+      <TableRow instance={instance} row={row} />
+      {row.canExpand &&
+        row.isExpanded &&
         row.subRows.map(subRow => (
-          <TableRow instance={instance} row={subRow} />
+          <TableRow instance={instance} row={subRow} key={subRow.id} />
         ))}
     </div>
-  ) : (
-    baseRow
   )
 }
 
-const TableBody: React.FC<{
-  instance: TableInstance<DVCExperimentRow>
-}> = ({ instance, instance: { rows, getTableBodyProps } }) => {
+const TableHead: React.FC<InstanceProp> = ({ instance: { headerGroups } }) => {
+  const lastHeaderGroupIndex = headerGroups.length - 1
+  const lastHeaderGroup = headerGroups[lastHeaderGroupIndex]
+
   return (
-    <div className="tbody" {...getTableBodyProps()}>
-      {rows.map(row => {
-        return <TableRow row={row} instance={instance} key={row.id} />
-      })}
+    <div className="thead">
+      {headerGroups.slice(0, lastHeaderGroupIndex).map((headerGroup, i) => (
+        <ParentHeaderGroup
+          headerGroup={headerGroup}
+          key={`header-group-${i}`}
+        />
+      ))}
+      <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
     </div>
   )
 }
@@ -402,6 +413,7 @@ export const ExperimentsTable: React.FC<{
     const columns = [
       {
         Header: 'Experiment',
+        id: 'sha',
         accessor: (item: any) => item.name || item.sha,
         Cell: TruncatedCell,
         disableGroupBy: true,
@@ -437,6 +449,7 @@ export const ExperimentsTable: React.FC<{
       defaultColumn,
       expandSubRows: false
     },
+    useFlexLayout,
     hooks => {
       hooks.stateReducers.push((state, action) => {
         if (action.type === 'set-ungrouped') {
@@ -452,7 +465,6 @@ export const ExperimentsTable: React.FC<{
     useGroupBy,
     useSortBy,
     useExpanded,
-    useFlexLayout,
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns } = instance
@@ -472,7 +484,7 @@ export const ExperimentsTable: React.FC<{
     toggleAllRowsExpanded,
     columns: columnInstances,
     toggleCommitUngroup,
-    headerGroups,
+    rows,
     state,
     sortedColumns
   } = instance
@@ -480,9 +492,6 @@ export const ExperimentsTable: React.FC<{
   useEffect(() => {
     toggleAllRowsExpanded()
   }, [])
-
-  const lastHeaderGroupIndex = headerGroups.length - 1
-  const lastHeaderGroup = headerGroups[lastHeaderGroupIndex]
 
   return (
     <div>
@@ -500,20 +509,17 @@ export const ExperimentsTable: React.FC<{
           </div>
         </summary>
         {columnInstances.map(column => (
-          <ColumnOptionsRow column={column} />
+          <ColumnOptionsRow column={column} key={column.id} />
         ))}
         <button onClick={() => toggleCommitUngroup()}>
           {state.ungrouped ? 'Group' : 'Ungroup'} by Commit
         </button>
       </details>
-      <div className="table" {...getTableProps()}>
-        <div className="thead">
-          {headerGroups.slice(0, lastHeaderGroupIndex).map(headerGroup => (
-            <ParentHeaderGroup headerGroup={headerGroup} key={headerGroup.id} />
-          ))}
-          <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
-        </div>
-        <TableBody instance={instance} />
+      <div {...getTableProps({ className: 'table' })}>
+        <TableHead instance={instance} />
+        {rows.map(row => {
+          return <TableBody row={row} instance={instance} key={row.id} />
+        })}
       </div>
     </div>
   )

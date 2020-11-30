@@ -1,95 +1,88 @@
-html {
-	overflow: auto;
+* {
+  box-sizing: border-box;
 }
 
 html,
 body,
 .react-root {
-	height: 100%;
-	width: 100%;
+  height: 100%;
+  padding: 1px;
 }
 
 body {
-	font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
 
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 
-	background-color: var(--vscode-editor-background);
+  background-color: var(--vscode-editor-background);
+  overflow: auto;
 }
 
 %bullet {
-	border-radius: 99px;
-	margin: 0 5px;
+  display: inline-block;
+  border-radius: 99px;
+  margin: 0 5px;
 }
 
 .queued-bullet {
-	@extend %bullet;
-	width: 9px;
-	height: 9px;
-	margin: 0 6px;
-
-	/* vcs/bg-icon | process */
-	background: conic-gradient(
-		from 180deg at 50% 50%,
-		rgba(255, 255, 255, 0.5) 0deg,
-		rgba(255, 255, 255, 0) 180.31deg,
-		rgba(255, 255, 255, 0) 360deg
-	);
-
-	/* vsc/text | hover */
-	border: 1px solid #ffffff;
-	box-sizing: border-box;
+  @extend %bullet;
+  width: 9px;
+  height: 9px;
+  margin: 0 6px;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0.5) 0deg,
+    rgba(255, 255, 255, 0) 180.31deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+  border: 1px solid #ffffff;
 }
 
 .bullet {
-	@extend %bullet;
-	/* default */
-	display: inline-block;
-	width: 5px;
-	height: 5px;
-	margin: 0 10px;
-	line-height: 0;
-
-	/* vsc/text | muted */
-	background: rgba(255, 255, 255, 0.5);
+  @extend %bullet;
+  width: 5px;
+  height: 5px;
+  margin: 0 10px;
+  line-height: 0;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 %row-arrow-base {
-	width: 8px;
-	height: 8px;
-	margin: 0 6px;
-	display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 6px;
+  display: inline-block;
 }
 
 %expandable-row-arrow {
-	@extend %row-arrow-base;
-	position: relative;
-	border: 2px solid rgba(255, 255, 255, 0.21);
-	border-top: unset;
-	border-left: unset;
-	transition: transform 0.2s, right 0.2s, bottom 0.2s;
+  @extend %row-arrow-base;
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.21);
+  border-top: unset;
+  border-left: unset;
+  transition: transform 0.2s, right 0.2s, bottom 0.2s;
 }
 
 .row-arrow-placeholder {
-	@extend %row-arrow-base;
+  @extend %row-arrow-base;
 }
 
 .expanded-row-arrow {
-	@extend %expandable-row-arrow;
-	transform: rotate(45deg);
-	right: 1px;
-	bottom: 2px;
+  @extend %expandable-row-arrow;
+  transform: rotate(45deg);
+  right: 1px;
+  bottom: 2px;
 }
 
 .contracted-row-arrow {
-	@extend %expandable-row-arrow;
-	transform: rotate(-45deg);
-	right: 4px;
-	bottom: 0;
+  @extend %expandable-row-arrow;
+  transform: rotate(-45deg);
+  right: 4px;
+  bottom: 0;
 }
 
 $row-bg-color: var(--vscode-editor-background);
@@ -101,78 +94,104 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   border: 1px solid var(--vscode-editor-foreground);
 }
 
+%row-group {
+  .tr {
+    background-color: $row-bg-alt-color;
+  }
+  .tr:nth-child(2n) {
+    background-color: $row-bg-color;
+  }
+}
+
+%inverted-row-group {
+  .tr {
+    background-color: $row-bg-color;
+  }
+  .tr:nth-child(2n) {
+    background-color: $row-bg-alt-color;
+  }
+}
+
 .experiments {
-	margin: 1rem;
-	width: 100%;
-	ul {
-		padding-left: 1rem;
-	}
-	.table,
-	.thead,
-	.tbody,
-	.tr {
-		width: 100%;
-	}
-	summary {
-		white-space: nowrap;
-		cursor: pointer;
-		h2,
-		h3 {
-			margin: 0.25em;
-			white-space: nowrap;
-			display: inline-block;
-		}
-	}
+  margin: 1rem;
+  display: inline-block;
+  ul {
+    padding-left: 1rem;
+  }
+  .table,
+  .thead,
+  .tbody,
+  .tr {
+  }
+  .table {
+    border-collapse: collapse;
+  }
+  summary {
+    white-space: nowrap;
+    cursor: pointer;
+    h2,
+    h3 {
+      margin: 0.25em;
+      white-space: nowrap;
+      display: inline-block;
+    }
+  }
 
-	.depth-spacer {
-		width: 1rem;
-	}
+  .depth-spacer {
+    width: 1rem;
+  }
 
-	.row-group {
-		border: 1px solid gray;
-		background-color: $row-bg-color;
-		.tr:nth-child(2n + 1) .td {
-			background-color: $row-bg-alt-color;
-		}
-	}
-	.td,
-	.th {
-		white-space: nowrap;
-	}
-	.td {
-		padding: 0.5rem;
-		font-size: 1.1rem;
-		text-align: center;
-		line-height: 2rem;
-		display: flex;
-		flex-flow: row nowrap;
-		align-items: center;
-	}
-	.experiment-cell {
-		text-align: left;
-		padding-left: 1rem;
-	}
-	.grouped-cell,
-	.grouped-header {
-		transition: 0.2s all;
-		background-color: var(--vscode-button-background);
-		&:hover {
-			background-color: var(--vscode-button-hoverBackground);
-		}
-	}
-	.parent-header-cell {
-		padding: 0.1rem 0.2rem;
-		font-size: 0.9rem;
-	}
-	.headers-row {
-		text-align: center;
-		font-weight: bold;
-		.th {
-			padding: 0.4rem 0.25rem;
-		}
-		font-size: 1.2rem;
-	}
-	.group-placeholder {
-		flex: 0 0 1rem;
-	}
+  .row-group {
+    @extend %row-group;
+    &:nth-child(2n) {
+      @extend %inverted-row-group;
+    }
+  }
+
+  .normal-row-group {
+    border: 1px solid gray;
+  }
+  .workspace-row-group {
+    border: none;
+    .tr .td {
+      background-color: none;
+    }
+  }
+  .td,
+  .th {
+    white-space: nowrap;
+    text-align: left;
+    min-width: 0;
+  }
+  .td {
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    line-height: 2rem;
+    align-items: center;
+  }
+  .experiment-cell {
+    text-align: left;
+    padding-left: 1rem;
+  }
+  .grouped-cell,
+  .grouped-header {
+    transition: 0.2s all;
+    background-color: var(--vscode-button-background);
+    &:hover {
+      background-color: var(--vscode-button-hoverBackground);
+    }
+  }
+  .parent-header-cell {
+    text-align: left;
+    padding: 0.1rem 0.2rem;
+    font-size: 0.9rem;
+  }
+  .headers-row {
+    text-align: center;
+    font-weight: bold;
+    .th {
+      padding: 0.4rem 0.25rem;
+    }
+    font-size: 1.2rem;
+  }
 }
