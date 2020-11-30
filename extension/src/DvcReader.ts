@@ -13,15 +13,13 @@ export interface DataFileDict {
 export interface DataFilesDict {
   [filename: string]: DataFileDict
 }
-interface DVCExperimentCommon {
+export interface DVCExperiment {
   name?: string
   timestamp: Date
   params: DataFilesDict
   metrics: DataFilesDict
   queued: boolean
-}
-export interface DVCExperiment extends DVCExperimentCommon {
-  checkpointTip: string
+  checkpoint_tip: string
 }
 export interface DVCExperimentWithSha extends DVCExperiment {
   sha: string
@@ -62,20 +60,10 @@ const execCommand: (
     cwd
   })
 
-const camelRegex = /_(\w)/g
-const camelReplace = (_: string, letter: string) => letter.toUpperCase()
-function camelReviver(this: any, key: string, value: any) {
-  if (camelRegex.test(key)) {
-    this[key.replace(camelRegex, camelReplace)] = value
-    return undefined
-  }
-  return value
-}
-
 export const getExperiments: (
   options: DVCExtensionOptions
 ) => Promise<DVCExperimentsRepoJSONOutput> = async options => {
   const output = await execCommand(options, 'exp show --show-json')
   const { stdout } = output
-  return JSON.parse(String(stdout), camelReviver)
+  return JSON.parse(String(stdout))
 }

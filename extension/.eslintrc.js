@@ -15,6 +15,7 @@ module.exports = {
     es6: true
   },
   rules: {
+    camelcase: 'off',
     // prettier
     'prettier/prettier': ['error'],
     // TypeScript
