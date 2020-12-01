@@ -1,6 +1,5 @@
 import * as React from 'react'
 import {
-  DataFileDict,
   DVCExperimentsRepoJSONOutput,
   DVCExperiment,
   DVCExperimentWithSha
@@ -145,9 +144,17 @@ const buildNestedColumnsFromExperiments: (def: {
   if (!data || data.length === 0) {
     return []
   }
-  return buildColumnsFromSampleObject(data[0][accessor] as DataFileDict, [
-    accessor
-  ])
+  const sampleObject: Record<string, any> = data.reduce((sampleObject, row) => {
+    const currentSample = row[accessor]
+    if (typeof currentSample !== 'object') {
+      return sampleObject
+    }
+    return {
+      ...sampleObject,
+      ...currentSample
+    }
+  }, {})
+  return buildColumnsFromSampleObject(sampleObject, [accessor])
 }
 
 const TruncatedCell = ({ value }: { value: string }) =>
