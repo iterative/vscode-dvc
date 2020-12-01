@@ -284,7 +284,14 @@ const TableRow: React.FC<RowProp & InstanceProp> = ({
   prepareRow(row)
   const [firstCell, ...cells] = row.cells
   return (
-    <div {...row.getRowProps({ className: cx('tr') })}>
+    <div
+      {...row.getRowProps({
+        className: cx(
+          'tr',
+          row.values.sha === 'workspace' ? 'workspace-row' : 'normal-row'
+        )
+      })}
+    >
       <FirstCell cell={firstCell} />
       {cells.map(cell => {
         return (
@@ -396,6 +403,37 @@ function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
   })
 }
 
+const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
+  const {
+    columns: columnInstances,
+    toggleCommitUngroup,
+    state,
+    sortedColumns
+  } = instance
+
+  return (
+    <details className="options-panel">
+      <summary>
+        <b>Options</b>
+        <div>Sorted by:</div>
+        <div>
+          {sortedColumns.map(column => (
+            <span key={column.id}>
+              {column.render('Header')} ({column.isSortedDesc ? 'DESC' : 'ASC'})
+            </span>
+          ))}
+        </div>
+      </summary>
+      {columnInstances.map(column => (
+        <ColumnOptionsRow column={column} key={column.id} />
+      ))}
+      <button onClick={() => toggleCommitUngroup()}>
+        {state.ungrouped ? 'Group' : 'Ungroup'} by Commit
+      </button>
+    </details>
+  )
+}
+
 export const ExperimentsTable: React.FC<{
   experiments: DVCExperimentsRepoJSONOutput
 }> = ({ experiments }) => {
@@ -486,49 +524,24 @@ export const ExperimentsTable: React.FC<{
     }
   )
 
-  const {
-    getTableProps,
-    toggleAllRowsExpanded,
-    columns: columnInstances,
-    toggleCommitUngroup,
-    rows,
-    state,
-    sortedColumns
-  } = instance
+  const { getTableProps, toggleAllRowsExpanded, rows } = instance
 
   useEffect(() => {
     toggleAllRowsExpanded()
   }, [])
 
   return (
-    <div>
-      <details className="options-panel">
-        <summary>
-          <b>Options</b>
-          <div>Sorted by:</div>
-          <div>
-            {sortedColumns.map(column => (
-              <span key={column.id}>
-                {column.render('Header')} (
-                {column.isSortedDesc ? 'DESC' : 'ASC'})
-              </span>
-            ))}
-          </div>
-        </summary>
-        {columnInstances.map(column => (
-          <ColumnOptionsRow column={column} key={column.id} />
-        ))}
-        <button onClick={() => toggleCommitUngroup()}>
-          {state.ungrouped ? 'Group' : 'Ungroup'} by Commit
-        </button>
-      </details>
-      <div {...getTableProps({ className: 'table' })}>
-        <TableHead instance={instance} />
-        {rows.map(row => {
-          return <TableBody row={row} instance={instance} key={row.id} />
-        })}
+    <>
+      <OptionsPanel instance={instance} />
+      <div className="table-container">
+        <div {...getTableProps({ className: 'table' })}>
+          <TableHead instance={instance} />
+          {rows.map(row => {
+            return <TableBody row={row} instance={instance} key={row.id} />
+          })}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -536,7 +549,7 @@ const Experiments: React.FC<{
   experiments?: DVCExperimentsRepoJSONOutput | null
 }> = ({ experiments }) => (
   <div className="experiments">
-    <h1>Experiments</h1>
+    <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
     {experiments ? (
       <ExperimentsTable experiments={experiments} />
     ) : (

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react'
 import { Model } from '../model/Model'
 import { hotComponent } from '../hotComponent'
 
-import Experiments from './Experiments'
+import ExperimentsGUI from './Experiments'
 
 export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
@@ -17,7 +17,7 @@ export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
                 {error}
               </div>
             ))}
-          <Experiments experiments={experiments} />
+          <ExperimentsGUI experiments={experiments} />
         </>
       )
     } catch (e) {
