@@ -20,14 +20,25 @@ import {
 import cx from 'classnames'
 import dayjs from '../dayjs'
 
+import buildDynamicColumns from './build-dynamic-columns'
+
 const { useCallback, useMemo, useEffect } = React
 
-interface DVCExperimentRow extends DVCExperimentWithSha {
+export interface DVCExperimentRow extends DVCExperimentWithSha {
   subRows?: DVCExperimentRow[]
 }
 
 interface InstanceProp {
   instance: TableInstance<DVCExperimentRow>
+}
+
+interface RowProp {
+  row: Row<DVCExperimentRow>
+}
+
+interface ParseExperimentsOutput {
+  experiments: DVCExperimentRow[]
+  flatExperiments: DVCExperimentRow[]
 }
 
 const parseExperimentJSONEntry: (
@@ -67,94 +78,38 @@ const ColumnOptionsRow: React.FC<{
   )
 }
 
-const parseExperiments = (experimentsData: DVCExperimentsRepoJSONOutput) => {
-  return Object.entries(experimentsData).reduce<DVCExperimentRow[]>(
-    (acc, [commitId, { baseline, ...childExperiments }]) => {
-      return [
-        ...acc,
-        {
-          ...parseExperimentJSONEntry(commitId, baseline),
-          subRows: Object.entries(childExperiments).map(([sha, experiment]) =>
-            parseExperimentJSONEntry(sha, experiment)
-          )
-        }
-      ]
-    },
-    []
-  )
-}
-
-interface ObjectEntriesWithParents {
-  skippedKeys: string[]
-  entries: [string, any][]
-}
-
-export const getBranchingEntries: (
-  input: Record<string, any>,
-  skippedKeys?: string[]
-) => ObjectEntriesWithParents = (input, skippedKeys = []) => {
-  const entries = Object.entries(input)
-  if (entries.length === 1) {
-    const [key, value] = entries[0]
-    const newPath = [...skippedKeys, key]
-    if (typeof value === 'object') {
-      return getBranchingEntries(value, newPath)
-    }
-  }
-  return {
-    skippedKeys,
-    entries
-  }
-}
-
-const arrayAccessor: <T = string>(
-  pathArray: string[]
-) => (originalRow: any) => T = pathArray => originalRow =>
-  pathArray.reduce((acc, cur) => acc[cur], originalRow)
-
-const buildColumnsFromSampleObject: (
-  data: Record<string, any>,
-  parents?: string[]
-) => Column<DVCExperimentRow>[] = (data, oldParents = []) => {
-  const entries = Object.entries(data)
-  return entries.map(([fieldName, value]) => {
-    const currentPath = [...oldParents, fieldName]
-    const base: Column<any> & {
-      columns?: Column<any>[]
-    } = {
-      Header: fieldName,
-      id: currentPath.join('___'),
-      accessor: arrayAccessor(currentPath)
-    }
-    if (typeof value === 'object') {
+const parseExperiments: (
+  experimentsData: DVCExperimentsRepoJSONOutput
+) => ParseExperimentsOutput = experimentsData => {
+  return Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
+    (
+      { experiments, flatExperiments },
+      [commitId, { baseline, ...childExperiments }]
+    ) => {
+      const parsedChildExperiments = Object.entries(
+        childExperiments
+      ).map(([sha, experiment]) => parseExperimentJSONEntry(sha, experiment))
+      const baselineEntry = parseExperimentJSONEntry(commitId, baseline)
       return {
-        ...base,
-        disableSortBy: true,
-        columns: buildColumnsFromSampleObject(value, currentPath)
+        experiments: [
+          ...experiments,
+          {
+            ...baselineEntry,
+            subRows: parsedChildExperiments
+          }
+        ],
+        flatExperiments: [
+          ...flatExperiments,
+          baselineEntry,
+          ...parsedChildExperiments
+        ]
       }
+    },
+    {
+      experiments: [],
+      flatExperiments: []
     }
-    return base
-  })
-}
-
-const buildNestedColumnsFromExperiments: (def: {
-  data: DVCExperimentRow[]
-  accessor: keyof DVCExperimentRow
-}) => Column<DVCExperimentRow>[] = ({ accessor, data }) => {
-  if (!data || data.length === 0) {
-    return []
-  }
-  const sampleObject: Record<string, any> = data.reduce((sampleObject, row) => {
-    const currentSample = row[accessor]
-    if (typeof currentSample !== 'object') {
-      return sampleObject
-    }
-    return {
-      ...sampleObject,
-      ...currentSample
-    }
-  }, {})
-  return buildColumnsFromSampleObject(sampleObject, [accessor])
+  )
 }
 
 const TruncatedCell = ({ value }: { value: string }) =>
@@ -272,10 +227,6 @@ const PrimaryHeaderGroup: React.FC<{
     ))}
   </div>
 )
-
-interface RowProp {
-  row: Row<DVCExperimentRow>
-}
 
 const TableRow: React.FC<RowProp & InstanceProp> = ({
   row,
@@ -436,25 +387,15 @@ const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
 
 export const ExperimentsTable: React.FC<{
   experiments: DVCExperimentsRepoJSONOutput
-}> = ({ experiments }) => {
+}> = ({ experiments: rawExperiments }) => {
   const [initialState, defaultColumn] = useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<DVCExperimentRow>> = {
-      Cell: ({ value }: { value?: string | number }) => {
-        return !value
-          ? null
-          : typeof value === 'number'
-          ? value.toLocaleString(undefined, {
-              maximumFractionDigits: 2
-            })
-          : value
-      }
-    }
+    const defaultColumn: Partial<Column<DVCExperimentRow>> = {}
     return [initialState, defaultColumn]
   }, [])
 
   const [data, columns] = useMemo(() => {
-    const data = parseExperiments(experiments)
+    const { experiments, flatExperiments } = parseExperiments(rawExperiments)
     const columns = [
       {
         Header: 'Experiment',
@@ -473,24 +414,16 @@ export const ExperimentsTable: React.FC<{
           return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
         }
       },
-      ...buildNestedColumnsFromExperiments({
-        accessor: 'params',
-        data
-      }),
-      ...buildNestedColumnsFromExperiments({
-        accessor: 'metrics',
-        data
-      })
+      ...buildDynamicColumns(flatExperiments)
     ] as Column<DVCExperimentRow>[]
-    return [data, columns]
-  }, [experiments])
+    return [experiments, columns]
+  }, [rawExperiments])
 
   const instance = useTable<DVCExperimentRow>(
     {
       columns,
       data,
       initialState,
-      isMultiSortEvent: () => true,
       defaultColumn,
       expandSubRows: false
     },
