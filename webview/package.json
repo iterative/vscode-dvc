@@ -15,7 +15,6 @@
     "@hediet/std": "^0.6.0",
     "classnames": "^2.2.6",
     "dayjs": "^1.9.6",
-    "generate-schema": "^2.6.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.1.8",
     "react": "^16.12.0",
