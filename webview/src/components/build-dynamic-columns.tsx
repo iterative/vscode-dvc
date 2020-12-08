@@ -1,10 +1,17 @@
 import React from 'react'
 
+import { DataFilesDict } from 'dvc-integration/src/DvcReader'
+
 import { Column } from 'react-table'
 
 import { DVCExperimentRow } from './Experiments'
 
-import { formatSigned, formatSignedInteger } from '../util/number-formatting'
+import {
+  formatFloat,
+  formatInteger,
+  formatSignedFloat,
+  formatSignedInteger
+} from '../util/number-formatting'
 
 type SchemaType = string | string[]
 
@@ -19,18 +26,20 @@ type SchemaProperties = Record<string, SchemaProperty>
 // String
 const StringCell: React.FC<{ value: string }> = ({ value }) => <>{value}</>
 // Integer
-const IntegerCell: React.FC<{ value: number }> = ({ value }) => <>{value}</>
+const IntegerCell: React.FC<{ value: number }> = ({ value }) => (
+  <>{formatInteger(value)}</>
+)
 // Signed Integer
 const SignedIntegerCell: React.FC<{ value: number }> = ({ value }) => (
   <>{formatSignedInteger(value)}</>
 )
 // Float
 const FloatCell: React.FC<{ value: number }> = ({ value }) => (
-  <>{value.toFixed(5)}</>
+  <>{formatFloat(value)}</>
 )
 // Signed Float
 const SignedFloatCell: React.FC<{ value: number }> = ({ value }) => (
-  <>{formatSigned(value)}</>
+  <>{formatSignedFloat(value)}</>
 )
 
 const getNumberCellComponent: (
@@ -53,12 +62,14 @@ const makeMixedCellComponent: (
   propertyType: SchemaProperty
 ) => React.FC<{ value: any }> = propertyType => {
   const NumberCell = getNumberCellComponent(propertyType)
-  return ({ value }) =>
-    typeof value === 'number' ? (
+  return ({ value }) => {
+    if (value === undefined) return null
+    return typeof value === 'number' ? (
       <NumberCell value={value} />
     ) : (
       <StringCell value={value} />
     )
+  }
 }
 
 const getCellComponent: (
@@ -97,12 +108,13 @@ const mergeType: (
   return original
 }
 
-const mergeProperties: (
-  samples: Record<string, any>[]
-) => SchemaProperties = samples =>
-  samples.reduce((acc, cur) => buildProperties(cur, acc), {})
+const convertObjectsToProperties: (
+  samples: Record<string, any>[],
+  base?: SchemaProperties
+) => SchemaProperties = (samples, base = {}) =>
+  samples.reduce((acc, cur) => convertObjectToProperties(cur, acc), base)
 
-const buildProperties: (
+const convertObjectToProperties: (
   addition: Record<string, any>,
   base?: SchemaProperties
 ) => SchemaProperties = (sample, base = {}) => {
@@ -134,7 +146,10 @@ const addToProperty: (
         newProperty.canBeFloat || !Number.isInteger(addition)
       break
     case 'object':
-      newProperty.properties = buildProperties(addition, newProperty.properties)
+      newProperty.properties = convertObjectToProperties(
+        addition,
+        newProperty.properties
+      )
       break
     default:
   }
@@ -196,11 +211,26 @@ const buildDynamicColumnsFromExperiments: (
     return []
   }
 
-  const dynamicProperties = mergeProperties(
-    data.map(({ params, metrics }) => ({ params, metrics }))
+  const { params, metrics } = data.reduce<{
+    params: DataFilesDict[]
+    metrics: DataFilesDict[]
+  }>(
+    ({ params, metrics }, cur) => {
+      return {
+        params: [...params, cur.params],
+        metrics: [...metrics, cur.metrics]
+      }
+    },
+    { params: [], metrics: [] }
   )
 
-  return buildColumnsFromSchemaProperties(dynamicProperties)
+  const paramsProperties = convertObjectsToProperties(params)
+  const metricsProperties = convertObjectsToProperties(metrics)
+
+  return [
+    ...buildColumnsFromSchemaProperties(paramsProperties, ['params']),
+    ...buildColumnsFromSchemaProperties(metricsProperties, ['metrics'])
+  ]
 }
 
 export default buildDynamicColumnsFromExperiments

@@ -1,20 +1,22 @@
 const defaultPrecision = 5 // for when we can't calculate real precision yet
-const defaultType = 'fixed'
 
 const addSign: (num: string) => string = num =>
   (num[0] === '-' ? '' : '+') + num
 
-export const formatSigned = (
-  value: number,
-  precision: number = defaultPrecision,
-  method: 'fixed' | 'precision' = defaultType
-): string => {
-  if (method === 'fixed') {
-    return value > 0 ? `+${value.toFixed(precision)}` : value.toFixed(precision)
+export const formatFloat = (value: number): string => {
+  const automatic = value.toString()
+  if (automatic.length > 7) {
+    return value.toPrecision(defaultPrecision)
   }
-
-  return addSign(value.toPrecision(precision))
+  return automatic
 }
+
+export const formatSignedFloat = (value: number): string => {
+  const unsigned = formatFloat(value)
+  return value > 0 ? `+${unsigned}` : unsigned
+}
+
+export const formatInteger: (value: number) => string = value => String(value)
 
 export const formatSignedInteger: (value: number) => string = value =>
   addSign(String(value))
