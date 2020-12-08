@@ -11,15 +11,13 @@ export const formatFloat = (value: number): string => {
   return automatic
 }
 
-export const formatSignedFloat = (value: number): string => {
-  const unsigned = formatFloat(value)
-  return value > 0 ? `+${unsigned}` : unsigned
-}
+export const formatSignedFloat = (value: number): string =>
+  addSign(formatFloat(value))
 
 export const formatInteger: (value: number) => string = value => String(value)
 
 export const formatSignedInteger: (value: number) => string = value =>
-  addSign(String(value))
+  addSign(formatInteger(value))
 
 export const formatLargeInteger: (value: number) => string = value =>
   value.toLocaleString('en')

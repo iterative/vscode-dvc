@@ -9,8 +9,7 @@ import { DVCExperimentRow } from './Experiments'
 import {
   formatFloat,
   formatInteger,
-  formatSignedFloat,
-  formatSignedInteger
+  formatSignedFloat
 } from '../util/number-formatting'
 
 type SchemaType = string | string[]
@@ -28,10 +27,6 @@ const StringCell: React.FC<{ value: string }> = ({ value }) => <>{value}</>
 // Integer
 const IntegerCell: React.FC<{ value: number }> = ({ value }) => (
   <>{formatInteger(value)}</>
-)
-// Signed Integer
-const SignedIntegerCell: React.FC<{ value: number }> = ({ value }) => (
-  <>{formatSignedInteger(value)}</>
 )
 // Float
 const FloatCell: React.FC<{ value: number }> = ({ value }) => (
@@ -52,9 +47,6 @@ const getNumberCellComponent: (
     }
     return FloatCell
   }
-  if (canBeNegative) {
-    return SignedIntegerCell
-  }
   return IntegerCell
 }
 
@@ -74,12 +66,14 @@ const makeMixedCellComponent: (
 
 const getCellComponent: (
   propertyType: SchemaProperty
-) => React.FC<{ value: any }> = propertyType => {
-  switch (propertyType.type) {
+) => React.FC<{ value: any }> = schemaProperty => {
+  const propertyType = schemaProperty.type
+  if (Array.isArray(propertyType)) {
+    return makeMixedCellComponent(schemaProperty)
+  }
+  switch (propertyType) {
     case 'number':
-      return getNumberCellComponent(propertyType)
-    case 'mixed':
-      return makeMixedCellComponent(propertyType)
+      return getNumberCellComponent(schemaProperty)
     default:
       return StringCell
   }
@@ -227,10 +221,12 @@ const buildDynamicColumnsFromExperiments: (
   const paramsProperties = convertObjectsToProperties(params)
   const metricsProperties = convertObjectsToProperties(metrics)
 
-  return [
+  const columns = [
     ...buildColumnsFromSchemaProperties(paramsProperties, ['params']),
     ...buildColumnsFromSchemaProperties(metricsProperties, ['metrics'])
   ]
+
+  return columns
 }
 
 export default buildDynamicColumnsFromExperiments
