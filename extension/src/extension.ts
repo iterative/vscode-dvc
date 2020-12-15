@@ -80,15 +80,23 @@ export class Extension {
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      commands.registerCommand('dvc-integration.showWebview', async () => {
-        const dvcWebview = this.dispose.track(await this.manager.createNew())
-        try {
-          const tableData = await this.getCachedTable()
-          dvcWebview.showExperiments({ tableData })
-        } catch (e) {
-          dvcWebview.showExperiments({ errors: [e.toString()] })
-        }
-      })
+      commands.registerCommand(
+        'dvc-integration.showWebview',
+        async () => {
+          const dvcWebview = this.dispose.track(await this.manager.createNew())
+          try {
+            const tableData = await this.getCachedTable()
+            dvcWebview.showExperiments({ tableData })
+          } catch (e) {
+            dvcWebview.showExperiments({ errors: [e.toString()] })
+          }
+        },
+        commands.registerCommand('dvc-integration.runExperiment', () => {
+          const terminal = window.createTerminal('DVC')
+          terminal.sendText('dvc exp run')
+          terminal.show()
+        })
+      )
     )
 
     this.dvcScmFilesView()

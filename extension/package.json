@@ -27,6 +27,10 @@
       {
         "title": "DVC: Show Webview",
         "command": "dvc-integration.showWebview"
+      },
+      {
+        "title": "DVC: Run Experiment",
+        "command": "dvc-integration.runExperiment"
       }
     ],
     "configuration": {
