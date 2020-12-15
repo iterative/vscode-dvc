@@ -124,6 +124,13 @@ export class Extension {
                 title: 'Webview Tree',
                 command: 'dvc-integration.showWebview'
               }
+            },
+            {
+              label: 'Run Experiment',
+              command: {
+                title: 'Run Experiment',
+                command: 'dvc-integration.runExperiment'
+              }
             }
           ]
         }
