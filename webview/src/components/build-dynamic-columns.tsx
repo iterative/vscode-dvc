@@ -24,10 +24,10 @@ type SchemaProperties = Record<string, SchemaProperty>
 
 const MaybeUndefinedCell: React.FC<{
   value?: any
-  formatter: (input: any) => string
-}> = ({ value, formatter }) => {
-  if (value === undefined) return '-'
-  return formatter(value)
+  formatter?: (input: any) => string
+}> = ({ value, formatter = x => x.toString() }) => {
+  if (value === undefined) return <>-</>
+  return <>{formatter(value)}</>
 }
 
 // String
