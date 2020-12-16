@@ -16,10 +16,13 @@ Code
 
 ## Usage
 
-### Experiments table
+### Commands
 
-To bring up the Experiments view, use the "View Tree" option in the DVC view
-container.
+Use the main view or VS Code's Command Palette (ctrl+shift+p) to access
+commands.
+
+- View Tree: show the webview.
+- Run Experiment: run 'dvc exp run' in current workspace.
 
 ## Development
 
