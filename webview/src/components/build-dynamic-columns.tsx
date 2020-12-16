@@ -22,19 +22,29 @@ interface SchemaProperty {
 }
 type SchemaProperties = Record<string, SchemaProperty>
 
+const MaybeUndefinedCell: React.FC<{
+  value?: any
+  formatter: (input: any) => string
+}> = ({ value, formatter }) => {
+  if (value === undefined) return '-'
+  return formatter(value)
+}
+
 // String
-const StringCell: React.FC<{ value: string }> = ({ value }) => <>{value}</>
+const StringCell: React.FC<{ value: string }> = ({ value }) => (
+  <>{value === undefined ? '-' : value}</>
+)
 // Integer
 const IntegerCell: React.FC<{ value: number }> = ({ value }) => (
-  <>{formatInteger(value)}</>
+  <MaybeUndefinedCell value={value} formatter={formatInteger} />
 )
 // Float
 const FloatCell: React.FC<{ value: number }> = ({ value }) => (
-  <>{formatFloat(value)}</>
+  <MaybeUndefinedCell value={value} formatter={formatFloat} />
 )
 // Signed Float
 const SignedFloatCell: React.FC<{ value: number }> = ({ value }) => (
-  <>{formatSignedFloat(value)}</>
+  <MaybeUndefinedCell value={value} formatter={formatSignedFloat} />
 )
 
 const getNumberCellComponent: (
@@ -109,9 +119,10 @@ const convertObjectsToProperties: (
   samples.reduce((acc, cur) => convertObjectToProperties(cur, acc), base)
 
 const convertObjectToProperties: (
-  addition: Record<string, any>,
+  addition: Record<string, any> | undefined,
   base?: SchemaProperties
 ) => SchemaProperties = (sample, base = {}) => {
+  if (!sample) return base
   const sampleEntries = Object.entries(sample)
   for (const [propertyKey, propertyValue] of sampleEntries) {
     base[propertyKey] = addToProperty(base[propertyKey], propertyValue)
