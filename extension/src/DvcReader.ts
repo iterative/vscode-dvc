@@ -8,18 +8,19 @@ interface DVCExtensionOptions {
 }
 
 export interface DataFileDict {
-  [name: string]: string | DataFileDict
+  [name: string]: string | number | DataFileDict
 }
 export interface DataFilesDict {
   [filename: string]: DataFileDict
 }
 export interface DVCExperiment {
   name?: string
-  timestamp: Date
-  params: DataFilesDict
-  metrics: DataFilesDict
-  queued: boolean
-  checkpoint_tip: string
+  timestamp?: Date
+  params?: DataFilesDict
+  metrics?: DataFilesDict
+  queued?: boolean
+  checkpoint_tip?: string
+  checkpoint_parent?: string
 }
 export interface DVCExperimentWithSha extends DVCExperiment {
   sha: string
