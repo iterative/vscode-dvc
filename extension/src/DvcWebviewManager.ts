@@ -10,6 +10,7 @@ import {
   WindowWithWebviewData
 } from './webviewContract'
 import { DVCExperimentsRepoJSONOutput } from './DvcReader'
+import { runExperiment } from './commands'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -140,11 +141,17 @@ export class DvcWebview {
 
   private handleMessage(message: MessageFromWebview) {
     switch (message.kind) {
-      case 'initialized':
+      case 'initialized': {
         this._initialized.resolve()
         return
-      default:
+      }
+      case 'onClickRunExperiment': {
+        runExperiment()
+        return
+      }
+      default: {
         console.error('Unexpected message', message)
+      }
     }
   }
 

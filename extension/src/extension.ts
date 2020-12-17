@@ -26,6 +26,7 @@ import {
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
+import { runExperiment } from './commands'
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -93,9 +94,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc-integration.runExperiment', () => {
-        const terminal = window.createTerminal('DVC')
-        terminal.sendText('dvc exp run')
-        terminal.show()
+        runExperiment()
       })
     )
 

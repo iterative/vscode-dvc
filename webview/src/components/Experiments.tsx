@@ -21,6 +21,7 @@ import cx from 'classnames'
 import dayjs from '../dayjs'
 
 import buildDynamicColumns from './build-dynamic-columns'
+import { getVsCodeApi } from '../model/VsCodeApi'
 
 const { useCallback, useMemo, useEffect } = React
 
@@ -478,11 +479,17 @@ export const ExperimentsTable: React.FC<{
   )
 }
 
+function onClickRunExperiment() {
+  const vscode = getVsCodeApi()
+  vscode.postMessage({ kind: 'onClickRunExperiment' })
+}
+
 const Experiments: React.FC<{
   experiments?: DVCExperimentsRepoJSONOutput | null
 }> = ({ experiments }) => (
   <div className="experiments">
     <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
+    <button onClick={onClickRunExperiment}>Run Experiment</button>
     {experiments ? (
       <ExperimentsTable experiments={experiments} />
     ) : (
