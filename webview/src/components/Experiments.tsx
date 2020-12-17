@@ -403,7 +403,7 @@ export const ExperimentsTable: React.FC<{
       },
       ...buildDynamicColumns(flatExperiments)
     ] as Column<DVCExperimentRow>[]
-    const nestedExperiments = experiments.reduce(
+    const nestedExperiments = experiments.reduce<DVCExperimentRow[]>(
       (acc, cur) => [...acc, ...nestAndFlattenSubRows(cur)],
       []
     )

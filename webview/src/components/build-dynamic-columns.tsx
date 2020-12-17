@@ -222,8 +222,8 @@ const buildDynamicColumnsFromExperiments: (
   }>(
     ({ params, metrics }, cur) => {
       return {
-        params: [...params, cur.params],
-        metrics: [...metrics, cur.metrics]
+        params: cur.params ? [...params, cur.params] : params,
+        metrics: cur.metrics ? [...metrics, cur.metrics] : metrics
       }
     },
     { params: [], metrics: [] }
