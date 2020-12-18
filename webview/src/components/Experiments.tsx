@@ -21,7 +21,7 @@ import cx from 'classnames'
 import dayjs from '../dayjs'
 
 import buildDynamicColumns from './build-dynamic-columns'
-import { getVsCodeApi } from '../model/VsCodeApi'
+import { getModel } from '../model/Model'
 
 const { useCallback, useMemo, useEffect } = React
 
@@ -480,8 +480,8 @@ export const ExperimentsTable: React.FC<{
 }
 
 function onClickRunExperiment() {
-  const vscode = getVsCodeApi()
-  vscode.postMessage({ kind: 'onClickRunExperiment' })
+  const model = getModel()
+  model.vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
 }
 
 const Experiments: React.FC<{

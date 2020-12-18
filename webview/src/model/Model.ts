@@ -16,7 +16,9 @@ interface PersistedModelState {
   experiments?: DVCExperimentsRepoJSONOutput | null
 }
 
-export class Model {
+let instance: Model
+
+class Model {
   public readonly dispose = Disposable.fn()
 
   @observable
@@ -25,7 +27,7 @@ export class Model {
   @observable
   public experiments?: DVCExperimentsRepoJSONOutput | null = null
 
-  private readonly vsCodeApi = getVsCodeApi<
+  public readonly vsCodeApi = getVsCodeApi<
     PersistedModelState,
     MessageFromWebview,
     MessageToWebview
@@ -88,4 +90,11 @@ export class Model {
         console.error('Unexpected message', message)
     }
   }
+}
+
+export function getModel(): Model {
+  if (!instance) {
+    instance = new Model()
+  }
+  return instance
 }
