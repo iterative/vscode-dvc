@@ -92,7 +92,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc-integration.runExperiment', () =>
-        runCommand('dvc exp show')
+        runCommand('dvc exp run -v')
       )
     )
 
