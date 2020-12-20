@@ -1,6 +1,3 @@
-// REMOVE
-/* eslint-disable */
-
 import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
