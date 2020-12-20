@@ -50,6 +50,8 @@ export class Extension {
     new DvcWebviewManager(this.config)
   )
 
+  private channel: OutputChannel | undefined
+
   private async updateCachedTable() {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0)
@@ -69,6 +71,13 @@ export class Extension {
     )
       await this.updateCachedTable()
     return this.experimentsDataPromise
+  }
+
+  private async getOutputChannel() {
+    if (!this.channel) {
+      this.channel = window.createOutputChannel('DVC')
+    }
+    return this.channel
   }
 
   constructor() {
@@ -96,14 +105,14 @@ export class Extension {
         const { workspaceFolders } = workspace
         if (!workspaceFolders || workspaceFolders.length === 0)
           throw new Error(
-            'There are no folders in the Workspace to operate on!'
+            '"dvc exp run" failed! There are no folders in the Workspace to operate on!'
           )
         const dvcReaderOptions = await inferDefaultOptions(
           workspaceFolders[0].uri.fsPath
         )
         const output = await runExperiment(dvcReaderOptions)
-        const channel: OutputChannel = window.createOutputChannel('DVC')
-        channel.append(output)
+        const outputChannel = await this.getOutputChannel()
+        outputChannel.append(output)
         this.manager.refreshAll()
       })
     )
