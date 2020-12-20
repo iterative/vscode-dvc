@@ -1,3 +1,6 @@
+// REMOVE
+/* eslint-disable */
+
 import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -190,6 +193,12 @@ export class DvcWebviewManager {
     const view = await DvcWebview.create(this.config)
     this.addView(view)
     return view
+  }
+
+  public refreshAll() {
+    for (const panel of this.openedWebviews) {
+      panel.showExperiments()
+    }
   }
 
   private addView(view: DvcWebview) {

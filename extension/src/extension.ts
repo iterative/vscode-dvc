@@ -91,9 +91,9 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc-integration.runExperiment', () =>
-        runCommand('dvc exp run -v')
-      )
+      commands.registerCommand('dvc-integration.runExperiment', () => {
+        runCommand('dvc exp run -v', this.manager.refreshAll)
+      })
     )
 
     this.dvcScmFilesView()

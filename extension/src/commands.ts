@@ -1,3 +1,6 @@
+// REMOVE
+/* eslint-disable */
+
 import * as vscode from 'vscode'
 import * as cp from 'child_process'
 
@@ -10,37 +13,37 @@ function getOutputChannel(): vscode.OutputChannel {
   return _channel
 }
 
-async function execute(
+function exec(
   command: string,
   options: cp.ExecOptions
 ): Promise<{ stdout: string; stderr: string }> {
   return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
     cp.exec(command, options, (error, stdout, stderr) => {
       if (error) {
-        reject(new Error(stderr))
+        reject({ error, stdout, stderr })
       }
       resolve({ stdout, stderr })
     })
   })
 }
 
-export async function runCommand(command: string) {
-  const { workspaceFolders } = vscode.workspace
-  if (!workspaceFolders || workspaceFolders.length === 0) {
+export async function runCommand(command: string, callback: Function) {
+  if (!vscode.workspace.workspaceFolders) {
     return
   }
-  const workspaceFolder = workspaceFolders[0].uri.fsPath
+  const workspaceFolder = vscode.workspace.workspaceFolders[0].uri.fsPath
   const channel = getOutputChannel()
   try {
-    const { stdout, stderr } = await execute(command, {
-      cwd: workspaceFolder
-    })
+    const { stdout, stderr } = await exec(command, { cwd: workspaceFolder })
     if (stderr && stderr.length > 0) {
       channel.appendLine(stderr)
       channel.show(true)
     }
     if (stdout) {
-      channel.appendLine(stdout)
+      const lines = stdout.split(/\r{0,1}\n/)
+      for (const line of lines) {
+        channel.appendLine(line)
+      }
     }
   } catch (err) {
     if (err.stderr) {
@@ -49,6 +52,8 @@ export async function runCommand(command: string) {
     if (err.stdout) {
       channel.appendLine(err.stdout)
     }
+    channel.appendLine(`Command: '${command}' failed.`)
     channel.show(true)
   }
+  callback()
 }
