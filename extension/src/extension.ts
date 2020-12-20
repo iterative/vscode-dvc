@@ -104,6 +104,7 @@ export class Extension {
         const output = await runExperiment(dvcReaderOptions)
         const channel: OutputChannel = window.createOutputChannel('DVC')
         channel.append(output)
+        this.manager.refreshAll()
       })
     )
 
