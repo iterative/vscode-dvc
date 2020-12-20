@@ -16,9 +16,9 @@ interface PersistedModelState {
   experiments?: DVCExperimentsRepoJSONOutput | null
 }
 
-let instance: Model
+export class Model {
+  private static instance: Model
 
-class Model {
   public readonly dispose = Disposable.fn()
 
   @observable
@@ -35,9 +35,8 @@ class Model {
 
   public errors?: Array<Error | string> = undefined
 
-  constructor() {
+  private constructor() {
     const data = window.webviewData
-
     // this needs to be setup so that dynamic imports work
     __webpack_public_path__ = data.publicPath
     this.theme = data.theme
@@ -59,6 +58,13 @@ class Model {
         this.vsCodeApi.setState(this.getState())
       })
     })
+  }
+
+  public static getInstance(): Model {
+    if (!Model.instance) {
+      Model.instance = new Model()
+    }
+    return Model.instance
   }
 
   private getState(): PersistedModelState {
@@ -90,11 +96,4 @@ class Model {
         console.error('Unexpected message', message)
     }
   }
-}
-
-export function getModel(): Model {
-  if (!instance) {
-    instance = new Model()
-  }
-  return instance
 }

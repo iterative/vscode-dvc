@@ -21,7 +21,7 @@ import cx from 'classnames'
 import dayjs from '../dayjs'
 
 import buildDynamicColumns from './build-dynamic-columns'
-import { getModel } from '../model/Model'
+import { Model } from '../model/Model'
 
 const { useCallback, useMemo, useEffect } = React
 
@@ -485,9 +485,10 @@ const Experiments: React.FC<{
   <div className="experiments">
     <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
     <button
-      onClick={() =>
-        getModel().vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
-      }
+      onClick={() => {
+        const model = Model.getInstance()
+        model.vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
+      }}
     >
       Run Experiment
     </button>
