@@ -1,6 +1,3 @@
-// REMOVE
-/* eslint-disable */
-
 import * as vscode from 'vscode'
 import * as cp from 'child_process'
 
@@ -20,14 +17,15 @@ function exec(
   return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
     cp.exec(command, options, (error, stdout, stderr) => {
       if (error) {
-        reject({ error, stdout, stderr })
+        reject(new Error())
       }
       resolve({ stdout, stderr })
     })
   })
 }
 
-export async function runCommand(command: string, callback: Function) {
+export async function runCommand(command: string, callback: any) {
+  // TODO: callback type
   if (!vscode.workspace.workspaceFolders) {
     return
   }
