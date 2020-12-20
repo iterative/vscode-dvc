@@ -42,7 +42,9 @@ export class Extension {
 
   private readonly config = new Config()
 
-  private experimentsDataPromise: Promise<DVCExperimentsRepoJSONOutput> | null = null
+  private experimentsDataPromise: Promise<
+    DVCExperimentsRepoJSONOutput
+  > | null = null
 
   private lastTableUpdate?: number = undefined
 
@@ -110,10 +112,17 @@ export class Extension {
         const dvcReaderOptions = await inferDefaultOptions(
           workspaceFolders[0].uri.fsPath
         )
-        const output = await runExperiment(dvcReaderOptions)
         const outputChannel = await this.getOutputChannel()
-        outputChannel.append(output)
-        this.manager.refreshAll()
+        try {
+          const output = await runExperiment(dvcReaderOptions)
+          outputChannel.append(output)
+          outputChannel.show()
+        } catch (error) {
+          throw new Error(`Execution of "dvc exp run" failed: ${error}`)
+        } finally {
+          const tableData = await this.getCachedTable()
+          this.manager.refreshAll(tableData)
+        }
       })
     )
 
