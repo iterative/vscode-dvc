@@ -9,7 +9,8 @@ import {
   TreeItem,
   ThemeIcon,
   TreeItemCollapsibleState,
-  Command
+  Command,
+  OutputChannel
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
@@ -100,7 +101,9 @@ export class Extension {
         const dvcReaderOptions = await inferDefaultOptions(
           workspaceFolders[0].uri.fsPath
         )
-        runExperiment(dvcReaderOptions)
+        const output = await runExperiment(dvcReaderOptions)
+        const channel: OutputChannel = window.createOutputChannel('DVC')
+        channel.append(output)
       })
     )
 

@@ -1,6 +1,5 @@
 import { accessSync } from 'fs'
 import * as path from 'path'
-import * as vscode from 'vscode'
 import { execPromise } from './util'
 
 interface DVCExtensionOptions {
@@ -37,14 +36,6 @@ export type DVCExperimentsRepoJSONOutput = Record<
   DVCExperimentsCommitJSONOutput
 >
 
-let _channel: vscode.OutputChannel
-function getOutputChannel(): vscode.OutputChannel {
-  if (!_channel) {
-    _channel = vscode.window.createOutputChannel('DVC')
-  }
-  return _channel
-}
-
 export const inferDefaultOptions: (
   cwd: string
 ) => Promise<DVCExtensionOptions> = async cwd => {
@@ -78,12 +69,10 @@ export const getExperiments: (
   return JSON.parse(String(stdout))
 }
 
-export async function runExperiment(options: DVCExtensionOptions) {
-  const { stdout, stderr } = await execCommand(options, 'exp run -v')
-  if (stdout) {
-    getOutputChannel().append(stdout)
-  }
-  if (stderr) {
-    getOutputChannel().append(stderr)
-  }
+export const runExperiment: (
+  options: DVCExtensionOptions
+) => Promise<string> = async options => {
+  const output = await execCommand(options, 'exp run -v')
+  const { stdout } = output
+  return String(stdout)
 }
