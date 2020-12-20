@@ -470,7 +470,7 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments: DVCExperimentsRepoJSONOutput | null
+  experiments?: DVCExperimentsRepoJSONOutput | null
   vsCodeApi: any
 }> = ({ experiments, vsCodeApi }) => {
   return (
