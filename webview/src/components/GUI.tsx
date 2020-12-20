@@ -8,7 +8,7 @@ import { Model } from '../model/Model'
 export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
     try {
-      const { experiments, errors } = model
+      const { errors, experiments, vsCodeApi } = model
       return (
         <>
           {errors &&
@@ -22,7 +22,7 @@ export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
                 </div>
               )
             )}
-          <ExperimentsGUI experiments={experiments} />
+          <ExperimentsGUI experiments={experiments} vsCodeApi={vsCodeApi} />
         </>
       )
     } catch (e) {

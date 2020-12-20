@@ -21,7 +21,6 @@ import cx from 'classnames'
 import dayjs from '../dayjs'
 
 import buildDynamicColumns from './build-dynamic-columns'
-import { Model } from '../model/Model'
 
 import { nestAndFlattenSubRows } from '../util/build-experiment-tree'
 
@@ -471,24 +470,26 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments?: DVCExperimentsRepoJSONOutput | null
-}> = ({ experiments }) => (
-  <div className="experiments">
-    <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
-    <button
-      onClick={() => {
-        const model = Model.getInstance()
-        model.vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
-      }}
-    >
-      Run Experiment
-    </button>
-    {experiments ? (
-      <ExperimentsTable experiments={experiments} />
-    ) : (
-      <p>Loading experiments...</p>
-    )}
-  </div>
-)
+  experiments: DVCExperimentsRepoJSONOutput | null
+  vsCodeApi: any
+}> = ({ experiments, vsCodeApi }) => {
+  return (
+    <div className="experiments">
+      <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
+      <button
+        onClick={() => {
+          vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
+        }}
+      >
+        Run Experiment
+      </button>
+      {experiments ? (
+        <ExperimentsTable experiments={experiments} />
+      ) : (
+        <p>Loading experiments...</p>
+      )}
+    </div>
+  )
+}
 
 export default Experiments
