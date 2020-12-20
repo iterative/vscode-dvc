@@ -23,6 +23,8 @@ import dayjs from '../dayjs'
 import buildDynamicColumns from './build-dynamic-columns'
 import { Model } from '../model/Model'
 
+import { nestAndFlattenSubRows } from '../util/build-experiment-tree'
+
 const { useCallback, useMemo, useEffect } = React
 
 export interface DVCExperimentRow extends DVCExperimentWithSha {
@@ -229,49 +231,39 @@ const PrimaryHeaderGroup: React.FC<{
   </div>
 )
 
-const TableRow: React.FC<RowProp & InstanceProp> = ({
-  row,
-  instance: { prepareRow }
-}) => {
-  prepareRow(row)
+const TableRow: React.FC<RowProp & InstanceProp> = ({ row, instance }) => {
+  instance.prepareRow(row)
   const [firstCell, ...cells] = row.cells
   return (
-    <div
-      {...row.getRowProps({
-        className: cx(
-          'tr',
-          row.values.sha === 'workspace' ? 'workspace-row' : 'normal-row'
-        )
-      })}
-    >
-      <FirstCell cell={firstCell} />
-      {cells.map(cell => {
-        return (
-          <div
-            {...cell.getCellProps({
-              className: cx('td', {
-                'group-placeholder': cell.isPlaceholder,
-                'grouped-column-cell': cell.column.isGrouped,
-                'grouped-cell': cell.isGrouped
-              })
-            })}
-            key={`${cell.column.id}___${cell.row.id}`}
-          >
-            {cell.isGrouped ? (
-              <>
-                <span {...row.getToggleRowExpandedProps()}>
-                  {row.isExpanded ? '👇' : '👉'} {cell.render('Cell')} (
-                  {row.subRows.length})
-                </span>
-              </>
-            ) : cell.isAggregated ? (
-              cell.render('Aggregated')
-            ) : cell.isPlaceholder ? null : (
-              cell.render('Cell')
-            )}
-          </div>
-        )
-      })}
+    <div>
+      <div
+        {...row.getRowProps({
+          className: cx(
+            'tr',
+            row.values.sha === 'workspace' ? 'workspace-row' : 'normal-row'
+          )
+        })}
+      >
+        <FirstCell cell={firstCell} />
+        {cells.map(cell => {
+          return (
+            <div
+              {...cell.getCellProps({
+                className: cx('td', {
+                  'group-placeholder': cell.isPlaceholder,
+                  'grouped-column-cell': cell.column.isGrouped,
+                  'grouped-cell': cell.isGrouped
+                })
+              })}
+              key={`${cell.column.id}___${cell.row.id}`}
+            >
+              {cell.isPlaceholder ? null : cell.render('Cell')}
+            </div>
+          )
+        })}
+      </div>
+      {row.isExpanded &&
+        row.subRows.map(row => <TableRow row={row} instance={instance} />)}
     </div>
   )
 }
@@ -290,11 +282,6 @@ const TableBody: React.FC<RowProp & InstanceProp> = ({ row, instance }) => {
       })}
     >
       <TableRow instance={instance} row={row} />
-      {row.canExpand &&
-        row.isExpanded &&
-        row.subRows.map(subRow => (
-          <TableRow instance={instance} row={subRow} key={subRow.id} />
-        ))}
     </div>
   )
 }
@@ -417,7 +404,11 @@ export const ExperimentsTable: React.FC<{
       },
       ...buildDynamicColumns(flatExperiments)
     ] as Column<DVCExperimentRow>[]
-    return [experiments, columns]
+    const nestedExperiments = experiments.reduce<DVCExperimentRow[]>(
+      (acc, cur) => [...acc, ...nestAndFlattenSubRows(cur)],
+      []
+    )
+    return [nestedExperiments, columns]
   }, [rawExperiments])
 
   const instance = useTable<DVCExperimentRow>(

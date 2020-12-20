@@ -18,6 +18,7 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
+import { runCommand } from './commands'
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
@@ -26,7 +27,6 @@ import {
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
-import { runExperiment } from './commands'
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -41,9 +41,7 @@ export class Extension {
 
   private readonly config = new Config()
 
-  private experimentsDataPromise: Promise<
-    DVCExperimentsRepoJSONOutput
-  > | null = null
+  private experimentsDataPromise: Promise<DVCExperimentsRepoJSONOutput> | null = null
 
   private lastTableUpdate?: number = undefined
 
@@ -94,7 +92,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc-integration.runExperiment', () => {
-        runExperiment()
+        runCommand('dvc exp run -v', this.manager.refreshAll)
       })
     )
 

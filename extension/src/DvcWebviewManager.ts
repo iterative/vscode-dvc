@@ -1,4 +1,7 @@
-import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
+// REMOVE
+/* eslint-disable */
+
+import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { Deferred } from '@hediet/std/synchronization'
@@ -10,7 +13,6 @@ import {
   WindowWithWebviewData
 } from './webviewContract'
 import { DVCExperimentsRepoJSONOutput } from './DvcReader'
-import { runExperiment } from './commands'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -146,7 +148,7 @@ export class DvcWebview {
         return
       }
       case 'onClickRunExperiment': {
-        runExperiment()
+        commands.executeCommand('dvc-integration.runExperiment')
         return
       }
       default: {
@@ -197,6 +199,12 @@ export class DvcWebviewManager {
     const view = await DvcWebview.create(this.config)
     this.addView(view)
     return view
+  }
+
+  public refreshAll() {
+    for (const panel of this.openedWebviews) {
+      panel.showExperiments()
+    }
   }
 
   private addView(view: DvcWebview) {
