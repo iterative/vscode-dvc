@@ -203,7 +203,7 @@ export class DvcWebviewManager {
 
   public refreshAll(
     tableData: Record<string, DVCExperimentsCommitJSONOutput> | null
-  ) {
+  ): void {
     for (const panel of this.openedWebviews) {
       try {
         panel.showExperiments({ tableData })
