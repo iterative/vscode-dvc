@@ -18,12 +18,12 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { runCommand } from './commands'
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
 import {
   getExperiments,
+  runExperiment,
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
@@ -91,8 +91,16 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc-integration.runExperiment', () => {
-        runCommand('dvc exp run -v', this.manager.refreshAll)
+      commands.registerCommand('dvc-integration.runExperiment', async () => {
+        const { workspaceFolders } = workspace
+        if (!workspaceFolders || workspaceFolders.length === 0)
+          throw new Error(
+            'There are no folders in the Workspace to operate on!'
+          )
+        const dvcReaderOptions = await inferDefaultOptions(
+          workspaceFolders[0].uri.fsPath
+        )
+        runExperiment(dvcReaderOptions)
       })
     )
 
