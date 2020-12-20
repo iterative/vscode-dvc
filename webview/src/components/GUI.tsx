@@ -3,8 +3,9 @@ import { observer } from 'mobx-react'
 import { hotComponent } from '../hotComponent'
 
 import ExperimentsGUI from './Experiments'
+import { Model } from '../model/Model'
 
-export const GUI: React.FC<{ model: any }> = hotComponent(module)(
+export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
     try {
       const { experiments, errors } = model
