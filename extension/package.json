@@ -43,6 +43,18 @@
           "command": "dvc-integration.push",
           "group": "inline"
         }
+      ],
+      "explorer/context": [
+        {
+          "command": "dvc-integration.runExperiment",
+          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "dvc-integration.runExperiment",
+          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
+        }
       ]
     },
     "viewsContainers": {
