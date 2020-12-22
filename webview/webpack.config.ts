@@ -31,8 +31,31 @@ module.exports = {
         test: /\.less$/,
         loaders: ['style-loader', 'css-loader', 'less-loader']
       },
-      { test: /\.css$/, loader: 'style-loader!css-loader' },
-      { test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader' },
+      {
+        test: /\.css$/,
+        loaders: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: { auto: true }
+            }
+          }
+        ]
+      },
+      {
+        test: /\.scss$/,
+        loaders: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: { auto: true }
+            }
+          },
+          'sass-loader'
+        ]
+      },
       {
         test: /\.(jpe?g|png|gif|eot|ttf|svg|woff|woff2|md)$/i,
         loader: 'file-loader'

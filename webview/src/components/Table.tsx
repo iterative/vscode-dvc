@@ -2,6 +2,7 @@ import React from 'react'
 import { Cell, HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { InstanceProp, RowProp, DVCExperimentRow } from './Experiments'
+import styles from './table-styles.module.scss'
 
 export const ParentHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<DVCExperimentRow>
@@ -9,20 +10,18 @@ export const ParentHeaderGroup: React.FC<{
   return (
     <div
       {...headerGroup.getHeaderGroupProps({
-        className: cx('parent-headers-row', 'tr')
+        className: cx(styles.parentHeadersRow, styles.tr)
       })}
     >
       {headerGroup.headers.map(column => (
         <div
           {...column.getHeaderProps({
             className: cx(
-              'th',
+              styles.th,
               column.placeholderOf
-                ? 'placeholder-header-cell'
-                : 'parent-header-cell',
-              {
-                'grouped-header': column.isGrouped
-              }
+                ? styles.placeholderHeaderCell
+                : styles.parentHeaderCell,
+              column.isGrouped && styles.groupedHeader
             )
           })}
           key={column.id}
@@ -38,22 +37,25 @@ export const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
   cell
 }) => {
   const { row } = cell
+  const { depth } = row
   const baseFirstCellProps = cell.getCellProps({
-    className: cx('td', 'experiment-cell', {
-      'group-placeholder': cell.isPlaceholder,
-      'grouped-column-cell': cell.column.isGrouped,
-      'grouped-cell': cell.isGrouped
-    })
+    className: cx(
+      styles.td,
+      styles.experimentCell,
+      cell.isPlaceholder && styles.groupPlaceholder,
+      cell.column.isGrouped && styles.groupedColumnCell,
+      cell.isGrouped && styles.groupedCell
+    )
   })
   const firstCellProps = row.canExpand
     ? row.getToggleRowExpandedProps({
         ...baseFirstCellProps,
         className: cx(
           baseFirstCellProps.className,
-          'expandable-experiment-cell',
+          styles.expandableExperimentCell,
           row.isExpanded
-            ? 'expanded-experiment-cell'
-            : 'contracted-experiment-cell'
+            ? styles.expandedExperimentCell
+            : styles.contractedExperimentCell
         )
       })
     : baseFirstCellProps
@@ -61,27 +63,26 @@ export const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
   return (
     <div {...firstCellProps}>
       <span
+        className={styles.depthSpacer}
+        style={{
+          width: `${depth}em`,
+          backgroundColor: 'green',
+          display: 'inline-block'
+        }}
+      ></span>
+      <span
         className={
           row.canExpand
             ? row.isExpanded
-              ? 'expanded-row-arrow'
-              : 'contracted-row-arrow'
-            : 'row-arrow-placeholder'
+              ? styles.expandedRowArrow
+              : styles.contractedRowArrow
+            : styles.rowArrowPlaceholder
         }
       />
-      <span className={row.original.queued ? 'queued-bullet' : 'bullet'} />
-      {cell.isGrouped ? (
-        <>
-          <span {...row.getToggleRowExpandedProps()}>
-            {row.isExpanded ? '👇' : '👉'} {cell.render('Cell')} (
-            {row.subRows.length})
-          </span>
-        </>
-      ) : cell.isAggregated ? (
-        cell.render('Aggregated')
-      ) : cell.isPlaceholder ? null : (
-        cell.render('Cell')
-      )}
+      <span
+        className={row.original.queued ? styles.queuedBullet : styles.bullet}
+      />
+      {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
 }
@@ -91,17 +92,18 @@ export const PrimaryHeaderGroup: React.FC<{
 }> = ({ headerGroup }) => (
   <div
     {...headerGroup.getHeaderGroupProps({
-      className: cx('tr', 'headers-row')
+      className: cx(styles.tr, styles.headersRow)
     })}
   >
     {headerGroup.headers.map(header => (
       <div
         {...header.getHeaderProps(
           header.getSortByToggleProps({
-            className: cx('th', {
-              'grouped-header': header.isGrouped,
-              'sorted-header': header.isSorted
-            })
+            className: cx(
+              styles.th,
+              header.isGrouped && styles.groupedHeader,
+              header.isSorted && styles.sortedHeader
+            )
           })
         )}
       >
@@ -114,43 +116,53 @@ export const PrimaryHeaderGroup: React.FC<{
   </div>
 )
 
-export const TableRow: React.FC<RowProp & InstanceProp> = ({
+export const Row: React.FC<RowProp> = ({ row }) => {
+  const [firstCell, ...cells] = row.cells
+  return (
+    <div
+      {...row.getRowProps({
+        className: cx(
+          styles.tr,
+          row.values.sha === 'workspace'
+            ? styles.workspaceRow
+            : styles.normalRow,
+          styles.row
+        )
+      })}
+    >
+      <FirstCell cell={firstCell} />
+      {cells.map(cell => {
+        return (
+          <div
+            {...cell.getCellProps({
+              className: cx(
+                styles.td,
+                cell.isPlaceholder && styles.groupPlaceholder,
+                cell.column.isGrouped && styles.groupedColumnCell,
+                cell.isGrouped && styles.groupedCell
+              )
+            })}
+            key={`${cell.column.id}___${cell.row.id}`}
+          >
+            {cell.isPlaceholder ? null : cell.render('Cell')}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   row,
   instance
 }) => {
   instance.prepareRow(row)
-  const [firstCell, ...cells] = row.cells
   return (
-    <div>
-      <div
-        {...row.getRowProps({
-          className: cx(
-            'tr',
-            row.values.sha === 'workspace' ? 'workspace-row' : 'normal-row'
-          )
-        })}
-      >
-        <FirstCell cell={firstCell} />
-        {cells.map(cell => {
-          return (
-            <div
-              {...cell.getCellProps({
-                className: cx('td', {
-                  'group-placeholder': cell.isPlaceholder,
-                  'grouped-column-cell': cell.column.isGrouped,
-                  'grouped-cell': cell.isGrouped
-                })
-              })}
-              key={`${cell.column.id}___${cell.row.id}`}
-            >
-              {cell.isPlaceholder ? null : cell.render('Cell')}
-            </div>
-          )
-        })}
-      </div>
+    <>
       {row.isExpanded &&
-        row.subRows.map(row => <TableRow row={row} instance={instance} />)}
-    </div>
+        row.subRows.map(row => <NestedRow row={row} instance={instance} />)}
+      <Row row={row} />
+    </>
   )
 }
 
@@ -158,19 +170,24 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
   row,
   instance
 }) => {
+  instance.prepareRow(row)
   return (
     <div
       {...instance.getTableBodyProps({
         className: cx(
-          'row-group',
-          'tbody',
+          styles.rowGroup,
+          styles.tbody,
           row.values.sha === 'workspace'
-            ? 'workspace-row-group'
-            : 'normal-row-group'
+            ? styles.workspaceRowGroup
+            : styles.normalRowGroup
         )
       })}
     >
-      <TableRow instance={instance} row={row} />
+      <Row row={row} />
+      {row.isExpanded &&
+        row.subRows.map(subRow => (
+          <NestedRow row={subRow} instance={instance} />
+        ))}
     </div>
   )
 }
@@ -182,7 +199,7 @@ export const TableHead: React.FC<InstanceProp> = ({
   const lastHeaderGroup = headerGroups[lastHeaderGroupIndex]
 
   return (
-    <div className="thead">
+    <div className={styles.thead}>
       {headerGroups.slice(0, lastHeaderGroupIndex).map((headerGroup, i) => (
         <ParentHeaderGroup
           headerGroup={headerGroup}
@@ -190,6 +207,21 @@ export const TableHead: React.FC<InstanceProp> = ({
         />
       ))}
       <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
+    </div>
+  )
+}
+
+export const Table: React.FC<InstanceProp> = ({ instance }) => {
+  const { getTableProps, rows } = instance
+
+  return (
+    <div className={styles.tableContainer}>
+      <div {...getTableProps({ className: styles.table })}>
+        <TableHead instance={instance} />
+        {rows.map(row => {
+          return <TableBody row={row} instance={instance} key={row.id} />
+        })}
+      </div>
     </div>
   )
 }

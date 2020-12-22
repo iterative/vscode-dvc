@@ -17,7 +17,9 @@ import {
 } from 'react-table'
 import cx from 'classnames'
 import dayjs from '../dayjs'
-import { TableBody, TableHead } from './Table'
+import { Table } from './Table'
+
+import styles from './table-styles.module.scss'
 
 import buildDynamicColumns from './build-dynamic-columns'
 
@@ -113,11 +115,6 @@ const parseExperiments: (
   )
 }
 
-const TruncatedCell = ({ value }: { value: string }) =>
-  value && value.length && value.length > 12
-    ? `${value.slice(0, 4)}...${value.slice(value.length - 4)}`
-    : value
-
 function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
   const {
     rows,
@@ -166,7 +163,7 @@ const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
   } = instance
 
   return (
-    <details className="options-panel">
+    <details className={styles.optionsPanel}>
       <summary>
         <b>Options</b>
         <div>Sorted by:</div>
@@ -203,10 +200,12 @@ export const ExperimentsTable: React.FC<{
       {
         Header: 'Experiment',
         id: 'sha',
-        accessor: (item: any) => item.name || item.sha,
-        Cell: TruncatedCell,
-        disableGroupBy: true,
-        width: 175
+        accessor: ({ name, sha }) => {
+          if (name) return name
+          if (sha === 'workspace') return sha
+          return sha.slice(0, 7)
+        },
+        width: 200
       },
       {
         Header: 'Timestamp',
@@ -264,7 +263,7 @@ export const ExperimentsTable: React.FC<{
     }
   )
 
-  const { getTableProps, toggleAllRowsExpanded, rows } = instance
+  const { toggleAllRowsExpanded } = instance
 
   useEffect(() => {
     toggleAllRowsExpanded()
@@ -273,14 +272,7 @@ export const ExperimentsTable: React.FC<{
   return (
     <>
       <OptionsPanel instance={instance} />
-      <div className="table-container">
-        <div {...getTableProps({ className: 'table' })}>
-          <TableHead instance={instance} />
-          {rows.map(row => {
-            return <TableBody row={row} instance={instance} key={row.id} />
-          })}
-        </div>
-      </div>
+      <Table instance={instance} />
     </>
   )
 }
@@ -288,8 +280,10 @@ export const ExperimentsTable: React.FC<{
 const Experiments: React.FC<{
   experiments?: DVCExperimentsRepoJSONOutput | null
 }> = ({ experiments }) => (
-  <div className="experiments">
-    <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
+  <div className={styles.experiments}>
+    <h1 className={cx(styles.experimentsHeading, styles.pageHeading)}>
+      Experiments
+    </h1>
     {experiments ? (
       <ExperimentsTable experiments={experiments} />
     ) : (
