@@ -26,6 +26,7 @@ import {
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
+import { createFileTreeView } from './tree/fileTreeDataProvider';
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -99,6 +100,8 @@ export class Extension {
 
     this.dvcScmFilesView()
     this.dvcCommandView()
+
+
   }
 
   dvcCommandView(): void {
@@ -222,7 +225,8 @@ export class Extension {
 export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
     hotRequireExportedFn(module, Extension, HotExtension => new HotExtension())
-  )
+  );
+  createFileTreeView(context);
 }
 
 // export function deactivate(): void {}

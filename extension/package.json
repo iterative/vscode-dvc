@@ -1,22 +1,43 @@
 {
-  "name": "dvc-integration",
+  "name": "dvc",
   "private": true,
-  "displayName": "DVC Integration",
-  "description": "",
-  "publisher": "todo-dvc",
-  "icon": "docs/logo.drawio.png",
+  "displayName": "DVC",
+  "description": "DVC VSCode extension",
+  "publisher": "iterative",
+  "icon": "docs/dvc.png",
   "version": "0.1.0",
-  "engines": {
-    "vscode": "^1.46.0"
-  },
-  "readme": "./README.md",
-  "activationEvents": [
-    "*",
-    "onWebviewPanel:dvc-view"
-  ],
+  "license": "Apache-2.0",
+  "readme": "README.md",
   "repository": {
+    "type": "git",
     "url": "https://github.com/iterative/vscode-dvc"
   },
+  "bugs": "https://github.com/iterative/vscode-dvc",
+  "homepage": "https://github.com/iterative/vscode-dvc/README.md",
+  "keywords": [
+    "iterative",
+    "data",
+    "version",
+    "control",
+    "dvc"
+  ],
+  "categories": [
+    "Data Science",
+    "Visualization"
+  ],  
+  "galleryBanner": {
+    "color": "#333",
+    "theme": "dark"
+  },  
+  "engines": {
+    "vscode": "^1.48.0",
+    "node": ">=10.2.0"
+  },
+  "activationEvents": [
+    "*",
+    "onWebviewPanel:dvc-view",
+    "onView:dvc.fileTreeView"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
@@ -71,9 +92,19 @@
         {
           "id": "dvc-tree",
           "name": "Commands"
+        },
+        {
+          "id": "dvc.fileTreeView",
+          "name": "Files"
         }
       ]
-    }
+    },
+    "viewsWelcome": [
+      {
+        "view": "dvc.fileTreeView",
+        "contents": "Loading files ..."
+      }
+    ]
   },
   "scripts": {
     "dev": "shx rm -rf dist && tsc -watch -p ./",
