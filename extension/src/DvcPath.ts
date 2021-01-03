@@ -29,6 +29,7 @@ export class DVCPathStatusBarItem {
 }
 
 /**
+
  * Shows an input dialog allowing the user to enter a custom path.
  */
 async function defineDvcPath(): Promise<string | undefined> {

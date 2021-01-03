@@ -26,6 +26,7 @@ import {
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
+
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 
 if (process.env.HOT_RELOAD) {
