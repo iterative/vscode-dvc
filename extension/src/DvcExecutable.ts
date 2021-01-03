@@ -30,7 +30,7 @@ export class DVCExecutableStatusBarItem {
 /**
  * Shows an input dialog allowing the user to enter a custom executable path.
  */
-export async function defineExecutable(): Promise<string | undefined> {
+async function defineExecutable(): Promise<string | undefined> {
   return window.showInputBox({
     prompt: 'Enter a custom DVC executable path...'
   })
