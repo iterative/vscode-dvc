@@ -6,7 +6,7 @@ import { getConfig } from './configuration'
  * Status bar item. Displays the current DVC path. Corresponds to "dvc.dvcPath" setting.
  * Choose from all detected & defined alternatives on-click.
  */
-export class DVCExecutableStatusBarItem {
+export class DVCPathStatusBarItem {
   public readonly dispose = Disposable.fn()
 
   private instance: StatusBarItem

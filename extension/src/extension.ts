@@ -26,7 +26,7 @@ import {
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
-import { DVCExecutableStatusBarItem, selectExecutable } from './DvcExecutable'
+import { DVCPathStatusBarItem, selectExecutable } from './DvcPath'
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -45,7 +45,7 @@ export class Extension {
 
   private lastTableUpdate?: number = undefined
 
-  private dvcExecutableStatusBarItem: DVCExecutableStatusBarItem
+  private dvcPathStatusBarItem: DVCPathStatusBarItem
 
   private readonly manager = this.dispose.track(
     new DvcWebviewManager(this.config)
@@ -79,15 +79,13 @@ export class Extension {
       i.show()
     }
 
-    this.dispose.track(
-      (this.dvcExecutableStatusBarItem = new DVCExecutableStatusBarItem())
-    )
+    this.dispose.track((this.dvcPathStatusBarItem = new DVCPathStatusBarItem()))
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
-          this.dvcExecutableStatusBarItem.update()
+          this.dvcPathStatusBarItem.update()
         }
       })
     )
