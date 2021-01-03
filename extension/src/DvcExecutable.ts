@@ -3,7 +3,8 @@ import { StatusBarItem, window, workspace } from 'vscode'
 import { getConfig } from './configuration'
 
 /**
- * Status bar item that displays the DVC executable currently in-use. Corresponds to dvc-integration.dvcPath Choose from all detected & defined alternatives on click.
+ * Status bar item. Displays the current DVC path. Corresponds to "dvc.dvcPath" setting.
+ * Choose from all detected & defined alternatives on-click.
  */
 export class DVCExecutableStatusBarItem {
   public readonly dispose = Disposable.fn()
