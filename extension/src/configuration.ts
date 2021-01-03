@@ -1,17 +1,17 @@
-import * as vscode from 'vscode'
+import { workspace, WorkspaceConfiguration } from 'vscode'
 
 /**
  * Configurations contributed by the DVC extension.
  *
  * @remarks
  * Import 'getConfig' to use, and call it before each retrieval. Think of it as a snapshot.
- * There is odd persistence behaviour with vscode.WorkspaceConfiguration objects that we want to avoid tripping over.
+ * There is odd persistence behaviour with WorkspaceConfiguration objects that we want to avoid tripping over.
  */
 class Config {
-  private config: vscode.WorkspaceConfiguration
+  private config: WorkspaceConfiguration
 
   constructor() {
-    this.config = vscode.workspace.getConfiguration()
+    this.config = workspace.getConfiguration()
   }
 
   public get dvcPath(): string {

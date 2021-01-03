@@ -1,5 +1,5 @@
-import * as vscode from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { StatusBarItem, window, workspace } from 'vscode'
 import { getConfig } from './configuration'
 
 /**
@@ -8,10 +8,10 @@ import { getConfig } from './configuration'
 export class DVCExecutableStatusBarItem {
   public readonly dispose = Disposable.fn()
 
-  private instance: vscode.StatusBarItem
+  private instance: StatusBarItem
 
   constructor() {
-    this.instance = vscode.window.createStatusBarItem()
+    this.instance = window.createStatusBarItem()
     this.instance.tooltip = 'Current DVC executable.'
     this.instance.command = 'dvc-integration.selectExecutable'
     this.update()
@@ -31,7 +31,7 @@ export class DVCExecutableStatusBarItem {
  * Shows an input dialog allowing the user to enter a custom executable path.
  */
 export async function defineExecutable(): Promise<string | undefined> {
-  return vscode.window.showInputBox({
+  return window.showInputBox({
     prompt: 'Enter a custom DVC executable path...'
   })
 }
@@ -42,7 +42,7 @@ export async function defineExecutable(): Promise<string | undefined> {
 export async function selectExecutable(): Promise<void> {
   // TODO: detection call and append to quick pick
   let path: string | undefined
-  const result = await vscode.window.showQuickPick(
+  const result = await window.showQuickPick(
     [{ label: 'default' }, { label: 'custom' }],
     { placeHolder: 'Please choose...' }
   )
@@ -53,6 +53,6 @@ export async function selectExecutable(): Promise<void> {
     if (result.label === 'custom') {
       path = await defineExecutable()
     }
-    vscode.workspace.getConfiguration().update('dvc.dvcPath', path)
+    workspace.getConfiguration().update('dvc.dvcPath', path)
   }
 }
