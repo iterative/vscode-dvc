@@ -35,7 +35,14 @@
     ],
     "configuration": {
       "title": "DVC",
-      "properties": {}
+      "properties": {
+        "dvc.dvcPath": {
+          "type": "string",
+          "description": "Path to dvc executable.",
+          "default": "dvc",
+          "scope": "resource"
+        }
+      }
     },
     "menus": {
       "scm/resourceState/context": [
