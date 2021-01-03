@@ -42,7 +42,7 @@
       "properties": {
         "dvc.dvcPath": {
           "type": "string",
-          "description": "Path to dvc executable.",
+          "description": "Path to DVC.",
           "default": "dvc",
           "scope": "resource"
         }

@@ -13,7 +13,7 @@ export class DVCPathStatusBarItem {
 
   constructor() {
     this.instance = window.createStatusBarItem()
-    this.instance.tooltip = 'Current DVC executable.'
+    this.instance.tooltip = 'Current DVC path.'
     this.instance.command = 'dvc.selectDvcPath'
     this.update()
     this.instance.show()
@@ -29,18 +29,19 @@ export class DVCPathStatusBarItem {
 }
 
 /**
- * Shows an input dialog allowing the user to enter a custom executable path.
+
+ * Shows an input dialog allowing the user to enter a custom path.
  */
-async function defineExecutable(): Promise<string | undefined> {
+async function defineDvcPath(): Promise<string | undefined> {
   return window.showInputBox({
-    prompt: 'Enter a custom DVC executable path...'
+    prompt: 'Enter a custom DVC path...'
   })
 }
 
 /**
- * Shows a dialog allowing the user to choose from a list of detected DVC executables or define their own.
+ * Shows a dialog allowing the user to choose from a list of detected DVC paths or define their own.
  */
-export async function selectExecutable(): Promise<void> {
+export async function selectDvcPath(): Promise<void> {
   // TODO: detection call and append to quick pick
   let path: string | undefined
   const result = await window.showQuickPick(
@@ -52,7 +53,7 @@ export async function selectExecutable(): Promise<void> {
       path = 'dvc'
     }
     if (result.label === 'custom') {
-      path = await defineExecutable()
+      path = await defineDvcPath()
     }
     workspace.getConfiguration().update('dvc.dvcPath', path)
   }

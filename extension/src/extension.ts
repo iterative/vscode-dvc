@@ -26,7 +26,8 @@ import {
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
-import { DVCPathStatusBarItem, selectExecutable } from './DvcPath'
+
+import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -91,7 +92,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', () => selectExecutable())
+      commands.registerCommand('dvc.selectDvcPath', () => selectDvcPath())
     )
 
     this.dispose.track(
