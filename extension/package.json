@@ -81,7 +81,7 @@
     "build-webpack": "webpack --mode production",
     "package": "vsce package --yarn",
     "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
-    "format": "prettier --write '**/*.{js,ts,md}'",
+    "format": "prettier '**/*.{js,ts,md}'",
     "test": "jest src",
     "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}' && tsc --noEmit",
     "vscode:prepublish": ""

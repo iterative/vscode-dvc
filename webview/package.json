@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "webpack-dev-server --hot",
     "build": "webpack --mode production",
-    "format": "prettier --write '**/*.{js,ts,md,jsx,tsx}'",
+    "format": "prettier '**/*.{js,ts,md,jsx,tsx}'",
     "lint": "eslint --cache --fix 'src/**/*.{js,ts,jsx,tsx}'"
   },
   "main": "./index.js",

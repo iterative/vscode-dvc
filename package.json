@@ -5,7 +5,7 @@
     "./webview"
   ],
   "scripts": {
-    "format": "prettier --write './*.{json,md}'",
+    "format": "prettier './*.{json,md}'",
     "format-all": "yarn format; yarn workspaces run format",
     "lint-all": "yarn workspaces run lint",
     "build": "yarn build-ui && yarn build-extension",
