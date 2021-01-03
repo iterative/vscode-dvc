@@ -33,8 +33,8 @@
         "command": "dvc-integration.runExperiment"
       },
       {
-        "title": "DVC: Select executable...",
-        "command": "dvc-integration.selectExecutable"
+        "title": "DVC: Select DVC path...",
+        "command": "dvc.selectDvcPath"
       }
     ],
     "configuration": {

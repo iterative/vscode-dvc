@@ -14,7 +14,7 @@ export class DVCPathStatusBarItem {
   constructor() {
     this.instance = window.createStatusBarItem()
     this.instance.tooltip = 'Current DVC executable.'
-    this.instance.command = 'dvc-integration.selectExecutable'
+    this.instance.command = 'dvc.selectDvcPath'
     this.update()
     this.instance.show()
   }

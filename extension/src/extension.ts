@@ -91,9 +91,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc-integration.selectExecutable', () =>
-        selectExecutable()
-      )
+      commands.registerCommand('dvc.selectDvcPath', () => selectExecutable())
     )
 
     this.dispose.track(
