@@ -1,4 +1,16 @@
-import * as vscode from 'vscode'
+import {
+  workspace,
+  window,
+  commands,
+  TreeDataProvider,
+  ThemeIcon,
+  TreeItemCollapsibleState,
+  scm,
+  Uri,
+  TreeItem,
+  Command,
+  ExtensionContext
+} from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -40,7 +52,7 @@ export class Extension {
   )
 
   private async updateCachedTable() {
-    const { workspaceFolders } = vscode.workspace
+    const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0)
       throw new Error('There are no folders in the Workspace to operate on!')
     const dvcReaderOptions = await inferDefaultOptions(
@@ -62,7 +74,7 @@ export class Extension {
 
   constructor() {
     if (getReloadCount(module) > 0) {
-      const i = this.dispose.track(vscode.window.createStatusBarItem())
+      const i = this.dispose.track(window.createStatusBarItem())
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
@@ -73,7 +85,7 @@ export class Extension {
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      vscode.workspace.onDidChangeConfiguration(e => {
+      workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
           this.dvcExecutableStatusBarItem.update()
         }
@@ -81,29 +93,26 @@ export class Extension {
     )
 
     this.dispose.track(
-      vscode.commands.registerCommand('dvc-integration.selectExecutable', () =>
+      commands.registerCommand('dvc-integration.selectExecutable', () =>
         selectExecutable()
       )
     )
 
     this.dispose.track(
-      vscode.commands.registerCommand(
-        'dvc-integration.showWebview',
-        async () => {
-          const dvcWebview = this.dispose.track(await this.manager.createNew())
-          try {
-            const tableData = await this.getCachedTable()
-            dvcWebview.showExperiments({ tableData })
-          } catch (e) {
-            dvcWebview.showExperiments({ errors: [e.toString()] })
-          }
+      commands.registerCommand('dvc-integration.showWebview', async () => {
+        const dvcWebview = this.dispose.track(await this.manager.createNew())
+        try {
+          const tableData = await this.getCachedTable()
+          dvcWebview.showExperiments({ tableData })
+        } catch (e) {
+          dvcWebview.showExperiments({ errors: [e.toString()] })
         }
-      )
+      })
     )
 
     this.dispose.track(
-      vscode.commands.registerCommand('dvc-integration.runExperiment', () => {
-        const terminal = vscode.window.createTerminal('DVC')
+      commands.registerCommand('dvc-integration.runExperiment', () => {
+        const terminal = window.createTerminal('DVC')
         terminal.sendText('dvc exp run')
         terminal.show()
       })
@@ -116,11 +125,10 @@ export class Extension {
   dvcCommandView(): void {
     interface TreeItemEntry {
       label: string
-      command?: vscode.Command
+      command?: Command
     }
 
-    class DVCTreeDataProvider
-      implements vscode.TreeDataProvider<TreeItemEntry> {
+    class DVCTreeDataProvider implements TreeDataProvider<TreeItemEntry> {
       /* onDidChangeTreeData?:
 				| Event<void | MyTreeItem | null | undefined>
 				| undefined; */
@@ -148,18 +156,18 @@ export class Extension {
         return []
       }
 
-      async getTreeItem(element: TreeItemEntry): Promise<vscode.TreeItem> {
+      async getTreeItem(element: TreeItemEntry): Promise<TreeItem> {
         return {
           label: element.label,
           command: element.command,
-          iconPath: vscode.ThemeIcon.File,
-          collapsibleState: vscode.TreeItemCollapsibleState.None
+          iconPath: ThemeIcon.File,
+          collapsibleState: TreeItemCollapsibleState.None
         }
       }
     }
 
     this.dispose.track(
-      vscode.window.createTreeView('dvc-tree', {
+      window.createTreeView('dvc-tree', {
         treeDataProvider: new DVCTreeDataProvider(),
         canSelectMany: false
       })
@@ -167,14 +175,14 @@ export class Extension {
   }
 
   dvcScmFilesView(): void {
-    const { workspaceFolders } = vscode.workspace
+    const { workspaceFolders } = workspace
     if (!workspaceFolders) return
 
     workspaceFolders.forEach(folder => {
       const uri = `${folder.uri.fsPath}/`
 
       const c = this.dispose.track(
-        vscode.scm.createSourceControl('dvc', 'DVC', vscode.Uri.file(uri))
+        scm.createSourceControl('dvc', 'DVC', Uri.file(uri))
       )
       c.acceptInputCommand = {
         command: 'workbench.action.output.toggleOutput',
@@ -197,7 +205,7 @@ export class Extension {
 
       resourceGroup.resourceStates = [
         {
-          resourceUri: vscode.Uri.file(`${uri}path/file.ts`),
+          resourceUri: Uri.file(`${uri}path/file.ts`),
           command: {
             command: 'workbench.action.output.toggleOutput',
             title: 'group1-file1'
@@ -208,7 +216,7 @@ export class Extension {
           }
         },
         {
-          resourceUri: vscode.Uri.file(`${uri}path/file2.txt`),
+          resourceUri: Uri.file(`${uri}path/file2.txt`),
           command: {
             command: 'workbench.action.output.toggleOutput',
             title: 'group1-file1'
@@ -218,7 +226,7 @@ export class Extension {
           }
         },
         {
-          resourceUri: vscode.Uri.file(`${uri}path/sub/file.txt`),
+          resourceUri: Uri.file(`${uri}path/sub/file.txt`),
           command: {
             command: 'workbench.action.output.toggleOutput',
             title: 'group1-file1'
@@ -232,7 +240,7 @@ export class Extension {
   }
 }
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
     hotRequireExportedFn(module, Extension, HotExtension => new HotExtension())
   )
