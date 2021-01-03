@@ -1,26 +1,37 @@
-name: Build plugin
+name: Check and Build
 on:
-    push:
-        branches:
-            - master
-    pull_request:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              with:
-                  submodules: true
-            - name: Install Node.js
-              uses: actions/setup-node@v1
-              with:
-                  node-version: 10.x
-            - run: yarn install
-            - run: yarn build -o ./vscode-dvc.vsix
-            - name: Upload
-              uses: actions/upload-artifact@v2
-              with:
-                  name: Built package
-                  path: ./extension/vscode-dvc.vsix
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+
+      - run: yarn install
+
+      - name: Prettier Action
+        uses: creyD/prettier_action@v3.2
+
+      - name: ESLint (JS/TS) Action
+        uses: iCrawl/action-eslint@v1
+
+      - run: yarn build -o ./vscode-dvc.vsix
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: Built package
+          path: ./extension/vscode-dvc.vsix
