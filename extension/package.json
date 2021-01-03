@@ -4,7 +4,7 @@
   "displayName": "DVC Integration",
   "description": "",
   "publisher": "todo-dvc",
-  "icon": "docs/logo.drawio.png",
+  "icon": "docs/logo.dvc.png",
   "version": "0.1.0",
   "engines": {
     "vscode": "^1.46.0"
