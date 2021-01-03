@@ -4,7 +4,7 @@
   "displayName": "DVC Integration",
   "description": "",
   "publisher": "todo-dvc",
-  "icon": "docs/logo.drawio.png",
+  "icon": "docs/logo.dvc.png",
   "version": "0.1.0",
   "engines": {
     "vscode": "^1.46.0"
@@ -31,11 +31,22 @@
       {
         "title": "DVC: Run Experiment",
         "command": "dvc-integration.runExperiment"
+      },
+      {
+        "title": "DVC: Select DVC path...",
+        "command": "dvc.selectDvcPath"
       }
     ],
     "configuration": {
       "title": "DVC",
-      "properties": {}
+      "properties": {
+        "dvc.dvcPath": {
+          "type": "string",
+          "description": "Path to dvc executable.",
+          "default": "dvc",
+          "scope": "resource"
+        }
+      }
     },
     "menus": {
       "scm/resourceState/context": [
@@ -45,12 +56,6 @@
         }
       ],
       "explorer/context": [
-        {
-          "command": "dvc-integration.runExperiment",
-          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
-        }
-      ],
-      "editor/context": [
         {
           "command": "dvc-integration.runExperiment",
           "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
