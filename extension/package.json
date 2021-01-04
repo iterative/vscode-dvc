@@ -6,17 +6,36 @@
   "publisher": "todo-dvc",
   "icon": "docs/dvc.png",
   "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iterative/vscode-dvc"
+  },
+  "readme": "./README.md",
+  "bugs": "https://github.com/iterative/vscode-dvc",
+  "homepage": "https://github.com/iterative/vscode-dvc/README.md",
+  "keywords": [
+    "iterative",
+    "data",
+    "version",
+    "control",
+    "dvc"
+  ],
+  "categories": [
+    "Data Science",
+    "Visualization"
+  ],
+  "galleryBanner": {
+    "color": "#333",
+    "theme": "dark"
+  },
   "engines": {
     "vscode": "^1.46.0"
   },
-  "readme": "./README.md",
   "activationEvents": [
     "*",
     "onWebviewPanel:dvc-view"
   ],
-  "repository": {
-    "url": "https://github.com/iterative/vscode-dvc"
-  },
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
