@@ -1,15 +1,15 @@
 import {
-  window,
-  ExtensionContext,
-  commands,
-  scm,
-  Uri,
   workspace,
+  window,
+  commands,
   TreeDataProvider,
-  TreeItem,
   ThemeIcon,
   TreeItemCollapsibleState,
-  Command
+  scm,
+  Uri,
+  TreeItem,
+  Command,
+  ExtensionContext
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
@@ -28,6 +28,8 @@ import {
 } from './DvcReader'
 import { createFileTreeView } from './tree/fileTreeDataProvider';
 
+import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
+
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
 }
@@ -44,6 +46,8 @@ export class Extension {
   private experimentsDataPromise: Promise<DVCExperimentsRepoJSONOutput> | null = null
 
   private lastTableUpdate?: number = undefined
+
+  private dvcPathStatusBarItem: DVCPathStatusBarItem
 
   private readonly manager = this.dispose.track(
     new DvcWebviewManager(this.config)
@@ -77,7 +81,21 @@ export class Extension {
       i.show()
     }
 
+    this.dispose.track((this.dvcPathStatusBarItem = new DVCPathStatusBarItem()))
+
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('dvc.dvcPath')) {
+          this.dvcPathStatusBarItem.update()
+        }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDvcPath', () => selectDvcPath())
+    )
+
     this.dispose.track(
       commands.registerCommand('dvc-integration.showWebview', async () => {
         const dvcWebview = this.dispose.track(await this.manager.createNew())

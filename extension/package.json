@@ -52,11 +52,22 @@
       {
         "title": "DVC: Run Experiment",
         "command": "dvc-integration.runExperiment"
+      },
+      {
+        "title": "DVC: Select DVC path...",
+        "command": "dvc.selectDvcPath"
       }
     ],
     "configuration": {
       "title": "DVC",
-      "properties": {}
+      "properties": {
+        "dvc.dvcPath": {
+          "type": "string",
+          "description": "Path to DVC.",
+          "default": "dvc",
+          "scope": "resource"
+        }
+      }
     },
     "menus": {
       "scm/resourceState/context": [
@@ -66,12 +77,6 @@
         }
       ],
       "explorer/context": [
-        {
-          "command": "dvc-integration.runExperiment",
-          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
-        }
-      ],
-      "editor/context": [
         {
           "command": "dvc-integration.runExperiment",
           "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
