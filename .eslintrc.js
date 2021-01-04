@@ -22,18 +22,25 @@ module.exports = {
     // prettier
     'prettier/prettier': ['error'],
     // TypeScript
+    '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
     '@typescript-eslint/explicit-member-accessibility': 'off',
     '@typescript-eslint/no-object-literal-type-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off',
     'no-console': 'off',
     'max-classes-per-file': 'off',
     'class-methods-use-this': 'off',
     // import
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'never',
+        mjs: 'never',
+        ts: 'never'
+      }
+    ],
     'import/prefer-default-export': 'off',
-    'import/no-unresolved': 'off',
-    'import/extensions': 'off',
     'no-underscore-dangle': 'off',
     'no-restricted-syntax': 'off',
     'no-param-reassign': 'off'
@@ -45,29 +52,29 @@ module.exports = {
       }
     },
     'import/extensions': ['.js', '.ts', '.mjs'],
-    'import/core-modules': ['vscode', 'dvc-integration']
+    'import/core-modules': ['vscode', 'dvc-vscode-webview', 'dvc-integration']
   },
   overrides: [
     {
-      files: ['webpack.config.ts'],
+      files: ['**/*.{ts,tsx}'],
+      rules: {
+        'import/extensions': 'off',
+        'import/no-unresolved': 'off'
+      }
+    },
+    {
+      files: ['**/webpack.config.ts'],
       rules: {
         '@typescript-eslint/no-var-requires': 'off',
         'import/no-extraneous-dependencies': 'off'
       }
     },
     {
-      files: ['*.test.js'],
+      files: ['**/*.test.js'],
       rules: {
         'no-undef': 'off'
       }
-    },
-    {
-      files: ['src/**/*.ts'],
-      parserOptions: {
-        sourceType: 'module',
-        project: './tsconfig.json'
-      }
     }
   ],
-  ignorePatterns: ['/dist/**', '/github-action/**']
+  ignorePatterns: ['**/dist/**']
 }
