@@ -1,9 +1,9 @@
 {
-  "name": "dvc-integration",
+  "name": "dvc",
   "private": true,
-  "displayName": "DVC Integration",
-  "description": "",
-  "publisher": "todo-dvc",
+  "displayName": "DVC",
+  "description": "DVC VSCode extension",
+  "publisher": "iterative",
   "icon": "docs/logo.dvc.png",
   "version": "0.1.0",
   "engines": {
