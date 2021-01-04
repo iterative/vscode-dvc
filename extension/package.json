@@ -1,5 +1,5 @@
 {
-  "name": "dvc",
+  "name": "dvc-integration",
   "private": true,
   "displayName": "DVC",
   "description": "DVC VSCode extension",
