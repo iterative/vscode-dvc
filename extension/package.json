@@ -4,7 +4,7 @@
   "displayName": "DVC Integration",
   "description": "",
   "publisher": "todo-dvc",
-  "icon": "docs/logo.dvc.png",
+  "icon": "docs/dvc.png",
   "version": "0.1.0",
   "license": "Apache-2.0",
   "repository": {
