@@ -12,6 +12,7 @@
     "type": "git",
     "url": "https://github.com/iterative/vscode-dvc"
   },
+  "readme": "./README.md",
   "bugs": "https://github.com/iterative/vscode-dvc",
   "homepage": "https://github.com/iterative/vscode-dvc/README.md",
   "keywords": [
