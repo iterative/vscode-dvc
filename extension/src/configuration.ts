@@ -19,6 +19,6 @@ class Config {
   }
 }
 
-export function getConfig() {
+export function getConfig(): Config {
   return new Config()
 }
