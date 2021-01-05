@@ -89,9 +89,8 @@ const getCellComponent: (
   }
 }
 
-const buildColumnIdFromPath = (objectPath: string[]) => {
-  return objectPath.map(segment => `[${segment}]`).join('')
-}
+const buildColumnIdFromPath = (objectPath: string[]) =>
+  objectPath.map(segment => `[${segment}]`).join('')
 
 const mergeType: (
   original: SchemaType | undefined,
@@ -220,12 +219,10 @@ const buildDynamicColumnsFromExperiments: (
     params: DataFilesDict[]
     metrics: DataFilesDict[]
   }>(
-    ({ params, metrics }, cur) => {
-      return {
-        params: cur.params ? [...params, cur.params] : params,
-        metrics: cur.metrics ? [...metrics, cur.metrics] : metrics
-      }
-    },
+    ({ params, metrics }, cur) => ({
+      params: cur.params ? [...params, cur.params] : params,
+      metrics: cur.metrics ? [...metrics, cur.metrics] : metrics
+    }),
     { params: [], metrics: [] }
   )
 

@@ -4,9 +4,7 @@ const getItemKey: (input: DVCExperimentRow) => string = input => input.sha
 const getParentKey: (input: any, parent: any) => string | undefined = (
   { checkpoint_parent },
   parent
-) => {
-  return checkpoint_parent === parent.sha ? undefined : checkpoint_parent
-}
+) => (checkpoint_parent === parent.sha ? undefined : checkpoint_parent)
 const addChild: (parent: any, child: any) => void = (parent, child) => {
   parent.subRows = parent.subRows || []
   parent.subRows.push(child)
