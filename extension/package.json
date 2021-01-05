@@ -36,8 +36,7 @@
   },
   "activationEvents": [
     "*",
-    "onWebviewPanel:dvc-view",
-    "onView:dvc.fileTreeView"
+    "onWebviewPanel:dvc-view"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -98,19 +97,9 @@
         {
           "id": "dvc-tree",
           "name": "Commands"
-        },
-        {
-          "id": "dvc.fileTreeView",
-          "name": "Files"
         }
       ]
-    },
-    "viewsWelcome": [
-      {
-        "view": "dvc.fileTreeView",
-        "contents": "Loading files ..."
-      }
-    ]
+    }
   },
   "scripts": {
     "dev": "shx rm -rf dist && tsc -watch -p ./",
