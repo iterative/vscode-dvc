@@ -64,7 +64,7 @@ const makeMixedCellComponent: (
   propertyType: SchemaProperty
 ) => React.FC<{ value: any }> = propertyType => {
   const NumberCell = getNumberCellComponent(propertyType)
-  return ({ value }) => {
+  return function MixedCell({ value }) {
     if (value === undefined) return null
     return typeof value === 'number' ? (
       <NumberCell value={value} />

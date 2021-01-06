@@ -205,7 +205,7 @@ const PrimaryHeaderGroup: React.FC<{
       className: cx('tr', 'headers-row')
     })}
   >
-    {headerGroup.headers.map(header => (
+    {headerGroup.headers.map((header, i) => (
       <div
         {...header.getHeaderProps(
           header.getSortByToggleProps({
@@ -215,6 +215,7 @@ const PrimaryHeaderGroup: React.FC<{
             })
           })
         )}
+        key={i}
       >
         <div>
           {header.render('Header')}
@@ -255,7 +256,9 @@ const TableRow: React.FC<RowProp & InstanceProp> = ({ row, instance }) => {
         ))}
       </div>
       {row.isExpanded &&
-        row.subRows.map(row => <TableRow row={row} instance={instance} />)}
+        row.subRows.map((row, i) => (
+          <TableRow key={i} row={row} instance={instance} />
+        ))}
     </div>
   )
 }

@@ -1,3 +1,4 @@
+/* global module, require, __dirname */
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 // This is the entry point when this package is used as library from the extension.
