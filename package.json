@@ -5,7 +5,7 @@
     "./webview"
   ],
   "scripts": {
-    "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json}'",
+    "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json,yml,yaml}'",
     "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
     "build": "yarn build-ui && yarn build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
@@ -27,7 +27,7 @@
     "prettier": "^1.19.1"
   },
   "lint-staged": {
-    "*.{md,json}": "prettier --write",
+    "*.{md,json,yml,yaml}": "prettier --write",
     "*.{js,ts,tsx}": "eslint --fix"
   }
 }
