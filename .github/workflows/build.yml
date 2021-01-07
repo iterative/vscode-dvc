@@ -42,7 +42,7 @@ jobs:
 
       - run: yarn workspace dvc-integration tsc -p './'
 
-      - run: xvfb -a yarn test
+      - run: xvfb-run -a yarn test
 
       - run: yarn build -o ./vscode-dvc.vsix
 
