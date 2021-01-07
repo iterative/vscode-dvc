@@ -40,6 +40,8 @@ jobs:
 
       - run: yarn eslint "**/*.{js,ts,tsx}"
 
+      - run: yarn test
+
       - run: yarn build -o ./vscode-dvc.vsix
 
       - name: Upload

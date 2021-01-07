@@ -7,6 +7,7 @@
   "scripts": {
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json,yml,yaml}'",
     "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "test": "yarn workspaces run test",
     "build": "yarn build-ui && yarn build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "extension-dev-server": "yarn workspace dvc-integration dev",
