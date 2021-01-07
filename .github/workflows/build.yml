@@ -25,15 +25,19 @@ jobs:
 
       - uses: actions/cache@v2
         name: Restore cache
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
-          path: |
-            **/yarn.lock
-            extension/.vscode-test
-            ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
+
+      - uses: actions/cache@v2
+        name: Restore VSCode Test cache
+        id: vscode-cache
+        with:
+          path: extension/.vscode-test
+          key: vscode-test
 
       - run: yarn install
 
