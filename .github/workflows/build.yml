@@ -40,9 +40,11 @@ jobs:
 
       - run: yarn eslint "**/*.{js,ts,tsx}"
 
-      - run: yarn build -o ./vscode-dvc.vsix
+      - run: yarn workspace dvc-integration tsc -p './'
 
       - run: yarn test
+
+      - run: yarn build -o ./vscode-dvc.vsix
 
       - name: Upload
         uses: actions/upload-artifact@v2
