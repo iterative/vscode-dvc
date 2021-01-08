@@ -53,37 +53,35 @@ const parseExperimentJSONEntry: (
 
 const ColumnOptionsRow: React.FC<{
   column: ColumnInstance<DVCExperimentRow>
-}> = ({ column }) => {
-  return (
-    <div>
-      <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
-      {column.canSort && (
-        <button {...column.getSortByToggleProps()}>
-          Sort
-          {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
-        </button>
-      )}
-      {(!column.columns || column.columns.length === 0) && (
-        <button
-          onClick={() => {
-            column.toggleHidden()
-          }}
-        >
-          {column.isVisible ? 'Hide' : 'Show'}
-        </button>
-      )}
-      {column.columns &&
-        column.columns.map(childColumn => (
-          <ColumnOptionsRow column={childColumn} key={childColumn.id} />
-        ))}
-    </div>
-  )
-}
+}> = ({ column }) => (
+  <div>
+    <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
+    {column.canSort && (
+      <button {...column.getSortByToggleProps()}>
+        Sort
+        {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
+      </button>
+    )}
+    {(!column.columns || column.columns.length === 0) && (
+      <button
+        onClick={() => {
+          column.toggleHidden()
+        }}
+      >
+        {column.isVisible ? 'Hide' : 'Show'}
+      </button>
+    )}
+    {column.columns &&
+      column.columns.map(childColumn => (
+        <ColumnOptionsRow column={childColumn} key={childColumn.id} />
+      ))}
+  </div>
+)
 
 const parseExperiments: (
   experimentsData: DVCExperimentsRepoJSONOutput
-) => ParseExperimentsOutput = experimentsData => {
-  return Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
+) => ParseExperimentsOutput = experimentsData =>
+  Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
     (
       { experiments, flatExperiments },
       [commitId, { baseline, ...childExperiments }]
@@ -112,7 +110,6 @@ const parseExperiments: (
       flatExperiments: []
     }
   )
-}
 
 const TruncatedCell = ({ value }: { value: string }) =>
   value && value.length && value.length > 12
@@ -121,34 +118,32 @@ const TruncatedCell = ({ value }: { value: string }) =>
 
 const ParentHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<DVCExperimentRow>
-}> = ({ headerGroup }) => {
-  return (
-    <div
-      {...headerGroup.getHeaderGroupProps({
-        className: cx('parent-headers-row', 'tr')
-      })}
-    >
-      {headerGroup.headers.map(column => (
-        <div
-          {...column.getHeaderProps({
-            className: cx(
-              'th',
-              column.placeholderOf
-                ? 'placeholder-header-cell'
-                : 'parent-header-cell',
-              {
-                'grouped-header': column.isGrouped
-              }
-            )
-          })}
-          key={column.id}
-        >
-          <div>{column.render('Header')}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
+}> = ({ headerGroup }) => (
+  <div
+    {...headerGroup.getHeaderGroupProps({
+      className: cx('parent-headers-row', 'tr')
+    })}
+  >
+    {headerGroup.headers.map(column => (
+      <div
+        {...column.getHeaderProps({
+          className: cx(
+            'th',
+            column.placeholderOf
+              ? 'placeholder-header-cell'
+              : 'parent-header-cell',
+            {
+              'grouped-header': column.isGrouped
+            }
+          )
+        })}
+        key={column.id}
+      >
+        <div>{column.render('Header')}</div>
+      </div>
+    ))}
+  </div>
+)
 
 const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
   cell
@@ -210,7 +205,7 @@ const PrimaryHeaderGroup: React.FC<{
       className: cx('tr', 'headers-row')
     })}
   >
-    {headerGroup.headers.map(header => (
+    {headerGroup.headers.map((header, i) => (
       <div
         {...header.getHeaderProps(
           header.getSortByToggleProps({
@@ -220,6 +215,7 @@ const PrimaryHeaderGroup: React.FC<{
             })
           })
         )}
+        key={i}
       >
         <div>
           {header.render('Header')}
@@ -244,46 +240,44 @@ const TableRow: React.FC<RowProp & InstanceProp> = ({ row, instance }) => {
         })}
       >
         <FirstCell cell={firstCell} />
-        {cells.map(cell => {
-          return (
-            <div
-              {...cell.getCellProps({
-                className: cx('td', {
-                  'group-placeholder': cell.isPlaceholder,
-                  'grouped-column-cell': cell.column.isGrouped,
-                  'grouped-cell': cell.isGrouped
-                })
-              })}
-              key={`${cell.column.id}___${cell.row.id}`}
-            >
-              {cell.isPlaceholder ? null : cell.render('Cell')}
-            </div>
-          )
-        })}
+        {cells.map(cell => (
+          <div
+            {...cell.getCellProps({
+              className: cx('td', {
+                'group-placeholder': cell.isPlaceholder,
+                'grouped-column-cell': cell.column.isGrouped,
+                'grouped-cell': cell.isGrouped
+              })
+            })}
+            key={`${cell.column.id}___${cell.row.id}`}
+          >
+            {cell.isPlaceholder ? null : cell.render('Cell')}
+          </div>
+        ))}
       </div>
       {row.isExpanded &&
-        row.subRows.map(row => <TableRow row={row} instance={instance} />)}
+        row.subRows.map((row, i) => (
+          <TableRow key={i} row={row} instance={instance} />
+        ))}
     </div>
   )
 }
 
-const TableBody: React.FC<RowProp & InstanceProp> = ({ row, instance }) => {
-  return (
-    <div
-      {...instance.getTableBodyProps({
-        className: cx(
-          'row-group',
-          'tbody',
-          row.values.sha === 'workspace'
-            ? 'workspace-row-group'
-            : 'normal-row-group'
-        )
-      })}
-    >
-      <TableRow instance={instance} row={row} />
-    </div>
-  )
-}
+const TableBody: React.FC<RowProp & InstanceProp> = ({ row, instance }) => (
+  <div
+    {...instance.getTableBodyProps({
+      className: cx(
+        'row-group',
+        'tbody',
+        row.values.sha === 'workspace'
+          ? 'workspace-row-group'
+          : 'normal-row-group'
+      )
+    })}
+  >
+    <TableRow instance={instance} row={row} />
+  </div>
+)
 
 const TableHead: React.FC<InstanceProp> = ({ instance: { headerGroups } }) => {
   const lastHeaderGroupIndex = headerGroups.length - 1
@@ -460,9 +454,9 @@ export const ExperimentsTable: React.FC<{
       <div className="table-container">
         <div {...getTableProps({ className: 'table' })}>
           <TableHead instance={instance} />
-          {rows.map(row => {
-            return <TableBody row={row} instance={instance} key={row.id} />
-          })}
+          {rows.map(row => (
+            <TableBody row={row} instance={instance} key={row.id} />
+          ))}
         </div>
       </div>
     </>
