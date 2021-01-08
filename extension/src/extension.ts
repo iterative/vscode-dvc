@@ -42,7 +42,9 @@ export class Extension {
 
   private readonly config = new Config()
 
-  private experimentsDataPromise: Promise<DVCExperimentsRepoJSONOutput> | null = null
+  private experimentsDataPromise: Promise<
+    DVCExperimentsRepoJSONOutput
+  > | null = null
 
   private lastTableUpdate?: number = undefined
 

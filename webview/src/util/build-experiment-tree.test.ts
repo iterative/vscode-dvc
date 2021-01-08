@@ -120,10 +120,11 @@ test('Works on a manually defined tree', () => {
             "sha": "538075916ab0c12640b142632ccd0bdbbb2d99fd",
             "subRows": Array [
               Object {
-                "checkpoint_parent": "538075916ab0c12640b142632ccd0bdbbb2d99fd",
+                "checkpoint_parent": "c39f37f176f043512536b175f4c3e6a201270b80",
                 "checkpoint_tip": "ebb29fc4afc8768e54bef64db01bf9d36e1b93e6",
+                "name": "exp-5a8b8",
                 "queued": false,
-                "sha": "195ee4c7673f1e8bdbf1648e510d53fcf98faba2",
+                "sha": "ebb29fc4afc8768e54bef64db01bf9d36e1b93e6",
               },
               Object {
                 "checkpoint_parent": "195ee4c7673f1e8bdbf1648e510d53fcf98faba2",
@@ -132,11 +133,10 @@ test('Works on a manually defined tree', () => {
                 "sha": "c39f37f176f043512536b175f4c3e6a201270b80",
               },
               Object {
-                "checkpoint_parent": "c39f37f176f043512536b175f4c3e6a201270b80",
+                "checkpoint_parent": "538075916ab0c12640b142632ccd0bdbbb2d99fd",
                 "checkpoint_tip": "ebb29fc4afc8768e54bef64db01bf9d36e1b93e6",
-                "name": "exp-5a8b8",
                 "queued": false,
-                "sha": "ebb29fc4afc8768e54bef64db01bf9d36e1b93e6",
+                "sha": "195ee4c7673f1e8bdbf1648e510d53fcf98faba2",
               },
             ],
           },
@@ -147,10 +147,11 @@ test('Works on a manually defined tree', () => {
             "sha": "e1b0c4422766a3b53489feaf1dc831ac48cff974",
             "subRows": Array [
               Object {
-                "checkpoint_parent": "e1b0c4422766a3b53489feaf1dc831ac48cff974",
+                "checkpoint_parent": "c65ddb77a5b952ac503bdb397c38097ef464ccb0",
                 "checkpoint_tip": "1206f4bc466f23b1042c216e7ecfcadffc20018b",
+                "name": "exp-4fd17",
                 "queued": false,
-                "sha": "7ea8bf6c46eab35739075286e0fa04acc341a561",
+                "sha": "1206f4bc466f23b1042c216e7ecfcadffc20018b",
               },
               Object {
                 "checkpoint_parent": "7ea8bf6c46eab35739075286e0fa04acc341a561",
@@ -159,11 +160,10 @@ test('Works on a manually defined tree', () => {
                 "sha": "c65ddb77a5b952ac503bdb397c38097ef464ccb0",
               },
               Object {
-                "checkpoint_parent": "c65ddb77a5b952ac503bdb397c38097ef464ccb0",
+                "checkpoint_parent": "e1b0c4422766a3b53489feaf1dc831ac48cff974",
                 "checkpoint_tip": "1206f4bc466f23b1042c216e7ecfcadffc20018b",
-                "name": "exp-4fd17",
                 "queued": false,
-                "sha": "1206f4bc466f23b1042c216e7ecfcadffc20018b",
+                "sha": "7ea8bf6c46eab35739075286e0fa04acc341a561",
               },
             ],
           },
@@ -174,22 +174,11 @@ test('Works on a manually defined tree', () => {
             "sha": "33224258fdec80828010f09bde20bcd453e3a8a9",
             "subRows": Array [
               Object {
-                "checkpoint_parent": "33224258fdec80828010f09bde20bcd453e3a8a9",
+                "checkpoint_parent": "9515eba4eded89c906957420e13d10e6015bef5a",
                 "checkpoint_tip": "30b4676023d84de629d3a0bce3f1814642bd960b",
+                "name": "exp-5e230",
                 "queued": false,
-                "sha": "4d08facf98b8121602b2cf3efd0d69f215f70dea",
-              },
-              Object {
-                "checkpoint_parent": "4d08facf98b8121602b2cf3efd0d69f215f70dea",
-                "checkpoint_tip": "30b4676023d84de629d3a0bce3f1814642bd960b",
-                "queued": false,
-                "sha": "3fdd5ebeb5eb14d767a52c15b94f403f643103d6",
-              },
-              Object {
-                "checkpoint_parent": "3fdd5ebeb5eb14d767a52c15b94f403f643103d6",
-                "checkpoint_tip": "30b4676023d84de629d3a0bce3f1814642bd960b",
-                "queued": false,
-                "sha": "e0e36dbb1308984ae567aca66a3ed2661ec82a92",
+                "sha": "30b4676023d84de629d3a0bce3f1814642bd960b",
               },
               Object {
                 "checkpoint_parent": "e0e36dbb1308984ae567aca66a3ed2661ec82a92",
@@ -198,11 +187,22 @@ test('Works on a manually defined tree', () => {
                 "sha": "9515eba4eded89c906957420e13d10e6015bef5a",
               },
               Object {
-                "checkpoint_parent": "9515eba4eded89c906957420e13d10e6015bef5a",
+                "checkpoint_parent": "3fdd5ebeb5eb14d767a52c15b94f403f643103d6",
                 "checkpoint_tip": "30b4676023d84de629d3a0bce3f1814642bd960b",
-                "name": "exp-5e230",
                 "queued": false,
-                "sha": "30b4676023d84de629d3a0bce3f1814642bd960b",
+                "sha": "e0e36dbb1308984ae567aca66a3ed2661ec82a92",
+              },
+              Object {
+                "checkpoint_parent": "4d08facf98b8121602b2cf3efd0d69f215f70dea",
+                "checkpoint_tip": "30b4676023d84de629d3a0bce3f1814642bd960b",
+                "queued": false,
+                "sha": "3fdd5ebeb5eb14d767a52c15b94f403f643103d6",
+              },
+              Object {
+                "checkpoint_parent": "33224258fdec80828010f09bde20bcd453e3a8a9",
+                "checkpoint_tip": "30b4676023d84de629d3a0bce3f1814642bd960b",
+                "queued": false,
+                "sha": "4d08facf98b8121602b2cf3efd0d69f215f70dea",
               },
             ],
           },

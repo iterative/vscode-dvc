@@ -4,8 +4,9 @@
   "scripts": {
     "dev": "webpack-dev-server --hot",
     "build": "webpack --mode production",
-    "format": "prettier --write '**/*.{js,ts,md,jsx,tsx}'",
-    "lint": "eslint --cache --fix 'src/**/*.{js,ts,jsx,tsx}'"
+    "test": "jest",
+    "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json}'",
+    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'"
   },
   "main": "./index.js",
   "peerDependencies": {
@@ -33,7 +34,6 @@
     "@types/webpack": "^4.41.25",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.4.2",
-    "eslint-plugin-prettier": "^3.1.4",
     "file-loader": "^5.1.0",
     "fork-ts-checker-webpack-plugin": "^4.0.4",
     "html-webpack-plugin": "^3.2.0",

@@ -1,26 +1,64 @@
-name: Build plugin
+name: Continuous Integration
 on:
-    push:
-        branches:
-            - master
-    pull_request:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
-              with:
-                  submodules: true
-            - name: Install Node.js
-              uses: actions/setup-node@v1
-              with:
-                  node-version: 10.x
-            - run: yarn install
-            - run: yarn build -o ./vscode-dvc.vsix
-            - name: Upload
-              uses: actions/upload-artifact@v2
-              with:
-                  name: Built package
-                  path: ./extension/vscode-dvc.vsix
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+
+      - name: Get Yarn cache path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v2
+        name: Restore Yarn cache
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn
+
+      - uses: actions/cache@v2
+        name: Restore ESLint cache
+        id: eslint-cache
+        with:
+          path: .eslintcache
+          key: eslint-cache
+
+      - uses: actions/cache@v2
+        name: Restore .vscode-test cache
+        id: vscode-cache
+        with:
+          path: extension/.vscode-test
+          key: vscode-test
+
+      - run: yarn install
+
+      - run: yarn prettier -c "**/*.{md,json}"
+
+      - run: yarn eslint --cache "**/*.{js,ts,tsx}"
+
+      - run: yarn workspace dvc-integration tsc -p './'
+
+      - run: xvfb-run -a yarn test
+
+      - run: yarn build -o ./vscode-dvc.vsix
+
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: Built package
+          path: ./extension/vscode-dvc.vsix
