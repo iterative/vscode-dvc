@@ -10,7 +10,7 @@ export interface WindowWithWebviewData {
 // Use union type to add more messages
 
 export type MessageFromWebview = {
-  kind: 'initialized'
+  kind: 'initialized' | 'onClickRunExperiment'
 }
 
 export type MessageToWebview = {

@@ -1,4 +1,4 @@
-import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
+import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { Deferred } from '@hediet/std/synchronization'
@@ -9,7 +9,10 @@ import {
   MessageToWebview,
   WindowWithWebviewData
 } from './webviewContract'
-import { DVCExperimentsRepoJSONOutput } from './DvcReader'
+import {
+  DVCExperimentsRepoJSONOutput,
+  DVCExperimentsCommitJSONOutput
+} from './DvcReader'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -140,11 +143,17 @@ export class DvcWebview {
 
   private handleMessage(message: MessageFromWebview) {
     switch (message.kind) {
-      case 'initialized':
+      case 'initialized': {
         this._initialized.resolve()
         return
-      default:
+      }
+      case 'onClickRunExperiment': {
+        commands.executeCommand('dvc-integration.runExperiment')
+        return
+      }
+      default: {
         console.error('Unexpected message', message)
+      }
     }
   }
 
@@ -190,6 +199,18 @@ export class DvcWebviewManager {
     const view = await DvcWebview.create(this.config)
     this.addView(view)
     return view
+  }
+
+  public refreshAll(
+    tableData: Record<string, DVCExperimentsCommitJSONOutput> | null
+  ): void {
+    for (const panel of this.openedWebviews) {
+      try {
+        panel.showExperiments({ tableData })
+      } catch (e) {
+        panel.showExperiments({ errors: [e.toString()] })
+      }
+    }
   }
 
   private addView(view: DvcWebview) {

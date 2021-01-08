@@ -465,15 +465,25 @@ export const ExperimentsTable: React.FC<{
 
 const Experiments: React.FC<{
   experiments?: DVCExperimentsRepoJSONOutput | null
-}> = ({ experiments }) => (
-  <div className="experiments">
-    <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
-    {experiments ? (
-      <ExperimentsTable experiments={experiments} />
-    ) : (
-      <p>Loading experiments...</p>
-    )}
-  </div>
-)
+  vsCodeApi: any
+}> = ({ experiments, vsCodeApi }) => {
+  return (
+    <div className="experiments">
+      <h1 className={cx('experiments-heading', 'page-heading')}>Experiments</h1>
+      <button
+        onClick={() => {
+          vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
+        }}
+      >
+        Run Experiment
+      </button>
+      {experiments ? (
+        <ExperimentsTable experiments={experiments} />
+      ) : (
+        <p>Loading experiments...</p>
+      )}
+    </div>
+  )
+}
 
 export default Experiments
