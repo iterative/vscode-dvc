@@ -84,5 +84,8 @@ out/
 
 # Ignore all NPM lockfiles
 package-lock.json
+
 # Ignore all but the root yarn.lock
 */yarn.lock
+
+.vscode-test/
