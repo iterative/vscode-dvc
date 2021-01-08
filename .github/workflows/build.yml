@@ -24,16 +24,22 @@ jobs:
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - uses: actions/cache@v2
-        name: Restore cache
+        name: Restore Yarn cache
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          restore-keys: yarn
 
       - uses: actions/cache@v2
-        name: Restore VSCode Test cache
+        name: Restore ESLint cache
+        id: eslint-cache
+        with:
+          path: .eslintcache
+          key: eslint-cache
+
+      - uses: actions/cache@v2
+        name: Restore .vscode-test cache
         id: vscode-cache
         with:
           path: extension/.vscode-test
@@ -43,7 +49,7 @@ jobs:
 
       - run: yarn prettier -c "**/*.{md,json}"
 
-      - run: yarn eslint "**/*.{js,ts,tsx}"
+      - run: yarn eslint --cache "**/*.{js,ts,tsx}"
 
       - run: yarn workspace dvc-integration tsc -p './'
 
