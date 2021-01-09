@@ -54,37 +54,35 @@ const parseExperimentJSONEntry: (
 
 const ColumnOptionsRow: React.FC<{
   column: ColumnInstance<DVCExperimentRow>
-}> = ({ column }) => {
-  return (
-    <div>
-      <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
-      {column.canSort && (
-        <button {...column.getSortByToggleProps()}>
-          Sort
-          {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
-        </button>
-      )}
-      {(!column.columns || column.columns.length === 0) && (
-        <button
-          onClick={() => {
-            column.toggleHidden()
-          }}
-        >
-          {column.isVisible ? 'Hide' : 'Show'}
-        </button>
-      )}
-      {column.columns &&
-        column.columns.map(childColumn => (
-          <ColumnOptionsRow column={childColumn} key={childColumn.id} />
-        ))}
-    </div>
-  )
-}
+}> = ({ column }) => (
+  <div>
+    <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
+    {column.canSort && (
+      <button {...column.getSortByToggleProps()}>
+        Sort
+        {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
+      </button>
+    )}
+    {(!column.columns || column.columns.length === 0) && (
+      <button
+        onClick={() => {
+          column.toggleHidden()
+        }}
+      >
+        {column.isVisible ? 'Hide' : 'Show'}
+      </button>
+    )}
+    {column.columns &&
+      column.columns.map(childColumn => (
+        <ColumnOptionsRow column={childColumn} key={childColumn.id} />
+      ))}
+  </div>
+)
 
 const parseExperiments: (
   experimentsData: DVCExperimentsRepoJSONOutput
-) => ParseExperimentsOutput = experimentsData => {
-  return Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
+) => ParseExperimentsOutput = experimentsData =>
+  Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
     (
       { experiments, flatExperiments },
       [commitId, { baseline, ...childExperiments }]
@@ -113,7 +111,6 @@ const parseExperiments: (
       flatExperiments: []
     }
   )
-}
 
 function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
   const {
@@ -279,17 +276,25 @@ export const ExperimentsTable: React.FC<{
 
 const Experiments: React.FC<{
   experiments?: DVCExperimentsRepoJSONOutput | null
-}> = ({ experiments }) => (
-  <div className={styles.experiments}>
-    <h1 className={cx(styles.experimentsHeading, styles.pageHeading)}>
-      Experiments
-    </h1>
-    {experiments ? (
-      <ExperimentsTable experiments={experiments} />
-    ) : (
-      <p>Loading experiments...</p>
-    )}
-  </div>
-)
+  vsCodeApi: any
+}> = ({ experiments, vsCodeApi }) => {
+  return (
+    <div className={styles.experiments}>
+      <h1 className={cx(styles.experimentsHeading, styles.pageHeading)} />
+      <button
+        onClick={() => {
+          vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
+        }}
+      >
+        Run Experiment
+      </button>
+      {experiments ? (
+        <ExperimentsTable experiments={experiments} />
+      ) : (
+        <p>Loading experiments...</p>
+      )}
+    </div>
+  )
+}
 
 export default Experiments

@@ -1,40 +1,37 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "npm",
-			"label": "npm: dev - extension",
-			"script": "dev",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never"
-			},
-			"path": "extension/",
-			"group": "build"
-		},
-		{
-			"type": "npm",
-			"label": "npm: dev - webview",
-			"script": "dev",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never"
-			},
-			"path": "webview/",
-			"group": "build"
-		},
-		{
-			"label": "npm: dev - all",
-			"isBackground": true,
-			"dependsOn": [
-				"npm: dev - extension",
-				"npm: dev - webview"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
-		}
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "label": "npm: dev - extension",
+      "script": "dev",
+      "problemMatcher": "$tsc-watch",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never"
+      },
+      "path": "extension/",
+      "group": "build"
+    },
+    {
+      "type": "npm",
+      "label": "npm: dev - webview",
+      "script": "dev",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "never"
+      },
+      "path": "webview/",
+      "group": "build"
+    },
+    {
+      "label": "npm: dev - all",
+      "isBackground": true,
+      "dependsOn": ["npm: dev - extension", "npm: dev - webview"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
 }

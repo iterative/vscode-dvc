@@ -1,15 +1,16 @@
 import {
-  window,
-  ExtensionContext,
-  commands,
-  scm,
-  Uri,
   workspace,
+  window,
+  commands,
   TreeDataProvider,
-  TreeItem,
   ThemeIcon,
   TreeItemCollapsibleState,
-  Command
+  Command,
+  OutputChannel,
+  scm,
+  Uri,
+  TreeItem,
+  ExtensionContext
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
@@ -23,9 +24,12 @@ import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
 import {
   getExperiments,
+  runExperiment,
   inferDefaultOptions,
   DVCExperimentsRepoJSONOutput
 } from './DvcReader'
+
+import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -40,13 +44,19 @@ export class Extension {
 
   private readonly config = new Config()
 
-  private experimentsDataPromise: Promise<DVCExperimentsRepoJSONOutput> | null = null
+  private experimentsDataPromise: Promise<
+    DVCExperimentsRepoJSONOutput
+  > | null = null
 
   private lastTableUpdate?: number = undefined
+
+  private dvcPathStatusBarItem: DVCPathStatusBarItem
 
   private readonly manager = this.dispose.track(
     new DvcWebviewManager(this.config)
   )
+
+  private channel: OutputChannel | undefined
 
   private async updateCachedTable() {
     const { workspaceFolders } = workspace
@@ -69,6 +79,13 @@ export class Extension {
     return this.experimentsDataPromise
   }
 
+  private async getOutputChannel() {
+    if (!this.channel) {
+      this.channel = window.createOutputChannel('DVC')
+    }
+    return this.channel
+  }
+
   constructor() {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -76,7 +93,21 @@ export class Extension {
       i.show()
     }
 
+    this.dispose.track((this.dvcPathStatusBarItem = new DVCPathStatusBarItem()))
+
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('dvc.dvcPath')) {
+          this.dvcPathStatusBarItem.update()
+        }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDvcPath', () => selectDvcPath())
+    )
+
     this.dispose.track(
       commands.registerCommand('dvc-integration.showWebview', async () => {
         const dvcWebview = this.dispose.track(await this.manager.createNew())
@@ -90,10 +121,26 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc-integration.runExperiment', () => {
-        const terminal = window.createTerminal('DVC')
-        terminal.sendText('dvc exp run')
-        terminal.show()
+      commands.registerCommand('dvc-integration.runExperiment', async () => {
+        const { workspaceFolders } = workspace
+        if (!workspaceFolders || workspaceFolders.length === 0)
+          throw new Error(
+            '"dvc exp run" failed! There are no folders in the Workspace to operate on!'
+          )
+        const dvcReaderOptions = await inferDefaultOptions(
+          workspaceFolders[0].uri.fsPath
+        )
+        const outputChannel = await this.getOutputChannel()
+        try {
+          const output = await runExperiment(dvcReaderOptions)
+          outputChannel.append(output)
+          outputChannel.show()
+        } catch (error) {
+          throw new Error(`Execution of "dvc exp run" failed: ${error}`)
+        } finally {
+          const tableData = await this.getCachedTable()
+          this.manager.refreshAll(tableData)
+        }
       })
     )
 

@@ -106,6 +106,7 @@ export const PrimaryHeaderGroup: React.FC<{
             )
           })
         )}
+        key={header.id}
       >
         <div>
           {header.render('Header')}
@@ -160,7 +161,9 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   return (
     <>
       {row.isExpanded &&
-        row.subRows.map(row => <NestedRow row={row} instance={instance} />)}
+        row.subRows.map(row => (
+          <NestedRow row={row} instance={instance} key={row.id} />
+        ))}
       <Row row={row} />
     </>
   )
@@ -186,7 +189,11 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
       <Row row={row} />
       {row.isExpanded &&
         row.subRows.map(subRow => (
-          <NestedRow row={subRow} instance={instance} />
+          <NestedRow
+            row={subRow}
+            instance={instance}
+            key={`${subRow.column.id}.${subRow.values.sha}`}
+          />
         ))}
     </div>
   )

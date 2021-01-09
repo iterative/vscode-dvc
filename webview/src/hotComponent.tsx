@@ -22,7 +22,7 @@ export function hotComponent(
     } else {
       setTimeout(() => {
         runInAction(`Update Component ${component.name}`, () => {
-          result!.component = component
+          if (result) result.component = component
         })
       }, 0)
     }
@@ -40,7 +40,7 @@ export function hotComponent(
     }
 
     return observer((props: any) => {
-      const C = result!.component
+      const C = result ? result.component : React.Fragment
       return <C {...props} />
     }) as any
   }

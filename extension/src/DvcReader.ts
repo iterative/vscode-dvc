@@ -27,7 +27,8 @@ export interface DVCExperimentWithSha extends DVCExperiment {
 }
 
 type DVCCommitId = 'workspace' | string
-interface DVCExperimentsCommitJSONOutput extends Record<string, DVCExperiment> {
+export interface DVCExperimentsCommitJSONOutput
+  extends Record<string, DVCExperiment> {
   baseline: DVCExperiment
 }
 
@@ -67,4 +68,12 @@ export const getExperiments: (
   const output = await execCommand(options, 'exp show --show-json')
   const { stdout } = output
   return JSON.parse(String(stdout))
+}
+
+export const runExperiment: (
+  options: DVCExtensionOptions
+) => Promise<string> = async options => {
+  const output = await execCommand(options, 'exp run -v')
+  const { stdout } = output
+  return stdout
 }
