@@ -189,11 +189,7 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
       <Row row={row} />
       {row.isExpanded &&
         row.subRows.map(subRow => (
-          <NestedRow
-            row={subRow}
-            instance={instance}
-            key={`${subRow.column.id}.${subRow.values.sha}`}
-          />
+          <NestedRow row={subRow} instance={instance} key={subRow.values.sha} />
         ))}
     </div>
   )
