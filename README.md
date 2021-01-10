@@ -46,3 +46,74 @@ commands.
   (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
   them individually)
 - run the `dev-ui` script to launch VS code in with this plugin in dev mode.
+
+# Resources
+
+Expand for project-related examples:
+
+<details><summary>Using DVC
+</summary>
+<p>
+
+- [Command Reference](https://dvc.org/doc/command-reference)
+
+  </details>
+  <br>
+  <details><summary>Using Visual Studio Code
+  </summary>
+  <p>
+
+  - [User and Workspace Settings](https://code.visualstudio.com/docs/getstarted/settings)
+    <p>
+    </details>
+    <br>
+    <details><summary>VS Code API
+    </summary>
+    <br>
+
+- Official (code.visualstudio.com/api)
+
+  - [Window](https://code.visualstudio.com/api/references/vscode-api#window)
+  - [Worskspace](https://code.visualstudio.com/api/references/vscode-api#workspace)
+  - [Source Control Management](https://code.visualstudio.com/api/references/vscode-api#scm)
+  - [Commands](https://code.visualstudio.com/api/references/vscode-api#commands)
+  - [API Patterns](https://code.visualstudio.com/api/references/vscode-api#api-patterns)
+    </details>
+    <br>
+    <details><summary>Other Extensions
+    </summary>
+    <p>
+
+- **Samples:**
+  - [Tree View](https://github.com/microsoft/vscode-extension-samples/tree/master/webview-view-sample)
+  - [Webview Panel](https://github.com/microsoft/vscode-extension-samples/tree/master/webview-view-sample)
+- **Other:**
+
+  - [Git Graph](https://github.com/mhutchie/vscode-git-graph)
+  - [Mercurial](https://github.com/mrcrowl/vscode-hg)
+    </details>
+    <br>
+    <details><summary>Figma Toolkit for VS Code
+    </summary>
+    <br>
+
+- [Webview List Pattern](https://www.figma.com/file/bfGPz3571VtKVHb0DR3HIk/VS-Code-Webview-Page-Patterns?node-id=2%3A0)
+
+![](./extension/docs/figma-webview-list.png.png)
+
+</details>
+
+## Special Tech
+
+- [Hot Reload for VS Code Extension Development](https://blog.hediet.de/post/hot_reload_for_vs_code_extension_development)
+  by @heidet 🙏
+- [node-reload](https://github.com/hediet/node-reload) by @heidet 🙏
+- [vscode-webview-react](https://github.com/rebornix/vscode-webview-react) by
+  @rebornix 🙏
+- [MobX](https://mobx.js.org/README.html) by @mobxjs 🙏
+
+## Submit/Request
+
+Identify a unique challenge while working in the project? Describe it [here]().
+
+Have a useful resource/snippet to add? Share it [here]().
