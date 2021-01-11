@@ -15,7 +15,8 @@
     "dev-server": "run-p extension-dev-server webview-dev-server",
     "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true code --extensionDevelopmentPath $PWD/extension demo/example-get-started --disable-extensions",
     "build-extension": "yarn workspace dvc-integration build",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "storybook": "yarn workspace dvc-vscode-webview storybook"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
