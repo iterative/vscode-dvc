@@ -1,3 +1,4 @@
 dist
 demo
 .vscode-test
+storybook-static
