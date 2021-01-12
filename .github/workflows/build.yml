@@ -57,6 +57,13 @@ jobs:
 
       - run: yarn build -o ./vscode-dvc.vsix
 
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: 'webview/storybook-static'
+
       - name: Upload
         uses: actions/upload-artifact@v2
         with:

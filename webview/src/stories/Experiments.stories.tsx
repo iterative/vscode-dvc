@@ -9,20 +9,26 @@ import complexExperimentsData from './complex-experiments-output.json'
 import './test-vscode-styles.scss'
 import '../style.scss'
 
-const dummyVsCodeAPI = {
+const dummyVsCodeApi = {
   postMessage: action('postMessage')
 }
 
 export default {
   title: 'Experiments/Table',
-  component: Experiments
+  component: Experiments,
+  args: {
+    experiments: complexExperimentsData,
+    vsCodeApi: dummyVsCodeApi
+  },
+  argTypes: {
+    vsCodeApi: {
+      table: {
+        disable: true
+      }
+    }
+  }
 } as Meta
 
-export const ComplexTable: Story = () => {
-  return (
-    <Experiments
-      experiments={complexExperimentsData}
-      vsCodeApi={dummyVsCodeAPI}
-    />
-  )
+export const ComplexTable: Story = ({ experiments, vsCodeApi }) => {
+  return <Experiments experiments={experiments} vsCodeApi={vsCodeApi} />
 }
