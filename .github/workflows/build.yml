@@ -48,11 +48,9 @@ jobs:
 
       - run: yarn install
 
-      - run: yarn prettier -c "**/*.{md,json}"
+      - run: yarn run-p "ci:*"
 
-      - run: yarn eslint --cache "**/*.{js,ts,tsx}"
-
-      - run: yarn workspace dvc-integration tsc -p './'
+      - run: yarn build-tests
 
       - run: xvfb-run -a yarn test
 
