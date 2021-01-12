@@ -10,9 +10,7 @@ import './test-vscode-styles.scss'
 import '../style.scss'
 
 const dummyVsCodeAPI = {
-  postMessage(message: any) {
-    action(message)
-  }
+  postMessage: action('postMessage')
 }
 
 export default {
