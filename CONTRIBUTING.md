@@ -36,3 +36,9 @@ See something that should be changed? Want to request a new feature? Open
 Start Storybook with `yarn storybook` in either the monorepo root or the
 `webview` project, and you can develop the React components this plugin uses
 without requiring VS Code as a dev environment.
+
+# Resources
+
+Check out the
+[Resources page](https://github.com/iterative/vscode-dvc/wiki/Resources) of our
+GitHub wiki for a list of relevant docs and related projects.
