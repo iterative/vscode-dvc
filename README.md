@@ -1,4 +1,4 @@
-# VSCode DVC
+# DVC for Visual Studio Code
 
 [![Build plugin](https://github.com/iterative/vscode-dvc/workflows/Build%20plugin/badge.svg)](https://github.com/iterative/vscode-dvc/actions?query=workflow%3A%22Build+plugin%22)
 
