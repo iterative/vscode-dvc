@@ -15,7 +15,13 @@
     "dev-server": "run-p extension-dev-server webview-dev-server",
     "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true code --extensionDevelopmentPath $PWD/extension demo/example-get-started --disable-extensions",
     "build-extension": "yarn workspace dvc-integration build",
-    "postinstall": "husky install"
+    "postinstall": "husky install",
+    "storybook": "yarn workspace dvc-vscode-webview storybook",
+    "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
+    "chromatic": "yarn workspace dvc-vscode-webview chromatic",
+    "ci:prettier": "prettier -c '**/*.{md,json}'",
+    "ci:eslint": "eslint --cache '**/*.{js,ts,tsx}'",
+    "build-tests": "yarn workspace dvc-integration tsc -p './'"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",

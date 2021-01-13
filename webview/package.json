@@ -6,7 +6,10 @@
     "build": "webpack --mode production",
     "test": "jest",
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json}'",
-    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'"
+    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "chromatic": "npx chromatic --project-token fexq6zfy6"
   },
   "main": "./index.js",
   "peerDependencies": {
@@ -23,6 +26,12 @@
     "react-table": "^7.6.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@storybook/addon-actions": "^6.1.12",
+    "@storybook/addon-essentials": "^6.1.11",
+    "@storybook/addon-links": "^6.1.11",
+    "@storybook/preset-scss": "^1.0.3",
+    "@storybook/react": "^6.1.11",
     "@types/classnames": "^2.2.9",
     "@types/html-webpack-plugin": "^3.2.2",
     "@types/jest": "^26.0.15",
@@ -32,6 +41,8 @@
     "@types/react-measure": "^2.0.6",
     "@types/react-table": "^7.0.25",
     "@types/webpack": "^4.41.25",
+    "babel-loader": "^8.2.2",
+    "chromatic": "^5.5.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.4.2",
     "file-loader": "^5.1.0",

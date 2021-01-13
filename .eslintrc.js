@@ -53,5 +53,9 @@ module.exports = {
       }
     }
   ],
-  ignorePatterns: ['**/dist/**']
+  ignorePatterns: [
+    '**/dist/**',
+    'webview/storybook-static/**',
+    'extension/vscode-test/**'
+  ]
 }

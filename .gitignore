@@ -89,3 +89,4 @@ package-lock.json
 */yarn.lock
 
 .vscode-test/
+storybook-static

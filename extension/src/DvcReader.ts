@@ -15,7 +15,7 @@ export interface DataFilesDict {
 }
 export interface DVCExperiment {
   name?: string
-  timestamp?: Date
+  timestamp?: string | Date | null
   params?: DataFilesDict
   metrics?: DataFilesDict
   queued?: boolean
