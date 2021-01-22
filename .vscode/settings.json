@@ -2,11 +2,13 @@
   "search.exclude": {
     "extension/out": true
   },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "plantuml.diagramsRoot": "docs",
   "plantuml.exportFormat": "png",
   "plantuml.exportOutDir": "docs/exported",
   "typescript.updateImportsOnFileMove.enabled": "prompt",
   "mochaExplorer.files": "./data-extraction/test/**/*.test.ts",
   "mochaExplorer.require": ["ts-node/register", "source-map-support/register"],
-  "tasksStatusbar.taskLabelFilter": "dev"
+  "tasksStatusbar.taskLabelFilter": "dev",
+  "editor.formatOnSave": true
 }
