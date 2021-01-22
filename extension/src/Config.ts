@@ -1,4 +1,10 @@
-import { window, ColorThemeKind, ColorTheme } from 'vscode'
+import {
+  ColorTheme,
+  ColorThemeKind,
+  window,
+  workspace,
+  WorkspaceConfiguration
+} from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { observable } from 'mobx'
 
@@ -7,6 +13,12 @@ export class Config {
 
   @observable
   private _vsCodeTheme: ColorTheme
+
+  private config: WorkspaceConfiguration
+
+  public get dvcPath(): string {
+    return <string>this.config.get('dvc.dvcPath')
+  }
 
   public get theme(): 'light' | 'dark' {
     if (this._vsCodeTheme.kind === ColorThemeKind.Light) {
@@ -25,5 +37,10 @@ export class Config {
         this._vsCodeTheme = window.activeColorTheme
       })
     )
+    this.config = workspace.getConfiguration()
   }
+}
+
+export function getConfig(): Config {
+  return new Config()
 }
