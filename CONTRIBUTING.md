@@ -24,6 +24,8 @@ See something that should be changed? Want to request a new feature? Open
 
 - Open the test instance of VS Code with `Start Debugging` (f5)
 
+- To enable formatting on save install the `esbenp.prettier-vscode` extension
+
 ### Editor-agnostic Extension Development
 
 - run the `dev-server` script to start the extension and webview dev servers
