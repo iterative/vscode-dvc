@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window, workspace } from 'vscode'
-import { getConfig } from './configuration'
+import { getConfig } from './Config'
 
 /**
  * Status bar item. Displays the current DVC path. Corresponds to "dvc.dvcPath" setting.
@@ -29,7 +29,6 @@ export class DVCPathStatusBarItem {
 }
 
 /**
-
  * Shows an input dialog allowing the user to enter a custom path.
  */
 async function defineDvcPath(): Promise<string | undefined> {
