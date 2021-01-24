@@ -8,7 +8,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
@@ -25,7 +25,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
@@ -42,7 +42,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
@@ -59,7 +59,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
