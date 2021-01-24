@@ -8,18 +8,18 @@ async function main() {
 
     const extensionTestsPath = path.resolve(__dirname, './suite/index')
 
+    const vscodeExecutablePath = await downloadAndUnzipVSCode('insiders')
+
     const workspacePath = path.resolve(
       __dirname,
       '../../../demo/example-get-started'
     )
 
-    const vscodeExecutablePath = await downloadAndUnzipVSCode('insiders')
-
     await runTests({
       extensionDevelopmentPath,
-      vscodeExecutablePath,
       extensionTestsPath,
-      launchArgs: ['--disable-extensions', workspacePath]
+      launchArgs: ['--disable-extensions', workspacePath],
+      vscodeExecutablePath
     })
   } catch (err) {
     console.error('Failed to run tests')
