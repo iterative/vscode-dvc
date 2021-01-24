@@ -54,6 +54,8 @@ export async function selectDvcPath(): Promise<void> {
     if (result.label === 'custom') {
       path = await defineDvcPath()
     }
-    workspace.getConfiguration().update('dvc.dvcPath', path)
+
+    await workspace.getConfiguration().update('dvc.dvcPath', path)
+    return workspace.getConfiguration().get('dvc.dvcPath')
   }
 }
