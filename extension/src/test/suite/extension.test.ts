@@ -1,15 +1,62 @@
-import * as assert from 'assert'
+import { describe, it } from 'mocha'
+import * as chai from 'chai'
+import { stub } from 'sinon'
+import * as sinonChai from 'sinon-chai'
+import { window, commands, workspace } from 'vscode'
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from 'vscode'
-// import * as myExtension from '../../extension';
+chai.use(sinonChai)
+const { expect } = chai
 
 suite('Extension Test Suite', () => {
-  vscode.window.showInformationMessage('Start all tests.')
+  window.showInformationMessage('Start all tests.')
 
-  test('Sample test', () => {
-    assert.equal(-1, [1, 2, 3].indexOf(5))
-    assert.equal(-1, [1, 2, 3].indexOf(0))
+  describe('dvc binary path picker', () => {
+    it('should be able to select the default dvc path', async () => {
+      await workspace.getConfiguration().update('dvc.dvcPath', undefined)
+      const selectDefaultPathInUI = async () => {
+        await commands.executeCommand('workbench.action.quickOpenSelectNext')
+        await commands.executeCommand(
+          'workbench.action.acceptSelectedQuickOpenItem'
+        )
+      }
+
+      const mockShowInputBox = stub(window, 'showInputBox')
+
+      const defaultPath = commands.executeCommand('dvc.selectDvcPath')
+      await selectDefaultPathInUI()
+
+      expect(mockShowInputBox).not.to.have.been.called
+      expect(await defaultPath).to.equal('dvc')
+      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
+        'dvc'
+      )
+
+      mockShowInputBox.restore()
+    })
+
+    it('should be able to select a custom path for the dvc binary', async () => {
+      await workspace.getConfiguration().update('dvc.dvcPath', undefined)
+      const selectCustomPathInUI = async () => {
+        await commands.executeCommand('workbench.action.quickOpenSelectNext')
+        await commands.executeCommand('workbench.action.quickOpenSelectNext')
+        await commands.executeCommand(
+          'workbench.action.acceptSelectedQuickOpenItem'
+        )
+      }
+
+      const customPath = '.env/bin/dvc'
+      const mockShowInputBox = stub(window, 'showInputBox').resolves(customPath)
+
+      const selectedCustomPath = commands.executeCommand('dvc.selectDvcPath')
+      await selectCustomPathInUI()
+
+      expect(await selectedCustomPath).to.equal(customPath)
+      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
+        customPath
+      )
+      expect(mockShowInputBox).to.have.been.calledOnce
+
+      mockShowInputBox.restore()
+    })
   })
 })

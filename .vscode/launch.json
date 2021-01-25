@@ -8,7 +8,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
@@ -25,7 +25,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
@@ -42,7 +42,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
@@ -59,13 +59,26 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo/example-get-started/",
+        "${workspaceFolder}/demo/example-get-started",
         "--disable-extensions"
       ],
       "env": {
         "HOT_RELOAD": "",
         "USE_DEV_UI": ""
       },
+      "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"]
+    },
+    {
+      "name": "Run Integration Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "${workspaceFolder}/demo/example-get-started",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/dist/test/suite/index",
+        "--disable-extensions"
+      ],
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"]
     }
   ]
