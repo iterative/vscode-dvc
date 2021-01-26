@@ -9,10 +9,7 @@ import {
   MessageToWebview,
   WindowWithWebviewData
 } from './webviewContract'
-import {
-  DVCExperimentsRepoJSONOutput,
-  DVCExperimentsCommitJSONOutput
-} from './DvcReader'
+import { ExperimentsRepoJSONOutput } from './DvcReader'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -159,7 +156,7 @@ export class DvcWebview {
 
   public showExperiments(
     payload: {
-      tableData?: DVCExperimentsRepoJSONOutput | null
+      tableData?: ExperimentsRepoJSONOutput | null
       errors?: Error[]
     } = {}
   ): void {
@@ -201,9 +198,7 @@ export class DvcWebviewManager {
     return view
   }
 
-  public refreshAll(
-    tableData: Record<string, DVCExperimentsCommitJSONOutput> | null
-  ): void {
+  public refreshAll(tableData: ExperimentsRepoJSONOutput | null): void {
     for (const panel of this.openedWebviews) {
       try {
         panel.showExperiments({ tableData })

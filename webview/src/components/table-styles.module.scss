@@ -9,28 +9,6 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   @extend %fullwidth;
 }
 
-%rowGroup {
-  .tr {
-    background-color: $row-bg-alt-color;
-  }
-  .tr {
-    &:nth-child(2n) {
-      background-color: $row-bg-color;
-    }
-  }
-}
-
-%invertedRowGroup {
-  .tr {
-    background-color: $row-bg-color;
-  }
-  .tr {
-    &:nth-child(2n) {
-      background-color: $row-bg-alt-color;
-    }
-  }
-}
-
 %bullet {
   display: inline-block;
   border-radius: 99px;
@@ -71,11 +49,21 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
 
 .bullet {
   @extend %bullet;
-  width: 5px;
-  height: 5px;
+  position: relative;
+  height: 100%;
   margin: 0 10px;
-  line-height: 0;
-  background: rgba(255, 255, 255, 0.5);
+  &::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    line-height: 0;
+    background: rgb(127,127,127);
+    border-radius: 100%;
+    top: calc(50% - 3px);
+  }
 }
 
 .rowArrowPlaceholder {
@@ -107,6 +95,36 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+  .firstCell {
+      display: flex;
+      flex-flow: row nowrap;
+  }
+  .experimentGroup .nestedRow {
+    .firstCell {
+        padding-left: 2rem;
+    }
+    .bullet {
+        &::after {
+            content: '';
+            height: 100%;
+            top: 0;
+            right: 0;
+            position: absolute;
+            border-right: 1px solid rgb(127,127,127);
+        }
+    }
+    &:first-of-type {
+        .bullet::after {
+            height: 50%;
+            top: 50%;
+        }
+    }
+    &:last-of-type {
+        .bullet::after {
+            height: 50%;
+        }
+    }
+  }
   ul {
     padding-left: 1rem;
   }
@@ -136,16 +154,18 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
     width: 1rem;
   }
 
-  .rowGroup {
-    @extend %rowGroup;
-    margin: 0.5rem 0;
-    &:nth-child(2n) {
-      @extend %invertedRowGroup;
-    }
+  .tr {
+    position: relative;
   }
 
+  .rowGroup {
+    margin: 0.5rem 0;
+  }
   .normalRowGroup {
     border: 1px solid gray;
+    .oddRow {
+      background-color: $row-bg-alt-color;
+    }
   }
   .workspaceRowGroup {
     border: none;
@@ -161,7 +181,7 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
     padding: 0 0.25rem;
   }
   .td {
-    padding: 0.5rem;
+    padding: 0 0.25rem;
     font-size: 1.1rem;
     line-height: 2rem;
     align-items: center;

@@ -1,10 +1,10 @@
-import { DVCExperimentRow } from '../components/Experiments'
+import { Experiment } from '../components/Experiments'
 
-const getItemKey: (input: DVCExperimentRow) => string = input => input.sha
+const getItemKey: (input: Experiment) => string = input => input.id
 const getParentKey: (input: any, parent: any) => string | undefined = (
   { checkpoint_parent },
   parent
-) => (checkpoint_parent === parent.sha ? undefined : checkpoint_parent)
+) => (checkpoint_parent === parent.id ? undefined : checkpoint_parent)
 const addChild: (parent: any, child: any) => void = (parent, child) => {
   parent.subRows = parent.subRows || []
   parent.subRows.push(child)
@@ -17,8 +17,8 @@ const setChildren: (parent: any, children: any[]) => void = (
 }
 
 export const nestSubRowsByParentKey: (
-  base: DVCExperimentRow
-) => DVCExperimentRow = base => {
+  base: Experiment
+) => Experiment = base => {
   const { subRows } = base
   if (!subRows) return base
 
@@ -62,10 +62,10 @@ export const nestSubRowsByParentKey: (
 }
 
 export const flattenNestedRows: (
-  base: DVCExperimentRow | DVCExperimentRow[]
-) => DVCExperimentRow[] = base => {
+  base: Experiment | Experiment[]
+) => Experiment[] = base => {
   if (Array.isArray(base))
-    return base.reduce<DVCExperimentRow[]>(
+    return base.reduce<Experiment[]>(
       (acc, cur) => [...acc, ...flattenNestedRows(cur)],
       []
     )
@@ -85,9 +85,7 @@ export const flattenNestedRows: (
   return [base]
 }
 
-const maybeFlattenChildren: (
-  item: DVCExperimentRow
-) => DVCExperimentRow = item => {
+const maybeFlattenChildren: (item: Experiment) => Experiment = item => {
   if (item.subRows) {
     return {
       ...item,
@@ -97,7 +95,5 @@ const maybeFlattenChildren: (
   return item
 }
 
-export const nestAndFlattenSubRows: (
-  base: DVCExperimentRow
-) => DVCExperimentRow[] = base =>
+export const nestAndFlattenSubRows: (base: Experiment) => Experiment[] = base =>
   flattenNestedRows(nestSubRowsByParentKey(base))

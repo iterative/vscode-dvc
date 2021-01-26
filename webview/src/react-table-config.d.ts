@@ -72,7 +72,14 @@ declare module 'react-table' {
       // note that having Record here allows you to add anything to the options, this matches the spirit of the
       // underlying js library, but might be cleaner if it's replaced by a more specific type that matches your
       // feature set, this is a safe default.
-      Record<string, any> {}
+      Record<string, any> {
+    orderByFn: (
+      rows: Array<Row<D>>,
+      sortFns: Array<SortByFn<D>>,
+      directions: boolean[],
+      parentRow: Row<D>
+    ) => Array<Row<D>>
+  }
 
   export interface Hooks<
     D extends Record<string, unknown> = Record<string, unknown>
@@ -142,5 +149,7 @@ declare module 'react-table' {
     extends UseExpandedRowProps<D>,
       UseGroupByRowProps<D>,
       UseRowSelectRowProps<D>,
-      UseRowStateRowProps<D> {}
+      UseRowStateRowProps<D> {
+    flatIndex: number
+  }
 }

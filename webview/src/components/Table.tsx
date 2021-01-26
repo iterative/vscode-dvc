@@ -1,11 +1,11 @@
 import React from 'react'
 import { Cell, HeaderGroup } from 'react-table'
 import cx from 'classnames'
-import { InstanceProp, RowProp, DVCExperimentRow } from './Experiments'
+import { InstanceProp, RowProp, Experiment } from './Experiments'
 import styles from './table-styles.module.scss'
 
 export const ParentHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<DVCExperimentRow>
+  headerGroup: HeaderGroup<Experiment>
 }> = ({ headerGroup }) => {
   return (
     <div
@@ -33,13 +33,14 @@ export const ParentHeaderGroup: React.FC<{
   )
 }
 
-export const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
+export const FirstCell: React.FC<{ cell: Cell<Experiment, any> }> = ({
   cell
 }) => {
   const { row } = cell
-  const { depth } = row
+
   const baseFirstCellProps = cell.getCellProps({
     className: cx(
+      styles.firstCell,
       styles.td,
       styles.experimentCell,
       cell.isPlaceholder && styles.groupPlaceholder,
@@ -63,14 +64,6 @@ export const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
   return (
     <div {...firstCellProps}>
       <span
-        className={styles.depthSpacer}
-        style={{
-          width: `${depth}em`,
-          backgroundColor: 'green',
-          display: 'inline-block'
-        }}
-      ></span>
-      <span
         className={
           row.canExpand
             ? row.isExpanded
@@ -88,7 +81,7 @@ export const FirstCell: React.FC<{ cell: Cell<DVCExperimentRow, any> }> = ({
 }
 
 export const PrimaryHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<DVCExperimentRow>
+  headerGroup: HeaderGroup<Experiment>
 }> = ({ headerGroup }) => (
   <div
     {...headerGroup.getHeaderGroupProps({
@@ -117,14 +110,19 @@ export const PrimaryHeaderGroup: React.FC<{
   </div>
 )
 
-export const Row: React.FC<RowProp> = ({ row }) => {
+export const RowContent: React.FC<RowProp & { className?: string }> = ({
+  row,
+  className
+}) => {
   const [firstCell, ...cells] = row.cells
   return (
     <div
       {...row.getRowProps({
         className: cx(
+          className,
           styles.tr,
-          row.values.sha === 'workspace'
+          row.flatIndex % 2 === 0 || styles.oddRow,
+          row.values.id === 'workspace'
             ? styles.workspaceRow
             : styles.normalRow,
           styles.row
@@ -160,12 +158,24 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   instance.prepareRow(row)
   return (
     <>
+      <RowContent row={row} className={styles.nestedRow} />
       {row.isExpanded &&
         row.subRows.map(row => (
           <NestedRow row={row} instance={instance} key={row.id} />
         ))}
-      <Row row={row} />
     </>
+  )
+}
+
+export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
+  row,
+  instance
+}) => {
+  instance.prepareRow(row)
+  return (
+    <div className={styles.experimentGroup}>
+      <NestedRow row={row} instance={instance} />
+    </div>
   )
 }
 
@@ -180,16 +190,20 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
         className: cx(
           styles.rowGroup,
           styles.tbody,
-          row.values.sha === 'workspace'
+          row.values.id === 'workspace'
             ? styles.workspaceRowGroup
             : styles.normalRowGroup
         )
       })}
     >
-      <Row row={row} />
+      <RowContent row={row} />
       {row.isExpanded &&
         row.subRows.map(subRow => (
-          <NestedRow row={subRow} instance={instance} key={subRow.values.sha} />
+          <ExperimentGroup
+            row={subRow}
+            instance={instance}
+            key={subRow.values.id}
+          />
         ))}
     </div>
   )

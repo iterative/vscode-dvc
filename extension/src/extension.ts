@@ -26,7 +26,7 @@ import {
   getExperiments,
   runExperiment,
   inferDefaultOptions,
-  DVCExperimentsRepoJSONOutput
+  ExperimentsRepoJSONOutput
 } from './DvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
@@ -45,7 +45,7 @@ export class Extension {
   private readonly config = new Config()
 
   private experimentsDataPromise: Promise<
-    DVCExperimentsRepoJSONOutput
+    ExperimentsRepoJSONOutput
   > | null = null
 
   private lastTableUpdate?: number = undefined
