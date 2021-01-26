@@ -156,15 +156,7 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   instance
 }) => {
   instance.prepareRow(row)
-  return (
-    <>
-      <RowContent row={row} className={styles.nestedRow} />
-      {row.isExpanded &&
-        row.subRows.map(row => (
-          <NestedRow row={row} instance={instance} key={row.id} />
-        ))}
-    </>
-  )
+  return <RowContent row={row} className={styles.nestedRow} />
 }
 
 export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
@@ -173,8 +165,17 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
 }) => {
   instance.prepareRow(row)
   return (
-    <div className={styles.experimentGroup}>
+    <div
+      className={cx(
+        styles.experimentGroup,
+        row.isExpanded && styles.expandedGroup
+      )}
+    >
       <NestedRow row={row} instance={instance} />
+      {row.isExpanded &&
+        row.subRows.map(row => (
+          <NestedRow row={row} instance={instance} key={row.id} />
+        ))}
     </div>
   )
 }

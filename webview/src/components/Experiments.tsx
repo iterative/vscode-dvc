@@ -104,12 +104,7 @@ const ColumnOptionsRow: React.FC<{
 )
 
 const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
-  const {
-    columns: columnInstances,
-    toggleCommitUngroup,
-    state,
-    sortedColumns
-  } = instance
+  const { columns: columnInstances, sortedColumns } = instance
 
   return (
     <details className={styles.optionsPanel}>
@@ -127,9 +122,6 @@ const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
       {columnInstances.map(column => (
         <ColumnOptionsRow column={column} key={column.id} />
       ))}
-      <button onClick={() => toggleCommitUngroup()}>
-        {state.ungrouped ? 'Group' : 'Ungroup'} by Commit
-      </button>
     </details>
   )
 }

@@ -60,7 +60,7 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
     width: 6px;
     height: 6px;
     line-height: 0;
-    background: rgb(127,127,127);
+    background: rgb(127, 127, 127);
     border-radius: 100%;
     top: calc(50% - 3px);
   }
@@ -96,33 +96,37 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   display: flex;
   flex-flow: column nowrap;
   .firstCell {
-      display: flex;
-      flex-flow: row nowrap;
+    display: flex;
+    flex-flow: row nowrap;
   }
-  .experimentGroup .nestedRow {
-    .firstCell {
+  .experimentGroup {
+    .nestedRow {
+      .firstCell {
         padding-left: 2rem;
+      }
     }
-    .bullet {
+    &.expandedGroup .nestedRow {
+      .bullet {
         &::after {
-            content: '';
-            height: 100%;
-            top: 0;
-            right: 0;
-            position: absolute;
-            border-right: 1px solid rgb(127,127,127);
+          content: '';
+          height: 100%;
+          top: 0;
+          right: 0;
+          position: absolute;
+          border-right: 1px solid rgb(127, 127, 127);
         }
-    }
-    &:first-of-type {
+      }
+      &:first-of-type {
         .bullet::after {
-            height: 50%;
-            top: 50%;
+          height: 50%;
+          top: 50%;
         }
-    }
-    &:last-of-type {
+      }
+      &:last-of-type {
         .bullet::after {
-            height: 50%;
+          height: 50%;
         }
+      }
     }
   }
   ul {
