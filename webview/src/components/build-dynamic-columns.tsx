@@ -1,10 +1,8 @@
 import React from 'react'
 
-import { DataFilesDict } from 'dvc-integration/src/DvcReader'
+import { DataDictRoot } from 'dvc-integration/src/DvcReader'
 
-import { Column } from 'react-table'
-
-import { DVCExperimentRow } from './Experiments'
+import { Experiment } from './Experiments'
 
 import {
   formatFloat,
@@ -174,14 +172,14 @@ const arrayAccessor: <T = any>(
 const buildColumnsFromSchemaProperties: (
   properties: SchemaProperties,
   objectPath?: string[]
-) => Column<DVCExperimentRow>[] = (properties, objectPath = []) => {
+) => Record<string, any>[] = (properties, objectPath = []) => {
   const entries = Object.entries(properties)
   return entries.map(([key, property]) => {
     const currentPath = [...objectPath, key]
     const { type: propertyType } = property
     const Cell = getCellComponent(property)
-    const column: Column<DVCExperimentRow> & {
-      columns?: Column<DVCExperimentRow>[]
+    const column: Record<string, any> & {
+      columns?: Record<string, any>[]
       sortType?: string
       type?: SchemaType
     } = {
@@ -209,15 +207,15 @@ const buildColumnsFromSchemaProperties: (
 }
 
 const buildDynamicColumnsFromExperiments: (
-  data: DVCExperimentRow[]
-) => Column<DVCExperimentRow>[] = data => {
+  data: Experiment[]
+) => Record<string, any>[] = data => {
   if (!data || data.length === 0) {
     return []
   }
 
   const { params, metrics } = data.reduce<{
-    params: DataFilesDict[]
-    metrics: DataFilesDict[]
+    params: DataDictRoot[]
+    metrics: DataDictRoot[]
   }>(
     ({ params, metrics }, cur) => ({
       params: cur.params ? [...params, cur.params] : params,

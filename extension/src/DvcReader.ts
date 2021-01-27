@@ -2,44 +2,41 @@ import { accessSync } from 'fs'
 import * as path from 'path'
 import { execPromise } from './util'
 
-interface DVCExtensionOptions {
+export interface ReaderOptions {
   bin: string
   cwd: string
 }
 
-export interface DataFileDict {
-  [name: string]: string | number | DataFileDict
+export interface DataDict {
+  [name: string]: string | number | DataDict
 }
-export interface DataFilesDict {
-  [filename: string]: DataFileDict
+export interface DataDictRoot {
+  [filename: string]: DataDict
 }
-export interface DVCExperiment {
+
+export interface ExperimentJSONOutput {
   name?: string
   timestamp?: string | Date | null
-  params?: DataFilesDict
-  metrics?: DataFilesDict
+  params?: DataDictRoot
+  metrics?: DataDictRoot
   queued?: boolean
   checkpoint_tip?: string
   checkpoint_parent?: string
 }
-export interface DVCExperimentWithSha extends DVCExperiment {
-  sha: string
+
+export interface ExperimentsCommitJSONOutput
+  extends Record<string, ExperimentJSONOutput> {
+  baseline: ExperimentJSONOutput
 }
 
-type DVCCommitId = 'workspace' | string
-export interface DVCExperimentsCommitJSONOutput
-  extends Record<string, DVCExperiment> {
-  baseline: DVCExperiment
+export interface ExperimentsRepoJSONOutput
+  extends Record<string, ExperimentsCommitJSONOutput> {
+  workspace: ExperimentsCommitJSONOutput
 }
-
-export type DVCExperimentsRepoJSONOutput = Record<
-  DVCCommitId,
-  DVCExperimentsCommitJSONOutput
->
 
 export const inferDefaultOptions: (
   cwd: string
-) => Promise<DVCExtensionOptions> = async cwd => {
+) => Promise<ReaderOptions> = async cwd => {
   const envDvcPath = path.resolve(cwd || '.', '.env', 'bin', 'dvc')
   let bin
   try {
@@ -55,7 +52,7 @@ export const inferDefaultOptions: (
 }
 
 const execCommand: (
-  options: DVCExtensionOptions,
+  options: ReaderOptions,
   command: string
 ) => Promise<{ stdout: string; stderr: string }> = ({ bin, cwd }, command) =>
   execPromise(`${bin} ${command}`, {
@@ -63,15 +60,15 @@ const execCommand: (
   })
 
 export const getExperiments: (
-  options: DVCExtensionOptions
-) => Promise<DVCExperimentsRepoJSONOutput> = async options => {
+  options: ReaderOptions
+) => Promise<ExperimentsRepoJSONOutput> = async options => {
   const output = await execCommand(options, 'exp show --show-json')
   const { stdout } = output
   return JSON.parse(String(stdout))
 }
 
 export const runExperiment: (
-  options: DVCExtensionOptions
+  options: ReaderOptions
 ) => Promise<string> = async options => {
   const output = await execCommand(options, 'exp run -v')
   const { stdout } = output

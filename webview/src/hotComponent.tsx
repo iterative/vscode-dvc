@@ -21,7 +21,7 @@ export function hotComponent(
       allComponents.set(key, result)
     } else {
       setTimeout(() => {
-        runInAction(`Update Component ${component.name}`, () => {
+        runInAction(() => {
           if (result) result.component = component
         })
       }, 0)

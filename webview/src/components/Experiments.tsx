@@ -1,8 +1,7 @@
 import * as React from 'react'
 import {
-  DVCExperimentsRepoJSONOutput,
-  DVCExperiment,
-  DVCExperimentWithSha
+  ExperimentsRepoJSONOutput,
+  ExperimentJSONOutput
 } from 'dvc-integration/src/DvcReader'
 import {
   TableInstance,
@@ -13,47 +12,72 @@ import {
   useGroupBy,
   useExpanded,
   useSortBy,
-  useFlexLayout
+  useFlexLayout,
+  SortByFn
 } from 'react-table'
 import cx from 'classnames'
 import dayjs from '../dayjs'
 import { Table } from './Table'
+import parseExperiments from '../util/parse-experiments'
 
 import styles from './table-styles.module.scss'
 
 import buildDynamicColumns from './build-dynamic-columns'
 
-import { nestAndFlattenSubRows } from '../util/build-experiment-tree'
+const { useMemo, useEffect } = React
 
-const { useCallback, useMemo, useEffect } = React
-
-export interface DVCExperimentRow extends DVCExperimentWithSha {
-  subRows?: DVCExperimentRow[]
+export interface Experiment extends ExperimentJSONOutput {
+  subRows?: Experiment[]
+  id: string
 }
 
 export interface InstanceProp {
-  instance: TableInstance<DVCExperimentRow>
+  instance: TableInstance<Experiment>
 }
 
 export interface RowProp {
-  row: Row<DVCExperimentRow>
+  row: Row<Experiment>
 }
 
-interface ParseExperimentsOutput {
-  experiments: DVCExperimentRow[]
-  flatExperiments: DVCExperimentRow[]
+const countRowsAndAddIndexes: (
+  rows: Row<Experiment>[],
+  index?: number
+) => number = (rows, index = 0) => {
+  for (const row of rows) {
+    row.flatIndex = index
+    index += 1
+    if (row.isExpanded) {
+      index = countRowsAndAddIndexes(row.subRows, index)
+    }
+  }
+  return index
 }
 
-const parseExperimentJSONEntry: (
-  sha: string,
-  experiment: DVCExperiment
-) => DVCExperimentWithSha = (sha, experiment) => ({
-  ...experiment,
-  sha
-})
+const orderByFn: (
+  rows: Row<Experiment>[],
+  sortFns: SortByFn<Experiment>[],
+  directions: (boolean | 'desc')[],
+  parentRow: Row<Experiment>
+) => Row<Experiment>[] = (arr, funcs, dirs, parentRow) => {
+  if (parentRow && parentRow.depth === 0) {
+    return [...arr].sort((rowA, rowB) => {
+      for (let i = 0; i < funcs.length; i += 1) {
+        const sortFn = funcs[i]
+        const desc = dirs[i] === false || dirs[i] === 'desc'
+        const sortInt = sortFn(rowA, rowB, '', desc)
+        if (sortInt !== 0) {
+          return desc ? -sortInt : sortInt
+        }
+      }
+      return dirs[0] ? rowA.index - rowB.index : rowB.index - rowA.index
+    })
+  } else {
+    return arr
+  }
+}
 
 const ColumnOptionsRow: React.FC<{
-  column: ColumnInstance<DVCExperimentRow>
+  column: ColumnInstance<Experiment>
 }> = ({ column }) => (
   <div>
     <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
@@ -79,85 +103,8 @@ const ColumnOptionsRow: React.FC<{
   </div>
 )
 
-const parseExperiments: (
-  experimentsData: DVCExperimentsRepoJSONOutput
-) => ParseExperimentsOutput = experimentsData =>
-  Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
-    (
-      { experiments, flatExperiments },
-      [commitId, { baseline, ...childExperiments }]
-    ) => {
-      const parsedChildExperiments = Object.entries(
-        childExperiments
-      ).map(([sha, experiment]) => parseExperimentJSONEntry(sha, experiment))
-      const baselineEntry = parseExperimentJSONEntry(commitId, baseline)
-      return {
-        experiments: [
-          ...experiments,
-          {
-            ...baselineEntry,
-            subRows: parsedChildExperiments
-          }
-        ],
-        flatExperiments: [
-          ...flatExperiments,
-          baselineEntry,
-          ...parsedChildExperiments
-        ]
-      }
-    },
-    {
-      experiments: [],
-      flatExperiments: []
-    }
-  )
-
-function ungroupByCommit(instance: TableInstance<DVCExperimentRow>) {
-  const {
-    rows,
-    dispatch,
-    state: { ungrouped }
-  } = instance
-  const toggleCommitUngroup = useCallback(
-    setting =>
-      dispatch({
-        type: 'set-ungrouped',
-        setting
-      }),
-    [dispatch]
-  )
-  Object.assign(instance, {
-    preSortedRows: rows,
-    toggleCommitUngroup
-  })
-  const ungroupedRows = useMemo(
-    () =>
-      rows.reduce<Row<DVCExperimentRow>[]>((acc, row) => {
-        if (row.subRows) {
-          const result = [
-            ...acc,
-            { ...row, subRows: [] },
-            ...row.subRows
-          ].map((item, index) => ({ ...item, index }))
-          return result
-        }
-        return [...acc, row]
-      }, []),
-    [rows]
-  )
-  if (!ungrouped) return
-  Object.assign(instance, {
-    rows: ungroupedRows
-  })
-}
-
 const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
-  const {
-    columns: columnInstances,
-    toggleCommitUngroup,
-    state,
-    sortedColumns
-  } = instance
+  const { columns: columnInstances, sortedColumns } = instance
 
   return (
     <details className={styles.optionsPanel}>
@@ -175,19 +122,16 @@ const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
       {columnInstances.map(column => (
         <ColumnOptionsRow column={column} key={column.id} />
       ))}
-      <button onClick={() => toggleCommitUngroup()}>
-        {state.ungrouped ? 'Group' : 'Ungroup'} by Commit
-      </button>
     </details>
   )
 }
 
 export const ExperimentsTable: React.FC<{
-  experiments: DVCExperimentsRepoJSONOutput
+  experiments: ExperimentsRepoJSONOutput
 }> = ({ experiments: rawExperiments }) => {
   const [initialState, defaultColumn] = useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<DVCExperimentRow>> = {}
+    const defaultColumn: Partial<Column<Experiment>> = {}
     return [initialState, defaultColumn]
   }, [])
 
@@ -196,11 +140,11 @@ export const ExperimentsTable: React.FC<{
     const columns = [
       {
         Header: 'Experiment',
-        id: 'sha',
-        accessor: ({ name, sha }) => {
+        id: 'id',
+        accessor: ({ name, id }) => {
           if (name) return name
-          if (sha === 'workspace') return sha
-          return sha.slice(0, 7)
+          if (id === 'workspace') return id
+          return id.slice(0, 7)
         },
         width: 200
       },
@@ -214,20 +158,17 @@ export const ExperimentsTable: React.FC<{
         }
       },
       ...buildDynamicColumns(flatExperiments)
-    ] as Column<DVCExperimentRow>[]
-    const nestedExperiments = experiments.reduce<DVCExperimentRow[]>(
-      (acc, cur) => [...acc, ...nestAndFlattenSubRows(cur)],
-      []
-    )
-    return [nestedExperiments, columns]
+    ] as Column<Experiment>[]
+    return [experiments, columns]
   }, [rawExperiments])
 
-  const instance = useTable<DVCExperimentRow>(
+  const instance = useTable<Experiment>(
     {
       columns,
       data,
       initialState,
       defaultColumn,
+      orderByFn,
       expandSubRows: false
     },
     useFlexLayout,
@@ -241,20 +182,21 @@ export const ExperimentsTable: React.FC<{
         }
         return state
       })
-      hooks.useInstance.push(ungroupByCommit)
     },
     useGroupBy,
     useSortBy,
     useExpanded,
     hooks => {
       hooks.useInstance.push(instance => {
-        const { allColumns } = instance
-        const sortedColumns: ColumnInstance<DVCExperimentRow>[] = useMemo(
+        const { allColumns, rows } = instance
+        const sortedColumns: ColumnInstance<Experiment>[] = useMemo(
           () => allColumns.filter(column => column.isSorted),
           [allColumns]
         )
+        const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
-          sortedColumns
+          sortedColumns,
+          expandedRowCount
         })
       })
     }
@@ -275,7 +217,7 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments?: DVCExperimentsRepoJSONOutput | null
+  experiments?: ExperimentsRepoJSONOutput | null
   vsCodeApi: any
 }> = ({ experiments, vsCodeApi }) => {
   return (
