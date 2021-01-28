@@ -49,9 +49,9 @@ jobs:
 
       - run: yarn install
 
-      - run: yarn run-p "ci:setup"
+      - run: yarn run-p "ci:setup:*"
 
-      - run: xvfb-run -a yarn run-p "ci:run"
+      - run: xvfb-run -a yarn run-p "ci:run:*"
 
       - run: yarn run-p "build -o ./vscode-dvc.vsix" build-storybook
 
