@@ -19,9 +19,10 @@
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
-    "ci:prettier": "prettier -c '**/*.{md,json}'",
-    "ci:eslint": "eslint --cache '**/*.{js,ts,tsx}'",
-    "build-tests": "yarn workspace dvc-integration tsc -p './'"
+    "ci:setup:install-dvc-master": "pip install git+https://github.com/iterative/dvc",
+    "ci:setup:build-tests": "yarn workspace dvc-integration tsc -p './'",
+    "ci:run:prettier": "prettier -c '**/*.{md,json}'",
+    "ci:run:eslint": "eslint --cache '**/*.{js,ts,tsx}'"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
