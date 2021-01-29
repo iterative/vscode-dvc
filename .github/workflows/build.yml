@@ -49,6 +49,8 @@ jobs:
 
       - run: yarn install
 
+      - run: python3 -m pip install --upgrade virtualenv pip
+
       - run: yarn run-p "ci:setup:*"
 
       - run: xvfb-run -a yarn run-p "ci:run:*"

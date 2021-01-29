@@ -20,7 +20,7 @@
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
     "ci:setup:install-dvc-master": "pip install git+https://github.com/iterative/dvc",
-    "ci:setup:venv": "cd demo/example-get-started && python3 -m pip install --upgrade virtualenv && python3 -m virtualenv .env && pip install -r src/requirements.txt",
+    "ci:setup:venv": "cd demo/example-get-started && python3 -m virtualenv .env && pip install -r src/requirements.txt",
     "ci:setup:build-tests": "yarn workspace dvc-integration tsc -p './'",
     "ci:run:prettier": "prettier -c '**/*.{md,json}'",
     "ci:run:test": "yarn test",
