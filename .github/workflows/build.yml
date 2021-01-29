@@ -57,7 +57,7 @@ jobs:
 
       - run: yarn install
 
-      - run: python3 -m pip install --upgrade virtualenv pip
+      - run: python3 -m pip install --upgrade pip
 
       - run: yarn run-p "ci:setup:*"
 
