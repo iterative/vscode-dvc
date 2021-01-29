@@ -34,12 +34,12 @@ jobs:
           restore-keys: yarn
 
       - uses: actions/cache@v2
-        name: Restore Venv cache
-        id: venv-cache
+        name: Get pip cache
+        id: pip-cache
         with:
-          path: ./demo/example-get-started/.env
-          key: venv-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: venv
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: pip
 
       - uses: actions/cache@v2
         name: Restore ESLint cache
