@@ -56,6 +56,7 @@ suite('Integrated Terminal Test Suite', () => {
 
       await IntegratedTerminal.run(echoString)
       await waitForAndDispose(disposable)
+      console.error(eventStream)
 
       expect(eventStream.includes(echoString)).to.be.true
     }).timeout(12000)
@@ -76,6 +77,7 @@ suite('Integrated Terminal Test Suite', () => {
       await IntegratedTerminal.run(firstEchoString)
       await IntegratedTerminal.run(secondEchoString)
       await waitForAndDispose(disposable)
+      console.error(eventStream)
 
       expect(eventStream.includes(firstEchoString)).to.be.true
       expect(eventStream.includes(secondEchoString)).to.be.true
@@ -101,6 +103,7 @@ suite('Integrated Terminal Test Suite', () => {
 
       await IntegratedTerminal.run(echoString)
       await waitForAndDispose(disposable)
+      console.error(eventStream)
 
       expect(eventStream.includes(envFolder)).to.be.true
       expect(eventStream.includes(echoString)).to.be.true
