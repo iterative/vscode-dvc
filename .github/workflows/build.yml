@@ -34,7 +34,7 @@ jobs:
           restore-keys: yarn
 
       - uses: actions/cache@v2
-        name: Get pip cache
+        name: Restore pip cache
         id: pip-cache
         with:
           path: ~/.cache/pip
