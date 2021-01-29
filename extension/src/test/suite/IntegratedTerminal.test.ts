@@ -92,6 +92,17 @@ suite('Integrated Terminal Test Suite', () => {
       workspace
         .getConfiguration()
         .update('python.pythonPath', envFolder + 'python3.9')
+      workspace
+        .getConfiguration()
+        .update('python.terminal.activateEnvInCurrentTerminal', true)
+
+      console.error(
+        workspace.getConfiguration().get('python.pythonPath'),
+        workspace
+          .getConfiguration()
+          .get('python.terminal.activateEnvInCurrentTerminal')
+      )
+
       const text = 'some-different-long-string'
       let eventStream = ''
       disposable.track(
