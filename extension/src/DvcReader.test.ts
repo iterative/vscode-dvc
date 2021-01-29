@@ -1,4 +1,5 @@
-import * as path from 'path'
+import path from 'path'
+import fs from 'fs'
 
 import { getExperiments, inferDefaultOptions } from './DvcReader'
 
@@ -19,9 +20,21 @@ test('Inferring default options on a directory without .env', async () => {
   })
 })
 
-test('Inferring default options on a directory with .env', async () => {
+test('Inferring default options on the test directory alongside a basic check', async () => {
+  const dotEnvDvcBinaryPath = path.resolve(
+    testDvcDirectory,
+    '.env',
+    'bin',
+    'dvc'
+  )
+
+  const ourInferredPath = (fs as any).statSync(dotEnvDvcBinaryPath, {
+    throwIfNoEntry: false
+  })
+    ? dotEnvDvcBinaryPath
+    : 'dvc'
   expect(await testRepoOptions).toEqual({
-    bin: path.resolve(testDvcDirectory, '.env', 'bin', 'dvc'),
+    bin: ourInferredPath,
     cwd: testDvcDirectory
   })
 })
