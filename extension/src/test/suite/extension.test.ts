@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
-import * as chai from 'chai'
+import chai from 'chai'
 import { stub } from 'sinon'
-import * as sinonChai from 'sinon-chai'
+import sinonChai from 'sinon-chai'
 import { window, commands, workspace } from 'vscode'
 
 chai.use(sinonChai)
