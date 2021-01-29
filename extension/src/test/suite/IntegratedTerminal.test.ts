@@ -74,7 +74,7 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + firstText)
-      await delay(100)
+      await delay(200)
       await IntegratedTerminal.run('echo ' + secondText)
       await waitForAndDispose(disposable)
 
@@ -96,10 +96,6 @@ suite('Integrated Terminal Test Suite', () => {
         .update('python.terminal.activateEnvironment', true, false)
 
       await delay(500)
-      console.error(
-        workspace.getConfiguration().get('python.pythonPath'),
-        workspace.getConfiguration().get('python.terminal.activateEnvironment')
-      )
 
       const text = 'some-different-long-string'
       let eventStream = ''
@@ -112,12 +108,6 @@ suite('Integrated Terminal Test Suite', () => {
 
       await IntegratedTerminal.run('echo ' + text)
       await waitForAndDispose(disposable)
-      console.error(
-        eventStream,
-        '\n--------------\n',
-        workspace.getConfiguration().get('python.pythonPath'),
-        workspace.getConfiguration().get('python.terminal.activateEnvironment')
-      )
 
       expect(eventStream.includes(envFolder)).to.be.true
       expect(eventStream.includes(text)).to.be.true
