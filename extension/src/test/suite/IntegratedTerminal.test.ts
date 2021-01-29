@@ -1,6 +1,6 @@
 import { describe, it, before, beforeEach } from 'mocha'
-import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
+import chai from 'chai'
+import sinonChai from 'sinon-chai'
 import { window, workspace } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { delay } from '../../util'
