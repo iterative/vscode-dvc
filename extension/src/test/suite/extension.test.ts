@@ -1,4 +1,4 @@
-import { describe, it } from 'mocha'
+import { describe, it, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
@@ -8,11 +8,14 @@ chai.use(sinonChai)
 const { expect } = chai
 
 suite('Extension Test Suite', () => {
-  window.showInformationMessage('Start all tests.')
+  window.showInformationMessage('Start all extension tests.')
+
+  beforeEach(async () => {
+    await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
+  })
 
   describe('dvc binary path picker', () => {
     it('should be able to select the default dvc path', async () => {
-      await workspace.getConfiguration().update('dvc.dvcPath', undefined)
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
@@ -35,7 +38,6 @@ suite('Extension Test Suite', () => {
     })
 
     it('should be able to select a custom path for the dvc binary', async () => {
-      await workspace.getConfiguration().update('dvc.dvcPath', undefined)
       const selectCustomPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
