@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'mocha'
+import { describe, it, before, beforeEach } from 'mocha'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { window, workspace } from 'vscode'
@@ -18,7 +18,11 @@ suite('Integrated Terminal Test Suite', () => {
     await delay(1000)
   }
 
-  beforeEach(async () => {
+  before(() => {
+    workspace.getConfiguration().update('python.showStartPage', false, true)
+  })
+
+  beforeEach(() => {
     workspace.getConfiguration().update('python.pythonPath', undefined, false)
     workspace
       .getConfiguration()
