@@ -1,4 +1,4 @@
-import { describe, it, before } from 'mocha'
+import { describe, it, beforeEach } from 'mocha'
 import * as chai from 'chai'
 import * as sinonChai from 'sinon-chai'
 import { window, workspace } from 'vscode'
@@ -18,15 +18,17 @@ suite('Integrated Terminal Test Suite', () => {
     await delay(1000)
   }
 
-  before(async () => {
-    workspace.getConfiguration().update('python.pythonPath', undefined, true)
+  beforeEach(async () => {
+    workspace.getConfiguration().update('python.pythonPath', undefined, false)
+    workspace
+      .getConfiguration()
+      .update('python.terminal.activateEnvironment', false, false)
   })
 
   describe('IntegratedTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
 
-      workspace.getConfiguration().update('python.pythonPath', undefined)
       let eventCount = 0
       disposable.track(
         window.onDidOpenTerminal(event => {
@@ -44,7 +46,6 @@ suite('Integrated Terminal Test Suite', () => {
 
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
-      workspace.getConfiguration().update('python.pythonPath', undefined)
       const text = 'some-really-long-string'
       let eventStream = ''
       disposable.track(
@@ -56,14 +57,12 @@ suite('Integrated Terminal Test Suite', () => {
 
       await IntegratedTerminal.run('echo ' + text)
       await waitForAndDispose(disposable)
-      console.error(eventStream)
 
       expect(eventStream.includes(text)).to.be.true
     }).timeout(12000)
 
     it('should be able to run multiple commands in the same terminal', async () => {
       const disposable = Disposable.fn()
-      workspace.getConfiguration().update('python.pythonPath', undefined)
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
       let eventStream = ''
@@ -75,9 +74,9 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + firstText)
+      await delay(100)
       await IntegratedTerminal.run('echo ' + secondText)
       await waitForAndDispose(disposable)
-      console.error(eventStream)
 
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
@@ -91,17 +90,12 @@ suite('Integrated Terminal Test Suite', () => {
       const envFolder = '.env/bin/'
       workspace
         .getConfiguration()
-        .update('python.pythonPath', envFolder + 'python3.9')
+        .update('python.pythonPath', envFolder + 'python3.9', false)
       workspace
         .getConfiguration()
-        .update('python.terminal.activateEnvInCurrentTerminal', true)
+        .update('python.terminal.activateEnvironment', true, false)
 
-      console.error(
-        workspace.getConfiguration().get('python.pythonPath'),
-        workspace
-          .getConfiguration()
-          .get('python.terminal.activateEnvInCurrentTerminal')
-      )
+      await delay(500)
 
       const text = 'some-different-long-string'
       let eventStream = ''
@@ -114,7 +108,6 @@ suite('Integrated Terminal Test Suite', () => {
 
       await IntegratedTerminal.run('echo ' + text)
       await waitForAndDispose(disposable)
-      console.error(eventStream)
 
       expect(eventStream.includes(envFolder)).to.be.true
       expect(eventStream.includes(text)).to.be.true
