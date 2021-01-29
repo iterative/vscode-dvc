@@ -45,7 +45,7 @@ suite('Integrated Terminal Test Suite', () => {
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
       workspace.getConfiguration().update('python.pythonPath', undefined)
-      const echoString = 'echo some-really-long-string'
+      const text = 'some-really-long-string'
       let eventStream = ''
       disposable.track(
         window.onDidWriteTerminalData(event => {
@@ -54,18 +54,18 @@ suite('Integrated Terminal Test Suite', () => {
       )
       disposable.track(IntegratedTerminal)
 
-      await IntegratedTerminal.run(echoString)
+      await IntegratedTerminal.run('echo ' + text)
       await waitForAndDispose(disposable)
       console.error(eventStream)
 
-      expect(eventStream.includes(echoString)).to.be.true
+      expect(eventStream.includes(text)).to.be.true
     }).timeout(12000)
 
     it('should be able to run multiple commands in the same terminal', async () => {
       const disposable = Disposable.fn()
       workspace.getConfiguration().update('python.pythonPath', undefined)
-      const firstEchoString = 'echo some-really-long-string'
-      const secondEchoString = 'echo :weeeee:'
+      const firstText = 'some-really-long-string'
+      const secondText = ':weeeee:'
       let eventStream = ''
       disposable.track(
         window.onDidWriteTerminalData(event => {
@@ -74,15 +74,15 @@ suite('Integrated Terminal Test Suite', () => {
       )
       disposable.track(IntegratedTerminal)
 
-      await IntegratedTerminal.run(firstEchoString)
-      await IntegratedTerminal.run(secondEchoString)
+      await IntegratedTerminal.run('echo ' + firstText)
+      await IntegratedTerminal.run('echo ' + secondText)
       await waitForAndDispose(disposable)
       console.error(eventStream)
 
-      expect(eventStream.includes(firstEchoString)).to.be.true
-      expect(eventStream.includes(secondEchoString)).to.be.true
-      expect(eventStream.indexOf(firstEchoString)).to.be.lessThan(
-        eventStream.indexOf(secondEchoString)
+      expect(eventStream.includes(firstText)).to.be.true
+      expect(eventStream.includes(secondText)).to.be.true
+      expect(eventStream.indexOf(firstText)).to.be.lessThan(
+        eventStream.indexOf(secondText)
       )
     }).timeout(12000)
 
@@ -92,7 +92,7 @@ suite('Integrated Terminal Test Suite', () => {
       workspace
         .getConfiguration()
         .update('python.pythonPath', envFolder + 'python3.9')
-      const echoString = 'echo some-different-long-string'
+      const text = 'some-different-long-string'
       let eventStream = ''
       disposable.track(
         window.onDidWriteTerminalData(event => {
@@ -101,14 +101,14 @@ suite('Integrated Terminal Test Suite', () => {
       )
       disposable.track(IntegratedTerminal)
 
-      await IntegratedTerminal.run(echoString)
+      await IntegratedTerminal.run('echo ' + text)
       await waitForAndDispose(disposable)
       console.error(eventStream)
 
       expect(eventStream.includes(envFolder)).to.be.true
-      expect(eventStream.includes(echoString)).to.be.true
+      expect(eventStream.includes(text)).to.be.true
       expect(eventStream.indexOf(envFolder)).to.be.lessThan(
-        eventStream.indexOf(echoString)
+        eventStream.indexOf(text)
       )
     }).timeout(12000)
   })
