@@ -56,6 +56,7 @@ module.exports = {
   ignorePatterns: [
     '**/dist/**',
     'webview/storybook-static/**',
-    'extension/vscode-test/**'
+    'extension/vscode-test/**',
+    'extension/src/vscode.proposed.d.ts'
   ]
 }

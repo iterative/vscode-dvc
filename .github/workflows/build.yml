@@ -34,6 +34,14 @@ jobs:
           restore-keys: yarn
 
       - uses: actions/cache@v2
+        name: Restore pip cache
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: pip
+
+      - uses: actions/cache@v2
         name: Restore ESLint cache
         id: eslint-cache
         with:
@@ -48,6 +56,8 @@ jobs:
           key: vscode-test
 
       - run: yarn install
+
+      - run: python3 -m pip install --upgrade pip
 
       - run: yarn run-p "ci:setup:*"
 

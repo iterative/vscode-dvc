@@ -19,6 +19,7 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
+import { IntegratedTerminal } from './IntegratedTerminal'
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
@@ -30,6 +31,8 @@ import {
 } from './DvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
+
+export { Disposable }
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -93,6 +96,8 @@ export class Extension {
       i.show()
     }
 
+    this.dispose.track(IntegratedTerminal)
+
     this.dispose.track((this.dvcPathStatusBarItem = new DVCPathStatusBarItem()))
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
@@ -105,7 +110,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', () => selectDvcPath())
+      commands.registerCommand('dvc.selectDvcPath', async () => selectDvcPath())
     )
 
     this.dispose.track(
