@@ -34,6 +34,14 @@ jobs:
           restore-keys: yarn
 
       - uses: actions/cache@v2
+        name: Restore Venv cache
+        id: venv-cache
+        with:
+          path: ./demo/example-get-started/.env
+          key: venv-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: venv
+
+      - uses: actions/cache@v2
         name: Restore ESLint cache
         id: eslint-cache
         with:
