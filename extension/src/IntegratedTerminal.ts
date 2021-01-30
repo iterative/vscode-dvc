@@ -41,15 +41,6 @@ export class IntegratedTerminal {
     return IntegratedTerminal.createInstance(2000)
   }
 
-  private static createPythonInstance = async (
-    pythonExtension: Extension<any>
-  ): Promise<void> => {
-    if (!pythonExtension.isActive) {
-      await IntegratedTerminal.activateExtension(pythonExtension)
-    }
-    return IntegratedTerminal.createInstance(5000)
-  }
-
   private static deleteReferenceOnClose = (): void => {
     window.onDidCloseTerminal(async event => {
       if (
@@ -59,6 +50,15 @@ export class IntegratedTerminal {
         IntegratedTerminal.instance = undefined
       }
     })
+  }
+
+  private static createPythonInstance = async (
+    pythonExtension: Extension<any>
+  ): Promise<void> => {
+    if (!pythonExtension.isActive) {
+      await IntegratedTerminal.activateExtension(pythonExtension)
+    }
+    return IntegratedTerminal.createInstance(5000)
   }
 
   private static activateExtension = async (
