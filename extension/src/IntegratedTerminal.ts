@@ -6,6 +6,27 @@ export class IntegratedTerminal {
   static termName = 'DVC'
   private static instance: Terminal | undefined
 
+  static openCurrentInstance = async (): Promise<Terminal | undefined> => {
+    if (!IntegratedTerminal.instance) {
+      await IntegratedTerminal.initializeInstance()
+    }
+    IntegratedTerminal.instance?.show(true)
+    return IntegratedTerminal.instance
+  }
+
+  static run = async (command: string): Promise<void> => {
+    const currentTerminal = await IntegratedTerminal.openCurrentInstance()
+    return currentTerminal?.sendText(command, true)
+  }
+
+  static dispose = (): void => {
+    const currentTerminal = IntegratedTerminal.instance
+    if (currentTerminal) {
+      currentTerminal.dispose()
+      IntegratedTerminal.instance = undefined
+    }
+  }
+
   private static initializeInstance = async (): Promise<void> => {
     IntegratedTerminal.deleteReferenceOnClose()
 
@@ -54,26 +75,5 @@ export class IntegratedTerminal {
       // https://github.com/microsoft/vscode-python/issues/11122
     })
     return delay(ms)
-  }
-
-  static openCurrentInstance = async (): Promise<Terminal | undefined> => {
-    if (!IntegratedTerminal.instance) {
-      await IntegratedTerminal.initializeInstance()
-    }
-    IntegratedTerminal.instance?.show(true)
-    return IntegratedTerminal.instance
-  }
-
-  static run = async (command: string): Promise<void> => {
-    const currentTerminal = await IntegratedTerminal.openCurrentInstance()
-    return currentTerminal?.sendText(command, true)
-  }
-
-  static dispose = (): void => {
-    const currentTerminal = IntegratedTerminal.instance
-    if (currentTerminal) {
-      currentTerminal.dispose()
-      IntegratedTerminal.instance = undefined
-    }
   }
 }
