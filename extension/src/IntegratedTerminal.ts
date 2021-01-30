@@ -7,15 +7,7 @@ export class IntegratedTerminal {
   static instance: Terminal | undefined
 
   static _initializeInstance = async (): Promise<void> => {
-    // if user closes the terminal, delete our reference:
-    window.onDidCloseTerminal(async event => {
-      if (
-        IntegratedTerminal.instance &&
-        event.name === IntegratedTerminal.termName
-      ) {
-        IntegratedTerminal.instance = undefined
-      }
-    })
+    IntegratedTerminal._deleteReferenceOnClose()
 
     const pythonExtension = extensions.getExtension('ms-python.python')
     if (
@@ -35,6 +27,17 @@ export class IntegratedTerminal {
       await IntegratedTerminal._activateExtension(pythonExtension)
     }
     return IntegratedTerminal._createInstance(5000)
+  }
+
+  static _deleteReferenceOnClose = (): void => {
+    window.onDidCloseTerminal(async event => {
+      if (
+        IntegratedTerminal.instance &&
+        event.name === IntegratedTerminal.termName
+      ) {
+        IntegratedTerminal.instance = undefined
+      }
+    })
   }
 
   static _activateExtension = async (
