@@ -4,32 +4,32 @@ import { delay } from './util'
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
 export class IntegratedTerminal {
   static termName = 'DVC'
-  static instance: Terminal | undefined
+  private static instance: Terminal | undefined
 
-  static _initializeInstance = async (): Promise<void> => {
-    IntegratedTerminal._deleteReferenceOnClose()
+  private static initializeInstance = async (): Promise<void> => {
+    IntegratedTerminal.deleteReferenceOnClose()
 
     const pythonExtension = extensions.getExtension('ms-python.python')
     if (
       pythonExtension &&
       workspace.getConfiguration().get('python.terminal.activateEnvironment')
     ) {
-      return IntegratedTerminal._createPythonInstance(pythonExtension)
+      return IntegratedTerminal.createPythonInstance(pythonExtension)
     }
 
-    return IntegratedTerminal._createInstance(2000)
+    return IntegratedTerminal.createInstance(2000)
   }
 
-  static _createPythonInstance = async (
+  private static createPythonInstance = async (
     pythonExtension: Extension<any>
   ): Promise<void> => {
     if (!pythonExtension.isActive) {
-      await IntegratedTerminal._activateExtension(pythonExtension)
+      await IntegratedTerminal.activateExtension(pythonExtension)
     }
-    return IntegratedTerminal._createInstance(5000)
+    return IntegratedTerminal.createInstance(5000)
   }
 
-  static _deleteReferenceOnClose = (): void => {
+  private static deleteReferenceOnClose = (): void => {
     window.onDidCloseTerminal(async event => {
       if (
         IntegratedTerminal.instance &&
@@ -40,14 +40,14 @@ export class IntegratedTerminal {
     })
   }
 
-  static _activateExtension = async (
+  private static activateExtension = async (
     extension: Extension<any>
   ): Promise<void> => {
     await extension.activate()
     return delay(2000)
   }
 
-  static _createInstance = async (ms: number): Promise<void> => {
+  private static createInstance = async (ms: number): Promise<void> => {
     IntegratedTerminal.instance = window.createTerminal({
       name: IntegratedTerminal.termName
       // hideFromUser: true <- cannot use this as the python extension will not activate the environment
@@ -58,7 +58,7 @@ export class IntegratedTerminal {
 
   static openCurrentInstance = async (): Promise<Terminal | undefined> => {
     if (!IntegratedTerminal.instance) {
-      await IntegratedTerminal._initializeInstance()
+      await IntegratedTerminal.initializeInstance()
     }
     IntegratedTerminal.instance?.show(true)
     return IntegratedTerminal.instance
