@@ -65,7 +65,7 @@ export class IntegratedTerminal {
     extension: Extension<any>
   ): Promise<void> => {
     await extension.activate()
-    return delay(2000)
+    return delay(2500)
   }
 
   private static createInstance = async (ms: number): Promise<void> => {
