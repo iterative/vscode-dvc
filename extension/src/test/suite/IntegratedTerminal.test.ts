@@ -42,7 +42,7 @@ suite('Integrated Terminal Test Suite', () => {
       )
       disposable.track(IntegratedTerminal)
 
-      await IntegratedTerminal._createTerminal()
+      await IntegratedTerminal.openCurrentInstance()
       await waitForAndDispose(disposable)
 
       expect(eventCount).to.equal(1)
