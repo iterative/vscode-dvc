@@ -99,7 +99,7 @@ suite('Integrated Terminal Test Suite', () => {
         .getConfiguration()
         .update('python.terminal.activateEnvironment', true, false)
 
-      await delay(500)
+      await delay(1000)
 
       const text = 'some-different-long-string'
       let eventStream = ''
