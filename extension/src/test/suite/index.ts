@@ -1,8 +1,8 @@
 /* eslint consistent-return: off */
 /* eslint no-shadow: off */
-import * as path from 'path'
-import * as Mocha from 'mocha'
-import * as glob from 'glob'
+import path from 'path'
+import Mocha from 'mocha'
+import glob from 'glob'
 
 export function run(): Promise<void> {
   // Create the mocha test

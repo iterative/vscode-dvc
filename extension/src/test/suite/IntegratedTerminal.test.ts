@@ -1,6 +1,6 @@
 import { describe, it, before, beforeEach } from 'mocha'
-import * as chai from 'chai'
-import * as sinonChai from 'sinon-chai'
+import chai from 'chai'
+import sinonChai from 'sinon-chai'
 import { window, workspace } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { delay } from '../../util'
@@ -42,7 +42,7 @@ suite('Integrated Terminal Test Suite', () => {
       )
       disposable.track(IntegratedTerminal)
 
-      await IntegratedTerminal._createTerminal()
+      await IntegratedTerminal.openCurrentInstance()
       await waitForAndDispose(disposable)
 
       expect(eventCount).to.equal(1)
@@ -99,7 +99,7 @@ suite('Integrated Terminal Test Suite', () => {
         .getConfiguration()
         .update('python.terminal.activateEnvironment', true, false)
 
-      await delay(500)
+      await delay(1000)
 
       const text = 'some-different-long-string'
       let eventStream = ''

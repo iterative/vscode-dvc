@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "resolveJsonModule": true,
     "module": "commonjs",
     "target": "es6",
     "outDir": "dist",
@@ -8,7 +9,8 @@
     "rootDir": "src",
     "strict": true,
     "skipLibCheck": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "esModuleInterop": true
   },
   "include": ["src/**/*"]
 }
