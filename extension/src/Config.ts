@@ -6,7 +6,7 @@ import {
   WorkspaceConfiguration
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { observable } from 'mobx'
+import { makeObservable, observable } from 'mobx'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -31,6 +31,7 @@ export class Config {
   }
 
   constructor() {
+    makeObservable(this)
     this._vsCodeTheme = window.activeColorTheme
     this.dispose.track(
       window.onDidChangeActiveColorTheme(() => {
