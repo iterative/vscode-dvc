@@ -3,7 +3,7 @@ import {
   MessageToWebview,
   WindowWithWebviewData
 } from 'dvc-integration/src/webviewContract'
-import { observable, autorun } from 'mobx'
+import { autorun, makeObservable, observable } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsRepoJSONOutput } from 'dvc-integration/src/DvcReader'
 import { getVsCodeApi } from './VsCodeApi'
@@ -36,6 +36,7 @@ export class Model {
   public errors?: Array<Error | string> = undefined
 
   private constructor() {
+    makeObservable(this)
     const data = window.webviewData
     // this needs to be setup so that dynamic imports work
     __webpack_public_path__ = data.publicPath
@@ -54,7 +55,6 @@ export class Model {
 
     this.dispose.track({
       dispose: autorun(() => {
-        console.log(this.getState())
         this.vsCodeApi.setState(this.getState())
       })
     })
