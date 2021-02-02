@@ -3,7 +3,7 @@ import {
   MessageToWebview,
   WindowWithWebviewData
 } from 'dvc-integration/src/webviewContract'
-import { observable, autorun, makeObservable } from 'mobx'
+import { autorun, makeObservable, observable } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsRepoJSONOutput } from 'dvc-integration/src/DvcReader'
 import { getVsCodeApi } from './VsCodeApi'
