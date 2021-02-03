@@ -1,7 +1,7 @@
 import {
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
-} from 'dvc-integration/src/DvcReader'
+} from 'dvc/src/DvcReader'
 
 import { DataDictRoot } from '../../../extension/src/DvcReader'
 

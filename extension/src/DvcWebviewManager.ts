@@ -145,7 +145,7 @@ export class DvcWebview {
         return
       }
       case 'onClickRunExperiment': {
-        commands.executeCommand('dvc-integration.runExperiment')
+        commands.executeCommand('dvc.runExperiment')
         return
       }
       default: {

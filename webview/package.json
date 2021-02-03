@@ -14,7 +14,7 @@
   },
   "main": "./index.js",
   "peerDependencies": {
-    "dvc-integration": ">=0.0.1"
+    "dvc": ">=0.0.1"
   },
   "dependencies": {
     "@hediet/std": "^0.6.0",
