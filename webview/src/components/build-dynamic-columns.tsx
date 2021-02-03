@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DataDictRoot } from 'dvc-integration/src/DvcReader'
+import { DataDictRoot } from 'dvc/src/DvcReader'
 
 import { Experiment } from './Experiments'
 
