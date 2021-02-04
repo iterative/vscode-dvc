@@ -15,10 +15,7 @@ async function main() {
 
     const vscodeExecutablePath = await downloadAndUnzipVSCode('insiders')
 
-    const workspacePath = resolve(
-      __dirname,
-      '../../../demo/example-get-started'
-    )
+    const workspacePath = resolve(__dirname, '../../../demo')
 
     const cliPath = resolveCliPathFromVSCodeExecutablePath(vscodeExecutablePath)
 
