@@ -1,3 +1,2 @@
 pyyaml
 git+https://github.com/iterative/dvc
-tensorflow
