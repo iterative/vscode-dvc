@@ -1,5 +1,5 @@
 {
-  "name": "dvc-integration",
+  "name": "dvc",
   "private": true,
   "displayName": "DVC",
   "description": "DVC VSCode extension",
@@ -42,15 +42,15 @@
     "commands": [
       {
         "title": "DVC: Push",
-        "command": "dvc-integration.push"
+        "command": "dvc.push"
       },
       {
         "title": "DVC: Show Webview",
-        "command": "dvc-integration.showWebview"
+        "command": "dvc.showWebview"
       },
       {
         "title": "DVC: Run Experiment",
-        "command": "dvc-integration.runExperiment"
+        "command": "dvc.runExperiment"
       },
       {
         "title": "DVC: Select DVC path...",
@@ -71,13 +71,13 @@
     "menus": {
       "scm/resourceState/context": [
         {
-          "command": "dvc-integration.push",
+          "command": "dvc.push",
           "group": "inline"
         }
       ],
       "explorer/context": [
         {
-          "command": "dvc-integration.runExperiment",
+          "command": "dvc.runExperiment",
           "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
         }
       ]

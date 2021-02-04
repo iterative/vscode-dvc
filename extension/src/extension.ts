@@ -114,7 +114,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc-integration.showWebview', async () => {
+      commands.registerCommand('dvc.showWebview', async () => {
         const dvcWebview = this.dispose.track(await this.manager.createNew())
         try {
           const tableData = await this.getCachedTable()
@@ -126,7 +126,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc-integration.runExperiment', async () => {
+      commands.registerCommand('dvc.runExperiment', async () => {
         const { workspaceFolders } = workspace
         if (!workspaceFolders || workspaceFolders.length === 0)
           throw new Error(
@@ -172,14 +172,14 @@ export class Extension {
               label: 'View Tree',
               command: {
                 title: 'Webview Tree',
-                command: 'dvc-integration.showWebview'
+                command: 'dvc.showWebview'
               }
             },
             {
               label: 'Run Experiment',
               command: {
                 title: 'Run Experiment',
-                command: 'dvc-integration.runExperiment'
+                command: 'dvc.runExperiment'
               }
             }
           ]
