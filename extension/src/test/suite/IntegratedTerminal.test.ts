@@ -111,6 +111,7 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + text)
+      await delay(500)
       await waitForAndDispose(disposable)
 
       expect(eventStream.includes(envFolder)).to.be.true
@@ -118,6 +119,6 @@ suite('Integrated Terminal Test Suite', () => {
       expect(eventStream.indexOf(envFolder)).to.be.lessThan(
         eventStream.indexOf(text)
       )
-    }).timeout(12000)
+    }).timeout(14000)
   })
 })
