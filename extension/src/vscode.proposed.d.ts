@@ -60,7 +60,9 @@ declare module 'vscode' {
      * An [event](#Event) which fires when the array of sessions has changed, or data
      * within a session has changed.
      */
-    readonly onDidChangeSessions: Event<AuthenticationProviderAuthenticationSessionsChangeEvent>
+    readonly onDidChangeSessions: Event<
+      AuthenticationProviderAuthenticationSessionsChangeEvent
+    >
 
     /**
      * Returns an array of current sessions.
@@ -1671,7 +1673,9 @@ declare module 'vscode' {
 
   export interface NotebookContentProvider {
     readonly options?: NotebookDocumentContentOptions
-    readonly onDidChangeNotebookContentOptions?: Event<NotebookDocumentContentOptions>
+    readonly onDidChangeNotebookContentOptions?: Event<
+      NotebookDocumentContentOptions
+    >
     readonly onDidChangeNotebook: Event<
       NotebookDocumentContentChangeEvent | NotebookDocumentEditEvent
     >

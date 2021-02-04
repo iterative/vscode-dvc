@@ -1,0 +1,37 @@
+name: train-my-model
+
+on: [push]
+
+jobs:
+  run:
+    runs-on: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - uses: iterative/setup-cml@v1
+      - uses: iterative/setup-dvc@v1
+
+      - name: cml
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.aws_session_token }}
+        run: |
+          echo "HELLO GH ACTIONS"
+          python -V
+          pip -V
+          dvc version
+
+          pip3 install -r requirements.txt
+          dvc repro
+          dvc push
+          
+          git config --local user.email "$(git log --format='%ae' HEAD^!)"
+          git config --local user.name "$(git log --format='%an' HEAD^!)"
+          git add .
+          git commit -m 'ci train'
+          git push
