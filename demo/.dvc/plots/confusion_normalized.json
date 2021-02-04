@@ -43,16 +43,18 @@
             {
                 "joinaggregate": [
                     {
-                        "op": "max",
+                        "op": "sum",
                         "field": "xy_count",
-                        "as": "max_count"
+                        "as": "sum_y"
                     }
                 ],
-                "groupby": []
+                "groupby": [
+                    "<DVC_METRIC_Y>"
+                ]
             },
             {
-                "calculate": "datum.xy_count / datum.max_count",
-                "as": "percent_of_max"
+                "calculate": "datum.xy_count / datum.sum_y",
+                "as": "percent_of_y"
             }
         ],
         "encoding": {
@@ -76,12 +78,14 @@
                 "height": 300,
                 "encoding": {
                     "color": {
-                        "field": "xy_count",
+                        "field": "percent_of_y",
                         "type": "quantitative",
                         "title": "",
                         "scale": {
-                            "domainMin": 0,
-                            "nice": true
+                            "domain": [
+                                0,
+                                1
+                            ]
                         }
                     }
                 }
@@ -90,12 +94,13 @@
                 "mark": "text",
                 "encoding": {
                     "text": {
-                        "field": "xy_count",
-                        "type": "quantitative"
+                        "field": "percent_of_y",
+                        "type": "quantitative",
+                        "format": ".2f"
                     },
                     "color": {
                         "condition": {
-                            "test": "datum.percent_of_max > 0.5",
+                            "test": "datum.percent_of_y > 0.5",
                             "value": "white"
                         },
                         "value": "black"
