@@ -49,7 +49,7 @@ suite('Integrated Terminal Test Suite', () => {
       await waitForAndDispose(disposable)
 
       expect(eventCount).to.equal(1)
-    }).timeout(12000)
+    }).timeout(20000)
 
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
