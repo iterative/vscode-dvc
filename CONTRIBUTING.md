@@ -9,18 +9,14 @@ See something that should be changed? Want to request a new feature? Open
 
 ## Extension Development with VS Code
 
-- Clone this repo with
-  `git clone --recurse-submodules https://github.com/iterative/vscode-dvc.git`
-  to clone the demo DVC repo with the base project code in one command.
-- If you've already cloned the repo, use
-  `git submodule update --init --recursive`
+- Clone this repo with `git clone https://github.com/iterative/vscode-dvc.git`
 
 ### Using VS Code as an Editor
 
 - Open the monorepo root as a project in VS Code
 
 - Run `Tasks: Run Build Task` (Ctrl+Shift+b) to start the extension and webview
-  development servers
+  development servers (alternatively run `yarn dev-server` from the terminal).
 
 - Open the test instance of VS Code with `Start Debugging` (f5)
 
