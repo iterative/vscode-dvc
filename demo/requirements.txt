@@ -1,2 +1,2 @@
 pyyaml
-dvc
+git+https://github.com/iterative/dvc
