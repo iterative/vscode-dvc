@@ -12,10 +12,13 @@ const { expect } = chai
 suite('Integrated Terminal Test Suite', () => {
   window.showInformationMessage('Start all integrated terminal tests.')
 
-  const waitForAndDispose = async (disposable: Disposable): Promise<void> => {
-    await delay(1000)
+  const waitForAndDispose = async (
+    disposable: Disposable,
+    ms = 1000
+  ): Promise<void> => {
+    await delay(ms)
     disposable.dispose()
-    await delay(1000)
+    await delay(ms)
   }
 
   before(() => {
@@ -46,7 +49,7 @@ suite('Integrated Terminal Test Suite', () => {
       await waitForAndDispose(disposable)
 
       expect(eventCount).to.equal(1)
-    }).timeout(12000)
+    }).timeout(20000)
 
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
@@ -99,7 +102,7 @@ suite('Integrated Terminal Test Suite', () => {
         .getConfiguration()
         .update('python.terminal.activateEnvironment', true, false)
 
-      await delay(1000)
+      await delay(1500)
 
       const text = 'some-different-long-string'
       let eventStream = ''
@@ -111,8 +114,7 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + text)
-      await delay(500)
-      await waitForAndDispose(disposable)
+      await waitForAndDispose(disposable, 1500)
 
       expect(eventStream.includes(envFolder)).to.be.true
       expect(eventStream.includes(text)).to.be.true
