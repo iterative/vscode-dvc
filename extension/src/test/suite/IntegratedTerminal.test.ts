@@ -24,6 +24,7 @@ suite('Integrated Terminal Test Suite', () => {
   const envFolder = '.env/bin/'
 
   before(async () => {
+    workspace.getConfiguration().update('python.showStartPage', false, true)
     workspace
       .getConfiguration()
       .update('python.pythonPath', envFolder + 'python3.9', false)
