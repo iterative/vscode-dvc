@@ -95,7 +95,7 @@
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"]
     },
     {
-      "name": "Run All Extensions",
+      "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -110,13 +110,14 @@
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"]
     },
     {
-      "name": "Run Extension",
+      "name": "Run All Extensions",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo"
+        "${workspaceFolder}/demo",
+        "--disable-extensions"
       ],
       "env": {
         "HOT_RELOAD": "",
