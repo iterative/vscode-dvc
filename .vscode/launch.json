@@ -101,7 +101,8 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo"
+        "${workspaceFolder}/demo",
+        "--disable-extensions"
       ],
       "env": {
         "HOT_RELOAD": "",
@@ -116,8 +117,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo",
-        "--disable-extensions"
+        "${workspaceFolder}/demo"
       ],
       "env": {
         "HOT_RELOAD": "",
