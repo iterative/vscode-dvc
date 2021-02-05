@@ -1,4 +1,4 @@
-import { describe, it, before, beforeEach } from 'mocha'
+import { describe, it, before } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { window, workspace } from 'vscode'
@@ -21,54 +21,20 @@ suite('Integrated Terminal Test Suite', () => {
     await delay(ms)
   }
 
-  before(() => {
-    workspace.getConfiguration().update('python.showStartPage', false, true)
-  })
+  const envFolder = '.env/bin/'
 
-  beforeEach(() => {
-    workspace.getConfiguration().update('python.pythonPath', undefined, false)
+  before(async () => {
     workspace
       .getConfiguration()
-      .update('python.terminal.activateEnvironment', false, false)
+      .update('python.pythonPath', envFolder + 'python3.9', false)
+    workspace
+      .getConfiguration()
+      .update('python.terminal.activateEnvironment', true, false)
+    return delay(1000)
   })
 
   describe('IntegratedTerminal', () => {
-    it('should be able to open a terminal', async () => {
-      const disposable = Disposable.fn()
-
-      let eventCount = 0
-      disposable.track(
-        window.onDidOpenTerminal(event => {
-          eventCount += 1
-          expect(event.creationOptions?.name).to.equal('DVC')
-        })
-      )
-      disposable.track(IntegratedTerminal)
-
-      await IntegratedTerminal.openCurrentInstance()
-      await waitForAndDispose(disposable)
-
-      expect(eventCount).to.equal(1)
-    }).timeout(20000)
-
-    it('should be able to run a command', async () => {
-      const disposable = Disposable.fn()
-      const text = 'some-really-long-string'
-      let eventStream = ''
-      disposable.track(
-        window.onDidWriteTerminalData(event => {
-          eventStream += event.data
-        })
-      )
-      disposable.track(IntegratedTerminal)
-
-      await IntegratedTerminal.run('echo ' + text)
-      await waitForAndDispose(disposable)
-
-      expect(eventStream.includes(text)).to.be.true
-    }).timeout(12000)
-
-    it('should be able to run multiple commands in the same terminal', async () => {
+    it('should be able to run multiple commands in the same terminal after the python environment is initialized', async () => {
       const disposable = Disposable.fn()
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
@@ -81,46 +47,20 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + firstText)
-      await delay(200)
+      await delay(500)
       await IntegratedTerminal.run('echo ' + secondText)
       await waitForAndDispose(disposable)
 
+      expect(eventStream.includes(envFolder)).to.be.true
+      expect(eventStream.includes(firstText)).to.be.true
+      expect(eventStream.indexOf(envFolder)).to.be.lessThan(
+        eventStream.indexOf(firstText)
+      )
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
       expect(eventStream.indexOf(firstText)).to.be.lessThan(
         eventStream.indexOf(secondText)
       )
-    }).timeout(12000)
-
-    it('should be able to run a command after the python environment is initialized', async () => {
-      const disposable = Disposable.fn()
-      const envFolder = '.env/bin/'
-      workspace
-        .getConfiguration()
-        .update('python.pythonPath', envFolder + 'python3.9', false)
-      workspace
-        .getConfiguration()
-        .update('python.terminal.activateEnvironment', true, false)
-
-      await delay(1500)
-
-      const text = 'some-different-long-string'
-      let eventStream = ''
-      disposable.track(
-        window.onDidWriteTerminalData(event => {
-          eventStream += event.data
-        })
-      )
-      disposable.track(IntegratedTerminal)
-
-      await IntegratedTerminal.run('echo ' + text)
-      await waitForAndDispose(disposable, 1500)
-
-      expect(eventStream.includes(envFolder)).to.be.true
-      expect(eventStream.includes(text)).to.be.true
-      expect(eventStream.indexOf(envFolder)).to.be.lessThan(
-        eventStream.indexOf(text)
-      )
-    }).timeout(14000)
+    }).timeout(20000)
   })
 })
