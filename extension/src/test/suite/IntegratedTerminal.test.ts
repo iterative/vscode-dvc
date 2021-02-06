@@ -70,7 +70,7 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + firstText)
-      await delay(200)
+      await delay(500)
       await IntegratedTerminal.run('echo ' + secondText)
       await waitForAndDispose(disposable)
 
