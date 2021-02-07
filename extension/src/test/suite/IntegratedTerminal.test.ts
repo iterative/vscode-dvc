@@ -1,7 +1,7 @@
-import { describe, it, before, beforeEach } from 'mocha'
+import { describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
-import { window, workspace } from 'vscode'
+import { window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { delay } from '../../util'
 import { Disposable } from '../../extension'
@@ -21,17 +21,6 @@ suite('Integrated Terminal Test Suite', () => {
     await delay(ms)
   }
 
-  before(() => {
-    workspace.getConfiguration().update('python.showStartPage', false, true)
-  })
-
-  beforeEach(() => {
-    workspace.getConfiguration().update('python.pythonPath', undefined, false)
-    workspace
-      .getConfiguration()
-      .update('python.terminal.activateEnvironment', false, false)
-  })
-
   describe('IntegratedTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
@@ -49,7 +38,7 @@ suite('Integrated Terminal Test Suite', () => {
       await waitForAndDispose(disposable)
 
       expect(eventCount).to.equal(1)
-    }).timeout(20000)
+    }).timeout(12000)
 
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
@@ -81,7 +70,7 @@ suite('Integrated Terminal Test Suite', () => {
       disposable.track(IntegratedTerminal)
 
       await IntegratedTerminal.run('echo ' + firstText)
-      await delay(200)
+      await delay(500)
       await IntegratedTerminal.run('echo ' + secondText)
       await waitForAndDispose(disposable)
 
@@ -91,36 +80,5 @@ suite('Integrated Terminal Test Suite', () => {
         eventStream.indexOf(secondText)
       )
     }).timeout(12000)
-
-    it('should be able to run a command after the python environment is initialized', async () => {
-      const disposable = Disposable.fn()
-      const envFolder = '.env/bin/'
-      workspace
-        .getConfiguration()
-        .update('python.pythonPath', envFolder + 'python3.9', false)
-      workspace
-        .getConfiguration()
-        .update('python.terminal.activateEnvironment', true, false)
-
-      await delay(1500)
-
-      const text = 'some-different-long-string'
-      let eventStream = ''
-      disposable.track(
-        window.onDidWriteTerminalData(event => {
-          eventStream += event.data
-        })
-      )
-      disposable.track(IntegratedTerminal)
-
-      await IntegratedTerminal.run('echo ' + text)
-      await waitForAndDispose(disposable, 1500)
-
-      expect(eventStream.includes(envFolder)).to.be.true
-      expect(eventStream.includes(text)).to.be.true
-      expect(eventStream.indexOf(envFolder)).to.be.lessThan(
-        eventStream.indexOf(text)
-      )
-    }).timeout(14000)
   })
 })

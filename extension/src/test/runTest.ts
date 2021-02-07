@@ -1,11 +1,6 @@
-import { spawnSync } from 'child_process'
 import { resolve } from 'path'
 
-import {
-  downloadAndUnzipVSCode,
-  resolveCliPathFromVSCodeExecutablePath,
-  runTests
-} from 'vscode-test'
+import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
 
 async function main() {
   try {
@@ -17,21 +12,10 @@ async function main() {
 
     const workspacePath = resolve(__dirname, '../../../demo')
 
-    const cliPath = resolveCliPathFromVSCodeExecutablePath(vscodeExecutablePath)
-
-    spawnSync(
-      cliPath,
-      ['--install-extension', 'ms-python.python', '--enable-proposed-api'],
-      {
-        encoding: 'utf-8',
-        stdio: 'inherit'
-      }
-    )
-
     await runTests({
       extensionDevelopmentPath,
       extensionTestsPath,
-      launchArgs: [workspacePath],
+      launchArgs: ['--disable-extensions', workspacePath],
       vscodeExecutablePath
     })
   } catch (err) {
