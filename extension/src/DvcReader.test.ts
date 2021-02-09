@@ -14,7 +14,7 @@ const mockedExecPromise: any = execPromise
 const extensionDirectory = path.resolve(__dirname, '..')
 
 test('Inferring default options on a directory with accessible .env', async () => {
-  ;(fs.accessSync as any).mockImplementationOnce(() => true)
+  mockedFs.accessSync.mockImplementationOnce(() => true)
 
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
     bin: path.join(extensionDirectory, '.env', 'bin', 'dvc'),
