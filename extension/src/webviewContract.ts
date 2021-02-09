@@ -3,25 +3,38 @@ import { ExperimentsRepoJSONOutput } from './DvcReader'
 export interface WindowWithWebviewData {
   webviewData: {
     publicPath: string
-    theme: 'light' | 'dark'
+    theme: WebviewColorTheme
   }
 }
 
-// Use union type to add more messages
+export enum WebviewColorTheme {
+  light = 'light',
+  dark = 'dark'
+}
 
 export type MessageFromWebview = {
-  kind: 'initialized' | 'onClickRunExperiment'
+  kind: MessageFromWebviewKind
+}
+
+export enum MessageFromWebviewKind {
+  initialized = 'initialized',
+  onClickRunExperiment = 'onClickRunExperiment'
 }
 
 export type MessageToWebview = {
   errors?: Error[]
 } & (
   | {
-      kind: 'setTheme'
-      theme: 'light' | 'dark'
+      kind: MessageToWebviewKind.setTheme
+      theme: WebviewColorTheme
     }
   | {
-      kind: 'showExperiments'
+      kind: MessageToWebviewKind.showExperiments
       tableData?: ExperimentsRepoJSONOutput | null
     }
 )
+
+export enum MessageToWebviewKind {
+  setTheme = 'setTheme',
+  showExperiments = 'showExperiments'
+}

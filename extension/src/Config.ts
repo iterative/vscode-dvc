@@ -7,6 +7,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
+import { WebviewColorTheme } from './webviewContract'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -20,14 +21,11 @@ export class Config {
     return <string>this.config.get('dvc.dvcPath')
   }
 
-  public get theme(): 'light' | 'dark' {
-    if (this._vsCodeTheme.kind === ColorThemeKind.Light) {
-      return 'light'
-    }
+  public get theme(): WebviewColorTheme {
     if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
-      return 'dark'
+      return WebviewColorTheme.dark
     }
-    return 'light'
+    return WebviewColorTheme.light
   }
 
   constructor() {
