@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { inferDefaultOptions, getExperiments } from './DvcReader'
+import { inferDefaultOptions, getExperiments, runExperiment } from './DvcReader'
 import fs from 'fs'
 import { execPromise } from './util'
 import complexExperimentsOutput from 'dvc-vscode-webview/src/stories/complex-experiments-output.json'
@@ -12,6 +12,11 @@ const mockedFs: any = fs
 const mockedExecPromise: any = execPromise
 
 const extensionDirectory = path.resolve(__dirname, '..')
+
+const testReaderOptions = {
+  bin: 'dvc',
+  cwd: path.resolve()
+}
 
 test('Inferring default options on a directory with accessible .env', async () => {
   mockedFs.accessSync.mockImplementationOnce(() => true)
@@ -39,10 +44,16 @@ test('Command-mocked getExperiments matches a snapshot when parsed', async () =>
     stdout: JSON.stringify(complexExperimentsOutput)
   }))
 
-  expect(
-    await getExperiments({
-      bin: 'dvc',
-      cwd: path.resolve()
-    })
-  ).toMatchSnapshot()
+  const experiments = await getExperiments(testReaderOptions)
+
+  expect(experiments).toMatchSnapshot()
+})
+
+test('Command-mocked runExperiment matches a snapshot', async () => {
+  mockedExecPromise.mockImplementationOnce(async () => ({
+    stdout: 'This is test DVC log output'
+  }))
+
+  const output = await runExperiment(testReaderOptions)
+  expect(output).toMatchSnapshot()
 })

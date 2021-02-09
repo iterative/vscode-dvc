@@ -37,7 +37,7 @@ export interface ExperimentsRepoJSONOutput
 export const inferDefaultOptions: (
   cwd: string
 ) => Promise<ReaderOptions> = async cwd => {
-  const envDvcPath = path.resolve(cwd || '.', '.env', 'bin', 'dvc')
+  const envDvcPath = path.resolve(cwd, '.env', 'bin', 'dvc')
   let bin
   try {
     accessSync(envDvcPath)
