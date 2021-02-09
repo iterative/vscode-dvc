@@ -6,7 +6,9 @@ import { autorun } from 'mobx'
 import { Config } from './Config'
 import {
   MessageFromWebview,
+  MessageFromWebviewKind,
   MessageToWebview,
+  MessageToWebviewKind,
   WindowWithWebviewData
 } from './webviewContract'
 import { ExperimentsRepoJSONOutput } from './DvcReader'
@@ -65,7 +67,7 @@ export class DvcWebview {
         // Update theme changes
         const { theme } = config
         await this.initialized // Read all mobx dependencies before await
-        this.sendMessage({ kind: 'setTheme', theme })
+        this.sendMessage({ kind: MessageToWebviewKind.setTheme, theme })
       })
     })
   }
@@ -140,11 +142,11 @@ export class DvcWebview {
 
   private handleMessage(message: MessageFromWebview) {
     switch (message.kind) {
-      case 'initialized': {
+      case MessageFromWebviewKind.initialized: {
         this._initialized.resolve()
         return
       }
-      case 'onClickRunExperiment': {
+      case MessageFromWebviewKind.onClickRunExperiment: {
         commands.executeCommand('dvc.runExperiment')
         return
       }
@@ -161,7 +163,7 @@ export class DvcWebview {
     } = {}
   ): void {
     this.sendMessage({
-      kind: 'showExperiments',
+      kind: MessageToWebviewKind.showExperiments,
       ...payload
     })
   }
