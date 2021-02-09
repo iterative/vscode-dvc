@@ -1,6 +1,9 @@
 import {
   MessageFromWebview,
+  MessageFromWebviewKind,
   MessageToWebview,
+  MessageToWebviewKind,
+  WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webviewContract'
 import { autorun, makeObservable, observable } from 'mobx'
@@ -22,7 +25,7 @@ export class Model {
   public readonly dispose = Disposable.fn()
 
   @observable
-  public theme: 'dark' | 'light' = 'light'
+  public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
   public experiments?: ExperimentsRepoJSONOutput | null = null
@@ -51,7 +54,7 @@ export class Model {
       this.setState(state)
     }
 
-    this.sendMessage({ kind: 'initialized' })
+    this.sendMessage({ kind: MessageFromWebviewKind.initialized })
 
     this.dispose.track({
       dispose: autorun(() => {
@@ -84,10 +87,10 @@ export class Model {
   private handleMessage(message: MessageToWebview): void {
     this.errors = message.errors || undefined
     switch (message.kind) {
-      case 'setTheme':
+      case MessageToWebviewKind.setTheme:
         this.theme = message.theme
         return
-      case 'showExperiments':
+      case MessageToWebviewKind.showExperiments:
         this.experiments = message.tableData
         return
       default:

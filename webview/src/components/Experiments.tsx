@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
-} from 'dvc/src/DvcReader'
+} from 'dvc/src/DvcReader' // these need to come through the contract
 import {
   TableInstance,
   Row,
@@ -23,6 +23,7 @@ import parseExperiments from '../util/parse-experiments'
 import styles from './table-styles.module.scss'
 
 import buildDynamicColumns from './build-dynamic-columns'
+import { MessageFromWebviewKind } from 'dvc/src/webviewContract'
 
 const { useMemo, useEffect } = React
 
@@ -225,7 +226,9 @@ const Experiments: React.FC<{
       <h1 className={cx(styles.experimentsHeading, styles.pageHeading)} />
       <button
         onClick={() => {
-          vsCodeApi.postMessage({ kind: 'onClickRunExperiment' })
+          vsCodeApi.postMessage({
+            kind: MessageFromWebviewKind.onClickRunExperiment
+          })
         }}
       >
         Run Experiment
