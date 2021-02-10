@@ -1,8 +1,8 @@
 import {
   MessageFromWebview,
-  MessageFromWebviewKind,
+  MessageFromWebviewType,
   MessageToWebview,
-  MessageToWebviewKind,
+  MessageToWebviewType,
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webviewContract'
@@ -54,7 +54,7 @@ export class Model {
       this.setState(state)
     }
 
-    this.sendMessage({ kind: MessageFromWebviewKind.initialized })
+    this.sendMessage({ type: MessageFromWebviewType.initialized })
 
     this.dispose.track({
       dispose: autorun(() => {
@@ -86,11 +86,11 @@ export class Model {
 
   private handleMessage(message: MessageToWebview): void {
     this.errors = message.errors || undefined
-    switch (message.kind) {
-      case MessageToWebviewKind.setTheme:
+    switch (message.type) {
+      case MessageToWebviewType.setTheme:
         this.theme = message.theme
         return
-      case MessageToWebviewKind.showExperiments:
+      case MessageToWebviewType.showExperiments:
         this.experiments = message.tableData
         return
       default:
