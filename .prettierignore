@@ -2,3 +2,4 @@ dist
 demo
 .vscode-test
 storybook-static
+coverage
