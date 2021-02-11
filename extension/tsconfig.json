@@ -12,5 +12,6 @@
     "experimentalDecorators": true,
     "esModuleInterop": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["**/__mocks__/"]
 }
