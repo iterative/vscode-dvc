@@ -23,6 +23,8 @@ const testReaderOptions = {
 }
 
 test('Inferring default options on a directory with accessible .env', async () => {
+  mockedFs.accessSync.mockReturnValue()
+
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
     bin: path.join(extensionDirectory, '.env', 'bin', 'dvc'),
     cwd: extensionDirectory
@@ -30,7 +32,7 @@ test('Inferring default options on a directory with accessible .env', async () =
 })
 
 test('Inferring default options on a directory without .env', async () => {
-  mockedFs.accessSync.mockImplementationOnce(() => {
+  mockedFs.accessSync.mockImplementation(() => {
     throw new Error('Mocked access fail')
   })
 
@@ -48,12 +50,7 @@ test('Command-mocked getExperiments matches a snapshot when parsed', async () =>
     }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
   )
 
-  expect(
-    await getExperiments({
-      bin: 'dvc',
-      cwd: path.resolve()
-    })
-  ).toMatchSnapshot()
+  expect(await getExperiments(testReaderOptions)).toMatchSnapshot()
 })
 
 test('Command-mocked runExperiment matches a snapshot', async () => {
@@ -63,6 +60,5 @@ test('Command-mocked runExperiment matches a snapshot', async () => {
     }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
   )
 
-  const output = await runExperiment(testReaderOptions)
-  expect(output).toMatchSnapshot()
+  expect(await runExperiment(testReaderOptions)).toMatchSnapshot()
 })
