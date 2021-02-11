@@ -7,7 +7,7 @@ import { execPromise } from './util'
 import complexExperimentsOutput from 'dvc-vscode-webview/src/stories/complex-experiments-output.json'
 import { PromiseWithChild } from 'child_process'
 
-jest.mock('fs', () => jest.createMockFromModule('fs'))
+jest.mock('fs')
 jest.mock('./util')
 
 const mockedFs = mocked(fs)
