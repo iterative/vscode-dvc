@@ -13,11 +13,11 @@ jest.mock('./util')
 const mockedFs = mocked(fs)
 const mockedExecPromise = mocked(execPromise)
 
+mockedFs.accessSync.mockReturnValue()
+
 const extensionDirectory = path.resolve(__dirname, '..')
 
 test('Inferring default options on a directory with accessible .env', async () => {
-  mockedFs.accessSync.mockImplementationOnce(() => true)
-
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
     bin: path.join(extensionDirectory, '.env', 'bin', 'dvc'),
     cwd: extensionDirectory
@@ -26,8 +26,7 @@ test('Inferring default options on a directory with accessible .env', async () =
 
 test('Inferring default options on a directory without .env', async () => {
   mockedFs.accessSync.mockImplementationOnce(() => {
-    const e = new Error('Mocked access fail')
-    throw e
+    throw new Error('Mocked access fail')
   })
 
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
@@ -37,12 +36,11 @@ test('Inferring default options on a directory without .env', async () => {
 })
 
 test('Command-mocked getExperiments matches a snapshot when parsed', async () => {
-  mockedExecPromise.mockImplementationOnce(
-    () =>
-      (Promise.resolve({
-        stdout: JSON.stringify(complexExperimentsOutput),
-        stderr: ''
-      }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
+  mockedExecPromise.mockReturnValue(
+    (Promise.resolve({
+      stdout: JSON.stringify(complexExperimentsOutput),
+      stderr: ''
+    }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
   )
 
   expect(
