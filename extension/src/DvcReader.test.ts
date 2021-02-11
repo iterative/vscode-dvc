@@ -13,14 +13,16 @@ jest.mock('./util')
 const mockedFs = mocked(fs)
 const mockedExecPromise = mocked(execPromise)
 
-mockedFs.accessSync.mockReturnValue()
-
 const extensionDirectory = path.resolve(__dirname, '..')
 
 const testReaderOptions = {
   bin: 'dvc',
   cwd: path.resolve()
 }
+
+beforeEach(() => {
+  jest.resetAllMocks()
+})
 
 test('Inferring default options on a directory with accessible .env', async () => {
   mockedFs.accessSync.mockReturnValue()
