@@ -13,10 +13,10 @@ export enum WebviewColorTheme {
 }
 
 export type MessageFromWebview = {
-  kind: MessageFromWebviewKind
+  type: MessageFromWebviewType
 }
 
-export enum MessageFromWebviewKind {
+export enum MessageFromWebviewType {
   initialized = 'initialized',
   onClickRunExperiment = 'onClickRunExperiment'
 }
@@ -25,16 +25,16 @@ export type MessageToWebview = {
   errors?: Error[]
 } & (
   | {
-      kind: MessageToWebviewKind.setTheme
+      type: MessageToWebviewType.setTheme
       theme: WebviewColorTheme
     }
   | {
-      kind: MessageToWebviewKind.showExperiments
+      type: MessageToWebviewType.showExperiments
       tableData?: ExperimentsRepoJSONOutput | null
     }
 )
 
-export enum MessageToWebviewKind {
+export enum MessageToWebviewType {
   setTheme = 'setTheme',
   showExperiments = 'showExperiments'
 }

@@ -1,15 +1,19 @@
 import path from 'path'
+import { mocked } from 'ts-jest/utils'
 
 import { inferDefaultOptions, getExperiments, runExperiment } from './DvcReader'
 import fs from 'fs'
 import { execPromise } from './util'
 import complexExperimentsOutput from 'dvc-vscode-webview/src/stories/complex-experiments-output.json'
+import { PromiseWithChild } from 'child_process'
 
 jest.mock('fs')
 jest.mock('./util')
 
-const mockedFs: any = fs
-const mockedExecPromise: any = execPromise
+const mockedFs = mocked(fs)
+const mockedExecPromise = mocked(execPromise)
+
+mockedFs.accessSync.mockReturnValue()
 
 const extensionDirectory = path.resolve(__dirname, '..')
 
@@ -19,8 +23,6 @@ const testReaderOptions = {
 }
 
 test('Inferring default options on a directory with accessible .env', async () => {
-  mockedFs.accessSync.mockImplementationOnce(() => true)
-
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
     bin: path.join(extensionDirectory, '.env', 'bin', 'dvc'),
     cwd: extensionDirectory
@@ -29,8 +31,7 @@ test('Inferring default options on a directory with accessible .env', async () =
 
 test('Inferring default options on a directory without .env', async () => {
   mockedFs.accessSync.mockImplementationOnce(() => {
-    const e = new Error('Mocked access fail')
-    throw e
+    throw new Error('Mocked access fail')
   })
 
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
@@ -40,19 +41,27 @@ test('Inferring default options on a directory without .env', async () => {
 })
 
 test('Command-mocked getExperiments matches a snapshot when parsed', async () => {
-  mockedExecPromise.mockImplementationOnce(async () => ({
-    stdout: JSON.stringify(complexExperimentsOutput)
-  }))
+  mockedExecPromise.mockReturnValue(
+    (Promise.resolve({
+      stdout: JSON.stringify(complexExperimentsOutput),
+      stderr: ''
+    }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
+  )
 
-  const experiments = await getExperiments(testReaderOptions)
-
-  expect(experiments).toMatchSnapshot()
+  expect(
+    await getExperiments({
+      bin: 'dvc',
+      cwd: path.resolve()
+    })
+  ).toMatchSnapshot()
 })
 
 test('Command-mocked runExperiment matches a snapshot', async () => {
-  mockedExecPromise.mockImplementationOnce(async () => ({
-    stdout: 'This is test DVC log output'
-  }))
+  mockedExecPromise.mockReturnValue(
+    (Promise.resolve({
+      stdout: 'This is test DVC log output'
+    }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
+  )
 
   const output = await runExperiment(testReaderOptions)
   expect(output).toMatchSnapshot()
