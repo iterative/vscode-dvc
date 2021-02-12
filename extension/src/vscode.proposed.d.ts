@@ -37,19 +37,19 @@ declare module 'vscode' {
    */
   export interface AuthenticationProviderAuthenticationSessionsChangeEvent {
     /**
-     * The ids of the [AuthenticationSession](#AuthenticationSession)s that have been added.
+     * The [AuthenticationSession](#AuthenticationSession)s of the [AuthenticationProvider](#AuthentiationProvider) that have been added.
      */
-    readonly added: ReadonlyArray<string>
+    readonly added: ReadonlyArray<AuthenticationSession>
 
     /**
-     * The ids of the [AuthenticationSession](#AuthenticationSession)s that have been removed.
+     * The [AuthenticationSession](#AuthenticationSession)s of the [AuthenticationProvider](#AuthentiationProvider) that have been removed.
      */
-    readonly removed: ReadonlyArray<string>
+    readonly removed: ReadonlyArray<AuthenticationSession>
 
     /**
-     * The ids of the [AuthenticationSession](#AuthenticationSession)s that have been changed.
+     * The [AuthenticationSession](#AuthenticationSession)s of the [AuthenticationProvider](#AuthentiationProvider) that have been changed.
      */
-    readonly changed: ReadonlyArray<string>
+    readonly changed: ReadonlyArray<AuthenticationSession>
   }
 
   /**
@@ -66,22 +66,32 @@ declare module 'vscode' {
 
     /**
      * Returns an array of current sessions.
+     *
+     * TODO @RMacfarlane finish deprecating this and remove it
      */
     // eslint-disable-next-line vscode-dts-provider-naming
-    getSessions(): Thenable<ReadonlyArray<AuthenticationSession>>
+    getAllSessions(): Thenable<ReadonlyArray<AuthenticationSession>>
+
+    /**
+     * Returns an array of current sessions.
+     */
+    // eslint-disable-next-line vscode-dts-provider-naming
+    getSessions(
+      scopes: string[]
+    ): Thenable<ReadonlyArray<AuthenticationSession>>
 
     /**
      * Prompts a user to login.
      */
     // eslint-disable-next-line vscode-dts-provider-naming
-    login(scopes: string[]): Thenable<AuthenticationSession>
+    createSession(scopes: string[]): Thenable<AuthenticationSession>
 
     /**
      * Removes the session corresponding to session id.
      * @param sessionId The session id to log out of
      */
     // eslint-disable-next-line vscode-dts-provider-naming
-    logout(sessionId: string): Thenable<void>
+    removeSession(sessionId: string): Thenable<void>
   }
 
   /**
@@ -1071,100 +1081,11 @@ declare module 'vscode' {
 
   //#endregion
 
-  //#region notebook https://github.com/microsoft/vscode/issues/106744
+  //#region https://github.com/microsoft/vscode/issues/106744, Notebooks (misc)
 
   export enum CellKind {
     Markdown = 1,
     Code = 2
-  }
-
-  export enum CellOutputKind {
-    Text = 1,
-    Error = 2,
-    Rich = 3
-  }
-
-  export interface CellStreamOutput {
-    outputKind: CellOutputKind.Text
-    text: string
-  }
-
-  export interface CellErrorOutput {
-    outputKind: CellOutputKind.Error
-    /**
-     * Exception Name
-     */
-    ename: string
-    /**
-     * Exception Value
-     */
-    evalue: string
-    /**
-     * Exception call stack
-     */
-    traceback: string[]
-  }
-
-  export interface NotebookCellOutputMetadata {
-    /**
-     * Additional attributes of a cell metadata.
-     */
-    custom?: { [key: string]: any }
-  }
-
-  export interface CellDisplayOutput {
-    outputKind: CellOutputKind.Rich
-    /**
-     * { mime_type: value }
-     *
-     * Example:
-     * ```json
-     * {
-     *   "outputKind": vscode.CellOutputKind.Rich,
-     *   "data": {
-     *      "text/html": [
-     *          "<h1>Hello</h1>"
-     *       ],
-     *      "text/plain": [
-     *        "<IPython.lib.display.IFrame at 0x11dee3e80>"
-     *      ]
-     *   }
-     * }
-     */
-    data: { [key: string]: any }
-
-    readonly metadata?: NotebookCellOutputMetadata
-  }
-
-  export type CellOutput =
-    | CellStreamOutput
-    | CellErrorOutput
-    | CellDisplayOutput
-
-  export class NotebookCellOutputItem {
-    readonly mime: string
-    readonly value: unknown
-    readonly metadata?: Record<string, string | number | boolean>
-
-    constructor(
-      mime: string,
-      value: unknown,
-      metadata?: Record<string, string | number | boolean>
-    )
-  }
-
-  //TODO@jrieken add id?
-  export class NotebookCellOutput {
-    readonly outputs: NotebookCellOutputItem[]
-    readonly metadata?: Record<string, string | number | boolean>
-
-    constructor(
-      outputs: NotebookCellOutputItem[],
-      metadata?: Record<string, string | number | boolean>
-    )
-
-    //TODO@jrieken HACK to workaround dependency issues...
-    toJSON(): any
   }
 
   export enum NotebookCellRunState {
@@ -1179,6 +1100,8 @@ declare module 'vscode' {
     Idle = 2
   }
 
+  // TODO@API
+  // make this a class, allow modified using with-pattern
   export interface NotebookCellMetadata {
     /**
      * Controls whether a cell's editor is editable/readonly.
@@ -1186,47 +1109,10 @@ declare module 'vscode' {
     editable?: boolean
 
     /**
-     * Controls if the cell is executable.
-     * This metadata is ignored for markdown cell.
-     */
-    runnable?: boolean
-
-    /**
      * Controls if the cell has a margin to support the breakpoint UI.
      * This metadata is ignored for markdown cell.
      */
     breakpointMargin?: boolean
-
-    /**
-     * Whether the [execution order](#NotebookCellMetadata.executionOrder) indicator will be displayed.
-     * Defaults to true.
-     */
-    hasExecutionOrder?: boolean
-
-    /**
-     * The order in which this cell was executed.
-     */
-    executionOrder?: number
-
-    /**
-     * A status message to be shown in the cell's status bar
-     */
-    statusMessage?: string
-
-    /**
-     * The cell's current run state
-     */
-    runState?: NotebookCellRunState
-
-    /**
-     * If the cell is running, the time at which the cell started running
-     */
-    runStartTime?: number
-
-    /**
-     * The total duration of the cell's last run
-     */
-    lastRunDuration?: number
 
     /**
      * Whether a code cell's editor is collapsed
@@ -1244,6 +1130,7 @@ declare module 'vscode' {
     custom?: { [key: string]: any }
   }
 
+  // todo@API support ids https://github.com/jupyter/enhancement-proposals/blob/master/62-cell-id/cell-id.md
   export interface NotebookCell {
     readonly index: number
     readonly notebook: NotebookDocument
@@ -1251,8 +1138,13 @@ declare module 'vscode' {
     readonly cellKind: CellKind
     readonly document: TextDocument
     readonly language: string
-    outputs: CellOutput[]
-    metadata: NotebookCellMetadata
+    readonly outputs: readonly NotebookCellOutput[]
+    readonly metadata: NotebookCellMetadata
+    /** @deprecated use WorkspaceEdit.replaceCellOutput */
+    // outputs: CellOutput[];
+    // readonly outputs2: NotebookCellOutput[];
+    /** @deprecated use WorkspaceEdit.replaceCellMetadata */
+    // metadata: NotebookCellMetadata;
   }
 
   export interface NotebookDocumentMetadata {
@@ -1263,40 +1155,16 @@ declare module 'vscode' {
     editable?: boolean
 
     /**
-     * Controls whether the full notebook can be run at once.
-     * Defaults to true
-     */
-    runnable?: boolean
-
-    /**
      * Default value for [cell editable metadata](#NotebookCellMetadata.editable).
      * Defaults to true.
      */
     cellEditable?: boolean
-
-    /**
-     * Default value for [cell runnable metadata](#NotebookCellMetadata.runnable).
-     * Defaults to true.
-     */
-    cellRunnable?: boolean
-
-    /**
-     * Default value for [cell hasExecutionOrder metadata](#NotebookCellMetadata.hasExecutionOrder).
-     * Defaults to true.
-     */
-    cellHasExecutionOrder?: boolean
-
     displayOrder?: GlobPattern[]
 
     /**
      * Additional attributes of the document metadata.
      */
     custom?: { [key: string]: any }
-
-    /**
-     * The document's current run state
-     */
-    runState?: NotebookRunState
 
     /**
      * Whether the document is trusted, default to true
@@ -1333,62 +1201,15 @@ declare module 'vscode' {
     readonly isUntitled: boolean
     readonly cells: ReadonlyArray<NotebookCell>
     readonly contentOptions: NotebookDocumentContentOptions
+    // todo@API
+    // - move to kernel -> control runnable state of a cell
+    // - remove from this type
     languages: string[]
-    metadata: NotebookDocumentMetadata
+    readonly metadata: NotebookDocumentMetadata
   }
 
-  export interface NotebookConcatTextDocument {
-    uri: Uri
-    isClosed: boolean
-    dispose(): void
-    onDidChange: Event<void>
-    version: number
-    getText(): string
-    getText(range: Range): string
-
-    offsetAt(position: Position): number
-    positionAt(offset: number): Position
-    validateRange(range: Range): Range
-    validatePosition(position: Position): Position
-
-    locationAt(positionOrRange: Position | Range): Location
-    positionAt(location: Location): Position
-    contains(uri: Uri): boolean
-  }
-
-  export interface WorkspaceEdit {
-    replaceNotebookMetadata(uri: Uri, value: NotebookDocumentMetadata): void
-    replaceNotebookCells(
-      uri: Uri,
-      start: number,
-      end: number,
-      cells: NotebookCellData[],
-      metadata?: WorkspaceEditEntryMetadata
-    ): void
-    replaceNotebookCellOutput(
-      uri: Uri,
-      index: number,
-      outputs: (NotebookCellOutput | CellOutput)[],
-      metadata?: WorkspaceEditEntryMetadata
-    ): void
-    replaceNotebookCellMetadata(
-      uri: Uri,
-      index: number,
-      cellMetadata: NotebookCellMetadata,
-      metadata?: WorkspaceEditEntryMetadata
-    ): void
-  }
-
-  export interface NotebookEditorEdit {
-    replaceMetadata(value: NotebookDocumentMetadata): void
-    replaceCells(start: number, end: number, cells: NotebookCellData[]): void
-    replaceCellOutput(
-      index: number,
-      outputs: (NotebookCellOutput | CellOutput)[]
-    ): void
-    replaceCellMetadata(index: number, metadata: NotebookCellMetadata): void
-  }
-
+  // todo@API maybe have a NotebookCellPosition sibling
+  // todo@API should be a class
   export interface NotebookCellRange {
     readonly start: number
     /**
@@ -1428,77 +1249,39 @@ declare module 'vscode' {
     /**
      * The primary selected cell on this notebook editor.
      */
+    // todo@API should not be undefined, rather a default
     readonly selection?: NotebookCell
+
+    // @rebornix
+    // todo@API should replace selection
+    // never empty!
+    // primary/secondary selections
+    // readonly selections: NotebookCellRange[];
 
     /**
      * The current visible ranges in the editor (vertically).
      */
     readonly visibleRanges: NotebookCellRange[]
 
+    revealRange(
+      range: NotebookCellRange,
+      revealType?: NotebookEditorRevealType
+    ): void
+
     /**
      * The column in which this editor shows.
      */
+    // @jrieken
+    // todo@API maybe never undefined because notebooks always show in the editor area (unlike text editors)
+    // maybe for notebook diff editor
     readonly viewColumn?: ViewColumn
 
     /**
      * Fired when the panel is disposed.
      */
+    // @rebornix REMOVE/REplace NotebookCommunication
+    // todo@API fishy? notebooks are public objects, there should be a "global" events for this
     readonly onDidDispose: Event<void>
-
-    /**
-     * Active kernel used in the editor
-     */
-    readonly kernel?: NotebookKernel
-
-    /**
-     * Fired when the output hosting webview posts a message.
-     */
-    readonly onDidReceiveMessage: Event<any>
-    /**
-     * Post a message to the output hosting webview.
-     *
-     * Messages are only delivered if the editor is live.
-     *
-     * @param message Body of the message. This must be a string or other json serializable object.
-     */
-    postMessage(message: any): Thenable<boolean>
-
-    /**
-     * Convert a uri for the local file system to one that can be used inside outputs webview.
-     */
-    asWebviewUri(localResource: Uri): Uri
-
-    /**
-     * Perform an edit on the notebook associated with this notebook editor.
-     *
-     * The given callback-function is invoked with an [edit-builder](#NotebookEditorEdit) which must
-     * be used to make edits. Note that the edit-builder is only valid while the
-     * callback executes.
-     *
-     * @param callback A function which can create edits using an [edit-builder](#NotebookEditorEdit).
-     * @return A promise that resolves with a value indicating if the edits could be applied.
-     */
-    edit(callback: (editBuilder: NotebookEditorEdit) => void): Thenable<boolean>
-
-    setDecorations(
-      decorationType: NotebookEditorDecorationType,
-      range: NotebookCellRange
-    ): void
-
-    revealRange(
-      range: NotebookCellRange,
-      revealType?: NotebookEditorRevealType
-    ): void
-  }
-
-  export interface NotebookOutputSelector {
-    mimeTypes?: string[]
-  }
-
-  export interface NotebookRenderRequest {
-    output: CellDisplayOutput
-    mimeType: string
-    outputId: string
   }
 
   export interface NotebookDocumentMetadataChangeEvent {
@@ -1518,15 +1301,6 @@ declare module 'vscode' {
      */
     readonly document: NotebookDocument
     readonly changes: ReadonlyArray<NotebookCellsChangeData>
-  }
-
-  export interface NotebookCellMoveEvent {
-    /**
-     * The affected document.
-     */
-    readonly document: NotebookDocument
-    readonly index: number
-    readonly newIndex: number
   }
 
   export interface NotebookCellOutputsChangeEvent {
@@ -1553,6 +1327,8 @@ declare module 'vscode' {
 
   export interface NotebookEditorSelectionChangeEvent {
     readonly notebookEditor: NotebookEditor
+    // @rebornix
+    // todo@API show NotebookCellRange[] instead
     readonly selection?: NotebookCell
   }
 
@@ -1561,11 +1337,13 @@ declare module 'vscode' {
     readonly visibleRanges: ReadonlyArray<NotebookCellRange>
   }
 
+  // todo@API support ids https://github.com/jupyter/enhancement-proposals/blob/master/62-cell-id/cell-id.md
   export interface NotebookCellData {
     readonly cellKind: CellKind
     readonly source: string
     readonly language: string
-    readonly outputs: CellOutput[]
+    // todo@API maybe use a separate data type?
+    readonly outputs: NotebookCellOutput[]
     readonly metadata: NotebookCellMetadata | undefined
   }
 
@@ -1573,70 +1351,6 @@ declare module 'vscode' {
     readonly cells: NotebookCellData[]
     readonly languages: string[]
     readonly metadata: NotebookDocumentMetadata
-  }
-
-  interface NotebookDocumentContentChangeEvent {
-    /**
-     * The document that the edit is for.
-     */
-    readonly document: NotebookDocument
-  }
-
-  interface NotebookDocumentEditEvent {
-    /**
-     * The document that the edit is for.
-     */
-    readonly document: NotebookDocument
-
-    /**
-     * Undo the edit operation.
-     *
-     * This is invoked by VS Code when the user undoes this edit. To implement `undo`, your
-     * extension should restore the document and editor to the state they were in just before this
-     * edit was added to VS Code's internal edit stack by `onDidChangeCustomDocument`.
-     */
-    undo(): Thenable<void> | void
-
-    /**
-     * Redo the edit operation.
-     *
-     * This is invoked by VS Code when the user redoes this edit. To implement `redo`, your
-     * extension should restore the document and editor to the state they were in just after this
-     * edit was added to VS Code's internal edit stack by `onDidChangeCustomDocument`.
-     */
-    redo(): Thenable<void> | void
-
-    /**
-     * Display name describing the edit.
-     *
-     * This will be shown to users in the UI for undo/redo operations.
-     */
-    readonly label?: string
-  }
-
-  interface NotebookDocumentBackup {
-    /**
-     * Unique identifier for the backup.
-     *
-     * This id is passed back to your extension in `openNotebook` when opening a notebook editor from a backup.
-     */
-    readonly id: string
-
-    /**
-     * Delete the current backup.
-     *
-     * This is called by VS Code when it is clear the current backup is no longer needed, such as when a new backup
-     * is made or when the file is saved.
-     */
-    delete(): void
-  }
-
-  interface NotebookDocumentBackupContext {
-    readonly destination: Uri
-  }
-
-  interface NotebookDocumentOpenContext {
-    readonly backupId?: string
   }
 
   /**
@@ -1669,6 +1383,191 @@ declare module 'vscode' {
      * Convert a uri for the local file system to one that can be used inside outputs webview.
      */
     asWebviewUri(localResource: Uri): Uri
+
+    // @rebornix
+    // readonly onDidDispose: Event<void>;
+  }
+
+  // export function registerNotebookKernel(selector: string, kernel: NotebookKernel): Disposable;
+
+  export interface NotebookDocumentShowOptions {
+    viewColumn?: ViewColumn
+    preserveFocus?: boolean
+    preview?: boolean
+    selection?: NotebookCellRange
+  }
+
+  export namespace notebook {
+    export function openNotebookDocument(
+      uri: Uri,
+      viewType?: string
+    ): Thenable<NotebookDocument>
+    export const onDidOpenNotebookDocument: Event<NotebookDocument>
+    export const onDidCloseNotebookDocument: Event<NotebookDocument>
+
+    // todo@API really needed?
+    export const onDidSaveNotebookDocument: Event<NotebookDocument>
+
+    /**
+     * All currently known notebook documents.
+     */
+    export const notebookDocuments: ReadonlyArray<NotebookDocument>
+    export const onDidChangeNotebookDocumentMetadata: Event<NotebookDocumentMetadataChangeEvent>
+    export const onDidChangeNotebookCells: Event<NotebookCellsChangeEvent>
+    export const onDidChangeCellOutputs: Event<NotebookCellOutputsChangeEvent>
+    export const onDidChangeCellLanguage: Event<NotebookCellLanguageChangeEvent>
+    export const onDidChangeCellMetadata: Event<NotebookCellMetadataChangeEvent>
+  }
+
+  export namespace window {
+    export const visibleNotebookEditors: NotebookEditor[]
+    export const onDidChangeVisibleNotebookEditors: Event<NotebookEditor[]>
+    export const activeNotebookEditor: NotebookEditor | undefined
+    export const onDidChangeActiveNotebookEditor: Event<
+      NotebookEditor | undefined
+    >
+    export const onDidChangeNotebookEditorSelection: Event<NotebookEditorSelectionChangeEvent>
+    export const onDidChangeNotebookEditorVisibleRanges: Event<NotebookEditorVisibleRangesChangeEvent>
+    export function showNotebookDocument(
+      document: NotebookDocument,
+      options?: NotebookDocumentShowOptions
+    ): Thenable<NotebookEditor>
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookCellOutput
+
+  // code specific mime types
+  // application/x.notebook.error-traceback
+  // application/x.notebook.stream
+  export class NotebookCellOutputItem {
+    // todo@API
+    // add factory functions for common mime types
+    // static textplain(value:string): NotebookCellOutputItem;
+    // static errortrace(value:any): NotebookCellOutputItem;
+
+    readonly mime: string
+    readonly value: unknown
+    readonly metadata?: Record<string, string | number | boolean | unknown>
+
+    constructor(
+      mime: string,
+      value: unknown,
+      metadata?: Record<string, string | number | boolean | unknown>
+    )
+  }
+
+  // @jrieken
+  //TODO@API add execution count to cell output?
+  export class NotebookCellOutput {
+    readonly id: string
+    readonly outputs: NotebookCellOutputItem[]
+    constructor(outputs: NotebookCellOutputItem[], id?: string)
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookEditorEdit
+
+  export interface WorkspaceEdit {
+    replaceNotebookMetadata(uri: Uri, value: NotebookDocumentMetadata): void
+
+    // todo@API use NotebookCellRange
+    replaceNotebookCells(
+      uri: Uri,
+      start: number,
+      end: number,
+      cells: NotebookCellData[],
+      metadata?: WorkspaceEditEntryMetadata
+    ): void
+    replaceNotebookCellMetadata(
+      uri: Uri,
+      index: number,
+      cellMetadata: NotebookCellMetadata,
+      metadata?: WorkspaceEditEntryMetadata
+    ): void
+
+    replaceNotebookCellOutput(
+      uri: Uri,
+      index: number,
+      outputs: NotebookCellOutput[],
+      metadata?: WorkspaceEditEntryMetadata
+    ): void
+    appendNotebookCellOutput(
+      uri: Uri,
+      index: number,
+      outputs: NotebookCellOutput[],
+      metadata?: WorkspaceEditEntryMetadata
+    ): void
+
+    // TODO@api
+    // https://jupyter-protocol.readthedocs.io/en/latest/messaging.html#update-display-data
+    replaceNotebookCellOutputItems(
+      uri: Uri,
+      index: number,
+      outputId: string,
+      items: NotebookCellOutputItem[],
+      metadata?: WorkspaceEditEntryMetadata
+    ): void
+    appendNotebookCellOutputItems(
+      uri: Uri,
+      index: number,
+      outputId: string,
+      items: NotebookCellOutputItem[],
+      metadata?: WorkspaceEditEntryMetadata
+    ): void
+  }
+
+  export interface NotebookEditorEdit {
+    replaceMetadata(value: NotebookDocumentMetadata): void
+    replaceCells(start: number, end: number, cells: NotebookCellData[]): void
+    replaceCellOutput(index: number, outputs: NotebookCellOutput[]): void
+    replaceCellMetadata(index: number, metadata: NotebookCellMetadata): void
+  }
+
+  export interface NotebookEditor {
+    /**
+     * Perform an edit on the notebook associated with this notebook editor.
+     *
+     * The given callback-function is invoked with an [edit-builder](#NotebookEditorEdit) which must
+     * be used to make edits. Note that the edit-builder is only valid while the
+     * callback executes.
+     *
+     * @param callback A function which can create edits using an [edit-builder](#NotebookEditorEdit).
+     * @return A promise that resolves with a value indicating if the edits could be applied.
+     */
+    // @jrieken REMOVE maybe
+    edit(callback: (editBuilder: NotebookEditorEdit) => void): Thenable<boolean>
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookContentProvider
+
+  interface NotebookDocumentBackup {
+    /**
+     * Unique identifier for the backup.
+     *
+     * This id is passed back to your extension in `openNotebook` when opening a notebook editor from a backup.
+     */
+    readonly id: string
+
+    /**
+     * Delete the current backup.
+     *
+     * This is called by VS Code when it is clear the current backup is no longer needed, such as when a new backup
+     * is made or when the file is saved.
+     */
+    delete(): void
+  }
+
+  interface NotebookDocumentBackupContext {
+    readonly destination: Uri
+  }
+
+  interface NotebookDocumentOpenContext {
+    readonly backupId?: string
   }
 
   export interface NotebookContentProvider {
@@ -1676,10 +1575,6 @@ declare module 'vscode' {
     readonly onDidChangeNotebookContentOptions?: Event<
       NotebookDocumentContentOptions
     >
-    readonly onDidChangeNotebook: Event<
-      NotebookDocumentContentChangeEvent | NotebookDocumentEditEvent
-    >
-
     /**
      * Content providers should always use [file system providers](#FileSystemProvider) to
      * resolve the raw content for `uri` as the resouce is not necessarily a file on disk.
@@ -1712,6 +1607,122 @@ declare module 'vscode' {
       context: NotebookDocumentBackupContext,
       cancellation: CancellationToken
     ): Thenable<NotebookDocumentBackup>
+
+    // ???
+    // provideKernels(document: NotebookDocument, token: CancellationToken): ProviderResult<T[]>;
+  }
+
+  export namespace notebook {
+    // TODO@api use NotebookDocumentFilter instead of just notebookType:string?
+    // TODO@API options duplicates the more powerful variant on NotebookContentProvider
+    export function registerNotebookContentProvider(
+      notebookType: string,
+      provider: NotebookContentProvider,
+      options?: NotebookDocumentContentOptions & {
+        /**
+         * Not ready for production or development use yet.
+         */
+        viewOptions?: {
+          displayName: string
+          filenamePattern: NotebookFilenamePattern[]
+          exclusive?: boolean
+        }
+      }
+    ): Disposable
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookKernel
+
+  export interface NotebookDocumentMetadata {
+    /**
+     * Controls whether the full notebook can be run at once.
+     * Defaults to true
+     */
+    // todo@API infer from kernel
+    // todo@API remove
+    runnable?: boolean
+
+    /**
+     * Default value for [cell runnable metadata](#NotebookCellMetadata.runnable).
+     * Defaults to true.
+     */
+    cellRunnable?: boolean
+
+    /**
+     * Default value for [cell hasExecutionOrder metadata](#NotebookCellMetadata.hasExecutionOrder).
+     * Defaults to true.
+     */
+    cellHasExecutionOrder?: boolean
+
+    /**
+     * The document's current run state
+     */
+    runState?: NotebookRunState
+  }
+
+  // todo@API use the NotebookCellExecution-object as a container to model and enforce
+  // the flow of a cell execution
+
+  // kernel -> execute_info
+  // ext -> createNotebookCellExecution(cell)
+  // kernel -> done
+  // exec.dispose();
+
+  // export interface NotebookCellExecution {
+  // 	dispose(): void;
+  // 	clearOutput(): void;
+  // 	appendOutput(out: NotebookCellOutput): void;
+  // 	replaceOutput(out: NotebookCellOutput): void;
+  //  appendOutputItems(output:string, items: NotebookCellOutputItem[]):void;
+  //  replaceOutputItems(output:string, items: NotebookCellOutputItem[]):void;
+  // }
+
+  // export function createNotebookCellExecution(cell: NotebookCell, startTime?: number): NotebookCellExecution;
+  // export const onDidStartNotebookCellExecution: Event<any>;
+  // export const onDidStopNotebookCellExecution: Event<any>;
+
+  export interface NotebookCellMetadata {
+    /**
+     * Controls if the cell is executable.
+     * This metadata is ignored for markdown cell.
+     */
+    // todo@API infer from kernel
+    runnable?: boolean
+
+    /**
+     * Whether the [execution order](#NotebookCellMetadata.executionOrder) indicator will be displayed.
+     * Defaults to true.
+     */
+    hasExecutionOrder?: boolean
+
+    /**
+     * The order in which this cell was executed.
+     */
+    executionOrder?: number
+
+    /**
+     * A status message to be shown in the cell's status bar
+     */
+    // todo@API duplicates status bar API
+    statusMessage?: string
+
+    /**
+     * The cell's current run state
+     */
+    runState?: NotebookCellRunState
+
+    /**
+     * If the cell is running, the time at which the cell started running
+     */
+    runStartTime?: number
+
+    /**
+     * The total duration of the cell's last run
+     */
+    // todo@API depends on having output
+    lastRunDuration?: number
   }
 
   export interface NotebookKernel {
@@ -1721,6 +1732,16 @@ declare module 'vscode' {
     detail?: string
     isPreferred?: boolean
     preloads?: Uri[]
+
+    // todo@API
+    // languages supported by kernel
+    // first is preferred
+    // languages: string[];
+
+    // @roblourens
+    // todo@API change to `executeCells(document: NotebookDocument, cells: NotebookCellRange[], context:{isWholeNotebooke: boolean}, token: CancelationToken): void;`
+    // todo@API interrupt vs cancellation, https://github.com/microsoft/vscode/issues/106741
+    // interrupt?():void;
     executeCell(document: NotebookDocument, cell: NotebookCell): void
     cancelCellExecution(document: NotebookDocument, cell: NotebookCell): void
     executeAllCells(document: NotebookDocument): void
@@ -1731,11 +1752,14 @@ declare module 'vscode' {
     | GlobPattern
     | { include: GlobPattern; exclude: GlobPattern }
 
+  // todo@API why not for NotebookContentProvider?
   export interface NotebookDocumentFilter {
     viewType?: string | string[]
     filenamePattern?: NotebookFilenamePattern
   }
 
+  // todo@API very unclear, provider MUST not return alive object but only data object
+  // todo@API unclear how the flow goes
   export interface NotebookKernelProvider<
     T extends NotebookKernel = NotebookKernel
   > {
@@ -1751,6 +1775,59 @@ declare module 'vscode' {
       token: CancellationToken
     ): ProviderResult<void>
   }
+
+  export interface NotebookEditor {
+    /**
+     * Active kernel used in the editor
+     */
+    // todo@API unsure about that
+    // kernel, kernel selection, kernel provider
+    readonly kernel?: NotebookKernel
+  }
+
+  export namespace notebook {
+    export const onDidChangeActiveNotebookKernel: Event<{
+      document: NotebookDocument
+      kernel: NotebookKernel | undefined
+    }>
+
+    export function registerNotebookKernelProvider(
+      selector: NotebookDocumentFilter,
+      provider: NotebookKernelProvider
+    ): Disposable
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookEditorDecorationType
+
+  export interface NotebookEditor {
+    setDecorations(
+      decorationType: NotebookEditorDecorationType,
+      range: NotebookCellRange
+    ): void
+  }
+
+  export interface NotebookDecorationRenderOptions {
+    backgroundColor?: string | ThemeColor
+    borderColor?: string | ThemeColor
+    top: ThemableDecorationAttachmentRenderOptions
+  }
+
+  export interface NotebookEditorDecorationType {
+    readonly key: string
+    dispose(): void
+  }
+
+  export namespace notebook {
+    export function createNotebookEditorDecorationType(
+      options: NotebookDecorationRenderOptions
+    ): NotebookEditorDecorationType
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookCellStatusBarItem
 
   /**
    * Represents the alignment of status bar items.
@@ -1780,82 +1857,7 @@ declare module 'vscode' {
     dispose(): void
   }
 
-  export interface NotebookDecorationRenderOptions {
-    backgroundColor?: string | ThemeColor
-    borderColor?: string | ThemeColor
-    top: ThemableDecorationAttachmentRenderOptions
-  }
-
-  export interface NotebookEditorDecorationType {
-    readonly key: string
-    dispose(): void
-  }
-
-  export interface NotebookDocumentShowOptions {
-    viewColumn?: ViewColumn
-    preserveFocus?: boolean
-    preview?: boolean
-    selection?: NotebookCellRange
-  }
-
   export namespace notebook {
-    export function registerNotebookContentProvider(
-      notebookType: string,
-      provider: NotebookContentProvider,
-      options?: NotebookDocumentContentOptions & {
-        /**
-         * Not ready for production or development use yet.
-         */
-        viewOptions?: {
-          displayName: string
-          filenamePattern: NotebookFilenamePattern[]
-          exclusive?: boolean
-        }
-      }
-    ): Disposable
-
-    export function registerNotebookKernelProvider(
-      selector: NotebookDocumentFilter,
-      provider: NotebookKernelProvider
-    ): Disposable
-
-    export function createNotebookEditorDecorationType(
-      options: NotebookDecorationRenderOptions
-    ): NotebookEditorDecorationType
-    export function openNotebookDocument(
-      uri: Uri,
-      viewType?: string
-    ): Thenable<NotebookDocument>
-    export const onDidOpenNotebookDocument: Event<NotebookDocument>
-    export const onDidCloseNotebookDocument: Event<NotebookDocument>
-    export const onDidSaveNotebookDocument: Event<NotebookDocument>
-
-    /**
-     * All currently known notebook documents.
-     */
-    export const notebookDocuments: ReadonlyArray<NotebookDocument>
-    export const onDidChangeNotebookDocumentMetadata: Event<NotebookDocumentMetadataChangeEvent>
-    export const onDidChangeNotebookCells: Event<NotebookCellsChangeEvent>
-    export const onDidChangeCellOutputs: Event<NotebookCellOutputsChangeEvent>
-    export const onDidChangeCellLanguage: Event<NotebookCellLanguageChangeEvent>
-    export const onDidChangeCellMetadata: Event<NotebookCellMetadataChangeEvent>
-    /**
-     * Create a document that is the concatenation of all  notebook cells. By default all code-cells are included
-     * but a selector can be provided to narrow to down the set of cells.
-     *
-     * @param notebook
-     * @param selector
-     */
-    export function createConcatTextDocument(
-      notebook: NotebookDocument,
-      selector?: DocumentSelector
-    ): NotebookConcatTextDocument
-
-    export const onDidChangeActiveNotebookKernel: Event<{
-      document: NotebookDocument
-      kernel: NotebookKernel | undefined
-    }>
-
     /**
      * Creates a notebook cell status bar [item](#NotebookCellStatusBarItem).
      * It will be disposed automatically when the notebook document is closed or the cell is deleted.
@@ -1865,6 +1867,8 @@ declare module 'vscode' {
      * @param priority The priority of the item. Higher values mean the item should be shown more to the left.
      * @return A new status bar item.
      */
+    // @roblourens
+    // todo@API this should be a provider, https://github.com/microsoft/vscode/issues/105809
     export function createCellStatusBarItem(
       cell: NotebookCell,
       alignment?: NotebookCellStatusBarAlignment,
@@ -1872,19 +1876,43 @@ declare module 'vscode' {
     ): NotebookCellStatusBarItem
   }
 
-  export namespace window {
-    export const visibleNotebookEditors: NotebookEditor[]
-    export const onDidChangeVisibleNotebookEditors: Event<NotebookEditor[]>
-    export const activeNotebookEditor: NotebookEditor | undefined
-    export const onDidChangeActiveNotebookEditor: Event<
-      NotebookEditor | undefined
-    >
-    export const onDidChangeNotebookEditorSelection: Event<NotebookEditorSelectionChangeEvent>
-    export const onDidChangeNotebookEditorVisibleRanges: Event<NotebookEditorVisibleRangesChangeEvent>
-    export function showNotebookDocument(
-      document: NotebookDocument,
-      options?: NotebookDocumentShowOptions
-    ): Thenable<NotebookEditor>
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106744, NotebookConcatTextDocument
+
+  export namespace notebook {
+    /**
+     * Create a document that is the concatenation of all  notebook cells. By default all code-cells are included
+     * but a selector can be provided to narrow to down the set of cells.
+     *
+     * @param notebook
+     * @param selector
+     */
+    // @jrieken REMOVE. p_never
+    // todo@API really needed? we didn't find a user here
+    export function createConcatTextDocument(
+      notebook: NotebookDocument,
+      selector?: DocumentSelector
+    ): NotebookConcatTextDocument
+  }
+
+  export interface NotebookConcatTextDocument {
+    uri: Uri
+    isClosed: boolean
+    dispose(): void
+    onDidChange: Event<void>
+    version: number
+    getText(): string
+    getText(range: Range): string
+
+    offsetAt(position: Position): number
+    positionAt(offset: number): Position
+    validateRange(range: Range): Range
+    validatePosition(position: Position): Position
+
+    locationAt(positionOrRange: Position | Range): Location
+    positionAt(location: Location): Position
+    contains(uri: Uri): boolean
   }
 
   //#endregion
@@ -2112,6 +2140,11 @@ declare module 'vscode' {
 
   //#region https://github.com/microsoft/vscode/issues/16221
 
+  // todo@API rename to InlayHint
+  // todo@API add "mini-markdown" for links and styles
+  // todo@API remove description
+  // (done:)  add InlayHintKind with type, argument, etc
+
   export namespace languages {
     /**
      * Register a inline hints provider.
@@ -2130,6 +2163,12 @@ declare module 'vscode' {
     ): Disposable
   }
 
+  export enum InlineHintKind {
+    Other = 0,
+    Type = 1,
+    Parameter = 2
+  }
+
   /**
    * Inline hint information.
    */
@@ -2142,9 +2181,10 @@ declare module 'vscode' {
      * The range of the hint.
      */
     range: Range
-    /**
-     * Tooltip when hover on the hint.
-     */
+
+    kind?: InlineHintKind
+
+    // todo@API remove this
     description?: string | MarkdownString
     /**
      * Whitespace before the hint.
@@ -2155,22 +2195,7 @@ declare module 'vscode' {
      */
     whitespaceAfter?: boolean
 
-    /**
-     * Creates a new inline hint information object.
-     *
-     * @param text The text of the hint.
-     * @param range The range of the hint.
-     * @param hoverMessage Tooltip when hover on the hint.
-     * @param whitespaceBefore Whitespace before the hint.
-     * @param whitespaceAfter TWhitespace after the hint.
-     */
-    constructor(
-      text: string,
-      range: Range,
-      description?: string | MarkdownString,
-      whitespaceBefore?: boolean,
-      whitespaceAfter?: boolean
-    )
+    constructor(text: string, range: Range, kind?: InlineHintKind)
   }
 
   /**
@@ -2248,11 +2273,13 @@ declare module 'vscode' {
     ): Disposable
 
     /**
-     * Runs tests with the given options. If no options are given, then
-     * all tests are run. Returns the resulting test run.
+     * Runs tests. The "run" contains the list of tests to run as well as a
+     * method that can be used to update their state. At the point in time
+     * that "run" is called, all tests given in the run have their state
+     * automatically set to {@link TestRunState.Queued}.
      */
     export function runTests<T extends TestItem>(
-      options: TestRunOptions<T>,
+      run: TestRunOptions<T>,
       cancellationToken?: CancellationToken
     ): Thenable<void>
 
@@ -2373,6 +2400,14 @@ declare module 'vscode' {
     readonly discoveredInitialTests?: Thenable<unknown>
 
     /**
+     * An event that fires when a test becomes outdated, as a result of
+     * file changes, for example. In "watch" mode, tests that are outdated
+     * will be automatically re-run after a short delay. Firing a test
+     * with children will mark the entire subtree as outdated.
+     */
+    readonly onDidInvalidateTest?: Event<T>
+
+    /**
      * Dispose will be called when there are no longer observers interested
      * in the hierarchy.
      */
@@ -2421,13 +2456,13 @@ declare module 'vscode' {
      */
     // eslint-disable-next-line vscode-dts-provider-naming
     runTests?(
-      options: TestRunOptions<T>,
+      options: TestRun<T>,
       cancellationToken: CancellationToken
     ): ProviderResult<void>
   }
 
   /**
-   * Options given to `TestProvider.runTests`
+   * Options given to {@link test.runTests}
    */
   export interface TestRunOptions<T extends TestItem = TestItem> {
     /**
@@ -2440,6 +2475,18 @@ declare module 'vscode' {
      * Whether or not tests in this run should be debugged.
      */
     debug: boolean
+  }
+
+  /**
+   * Options given to `TestProvider.runTests`
+   */
+  export interface TestRun<T extends TestItem = TestItem>
+    extends TestRunOptions<T> {
+    /**
+     * Updates the state of the test in the run. By default, all tests involved
+     * in the run will have a "queued" state until they are updated by this method.
+     */
+    setState(test: T, state: TestState): void
   }
 
   /**
@@ -2490,12 +2537,6 @@ declare module 'vscode' {
      * Optional list of nested tests for this item.
      */
     children?: TestItem[]
-
-    /**
-     * Test run state. Will generally be {@link TestRunState.Unset} by
-     * default.
-     */
-    state: TestState
   }
 
   /**
@@ -2532,11 +2573,11 @@ declare module 'vscode' {
    * in order to update it. This allows consumers to quickly and easily check
    * for changes via object identity.
    */
-  export class TestState {
+  export interface TestState {
     /**
      * Current state of the test.
      */
-    readonly runState: TestRunState
+    readonly state: TestRunState
 
     /**
      * Optional duration of the test run, in milliseconds.
@@ -2547,18 +2588,7 @@ declare module 'vscode' {
      * Associated test run message. Can, for example, contain assertion
      * failure information if the test fails.
      */
-    readonly messages: ReadonlyArray<Readonly<TestMessage>>
-
-    /**
-     * @param state Run state to hold in the test state
-     * @param messages List of associated messages for the test
-     * @param duration Length of time the test run took, if appropriate.
-     */
-    constructor(
-      runState: TestRunState,
-      messages?: TestMessage[],
-      duration?: number
-    )
+    readonly messages?: ReadonlyArray<Readonly<TestMessage>>
   }
 
   /**
@@ -2734,7 +2764,7 @@ declare module 'vscode' {
     /**
      * Register a new `ExternalUriOpener`.
      *
-     * When a uri is about to be opened, an `onUriOpen:SCHEME` activation event is fired.
+     * When a uri is about to be opened, an `onOpenExternalUri:SCHEME` activation event is fired.
      *
      * @param id Unique id of the opener, such as `myExtension.browserPreview`. This is used in settings
      *   and commands to identify the opener.
@@ -2772,7 +2802,7 @@ declare module 'vscode' {
     ): Thenable<boolean>
   }
 
-  //endregionn
+  //#endregion
 
   //#region https://github.com/Microsoft/vscode/issues/15178
 
@@ -2787,6 +2817,64 @@ declare module 'vscode' {
 
     // todo@API proper event type
     export const onDidChangeOpenEditors: Event<void>
+  }
+
+  //#endregion
+
+  //#region https://github.com/microsoft/vscode/issues/106488
+
+  export enum WorkspaceTrustState {
+    /**
+     * The workspace is untrusted, and it will have limited functionality.
+     */
+    Untrusted = 0,
+
+    /**
+     * The workspace is trusted, and all functionality will be available.
+     */
+    Trusted = 1,
+
+    /**
+     * The initial state of the workspace.
+     *
+     * If trust will be required, users will be prompted to make a choice.
+     */
+    Unknown = 2
+  }
+
+  /**
+   * The event data that is fired when the trust state of the workspace changes
+   */
+  export interface WorkspaceTrustStateChangeEvent {
+    /**
+     * Previous trust state of the workspace
+     */
+    previousTrustState: WorkspaceTrustState
+
+    /**
+     * Current trust state of the workspace
+     */
+    currentTrustState: WorkspaceTrustState
+  }
+
+  export namespace workspace {
+    /**
+     * The trust state of the current workspace
+     */
+    export const trustState: WorkspaceTrustState
+
+    /**
+     * Prompt the user to chose whether to trust the current workspace
+     * @param message Optional message which would be displayed in the prompt
+     */
+    export function requireWorkspaceTrust(
+      message?: string
+    ): Thenable<WorkspaceTrustState>
+
+    /**
+     * Event that fires when the trust state of the current workspace changes
+     */
+    export const onDidChangeWorkspaceTrustState: Event<WorkspaceTrustStateChangeEvent>
   }
 
   //#endregion
