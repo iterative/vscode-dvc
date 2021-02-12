@@ -27,11 +27,11 @@ beforeEach(() => {
 
   const { window } = new JSDOM()
   windowSpy = jest.spyOn(global, 'window', 'get')
-  windowSpy.mockImplementation(() => window)
   window.webviewData = {
     publicPath: 'some/path',
     theme: WebviewColorTheme.dark
   }
+  windowSpy.mockImplementation(() => window)
 })
 
 afterEach(() => {
