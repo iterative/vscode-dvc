@@ -3,5 +3,11 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  collectCoverage: true
+  collectCoverage: true,
+  moduleNameMapper: {
+    '\\.(scss|css|less)$': 'identity-obj-proxy'
+  },
+  globals: {
+    __webpack_public_path__: true
+  }
 }
