@@ -15,7 +15,7 @@ declare const window: Window & WindowWithWebviewData
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare let __webpack_public_path__: string
 
-export interface PersistedModelState {
+interface PersistedModelState {
   experiments?: ExperimentsRepoJSONOutput | null
 }
 
