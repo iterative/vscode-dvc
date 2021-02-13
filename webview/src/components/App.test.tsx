@@ -13,6 +13,19 @@ import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
 import { App } from './App'
 import complexExperimentsOutput from '../stories/complex-experiments-output.json'
+import { getVsCodeApi } from '../model/VsCodeApi'
+import {
+  MessageFromWebviewType,
+  MessageToWebviewType,
+  WebviewColorTheme
+} from 'dvc/src/webviewContract'
+
+jest.mock('../model/VsCodeApi')
+
+const { postMessage, getState } = getVsCodeApi()
+const mockGetVsCodeApi = mocked(getVsCodeApi)
+const mockPostMessage = mocked(postMessage)
+const mockGetState = mocked(getState)
 
 interface CustomWindow extends Window {
   webviewData: {
@@ -21,24 +34,10 @@ interface CustomWindow extends Window {
   }
 }
 
-import { getVsCodeApi } from '../model/VsCodeApi'
-import {
-  MessageFromWebviewType,
-  MessageToWebviewType,
-  WebviewColorTheme
-} from 'dvc/src/webviewContract'
-
-const { postMessage, getState } = getVsCodeApi()
-const mockGetVsCodeApi = mocked(getVsCodeApi)
-const mockPostMessage = mocked(postMessage)
-const mockGetState = mocked(getState)
-
-jest.mock('../model/VsCodeApi')
-
 let customWindow: CustomWindow
 beforeEach(() => {
   jest.clearAllMocks()
-  customWindow = (global as unknown) as CustomWindow
+  customWindow = (window as unknown) as CustomWindow
   customWindow.webviewData = {
     publicPath: '/some/path',
     theme: WebviewColorTheme.dark
