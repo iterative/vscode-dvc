@@ -1,6 +1,7 @@
 /* global window */
 
 import { Disposable } from '@hediet/std/disposable'
+import { addMessageHandler } from './window'
 
 interface InternalVsCodeApi {
   getState(): any
@@ -16,8 +17,6 @@ export interface VsCodeApi<TState, TMessageFromWebview, TMessageToWebview> {
   postMessage(message: TMessageFromWebview): void
   addMessageHandler(handler: (message: TMessageToWebview) => void): Disposable
 }
-
-type MessageEvent = Record<any, any>
 
 export function getVsCodeApi<
   TState,
@@ -36,19 +35,6 @@ export function getVsCodeApi<
     getState: () => api.getState(),
     setState: state => api.setState(state),
     postMessage: api.postMessage,
-    addMessageHandler: handler => {
-      const listener = (event: MessageEvent) => {
-        if (event.source === window) {
-          return
-        }
-        handler(event.data)
-      }
-      window.addEventListener('message', listener)
-      return {
-        dispose: () => {
-          window.removeEventListener('message', listener)
-        }
-      }
-    }
+    addMessageHandler
   }
 }
