@@ -1,16 +1,30 @@
 /**
  * @jest-environment jsdom
  */
-import { JSDOM } from 'jsdom'
 import React from 'react'
-import { render, cleanup, waitFor, screen } from '@testing-library/react'
+import {
+  render,
+  cleanup,
+  waitFor,
+  screen,
+  fireEvent
+} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
 import { App } from './App'
+import complexExperimentsOutput from '../stories/complex-experiments-output.json'
+
+interface CustomWindow extends Window {
+  webviewData: {
+    publicPath: string
+    theme: WebviewColorTheme
+  }
+}
 
 import { getVsCodeApi } from '../model/VsCodeApi'
 import {
   MessageFromWebviewType,
+  MessageToWebviewType,
   WebviewColorTheme
 } from 'dvc/src/webviewContract'
 
@@ -21,30 +35,26 @@ const mockGetState = mocked(getState)
 
 jest.mock('../model/VsCodeApi')
 
-let windowSpy: any
+let customWindow: CustomWindow
 beforeEach(() => {
   jest.clearAllMocks()
-
-  const { window } = new JSDOM()
-  windowSpy = jest.spyOn(global, 'window', 'get')
-  window.webviewData = {
-    publicPath: 'some/path',
+  customWindow = (global as unknown) as CustomWindow
+  customWindow.webviewData = {
+    publicPath: '/some/path',
     theme: WebviewColorTheme.dark
   }
-  windowSpy.mockImplementation(() => window)
 })
 
 afterEach(() => {
-  windowSpy.mockRestore()
   cleanup()
 })
 
 describe('App', () => {
-  describe('Given an empty state', () => {
+  describe('Given an initial empty state', () => {
     mockGetState.mockReturnValue({})
 
     describe('When we render the App', () => {
-      it('Then a message should be sent to the extension on the first render', () => {
+      it('Then a message should be sent to the extension on the first render', async () => {
         render(<App />)
         expect(mockGetVsCodeApi).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
@@ -67,6 +77,27 @@ describe('App', () => {
         const emptyState = screen.getByText('Loading experiments...')
         await waitFor(() => emptyState)
         expect(emptyState).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('Given a message to add experiments to the state', () => {
+    const messageToChangeState = new MessageEvent('message', {
+      data: {
+        type: MessageToWebviewType.showExperiments,
+        tableData: complexExperimentsOutput
+      }
+    })
+
+    describe('When we render the App and send the message', () => {
+      it('Then the experiments table should be shown', async () => {
+        render(<App />)
+        fireEvent(customWindow, messageToChangeState)
+
+        const experimentText = screen.queryAllByText('Experiment')
+        await waitFor(() => experimentText)
+        const emptyState = screen.queryByText('Loading experiments...')
+        expect(emptyState).not.toBeInTheDocument()
       })
     })
   })
