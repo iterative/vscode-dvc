@@ -1,7 +1,7 @@
 /* global window */
 
 import { Disposable } from '@hediet/std/disposable'
-import { addMessageHandler } from './util'
+import { addMessageHandler } from './window'
 
 interface InternalVsCodeApi {
   getState(): any

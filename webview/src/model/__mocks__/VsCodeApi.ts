@@ -1,4 +1,4 @@
-import { addMessageHandler } from '../util'
+import { addMessageHandler } from '../window'
 
 export const getVsCodeApi = jest.fn().mockReturnValue({
   addMessageHandler,
