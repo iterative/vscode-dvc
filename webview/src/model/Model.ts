@@ -6,7 +6,7 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webviewContract'
-import { autorun, makeObservable, observable } from 'mobx'
+import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsRepoJSONOutput } from 'dvc/src/DvcReader'
 import { getVsCodeApi } from './VsCodeApi'
@@ -15,7 +15,7 @@ declare const window: Window & WindowWithWebviewData
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare let __webpack_public_path__: string
 
-interface PersistedModelState {
+export interface PersistedModelState {
   experiments?: ExperimentsRepoJSONOutput | null
 }
 
@@ -88,10 +88,15 @@ export class Model {
     this.errors = message.errors || undefined
     switch (message.type) {
       case MessageToWebviewType.setTheme:
-        this.theme = message.theme
+        runInAction(() => {
+          this.theme = message.theme
+        })
         return
       case MessageToWebviewType.showExperiments:
-        this.experiments = message.tableData
+        runInAction(() => {
+          this.experiments = message.tableData
+        })
+
         return
       default:
         // eslint-disable-next-line
