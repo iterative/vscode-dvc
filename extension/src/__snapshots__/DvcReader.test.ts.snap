@@ -505,5 +505,3 @@ Object {
   },
 }
 `;
-
-exports[`Command-mocked runExperiment matches a snapshot 1`] = `"This is test DVC log output"`;

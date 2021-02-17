@@ -66,11 +66,3 @@ export const getExperiments: (
   const { stdout } = output
   return JSON.parse(String(stdout))
 }
-
-export const runExperiment: (
-  options: ReaderOptions
-) => Promise<string> = async options => {
-  const output = await execCommand(options, 'exp run -v')
-  const { stdout } = output
-  return stdout
-}

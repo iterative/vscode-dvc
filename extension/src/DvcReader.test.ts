@@ -1,7 +1,7 @@
 import path from 'path'
 import { mocked } from 'ts-jest/utils'
 
-import { inferDefaultOptions, getExperiments, runExperiment } from './DvcReader'
+import { inferDefaultOptions, getExperiments } from './DvcReader'
 import fs from 'fs'
 import { execPromise } from './util'
 import complexExperimentsOutput from 'dvc-vscode-webview/src/stories/complex-experiments-output.json'
@@ -53,14 +53,4 @@ test('Command-mocked getExperiments matches a snapshot when parsed', async () =>
   )
 
   expect(await getExperiments(testReaderOptions)).toMatchSnapshot()
-})
-
-test('Command-mocked runExperiment matches a snapshot', async () => {
-  mockedExecPromise.mockReturnValue(
-    (Promise.resolve({
-      stdout: 'This is test DVC log output'
-    }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
-  )
-
-  expect(await runExperiment(testReaderOptions)).toMatchSnapshot()
 })

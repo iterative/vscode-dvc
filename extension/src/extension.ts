@@ -6,7 +6,6 @@ import {
   ThemeIcon,
   TreeItemCollapsibleState,
   Command,
-  OutputChannel,
   scm,
   Uri,
   TreeItem,
@@ -25,7 +24,6 @@ import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
 import {
   getExperiments,
-  runExperiment,
   inferDefaultOptions,
   ExperimentsRepoJSONOutput
 } from './DvcReader'
@@ -59,8 +57,6 @@ export class Extension {
     new DvcWebviewManager(this.config)
   )
 
-  private channel: OutputChannel | undefined
-
   private async updateCachedTable() {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0)
@@ -80,13 +76,6 @@ export class Extension {
     )
       await this.updateCachedTable()
     return this.experimentsDataPromise
-  }
-
-  private async getOutputChannel() {
-    if (!this.channel) {
-      this.channel = window.createOutputChannel('DVC')
-    }
-    return this.channel
   }
 
   constructor() {
@@ -126,27 +115,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', async () => {
-        const { workspaceFolders } = workspace
-        if (!workspaceFolders || workspaceFolders.length === 0)
-          throw new Error(
-            '"dvc exp run" failed! There are no folders in the Workspace to operate on!'
-          )
-        const dvcReaderOptions = await inferDefaultOptions(
-          workspaceFolders[0].uri.fsPath
-        )
-        const outputChannel = await this.getOutputChannel()
-        try {
-          const output = await runExperiment(dvcReaderOptions)
-          outputChannel.append(output)
-          outputChannel.show()
-        } catch (error) {
-          throw new Error(`Execution of "dvc exp run" failed: ${error}`)
-        } finally {
-          const tableData = await this.getCachedTable()
-          this.manager.refreshAll(tableData)
-        }
-      })
+      commands.registerCommand('dvc.runExperiment', () => undefined)
     )
 
     this.dvcScmFilesView()
