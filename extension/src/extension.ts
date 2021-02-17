@@ -18,7 +18,7 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { IntegratedTerminal } from './IntegratedTerminal'
+import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
@@ -115,7 +115,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', () => undefined)
+      commands.registerCommand('dvc.runExperiment', runExperiment)
     )
 
     this.dvcScmFilesView()
