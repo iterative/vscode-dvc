@@ -40,7 +40,7 @@ async function defineDvcPath(): Promise<string | undefined> {
 /**
  * Shows a dialog allowing the user to choose from a list of detected DVC paths or define their own.
  */
-export async function selectDvcPath(): Promise<void> {
+export async function selectDvcPath(): Promise<string | undefined> {
   // TODO: detection call and append to quick pick
   let path: string | undefined
   const result = await window.showQuickPick(
@@ -56,7 +56,7 @@ export async function selectDvcPath(): Promise<void> {
     }
 
     await workspace.getConfiguration().update('dvc.dvcPath', path)
-    return workspace.getConfiguration().get('dvc.dvcPath')
+    return getDvcPath()
   }
 }
 
