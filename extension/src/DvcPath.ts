@@ -59,3 +59,6 @@ export async function selectDvcPath(): Promise<void> {
     return workspace.getConfiguration().get('dvc.dvcPath')
   }
 }
+
+export const getDvcPath = (): string =>
+  workspace.getConfiguration().get('dvc.dvcPath') || 'dvc'
