@@ -1,4 +1,5 @@
 import { Extension, extensions, Terminal, window, workspace } from 'vscode'
+import { getRunExperimentCommand } from './dvcCommands'
 import { delay } from './util'
 
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
@@ -76,4 +77,9 @@ export class IntegratedTerminal {
     })
     return delay(ms)
   }
+}
+
+export const runExperiment = (): Promise<void> => {
+  const runExperimentCommand = getRunExperimentCommand()
+  return IntegratedTerminal.run(runExperimentCommand)
 }
