@@ -29,6 +29,7 @@ import {
 } from './DvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
+import { addFileChangeHandler } from './fileSystem'
 
 export { Disposable }
 
@@ -45,6 +46,8 @@ export class Extension {
 
   private readonly config = new Config()
 
+  private readonly cwd = workspace?.workspaceFolders?.[0].uri.path
+
   private experimentsDataPromise: Promise<
     ExperimentsRepoJSONOutput
   > | null = null
@@ -56,6 +59,11 @@ export class Extension {
   private readonly manager = this.dispose.track(
     new DvcWebviewManager(this.config)
   )
+
+  private async refreshWebviews() {
+    const tableData = await this.getCachedTable()
+    this.manager.refreshAll(tableData)
+  }
 
   private async updateCachedTable() {
     const { workspaceFolders } = workspace
@@ -84,6 +92,10 @@ export class Extension {
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
+
+    this.dispose.track(
+      addFileChangeHandler(`${this.cwd}/logs.csv`, this.refreshWebviews)
+    )
 
     this.dispose.track(IntegratedTerminal)
 
