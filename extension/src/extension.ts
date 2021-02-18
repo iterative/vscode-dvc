@@ -65,6 +65,15 @@ export class Extension {
     this.manager.refreshAll(tableData)
   }
 
+  private async getCachedTable() {
+    if (
+      !this.lastTableUpdate ||
+      Date.now() - this.lastTableUpdate >= updateInterval
+    )
+      await this.updateCachedTable()
+    return this.experimentsDataPromise
+  }
+
   private async updateCachedTable() {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0)
@@ -74,15 +83,6 @@ export class Extension {
     )
     this.experimentsDataPromise = getExperiments(dvcReaderOptions)
     this.lastTableUpdate = Date.now()
-    return this.experimentsDataPromise
-  }
-
-  private async getCachedTable() {
-    if (
-      !this.lastTableUpdate ||
-      Date.now() - this.lastTableUpdate >= updateInterval
-    )
-      await this.updateCachedTable()
     return this.experimentsDataPromise
   }
 
