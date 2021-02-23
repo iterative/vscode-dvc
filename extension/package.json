@@ -119,6 +119,7 @@
     "@hediet/node-reload": "^0.7.3",
     "@hediet/std": "^0.6.0",
     "bufferutil": "^4.0.3",
+    "chokidar": "^3.5.1",
     "dayjs": "^1.10.1",
     "glob": "^7.1.6",
     "lodash.debounce": "^4.0.8",
