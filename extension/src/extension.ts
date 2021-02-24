@@ -30,6 +30,7 @@ import {
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
+import { resolve } from 'path'
 
 export { Disposable }
 
@@ -46,7 +47,14 @@ export class Extension {
 
   private readonly config = new Config()
 
-  private readonly cwd = workspace?.workspaceFolders?.[0].uri.path
+  private getDefaultCwd = (): string => {
+    const { workspaceFolders } = workspace
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      throw new Error('There are no folders in the Workspace to operate on!')
+    }
+
+    return workspaceFolders[0].uri.fsPath
+  }
 
   private experimentsDataPromise: Promise<
     ExperimentsRepoJSONOutput
@@ -75,12 +83,7 @@ export class Extension {
   }
 
   private async updateCachedTable() {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0)
-      throw new Error('There are no folders in the Workspace to operate on!')
-    const dvcReaderOptions = await inferDefaultOptions(
-      workspaceFolders[0].uri.fsPath
-    )
+    const dvcReaderOptions = await inferDefaultOptions(this.getDefaultCwd())
     this.experimentsDataPromise = getExperiments(dvcReaderOptions)
     this.lastTableUpdate = Date.now()
     return this.experimentsDataPromise
@@ -94,7 +97,10 @@ export class Extension {
     }
 
     this.dispose.track(
-      addFileChangeHandler(`${this.cwd}/logs.csv`, this.refreshWebviews)
+      addFileChangeHandler(
+        resolve(this.getDefaultCwd(), '.dvc', 'tmp', 'lock'),
+        this.refreshWebviews
+      )
     )
 
     this.dispose.track(IntegratedTerminal)
