@@ -68,7 +68,7 @@ export class Extension {
     new DvcWebviewManager(this.config)
   )
 
-  private async refreshWebviews() {
+  private refreshWebviews = async () => {
     const tableData = await this.getCachedTable()
     this.manager.refreshAll(tableData)
   }
