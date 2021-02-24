@@ -1,5 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
-import fs from 'fs'
+import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 
 export const addFileChangeHandler = (
@@ -13,7 +13,12 @@ export const addFileChangeHandler = (
     trailing: false
   })
 
-  const fileWatcher = fs.watch(file, debouncedWatcher)
+  const fileWatcher = chokidar.watch(file)
+
+  fileWatcher.on('ready', debouncedWatcher)
+  fileWatcher.on('add', debouncedWatcher)
+  fileWatcher.on('change', debouncedWatcher)
+  fileWatcher.on('unlink', debouncedWatcher)
 
   return {
     dispose: () => {
@@ -22,11 +27,8 @@ export const addFileChangeHandler = (
   }
 }
 
-export const getWatcher = (handler: () => void) => (
-  event: 'rename' | 'change',
-  filename: string
-): void => {
-  if (filename && event === 'change') {
+export const getWatcher = (handler: () => void) => (path: string): void => {
+  if (path) {
     handler()
   }
 }
