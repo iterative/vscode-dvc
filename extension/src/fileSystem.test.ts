@@ -1,14 +1,14 @@
 import * as fileSystem from './fileSystem'
-import fs from 'fs'
+import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 
 const { addFileChangeHandler, getWatcher } = fileSystem
 
-jest.mock('fs')
+jest.mock('chokidar')
 jest.mock('lodash.debounce')
 
-const mockedFs = mocked(fs)
+const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
 
 beforeEach(() => {
@@ -19,6 +19,9 @@ describe('addFileChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
+
+    const mockedWatcher = mocked(new FSWatcher())
+    mockedWatch.mockReturnValue(mockedWatcher)
 
     const getWatcherSpy = jest
       .spyOn(fileSystem, 'getWatcher')
@@ -31,14 +34,23 @@ describe('addFileChangeHandler', () => {
     const { dispose } = addFileChangeHandler(file, func)
 
     expect(dispose).toBeDefined()
+
     expect(getWatcherSpy).toBeCalledTimes(1)
+
     expect(mockedDebounce).toBeCalledTimes(1)
     expect(mockedDebounce).toBeCalledWith(func, 1500, {
       leading: true,
       trailing: false
     })
-    expect(mockedFs.watch).toBeCalledWith(file, func)
-    expect(mockedFs.watch).toBeCalledTimes(1)
+
+    expect(mockedWatch).toBeCalledWith(file)
+    expect(mockedWatch).toBeCalledTimes(1)
+
+    expect(mockedWatcher.on).toBeCalledTimes(4)
+    expect(mockedWatcher.on).toBeCalledWith('ready', func)
+    expect(mockedWatcher.on).toBeCalledWith('add', func)
+    expect(mockedWatcher.on).toBeCalledWith('change', func)
+    expect(mockedWatcher.on).toBeCalledWith('unlink', func)
   })
 })
 
@@ -46,26 +58,18 @@ describe('getWatcher', () => {
   const mockHandler = jest.fn()
   const file = '/some/file/on/a/system.log'
 
-  it('should return a new file watcher callback which calls the handler on change', () => {
+  it('should return a new file watcher callback which calls the handler when a path is provided', () => {
     const watcher = getWatcher(mockHandler)
 
-    watcher('change', file)
+    watcher(file)
 
     expect(mockHandler).toBeCalledTimes(1)
   })
 
-  it('should return a new file watcher callback which does not call the handler on rename', () => {
+  it('should return a new file watcher callback which does not call the handler when a path is not provided', () => {
     const watcher = getWatcher(mockHandler)
 
-    watcher('rename', file)
-
-    expect(mockHandler).not.toBeCalled()
-  })
-
-  it('should return a new file watcher callback which does not call the handler without a filename', () => {
-    const watcher = getWatcher(mockHandler)
-
-    watcher('change', '')
+    watcher('')
 
     expect(mockHandler).not.toBeCalled()
   })
