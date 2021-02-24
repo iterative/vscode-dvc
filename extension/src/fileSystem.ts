@@ -9,8 +9,8 @@ export const addFileChangeHandler = (
   const watcher = getWatcher(handler)
 
   const debouncedWatcher = debounce(watcher, 1500, {
-    leading: true,
-    trailing: false
+    leading: false,
+    trailing: true
   })
 
   const fileWatcher = chokidar.watch(file)
