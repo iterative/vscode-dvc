@@ -29,6 +29,8 @@ import {
 } from './DvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
+import { addFileChangeHandler } from './fileSystem'
+import { resolve } from 'path'
 
 export { Disposable }
 
@@ -45,6 +47,15 @@ export class Extension {
 
   private readonly config = new Config()
 
+  private getDefaultCwd = (): string => {
+    const { workspaceFolders } = workspace
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      throw new Error('There are no folders in the Workspace to operate on!')
+    }
+
+    return workspaceFolders[0].uri.fsPath
+  }
+
   private experimentsDataPromise: Promise<
     ExperimentsRepoJSONOutput
   > | null = null
@@ -57,16 +68,9 @@ export class Extension {
     new DvcWebviewManager(this.config)
   )
 
-  private async updateCachedTable() {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0)
-      throw new Error('There are no folders in the Workspace to operate on!')
-    const dvcReaderOptions = await inferDefaultOptions(
-      workspaceFolders[0].uri.fsPath
-    )
-    this.experimentsDataPromise = getExperiments(dvcReaderOptions)
-    this.lastTableUpdate = Date.now()
-    return this.experimentsDataPromise
+  private refreshWebviews = async () => {
+    const tableData = await this.getCachedTable()
+    this.manager.refreshAll(tableData)
   }
 
   private async getCachedTable() {
@@ -78,12 +82,26 @@ export class Extension {
     return this.experimentsDataPromise
   }
 
+  private async updateCachedTable() {
+    const dvcReaderOptions = await inferDefaultOptions(this.getDefaultCwd())
+    this.experimentsDataPromise = getExperiments(dvcReaderOptions)
+    this.lastTableUpdate = Date.now()
+    return this.experimentsDataPromise
+  }
+
   constructor() {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
+
+    this.dispose.track(
+      addFileChangeHandler(
+        resolve(this.getDefaultCwd(), '.dvc', 'tmp', 'lock'),
+        this.refreshWebviews
+      )
+    )
 
     this.dispose.track(IntegratedTerminal)
 
