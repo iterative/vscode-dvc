@@ -39,6 +39,9 @@ See something that should be changed? Want to request a new feature? Open
 - It is recommended that you create the project's virtual environment with
   Python 3.8 as TensorFlow is not yet available for Python 3.9
 
+- Run `yarn setup:venv` from the monorepo root to automatically setup the Python
+  virtual environment in the demo project
+
 - In order to run experiments in our demo project we require the Python virtual
   environment to be loaded.
 

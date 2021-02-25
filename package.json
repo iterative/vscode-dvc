@@ -19,7 +19,7 @@
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
-    "ci:setup:venv": "./virtualenv-install.sh",
+    "setup:venv": "./virtualenv-install.sh",
     "ci:setup:build-tests": "yarn workspace dvc tsc -p './'",
     "ci:run:prettier": "prettier -c '**/*.{md,json}'",
     "ci:run:test": "yarn test",
