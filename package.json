@@ -13,7 +13,7 @@
     "extension-dev-server": "yarn workspace dvc dev",
     "webview-dev-server": "yarn workspace dvc-vscode-webview dev",
     "dev-server": "run-p extension-dev-server webview-dev-server",
-    "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true code --extensionDevelopmentPath $PWD/extension demo --disable-extensions",
+    "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true code --extensionDevelopmentPath $PWD/extension demo",
     "build-extension": "yarn workspace dvc build",
     "postinstall": "husky install",
     "storybook": "yarn workspace dvc-vscode-webview storybook",
