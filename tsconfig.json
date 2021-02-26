@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "experimentalDecorators": true
   },
-  "include": ["*/src/**/*"]
+  "include": ["./.eslintrc.js", "./**/*"]
 }
