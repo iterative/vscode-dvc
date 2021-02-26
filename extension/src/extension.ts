@@ -22,11 +22,7 @@ import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
-import {
-  getExperiments,
-  inferDefaultOptions,
-  ExperimentsRepoJSONOutput
-} from './DvcReader'
+import { getExperiments, inferDefaultOptions } from './DvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
@@ -39,8 +35,6 @@ if (process.env.HOT_RELOAD) {
 }
 
 registerUpdateReconciler(module)
-
-const updateInterval = 3000
 
 export class Extension {
   public readonly dispose = Disposable.fn()
@@ -56,12 +50,6 @@ export class Extension {
     return workspaceFolders[0].uri.fsPath
   }
 
-  private experimentsDataPromise: Promise<
-    ExperimentsRepoJSONOutput
-  > | null = null
-
-  private lastTableUpdate?: number = undefined
-
   private dvcPathStatusBarItem: DVCPathStatusBarItem
 
   private readonly manager = this.dispose.track(
@@ -69,24 +57,13 @@ export class Extension {
   )
 
   private refreshWebviews = async () => {
-    const tableData = await this.getCachedTable()
+    const tableData = await this.getExperimentsTableData()
     this.manager.refreshAll(tableData)
   }
 
-  private async getCachedTable() {
-    if (
-      !this.lastTableUpdate ||
-      Date.now() - this.lastTableUpdate >= updateInterval
-    )
-      await this.updateCachedTable()
-    return this.experimentsDataPromise
-  }
-
-  private async updateCachedTable() {
+  private async getExperimentsTableData() {
     const dvcReaderOptions = await inferDefaultOptions(this.getDefaultCwd())
-    this.experimentsDataPromise = getExperiments(dvcReaderOptions)
-    this.lastTableUpdate = Date.now()
-    return this.experimentsDataPromise
+    return getExperiments(dvcReaderOptions)
   }
 
   constructor() {
@@ -124,7 +101,7 @@ export class Extension {
       commands.registerCommand('dvc.showWebview', async () => {
         const dvcWebview = this.dispose.track(await this.manager.createNew())
         try {
-          const tableData = await this.getCachedTable()
+          const tableData = await this.getExperimentsTableData()
           dvcWebview.showExperiments({ tableData })
         } catch (e) {
           dvcWebview.showExperiments({ errors: [e.toString()] })
