@@ -1,8 +1,5 @@
-import { getDvcPath } from './DvcPath'
-
 const getCliCommand = (command: string): string => {
-  const dvcPath = getDvcPath()
-  return `${dvcPath} ${command}`
+  return `dvc ${command}`
 }
 
 const RUN_EXPERIMENT = 'exp run'
