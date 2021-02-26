@@ -170,7 +170,8 @@ export const ExperimentsTable: React.FC<{
       initialState,
       defaultColumn,
       orderByFn,
-      expandSubRows: false
+      expandSubRows: false,
+      autoResetExpanded: false
     },
     useFlexLayout,
     hooks => {
