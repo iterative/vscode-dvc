@@ -18,9 +18,6 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.4
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
-
       - name: Get Yarn cache path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -32,14 +29,6 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: yarn
-
-      - uses: actions/cache@v2
-        name: Restore pip cache
-        id: pip-cache
-        with:
-          path: ~/.cache/pip
-          key: pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: pip
 
       - uses: actions/cache@v2
         name: Restore ESLint cache
