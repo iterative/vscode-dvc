@@ -18,7 +18,11 @@ See something that should be changed? Want to request a new feature? Open
 - Run `Tasks: Run Build Task` (Ctrl+Shift+b) to start the extension and webview
   development servers (alternatively run `yarn dev-server` from the terminal).
 
-- Open the test instance of VS Code with `Start Debugging` (f5)
+- Open the test instance of VS Code with `Start Debugging` (f5). Note: selecting
+  the `Run Extension (Hot Reload + Dev UI for dev-server)` option when running
+  the debugger will prevent all other extensions from being loaded into the VS
+  code instance. This will improve the performance of VS code but cause certain
+  DVC commands to fail.
 
 - To enable formatting on save install the `esbenp.prettier-vscode` extension
 
@@ -27,7 +31,22 @@ See something that should be changed? Want to request a new feature? Open
 - run the `dev-server` script to start the extension and webview dev servers
   (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
   them individually).
+
 - run the `dev-ui` script to launch VS code in with this plugin in dev mode.
+
+### The demo project
+
+- It is recommended that you create the project's virtual environment with
+  Python 3.8 as TensorFlow is not yet available for Python 3.9
+
+- Run `yarn setup:venv` from the monorepo root to automatically setup the Python
+  virtual environment in the demo project
+
+- In order to run experiments in our demo project we require the Python virtual
+  environment to be loaded.
+
+- This will happen automatically IF the `ms-python.python` extension is
+  installed within the VS code instance that you are developing against.
 
 ## React Component Development with Storybook
 
