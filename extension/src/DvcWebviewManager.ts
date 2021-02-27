@@ -11,7 +11,7 @@ import {
   MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData
-} from './webviewContract'
+} from './webviews/experiments/contract'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'

@@ -1,7 +1,7 @@
 import { accessSync } from 'fs'
 import * as path from 'path'
 import { execPromise } from './util'
-import { ExperimentsRepoJSONOutput } from './webviewContract'
+import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
 export interface ReaderOptions {
   bin: string
   cwd: string

@@ -7,7 +7,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
-import { WebviewColorTheme } from './webviewContract'
+import { WebviewColorTheme } from './webviews/experiments/contract'
 
 export class Config {
   public readonly dispose = Disposable.fn()

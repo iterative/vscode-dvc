@@ -2,7 +2,7 @@ import {
   DataDictRoot,
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
-} from 'dvc/src/webviewContract'
+} from 'dvc/src/webviews/experiments/contract'
 
 export interface Experiment {
   id: string
