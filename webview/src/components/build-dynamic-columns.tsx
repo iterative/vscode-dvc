@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DataDictRoot } from 'dvc/src/DvcReader'
+import { DataDictRoot } from 'dvc/src/webviewContract'
 
 import { Experiment } from './Experiments'
 

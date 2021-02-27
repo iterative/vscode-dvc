@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
-} from 'dvc/src/DvcReader'
+} from 'dvc/src/webviewContract'
 import {
   TableInstance,
   Row,

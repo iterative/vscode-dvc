@@ -1,5 +1,3 @@
-import { ExperimentsRepoJSONOutput } from './DvcReader'
-
 export interface WindowWithWebviewData {
   webviewData: {
     publicPath: string
@@ -37,4 +35,41 @@ export type MessageToWebview = {
 export enum MessageToWebviewType {
   setTheme = 'setTheme',
   showExperiments = 'showExperiments'
+}
+
+interface DataDict {
+  [name: string]: string | number | DataDict
+}
+export interface DataDictRoot {
+  [filename: string]: DataDict
+}
+
+export interface ExperimentJSONOutput {
+  name?: string
+  timestamp?: string | Date | null
+  params?: DataDictRoot
+  metrics?: DataDictRoot
+  queued?: boolean
+  checkpoint_tip?: string
+  checkpoint_parent?: string
+}
+
+interface ExperimentsCommitJSONOutput
+  extends Record<string, ExperimentJSONOutput> {
+  baseline: ExperimentJSONOutput
+}
+
+export interface ExperimentsRepoJSONOutput
+  extends Record<string, ExperimentsCommitJSONOutput> {
+  workspace: ExperimentsCommitJSONOutput
+}
+
+interface ExperimentsCommitJSONOutput
+  extends Record<string, ExperimentJSONOutput> {
+  baseline: ExperimentJSONOutput
+}
+
+export interface ExperimentsRepoJSONOutput
+  extends Record<string, ExperimentsCommitJSONOutput> {
+  workspace: ExperimentsCommitJSONOutput
 }

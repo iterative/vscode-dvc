@@ -5,13 +5,13 @@ import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
 import { Config } from './Config'
 import {
+  ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData
 } from './webviewContract'
-import { ExperimentsRepoJSONOutput } from './DvcReader'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
