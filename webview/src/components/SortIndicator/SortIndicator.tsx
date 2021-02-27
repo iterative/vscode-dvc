@@ -1,6 +1,6 @@
 import { TableInstance, ColumnInstance } from 'react-table'
-import { Experiment } from './interfaces/table'
-import styles from './table-styles.module.scss'
+import { Experiment } from '../interfaces/table'
+import styles from '../table-styles.module.scss'
 import React from 'react'
 
 export interface InstanceProp {
@@ -34,7 +34,7 @@ const ColumnOptionsRow: React.FC<{
   </div>
 )
 
-const SortWidget: React.FC<InstanceProp> = ({ instance }) => {
+const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
   const { columns: columnInstances, sortedColumns } = instance
   return (
     <details className={styles.optionsPanel}>
@@ -56,4 +56,4 @@ const SortWidget: React.FC<InstanceProp> = ({ instance }) => {
   )
 }
 
-export default SortWidget
+export default SortIndicator

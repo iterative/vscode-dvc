@@ -24,7 +24,7 @@ import styles from './table-styles.module.scss'
 import buildDynamicColumns from '../util/build-dynamic-columns'
 
 import { VsCodeApi } from '../model/Model'
-import SortWidget from './SortWidget'
+import SortIndicator from './SortIndicator/SortIndicator'
 
 const { useMemo, useEffect } = React
 
@@ -157,7 +157,7 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <>
-      <SortWidget instance={instance} />
+      <SortIndicator instance={instance} />
       <Table instance={instance} />
     </>
   )
