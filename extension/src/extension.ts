@@ -70,7 +70,7 @@ export class Extension {
 
   private refreshWebviews = async () => {
     const tableData = await this.getCachedTable()
-    this.manager.refreshAll(tableData)
+    return this.manager.refreshAll(tableData)
   }
 
   private async getCachedTable() {
@@ -127,7 +127,7 @@ export class Extension {
           const tableData = await this.getCachedTable()
           dvcWebview.showExperiments({ tableData })
         } catch (e) {
-          dvcWebview.showExperiments({ errors: [e.toString()] })
+          dvcWebview.showExperiments({ errors: [String(e)] })
         }
       })
     )
@@ -151,7 +151,7 @@ export class Extension {
 				| Event<void | MyTreeItem | null | undefined>
 				| undefined; */
 
-      async getChildren(element?: TreeItemEntry): Promise<TreeItemEntry[]> {
+      getChildren(element?: TreeItemEntry): Promise<TreeItemEntry[]> {
         if (!element) {
           // Root
           return [
@@ -174,7 +174,7 @@ export class Extension {
         return []
       }
 
-      async getTreeItem(element: TreeItemEntry): Promise<TreeItem> {
+      getTreeItem(element: TreeItemEntry): Promise<TreeItem> {
         return {
           label: element.label,
           command: element.command,

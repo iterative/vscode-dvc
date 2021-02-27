@@ -10,7 +10,7 @@ function includeDependency(location: string) {
   const content = readFileSync(path.join(location, 'package.json'), {
     encoding: 'utf8'
   })
-  const pkgName = JSON.parse(content).name
+  const pkgName = (JSON.parse(content) as { name: string }).name
 
   return new CopyPlugin([
     {

@@ -37,14 +37,19 @@ module.exports = {
     // Treat prettier issues as errors
     'prettier/prettier': ['error'],
     // We use TS in place of the recommended prop-types
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+    '@typescript-eslint/unbound-method': 'off'
   },
   overrides: [
     // Jest tests rely on a lot of undefined globals
     {
-      files: ['**/*.test.js'],
+      files: ['**/*.test.*'],
       rules: {
-        'no-undef': 'off'
+        'no-undef': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/no-floating-promises': 'off'
       }
     },
     // Webpack dependencies are meant to be devDependencies

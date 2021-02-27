@@ -12,6 +12,7 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
 import { App } from './App'
+import { ExperimentsRepoJSONOutput } from 'dvc/src/DvcReader'
 import complexExperimentsOutput from '../stories/complex-experiments-output.json'
 import { getVsCodeApi } from '../model/VsCodeApi'
 import {
@@ -19,6 +20,8 @@ import {
   MessageToWebviewType,
   WebviewColorTheme
 } from 'dvc/src/webviewContract'
+
+const complexExperimentsOutput = complexExperimentsOutputJSON as ExperimentsRepoJSONOutput
 
 jest.mock('../model/VsCodeApi')
 
@@ -53,7 +56,7 @@ describe('App', () => {
     mockGetState.mockReturnValue({})
 
     describe('When we render the App', () => {
-      it('Then a message should be sent to the extension on the first render', async () => {
+      it('Then a message should be sent to the extension on the first render', () => {
         render(<App />)
         expect(mockGetVsCodeApi).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({

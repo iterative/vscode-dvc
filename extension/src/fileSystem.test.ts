@@ -1,9 +1,8 @@
 import * as fileSystem from './fileSystem'
+import { addFileChangeHandler, getWatcher } from './fileSystem'
 import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
-
-const { addFileChangeHandler, getWatcher } = fileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -31,7 +30,8 @@ describe('addFileChangeHandler', () => {
       (func: (...args: any) => any) => func as any
     )
 
-    const { dispose } = addFileChangeHandler(file, func)
+    const handler = addFileChangeHandler(file, func)
+    const { dispose } = handler
 
     expect(dispose).toBeDefined()
 

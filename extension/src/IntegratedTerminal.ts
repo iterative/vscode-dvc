@@ -43,7 +43,7 @@ export class IntegratedTerminal {
   }
 
   private static deleteReferenceOnClose = (): void => {
-    window.onDidCloseTerminal(async event => {
+    window.onDidCloseTerminal(event => {
       if (
         IntegratedTerminal.instance &&
         event.name === IntegratedTerminal.termName

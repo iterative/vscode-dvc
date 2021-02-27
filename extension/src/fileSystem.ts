@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce'
 
 export const addFileChangeHandler = (
   file: string,
-  handler: () => void
+  handler: () => any
 ): Disposable => {
   const watcher = getWatcher(handler)
 
@@ -22,7 +22,7 @@ export const addFileChangeHandler = (
 
   return {
     dispose: () => {
-      fileWatcher.close()
+      return fileWatcher.close()
     }
   }
 }

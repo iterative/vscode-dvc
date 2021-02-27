@@ -57,7 +57,7 @@ export class DvcWebview {
       this._disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
-      this.handleMessage(arg as MessageFromWebview)
+      return this.handleMessage(arg as MessageFromWebview)
     })
 
     webviewPanel.webview.html = this.getHtml()
@@ -67,7 +67,7 @@ export class DvcWebview {
         // Update theme changes
         const { theme } = config
         await this.initialized // Read all mobx dependencies before await
-        this.sendMessage({ type: MessageToWebviewType.setTheme, theme })
+        return this.sendMessage({ type: MessageToWebviewType.setTheme, theme })
       })
     })
   }
@@ -137,7 +137,7 @@ export class DvcWebview {
         'Cannot send message when webview is not initialized yet!'
       )
     }
-    this.webviewPanel.webview.postMessage(message)
+    return this.webviewPanel.webview.postMessage(message)
   }
 
   private handleMessage(message: MessageFromWebview) {
@@ -147,8 +147,7 @@ export class DvcWebview {
         return
       }
       case MessageFromWebviewType.onClickRunExperiment: {
-        commands.executeCommand('dvc.runExperiment')
-        return
+        return commands.executeCommand('dvc.runExperiment')
       }
       default: {
         console.error('Unexpected message', message)
@@ -162,7 +161,7 @@ export class DvcWebview {
       errors?: Error[]
     } = {}
   ): void {
-    this.sendMessage({
+    return this.sendMessage({
       type: MessageToWebviewType.showExperiments,
       ...payload
     })
@@ -178,7 +177,7 @@ export class DvcWebviewManager {
     this.dispose.track(
       window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
         deserializeWebviewPanel: async panel => {
-          DvcWebview.restore(panel, this.config).then(view => {
+          return DvcWebview.restore(panel, this.config).then(view => {
             this.addView(view)
           })
         }
@@ -205,7 +204,7 @@ export class DvcWebviewManager {
       try {
         panel.showExperiments({ tableData })
       } catch (e) {
-        panel.showExperiments({ errors: [e.toString()] })
+        panel.showExperiments({ errors: [String(e)] })
       }
     }
   }

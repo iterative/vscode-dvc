@@ -33,7 +33,7 @@ export function run(): Promise<void> {
         })
       } catch (e) {
         console.error(e)
-        e(e)
+        throw e
       }
     })
   })

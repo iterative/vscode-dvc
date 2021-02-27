@@ -36,7 +36,7 @@ export interface ExperimentsRepoJSONOutput
 
 export const inferDefaultOptions: (
   cwd: string
-) => Promise<ReaderOptions> = async cwd => {
+) => Promise<ReaderOptions> = cwd => {
   const envDvcPath = path.resolve(cwd, '.env', 'bin', 'dvc')
   let bin
   try {
@@ -63,6 +63,12 @@ export const getExperiments: (
   options: ReaderOptions
 ) => Promise<ExperimentsRepoJSONOutput> = async options => {
   const output = await execCommand(options, 'exp show --show-json')
-  const { stdout } = output
-  return JSON.parse(String(stdout))
+  const parsedData = JSON.parse(String(output.stdout)) as unknown
+  const parsedDataType = typeof parsedData
+  if (parsedDataType !== 'object')
+    throw new Error(
+      `Parsed DVC experiment data is not an object! (was "${parsedDataType}")`
+    )
+
+  return parsedData as ExperimentsRepoJSONOutput
 }
