@@ -23,18 +23,13 @@ describe('getRepoPathCore', () => {
     }
   })
 
-  it('should find the root directory and present a warning given a directory in this project with the wrong casing', async () => {
+  it('should present a warning given a directory in this project with the wrong casing', async () => {
     const mockedWarningMessage = jest.fn().mockResolvedValue(undefined)
     mockedWindow.showWarningMessage = mockedWarningMessage
 
-    const repoRoot = await getRepoPathCore(__dirname.toUpperCase())
+    await getRepoPathCore(__dirname.toUpperCase())
 
-    expect(repoRoot).toBeDefined()
-    if (repoRoot) {
-      const gitDir = resolve(repoRoot, '.git')
-      expect(lstatSync(gitDir).isDirectory).toBeTruthy()
-      expect(mockedWarningMessage).toHaveBeenCalledTimes(1)
-    }
+    expect(mockedWarningMessage).toHaveBeenCalledTimes(1)
   })
 
   it('should return undefined given a non-existent path', async () => {
