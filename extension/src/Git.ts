@@ -1,13 +1,7 @@
-import { exists, realpath } from 'fs'
+import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
 import { dirname } from 'path'
-
-function fsExists(path: string): Promise<boolean> {
-  return new Promise<boolean>(resolve =>
-    exists(path, exists => resolve(exists))
-  )
-}
 
 const isWindows = process.platform === 'win32'
 
@@ -83,14 +77,14 @@ export async function rev_parse__show_toplevel(
   } catch (ex) {
     if (ex.code === 'ENOENT') {
       // If the `cwd` doesn't exist, walk backward to see if any parent folder exists
-      let exists = await fsExists(cwd)
+      let exists = await pathExists(cwd)
       if (!exists) {
         do {
           const parent = dirname(cwd)
           if (parent === cwd || parent.length === 0) return undefined
 
           cwd = parent
-          exists = await fsExists(cwd)
+          exists = await pathExists(cwd)
         } while (!exists)
 
         return rev_parse__show_toplevel(cwd)
@@ -128,7 +122,7 @@ export const getRepoPathCore = async (
 
           try {
             const networkPath = await new Promise<string | undefined>(resolve =>
-              realpath.native(
+              realpath(
                 `${letter}:\\`,
                 { encoding: 'utf8' },
                 (err, resolvedPath) =>
