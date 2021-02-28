@@ -31,7 +31,9 @@ function normalizePath(
     stripTrailingSlash: true
   }
 ) {
-  if (fileName == null || fileName.length === 0) return fileName
+  if (fileName == null || fileName.length === 0) {
+    return fileName
+  }
 
   let normalized = fileName.replace(pathNormalizeRegex, '/')
 
@@ -59,7 +61,7 @@ function normalizePath(
   return normalized
 }
 
-export async function rev_parse__show_toplevel(
+async function rev_parse__show_toplevel(
   cwd: string
 ): Promise<string | undefined> {
   try {
@@ -81,7 +83,9 @@ export async function rev_parse__show_toplevel(
       if (!exists) {
         do {
           const parent = dirname(cwd)
-          if (parent === cwd || parent.length === 0) return undefined
+          if (parent === cwd || parent.length === 0) {
+            return undefined
+          }
 
           cwd = parent
           exists = await pathExists(cwd)
