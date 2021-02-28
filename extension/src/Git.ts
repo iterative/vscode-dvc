@@ -101,14 +101,11 @@ async function rev_parse__show_toplevel(
 const driveLetterRegex = /(?<=^\/?)([a-zA-Z])(?=:\/)/
 
 export const getRepoPathCore = async (
-  filePath: string,
-  isDirectory: boolean
+  dirPath: string
 ): Promise<string | undefined> => {
   let repoPath: string | undefined
   try {
-    const path = isDirectory ? filePath : dirname(filePath)
-
-    repoPath = await rev_parse__show_toplevel(path)
+    repoPath = await rev_parse__show_toplevel(dirPath)
     if (repoPath == null) return repoPath
 
     if (isWindows) {
@@ -116,7 +113,7 @@ export const getRepoPathCore = async (
       // So try to normalize it back to the mapped drive path, if possible
 
       const repoUri = Uri.file(repoPath)
-      const pathUri = Uri.file(path)
+      const pathUri = Uri.file(dirPath)
       if (repoUri.authority.length !== 0 && pathUri.authority.length === 0) {
         const match = driveLetterRegex.exec(pathUri.path)
         if (match != null) {
@@ -156,13 +153,13 @@ export const getRepoPathCore = async (
     // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
     // This is because VS Code will provide document Uris using the symlinked path
     repoPath = await new Promise<string | undefined>(resolve => {
-      realpath(path, { encoding: 'utf8' }, (err, resolvedPath) => {
+      realpath(dirPath, { encoding: 'utf8' }, (err, resolvedPath) => {
         if (err != null) {
           resolve(repoPath)
           return
         }
 
-        if (path.toLowerCase() === resolvedPath.toLowerCase()) {
+        if (dirPath.toLowerCase() === resolvedPath.toLowerCase()) {
           resolve(repoPath)
           return
         }
@@ -170,7 +167,7 @@ export const getRepoPathCore = async (
         const linkPath = normalizePath(resolvedPath, {
           stripTrailingSlash: true
         })
-        repoPath = repoPath?.replace(linkPath, path)
+        repoPath = repoPath?.replace(linkPath, dirPath)
         resolve(repoPath)
       })
     })
@@ -182,7 +179,7 @@ export const getRepoPathCore = async (
     return repoPath
   } finally {
     if (repoPath) {
-      void ensureProperWorkspaceCasing(repoPath, filePath)
+      void ensureProperWorkspaceCasing(repoPath, dirPath)
     }
   }
 }

@@ -14,7 +14,7 @@ beforeEach(() => {
 
 describe('getRepoPathCore', () => {
   it('should find the root directory given a directory in this project', async () => {
-    const repoRoot = await getRepoPathCore(__dirname, true)
+    const repoRoot = await getRepoPathCore(__dirname)
 
     expect(repoRoot).toBeDefined()
     if (repoRoot) {
@@ -27,7 +27,7 @@ describe('getRepoPathCore', () => {
     const mockedWarningMessage = jest.fn().mockResolvedValue(undefined)
     mockedWindow.showWarningMessage = mockedWarningMessage
 
-    const repoRoot = await getRepoPathCore(__dirname.toUpperCase(), true)
+    const repoRoot = await getRepoPathCore(__dirname.toUpperCase())
 
     expect(repoRoot).toBeDefined()
     if (repoRoot) {
@@ -38,10 +38,7 @@ describe('getRepoPathCore', () => {
   })
 
   it('should return undefined given a non-existent path', async () => {
-    const repoRoot = await getRepoPathCore(
-      '/some/path/that/does/not/exist',
-      true
-    )
+    const repoRoot = await getRepoPathCore('/some/path/that/does/not/exist')
     expect(repoRoot).toBeUndefined()
   })
 })
