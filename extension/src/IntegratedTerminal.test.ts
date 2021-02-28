@@ -43,7 +43,7 @@ describe('add', () => {
     const undef = await add(path.resolve(__dirname, './fileSystem.js'))
     expect(undef).toBeUndefined()
 
-    expect(terminalSpy).toBeCalledWith(`dvc add src\\fileSystem.js`)
+    expect(terminalSpy).toBeCalledWith(`dvc add src/fileSystem.js`)
   })
 })
 
