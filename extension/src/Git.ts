@@ -100,8 +100,6 @@ export const getRepoPathCore = async (
   filePath: string,
   isDirectory: boolean
 ): Promise<string | undefined> => {
-  //   const cc = Logger.getCorrelationContext()
-
   let repoPath: string | undefined
   try {
     const path = isDirectory ? filePath : dirname(filePath)
@@ -156,13 +154,11 @@ export const getRepoPathCore = async (
     repoPath = await new Promise<string | undefined>(resolve => {
       realpath(path, { encoding: 'utf8' }, (err, resolvedPath) => {
         if (err != null) {
-          //   Logger.debug(cc, `fs.realpath failed; repoPath=${repoPath}`)
           resolve(repoPath)
           return
         }
 
         if (path.toLowerCase() === resolvedPath.toLowerCase()) {
-          //   Logger.debug(cc, `No symlink detected; repoPath=${repoPath}`)
           resolve(repoPath)
           return
         }
@@ -171,17 +167,13 @@ export const getRepoPathCore = async (
           stripTrailingSlash: true
         })
         repoPath = repoPath?.replace(linkPath, path)
-        // Logger.debug(
-        //   cc,
-        //   `Symlink detected; repoPath=${repoPath}, path=${path}, resolvedPath=${resolvedPath}`
-        // )
         resolve(repoPath)
       })
     })
 
     return repoPath
   } catch (ex) {
-    // Logger.error(ex, cc)
+    console.error(ex)
     repoPath = undefined
     return repoPath
   } finally {
