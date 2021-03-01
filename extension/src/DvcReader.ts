@@ -1,43 +1,16 @@
 import { accessSync } from 'fs'
-import * as path from 'path'
+import { resolve } from 'path'
 import { execPromise } from './util'
-
+import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
 export interface ReaderOptions {
   bin: string
   cwd: string
 }
 
-export interface DataDict {
-  [name: string]: string | number | DataDict
-}
-export interface DataDictRoot {
-  [filename: string]: DataDict
-}
-
-export interface ExperimentJSONOutput {
-  name?: string
-  timestamp?: string | Date | null
-  params?: DataDictRoot
-  metrics?: DataDictRoot
-  queued?: boolean
-  checkpoint_tip?: string
-  checkpoint_parent?: string
-}
-
-export interface ExperimentsCommitJSONOutput
-  extends Record<string, ExperimentJSONOutput> {
-  baseline: ExperimentJSONOutput
-}
-
-export interface ExperimentsRepoJSONOutput
-  extends Record<string, ExperimentsCommitJSONOutput> {
-  workspace: ExperimentsCommitJSONOutput
-}
-
 export const inferDefaultOptions: (
   cwd: string
 ) => Promise<ReaderOptions> = async cwd => {
-  const envDvcPath = path.resolve(cwd, '.env', 'bin', 'dvc')
+  const envDvcPath = resolve(cwd, '.env', 'bin', 'dvc')
   let bin
   try {
     accessSync(envDvcPath)

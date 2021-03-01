@@ -1,10 +1,10 @@
-import path from 'path'
+import { resolve, join } from 'path'
 import { mocked } from 'ts-jest/utils'
 
 import { inferDefaultOptions, getExperiments } from './DvcReader'
 import fs from 'fs'
 import { execPromise } from './util'
-import complexExperimentsOutput from 'dvc-vscode-webview/src/stories/complex-experiments-output.json'
+import complexExperimentsOutput from './webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
 
 jest.mock('fs')
@@ -13,11 +13,11 @@ jest.mock('./util')
 const mockedFs = mocked(fs)
 const mockedExecPromise = mocked(execPromise)
 
-const extensionDirectory = path.resolve(__dirname, '..')
+const extensionDirectory = resolve(__dirname, '..')
 
 const testReaderOptions = {
   bin: 'dvc',
-  cwd: path.resolve()
+  cwd: resolve()
 }
 
 beforeEach(() => {
@@ -28,7 +28,7 @@ test('Inferring default options on a directory with accessible .env', async () =
   mockedFs.accessSync.mockReturnValue()
 
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
-    bin: path.join(extensionDirectory, '.env', 'bin', 'dvc'),
+    bin: join(extensionDirectory, '.env', 'bin', 'dvc'),
     cwd: extensionDirectory
   })
 })

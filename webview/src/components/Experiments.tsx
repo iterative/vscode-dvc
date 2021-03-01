@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
-} from 'dvc/src/DvcReader'
+} from 'dvc/src/webviews/experiments/contract'
 import {
   TableInstance,
   Row,
@@ -23,7 +23,7 @@ import parseExperiments from '../util/parse-experiments'
 import styles from './table-styles.module.scss'
 
 import buildDynamicColumns from './build-dynamic-columns'
-import { MessageFromWebviewType } from 'dvc/src/webviewContract'
+import { MessageFromWebviewType } from 'dvc/src/webviews/experiments/contract'
 
 const { useMemo, useEffect } = React
 
