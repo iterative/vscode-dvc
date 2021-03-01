@@ -34,6 +34,7 @@ import { getExperiments, inferDefaultOptions } from './DvcReader'
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { resolve } from 'path'
+import { getRepoRootPath } from './git'
 
 export { Disposable }
 
@@ -55,6 +56,20 @@ export class Extension {
     }
 
     return workspaceFolders[0].uri.fsPath
+  }
+
+  private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
+    const cwd = this.getDefaultCwd()
+    const path = await getRepoRootPath(cwd)
+    if (!path) {
+      throw new Error(
+        'Live updates for the experiment table are not possible as the Git repo root was not found!'
+      )
+    }
+    return addFileChangeHandler(
+      resolve(path, '.git', 'refs', 'exps'),
+      this.refreshWebviews
+    )
   }
 
   private dvcPathStatusBarItem: DVCPathStatusBarItem
@@ -80,11 +95,8 @@ export class Extension {
       i.show()
     }
 
-    this.dispose.track(
-      addFileChangeHandler(
-        resolve(this.getDefaultCwd(), '.dvc', 'tmp', 'lock'),
-        this.refreshWebviews
-      )
+    this.onChangeExperimentsUpdateWebview().then(disposable =>
+      this.dispose.track(disposable)
     )
 
     this.dispose.track(IntegratedTerminal)
