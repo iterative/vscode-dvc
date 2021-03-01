@@ -1,13 +1,13 @@
 import * as webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { readFileSync } from 'fs'
-import path = require('path')
+import { join, resolve } from 'path'
 import CopyPlugin = require('copy-webpack-plugin')
 
-const r = (file: string) => path.resolve(__dirname, file)
+const r = (file: string) => resolve(__dirname, file)
 
 function includeDependency(location: string) {
-  const content = readFileSync(path.join(location, 'package.json'), {
+  const content = readFileSync(join(location, 'package.json'), {
     encoding: 'utf8'
   })
   const pkgName = (JSON.parse(content) as { name: string }).name

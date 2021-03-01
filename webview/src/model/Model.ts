@@ -1,14 +1,15 @@
 import {
+  ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
   WebviewColorTheme,
   WindowWithWebviewData
-} from 'dvc/src/webviewContract'
+} from 'dvc/src/webviews/experiments/contract'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
-import { ExperimentsRepoJSONOutput } from 'dvc/src/DvcReader'
+
 import { getVsCodeApi } from './VsCodeApi'
 
 declare const window: Window & WindowWithWebviewData
