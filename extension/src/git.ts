@@ -113,7 +113,8 @@ const getWindowsRepoRootPath = async (
 }
 
 const getNonWidowsRepoRootPath = async (dirPath: string, rootPath?: string) => {
-  // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
+  // If we are not on Windows (symlinks don't seem to have the same issue on Windows),
+  // check if we are a symlink and if so, use the symlink path (not its resolved path)
   // This is because VS Code will provide document Uris using the symlinked path
   rootPath = await new Promise<string | undefined>(resolve => {
     realpath(dirPath, { encoding: 'utf8' }, (err, resolvedPath) => {
