@@ -6,7 +6,7 @@ import {
   checkout,
   checkoutRecursive
 } from './IntegratedTerminal'
-import path from 'path'
+import { resolve, relative } from 'path'
 
 describe('runExperiment', () => {
   it('should run the correct command in the IntegratedTerminal', async () => {
@@ -40,10 +40,12 @@ describe('add', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const undef = await add(path.resolve(__dirname, './fileSystem.js'))
+    const path = resolve(__dirname, 'fileSystem.js')
+    const relPath = relative(resolve(__dirname, '..'), path)
+    const undef = await add(path)
     expect(undef).toBeUndefined()
 
-    expect(terminalSpy).toBeCalledWith(`dvc add src/fileSystem.js`)
+    expect(terminalSpy).toBeCalledWith(`dvc add ${relPath}`)
   })
 })
 
