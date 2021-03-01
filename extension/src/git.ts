@@ -19,7 +19,7 @@ export const getRepoRootPath = async (
       return getWindowsRepoRootPath(dirPath, rootPath)
     }
 
-    return getNonWidowsRepoRootPath(dirPath, rootPath)
+    return getNonWindowsRepoRootPath(dirPath, rootPath)
   } catch (ex) {
     console.error(ex)
     rootPath = undefined
@@ -112,7 +112,10 @@ const getWindowsRepoRootPath = async (
   return rootPath
 }
 
-const getNonWidowsRepoRootPath = async (dirPath: string, rootPath?: string) => {
+const getNonWindowsRepoRootPath = async (
+  dirPath: string,
+  rootPath?: string
+) => {
   // If we are not on Windows (symlinks don't seem to have the same issue on Windows),
   // check if we are a symlink and if so, use the symlink path (not its resolved path)
   // This is because VS Code will provide document Uris using the symlinked path
