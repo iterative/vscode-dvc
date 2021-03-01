@@ -19,29 +19,7 @@ export const getRepoPathCore = async (
       return getWindowsRepoPathCore(dirPath, repoPath)
     }
 
-    // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
-    // This is because VS Code will provide document Uris using the symlinked path
-    repoPath = await new Promise<string | undefined>(resolve => {
-      realpath(dirPath, { encoding: 'utf8' }, (err, resolvedPath) => {
-        if (err != null) {
-          resolve(repoPath)
-          return
-        }
-
-        if (dirPath.toLowerCase() === resolvedPath.toLowerCase()) {
-          resolve(repoPath)
-          return
-        }
-
-        const linkPath = normalizePath(resolvedPath, {
-          stripTrailingSlash: true
-        })
-        repoPath = repoPath?.replace(linkPath, dirPath)
-        resolve(repoPath)
-      })
-    })
-
-    return repoPath
+    return getNonWidowsRepoPathCore(dirPath, repoPath)
   } catch (ex) {
     console.error(ex)
     repoPath = undefined
@@ -129,6 +107,32 @@ const getWindowsRepoPathCore = async (
 
     repoPath = normalizePath(pathUri.fsPath)
   }
+
+  return repoPath
+}
+
+const getNonWidowsRepoPathCore = async (dirPath: string, repoPath?: string) => {
+  // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
+  // This is because VS Code will provide document Uris using the symlinked path
+  repoPath = await new Promise<string | undefined>(resolve => {
+    realpath(dirPath, { encoding: 'utf8' }, (err, resolvedPath) => {
+      if (err != null) {
+        resolve(repoPath)
+        return
+      }
+
+      if (dirPath.toLowerCase() === resolvedPath.toLowerCase()) {
+        resolve(repoPath)
+        return
+      }
+
+      const linkPath = normalizePath(resolvedPath, {
+        stripTrailingSlash: true
+      })
+      repoPath = repoPath?.replace(linkPath, dirPath)
+      resolve(repoPath)
+    })
+  })
 
   return repoPath
 }
