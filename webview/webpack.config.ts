@@ -1,10 +1,10 @@
 import * as webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import path = require('path')
+import { resolve } from 'path'
 import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
-const r = (file: string) => path.resolve(__dirname, file)
+const r = (file: string) => resolve(__dirname, file)
 
 module.exports = {
   entry: [r('src/index.tsx')],
