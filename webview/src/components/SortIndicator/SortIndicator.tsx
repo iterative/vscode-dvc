@@ -1,7 +1,7 @@
 import { TableInstance, ColumnInstance } from 'react-table'
-import { Experiment } from '../interfaces/table'
 import styles from '../table-styles.module.scss'
 import React from 'react'
+import { Experiment } from '../Experiments'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>

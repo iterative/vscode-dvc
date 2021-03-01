@@ -1,9 +1,16 @@
 import React from 'react'
-import { Cell, HeaderGroup } from 'react-table'
+import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
-import { InstanceProp, RowProp } from './Experiments'
 import { Experiment } from '../util/parse-experiments'
 import styles from './table-styles.module.scss'
+
+export interface InstanceProp {
+  instance: TableInstance<Experiment>
+}
+
+export interface RowProp {
+  row: Row<Experiment>
+}
 
 export const ParentHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>

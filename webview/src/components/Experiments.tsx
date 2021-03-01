@@ -1,7 +1,8 @@
 import * as React from 'react'
 import {
   ExperimentsRepoJSONOutput,
-  MessageFromWebviewType
+  MessageFromWebviewType,
+  ExperimentJSONOutput
 } from 'dvc/src/webviews/experiments/contract'
 import {
   TableInstance,
@@ -25,6 +26,11 @@ import buildDynamicColumns from '../util/build-dynamic-columns'
 
 import { VsCodeApi } from '../model/Model'
 import SortIndicator from './SortIndicator/SortIndicator'
+
+export interface Experiment extends ExperimentJSONOutput {
+  subRows?: Experiment[]
+  id: string
+}
 
 const { useMemo, useEffect } = React
 
