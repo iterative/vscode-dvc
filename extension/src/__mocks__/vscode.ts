@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from 'path'
 
 export const Extension = jest.fn()
 export const extensions = jest.fn()
@@ -8,7 +8,7 @@ export const workspace = {
   workspaceFolders: [
     {
       uri: {
-        fsPath: path.join(__dirname, '..', '..')
+        fsPath: join(__dirname, '..', '..')
       }
     }
   ]

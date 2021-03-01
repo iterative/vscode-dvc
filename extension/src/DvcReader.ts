@@ -1,5 +1,5 @@
 import { accessSync } from 'fs'
-import * as path from 'path'
+import { resolve } from 'path'
 import { execPromise } from './util'
 import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
 export interface ReaderOptions {
@@ -10,7 +10,7 @@ export interface ReaderOptions {
 export const inferDefaultOptions: (
   cwd: string
 ) => Promise<ReaderOptions> = async cwd => {
-  const envDvcPath = path.resolve(cwd, '.env', 'bin', 'dvc')
+  const envDvcPath = resolve(cwd, '.env', 'bin', 'dvc')
   let bin
   try {
     accessSync(envDvcPath)
