@@ -1,7 +1,17 @@
 import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
-import { dirname } from 'path'
+import { dirname, resolve } from 'path'
+
+export const getExperimentsRefsPath = async (
+  dirPath: string
+): Promise<string | undefined> => {
+  const rootPath = await getRepoRootPath(dirPath)
+  if (!rootPath) {
+    return
+  }
+  return resolve(rootPath, '.git', 'refs', 'exps')
+}
 
 const isWindows = process.platform === 'win32'
 
