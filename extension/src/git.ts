@@ -5,7 +5,7 @@ import { dirname } from 'path'
 
 const isWindows = process.platform === 'win32'
 
-export const getRepoPathCore = async (
+export const getRepoRootPath = async (
   dirPath: string
 ): Promise<string | undefined> => {
   let repoPath: string | undefined
@@ -16,10 +16,10 @@ export const getRepoPathCore = async (
     }
 
     if (isWindows) {
-      return getWindowsRepoPathCore(dirPath, repoPath)
+      return getWindowsRepoRootPath(dirPath, repoPath)
     }
 
-    return getNonWidowsRepoPathCore(dirPath, repoPath)
+    return getNonWidowsRepoRootPath(dirPath, repoPath)
   } catch (ex) {
     console.error(ex)
     repoPath = undefined
@@ -68,7 +68,7 @@ const revParseShowToplevel = async (
   }
 }
 
-const getWindowsRepoPathCore = async (
+const getWindowsRepoRootPath = async (
   dirPath: string,
   repoPath: string
 ): Promise<string | undefined> => {
@@ -112,7 +112,7 @@ const getWindowsRepoPathCore = async (
   return repoPath
 }
 
-const getNonWidowsRepoPathCore = async (dirPath: string, repoPath?: string) => {
+const getNonWidowsRepoRootPath = async (dirPath: string, repoPath?: string) => {
   // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
   // This is because VS Code will provide document Uris using the symlinked path
   repoPath = await new Promise<string | undefined>(resolve => {
