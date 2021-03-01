@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 
 import Experiments from '../components/Experiments'
 
-import complexExperimentsData from './complex-experiments-output.json'
+import complexExperimentsData from 'dvc/src/webviews/experiments/complex-output-example.json'
 
 import './test-vscode-styles.scss'
 import '../style.scss'

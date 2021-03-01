@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { inferDefaultOptions, getExperiments } from './DvcReader'
 import fs from 'fs'
 import { execPromise } from './util'
-import complexExperimentsOutput from 'dvc-vscode-webview/src/stories/complex-experiments-output.json'
+import complexExperimentsOutput from './webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
 
 jest.mock('fs')
