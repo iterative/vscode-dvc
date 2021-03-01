@@ -11,49 +11,12 @@ export const getRepoPathCore = async (
   let repoPath: string | undefined
   try {
     repoPath = await revParseShowToplevel(dirPath)
-    if (repoPath == null) return repoPath
+    if (repoPath == null) {
+      return repoPath
+    }
 
     if (isWindows) {
-      // On Git 2.25+ if you call `rev-parse --show-toplevel` on a mapped drive,
-      // instead of getting the mapped drive path back, you get the UNC path for the mapped drive.
-      // So try to normalize it back to the mapped drive path, if possible
-
-      const repoUri = Uri.file(repoPath)
-      const pathUri = Uri.file(dirPath)
-      if (repoUri.authority.length !== 0 && pathUri.authority.length === 0) {
-        const match = driveLetterRegex.exec(pathUri.path)
-        if (match != null) {
-          const [, letter] = match
-
-          try {
-            const networkPath = await new Promise<string | undefined>(resolve =>
-              realpath(
-                `${letter}:\\`,
-                { encoding: 'utf8' },
-                (err, resolvedPath) =>
-                  resolve(err != null ? undefined : resolvedPath)
-              )
-            )
-            if (networkPath != null) {
-              repoPath = normalizePath(
-                repoUri.fsPath.replace(
-                  networkPath,
-                  `${letter.toLowerCase()}:${
-                    networkPath.endsWith('\\') ? '\\' : ''
-                  }`
-                )
-              )
-              return repoPath
-            }
-          } catch (e) {
-            console.error(e)
-          }
-        }
-
-        repoPath = normalizePath(pathUri.fsPath)
-      }
-
-      return repoPath
+      return getWindowsRepoPathCore(dirPath, repoPath)
     }
 
     // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
@@ -125,6 +88,49 @@ const revParseShowToplevel = async (
     }
     return undefined
   }
+}
+
+const getWindowsRepoPathCore = async (
+  dirPath: string,
+  repoPath: string
+): Promise<string | undefined> => {
+  // On Git 2.25+ if you call `rev-parse --show-toplevel` on a mapped drive,
+  // instead of getting the mapped drive path back, you get the UNC path for the mapped drive.
+  // So try to normalize it back to the mapped drive path, if possible
+
+  const repoUri = Uri.file(repoPath)
+  const pathUri = Uri.file(dirPath)
+  if (repoUri.authority.length !== 0 && pathUri.authority.length === 0) {
+    const match = driveLetterRegex.exec(pathUri.path)
+    if (match != null) {
+      const [, letter] = match
+
+      try {
+        const networkPath = await new Promise<string | undefined>(resolve =>
+          realpath(`${letter}:\\`, { encoding: 'utf8' }, (err, resolvedPath) =>
+            resolve(err != null ? undefined : resolvedPath)
+          )
+        )
+        if (networkPath != null) {
+          repoPath = normalizePath(
+            repoUri.fsPath.replace(
+              networkPath,
+              `${letter.toLowerCase()}:${
+                networkPath.endsWith('\\') ? '\\' : ''
+              }`
+            )
+          )
+          return repoPath
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    repoPath = normalizePath(pathUri.fsPath)
+  }
+
+  return repoPath
 }
 
 const enum CharCode {
