@@ -18,7 +18,14 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
+import {
+  IntegratedTerminal,
+  runExperiment,
+  initializeDirectory,
+  add,
+  checkout,
+  checkoutRecursive
+} from './IntegratedTerminal'
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
@@ -111,6 +118,30 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', runExperiment)
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
+        initializeDirectory(fsPath)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.add', ({ fsPath }) => {
+        add(fsPath)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.checkout', ({ fsPath }) => {
+        checkout(fsPath)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
+        checkoutRecursive(fsPath)
+      })
     )
 
     this.dvcScmFilesView()
