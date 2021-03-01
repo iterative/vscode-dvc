@@ -8,25 +8,25 @@ const isWindows = process.platform === 'win32'
 export const getRepoRootPath = async (
   dirPath: string
 ): Promise<string | undefined> => {
-  let repoPath: string | undefined
+  let rootPath: string | undefined
   try {
-    repoPath = await revParseShowToplevel(dirPath)
-    if (repoPath == null) {
-      return repoPath
+    rootPath = await revParseShowToplevel(dirPath)
+    if (rootPath == null) {
+      return rootPath
     }
 
     if (isWindows) {
-      return getWindowsRepoRootPath(dirPath, repoPath)
+      return getWindowsRepoRootPath(dirPath, rootPath)
     }
 
-    return getNonWidowsRepoRootPath(dirPath, repoPath)
+    return getNonWidowsRepoRootPath(dirPath, rootPath)
   } catch (ex) {
     console.error(ex)
-    repoPath = undefined
-    return repoPath
+    rootPath = undefined
+    return rootPath
   } finally {
-    if (repoPath) {
-      void ensureProperWorkspaceCasing(repoPath, dirPath)
+    if (rootPath) {
+      void ensureProperWorkspaceCasing(rootPath, dirPath)
     }
   }
 }
@@ -70,13 +70,13 @@ const revParseShowToplevel = async (
 
 const getWindowsRepoRootPath = async (
   dirPath: string,
-  repoPath: string
+  rootPath: string
 ): Promise<string | undefined> => {
   // On Git 2.25+ if you call `rev-parse --show-toplevel` on a mapped drive,
   // instead of getting the mapped drive path back, you get the UNC path for the mapped drive.
   // So try to normalize it back to the mapped drive path, if possible
 
-  const repoUri = Uri.file(repoPath)
+  const repoUri = Uri.file(rootPath)
   const pathUri = Uri.file(dirPath)
   if (repoUri.authority.length !== 0 && pathUri.authority.length === 0) {
     const driveLetterRegex = /(?<=^\/?)([a-zA-Z])(?=:\/)/
@@ -91,7 +91,7 @@ const getWindowsRepoRootPath = async (
           )
         )
         if (networkPath != null) {
-          repoPath = normalizePath(
+          rootPath = normalizePath(
             repoUri.fsPath.replace(
               networkPath,
               `${letter.toLowerCase()}:${
@@ -99,43 +99,43 @@ const getWindowsRepoRootPath = async (
               }`
             )
           )
-          return repoPath
+          return rootPath
         }
       } catch (e) {
         console.error(e)
       }
     }
 
-    repoPath = normalizePath(pathUri.fsPath)
+    rootPath = normalizePath(pathUri.fsPath)
   }
 
-  return repoPath
+  return rootPath
 }
 
-const getNonWidowsRepoRootPath = async (dirPath: string, repoPath?: string) => {
+const getNonWidowsRepoRootPath = async (dirPath: string, rootPath?: string) => {
   // If we are not on Windows (symlinks don't seem to have the same issue on Windows), check if we are a symlink and if so, use the symlink path (not its resolved path)
   // This is because VS Code will provide document Uris using the symlinked path
-  repoPath = await new Promise<string | undefined>(resolve => {
+  rootPath = await new Promise<string | undefined>(resolve => {
     realpath(dirPath, { encoding: 'utf8' }, (err, resolvedPath) => {
       if (err != null) {
-        resolve(repoPath)
+        resolve(rootPath)
         return
       }
 
       if (dirPath.toLowerCase() === resolvedPath.toLowerCase()) {
-        resolve(repoPath)
+        resolve(rootPath)
         return
       }
 
       const linkPath = normalizePath(resolvedPath, {
         stripTrailingSlash: true
       })
-      repoPath = repoPath?.replace(linkPath, dirPath)
-      resolve(repoPath)
+      rootPath = rootPath?.replace(linkPath, dirPath)
+      resolve(rootPath)
     })
   })
 
-  return repoPath
+  return rootPath
 }
 
 const enum CharCode {
@@ -190,17 +190,17 @@ const normalizePath = (
   return normalized
 }
 
-const ensureProperWorkspaceCasing = (repoPath: string, filePath: string) => {
+const ensureProperWorkspaceCasing = (rootPath: string, filePath: string) => {
   filePath = filePath.replace(/\\/g, '/')
 
   let regexPath
   let testPath
-  if (filePath > repoPath) {
+  if (filePath > rootPath) {
     regexPath = filePath
-    testPath = repoPath
+    testPath = rootPath
   } else {
     testPath = filePath
-    regexPath = repoPath
+    regexPath = rootPath
   }
 
   let pathRegex = new RegExp(`^${regexPath}`)
