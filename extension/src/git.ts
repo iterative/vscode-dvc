@@ -25,12 +25,12 @@ const driveLetterNormalizeRegex = /(?<=^\/?)([A-Z])(?=:\/)/
 const pathNormalizeRegex = /\\/g
 const pathStripTrailingSlashRegex = /\/$/g
 
-function normalizePath(
+const normalizePath = (
   fileName: string,
   options: { addLeadingSlash?: boolean; stripTrailingSlash?: boolean } = {
     stripTrailingSlash: true
   }
-) {
+) => {
   if (fileName == null || fileName.length === 0) {
     return fileName
   }
@@ -61,9 +61,9 @@ function normalizePath(
   return normalized
 }
 
-async function rev_parse__show_toplevel(
+const rev_parse__show_toplevel = async (
   cwd: string
-): Promise<string | undefined> {
+): Promise<string | undefined> => {
   try {
     const { stdout: data } = await execPromise(
       'git rev-parse --show-toplevel',
@@ -184,7 +184,7 @@ export const getRepoPathCore = async (
   }
 }
 
-async function ensureProperWorkspaceCasing(repoPath: string, filePath: string) {
+const ensureProperWorkspaceCasing = (repoPath: string, filePath: string) => {
   filePath = filePath.replace(/\\/g, '/')
 
   let regexPath
@@ -201,12 +201,12 @@ async function ensureProperWorkspaceCasing(repoPath: string, filePath: string) {
   if (!pathRegex.test(testPath)) {
     pathRegex = new RegExp(pathRegex, 'i')
     if (pathRegex.test(testPath)) {
-      await showIncorrectWorkspaceCasingWarningMessage()
+      return showIncorrectWorkspaceCasingWarningMessage()
     }
   }
 }
 
-async function showIncorrectWorkspaceCasingWarningMessage(): Promise<void> {
+const showIncorrectWorkspaceCasingWarningMessage = async (): Promise<void> => {
   void (await window.showWarningMessage(
     'This workspace was opened with a different casing than what exists on disk. Please re-open this workspace with the exact casing as it exists on disk, otherwise you may experience issues with certain Git features, such as missing blame or history.'
   ))
