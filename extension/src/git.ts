@@ -79,6 +79,7 @@ const getWindowsRepoPathCore = async (
   const repoUri = Uri.file(repoPath)
   const pathUri = Uri.file(dirPath)
   if (repoUri.authority.length !== 0 && pathUri.authority.length === 0) {
+    const driveLetterRegex = /(?<=^\/?)([a-zA-Z])(?=:\/)/
     const match = driveLetterRegex.exec(pathUri.path)
     if (match != null) {
       const [, letter] = match
@@ -152,11 +153,6 @@ const enum CharCode {
   z = 122
 }
 
-const emptyStr = ''
-const driveLetterNormalizeRegex = /(?<=^\/?)([A-Z])(?=:\/)/
-const pathNormalizeRegex = /\\/g
-const pathStripTrailingSlashRegex = /\/$/g
-
 const normalizePath = (
   fileName: string,
   options: { addLeadingSlash?: boolean; stripTrailingSlash?: boolean } = {
@@ -167,7 +163,7 @@ const normalizePath = (
     return fileName
   }
 
-  let normalized = fileName.replace(pathNormalizeRegex, '/')
+  let normalized = fileName.replace(/\\/g, '/')
 
   const { addLeadingSlash, stripTrailingSlash } = {
     stripTrailingSlash: true,
@@ -175,7 +171,7 @@ const normalizePath = (
   }
 
   if (stripTrailingSlash) {
-    normalized = normalized.replace(pathStripTrailingSlashRegex, emptyStr)
+    normalized = normalized.replace(/\/$/g, '')
   }
 
   if (addLeadingSlash && normalized.charCodeAt(0) !== CharCode.Slash) {
@@ -184,6 +180,7 @@ const normalizePath = (
 
   if (isWindows) {
     // Ensure that drive casing is normalized (lower case)
+    const driveLetterNormalizeRegex = /(?<=^\/?)([A-Z])(?=:\/)/
     normalized = normalized.replace(
       driveLetterNormalizeRegex,
       (drive: string) => drive.toLowerCase()
@@ -192,8 +189,6 @@ const normalizePath = (
 
   return normalized
 }
-
-const driveLetterRegex = /(?<=^\/?)([a-zA-Z])(?=:\/)/
 
 const ensureProperWorkspaceCasing = (repoPath: string, filePath: string) => {
   filePath = filePath.replace(/\\/g, '/')
