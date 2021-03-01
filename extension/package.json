@@ -55,6 +55,22 @@
       {
         "title": "DVC: Select DVC path...",
         "command": "dvc.selectDvcPath"
+      },
+      {
+        "title": "DVC: Initialize Directory",
+        "command": "dvc.initializeDirectory"
+      },
+      {
+        "title": "DVC: Add",
+        "command": "dvc.add"
+      },
+      {
+        "title": "DVC: Checkout",
+        "command": "dvc.checkout"
+      },
+      {
+        "title": "DVC: Checkout Recursive",
+        "command": "dvc.checkoutRecursive"
       }
     ],
     "configuration": {
@@ -78,7 +94,28 @@
       "explorer/context": [
         {
           "command": "dvc.runExperiment",
-          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml"
+          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml",
+          "group": "8_dvc@1"
+        },
+        {
+          "command": "dvc.initializeDirectory",
+          "when": "explorerResourceIsFolder",
+          "group": "8_dvc@1"
+        },
+        {
+          "command": "dvc.add",
+          "when": "isFileSystemResource",
+          "group": "8_dvc@2"
+        },
+        {
+          "command": "dvc.checkout",
+          "when": "isFileSystemResource",
+          "group": "8_dvc@3"
+        },
+        {
+          "command": "dvc.checkoutRecursive",
+          "when": "explorerResourceIsFolder",
+          "group": "8_dvc@4"
         }
       ]
     },
