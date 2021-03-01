@@ -57,8 +57,20 @@ module.exports = {
         ]
       },
       {
-        test: /\.(jpe?g|png|gif|eot|ttf|svg|woff|woff2|md)$/i,
+        test: /\.(jpe?g|png|gif|eot|svg|woff|woff2|md)$/i,
         loader: 'file-loader'
+      },
+      {
+        test: /\.(ttf)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts/'
+            }
+          }
+        ]
       },
       {
         test: /\.tsx?$/,
