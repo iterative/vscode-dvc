@@ -47,9 +47,7 @@ const revParseShowToplevel = async (
   try {
     const { stdout: data } = await execPromise(
       'git rev-parse --show-toplevel',
-      {
-        cwd
-      }
+      { cwd }
     )
     // Make sure to normalize: https://github.com/git-for-windows/git/issues/2478
     // Keep trailing spaces which are part of the directory name
