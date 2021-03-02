@@ -31,16 +31,8 @@ const ColumnOptionsRow: React.FC<{
   </div>
 )
 
-const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
-  const { allColumns } = instance
-  const [sortIndicatorState, setSortIndicatorState] = React.useState({
-    isOpen: false,
-    sortColumn: '',
-    sortDirection: '',
-    hideColumn: false
-  })
-
-  const selectedItemComponent = (
+const SortMenuItem: React.FC = () => {
+  return (
     <span className={menuStyles.sortMenu__menuItem__icon}>
       <svg
         fill="currentColor"
@@ -55,147 +47,135 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
       </svg>
     </span>
   )
+}
+
+const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
+  const { allColumns } = instance
+  const [sortIndicatorState, setSortIndicatorState] = React.useState({
+    isOpen: false,
+    sortColumn: '',
+    sortDirection: '',
+    hideColumn: false
+  })
 
   return (
-    <>
-      <div className={menuStyles.sortMenu}>
-        <div className={menuStyles.sortMenu__toggle}>
-          <button
-            onClick={() => {
-              setSortIndicatorState({
-                ...sortIndicatorState,
-                isOpen: !sortIndicatorState.isOpen //Toggle
-              })
-            }}
-            className={menuStyles.sortMenu__toggle__button}
-          >
-            Sort By
-          </button>
-        </div>
-        {sortIndicatorState.isOpen ? (
-          <div className={menuStyles.sortMenu__menu} role="menu">
-            <section className={menuStyles.sortMenu__group}>
-              <ul>
-                {allColumns.map(column => {
-                  return (
-                    <li id={column.id} key={column.id} role="menuitem">
-                      <button
-                        key={`button-${column.id}`}
-                        className={menuStyles.sortMenu__menuItem}
-                        onClick={() => {
-                          setSortIndicatorState({
-                            ...sortIndicatorState,
-                            sortColumn: column.Header as string
-                          })
-                        }}
-                      >
-                        {column.Header}
-                        {sortIndicatorState.sortColumn === column.Header
-                          ? selectedItemComponent
-                          : null}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </section>
-            <li role="separator"></li>
-            <section className={menuStyles.sortMenu__group}>
-              <ul>
-                <li role="menuitem">
-                  <button
-                    className={menuStyles.sortMenu__menuItem}
-                    onClick={() => {
-                      setSortIndicatorState({
-                        ...sortIndicatorState,
-                        sortDirection: 'Asc'
-                      })
-                    }}
-                  >
-                    Asc
-                    {sortIndicatorState.sortDirection === 'Asc'
-                      ? selectedItemComponent
-                      : null}
-                  </button>
-                </li>
-                <li role="menuitem">
-                  <button
-                    className={menuStyles.sortMenu__menuItem}
-                    onClick={() => {
-                      setSortIndicatorState({
-                        ...sortIndicatorState,
-                        sortDirection: 'Desc'
-                      })
-                    }}
-                  >
-                    Desc
-                    {sortIndicatorState.sortDirection === 'Desc'
-                      ? selectedItemComponent
-                      : null}
-                  </button>
-                </li>
-              </ul>
-            </section>
-            <li role="separator"></li>
-            <section className={menuStyles.sortMenu__group}>
-              <ul>
-                <li role="menuitem">
-                  <button
-                    className={menuStyles.sortMenu__menuItem}
-                    onClick={() => {
-                      setSortIndicatorState({
-                        ...sortIndicatorState,
-                        hideColumn: true
-                      })
-                    }}
-                  >
-                    Hide
-                    {sortIndicatorState.hideColumn
-                      ? selectedItemComponent
-                      : null}
-                  </button>
-                </li>
-                <li role="menuitem">
-                  <button
-                    className={menuStyles.sortMenu__menuItem}
-                    onClick={() => {
-                      setSortIndicatorState({
-                        ...sortIndicatorState,
-                        hideColumn: false
-                      })
-                    }}
-                  >
-                    Show
-                    {sortIndicatorState.sortColumn &&
-                    !sortIndicatorState.hideColumn
-                      ? selectedItemComponent
-                      : null}
-                  </button>
-                </li>
-              </ul>
-            </section>
-          </div>
-        ) : null}
+    <div className={menuStyles.sortMenu}>
+      <div className={menuStyles.sortMenu__toggle}>
+        <button
+          onClick={() => {
+            setSortIndicatorState({
+              ...sortIndicatorState,
+              isOpen: !sortIndicatorState.isOpen //Toggle
+            })
+          }}
+          className={menuStyles.sortMenu__toggle__button}
+        >
+          Sort By
+        </button>
       </div>
-      {/* TODO: Remove this commented code once SortIndicator is implemented completely */}
-      {/* <details className={styles.optionsPanel}>
-        <summary>
-          <b>Sort By</b>
-          {/* <div>Sorted by:</div> */}
-      {/* <div>
-            {sortedColumns.map(column => (
-              <span key={column.id}>
-                {column.render('Header')} (
-                {column.isSortedDesc ? 'DESC' : 'ASC'})
-              </span>
-            ))}
-          </div>
-        </summary> */}
-      {/* //   {columnInstances.map(column => ( */}
-      {/* //     <ColumnOptionsRow column={column} key={column.id} />
-      //   ))}
-      // </details> */}
-    </>
+      {sortIndicatorState.isOpen ? (
+        <div className={menuStyles.sortMenu__menu} role="menu">
+          <section className={menuStyles.sortMenu__group}>
+            <ul>
+              {allColumns.map(column => {
+                return (
+                  <li id={column.id} key={column.id} role="menuitem">
+                    <button
+                      key={`button-${column.id}`}
+                      className={menuStyles.sortMenu__menuItem}
+                      onClick={() => {
+                        setSortIndicatorState({
+                          ...sortIndicatorState,
+                          sortColumn: column.Header as string
+                        })
+                      }}
+                    >
+                      {column.Header}
+                      {sortIndicatorState.sortColumn === column.Header ? (
+                        <SortMenuItem />
+                      ) : null}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </section>
+          <li role="separator"></li>
+          <section className={menuStyles.sortMenu__group}>
+            <ul>
+              <li role="menuitem">
+                <button
+                  className={menuStyles.sortMenu__menuItem}
+                  onClick={() => {
+                    setSortIndicatorState({
+                      ...sortIndicatorState,
+                      sortDirection: 'Asc'
+                    })
+                  }}
+                >
+                  Asc
+                  {sortIndicatorState.sortDirection === 'Asc' ? (
+                    <SortMenuItem />
+                  ) : null}
+                </button>
+              </li>
+              <li role="menuitem">
+                <button
+                  className={menuStyles.sortMenu__menuItem}
+                  onClick={() => {
+                    setSortIndicatorState({
+                      ...sortIndicatorState,
+                      sortDirection: 'Desc'
+                    })
+                  }}
+                >
+                  Desc
+                  {sortIndicatorState.sortDirection === 'Desc' ? (
+                    <SortMenuItem />
+                  ) : null}
+                </button>
+              </li>
+            </ul>
+          </section>
+          <li role="separator"></li>
+          <section className={menuStyles.sortMenu__group}>
+            <ul>
+              <li role="menuitem">
+                <button
+                  className={menuStyles.sortMenu__menuItem}
+                  onClick={() => {
+                    setSortIndicatorState({
+                      ...sortIndicatorState,
+                      hideColumn: true
+                    })
+                  }}
+                >
+                  Hide
+                  {sortIndicatorState.hideColumn ? <SortMenuItem /> : null}
+                </button>
+              </li>
+              <li role="menuitem">
+                <button
+                  className={menuStyles.sortMenu__menuItem}
+                  onClick={() => {
+                    setSortIndicatorState({
+                      ...sortIndicatorState,
+                      hideColumn: false
+                    })
+                  }}
+                >
+                  Show
+                  {sortIndicatorState.sortColumn &&
+                  !sortIndicatorState.hideColumn ? (
+                    <SortMenuItem />
+                  ) : null}
+                </button>
+              </li>
+            </ul>
+          </section>
+        </div>
+      ) : null}
+    </div>
   )
 }
 
