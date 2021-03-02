@@ -1,8 +1,5 @@
 import * as React from 'react'
-import {
-  ExperimentsRepoJSONOutput,
-  ExperimentJSONOutput
-} from 'dvc/src/webviews/experiments/contract'
+import { ExperimentsRepoJSONOutput } from 'dvc/src/webviews/experiments/contract'
 import {
   TableInstance,
   Row,
@@ -18,19 +15,14 @@ import {
 import cx from 'classnames'
 import dayjs from '../dayjs'
 import { Table } from './Table'
-import parseExperiments from '../util/parse-experiments'
+import parseExperiments, { Experiment } from '../util/parse-experiments'
 
 import styles from './table-styles.module.scss'
 
-import buildDynamicColumns from './build-dynamic-columns'
+import buildDynamicColumns from '../util/build-dynamic-columns'
 import { MessageFromWebviewType } from 'dvc/src/webviews/experiments/contract'
 
 const { useMemo, useEffect } = React
-
-export interface Experiment extends ExperimentJSONOutput {
-  subRows?: Experiment[]
-  id: string
-}
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>
