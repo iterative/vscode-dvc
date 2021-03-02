@@ -1,7 +1,17 @@
 import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
-import { dirname } from 'path'
+import { dirname, resolve } from 'path'
+
+export const getExperimentsRefsPath = async (
+  dirPath: string
+): Promise<string | undefined> => {
+  const rootPath = await getRepoRootPath(dirPath)
+  if (!rootPath) {
+    return
+  }
+  return resolve(rootPath, '.git', 'refs', 'exps')
+}
 
 const isWindows = process.platform === 'win32'
 
@@ -37,9 +47,7 @@ const revParseShowToplevel = async (
   try {
     const { stdout: data } = await execPromise(
       'git rev-parse --show-toplevel',
-      {
-        cwd
-      }
+      { cwd }
     )
     // Make sure to normalize: https://github.com/git-for-windows/git/issues/2478
     // Keep trailing spaces which are part of the directory name
