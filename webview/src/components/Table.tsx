@@ -219,12 +219,12 @@ export const TableHead: React.FC<InstanceProp> = ({
 
   return (
     <div className={styles.thead}>
-      {headerGroups.slice(0, lastHeaderGroupIndex).map((headerGroup, i) => (
+      {/* {headerGroups.slice(0, lastHeaderGroupIndex).map((headerGroup, i) => (
         <ParentHeaderGroup
           headerGroup={headerGroup}
           key={`header-group-${i}`}
         />
-      ))}
+      ))} */}
       <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
     </div>
   )
