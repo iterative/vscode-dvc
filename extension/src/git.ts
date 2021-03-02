@@ -16,7 +16,7 @@ export const getExperimentsRefsPath = async (
 const isWindows = process.platform === 'win32'
 
 // getRepoRootPath was originally adapted from GitService.getRepoPathCore in GitLens
-// project: https://github.com/eamodio/vscode-gitlens/blob/main/src/git/gitService.ts
+// project: https://github.com/eamodio/vscode-gitlens
 // Copyright (c) 2016-2021 Eric Amodio
 // License (MIT): https://github.com/eamodio/vscode-gitlens/blob/main/LICENSE
 export const getRepoRootPath = async (
