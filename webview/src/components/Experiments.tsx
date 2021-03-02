@@ -1,11 +1,10 @@
-import * as React from 'react'
+import React from 'react'
 import {
   ExperimentsRepoJSONOutput,
   MessageFromWebviewType,
   ExperimentJSONOutput
 } from 'dvc/src/webviews/experiments/contract'
 import {
-  TableInstance,
   Row,
   Column,
   ColumnInstance,
@@ -30,16 +29,6 @@ import SortIndicator from './SortIndicator/SortIndicator'
 export interface Experiment extends ExperimentJSONOutput {
   subRows?: Experiment[]
   id: string
-}
-
-const { useMemo, useEffect } = React
-
-export interface InstanceProp {
-  instance: TableInstance<Experiment>
-}
-
-export interface RowProp {
-  row: Row<Experiment>
 }
 
 const countRowsAndAddIndexes: (
@@ -82,13 +71,13 @@ const orderByFn: (
 export const ExperimentsTable: React.FC<{
   experiments: ExperimentsRepoJSONOutput
 }> = ({ experiments: rawExperiments }) => {
-  const [initialState, defaultColumn] = useMemo(() => {
+  const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {}
     return [initialState, defaultColumn]
   }, [])
 
-  const [data, columns] = useMemo(() => {
+  const [data, columns] = React.useMemo(() => {
     const { experiments, flatExperiments } = parseExperiments(rawExperiments)
     const columns = [
       {
@@ -157,7 +146,7 @@ export const ExperimentsTable: React.FC<{
 
   const { toggleAllRowsExpanded } = instance
 
-  useEffect(() => {
+  React.useEffect(() => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
