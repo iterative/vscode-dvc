@@ -29,7 +29,7 @@ import {
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
-import { getExperiments, inferDefaultOptions } from './DvcReader'
+import { getExperiments, inferDefaultOptions } from './dvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
