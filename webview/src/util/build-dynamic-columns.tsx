@@ -1,8 +1,7 @@
 import React from 'react'
 
 import { DataDictRoot } from 'dvc/src/webviews/experiments/contract'
-
-import { Experiment } from '../components/Experiments'
+import { Experiment } from './parse-experiments'
 
 import {
   formatFloat,
