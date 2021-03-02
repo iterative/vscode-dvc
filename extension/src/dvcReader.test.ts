@@ -1,7 +1,7 @@
 import { resolve, join } from 'path'
 import { mocked } from 'ts-jest/utils'
 
-import { inferDefaultOptions, getExperiments } from './DvcReader'
+import { inferDefaultOptions, getExperiments } from './dvcReader'
 import fs from 'fs'
 import { execPromise } from './util'
 import complexExperimentsOutput from './webviews/experiments/complex-output-example.json'
