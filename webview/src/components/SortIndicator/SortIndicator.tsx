@@ -200,4 +200,3 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
 }
 
 export default SortIndicator
-/*  */
