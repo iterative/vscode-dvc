@@ -2,13 +2,13 @@ import React from 'react'
 
 import { DataDictRoot } from 'dvc/src/webviews/experiments/contract'
 
-import { Experiment } from './Experiments'
+import { Experiment } from '../components/Experiments'
 
 import {
   formatFloat,
   formatInteger,
   formatSignedFloat
-} from '../util/number-formatting'
+} from './number-formatting'
 
 type SchemaType = string | string[]
 
