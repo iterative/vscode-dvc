@@ -127,7 +127,9 @@ export const ExperimentsTable: React.FC<{
 }> = ({ experiments: rawExperiments }) => {
   const [initialState, defaultColumn] = useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<Experiment>> = {}
+    const defaultColumn: Partial<Column<Experiment>> = {
+      width: 110
+    }
     return [initialState, defaultColumn]
   }, [])
 
@@ -142,7 +144,7 @@ export const ExperimentsTable: React.FC<{
           if (id === 'workspace') return id
           return id.slice(0, 7)
         },
-        width: 200
+        width: 150
       },
       {
         Header: 'Timestamp',
