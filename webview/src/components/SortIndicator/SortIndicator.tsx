@@ -31,23 +31,21 @@ const ColumnOptionsRow: React.FC<{
   </div>
 )
 
-const SortMenuItem: React.FC = () => {
-  return (
-    <span className={menuStyles.sortMenu__menuItem__icon}>
-      <svg
-        fill="currentColor"
-        height="1em"
-        width="1em"
-        viewBox="0 0 512 512"
-        aria-hidden="true"
-        role="img"
-        style={{ verticalAlign: -0.125 + 'em' }}
-      >
-        <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
-      </svg>
-    </span>
-  )
-}
+const SelectedItem = (
+  <span className={menuStyles.sortMenu__menuItem__icon}>
+    <svg
+      fill="currentColor"
+      height="1em"
+      width="1em"
+      viewBox="0 0 512 512"
+      aria-hidden="true"
+      role="img"
+      style={{ verticalAlign: -0.125 + 'em' }}
+    >
+      <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
+    </svg>
+  </span>
+)
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
   const { allColumns } = instance
@@ -91,9 +89,9 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
                       }}
                     >
                       {column.Header}
-                      {sortIndicatorState.sortColumn === column.Header ? (
-                        <SortMenuItem />
-                      ) : null}
+                      {sortIndicatorState.sortColumn === column.Header
+                        ? SelectedItem
+                        : null}
                     </button>
                   </li>
                 )
@@ -114,9 +112,9 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
                   }}
                 >
                   Asc
-                  {sortIndicatorState.sortDirection === 'Asc' ? (
-                    <SortMenuItem />
-                  ) : null}
+                  {sortIndicatorState.sortDirection === 'Asc'
+                    ? SelectedItem
+                    : null}
                 </button>
               </li>
               <li role="menuitem">
@@ -130,9 +128,9 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
                   }}
                 >
                   Desc
-                  {sortIndicatorState.sortDirection === 'Desc' ? (
-                    <SortMenuItem />
-                  ) : null}
+                  {sortIndicatorState.sortDirection === 'Desc'
+                    ? SelectedItem
+                    : null}
                 </button>
               </li>
             </ul>
@@ -151,7 +149,7 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
                   }}
                 >
                   Hide
-                  {sortIndicatorState.hideColumn ? <SortMenuItem /> : null}
+                  {sortIndicatorState.hideColumn ? SelectedItem : null}
                 </button>
               </li>
               <li role="menuitem">
@@ -166,9 +164,9 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
                 >
                   Show
                   {sortIndicatorState.sortColumn &&
-                  !sortIndicatorState.hideColumn ? (
-                    <SortMenuItem />
-                  ) : null}
+                  !sortIndicatorState.hideColumn
+                    ? SelectedItem
+                    : null}
                 </button>
               </li>
             </ul>
