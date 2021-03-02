@@ -132,7 +132,9 @@ export const ExperimentsTable: React.FC<{
 }> = ({ experiments: rawExperiments }) => {
   const [initialState, defaultColumn] = useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<Experiment>> = {}
+    const defaultColumn: Partial<Column<Experiment>> = {
+      width: 110
+    }
     return [initialState, defaultColumn]
   }, [])
 
@@ -147,7 +149,7 @@ export const ExperimentsTable: React.FC<{
           if (id === 'workspace') return id
           return id.slice(0, 7)
         },
-        width: 200
+        width: 150
       },
       {
         Header: 'Timestamp',
@@ -224,16 +226,21 @@ const Experiments: React.FC<{
 }> = ({ experiments, vsCodeApi }) => {
   return (
     <div className={styles.experiments}>
-      <h1 className={cx(styles.experimentsHeading, styles.pageHeading)} />
-      <button
-        onClick={() => {
-          vsCodeApi.postMessage({
-            type: MessageFromWebviewType.onClickRunExperiment
-          })
-        }}
-      >
-        Run Experiment
-      </button>
+      <div className={cx(styles.webviewHeader)}>
+        <h1 className={cx(styles.experimentsHeading, styles.pageHeading)}>
+          metrics-tracking
+        </h1>
+        <button
+          className={styles.experimentsButton}
+          onClick={() => {
+            vsCodeApi.postMessage({
+              type: MessageFromWebviewType.onClickRunExperiment
+            })
+          }}
+        >
+          Run Experiment
+        </button>
+      </div>
       {experiments ? (
         <ExperimentsTable experiments={experiments} />
       ) : (
