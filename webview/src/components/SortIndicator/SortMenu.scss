@@ -1,29 +1,37 @@
 .sortMenu {
     margin-top: 1rem;
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
     &__toggle {
+        padding-top: 0.375rem;
+        padding-right: 0.5rem;
+        padding-bottom: 0.375rem;
+        padding-left: 0.5rem;
         position: relative;
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 100px;
         max-width: 100%;
-        &__button {
-            padding-top: 0.375rem;
-            padding-right: 0.5rem;
-            padding-bottom: 0.375rem;
-            padding-left: 0.5rem;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            min-width: 100px;
-            max-width: 100%;
-            line-height: 24px;
-            color: #ffffff;
-            background-color: #4f5255;
-            border: none;
+        line-height: 1.5;
+        color: #ffffff;
+        background-color: #4f5255;
+        border: none;
+        &__text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 1rem;
+        }
+        &__icon {
+            margin-right: 0.5rem;
+            margin-left: 1rem;
         }
     }
     &__menu {
         position: absolute;
-        top: 123px;
+        top: calc(100% + 0.25rem);
         z-index: 200;
         padding-top: 0.5rem;
         padding-bottom: 0.5rem;
@@ -32,6 +40,10 @@
         box-shadow: 0 0.25rem 0.5rem 0rem rgba(3,3,3,0.12), 0 0 0.25rem 0 rgba(3,3,3,0.06);
     }
     &__group {
+        padding: 0;
+        margin: 0;
+        line-height: 1.5;
+        background-color: transparent;
         ul {
             list-style: none;
             margin: 0;
@@ -39,15 +51,11 @@
         }
         li {
             list-style: none;
-            margin: 0;
-            padding: 0;
         }
         
     }
     li[role="separator"] {
         list-style: none;
-        margin: 0;
-        padding: 0;
     }
     li[role="separator"]::after {
         display: block;
@@ -62,12 +70,15 @@
         display: flex;
         align-items: baseline;
         width: 100%;
-        padding: 1rem 0.5rem 1rem 0.5rem;
+        padding: 0.5rem 1rem 0.5rem 1rem;
         font-size: 1rem;
         color: #ffffff;
         white-space: nowrap;
         background-color: #4f5255;
         border: none;
+        line-height: 24px;
+        box-sizing: border-box;
+        text-align: center;
         &__icon {
             align-self: center;
             width: auto;
