@@ -3,6 +3,7 @@ import React from 'react'
 import menuStyles from './SortMenu.scss'
 import { Experiment } from '../Experiments'
 import { InstanceProp } from '../Table'
+import { isEmpty } from 'lodash'
 
 const ColumnOptionsRow: React.FC<{
   column: ColumnInstance<Experiment>
@@ -49,6 +50,8 @@ const SelectedItem = (
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
   const { allColumns } = instance
+  const sortMenuRef = React.useRef(null)
+  const [isClickedOutside, setClickedOutside] = React.useState(false)
   const [sortIndicatorState, setSortIndicatorState] = React.useState({
     isOpen: false,
     sortColumn: '',
@@ -56,23 +59,67 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
     hideColumn: false
   })
 
+  React.useEffect(() => {
+    if (isClickedOutside) {
+      setSortIndicatorState({
+        ...sortIndicatorState,
+        isOpen: false
+      })
+    }
+  }, [isClickedOutside])
+
+  // hook for handling a click that happens outside the SortIndicator component
+  React.useEffect(() => {
+    const outsideClickEventHandler = (e: any) => {
+      const target: any = sortMenuRef.current
+      if (target !== null && !target.contains(e.target)) {
+        setClickedOutside(true)
+      } else {
+        setClickedOutside(false)
+      }
+    }
+
+    if (sortIndicatorState.isOpen) {
+      document.addEventListener('click', outsideClickEventHandler)
+    }
+
+    return () => {
+      document.removeEventListener('click', outsideClickEventHandler)
+    }
+  }, [sortIndicatorState.isOpen])
+
   return (
     <div className={menuStyles.sortMenu}>
-      <div className={menuStyles.sortMenu__toggle}>
-        <button
-          onClick={() => {
-            setSortIndicatorState({
-              ...sortIndicatorState,
-              isOpen: !sortIndicatorState.isOpen //Toggle
-            })
-          }}
-          className={menuStyles.sortMenu__toggle__button}
-        >
-          Sort By
-        </button>
-      </div>
+      <button
+        onClick={() => {
+          setSortIndicatorState({
+            ...sortIndicatorState,
+            isOpen: !sortIndicatorState.isOpen //Toggle
+          })
+        }}
+        className={menuStyles.sortMenu__toggle}
+      >
+        <span className={menuStyles.sortMenu__toggle__text}>Sort By</span>
+        <span className={menuStyles.sortMenu__toggle__icon}>
+          <svg
+            fill="currentColor"
+            height="1em"
+            width="1em"
+            viewBox="0 0 320 512"
+            aria-hidden="true"
+            role="img"
+            style={{ verticalAlign: -0.125 + 'em' }}
+          >
+            <path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path>
+          </svg>
+        </span>
+      </button>
       {sortIndicatorState.isOpen ? (
-        <div className={menuStyles.sortMenu__menu} role="menu">
+        <div
+          ref={sortMenuRef}
+          className={menuStyles.sortMenu__menu}
+          role="menu"
+        >
           <section className={menuStyles.sortMenu__group}>
             <ul>
               {allColumns.map(column => {
@@ -84,7 +131,10 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
                       onClick={() => {
                         setSortIndicatorState({
                           ...sortIndicatorState,
-                          sortColumn: column.Header as string
+                          sortColumn: column.Header as string,
+                          sortDirection: isEmpty(sortIndicatorState.sortColumn)
+                            ? 'Asc'
+                            : sortIndicatorState.sortDirection
                         })
                       }}
                     >
