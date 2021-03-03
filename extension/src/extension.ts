@@ -29,11 +29,11 @@ import {
 
 import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
-import { getExperiments, inferDefaultOptions } from './DvcReader'
+import { getExperiments, inferDefaultOptions } from './dvcReader'
 
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
-import { resolve } from 'path'
+import { getExperimentsRefsPath } from './git'
 
 export { Disposable }
 
@@ -63,6 +63,17 @@ export class Extension {
     new DvcWebviewManager(this.config)
   )
 
+  private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
+    const cwd = this.getDefaultCwd()
+    const refsPath = await getExperimentsRefsPath(cwd)
+    if (!refsPath) {
+      throw new Error(
+        'Live updates for the experiment table are not possible as the Git repo root was not found!'
+      )
+    }
+    return addFileChangeHandler(refsPath, this.refreshWebviews)
+  }
+
   private refreshWebviews = async () => {
     const tableData = await this.getExperimentsTableData()
     this.manager.refreshAll(tableData)
@@ -80,11 +91,8 @@ export class Extension {
       i.show()
     }
 
-    this.dispose.track(
-      addFileChangeHandler(
-        resolve(this.getDefaultCwd(), '.dvc', 'tmp', 'lock'),
-        this.refreshWebviews
-      )
+    this.onChangeExperimentsUpdateWebview().then(disposable =>
+      this.dispose.track(disposable)
     )
 
     this.dispose.track(IntegratedTerminal)

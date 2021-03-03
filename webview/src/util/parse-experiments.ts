@@ -1,50 +1,42 @@
 import {
-  DataDictRoot,
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
 } from 'dvc/src/webviews/experiments/contract'
 
-export interface Experiment {
+export interface ExperimentWithId extends ExperimentJSONOutput {
   id: string
-  name?: string
-  timestamp?: string | Date | null
-  params?: DataDictRoot
-  metrics?: DataDictRoot
-  queued?: boolean
-  checkpoint_tip?: string
-  checkpoint_parent?: string
 }
 
-export interface ExperimentRow extends Experiment {
-  subRows?: ExperimentRow[]
+export interface Experiment extends ExperimentWithId {
+  subRows?: Experiment[]
 }
 
-export type RepoExperiments = Array<Experiment>
+export type RepoExperiments = Array<ExperimentWithId>
 
 interface ParseExperimentsOutput {
-  experiments: Experiment[]
-  flatExperiments: Experiment[]
+  experiments: ExperimentWithId[]
+  flatExperiments: ExperimentWithId[]
 }
 
 const addIdToExperiment: (
   id: string,
   experiment: ExperimentJSONOutput
-) => ExperimentRow = (id, experiment) => ({
+) => Experiment = (id, experiment) => ({
   ...experiment,
   id
 })
 
 const buildExperimentFromEntry: (
   entry: [string, ExperimentJSONOutput]
-) => ExperimentRow = ([id, experiment]) => addIdToExperiment(id, experiment)
+) => Experiment = ([id, experiment]) => addIdToExperiment(id, experiment)
 
-const isExperiment: (row: Experiment) => boolean = row =>
+const isExperiment: (row: ExperimentWithId) => boolean = row =>
   row.queued || row.id === row.checkpoint_tip
 
-const groupCheckpoints: (rows: ExperimentRow[]) => Experiment[] = rows => {
-  let currentTip: ExperimentRow | undefined
-  let currentEpochs: ExperimentRow[] = []
-  const result: ExperimentRow[] = []
+const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
+  let currentTip: Experiment | undefined
+  let currentEpochs: Experiment[] = []
+  const result: Experiment[] = []
   const pushResult: () => void = () => {
     if (currentTip) {
       const resultToPush = {
@@ -77,9 +69,9 @@ const parseExperiments: (
       { experiments, flatExperiments },
       [commitId, { baseline, ...childExperiments }]
     ) => {
-      const parsedChildExperiments: ExperimentRow[] = Object.entries(
+      const parsedChildExperiments: Experiment[] = Object.entries(
         childExperiments
-      ).map<ExperimentRow>(buildExperimentFromEntry)
+      ).map<Experiment>(buildExperimentFromEntry)
       const baselineEntry = addIdToExperiment(commitId, baseline)
       return {
         experiments: [

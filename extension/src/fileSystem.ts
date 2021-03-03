@@ -8,7 +8,7 @@ export const addFileChangeHandler = (
 ): Disposable => {
   const watcher = getWatcher(handler)
 
-  const debouncedWatcher = debounce(watcher, 1500, {
+  const debouncedWatcher = debounce(watcher, 500, {
     leading: false,
     trailing: true
   })
@@ -29,6 +29,6 @@ export const addFileChangeHandler = (
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
-    handler()
+    return handler()
   }
 }

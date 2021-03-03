@@ -38,7 +38,7 @@ describe('addFileChangeHandler', () => {
     expect(getWatcherSpy).toBeCalledTimes(1)
 
     expect(mockedDebounce).toBeCalledTimes(1)
-    expect(mockedDebounce).toBeCalledWith(func, 1500, {
+    expect(mockedDebounce).toBeCalledWith(func, 500, {
       leading: false,
       trailing: true
     })
