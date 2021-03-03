@@ -5,8 +5,8 @@ import { hotComponent } from '../hotComponent'
 import ExperimentsGUI from './Experiments'
 import { Model } from '../model/Model'
 
-export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
-  observer(({ model }) => {
+export const GUI = hotComponent(module)(
+  observer(({ model }: { model: Model }) => {
     try {
       const { errors, experiments, vsCodeApi } = model
       return (
@@ -29,4 +29,4 @@ export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
       return <p>{e.toString()}</p>
     }
   })
-)
+) as React.FC<{ model: Model }>

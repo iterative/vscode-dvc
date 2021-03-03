@@ -65,7 +65,7 @@ export class Extension {
 
   private refreshWebviews = async () => {
     const tableData = await this.getExperimentsTableData()
-    return this.manager.refreshAll(tableData)
+    this.manager.refreshAll(tableData)
   }
 
   private async getExperimentsTableData() {
@@ -122,25 +122,25 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory(fsPath)
+        return initializeDirectory(fsPath)
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.add', ({ fsPath }) => {
-        add(fsPath)
+        return add(fsPath)
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout(fsPath)
+        return checkout(fsPath)
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive(fsPath)
+        return checkoutRecursive(fsPath)
       })
     )
 

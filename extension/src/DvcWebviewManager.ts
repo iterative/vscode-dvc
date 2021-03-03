@@ -57,7 +57,7 @@ export class DvcWebview {
       this._disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
-      return this.handleMessage(arg as MessageFromWebview)
+      void this.handleMessage(arg as MessageFromWebview)
     })
 
     webviewPanel.webview.html = this.getHtml()
@@ -137,7 +137,7 @@ export class DvcWebview {
         'Cannot send message when webview is not initialized yet!'
       )
     }
-    return this.webviewPanel.webview.postMessage(message)
+    void this.webviewPanel.webview.postMessage(message)
   }
 
   private handleMessage(message: MessageFromWebview) {
@@ -161,7 +161,7 @@ export class DvcWebview {
       errors?: Error[]
     } = {}
   ): void {
-    return this.sendMessage({
+    this.sendMessage({
       type: MessageToWebviewType.showExperiments,
       ...payload
     })
@@ -204,7 +204,7 @@ export class DvcWebviewManager {
       try {
         panel.showExperiments({ tableData })
       } catch (e) {
-        panel.showExperiments({ errors: [String(e)] })
+        panel.showExperiments({ errors: [e] })
       }
     }
   }

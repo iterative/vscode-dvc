@@ -16,7 +16,8 @@ import {
   SortByFn
 } from 'react-table'
 import cx from 'classnames'
-import dayjs from '../dayjs'
+import dayjs from 'dayjs'
+import '../dayjs'
 import { Table } from './Table'
 import parseExperiments from '../util/parse-experiments'
 
@@ -153,7 +154,7 @@ export const ExperimentsTable: React.FC<{
         Header: 'Timestamp',
         accessor: 'timestamp',
         Cell: ({ value }: { value: string }) => {
-          if (!value || value === '') return null
+          if (!value) return null
           const time = dayjs(value)
           return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
         }

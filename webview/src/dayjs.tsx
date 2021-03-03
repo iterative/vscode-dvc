@@ -4,4 +4,3 @@ import isToday from 'dayjs/plugin/isToday'
 
 dayjs.extend(relativeTime)
 dayjs.extend(isToday)
-export default dayjs

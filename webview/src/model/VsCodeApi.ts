@@ -1,4 +1,5 @@
 /* global window */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import { Disposable } from '@hediet/std/disposable'
 import { addMessageHandler } from './window'
