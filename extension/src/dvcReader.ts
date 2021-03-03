@@ -1,3 +1,4 @@
+import { createHash } from 'crypto'
 import { accessSync } from 'fs'
 import { resolve } from 'path'
 import { execPromise } from './util'
@@ -34,8 +35,16 @@ const execCommand: (
 
 export const getExperiments: (
   options: ReaderOptions
-) => Promise<ExperimentsRepoJSONOutput> = async options => {
+) => Promise<{
+  experiments: ExperimentsRepoJSONOutput
+  outputHash: string
+}> = async options => {
   const output = await execCommand(options, 'exp show --show-json')
+  const outputHash = createHash('sha1')
+    .update(output.stdout)
+    .digest('base64')
   const { stdout } = output
-  return JSON.parse(String(stdout))
+  const experiments = JSON.parse(String(stdout))
+
+  return { experiments, outputHash }
 }

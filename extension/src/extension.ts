@@ -63,6 +63,8 @@ export class Extension {
     new DvcWebviewManager(this.config)
   )
 
+  private lastExperimentsOutputHash = ''
+
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const cwd = this.getDefaultCwd()
     const refsPath = await getExperimentsRefsPath(cwd)
@@ -75,8 +77,11 @@ export class Extension {
   }
 
   private refreshWebviews = async () => {
-    const tableData = await this.getExperimentsTableData()
-    this.manager.refreshAll(tableData)
+    const { experiments, outputHash } = await this.getExperimentsTableData()
+    if (outputHash !== this.lastExperimentsOutputHash) {
+      this.lastExperimentsOutputHash = outputHash
+      this.manager.refreshAll(experiments)
+    }
   }
 
   private async getExperimentsTableData() {
@@ -116,8 +121,8 @@ export class Extension {
       commands.registerCommand('dvc.showWebview', async () => {
         const dvcWebview = this.dispose.track(await this.manager.createNew())
         try {
-          const tableData = await this.getExperimentsTableData()
-          dvcWebview.showExperiments({ tableData })
+          const { experiments } = await this.getExperimentsTableData()
+          dvcWebview.showExperiments({ tableData: experiments })
         } catch (e) {
           dvcWebview.showExperiments({ errors: [e.toString()] })
         }
