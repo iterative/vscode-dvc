@@ -1,0 +1,16 @@
+.sortIndicator {
+    &__columnGroup {
+        display: block;
+        padding-left: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+    &__sortDirectionIcon {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+    &__columnVisibility {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}

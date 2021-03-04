@@ -11,13 +11,14 @@ export interface SortMenuToggleProps {
 
 export interface SortMenuItemProps {
   children?: React.ReactNode
-  isSelected?: boolean
   isDisabled?: boolean
   onSelect?: (
     event?: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent,
     value?: any
   ) => void
   id?: string
+  value?: any
+  actions?: any
 }
 
 export interface SortMenuProps {
@@ -70,10 +71,12 @@ export const SortMenuToggle: React.FC<SortMenuToggleProps> = ({
 
 export const SortMenuItem: React.FC<SortMenuItemProps> = ({
   children,
-  isSelected,
   isDisabled,
   onSelect,
-  id
+  id,
+  value,
+  actions,
+  ...props
 }) => {
   return (
     <li id={id} key={id} role="menuitem">
@@ -81,27 +84,14 @@ export const SortMenuItem: React.FC<SortMenuItemProps> = ({
         key={`button-${id}`}
         className={menuStyles.sortMenu__menuItem}
         onClick={event => {
-          onSelect && onSelect(event, children)
+          onSelect && onSelect(event, value)
         }}
         disabled={isDisabled}
+        {...props}
       >
         {children}
-        {isSelected && (
-          <span className={menuStyles.sortMenu__menuItem__icon}>
-            <svg
-              fill="currentColor"
-              height="1em"
-              width="1em"
-              viewBox="0 0 512 512"
-              aria-hidden="true"
-              role="img"
-              style={{ verticalAlign: -0.125 + 'em' }}
-            >
-              <path d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"></path>
-            </svg>
-          </span>
-        )}
       </button>
+      <div className={menuStyles.sortMenu__menuItem__actions}>{actions}</div>
     </li>
   )
 }

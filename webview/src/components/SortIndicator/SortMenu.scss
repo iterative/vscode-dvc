@@ -54,15 +54,17 @@
         }
         li {
             list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        
     }
     li[role="separator"] {
         list-style: none;
     }
     li[role="separator"]::after {
         display: block;
-        flex-basis: calc(100% - 0 * 2);
+        flex-basis: 100%;
         align-self: stretch;
         height: 1px;
         content: "";
@@ -89,6 +91,11 @@
             margin-left: auto;
             font-size: 12px;
             color: #fafafa
+        }
+        &__actions {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
         }
     }
 }
