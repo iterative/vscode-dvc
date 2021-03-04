@@ -1,5 +1,4 @@
 import React from 'react'
-import { ColumnInstance } from 'react-table'
 import { InstanceProp } from '../Table'
 import { isEmpty } from 'lodash'
 import {
@@ -9,44 +8,16 @@ import {
   SortMenuItem,
   SortMenuSeparator
 } from './SortMenu'
-import { Experiment } from '../../util/parse-experiments'
 import styles from './SortIndicator.scss'
-
-const ColumnOptionsRow: React.FC<{
-  column: ColumnInstance<Experiment>
-}> = ({ column }) => (
-  <div>
-    <span>{'-'.repeat(column.depth)}</span>
-    <span>{column.Header}</span>
-    {column.canSort && (
-      <button {...column.getSortByToggleProps()}>
-        Sort
-        {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
-      </button>
-    )}
-    {(!column.columns || column.columns.length === 0) && (
-      <button
-        onClick={() => {
-          column.toggleHidden()
-        }}
-      >
-        {column.isVisible ? 'Hide' : 'Show'}
-      </button>
-    )}
-    {column.columns &&
-      column.columns.map(childColumn => (
-        <ColumnOptionsRow column={childColumn} key={childColumn.id} />
-      ))}
-  </div>
-)
+import { ColumnInstance } from 'react-table'
+import { Experiment } from '../../util/parse-experiments'
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
   const { columns: columnInstances } = instance
   const [sortIndicatorState, setSortIndicatorState] = React.useState({
     isOpen: false,
     sortColumn: '',
-    sortDirection: '',
-    hideColumn: false
+    sortDirection: ''
   })
 
   const onToggle = (isOpen: any) => {
@@ -56,7 +27,7 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
     })
   }
 
-  const onSelectColumn = (event: any, column: string) => {
+  const onSelectColumn = (column: string) => {
     setSortIndicatorState({
       ...sortIndicatorState,
       sortColumn: column,
@@ -70,7 +41,7 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
     <SortMenuToggle onToggle={onToggle} toggleTemplate="Sort By" id="toggle" />
   )
 
-  const columnOptions = (column: any) => (
+  const columnOptions = (column: ColumnInstance<Experiment>): any => (
     <>
       {!column.canSort && (
         <>

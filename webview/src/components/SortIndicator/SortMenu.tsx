@@ -12,10 +12,7 @@ export interface SortMenuToggleProps {
 export interface SortMenuItemProps {
   children?: React.ReactNode
   isDisabled?: boolean
-  onSelect?: (
-    event?: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent,
-    value?: any
-  ) => void
+  onSelect?: (value?: any) => void
   id?: string
   value?: any
   actions?: any
@@ -72,20 +69,21 @@ export const SortMenuToggle: React.FC<SortMenuToggleProps> = ({
 export const SortMenuItem: React.FC<SortMenuItemProps> = ({
   children,
   isDisabled,
-  onSelect,
   id,
+  onSelect,
   value,
   actions,
   ...props
 }) => {
+  const onClick = () => {
+    onSelect && onSelect(value)
+  }
   return (
     <li id={id} key={id} role="menuitem">
       <button
         key={`button-${id}`}
         className={menuStyles.sortMenu__menuItem}
-        onClick={event => {
-          onSelect && onSelect(event, value)
-        }}
+        onClick={onClick}
         disabled={isDisabled}
         {...props}
       >
