@@ -59,11 +59,6 @@ interface ExperimentsCommitJSONOutput
   baseline: ExperimentJSONOutput
 }
 
-export interface ExperimentsRepoJSONOutput
-  extends Record<string, ExperimentsCommitJSONOutput> {
-  workspace: ExperimentsCommitJSONOutput
-}
-
 interface ExperimentsCommitJSONOutput
   extends Record<string, ExperimentJSONOutput> {
   baseline: ExperimentJSONOutput

@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { ExperimentsRepoJSONOutput } from 'dvc/src/webviews/experiments/contract'
+import {
+  ExperimentsRepoJSONOutput,
+  MessageFromWebviewType
+} from 'dvc/src/webviews/experiments/contract'
 import {
   TableInstance,
   Row,
@@ -12,7 +15,6 @@ import {
   useFlexLayout,
   SortByFn
 } from 'react-table'
-import cx from 'classnames'
 import dayjs from '../dayjs'
 import { Table } from './Table'
 import parseExperiments, { Experiment } from '../util/parse-experiments'
@@ -20,7 +22,8 @@ import parseExperiments, { Experiment } from '../util/parse-experiments'
 import styles from './table-styles.module.scss'
 
 import buildDynamicColumns from '../util/build-dynamic-columns'
-import { MessageFromWebviewType } from 'dvc/src/webviews/experiments/contract'
+
+import { VsCodeApi } from '../model/Model'
 
 const { useMemo, useEffect } = React
 
@@ -183,9 +186,8 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns, rows } = instance
-        const sortedColumns: ColumnInstance<Experiment>[] = useMemo(
-          () => allColumns.filter(column => column.isSorted),
-          [allColumns]
+        const sortedColumns: ColumnInstance<Experiment>[] = allColumns.filter(
+          column => column.isSorted
         )
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
@@ -200,7 +202,7 @@ export const ExperimentsTable: React.FC<{
 
   useEffect(() => {
     toggleAllRowsExpanded()
-  }, [])
+  }, [toggleAllRowsExpanded])
 
   return (
     <>
@@ -212,11 +214,10 @@ export const ExperimentsTable: React.FC<{
 
 const Experiments: React.FC<{
   experiments?: ExperimentsRepoJSONOutput | null
-  vsCodeApi: any
+  vsCodeApi: VsCodeApi
 }> = ({ experiments, vsCodeApi }) => {
   return (
     <div className={styles.experiments}>
-      <h1 className={cx(styles.experimentsHeading, styles.pageHeading)} />
       <button
         onClick={() => {
           vsCodeApi.postMessage({
