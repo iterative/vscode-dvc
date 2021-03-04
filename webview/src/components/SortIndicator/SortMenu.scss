@@ -38,6 +38,9 @@
         background-color: #4f5255;
         background-clip: padding-box;
         box-shadow: 0 0.25rem 0.5rem 0rem rgba(3,3,3,0.12), 0 0 0.25rem 0 rgba(3,3,3,0.06);
+        &__inactive {
+            display: none
+        }
     }
     &__group {
         padding: 0;
