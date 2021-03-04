@@ -1,0 +1,4 @@
+outs:
+- md5: 2646ac647ad5339dbf082846283269ea
+  size: 7840016
+  path: t10k-images-idx3-ubyte

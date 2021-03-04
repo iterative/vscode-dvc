@@ -1,0 +1,4 @@
+outs:
+- md5: a25bea736e30d166cdddb491f175f624
+  size: 60008
+  path: train-labels-idx1-ubyte
