@@ -1,8 +1,7 @@
 import React from 'react'
 import {
   ExperimentsRepoJSONOutput,
-  MessageFromWebviewType,
-  ExperimentJSONOutput
+  MessageFromWebviewType
 } from 'dvc/src/webviews/experiments/contract'
 import {
   Row,
@@ -25,11 +24,6 @@ import buildDynamicColumns from '../util/build-dynamic-columns'
 
 import { VsCodeApi } from '../model/Model'
 import SortIndicator from './SortIndicator/SortIndicator'
-
-export interface Experiment extends ExperimentJSONOutput {
-  subRows?: Experiment[]
-  id: string
-}
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
