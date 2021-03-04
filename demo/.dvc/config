@@ -1,5 +1,5 @@
 [core]
-	experiments = true
+    experiments = true
     remote = storage
 ['remote "storage"']
     url = https://remote.dvc.org/mnist-vscode
