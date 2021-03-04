@@ -3,21 +3,10 @@ stages:
     cmd: python train.py
     deps:
     - train.py
-    - mymodel.py
-    params:
-    - epochs
-    - learning_rate
-    - log_file
-    - dvc_logs_dir
-    - dropout
     outs:
-    - logs
-    - model.h5:
+    - model.pt:
         checkpoint: true
-    metrics:
-    - summary.json:
-        cache: false
-    plots:
-    - logs.csv:
-        cache: false
-    always_changed: true
+    live:
+      logs:
+        summary: true
+        html: true
