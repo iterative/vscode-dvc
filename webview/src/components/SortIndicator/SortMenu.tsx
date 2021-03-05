@@ -1,5 +1,5 @@
 import React from 'react'
-import menuStyles from './SortMenu.scss'
+import menuStyles from './SortMenu.module.scss'
 import { useOutsideClickHook } from '../../util/useOutsideClickHook'
 
 export interface SortMenuToggleProps {

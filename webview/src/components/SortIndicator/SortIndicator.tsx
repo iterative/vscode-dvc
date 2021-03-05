@@ -8,7 +8,7 @@ import {
   SortMenuItem,
   SortMenuSeparator
 } from './SortMenu'
-import styles from './SortIndicator.scss'
+import styles from './SortIndicator.module.scss'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 
