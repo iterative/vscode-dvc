@@ -22,6 +22,7 @@
     "setup:venv": "./virtualenv-install.sh",
     "ci:setup:build-tests": "yarn workspace dvc tsc -p './'",
     "ci:run:prettier": "prettier -c '**/*.{md,json}'",
+    "ci:run:tsc": "tsc --noEmit",
     "ci:run:test": "yarn test",
     "ci:run:eslint": "eslint --cache '**/*.{js,ts,tsx}'"
   },
