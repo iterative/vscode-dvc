@@ -1,4 +1,0 @@
-dvc[s3]>=2.0.0a0
-dvclive
-torch
-torchvision
