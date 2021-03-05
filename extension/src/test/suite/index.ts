@@ -1,6 +1,6 @@
 /* eslint consistent-return: off */
 /* eslint no-shadow: off */
-import { resolve } from 'path'
+import { resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
 
@@ -11,27 +11,28 @@ export function run(): Promise<void> {
     color: true
   })
 
-  const testsRoot = resolve(__dirname, '..')
+  const testsRoot = resolvePath(__dirname, '..')
 
-  return new Promise((c, e) => {
+  return new Promise((resolve, reject) => {
     glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
       if (err) {
-        return e(err)
+        return reject(err)
       }
 
       // Add files to the test suite
-      files.forEach(f => mocha.addFile(resolve(testsRoot, f)))
+      files.forEach(f => mocha.addFile(resolvePath(testsRoot, f)))
 
       try {
         // Run the mocha test
         mocha.run(failures => {
           if (failures > 0) {
-            e(new Error(`${failures} tests failed.`))
+            reject(new Error(`${failures} tests failed.`))
           } else {
-            c()
+            resolve()
           }
         })
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error(e)
         e(e)
       }

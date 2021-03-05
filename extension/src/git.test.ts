@@ -4,16 +4,14 @@ import { resolve } from 'path'
 
 describe('getExperimentsRefsPath', () => {
   it('should find the path of the custom experiments refs given a directory in this project', async () => {
-    const refsPath = await getExperimentsRefsPath(__dirname)
+    const refsPath = (await getExperimentsRefsPath(__dirname)) as string
     expect(refsPath).toBeDefined()
-    if (refsPath) {
-      const isValidPath = await ensureDir(refsPath)
-      const existing = undefined
-      const created = refsPath
+    const isValidPath = await ensureDir(refsPath)
+    const existing = undefined
+    const created = refsPath
 
-      expect([existing, created]).toContain(isValidPath)
-      expect(lstatSync(refsPath).isDirectory).toBeTruthy()
-    }
+    expect([existing, created]).toContain(isValidPath)
+    expect(lstatSync(refsPath).isDirectory).toBeTruthy()
   })
 
   it('should return undefined given a non-existent path', async () => {
@@ -26,13 +24,11 @@ describe('getExperimentsRefsPath', () => {
 
 describe('getRepoRootPath', () => {
   it('should find the root directory given a directory in this project', async () => {
-    const gitRoot = await getRepoRootPath(__dirname)
+    const gitRoot = (await getRepoRootPath(__dirname)) as string
 
     expect(gitRoot).toBeDefined()
-    if (gitRoot) {
-      const gitDir = resolve(gitRoot, '.git')
-      expect(lstatSync(gitDir).isDirectory).toBeTruthy()
-    }
+    const gitDir = resolve(gitRoot, '.git')
+    expect(lstatSync(gitDir).isDirectory).toBeTruthy()
   })
 
   it('should return undefined given a non-existent path', async () => {
