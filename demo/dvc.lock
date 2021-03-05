@@ -1,0 +1,16 @@
+schema: '2.0'
+stages:
+  train:
+    cmd: python train.py
+    deps:
+    - path: train.py
+      md5: 1bf1de66a00744593500b47e9c84bd3a
+      size: 2920
+    outs:
+    - path: logs
+      md5: 4421b68fa365e7293e613ae2a1e950ad.dir
+      size: 259
+      nfiles: 1
+    - path: model.pt
+      md5: 6f3e793973612779c4c2c18be38feb39
+      size: 410751
