@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import React from 'react'
+import get from 'lodash/get'
 
 import { DataDictRoot } from 'dvc/src/webviews/experiments/contract'
 import { Experiment } from './parse-experiments'
@@ -8,6 +10,7 @@ import {
   formatInteger,
   formatSignedFloat
 } from './number-formatting'
+import { Column, Accessor } from 'react-table'
 
 type SchemaType = string | string[]
 
@@ -19,34 +22,32 @@ interface SchemaProperty {
 }
 type SchemaProperties = Record<string, SchemaProperty>
 
-const MaybeUndefinedCell: React.FC<{
-  value?: any
-  formatter?: (input: any) => string
-}> = ({ value, formatter = x => x.toString() }) => {
-  if (value === undefined) return <>-</>
-  return <>{formatter(value)}</>
-}
+type Value = string | number
+type ValueObject = Record<string, Value>
+type ValueTree = Record<string, ValueObject | Value>
+
+const UndefinedCell = <>-</>
 
 // String
-const StringCell: React.FC<{ value: string }> = ({ value }) => (
-  <>{value === undefined ? '-' : value}</>
-)
+const StringCell: React.FC<{ value: Value }> = ({ value }) =>
+  value === undefined ? UndefinedCell : <>value</>
 // Integer
-const IntegerCell: React.FC<{ value: number }> = ({ value }) => (
-  <MaybeUndefinedCell value={value} formatter={formatInteger} />
-)
+const IntegerCell: React.FC<{ value: Value }> = ({ value }) =>
+  value === undefined ? UndefinedCell : <>{formatInteger(value as number)}</>
 // Float
-const FloatCell: React.FC<{ value: number }> = ({ value }) => (
-  <MaybeUndefinedCell value={value} formatter={formatFloat} />
-)
+const FloatCell: React.FC<{ value: Value }> = ({ value }) =>
+  value === undefined ? UndefinedCell : <>{formatFloat(value as number)}</>
 // Signed Float
-const SignedFloatCell: React.FC<{ value: number }> = ({ value }) => (
-  <MaybeUndefinedCell value={value} formatter={formatSignedFloat} />
-)
+const SignedFloatCell: React.FC<{ value: Value }> = ({ value }) =>
+  value === undefined ? (
+    UndefinedCell
+  ) : (
+    <>{formatSignedFloat(value as number)}</>
+  )
 
 const getNumberCellComponent: (
   propertyType: SchemaProperty
-) => React.FC<{ value: number }> = propertyType => {
+) => React.FC<{ value: Value }> = propertyType => {
   const { canBeFloat, canBeNegative } = propertyType
   if (canBeFloat) {
     if (canBeNegative) {
@@ -59,7 +60,7 @@ const getNumberCellComponent: (
 
 const makeMixedCellComponent: (
   propertyType: SchemaProperty
-) => React.FC<{ value: any }> = propertyType => {
+) => React.FC<{ value: Value }> = propertyType => {
   const NumberCell = getNumberCellComponent(propertyType)
   return function MixedCell({ value }) {
     if (value === undefined) return null
@@ -73,7 +74,7 @@ const makeMixedCellComponent: (
 
 const getCellComponent: (
   propertyType: SchemaProperty
-) => React.FC<{ value: any }> = schemaProperty => {
+) => React.FC<{ value: Value }> = schemaProperty => {
   const propertyType = schemaProperty.type
   if (Array.isArray(propertyType)) {
     return makeMixedCellComponent(schemaProperty)
@@ -109,13 +110,13 @@ const mergeType: (
 }
 
 const convertObjectsToProperties: (
-  samples: Record<string, any>[],
+  samples: ValueTree[],
   base?: SchemaProperties
 ) => SchemaProperties = (samples, base = {}) =>
   samples.reduce((acc, cur) => convertObjectToProperties(cur, acc), base)
 
 const convertObjectToProperties: (
-  addition: Record<string, any> | undefined,
+  addition?: ValueTree,
   base?: SchemaProperties
 ) => SchemaProperties = (sample, base = {}) => {
   if (!sample) return base
@@ -128,7 +129,7 @@ const convertObjectToProperties: (
 
 const addToProperty: (
   original: SchemaProperty | undefined,
-  addition: any
+  addition: Value | Record<string, Value>
 ) => SchemaProperty = (original, addition) => {
   const additionType = typeof addition
   const newProperty: SchemaProperty = original
@@ -148,7 +149,7 @@ const addToProperty: (
       break
     case 'object':
       newProperty.properties = convertObjectToProperties(
-        addition,
+        addition as Record<string, Value>,
         newProperty.properties
       )
       break
@@ -157,34 +158,28 @@ const addToProperty: (
   return newProperty
 }
 
-const arrayAccessor: <T = any>(
-  pathArray: string[]
-) => (originalRow: any) => T = pathArray => originalRow => {
-  let result = originalRow
-  for (let i = 0; i < pathArray.length; i += 1) {
-    if (result === undefined) break
-    result = result[pathArray[i]]
-  }
-  return result
-}
+const buildAccessor: (
+  valuePath: string[]
+) => Accessor<Experiment> = pathArray => originalRow =>
+  get(originalRow, pathArray)
 
 const buildColumnsFromSchemaProperties: (
   properties: SchemaProperties,
   objectPath?: string[]
-) => Record<string, any>[] = (properties, objectPath = []) => {
+) => Column<Experiment>[] = (properties, objectPath = []) => {
   const entries = Object.entries(properties)
   return entries.map(([key, property]) => {
     const currentPath = [...objectPath, key]
     const { type: propertyType } = property
     const Cell = getCellComponent(property)
-    const column: Record<string, any> & {
-      columns?: Record<string, any>[]
+    const column: Column<Experiment> & {
+      columns?: Column<Experiment>[]
       sortType?: string
       type?: SchemaType
     } = {
       Header: key,
       id: buildColumnIdFromPath(currentPath),
-      accessor: arrayAccessor(currentPath),
+      accessor: buildAccessor(currentPath),
       type: propertyType,
       Cell
     }
@@ -223,8 +218,8 @@ const buildDynamicColumnsFromExperiments: (
     { params: [], metrics: [] }
   )
 
-  const paramsProperties = convertObjectsToProperties(params)
-  const metricsProperties = convertObjectsToProperties(metrics)
+  const paramsProperties = convertObjectsToProperties(params as ValueTree[])
+  const metricsProperties = convertObjectsToProperties(metrics as ValueTree[])
 
   const columns = [
     ...buildColumnsFromSchemaProperties(paramsProperties, ['params']),

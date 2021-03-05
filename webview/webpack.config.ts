@@ -1,4 +1,4 @@
-import * as webpack from 'webpack'
+import webpack, { Plugin } from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { resolve } from 'path'
 import HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -71,7 +71,7 @@ module.exports = {
     fs: 'empty'
   },
   plugins: (() => {
-    const plugins: any[] = [
+    const plugins: Plugin[] = [
       new HtmlWebpackPlugin({
         title: 'DVC View'
       }),

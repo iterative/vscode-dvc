@@ -151,6 +151,7 @@ export class DvcWebview {
         return
       }
       default: {
+        // eslint-disable-next-line no-console
         console.error('Unexpected message', message)
       }
     }
