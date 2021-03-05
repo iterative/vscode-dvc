@@ -1,0 +1,5 @@
+{
+    "python.terminal.activateEnvironment": true,
+    "python.pythonPath": ".env/bin/python3",
+    "dvc.dvcPath": ".env/bin/dvc"
+}
