@@ -42,6 +42,9 @@ See something that should be changed? Want to request a new feature? Open
 - Run `yarn setup:venv` from the monorepo root to automatically setup the Python
   virtual environment in the demo project
 
+- Once the environment has been setup you should navigate into the demo folder
+  activate the virtual environment and run `dvc pull`.
+
 - In order to run experiments in our demo project we require the Python virtual
   environment to be loaded.
 
