@@ -1,15 +1,11 @@
 """Model training and evaluation."""
+import json
+import yaml
 import os
 import torch
 import torch.nn.functional as F
 import torchvision
 import dvclive
-
-# temporary fix from https://github.com/pytorch/vision/issues/1938
-from six.moves import urllib
-opener = urllib.request.build_opener()
-opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-urllib.request.install_opener(opener)
 
 
 EPOCHS = 10
@@ -42,11 +38,12 @@ def transform(dataset):
     return x, y
 
 
-def train(model, x, y):
+def train(model, x, y, lr, weight_decay):
     """Train a single epoch."""
     model.train()
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr,
+                                 weight_decay=weight_decay)
     y_pred = model(x)
     loss = criterion(y_pred, y)
     optimizer.zero_grad()
@@ -66,6 +63,7 @@ def get_metrics(y, y_pred, y_pred_label):
     """Get loss and accuracy metrics."""
     metrics = {}
     criterion = torch.nn.CrossEntropyLoss()
+    metrics["loss"] = criterion(y_pred, y).item()
     metrics["acc"] = (y_pred_label == y).sum().item()/len(y)
     return metrics
 
@@ -74,17 +72,26 @@ def evaluate(model, x, y):
     """Evaluate model and save metrics."""
     scores = predict(model, x)
     _, labels = torch.max(scores, 1)
+    predictions = [{
+                    "actual": int(actual),
+                    "predicted": int(predicted)
+                   } for actual, predicted in zip(y, labels)]
+    with open("predictions.json", "w") as f:
+        json.dump(predictions, f)
     metrics = get_metrics(y, scores, labels)
     return metrics
 
 
 def main():
     """Train model and evaluate on test data."""
-    torch.manual_seed(0)
     model = ConvNet()
     # Load model.
     if os.path.exists("model.pt"):
         model.load_state_dict(torch.load("model.pt"))
+    # Load params.
+    with open("params.yaml") as f:
+        params = yaml.safe_load(f)
+    torch.manual_seed(params["seed"])
     # Load train and test data.
     mnist_train = torchvision.datasets.MNIST("data", download=True)
     x_train, y_train = transform(mnist_train)
@@ -92,12 +99,12 @@ def main():
     x_test, y_test = transform(mnist_test)
     # Iterate over training epochs.
     for i in range(1, EPOCHS+1):
-        train(model, x_train, y_train)
+        train(model, x_train, y_train, params["lr"], params["weight_decay"])
         torch.save(model.state_dict(), "model.pt")
         # Evaluate and checkpoint.
         metrics = evaluate(model, x_test, y_test)
-        for metric, value in metrics.items():
-            dvclive.log(metric, value)
+        for k, v in metrics.items():
+            dvclive.log(k, v)
         dvclive.next_step()
 
 
