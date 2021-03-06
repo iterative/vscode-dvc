@@ -24,6 +24,7 @@ import buildDynamicColumns from '../util/build-dynamic-columns'
 
 import { VsCodeApi } from '../model/Model'
 import SortIndicator from './SortIndicator/SortIndicator'
+import ManageColumns from './ManageColumns/ManageColumns'
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -146,7 +147,10 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <>
-      <SortIndicator instance={instance} />
+      <div className={styles.tableOptions}>
+        <SortIndicator instance={instance} />
+        <ManageColumns instance={instance} />
+      </div>
       <Table instance={instance} />
     </>
   )

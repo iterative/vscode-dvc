@@ -1,16 +1,16 @@
 .sortIndicator {
-    &__columnGroup {
-        display: block;
-        padding-left: 1rem;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    padding: 0.375rem 0.5rem;
+    background-color: #4f5255;
+    min-width: 150px;
+    color: #fafafa;
+    margin: 1rem 0;
+    &__text {
+        font-size: 14px;
     }
-    &__sortDirectionIcon {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
-    &__columnVisibility {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+    &__subText {
+        font-size: 15px;
     }
 }
