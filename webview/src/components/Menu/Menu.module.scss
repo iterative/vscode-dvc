@@ -1,5 +1,4 @@
-.sortMenu {
-    margin-top: 1rem;
+.menu {
     position: relative;
     display: inline-block;
     max-width: 100%;
@@ -11,8 +10,8 @@
         position: relative;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        min-width: 100px;
+        justify-content: space-around;
+        min-width: 150px;
         max-width: 100%;
         line-height: 1.5;
         color: #ffffff;
@@ -29,7 +28,7 @@
             margin-left: 1rem;
         }
     }
-    &__menu {
+    &__menuOptions {
         position: absolute;
         top: calc(100% + 0.25rem);
         z-index: 200;
@@ -74,7 +73,7 @@
     &__menuItem {
         display: flex;
         align-items: baseline;
-        width: 100%;
+        width: auto !important;
         padding: 0.5rem 1rem 0.5rem 1rem;
         font-size: 1rem;
         color: #ffffff;
