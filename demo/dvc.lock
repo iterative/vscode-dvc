@@ -4,12 +4,12 @@ stages:
     cmd: python train.py
     deps:
     - path: data/MNIST
-      md5: 538a941b3cb08448e280e6a678a89b5d.dir
-      size: 121986952
-      nfiles: 10
+      md5: 961f2bf942091d363b13c12c51f941e8.dir
+      size: 121987048
+      nfiles: 12
     - path: train.py
-      md5: 2104367740df44dbbe40e28771df8765
-      size: 3387
+      md5: 3fd5e84a128802ae59fe9b58e6b63d31
+      size: 3228
     params:
       params.yaml:
         lr: 0.001
@@ -17,12 +17,12 @@ stages:
         weight_decay: 0
     outs:
     - path: logs
-      md5: 135011be7b1a0287f2c339fa521e7428.dir
-      size: 635
+      md5: 614084ce71808612b310a754ee5875e8.dir
+      size: 638
       nfiles: 2
     - path: model.pt
-      md5: 2d50a725c2499f20f5d3cd5240d5b1f9
+      md5: 1df4db5a5c30770fc895a10bd7ef2ef2
       size: 410751
     - path: predictions.json
-      md5: 26dcfcb73aae3e235d1bf5747f31f994
+      md5: 9abe1d49236bd3fa78968a8133035800
       size: 310000

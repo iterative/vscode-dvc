@@ -36,6 +36,9 @@ See something that should be changed? Want to request a new feature? Open
 
 ### The demo project
 
+- The demo project was initially forked from
+  (dvc-checkpoints-mnist)[https://github.com/iterative/dvc-checkpoints-mnist/tree/make_checkpoint]
+
 - It is recommended that you create the project's virtual environment with
   Python 3.8 as some dependencies are not yet available for Python 3.9
 
