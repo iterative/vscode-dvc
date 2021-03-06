@@ -93,9 +93,9 @@ def main():
         params = yaml.safe_load(f)
     torch.manual_seed(params["seed"])
     # Load train and test data.
-    mnist_train = torchvision.datasets.MNIST("data")
+    mnist_train = torchvision.datasets.MNIST("data", download=True)
     x_train, y_train = transform(mnist_train)
-    mnist_test = torchvision.datasets.MNIST("data", train=False)
+    mnist_test = torchvision.datasets.MNIST("data", download=True, train=False)
     x_test, y_test = transform(mnist_test)
     # Iterate over training epochs.
     for i in range(1, EPOCHS+1):

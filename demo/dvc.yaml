@@ -1,10 +1,4 @@
 stages:
-  download:
-    cmd: python download.py
-    deps:
-    - download.py
-    outs:
-    - data/MNIST
   train:
     cmd: python train.py
     deps:
