@@ -46,10 +46,10 @@ test('Inferring default options on a directory without .env', async () => {
 
 test('Command-mocked getExperiments matches a snapshot when parsed', async () => {
   mockedExecPromise.mockReturnValue(
-    (Promise.resolve({
+    Promise.resolve({
       stdout: JSON.stringify(complexExperimentsOutput),
       stderr: ''
-    }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
+    }) as PromiseWithChild<{ stdout: string; stderr: string }>
   )
 
   expect(await getExperiments(testReaderOptions)).toMatchSnapshot()

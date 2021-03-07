@@ -34,7 +34,7 @@ export const ParentHeaderGroup: React.FC<{
   )
 }
 
-export const FirstCell: React.FC<{ cell: Cell<Experiment, any> }> = ({
+export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
   cell
 }) => {
   const { row } = cell

@@ -4,9 +4,9 @@ import { Disposable } from '@hediet/std/disposable'
 import { addMessageHandler } from './window'
 
 interface InternalVsCodeApi {
-  getState(): any
-  setState(state: any): void
-  postMessage(message: any): void
+  getState<T>(): T
+  setState<T>(state: T): void
+  postMessage<T>(message: T): void
 }
 
 declare function acquireVsCodeApi(): InternalVsCodeApi
@@ -25,7 +25,7 @@ export function getVsCodeApi<
 >(): VsCodeApi<TState, TMessageFromWebview, TMessageToWebview> {
   // acquireVsCodeApi can be called only once.
   // This hack makes hot reload possible.
-  const w = (window as any) as { vscodeApi?: InternalVsCodeApi }
+  const w = window as { vscodeApi?: InternalVsCodeApi }
   if (!w.vscodeApi) {
     w.vscodeApi = acquireVsCodeApi()
   }
