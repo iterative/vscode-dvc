@@ -15,7 +15,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   const { columns: columnInstances } = instance
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const onToggle = (isOpen: any) => {
+  const onToggle = (isOpen: boolean) => {
     setIsOpen(isOpen)
   }
 
@@ -31,7 +31,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
     />
   )
 
-  const columnOptions = (column: ColumnInstance<Experiment>): any => (
+  const columnOptions = (column: ColumnInstance<Experiment>) => (
     <div key={column.id}>
       {!column.canSort && (
         <>
@@ -64,7 +64,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
         </MenuItem>
       )}
       {column.columns &&
-        column.columns.map((childColumn: any) => columnOptions(childColumn))}
+        column.columns.map(childColumn => columnOptions(childColumn))}
     </div>
   )
 

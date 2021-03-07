@@ -10,13 +10,16 @@ export interface MenuToggleProps {
 }
 
 export interface MenuItemProps {
-  children?: any
+  children?: React.ReactNode
   isDisabled?: boolean
   isSelected?: boolean
-  onSelect?: (event: React.MouseEvent<HTMLAnchorElement>, value?: any) => void
+  onSelect?: (
+    event: React.MouseEvent<HTMLAnchorElement>,
+    value?: string
+  ) => void
   id?: string
-  actions?: any
-  onClick?: () => void
+  actions?: React.ReactNode
+  onClick?: (event: React.MouseEvent | React.KeyboardEvent | MouseEvent) => void
 }
 
 export interface MenuProps {

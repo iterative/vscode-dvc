@@ -94,7 +94,7 @@ export const PrimaryHeaderGroup: React.FC<{
 }> = ({ headerGroup }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const onToggle = (isOpen: any) => {
+  const onToggle = (isOpen: boolean) => {
     setIsOpen(isOpen)
   }
 
