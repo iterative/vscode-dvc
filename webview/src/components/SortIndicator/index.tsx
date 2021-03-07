@@ -1,30 +1,23 @@
 import React from 'react'
-import { InstanceProp } from '../Table'
-import styles from './SortIndicator.module.scss'
+import { InstanceProp } from '../Table/index'
+import styles from './module.scss'
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
-  const { columns } = instance
-  let sortedBy = {} as any
-
-  const getColumnName = (id: any) => {
-    const header = columns.find(column => column.id === id)
-    return header ? header.Header : ''
-  }
-
-  if (instance.state.sortBy.length) {
-    sortedBy = {
-      column: getColumnName(instance.state.sortBy[0].id),
-      isSortedDesc: instance.state.sortBy[0].desc
-    }
+  const sortedByColumn = instance.sortedColumns.length
+    ? instance.sortedColumns[0]
+    : null
+  const sortedBy = {
+    header: sortedByColumn && sortedByColumn.Header,
+    isSortedDesc: sortedByColumn && sortedByColumn.isSortedDesc
   }
 
   return (
     <div className={styles.sortIndicator}>
       <span className={styles.sortIndicator__text}>Sorted By</span>
       <span className={styles.sortIndicator__subText}>
-        {instance.state.sortBy.length ? (
+        {sortedByColumn ? (
           <>
-            {sortedBy.column}
+            {sortedBy.header}
             {sortedBy.isSortedDesc ? (
               <svg
                 fill="currentColor"

@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
-import { Experiment } from '../util/parse-experiments'
-import styles from './table-styles.module.scss'
-import { Menu, MenuToggle, MenuItemGroup, MenuItem } from './Menu/Menu'
+import { Experiment } from '../../util/parse-experiments'
+import styles from './module.scss'
+import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu/index'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>
@@ -92,7 +92,7 @@ export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
 export const PrimaryHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
 }> = ({ headerGroup }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = React.useState(false)
 
   const onToggle = (isOpen: any) => {
     setIsOpen(isOpen)

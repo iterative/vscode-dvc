@@ -14,17 +14,17 @@ import {
   useFlexLayout,
   SortByFn
 } from 'react-table'
-import dayjs from '../dayjs'
-import { Table } from './Table'
-import parseExperiments, { Experiment } from '../util/parse-experiments'
+import dayjs from '../../dayjs'
+import { Table } from '../Table/index'
+import parseExperiments, { Experiment } from '../../util/parse-experiments'
 
-import styles from './table-styles.module.scss'
+import styles from '../Table/module.scss'
 
-import buildDynamicColumns from '../util/build-dynamic-columns'
+import buildDynamicColumns from '../../util/build-dynamic-columns'
 
-import { VsCodeApi } from '../model/Model'
-import SortIndicator from './SortIndicator/SortIndicator'
-import ManageColumns from './ManageColumns/ManageColumns'
+import { VsCodeApi } from '../../model/Model'
+import SortIndicator from '../SortIndicator/index'
+import ManageColumns from '../ManageColumns/index'
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],

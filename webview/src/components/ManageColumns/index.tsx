@@ -6,8 +6,8 @@ import {
   MenuItemGroup,
   MenuItem,
   MenuSeparator
-} from '../Menu/Menu'
-import styles from './ManageColumns.module.scss'
+} from '../Menu/index'
+import styles from './module.scss'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 
@@ -54,7 +54,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
           <input
             type="checkbox"
             id={column.id}
-            checked={column.isVisible}
+            defaultChecked={column.isVisible}
             key={`manage-column-input-${column.id}`}
           />
           <span key={`column-${column.Header}-span`}>

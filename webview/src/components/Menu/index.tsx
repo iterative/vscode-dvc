@@ -1,5 +1,5 @@
 import React from 'react'
-import styles from './Menu.module.scss'
+import styles from './module.scss'
 import { useOutsideClickHook } from '../../util/useOutsideClickHook'
 
 export interface MenuToggleProps {
