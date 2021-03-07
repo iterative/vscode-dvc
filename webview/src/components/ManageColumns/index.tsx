@@ -7,7 +7,11 @@ import {
   MenuItem,
   MenuSeparator
 } from '../Menu/index'
+<<<<<<< HEAD:webview/src/components/ManageColumns/index.tsx
 import styles from './styles.module.scss'
+=======
+import styles from './module.scss'
+>>>>>>> (chore): fixes bug and restructure files:webview/src/components/ManageColumns/index.tsx
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 

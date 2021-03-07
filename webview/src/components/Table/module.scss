@@ -1,0 +1,234 @@
+// Variables
+
+$row-bg-color: var(--vscode-editor-background);
+$row-bg-alt-color: rgb(60, 60, 60, 1);
+
+// Extendable Silent Rules
+
+%fullwidth {
+  @extend %fullwidth;
+}
+
+%bullet {
+  display: inline-block;
+  border-radius: 99px;
+  margin: 0 5px;
+}
+
+%rowArrowBase {
+  width: 8px;
+  height: 8px;
+  margin: 0 6px;
+  display: inline-block;
+}
+
+%expandableRowArrow {
+  @extend %rowArrowBase;
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.21);
+  border-top: unset;
+  border-left: unset;
+  transition: transform 0.2s, right 0.2s, bottom 0.2s;
+}
+
+// Concrete selectors
+
+.queuedBullet {
+  @extend %bullet;
+  width: 9px;
+  height: 9px;
+  margin: 0 6px;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0.5) 0deg,
+    rgba(255, 255, 255, 0) 180.31deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+  border: 1px solid #ffffff;
+}
+
+.bullet {
+  @extend %bullet;
+  position: relative;
+  height: 100%;
+  margin: 0 10px;
+  &::before {
+    content: '';
+    position: absolute;
+    left: -3px;
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    line-height: 0;
+    background: rgb(127, 127, 127);
+    border-radius: 100%;
+    top: calc(50% - 3px);
+  }
+}
+
+.rowArrowPlaceholder {
+  @extend %rowArrowBase;
+}
+
+.expandedRowArrow {
+  @extend %expandableRowArrow;
+  transform: rotate(45deg);
+  right: 1px;
+  bottom: 2px;
+}
+
+.contractedRowArrow {
+  @extend %expandableRowArrow;
+  transform: rotate(-45deg);
+  right: 4px;
+  bottom: 0;
+}
+
+.errorMessage {
+  padding: 0.5rem;
+  background-color: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-editor-foreground);
+}
+
+.experiments {
+  @extend %fullwidth;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  .firstCell {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+  .experimentGroup {
+    .nestedRow {
+      .firstCell {
+        padding-left: 2rem;
+      }
+    }
+    &.expandedGroup .nestedRow {
+      .bullet {
+        &::after {
+          content: '';
+          height: 100%;
+          top: 0;
+          right: 0;
+          position: absolute;
+          border-right: 1px solid rgb(127, 127, 127);
+        }
+      }
+      &:first-of-type {
+        .bullet::after {
+          height: 50%;
+          top: 50%;
+        }
+      }
+      &:last-of-type {
+        .bullet::after {
+          height: 50%;
+        }
+      }
+    }
+  }
+  ul {
+    padding-left: 1rem;
+  }
+  .tableContainer {
+    @extend %fullwidth;
+    overflow: auto;
+    flex: 1;
+  }
+  .table {
+    @extend %fullwidth;
+    margin: 0.5rem 1rem;
+    display: inline-block;
+    border-collapse: collapse;
+  }
+  summary {
+    white-space: nowrap;
+    cursor: pointer;
+    h2,
+    h3 {
+      margin: 0.25em;
+      white-space: nowrap;
+      display: inline-block;
+    }
+  }
+
+  .depthSpacer {
+    width: 1rem;
+  }
+
+  .tr {
+    position: relative;
+  }
+
+  .rowGroup {
+    margin: 0.5rem 0;
+  }
+  .normalRowGroup {
+    border: 1px solid gray;
+    .oddRow {
+      background-color: $row-bg-alt-color;
+    }
+  }
+  .workspaceRowGroup {
+    border: none;
+    .tr .td {
+      background-color: none;
+    }
+  }
+  .td,
+  .th {
+    white-space: nowrap;
+    text-align: left;
+    min-width: 0;
+    padding: 0 0.25rem;
+  }
+  .td {
+    padding: 0 0.25rem;
+    font-size: 1.1rem;
+    line-height: 2rem;
+    align-items: center;
+  }
+  .experimentCell {
+    text-align: left;
+    padding-left: 1rem;
+  }
+  .groupedCell,
+  .groupedHeader {
+    transition: 0.2s all;
+    background-color: var(--vscode-button-background);
+    &:hover {
+      background-color: var(--vscode-button-hoverBackground);
+    }
+  }
+  .parentHeaderCell {
+    text-align: left;
+    padding: 0.1rem 0.2rem;
+    font-size: 0.9rem;
+  }
+  .headersRow {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    .th {
+      padding: 0.4rem 0.25rem;
+    }
+  }
+}
+
+.pageHeading {
+  font-size: 2rem;
+  margin: 1rem;
+}
+
+.optionsPanel {
+  margin: 0.5rem 1rem;
+}
+
+.tableOptions {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 0 1rem;
+}
