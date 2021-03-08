@@ -3,7 +3,7 @@ import * as React from 'react'
 import { observable, runInAction } from 'mobx'
 import Module = require('module')
 
-type ReactComponent<P = any> =
+type ReactComponent<P = Record<string, unknown>> =
   | React.ComponentClass<P>
   | React.FunctionComponent<P>
 
@@ -39,9 +39,9 @@ export function hotComponent(
       m.hot.accept(() => {})
     }
 
-    return observer((props: any) => {
+    return observer((props: Record<string, unknown>) => {
       const C = result ? result.component : React.Fragment
       return <C {...props} />
-    }) as any
+    }) as T
   }
 }
