@@ -1,6 +1,6 @@
 import React from 'react'
 import { InstanceProp } from '../Table/index'
-import styles from './module.scss'
+import styles from './styles.module.scss'
 import SortIconToggle from '../SortIconToggle'
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {

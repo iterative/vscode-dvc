@@ -2,7 +2,7 @@ import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { Experiment } from '../../util/parse-experiments'
-import styles from './module.scss'
+import styles from './styles.module.scss'
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu/index'
 import SortIconToggle from '../SortIconToggle'
 

@@ -7,7 +7,7 @@ import {
   MenuItem,
   MenuSeparator
 } from '../Menu/index'
-import styles from './module.scss'
+import styles from './styles.module.scss'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 

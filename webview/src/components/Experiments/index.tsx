@@ -18,7 +18,7 @@ import dayjs from '../../dayjs'
 import { Table } from '../Table/index'
 import parseExperiments, { Experiment } from '../../util/parse-experiments'
 
-import styles from '../Table/module.scss'
+import styles from '../Table/styles.module.scss'
 
 import buildDynamicColumns from '../../util/build-dynamic-columns'
 
