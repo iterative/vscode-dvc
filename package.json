@@ -6,7 +6,9 @@
   ],
   "scripts": {
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json,yml,yaml}'",
-    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "lint:eslint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "yarn run-p 'lint:*'",
     "test": "yarn workspaces run test",
     "build": "yarn build-ui && yarn build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
