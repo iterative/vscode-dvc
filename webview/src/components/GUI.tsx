@@ -8,7 +8,7 @@ import { Model } from '../model/Model'
 export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
     try {
-      const { errors, experiments, vsCodeApi } = model
+      const { errors, experiments, vsCodeApi } = model as Model
       return (
         <>
           {errors &&
