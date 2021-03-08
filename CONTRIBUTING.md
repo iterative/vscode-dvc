@@ -42,9 +42,8 @@ See something that should be changed? Want to request a new feature? Open
 - It is recommended that you create the project's virtual environment with
   Python 3.8 as some dependencies are not yet available for Python 3.9
 
-- Run `yarn setup:venv` (alternatively run `yarn setup:venv:win` if on windows)
-  from the monorepo root to automatically setup the Python virtual environment
-  in the demo project
+- Run `yarn setup:venv` from the monorepo root to automatically setup the Python
+  virtual environment in the demo project
 
 - Once the environment has been setup you should navigate into the demo folder
   activate the virtual environment and run `dvc pull`.
