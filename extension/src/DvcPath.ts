@@ -15,6 +15,9 @@ export class DVCPathStatusBarItem {
   private instance: StatusBarItem
 
   constructor() {
+    if (process.env.DVCPATH) {
+      workspace.getConfiguration().update('dvc.dvcPath', process.env.DVCPATH)
+    }
     this.instance = window.createStatusBarItem()
     this.instance.tooltip = 'Current DVC path.'
     this.instance.command = 'dvc.selectDvcPath'
