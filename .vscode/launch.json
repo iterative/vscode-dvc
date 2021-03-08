@@ -12,10 +12,20 @@
         "--disable-extensions"
       ],
       "env": {
+        "DVCPATH": ".env/bin/dvc",
         "HOT_RELOAD": "true",
+        "PYTHONPATH": ".env/bin/python3",
         "USE_DEV_UI": "true"
       },
-      "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"]
+      "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"],
+      "windows": {
+        "env": {
+          "DVCPATH": ".env\\Scripts\\dvc.exe",
+          "HOT_RELOAD": "true",
+          "PYTHONPATH": ".env\\Scripts\\python.exe",
+          "USE_DEV_UI": "true"
+        }
+      }
     },
     {
       "name": "Run All Extensions (Hot Reload + Dev UI for dev-server)",
@@ -27,10 +37,20 @@
         "${workspaceFolder}/demo"
       ],
       "env": {
+        "DVCPATH": ".env/bin/dvc",
         "HOT_RELOAD": "true",
+        "PYTHONPATH": ".env/bin/python3",
         "USE_DEV_UI": "true"
       },
-      "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"]
+      "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"],
+      "windows": {
+        "env": {
+          "DVCPATH": ".env\\Scripts\\dvc.exe",
+          "HOT_RELOAD": "true",
+          "PYTHONPATH": ".env\\Scripts\\python.exe",
+          "USE_DEV_UI": "true"
+        }
+      }
     }
   ]
 }
