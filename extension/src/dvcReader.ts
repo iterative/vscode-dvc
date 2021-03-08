@@ -1,3 +1,4 @@
+import { getDvcPath } from './DvcPath'
 import { accessSync } from 'fs'
 import { resolve } from 'path'
 import { execPromise } from './util'
@@ -10,7 +11,8 @@ export interface ReaderOptions {
 export const inferDefaultOptions: (
   cwd: string
 ) => Promise<ReaderOptions> = async cwd => {
-  const envDvcPath = resolve(cwd, '.env', 'bin', 'dvc')
+  const localDvcPath = getDvcPath()
+  const envDvcPath = resolve(cwd, localDvcPath)
   let bin
   try {
     accessSync(envDvcPath)
