@@ -21,8 +21,7 @@
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
-    "setup:venv": "sh ./virtualenv-install.sh",
-    "build-tests": "yarn workspace dvc tsc -p './'"
+    "setup:venv": "sh ./virtualenv-install.sh"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
