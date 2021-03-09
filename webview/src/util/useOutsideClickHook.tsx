@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { RefObject } from 'react'
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useOutsideClickHook = (el: any, initialState: boolean) => {
+export const useOutsideClickHook = (
+  el: RefObject<HTMLElement>,
+  initialState: boolean
+) => {
   const [isActive, setIsActive] = React.useState(initialState)
 
   React.useEffect(() => {
     const onClick = (e: Event) => {
       const activeElement = el.current
-      if (activeElement && !activeElement.contains(e.target)) {
+      if (activeElement && !activeElement.contains(e.target as HTMLElement)) {
         setIsActive(!isActive)
       }
     }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { MouseEvent } from 'react'
 import styles from './styles.module.scss'
 import { useOutsideClickHook } from '../../util/useOutsideClickHook'
 
@@ -13,10 +13,6 @@ export interface MenuItemProps {
   children?: React.ReactNode
   isDisabled?: boolean
   isSelected?: boolean
-  onSelect?: (
-    event: React.MouseEvent<HTMLAnchorElement>,
-    value?: string
-  ) => void
   id?: string
   actions?: React.ReactNode
   onClick?: (event: React.MouseEvent | React.KeyboardEvent | MouseEvent) => void
@@ -73,7 +69,6 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   isDisabled,
   isSelected,
   id,
-  onSelect,
   actions,
   ...props
 }) => {
@@ -83,7 +78,6 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         key={`button-${id}`}
         id={id}
         className={styles.menu__menuItem}
-        onClick={(event: any) => onSelect && onSelect(event, event.current)}
         disabled={isDisabled}
         {...props}
       >
