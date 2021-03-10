@@ -1,7 +1,9 @@
+import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
+
 import {
-  DataDictRoot as DataDictRootType,
-  ExperimentJSONOutput as ExperimentJSONOutputType,
-  ExperimentsRepoJSONOutput as ExperimentsRepoJSONOutputType,
+  DataDictRoot as DataDictRootT,
+  ExperimentJSONOutput as ExperimentJSONOutputT,
+  ExperimentsRepoJSONOutput as ExperimentsRepoJSONOutputT,
   MessageFromWebview as MessageFromWebviewT,
   MessageFromWebviewType,
   MessageToWebview as MessageToWebviewT,
@@ -9,16 +11,16 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData as WindowWithWebviewDataT
 } from '../webviews/experiments/contract'
-import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
+
 export { complexExperimentsOutput }
 
-export type DataDictRoot = DataDictRootType
-export type ExperimentJSONOutput = ExperimentJSONOutputType
-export type ExperimentsRepoJSONOutput = ExperimentsRepoJSONOutputType
+export type DataDictRoot = DataDictRootT
+export type ExperimentJSONOutput = ExperimentJSONOutputT
+export type ExperimentsRepoJSONOutput = ExperimentsRepoJSONOutputT
 export type MessageFromWebview = MessageFromWebviewT
-export { MessageFromWebviewType }
 export type MessageToWebview = MessageToWebviewT
-export { MessageToWebviewType, WebviewColorTheme }
 export type WindowWithWebviewData = WindowWithWebviewDataT
+
+export { MessageFromWebviewType, MessageToWebviewType, WebviewColorTheme }
 
 export { Logger } from '../Logger'

@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
-    "isolatedModules": false
+    "declaration": true
   },
   "include": ["src/**/*"],
   "exclude": ["**/__mocks__/"]
