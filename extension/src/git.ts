@@ -2,6 +2,7 @@ import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
 import { dirname, resolve } from 'path'
+import { Logger } from './common/Logger'
 
 const enum CharCode {
   /**
@@ -91,8 +92,7 @@ const getWindowsRepoRootPath = async (
           return rootPath
         }
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e)
+        Logger.error(e)
       }
     }
 
@@ -214,9 +214,8 @@ export const getRepoRootPath = async (
     }
 
     return getNonWindowsRepoRootPath(dirPath, rootPath)
-  } catch (ex) {
-    // eslint-disable-next-line no-console
-    console.error(ex)
+  } catch (e) {
+    Logger.error(e)
     rootPath = undefined
     return rootPath
   } finally {

@@ -3,6 +3,7 @@
 import { resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
+import { Logger } from '../../common/Logger'
 
 export function run(): Promise<void> {
   // Create the mocha test
@@ -32,8 +33,7 @@ export function run(): Promise<void> {
           }
         })
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e)
+        Logger.error(e)
         e(e)
       }
     })
