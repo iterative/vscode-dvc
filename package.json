@@ -6,7 +6,10 @@
   ],
   "scripts": {
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json,yml,yaml}'",
-    "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "lint:prettier": "prettier -c '**/*.{md,json}'",
+    "lint:eslint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "run-p 'lint:*'",
     "test": "yarn workspaces run test",
     "build": "yarn build-ui && yarn build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
@@ -19,12 +22,7 @@
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
-    "setup:venv": "sh ./virtualenv-install.sh",
-    "ci:setup:build-tests": "yarn workspace dvc tsc -p './'",
-    "ci:run:prettier": "prettier -c '**/*.{md,json}'",
-    "ci:run:tsc": "tsc --noEmit",
-    "ci:run:test": "yarn test",
-    "ci:run:eslint": "eslint --cache '**/*.{js,ts,tsx}'"
+    "setup:venv": "sh ./virtualenv-install.sh"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
@@ -50,9 +48,5 @@
     "prettier-config-standard": "^4.0.0",
     "ts-jest": "^26.4.4",
     "typescript": "^4.1.3"
-  },
-  "lint-staged": {
-    "*.{md,json,yml,yaml,js,ts,tsx}": "prettier --write",
-    "*.{js,ts,tsx}": "eslint --fix"
   }
 }
