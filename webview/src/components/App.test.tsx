@@ -18,7 +18,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType,
   WebviewColorTheme
-} from 'dvc/src/common'
+} from 'dvc/contract'
 
 jest.mock('../model/VsCodeApi')
 

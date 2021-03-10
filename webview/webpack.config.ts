@@ -1,6 +1,7 @@
 import webpack, { Plugin } from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { resolve } from 'path'
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
@@ -22,7 +23,12 @@ module.exports = {
     }
   },
   resolve: {
-    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
+    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
+    plugins: [
+      new TsconfigPathsPlugin({
+        extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
+      })
+    ]
   },
   devtool: 'source-map',
   module: {

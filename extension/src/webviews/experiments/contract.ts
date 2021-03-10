@@ -1,3 +1,6 @@
+import complexExperimentsOutput from './complex-output-example.json'
+export { complexExperimentsOutput }
+
 export interface WindowWithWebviewData {
   webviewData: {
     publicPath: string

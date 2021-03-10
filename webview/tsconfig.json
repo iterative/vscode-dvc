@@ -10,7 +10,12 @@
     "newLine": "LF",
     "sourceMap": true,
     "jsx": "react",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "dvc/common": ["../extension/dist/common"],
+      "dvc/contract": ["../extension/dist/webviews/experiments/contract"]
+    }
   },
   "include": ["src/**/*", "webpack.config.ts"]
 }

@@ -20,7 +20,12 @@
     "moduleResolution": "node",
     "isolatedModules": true,
     "downlevelIteration": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "dvc/common": ["extension/dist/common"],
+      "dvc/contract": ["extension/dist/webviews/experiments/contract"]
+    }
   },
   "include": ["*/src/**/*"]
 }
