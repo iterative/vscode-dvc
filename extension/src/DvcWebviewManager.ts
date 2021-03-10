@@ -12,6 +12,7 @@ import {
   MessageToWebviewType,
   WindowWithWebviewData
 } from './webviews/experiments/contract'
+import { Logger } from './Logger'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -151,8 +152,7 @@ export class DvcWebview {
         return
       }
       default: {
-        // eslint-disable-next-line no-console
-        console.error('Unexpected message', message)
+        Logger.error(`Unexpected message: ${message}`)
       }
     }
   }

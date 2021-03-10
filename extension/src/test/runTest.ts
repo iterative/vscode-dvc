@@ -2,6 +2,7 @@
 import { resolve } from 'path'
 
 import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
+import { Logger } from '../Logger'
 
 async function main() {
   try {
@@ -20,7 +21,7 @@ async function main() {
       vscodeExecutablePath
     })
   } catch (err) {
-    console.error('Failed to run tests')
+    Logger.error('Failed to run tests')
     process.exit(1)
   }
 }
