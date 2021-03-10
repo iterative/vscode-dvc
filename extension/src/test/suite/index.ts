@@ -3,7 +3,7 @@
 import { resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
-import { Logger } from '../../Logger'
+import { Logger } from '../../common/Logger'
 
 export function run(): Promise<void> {
   // Create the mocha test

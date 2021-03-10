@@ -2,7 +2,7 @@ import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
 import { dirname, resolve } from 'path'
-import { Logger } from './Logger'
+import { Logger } from './common/Logger'
 
 const enum CharCode {
   /**
