@@ -13,9 +13,9 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "dvc/common": ["../extension/dist/common"],
+      "dvc/common": ["../extension/src/common"],
       "dvc/experiments-contract": [
-        "../extension/dist/webviews/experiments/contract"
+        "../extension/src/webviews/experiments/contract"
       ]
     }
   },
