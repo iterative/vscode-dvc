@@ -12,13 +12,13 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
 import { App } from './App'
-import complexExperimentsOutput from 'dvc/src/webviews/experiments/complex-output-example.json'
 import { getVsCodeApi } from '../model/VsCodeApi'
 import {
+  complexExperimentsOutput,
   MessageFromWebviewType,
   MessageToWebviewType,
   WebviewColorTheme
-} from 'dvc/src/webviews/experiments/contract'
+} from 'dvc/src/common'
 
 jest.mock('../model/VsCodeApi')
 

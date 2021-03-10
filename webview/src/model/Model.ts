@@ -1,13 +1,13 @@
 import {
   ExperimentsRepoJSONOutput,
+  Logger,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
   WebviewColorTheme,
   WindowWithWebviewData
-} from 'dvc/src/webviews/experiments/contract'
-import { Logger } from 'dvc/src/common/Logger'
+} from 'dvc/src/common'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 

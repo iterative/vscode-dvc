@@ -12,7 +12,7 @@ import {
   MessageToWebviewType,
   WindowWithWebviewData
 } from './webviews/experiments/contract'
-import { Logger } from './common/Logger'
+import { Logger } from './Logger'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'

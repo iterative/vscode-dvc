@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 
 import Experiments from '../components/Experiments'
 
-import complexExperimentsData from 'dvc/src/webviews/experiments/complex-output-example.json'
+import { complexExperimentsOutput } from 'dvc/src/common'
 
 import './test-vscode-styles.scss'
 import '../style.scss'
@@ -17,7 +17,7 @@ export default {
   title: 'Experiments/Table',
   component: Experiments,
   args: {
-    experiments: complexExperimentsData,
+    experiments: complexExperimentsOutput,
     vsCodeApi: dummyVsCodeApi
   },
   argTypes: {

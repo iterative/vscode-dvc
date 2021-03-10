@@ -2,7 +2,7 @@
 import { resolve } from 'path'
 
 import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
-import { Logger } from '../common/Logger'
+import { Logger } from '../Logger'
 
 async function main() {
   try {

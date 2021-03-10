@@ -10,7 +10,8 @@
     "strict": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "isolatedModules": false
   },
   "include": ["src/**/*"],
   "exclude": ["**/__mocks__/"]

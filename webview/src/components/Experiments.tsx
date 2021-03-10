@@ -2,7 +2,7 @@ import * as React from 'react'
 import {
   ExperimentsRepoJSONOutput,
   MessageFromWebviewType
-} from 'dvc/src/webviews/experiments/contract'
+} from 'dvc/src/common'
 import {
   TableInstance,
   Row,
