@@ -7,7 +7,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.(scss|css|less)$': 'identity-obj-proxy',
     '^dvc/common$': '<rootDir>/../extension/dist/common',
-    '^dvc/contract$':
+    '^dvc/experiments-contract$':
       '<rootDir>/../extension/dist/webviews/experiments/contract'
   },
   globals: {

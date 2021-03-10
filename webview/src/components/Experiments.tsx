@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { ExperimentsRepoJSONOutput, MessageFromWebviewType } from 'dvc/contract'
+import {
+  ExperimentsRepoJSONOutput,
+  MessageFromWebviewType
+} from 'dvc/experiments-contract'
 import {
   TableInstance,
   Row,

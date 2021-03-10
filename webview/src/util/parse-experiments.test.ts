@@ -1,5 +1,5 @@
 import parseExperiments from './parse-experiments'
-import { complexExperimentsOutput } from 'dvc/contract'
+import { complexExperimentsOutput } from 'dvc/experiments-contract'
 
 test('Running parseExperiments on sampleData matches a Snapshot', () => {
   expect(parseExperiments(complexExperimentsOutput)).toMatchInlineSnapshot(`

@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 
 import Experiments from '../components/Experiments'
 
-import { complexExperimentsOutput } from 'dvc/contract'
+import { complexExperimentsOutput } from 'dvc/experiments-contract'
 
 import './test-vscode-styles.scss'
 import '../style.scss'

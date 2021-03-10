@@ -1,4 +1,7 @@
-import { ExperimentsRepoJSONOutput, ExperimentJSONOutput } from 'dvc/contract'
+import {
+  ExperimentsRepoJSONOutput,
+  ExperimentJSONOutput
+} from 'dvc/experiments-contract'
 
 export interface ExperimentWithId extends ExperimentJSONOutput {
   id: string
