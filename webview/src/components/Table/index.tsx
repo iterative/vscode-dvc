@@ -1,9 +1,18 @@
 import React from 'react'
-import { Cell, HeaderGroup } from 'react-table'
+import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
-import { InstanceProp, RowProp } from './Experiments'
-import { Experiment } from '../util/parse-experiments'
-import styles from './table-styles.module.scss'
+import { Experiment } from '../../util/parse-experiments'
+import styles from './styles.module.scss'
+import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu/index'
+import SortIconToggle from '../SortIconToggle'
+
+export interface InstanceProp {
+  instance: TableInstance<Experiment>
+}
+
+export interface RowProp {
+  row: Row<Experiment>
+}
 
 export const ParentHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
@@ -83,33 +92,67 @@ export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
 
 export const PrimaryHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
-}> = ({ headerGroup }) => (
-  <div
-    {...headerGroup.getHeaderGroupProps({
-      className: cx(styles.tr, styles.headersRow)
-    })}
-  >
-    {headerGroup.headers.map(header => (
-      <div
-        {...header.getHeaderProps(
-          header.getSortByToggleProps({
-            className: cx(
-              styles.th,
-              header.isGrouped && styles.groupedHeader,
-              header.isSorted && styles.sortedHeader
-            )
-          })
-        )}
-        key={header.id}
-      >
-        <div>
-          {header.render('Header')}
-          {header.isSorted && <span>{header.isSortedDesc ? '↓' : '↑'}</span>}
+}> = ({ headerGroup }) => {
+  const [isOpen, setIsOpen] = React.useState(false)
+
+  const onToggle = (isOpen: boolean) => {
+    setIsOpen(isOpen)
+  }
+
+  return (
+    <div
+      {...headerGroup.getHeaderGroupProps({
+        className: cx(styles.tr, styles.headersRow)
+      })}
+    >
+      {headerGroup.headers.map(header => (
+        <div key={`sort-header-${header.id}`}>
+          <Menu
+            id={`sort-menu-${header.id}`}
+            key={`sort-menu-${header.id}`}
+            menuItems={[
+              <MenuItemGroup
+                key={`sort-menu-item-group-${header.id}`}
+                id={`sort-menu-item-group-${header.id}`}
+              >
+                <MenuItem
+                  id={'Sort'}
+                  isSelected={header.isSorted}
+                  {...header.getHeaderProps(
+                    header.getSortByToggleProps({
+                      key: `sort-menu-item-asc_${header.id}`
+                    })
+                  )}
+                >
+                  Sort Column
+                  {header.isSorted && (
+                    <SortIconToggle isSortedDesc={header.isSortedDesc} />
+                  )}
+                </MenuItem>
+                <MenuItem
+                  id={'Visibility'}
+                  key={`sort-menu-item-visibility-${header.id}`}
+                  onClick={() => header.toggleHidden()}
+                >
+                  Hide Column
+                </MenuItem>
+              </MenuItemGroup>
+            ]}
+            isOpen={isOpen}
+            toggle={
+              <MenuToggle
+                onToggle={onToggle}
+                toggleTemplate={header.Header}
+                id="toggle"
+                key={`sort-toggle-${header.id}`}
+              />
+            }
+          />
         </div>
-      </div>
-    ))}
-  </div>
-)
+      ))}
+    </div>
+  )
+}
 
 export const RowContent: React.FC<RowProp & { className?: string }> = ({
   row,

@@ -1,10 +1,9 @@
-import * as React from 'react'
+import React from 'react'
 import {
   ExperimentsRepoJSONOutput,
   MessageFromWebviewType
 } from 'dvc/src/webviews/experiments/contract'
 import {
-  TableInstance,
   Row,
   Column,
   ColumnInstance,
@@ -15,25 +14,17 @@ import {
   useFlexLayout,
   SortByFn
 } from 'react-table'
-import dayjs from '../dayjs'
-import { Table } from './Table'
-import parseExperiments, { Experiment } from '../util/parse-experiments'
+import dayjs from '../../dayjs'
+import { Table } from '../Table/index'
+import parseExperiments, { Experiment } from '../../util/parse-experiments'
 
-import styles from './table-styles.module.scss'
+import styles from '../Table/styles.module.scss'
 
-import buildDynamicColumns from '../util/build-dynamic-columns'
+import buildDynamicColumns from '../../util/build-dynamic-columns'
 
-import { VsCodeApi } from '../model/Model'
-
-const { useMemo, useEffect } = React
-
-export interface InstanceProp {
-  instance: TableInstance<Experiment>
-}
-
-export interface RowProp {
-  row: Row<Experiment>
-}
+import { VsCodeApi } from '../../model/Model'
+import SortIndicator from '../SortIndicator/index'
+import ManageColumns from '../ManageColumns/index'
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -72,66 +63,16 @@ const orderByFn: (
   }
 }
 
-const ColumnOptionsRow: React.FC<{
-  column: ColumnInstance<Experiment>
-}> = ({ column }) => (
-  <div>
-    <span>{'-'.repeat(column.depth)}</span> <span>{column.Header}</span>
-    {column.canSort && (
-      <button {...column.getSortByToggleProps()}>
-        Sort
-        {column.isSorted && <> ({column.isSortedDesc ? 'DESC' : 'ASC'})</>}
-      </button>
-    )}
-    {(!column.columns || column.columns.length === 0) && (
-      <button
-        onClick={() => {
-          column.toggleHidden()
-        }}
-      >
-        {column.isVisible ? 'Hide' : 'Show'}
-      </button>
-    )}
-    {column.columns &&
-      column.columns.map(childColumn => (
-        <ColumnOptionsRow column={childColumn} key={childColumn.id} />
-      ))}
-  </div>
-)
-
-const OptionsPanel: React.FC<InstanceProp> = ({ instance }) => {
-  const { columns: columnInstances, sortedColumns } = instance
-
-  return (
-    <details className={styles.optionsPanel}>
-      <summary>
-        <b>Options</b>
-        <div>Sorted by:</div>
-        <div>
-          {sortedColumns.map(column => (
-            <span key={column.id}>
-              {column.render('Header')} ({column.isSortedDesc ? 'DESC' : 'ASC'})
-            </span>
-          ))}
-        </div>
-      </summary>
-      {columnInstances.map(column => (
-        <ColumnOptionsRow column={column} key={column.id} />
-      ))}
-    </details>
-  )
-}
-
 export const ExperimentsTable: React.FC<{
   experiments: ExperimentsRepoJSONOutput
 }> = ({ experiments: rawExperiments }) => {
-  const [initialState, defaultColumn] = useMemo(() => {
+  const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {}
     return [initialState, defaultColumn]
   }, [])
 
-  const [data, columns] = useMemo(() => {
+  const [data, columns] = React.useMemo(() => {
     const { experiments, flatExperiments } = parseExperiments(rawExperiments)
     const columns = [
       {
@@ -200,13 +141,16 @@ export const ExperimentsTable: React.FC<{
 
   const { toggleAllRowsExpanded } = instance
 
-  useEffect(() => {
+  React.useEffect(() => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
 
   return (
     <>
-      <OptionsPanel instance={instance} />
+      <div className={styles.tableOptions}>
+        <SortIndicator instance={instance} />
+        <ManageColumns instance={instance} />
+      </div>
       <Table instance={instance} />
     </>
   )

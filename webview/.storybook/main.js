@@ -8,7 +8,8 @@ module.exports = {
       options: {
         cssLoaderOptions: {
           modules: {
-            localIdentName: '[path][name]__[local]--[hash:base64:5]'
+            localIdentName: '[path][name]__[local]--[hash:base64:5]',
+            auto: true
           }
         }
       }

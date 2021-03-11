@@ -225,3 +225,10 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
 .optionsPanel {
   margin: 0.5rem 1rem;
 }
+
+.tableOptions {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 0 1rem;
+}
