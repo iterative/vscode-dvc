@@ -4,3 +4,9 @@ declare namespace NodeJS {
     USE_DEV_UI?: 'true'
   }
 }
+
+declare interface DvcTrackedItem {
+  uri: vscode.Uri
+  type: vscode.FileType
+  rel: string
+}
