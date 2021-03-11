@@ -1,6 +1,6 @@
 import React from 'react'
 import { InstanceProp } from '../Table/index'
-import styles from './module.scss'
+import styles from './styles.module.scss'
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
   const sortedByColumn = instance.sortedColumns.length

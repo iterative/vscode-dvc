@@ -7,11 +7,7 @@ import {
   MenuItem,
   MenuSeparator
 } from '../Menu/index'
-<<<<<<< HEAD:webview/src/components/ManageColumns/index.tsx
 import styles from './styles.module.scss'
-=======
-import styles from './module.scss'
->>>>>>> (chore): fixes bug and restructure files:webview/src/components/ManageColumns/index.tsx
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 
@@ -58,7 +54,8 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
           <input
             type="checkbox"
             id={column.id}
-            defaultChecked={column.isVisible}
+            checked={column.isVisible}
+            readOnly
             key={`manage-column-input-${column.id}`}
           />
           <span key={`column-${column.Header}-span`}>
