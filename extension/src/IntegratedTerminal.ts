@@ -4,7 +4,8 @@ import {
   getInitializeDirectoryCommand,
   getAddCommand,
   getCheckoutCommand,
-  getCheckoutRecursiveCommand
+  getCheckoutRecursiveCommand,
+  getPushCommand
 } from './dvcCommands'
 import { delay } from './util'
 
@@ -116,4 +117,9 @@ export const checkout = (fsPath: string): Promise<void> => {
 export const checkoutRecursive = (fsPath: string): Promise<void> => {
   const checkoutRecursiveCommand = getCheckoutRecursiveCommand(fsPath)
   return IntegratedTerminal.run(checkoutRecursiveCommand)
+}
+
+export const push = (options: DvcTrackedItem | undefined): Promise<void> => {
+  const pushCommand = getPushCommand(options)
+  return IntegratedTerminal.run(pushCommand)
 }
