@@ -10,6 +10,7 @@ import {
   IntegratedTerminal,
   runExperiment,
   initializeDirectory,
+  push,
   add,
   checkout,
   checkoutRecursive
@@ -22,6 +23,8 @@ import { getExperiments, inferDefaultOptions } from './dvcReader'
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
+
+import { OverviewTreeItemProvider } from './DvcOverviewTree'
 
 export { Disposable }
 
@@ -123,6 +126,15 @@ export class Extension {
     )
 
     this.dispose.track(
+      commands.registerCommand(
+        'dvc.push',
+        (options: DvcTrackedItem | undefined) => {
+          push(options)
+        }
+      )
+    )
+
+    this.dispose.track(
       commands.registerCommand('dvc.add', ({ fsPath }) => {
         add(fsPath)
       })
@@ -139,8 +151,18 @@ export class Extension {
         checkoutRecursive(fsPath)
       })
     )
-
+    this.dvcExplorerView()
     this.dvcScmFilesView()
+  }
+
+  dvcExplorerView(): void {
+    const explorerView = new OverviewTreeItemProvider(this.getDefaultCwd())
+    this.dispose.track(
+      window.registerTreeDataProvider('dvcOverview', explorerView)
+    )
+    commands.registerCommand('dvcOverview.openFile', resource =>
+      explorerView.openResource(resource)
+    )
   }
 
   dvcScmFilesView(): void {

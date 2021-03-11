@@ -43,7 +43,12 @@
       {
         "title": "Push",
         "command": "dvc.push",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "media/push.svg"
+      },
+      {
+        "title": "DVC: Pull",
+        "command": "dvc.pull"
       },
       {
         "title": "Show Webview",
@@ -77,8 +82,12 @@
       },
       {
         "title": "Checkout Recursive",
-        "command": "dvc.checkoutRecursive",
-        "category": "DVC"
+        "category": "DVC",
+        "command": "dvc.checkoutRecursive"
+      },
+      {
+        "command": "dvcOverview.openFile",
+        "title": "Open File"
       }
     ],
     "configuration": {
@@ -137,6 +146,28 @@
           "command": "dvc.checkoutRecursive",
           "when": "explorerResourceIsFolder",
           "group": "8_dvc@4"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "dvc.push",
+          "when": "view == dvcOverview ",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dvc.push",
+          "when": "view == dvcOverview",
+          "group": "inline"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "dvcOverview",
+          "name": "DVC Tracked Files"
         }
       ]
     }
