@@ -88,6 +88,11 @@
       {
         "command": "dvcOverview.openFile",
         "title": "Open File"
+      },
+      {
+        "command": "dvcOverview.refreshEntry",
+        "title": "Refresh",
+        "icon": "media/refresh.svg"
       }
     ],
     "configuration": {
@@ -150,9 +155,9 @@
       ],
       "view/title": [
         {
-          "command": "dvc.push",
-          "when": "view == dvcOverview ",
-          "group": "navigation@1"
+          "command": "dvcOverview.refreshEntry",
+          "when": "view == dvcOverview",
+          "group": "navigation"
         }
       ],
       "view/item/context": [

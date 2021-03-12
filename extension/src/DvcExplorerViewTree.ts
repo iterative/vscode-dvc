@@ -1,9 +1,10 @@
 import * as vscode from 'vscode'
 import * as fs from 'fs'
-import { join } from 'path'
+import { join, relative } from 'path'
 import * as cp from 'child_process'
+import { workspace } from 'vscode'
 
-export class OverviewTreeItemProvider
+export class ExplorerViewTreeItemProvider
   implements vscode.TreeDataProvider<DvcTrackedItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<
     DvcTrackedItem | undefined | void
@@ -17,6 +18,8 @@ export class OverviewTreeItemProvider
 
   constructor(private workspaceRoot: string) {
     this.workspaceUri = vscode.Uri.file(this.workspaceRoot)
+    workspace.onDidDeleteFiles(() => this.refresh())
+    workspace.onDidCreateFiles(() => this.refresh())
   }
 
   refresh(): void {
@@ -29,16 +32,15 @@ export class OverviewTreeItemProvider
 
   async getChildren(element?: DvcTrackedItem): Promise<DvcTrackedItem[]> {
     if (element) {
-      const children = await this.readDirectory(element.uri, element.rel)
-      return children.map(([name, type, rel]) => ({
+      const children = await this.readDirectory(element.uri)
+      return children.map(([name, type]) => ({
         uri: vscode.Uri.file(join(element.uri.fsPath, name)),
-        type,
-        rel
+        type
       }))
     }
 
     if (this.workspaceRoot) {
-      const children = await this.readDirectory(this.workspaceUri, '')
+      const children = await this.readDirectory(this.workspaceUri)
       children.sort((a, b) => {
         if (a[1] === b[1]) {
           return a[0].localeCompare(b[0])
@@ -46,10 +48,9 @@ export class OverviewTreeItemProvider
         return a[1] === vscode.FileType.Directory ? -1 : 1
       })
 
-      return children.map(([name, type, rel]) => ({
+      return children.map(([name, type]) => ({
         uri: vscode.Uri.file(join(this.workspaceUri.fsPath, name)),
-        type,
-        rel
+        type
       }))
     }
 
@@ -72,25 +73,24 @@ export class OverviewTreeItemProvider
       }
       treeItem.contextValue = 'file'
     }
+    treeItem.resourceUri = element.uri.with({ scheme: 'dvcItem' })
 
     return treeItem
   }
 
   private async readDirectory(
-    uri: vscode.Uri,
-    rel: string
-  ): Promise<[string, vscode.FileType, string][]> {
+    uri: vscode.Uri
+  ): Promise<[string, vscode.FileType][]> {
     const children = await this.execDvc(
-      `cd ${this.workspaceRoot} && dvc list . ${rel || ''} --dvc-only`
+      `cd ${this.workspaceRoot} && dvc list . ${this.getRel(uri)} --dvc-only`
     )
-    const result: [string, vscode.FileType, string][] = []
+    const result: [string, vscode.FileType][] = []
 
-    for (let i = 0; i < children.length; i++) {
+    for (let i = 0; i < children.length - 1; i++) {
       const child = children[i]
       const stat = await this.isDir(join(uri.fsPath, child))
-      const relative = join(rel, child)
 
-      result.push([child, stat, relative])
+      result.push([child, stat])
     }
 
     return Promise.resolve(result)
@@ -102,8 +102,8 @@ export class OverviewTreeItemProvider
         if (err) {
           return reject(err)
         }
-        const arr = out.split('\r\n')
-        arr.pop()
+        const arr = out.split(/\r\n?|\n/)
+
         return resolve(arr)
       })
     })
@@ -119,5 +119,9 @@ export class OverviewTreeItemProvider
     } catch (e) {
       return vscode.FileType.File
     }
+  }
+
+  private getRel(uri: vscode.Uri): string {
+    return relative(this.workspaceRoot, uri.fsPath)
   }
 }
