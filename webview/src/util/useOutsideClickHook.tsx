@@ -4,7 +4,7 @@ import React, { RefObject } from 'react'
 export const useOutsideClickHook = (
   el: RefObject<HTMLElement>,
   initialState: boolean
-) => {
+): [boolean, React.Dispatch<React.SetStateAction<boolean>>] => {
   const [isActive, setIsActive] = React.useState(initialState)
 
   React.useEffect(() => {

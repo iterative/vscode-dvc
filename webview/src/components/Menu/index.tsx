@@ -130,8 +130,7 @@ export const Menu: React.FC<MenuProps> = ({
     renderedMenuItems = menuItems
   }
 
-  const onClick = () =>
-    (setIsActive as React.Dispatch<React.SetStateAction<boolean>>)(!isActive)
+  const onClick = () => setIsActive(!isActive)
 
   return (
     <div className={styles.menu} id={id}>
