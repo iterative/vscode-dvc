@@ -124,17 +124,13 @@ export const Menu: React.FC<MenuProps> = ({
 }) => {
   const MenuRef = React.useRef(null)
   let renderedMenuItems
-  let onClick
   const [isActive, setIsActive] = useOutsideClickHook(MenuRef, false)
 
   if (menuItems && menuItems.length) {
     renderedMenuItems = menuItems
   }
 
-  // we need to add this check to determine if setIsActive is a function or not othherwise we'll get type compatible call signature error.
-  if (typeof setIsActive === 'function' && !(setIsActive instanceof Array)) {
-    onClick = () => setIsActive(!isActive)
-  }
+  const onClick = () => setIsActive(!isActive)
 
   return (
     <div className={styles.menu} id={id}>
