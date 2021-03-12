@@ -1,7 +1,7 @@
-import React, { RefObject } from 'react'
+import React from 'react'
 
 export const useOutsideClickHook = (
-  el: RefObject<HTMLElement>,
+  el: React.RefObject<HTMLElement>,
   initialState: boolean
 ): [boolean, React.Dispatch<React.SetStateAction<boolean>>] => {
   const [isActive, setIsActive] = React.useState(initialState)
