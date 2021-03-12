@@ -8,5 +8,4 @@ declare namespace NodeJS {
 declare interface DvcTrackedItem {
   uri: vscode.Uri
   type: vscode.FileType
-  rel: string
 }
