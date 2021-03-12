@@ -1,6 +1,5 @@
 import React, { RefObject } from 'react'
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useOutsideClickHook = (
   el: RefObject<HTMLElement>,
   initialState: boolean
