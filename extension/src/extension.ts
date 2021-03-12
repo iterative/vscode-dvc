@@ -25,6 +25,7 @@ import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 
 import { OverviewTreeItemProvider } from './DvcOverviewTree'
+import { DvcDecorationProvider } from './DvcDecorationProvider'
 
 export { Disposable }
 
@@ -151,8 +152,15 @@ export class Extension {
         checkoutRecursive(fsPath)
       })
     )
+    this.dvcFileDecorator()
     this.dvcExplorerView()
     this.dvcScmFilesView()
+  }
+
+  dvcFileDecorator(): void {
+    this.dispose.track(
+      window.registerFileDecorationProvider(new DvcDecorationProvider())
+    )
   }
 
   dvcExplorerView(): void {
