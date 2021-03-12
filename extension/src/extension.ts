@@ -1,16 +1,4 @@
-import {
-  workspace,
-  window,
-  commands,
-  TreeDataProvider,
-  ThemeIcon,
-  TreeItemCollapsibleState,
-  Command,
-  scm,
-  Uri,
-  TreeItem,
-  ExtensionContext
-} from 'vscode'
+import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -153,59 +141,6 @@ export class Extension {
     )
 
     this.dvcScmFilesView()
-    this.dvcCommandView()
-  }
-
-  dvcCommandView(): void {
-    interface TreeItemEntry {
-      label: string
-      command?: Command
-    }
-
-    class DVCTreeDataProvider implements TreeDataProvider<TreeItemEntry> {
-      /* onDidChangeTreeData?:
-				| Event<void | MyTreeItem | null | undefined>
-				| undefined; */
-
-      async getChildren(element?: TreeItemEntry): Promise<TreeItemEntry[]> {
-        if (!element) {
-          // Root
-          return [
-            {
-              label: 'View Tree',
-              command: {
-                title: 'Webview Tree',
-                command: 'dvc.showWebview'
-              }
-            },
-            {
-              label: 'Run Experiment',
-              command: {
-                title: 'Run Experiment',
-                command: 'dvc.runExperiment'
-              }
-            }
-          ]
-        }
-        return []
-      }
-
-      async getTreeItem(element: TreeItemEntry): Promise<TreeItem> {
-        return {
-          label: element.label,
-          command: element.command,
-          iconPath: ThemeIcon.File,
-          collapsibleState: TreeItemCollapsibleState.None
-        }
-      }
-    }
-
-    this.dispose.track(
-      window.createTreeView('dvc-tree', {
-        treeDataProvider: new DVCTreeDataProvider(),
-        canSelectMany: false
-      })
-    )
   }
 
   dvcScmFilesView(): void {
