@@ -1,10 +1,8 @@
 import * as vscode from 'vscode'
-import * as fs from 'fs'
 import { join, relative } from 'path'
-import * as cp from 'child_process'
-import { workspace } from 'vscode'
+import { execDvcCmd, isDirOrFile } from './util'
 
-export class ExplorerViewTreeItemProvider
+export class ExplorerTreeViewItemProvider
   implements vscode.TreeDataProvider<DvcTrackedItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<
     DvcTrackedItem | undefined | void
@@ -18,8 +16,8 @@ export class ExplorerViewTreeItemProvider
 
   constructor(private workspaceRoot: string) {
     this.workspaceUri = vscode.Uri.file(this.workspaceRoot)
-    workspace.onDidDeleteFiles(() => this.refresh())
-    workspace.onDidCreateFiles(() => this.refresh())
+    vscode.workspace.onDidDeleteFiles(() => this.refresh())
+    vscode.workspace.onDidCreateFiles(() => this.refresh())
   }
 
   refresh(): void {
@@ -67,7 +65,7 @@ export class ExplorerViewTreeItemProvider
 
     if (element.type === vscode.FileType.File) {
       treeItem.command = {
-        command: 'dvcOverview.openFile',
+        command: 'explorerTreeView.openFile',
         title: 'Open File',
         arguments: [element.uri]
       }
@@ -81,14 +79,17 @@ export class ExplorerViewTreeItemProvider
   private async readDirectory(
     uri: vscode.Uri
   ): Promise<[string, vscode.FileType][]> {
-    const children = await this.execDvc(
-      `cd ${this.workspaceRoot} && dvc list . ${this.getRel(uri)} --dvc-only`
+    const children = await this.getTrackedFiles(
+      `cd ${this.workspaceRoot} && dvc list . ${relative(
+        this.workspaceRoot,
+        uri.fsPath
+      )} --dvc-only`
     )
     const result: [string, vscode.FileType][] = []
 
     for (let i = 0; i < children.length - 1; i++) {
       const child = children[i]
-      const stat = await this.isDir(join(uri.fsPath, child))
+      const stat = await isDirOrFile(join(uri.fsPath, child))
 
       result.push([child, stat])
     }
@@ -96,32 +97,8 @@ export class ExplorerViewTreeItemProvider
     return Promise.resolve(result)
   }
 
-  private execDvc(cmd: string): Promise<string[]> {
-    return new Promise<string[]>((resolve, reject) => {
-      cp.exec(cmd, (err, out) => {
-        if (err) {
-          return reject(err)
-        }
-        const arr = out.split(/\r\n?|\n/)
-
-        return resolve(arr)
-      })
-    })
-  }
-
-  private isDir(path: fs.PathLike): vscode.FileType {
-    try {
-      const stat = fs.lstatSync(path)
-      if (stat.isDirectory()) {
-        return vscode.FileType.Directory
-      }
-      return vscode.FileType.File
-    } catch (e) {
-      return vscode.FileType.File
-    }
-  }
-
-  private getRel(uri: vscode.Uri): string {
-    return relative(this.workspaceRoot, uri.fsPath)
+  private async getTrackedFiles(cmd: string): Promise<string[]> {
+    const res = await execDvcCmd(cmd)
+    return res.split(/\r\n?|\n/)
   }
 }
