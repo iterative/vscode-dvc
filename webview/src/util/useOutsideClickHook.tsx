@@ -14,15 +14,15 @@ export const useOutsideClickHook = (
       }
     }
 
-    const onEscape = (e: Event) => {
-      if (e.keyCode === 27) {
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
         setIsActive(!isActive)
       }
     }
 
     if (isActive) {
-      window.addEventListener('keydown', onClick)
-      window.addEventListener('click', onEscape)
+      window.addEventListener('click', onClick)
+      window.addEventListener('keydown', onEscape)
     }
 
     return () => {
