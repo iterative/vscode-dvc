@@ -1,8 +1,18 @@
-import { workspace } from 'vscode'
+/* eslint-disable no-console */
+import { workspace, Uri } from 'vscode'
 import { relative } from 'path'
 
 const getCliCommand = (command: string, ...options: string[]): string => {
   return `dvc ${command} ${options.join(' ')}`
+}
+
+const getDefaultCwd = (): string => {
+  const { workspaceFolders } = workspace
+  if (!workspaceFolders || workspaceFolders.length === 0) {
+    throw new Error('There are no folders in the Workspace to operate on!')
+  }
+
+  return workspaceFolders[0].uri.fsPath
 }
 
 const RUN_EXPERIMENT = 'exp run'
@@ -43,7 +53,9 @@ export const getCheckoutRecursiveCommand = (fsPath: string): string => {
 }
 
 export const getPushCommand = (options: DvcTrackedItem | undefined): string => {
-  let path = ''
-  if (options) path = options.rel
+  const path = options
+    ? Uri.file(relative(getDefaultCwd(), options.uri.fsPath)).path.substring(1)
+    : ''
+
   return getCliCommand(PUSH, path)
 }
