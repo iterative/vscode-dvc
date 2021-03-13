@@ -86,11 +86,11 @@
         "command": "dvc.checkoutRecursive"
       },
       {
-        "command": "dvcOverview.openFile",
+        "command": "explorerTreeView.openFile",
         "title": "Open File"
       },
       {
-        "command": "dvcOverview.refreshEntry",
+        "command": "explorerTreeView.refreshEntry",
         "title": "Refresh",
         "icon": "media/refresh.svg"
       }
@@ -155,15 +155,15 @@
       ],
       "view/title": [
         {
-          "command": "dvcOverview.refreshEntry",
-          "when": "view == dvcOverview",
+          "command": "explorerTreeView.refreshEntry",
+          "when": "view == explorerTreeView",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "dvc.push",
-          "when": "view == dvcOverview",
+          "when": "view == explorerTreeView",
           "group": "inline"
         }
       ]
@@ -171,7 +171,7 @@
     "views": {
       "explorer": [
         {
-          "id": "dvcOverview",
+          "id": "explorerTreeView",
           "name": "DVC Tracked Files"
         }
       ]

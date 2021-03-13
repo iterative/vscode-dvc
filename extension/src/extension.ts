@@ -24,7 +24,7 @@ import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 
-import { ExplorerViewTreeItemProvider } from './DvcExplorerViewTree'
+import { ExplorerTreeViewItemProvider } from './DvcExplorerTreeView'
 import { DvcDecorationProvider } from './DvcDecorationProvider'
 
 export { Disposable }
@@ -164,17 +164,17 @@ export class Extension {
   }
 
   dvcExplorerView(): void {
-    const explorerView = new ExplorerViewTreeItemProvider(this.getDefaultCwd())
+    const explorerView = new ExplorerTreeViewItemProvider(this.getDefaultCwd())
     this.dispose.track(
-      window.registerTreeDataProvider('dvcOverview', explorerView)
+      window.registerTreeDataProvider('explorerTreeView', explorerView)
     )
     this.dispose.track(
-      commands.registerCommand('dvcOverview.openFile', resource =>
+      commands.registerCommand('explorerTreeView.openFile', resource =>
         explorerView.openResource(resource)
       )
     )
     this.dispose.track(
-      commands.registerCommand('dvcOverview.refreshEntry', () =>
+      commands.registerCommand('explorerTreeView.refreshEntry', () =>
         explorerView.refresh()
       )
     )
