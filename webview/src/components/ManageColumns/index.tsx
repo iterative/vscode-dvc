@@ -78,12 +78,14 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   ]
 
   return (
-    <Menu
-      id="manage-columns"
-      menuItems={menuItems}
-      isOpen={isOpen}
-      toggle={toggle}
-    />
+    <div data-testid={'manage-columns'}>
+      <Menu
+        id="manage-columns"
+        menuItems={menuItems}
+        isOpen={isOpen}
+        toggle={toggle}
+      />
+    </div>
   )
 }
 

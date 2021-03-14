@@ -277,7 +277,7 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
   const { getTableProps, rows } = instance
 
   return (
-    <div className={styles.tableContainer}>
+    <div className={styles.tableContainer} data-testid={'experiments-table'}>
       <div {...getTableProps({ className: styles.table })}>
         <TableHead instance={instance} />
         {rows.map(row => {

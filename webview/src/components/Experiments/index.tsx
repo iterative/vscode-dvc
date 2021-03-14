@@ -147,7 +147,7 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <>
-      <div className={styles.tableOptions}>
+      <div className={styles.tableOptions} data-testid={'table-header-options'}>
         <SortIndicator instance={instance} />
         <ManageColumns instance={instance} />
       </div>
