@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const useOutsideClickHook = (
+export const useCloseActiveHook = (
   el: React.RefObject<HTMLElement>,
   initialState: boolean
 ): [boolean, React.Dispatch<React.SetStateAction<boolean>>] => {
