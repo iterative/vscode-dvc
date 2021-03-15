@@ -1,8 +1,8 @@
 {
   "name": "dvc",
   "private": true,
-  "displayName": "DVC",
-  "description": "DVC VSCode extension",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "publisher": "iterative",
   "icon": "docs/dvc.png",
   "version": "0.1.0",
@@ -41,8 +41,79 @@
   "contributes": {
     "commands": [
       {
-        "title": "Push",
+        "title": "%command.add%",
+        "command": "dvc.add",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.checkout%",
+        "command": "dvc.checkout",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.checkoutRecursive%",
+        "category": "DVC",
+        "command": "dvc.checkoutRecursive"
+      },
+      {
+        "title": "%command.commit%",
+        "command": "dvc.commit",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.fetch%",
+        "command": "dvc.fetch",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.fetchAllBranches%",
+        "command": "dvc.fetchAllBranches",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.gc%",
+        "command": "dvc.gc",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.init%",
+        "command": "dvc.init",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.initNoScm%",
+        "command": "dvc.initNoScm",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.install%",
+        "command": "dvc.install",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.list%",
+        "command": "dvc.list",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.pull%",
+        "command": "dvc.pull",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.push%",
         "command": "dvc.push",
+        "category": "DVC",
+        "icon": "media/push.svg"
+      },
+      {
+        "title": "%command.destroy%",
+        "command": "dvc.destroy",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.status%",
+        "command": "dvc.status",
         "category": "DVC"
       },
       {
@@ -61,24 +132,13 @@
         "category": "DVC"
       },
       {
-        "title": "Initialize Directory",
-        "command": "dvc.initializeDirectory",
-        "category": "DVC"
+        "command": "explorerTreeView.openFile",
+        "title": "Open File"
       },
       {
-        "title": "Add",
-        "command": "dvc.add",
-        "category": "DVC"
-      },
-      {
-        "title": "Checkout",
-        "command": "dvc.checkout",
-        "category": "DVC"
-      },
-      {
-        "title": "Checkout Recursive",
-        "command": "dvc.checkoutRecursive",
-        "category": "DVC"
+        "command": "explorerTreeView.refreshEntry",
+        "title": "Refresh",
+        "icon": "media/refresh.svg"
       }
     ],
     "configuration": {
@@ -95,15 +155,105 @@
     "menus": {
       "scm/title": [
         {
-          "title": "Run Experiment",
-          "command": "dvc.showWebview",
-          "group": "experiments",
+          "command": "dvc.install",
+          "group": "1_header@1",
           "when": "scmProvider == dvc"
         },
         {
-          "command": "dvc.runExperiment",
-          "group": "experiments",
+          "command": "dvc.list",
+          "group": "1_header@2",
           "when": "scmProvider == dvc"
+        },
+        {
+          "command": "dvc.status",
+          "group": "1_header@3",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "submenu": "dvc.init",
+          "group": "2_main@1",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "submenu": "dvc.checkout",
+          "group": "2_main@2",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "submenu": "dvc.commit",
+          "group": "2_main@3",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "submenu": "dvc.fetch",
+          "group": "2_main@4",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "submenu": "dvc.pushpull",
+          "group": "2_main@5",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "submenu": "dvc.dvcExtra",
+          "group": "3_main@1",
+          "when": "scmProvider == dvc"
+        }
+      ],
+      "dvc.init": [
+        {
+          "command": "dvc.init",
+          "group": "1_init@1"
+        },
+        {
+          "command": "dvc.initNoScm",
+          "group": "1_init@2"
+        }
+      ],
+      "dvc.checkout": [
+        {
+          "command": "dvc.checkout",
+          "group": "1_checkout@1"
+        },
+        {
+          "command": "dvc.checkoutRecursive",
+          "group": "1_checkout@2"
+        }
+      ],
+      "dvc.commit": [
+        {
+          "command": "dvc.commit",
+          "group": "1_commit@1"
+        }
+      ],
+      "dvc.dvcExtra": [
+        {
+          "command": "dvc.gc",
+          "group": "1_extra@1"
+        },
+        {
+          "command": "dvc.destroy",
+          "group": "1_extra@2"
+        }
+      ],
+      "dvc.fetch": [
+        {
+          "command": "dvc.fetch",
+          "group": "1_fetch@1"
+        },
+        {
+          "command": "dvc.fetchAllBranches",
+          "group": "1_fetch@2"
+        }
+      ],
+      "dvc.pushpull": [
+        {
+          "command": "dvc.push",
+          "group": "1_push@1"
+        },
+        {
+          "command": "dvc.pull",
+          "group": "2_pull@1"
         }
       ],
       "scm/resourceState/context": [
@@ -119,7 +269,7 @@
           "group": "8_dvc@1"
         },
         {
-          "command": "dvc.initializeDirectory",
+          "command": "dvc.init",
           "when": "explorerResourceIsFolder",
           "group": "8_dvc@1"
         },
@@ -130,7 +280,7 @@
         },
         {
           "command": "dvc.checkout",
-          "when": "isFileSystemResource",
+          "when": "explorerResourceIsFolder",
           "group": "8_dvc@3"
         },
         {
@@ -139,7 +289,33 @@
           "group": "8_dvc@4"
         }
       ]
-    }
+    },
+    "submenus": [
+      {
+        "id": "dvc.checkout",
+        "label": "%submenu.checkout%"
+      },
+      {
+        "id": "dvc.commit",
+        "label": "%submenu.commit%"
+      },
+      {
+        "id": "dvc.dvcExtra",
+        "label": "%submenu.dvcExtra%"
+      },
+      {
+        "id": "dvc.fetch",
+        "label": "%submenu.fetch%"
+      },
+      {
+        "id": "dvc.init",
+        "label": "%submenu.init%"
+      },
+      {
+        "id": "dvc.pushpull",
+        "label": "%submenu.pushpull%"
+      }
+    ]
   },
   "enableProposedApi": true,
   "scripts": {
