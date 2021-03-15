@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
@@ -7,12 +8,20 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import {
-  IntegratedTerminal,
-  runExperiment,
-  initializeDirectory,
   add,
   checkout,
-  checkoutRecursive
+  commit,
+  destroy,
+  fetch,
+  gc,
+  initialize,
+  install,
+  IntegratedTerminal,
+  list,
+  pull,
+  push,
+  runExperiment,
+  status
 } from './IntegratedTerminal'
 
 import { Config } from './Config'
@@ -118,30 +127,102 @@ export class Extension {
     )
 
     this.dispose.track(
+      commands.registerCommand('dvc.add', item => {
+        item.rootUri && add(item.rootUri.path)
+        item.path && add(item.path)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.checkout', item => {
+        item.rootUri && checkout(item.rootUri.path)
+        item.path && checkout(item.path)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.checkoutRecursive', item => {
+        item.rootUri && checkout(item.rootUri.path)
+        item.path && checkout(item.path, ['-R'])
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.commit', () => {
+        commit()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.destroy', () => {
+        destroy()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.fetch', item => {
+        item.rootUri && fetch(item.rootUri.path)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.fetchAllBranches', item => {
+        fetch(item, ['-a'])
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.gc', item => {
+        item.rootUri && gc(item.rootUri.path, ['-w'])
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.init', item => {
+        item.rootUri && initialize(item.rootUri.path)
+        item.path && initialize(item.path, ['--subdir'])
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.initNoScm', item => {
+        item.rootUri && initialize(item.rootUri.path, ['--no-scm'])
+        item.path && initialize(item.path, ['--subdir', '--no-scm'])
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.install', () => {
+        install()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.list', () => {
+        list()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.pull', () => {
+        pull()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.push', item => {
+        item.rootUri && push(item.rootUri.path)
+        item.uri && push(item.uri.path)
+      })
+    )
+
+    this.dispose.track(
       commands.registerCommand('dvc.runExperiment', runExperiment)
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory(fsPath)
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.add', ({ fsPath }) => {
-        add(fsPath)
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout(fsPath)
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive(fsPath)
+      commands.registerCommand('dvc.status', () => {
+        status()
       })
     )
 

@@ -1,10 +1,21 @@
-import { Extension, extensions, Terminal, window, workspace } from 'vscode'
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { relative } from 'path'
+import { Extension, extensions, Terminal, Uri, window, workspace } from 'vscode'
 import {
-  getRunExperimentCommand,
-  getInitializeDirectoryCommand,
   getAddCommand,
   getCheckoutCommand,
-  getCheckoutRecursiveCommand
+  getCommitCommand,
+  getDestroyCommand,
+  getFetchCommand,
+  getGcCommand,
+  getInitCommand,
+  getInstallCommand,
+  getListCommand,
+  getPullCommand,
+  getPushCommand,
+  getRunExperimentCommand,
+  getStatusCommand
 } from './dvcCommands'
 import { delay } from './util'
 
@@ -93,27 +104,84 @@ export class IntegratedTerminal {
   }
 }
 
+export const getDefaultCwd = (): string => {
+  const { workspaceFolders } = workspace
+  if (!workspaceFolders || workspaceFolders.length === 0) {
+    throw new Error('There are no folders in the Workspace to operate on!')
+  }
+
+  return workspaceFolders[0].uri.path
+}
+
 export const runExperiment = (): Promise<void> => {
   const runExperimentCommand = getRunExperimentCommand()
   return IntegratedTerminal.run(runExperimentCommand)
 }
 
-export const initializeDirectory = (fsPath: string): Promise<void> => {
-  const initializeDirectoryCommand = getInitializeDirectoryCommand(fsPath)
-  return IntegratedTerminal.run(initializeDirectoryCommand)
-}
-
-export const add = (fsPath: string): Promise<void> => {
-  const addCommand = getAddCommand(fsPath)
+export const add = (item: string, options: string[] = []): Promise<void> => {
+  const path = Uri.file(relative(getDefaultCwd(), item)).path
+  const addCommand = getAddCommand(path, options)
   return IntegratedTerminal.run(addCommand)
 }
 
-export const checkout = (fsPath: string): Promise<void> => {
-  const checkoutCommand = getCheckoutCommand(fsPath)
+export const checkout = (
+  item: string,
+  options: string[] = []
+): Promise<void> => {
+  const checkoutCommand = getCheckoutCommand(item, options)
   return IntegratedTerminal.run(checkoutCommand)
 }
 
-export const checkoutRecursive = (fsPath: string): Promise<void> => {
-  const checkoutRecursiveCommand = getCheckoutRecursiveCommand(fsPath)
-  return IntegratedTerminal.run(checkoutRecursiveCommand)
+export const commit = (): Promise<void> => {
+  const commitCommand = getCommitCommand(getDefaultCwd())
+  return IntegratedTerminal.run(commitCommand)
+}
+
+export const destroy = (): Promise<void> => {
+  const destroyCommand = getDestroyCommand(getDefaultCwd())
+  return IntegratedTerminal.run(destroyCommand)
+}
+
+export const fetch = (item: string, options: string[] = []): Promise<void> => {
+  const fetchCommand = getFetchCommand(item, options)
+  return IntegratedTerminal.run(fetchCommand)
+}
+
+export const gc = (item: string, options: string[] = []): Promise<void> => {
+  const gcCommand = getGcCommand(item, options)
+  return IntegratedTerminal.run(gcCommand)
+}
+
+export const initialize = (
+  item: string,
+  options: string[] = []
+): Promise<void> => {
+  const initializeCommand = getInitCommand(item, options)
+  return IntegratedTerminal.run(initializeCommand)
+}
+
+export const install = (): Promise<void> => {
+  const installCommand = getInstallCommand(getDefaultCwd())
+  return IntegratedTerminal.run(installCommand)
+}
+
+export const list = (): Promise<void> => {
+  const listCommand = getListCommand(getDefaultCwd())
+  return IntegratedTerminal.run(listCommand)
+}
+
+export const pull = (): Promise<void> => {
+  const pullCommand = getPullCommand(getDefaultCwd())
+  return IntegratedTerminal.run(pullCommand)
+}
+
+export const push = (item: string, options: string[] = []): Promise<void> => {
+  const path = Uri.file(relative(getDefaultCwd(), item)).path
+  const pushCommand = getPushCommand(path, options)
+  return IntegratedTerminal.run(pushCommand)
+}
+
+export const status = (): Promise<void> => {
+  const statusCommand = getStatusCommand(getDefaultCwd())
+  return IntegratedTerminal.run(statusCommand)
 }

@@ -1,42 +1,101 @@
-import { workspace } from 'vscode'
-import { relative } from 'path'
-
-const getCliCommand = (command: string, ...options: string[]): string => {
-  return `dvc ${command} ${options.join(' ')}`
+const isWin = (path: string): string => {
+  if (process.platform === 'win32') path = path.substring(1)
+  return path
 }
 
-const RUN_EXPERIMENT = 'exp run'
-const INITIALIZE_DIRECTORY = 'init --subdir'
+const getCliCommand = (command: string, fsPath: string): string => {
+  return `cd ${isWin(fsPath)} && dvc ${command}`
+}
+
 const ADD = 'add'
 const CHECKOUT = 'checkout'
-const CHECKOUT_RECURSIVE = 'checkout --recursive'
+const COMMIT = 'commit'
+const DESTROY = 'destroy'
+const FETCH = 'fetch'
+const GC = 'gc'
+const INIT = 'init'
+const INSTALL = 'install'
+const LIST = 'list'
+const PULL = 'pull'
+const PUSH = 'push'
+const RUN_EXPERIMENT = 'exp run'
+const STATUS = 'status'
+
+export const getAddCommand = (relPath: string, options: string[]): string => {
+  let cmd = `dvc ${ADD} ${isWin(relPath)}`
+  if (options.length) {
+    cmd = cmd.concat(' ', options.join(' '))
+  }
+  return cmd
+}
+
+export const getCheckoutCommand = (
+  fsPath: string,
+  options: string[]
+): string => {
+  let cmd = getCliCommand(CHECKOUT, fsPath)
+  if (options.length) {
+    cmd = cmd.concat(' ', options.join(' '))
+  }
+  return cmd
+}
+
+export const getCommitCommand = (fsPath: string): string => {
+  return getCliCommand(COMMIT, fsPath)
+}
+
+export const getDestroyCommand = (fsPath: string): string => {
+  return getCliCommand(DESTROY, fsPath)
+}
+
+export const getFetchCommand = (fsPath: string, options: string[]): string => {
+  let cmd = getCliCommand(FETCH, fsPath)
+  if (options.length) {
+    cmd = cmd.concat(' ', options.join(' '))
+  }
+  return cmd
+}
+
+export const getGcCommand = (fsPath: string, options: string[]): string => {
+  let cmd = getCliCommand(GC, fsPath)
+  if (options.length) {
+    cmd = cmd.concat(' ', options.join(' '))
+  }
+  return cmd
+}
+
+export const getInitCommand = (fsPath: string, options: string[]): string => {
+  let cmd = getCliCommand(INIT, fsPath)
+  if (options.length) {
+    cmd = cmd.concat(' ', options.join(' '))
+  }
+  return cmd
+}
+
+export const getInstallCommand = (fsPath: string): string => {
+  return getCliCommand(INSTALL, fsPath)
+}
+
+export const getListCommand = (fsPath: string): string => {
+  return `dvc ${LIST} ${fsPath}`
+}
+
+export const getPullCommand = (fsPath: string): string => {
+  return getCliCommand(PULL, fsPath)
+}
+
+export const getPushCommand = (relPath: string, options: string[]): string => {
+  let cmd = `dvc ${PUSH} ${isWin(relPath)}`
+  if (options.length) {
+    cmd = cmd.concat(' ', options.join(' '))
+  }
+  return cmd
+}
 
 export const getRunExperimentCommand = (): string => {
-  return getCliCommand(RUN_EXPERIMENT)
+  return `dvc ${RUN_EXPERIMENT}`
 }
 
-export const getInitializeDirectoryCommand = (fsPath: string): string => {
-  // need to return cwd to workspace root or find better implementation
-  return `cd ${fsPath} && ${getCliCommand(INITIALIZE_DIRECTORY)}`
-}
-
-export const getAddCommand = (fsPath: string): string => {
-  if (workspace.workspaceFolders !== undefined) {
-    const relativePath = relative(
-      workspace.workspaceFolders[0].uri.fsPath,
-      fsPath
-    )
-
-    return getCliCommand(ADD, relativePath)
-  } else {
-    throw new Error('No workspace open')
-  }
-}
-
-export const getCheckoutCommand = (fsPath: string): string => {
-  return getCliCommand(CHECKOUT, fsPath)
-}
-
-export const getCheckoutRecursiveCommand = (fsPath: string): string => {
-  return getCliCommand(CHECKOUT_RECURSIVE, fsPath)
+export const getStatusCommand = (fsPath: string): string => {
+  return getCliCommand(STATUS, fsPath)
 }
