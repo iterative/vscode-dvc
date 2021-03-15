@@ -111,7 +111,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.showExperiments', async () => {
-        const dvcWebview = this.dispose.track(await this.manager.createNew())
+        const dvcWebview = this.dispose.track(await this.manager.findOrCreate())
         try {
           const { experiments } = await this.getExperimentsTableData()
           dvcWebview.showExperiments({ tableData: experiments })
@@ -122,7 +122,10 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', runExperiment)
+      commands.registerCommand('dvc.runExperiment', async () => {
+        runExperiment()
+        commands.executeCommand('dvc.showExperiments')
+      })
     )
 
     this.dispose.track(

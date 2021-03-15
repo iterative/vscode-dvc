@@ -204,11 +204,12 @@ export class DvcWebviewManager {
     })
   }
 
-  public async createNew(): Promise<DvcWebview> {
+  public async findOrCreate(): Promise<DvcWebview> {
     const _set = this.openedWebviews.values()
     for (let i = 0; i < this.openedWebviews.size; i += 1) {
       const item = _set.next().value
       if (item.webviewPanel.title === 'Experiments') {
+        item.webviewPanel.reveal()
         return item
       }
     }
