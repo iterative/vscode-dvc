@@ -1,11 +1,13 @@
 import {
   IntegratedTerminal,
   runExperiment,
-  initialize,
-  add,
   checkout
 } from './IntegratedTerminal'
-import { resolve, relative } from 'path'
+import { resolve } from 'path'
+
+beforeEach(() => {
+  jest.resetAllMocks()
+})
 
 describe('runExperiment', () => {
   it('should run the correct command in the IntegratedTerminal', async () => {
@@ -14,8 +16,8 @@ describe('runExperiment', () => {
       .mockResolvedValueOnce(undefined)
 
     const undef = await runExperiment()
-    expect(undef).toBeUndefined()
 
+    expect(undef).toBeUndefined()
     expect(terminalSpy).toBeCalledWith('dvc exp run')
   })
 })
@@ -26,9 +28,10 @@ describe('checkout', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const undef = await checkout('/test/dir')
-    expect(undef).toBeUndefined()
+    const mockPath = resolve('test', 'dir')
+    const undef = await checkout(mockPath)
 
-    expect(terminalSpy).toBeCalledWith(`cd test/dir && dvc checkout`)
+    expect(undef).toBeUndefined()
+    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc checkout`)
   })
 })
