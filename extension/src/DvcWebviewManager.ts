@@ -31,7 +31,7 @@ export class DvcWebview {
     const webviewPanel = window.createWebviewPanel(
       DvcWebview.viewKey,
       'Experiments',
-      ViewColumn.Active,
+      ViewColumn.Two,
       {
         enableScripts: true,
         retainContextWhenHidden: true,
