@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const useOutsideClickHook = (
+export const useCloseActiveHook = (
   el: React.RefObject<HTMLElement>,
   initialState: boolean
 ): [boolean, React.Dispatch<React.SetStateAction<boolean>>] => {
@@ -14,12 +14,20 @@ export const useOutsideClickHook = (
       }
     }
 
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsActive(!isActive)
+      }
+    }
+
     if (isActive) {
       window.addEventListener('click', onClick)
+      window.addEventListener('keydown', onEscape)
     }
 
     return () => {
       window.removeEventListener('click', onClick)
+      window.removeEventListener('keydown', onEscape)
     }
   }, [isActive, el])
 

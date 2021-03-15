@@ -1,6 +1,6 @@
 import React, { MouseEvent } from 'react'
 import styles from './styles.module.scss'
-import { useOutsideClickHook } from '../../util/useOutsideClickHook'
+import { useCloseActiveHook } from '../../util/useCloseActiveHook'
 
 export interface MenuToggleProps {
   onToggle?: (isOpen: boolean) => void
@@ -124,7 +124,7 @@ export const Menu: React.FC<MenuProps> = ({
 }) => {
   const MenuRef = React.useRef(null)
   let renderedMenuItems
-  const [isActive, setIsActive] = useOutsideClickHook(MenuRef, false)
+  const [isActive, setIsActive] = useCloseActiveHook(MenuRef, false)
 
   if (menuItems && menuItems.length) {
     renderedMenuItems = menuItems
