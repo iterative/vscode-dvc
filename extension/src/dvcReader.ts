@@ -41,11 +41,10 @@ export const getExperiments: (
   experiments: ExperimentsRepoJSONOutput
   outputHash: string
 }> = async options => {
-  const output = await execCommand(options, 'exp show --show-json')
+  const { stdout } = await execCommand(options, 'exp show --show-json')
   const outputHash = createHash('sha1')
-    .update(output.stdout)
+    .update(stdout)
     .digest('base64')
-  const { stdout } = output
   const experiments = JSON.parse(String(stdout))
 
   return { experiments, outputHash }
