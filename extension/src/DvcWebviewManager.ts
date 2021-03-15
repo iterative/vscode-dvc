@@ -13,6 +13,7 @@ import {
   WindowWithWebviewData
 } from './webviews/experiments/contract'
 import { Logger } from './common/Logger'
+import { join } from 'path'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -29,14 +30,22 @@ export class DvcWebview {
   public static async create(config: Config): Promise<DvcWebview> {
     const webviewPanel = window.createWebviewPanel(
       DvcWebview.viewKey,
-      'DVC View',
-      ViewColumn.Two,
+      'Experiments',
+      ViewColumn.Active,
       {
         enableScripts: true,
         retainContextWhenHidden: true,
         localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)]
       }
     )
+
+    if (config.extensionPath) {
+      webviewPanel.iconPath = {
+        // placeholders for different svgs
+        dark: Uri.file(join(config.extensionPath, 'media', 'dvc-color.svg')),
+        light: Uri.file(join(config.extensionPath, 'media', 'dvc-color.svg'))
+      }
+    }
     const view = new DvcWebview(webviewPanel, config)
     await view.initialized
     return view
@@ -199,7 +208,7 @@ export class DvcWebviewManager {
     const _set = this.openedWebviews.values()
     for (let i = 0; i < this.openedWebviews.size; i += 1) {
       const item = _set.next().value
-      if (item.webviewPanel.title === 'DVC View') {
+      if (item.webviewPanel.title === 'Experiments') {
         return item
       }
     }

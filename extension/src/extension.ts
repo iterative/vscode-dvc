@@ -34,7 +34,9 @@ registerUpdateReconciler(module)
 export class Extension {
   public readonly dispose = Disposable.fn()
 
-  private readonly config = new Config()
+  private readonly extensionPath: string
+  private readonly config: Config
+  private readonly manager: DvcWebviewManager
 
   private getDefaultCwd = (): string => {
     const { workspaceFolders } = workspace
@@ -46,10 +48,6 @@ export class Extension {
   }
 
   private dvcPathStatusBarItem: DVCPathStatusBarItem
-
-  private readonly manager = this.dispose.track(
-    new DvcWebviewManager(this.config)
-  )
 
   private lastExperimentsOutputHash = ''
 
@@ -77,12 +75,18 @@ export class Extension {
     return getExperiments(dvcReaderOptions)
   }
 
-  constructor() {
+  constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
+
+    this.extensionPath = context.extensionPath
+
+    this.config = new Config(this.extensionPath)
+
+    this.manager = this.dispose.track(new DvcWebviewManager(this.config))
 
     this.onChangeExperimentsUpdateWebview().then(disposable =>
       this.dispose.track(disposable)
@@ -106,7 +110,7 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.showWebview', async () => {
+      commands.registerCommand('dvc.showExperiments', async () => {
         const dvcWebview = this.dispose.track(await this.manager.createNew())
         try {
           const { experiments } = await this.getExperimentsTableData()
@@ -216,7 +220,11 @@ export class Extension {
 
 export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
-    hotRequireExportedFn(module, Extension, HotExtension => new HotExtension())
+    hotRequireExportedFn(
+      module,
+      Extension,
+      HotExtension => new HotExtension(context)
+    )
   )
 }
 

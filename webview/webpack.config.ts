@@ -73,7 +73,7 @@ module.exports = {
   plugins: (() => {
     const plugins: Plugin[] = [
       new HtmlWebpackPlugin({
-        title: 'DVC View'
+        title: 'Experiments'
       }),
       new ForkTsCheckerWebpackPlugin(),
       new CleanWebpackPlugin()
