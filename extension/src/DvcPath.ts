@@ -2,6 +2,9 @@ import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window, workspace } from 'vscode'
 import { getConfig } from './Config'
 
+export const getDvcPath = (): string =>
+  workspace.getConfiguration().get('dvc.dvcPath') || 'dvc'
+
 /**
  * Status bar item. Displays the current DVC path. Corresponds to "dvc.dvcPath" setting.
  * Choose from all detected & defined alternatives on-click.
@@ -12,6 +15,10 @@ export class DVCPathStatusBarItem {
   private instance: StatusBarItem
 
   constructor() {
+    const dvcPath = process.env.DVCPATH
+    if (dvcPath) {
+      workspace.getConfiguration().update('dvc.dvcPath', dvcPath)
+    }
     this.instance = window.createStatusBarItem()
     this.instance.tooltip = 'Current DVC path.'
     this.instance.command = 'dvc.selectDvcPath'
@@ -59,6 +66,3 @@ export async function selectDvcPath(): Promise<string | undefined> {
     return getDvcPath()
   }
 }
-
-export const getDvcPath = (): string =>
-  workspace.getConfiguration().get('dvc.dvcPath') || 'dvc'

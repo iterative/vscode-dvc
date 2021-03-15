@@ -7,10 +7,17 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webviews/experiments/contract'
+import { Logger } from 'dvc/src/common/Logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
-import { getVsCodeApi } from './VsCodeApi'
+import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './VsCodeApi'
+
+export type VsCodeApi = BaseVsCodeApi<
+  PersistedModelState,
+  MessageFromWebview,
+  MessageToWebview
+>
 
 declare const window: Window & WindowWithWebviewData
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -100,9 +107,7 @@ export class Model {
 
         return
       default:
-        // eslint-disable-next-line
-        const nvr: never = message
-        console.error('Unexpected message', message)
+        Logger.error(`Unexpected message: ${message}`)
     }
   }
 }

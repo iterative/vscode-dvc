@@ -12,6 +12,7 @@ import {
   MessageToWebviewType,
   WindowWithWebviewData
 } from './webviews/experiments/contract'
+import { Logger } from './common/Logger'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -151,7 +152,7 @@ export class DvcWebview {
         return
       }
       default: {
-        console.error('Unexpected message', message)
+        Logger.error(`Unexpected message: ${message}`)
       }
     }
   }
@@ -195,6 +196,14 @@ export class DvcWebviewManager {
   }
 
   public async createNew(): Promise<DvcWebview> {
+    const _set = this.openedWebviews.values()
+    for (let i = 0; i < this.openedWebviews.size; i += 1) {
+      const item = _set.next().value
+      if (item.webviewPanel.title === 'DVC View') {
+        return item
+      }
+    }
+
     const view = await DvcWebview.create(this.config)
     this.addView(view)
     return view

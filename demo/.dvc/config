@@ -1,5 +1,4 @@
 [core]
-    experiments = true
-    remote = mys3
-['remote "mys3"']
-    url = s3://dvc-temp/dmitry/exp2_ci
+    remote = storage
+['remote "storage"']
+    url = https://remote.dvc.org/mnist-vscode

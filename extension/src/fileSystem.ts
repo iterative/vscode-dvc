@@ -2,6 +2,12 @@ import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 
+export const getWatcher = (handler: () => void) => (path: string): void => {
+  if (path) {
+    return handler()
+  }
+}
+
 export const addFileChangeHandler = (
   file: string,
   handler: () => void
@@ -24,11 +30,5 @@ export const addFileChangeHandler = (
     dispose: () => {
       fileWatcher.close()
     }
-  }
-}
-
-export const getWatcher = (handler: () => void) => (path: string): void => {
-  if (path) {
-    return handler()
   }
 }

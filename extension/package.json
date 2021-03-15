@@ -41,36 +41,44 @@
   "contributes": {
     "commands": [
       {
-        "title": "DVC: Push",
-        "command": "dvc.push"
+        "title": "Push",
+        "command": "dvc.push",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Show Webview",
-        "command": "dvc.showWebview"
+        "title": "Show Webview",
+        "command": "dvc.showWebview",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Run Experiment",
-        "command": "dvc.runExperiment"
+        "title": "Run Experiment",
+        "command": "dvc.runExperiment",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Select DVC path...",
-        "command": "dvc.selectDvcPath"
+        "title": "Select DVC path",
+        "command": "dvc.selectDvcPath",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Initialize Directory",
-        "command": "dvc.initializeDirectory"
+        "title": "Initialize Directory",
+        "command": "dvc.initializeDirectory",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Add",
-        "command": "dvc.add"
+        "title": "Add",
+        "command": "dvc.add",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Checkout",
-        "command": "dvc.checkout"
+        "title": "Checkout",
+        "command": "dvc.checkout",
+        "category": "DVC"
       },
       {
-        "title": "DVC: Checkout Recursive",
-        "command": "dvc.checkoutRecursive"
+        "title": "Checkout Recursive",
+        "command": "dvc.checkoutRecursive",
+        "category": "DVC"
       }
     ],
     "configuration": {
@@ -85,6 +93,19 @@
       }
     },
     "menus": {
+      "scm/title": [
+        {
+          "title": "Run Experiment",
+          "command": "dvc.showWebview",
+          "group": "experiments",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "group": "experiments",
+          "when": "scmProvider == dvc"
+        }
+      ],
       "scm/resourceState/context": [
         {
           "command": "dvc.push",
@@ -118,23 +139,6 @@
           "group": "8_dvc@4"
         }
       ]
-    },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "dvc-container",
-          "title": "DVC",
-          "icon": "media/dvc-monochrome.svg"
-        }
-      ]
-    },
-    "views": {
-      "dvc-container": [
-        {
-          "id": "dvc-tree",
-          "name": "Commands"
-        }
-      ]
     }
   },
   "enableProposedApi": true,
@@ -146,7 +150,9 @@
     "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
     "format": "prettier --write '**/*.{js,ts,md,json}'",
     "lint": "eslint --cache --fix '**/*.{js,ts}'",
-    "test:vscode": "node ./dist/test/runTest.js",
+    "build-vscode-tests": "tsc -p './'",
+    "run-vscode-tests": "node ./dist/test/runTest.js",
+    "test:vscode": "run-s build-vscode-tests run-vscode-tests",
     "test:jest": "jest",
     "test": "run-p test:*",
     "test-staged": "lint-staged",

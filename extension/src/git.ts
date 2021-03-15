@@ -2,82 +2,60 @@ import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
 import { dirname, resolve } from 'path'
+import { Logger } from './common/Logger'
 
-export const getExperimentsRefsPath = async (
-  dirPath: string
-): Promise<string | undefined> => {
-  const rootPath = await getRepoRootPath(dirPath)
-  if (!rootPath) {
-    return
-  }
-  return resolve(rootPath, '.git', 'refs', 'exps')
+const enum CharCode {
+  /**
+   * The `/` character.
+   */
+  Slash = 47,
+  /**
+   * The `\` character.
+   */
+  Backslash = 92,
+  A = 65,
+  Z = 90,
+  a = 97,
+  z = 122
 }
 
 const isWindows = process.platform === 'win32'
 
-// getRepoRootPath was originally adapted from GitService.getRepoPathCore in GitLens
-// project: https://github.com/eamodio/vscode-gitlens
-// Copyright (c) 2016-2021 Eric Amodio
-// License (MIT): https://github.com/eamodio/vscode-gitlens/blob/main/LICENSE
-export const getRepoRootPath = async (
-  dirPath: string
-): Promise<string | undefined> => {
-  let rootPath: string | undefined
-  try {
-    rootPath = await revParseShowToplevel(dirPath)
-    if (rootPath == null) {
-      return rootPath
-    }
-
-    if (isWindows) {
-      return getWindowsRepoRootPath(dirPath, rootPath)
-    }
-
-    return getNonWindowsRepoRootPath(dirPath, rootPath)
-  } catch (ex) {
-    console.error(ex)
-    rootPath = undefined
-    return rootPath
-  } finally {
-    if (rootPath) {
-      void ensureProperWorkspaceCasing(rootPath, dirPath)
-    }
+const normalizePath = (
+  fileName: string,
+  options: { addLeadingSlash?: boolean; stripTrailingSlash?: boolean } = {
+    stripTrailingSlash: true
   }
-}
+) => {
+  if (fileName == null || fileName.length === 0) {
+    return fileName
+  }
 
-const revParseShowToplevel = async (
-  cwd: string
-): Promise<string | undefined> => {
-  try {
-    const { stdout: data } = await execPromise(
-      'git rev-parse --show-toplevel',
-      { cwd }
+  let normalized = fileName.replace(/\\/g, '/')
+
+  const { addLeadingSlash, stripTrailingSlash } = {
+    stripTrailingSlash: true,
+    ...options
+  }
+
+  if (stripTrailingSlash) {
+    normalized = normalized.replace(/\/$/g, '')
+  }
+
+  if (addLeadingSlash && normalized.charCodeAt(0) !== CharCode.Slash) {
+    normalized = `/${normalized}`
+  }
+
+  if (isWindows) {
+    // Ensure that drive casing is normalized (lower case)
+    const driveLetterNormalizeRegex = /(?<=^\/?)([A-Z])(?=:\/)/
+    normalized = normalized.replace(
+      driveLetterNormalizeRegex,
+      (drive: string) => drive.toLowerCase()
     )
-    // Make sure to normalize: https://github.com/git-for-windows/git/issues/2478
-    // Keep trailing spaces which are part of the directory name
-    return data.length === 0
-      ? undefined
-      : normalizePath(data.trimLeft().replace(/[\r|\n]+$/, ''))
-  } catch (ex) {
-    if (ex.code === 'ENOENT') {
-      // If the `cwd` doesn't exist, walk backward to see if any parent folder exists
-      let exists = await pathExists(cwd)
-      if (!exists) {
-        do {
-          const parent = dirname(cwd)
-          if (parent === cwd || parent.length === 0) {
-            return undefined
-          }
-
-          cwd = parent
-          exists = await pathExists(cwd)
-        } while (!exists)
-
-        return revParseShowToplevel(cwd)
-      }
-    }
-    return undefined
   }
+
+  return normalized
 }
 
 const getWindowsRepoRootPath = async (
@@ -114,7 +92,7 @@ const getWindowsRepoRootPath = async (
           return rootPath
         }
       } catch (e) {
-        console.error(e)
+        Logger.error(e)
       }
     }
 
@@ -154,56 +132,10 @@ const getNonWindowsRepoRootPath = async (
   return rootPath
 }
 
-const enum CharCode {
-  /**
-   * The `/` character.
-   */
-  Slash = 47,
-  /**
-   * The `\` character.
-   */
-  Backslash = 92,
-  A = 65,
-  Z = 90,
-  a = 97,
-  z = 122
-}
-
-const normalizePath = (
-  fileName: string,
-  options: { addLeadingSlash?: boolean; stripTrailingSlash?: boolean } = {
-    stripTrailingSlash: true
-  }
-) => {
-  if (fileName == null || fileName.length === 0) {
-    return fileName
-  }
-
-  let normalized = fileName.replace(/\\/g, '/')
-
-  const { addLeadingSlash, stripTrailingSlash } = {
-    stripTrailingSlash: true,
-    ...options
-  }
-
-  if (stripTrailingSlash) {
-    normalized = normalized.replace(/\/$/g, '')
-  }
-
-  if (addLeadingSlash && normalized.charCodeAt(0) !== CharCode.Slash) {
-    normalized = `/${normalized}`
-  }
-
-  if (isWindows) {
-    // Ensure that drive casing is normalized (lower case)
-    const driveLetterNormalizeRegex = /(?<=^\/?)([A-Z])(?=:\/)/
-    normalized = normalized.replace(
-      driveLetterNormalizeRegex,
-      (drive: string) => drive.toLowerCase()
-    )
-  }
-
-  return normalized
+const showIncorrectWorkspaceCasingWarningMessage = async (): Promise<void> => {
+  await window.showWarningMessage(
+    'This workspace was opened with a different casing than what exists on disk. Please re-open this workspace with the exact casing as it exists on disk, otherwise you may experience issues with certain Git features, such as missing blame or history.'
+  )
 }
 
 const ensureProperWorkspaceCasing = (rootPath: string, filePath: string) => {
@@ -228,8 +160,77 @@ const ensureProperWorkspaceCasing = (rootPath: string, filePath: string) => {
   }
 }
 
-const showIncorrectWorkspaceCasingWarningMessage = async (): Promise<void> => {
-  void (await window.showWarningMessage(
-    'This workspace was opened with a different casing than what exists on disk. Please re-open this workspace with the exact casing as it exists on disk, otherwise you may experience issues with certain Git features, such as missing blame or history.'
-  ))
+const revParseShowToplevel = async (
+  cwd: string
+): Promise<string | undefined> => {
+  try {
+    const { stdout: data } = await execPromise(
+      'git rev-parse --show-toplevel',
+      { cwd }
+    )
+    // Make sure to normalize: https://github.com/git-for-windows/git/issues/2478
+    // Keep trailing spaces which are part of the directory name
+    return data.length === 0
+      ? undefined
+      : normalizePath(data.trimLeft().replace(/[\r|\n]+$/, ''))
+  } catch (ex) {
+    if (ex.code === 'ENOENT') {
+      // If the `cwd` doesn't exist, walk backward to see if any parent folder exists
+      let exists = await pathExists(cwd)
+      if (!exists) {
+        do {
+          const parent = dirname(cwd)
+          if (parent === cwd || parent.length === 0) {
+            return undefined
+          }
+
+          cwd = parent
+          exists = await pathExists(cwd)
+        } while (!exists)
+
+        return revParseShowToplevel(cwd)
+      }
+    }
+    return undefined
+  }
+}
+
+// getRepoRootPath was originally adapted from GitService.getRepoPathCore in GitLens
+// project: https://github.com/eamodio/vscode-gitlens
+// Copyright (c) 2016-2021 Eric Amodio
+// License (MIT): https://github.com/eamodio/vscode-gitlens/blob/main/LICENSE
+export const getRepoRootPath = async (
+  dirPath: string
+): Promise<string | undefined> => {
+  let rootPath: string | undefined
+  try {
+    rootPath = await revParseShowToplevel(dirPath)
+    if (rootPath == null) {
+      return rootPath
+    }
+
+    if (isWindows) {
+      return getWindowsRepoRootPath(dirPath, rootPath)
+    }
+
+    return getNonWindowsRepoRootPath(dirPath, rootPath)
+  } catch (e) {
+    Logger.error(e)
+    rootPath = undefined
+    return rootPath
+  } finally {
+    if (rootPath) {
+      ensureProperWorkspaceCasing(rootPath, dirPath)
+    }
+  }
+}
+
+export const getExperimentsRefsPath = async (
+  dirPath: string
+): Promise<string | undefined> => {
+  const rootPath = await getRepoRootPath(dirPath)
+  if (!rootPath) {
+    return
+  }
+  return resolve(rootPath, '.git', 'refs', 'exps')
 }

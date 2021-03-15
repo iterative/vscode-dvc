@@ -1,0 +1,103 @@
+.menu {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  &__toggle {
+    padding-top: 0.375rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.375rem;
+    padding-left: 0.5rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    min-width: 150px;
+    max-width: 100%;
+    line-height: 1.5;
+    color: #ffffff;
+    background-color: #4f5255;
+    border: none;
+    &__text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 1rem;
+    }
+    &__icon {
+      margin-right: 0.5rem;
+      margin-left: 1rem;
+    }
+  }
+  &__menuOptions {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    z-index: 200;
+    background-color: #4f5255;
+    background-clip: padding-box;
+    box-shadow: 0 0.25rem 0.5rem 0rem rgba(3, 3, 3, 0.12),
+      0 0 0.25rem 0 rgba(3, 3, 3, 0.06);
+    &__inactive {
+      display: none;
+    }
+  }
+  &__group {
+    padding: 0;
+    margin: 0;
+    line-height: 1.5;
+    background-color: transparent;
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0 !important;
+    }
+    li {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #d2d2d2;
+    }
+    li:last-child {
+      border: none;
+    }
+  }
+  li[role='separator'] {
+    list-style: none;
+  }
+  li[role='separator']::after {
+    display: block;
+    flex-basis: 100%;
+    align-self: stretch;
+    height: 1px;
+    content: '';
+    background-color: #d2d2d2;
+    justify-self: center;
+  }
+  &__menuItem {
+    display: flex;
+    align-items: baseline;
+    width: auto !important;
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: #ffffff;
+    white-space: nowrap;
+    background-color: #4f5255;
+    border: none;
+    line-height: 24px;
+    box-sizing: border-box;
+    text-align: center;
+    &__icon {
+      align-self: center;
+      width: auto;
+      padding-left: 10px;
+      margin-left: auto;
+      font-size: 12px;
+      color: #fafafa;
+    }
+    &__actions {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+  }
+}

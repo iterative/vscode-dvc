@@ -1,81 +1,112 @@
-import tensorflow as tf
-import datetime
-import yaml
+"""Model training and evaluation."""
 import json
-import time
-#import neptune
-#from neptunecontrib.monitoring.keras import NeptuneMonitor
-#import wandb
-#from wandb.keras import WandbCallback
-from mymodel import create_model
+import yaml
 import os
-#from elog.keras import ElogCallback
-from tensorflow import keras
-from tensorflow.keras.callbacks import ModelCheckpoint, Callback
-from dvc.api import make_checkpoint
+import torch
+import torch.nn.functional as F
+import torchvision
+import dvclive
 
-#wandb.init(project="mnist")
 
-weights_file = "model.h5"
-summary = "summary.json"
+EPOCHS = 10
 
-params = yaml.safe_load(open('params.yaml'))
-epochs = params['epochs']
-log_file = params['log_file']
-dropout = params['dropout']
-dvc_logs_dir = params['dvc_logs_dir']
-lr = params['learning_rate']
 
-logs_subdir = 'logs'
+class ConvNet(torch.nn.Module):
+    """Toy convolutional neural net."""
+    def __init__(self):
+        super().__init__()
+        self.conv1 = torch.nn.Conv2d(1, 8, 3, padding=1)
+        self.maxpool1 = torch.nn.MaxPool2d(2)
+        self.conv2 = torch.nn.Conv2d(8, 16, 3, padding=1)
+        self.dense1 = torch.nn.Linear(16*14*14, 32)
+        self.dense2 = torch.nn.Linear(32, 10)
 
-class MyCallback(Callback):
-    def __init__(self, file):
-        self.file = file
-    def on_epoch_end(self, epoch, logs={}):
-        self.model.save(self.file)
-        json.dump(logs, open(summary, 'w'))
-        make_checkpoint()
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = self.maxpool1(x)
+        x = F.relu(self.conv2(x))
+        x = x.view(-1, 16*14*14)
+        x = F.relu(self.dense1(x))
+        x = self.dense2(x)
+        return x
 
-#neptune.init('dmpetrov/sandbox')
-#neptune.create_experiment(name='exp1', params=params)
 
-mnist = tf.keras.datasets.mnist
+def transform(dataset):
+    """Get inputs and targets from dataset."""
+    x = dataset.data.reshape(len(dataset.data), 1, 28, 28)/255
+    y = dataset.targets
+    return x, y
 
-(x_train, y_train),(x_test, y_test) = mnist.load_data()
-x_train, x_test = x_train / 255.0, x_test / 255.0
 
-model = create_model(dropout)
-opt = keras.optimizers.Adam(learning_rate=lr)
-model.compile(optimizer=opt,
-              loss='sparse_categorical_crossentropy',
-              metrics=['accuracy'])
+def train(model, x, y, lr, weight_decay):
+    """Train a single epoch."""
+    model.train()
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr,
+                                 weight_decay=weight_decay)
+    y_pred = model(x)
+    loss = criterion(y_pred, y)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
 
-if os.path.exists(weights_file):
-    model.load_weights(weights_file)
 
-log_dir = "logs/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+def predict(model, x):
+    """Get model prediction scores."""
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(x)
+    return y_pred
 
-csv_logger = tf.keras.callbacks.CSVLogger(log_file)
 
-start_real = time.time()
-start_process = time.process_time()
-history = model.fit(x=x_train,
-                    y=y_train,
-                    epochs=epochs,
-                    validation_data=(x_test, y_test),
-                    callbacks=[
-                        csv_logger,
-                        tensorboard_callback
-                        #, NeptuneMonitor()
-                        #, WandbCallback()
-                        #, ElogCallback()
-                        #, ModelCheckpoint(weights_file, monitor='loss',
-                        #                    mode='auto', period=1)
-                        , MyCallback(weights_file)
-                    ])
-end_real = time.time()
-end_process = time.process_time()
+def get_metrics(y, y_pred, y_pred_label):
+    """Get loss and accuracy metrics."""
+    metrics = {}
+    criterion = torch.nn.CrossEntropyLoss()
+    metrics["loss"] = criterion(y_pred, y).item()
+    metrics["acc"] = (y_pred_label == y).sum().item()/len(y)
+    return metrics
 
-model.save(weights_file)
 
+def evaluate(model, x, y):
+    """Evaluate model and save metrics."""
+    scores = predict(model, x)
+    _, labels = torch.max(scores, 1)
+    predictions = [{
+                    "actual": int(actual),
+                    "predicted": int(predicted)
+                   } for actual, predicted in zip(y, labels)]
+    with open("predictions.json", "w") as f:
+        json.dump(predictions, f)
+    metrics = get_metrics(y, scores, labels)
+    return metrics
+
+
+def main():
+    """Train model and evaluate on test data."""
+    model = ConvNet()
+    # Load model.
+    if os.path.exists("model.pt"):
+        model.load_state_dict(torch.load("model.pt"))
+    # Load params.
+    with open("params.yaml") as f:
+        params = yaml.safe_load(f)
+    torch.manual_seed(params["seed"])
+    # Load train and test data.
+    mnist_train = torchvision.datasets.MNIST("data", download=True)
+    x_train, y_train = transform(mnist_train)
+    mnist_test = torchvision.datasets.MNIST("data", download=True, train=False)
+    x_test, y_test = transform(mnist_test)
+    # Iterate over training epochs.
+    for i in range(1, EPOCHS+1):
+        train(model, x_train, y_train, params["lr"], params["weight_decay"])
+        torch.save(model.state_dict(), "model.pt")
+        # Evaluate and checkpoint.
+        metrics = evaluate(model, x_test, y_test)
+        for k, v in metrics.items():
+            dvclive.log(k, v)
+        dvclive.next_step()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,6 +1,3 @@
-/users.csv
-/logs
-/model.h5
-/__pycache__
-/wandb
-.env
+/model.pt
+/data/MNIST/processed
+/.vscode/settings.json
