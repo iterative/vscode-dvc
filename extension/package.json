@@ -46,7 +46,7 @@
         "category": "DVC"
       },
       {
-        "title": "Show Experiment Results",
+        "title": "Show Experiments",
         "command": "dvc.showExperiments",
         "category": "DVC"
       },
