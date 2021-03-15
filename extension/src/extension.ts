@@ -22,6 +22,7 @@ import { getExperiments, inferDefaultOptions } from './dvcReader'
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
+import { ResourceLocator } from './ResouceLocator'
 
 export { Disposable }
 
@@ -34,7 +35,7 @@ registerUpdateReconciler(module)
 export class Extension {
   public readonly dispose = Disposable.fn()
 
-  private readonly extensionPath: string
+  private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly manager: DvcWebviewManager
 
@@ -82,11 +83,13 @@ export class Extension {
       i.show()
     }
 
-    this.extensionPath = context.extensionPath
+    this.resourceLocator = new ResourceLocator(context.extensionPath)
 
-    this.config = new Config(this.extensionPath)
+    this.config = new Config()
 
-    this.manager = this.dispose.track(new DvcWebviewManager(this.config))
+    this.manager = this.dispose.track(
+      new DvcWebviewManager(this.config, this.resourceLocator)
+    )
 
     this.onChangeExperimentsUpdateWebview().then(disposable =>
       this.dispose.track(disposable)

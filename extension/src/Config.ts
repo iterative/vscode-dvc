@@ -21,8 +21,6 @@ export class Config {
     return <string>this.config.get('dvc.dvcPath')
   }
 
-  public extensionPath: string | undefined
-
   public get theme(): WebviewColorTheme {
     if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
       return WebviewColorTheme.dark
@@ -30,7 +28,7 @@ export class Config {
     return WebviewColorTheme.light
   }
 
-  constructor(extensionPath?: string) {
+  constructor() {
     makeObservable(this)
     this._vsCodeTheme = window.activeColorTheme
     this.dispose.track(
@@ -39,10 +37,10 @@ export class Config {
       })
     )
     this.config = workspace.getConfiguration()
-    this.extensionPath = extensionPath
   }
 }
 
 export function getConfig(): Config {
+  // TODO: #160
   return new Config()
 }
