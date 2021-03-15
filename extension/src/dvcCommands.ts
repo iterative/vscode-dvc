@@ -1,10 +1,5 @@
-const isWin = (path: string): string => {
-  if (process.platform === 'win32') path = path.substring(1)
-  return path
-}
-
 const getCliCommand = (command: string, fsPath: string): string => {
-  return `cd ${isWin(fsPath)} && dvc ${command}`
+  return `cd ${fsPath} && dvc ${command}`
 }
 
 const ADD = 'add'
@@ -22,7 +17,7 @@ const RUN_EXPERIMENT = 'exp run'
 const STATUS = 'status'
 
 export const getAddCommand = (relPath: string, options: string[]): string => {
-  let cmd = `dvc ${ADD} ${isWin(relPath)}`
+  let cmd = `dvc ${ADD} ${relPath}`
   if (options.length) {
     cmd = cmd.concat(' ', options.join(' '))
   }
@@ -85,7 +80,7 @@ export const getPullCommand = (fsPath: string): string => {
 }
 
 export const getPushCommand = (relPath: string, options: string[]): string => {
-  let cmd = `dvc ${PUSH} ${isWin(relPath)}`
+  let cmd = `dvc ${PUSH} ${relPath}`
   if (options.length) {
     cmd = cmd.concat(' ', options.join(' '))
   }
