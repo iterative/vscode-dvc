@@ -51,8 +51,8 @@
         "command": "dvc.pull"
       },
       {
-        "title": "Show Webview",
-        "command": "dvc.showWebview",
+        "title": "Show Experiments",
+        "command": "dvc.showExperiments",
         "category": "DVC"
       },
       {
@@ -110,7 +110,7 @@
       "scm/title": [
         {
           "title": "Run Experiment",
-          "command": "dvc.showWebview",
+          "command": "dvc.showExperiments",
           "group": "experiments",
           "when": "scmProvider == dvc"
         },
