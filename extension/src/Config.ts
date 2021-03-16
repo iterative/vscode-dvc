@@ -3,8 +3,7 @@ import {
   ColorThemeKind,
   StatusBarItem,
   window,
-  workspace,
-  WorkspaceConfiguration
+  workspace
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
@@ -16,16 +15,6 @@ export class Config {
   @observable
   private _vsCodeTheme: ColorTheme
 
-  private config: WorkspaceConfiguration
-
-  public get dvcPath(): string {
-    return <string>this.config.get('dvc.dvcPath')
-  }
-
-  public updateDvcPathStatusBarItem = (): void => {
-    this.dvcPathStatusBarItem.text = this.dvcPath
-  }
-
   public get theme(): WebviewColorTheme {
     if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
       return WebviewColorTheme.dark
@@ -33,25 +22,52 @@ export class Config {
     return WebviewColorTheme.light
   }
 
+  @observable
   private dvcPathStatusBarItem: StatusBarItem
+
+  private updateDvcPathStatusBarItem = (path = this.dvcPath): void => {
+    this.dvcPathStatusBarItem.text = path
+  }
+
+  private overrideStatusBar = () => {
+    const dvcPath = process.env.DVCPATH
+    if (dvcPath) {
+      this.updateDvcPathStatusBarItem(dvcPath)
+    }
+  }
+
+  public get dvcPath(): string {
+    return <string>workspace.getConfiguration().get('dvc.dvcPath')
+  }
+
+  private createDvcPathStatusBarItem = () => {
+    const dvcPathStatusBarItem = window.createStatusBarItem()
+
+    dvcPathStatusBarItem.tooltip = 'Current DVC path.'
+    dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
+    dvcPathStatusBarItem.show()
+    return dvcPathStatusBarItem
+  }
 
   constructor() {
     makeObservable(this)
     this._vsCodeTheme = window.activeColorTheme
+
     this.dispose.track(
       window.onDidChangeActiveColorTheme(() => {
         this._vsCodeTheme = window.activeColorTheme
       })
     )
-    this.config = workspace.getConfiguration()
 
-    this.dvcPathStatusBarItem = window.createStatusBarItem()
-    const dvcPath = process.env.DVCPATH
-    if (dvcPath) {
-      this.updateDvcPathStatusBarItem()
-    }
-    this.dvcPathStatusBarItem.tooltip = 'Current DVC path.'
-    this.dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
-    this.dvcPathStatusBarItem.show()
+    this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
+    this.overrideStatusBar()
+
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration('dvc.dvcPath')) {
+          this.updateDvcPathStatusBarItem()
+        }
+      })
+    )
   }
 }

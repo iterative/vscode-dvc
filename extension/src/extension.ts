@@ -97,14 +97,6 @@ export class Extension {
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('dvc.dvcPath')) {
-          this.config.updateDvcPathStatusBarItem()
-        }
-      })
-    )
-
-    this.dispose.track(
       commands.registerCommand('dvc.selectDvcPath', async () => selectDvcPath())
     )
 
