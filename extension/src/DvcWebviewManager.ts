@@ -13,7 +13,7 @@ import {
   WindowWithWebviewData
 } from './webviews/experiments/contract'
 import { Logger } from './common/Logger'
-import { ResourceLocator } from './ResouceLocator'
+import { ResourceLocator } from './ResourceLocator'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'

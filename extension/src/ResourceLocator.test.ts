@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { Uri } from 'vscode'
-import { ResourceLocator } from './ResouceLocator'
+import { ResourceLocator } from './ResourceLocator'
 
 jest.mock('vscode')
 
