@@ -19,7 +19,6 @@ import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
 import { getExperiments, inferDefaultOptions } from './dvcReader'
 
-import { selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResouceLocator'
@@ -97,7 +96,9 @@ export class Extension {
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', async () => selectDvcPath())
+      commands.registerCommand('dvc.selectDvcPath', async () =>
+        this.config.selectDvcPath()
+      )
     )
 
     this.dispose.track(

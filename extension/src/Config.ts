@@ -40,6 +40,10 @@ export class Config {
     return <string>workspace.getConfiguration().get('dvc.dvcPath')
   }
 
+  private setDvcPath(path = 'dvc'): Thenable<void> {
+    return workspace.getConfiguration().update('dvc.dvcPath', path)
+  }
+
   private createDvcPathStatusBarItem = () => {
     const dvcPathStatusBarItem = window.createStatusBarItem()
 
@@ -47,6 +51,26 @@ export class Config {
     dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
     dvcPathStatusBarItem.show()
     return dvcPathStatusBarItem
+  }
+
+  public selectDvcPath = async (): Promise<string | undefined> => {
+    const result = await window.showQuickPick(
+      [{ label: 'default' }, { label: 'custom' }],
+      { placeHolder: 'Please choose...' }
+    )
+    if (result) {
+      if (result.label === 'default') {
+        await this.setDvcPath()
+        return this.dvcPath
+      }
+      if (result.label === 'custom') {
+        const path = await window.showInputBox({
+          prompt: 'Enter a custom DVC path...'
+        })
+        await this.setDvcPath(path)
+        return this.dvcPath
+      }
+    }
   }
 
   constructor() {
