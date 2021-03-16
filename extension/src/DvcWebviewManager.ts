@@ -188,7 +188,7 @@ export class DvcWebviewManager {
   ) {
     this.dispose.track(
       window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
-        deserializeWebviewPanel: async panel => {
+        deserializeWebviewPanel: async (panel: WebviewPanel) => {
           DvcWebview.restore(panel, this.config).then(view => {
             this.addView(view)
           })

@@ -1,5 +1,4 @@
 import { createHash } from 'crypto'
-import { getDvcPath } from './DvcPath'
 import { accessSync } from 'fs'
 import { resolve } from 'path'
 import { execPromise } from './util'
@@ -9,11 +8,11 @@ export interface ReaderOptions {
   cwd: string
 }
 
-export const inferDefaultOptions: (
-  cwd: string
-) => Promise<ReaderOptions> = async cwd => {
-  const localDvcPath = getDvcPath()
-  const envDvcPath = resolve(cwd, localDvcPath)
+export const inferDefaultOptions = async (
+  cwd: string,
+  dvcPath = 'dvc'
+): Promise<ReaderOptions> => {
+  const envDvcPath = resolve(cwd, dvcPath)
   let bin
   try {
     accessSync(envDvcPath)
