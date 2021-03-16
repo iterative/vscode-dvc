@@ -1,8 +1,8 @@
 {
   "name": "dvc",
   "private": true,
-  "displayName": "DVC",
-  "description": "DVC VSCode extension",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "publisher": "iterative",
   "icon": "docs/dvc.png",
   "version": "0.1.0",
