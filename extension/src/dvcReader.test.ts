@@ -6,7 +6,6 @@ import fs from 'fs'
 import { execPromise } from './util'
 import complexExperimentsOutput from './webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
-import * as DvcPath from './DvcPath'
 
 jest.mock('fs')
 jest.mock('./util')
@@ -27,21 +26,16 @@ beforeEach(() => {
 
 test('Inferring default options on a directory with accessible .env', async () => {
   mockedFs.accessSync.mockReturnValue()
-  jest
-    .spyOn(DvcPath, 'getDvcPath')
-    .mockReturnValueOnce(join('.env', 'bin', 'dvc'))
 
-  expect(await inferDefaultOptions(extensionDirectory)).toEqual({
-    bin: join(extensionDirectory, '.env', 'bin', 'dvc'),
+  const localPath = join('.env', 'bin', 'dvc')
+
+  expect(await inferDefaultOptions(extensionDirectory, localPath)).toEqual({
+    bin: join(extensionDirectory, localPath),
     cwd: extensionDirectory
   })
 })
 
 test('Inferring default options on a directory without .env', async () => {
-  jest
-    .spyOn(DvcPath, 'getDvcPath')
-    .mockReturnValueOnce(join('not', 'a', 'path'))
-
   mockedFs.accessSync.mockImplementation(() => {
     throw new Error('Mocked access fail')
   })

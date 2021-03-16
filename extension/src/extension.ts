@@ -69,7 +69,10 @@ export class Extension {
   }
 
   private async getExperimentsTableData() {
-    const dvcReaderOptions = await inferDefaultOptions(this.getDefaultCwd())
+    const dvcReaderOptions = await inferDefaultOptions(
+      this.getDefaultCwd(),
+      this.config.dvcPath
+    )
     return getExperiments(dvcReaderOptions)
   }
 
