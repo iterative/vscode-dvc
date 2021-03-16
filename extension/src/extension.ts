@@ -19,7 +19,7 @@ import { Config } from './Config'
 import { DvcWebviewManager } from './DvcWebviewManager'
 import { getExperiments, inferDefaultOptions } from './dvcReader'
 
-import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
+import { selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResouceLocator'
@@ -47,8 +47,6 @@ export class Extension {
 
     return workspaceFolders[0].uri.fsPath
   }
-
-  private dvcPathStatusBarItem: DVCPathStatusBarItem
 
   private lastExperimentsOutputHash = ''
 
@@ -97,13 +95,11 @@ export class Extension {
 
     this.dispose.track(IntegratedTerminal)
 
-    this.dispose.track((this.dvcPathStatusBarItem = new DVCPathStatusBarItem()))
-
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
-          this.dvcPathStatusBarItem.update()
+          this.config.updateDvcPathStatusBarItem()
         }
       })
     )

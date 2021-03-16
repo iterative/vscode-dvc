@@ -1,6 +1,7 @@
 import {
   ColorTheme,
   ColorThemeKind,
+  StatusBarItem,
   window,
   workspace,
   WorkspaceConfiguration
@@ -21,12 +22,18 @@ export class Config {
     return <string>this.config.get('dvc.dvcPath')
   }
 
+  public updateDvcPathStatusBarItem = (): void => {
+    this.dvcPathStatusBarItem.text = this.dvcPath
+  }
+
   public get theme(): WebviewColorTheme {
     if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
   }
+
+  private dvcPathStatusBarItem: StatusBarItem
 
   constructor() {
     makeObservable(this)
@@ -37,5 +44,14 @@ export class Config {
       })
     )
     this.config = workspace.getConfiguration()
+
+    this.dvcPathStatusBarItem = window.createStatusBarItem()
+    const dvcPath = process.env.DVCPATH
+    if (dvcPath) {
+      this.updateDvcPathStatusBarItem()
+    }
+    this.dvcPathStatusBarItem.tooltip = 'Current DVC path.'
+    this.dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
+    this.dvcPathStatusBarItem.show()
   }
 }

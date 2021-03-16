@@ -1,33 +1,7 @@
-import { Disposable } from '@hediet/std/disposable'
-import { StatusBarItem, window, workspace } from 'vscode'
+import { window, workspace } from 'vscode'
 
 export const getDvcPath = (): string =>
   workspace.getConfiguration().get('dvc.dvcPath') || 'dvc'
-
-export class DVCPathStatusBarItem {
-  public readonly dispose = Disposable.fn()
-
-  private instance: StatusBarItem
-
-  constructor() {
-    const dvcPath = process.env.DVCPATH
-    if (dvcPath) {
-      workspace.getConfiguration().update('dvc.dvcPath', dvcPath)
-    }
-    this.instance = window.createStatusBarItem()
-    this.instance.tooltip = 'Current DVC path.'
-    this.instance.command = 'dvc.selectDvcPath'
-    this.update()
-    this.instance.show()
-  }
-
-  /**
-   * Updates the text content of the status bar item to reflect the selection.
-   */
-  public update(): void {
-    this.instance.text = getDvcPath()
-  }
-}
 
 /**
  * Shows an input dialog allowing the user to enter a custom path.
