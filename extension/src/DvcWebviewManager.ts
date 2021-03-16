@@ -13,6 +13,7 @@ import {
   WindowWithWebviewData
 } from './webviews/experiments/contract'
 import { Logger } from './common/Logger'
+import { ResourceLocator } from './ResouceLocator'
 
 export class DvcWebview {
   public static viewKey = 'dvc-view'
@@ -26,10 +27,13 @@ export class DvcWebview {
     return view
   }
 
-  public static async create(config: Config): Promise<DvcWebview> {
+  public static async create(
+    config: Config,
+    resourceLocator: ResourceLocator
+  ): Promise<DvcWebview> {
     const webviewPanel = window.createWebviewPanel(
       DvcWebview.viewKey,
-      'DVC View',
+      'Experiments',
       ViewColumn.Two,
       {
         enableScripts: true,
@@ -37,6 +41,9 @@ export class DvcWebview {
         localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)]
       }
     )
+
+    webviewPanel.iconPath = resourceLocator.dvcIconPath
+
     const view = new DvcWebview(webviewPanel, config)
     await view.initialized
     return view
@@ -175,7 +182,10 @@ export class DvcWebviewManager {
 
   public readonly dispose = Disposable.fn()
 
-  constructor(private readonly config: Config) {
+  constructor(
+    private readonly config: Config,
+    private readonly resourceLocator: ResourceLocator
+  ) {
     this.dispose.track(
       window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
         deserializeWebviewPanel: async panel => {
@@ -195,16 +205,17 @@ export class DvcWebviewManager {
     })
   }
 
-  public async createNew(): Promise<DvcWebview> {
+  public async findOrCreate(): Promise<DvcWebview> {
     const _set = this.openedWebviews.values()
     for (let i = 0; i < this.openedWebviews.size; i += 1) {
       const item = _set.next().value
-      if (item.webviewPanel.title === 'DVC View') {
+      if (item.webviewPanel.title === 'Experiments') {
+        item.webviewPanel.reveal()
         return item
       }
     }
 
-    const view = await DvcWebview.create(this.config)
+    const view = await DvcWebview.create(this.config, this.resourceLocator)
     this.addView(view)
     return view
   }

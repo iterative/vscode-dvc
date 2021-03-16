@@ -41,5 +41,6 @@ export class Config {
 }
 
 export function getConfig(): Config {
+  // TODO: #160
   return new Config()
 }
