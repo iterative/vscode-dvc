@@ -36,12 +36,12 @@ jobs:
           path: .eslintcache
           key: eslint-cache
 
-      - uses: actions/cache@v2
-        name: Restore .vscode-test cache
-        id: vscode-cache
-        with:
-          path: extension/.vscode-test
-          key: vscode-test
+      # - uses: actions/cache@v2
+      #   name: Restore .vscode-test cache
+      #   id: vscode-cache
+      #   with:
+      #     path: extension/.vscode-test
+      #     key: vscode-test
 
       - run: yarn install
 
