@@ -39,8 +39,3 @@ export class Config {
     this.config = workspace.getConfiguration()
   }
 }
-
-export function getConfig(): Config {
-  // TODO: #160
-  return new Config()
-}
