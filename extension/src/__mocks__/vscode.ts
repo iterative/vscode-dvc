@@ -13,4 +13,4 @@ export const workspace = {
     }
   ]
 }
-export const Uri = { file: jest.fn()}
+export const Uri = { file: jest.fn() }

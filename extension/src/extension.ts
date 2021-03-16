@@ -31,6 +31,7 @@ import { getExperiments, inferDefaultOptions } from './dvcReader'
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
+import { ResourceLocator } from './ResouceLocator'
 
 export { Disposable }
 
@@ -43,7 +44,9 @@ registerUpdateReconciler(module)
 export class Extension {
   public readonly dispose = Disposable.fn()
 
-  private readonly config = new Config()
+  private readonly resourceLocator: ResourceLocator
+  private readonly config: Config
+  private readonly manager: DvcWebviewManager
 
   private getDefaultCwd = (): string => {
     const { workspaceFolders } = workspace
@@ -55,10 +58,6 @@ export class Extension {
   }
 
   private dvcPathStatusBarItem: DVCPathStatusBarItem
-
-  private readonly manager = this.dispose.track(
-    new DvcWebviewManager(this.config)
-  )
 
   private lastExperimentsOutputHash = ''
 
@@ -86,12 +85,20 @@ export class Extension {
     return getExperiments(dvcReaderOptions)
   }
 
-  constructor() {
+  constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
+
+    this.resourceLocator = new ResourceLocator(context.extensionPath)
+
+    this.config = new Config()
+
+    this.manager = this.dispose.track(
+      new DvcWebviewManager(this.config, this.resourceLocator)
+    )
 
     this.onChangeExperimentsUpdateWebview().then(disposable =>
       this.dispose.track(disposable)
@@ -115,8 +122,8 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.showWebview', async () => {
-        const dvcWebview = this.dispose.track(await this.manager.createNew())
+      commands.registerCommand('dvc.showExperiments', async () => {
+        const dvcWebview = this.dispose.track(await this.manager.findOrCreate())
         try {
           const { experiments } = await this.getExperimentsTableData()
           dvcWebview.showExperiments({ tableData: experiments })
@@ -130,6 +137,13 @@ export class Extension {
       commands.registerCommand('dvc.add', item => {
         item.rootUri && add(item.rootUri.path)
         item.path && add(item.path)
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.runExperiment', async () => {
+        runExperiment()
+        commands.executeCommand('dvc.showExperiments')
       })
     )
 
@@ -217,10 +231,6 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', runExperiment)
-    )
-
-    this.dispose.track(
       commands.registerCommand('dvc.status', () => {
         status()
       })
@@ -297,7 +307,11 @@ export class Extension {
 
 export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
-    hotRequireExportedFn(module, Extension, HotExtension => new HotExtension())
+    hotRequireExportedFn(
+      module,
+      Extension,
+      HotExtension => new HotExtension(context)
+    )
   )
 }
 

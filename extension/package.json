@@ -117,12 +117,12 @@
         "category": "DVC"
       },
       {
-        "title": "Show Webview",
-        "command": "dvc.showWebview",
+        "title": "%command.showExperiments%",
+        "command": "dvc.showExperiments",
         "category": "DVC"
       },
       {
-        "title": "Run Experiment",
+        "title": "%command.runExperiment%",
         "command": "dvc.runExperiment",
         "category": "DVC"
       },
@@ -155,18 +155,13 @@
     "menus": {
       "scm/title": [
         {
-          "command": "dvc.install",
+          "command": "dvc.showExperiments",
           "group": "1_header@1",
           "when": "scmProvider == dvc"
         },
         {
-          "command": "dvc.list",
+          "command": "dvc.runExperiment",
           "group": "1_header@2",
-          "when": "scmProvider == dvc"
-        },
-        {
-          "command": "dvc.status",
-          "group": "1_header@3",
           "when": "scmProvider == dvc"
         },
         {
@@ -228,12 +223,24 @@
       ],
       "dvc.dvcExtra": [
         {
-          "command": "dvc.gc",
+          "command": "dvc.install",
           "group": "1_extra@1"
         },
         {
-          "command": "dvc.destroy",
+          "command": "dvc.gc",
           "group": "1_extra@2"
+        },
+        {
+          "command": "dvc.destroy",
+          "group": "1_extra@3"
+        },
+        {
+          "command": "dvc.list",
+          "group": "1_extra@4"
+        },
+        {
+          "command": "dvc.status",
+          "group": "1_extra@5"
         }
       ],
       "dvc.fetch": [

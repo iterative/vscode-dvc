@@ -17,6 +17,8 @@
   "command.refresh": "Refresh",
   "command.destroy": "Remove All DVC Files",
   "command.status": "Status",
+  "command.runExperiment": "Run Experiment",
+  "command.showExperiments": "Show Experiments",
   "submenu.checkout": "Checkout",
   "submenu.commit": "Commit",
   "submenu.dvcExtra": "Extra",
