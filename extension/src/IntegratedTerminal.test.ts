@@ -1,6 +1,7 @@
 import {
   IntegratedTerminal,
   runExperiment,
+  add,
   checkout,
   commit,
   destroy,
@@ -14,12 +15,19 @@ import {
   push
 } from './IntegratedTerminal'
 import * as IntTerm from './IntegratedTerminal'
-import { resolve } from 'path'
+import { relative, resolve } from 'path'
+import { mocked } from 'ts-jest/utils'
 import { Uri } from 'vscode'
 
 beforeEach(() => {
   jest.resetAllMocks()
 })
+
+jest.mock('vscode')
+
+const mockCwd = resolve('root')
+const mockPath = resolve('root', 'test', 'dir')
+const mockRelPath = relative(mockCwd, mockPath)
 
 describe('runExperiment', () => {
   it('should run the correct command in the IntegratedTerminal', async () => {
@@ -34,13 +42,30 @@ describe('runExperiment', () => {
   })
 })
 
+describe('add', () => {
+  it('should run without options', async () => {
+    const terminalSpy = jest
+      .spyOn(IntegratedTerminal, 'run')
+      .mockResolvedValueOnce(undefined)
+
+    const mockedUri = mocked(Uri)
+    const mockUri = ({ path: mockRelPath } as unknown) as Uri
+    jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockCwd)
+    mockedUri.file.mockReturnValue(mockUri)
+
+    const undef = await add(mockPath)
+
+    expect(undef).toBeUndefined()
+    expect(terminalSpy).toBeCalledWith(`dvc add ${mockRelPath}`)
+  })
+})
+
 describe('checkout', () => {
   it('should run without options', async () => {
     const terminalSpy = jest
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await checkout(mockPath)
 
@@ -53,7 +78,6 @@ describe('checkout', () => {
       .mockResolvedValueOnce(undefined)
 
     const mockOptions = ['-R']
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await checkout(mockPath, mockOptions)
 
@@ -68,7 +92,6 @@ describe('commit', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await commit()
 
@@ -83,7 +106,6 @@ describe('destroy', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await destroy()
 
@@ -98,7 +120,6 @@ describe('fetch', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await fetch(mockPath)
 
@@ -113,7 +134,6 @@ describe('garbageCollect', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await gc(mockPath)
 
@@ -128,7 +148,6 @@ describe('initialize', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await initialize(mockPath)
 
@@ -143,7 +162,6 @@ describe('install', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await install()
 
@@ -152,18 +170,19 @@ describe('install', () => {
   })
 })
 
-// describe('list', () => {
-//   it('should run without arguments', async () => {
-//     const terminalSpy = jest
-//       .spyOn(IntegratedTerminal, 'run')
-//       .mockResolvedValueOnce(undefined)
+describe('list', () => {
+  it('should run without arguments', async () => {
+    const terminalSpy = jest
+      .spyOn(IntegratedTerminal, 'run')
+      .mockResolvedValueOnce(undefined)
 
-//     const undef = await list()
+    jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
+    const undef = await list()
 
-//     expect(undef).toBeUndefined()
-//     expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc list`)
-//   })
-// })
+    expect(undef).toBeUndefined()
+    expect(terminalSpy).toBeCalledWith(`dvc list ${mockPath}`)
+  })
+})
 
 describe('pull', () => {
   it('should run without arguments', async () => {
@@ -171,7 +190,6 @@ describe('pull', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
     const undef = await pull()
 
@@ -186,13 +204,15 @@ describe('push', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('root', 'test', 'dir')
-    const mockCwd = resolve('root')
+    const mockedUri = mocked(Uri)
+    const mockUri = ({ path: mockRelPath } as unknown) as Uri
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockCwd)
+    mockedUri.file.mockReturnValue(mockUri)
+
     const undef = await push(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`dvc push`)
+    expect(terminalSpy).toBeCalledWith(`dvc push ${mockRelPath}`)
   })
 })
 
@@ -202,9 +222,7 @@ describe('status', () => {
       .spyOn(IntegratedTerminal, 'run')
       .mockResolvedValueOnce(undefined)
 
-    const mockPath = resolve('test', 'dir')
     jest.spyOn(IntTerm, 'getDefaultCwd').mockReturnValue(mockPath)
-
     const undef = await status()
 
     expect(undef).toBeUndefined()
