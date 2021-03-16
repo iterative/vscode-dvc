@@ -7,6 +7,7 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webviews/experiments/contract'
+import { Logger } from 'dvc/src/common/Logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
@@ -106,8 +107,7 @@ export class Model {
 
         return
       default:
-        // eslint-disable-next-line no-console
-        console.error('Unexpected message', message)
+        Logger.error(`Unexpected message: ${message}`)
     }
   }
 }

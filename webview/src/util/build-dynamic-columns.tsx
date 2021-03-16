@@ -202,7 +202,7 @@ const buildColumnsFromSchemaProperties: (
 
 const buildDynamicColumnsFromExperiments: (
   data: Experiment[]
-) => Record<string, any>[] = data => {
+) => Column<Experiment>[] = data => {
   if (!data || data.length === 0) {
     return []
   }

@@ -1,16 +1,4 @@
-import {
-  workspace,
-  window,
-  commands,
-  TreeDataProvider,
-  ThemeIcon,
-  TreeItemCollapsibleState,
-  Command,
-  scm,
-  Uri,
-  TreeItem,
-  ExtensionContext
-} from 'vscode'
+import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -34,6 +22,7 @@ import { getExperiments, inferDefaultOptions } from './dvcReader'
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
+import { ResourceLocator } from './ResourceLocator'
 
 export { Disposable }
 
@@ -46,7 +35,9 @@ registerUpdateReconciler(module)
 export class Extension {
   public readonly dispose = Disposable.fn()
 
-  private readonly config = new Config()
+  private readonly resourceLocator: ResourceLocator
+  private readonly config: Config
+  private readonly manager: DvcWebviewManager
 
   private getDefaultCwd = (): string => {
     const { workspaceFolders } = workspace
@@ -59,9 +50,7 @@ export class Extension {
 
   private dvcPathStatusBarItem: DVCPathStatusBarItem
 
-  private readonly manager = this.dispose.track(
-    new DvcWebviewManager(this.config)
-  )
+  private lastExperimentsOutputHash = ''
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const cwd = this.getDefaultCwd()
@@ -75,8 +64,11 @@ export class Extension {
   }
 
   private refreshWebviews = async () => {
-    const tableData = await this.getExperimentsTableData()
-    this.manager.refreshAll(tableData)
+    const { experiments, outputHash } = await this.getExperimentsTableData()
+    if (outputHash !== this.lastExperimentsOutputHash) {
+      this.lastExperimentsOutputHash = outputHash
+      this.manager.refreshAll(experiments)
+    }
   }
 
   private async getExperimentsTableData() {
@@ -84,12 +76,20 @@ export class Extension {
     return getExperiments(dvcReaderOptions)
   }
 
-  constructor() {
+  constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
+
+    this.resourceLocator = new ResourceLocator(context.extensionPath)
+
+    this.config = new Config()
+
+    this.manager = this.dispose.track(
+      new DvcWebviewManager(this.config, this.resourceLocator)
+    )
 
     this.onChangeExperimentsUpdateWebview().then(disposable =>
       this.dispose.track(disposable)
@@ -113,11 +113,11 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.showWebview', async () => {
-        const dvcWebview = this.dispose.track(await this.manager.createNew())
+      commands.registerCommand('dvc.showExperiments', async () => {
+        const dvcWebview = this.dispose.track(await this.manager.findOrCreate())
         try {
-          const tableData = await this.getExperimentsTableData()
-          dvcWebview.showExperiments({ tableData })
+          const { experiments } = await this.getExperimentsTableData()
+          dvcWebview.showExperiments({ tableData: experiments })
         } catch (e) {
           dvcWebview.showExperiments({ errors: [e.toString()] })
         }
@@ -125,7 +125,10 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', runExperiment)
+      commands.registerCommand('dvc.runExperiment', async () => {
+        runExperiment()
+        commands.executeCommand('dvc.showExperiments')
+      })
     )
 
     this.dispose.track(
@@ -153,59 +156,6 @@ export class Extension {
     )
 
     this.dvcScmFilesView()
-    this.dvcCommandView()
-  }
-
-  dvcCommandView(): void {
-    interface TreeItemEntry {
-      label: string
-      command?: Command
-    }
-
-    class DVCTreeDataProvider implements TreeDataProvider<TreeItemEntry> {
-      /* onDidChangeTreeData?:
-				| Event<void | MyTreeItem | null | undefined>
-				| undefined; */
-
-      async getChildren(element?: TreeItemEntry): Promise<TreeItemEntry[]> {
-        if (!element) {
-          // Root
-          return [
-            {
-              label: 'View Tree',
-              command: {
-                title: 'Webview Tree',
-                command: 'dvc.showWebview'
-              }
-            },
-            {
-              label: 'Run Experiment',
-              command: {
-                title: 'Run Experiment',
-                command: 'dvc.runExperiment'
-              }
-            }
-          ]
-        }
-        return []
-      }
-
-      async getTreeItem(element: TreeItemEntry): Promise<TreeItem> {
-        return {
-          label: element.label,
-          command: element.command,
-          iconPath: ThemeIcon.File,
-          collapsibleState: TreeItemCollapsibleState.None
-        }
-      }
-    }
-
-    this.dispose.track(
-      window.createTreeView('dvc-tree', {
-        treeDataProvider: new DVCTreeDataProvider(),
-        canSelectMany: false
-      })
-    )
   }
 
   dvcScmFilesView(): void {
@@ -276,7 +226,11 @@ export class Extension {
 
 export function activate(context: ExtensionContext): void {
   context.subscriptions.push(
-    hotRequireExportedFn(module, Extension, HotExtension => new HotExtension())
+    hotRequireExportedFn(
+      module,
+      Extension,
+      HotExtension => new HotExtension(context)
+    )
   )
 }
 

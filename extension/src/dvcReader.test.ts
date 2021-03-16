@@ -6,6 +6,7 @@ import fs from 'fs'
 import { execPromise } from './util'
 import complexExperimentsOutput from './webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
+import * as DvcPath from './DvcPath'
 
 jest.mock('fs')
 jest.mock('./util')
@@ -26,6 +27,9 @@ beforeEach(() => {
 
 test('Inferring default options on a directory with accessible .env', async () => {
   mockedFs.accessSync.mockReturnValue()
+  jest
+    .spyOn(DvcPath, 'getDvcPath')
+    .mockReturnValueOnce(join('.env', 'bin', 'dvc'))
 
   expect(await inferDefaultOptions(extensionDirectory)).toEqual({
     bin: join(extensionDirectory, '.env', 'bin', 'dvc'),
@@ -34,6 +38,10 @@ test('Inferring default options on a directory with accessible .env', async () =
 })
 
 test('Inferring default options on a directory without .env', async () => {
+  jest
+    .spyOn(DvcPath, 'getDvcPath')
+    .mockReturnValueOnce(join('not', 'a', 'path'))
+
   mockedFs.accessSync.mockImplementation(() => {
     throw new Error('Mocked access fail')
   })
@@ -46,11 +54,13 @@ test('Inferring default options on a directory without .env', async () => {
 
 test('Command-mocked getExperiments matches a snapshot when parsed', async () => {
   mockedExecPromise.mockReturnValue(
-    (Promise.resolve({
+    Promise.resolve({
       stdout: JSON.stringify(complexExperimentsOutput),
       stderr: ''
-    }) as any) as PromiseWithChild<{ stdout: string; stderr: string }>
+    }) as PromiseWithChild<{ stdout: string; stderr: string }>
   )
 
-  expect(await getExperiments(testReaderOptions)).toMatchSnapshot()
+  const { experiments, outputHash } = await getExperiments(testReaderOptions)
+  expect(experiments).toMatchSnapshot()
+  expect(outputHash).toEqual('q8bw/2qL0rYstYzbwwCZK1RgRGo=')
 })

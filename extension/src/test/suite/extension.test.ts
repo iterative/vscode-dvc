@@ -3,6 +3,7 @@ import chai from 'chai'
 import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, workspace } from 'vscode'
+import { join } from 'path'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -46,7 +47,7 @@ suite('Extension Test Suite', () => {
         )
       }
 
-      const customPath = '.env/bin/dvc'
+      const customPath = join('custom', 'path', 'to', 'dvc')
       const mockShowInputBox = stub(window, 'showInputBox').resolves(customPath)
 
       const selectedCustomPath = commands.executeCommand('dvc.selectDvcPath')

@@ -32,6 +32,7 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'error',
+    '@typescript-eslint/no-explicit-any': 'error',
 
     // Let us wrap Radio components in labels.
     'jsx-a11y/label-has-associated-control': [

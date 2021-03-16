@@ -260,3 +260,10 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     outline: none;
   }
 }
+
+.tableOptions {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 0 1rem;
+}

@@ -25,10 +25,15 @@ describe('addFileChangeHandler', () => {
 
     const getWatcherSpy = jest
       .spyOn(fileSystem, 'getWatcher')
-      .mockImplementationOnce((e: any) => e)
+      .mockImplementationOnce(e => e)
 
     mockedDebounce.mockImplementationOnce(
-      (func: (...args: any) => any) => func as any
+      (func: (...args: string[]) => void) =>
+        func as {
+          (...args: string[]): void
+          cancel(): void
+          flush(): void
+        }
     )
 
     const { dispose } = addFileChangeHandler(file, func)

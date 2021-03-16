@@ -60,7 +60,11 @@ export class IntegratedTerminal {
   }
 
   private static createPythonInstance = async (
-    pythonExtension: Extension<any>
+    pythonExtension: Extension<
+      Thenable<{
+        activate: () => void
+      }>
+    >
   ): Promise<void> => {
     if (!pythonExtension.isActive) {
       await IntegratedTerminal.activateExtension(pythonExtension)
@@ -69,7 +73,11 @@ export class IntegratedTerminal {
   }
 
   private static activateExtension = async (
-    extension: Extension<any>
+    extension: Extension<
+      Thenable<{
+        activate: () => void
+      }>
+    >
   ): Promise<void> => {
     await extension.activate()
     return delay(2500)

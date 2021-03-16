@@ -1,3 +1,5 @@
+import { createHash } from 'crypto'
+import { getDvcPath } from './DvcPath'
 import { accessSync } from 'fs'
 import { resolve } from 'path'
 import { execPromise } from './util'
@@ -10,7 +12,8 @@ export interface ReaderOptions {
 export const inferDefaultOptions: (
   cwd: string
 ) => Promise<ReaderOptions> = async cwd => {
-  const envDvcPath = resolve(cwd, '.env', 'bin', 'dvc')
+  const localDvcPath = getDvcPath()
+  const envDvcPath = resolve(cwd, localDvcPath)
   let bin
   try {
     accessSync(envDvcPath)
@@ -34,8 +37,15 @@ const execCommand: (
 
 export const getExperiments: (
   options: ReaderOptions
-) => Promise<ExperimentsRepoJSONOutput> = async options => {
-  const output = await execCommand(options, 'exp show --show-json')
-  const { stdout } = output
-  return JSON.parse(String(stdout))
+) => Promise<{
+  experiments: ExperimentsRepoJSONOutput
+  outputHash: string
+}> = async options => {
+  const { stdout } = await execCommand(options, 'exp show --show-json')
+  const outputHash = createHash('sha1')
+    .update(stdout)
+    .digest('base64')
+  const experiments = JSON.parse(String(stdout))
+
+  return { experiments, outputHash }
 }
