@@ -31,7 +31,7 @@ import { getExperiments, inferDefaultOptions } from './dvcReader'
 import { DVCPathStatusBarItem, selectDvcPath } from './DvcPath'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
-import { ResourceLocator } from './ResouceLocator'
+import { ResourceLocator } from './ResourceLocator'
 
 export { Disposable }
 
