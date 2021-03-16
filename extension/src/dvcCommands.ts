@@ -1,5 +1,5 @@
 const getCliCommand = (command: string, fsPath: string): string => {
-  return `cd ${fsPath} && dvc ${command}`
+  return `cd ${fsPath.substring(1)} && dvc ${command}`
 }
 
 const ADD = 'add'
@@ -17,7 +17,7 @@ const RUN_EXPERIMENT = 'exp run'
 const STATUS = 'status'
 
 export const getAddCommand = (relPath: string, options: string[]): string => {
-  let cmd = `dvc ${ADD} ${relPath}`
+  let cmd = `dvc ${ADD} ${relPath.substring(1)}`
   if (options.length) {
     cmd = cmd.concat(' ', options.join(' '))
   }
@@ -80,7 +80,7 @@ export const getPullCommand = (fsPath: string): string => {
 }
 
 export const getPushCommand = (relPath: string, options: string[]): string => {
-  let cmd = `dvc ${PUSH} ${relPath}`
+  let cmd = `dvc ${PUSH} ${relPath.substring(1)}`
   if (options.length) {
     cmd = cmd.concat(' ', options.join(' '))
   }
