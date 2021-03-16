@@ -56,7 +56,7 @@ describe('add', () => {
     const undef = await add(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`dvc add ${mockRelPath}`)
+    expect(terminalSpy).toBeCalledWith(`dvc add ${mockRelPath.substring(1)}`)
   })
 })
 
@@ -70,7 +70,9 @@ describe('checkout', () => {
     const undef = await checkout(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc checkout`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc checkout`
+    )
   })
   it('should run with options', async () => {
     const terminalSpy = jest
@@ -82,7 +84,9 @@ describe('checkout', () => {
     const undef = await checkout(mockPath, mockOptions)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc checkout -R`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc checkout -R`
+    )
   })
 })
 
@@ -96,7 +100,9 @@ describe('commit', () => {
     const undef = await commit()
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc commit`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc commit`
+    )
   })
 })
 
@@ -110,7 +116,9 @@ describe('destroy', () => {
     const undef = await destroy()
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc destroy`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc destroy`
+    )
   })
 })
 
@@ -124,7 +132,9 @@ describe('fetch', () => {
     const undef = await fetch(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc fetch`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc fetch`
+    )
   })
 })
 
@@ -138,7 +148,7 @@ describe('garbageCollect', () => {
     const undef = await gc(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc gc`)
+    expect(terminalSpy).toBeCalledWith(`cd ${mockPath.substring(1)} && dvc gc`)
   })
 })
 
@@ -152,7 +162,9 @@ describe('initialize', () => {
     const undef = await initialize(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc init`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc init`
+    )
   })
 })
 
@@ -166,7 +178,9 @@ describe('install', () => {
     const undef = await install()
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc install`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc install`
+    )
   })
 })
 
@@ -194,7 +208,9 @@ describe('pull', () => {
     const undef = await pull()
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc pull`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc pull`
+    )
   })
 })
 
@@ -212,7 +228,7 @@ describe('push', () => {
     const undef = await push(mockPath)
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`dvc push ${mockRelPath}`)
+    expect(terminalSpy).toBeCalledWith(`dvc push ${mockRelPath.substring(1)}`)
   })
 })
 
@@ -226,6 +242,8 @@ describe('status', () => {
     const undef = await status()
 
     expect(undef).toBeUndefined()
-    expect(terminalSpy).toBeCalledWith(`cd ${mockPath} && dvc status`)
+    expect(terminalSpy).toBeCalledWith(
+      `cd ${mockPath.substring(1)} && dvc status`
+    )
   })
 })
