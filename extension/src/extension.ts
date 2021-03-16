@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {

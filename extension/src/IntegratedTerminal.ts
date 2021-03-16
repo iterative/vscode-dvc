@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { relative } from 'path'
 import { Extension, extensions, Terminal, Uri, window, workspace } from 'vscode'
 import {
