@@ -152,7 +152,7 @@
     "lint": "eslint --cache --fix '**/*.{js,ts}'",
     "build-vscode-tests": "tsc -p './'",
     "run-vscode-tests": "node ./dist/test/runTest.js",
-    "test:vscode": "run-s build-vscode-tests run-vscode-tests",
+    "temp-disabled-test:vscode": "run-s build-vscode-tests run-vscode-tests",
     "test:jest": "jest",
     "test": "run-p test:*",
     "test-staged": "lint-staged",
