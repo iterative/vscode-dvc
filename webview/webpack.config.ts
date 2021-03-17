@@ -61,18 +61,6 @@ module.exports = {
         loader: 'file-loader'
       },
       {
-        test: /\.(ttf)(\?v=\d+\.\d+\.\d+)?$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'fonts/'
-            }
-          }
-        ]
-      },
-      {
         test: /\.tsx?$/,
         loader: 'ts-loader',
         options: { transpileOnly: true }

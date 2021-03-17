@@ -150,8 +150,8 @@ export const ExperimentsTable: React.FC<{
   return (
     <>
       <div className={styles.tableOptions}>
-        <SortIndicator instance={instance} />
         <ManageColumns instance={instance} />
+        <SortIndicator instance={instance} />
       </div>
       <Table instance={instance} />
     </>
@@ -165,6 +165,7 @@ const Experiments: React.FC<{
   return (
     <div className={styles.experiments}>
       <button
+        className={styles.experimentsButton}
         onClick={() => {
           vsCodeApi.postMessage({
             type: MessageFromWebviewType.onClickRunExperiment

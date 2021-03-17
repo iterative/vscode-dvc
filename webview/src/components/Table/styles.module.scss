@@ -97,14 +97,15 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   flex-flow: column nowrap;
   .experimentsButton {
     width: fit-content;
-    margin: 0 0.5rem;
     background-color: #4f4f4f;
+    align-self: flex-start;
     display: inline-block;
     cursor: pointer;
     color: #e8e8e8;
     font-size: 0.9rem;
     font-weight: bold;
     padding: 0.3rem 0.7rem;
+    margin: 0.5rem 1rem;
     text-decoration: none;
     outline: none;
   }
@@ -176,7 +177,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   }
 
   .rowGroup {
-    font-family: 'Roboto Mono', 'monospace';
+    font-family: 'monospace';
     margin: 0.5rem 0;
   }
   .normalRowGroup {
@@ -226,6 +227,8 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     font-weight: bold;
     font-size: 0.9rem;
     user-select: none;
+    background-color: inherit;
+    border-bottom: 1px solid white;
     .th {
       border-bottom: 2px solid rgba(255, 255, 255, 0.5);
       padding: 0.4rem 0.25rem;
@@ -263,7 +266,11 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 
 .tableOptions {
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
   padding: 0 1rem;
+  button {
+    background-color: rgb(54, 54, 54);
+  }
 }

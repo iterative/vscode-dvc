@@ -1,6 +1,7 @@
 * {
   box-sizing: border-box;
   outline: none;
+  font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html,
@@ -11,10 +12,10 @@ body,
 
 .react-root {
   display: inline-block;
-  width: 100%;
+  max-width: fit-content;
+  width: inherit;
 }
 body {
-  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0px;
   padding: 0px;
   border: 0px;
@@ -24,14 +25,4 @@ body {
 
   background-color: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
-}
-
-@font-face {
-  font-family: 'Roboto';
-  src: url('./fonts/Roboto-Light.ttf') format('ttf');
-}
-
-@font-face {
-  font-family: 'Roboto Mono';
-  src: url('./fonts/RobotoMono-Light.ttf') format('ttf');
 }
