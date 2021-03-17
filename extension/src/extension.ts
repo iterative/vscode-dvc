@@ -55,10 +55,10 @@ export class Extension {
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
-    return addFileChangeHandler(refsPath, this.refreshWebviews)
+    return addFileChangeHandler(refsPath, this.refreshExperimentWebview)
   }
 
-  private refreshWebviews = async () => {
+  private refreshExperimentWebview = async () => {
     const experiments = await this.getExperimentsTableData()
     this.webviewManager.refreshExperiments(experiments)
   }
