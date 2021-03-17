@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'mocha'
 import chai from 'chai'
-import { stub } from 'sinon'
+import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, workspace } from 'vscode'
 import { join } from 'path'
@@ -13,6 +13,14 @@ suite('Extension Test Suite', () => {
 
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
+  })
+
+  describe('experiments webview', () => {
+    it('should be open the experiments webview', async () => {
+      const windowSpy = spy(window, 'createWebviewPanel')
+      await commands.executeCommand('dvc.showExperiments')
+      expect(windowSpy).to.have.been.calledOnce
+    })
   })
 
   describe('dvc binary path picker', () => {
