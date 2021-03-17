@@ -16,7 +16,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('experiments webview', () => {
-    it('should be open the experiments webview', async () => {
+    it('should be able to open the experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
       commands.executeCommand('dvc.showExperiments')
       expect(windowSpy).to.have.been.calledOnce
