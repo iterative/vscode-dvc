@@ -47,8 +47,6 @@ export class Extension {
     return workspaceFolders[0].uri.fsPath
   }
 
-  private lastExperimentsOutputHash = ''
-
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const cwd = this.getDefaultCwd()
     const refsPath = await getExperimentsRefsPath(cwd)
@@ -61,11 +59,8 @@ export class Extension {
   }
 
   private refreshWebviews = async () => {
-    const { experiments, outputHash } = await this.getExperimentsTableData()
-    if (outputHash !== this.lastExperimentsOutputHash) {
-      this.lastExperimentsOutputHash = outputHash
-      this.webviewManager.refreshExperiments(experiments)
-    }
+    const { experiments } = await this.getExperimentsTableData()
+    this.webviewManager.refreshExperiments(experiments)
   }
 
   private async getExperimentsTableData() {

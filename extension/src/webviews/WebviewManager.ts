@@ -1,5 +1,6 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { ExperimentsWebview } from './experiments/ExperimentsWebview'
 import { Config } from '../Config'
@@ -11,6 +12,8 @@ export class WebviewManager {
   }
 
   public readonly dispose = Disposable.fn()
+
+  private lastExperimentsOutputHash = ''
 
   constructor(
     private readonly config: Config,
@@ -51,7 +54,14 @@ export class WebviewManager {
   }
 
   public refreshExperiments(tableData: ExperimentsRepoJSONOutput | null): void {
-    this.openedWebviews?.experiments?.showExperiments({ tableData })
+    const outputHash = createHash('sha1')
+      .update(JSON.stringify(tableData))
+      .digest('base64')
+
+    if (outputHash !== this.lastExperimentsOutputHash) {
+      this.lastExperimentsOutputHash = outputHash
+      this.openedWebviews?.experiments?.showExperiments({ tableData })
+    }
   }
 
   private addExperiments(view: ExperimentsWebview) {
