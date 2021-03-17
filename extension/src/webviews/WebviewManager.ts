@@ -6,10 +6,11 @@ import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from './experiments/contract'
 
 export class WebviewManager {
-  public readonly dispose = Disposable.fn()
   private readonly openedWebviews: {
     experiments?: ExperimentsWebview
   }
+
+  public readonly dispose = Disposable.fn()
 
   constructor(
     private readonly config: Config,
