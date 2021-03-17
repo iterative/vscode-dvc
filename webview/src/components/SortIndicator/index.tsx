@@ -13,7 +13,8 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
 
   return (
     <div className={styles.sortIndicator}>
-      <span className={styles.sortIndicator__text}>Sorted By</span>
+      <span className={styles.sortIndicator__text}>Sorted By: &nbsp; </span>
+      {''}
       <span className={styles.sortIndicator__subText}>
         {sortedByColumn ? (
           <>
