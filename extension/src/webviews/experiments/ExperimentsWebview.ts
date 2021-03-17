@@ -1,28 +1,29 @@
 import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { Deferred } from '@hediet/std/synchronization'
+import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
-import { Config } from './Config'
+import { Config } from '../../Config'
 import {
+  WebviewType as Experiments,
   ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData
-} from './webviews/experiments/contract'
-import { Logger } from './common/Logger'
-import { ResourceLocator } from './ResourceLocator'
+} from './contract'
+import { Logger } from '../../common/Logger'
+import { ResourceLocator } from '../../ResourceLocator'
 
-export class DvcWebview {
-  public static viewKey = 'dvc-view'
+export class ExperimentsWebview {
+  public static viewKey = 'dvc-experiments'
 
   public static async restore(
     webviewPanel: WebviewPanel,
     config: Config
-  ): Promise<DvcWebview> {
-    const view = new DvcWebview(webviewPanel, config)
+  ): Promise<ExperimentsWebview> {
+    const view = new ExperimentsWebview(webviewPanel, config)
     await view.initialized
     return view
   }
@@ -30,10 +31,10 @@ export class DvcWebview {
   public static async create(
     config: Config,
     resourceLocator: ResourceLocator
-  ): Promise<DvcWebview> {
+  ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
-      DvcWebview.viewKey,
-      'Experiments',
+      ExperimentsWebview.viewKey,
+      Experiments,
       ViewColumn.Two,
       {
         enableScripts: true,
@@ -44,7 +45,7 @@ export class DvcWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new DvcWebview(webviewPanel, config)
+    const view = new ExperimentsWebview(webviewPanel, config)
     await view.initialized
     return view
   }
@@ -56,6 +57,11 @@ export class DvcWebview {
   protected readonly initialized = this._initialized.promise
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
+
+  public reveal = async () => {
+    this.webviewPanel.reveal()
+    return this
+  }
 
   private constructor(
     private readonly webviewPanel: WebviewPanel,
@@ -116,25 +122,25 @@ export class DvcWebview {
 
     // TODO make CSP more strict!
     return `
-			<html>
-				<head>
-				<meta charset="UTF-8">
-				<meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src ${
-          this.webviewPanel.webview.cspSource
-        } * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline'; worker-src * data: blob: data: 'unsafe-inline' 'unsafe-eval'; font-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:;">
-				<style>
-					html { height: 100%; width: 100%; padding: 0; margin: 0; }
-					body { height: 100%; width: 100%; padding: 0; margin: 0; }
-				</style>
-				</head>
-				<body>
-					<script>
-						Object.assign(window, ${JSON.stringify(data)});
-					</script>
-					<script type="text/javascript" src="${urls.mainJsUrl}"></script>
-				</body>
-			</html>
-		`
+			  <html>
+				  <head>
+				  <meta charset="UTF-8">
+				  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src ${
+            this.webviewPanel.webview.cspSource
+          } * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline'; worker-src * data: blob: data: 'unsafe-inline' 'unsafe-eval'; font-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:;">
+				  <style>
+					  html { height: 100%; width: 100%; padding: 0; margin: 0; }
+					  body { height: 100%; width: 100%; padding: 0; margin: 0; }
+				  </style>
+				  </head>
+				  <body>
+					  <script>
+						  Object.assign(window, ${JSON.stringify(data)});
+					  </script>
+					  <script type="text/javascript" src="${urls.mainJsUrl}"></script>
+				  </body>
+			  </html>
+		  `
   }
 
   // TODO: Implement Request/Response Semantic!
@@ -173,67 +179,6 @@ export class DvcWebview {
     this.sendMessage({
       type: MessageToWebviewType.showExperiments,
       ...payload
-    })
-  }
-}
-
-export class DvcWebviewManager {
-  private readonly openedWebviews = new Set<DvcWebview>()
-
-  public readonly dispose = Disposable.fn()
-
-  constructor(
-    private readonly config: Config,
-    private readonly resourceLocator: ResourceLocator
-  ) {
-    this.dispose.track(
-      window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
-        deserializeWebviewPanel: async (panel: WebviewPanel) => {
-          DvcWebview.restore(panel, this.config).then(view => {
-            this.addView(view)
-          })
-        }
-      })
-    )
-
-    this.dispose.track({
-      dispose: () => {
-        for (const panel of this.openedWebviews) {
-          panel.dispose()
-        }
-      }
-    })
-  }
-
-  public async findOrCreate(): Promise<DvcWebview> {
-    const _set = this.openedWebviews.values()
-    for (let i = 0; i < this.openedWebviews.size; i += 1) {
-      const item = _set.next().value
-      if (item.webviewPanel.title === 'Experiments') {
-        item.webviewPanel.reveal()
-        return item
-      }
-    }
-
-    const view = await DvcWebview.create(this.config, this.resourceLocator)
-    this.addView(view)
-    return view
-  }
-
-  public refreshAll(tableData: ExperimentsRepoJSONOutput | null): void {
-    for (const panel of this.openedWebviews) {
-      try {
-        panel.showExperiments({ tableData })
-      } catch (e) {
-        panel.showExperiments({ errors: [e.toString()] })
-      }
-    }
-  }
-
-  private addView(view: DvcWebview) {
-    this.openedWebviews.add(view)
-    view.onDidDispose(() => {
-      this.openedWebviews.delete(view)
     })
   }
 }
