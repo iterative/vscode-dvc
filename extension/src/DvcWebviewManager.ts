@@ -5,6 +5,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
 import { Config } from './Config'
 import {
+  WebviewType as Experiments,
   ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
@@ -16,7 +17,7 @@ import { Logger } from './common/Logger'
 import { ResourceLocator } from './ResourceLocator'
 
 export class DvcWebview {
-  public static viewKey = 'dvc-view'
+  public static viewKey = 'dvc-experiments'
 
   public static async restore(
     webviewPanel: WebviewPanel,
@@ -33,7 +34,7 @@ export class DvcWebview {
   ): Promise<DvcWebview> {
     const webviewPanel = window.createWebviewPanel(
       DvcWebview.viewKey,
-      'Experiments',
+      Experiments,
       ViewColumn.Two,
       {
         enableScripts: true,
@@ -56,6 +57,11 @@ export class DvcWebview {
   protected readonly initialized = this._initialized.promise
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
+
+  public reveal = async () => {
+    this.webviewPanel.reveal()
+    return this
+  }
 
   private constructor(
     private readonly webviewPanel: WebviewPanel,
@@ -178,19 +184,21 @@ export class DvcWebview {
 }
 
 export class DvcWebviewManager {
-  private readonly openedWebviews = new Set<DvcWebview>()
-
   public readonly dispose = Disposable.fn()
+  private readonly openedWebviews: {
+    experiments?: DvcWebview
+  }
 
   constructor(
     private readonly config: Config,
     private readonly resourceLocator: ResourceLocator
   ) {
+    this.openedWebviews = {}
     this.dispose.track(
       window.registerWebviewPanelSerializer(DvcWebview.viewKey, {
         deserializeWebviewPanel: async (panel: WebviewPanel) => {
           DvcWebview.restore(panel, this.config).then(view => {
-            this.addView(view)
+            this.addExperiments(view)
           })
         }
       })
@@ -198,42 +206,32 @@ export class DvcWebviewManager {
 
     this.dispose.track({
       dispose: () => {
-        for (const panel of this.openedWebviews) {
-          panel.dispose()
-        }
+        Object.values(this.openedWebviews).map(panel => {
+          panel?.dispose()
+        })
       }
     })
   }
 
-  public async findOrCreate(): Promise<DvcWebview> {
-    const _set = this.openedWebviews.values()
-    for (let i = 0; i < this.openedWebviews.size; i += 1) {
-      const item = _set.next().value
-      if (item.webviewPanel.title === 'Experiments') {
-        item.webviewPanel.reveal()
-        return item
-      }
+  public async findOrCreateExperiments(): Promise<DvcWebview> {
+    const experiments = this.openedWebviews.experiments
+    if (experiments) {
+      return experiments.reveal()
     }
 
     const view = await DvcWebview.create(this.config, this.resourceLocator)
-    this.addView(view)
+    this.addExperiments(view)
     return view
   }
 
-  public refreshAll(tableData: ExperimentsRepoJSONOutput | null): void {
-    for (const panel of this.openedWebviews) {
-      try {
-        panel.showExperiments({ tableData })
-      } catch (e) {
-        panel.showExperiments({ errors: [e.toString()] })
-      }
-    }
+  public refreshExperiments(tableData: ExperimentsRepoJSONOutput | null): void {
+    this.openedWebviews?.experiments?.showExperiments({ tableData })
   }
 
-  private addView(view: DvcWebview) {
-    this.openedWebviews.add(view)
+  private addExperiments(view: DvcWebview) {
+    this.openedWebviews.experiments = view
     view.onDidDispose(() => {
-      this.openedWebviews.delete(view)
+      this.openedWebviews.experiments = undefined
     })
   }
 }
