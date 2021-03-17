@@ -59,7 +59,7 @@ export class Extension {
   }
 
   private refreshWebviews = async () => {
-    const { experiments } = await this.getExperimentsTableData()
+    const experiments = await this.getExperimentsTableData()
     this.webviewManager.refreshExperiments(experiments)
   }
 
@@ -105,7 +105,7 @@ export class Extension {
           await this.webviewManager.findOrCreateExperiments()
         )
         try {
-          const { experiments } = await this.getExperimentsTableData()
+          const experiments = await this.getExperimentsTableData()
           dvcWebview.showExperiments({ tableData: experiments })
         } catch (e) {
           dvcWebview.showExperiments({ errors: [e.toString()] })
