@@ -1,0 +1,14 @@
+{
+  "displayName": "DVC",
+  "description": "DVC VSCode extension",
+  "command.add": "Add",
+  "command.checkout": "Checkout",
+  "command.checkoutRecursive": "Checkout Recursive",
+  "command.commit": "Commit",
+  "command.init": "Init DVC",
+  "command.initNoScm": "Init DVC --no-scm",
+  "command.push": "Push",
+  "command.runExperiment": "Run Experiment",
+  "command.selectDvcPath": "Select DVC Path",
+  "command.showExperiments": "Show Experiments"
+}

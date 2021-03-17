@@ -1,8 +1,8 @@
 {
   "name": "dvc",
   "private": true,
-  "displayName": "DVC",
-  "description": "DVC VSCode extension",
+  "displayName": "%displayName%",
+  "description": "%description%",
   "publisher": "iterative",
   "icon": "docs/dvc.png",
   "version": "0.1.0",
@@ -41,42 +41,42 @@
   "contributes": {
     "commands": [
       {
-        "title": "Push",
+        "title": "%command.push%",
         "command": "dvc.push",
         "category": "DVC"
       },
       {
-        "title": "Show Experiments",
+        "title": "%command.showExperiments%",
         "command": "dvc.showExperiments",
         "category": "DVC"
       },
       {
-        "title": "Run Experiment",
+        "title": "%command.runExperiment%",
         "command": "dvc.runExperiment",
         "category": "DVC"
       },
       {
-        "title": "Select DVC path",
+        "title": "%command.selectDvcPath%",
         "command": "dvc.selectDvcPath",
         "category": "DVC"
       },
       {
-        "title": "Initialize Directory",
+        "title": "%command.init%",
         "command": "dvc.initializeDirectory",
         "category": "DVC"
       },
       {
-        "title": "Add",
+        "title": "%command.add%",
         "command": "dvc.add",
         "category": "DVC"
       },
       {
-        "title": "Checkout",
+        "title": "%command.checkout%",
         "command": "dvc.checkout",
         "category": "DVC"
       },
       {
-        "title": "Checkout Recursive",
+        "title": "%command.checkoutRecursive%",
         "command": "dvc.checkoutRecursive",
         "category": "DVC"
       }
@@ -95,7 +95,6 @@
     "menus": {
       "scm/title": [
         {
-          "title": "Run Experiment",
           "command": "dvc.showExperiments",
           "group": "experiments",
           "when": "scmProvider == dvc"
