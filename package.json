@@ -16,7 +16,6 @@
     "test:vscode": "run-s test-vscode-build test-vscode-run",
     "test:jest": "yarn workspaces run test",
     "test": "run-p test:*",
-    "build": "run-s build-ui build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "build-extension": "yarn workspace dvc build",
     "extension-dev-server": "yarn workspace dvc dev",
