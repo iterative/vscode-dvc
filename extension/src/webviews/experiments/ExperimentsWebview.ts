@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
-import { Config } from './Config'
+import { Config } from '../../Config'
 import {
   WebviewType as Experiments,
   ExperimentsRepoJSONOutput,
@@ -12,18 +12,18 @@ import {
   MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData
-} from './webviews/experiments/contract'
-import { Logger } from './common/Logger'
-import { ResourceLocator } from './ResourceLocator'
+} from './contract'
+import { Logger } from '../../common/Logger'
+import { ResourceLocator } from '../../ResourceLocator'
 
-export class DvcExperimentsWebview {
+export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
 
   public static async restore(
     webviewPanel: WebviewPanel,
     config: Config
-  ): Promise<DvcExperimentsWebview> {
-    const view = new DvcExperimentsWebview(webviewPanel, config)
+  ): Promise<ExperimentsWebview> {
+    const view = new ExperimentsWebview(webviewPanel, config)
     await view.initialized
     return view
   }
@@ -31,9 +31,9 @@ export class DvcExperimentsWebview {
   public static async create(
     config: Config,
     resourceLocator: ResourceLocator
-  ): Promise<DvcExperimentsWebview> {
+  ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
-      DvcExperimentsWebview.viewKey,
+      ExperimentsWebview.viewKey,
       Experiments,
       ViewColumn.Two,
       {
@@ -45,7 +45,7 @@ export class DvcExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new DvcExperimentsWebview(webviewPanel, config)
+    const view = new ExperimentsWebview(webviewPanel, config)
     await view.initialized
     return view
   }
