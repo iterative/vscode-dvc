@@ -1,7 +1,7 @@
 // Variables
 
 $row-bg-color: var(--vscode-editor-background);
-$row-bg-alt-color: rgb(60, 60, 60, 1);
+$row-bg-alt-color: rgba(60, 60, 60, 0.7);
 
 // Extendable Silent Rules
 
@@ -95,6 +95,20 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+  .experimentsButton {
+    width: fit-content;
+    background-color: #4f4f4f;
+    align-self: flex-start;
+    display: inline-block;
+    cursor: pointer;
+    color: #e8e8e8;
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 0.3rem 0.7rem;
+    margin: 0.5rem 1rem;
+    text-decoration: none;
+    outline: none;
+  }
   .firstCell {
     display: flex;
     flex-flow: row nowrap;
@@ -163,6 +177,7 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   }
 
   .rowGroup {
+    font-family: 'monospace';
     margin: 0.5rem 0;
   }
   .normalRowGroup {
@@ -186,13 +201,13 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   }
   .td {
     padding: 0 0.25rem;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     line-height: 2rem;
     align-items: center;
   }
   .experimentCell {
     text-align: left;
-    padding-left: 1rem;
+    padding-left: 0.7rem;
   }
   .groupedCell,
   .groupedHeader {
@@ -205,30 +220,57 @@ $row-bg-alt-color: rgb(60, 60, 60, 1);
   .parentHeaderCell {
     text-align: left;
     padding: 0.1rem 0.2rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
   .headersRow {
     text-align: center;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
+    user-select: none;
+    background-color: inherit;
+    border-bottom: 1px solid white;
     .th {
+      border-bottom: 2px solid rgba(255, 255, 255, 0.5);
       padding: 0.4rem 0.25rem;
+    }
+    .sortedHeader {
+      border-bottom: 2px solid rgba(255, 255, 255);
     }
   }
 }
+.webviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.experimentsButton:hover {
+  background-color: #414141;
+}
+.experimentsButton:active {
+  position: relative;
+  top: 1px;
+}
 
 .pageHeading {
-  font-size: 2rem;
+  font-size: 1.6rem;
   margin: 1rem;
 }
 
 .optionsPanel {
   margin: 0.5rem 1rem;
+  summary {
+    outline: none;
+  }
 }
 
 .tableOptions {
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
   padding: 0 1rem;
+  button {
+    background-color: rgb(54, 54, 54);
+  }
 }

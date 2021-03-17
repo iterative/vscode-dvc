@@ -1,6 +1,7 @@
 * {
   box-sizing: border-box;
   outline: none;
+  font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 html,
@@ -11,10 +12,10 @@ body,
 
 .react-root {
   display: inline-block;
+  max-width: fit-content;
+  width: inherit;
 }
-
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0px;
   padding: 0px;
   border: 0px;

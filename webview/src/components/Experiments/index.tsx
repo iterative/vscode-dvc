@@ -68,7 +68,9 @@ export const ExperimentsTable: React.FC<{
 }> = ({ experiments: rawExperiments }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<Experiment>> = {}
+    const defaultColumn: Partial<Column<Experiment>> = {
+      width: 110
+    }
     return [initialState, defaultColumn]
   }, [])
 
@@ -83,7 +85,7 @@ export const ExperimentsTable: React.FC<{
           if (id === 'workspace') return id
           return id.slice(0, 7)
         },
-        width: 200
+        width: 150
       },
       {
         Header: 'Timestamp',
@@ -148,8 +150,8 @@ export const ExperimentsTable: React.FC<{
   return (
     <>
       <div className={styles.tableOptions}>
-        <SortIndicator instance={instance} />
         <ManageColumns instance={instance} />
+        <SortIndicator instance={instance} />
       </div>
       <Table instance={instance} />
     </>
@@ -163,6 +165,7 @@ const Experiments: React.FC<{
   return (
     <div className={styles.experiments}>
       <button
+        className={styles.experimentsButton}
         onClick={() => {
           vsCodeApi.postMessage({
             type: MessageFromWebviewType.onClickRunExperiment
