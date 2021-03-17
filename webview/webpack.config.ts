@@ -1,3 +1,4 @@
+import { WebviewType } from 'dvc/src/webviews/experiments/contract'
 import webpack, { Plugin } from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { resolve } from 'path'
@@ -73,7 +74,7 @@ module.exports = {
   plugins: (() => {
     const plugins: Plugin[] = [
       new HtmlWebpackPlugin({
-        title: 'Experiments'
+        title: WebviewType
       }),
       new ForkTsCheckerWebpackPlugin(),
       new CleanWebpackPlugin()

@@ -36,7 +36,7 @@ export class Extension {
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly manager: DvcWebviewManager
+  private readonly webviewManager: DvcWebviewManager
 
   private getDefaultCwd = (): string => {
     const { workspaceFolders } = workspace
@@ -64,7 +64,7 @@ export class Extension {
     const { experiments, outputHash } = await this.getExperimentsTableData()
     if (outputHash !== this.lastExperimentsOutputHash) {
       this.lastExperimentsOutputHash = outputHash
-      this.manager.refreshAll(experiments)
+      this.webviewManager.refreshExperiments(experiments)
     }
   }
 
@@ -87,7 +87,7 @@ export class Extension {
 
     this.config = new Config()
 
-    this.manager = this.dispose.track(
+    this.webviewManager = this.dispose.track(
       new DvcWebviewManager(this.config, this.resourceLocator)
     )
 
@@ -106,7 +106,9 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.showExperiments', async () => {
-        const dvcWebview = this.dispose.track(await this.manager.findOrCreate())
+        const dvcWebview = this.dispose.track(
+          await this.webviewManager.findOrCreateExperiments()
+        )
         try {
           const { experiments } = await this.getExperimentsTableData()
           dvcWebview.showExperiments({ tableData: experiments })

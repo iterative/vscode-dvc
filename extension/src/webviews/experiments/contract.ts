@@ -1,3 +1,5 @@
+export const WebviewType = 'Experiments'
+
 export interface WindowWithWebviewData {
   webviewData: {
     publicPath: string
