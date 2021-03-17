@@ -184,10 +184,11 @@ export class DvcExperimentsWebview {
 }
 
 export class DvcWebviewManager {
-  public readonly dispose = Disposable.fn()
   private readonly openedWebviews: {
     experiments?: DvcExperimentsWebview
   }
+
+  public readonly dispose = Disposable.fn()
 
   constructor(
     private readonly config: Config,
