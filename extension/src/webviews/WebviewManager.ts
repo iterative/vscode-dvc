@@ -1,14 +1,14 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { ResourceLocator } from './ResourceLocator'
-import { DvcExperimentsWebview } from './DvcExperimentsWebview'
-import { Config } from './Config'
-import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
+import { ResourceLocator } from '../ResourceLocator'
+import { ExperimentsWebview } from './experiments/ExperimentsWebview'
+import { Config } from '../Config'
+import { ExperimentsRepoJSONOutput } from './experiments/contract'
 
-export class DvcWebviewManager {
+export class WebviewManager {
   public readonly dispose = Disposable.fn()
   private readonly openedWebviews: {
-    experiments?: DvcExperimentsWebview
+    experiments?: ExperimentsWebview
   }
 
   constructor(
@@ -17,9 +17,9 @@ export class DvcWebviewManager {
   ) {
     this.openedWebviews = {}
     this.dispose.track(
-      window.registerWebviewPanelSerializer(DvcExperimentsWebview.viewKey, {
+      window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (panel: WebviewPanel) => {
-          DvcExperimentsWebview.restore(panel, this.config).then(view => {
+          ExperimentsWebview.restore(panel, this.config).then(view => {
             this.addExperiments(view)
           })
         }
@@ -35,13 +35,13 @@ export class DvcWebviewManager {
     })
   }
 
-  public async findOrCreateExperiments(): Promise<DvcExperimentsWebview> {
+  public async findOrCreateExperiments(): Promise<ExperimentsWebview> {
     const experiments = this.openedWebviews.experiments
     if (experiments) {
       return experiments.reveal()
     }
 
-    const view = await DvcExperimentsWebview.create(
+    const view = await ExperimentsWebview.create(
       this.config,
       this.resourceLocator
     )
@@ -53,7 +53,7 @@ export class DvcWebviewManager {
     this.openedWebviews?.experiments?.showExperiments({ tableData })
   }
 
-  private addExperiments(view: DvcExperimentsWebview) {
+  private addExperiments(view: ExperimentsWebview) {
     this.openedWebviews.experiments = view
     view.onDidDispose(() => {
       this.openedWebviews.experiments = undefined
