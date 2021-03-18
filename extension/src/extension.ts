@@ -104,8 +104,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.showExperiments', async () => {
-        this.dispose.track(await this.webviewManager.findOrCreateExperiments())
-        return this.refreshExperimentsWebview()
+        return this.showExperimentsWebview()
       })
     )
 
