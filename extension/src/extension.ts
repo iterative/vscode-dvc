@@ -59,16 +59,19 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
-    const experiments = await this.getExperimentsTableData()
-    return this.webviewManager.refreshExperiments(experiments)
-  }
-
-  private async getExperimentsTableData() {
     const dvcReaderOptions = await inferDefaultOptions(
       this.getDefaultCwd(),
       this.config.dvcPath
     )
-    return getExperiments(dvcReaderOptions)
+
+    const experiments = await getExperiments(dvcReaderOptions)
+    return this.webviewManager.refreshExperiments(experiments)
+  }
+
+  private showExperimentsWebview = async () => {
+    const webview = await this.webviewManager.findOrCreateExperiments()
+    this.refreshExperimentsWebview()
+    return webview
   }
 
   constructor(context: ExtensionContext) {
@@ -109,7 +112,7 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async () => {
         runExperiment()
-        commands.executeCommand('dvc.showExperiments')
+        this.showExperimentsWebview()
       })
     )
 
