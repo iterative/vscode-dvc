@@ -66,10 +66,15 @@ export class WebviewManager {
     }
   }
 
-  private addExperiments(view: ExperimentsWebview) {
+  private addExperiments = (view: ExperimentsWebview) => {
     this.openedWebviews.experiments = view
     view.onDidDispose(() => {
-      this.openedWebviews.experiments = undefined
+      this.resetExperiments()
     })
+  }
+
+  private resetExperiments = () => {
+    this.openedWebviews.experiments = undefined
+    this.lastExperimentsOutputHash = ''
   }
 }
