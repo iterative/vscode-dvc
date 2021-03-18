@@ -53,7 +53,9 @@ export class WebviewManager {
     return experimentsWebview
   }
 
-  public refreshExperiments(tableData: ExperimentsRepoJSONOutput | null): void {
+  public refreshExperiments = (
+    tableData: ExperimentsRepoJSONOutput | null
+  ): void => {
     const outputHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
