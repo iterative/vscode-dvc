@@ -110,7 +110,7 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async () => {
         runExperiment()
-        commands.executeCommand('dvc.showExperiments')
+        this.showExperimentsWebview()
       })
     )
 
