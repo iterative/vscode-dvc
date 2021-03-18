@@ -70,7 +70,7 @@ export class Extension {
 
   private showExperimentsWebview = async () => {
     await this.webviewManager.findOrCreateExperiments()
-    // return this.refreshExperimentsWebview()
+    return this.refreshExperimentsWebview()
   }
 
   constructor(context: ExtensionContext) {
