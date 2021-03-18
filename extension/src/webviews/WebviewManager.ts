@@ -39,7 +39,7 @@ export class WebviewManager {
     })
   }
 
-  public async findOrCreateExperiments(): Promise<ExperimentsWebview> {
+  public findOrCreateExperiments = async (): Promise<ExperimentsWebview> => {
     const experiments = this.openedWebviews.experiments
     if (experiments) {
       return experiments.reveal()
@@ -53,7 +53,9 @@ export class WebviewManager {
     return experimentsWebview
   }
 
-  public refreshExperiments(tableData: ExperimentsRepoJSONOutput | null): void {
+  public refreshExperiments = (
+    tableData: ExperimentsRepoJSONOutput | null
+  ): void => {
     const outputHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
@@ -66,10 +68,15 @@ export class WebviewManager {
     }
   }
 
-  private addExperiments(view: ExperimentsWebview) {
+  private addExperiments = (view: ExperimentsWebview) => {
     this.openedWebviews.experiments = view
     view.onDidDispose(() => {
-      this.openedWebviews.experiments = undefined
+      this.resetExperiments()
     })
+  }
+
+  private resetExperiments = () => {
+    this.openedWebviews.experiments = undefined
+    this.lastExperimentsOutputHash = ''
   }
 }
