@@ -28,7 +28,12 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      await commands.executeCommand('dvc.showExperiments')
+      try {
+        await commands.executeCommand('dvc.showExperiments')
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e)
+      }
 
       expect(window.activeTextEditor).to.be.undefined
       expect(windowSpy).to.have.been.calledOnce
