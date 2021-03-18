@@ -63,6 +63,10 @@ export class ExperimentsWebview {
     return this
   }
 
+  public isActive = () => this.webviewPanel.active
+
+  public isVisible = () => this.webviewPanel.visible
+
   private constructor(
     private readonly webviewPanel: WebviewPanel,
     private readonly config: Config

@@ -6,7 +6,7 @@ import { window, commands, workspace, Uri } from 'vscode'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../dvcReader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
-import { delay } from '../../util'
+import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -22,7 +22,22 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.showExperiments', () => {
-    it('should be able to open a single experiments webview', async () => {
+    it('should be able to make the experiments webview visible', async () => {
+      const mockReader = stub(DvcReader, 'getExperiments').resolves(
+        complexExperimentsOutput
+      )
+
+      const experimentsWebview = (await commands.executeCommand(
+        'dvc.showExperiments'
+      )) as ExperimentsWebview
+
+      expect(experimentsWebview.isActive()).to.be.true
+      expect(experimentsWebview.isVisible()).to.be.true
+
+      mockReader.restore()
+    })
+
+    it('should only be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(demoFolderLocation, 'train.py'))
 
@@ -35,28 +50,33 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      await commands.executeCommand('dvc.showExperiments')
+      const experimentsWebview = (await commands.executeCommand(
+        'dvc.showExperiments'
+      )) as ExperimentsWebview
 
-      await delay(50)
+      expect(experimentsWebview.isActive()).to.be.true
+      expect(experimentsWebview.isVisible()).to.be.true
+
       expect(windowSpy).to.have.been.calledOnce
       expect(mockReader).to.have.been.calledOnce
+
       windowSpy.resetHistory()
       mockReader.resetHistory()
 
-      expect(window.activeTextEditor).to.be.undefined
-
       await commands.executeCommand('workbench.action.previousEditor')
-
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      await commands.executeCommand('dvc.showExperiments')
+      expect(experimentsWebview.isActive()).to.be.false
 
-      await delay(50)
+      const sameWebview = await commands.executeCommand('dvc.showExperiments')
+
+      expect(experimentsWebview === sameWebview).to.be.true
+
       expect(windowSpy).not.to.have.been.called
       expect(mockReader).to.have.been.calledOnce
+
       windowSpy.restore()
       mockReader.restore()
-      expect(window.activeTextEditor).to.be.undefined
     })
   })
 
