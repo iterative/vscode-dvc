@@ -40,11 +40,11 @@ export class Extension {
 
   private getDefaultCwd = (): string => {
     const { workspaceFolders } = workspace
-    // if (!workspaceFolders || workspaceFolders.length === 0) {
-    //   throw new Error('There are no folders in the Workspace to operate on!')
-    // }
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      throw new Error('There are no folders in the Workspace to operate on!')
+    }
 
-    return workspaceFolders?.[0].uri.fsPath || ''
+    return workspaceFolders?.[0].uri.fsPath
   }
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
@@ -59,16 +59,18 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
-    const experiments = await this.getExperimentsTableData()
-    return this.webviewManager.refreshExperiments(experiments)
-  }
-
-  private async getExperimentsTableData() {
     const dvcReaderOptions = await inferDefaultOptions(
       this.getDefaultCwd(),
       this.config.dvcPath
     )
-    return getExperiments(dvcReaderOptions)
+
+    const experiments = await getExperiments(dvcReaderOptions)
+    return this.webviewManager.refreshExperiments(experiments)
+  }
+
+  private showExperimentsWebview = async () => {
+    await this.webviewManager.findOrCreateExperiments()
+    return this.refreshExperimentsWebview()
   }
 
   constructor(context: ExtensionContext) {
@@ -100,10 +102,9 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.showExperiments', async () => {
-        this.dispose.track(await this.webviewManager.findOrCreateExperiments())
-        return this.refreshExperimentsWebview()
-      })
+      commands.registerCommand('dvc.showExperiments', async () =>
+        this.showExperimentsWebview()
+      )
     )
 
     this.dispose.track(
