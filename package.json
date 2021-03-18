@@ -11,7 +11,7 @@
     "lint:tsc": "tsc --noEmit",
     "lint": "run-p 'lint:*'",
     "test-build-extension": "yarn workspace dvc run test-vscode-build",
-    "test-vscode-build": "run-p build-ui  test-build-extension",
+    "test-vscode-build": "run-p build-ui test-build-extension",
     "test-vscode-run": "yarn workspace dvc run test-vscode-run",
     "test:vscode": "run-s test-vscode-build test-vscode-run",
     "test:jest": "yarn workspaces run test",
