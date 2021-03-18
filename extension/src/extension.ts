@@ -44,7 +44,7 @@ export class Extension {
       throw new Error('There are no folders in the Workspace to operate on!')
     }
 
-    return workspaceFolders?.[0].uri.fsPath
+    return workspaceFolders[0].uri.fsPath
   }
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
