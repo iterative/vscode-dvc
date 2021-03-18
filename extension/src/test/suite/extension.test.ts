@@ -2,7 +2,7 @@ import { describe, it, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { window, commands, workspace } from 'vscode'
+import { window, commands, workspace, Uri } from 'vscode'
 import { join } from 'path'
 
 chai.use(sinonChai)
@@ -11,19 +11,42 @@ const { expect } = chai
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
+  const demoFolderLocation = '../../../../demo'
+
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
+    await commands.executeCommand('workbench.action.closeAllEditors')
   })
 
-  describe('experiments webview', () => {
-    it('should be able to open the experiments webview', async () => {
+  describe('dvc.showExperiments', () => {
+    it('should be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
-      commands.executeCommand('dvc.showExperiments')
+      const uri = Uri.file(join(__dirname, demoFolderLocation, 'train.py'))
+
+      const document = await workspace.openTextDocument(uri)
+      await window.showTextDocument(document)
+
+      expect(window.activeTextEditor).not.to.be.undefined
+
+      await commands.executeCommand('dvc.showExperiments')
+
+      expect(window.activeTextEditor).to.be.undefined
       expect(windowSpy).to.have.been.calledOnce
-    })
+
+      windowSpy.resetHistory()
+
+      await commands.executeCommand('workbench.action.previousEditor')
+
+      expect(window.activeTextEditor).not.to.be.undefined
+
+      await commands.executeCommand('dvc.showExperiments')
+
+      expect(window.activeTextEditor).to.be.undefined
+      expect(windowSpy).not.to.have.been.called
+    }).timeout(8000)
   })
 
-  describe('dvc binary path picker', () => {
+  describe('dvc.selectDvcPath', () => {
     it('should be able to select the default dvc path', async () => {
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
