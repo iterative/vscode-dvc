@@ -55,12 +55,12 @@ export class Extension {
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
-    return addFileChangeHandler(refsPath, this.refreshExperimentWebview)
+    return addFileChangeHandler(refsPath, this.refreshExperimentsWebview)
   }
 
-  private refreshExperimentWebview = async () => {
+  private refreshExperimentsWebview = async () => {
     const experiments = await this.getExperimentsTableData()
-    this.webviewManager.refreshExperiments(experiments)
+    return this.webviewManager.refreshExperiments(experiments)
   }
 
   private async getExperimentsTableData() {
@@ -101,15 +101,8 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.showExperiments', async () => {
-        const dvcWebview = this.dispose.track(
-          await this.webviewManager.findOrCreateExperiments()
-        )
-        try {
-          const experiments = await this.getExperimentsTableData()
-          dvcWebview.showExperiments({ tableData: experiments })
-        } catch (e) {
-          dvcWebview.showExperiments({ errors: [e.toString()] })
-        }
+        this.dispose.track(await this.webviewManager.findOrCreateExperiments())
+        return this.refreshExperimentsWebview()
       })
     )
 
