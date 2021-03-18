@@ -40,11 +40,11 @@ export class Extension {
 
   private getDefaultCwd = (): string => {
     const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      throw new Error('There are no folders in the Workspace to operate on!')
-    }
+    // if (!workspaceFolders || workspaceFolders.length === 0) {
+    //   throw new Error('There are no folders in the Workspace to operate on!')
+    // }
 
-    return workspaceFolders[0].uri.fsPath
+    return workspaceFolders?.[0].uri.fsPath || ''
   }
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
