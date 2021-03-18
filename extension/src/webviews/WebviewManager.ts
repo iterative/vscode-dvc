@@ -45,12 +45,12 @@ export class WebviewManager {
       return experiments.reveal()
     }
 
-    const view = await ExperimentsWebview.create(
+    const experimentsWebview = await ExperimentsWebview.create(
       this.config,
       this.resourceLocator
     )
-    this.addExperiments(view)
-    return view
+    this.addExperiments(experimentsWebview)
+    return experimentsWebview
   }
 
   public refreshExperiments(tableData: ExperimentsRepoJSONOutput | null): void {
@@ -60,7 +60,9 @@ export class WebviewManager {
 
     if (outputHash !== this.lastExperimentsOutputHash) {
       this.lastExperimentsOutputHash = outputHash
-      this.openedWebviews?.experiments?.showExperiments({ tableData })
+      this.openedWebviews?.experiments?.showExperiments({
+        tableData
+      })
     }
   }
 
