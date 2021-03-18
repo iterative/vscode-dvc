@@ -61,16 +61,10 @@ export class WebviewManager {
       .digest('base64')
 
     if (outputHash !== this.lastExperimentsOutputHash) {
-      try {
-        this.openedWebviews?.experiments?.showExperiments({
-          tableData
-        })
-        this.lastExperimentsOutputHash = outputHash
-      } catch (e) {
-        this.openedWebviews?.experiments?.showExperiments({
-          errors: [e.toString()]
-        })
-      }
+      this.lastExperimentsOutputHash = outputHash
+      this.openedWebviews?.experiments?.showExperiments({
+        tableData
+      })
     }
   }
 

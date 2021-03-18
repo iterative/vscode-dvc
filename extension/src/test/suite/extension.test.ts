@@ -4,6 +4,9 @@ import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
 import { join, resolve } from 'path'
+import * as DvcReader from '../../dvcReader'
+import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
+import { delay } from '../../util'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -23,10 +26,9 @@ suite('Extension Test Suite', () => {
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(demoFolderLocation, 'train.py'))
 
-      // TODO: fix as part of #171
-      await workspace
-        .getConfiguration()
-        .update('dvc.dvcPath', join('.env', 'bin', 'dvc'))
+      const mockReader = stub(DvcReader, 'getExperiments').resolves(
+        complexExperimentsOutput
+      )
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
@@ -35,10 +37,13 @@ suite('Extension Test Suite', () => {
 
       await commands.executeCommand('dvc.showExperiments')
 
-      expect(window.activeTextEditor).to.be.undefined
+      await delay(50)
       expect(windowSpy).to.have.been.calledOnce
-
+      expect(mockReader).to.have.been.calledOnce
       windowSpy.resetHistory()
+      mockReader.resetHistory()
+
+      expect(window.activeTextEditor).to.be.undefined
 
       await commands.executeCommand('workbench.action.previousEditor')
 
@@ -46,11 +51,13 @@ suite('Extension Test Suite', () => {
 
       await commands.executeCommand('dvc.showExperiments')
 
-      expect(window.activeTextEditor).to.be.undefined
+      await delay(50)
       expect(windowSpy).not.to.have.been.called
-
+      expect(mockReader).to.have.been.calledOnce
       windowSpy.restore()
-    }).timeout(8000)
+      mockReader.restore()
+      expect(window.activeTextEditor).to.be.undefined
+    })
   })
 
   describe('dvc.selectDvcPath', () => {
