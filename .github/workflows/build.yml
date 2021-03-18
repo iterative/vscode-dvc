@@ -47,7 +47,7 @@ jobs:
 
       - run: xvfb-run -a yarn run-p lint test
 
-      - run: yarn run-p "build -o ./vscode-dvc.vsix" build-storybook
+      - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
 
       - name: Publish to Chromatic
         uses: chromaui/action@v1
