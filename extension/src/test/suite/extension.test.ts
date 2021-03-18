@@ -28,9 +28,7 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const experimentsWebview = await commands.executeCommand(
-        'dvc.showExperiments'
-      )
+      await commands.executeCommand('dvc.showExperiments')
 
       expect(window.activeTextEditor).to.be.undefined
       expect(windowSpy).to.have.been.calledOnce
@@ -41,9 +39,7 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await commands.executeCommand('dvc.showExperiments')
-
-      expect(experimentsWebview === sameWebview).is.true
+      await commands.executeCommand('dvc.showExperiments')
 
       expect(window.activeTextEditor).to.be.undefined
       expect(windowSpy).not.to.have.been.called
