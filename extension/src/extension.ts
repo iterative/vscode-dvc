@@ -47,8 +47,6 @@ export class Extension {
     return workspaceFolders[0].uri.fsPath
   }
 
-  private lastExperimentsOutputHash = ''
-
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const cwd = this.getDefaultCwd()
     const refsPath = await getExperimentsRefsPath(cwd)
@@ -57,23 +55,23 @@ export class Extension {
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
-    return addFileChangeHandler(refsPath, this.refreshWebviews)
+    return addFileChangeHandler(refsPath, this.refreshExperimentsWebview)
   }
 
-  private refreshWebviews = async () => {
-    const { experiments, outputHash } = await this.getExperimentsTableData()
-    if (outputHash !== this.lastExperimentsOutputHash) {
-      this.lastExperimentsOutputHash = outputHash
-      this.webviewManager.refreshExperiments(experiments)
-    }
-  }
-
-  private async getExperimentsTableData() {
+  private refreshExperimentsWebview = async () => {
     const dvcReaderOptions = await inferDefaultOptions(
       this.getDefaultCwd(),
       this.config.dvcPath
     )
-    return getExperiments(dvcReaderOptions)
+
+    const experiments = await getExperiments(dvcReaderOptions)
+    return this.webviewManager.refreshExperiments(experiments)
+  }
+
+  private showExperimentsWebview = async () => {
+    const webview = await this.webviewManager.findOrCreateExperiments()
+    this.refreshExperimentsWebview()
+    return webview
   }
 
   constructor(context: ExtensionContext) {
@@ -106,22 +104,15 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.showExperiments', async () => {
-        const dvcWebview = this.dispose.track(
-          await this.webviewManager.findOrCreateExperiments()
-        )
-        try {
-          const { experiments } = await this.getExperimentsTableData()
-          dvcWebview.showExperiments({ tableData: experiments })
-        } catch (e) {
-          dvcWebview.showExperiments({ errors: [e.toString()] })
-        }
+        this.dispose.track(await this.webviewManager.findOrCreateExperiments())
+        return this.refreshExperimentsWebview()
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async () => {
         runExperiment()
-        commands.executeCommand('dvc.showExperiments')
+        this.showExperimentsWebview()
       })
     )
 

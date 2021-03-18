@@ -54,7 +54,6 @@ test('Command-mocked getExperiments matches a snapshot when parsed', async () =>
     }) as PromiseWithChild<{ stdout: string; stderr: string }>
   )
 
-  const { experiments, outputHash } = await getExperiments(testReaderOptions)
+  const experiments = await getExperiments(testReaderOptions)
   expect(experiments).toMatchSnapshot()
-  expect(outputHash).toEqual('q8bw/2qL0rYstYzbwwCZK1RgRGo=')
 })

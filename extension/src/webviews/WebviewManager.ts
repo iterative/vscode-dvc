@@ -1,5 +1,6 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { ExperimentsWebview } from './experiments/ExperimentsWebview'
 import { Config } from '../Config'
@@ -11,6 +12,8 @@ export class WebviewManager {
   }
 
   public readonly dispose = Disposable.fn()
+
+  private lastExperimentsOutputHash = ''
 
   constructor(
     private readonly config: Config,
@@ -36,28 +39,44 @@ export class WebviewManager {
     })
   }
 
-  public async findOrCreateExperiments(): Promise<ExperimentsWebview> {
+  public findOrCreateExperiments = async (): Promise<ExperimentsWebview> => {
     const experiments = this.openedWebviews.experiments
     if (experiments) {
       return experiments.reveal()
     }
 
-    const view = await ExperimentsWebview.create(
+    const experimentsWebview = await ExperimentsWebview.create(
       this.config,
       this.resourceLocator
     )
-    this.addExperiments(view)
-    return view
+    this.addExperiments(experimentsWebview)
+    return experimentsWebview
   }
 
-  public refreshExperiments(tableData: ExperimentsRepoJSONOutput | null): void {
-    this.openedWebviews?.experiments?.showExperiments({ tableData })
+  public refreshExperiments = (
+    tableData: ExperimentsRepoJSONOutput | null
+  ): void => {
+    const outputHash = createHash('sha1')
+      .update(JSON.stringify(tableData))
+      .digest('base64')
+
+    if (outputHash !== this.lastExperimentsOutputHash) {
+      this.lastExperimentsOutputHash = outputHash
+      this.openedWebviews?.experiments?.showExperiments({
+        tableData
+      })
+    }
   }
 
-  private addExperiments(view: ExperimentsWebview) {
+  private addExperiments = (view: ExperimentsWebview) => {
     this.openedWebviews.experiments = view
     view.onDidDispose(() => {
-      this.openedWebviews.experiments = undefined
+      this.resetExperiments()
     })
+  }
+
+  private resetExperiments = () => {
+    this.openedWebviews.experiments = undefined
+    this.lastExperimentsOutputHash = ''
   }
 }
