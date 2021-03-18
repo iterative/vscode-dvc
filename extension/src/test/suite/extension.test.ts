@@ -11,7 +11,7 @@ const { expect } = chai
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
-  const demoFolderLocation = '../../../../demo'
+  const demoFolderLocation = join(__dirname, '..', '..', '..', '..', 'demo')
 
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
@@ -21,12 +21,12 @@ suite('Extension Test Suite', () => {
   describe('dvc.showExperiments', () => {
     it('should be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(join(__dirname, demoFolderLocation, 'train.py'))
+      const uri = Uri.file(join(demoFolderLocation, 'train.py'))
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
 
-      expect(window.activeTextEditor).not.to.be.undefined
+      expect(window.activeTextEditor?.document).to.deep.equal(document)
 
       await commands.executeCommand('dvc.showExperiments')
 
@@ -37,7 +37,7 @@ suite('Extension Test Suite', () => {
 
       await commands.executeCommand('workbench.action.previousEditor')
 
-      expect(window.activeTextEditor).not.to.be.undefined
+      expect(window.activeTextEditor?.document).to.deep.equal(document)
 
       await commands.executeCommand('dvc.showExperiments')
 
