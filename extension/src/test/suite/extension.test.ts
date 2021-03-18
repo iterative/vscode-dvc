@@ -43,6 +43,8 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor).to.be.undefined
       expect(windowSpy).not.to.have.been.called
+
+      windowSpy.restore()
     }).timeout(8000)
   })
 
