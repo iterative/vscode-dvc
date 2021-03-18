@@ -19,6 +19,10 @@ import { ResourceLocator } from '../../ResourceLocator'
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
 
+  public isActive = () => this.webviewPanel.active
+
+  public isVisible = () => this.webviewPanel.visible
+
   public static async restore(
     webviewPanel: WebviewPanel,
     config: Config
