@@ -2,8 +2,16 @@ import { describe, it, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { window, commands, workspace, Uri } from 'vscode'
-import { join, resolve } from 'path'
+import {
+  window,
+  commands,
+  workspace
+  // Uri
+} from 'vscode'
+import {
+  join
+  // resolve
+} from 'path'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -11,7 +19,7 @@ const { expect } = chai
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
-  const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
+  //   const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
@@ -21,12 +29,12 @@ suite('Extension Test Suite', () => {
   describe('dvc.showExperiments', () => {
     it('should be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(resolve(demoFolderLocation, 'train.py'))
+      //   const uri = Uri.file(resolve(demoFolderLocation, 'train.py'))
 
-      const document = await workspace.openTextDocument(uri)
-      await window.showTextDocument(document)
+      //   const document = await workspace.openTextDocument(uri)
+      //   await window.showTextDocument(document)
 
-      expect(window.activeTextEditor?.document).to.deep.equal(document)
+      //   expect(window.activeTextEditor?.document).to.deep.equal(document)
 
       await commands.executeCommand('dvc.showExperiments')
 
@@ -35,9 +43,9 @@ suite('Extension Test Suite', () => {
 
       windowSpy.resetHistory()
 
-      await commands.executeCommand('workbench.action.previousEditor')
+      //   await commands.executeCommand('workbench.action.previousEditor')
 
-      expect(window.activeTextEditor?.document).to.deep.equal(document)
+      //   expect(window.activeTextEditor?.document).to.deep.equal(document)
 
       await commands.executeCommand('dvc.showExperiments')
 
