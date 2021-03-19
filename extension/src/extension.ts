@@ -38,17 +38,8 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
 
-  private getDefaultCwd = (): string => {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      throw new Error('There are no folders in the Workspace to operate on!')
-    }
-
-    return workspaceFolders[0].uri.fsPath
-  }
-
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
-    const cwd = this.getDefaultCwd()
+    const cwd = this.config.workspaceRoot
     const refsPath = await getExperimentsRefsPath(cwd)
     if (!refsPath) {
       throw new Error(
@@ -60,7 +51,7 @@ export class Extension {
 
   private refreshExperimentsWebview = async () => {
     const dvcReaderOptions = await inferDefaultOptions(
-      this.getDefaultCwd(),
+      this.config.workspaceRoot,
       this.config.dvcPath
     )
 

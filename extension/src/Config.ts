@@ -11,6 +11,7 @@ import { WebviewColorTheme } from './webviews/experiments/contract'
 
 export class Config {
   public readonly dispose = Disposable.fn()
+  public readonly workspaceRoot: string
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -32,8 +33,17 @@ export class Config {
   private overrideStatusBar = () => {
     const dvcPath = process.env.DVCPATH
     if (dvcPath) {
-      this.updateDvcPathStatusBarItem(dvcPath)
+      this.setDvcPath(dvcPath)
     }
+  }
+
+  private getWorkspaceRoot = (): string => {
+    const { workspaceFolders } = workspace
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      throw new Error('There are no folders in the Workspace to operate on!')
+    }
+
+    return workspaceFolders[0].uri.fsPath
   }
 
   public get dvcPath(): string {
@@ -75,6 +85,9 @@ export class Config {
 
   constructor() {
     makeObservable(this)
+
+    this.workspaceRoot = this.getWorkspaceRoot()
+
     this._vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
