@@ -8,10 +8,14 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
+import glob from 'tiny-glob'
+import { join } from 'path'
+import { accessSync } from 'fs-extra'
 
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
+  public dvcBinPath: string | undefined
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -44,6 +48,36 @@ export class Config {
     }
 
     return workspaceFolders[0].uri.fsPath
+  }
+
+  private getBinaryPath = async (): Promise<string | undefined> => {
+    try {
+      accessSync('dvc')
+      return 'dvc'
+    } catch {}
+
+    try {
+      accessSync(this.dvcPath)
+      return this.dvcPath
+    } catch {}
+
+    const files = await glob(join('**', this.dvcPath), {
+      absolute: true,
+      flush: true,
+      filesOnly: true,
+      cwd: this.workspaceRoot
+    })
+
+    return files.find(file => {
+      try {
+        accessSync(file)
+        return file
+      } catch {}
+    })
+  }
+
+  private setDvcBinPath = async (): Promise<void> => {
+    this.dvcBinPath = await this.getBinaryPath()
   }
 
   public get dvcPath(): string {
@@ -88,6 +122,8 @@ export class Config {
 
     this.workspaceRoot = this.getWorkspaceRoot()
 
+    this.setDvcBinPath()
+
     this._vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
@@ -103,6 +139,7 @@ export class Config {
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
           this.updateDvcPathStatusBarItem()
+          this.setDvcBinPath()
         }
       })
     )
