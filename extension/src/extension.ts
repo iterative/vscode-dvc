@@ -17,7 +17,7 @@ import {
 
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments, inferDefaultOptions } from './dvcReader'
+import { getExperiments } from './dvcReader'
 
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
@@ -50,12 +50,10 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
-    const dvcReaderOptions = await inferDefaultOptions(
-      this.config.workspaceRoot,
-      this.config.dvcPath
-    )
-
-    const experiments = await getExperiments(dvcReaderOptions)
+    const experiments = await getExperiments({
+      cwd: this.config.workspaceRoot,
+      bin: this.config.dvcBinPath
+    })
     return this.webviewManager.refreshExperiments(experiments)
   }
 
