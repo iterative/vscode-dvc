@@ -129,7 +129,7 @@
         },
         {
           "command": "dvc.checkout",
-          "when": "isFileSystemResource",
+          "when": "resourceExtname == .dvc",
           "group": "8_dvc@3"
         },
         {

@@ -22,6 +22,7 @@ import { getExperiments, inferDefaultOptions } from './dvcReader'
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
+import { DVCDecorationProvider } from './DecorationProvider'
 
 export { Disposable }
 
@@ -88,6 +89,8 @@ export class Extension {
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
+
+    this.dispose.track(new DVCDecorationProvider())
 
     this.onChangeExperimentsUpdateWebview().then(disposable =>
       this.dispose.track(disposable)
