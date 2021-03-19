@@ -55,22 +55,22 @@ const isFileAccessible = (path: string): boolean => {
   }
 }
 
-export const findBinaryPath = async (cwd: string, relativePath: string) => {
-  const filename = basename(relativePath)
+export const findBinaryPath = async (cwd: string, path: string) => {
+  const filename = basename(path)
   if (await isBinaryAccessible(filename)) {
     return filename
   }
 
-  if (isFileAccessible(relativePath)) {
-    return relativePath
+  if (isFileAccessible(path)) {
+    return path
   }
 
-  const defaultRelativePath = join(cwd, relativePath)
+  const defaultRelativePath = join(cwd, path)
   if (isFileAccessible(defaultRelativePath)) {
     return defaultRelativePath
   }
 
-  const files = await glob(join('**', relativePath), {
+  const files = await glob(join('**', path), {
     absolute: true,
     cwd,
     dot: true
