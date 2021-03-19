@@ -36,7 +36,7 @@ export class Config {
     if (dvcPath) {
       this.setDvcPath(dvcPath)
       this.updateDvcPathStatusBarItem(dvcPath)
-      return this.setDvcBinPath()
+      this.setDvcBinPath()
     }
   }
 
