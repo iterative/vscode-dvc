@@ -1,6 +1,10 @@
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
+import { accessSync } from 'fs-extra'
 import debounce from 'lodash.debounce'
+import { basename, join } from 'path'
+import { execPromise } from './util'
+import glob from 'tiny-glob'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -31,4 +35,50 @@ export const addFileChangeHandler = (
       fileWatcher.close()
     }
   }
+}
+
+export const isBinaryAccessible = async (bin: string): Promise<boolean> => {
+  try {
+    await execPromise(`${bin} --version`)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+export const isFileAccessible = (path: string): boolean => {
+  try {
+    accessSync(path)
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+export const findBinaryPath = async (cwd: string, relativePath: string) => {
+  const filename = basename(relativePath)
+  if (await isBinaryAccessible(filename)) {
+    return filename
+  }
+
+  if (isFileAccessible(relativePath)) {
+    return relativePath
+  }
+
+  const defaultRelativePath = join(cwd, relativePath)
+  if (isFileAccessible(defaultRelativePath)) {
+    return defaultRelativePath
+  }
+
+  const files = await glob(join('**', relativePath), {
+    absolute: true,
+    cwd,
+    dot: true
+  })
+
+  return files.find(file => {
+    if (isFileAccessible(file)) {
+      return file
+    }
+  })
 }

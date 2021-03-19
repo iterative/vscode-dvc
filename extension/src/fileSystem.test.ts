@@ -2,8 +2,15 @@ import * as fileSystem from './fileSystem'
 import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
+import { basename, join } from 'path'
 
-const { addFileChangeHandler, getWatcher } = fileSystem
+const {
+  addFileChangeHandler,
+  isBinaryAccessible,
+  isFileAccessible,
+  findBinaryPath,
+  getWatcher
+} = fileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -77,5 +84,66 @@ describe('getWatcher', () => {
     watcher('')
 
     expect(mockHandler).not.toBeCalled()
+  })
+})
+
+describe('isBinaryAccessible', () => {
+  it('should return true for a binary in the path', async () => {
+    const accessible = await isBinaryAccessible('git')
+
+    expect(accessible).toBe(true)
+  })
+
+  it('should return false for a binary which is not in the path', async () => {
+    const accessible = await isBinaryAccessible('iamnotabinary')
+
+    expect(accessible).toBe(false)
+  })
+})
+
+describe('isFileAccessible', () => {
+  it('should return true for an accessible file', async () => {
+    const accessible = isFileAccessible(__filename)
+
+    expect(accessible).toBe(true)
+  })
+
+  it('should return false for a non-existent file', async () => {
+    const accessible = isFileAccessible('/some/made/up/file/fun')
+
+    expect(accessible).toBe(false)
+  })
+})
+
+describe('findBinaryPath', () => {
+  it('should return a path given the name of an available binary', async () => {
+    const git = 'git'
+    const accessiblePath = await findBinaryPath(__dirname, git)
+    expect(accessiblePath).toEqual(git)
+  })
+
+  it('should return a path given an absolute path and no cwd', async () => {
+    const accessiblePath = await findBinaryPath('', __filename)
+    expect(accessiblePath).toEqual(__filename)
+  })
+
+  it('should return a path given a relative path and cwd', async () => {
+    const filename = basename(__filename)
+    const accessiblePath = await findBinaryPath(__dirname, filename)
+    expect(accessiblePath).toEqual(__filename)
+  })
+
+  it('should return a path given a relative path which does not exactly match the cwd', async () => {
+    const filename = basename(__filename)
+    const accessiblePath = await findBinaryPath(join(__dirname, '..'), filename)
+    expect(accessiblePath).toEqual(__filename)
+  })
+
+  it('should return undefined given a non-existent file to find', async () => {
+    const accessiblePath = await findBinaryPath(
+      join(__dirname, '..'),
+      'non-existent-file.ts'
+    )
+    expect(accessiblePath).toBeUndefined()
   })
 })
