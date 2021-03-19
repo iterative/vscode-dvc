@@ -4,13 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { basename, join } from 'path'
 
-const {
-  addFileChangeHandler,
-  isBinaryAccessible,
-  isFileAccessible,
-  findBinaryPath,
-  getWatcher
-} = fileSystem
+const { addFileChangeHandler, findBinaryPath, getWatcher } = fileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -84,34 +78,6 @@ describe('getWatcher', () => {
     watcher('')
 
     expect(mockHandler).not.toBeCalled()
-  })
-})
-
-describe('isBinaryAccessible', () => {
-  it('should return true for a binary in the path', async () => {
-    const accessible = await isBinaryAccessible('git')
-
-    expect(accessible).toBe(true)
-  })
-
-  it('should return false for a binary which is not in the path', async () => {
-    const accessible = await isBinaryAccessible('iamnotabinary')
-
-    expect(accessible).toBe(false)
-  })
-})
-
-describe('isFileAccessible', () => {
-  it('should return true for an accessible file', async () => {
-    const accessible = isFileAccessible(__filename)
-
-    expect(accessible).toBe(true)
-  })
-
-  it('should return false for a non-existent file', async () => {
-    const accessible = isFileAccessible('/some/made/up/file/fun')
-
-    expect(accessible).toBe(false)
   })
 })
 

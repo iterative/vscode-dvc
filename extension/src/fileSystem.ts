@@ -37,7 +37,7 @@ export const addFileChangeHandler = (
   }
 }
 
-export const isBinaryAccessible = async (bin: string): Promise<boolean> => {
+const isBinaryAccessible = async (bin: string): Promise<boolean> => {
   try {
     await execPromise(`${bin} --version`)
     return true
@@ -46,7 +46,7 @@ export const isBinaryAccessible = async (bin: string): Promise<boolean> => {
   }
 }
 
-export const isFileAccessible = (path: string): boolean => {
+const isFileAccessible = (path: string): boolean => {
   try {
     accessSync(path)
     return true
