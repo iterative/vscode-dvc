@@ -8,14 +8,11 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import glob from 'tiny-glob'
-import { join } from 'path'
-import { accessSync } from 'fs-extra'
-
+import { findBinaryPath } from './fileSystem'
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
-  public dvcBinPath: string | undefined
+  public dvcBinPath = 'dvc'
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -38,6 +35,8 @@ export class Config {
     const dvcPath = process.env.DVCPATH
     if (dvcPath) {
       this.setDvcPath(dvcPath)
+      this.updateDvcPathStatusBarItem(dvcPath)
+      return this.setDvcBinPath()
     }
   }
 
@@ -50,34 +49,11 @@ export class Config {
     return workspaceFolders[0].uri.fsPath
   }
 
-  private getBinaryPath = async (): Promise<string | undefined> => {
-    try {
-      accessSync('dvc')
-      return 'dvc'
-    } catch {}
-
-    try {
-      accessSync(this.dvcPath)
-      return this.dvcPath
-    } catch {}
-
-    const files = await glob(join('**', this.dvcPath), {
-      absolute: true,
-      flush: true,
-      filesOnly: true,
-      cwd: this.workspaceRoot
-    })
-
-    return files.find(file => {
-      try {
-        accessSync(file)
-        return file
-      } catch {}
-    })
-  }
-
   private setDvcBinPath = async (): Promise<void> => {
-    this.dvcBinPath = await this.getBinaryPath()
+    const path = await findBinaryPath(this.workspaceRoot, this.dvcPath)
+    if (path) {
+      this.dvcBinPath = path
+    }
   }
 
   public get dvcPath(): string {
@@ -122,8 +98,6 @@ export class Config {
 
     this.workspaceRoot = this.getWorkspaceRoot()
 
-    this.setDvcBinPath()
-
     this._vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
@@ -133,8 +107,6 @@ export class Config {
     )
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
-    this.overrideStatusBar()
-
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
@@ -143,5 +115,6 @@ export class Config {
         }
       })
     )
+    this.overrideStatusBar()
   }
 }
