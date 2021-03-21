@@ -37,9 +37,9 @@ export const addFileChangeHandler = (
   }
 }
 
-const isBinaryAccessible = async (bin: string): Promise<boolean> => {
+const isCliGlobal = async (name: string): Promise<boolean> => {
   try {
-    await execPromise(`${bin} --version`)
+    await execPromise(`${name} --version`)
     return true
   } catch (e) {
     return false
@@ -55,10 +55,10 @@ const isFileAccessible = (path: string): boolean => {
   }
 }
 
-export const findBinaryPath = async (cwd: string, path: string) => {
-  const filename = basename(path)
-  if (await isBinaryAccessible(filename)) {
-    return filename
+export const findCliPath = async (cwd: string, path: string) => {
+  const cliName = basename(path)
+  if (path === cliName && (await isCliGlobal(cliName))) {
+    return cliName
   }
 
   if (isFileAccessible(path)) {

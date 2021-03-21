@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { basename, join } from 'path'
 
-const { addFileChangeHandler, findBinaryPath, getWatcher } = fileSystem
+const { addFileChangeHandler, findCliPath, getWatcher } = fileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -81,35 +81,38 @@ describe('getWatcher', () => {
   })
 })
 
-describe('findBinaryPath', () => {
+describe('findCliPath', () => {
   it('should return a path given the name of an available binary', async () => {
-    const git = 'git'
-    const accessiblePath = await findBinaryPath(__dirname, git)
-    expect(accessiblePath).toEqual(git)
+    const mockWorkspace = __dirname
+    const cli = 'git'
+    const accessiblePath = await findCliPath(mockWorkspace, cli)
+    expect(accessiblePath).toEqual(cli)
   })
 
   it('should return a path given an absolute path and no cwd', async () => {
-    const accessiblePath = await findBinaryPath('', __filename)
-    expect(accessiblePath).toEqual(__filename)
+    const mockCli = __filename
+    const mockWorkspace = ''
+    const accessiblePath = await findCliPath(mockWorkspace, mockCli)
+    expect(accessiblePath).toEqual(mockCli)
   })
 
   it('should return a path given a relative path and cwd', async () => {
-    const filename = basename(__filename)
-    const accessiblePath = await findBinaryPath(__dirname, filename)
+    const mockCli = basename(__filename)
+    const mockWorkspace = __dirname
+    const accessiblePath = await findCliPath(mockWorkspace, mockCli)
     expect(accessiblePath).toEqual(__filename)
   })
 
   it('should return a path given a relative path which does not exactly match the cwd', async () => {
-    const filename = basename(__filename)
-    const accessiblePath = await findBinaryPath(join(__dirname, '..'), filename)
+    const mockCli = basename(__filename)
+    const mockWorkspace = __dirname
+    const accessiblePath = await findCliPath(join(mockWorkspace, '..'), mockCli)
     expect(accessiblePath).toEqual(__filename)
   })
 
   it('should return undefined given a non-existent file to find', async () => {
-    const accessiblePath = await findBinaryPath(
-      join(__dirname, '..'),
-      'non-existent-file.ts'
-    )
+    const mockWorkspace = __dirname
+    const accessiblePath = await findCliPath(mockWorkspace, 'non-existent-cli')
     expect(accessiblePath).toBeUndefined()
   })
 })

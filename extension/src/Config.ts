@@ -8,7 +8,8 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import { findBinaryPath } from './fileSystem'
+import { findCliPath } from './fileSystem'
+
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
@@ -36,7 +37,7 @@ export class Config {
     if (dvcPath) {
       this.setDvcPath(dvcPath)
       this.updateDvcPathStatusBarItem(dvcPath)
-      this.setDvcBinPath()
+      this.setDvcCliPath()
     }
   }
 
@@ -49,8 +50,8 @@ export class Config {
     return workspaceFolders[0].uri.fsPath
   }
 
-  private setDvcBinPath = async (): Promise<void> => {
-    const path = await findBinaryPath(this.workspaceRoot, this.dvcPath)
+  private setDvcCliPath = async (): Promise<void> => {
+    const path = await findCliPath(this.workspaceRoot, this.dvcPath)
     if (path) {
       this.dvcBinPath = path
     }
@@ -111,7 +112,7 @@ export class Config {
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
           this.updateDvcPathStatusBarItem()
-          this.setDvcBinPath()
+          this.setDvcCliPath()
         }
       })
     )
