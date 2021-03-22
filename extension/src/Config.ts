@@ -8,12 +8,14 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import { findCliPath } from './fileSystem'
+import { findCliPath, findDvcRoots } from './fileSystem'
+import { getRoot } from './cli/reader'
 
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
   public dvcCliPath = 'dvc'
+  public dvcRoots: string[] = []
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -94,6 +96,25 @@ export class Config {
     }
   }
 
+  findDvcRoots = async () => {
+    const roots = await findDvcRoots(this.workspaceRoot)
+    if (roots !== []) {
+      this.dvcRoots = roots
+      return
+    }
+    try {
+      const root = await getRoot({
+        cliPath: this.dvcCliPath,
+        cwd: this.workspaceRoot
+      })
+      if (root) {
+        this.dvcRoots = [root]
+      }
+    } catch (e) {
+      throw new Error('Could not find a root DVC folder')
+    }
+  }
+
   constructor() {
     makeObservable(this)
 
@@ -113,9 +134,11 @@ export class Config {
         if (e.affectsConfiguration('dvc.dvcPath')) {
           this.updateDvcPathStatusBarItem()
           this.setDvcCliPath()
+          this.findDvcRoots()
         }
       })
     )
     this.overrideStatusBar()
+    this.findDvcRoots()
   }
 }
