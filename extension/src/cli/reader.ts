@@ -17,9 +17,9 @@ const execCommand = (
   })
 }
 
-export const getExperiments: (
+export const getExperiments = async (
   options: ReaderOptions
-) => Promise<ExperimentsRepoJSONOutput> = async options => {
+): Promise<ExperimentsRepoJSONOutput> => {
   const { stdout } = await execCommand(options, EXPERIMENT_SHOW)
   return JSON.parse(stdout)
 }
