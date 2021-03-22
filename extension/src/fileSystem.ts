@@ -85,16 +85,6 @@ export const findCliPath = async (cwd: string, path: string) => {
   })
 }
 
-export const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
-  const files = await glob(join('**', '.dvc'), {
-    absolute: true,
-    cwd,
-    dot: true
-  })
-
-  return files.map(file => dirname(file)).filter(folder => folder !== cwd)
-}
-
 const findDvcAbsoluteRootPath = async (
   cwd: string,
   cliPath: string
@@ -106,6 +96,16 @@ const findDvcAbsoluteRootPath = async (
     })
     return resolve(cwd, root)
   } catch (e) {}
+}
+
+const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
+  const files = await glob(join('**', '.dvc'), {
+    absolute: true,
+    cwd,
+    dot: true
+  })
+
+  return files.map(file => dirname(file)).filter(folder => folder !== cwd)
 }
 
 export const findDvcRootPaths = async (
