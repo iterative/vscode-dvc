@@ -5,6 +5,7 @@ import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../dvcReader'
+import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
 
@@ -81,7 +82,9 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should be able to select the default dvc path', async () => {
+    it('should be able to select the default path (global installation) of the dvc cli', async () => {
+      const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves('dvc')
+
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
@@ -94,16 +97,23 @@ suite('Extension Test Suite', () => {
       const defaultPath = commands.executeCommand('dvc.selectDvcPath')
       await selectDefaultPathInUI()
 
-      expect(mockShowInputBox).not.to.have.been.called
       expect(await defaultPath).to.equal('dvc')
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         'dvc'
       )
 
+      expect(mockFindCliPath).to.have.been.calledOnce
+      expect(mockShowInputBox).not.to.have.been.called
+
+      mockFindCliPath.restore()
       mockShowInputBox.restore()
     })
 
-    it('should be able to select a custom path for the dvc binary', async () => {
+    it('should be able to select a custom path for the dvc cli', async () => {
+      const customPath = join('custom', 'path', 'to', 'dvc')
+      const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves(
+        customPath
+      )
       const selectCustomPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
@@ -112,7 +122,6 @@ suite('Extension Test Suite', () => {
         )
       }
 
-      const customPath = join('custom', 'path', 'to', 'dvc')
       const mockShowInputBox = stub(window, 'showInputBox').resolves(customPath)
 
       const selectedCustomPath = commands.executeCommand('dvc.selectDvcPath')
@@ -122,8 +131,11 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         customPath
       )
+
+      expect(mockFindCliPath).to.have.been.calledOnce
       expect(mockShowInputBox).to.have.been.calledOnce
 
+      mockFindCliPath.restore()
       mockShowInputBox.restore()
     })
   })

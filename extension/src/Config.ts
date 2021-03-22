@@ -8,9 +8,12 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
+import { findCliPath } from './fileSystem'
 
 export class Config {
   public readonly dispose = Disposable.fn()
+  public readonly workspaceRoot: string
+  public dvcCliPath = 'dvc'
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -32,7 +35,25 @@ export class Config {
   private overrideStatusBar = () => {
     const dvcPath = process.env.DVCPATH
     if (dvcPath) {
+      this.setDvcPath(dvcPath)
       this.updateDvcPathStatusBarItem(dvcPath)
+      this.setDvcCliPath()
+    }
+  }
+
+  private getWorkspaceRoot = (): string => {
+    const { workspaceFolders } = workspace
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      throw new Error('There are no folders in the Workspace to operate on!')
+    }
+
+    return workspaceFolders[0].uri.fsPath
+  }
+
+  private setDvcCliPath = async (): Promise<void> => {
+    const path = await findCliPath(this.workspaceRoot, this.dvcPath)
+    if (path) {
+      this.dvcCliPath = path
     }
   }
 
@@ -75,6 +96,9 @@ export class Config {
 
   constructor() {
     makeObservable(this)
+
+    this.workspaceRoot = this.getWorkspaceRoot()
+
     this._vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
@@ -84,14 +108,14 @@ export class Config {
     )
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
-    this.overrideStatusBar()
-
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
           this.updateDvcPathStatusBarItem()
+          this.setDvcCliPath()
         }
       })
     )
+    this.overrideStatusBar()
   }
 }

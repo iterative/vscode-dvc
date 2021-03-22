@@ -17,7 +17,7 @@ import {
 
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments, inferDefaultOptions } from './dvcReader'
+import { getExperiments } from './dvcReader'
 
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
@@ -38,18 +38,8 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
 
-  private getDefaultCwd = (): string => {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      throw new Error('There are no folders in the Workspace to operate on!')
-    }
-
-    return workspaceFolders[0].uri.fsPath
-  }
-
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
-    const cwd = this.getDefaultCwd()
-    const refsPath = await getExperimentsRefsPath(cwd)
+    const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
     if (!refsPath) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
@@ -59,12 +49,10 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
-    const dvcReaderOptions = await inferDefaultOptions(
-      this.getDefaultCwd(),
-      this.config.dvcPath
-    )
-
-    const experiments = await getExperiments(dvcReaderOptions)
+    const experiments = await getExperiments({
+      cwd: this.config.workspaceRoot,
+      cliPath: this.config.dvcCliPath
+    })
     return this.webviewManager.refreshExperiments(experiments)
   }
 
