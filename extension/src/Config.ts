@@ -13,7 +13,7 @@ import { findCliPath } from './fileSystem'
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
-  public dvcBinPath = 'dvc'
+  public dvcCliPath = 'dvc'
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -53,7 +53,7 @@ export class Config {
   private setDvcCliPath = async (): Promise<void> => {
     const path = await findCliPath(this.workspaceRoot, this.dvcPath)
     if (path) {
-      this.dvcBinPath = path
+      this.dvcCliPath = path
     }
   }
 

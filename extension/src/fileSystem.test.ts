@@ -82,7 +82,7 @@ describe('getWatcher', () => {
 })
 
 describe('findCliPath', () => {
-  it('should return a path given the name of an available binary', async () => {
+  it('should return a cli name given the name of a globally available cli', async () => {
     const mockWorkspace = __dirname
     const cli = 'git'
     const accessiblePath = await findCliPath(mockWorkspace, cli)

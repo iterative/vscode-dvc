@@ -24,7 +24,7 @@ test('Command-mocked getExperiments matches a snapshot when parsed', async () =>
   )
 
   const experiments = await getExperiments({
-    bin: 'dvc',
+    cliPath: 'dvc',
     cwd: resolve()
   })
   expect(experiments).toMatchSnapshot()

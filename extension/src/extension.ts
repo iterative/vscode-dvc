@@ -39,8 +39,7 @@ export class Extension {
   private readonly webviewManager: WebviewManager
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
-    const cwd = this.config.workspaceRoot
-    const refsPath = await getExperimentsRefsPath(cwd)
+    const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
     if (!refsPath) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
@@ -52,7 +51,7 @@ export class Extension {
   private refreshExperimentsWebview = async () => {
     const experiments = await getExperiments({
       cwd: this.config.workspaceRoot,
-      bin: this.config.dvcBinPath
+      cliPath: this.config.dvcCliPath
     })
     return this.webviewManager.refreshExperiments(experiments)
   }
