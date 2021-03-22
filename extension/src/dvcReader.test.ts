@@ -15,17 +15,23 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-test('Command-mocked getExperiments matches a snapshot when parsed', async () => {
-  mockedExecPromise.mockReturnValue(
-    Promise.resolve({
-      stdout: JSON.stringify(complexExperimentsOutput),
-      stderr: ''
-    }) as PromiseWithChild<{ stdout: string; stderr: string }>
-  )
+describe('getExperiments', () => {
+  it('should match a snapshot when parsed', async () => {
+    const cwd = resolve()
+    mockedExecPromise.mockReturnValue(
+      Promise.resolve({
+        stdout: JSON.stringify(complexExperimentsOutput),
+        stderr: ''
+      }) as PromiseWithChild<{ stdout: string; stderr: string }>
+    )
 
-  const experiments = await getExperiments({
-    cliPath: 'dvc',
-    cwd: resolve()
+    const experiments = await getExperiments({
+      cliPath: 'dvc',
+      cwd
+    })
+    expect(experiments).toMatchSnapshot()
+    expect(mockedExecPromise).toBeCalledWith('dvc exp show --show-json', {
+      cwd
+    })
   })
-  expect(experiments).toMatchSnapshot()
 })
