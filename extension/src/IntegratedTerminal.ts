@@ -5,7 +5,7 @@ import {
   getAddCommand,
   getCheckoutCommand,
   getCheckoutRecursiveCommand
-} from './dvcCommands'
+} from './cli/commands'
 import { delay } from './util'
 
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
