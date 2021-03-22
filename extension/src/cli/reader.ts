@@ -23,3 +23,12 @@ export const getExperiments = async (
   const { stdout } = await execCommand(options, EXPERIMENT_SHOW)
   return JSON.parse(stdout)
 }
+
+export const getRoot = async (
+  options: ReaderOptions
+): Promise<string | undefined> => {
+  const { stdout, stderr } = await execCommand(options, 'root')
+  if (!stderr) {
+    return stdout.trim()
+  }
+}
