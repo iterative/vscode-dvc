@@ -5,14 +5,15 @@ const getCliCommand = (command: string, ...options: string[]): string => {
   return `dvc ${command} ${options.join(' ')}`
 }
 
-const RUN_EXPERIMENT = 'exp run'
+const EXPERIMENT_RUN = 'exp run'
+export const EXPERIMENT_SHOW = 'exp show --show-json'
 const INITIALIZE_DIRECTORY = 'init --subdir'
 const ADD = 'add'
 const CHECKOUT = 'checkout'
 const CHECKOUT_RECURSIVE = 'checkout --recursive'
 
 export const getRunExperimentCommand = (): string => {
-  return getCliCommand(RUN_EXPERIMENT)
+  return getCliCommand(EXPERIMENT_RUN)
 }
 
 export const getInitializeDirectoryCommand = (fsPath: string): string => {

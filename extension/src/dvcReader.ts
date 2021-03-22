@@ -1,3 +1,4 @@
+import { EXPERIMENT_SHOW } from './dvcCommands'
 import { execPromise } from './util'
 import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
 interface ReaderOptions {
@@ -19,6 +20,6 @@ const execCommand = (
 export const getExperiments: (
   options: ReaderOptions
 ) => Promise<ExperimentsRepoJSONOutput> = async options => {
-  const { stdout } = await execCommand(options, 'exp show --show-json')
+  const { stdout } = await execCommand(options, EXPERIMENT_SHOW)
   return JSON.parse(stdout)
 }
