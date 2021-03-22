@@ -61,7 +61,6 @@ export class Config {
     const path = await findCliPath(this.workspaceRoot, this.dvcPath)
     if (path) {
       this.dvcCliPath = path
-      this.findDvcRoots()
     }
   }
 
