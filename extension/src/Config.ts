@@ -1,6 +1,9 @@
 import {
   ColorTheme,
   ColorThemeKind,
+  ConfigurationChangeEvent,
+  EventEmitter,
+  Event,
   StatusBarItem,
   window,
   workspace
@@ -15,6 +18,9 @@ export class Config {
   public readonly workspaceRoot: string
   public dvcCliPath = 'dvc'
   public dvcRootPaths: string[] = []
+
+  private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
+  readonly onDidChange: Event<ConfigurationChangeEvent>
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -118,14 +124,24 @@ export class Config {
     )
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
+
+    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
+    this.onDidChange = this.onDidChangeEmitter.event
+
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
-          this.updateDvcPathStatusBarItem()
-          this.setDvcCliPath()
+          this.onDidChangeEmitter.fire(e)
         }
       })
     )
+
+    this.dispose.track(
+      this.onDidChange(() => this.updateDvcPathStatusBarItem())
+    )
+
+    this.dispose.track(this.onDidChange(() => this.setDvcCliPath()))
+
     this.overrideStatusBar()
     this.findDvcRoots()
   }
