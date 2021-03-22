@@ -82,7 +82,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should be able to select the default path for the dvc cli', async () => {
+    it('should be able to select the default path (global installation) of the dvc cli', async () => {
       const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves('dvc')
 
       const selectDefaultPathInUI = async () => {
