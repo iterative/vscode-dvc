@@ -1,20 +1,20 @@
 import { execPromise } from './util'
 import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
-export interface ReaderOptions {
+interface ReaderOptions {
   cliPath: string
   cwd: string
 }
 
-const execCommand: (
+const execCommand = (
   options: ReaderOptions,
   command: string
-) => Promise<{ stdout: string; stderr: string }> = (
-  { cliPath, cwd },
-  command
-) =>
-  execPromise(`${cliPath} ${command}`, {
+): Promise<{ stdout: string; stderr: string }> => {
+  const { cliPath, cwd } = options
+
+  return execPromise(`${cliPath} ${command}`, {
     cwd
   })
+}
 
 export const getExperiments: (
   options: ReaderOptions
