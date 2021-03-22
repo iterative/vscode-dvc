@@ -2,7 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import { accessSync } from 'fs-extra'
 import debounce from 'lodash.debounce'
-import { basename, join } from 'path'
+import { basename, dirname, join } from 'path'
 import { execPromise } from './util'
 import glob from 'tiny-glob'
 
@@ -73,7 +73,8 @@ export const findCliPath = async (cwd: string, path: string) => {
   const files = await glob(join('**', path), {
     absolute: true,
     cwd,
-    dot: true
+    dot: true,
+    filesOnly: true
   })
 
   return files.find(file => {
@@ -81,4 +82,14 @@ export const findCliPath = async (cwd: string, path: string) => {
       return file
     }
   })
+}
+
+export const findDvcRoots = async (cwd: string): Promise<string[]> => {
+  const files = await glob(join('**', '.dvc'), {
+    absolute: true,
+    cwd,
+    dot: true
+  })
+
+  return files.map(file => dirname(file))
 }

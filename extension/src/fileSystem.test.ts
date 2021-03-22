@@ -2,9 +2,15 @@ import * as fileSystem from './fileSystem'
 import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
-import { basename, join } from 'path'
+import { basename, join, resolve } from 'path'
+import { mkdirSync, rmdir } from 'fs-extra'
 
-const { addFileChangeHandler, findCliPath, getWatcher } = fileSystem
+const {
+  addFileChangeHandler,
+  findCliPath,
+  findDvcRoots,
+  getWatcher
+} = fileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -114,5 +120,25 @@ describe('findCliPath', () => {
     const mockWorkspace = __dirname
     const accessiblePath = await findCliPath(mockWorkspace, 'non-existent-cli')
     expect(accessiblePath).toBeUndefined()
+  })
+})
+
+describe('findDvcRoots', () => {
+  const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
+
+  it('should find the dvc root if it exists in the given folder', async () => {
+    const dvcRoots = await findDvcRoots(demoFolderLocation)
+    expect(dvcRoots).toEqual([demoFolderLocation])
+  })
+
+  it('should find multiple roots if available in the given folder', async () => {
+    const dataRoot = resolve(demoFolderLocation, 'data')
+    const mockDvcRoot = join(dataRoot, '.dvc')
+    mkdirSync(mockDvcRoot)
+
+    const dvcRoots = await findDvcRoots(demoFolderLocation)
+
+    rmdir(mockDvcRoot)
+    expect(dvcRoots).toEqual([demoFolderLocation, dataRoot])
   })
 })
