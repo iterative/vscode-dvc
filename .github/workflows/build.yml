@@ -30,13 +30,6 @@ jobs:
           restore-keys: yarn
 
       - uses: actions/cache@v2
-        name: Restore ESLint cache
-        id: eslint-cache
-        with:
-          path: .eslintcache
-          key: eslint-cache
-
-      - uses: actions/cache@v2
         name: Restore .vscode-test cache
         id: vscode-cache
         with:
