@@ -1,6 +1,6 @@
-import { EXPERIMENT_SHOW } from './dvcCommands'
-import { execPromise } from './util'
-import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
+import { EXPERIMENT_SHOW } from './commands'
+import { execPromise } from '../util'
+import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 interface ReaderOptions {
   cliPath: string
   cwd: string

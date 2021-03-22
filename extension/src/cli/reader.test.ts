@@ -1,13 +1,13 @@
 import { mocked } from 'ts-jest/utils'
 
-import { getExperiments } from './dvcReader'
-import { execPromise } from './util'
-import complexExperimentsOutput from './webviews/experiments/complex-output-example.json'
+import { getExperiments } from './reader'
+import { execPromise } from '../util'
+import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
 import { resolve } from 'path'
 
 jest.mock('fs')
-jest.mock('./util')
+jest.mock('../util')
 
 const mockedExecPromise = mocked(execPromise)
 

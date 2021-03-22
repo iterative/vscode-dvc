@@ -17,7 +17,7 @@ import {
 
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments } from './dvcReader'
+import { getExperiments } from './cli/reader'
 
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
