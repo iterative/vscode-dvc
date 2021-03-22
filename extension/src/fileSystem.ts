@@ -92,7 +92,7 @@ export const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
     dot: true
   })
 
-  return files.map(file => dirname(file)).filter(file => file !== cwd)
+  return files.map(file => dirname(file)).filter(folder => folder !== cwd)
 }
 
 const findDvcAbsoluteRootPath = async (
