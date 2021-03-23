@@ -8,7 +8,6 @@ import * as DvcReader from '../../cli/reader'
 import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
-import { getReadyPythonExtension } from '../../util/pythonExtension'
 import * as util from '../../util'
 
 chai.use(sinonChai)
@@ -20,9 +19,6 @@ suite('Extension Test Suite', async () => {
   const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   beforeEach(async () => {
-    window.showInformationMessage('Wait for Python Extension.')
-    await getReadyPythonExtension()
-
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
