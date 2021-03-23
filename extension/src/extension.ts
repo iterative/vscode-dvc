@@ -6,18 +6,17 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import {
-  IntegratedTerminal,
-  runExperiment,
-  initializeDirectory,
-  add,
-  checkout,
-  checkoutRecursive
-} from './IntegratedTerminal'
+import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments } from './cli/reader'
+import {
+  getExperiments,
+  initializeDirectory,
+  checkout,
+  checkoutRecursive
+} from './cli/reader'
+import { add } from './cli'
 
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
@@ -105,25 +104,25 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory(fsPath)
+        initializeDirectory({ cwd: fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.add', ({ fsPath }) => {
-        add(fsPath)
+        add({ fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout(fsPath)
+        checkout({ cwd: fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive(fsPath)
+        checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
