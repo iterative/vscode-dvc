@@ -1,11 +1,5 @@
 import { Terminal, window, workspace } from 'vscode'
-import {
-  getRunExperimentCommand,
-  getInitializeDirectoryCommand,
-  getAddCommand,
-  getCheckoutCommand,
-  getCheckoutRecursiveCommand
-} from './cli/commands'
+import { getRunExperimentCommand } from './cli/commands'
 import { getReadyPythonExtension } from './util/pythonExtension'
 import { delay } from './util'
 
@@ -78,24 +72,4 @@ export class IntegratedTerminal {
 export const runExperiment = (): Promise<void> => {
   const runExperimentCommand = getRunExperimentCommand()
   return IntegratedTerminal.run(runExperimentCommand)
-}
-
-export const initializeDirectory = (fsPath: string): Promise<void> => {
-  const initializeDirectoryCommand = getInitializeDirectoryCommand(fsPath)
-  return IntegratedTerminal.run(initializeDirectoryCommand)
-}
-
-export const add = (fsPath: string): Promise<void> => {
-  const addCommand = getAddCommand(fsPath)
-  return IntegratedTerminal.run(addCommand)
-}
-
-export const checkout = (fsPath: string): Promise<void> => {
-  const checkoutCommand = getCheckoutCommand(fsPath)
-  return IntegratedTerminal.run(checkoutCommand)
-}
-
-export const checkoutRecursive = (fsPath: string): Promise<void> => {
-  const checkoutRecursiveCommand = getCheckoutRecursiveCommand(fsPath)
-  return IntegratedTerminal.run(checkoutRecursiveCommand)
 }
