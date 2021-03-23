@@ -1,6 +1,5 @@
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
-import { PromiseWithChild } from 'child_process'
 import { basename, resolve } from 'path'
 import { add } from '.'
 
@@ -26,12 +25,10 @@ describe('add', () => {
       `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
       `\n\rgit add ${file} .gitignore`
 
-    mockedExecPromise.mockReturnValue(
-      Promise.resolve({
-        stdout,
-        stderr: ''
-      }) as PromiseWithChild<{ stdout: string; stderr: string }>
-    )
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await add({
       cliPath: 'dvc',

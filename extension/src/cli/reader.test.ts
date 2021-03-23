@@ -8,7 +8,6 @@ import {
 } from './reader'
 import { execPromise } from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
-import { PromiseWithChild } from 'child_process'
 import { join, resolve } from 'path'
 
 jest.mock('fs')
@@ -23,12 +22,10 @@ beforeEach(() => {
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
     const cwd = resolve()
-    mockedExecPromise.mockReturnValue(
-      Promise.resolve({
-        stdout: JSON.stringify(complexExperimentsOutput),
-        stderr: ''
-      }) as PromiseWithChild<{ stdout: string; stderr: string }>
-    )
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: JSON.stringify(complexExperimentsOutput),
+      stderr: ''
+    })
 
     const experiments = await getExperiments({
       cliPath: 'dvc',
@@ -63,12 +60,10 @@ describe('initializeDirectory', () => {
 	- Star us on GitHub: <https://github.com/iterative/dvc>
 	`
 
-    mockedExecPromise.mockReturnValue(
-      Promise.resolve({
-        stdout,
-        stderr: ''
-      }) as PromiseWithChild<{ stdout: string; stderr: string }>
-    )
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await initializeDirectory({
       cliPath: 'dvc',
@@ -85,12 +80,10 @@ describe('checkout', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\n\rM       logs/\n\r`
-    mockedExecPromise.mockReturnValue(
-      Promise.resolve({
-        stdout,
-        stderr: ''
-      }) as PromiseWithChild<{ stdout: string; stderr: string }>
-    )
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await checkout({
       cliPath: 'dvc',
@@ -108,12 +101,10 @@ describe('checkoutRecursive', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\n\rM       logs/\n\r`
-    mockedExecPromise.mockReturnValue(
-      Promise.resolve({
-        stdout,
-        stderr: ''
-      }) as PromiseWithChild<{ stdout: string; stderr: string }>
-    )
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await checkoutRecursive({
       cliPath: 'dvc',
@@ -132,12 +123,10 @@ describe('getRoot', () => {
     const mockRelativeRoot = join('..', '..')
     const mockStdout = mockRelativeRoot + '\n\r'
     const cwd = resolve()
-    mockedExecPromise.mockReturnValue(
-      Promise.resolve({
-        stdout: mockStdout,
-        stderr: ''
-      }) as PromiseWithChild<{ stdout: string; stderr: string }>
-    )
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: mockStdout,
+      stderr: ''
+    })
     const relativeRoot = await getRoot({
       cwd,
       cliPath: 'dvc'
