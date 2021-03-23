@@ -37,7 +37,7 @@ export class IntegratedTerminal {
       pythonExtension &&
       workspace.getConfiguration().get('python.terminal.activateEnvironment')
     ) {
-      return IntegratedTerminal.createPythonInstance()
+      return IntegratedTerminal.createInstance(5000)
     }
 
     return IntegratedTerminal.createInstance(2000)
@@ -52,11 +52,6 @@ export class IntegratedTerminal {
         IntegratedTerminal.instance = undefined
       }
     })
-  }
-
-  private static createPythonInstance = async (): Promise<void> => {
-    await getReadyPythonExtension()
-    return IntegratedTerminal.createInstance(5000)
   }
 
   private static createInstance = async (ms: number): Promise<void> => {
