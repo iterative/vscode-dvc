@@ -39,13 +39,11 @@ export class Config {
     this.dvcPathStatusBarItem.text = path
   }
 
-  private overrideStatusBar = () => {
-    const dvcPath = process.env.DVCPATH
-    if (dvcPath) {
-      this.setDvcPath(dvcPath)
-      this.updateDvcPathStatusBarItem(dvcPath)
-      this.setDvcCliPath()
-    }
+  private setDvcPaths = async (dvcPath?: string) => {
+    this.updateDvcPathStatusBarItem(dvcPath)
+    await this.setDvcPath(dvcPath)
+    await this.setDvcCliPath()
+    return this.findDvcRoots()
   }
 
   private getWorkspaceRoot = (): string => {
@@ -136,12 +134,14 @@ export class Config {
     )
 
     this.dispose.track(
-      this.onDidChange(() => this.updateDvcPathStatusBarItem())
+      this.onDidChange(async () => {
+        this.updateDvcPathStatusBarItem()
+        await this.setDvcCliPath()
+        return this.findDvcRoots()
+      })
     )
 
-    this.dispose.track(this.onDidChange(() => this.setDvcCliPath()))
-
-    this.overrideStatusBar()
-    this.findDvcRoots()
+    const dvcPath = process.env.DVCPATH
+    this.setDvcPaths(dvcPath)
   }
 }
