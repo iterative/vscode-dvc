@@ -8,16 +8,19 @@ interface ReaderOptions {
   cwd: string
 }
 
+const getDvcInvocation = async (options: ReaderOptions) => {
+  const { cliPath } = options
+  if (cliPath) return cliPath
+  const executionDetails = await getPythonExecutionDetails()
+  return executionDetails ? `${executionDetails.join(' ')} -m` : 'dvc'
+}
+
 const execCommand = async (
   options: ReaderOptions,
   command: string
 ): Promise<{ stdout: string; stderr: string }> => {
   const { cwd } = options
-  const executionDetails = await getPythonExecutionDetails()
-  const dvcInvocation = executionDetails
-    ? `${executionDetails.join(' ')} -m`
-    : 'dvc'
-  const fullCommandString = `${dvcInvocation} ${command}`
+  const fullCommandString = `${await getDvcInvocation(options)} ${command}`
   return execPromise(fullCommandString, {
     cwd
   })
