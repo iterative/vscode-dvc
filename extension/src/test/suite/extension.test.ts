@@ -36,6 +36,7 @@ suite('Extension Test Suite', () => {
       expect(experimentsWebview.isVisible()).to.be.true
 
       mockReader.restore()
+      experimentsWebview.dispose()
     })
 
     it('should only be able to open a single experiments webview', async () => {
@@ -78,6 +79,7 @@ suite('Extension Test Suite', () => {
 
       windowSpy.restore()
       mockReader.restore()
+      experimentsWebview.dispose()
     })
   })
 
@@ -106,8 +108,7 @@ suite('Extension Test Suite', () => {
         'dvc'
       )
 
-      expect(mockFindCliPath).to.have.been.calledOnce
-      expect(mockFindDvcRoots).to.have.been.calledOnce
+      expect(mockFindCliPath).to.have.been.calledWith(demoFolderLocation, cli)
       expect(mockFindDvcRoots).to.have.been.calledWith(demoFolderLocation, cli)
       expect(mockShowInputBox).not.to.have.been.called
 
@@ -142,8 +143,10 @@ suite('Extension Test Suite', () => {
         customPath
       )
 
-      expect(mockFindCliPath).to.have.been.calledOnce
-      expect(mockFindDvcRoots).to.have.been.calledOnce
+      expect(mockFindCliPath).to.have.been.calledWith(
+        demoFolderLocation,
+        customPath
+      )
       expect(mockFindDvcRoots).to.have.been.calledWith(
         demoFolderLocation,
         customPath
