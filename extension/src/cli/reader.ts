@@ -1,4 +1,4 @@
-import { EXPERIMENT_SHOW } from './commands'
+import { Commands } from './commands'
 import { execPromise } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 interface ReaderOptions {
@@ -20,6 +20,6 @@ const execCommand = (
 export const getExperiments = async (
   options: ReaderOptions
 ): Promise<ExperimentsRepoJSONOutput> => {
-  const { stdout } = await execCommand(options, EXPERIMENT_SHOW)
+  const { stdout } = await execCommand(options, Commands.experiment_show)
   return JSON.parse(stdout)
 }
