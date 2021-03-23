@@ -46,3 +46,8 @@ export const checkoutRecursive = async (
   const { stdout } = await execCommand(options, Commands.checkout_recursive)
   return stdout
 }
+
+export const getRoot = async (options: ReaderOptions): Promise<string> => {
+  const { stdout } = await execCommand(options, 'root')
+  return stdout.trim()
+}

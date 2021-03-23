@@ -2,6 +2,12 @@ import { Extension, extensions, Terminal, window, workspace } from 'vscode'
 import { getRunExperimentCommand } from './cli/commands'
 import { delay } from './util'
 
+interface PythonExtensionAPI {
+  ready: Thenable<void>
+}
+
+type PythonExtension = Extension<PythonExtensionAPI>
+
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
 export class IntegratedTerminal {
   static termName = 'DVC'
@@ -54,28 +60,16 @@ export class IntegratedTerminal {
   }
 
   private static createPythonInstance = async (
-    pythonExtension: Extension<
-      Thenable<{
-        activate: () => void
-      }>
-    >
+    pythonExtension: PythonExtension
   ): Promise<void> => {
     if (!pythonExtension.isActive) {
-      await IntegratedTerminal.activateExtension(pythonExtension)
+      await IntegratedTerminal.waitForReadyPromise(pythonExtension)
     }
     return IntegratedTerminal.createInstance(5000)
   }
 
-  private static activateExtension = async (
-    extension: Extension<
-      Thenable<{
-        activate: () => void
-      }>
-    >
-  ): Promise<void> => {
-    await extension.activate()
-    return delay(2500)
-  }
+  private static waitForReadyPromise = async (extension: PythonExtension) =>
+    (await extension.activate()).ready
 
   private static createInstance = async (ms: number): Promise<void> => {
     IntegratedTerminal.instance = window.createTerminal({

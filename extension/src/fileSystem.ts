@@ -2,9 +2,10 @@ import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import { accessSync } from 'fs-extra'
 import debounce from 'lodash.debounce'
-import { basename, join } from 'path'
+import { basename, dirname, join, resolve } from 'path'
 import { execPromise } from './util'
 import glob from 'tiny-glob'
+import { getRoot } from './cli/reader'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -73,7 +74,8 @@ export const findCliPath = async (cwd: string, path: string) => {
   const files = await glob(join('**', path), {
     absolute: true,
     cwd,
-    dot: true
+    dot: true,
+    filesOnly: true
   })
 
   return files.find(file => {
@@ -81,4 +83,41 @@ export const findCliPath = async (cwd: string, path: string) => {
       return file
     }
   })
+}
+
+const findDvcAbsoluteRootPath = async (
+  cwd: string,
+  cliPath: string
+): Promise<string | undefined> => {
+  try {
+    const root = await getRoot({
+      cliPath: cliPath,
+      cwd
+    })
+    return resolve(cwd, root)
+  } catch (e) {}
+}
+
+const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
+  const files = await glob(join('**', '.dvc'), {
+    absolute: true,
+    cwd,
+    dot: true
+  })
+
+  return files.map(file => dirname(file)).filter(folder => folder !== cwd)
+}
+
+export const findDvcRootPaths = async (
+  cwd: string,
+  cliPath: string
+): Promise<string[]> => {
+  const [subRoots, absoluteRoot] = await Promise.all([
+    findDvcSubRootPaths(cwd),
+    findDvcAbsoluteRootPath(cwd, cliPath)
+  ])
+
+  const roots = [...subRoots, absoluteRoot].filter(v => v).sort() as string[]
+
+  return roots
 }
