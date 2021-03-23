@@ -27,13 +27,13 @@ export const getReadyPythonExtension: () => Thenable<
   PythonExtension | undefined
 > = async () => {
   const extension = await getActivatedPythonExtension()
-  await extension?.exports.ready
+  if (!extension) return extension
+  await extension.exports.ready
   return extension
 }
 
 export const getPythonExecutionDetails: () => Thenable<
   string[] | undefined
-> = async () => {
-  const extension = await getReadyPythonExtension()
-  return extension?.exports.settings.getExecutionDetails().execCommand
-}
+> = async () =>
+  (await getReadyPythonExtension())?.exports.settings.getExecutionDetails()
+    .execCommand
