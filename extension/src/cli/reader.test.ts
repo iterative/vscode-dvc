@@ -1,10 +1,10 @@
 import { mocked } from 'ts-jest/utils'
 
-import { getExperiments } from './reader'
+import { getExperiments, getRoot } from './reader'
 import { execPromise } from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
-import { resolve } from 'path'
+import { join, resolve } from 'path'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -31,6 +31,29 @@ describe('getExperiments', () => {
     })
     expect(experiments).toMatchSnapshot()
     expect(mockedExecPromise).toBeCalledWith('dvc exp show --show-json', {
+      cwd
+    })
+  })
+})
+
+describe('getRoot', () => {
+  it('should return the root relative to the cwd', async () => {
+    const mockRelativeRoot = join('..', '..')
+    const mockStdout = mockRelativeRoot + '\n\r'
+    const cwd = resolve()
+    mockedExecPromise.mockReturnValue(
+      Promise.resolve({
+        stdout: mockStdout,
+        stderr: ''
+      }) as PromiseWithChild<{ stdout: string; stderr: string }>
+    )
+
+    const relativeRoot = await getRoot({
+      cwd,
+      cliPath: 'dvc'
+    })
+    expect(relativeRoot).toEqual(mockRelativeRoot)
+    expect(mockedExecPromise).toBeCalledWith('dvc root', {
       cwd
     })
   })

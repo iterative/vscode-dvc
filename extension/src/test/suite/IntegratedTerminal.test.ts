@@ -14,7 +14,7 @@ suite('Integrated Terminal Test Suite', () => {
 
   const waitForAndDispose = async (
     disposable: Disposable,
-    ms = 1000
+    ms = 1500
   ): Promise<void> => {
     await delay(ms)
     disposable.dispose()

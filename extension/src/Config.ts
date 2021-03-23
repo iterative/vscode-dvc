@@ -11,12 +11,13 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import { findCliPath } from './fileSystem'
+import { findCliPath, findDvcRootPaths } from './fileSystem'
 
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
   public dvcCliPath = 'dvc'
+  public dvcRootPaths: string[] = []
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
   readonly onDidChange: Event<ConfigurationChangeEvent>
@@ -38,13 +39,15 @@ export class Config {
     this.dvcPathStatusBarItem.text = path
   }
 
-  private overrideStatusBar = () => {
-    const dvcPath = process.env.DVCPATH
-    if (dvcPath) {
-      this.setDvcPath(dvcPath)
-      this.updateDvcPathStatusBarItem(dvcPath)
-      this.setDvcCliPath()
-    }
+  private setDvcPaths = async () => {
+    this.updateDvcPathStatusBarItem()
+    await this.setDvcCliPath()
+    return this.findDvcRoots()
+  }
+
+  private setDvcPathsOnActivation = async (dvcPath?: string) => {
+    await this.setDvcPath(dvcPath)
+    return this.setDvcPaths()
   }
 
   private getWorkspaceRoot = (): string => {
@@ -100,6 +103,14 @@ export class Config {
     }
   }
 
+  private findDvcRoots = async () => {
+    const rootPaths = await findDvcRootPaths(
+      this.workspaceRoot,
+      this.dvcCliPath
+    )
+    this.dvcRootPaths = rootPaths
+  }
+
   constructor() {
     makeObservable(this)
 
@@ -113,11 +124,11 @@ export class Config {
       })
     )
 
-    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
+    this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
 
+    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
     this.onDidChange = this.onDidChangeEmitter.event
 
-    this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
@@ -125,10 +136,14 @@ export class Config {
         }
       })
     )
+
     this.dispose.track(
-      this.onDidChange(() => this.updateDvcPathStatusBarItem())
+      this.onDidChange(async () => {
+        this.setDvcPaths()
+      })
     )
-    this.dispose.track(this.onDidChange(() => this.setDvcCliPath()))
-    this.overrideStatusBar()
+
+    const dvcOverridePath = process.env.DVCPATH
+    this.setDvcPathsOnActivation(dvcOverridePath)
   }
 }

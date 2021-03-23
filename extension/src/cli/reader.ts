@@ -23,3 +23,8 @@ export const getExperiments = async (
   const { stdout } = await execCommand(options, EXPERIMENT_SHOW)
   return JSON.parse(stdout)
 }
+
+export const getRoot = async (options: ReaderOptions): Promise<string> => {
+  const { stdout } = await execCommand(options, 'root')
+  return stdout.trim()
+}
