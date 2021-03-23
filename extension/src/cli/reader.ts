@@ -14,9 +14,10 @@ const execCommand = async (
 ): Promise<{ stdout: string; stderr: string }> => {
   const { cwd } = options
   const executionDetails = await getPythonExecutionDetails()
-  const fullCommandString = [...executionDetails, '-m', 'dvc', command].join(
-    ' '
-  )
+  const dvcInvocation = executionDetails
+    ? `${executionDetails.join(' ')} -m`
+    : 'dvc'
+  const fullCommandString = `${dvcInvocation} ${command}`
   return execPromise(fullCommandString, {
     cwd
   })

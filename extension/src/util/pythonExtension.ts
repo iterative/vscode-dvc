@@ -36,9 +36,10 @@ export const getReadyPythonExtension: () => Thenable<
   return extension
 }
 
-export const getPythonExecutionDetails: () => Thenable<string[]> = async () => {
+export const getPythonExecutionDetails: () => Thenable<
+  string[] | undefined
+> = async () => {
   const extension = await getReadyPythonExtension()
-  if (!extension) return []
-  const { execCommand } = extension.exports.settings.getExecutionDetails()
-  return execCommand || []
+  if (!extension) return extension
+  return extension.exports.settings.getExecutionDetails().execCommand
 }
