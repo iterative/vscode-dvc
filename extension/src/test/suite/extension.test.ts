@@ -8,16 +8,21 @@ import * as DvcReader from '../../cli/reader'
 import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
+import { getReadyPythonExtension } from '../../util/pythonExtension'
+import * as util from '../../util'
 
 chai.use(sinonChai)
 const { expect } = chai
 
-suite('Extension Test Suite', () => {
+suite('Extension Test Suite', async () => {
   window.showInformationMessage('Start all extension tests.')
 
   const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   beforeEach(async () => {
+    window.showInformationMessage('Wait for Python Extension.')
+    await getReadyPythonExtension()
+
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
@@ -156,6 +161,55 @@ suite('Extension Test Suite', () => {
       mockFindCliPath.restore()
       mockFindDvcRoots.restore()
       mockShowInputBox.restore()
+    })
+  })
+
+  describe('getExperiments', () => {
+    it('should match a snapshot when parsed', async () => {
+      const cwd = resolve()
+      const mockedExecPromise = stub(util, 'execPromise').resolves({
+        stdout: JSON.stringify(complexExperimentsOutput),
+        stderr: ''
+      })
+
+      await DvcReader.getExperiments({
+        cliPath: 'dvc',
+        cwd
+      })
+      expect(mockedExecPromise).to.have.been.calledWith(
+        'dvc exp show --show-json',
+        {
+          cwd
+        }
+      )
+      mockedExecPromise.restore()
+    })
+  })
+
+  describe('getRoot', () => {
+    it('should return the root relative to the cwd', async () => {
+      const mockedExecPromise = stub(util, 'execPromise').resolves({
+        stdout: JSON.stringify(complexExperimentsOutput),
+        stderr: ''
+      })
+
+      const mockRelativeRoot = join('..', '..')
+      const mockStdout = mockRelativeRoot + '\n\r'
+      const cwd = resolve()
+      mockedExecPromise.resolves({
+        stdout: mockStdout,
+        stderr: ''
+      })
+
+      const relativeRoot = await DvcReader.getRoot({
+        cwd,
+        cliPath: 'dvc'
+      })
+      expect(relativeRoot).to.equal(mockRelativeRoot)
+      expect(mockedExecPromise).to.have.been.calledWith('dvc root', {
+        cwd
+      })
+      mockedExecPromise.restore()
     })
   })
 })

@@ -1,4 +1,4 @@
-import { Extension, extensions, Terminal, window, workspace } from 'vscode'
+import { Terminal, window, workspace } from 'vscode'
 import {
   getRunExperimentCommand,
   getInitializeDirectoryCommand,
@@ -6,6 +6,7 @@ import {
   getCheckoutCommand,
   getCheckoutRecursiveCommand
 } from './cli/commands'
+import { getReadyPythonExtension } from './util/pythonExtension'
 import { delay } from './util'
 
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
@@ -37,12 +38,12 @@ export class IntegratedTerminal {
   private static initializeInstance = async (): Promise<void> => {
     IntegratedTerminal.deleteReferenceOnClose()
 
-    const pythonExtension = extensions.getExtension('ms-python.python')
+    const pythonExtension = await getReadyPythonExtension()
     if (
       pythonExtension &&
       workspace.getConfiguration().get('python.terminal.activateEnvironment')
     ) {
-      return IntegratedTerminal.createPythonInstance(pythonExtension)
+      return IntegratedTerminal.createPythonInstance()
     }
 
     return IntegratedTerminal.createInstance(2000)
@@ -59,28 +60,9 @@ export class IntegratedTerminal {
     })
   }
 
-  private static createPythonInstance = async (
-    pythonExtension: Extension<
-      Thenable<{
-        activate: () => void
-      }>
-    >
-  ): Promise<void> => {
-    if (!pythonExtension.isActive) {
-      await IntegratedTerminal.activateExtension(pythonExtension)
-    }
+  private static createPythonInstance = async (): Promise<void> => {
+    await getReadyPythonExtension()
     return IntegratedTerminal.createInstance(5000)
-  }
-
-  private static activateExtension = async (
-    extension: Extension<
-      Thenable<{
-        activate: () => void
-      }>
-    >
-  ): Promise<void> => {
-    await extension.activate()
-    return delay(2500)
   }
 
   private static createInstance = async (ms: number): Promise<void> => {
