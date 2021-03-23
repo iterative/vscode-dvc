@@ -1,8 +1,6 @@
 import { mocked } from 'ts-jest/utils'
-import { IntegratedTerminal } from '../IntegratedTerminal'
 import {
   getExperiments,
-  add,
   checkout,
   initializeDirectory,
   checkoutRecursive
@@ -10,7 +8,7 @@ import {
 import { execPromise } from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { PromiseWithChild } from 'child_process'
-import { resolve, relative } from 'path'
+import { resolve } from 'path'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -43,55 +41,87 @@ describe('getExperiments', () => {
 })
 
 describe('initializeDirectory', () => {
-  it('should run the correct command in the IntegratedTerminal', async () => {
-    const terminalSpy = jest
-      .spyOn(IntegratedTerminal, 'run')
-      .mockResolvedValueOnce(undefined)
+  it('should call execPromise with the correct parameters', async () => {
+    const fsPath = __dirname
+    const stdout = `
+	Initialized DVC repository.
+	You can now commit the changes to git.
+	
+	+---------------------------------------------------------------------+
+	|                                                                     |
+	|        DVC has enabled anonymous aggregate usage analytics.         |
+	|     Read the analytics documentation (and how to opt-out) here:     |
+	|             <https://dvc.org/doc/user-guide/analytics>              |
+	|                                                                     |
+	+---------------------------------------------------------------------+
+	
+	What's next?
+	------------
+	- Check out the documentation: <https://dvc.org/doc>
+	- Get help and share ideas: <https://dvc.org/chat>
+	- Star us on GitHub: <https://github.com/iterative/dvc>
+	`
 
-    const undef = await initializeDirectory('./test/dir')
-    expect(undef).toBeUndefined()
+    mockedExecPromise.mockReturnValue(
+      Promise.resolve({
+        stdout,
+        stderr: ''
+      }) as PromiseWithChild<{ stdout: string; stderr: string }>
+    )
 
-    expect(terminalSpy).toBeCalledWith('cd ./test/dir && dvc init --subdir ')
+    const output = await initializeDirectory({
+      cliPath: 'dvc',
+      cwd: fsPath
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedExecPromise).toBeCalledWith('dvc init --subdir', {
+      cwd: fsPath
+    })
   })
 })
-
-describe('add', () => {
-  it('should run the correct command in the IntegratedTerminal', async () => {
-    const terminalSpy = jest
-      .spyOn(IntegratedTerminal, 'run')
-      .mockResolvedValueOnce(undefined)
-
-    const path = resolve(__dirname, '..', 'fileSystem.js')
-    const relPath = relative(resolve(__dirname, '..', '..'), path)
-    const undef = await add(path)
-    expect(undef).toBeUndefined()
-
-    expect(terminalSpy).toBeCalledWith(`dvc add ${relPath}`)
-  })
-})
-
 describe('checkout', () => {
-  it('should run the correct command in the IntegratedTerminal', async () => {
-    const terminalSpy = jest
-      .spyOn(IntegratedTerminal, 'run')
-      .mockResolvedValueOnce(undefined)
+  it('should call execPromise with the correct parameters', async () => {
+    const fsPath = __dirname
+    const stdout = `M       model.pt\n\rM       logs/\n\r`
+    mockedExecPromise.mockReturnValue(
+      Promise.resolve({
+        stdout,
+        stderr: ''
+      }) as PromiseWithChild<{ stdout: string; stderr: string }>
+    )
 
-    const undef = await checkout('../test/dir')
-    expect(undef).toBeUndefined()
+    const output = await checkout({
+      cliPath: 'dvc',
+      cwd: fsPath
+    })
+    expect(output).toEqual(stdout)
 
-    expect(terminalSpy).toBeCalledWith(`dvc checkout ../test/dir`)
+    expect(mockedExecPromise).toBeCalledWith('dvc checkout', {
+      cwd: fsPath
+    })
   })
 })
 
-describe('checkout recursive', () => {
-  it('should run the correct command in the IntegratedTerminal', async () => {
-    const terminalSpy = jest
-      .spyOn(IntegratedTerminal, 'run')
-      .mockResolvedValueOnce(undefined)
+describe('checkoutRecursive', () => {
+  it('should call execPromise with the correct parameters', async () => {
+    const fsPath = __dirname
+    const stdout = `M       model.pt\n\rM       logs/\n\r`
+    mockedExecPromise.mockReturnValue(
+      Promise.resolve({
+        stdout,
+        stderr: ''
+      }) as PromiseWithChild<{ stdout: string; stderr: string }>
+    )
 
-    const undef = await checkoutRecursive('../test/dir')
-    expect(undef).toBeUndefined()
+    const output = await checkoutRecursive({
+      cliPath: 'dvc',
+      cwd: fsPath
+    })
+    expect(output).toEqual(stdout)
 
-    expect(terminalSpy).toBeCalledWith(`dvc checkout --recursive ../test/dir`)
+    expect(mockedExecPromise).toBeCalledWith('dvc checkout --recursive', {
+      cwd: fsPath
+    })
   })
 })
