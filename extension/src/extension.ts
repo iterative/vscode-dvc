@@ -6,18 +6,17 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
+import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
+
+import { Config } from './Config'
+import { WebviewManager } from './webviews/WebviewManager'
 import {
-  IntegratedTerminal,
-  runExperiment,
+  getExperiments,
   initializeDirectory,
   add,
   checkout,
   checkoutRecursive
-} from './IntegratedTerminal'
-
-import { Config } from './Config'
-import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments } from './cli/reader'
+} from './cli/reader'
 
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
