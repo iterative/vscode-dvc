@@ -1,6 +1,9 @@
 import {
   ColorTheme,
   ColorThemeKind,
+  ConfigurationChangeEvent,
+  EventEmitter,
+  Event,
   StatusBarItem,
   window,
   workspace
@@ -8,9 +11,16 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
+import { findCliPath, findDvcRootPaths } from './fileSystem'
 
 export class Config {
   public readonly dispose = Disposable.fn()
+  public readonly workspaceRoot: string
+  public dvcCliPath = 'dvc'
+  public dvcRootPaths: string[] = []
+
+  private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
+  readonly onDidChange: Event<ConfigurationChangeEvent>
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -29,10 +39,30 @@ export class Config {
     this.dvcPathStatusBarItem.text = path
   }
 
-  private overrideStatusBar = () => {
-    const dvcPath = process.env.DVCPATH
-    if (dvcPath) {
-      this.updateDvcPathStatusBarItem(dvcPath)
+  private setDvcPaths = async () => {
+    this.updateDvcPathStatusBarItem()
+    await this.setDvcCliPath()
+    return this.findDvcRoots()
+  }
+
+  private setDvcPathsOnActivation = async (dvcPath?: string) => {
+    await this.setDvcPath(dvcPath)
+    return this.setDvcPaths()
+  }
+
+  private getWorkspaceRoot = (): string => {
+    const { workspaceFolders } = workspace
+    if (!workspaceFolders || workspaceFolders.length === 0) {
+      throw new Error('There are no folders in the Workspace to operate on!')
+    }
+
+    return workspaceFolders[0].uri.fsPath
+  }
+
+  private setDvcCliPath = async (): Promise<void> => {
+    const path = await findCliPath(this.workspaceRoot, this.dvcPath)
+    if (path) {
+      this.dvcCliPath = path
     }
   }
 
@@ -73,8 +103,19 @@ export class Config {
     }
   }
 
+  private findDvcRoots = async () => {
+    const rootPaths = await findDvcRootPaths(
+      this.workspaceRoot,
+      this.dvcCliPath
+    )
+    this.dvcRootPaths = rootPaths
+  }
+
   constructor() {
     makeObservable(this)
+
+    this.workspaceRoot = this.getWorkspaceRoot()
+
     this._vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
@@ -84,14 +125,25 @@ export class Config {
     )
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
-    this.overrideStatusBar()
+
+    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
+    this.onDidChange = this.onDidChangeEmitter.event
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration('dvc.dvcPath')) {
-          this.updateDvcPathStatusBarItem()
+          this.onDidChangeEmitter.fire(e)
         }
       })
     )
+
+    this.dispose.track(
+      this.onDidChange(async () => {
+        this.setDvcPaths()
+      })
+    )
+
+    const dvcOverridePath = process.env.DVCPATH
+    this.setDvcPathsOnActivation(dvcOverridePath)
   }
 }

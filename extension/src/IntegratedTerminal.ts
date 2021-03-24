@@ -1,12 +1,12 @@
 import { Extension, extensions, Terminal, window, workspace } from 'vscode'
-import {
-  getRunExperimentCommand,
-  getInitializeDirectoryCommand,
-  getAddCommand,
-  getCheckoutCommand,
-  getCheckoutRecursiveCommand
-} from './dvcCommands'
+import { getRunExperimentCommand } from './cli/commands'
 import { delay } from './util'
+
+interface PythonExtensionAPI {
+  ready: Thenable<void>
+}
+
+type PythonExtension = Extension<PythonExtensionAPI>
 
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
 export class IntegratedTerminal {
@@ -60,28 +60,16 @@ export class IntegratedTerminal {
   }
 
   private static createPythonInstance = async (
-    pythonExtension: Extension<
-      Thenable<{
-        activate: () => void
-      }>
-    >
+    pythonExtension: PythonExtension
   ): Promise<void> => {
     if (!pythonExtension.isActive) {
-      await IntegratedTerminal.activateExtension(pythonExtension)
+      await IntegratedTerminal.waitForReadyPromise(pythonExtension)
     }
     return IntegratedTerminal.createInstance(5000)
   }
 
-  private static activateExtension = async (
-    extension: Extension<
-      Thenable<{
-        activate: () => void
-      }>
-    >
-  ): Promise<void> => {
-    await extension.activate()
-    return delay(2500)
-  }
+  private static waitForReadyPromise = async (extension: PythonExtension) =>
+    (await extension.activate()).ready
 
   private static createInstance = async (ms: number): Promise<void> => {
     IntegratedTerminal.instance = window.createTerminal({
@@ -96,24 +84,4 @@ export class IntegratedTerminal {
 export const runExperiment = (): Promise<void> => {
   const runExperimentCommand = getRunExperimentCommand()
   return IntegratedTerminal.run(runExperimentCommand)
-}
-
-export const initializeDirectory = (fsPath: string): Promise<void> => {
-  const initializeDirectoryCommand = getInitializeDirectoryCommand(fsPath)
-  return IntegratedTerminal.run(initializeDirectoryCommand)
-}
-
-export const add = (fsPath: string): Promise<void> => {
-  const addCommand = getAddCommand(fsPath)
-  return IntegratedTerminal.run(addCommand)
-}
-
-export const checkout = (fsPath: string): Promise<void> => {
-  const checkoutCommand = getCheckoutCommand(fsPath)
-  return IntegratedTerminal.run(checkoutCommand)
-}
-
-export const checkoutRecursive = (fsPath: string): Promise<void> => {
-  const checkoutRecursiveCommand = getCheckoutRecursiveCommand(fsPath)
-  return IntegratedTerminal.run(checkoutRecursiveCommand)
 }

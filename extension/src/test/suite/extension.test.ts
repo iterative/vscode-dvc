@@ -4,7 +4,8 @@ import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
 import { join, resolve } from 'path'
-import * as DvcReader from '../../dvcReader'
+import * as DvcReader from '../../cli/reader'
+import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
 
@@ -18,7 +19,7 @@ suite('Extension Test Suite', () => {
 
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
-    await commands.executeCommand('workbench.action.closeAllEditors')
+    return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
   describe('dvc.showExperiments', () => {
@@ -35,6 +36,7 @@ suite('Extension Test Suite', () => {
       expect(experimentsWebview.isVisible()).to.be.true
 
       mockReader.restore()
+      experimentsWebview.dispose()
     })
 
     it('should only be able to open a single experiments webview', async () => {
@@ -77,11 +79,18 @@ suite('Extension Test Suite', () => {
 
       windowSpy.restore()
       mockReader.restore()
+      experimentsWebview.dispose()
     })
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should be able to select the default dvc path', async () => {
+    it('should be able to select the default path (global installation) of the dvc cli', async () => {
+      const cli = 'dvc'
+      const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves(cli)
+      const mockFindDvcRoots = stub(FileSystem, 'findDvcRootPaths').resolves([
+        demoFolderLocation
+      ])
+
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
@@ -94,16 +103,28 @@ suite('Extension Test Suite', () => {
       const defaultPath = commands.executeCommand('dvc.selectDvcPath')
       await selectDefaultPathInUI()
 
-      expect(mockShowInputBox).not.to.have.been.called
       expect(await defaultPath).to.equal('dvc')
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         'dvc'
       )
 
+      expect(mockFindCliPath).to.have.been.calledWith(demoFolderLocation, cli)
+      expect(mockFindDvcRoots).to.have.been.calledWith(demoFolderLocation, cli)
+      expect(mockShowInputBox).not.to.have.been.called
+
+      mockFindCliPath.restore()
+      mockFindDvcRoots.restore()
       mockShowInputBox.restore()
     })
 
-    it('should be able to select a custom path for the dvc binary', async () => {
+    it('should be able to select a custom path for the dvc cli', async () => {
+      const customPath = join('custom', 'path', 'to', 'dvc')
+      const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves(
+        customPath
+      )
+      const mockFindDvcRoots = stub(FileSystem, 'findDvcRootPaths').resolves([
+        demoFolderLocation
+      ])
       const selectCustomPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
@@ -112,7 +133,6 @@ suite('Extension Test Suite', () => {
         )
       }
 
-      const customPath = join('custom', 'path', 'to', 'dvc')
       const mockShowInputBox = stub(window, 'showInputBox').resolves(customPath)
 
       const selectedCustomPath = commands.executeCommand('dvc.selectDvcPath')
@@ -122,8 +142,19 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         customPath
       )
+
+      expect(mockFindCliPath).to.have.been.calledWith(
+        demoFolderLocation,
+        customPath
+      )
+      expect(mockFindDvcRoots).to.have.been.calledWith(
+        demoFolderLocation,
+        customPath
+      )
       expect(mockShowInputBox).to.have.been.calledOnce
 
+      mockFindCliPath.restore()
+      mockFindDvcRoots.restore()
       mockShowInputBox.restore()
     })
   })

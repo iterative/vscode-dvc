@@ -6,18 +6,17 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import {
-  IntegratedTerminal,
-  runExperiment,
-  initializeDirectory,
-  add,
-  checkout,
-  checkoutRecursive
-} from './IntegratedTerminal'
+import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments, inferDefaultOptions } from './dvcReader'
+import {
+  getExperiments,
+  initializeDirectory,
+  checkout,
+  checkoutRecursive
+} from './cli/reader'
+import { add } from './cli'
 
 import { addFileChangeHandler } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
@@ -39,18 +38,8 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
 
-  private getDefaultCwd = (): string => {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      throw new Error('There are no folders in the Workspace to operate on!')
-    }
-
-    return workspaceFolders[0].uri.fsPath
-  }
-
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
-    const cwd = this.getDefaultCwd()
-    const refsPath = await getExperimentsRefsPath(cwd)
+    const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
     if (!refsPath) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
@@ -60,12 +49,10 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
-    const dvcReaderOptions = await inferDefaultOptions(
-      this.getDefaultCwd(),
-      this.config.dvcPath
-    )
-
-    const experiments = await getExperiments(dvcReaderOptions)
+    const experiments = await getExperiments({
+      cwd: this.config.workspaceRoot,
+      cliPath: this.config.dvcCliPath
+    })
     return this.webviewManager.refreshExperiments(experiments)
   }
 
@@ -120,25 +107,25 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory(fsPath)
+        initializeDirectory({ cwd: fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.add', ({ fsPath }) => {
-        add(fsPath)
+        add({ fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout(fsPath)
+        checkout({ cwd: fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive(fsPath)
+        checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcCliPath })
       })
     )
 
