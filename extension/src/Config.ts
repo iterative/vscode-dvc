@@ -70,7 +70,7 @@ export class Config {
     return <string>workspace.getConfiguration().get('dvc.dvcPath')
   }
 
-  private setDvcPath(path = 'dvc'): Thenable<void> {
+  private setDvcPath(path?: string): Thenable<void> {
     return workspace.getConfiguration().update('dvc.dvcPath', path)
   }
 

@@ -86,8 +86,7 @@
       "properties": {
         "dvc.dvcPath": {
           "type": "string",
-          "description": "Path to DVC.",
-          "default": "dvc",
+          "description": "Path to DVC. When not defined, the Python extension's current interpreter is used.",
           "scope": "resource"
         }
       }
