@@ -16,7 +16,7 @@ import { findCliPath, findDvcRootPaths } from './fileSystem'
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
-  public dvcCliPath = 'dvc'
+  public dvcCliPath?: string = undefined
   public dvcRootPaths: string[] = []
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>

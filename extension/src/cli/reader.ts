@@ -4,7 +4,7 @@ import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../util/pythonExtension'
 
 interface ReaderOptions {
-  cliPath: string
+  cliPath?: string
   cwd: string
 }
 
@@ -12,7 +12,7 @@ const getDvcInvocation = async (options: ReaderOptions) => {
   const { cliPath } = options
   if (cliPath) return cliPath
   const executionDetails = await getPythonExecutionDetails()
-  return executionDetails ? `${executionDetails.join(' ')} -m` : 'dvc'
+  return executionDetails ? `${executionDetails.join(' ')} -m dvc` : 'dvc'
 }
 
 export const execCommand = async (

@@ -87,11 +87,11 @@ export const findCliPath = async (cwd: string, path: string) => {
 
 const findDvcAbsoluteRootPath = async (
   cwd: string,
-  cliPath: string
+  cliPath?: string
 ): Promise<string | undefined> => {
   try {
     const root = await getRoot({
-      cliPath: cliPath,
+      cliPath,
       cwd
     })
     return resolve(cwd, root)
@@ -110,7 +110,7 @@ const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
 
 export const findDvcRootPaths = async (
   cwd: string,
-  cliPath: string
+  cliPath?: string
 ): Promise<string[]> => {
   const [subRoots, absoluteRoot] = await Promise.all([
     findDvcSubRootPaths(cwd),
