@@ -140,7 +140,7 @@ describe('getRoot', () => {
 })
 
 describe('getTracked', () => {
-  it('should return the root relative to the cwd', async () => {
+  it('should return all relative tracked paths', async () => {
     const stdout =
       `data/MNIST/raw/t10k-images-idx3-ubyte\n` +
       `data/MNIST/raw/t10k-images-idx3-ubyte.gz\n` +
