@@ -11,7 +11,7 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import { findCliPath, findDvcRootPaths } from './fileSystem'
+import { findDvcRootPaths } from './fileSystem'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -41,7 +41,6 @@ export class Config {
 
   private setDvcPaths = async () => {
     this.updateDvcPathStatusBarItem()
-    await this.setDvcCliPath()
     return this.findDvcRoots()
   }
 
@@ -57,13 +56,6 @@ export class Config {
     }
 
     return workspaceFolders[0].uri.fsPath
-  }
-
-  private setDvcCliPath = async (): Promise<void> => {
-    const path = await findCliPath(this.workspaceRoot, this.dvcPath)
-    if (path) {
-      this.dvcCliPath = path
-    }
   }
 
   public get dvcPath(): string {
@@ -85,21 +77,40 @@ export class Config {
 
   public selectDvcPath = async (): Promise<string | undefined> => {
     const result = await window.showQuickPick(
-      [{ label: 'default' }, { label: 'custom' }],
-      { placeHolder: 'Please choose...' }
+      [
+        {
+          label: 'Default',
+          description: 'Use Python Extension virtual environment if available',
+          picked: true,
+          value: undefined
+        },
+        {
+          label: 'Global',
+          description: 'Always use the globally installed DVC binary',
+          picked: true,
+          value: 'dvc'
+        },
+        {
+          label: 'Custom',
+          description: 'Type in a DVC binary to use',
+          value: async () => {
+            const path = await window.showInputBox({
+              prompt: 'Enter a custom DVC path...'
+            })
+            await this.setDvcPath(path)
+            return this.dvcPath
+          }
+        }
+      ],
+      {
+        placeHolder: 'Please choose...'
+      }
     )
     if (result) {
-      if (result.label === 'default') {
-        await this.setDvcPath()
-        return this.dvcPath
-      }
-      if (result.label === 'custom') {
-        const path = await window.showInputBox({
-          prompt: 'Enter a custom DVC path...'
-        })
-        await this.setDvcPath(path)
-        return this.dvcPath
-      }
+      const resultValue =
+        typeof result.value === 'function' ? await result.value() : result.value
+      await this.setDvcPath(resultValue)
+      return resultValue
     }
   }
 

@@ -1,9 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
-import { accessSync } from 'fs-extra'
 import debounce from 'lodash.debounce'
-import { basename, dirname, join, resolve } from 'path'
-import { execPromise } from './util'
+import { dirname, join, resolve } from 'path'
 import glob from 'tiny-glob'
 import { getRoot } from './cli/reader'
 
@@ -36,53 +34,6 @@ export const addFileChangeHandler = (
       fileWatcher.close()
     }
   }
-}
-
-const isCliGlobal = async (name: string): Promise<boolean> => {
-  try {
-    await execPromise(`${name} --version`)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-const isFileAccessible = (path: string): boolean => {
-  try {
-    accessSync(path)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-export const findCliPath = async (cwd: string, path: string) => {
-  const cliName = basename(path)
-  if (path === cliName && (await isCliGlobal(cliName))) {
-    return cliName
-  }
-
-  if (isFileAccessible(path)) {
-    return path
-  }
-
-  const defaultRelativePath = join(cwd, path)
-  if (isFileAccessible(defaultRelativePath)) {
-    return defaultRelativePath
-  }
-
-  const files = await glob(join('**', path), {
-    absolute: true,
-    cwd,
-    dot: true,
-    filesOnly: true
-  })
-
-  return files.find(file => {
-    if (isFileAccessible(file)) {
-      return file
-    }
-  })
 }
 
 const findDvcAbsoluteRootPath = async (

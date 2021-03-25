@@ -5,7 +5,6 @@ import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
-import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
 
@@ -84,13 +83,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should be able to select the default path (global installation) of the dvc cli', async () => {
-      const cli = 'dvc'
-      const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves(cli)
-      const mockFindDvcRoots = stub(FileSystem, 'findDvcRootPaths').resolves([
-        demoFolderLocation
-      ])
-
+    it('should be able to select the default path of the dvc cli (Python Extension / global installation)', async () => {
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
@@ -103,29 +96,18 @@ suite('Extension Test Suite', () => {
       const defaultPath = commands.executeCommand('dvc.selectDvcPath')
       await selectDefaultPathInUI()
 
-      expect(await defaultPath).to.equal('dvc')
-      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
-        'dvc'
-      )
+      expect(await defaultPath).to.equal(undefined)
+      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal('')
 
-      expect(mockFindCliPath).to.have.been.calledWith(demoFolderLocation, cli)
-      expect(mockFindDvcRoots).to.have.been.calledWith(demoFolderLocation, cli)
       expect(mockShowInputBox).not.to.have.been.called
 
-      mockFindCliPath.restore()
-      mockFindDvcRoots.restore()
       mockShowInputBox.restore()
     })
 
     it('should be able to select a custom path for the dvc cli', async () => {
       const customPath = join('custom', 'path', 'to', 'dvc')
-      const mockFindCliPath = stub(FileSystem, 'findCliPath').resolves(
-        customPath
-      )
-      const mockFindDvcRoots = stub(FileSystem, 'findDvcRootPaths').resolves([
-        demoFolderLocation
-      ])
       const selectCustomPathInUI = async () => {
+        await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
@@ -143,18 +125,8 @@ suite('Extension Test Suite', () => {
         customPath
       )
 
-      expect(mockFindCliPath).to.have.been.calledWith(
-        demoFolderLocation,
-        customPath
-      )
-      expect(mockFindDvcRoots).to.have.been.calledWith(
-        demoFolderLocation,
-        customPath
-      )
       expect(mockShowInputBox).to.have.been.calledOnce
 
-      mockFindCliPath.restore()
-      mockFindDvcRoots.restore()
       mockShowInputBox.restore()
     })
   })
