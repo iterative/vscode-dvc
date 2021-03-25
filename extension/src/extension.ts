@@ -18,9 +18,10 @@ import {
 } from './cli/reader'
 import { add } from './cli'
 
-import { addFileChangeHandler } from './fileSystem'
+import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
+import { DecorationProvider } from './DecorationProvider'
 
 export { Disposable }
 
@@ -36,6 +37,7 @@ export class Extension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly webviewManager: WebviewManager
+  private readonly decorationProvider: DecorationProvider
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -71,6 +73,17 @@ export class Extension {
     this.resourceLocator = new ResourceLocator(context.extensionPath)
 
     this.config = new Config()
+
+    this.decorationProvider = this.dispose.track(new DecorationProvider())
+
+    this.config.ready.then(() => {
+      findDvcTrackedPaths(
+        this.config.workspaceRoot,
+        this.config.dvcCliPath
+      ).then(files => {
+        this.decorationProvider.setTrackedFiles(files)
+      })
+    })
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
