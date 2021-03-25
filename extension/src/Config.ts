@@ -16,7 +16,6 @@ import { findDvcRootPaths } from './fileSystem'
 export class Config {
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
-  public dvcCliPath?: string = undefined
   public dvcRootPaths: string[] = []
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
@@ -36,17 +35,7 @@ export class Config {
   private dvcPathStatusBarItem: StatusBarItem
 
   private updateDvcPathStatusBarItem = (path = this.dvcPath): void => {
-    this.dvcPathStatusBarItem.text = path
-  }
-
-  private setDvcPaths = async () => {
-    this.updateDvcPathStatusBarItem()
-    return this.findDvcRoots()
-  }
-
-  private setDvcPathsOnActivation = async (dvcPath?: string) => {
-    await this.setDvcPath(dvcPath)
-    return this.setDvcPaths()
+    this.dvcPathStatusBarItem.text = path || ''
   }
 
   private getWorkspaceRoot = (): string => {
@@ -58,8 +47,8 @@ export class Config {
     return workspaceFolders[0].uri.fsPath
   }
 
-  public get dvcPath(): string {
-    return <string>workspace.getConfiguration().get('dvc.dvcPath')
+  public get dvcPath(): string | undefined {
+    return workspace.getConfiguration().get('dvc.dvcPath')
   }
 
   private setDvcPath(path?: string): Thenable<void> {
@@ -112,10 +101,7 @@ export class Config {
   }
 
   private findDvcRoots = async () => {
-    const rootPaths = await findDvcRootPaths(
-      this.workspaceRoot,
-      this.dvcCliPath
-    )
+    const rootPaths = await findDvcRootPaths(this.workspaceRoot)
     this.dvcRootPaths = rootPaths
   }
 
@@ -146,12 +132,10 @@ export class Config {
     )
 
     this.dispose.track(
-      this.onDidChange(async () => {
-        this.setDvcPaths()
+      this.onDidChange(() => {
+        this.updateDvcPathStatusBarItem()
+        this.findDvcRoots()
       })
     )
-
-    const dvcOverridePath = process.env.DVCPATH
-    this.setDvcPathsOnActivation(dvcOverridePath)
   }
 }

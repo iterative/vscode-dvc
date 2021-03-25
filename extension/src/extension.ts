@@ -50,7 +50,7 @@ export class Extension {
   private refreshExperimentsWebview = async () => {
     const experiments = await getExperiments({
       cwd: this.config.workspaceRoot,
-      cliPath: this.config.dvcCliPath
+      cliPath: this.config.dvcPath
     })
     return this.webviewManager.refreshExperiments(experiments)
   }
@@ -104,25 +104,28 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory({ cwd: fsPath, cliPath: this.config.dvcCliPath })
+        initializeDirectory({
+          cwd: fsPath,
+          cliPath: this.config.dvcPath
+        })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.add', ({ fsPath }) => {
-        add({ fsPath, cliPath: this.config.dvcCliPath })
+        add({ fsPath, cliPath: this.config.dvcPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout({ cwd: fsPath, cliPath: this.config.dvcCliPath })
+        checkout({ cwd: fsPath, cliPath: this.config.dvcPath })
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcCliPath })
+        checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcPath })
       })
     )
 
