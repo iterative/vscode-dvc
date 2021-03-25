@@ -1,7 +1,7 @@
 import { Commands } from './commands'
 import { execPromise } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { getPythonExecutionDetails } from '../util/pythonExtension'
+import { getPythonExecutionDetails } from '../extensions/python'
 
 interface ReaderOptions {
   cliPath?: string

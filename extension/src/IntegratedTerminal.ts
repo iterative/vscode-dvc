@@ -1,6 +1,6 @@
 import { Terminal, window, workspace } from 'vscode'
 import { getRunExperimentCommand } from './cli/commands'
-import { getReadyPythonExtension } from './util/pythonExtension'
+import { getReadyPythonExtension } from './extensions/python'
 import { delay } from './util'
 
 // Static class that creates and holds a reference to an integrated terminal and can run commands in it.
