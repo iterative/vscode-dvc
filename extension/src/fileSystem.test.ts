@@ -28,6 +28,8 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
+const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
+
 describe('addFileChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
     const file = '/some/file.csv'
@@ -130,7 +132,6 @@ describe('findCliPath', () => {
 })
 
 describe('findDvcRootPaths', () => {
-  const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
   const dataRoot = resolve(demoFolderLocation, 'data')
   const mockCliPath = 'dvc'
 
@@ -183,7 +184,6 @@ describe('findDvcRootPaths', () => {
 
 describe('getAbsoluteTrackedPath', () => {
   it('should return a list of tracked absolute paths given a list of .dvc files', async () => {
-    const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
     const tracked = getAbsoluteTrackedPath([
       join(demoFolderLocation, 'somefile.txt.dvc')
     ])
@@ -193,8 +193,6 @@ describe('getAbsoluteTrackedPath', () => {
 })
 
 describe('findDvcTrackedPaths', () => {
-  const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
-
   it('should find the .dvc files in the workspace and return them in a Set', async () => {
     mockListDvcOnlyRecursive.mockResolvedValueOnce([])
     const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
