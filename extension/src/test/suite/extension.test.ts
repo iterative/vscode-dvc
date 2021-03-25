@@ -17,16 +17,16 @@ suite('Extension Test Suite', () => {
 
   before(() => {
     stub(DvcReader, 'listDvcOnlyRecursive').resolves([
-      'data/MNIST/raw/t10k-images-idx3-ubyte',
-      'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
-      'data/MNIST/raw/t10k-labels-idx1-ubyte',
-      'data/MNIST/raw/t10k-labels-idx1-ubyte.gz',
-      'data/MNIST/raw/train-images-idx3-ubyte',
-      'data/MNIST/raw/train-images-idx3-ubyte.gz',
-      'data/MNIST/raw/train-labels-idx1-ubyte',
-      'data/MNIST/raw/train-labels-idx1-ubyte.gz',
-      'logs/acc.tsv',
-      'logs/loss.tsv',
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
+      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
+      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
+      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
+      join('logs', 'acc.tsv'),
+      join('logs', 'loss.tsv'),
       'model.pt'
     ])
   })
