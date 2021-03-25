@@ -85,8 +85,9 @@
       "title": "DVC",
       "properties": {
         "dvc.dvcPath": {
+          "title": "%config.dvcPath.title%",
+          "description": "%config.dvcPath.description%",
           "type": "string",
-          "description": "When defined, this string is used to invoke DVC from the CLI over all other settings.",
           "scope": "resource"
         }
       }
