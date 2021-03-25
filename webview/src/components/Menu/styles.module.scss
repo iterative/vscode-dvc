@@ -19,6 +19,9 @@
     li:last-child {
       border: none;
     }
+    li[role='separator']:first-child {
+      display: none;
+    }
   }
   li[role='separator'] {
     list-style: none;
