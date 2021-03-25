@@ -125,7 +125,6 @@ suite('Extension Test Suite', () => {
       const selectCustomPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
-        await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
           'workbench.action.acceptSelectedQuickOpenItem'
         )

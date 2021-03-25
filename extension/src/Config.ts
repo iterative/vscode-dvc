@@ -84,12 +84,6 @@ export class Config {
           value: undefined
         },
         {
-          label: 'Global',
-          description: 'Always use the globally installed DVC binary',
-          picked: true,
-          value: 'dvc'
-        },
-        {
           label: 'Custom',
           description: 'Type in a DVC binary to use',
           value: () =>
