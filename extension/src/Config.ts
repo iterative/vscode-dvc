@@ -34,8 +34,8 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private updateDvcPathStatusBarItem = (path = this.dvcPath): void => {
-    this.dvcPathStatusBarItem.text = path || ''
+  private updateDvcPathStatusBarItem = (path = this.dvcPath || ''): void => {
+    this.dvcPathStatusBarItem.text = path
   }
 
   private getWorkspaceRoot = (): string => {
@@ -60,6 +60,7 @@ export class Config {
 
     dvcPathStatusBarItem.tooltip = 'Current DVC path.'
     dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
+    dvcPathStatusBarItem.text = this.dvcPath || ''
     dvcPathStatusBarItem.show()
     return dvcPathStatusBarItem
   }
