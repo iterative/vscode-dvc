@@ -85,6 +85,9 @@ export const findCliPath = async (cwd: string, path: string) => {
   })
 }
 
+const filterRootDir = (dirs: string[], rootDir: string) =>
+  dirs.filter(dir => dir !== rootDir)
+
 const findDvcAbsoluteRootPath = async (
   cwd: string,
   cliPath: string
@@ -105,7 +108,10 @@ const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
     dot: true
   })
 
-  return files.map(file => dirname(file)).filter(folder => folder !== cwd)
+  return filterRootDir(
+    files.map(file => dirname(file)),
+    cwd
+  )
 }
 
 export const findDvcRootPaths = async (
@@ -122,7 +128,20 @@ export const findDvcRootPaths = async (
   return roots
 }
 
-export const findDvcTracked = async (
+export const getAbsoluteTrackedPath = (files: string[]): string[] =>
+  files.map(file => resolve(dirname(file), basename(file, '.dvc')))
+
+const getAbsolutePath = (rootDir: string, files: string[]): string[] =>
+  files.map(file => join(rootDir, file))
+
+const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
+  return filterRootDir(
+    files.map(file => join(rootDir, dirname(file))),
+    rootDir
+  )
+}
+
+export const findDvcTrackedPaths = async (
   cwd: string,
   cliPath: string
 ): Promise<Set<string>> => {
@@ -138,8 +157,8 @@ export const findDvcTracked = async (
   ])
 
   return new Set([
-    ...dotDvcFiles.map(file => resolve(dirname(file), basename(file, '.dvc'))),
-    ...dvcListFiles.map(file => join(cwd, file)),
-    ...dvcListFiles.map(file => join(cwd, dirname(file)))
+    ...getAbsoluteTrackedPath(dotDvcFiles),
+    ...getAbsolutePath(cwd, dvcListFiles),
+    ...getAbsoluteParentPath(cwd, dvcListFiles)
   ])
 }

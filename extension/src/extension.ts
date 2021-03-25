@@ -26,7 +26,7 @@ import {
 } from './cli/reader'
 import { add } from './cli'
 
-import { addFileChangeHandler, findDvcTracked } from './fileSystem'
+import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
@@ -90,11 +90,12 @@ export class Extension {
     )
 
     this.config.ready.then(() => {
-      findDvcTracked(this.config.workspaceRoot, this.config.dvcCliPath).then(
-        files => {
-          this.decorationProvider.setTrackedFiles(files)
-        }
-      )
+      findDvcTrackedPaths(
+        this.config.workspaceRoot,
+        this.config.dvcCliPath
+      ).then(files => {
+        this.decorationProvider.setTrackedFiles(files)
+      })
     })
 
     this.webviewManager = this.dispose.track(

@@ -10,7 +10,8 @@ const {
   addFileChangeHandler,
   findCliPath,
   findDvcRootPaths,
-  findDvcTracked,
+  findDvcTrackedPaths,
+  getAbsoluteTrackedPath,
   getWatcher
 } = fileSystem
 
@@ -180,15 +181,45 @@ describe('findDvcRootPaths', () => {
   })
 })
 
-describe('findDvcTracked', () => {
+describe('getAbsoluteTrackedPath', () => {
+  it('should find all the .dvc files in the workspace and return them in a Set', async () => {
+    const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
+    const tracked = getAbsoluteTrackedPath([
+      join(demoFolderLocation, 'somefile.txt.dvc')
+    ])
+
+    expect(tracked).toEqual([join(demoFolderLocation, 'somefile.txt')])
+  })
+})
+
+describe('findDvcTrackedPaths', () => {
   const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
 
-  it('should find the .dvc files in the workspace', async () => {
+  it('should find the .dvc files in the workspace and return them in a Set', async () => {
     mockListDvcOnlyRecursive.mockResolvedValueOnce([])
-    const dvcRoots = await findDvcTracked(demoFolderLocation, 'dvc')
+    const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
 
-    expect(dvcRoots).toEqual(
+    expect(tracked).toEqual(
       new Set([resolve(demoFolderLocation, 'data', 'MNIST', 'raw')])
+    )
+  })
+
+  it('should return a Set of tracked files, their folders and any .dvc files', async () => {
+    const logFolder = 'logs'
+    const logAcc = join(logFolder, 'acc.tsv')
+    const logLoss = join(logFolder, 'loss.tsv')
+    const model = 'model.pt'
+    mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
+    const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
+
+    expect(tracked).toEqual(
+      new Set([
+        resolve(demoFolderLocation, 'data', 'MNIST', 'raw'),
+        resolve(demoFolderLocation, logAcc),
+        resolve(demoFolderLocation, logLoss),
+        resolve(demoFolderLocation, logFolder),
+        resolve(demoFolderLocation, model)
+      ])
     )
   })
 })
