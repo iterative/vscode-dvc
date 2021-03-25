@@ -32,7 +32,8 @@ See something that should be changed? Want to request a new feature? Open
   (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
   them individually).
 
-- run the `dev-ui` script to launch VS code in with this plugin in dev mode.
+- run the `dev-ui` script (or `dev-ui-win` on Windows) to launch VS code with
+  our extension installed.
 
 ### The demo project
 
