@@ -93,13 +93,10 @@ export class Config {
         {
           label: 'Custom',
           description: 'Type in a DVC binary to use',
-          value: async () => {
-            const path = await window.showInputBox({
+          value: () =>
+            window.showInputBox({
               prompt: 'Enter a custom DVC path...'
             })
-            await this.setDvcPath(path)
-            return this.dvcPath
-          }
         }
       ],
       {
