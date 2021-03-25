@@ -26,8 +26,8 @@ export class DecorationProvider implements FileDecorationProvider {
     )
   }
 
-  constructor(eventEmitter: EventEmitter<Uri[]>) {
-    this.onDidChangeDecorations = eventEmitter
+  constructor() {
+    this.onDidChangeDecorations = new EventEmitter<Uri[]>()
     this.onDidChangeFileDecorations = this.onDidChangeDecorations.event
 
     this.disposables.push(window.registerFileDecorationProvider(this))

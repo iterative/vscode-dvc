@@ -1,12 +1,4 @@
-import {
-  workspace,
-  window,
-  commands,
-  scm,
-  Uri,
-  ExtensionContext,
-  EventEmitter
-} from 'vscode'
+import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -46,7 +38,6 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
-  private readonly decorationUpdater: EventEmitter<Uri[]>
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -83,11 +74,7 @@ export class Extension {
 
     this.config = new Config()
 
-    this.decorationUpdater = this.dispose.track(new EventEmitter<Uri[]>())
-
-    this.decorationProvider = this.dispose.track(
-      new DecorationProvider(this.decorationUpdater)
-    )
+    this.decorationProvider = this.dispose.track(new DecorationProvider())
 
     this.config.ready.then(() => {
       findDvcTrackedPaths(
