@@ -1,4 +1,12 @@
-import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
+import {
+  workspace,
+  window,
+  commands,
+  scm,
+  Uri,
+  ExtensionContext,
+  EventEmitter
+} from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -18,10 +26,10 @@ import {
 } from './cli/reader'
 import { add } from './cli'
 
-import { addFileChangeHandler } from './fileSystem'
+import { addFileChangeHandler, findDvcTracked } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
-import { DVCDecorationProvider } from './DecorationProvider'
+import { DecorationProvider } from './DecorationProvider'
 
 export { Disposable }
 
@@ -37,6 +45,8 @@ export class Extension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly webviewManager: WebviewManager
+  private readonly decorationProvider: DecorationProvider
+  private readonly decorationUpdater: EventEmitter<Uri[]>
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -73,11 +83,23 @@ export class Extension {
 
     this.config = new Config()
 
+    this.decorationUpdater = this.dispose.track(new EventEmitter<Uri[]>())
+
+    this.decorationProvider = this.dispose.track(
+      new DecorationProvider(this.decorationUpdater)
+    )
+
+    this.config.ready.then(() => {
+      findDvcTracked(this.config.workspaceRoot, this.config.dvcCliPath).then(
+        files => {
+          this.decorationProvider.setTrackedFiles(files)
+        }
+      )
+    })
+
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
-
-    this.dispose.track(new DVCDecorationProvider())
 
     this.onChangeExperimentsUpdateWebview().then(disposable =>
       this.dispose.track(disposable)

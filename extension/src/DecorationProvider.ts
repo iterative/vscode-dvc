@@ -1,28 +1,41 @@
 import {
   window,
+  Event,
+  EventEmitter,
   Disposable,
   FileDecorationProvider,
   FileDecoration,
-  Uri,
-  ThemeColor
+  Uri
 } from 'vscode'
 
-export class DVCDecorationProvider implements FileDecorationProvider {
-  private static Decoration: FileDecoration = {
-    tooltip: 'DVC Test!',
-    badge: 'D',
-    color: new ThemeColor('#FF1111')
+export class DecorationProvider implements FileDecorationProvider {
+  private static DecorationTracked: FileDecoration = {
+    tooltip: 'DVC tracked'
   }
 
   private disposables: Disposable[] = []
 
-  constructor() {
+  private trackedFiles?: Set<string>
+  readonly onDidChangeFileDecorations: Event<Uri[]>
+  private readonly onDidChangeDecorations: EventEmitter<Uri[]>
+
+  public setTrackedFiles = (trackedFiles: Set<string>) => {
+    this.trackedFiles = trackedFiles
+    this.onDidChangeDecorations.fire(
+      [...this.trackedFiles.values()].map(value => Uri.file(value))
+    )
+  }
+
+  constructor(eventEmitter: EventEmitter<Uri[]>) {
+    this.onDidChangeDecorations = eventEmitter
+    this.onDidChangeFileDecorations = this.onDidChangeDecorations.event
+
     this.disposables.push(window.registerFileDecorationProvider(this))
   }
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
-    if (uri.path.endsWith('.dvc')) {
-      return DVCDecorationProvider.Decoration
+    if (this.trackedFiles?.has(uri.path)) {
+      return DecorationProvider.DecorationTracked
     }
   }
 
