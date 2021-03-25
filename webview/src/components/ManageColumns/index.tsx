@@ -22,6 +22,18 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
     column.toggleHidden()
   }
 
+  const matchesFilter = (column: ColumnInstance<Experiment>): boolean => {
+    const id = column.id
+    const [parts] = id.split(']')
+    if (parts === '[params') {
+      return tabId === 'parameters'
+    } else if (parts === '[metrics') {
+      return tabId === 'metrics'
+    } else {
+      return tabId === 'general'
+    }
+  }
+
   const toggle = (
     <DropdownToggle
       className={styles.manageColumns__toggleBtn}
@@ -31,48 +43,52 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
     />
   )
 
-  const columnOptions = (column: ColumnInstance<Experiment>) => (
-    <div key={column.id}>
-      {!column.canSort && (
-        <>
-          <MenuSeparator key={column.id} />
-          <span
-            key={`${column.id}-column-group`}
-            className={styles.manageColumns__columnGroup}
-          >
-            {'-'.repeat(column.depth)}
-            {column.Header}
-          </span>
-        </>
-      )}
-      {column.canSort && (
-        <MenuItem
-          id={column.id}
-          key={`manage-column-${column.id}`}
-          onClick={() => onSelect(column)}
-        >
-          <input
-            type="checkbox"
+  const columnOptions = (column: ColumnInstance<Experiment>) => {
+    return (
+      <div key={column.id}>
+        {!column.canSort && (
+          <>
+            <MenuSeparator key={column.id} />
+            <span
+              key={`${column.id}-column-group`}
+              className={styles.manageColumns__columnGroup}
+            >
+              {'-'.repeat(column.depth)}
+              {column.Header}
+            </span>
+          </>
+        )}
+        {column.canSort && (
+          <MenuItem
             id={column.id}
-            checked={column.isVisible}
-            readOnly
-            key={`manage-column-input-${column.id}`}
-          />
-          <span key={`column-${column.Header}-span`}>
-            {'-'.repeat(column.depth)}
-          </span>
-          {column.Header}
-        </MenuItem>
-      )}
-      {column.columns &&
-        column.columns.map(childColumn => columnOptions(childColumn))}
-    </div>
-  )
+            key={`manage-column-${column.id}`}
+            onClick={() => onSelect(column)}
+          >
+            <input
+              type="checkbox"
+              id={column.id}
+              checked={column.isVisible}
+              readOnly
+              key={`manage-column-input-${column.id}`}
+            />
+            <span key={`column-${column.Header}-span`}>
+              {'-'.repeat(column.depth)}
+            </span>
+            {column.Header}
+          </MenuItem>
+        )}
+        {column.columns &&
+          column.columns.map(childColumn => columnOptions(childColumn))}
+      </div>
+    )
+  }
 
   const menuItems = [
     <MenuItemGroup id="column-visibility" key="column-visibility-group">
       {columnInstances.map(column => {
-        return <div key={column.id}>{columnOptions(column)}</div>
+        if (matchesFilter(column)) {
+          return <div key={column.id}>{columnOptions(column)}</div>
+        }
       })}
     </MenuItemGroup>
   ]
@@ -101,7 +117,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   )
 
   const content = (
-    <div style={{ width: 350 }}>
+    <div className={styles.manageColumns}>
       {columnTabs}
       {menuItems}
     </div>
