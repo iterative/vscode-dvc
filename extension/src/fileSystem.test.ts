@@ -182,7 +182,7 @@ describe('findDvcRootPaths', () => {
 })
 
 describe('getAbsoluteTrackedPath', () => {
-  it('should find all the .dvc files in the workspace and return them in a Set', async () => {
+  it('should return a list of tracked absolute paths given a list of .dvc files', async () => {
     const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
     const tracked = getAbsoluteTrackedPath([
       join(demoFolderLocation, 'somefile.txt.dvc')
