@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'mocha'
+import { describe, it, before, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
@@ -14,6 +14,22 @@ const { expect } = chai
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
+
+  before(() => {
+    stub(DvcReader, 'listDvcOnlyRecursive').resolves([
+      'data/MNIST/raw/t10k-images-idx3-ubyte',
+      'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
+      'data/MNIST/raw/t10k-labels-idx1-ubyte',
+      'data/MNIST/raw/t10k-labels-idx1-ubyte.gz',
+      'data/MNIST/raw/train-images-idx3-ubyte',
+      'data/MNIST/raw/train-images-idx3-ubyte.gz',
+      'data/MNIST/raw/train-labels-idx1-ubyte',
+      'data/MNIST/raw/train-labels-idx1-ubyte.gz',
+      'logs/acc.tsv',
+      'logs/loss.tsv',
+      'model.pt'
+    ])
+  })
 
   const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
