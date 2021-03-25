@@ -11,5 +11,12 @@
   "mochaExplorer.require": ["ts-node/register", "source-map-support/register"],
   "tasksStatusbar.taskLabelFilter": "dev",
   "editor.formatOnSave": true,
-  "cSpell.words": ["DVCPATH", "symlinked", "toplevel", "venv", "virtualenv"]
+  "cSpell.words": [
+    "DVCPATH",
+    "MNIST",
+    "symlinked",
+    "toplevel",
+    "venv",
+    "virtualenv"
+  ]
 }

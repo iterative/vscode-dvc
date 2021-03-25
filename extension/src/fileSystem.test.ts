@@ -4,9 +4,15 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { dirname, join, resolve } from 'path'
 import { mkdirSync, rmdir } from 'fs-extra'
-import { getRoot } from './cli/reader'
+import { getRoot, listDvcOnlyRecursive } from './cli/reader'
 
-const { addFileChangeHandler, findDvcRootPaths, getWatcher } = fileSystem
+const {
+  addFileChangeHandler,
+  findDvcRootPaths,
+  findDvcTrackedPaths,
+  getAbsoluteTrackedPath,
+  getWatcher
+} = fileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -15,10 +21,13 @@ jest.mock('./cli/reader')
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
 const mockGetRoot = mocked(getRoot)
+const mockListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 
 beforeEach(() => {
   jest.resetAllMocks()
 })
+
+const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
 
 describe('addFileChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
@@ -86,7 +95,6 @@ describe('getWatcher', () => {
 })
 
 describe('findDvcRootPaths', () => {
-  const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
   const dataRoot = resolve(demoFolderLocation, 'data')
   const mockCliPath = 'dvc'
 
@@ -134,5 +142,45 @@ describe('findDvcRootPaths', () => {
   it('should return an empty array given no dvc root in or above the given directory', async () => {
     const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath)
     expect(dvcRoots).toEqual([])
+  })
+})
+
+describe('getAbsoluteTrackedPath', () => {
+  it('should return a list of tracked absolute paths given a list of .dvc files', async () => {
+    const tracked = getAbsoluteTrackedPath([
+      join(demoFolderLocation, 'somefile.txt.dvc')
+    ])
+
+    expect(tracked).toEqual([join(demoFolderLocation, 'somefile.txt')])
+  })
+})
+
+describe('findDvcTrackedPaths', () => {
+  it('should find the paths in the workspace corresponding to .dvc files and return them in a Set', async () => {
+    mockListDvcOnlyRecursive.mockResolvedValueOnce([])
+    const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
+
+    expect(tracked).toEqual(
+      new Set([resolve(demoFolderLocation, 'data', 'MNIST', 'raw')])
+    )
+  })
+
+  it('should return a Set of tracked paths, their folders (if files) and any paths corresponding .dvc files', async () => {
+    const logFolder = 'logs'
+    const logAcc = join(logFolder, 'acc.tsv')
+    const logLoss = join(logFolder, 'loss.tsv')
+    const model = 'model.pt'
+    mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
+    const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
+
+    expect(tracked).toEqual(
+      new Set([
+        resolve(demoFolderLocation, 'data', 'MNIST', 'raw'),
+        resolve(demoFolderLocation, logAcc),
+        resolve(demoFolderLocation, logLoss),
+        resolve(demoFolderLocation, logFolder),
+        resolve(demoFolderLocation, model)
+      ])
+    )
   })
 })

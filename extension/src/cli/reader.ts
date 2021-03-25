@@ -59,3 +59,10 @@ export const getRoot = async (options: ReaderOptions): Promise<string> => {
   const { stdout } = await execCommand(options, 'root')
   return stdout.trim()
 }
+
+export const listDvcOnlyRecursive = async (
+  options: ReaderOptions
+): Promise<string[]> => {
+  const { stdout } = await execCommand(options, `list . --dvc-only -R`)
+  return stdout.trim().split('\n')
+}

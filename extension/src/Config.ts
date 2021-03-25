@@ -12,8 +12,13 @@ import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
 import { findDvcRootPaths } from './fileSystem'
+import { Deferred } from '@hediet/std/synchronization'
 
 export class Config {
+  private readonly _initialized = new Deferred()
+
+  private readonly initialized = this._initialized.promise
+
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
   public dvcRootPaths: string[] = []
@@ -29,6 +34,10 @@ export class Config {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
+  }
+
+  public get ready() {
+    return this.initialized
   }
 
   @observable
