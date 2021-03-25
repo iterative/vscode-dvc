@@ -4,7 +4,8 @@ import {
   checkout,
   initializeDirectory,
   checkoutRecursive,
-  getRoot
+  getRoot,
+  listDvcOnlyRecursive
 } from './reader'
 import { execPromise } from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
@@ -133,6 +134,50 @@ describe('getRoot', () => {
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
     expect(mockedExecPromise).toBeCalledWith('dvc root', {
+      cwd
+    })
+  })
+})
+
+describe('getTracked', () => {
+  it('should return the root relative to the cwd', async () => {
+    const stdout =
+      `data/MNIST/raw/t10k-images-idx3-ubyte\n` +
+      `data/MNIST/raw/t10k-images-idx3-ubyte.gz\n` +
+      `data/MNIST/raw/t10k-labels-idx1-ubyte\n` +
+      `data/MNIST/raw/t10k-labels-idx1-ubyte.gz\n` +
+      `data/MNIST/raw/train-images-idx3-ubyte\n` +
+      `data/MNIST/raw/train-images-idx3-ubyte.gz\n` +
+      `data/MNIST/raw/train-labels-idx1-ubyte\n` +
+      `data/MNIST/raw/train-labels-idx1-ubyte.gz\n` +
+      `logs/acc.tsv\n` +
+      `logs/loss.tsv\n` +
+      `model.pt`
+    const cwd = resolve()
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: stdout,
+      stderr: ''
+    })
+    const tracked = await listDvcOnlyRecursive({
+      cwd,
+      cliPath: 'dvc'
+    })
+
+    expect(tracked).toEqual([
+      'data/MNIST/raw/t10k-images-idx3-ubyte',
+      'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
+      'data/MNIST/raw/t10k-labels-idx1-ubyte',
+      'data/MNIST/raw/t10k-labels-idx1-ubyte.gz',
+      'data/MNIST/raw/train-images-idx3-ubyte',
+      'data/MNIST/raw/train-images-idx3-ubyte.gz',
+      'data/MNIST/raw/train-labels-idx1-ubyte',
+      'data/MNIST/raw/train-labels-idx1-ubyte.gz',
+      'logs/acc.tsv',
+      'logs/loss.tsv',
+      'model.pt'
+    ])
+
+    expect(mockedExecPromise).toBeCalledWith('dvc list . --dvc-only -R', {
       cwd
     })
   })
