@@ -4,12 +4,13 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { basename, dirname, join, resolve } from 'path'
 import { mkdirSync, rmdir } from 'fs-extra'
-import { getRoot } from './cli/reader'
+import { getRoot, listDvcOnlyRecursive } from './cli/reader'
 
 const {
   addFileChangeHandler,
   findCliPath,
   findDvcRootPaths,
+  findDvcTracked,
   getWatcher
 } = fileSystem
 
@@ -20,6 +21,7 @@ jest.mock('./cli/reader')
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
 const mockGetRoot = mocked(getRoot)
+const mockListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -175,5 +177,18 @@ describe('findDvcRootPaths', () => {
   it('should return an empty array given no dvc root in or above the given directory', async () => {
     const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath)
     expect(dvcRoots).toEqual([])
+  })
+})
+
+describe('findDvcTracked', () => {
+  const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
+
+  it('should find the .dvc files in the workspace', async () => {
+    mockListDvcOnlyRecursive.mockResolvedValueOnce([])
+    const dvcRoots = await findDvcTracked(demoFolderLocation, 'dvc')
+
+    expect(dvcRoots).toEqual(
+      new Set([resolve(demoFolderLocation, 'data', 'MNIST', 'raw')])
+    )
   })
 })

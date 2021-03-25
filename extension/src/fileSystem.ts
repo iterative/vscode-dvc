@@ -5,7 +5,7 @@ import debounce from 'lodash.debounce'
 import { basename, dirname, join, resolve } from 'path'
 import { execPromise } from './util'
 import glob from 'tiny-glob'
-import { getRoot } from './cli/reader'
+import { getRoot, listDvcOnlyRecursive } from './cli/reader'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -120,4 +120,26 @@ export const findDvcRootPaths = async (
   const roots = [...subRoots, absoluteRoot].filter(v => v).sort() as string[]
 
   return roots
+}
+
+export const findDvcTracked = async (
+  cwd: string,
+  cliPath: string
+): Promise<Set<string>> => {
+  const [dotDvcFiles, dvcListFiles] = await Promise.all([
+    glob(join('**', '*.dvc'), {
+      absolute: true,
+      cwd,
+      dot: true,
+      filesOnly: true
+    }),
+
+    listDvcOnlyRecursive({ cwd, cliPath })
+  ])
+
+  return new Set([
+    ...dotDvcFiles.map(file => resolve(dirname(file), basename(file, '.dvc'))),
+    ...dvcListFiles.map(file => join(cwd, file)),
+    ...dvcListFiles.map(file => join(cwd, dirname(file)))
+  ])
 }
