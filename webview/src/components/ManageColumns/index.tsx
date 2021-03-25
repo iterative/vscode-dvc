@@ -1,19 +1,18 @@
 import React from 'react'
 import { InstanceProp } from '../Table'
-import {
-  MenuToggle,
-  Menu,
-  MenuItemGroup,
-  MenuItem,
-  MenuSeparator
-} from '../Menu/index'
+import { MenuItemGroup, MenuItem, MenuSeparator } from '../Menu/index'
 import styles from './styles.module.scss'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
+import { Dropdown, DropdownToggle } from '../Dropdown'
+import { TabButton } from '../Button'
+
+type TabId = 'general' | 'metrics' | 'parameters'
 
 const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   const { columns: columnInstances } = instance
   const [isOpen, setIsOpen] = React.useState(false)
+  const [tabId, setTabId] = React.useState<TabId>('general')
 
   const onToggle = (isOpen: boolean) => {
     setIsOpen(isOpen)
@@ -24,7 +23,8 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   }
 
   const toggle = (
-    <MenuToggle
+    <DropdownToggle
+      className={styles.manageColumns__toggleBtn}
       onToggle={onToggle}
       toggleTemplate={'Manage Columns'}
       id="toggle"
@@ -77,12 +77,42 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
     </MenuItemGroup>
   ]
 
+  const columnTabs = (
+    <div>
+      <TabButton
+        active={tabId === 'general'}
+        onClick={() => setTabId('general')}
+      >
+        GENERAL
+      </TabButton>
+      <TabButton
+        active={tabId === 'metrics'}
+        onClick={() => setTabId('metrics')}
+      >
+        METRICS
+      </TabButton>
+      <TabButton
+        active={tabId === 'parameters'}
+        onClick={() => setTabId('parameters')}
+      >
+        PARAMETERS
+      </TabButton>
+    </div>
+  )
+
+  const content = (
+    <div style={{ width: 350 }}>
+      {columnTabs}
+      {menuItems}
+    </div>
+  )
+
   return (
-    <Menu
+    <Dropdown
       id="manage-columns"
-      menuItems={menuItems}
-      isOpen={isOpen}
       toggle={toggle}
+      content={content}
+      isOpen={isOpen}
     />
   )
 }

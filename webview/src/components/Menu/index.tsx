@@ -1,13 +1,6 @@
-import React, { MouseEvent } from 'react'
+import React, { MouseEvent, ReactElement } from 'react'
 import styles from './styles.module.scss'
-import { useCloseActiveHook } from '../../util/useCloseActiveHook'
-
-export interface MenuToggleProps {
-  onToggle?: (isOpen: boolean) => void
-  isOpen?: boolean
-  toggleTemplate?: React.ReactNode
-  id: string
-}
+import { Dropdown, DropdownToggle } from '../Dropdown'
 
 export interface MenuItemProps {
   children?: React.ReactNode
@@ -21,7 +14,7 @@ export interface MenuItemProps {
 export interface MenuProps {
   menuItems: React.ReactNode[]
   isOpen: boolean
-  toggle: React.ReactElement
+  toggle: ReactElement
   id: string
 }
 
@@ -34,35 +27,7 @@ export const MenuSeparator: React.FC = () => {
   return <li role="separator"></li>
 }
 
-export const MenuToggle: React.FC<MenuToggleProps> = ({
-  isOpen,
-  onToggle,
-  id,
-  toggleTemplate
-}) => {
-  return (
-    <button
-      onClick={() => onToggle && onToggle(!isOpen)}
-      className={styles.menu__toggle}
-      id={id}
-    >
-      <span className={styles.menu__toggle__text}>{toggleTemplate}</span>
-      <span className={styles.menu__toggle__icon}>
-        <svg
-          fill="currentColor"
-          height="1em"
-          width="1em"
-          viewBox="0 0 320 512"
-          aria-hidden="true"
-          role="img"
-          style={{ verticalAlign: -0.125 + 'em' }}
-        >
-          <path d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"></path>
-        </svg>
-      </span>
-    </button>
-  )
-}
+export const MenuToggle = DropdownToggle
 
 export const MenuItem: React.FC<MenuItemProps> = ({
   children,
@@ -122,31 +87,7 @@ export const Menu: React.FC<MenuProps> = ({
   toggle,
   id
 }) => {
-  const MenuRef = React.useRef(null)
-  let renderedMenuItems
-  const [isActive, setIsActive] = useCloseActiveHook(MenuRef, false)
-
-  if (menuItems && menuItems.length) {
-    renderedMenuItems = menuItems
-  }
-
-  const onClick = () => setIsActive(!isActive)
-
   return (
-    <div className={styles.menu} id={id}>
-      {React.cloneElement(toggle, {
-        isOpen,
-        onToggle: onClick // this passes the current toggle status to MenuToggle component
-      })}
-      <div
-        ref={MenuRef}
-        className={`${styles.menu__menuOptions} ${
-          !isActive && !isOpen ? styles.menu__menuOptions__inactive : ''
-        }`}
-        role="menu"
-      >
-        {renderedMenuItems}
-      </div>
-    </div>
+    <Dropdown content={menuItems} isOpen={isOpen} toggle={toggle} id={id} />
   )
 }

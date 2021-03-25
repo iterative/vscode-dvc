@@ -90,3 +90,6 @@ package-lock.json
 
 .vscode-test/
 storybook-static
+
+# intellij
+.idea/

@@ -9,6 +9,9 @@
         padding-left: 0.5rem;
         padding-right: 0.5rem;
     }
+    &__toggleBtn {
+        background-color: rgb(54, 54, 54);
+    }
 }
 input[type="checkbox"] {
     margin-right: 1.5rem;

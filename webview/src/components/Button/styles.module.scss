@@ -1,0 +1,35 @@
+.button {
+  padding: 0.375rem 0.5rem;
+  position: relative;
+  align-items: center;
+  justify-content: space-around;
+  min-width: 50px;
+  line-height: 1.5;
+  color: var(--vscode-tab-inactiveForeground);
+  background-color: transparent;
+  border: none;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1rem;
+
+  &:active, &:hover, .pressed {
+    color: var(--vscode-tab-activeForeground)
+  }
+
+  &__tab {
+    &.active {
+      margin-bottom: -1px;
+      color: var(--vscode-tab-activeForeground);
+      border-bottom: 1px solid var(--vscode-tab-activeForeground);
+    }
+  }
+
+  &__small {
+
+  }
+  &__large {
+
+  }
+}
