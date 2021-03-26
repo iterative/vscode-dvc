@@ -88,7 +88,8 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
 
   const hideAll = (column: ColumnInstance<Experiment>) => {
     if (columnIsParent(column)) {
-      for (const c of column.columns) {
+      const { columns } = column as { columns: ColumnInstance<Experiment>[] }
+      for (const c of columns) {
         hideAll(c)
       }
     } else if (columnMatchesSearch(column, searchTerm)) {
@@ -97,6 +98,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
   }
 
   if (columnIsParent(column)) {
+    const { columns } = column as { columns: ColumnInstance<Experiment>[] }
     return (
       <div>
         <MenuItem
@@ -126,7 +128,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
           </Button>
         </MenuItem>
         {!effectivelyCollapsed &&
-          column.columns.map(c => (
+          columns.map(c => (
             <ColumnRows
               key={c.id}
               searchTerm={searchTerm}
