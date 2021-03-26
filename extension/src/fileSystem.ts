@@ -5,7 +5,7 @@ import debounce from 'lodash.debounce'
 import { basename, dirname, join, resolve } from 'path'
 import { execPromise } from './util'
 import glob from 'tiny-glob'
-import { getRoot } from './cli/reader'
+import { getRoot, listDvcOnlyRecursive } from './cli/reader'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -85,6 +85,9 @@ export const findCliPath = async (cwd: string, path: string) => {
   })
 }
 
+const filterRootDir = (dirs: string[], rootDir: string) =>
+  dirs.filter(dir => dir !== rootDir)
+
 const findDvcAbsoluteRootPath = async (
   cwd: string,
   cliPath: string
@@ -105,7 +108,10 @@ const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
     dot: true
   })
 
-  return files.map(file => dirname(file)).filter(folder => folder !== cwd)
+  return filterRootDir(
+    files.map(file => dirname(file)),
+    cwd
+  )
 }
 
 export const findDvcRootPaths = async (
@@ -120,4 +126,39 @@ export const findDvcRootPaths = async (
   const roots = [...subRoots, absoluteRoot].filter(v => v).sort() as string[]
 
   return roots
+}
+
+export const getAbsoluteTrackedPath = (files: string[]): string[] =>
+  files.map(file => resolve(dirname(file), basename(file, '.dvc')))
+
+const getAbsolutePath = (rootDir: string, files: string[]): string[] =>
+  files.map(file => join(rootDir, file))
+
+const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
+  return filterRootDir(
+    files.map(file => join(rootDir, dirname(file))),
+    rootDir
+  )
+}
+
+export const findDvcTrackedPaths = async (
+  cwd: string,
+  cliPath: string
+): Promise<Set<string>> => {
+  const [dotDvcFiles, dvcListFiles] = await Promise.all([
+    glob(join('**', '*.dvc'), {
+      absolute: true,
+      cwd,
+      dot: true,
+      filesOnly: true
+    }),
+
+    listDvcOnlyRecursive({ cwd, cliPath })
+  ])
+
+  return new Set([
+    ...getAbsoluteTrackedPath(dotDvcFiles),
+    ...getAbsolutePath(cwd, dvcListFiles),
+    ...getAbsoluteParentPath(cwd, dvcListFiles)
+  ])
 }

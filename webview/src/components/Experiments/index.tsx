@@ -81,8 +81,12 @@ export const ExperimentsTable: React.FC<{
         Header: 'Experiment',
         id: 'id',
         accessor: ({ name, id }) => {
-          if (name) return name
-          if (id === 'workspace') return id
+          if (name) {
+            return name
+          }
+          if (id === 'workspace') {
+            return id
+          }
           return id.slice(0, 7)
         },
         width: 150
@@ -91,7 +95,9 @@ export const ExperimentsTable: React.FC<{
         Header: 'Timestamp',
         accessor: 'timestamp',
         Cell: ({ value }: { value: string }) => {
-          if (!value || value === '') return null
+          if (!value || value === '') {
+            return null
+          }
           const time = dayjs(value)
           return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
         }

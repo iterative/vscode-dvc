@@ -1,3 +1,5 @@
 /model.pt
 /data/MNIST/processed
 /.vscode/settings.json
+/logs
+/.env

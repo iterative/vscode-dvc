@@ -6,11 +6,7 @@ export interface InputProps extends HTMLProps<HTMLInputElement> {
   fullWidth?: boolean
 }
 
-export const Input: React.FC<InputProps> = ({
-  className,
-  fullWidth,
-  ...rest
-}) => {
+export const Input: React.FC<InputProps> = ({ fullWidth, ...rest }) => {
   return (
     <input
       className={cn(styles.input, {

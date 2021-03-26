@@ -16,11 +16,7 @@ export interface ColumnRowProps {
   tabIndex?: number
 }
 
-const columnIsParent = (
-  col: ColumnInstance<Experiment>
-): col is ColumnInstance<Experiment> & {
-  columns: ColumnInstance<Experiment>[]
-} => {
+const columnIsParent = (col: ColumnInstance<Experiment>): boolean => {
   return !col.canSort
 }
 
@@ -165,7 +161,11 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
             id={column.id}
             checked={column.isVisible}
             readOnly
-            onClick={() => onToggle && onToggle(column)}
+            onClick={() => {
+              if (onToggle) {
+                onToggle(column)
+              }
+            }}
             key={`manage-column-input-${column.id}`}
           />
         </MenuItem>
