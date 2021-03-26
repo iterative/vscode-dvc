@@ -1,0 +1,16 @@
+.input {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  &::placeholder {
+    color: var(--vscode-input-placeholderForeground);
+  }
+  border: none;
+  padding: 5px;
+
+  &:focus {
+    outline-color: var(--vscode-focusBorder);
+  }
+  &__fullWidth {
+    width: 100%;
+  }
+}

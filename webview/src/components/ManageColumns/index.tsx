@@ -6,6 +6,9 @@ import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 import { Dropdown, DropdownToggle } from '../Dropdown'
 import { TabButton } from '../Button'
+import { Input } from '../Input'
+import Fuse from 'fuse.js'
+import { minWordLength } from '../../util/strings'
 
 type TabId = 'general' | 'metrics' | 'parameters'
 
@@ -13,6 +16,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   const { columns: columnInstances } = instance
   const [isOpen, setIsOpen] = React.useState(false)
   const [tabId, setTabId] = React.useState<TabId>('general')
+  const [searchTerm, setSearchTerm] = React.useState<string | null>(null)
 
   const onToggle = (isOpen: boolean) => {
     setIsOpen(isOpen)
@@ -22,7 +26,15 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
     column.toggleHidden()
   }
 
-  const matchesFilter = (column: ColumnInstance<Experiment>): boolean => {
+  const onSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value && e.target.value.trim() !== '') {
+      setSearchTerm(e.target.value)
+    } else {
+      setSearchTerm(null)
+    }
+  }
+
+  const matchesTab = (column: ColumnInstance<Experiment>): boolean => {
     const id = column.id
     const [parts] = id.split(']')
     if (parts === '[params') {
@@ -43,7 +55,35 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
     />
   )
 
-  const columnOptions = (column: ColumnInstance<Experiment>) => {
+  const columnOptions = (
+    column: ColumnInstance<Experiment>,
+    filterBySearch = true
+  ) => {
+    let searchDisqualified = false
+    if (filterBySearch) {
+      if (searchTerm !== null) {
+        const fuse = new Fuse([column.id, column.Header], {
+          ignoreLocation: true,
+          includeScore: true,
+          useExtendedSearch: true,
+          minMatchCharLength: minWordLength(searchTerm)
+        })
+        if (!fuse.search(searchTerm).length) {
+          searchDisqualified = true
+        }
+      }
+    }
+
+    const children =
+      column.columns &&
+      column.columns
+        .map(childColumn => columnOptions(childColumn, searchDisqualified))
+        .filter(Boolean)
+
+    if (searchDisqualified && !children?.length) {
+      return
+    }
+
     return (
       <div key={column.id}>
         {!column.canSort && (
@@ -77,8 +117,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
             {column.Header}
           </MenuItem>
         )}
-        {column.columns &&
-          column.columns.map(childColumn => columnOptions(childColumn))}
+        {children}
       </div>
     )
   }
@@ -86,8 +125,11 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   const menuItems = [
     <MenuItemGroup id="column-visibility" key="column-visibility-group">
       {columnInstances.map(column => {
-        if (matchesFilter(column)) {
-          return <div key={column.id}>{columnOptions(column)}</div>
+        if (matchesTab(column)) {
+          const content = columnOptions(column)
+          if (content) {
+            return <div key={column.id}>{content}</div>
+          }
         }
       })}
     </MenuItemGroup>
@@ -119,6 +161,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   const content = (
     <div className={styles.manageColumns}>
       {columnTabs}
+      <Input placeholder={'Search'} fullWidth onInput={onSearchInput} />
       {menuItems}
     </div>
   )
