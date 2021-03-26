@@ -11,17 +11,13 @@ export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
       const { errors, experiments, vsCodeApi } = model as Model
       return (
         <>
-          {errors &&
-            errors.map(
-              (
-                error: React.ReactNode,
-                i: string | number | null | undefined
-              ) => (
-                <div className="error-message" key={i}>
-                  {error}
-                </div>
-              )
-            )}
+          {errors?.map(
+            (error: React.ReactNode, i: string | number | null | undefined) => (
+              <div className="error-message" key={i}>
+                {error}
+              </div>
+            )
+          )}
           <ExperimentsGUI experiments={experiments} vsCodeApi={vsCodeApi} />
         </>
       )

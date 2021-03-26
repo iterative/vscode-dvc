@@ -63,7 +63,9 @@ const makeMixedCellComponent: (
 ) => React.FC<{ value: Value }> = propertyType => {
   const NumberCell = getNumberCellComponent(propertyType)
   return function MixedCell({ value }) {
-    if (value === undefined) return null
+    if (value === undefined) {
+      return null
+    }
     return typeof value === 'number' ? (
       <NumberCell value={value} />
     ) : (
@@ -119,7 +121,9 @@ const convertObjectToProperties: (
   addition?: ValueTree,
   base?: SchemaProperties
 ) => SchemaProperties = (sample, base = {}) => {
-  if (!sample) return base
+  if (!sample) {
+    return base
+  }
   const sampleEntries = Object.entries(sample)
   for (const [propertyKey, propertyValue] of sampleEntries) {
     base[propertyKey] = addToProperty(base[propertyKey], propertyValue)

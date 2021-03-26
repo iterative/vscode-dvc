@@ -146,7 +146,9 @@ export class Extension {
 
   dvcScmFilesView(): void {
     const { workspaceFolders } = workspace
-    if (!workspaceFolders) return
+    if (!workspaceFolders) {
+      return
+    }
 
     workspaceFolders.forEach(folder => {
       const uri = `${folder.uri.fsPath}/`
@@ -161,6 +163,8 @@ export class Extension {
 
       c.inputBox.placeholder = "Message (Ctrl+Enter to commit on 'master')"
       // ic.commitTemplate = "templatea";
+
+      c.inputBox.visible = false
 
       c.statusBarCommands = [
         {

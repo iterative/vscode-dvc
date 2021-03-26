@@ -42,7 +42,9 @@ const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
       const resultToPush = {
         ...currentTip
       }
-      if (currentEpochs.length > 0) resultToPush.subRows = currentEpochs
+      if (currentEpochs.length > 0) {
+        resultToPush.subRows = currentEpochs
+      }
       result.push(resultToPush)
     }
   }

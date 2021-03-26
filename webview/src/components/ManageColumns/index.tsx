@@ -64,8 +64,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
           {column.Header}
         </MenuItem>
       )}
-      {column.columns &&
-        column.columns.map(childColumn => columnOptions(childColumn))}
+      {column.columns?.map(childColumn => columnOptions(childColumn))}
     </div>
   )
 
