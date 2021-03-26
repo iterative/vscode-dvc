@@ -26,9 +26,7 @@ export const DropdownToggle: React.FC<DropdownToggleProps> = ({
   return (
     <button
       onClick={() => {
-        if (onToggle) {
-          onToggle(!isOpen)
-        }
+        onToggle?.(!isOpen)
       }}
       className={cn(styles.dropdown__toggle, className)}
       {...rest}

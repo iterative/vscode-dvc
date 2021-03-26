@@ -164,9 +164,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
             checked={column.isVisible}
             readOnly
             onClick={() => {
-              if (onToggle) {
-                onToggle(column)
-              }
+              onToggle?.(column)
             }}
             key={`manage-column-input-${column.id}`}
           />
