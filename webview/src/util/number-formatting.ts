@@ -29,7 +29,9 @@ const suffixes = ' KMBT'
 export const abbreviateInteger: (value: number) => string = value => {
   const exponent = Math.floor(Math.log10(Math.max(Math.abs(value), 1)) / 3)
 
-  if (exponent === 0) return String(value)
+  if (exponent === 0) {
+    return String(value)
+  }
 
   const suffix = suffixes[exponent]
   const shortValue = (value / 1000 ** exponent).toFixed(1)

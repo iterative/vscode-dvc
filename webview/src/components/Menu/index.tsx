@@ -42,7 +42,7 @@ export const MenuToggle: React.FC<MenuToggleProps> = ({
 }) => {
   return (
     <button
-      onClick={() => onToggle && onToggle(!isOpen)}
+      onClick={() => onToggle?.(!isOpen)}
       className={styles.menu__toggle}
       id={id}
     >
@@ -126,7 +126,7 @@ export const Menu: React.FC<MenuProps> = ({
   let renderedMenuItems
   const [isActive, setIsActive] = useCloseActiveHook(MenuRef, false)
 
-  if (menuItems && menuItems.length) {
+  if (menuItems?.length) {
     renderedMenuItems = menuItems
   }
 
