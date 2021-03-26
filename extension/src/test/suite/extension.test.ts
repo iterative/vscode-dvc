@@ -99,7 +99,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should set dvc.selectDvcPath to blank on the first option', async () => {
+    it('should set dvc.dvcPath to blank on the first option', async () => {
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
