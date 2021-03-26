@@ -86,7 +86,7 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       id={id}
       key={`menu-item-li-${id}`}
       role="menuitem"
-      className={hover && styles.menu__menuItem__hover}
+      className={cn(hover && styles.menu__menuItem__hover)}
       {...rest}
     >
       <button
