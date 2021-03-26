@@ -84,12 +84,21 @@ export class Config {
           value: undefined
         },
         {
-          label: 'Custom',
-          description: 'Type in a DVC binary to use',
-          value: () =>
-            window.showInputBox({
-              prompt: 'Enter a custom DVC path...'
+          label: 'Find',
+          description: 'Browse the filesystem for a DVC binary',
+          value: async () => {
+            const result = await window.showOpenDialog({
+              title: 'Select a DVC binary'
             })
+            if (result) {
+              const [input] = result
+              const { fsPath } = input
+              this.setDvcPath(fsPath)
+              return fsPath
+            } else {
+              return undefined
+            }
+          }
         }
       ],
       {
@@ -97,10 +106,12 @@ export class Config {
       }
     )
     if (result) {
-      const resultValue =
-        typeof result.value === 'function' ? await result.value() : result.value
-      await this.setDvcPath(resultValue)
-      return resultValue
+      const { value } = result
+      if (typeof value === 'function') {
+        return value()
+      }
+      this.setDvcPath(value)
+      return value
     }
   }
 
