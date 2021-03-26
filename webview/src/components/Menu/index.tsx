@@ -1,4 +1,4 @@
-import React, { MouseEvent, ReactElement } from 'react'
+import React, { MouseEvent, ReactElement, SVGProps } from 'react'
 import styles from './styles.module.scss'
 import { Dropdown, DropdownToggle } from '../Dropdown'
 
@@ -23,11 +23,32 @@ export interface MenuItemGroupProps {
   id: string
 }
 
+export type DragDotProps = SVGProps<SVGSVGElement>
+
 export const MenuSeparator: React.FC = () => {
   return <li role="separator"></li>
 }
 
 export const MenuToggle = DropdownToggle
+
+export const DragDots: React.FC<DragDotProps> = props => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 19 24"
+      width={12}
+      {...props}
+      className={styles.menu__decorator}
+    >
+      <rect height="4" width="4" y="4" x="0" />
+      <rect height="4" width="4" y="12" x="0" />
+      <rect height="4" width="4" y="20" x="0" />
+      <rect height="4" width="4" y="4" x="8" />
+      <rect height="4" width="4" y="12" x="8" />
+      <rect height="4" width="4" y="20" x="8" />
+    </svg>
+  )
+}
 
 export const MenuItem: React.FC<MenuItemProps> = ({
   children,

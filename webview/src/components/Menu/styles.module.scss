@@ -62,4 +62,7 @@
       justify-content: space-between;
     }
   }
+  &__decorator {
+    fill: var(--vscode-icon-foreground)
+  }
 }
