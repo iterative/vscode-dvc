@@ -99,7 +99,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should be able to select the default path of the dvc cli (Python Extension / global installation)', async () => {
+    it('should set dvc.selectDvcPath to blank on the first option', async () => {
       const selectDefaultPathInUI = async () => {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
         await commands.executeCommand(
@@ -116,31 +116,6 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal('')
 
       expect(mockShowInputBox).not.to.have.been.called
-
-      mockShowInputBox.restore()
-    })
-
-    it('should be able to select a custom path for the dvc cli', async () => {
-      const customPath = join('custom', 'path', 'to', 'dvc')
-      const selectCustomPathInUI = async () => {
-        await commands.executeCommand('workbench.action.quickOpenSelectNext')
-        await commands.executeCommand('workbench.action.quickOpenSelectNext')
-        await commands.executeCommand(
-          'workbench.action.acceptSelectedQuickOpenItem'
-        )
-      }
-
-      const mockShowInputBox = stub(window, 'showInputBox').resolves(customPath)
-
-      const selectedCustomPath = commands.executeCommand('dvc.selectDvcPath')
-      await selectCustomPathInUI()
-
-      expect(await selectedCustomPath).to.equal(customPath)
-      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
-        customPath
-      )
-
-      expect(mockShowInputBox).to.have.been.calledOnce
 
       mockShowInputBox.restore()
     })
