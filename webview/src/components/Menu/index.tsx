@@ -25,6 +25,10 @@ export interface MenuItemGroupProps {
 
 export type DragDotProps = SVGProps<SVGSVGElement>
 
+export interface ChevronProps extends SVGProps<SVGSVGElement> {
+  open: boolean
+}
+
 export const MenuSeparator: React.FC = () => {
   return <li role="separator"></li>
 }
@@ -35,8 +39,8 @@ export const DragDots: React.FC<DragDotProps> = props => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 19 24"
-      width={12}
+      viewBox="-6 0 25 24"
+      width={14}
       {...props}
       className={styles.menu__decorator}
     >
@@ -46,6 +50,21 @@ export const DragDots: React.FC<DragDotProps> = props => {
       <rect height="4" width="4" y="4" x="8" />
       <rect height="4" width="4" y="12" x="8" />
       <rect height="4" width="4" y="20" x="8" />
+    </svg>
+  )
+}
+
+export const Chevron: React.FC<ChevronProps> = ({ open, ...rest }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="-50 0 356 256"
+      transform={open ? 'rotate(90)' : undefined}
+      width={17}
+      className={styles.menu__decorator}
+      {...rest}
+    >
+      <polygon points="79.093,0 48.907,30.187 146.72,128 48.907,225.813 79.093,256 207.093,128 		" />
     </svg>
   )
 }

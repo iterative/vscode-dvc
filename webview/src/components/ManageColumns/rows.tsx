@@ -3,8 +3,7 @@ import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 import Fuse from 'fuse.js'
 import { minWordLength } from '../../util/strings'
-import { DragDots, MenuItem, MenuSeparator } from '../Menu'
-import styles from './styles.module.scss'
+import { Chevron, DragDots, MenuItem } from '../Menu'
 
 export interface ColumnRowProps {
   searchTerm: string | null
@@ -59,56 +58,74 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
   showAll,
   onToggle
 }) => {
+  const [collapsed, setCollapsed] = React.useState(false)
+
   if (!showAll && !hasVisibleDescendent(column, searchTerm)) {
     return null
   }
 
+  const handleDropdownClick = () => {
+    setCollapsed(!collapsed)
+  }
+
   if (columnIsParent(column)) {
     return (
-      <>
-        <MenuSeparator key={column.id} />
-        <span
-          key={`${column.id}-column-group`}
-          className={styles.manageColumns__columnGroup}
+      <div>
+        <MenuItem
+          id={column.id}
+          key={`manage-column-${column.id}`}
+          onClick={handleDropdownClick}
         >
           <span
             key={`column-${column.Header}-span`}
             style={{ width: 10 * column.depth }}
           />
+          <DragDots />
+          <Chevron open={!collapsed} />
           {column.Header}
-        </span>
-        {column.columns.map(c => (
-          <ColumnRows
-            key={c.id}
-            searchTerm={searchTerm}
-            column={c}
-            showAll
-            onToggle={onToggle}
+          <input
+            type="checkbox"
+            id={column.id}
+            checked={column.isVisible}
+            readOnly
+            key={`manage-column-input-${column.id}`}
           />
-        ))}
-      </>
+        </MenuItem>
+        {!collapsed &&
+          column.columns.map(c => (
+            <ColumnRows
+              key={c.id}
+              searchTerm={searchTerm}
+              column={c}
+              showAll={showAll || columnMatchesSearch(column, searchTerm)}
+              onToggle={onToggle}
+            />
+          ))}
+      </div>
     )
   } else {
     return (
-      <MenuItem
-        id={column.id}
-        key={`manage-column-${column.id}`}
-        onClick={() => onToggle && onToggle(column)}
-      >
-        <span
-          key={`column-${column.Header}-span`}
-          style={{ width: 10 * column.depth }}
-        />
-        <DragDots />
-        {column.Header}
-        <input
-          type="checkbox"
+      <div>
+        <MenuItem
           id={column.id}
-          checked={column.isVisible}
-          readOnly
-          key={`manage-column-input-${column.id}`}
-        />
-      </MenuItem>
+          key={`manage-column-${column.id}`}
+          onClick={() => onToggle && onToggle(column)}
+        >
+          <span
+            key={`column-${column.Header}-span`}
+            style={{ width: 10 * column.depth }}
+          />
+          <DragDots />
+          {column.Header}
+          <input
+            type="checkbox"
+            id={column.id}
+            checked={column.isVisible}
+            readOnly
+            key={`manage-column-input-${column.id}`}
+          />
+        </MenuItem>
+      </div>
     )
   }
 }
