@@ -144,7 +144,9 @@ export class Extension {
 
   dvcScmFilesView(): void {
     const { workspaceFolders } = workspace
-    if (!workspaceFolders) return
+    if (!workspaceFolders) {
+      return
+    }
 
     workspaceFolders.forEach(folder => {
       const uri = `${folder.uri.fsPath}/`
