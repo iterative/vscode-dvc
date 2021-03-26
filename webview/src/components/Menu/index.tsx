@@ -1,12 +1,14 @@
-import React, { MouseEvent, ReactElement, SVGProps } from 'react'
+import React, { HTMLProps, MouseEvent, ReactElement, SVGProps } from 'react'
 import styles from './styles.module.scss'
 import { Dropdown, DropdownToggle } from '../Dropdown'
+import cn from 'classnames'
 
-export interface MenuItemProps {
+export interface MenuItemProps extends HTMLProps<HTMLLIElement> {
   children?: React.ReactNode
   isDisabled?: boolean
   isSelected?: boolean
   id?: string
+  hover?: boolean
   actions?: React.ReactNode
   onClick?: (event: React.MouseEvent | React.KeyboardEvent | MouseEvent) => void
 }
@@ -75,16 +77,23 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   isSelected,
   id,
   actions,
-  ...props
+  className,
+  hover,
+  ...rest
 }) => {
   return (
-    <li id={id} key={`menu-item-li-${id}`} role="menuitem">
+    <li
+      id={id}
+      key={`menu-item-li-${id}`}
+      role="menuitem"
+      className={hover && styles.menu__menuItem__hover}
+      {...rest}
+    >
       <button
         key={`button-${id}`}
         id={id}
-        className={styles.menu__menuItem}
+        className={cn(styles.menu__menuItem, className)}
         disabled={isDisabled}
-        {...props}
       >
         {children}
         {isSelected && (

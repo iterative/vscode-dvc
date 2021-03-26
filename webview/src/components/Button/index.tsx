@@ -5,6 +5,7 @@ import styles from './styles.module.scss'
 export interface ButtonProps {
   onClick?: MouseEventHandler
   pressed?: boolean
+  xsmall?: boolean
   small?: boolean
   large?: boolean
 }
@@ -16,6 +17,7 @@ export interface TabButtonProps extends ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   onClick,
   pressed,
+  xsmall,
   small,
   large,
   children
@@ -23,6 +25,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={cn(styles.button, {
+        [styles.button__xsmall]: xsmall,
         [styles.button__small]: small,
         [styles.button__large]: large,
         [styles.pressed]: pressed
@@ -38,6 +41,7 @@ export const Button: React.FC<ButtonProps> = ({
 export const TabButton: React.FC<TabButtonProps> = ({
   onClick,
   pressed,
+  xsmall,
   small,
   large,
   active,
@@ -46,6 +50,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
   return (
     <button
       className={cn(styles.button, styles.button__tab, {
+        [styles.button__xsmall]: xsmall,
         [styles.button__small]: small,
         [styles.button__large]: large,
         [styles.pressed]: pressed,

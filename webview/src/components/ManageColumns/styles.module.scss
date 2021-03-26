@@ -13,7 +13,24 @@
     &__toggleBtn {
         background-color: rgb(54, 54, 54);
     }
+    &__row_heading {
+        margin: auto;
+        width: 100%;
+        display: flex;
+    }
+    &__small_button {
+        font-size: 12px;
+        color: var(--vscode-foreground)
+    }
+
+    li {
+        height: 30px;
+    }
+    input {
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 }
 input[type="checkbox"] {
-    margin-right: 1.5rem;
+    margin-left: 1.5rem;
 }

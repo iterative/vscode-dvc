@@ -1,15 +1,19 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 import Fuse from 'fuse.js'
 import { minWordLength } from '../../util/strings'
 import { Chevron, DragDots, MenuItem } from '../Menu'
+import styles from './styles.module.scss'
+import { Button } from '../Button'
 
 export interface ColumnRowProps {
   searchTerm: string | null
   column: ColumnInstance<Experiment>
   showAll?: boolean
   onToggle?: (column: ColumnInstance<Experiment>) => void
+  ancestorHover?: boolean
+  tabIndex?: number
 }
 
 const columnIsParent = (
@@ -56,16 +60,44 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
   column,
   searchTerm,
   showAll,
+  ancestorHover,
   onToggle
 }) => {
   const [collapsed, setCollapsed] = React.useState(false)
+  const [selfHover, setSelfHover] = React.useState(false)
 
-  if (!showAll && !hasVisibleDescendent(column, searchTerm)) {
+  const hoverIn = () => {
+    setSelfHover(true)
+  }
+
+  const hoverOut = () => {
+    setSelfHover(false)
+  }
+
+  const iHaveVisibleDescendents = useMemo(
+    () => hasVisibleDescendent(column, searchTerm),
+    [column, searchTerm]
+  )
+
+  const effectivelyCollapsed =
+    collapsed && (searchTerm === null || !iHaveVisibleDescendents)
+
+  if (!showAll && !iHaveVisibleDescendents) {
     return null
   }
 
   const handleDropdownClick = () => {
     setCollapsed(!collapsed)
+  }
+
+  const hideAll = (column: ColumnInstance<Experiment>) => {
+    if (columnIsParent(column)) {
+      for (const c of column.columns) {
+        hideAll(c)
+      }
+    } else if (columnMatchesSearch(column, searchTerm)) {
+      column.toggleHidden(true)
+    }
   }
 
   if (columnIsParent(column)) {
@@ -74,30 +106,37 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
         <MenuItem
           id={column.id}
           key={`manage-column-${column.id}`}
-          onClick={handleDropdownClick}
+          hover={ancestorHover || selfHover}
+          onMouseEnter={hoverIn}
+          onMouseLeave={hoverOut}
         >
-          <span
-            key={`column-${column.Header}-span`}
-            style={{ width: 10 * column.depth }}
-          />
-          <DragDots />
-          <Chevron open={!collapsed} />
-          {column.Header}
-          <input
-            type="checkbox"
-            id={column.id}
-            checked={column.isVisible}
-            readOnly
-            key={`manage-column-input-${column.id}`}
-          />
+          <div
+            className={styles.manageColumns__row_heading}
+            onClick={handleDropdownClick}
+            onKeyDown={handleDropdownClick}
+            role="menu"
+            tabIndex={0}
+          >
+            <span
+              key={`column-${column.Header}-span`}
+              style={{ width: 20 * column.depth }}
+            />
+            <DragDots />
+            <Chevron open={!effectivelyCollapsed} />
+            {column.Header}
+          </div>
+          <Button small onClick={() => hideAll(column)}>
+            Hide all
+          </Button>
         </MenuItem>
-        {!collapsed &&
+        {!effectivelyCollapsed &&
           column.columns.map(c => (
             <ColumnRows
               key={c.id}
               searchTerm={searchTerm}
               column={c}
               showAll={showAll || columnMatchesSearch(column, searchTerm)}
+              ancestorHover={ancestorHover || selfHover}
               onToggle={onToggle}
             />
           ))}
@@ -109,19 +148,24 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
         <MenuItem
           id={column.id}
           key={`manage-column-${column.id}`}
-          onClick={() => onToggle && onToggle(column)}
+          onMouseEnter={hoverIn}
+          onMouseLeave={hoverOut}
+          hover={ancestorHover || selfHover}
         >
-          <span
-            key={`column-${column.Header}-span`}
-            style={{ width: 10 * column.depth }}
-          />
-          <DragDots />
-          {column.Header}
+          <div className={styles.manageColumns__row_heading}>
+            <span
+              key={`column-${column.Header}-span`}
+              style={{ width: 20 * column.depth }}
+            />
+            <DragDots />
+            {column.Header}
+          </div>
           <input
             type="checkbox"
             id={column.id}
             checked={column.isVisible}
             readOnly
+            onClick={() => onToggle && onToggle(column)}
             key={`manage-column-input-${column.id}`}
           />
         </MenuItem>

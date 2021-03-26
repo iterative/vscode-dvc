@@ -9,7 +9,6 @@
   background-color: transparent;
   border: none;
 
-  overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 1rem;
@@ -26,10 +25,18 @@
     }
   }
 
-  &__small {
+  &__xsmall {
 
+    min-width: 20px;
+    font-size: 0.5rem;
+  }
+  &__small {
+    min-width: 35px;
+    font-size: 0.75rem;
   }
   &__large {
 
+    min-width: 75px;
+    font-size: 2rem;
   }
 }

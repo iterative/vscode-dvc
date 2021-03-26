@@ -37,7 +37,6 @@
   &__menuItem {
     display: flex;
     align-items: baseline;
-    width: auto !important;
     padding: 0.5rem;
     font-size: 1rem;
     color: #ffffff;
@@ -47,6 +46,7 @@
     line-height: 24px;
     box-sizing: border-box;
     text-align: center;
+    width: 100%;
     &__icon {
       align-self: center;
       width: auto;
@@ -59,6 +59,9 @@
       display: flex;
       align-items: baseline;
       justify-content: space-between;
+    }
+    &__hover {
+      background-color: var(--vscode-list-hoverBackground);
     }
   }
   &__decorator {
