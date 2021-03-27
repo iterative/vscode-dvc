@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
-import Fuse from 'fuse.js'
-import { minWordLength } from '../../util/strings'
+import { isPathLikeSearchHit } from '../../util/strings'
 import { Chevron, DragDots, MenuItem } from '../Menu'
 import styles from './styles.module.scss'
 import { Button } from '../Button'
@@ -27,12 +26,12 @@ const columnMatchesSearch = (
   if (searchTerm === null) {
     return true
   }
-  const fuse = new Fuse([column.id, column.Header], {
-    ignoreLocation: true,
-    useExtendedSearch: true,
-    minMatchCharLength: minWordLength(searchTerm)
-  })
-  return Boolean(fuse.search(searchTerm).length)
+  if (typeof column.Header === 'string') {
+    if (isPathLikeSearchHit(column.Header, searchTerm)) {
+      return true
+    }
+  }
+  return isPathLikeSearchHit(column.id, searchTerm)
 }
 
 const hasVisibleDescendent = (
