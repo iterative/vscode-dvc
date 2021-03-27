@@ -45,7 +45,9 @@ module.exports = {
     // vscode-dvc specific
 
     // This project doesn't use prop types
-    'react/prop-types': 'off'
+    'react/prop-types': 'off',
+    curly: ['error', 'all'],
+    '@typescript-eslint/prefer-optional-chain': 'error'
   },
   env: {
     'jest/globals': true

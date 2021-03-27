@@ -22,7 +22,9 @@ export function hotComponent(
     } else {
       setTimeout(() => {
         runInAction(() => {
-          if (result) result.component = component
+          if (result) {
+            result.component = component
+          }
         })
       }, 0)
     }

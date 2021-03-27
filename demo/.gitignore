@@ -2,3 +2,4 @@
 /data/MNIST/processed
 /.vscode/settings.json
 /logs
+/.env

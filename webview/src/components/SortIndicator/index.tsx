@@ -7,8 +7,8 @@ const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
     ? instance.sortedColumns[0]
     : null
   const sortedBy = {
-    header: sortedByColumn && sortedByColumn.Header,
-    isSortedDesc: sortedByColumn && sortedByColumn.isSortedDesc
+    header: sortedByColumn?.Header,
+    isSortedDesc: sortedByColumn?.isSortedDesc
   }
 
   return (
