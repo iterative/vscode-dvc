@@ -7,9 +7,10 @@ import { Experiment } from '../../util/parse-experiments'
 import { Dropdown, DropdownToggle } from '../Dropdown'
 import { TabButton } from '../Button'
 import { Input } from '../Input'
-import { ColumnRows } from './rows'
+import { ColumnRows } from './ColumnRows'
 
-export type TabId = 'general' | 'metrics' | 'parameters'
+// NOTE: perhaps we might want to make tabs dynamic in the future.
+export type TabId = 'general' | 'params' | 'metrics'
 
 const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   const { columns: columnInstances } = instance
@@ -43,15 +44,10 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
   )
 
   const matchesTab = (column: ColumnInstance<Experiment>): boolean => {
-    const id = column.id
-    const [parts] = id.split(']')
-    if (parts === '[params') {
-      return tabId === 'parameters'
-    } else if (parts === '[metrics') {
-      return tabId === 'metrics'
-    } else {
+    if (!column.category) {
       return tabId === 'general'
     }
+    return tabId === column.category
   }
 
   const menuItems = [
@@ -86,10 +82,7 @@ const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {
       >
         METRICS
       </TabButton>
-      <TabButton
-        active={tabId === 'parameters'}
-        onClick={() => setTabId('parameters')}
-      >
+      <TabButton active={tabId === 'params'} onClick={() => setTabId('params')}>
         PARAMETERS
       </TabButton>
     </div>

@@ -89,7 +89,8 @@ export const ExperimentsTable: React.FC<{
           }
           return id.slice(0, 7)
         },
-        width: 150
+        width: 150,
+        category: 'general'
       },
       {
         Header: 'Timestamp',
@@ -100,7 +101,8 @@ export const ExperimentsTable: React.FC<{
           }
           const time = dayjs(value)
           return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
-        }
+        },
+        category: 'general'
       },
       ...buildDynamicColumns(flatExperiments)
     ] as Column<Experiment>[]

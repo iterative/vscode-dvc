@@ -15,7 +15,11 @@ export interface ColumnRowProps {
   tabIndex?: number
 }
 
-const columnIsParent = (col: ColumnInstance<Experiment>): boolean => {
+const columnIsParent = (
+  col: ColumnInstance<Experiment>
+): col is ColumnInstance<Experiment> & {
+  columns: ColumnInstance<Experiment>[]
+} => {
   return !col.canSort
 }
 
@@ -87,8 +91,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
 
   const hideAll = (column: ColumnInstance<Experiment>) => {
     if (columnIsParent(column)) {
-      const { columns } = column as { columns: ColumnInstance<Experiment>[] }
-      for (const c of columns) {
+      for (const c of column.columns) {
         hideAll(c)
       }
     } else if (columnMatchesSearch(column, searchTerm)) {
@@ -97,7 +100,6 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
   }
 
   if (columnIsParent(column)) {
-    const { columns } = column as { columns: ColumnInstance<Experiment>[] }
     return (
       <div>
         <MenuItem
@@ -127,7 +129,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
           </Button>
         </MenuItem>
         {!effectivelyCollapsed &&
-          columns.map(c => (
+          column.columns.map(c => (
             <ColumnRows
               key={c.id}
               searchTerm={searchTerm}

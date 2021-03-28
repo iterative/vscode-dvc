@@ -180,12 +180,14 @@ const buildColumnsFromSchemaProperties: (
       columns?: Column<Experiment>[]
       sortType?: string
       type?: SchemaType
+      category?: string
     } = {
       Header: key,
       id: buildColumnIdFromPath(currentPath),
       accessor: buildAccessor(currentPath),
       type: propertyType,
-      Cell
+      Cell,
+      category: objectPath[0]
     }
     switch (propertyType) {
       case 'object':
