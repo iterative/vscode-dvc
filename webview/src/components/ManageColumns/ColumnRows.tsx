@@ -150,6 +150,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
           onMouseEnter={hoverIn}
           onMouseLeave={hoverOut}
           hover={ancestorHover || selfHover}
+          className={styles.menuItem_button}
         >
           <div className={styles.manageColumns__row_heading}>
             <span

@@ -25,6 +25,10 @@
 
     li {
         height: 30px;
+        .menuItem_button {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
     }
     input {
         margin-top: 10px;
