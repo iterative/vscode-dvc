@@ -2,11 +2,12 @@ import { describe, it, before, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { window, commands, workspace, Uri } from 'vscode'
+import * as vscode from 'vscode'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
+const { window, commands, workspace, Uri } = vscode
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -123,10 +124,11 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option', async () => {
-      const mockShowOpenDialog = stub(window, 'showOpenDialog')
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
-      mockShowOpenDialog.resolves(fileResolve)
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
+        fileResolve
+      )
 
       await selectDvcPathItem(2)
 
