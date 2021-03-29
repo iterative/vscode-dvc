@@ -4,7 +4,7 @@ stages:
     cmd: python train.py
     deps:
     - path: data/MNIST
-      md5: 1ad655fad4cf43b9949749028a6e9198.dir
+      md5: 961f2bf942091d363b13c12c51f941e8.dir
       size: 121987048
       nfiles: 12
     - path: train.py
@@ -17,12 +17,12 @@ stages:
         weight_decay: 0
     outs:
     - path: logs
-      md5: 0ec6663b0635a88e966b3bcdff0a8c1a.dir
-      size: 636
+      md5: 614084ce71808612b310a754ee5875e8.dir
+      size: 638
       nfiles: 2
     - path: model.pt
-      md5: 978734ddbbfd621fb60cb546d9861b96
+      md5: 1df4db5a5c30770fc895a10bd7ef2ef2
       size: 410751
     - path: predictions.json
-      md5: 8f0d4c5998646e1aba46fe75087e2ff4
+      md5: 9abe1d49236bd3fa78968a8133035800
       size: 310000
