@@ -77,7 +77,7 @@ module.exports = {
         title: WebviewType
       }),
       new ForkTsCheckerWebpackPlugin(),
-      (new CleanWebpackPlugin() as unknown) as Plugin
+      new CleanWebpackPlugin()
     ]
 
     return plugins

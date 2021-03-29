@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 import { isPathLikeSearchHit } from '../../util/strings'
@@ -73,7 +73,7 @@ export const ColumnRows: React.FC<ColumnRowProps> = ({
     setSelfHover(false)
   }
 
-  const iHaveVisibleDescendents = useMemo(
+  const iHaveVisibleDescendents = React.useMemo(
     () => hasVisibleDescendent(column, searchTerm),
     [column, searchTerm]
   )
