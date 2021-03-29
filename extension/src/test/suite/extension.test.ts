@@ -121,5 +121,22 @@ suite('Extension Test Suite', () => {
 
       mockShowInputBox.restore()
     })
+
+    it('should invoke the file picker with the second option', async () => {
+      const mockShowOpenDialog = stub(window, 'showOpenDialog')
+      const testUri = Uri.file('/file/picked/path/to/dvc')
+      const fileResolve = [testUri]
+      mockShowOpenDialog.resolves(fileResolve)
+
+      await selectDvcPathItem(2)
+
+      expect(mockShowOpenDialog).to.have.been.called
+
+      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
+        testUri.fsPath
+      )
+
+      mockShowOpenDialog.restore()
+    })
   })
 })
