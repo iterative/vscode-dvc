@@ -74,7 +74,7 @@ export class Config {
     return dvcPathStatusBarItem
   }
 
-  public selectDvcPath = async (): Promise<string | undefined> => {
+  public selectDvcPath = async (): Promise<void> => {
     const result = await window.showQuickPick(
       [
         {
@@ -108,10 +108,10 @@ export class Config {
     if (result) {
       const { value } = result
       if (typeof value === 'function') {
-        return value()
+        await value()
+      } else {
+        this.setDvcPath(value)
       }
-      this.setDvcPath(value)
-      return value
     }
   }
 

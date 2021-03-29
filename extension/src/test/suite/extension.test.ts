@@ -99,20 +99,22 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
-    it('should set dvc.dvcPath to blank on the first option', async () => {
-      const selectDefaultPathInUI = async () => {
+    const selectDvcPathItem = async (selection: number) => {
+      const selectionPromise = commands.executeCommand('dvc.selectDvcPath')
+
+      for (let i = 0; i <= selection; i++) {
         await commands.executeCommand('workbench.action.quickOpenSelectNext')
-        await commands.executeCommand(
-          'workbench.action.acceptSelectedQuickOpenItem'
-        )
       }
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+      await selectionPromise
+    }
 
+    it('should set dvc.dvcPath to blank on the first option', async () => {
       const mockShowInputBox = stub(window, 'showInputBox')
+      await selectDvcPathItem(1)
 
-      const defaultPath = commands.executeCommand('dvc.selectDvcPath')
-      await selectDefaultPathInUI()
-
-      expect(await defaultPath).to.equal(undefined)
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal('')
 
       expect(mockShowInputBox).not.to.have.been.called
