@@ -73,9 +73,6 @@ suite('Extension Test Suite', () => {
         'dvc.showExperiments'
       )) as ExperimentsWebview
 
-      expect(experimentsWebview.isActive()).to.be.true
-      expect(experimentsWebview.isVisible()).to.be.true
-
       expect(windowSpy).to.have.been.calledOnce
       expect(mockReader).to.have.been.calledOnce
 
@@ -84,8 +81,6 @@ suite('Extension Test Suite', () => {
 
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
-
-      expect(experimentsWebview.isActive()).to.be.false
 
       const sameWebview = await commands.executeCommand('dvc.showExperiments')
 

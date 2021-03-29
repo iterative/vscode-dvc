@@ -161,9 +161,6 @@ export class Extension {
         title: 'foo'
       }
 
-      c.inputBox.placeholder = "Message (Ctrl+Enter to commit on 'master')"
-      // ic.commitTemplate = "templatea";
-
       c.inputBox.visible = false
 
       c.statusBarCommands = [
