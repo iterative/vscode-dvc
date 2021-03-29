@@ -69,5 +69,15 @@ describe('utils/strings', () => {
       expect(isPathLikeSearchHit(path, 'value1 helloworld')).toBe(true)
       expect(isPathLikeSearchHit(path, 'two foobar restauraNt')).toBe(true)
     })
+
+    it('should not match long shot subsequences', () => {
+      const trap1 = '[params.yaml][another_metric][deeper][is_this_a_bug]'
+      const trap2 =
+        '[params.yaml][another_metric][deeper2][this_is_file_everything_is_file]'
+      const good1 = '[params.yaml][seed]'
+      expect(isPathLikeSearchHit(trap1, 'seed')).toBe(false)
+      expect(isPathLikeSearchHit(trap2, 'seed')).toBe(false)
+      expect(isPathLikeSearchHit(good1, 'seed')).toBe(true)
+    })
   })
 })
