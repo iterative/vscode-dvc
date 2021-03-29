@@ -7,6 +7,7 @@ import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
+import { delay } from '../../util'
 const { window, commands, workspace, Uri } = vscode
 
 chai.use(sinonChai)
@@ -114,7 +115,7 @@ suite('Extension Test Suite', () => {
 
     it('should set dvc.dvcPath to blank on the first option', async () => {
       const mockShowInputBox = stub(window, 'showInputBox')
-      await selectDvcPathItem(1)
+      await selectDvcPathItem(0)
 
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal('')
 
@@ -130,10 +131,11 @@ suite('Extension Test Suite', () => {
         fileResolve
       )
 
-      await selectDvcPathItem(2)
+      await selectDvcPathItem(1)
 
       expect(mockShowOpenDialog).to.have.been.called
 
+      await delay(100)
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         testUri.fsPath
       )
