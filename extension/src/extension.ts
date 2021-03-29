@@ -1,4 +1,4 @@
-import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
+import { window, commands, ExtensionContext } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -7,7 +7,7 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
-
+import { SourceControlManagement } from './views/SourceControlManagement'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import {
@@ -38,6 +38,7 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
+  private readonly scm?: SourceControlManagement
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -139,73 +140,8 @@ export class Extension {
       })
     )
 
-    this.dvcScmFilesView()
-  }
-
-  dvcScmFilesView(): void {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders) {
-      return
-    }
-
-    workspaceFolders.forEach(folder => {
-      const uri = `${folder.uri.fsPath}/`
-
-      const c = this.dispose.track(
-        scm.createSourceControl('dvc', 'DVC', Uri.file(uri))
-      )
-      c.acceptInputCommand = {
-        command: 'workbench.action.output.toggleOutput',
-        title: 'foo'
-      }
-
-      c.inputBox.visible = false
-
-      c.statusBarCommands = [
-        {
-          command: 'test',
-          title: 'DVC'
-        }
-      ]
-
-      const resourceGroup = this.dispose.track(
-        c.createResourceGroup('group1', 'Unchanged')
-      )
-
-      resourceGroup.resourceStates = [
-        {
-          resourceUri: Uri.file(`${uri}path/file.ts`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/file2.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/sub/file.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        }
-      ]
-    })
+    this.scm = new SourceControlManagement()
+    this.scm.dvcScmFilesView()
   }
 }
 
