@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
-import { window } from 'vscode'
+import { Terminal, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { delay } from '../../util'
 import { Disposable } from '../../extension'
@@ -25,19 +25,24 @@ suite('Integrated Terminal Test Suite', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
 
-      let eventCount = 0
-      disposable.track(
-        window.onDidOpenTerminal(event => {
-          eventCount += 1
-          expect(event.creationOptions?.name).to.equal('DVC')
+      const openTerminalPromise = (): Promise<Terminal> => {
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidOpenTerminal(
+            (event: Terminal) => {
+              listener.dispose()
+              return resolve(event)
+            }
+          )
         })
-      )
-      disposable.track(IntegratedTerminal)
+      }
 
-      await IntegratedTerminal.openCurrentInstance()
-      await waitForAndDispose(disposable)
+      const event = openTerminalPromise()
 
-      expect(eventCount).to.equal(1)
+      disposable.track(await IntegratedTerminal.openCurrentInstance())
+
+      const terminal = await event
+      expect(terminal.creationOptions?.name).to.equal('DVC')
+      disposable.dispose()
     }).timeout(12000)
 
     it('should be able to run a command', async () => {
