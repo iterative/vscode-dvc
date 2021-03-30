@@ -18,8 +18,12 @@ export const getReadyPythonExtension: () => Thenable<
   PythonExtension | undefined
 > = async () => {
   const extension = getPythonExtension()
-  if (!extension) return extension
-  if (!extension.isActive) await extension.activate()
+  if (!extension) {
+    return extension
+  }
+  if (!extension.isActive) {
+    await extension.activate()
+  }
   await extension.exports.ready
   return extension
 }

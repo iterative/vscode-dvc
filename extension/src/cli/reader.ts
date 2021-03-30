@@ -10,7 +10,9 @@ interface ReaderOptions {
 
 export const getDvcInvocation = async (options: ReaderOptions) => {
   const { cliPath } = options
-  if (cliPath) return cliPath
+  if (cliPath) {
+    return cliPath
+  }
   const executionDetails = await getPythonExecutionDetails()
   return executionDetails ? `${executionDetails.join(' ')} -m dvc` : 'dvc'
 }

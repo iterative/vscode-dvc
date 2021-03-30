@@ -17,8 +17,8 @@ const configChangePromise = () => {
   return new Promise(resolve => {
     const listener: Disposable = workspace.onDidChangeConfiguration(
       (event: ConfigurationChangeEvent) => {
-        resolve(event)
         listener.dispose()
+        return resolve(event)
       }
     )
   })
