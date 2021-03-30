@@ -2,13 +2,18 @@ import { describe, it, before, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import * as vscode from 'vscode'
-import { ConfigurationChangeEvent, Disposable } from 'vscode'
+import {
+  window,
+  commands,
+  workspace,
+  Uri,
+  ConfigurationChangeEvent
+} from 'vscode'
+import { Disposable } from '../../extension'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
-const { window, commands, workspace, Uri } = vscode
 
 chai.use(sinonChai)
 const { expect } = chai
