@@ -11,7 +11,7 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import { findCliPath, findDvcRootPaths } from './fileSystem'
+import { findDvcRootPaths } from './fileSystem'
 import { Deferred } from '@hediet/std/synchronization'
 
 export class Config {
@@ -21,7 +21,6 @@ export class Config {
 
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
-  public dvcCliPath = 'dvc'
   public dvcRootPaths: string[] = []
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
@@ -48,17 +47,6 @@ export class Config {
     this.dvcPathStatusBarItem.text = path
   }
 
-  private setDvcPaths = async () => {
-    this.updateDvcPathStatusBarItem()
-    await this.setDvcCliPath()
-    return this.findDvcRoots()
-  }
-
-  private setDvcPathsOnActivation = async (dvcPath?: string) => {
-    await this.setDvcPath(dvcPath)
-    return this.setDvcPaths()
-  }
-
   private getWorkspaceRoot = (): string => {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -68,18 +56,11 @@ export class Config {
     return workspaceFolders[0].uri.fsPath
   }
 
-  private setDvcCliPath = async (): Promise<void> => {
-    const path = await findCliPath(this.workspaceRoot, this.dvcPath)
-    if (path) {
-      this.dvcCliPath = path
-    }
-  }
-
   public get dvcPath(): string {
-    return <string>workspace.getConfiguration().get('dvc.dvcPath')
+    return workspace.getConfiguration().get('dvc.dvcPath', '')
   }
 
-  private setDvcPath(path = 'dvc'): Thenable<void> {
+  private setDvcPath(path?: string): Thenable<void> {
     return workspace.getConfiguration().update('dvc.dvcPath', path)
   }
 
@@ -88,35 +69,54 @@ export class Config {
 
     dvcPathStatusBarItem.tooltip = 'Current DVC path.'
     dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
+    dvcPathStatusBarItem.text = this.dvcPath
     dvcPathStatusBarItem.show()
     return dvcPathStatusBarItem
   }
 
-  public selectDvcPath = async (): Promise<string | undefined> => {
+  public selectDvcPath = async (): Promise<void> => {
     const result = await window.showQuickPick(
-      [{ label: 'default' }, { label: 'custom' }],
-      { placeHolder: 'Please choose...' }
+      [
+        {
+          label: 'Default',
+          description: 'Use Python Extension virtual environment if available',
+          picked: true,
+          value: undefined
+        },
+        {
+          label: 'Find',
+          description: 'Browse the filesystem for a DVC executable',
+          value: async () => {
+            const result = await window.showOpenDialog({
+              title: 'Select a DVC executable'
+            })
+            if (result) {
+              const [input] = result
+              const { fsPath } = input
+              this.setDvcPath(fsPath)
+              return fsPath
+            } else {
+              return undefined
+            }
+          }
+        }
+      ],
+      {
+        placeHolder: 'Please choose...'
+      }
     )
     if (result) {
-      if (result.label === 'default') {
-        await this.setDvcPath()
-        return this.dvcPath
-      }
-      if (result.label === 'custom') {
-        const path = await window.showInputBox({
-          prompt: 'Enter a custom DVC path...'
-        })
-        await this.setDvcPath(path)
-        return this.dvcPath
+      const { value } = result
+      if (typeof value === 'function') {
+        await value()
+      } else {
+        this.setDvcPath(value)
       }
     }
   }
 
   private findDvcRoots = async () => {
-    const rootPaths = await findDvcRootPaths(
-      this.workspaceRoot,
-      this.dvcCliPath
-    )
+    const rootPaths = await findDvcRootPaths(this.workspaceRoot, this.dvcPath)
     this.dvcRootPaths = rootPaths
   }
 
@@ -147,14 +147,10 @@ export class Config {
     )
 
     this.dispose.track(
-      this.onDidChange(async () => {
-        this.setDvcPaths()
+      this.onDidChange(() => {
+        this.updateDvcPathStatusBarItem()
+        this.findDvcRoots()
       })
-    )
-
-    const dvcOverridePath = process.env.DVCPATH
-    this.setDvcPathsOnActivation(dvcOverridePath).then(() =>
-      this._initialized.resolve()
     )
   }
 }
