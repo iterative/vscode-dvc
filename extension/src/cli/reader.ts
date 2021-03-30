@@ -1,19 +1,29 @@
 import { Commands } from './commands'
 import { execPromise } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
+import { getPythonExecutionDetails } from '../extensions/python'
 
 interface ReaderOptions {
-  cliPath: string
+  cliPath: string | undefined
   cwd: string
 }
 
-export const execCommand = (
+export const getDvcInvocation = async (options: ReaderOptions) => {
+  const { cliPath } = options
+  if (cliPath) {
+    return cliPath
+  }
+  const executionDetails = await getPythonExecutionDetails()
+  return executionDetails ? `${executionDetails.join(' ')} -m dvc` : 'dvc'
+}
+
+export const execCommand = async (
   options: ReaderOptions,
   command: string
 ): Promise<{ stdout: string; stderr: string }> => {
-  const { cliPath, cwd } = options
-
-  return execPromise(`${cliPath} ${command}`, {
+  const { cwd } = options
+  const fullCommandString = `${await getDvcInvocation(options)} ${command}`
+  return execPromise(fullCommandString, {
     cwd
   })
 }
