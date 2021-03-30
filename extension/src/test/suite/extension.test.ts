@@ -13,6 +13,18 @@ const { window, commands, workspace, Uri } = vscode
 chai.use(sinonChai)
 const { expect } = chai
 
+const singleConfigChangePromise = () =>
+  new Promise(resolve => {
+    const disposable: Disposable = workspace.onDidChangeConfiguration(
+      (event: ConfigurationChangeEvent) => {
+        resolve({
+          event,
+          disposable
+        })
+      }
+    )
+  })
+
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
@@ -130,16 +142,8 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowOpenDialog).to.have.been.called
 
-      let storedSetEvent: Disposable
-      const configChangePromise = new Promise(resolve => {
-        const handler = (e: ConfigurationChangeEvent) => {
-          resolve(e)
-          storedSetEvent.dispose()
-        }
-        storedSetEvent = workspace.onDidChangeConfiguration(handler)
-      })
+      await singleConfigChangePromise()
 
-      await configChangePromise
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         testUri.fsPath
       )
