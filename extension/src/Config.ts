@@ -116,7 +116,7 @@ export class Config {
   }
 
   private findDvcRoots = async () => {
-    const rootPaths = await findDvcRootPaths(this.workspaceRoot)
+    const rootPaths = await findDvcRootPaths(this.workspaceRoot, this.dvcPath)
     this.dvcRootPaths = rootPaths
   }
 
