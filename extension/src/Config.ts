@@ -43,7 +43,7 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private updateDvcPathStatusBarItem = (path = this.dvcPath || ''): void => {
+  private updateDvcPathStatusBarItem = (path = this.dvcPath): void => {
     this.dvcPathStatusBarItem.text = path
   }
 
@@ -56,8 +56,8 @@ export class Config {
     return workspaceFolders[0].uri.fsPath
   }
 
-  public get dvcPath(): string | undefined {
-    return workspace.getConfiguration().get('dvc.dvcPath')
+  public get dvcPath(): string {
+    return workspace.getConfiguration().get('dvc.dvcPath', '')
   }
 
   private setDvcPath(path?: string): Thenable<void> {
@@ -69,7 +69,7 @@ export class Config {
 
     dvcPathStatusBarItem.tooltip = 'Current DVC path.'
     dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
-    dvcPathStatusBarItem.text = this.dvcPath || ''
+    dvcPathStatusBarItem.text = this.dvcPath
     dvcPathStatusBarItem.show()
     return dvcPathStatusBarItem
   }
