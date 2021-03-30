@@ -3,11 +3,11 @@ import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import * as vscode from 'vscode'
+import { ConfigurationChangeEvent, Disposable } from 'vscode'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
-import { delay } from '../../util'
 const { window, commands, workspace, Uri } = vscode
 
 chai.use(sinonChai)
@@ -130,7 +130,16 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowOpenDialog).to.have.been.called
 
-      await delay(100)
+      let storedSetEvent: Disposable
+      const configChangePromise = new Promise(resolve => {
+        const handler = (e: ConfigurationChangeEvent) => {
+          resolve(e)
+          storedSetEvent.dispose()
+        }
+        storedSetEvent = workspace.onDidChangeConfiguration(handler)
+      })
+
+      await configChangePromise
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         testUri.fsPath
       )
