@@ -85,10 +85,10 @@ export class Config {
         },
         {
           label: 'Find',
-          description: 'Browse the filesystem for a DVC binary',
+          description: 'Browse the filesystem for a DVC executable',
           value: async () => {
             const result = await window.showOpenDialog({
-              title: 'Select a DVC binary'
+              title: 'Select a DVC executable'
             })
             if (result) {
               const [input] = result
