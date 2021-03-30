@@ -41,7 +41,7 @@ const filterRootDir = (dirs: string[], rootDir: string) =>
 
 const findDvcAbsoluteRootPath = async (
   cwd: string,
-  cliPath?: string
+  cliPath: string | undefined
 ): Promise<string | undefined> => {
   try {
     const root = await getRoot({
@@ -67,7 +67,7 @@ const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
 
 export const findDvcRootPaths = async (
   cwd: string,
-  cliPath?: string
+  cliPath: string | undefined
 ): Promise<string[]> => {
   const [subRoots, absoluteRoot] = await Promise.all([
     findDvcSubRootPaths(cwd),
@@ -94,7 +94,7 @@ const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
 
 export const findDvcTrackedPaths = async (
   cwd: string,
-  cliPath?: string
+  cliPath: string | undefined
 ): Promise<Set<string>> => {
   const [dotDvcFiles, dvcListFiles] = await Promise.all([
     glob(join('**', '*.dvc'), {

@@ -4,7 +4,7 @@ import { execCommand } from './reader'
 
 export const add = async (options: {
   fsPath: string
-  cliPath?: string
+  cliPath: string | undefined
 }): Promise<string> => {
   const { fsPath, cliPath } = options
 

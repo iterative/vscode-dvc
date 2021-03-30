@@ -4,7 +4,7 @@ import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
 
 interface ReaderOptions {
-  cliPath?: string
+  cliPath: string | undefined
   cwd: string
 }
 
