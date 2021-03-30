@@ -2,7 +2,7 @@ import { describe, it, before, beforeEach } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { window, commands, workspace, Uri } from 'vscode'
+import { window, commands, workspace, Uri, extensions, Extension } from 'vscode'
 import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import * as FileSystem from '../../fileSystem'
@@ -36,6 +36,45 @@ suite('Extension Test Suite', () => {
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
+  })
+
+  describe('git extension', () => {
+    it('should return a usable API', async () => {
+      interface API {
+        // readonly state: APIState
+        // readonly onDidChangeState: Event<APIState>
+        // readonly onDidPublish: Event<PublishEvent>
+        // readonly git: Git
+        // readonly repositories: Repository[]
+        // readonly onDidOpenRepository: Event<Repository>
+        // readonly onDidCloseRepository: Event<Repository>
+        toGitUri(uri: Uri, ref: string): Uri
+        // getRepository(uri: Uri): Repository | null
+        // init(root: Uri): Promise<Repository | null>
+        // openRepository(root: Uri): Promise<Repository | null>
+        // registerRemoteSourceProvider(provider: RemoteSourceProvider): Disposable
+        // registerCredentialsProvider(provider: CredentialsProvider): Disposable
+        // registerPushErrorHandler(handler: PushErrorHandler): Disposable
+      }
+
+      interface GitExtensionAPI {
+        getAPI(version: number): Thenable<API>
+      }
+
+      type GitExtension = Extension<GitExtensionAPI>
+      const gitExtension = extensions.getExtension('vscode.git') as GitExtension
+      expect(gitExtension).not.to.be.undefined
+      const api = await (await gitExtension.activate()).getAPI(1)
+
+      const gitUri = api.toGitUri(Uri.file(__filename), 'HEAD')
+      expect(gitUri).not.to.be.undefined
+
+      expect(gitUri.scheme).to.equal('git')
+
+      const query = JSON.parse(gitUri.query)
+      expect(query.path).to.equal(__filename)
+      expect(query.ref).to.equal('HEAD')
+    })
   })
 
   describe('dvc.showExperiments', () => {
