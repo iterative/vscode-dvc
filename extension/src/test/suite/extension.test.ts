@@ -132,7 +132,7 @@ suite('Extension Test Suite', () => {
         fileResolve
       )
 
-      const configChangePromise = () => {
+      const configurationChangeEvent = () => {
         return new Promise(resolve => {
           const listener: Disposable = workspace.onDidChangeConfiguration(
             (event: ConfigurationChangeEvent) => {
@@ -147,7 +147,7 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowOpenDialog).to.have.been.called
 
-      await configChangePromise()
+      await configurationChangeEvent()
 
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         testUri.fsPath

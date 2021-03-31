@@ -15,7 +15,7 @@ suite('Integrated Terminal Test Suite', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
 
-      const openTerminalPromise = (): Promise<Terminal> => {
+      const openTerminalEvent = (): Promise<Terminal> => {
         return new Promise(resolve => {
           const listener: Disposable = window.onDidOpenTerminal(
             (event: Terminal) => {
@@ -28,7 +28,7 @@ suite('Integrated Terminal Test Suite', () => {
 
       IntegratedTerminal.openCurrentInstance()
 
-      const terminal = await openTerminalPromise()
+      const terminal = await openTerminalEvent()
       expect(terminal.creationOptions?.name).to.equal('DVC')
       disposable.dispose()
     }).timeout(12000)
@@ -38,7 +38,7 @@ suite('Integrated Terminal Test Suite', () => {
 
       const text = 'some-really-long-string'
 
-      const writeToTerminalPromise = (text: string): Promise<string> => {
+      const terminalDataWriteEventStream = (text: string): Promise<string> => {
         let eventStream = ''
         return new Promise(resolve => {
           const listener: Disposable = window.onDidWriteTerminalData(
@@ -55,7 +55,7 @@ suite('Integrated Terminal Test Suite', () => {
 
       IntegratedTerminal.run('echo ' + text)
 
-      const eventStream = await writeToTerminalPromise(text)
+      const eventStream = await terminalDataWriteEventStream(text)
       expect(eventStream.includes(text)).to.be.true
       disposable.dispose()
     }).timeout(12000)
@@ -64,7 +64,7 @@ suite('Integrated Terminal Test Suite', () => {
       const disposable = Disposable.fn()
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
-      const writeToTerminalPromise = (text: string): Promise<string> => {
+      const terminalDataWriteEventStream = (text: string): Promise<string> => {
         let eventStream = ''
         return new Promise(resolve => {
           const listener: Disposable = window.onDidWriteTerminalData(
@@ -79,8 +79,8 @@ suite('Integrated Terminal Test Suite', () => {
         })
       }
 
-      const firstEvent = writeToTerminalPromise(firstText)
-      const secondEvent = writeToTerminalPromise(secondText)
+      const firstEvent = terminalDataWriteEventStream(firstText)
+      const secondEvent = terminalDataWriteEventStream(secondText)
       await IntegratedTerminal.run('echo ' + firstText)
       await IntegratedTerminal.run('echo ' + secondText)
 
