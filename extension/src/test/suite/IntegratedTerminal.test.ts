@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
-import { Terminal, window } from 'vscode'
+import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { delay } from '../../util'
 import { Disposable } from '../../extension'
@@ -29,16 +29,16 @@ suite('Integrated Terminal Test Suite', () => {
         return new Promise(resolve => {
           const listener: Disposable = window.onDidOpenTerminal(
             (event: Terminal) => {
-              listener.dispose()
               return resolve(event)
             }
           )
+          disposable.track(listener)
         })
       }
 
       const event = openTerminalPromise()
 
-      disposable.track(await IntegratedTerminal.openCurrentInstance())
+      await IntegratedTerminal.openCurrentInstance()
 
       const terminal = await event
       expect(terminal.creationOptions?.name).to.equal('DVC')
@@ -47,19 +47,31 @@ suite('Integrated Terminal Test Suite', () => {
 
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
+
       const text = 'some-really-long-string'
-      let eventStream = ''
-      disposable.track(
-        window.onDidWriteTerminalData(event => {
-          eventStream += event.data
+
+      const writeToTerminalPromise = (text: string): Promise<string> => {
+        let eventStream = ''
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidWriteTerminalData(
+            (event: TerminalDataWriteEvent) => {
+              eventStream += event.data
+              if (eventStream.includes(text)) {
+                return resolve(eventStream)
+              }
+            }
+          )
+          disposable.track(listener)
         })
-      )
-      disposable.track(IntegratedTerminal)
+      }
 
-      await IntegratedTerminal.run('echo ' + text)
-      await waitForAndDispose(disposable)
+      const event = writeToTerminalPromise(text)
 
+      IntegratedTerminal.run('echo ' + text)
+
+      const eventStream = await event
       expect(eventStream.includes(text)).to.be.true
+      disposable.dispose()
     }).timeout(12000)
 
     it('should be able to run multiple commands in the same terminal', async () => {
