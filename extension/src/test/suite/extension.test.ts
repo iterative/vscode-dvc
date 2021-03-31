@@ -21,7 +21,7 @@ const { expect } = chai
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
-  before(async () => {
+  before(() => {
     stub(DvcReader, 'listDvcOnlyRecursive').resolves([
       join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
       join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
