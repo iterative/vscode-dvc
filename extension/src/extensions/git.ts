@@ -74,16 +74,14 @@ export class GitExtensionInterface {
   private externalApi?: API
   repositoriesState: RepositoryState[] = []
 
-  getReadyExtension = async (): Promise<API> => {
-    const activatedExtension = await (extensions.getExtension(
-      'vscode.git'
-    ) as GitExtension).activate()
-    const api = await activatedExtension.getAPI(1)
-    return api
-  }
-
   public get ready() {
     return this.initialized
+  }
+
+  private getExtensionAPI = async (): Promise<API> => {
+    const extension = extensions.getExtension('vscode.git') as GitExtension
+    const activatedExtension = await extension.activate()
+    return activatedExtension.getAPI(1)
   }
 
   private onDidChangeEmitter: EventEmitter<Uri[]>
@@ -95,8 +93,8 @@ export class GitExtensionInterface {
       .map(change => change.uri)
   }
 
-  private initialize(gitExtensionApi: API) {
-    this.externalApi = gitExtensionApi
+  private initialize(gitExtensionAPI: API) {
+    this.externalApi = gitExtensionAPI
     this.repositories = this.externalApi.repositories
     this.repositoriesState = this.externalApi.repositories.map(
       repository => repository.state
@@ -116,14 +114,14 @@ export class GitExtensionInterface {
     this._initialized.resolve()
   }
 
-  private setup(gitExtensionApi: API) {
-    if (gitExtensionApi.state === 'initialized') {
-      this.initialize(gitExtensionApi)
+  private setup(gitExtensionAPI: API) {
+    if (gitExtensionAPI.state === 'initialized') {
+      this.initialize(gitExtensionAPI)
       this._initialized.resolve()
     } else {
-      gitExtensionApi.onDidChangeState(state => {
+      gitExtensionAPI.onDidChangeState(state => {
         if (state === 'initialized') {
-          this.initialize(gitExtensionApi)
+          this.initialize(gitExtensionAPI)
         }
       })
     }
@@ -133,8 +131,8 @@ export class GitExtensionInterface {
     this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
     this.onDidChange = this.onDidChangeEmitter.event
 
-    this.getReadyExtension().then(gitExtensionApi => {
-      this.setup(gitExtensionApi)
+    this.getExtensionAPI().then(gitExtensionAPI => {
+      this.setup(gitExtensionAPI)
     })
   }
 }
