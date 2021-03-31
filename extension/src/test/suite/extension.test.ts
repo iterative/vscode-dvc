@@ -2,13 +2,12 @@ import { before, beforeEach, describe, it } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { ensureFile, remove } from 'fs-extra'
+import { ensureFile, accessSync, remove } from 'fs-extra'
 import {
   window,
   commands,
   workspace,
   Uri,
-  extensions,
   ConfigurationChangeEvent
 } from 'vscode'
 import { Disposable } from '../../extension'
@@ -16,8 +15,7 @@ import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
-import { delay } from '../../util'
-import { GitExtension, GitStatus } from '../../extensions/git'
+import { GitExtensionInterface } from '../../extensions/git'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -164,6 +162,7 @@ suite('Extension Test Suite', () => {
 
   describe('git extension', () => {
     it('should return a usable API', async () => {
+      const disposable = Disposable.fn()
       const untrackedDir = join(demoFolderLocation, 'folder-with-stuff')
       const untrackedFile = join(
         demoFolderLocation,
@@ -171,38 +170,26 @@ suite('Extension Test Suite', () => {
         'text.txt'
       )
 
+      const gei = new GitExtensionInterface()
+      await gei.ready
+
+      const untrackedChangeEvent = () => {
+        return new Promise(resolve => {
+          const listener: Disposable = gei.onDidChange((event: Uri[]) => {
+            return resolve(event)
+          })
+          disposable.track(listener)
+        })
+      }
+
+      const untrackedChanges = untrackedChangeEvent()
+
       await ensureFile(untrackedFile)
-      await delay(5000)
+      expect(accessSync(untrackedFile)).not.to.throw
 
-      const gitExtension = extensions.getExtension('vscode.git') as GitExtension
-      expect(gitExtension).not.to.be.undefined
-      const api = await (await gitExtension.activate()).getAPI(1)
-
-      const gitUri = api.toGitUri(Uri.file(__filename), 'HEAD')
-      expect(gitUri).not.to.be.undefined
-
-      expect(gitUri.scheme).to.equal('git')
-
-      const query = JSON.parse(gitUri.query)
-      expect(query.path).to.equal(__filename)
-      expect(query.ref).to.equal('HEAD')
-
-      const repositories = api.repositories
-      const repository = repositories[0]
-
-      try {
-        remove(untrackedDir)
-      } catch {}
-
-      expect(repositories.length).to.equal(1)
-
-      const untrackedChanges = repository.state.workingTreeChanges.filter(
-        c => c.status === GitStatus.UNTRACKED
-      )
-
-      expect(untrackedChanges).to.have.lengthOf.at.least(1)
-      expect(untrackedChanges.find(c => c.uri.fsPath === untrackedFile)).not.to
-        .be.undefined
-    }).timeout(6000)
+      expect(await untrackedChanges).to.have.lengthOf.at.least(1)
+      remove(untrackedDir)
+      disposable.dispose()
+    }).timeout(5000)
   })
 })

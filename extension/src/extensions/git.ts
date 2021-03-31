@@ -1,4 +1,6 @@
-import { Event, Extension, Uri } from 'vscode'
+import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
+import { Disposable } from '@hediet/std/disposable'
+import { Deferred } from '@hediet/std/synchronization'
 
 export const enum GitStatus {
   INDEX_MODIFIED,
@@ -35,12 +37,6 @@ interface Change {
 }
 
 interface RepositoryState {
-  // readonly HEAD: Branch | undefined
-  // readonly refs: Ref[]
-  // readonly remotes: Remote[]
-  // readonly submodules: Submodule[]
-  // readonly rebaseCommit: Commit | undefined
-
   readonly mergeChanges: Change[]
   readonly indexChanges: Change[]
   readonly workingTreeChanges: Change[]
@@ -49,95 +45,17 @@ interface RepositoryState {
 }
 
 interface Repository {
-  // readonly rootUri: Uri
-  // readonly inputBox: InputBox
   readonly state: RepositoryState
-  // readonly ui: RepositoryUIState
-
-  // getConfigs(): Promise<{ key: string; value: string }[]>
-  // getConfig(key: string): Promise<string>
-  // setConfig(key: string, value: string): Promise<string>
-  // getGlobalConfig(key: string): Promise<string>
-
-  // getObjectDetails(
-  //   treeish: string,
-  //   path: string
-  // ): Promise<{ mode: string; object: string; size: number }>
-  // detectObjectType(
-  //   object: string
-  // ): Promise<{ mimetype: string; encoding?: string }>
-  // buffer(ref: string, path: string): Promise<Buffer>
-  // show(ref: string, path: string): Promise<string>
-  // getCommit(ref: string): Promise<Commit>
-
-  // clean(paths: string[]): Promise<void>
-
-  // apply(patch: string, reverse?: boolean): Promise<void>
-  // diff(cached?: boolean): Promise<string>
-  // diffWithHEAD(): Promise<Change[]>
-  // diffWithHEAD(path: string): Promise<string>
-  // diffWith(ref: string): Promise<Change[]>
-  // diffWith(ref: string, path: string): Promise<string>
-  // diffIndexWithHEAD(): Promise<Change[]>
-  // diffIndexWithHEAD(path: string): Promise<string>
-  // diffIndexWith(ref: string): Promise<Change[]>
-  // diffIndexWith(ref: string, path: string): Promise<string>
-  // diffBlobs(object1: string, object2: string): Promise<string>
-  // diffBetween(ref1: string, ref2: string): Promise<Change[]>
-  // diffBetween(ref1: string, ref2: string, path: string): Promise<string>
-
-  // hashObject(data: string): Promise<string>
-
-  // createBranch(
-  //   name: string,
-  //   checkout: boolean,
-  //   ref?: string
-  // ): Promise<void>
-  // deleteBranch(name: string, force?: boolean): Promise<void>
-  // getBranch(name: string): Promise<Branch>
-  // getBranches(query: BranchQuery): Promise<Ref[]>
-  // setBranchUpstream(name: string, upstream: string): Promise<void>
-
-  // getMergeBase(ref1: string, ref2: string): Promise<string>
-
-  // status(): Promise<void>
-  // checkout(treeish: string): Promise<void>
-
-  // addRemote(name: string, url: string): Promise<void>
-  // removeRemote(name: string): Promise<void>
-  // renameRemote(name: string, newName: string): Promise<void>
-
-  // fetch(options?: FetchOptions): Promise<void>
-  // fetch(remote?: string, ref?: string, depth?: number): Promise<void>
-  // pull(unshallow?: boolean): Promise<void>
-  // push(
-  //   remoteName?: string,
-  //   branchName?: string,
-  //   setUpstream?: boolean,
-  //   force?: ForcePushMode
-  // ): Promise<void>
-
-  // blame(path: string): Promise<string>
-  // log(options?: LogOptions): Promise<Commit[]>
-
-  // commit(message: string, opts?: CommitOptions): Promise<void>
 }
 
+type APIState = 'uninitialized' | 'initialized'
+
 interface API {
-  // readonly state: APIState
-  // readonly onDidChangeState: Event<APIState>
-  // readonly onDidPublish: Event<PublishEvent>
-  // readonly git: Git
+  readonly state: APIState
+  readonly onDidChangeState: Event<APIState>
   readonly repositories: Repository[]
-  // readonly onDidOpenRepository: Event<Repository>
-  // readonly onDidCloseRepository: Event<Repository>
+
   toGitUri(uri: Uri, ref: string): Uri
-  // getRepository(uri: Uri): Repository | null
-  // init(root: Uri): Promise<Repository | null>
-  // openRepository(root: Uri): Promise<Repository | null>
-  // registerRemoteSourceProvider(provider: RemoteSourceProvider): Disposable
-  // registerCredentialsProvider(provider: CredentialsProvider): Disposable
-  // registerPushErrorHandler(handler: PushErrorHandler): Disposable
 }
 
 interface GitExtensionAPI {
@@ -145,3 +63,78 @@ interface GitExtensionAPI {
 }
 
 export type GitExtension = Extension<GitExtensionAPI>
+
+export class GitExtensionInterface {
+  dispose = Disposable.fn()
+  private readonly _initialized = new Deferred()
+
+  private readonly initialized = this._initialized.promise
+
+  repositories: Repository[] = []
+  private externalApi?: API
+  repositoriesState: RepositoryState[] = []
+
+  getReadyExtension = async (): Promise<API> => {
+    const activatedExtension = await (extensions.getExtension(
+      'vscode.git'
+    ) as GitExtension).activate()
+    const api = await activatedExtension.getAPI(1)
+    return api
+  }
+
+  public get ready() {
+    return this.initialized
+  }
+
+  private onDidChangeEmitter: EventEmitter<Uri[]>
+  readonly onDidChange: Event<Uri[]>
+
+  private getUntrackedChanges(changes: Change[]): Uri[] {
+    return changes
+      .filter(change => change.status === GitStatus.UNTRACKED)
+      .map(change => change.uri)
+  }
+
+  private initialize(gitExtensionApi: API) {
+    this.externalApi = gitExtensionApi
+    this.repositories = this.externalApi.repositories
+    this.repositoriesState = this.externalApi.repositories.map(
+      repository => repository.state
+    )
+    this.repositoriesState.map(state => {
+      this.dispose.track(
+        state.onDidChange(() => {
+          const uris = [
+            ...this.getUntrackedChanges(state.mergeChanges),
+            ...this.getUntrackedChanges(state.indexChanges),
+            ...this.getUntrackedChanges(state.workingTreeChanges)
+          ]
+          this.onDidChangeEmitter.fire(uris)
+        })
+      )
+    })
+    this._initialized.resolve()
+  }
+
+  private setup(gitExtensionApi: API) {
+    if (gitExtensionApi.state === 'initialized') {
+      this.initialize(gitExtensionApi)
+      this._initialized.resolve()
+    } else {
+      gitExtensionApi.onDidChangeState(state => {
+        if (state === 'initialized') {
+          this.initialize(gitExtensionApi)
+        }
+      })
+    }
+  }
+
+  constructor() {
+    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
+    this.onDidChange = this.onDidChangeEmitter.event
+
+    this.getReadyExtension().then(gitExtensionApi => {
+      this.setup(gitExtensionApi)
+    })
+  }
+}
