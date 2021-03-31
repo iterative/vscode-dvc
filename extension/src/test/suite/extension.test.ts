@@ -18,17 +18,6 @@ import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebvie
 chai.use(sinonChai)
 const { expect } = chai
 
-const configChangePromise = () => {
-  return new Promise(resolve => {
-    const listener: Disposable = workspace.onDidChangeConfiguration(
-      (event: ConfigurationChangeEvent) => {
-        listener.dispose()
-        return resolve(event)
-      }
-    )
-  })
-}
-
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
@@ -136,11 +125,23 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option', async () => {
+      const disposable = Disposable.fn()
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         fileResolve
       )
+
+      const configChangePromise = () => {
+        return new Promise(resolve => {
+          const listener: Disposable = workspace.onDidChangeConfiguration(
+            (event: ConfigurationChangeEvent) => {
+              return resolve(event)
+            }
+          )
+          disposable.track(listener)
+        })
+      }
 
       await selectDvcPathItem(1)
 
@@ -153,6 +154,7 @@ suite('Extension Test Suite', () => {
       )
 
       mockShowOpenDialog.restore()
+      disposable.dispose()
     })
   })
 })
