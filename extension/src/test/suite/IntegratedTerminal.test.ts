@@ -3,7 +3,6 @@ import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
-import { delay } from '../../util'
 import { Disposable } from '../../extension'
 
 chai.use(sinonChai)
@@ -11,15 +10,6 @@ const { expect } = chai
 
 suite('Integrated Terminal Test Suite', () => {
   window.showInformationMessage('Start all integrated terminal tests.')
-
-  const waitForAndDispose = async (
-    disposable: Disposable,
-    ms = 1500
-  ): Promise<void> => {
-    await delay(ms)
-    disposable.dispose()
-    await delay(ms)
-  }
 
   describe('IntegratedTerminal', () => {
     it('should be able to open a terminal', async () => {
@@ -78,24 +68,36 @@ suite('Integrated Terminal Test Suite', () => {
       const disposable = Disposable.fn()
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
-      let eventStream = ''
-      disposable.track(
-        window.onDidWriteTerminalData(event => {
-          eventStream += event.data
+      const writeToTerminalPromise = (text: string): Promise<string> => {
+        let eventStream = ''
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidWriteTerminalData(
+            (event: TerminalDataWriteEvent) => {
+              eventStream += event.data
+              if (eventStream.includes(text)) {
+                return resolve(eventStream)
+              }
+            }
+          )
+          disposable.track(listener)
         })
-      )
-      disposable.track(IntegratedTerminal)
+      }
 
+      const firstEvent = writeToTerminalPromise(firstText)
+      const secondEvent = writeToTerminalPromise(secondText)
       await IntegratedTerminal.run('echo ' + firstText)
-      await delay(500)
       await IntegratedTerminal.run('echo ' + secondText)
-      await waitForAndDispose(disposable)
+
+      const firstStream = await Promise.race([firstEvent, secondEvent])
+      let eventStream = await firstEvent
+      expect(firstStream).to.equal(eventStream)
+
+      eventStream += await secondEvent
 
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
-      expect(eventStream.indexOf(firstText)).to.be.lessThan(
-        eventStream.indexOf(secondText)
-      )
+
+      disposable.dispose()
     }).timeout(12000)
   })
 })
