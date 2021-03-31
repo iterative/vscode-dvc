@@ -2,7 +2,6 @@ import { before, beforeEach, describe, it } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { ensureFile, accessSync, remove } from 'fs-extra'
 import {
   window,
   commands,
@@ -15,7 +14,6 @@ import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
-import { GitExtensionInterface } from '../../extensions/git'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -158,38 +156,5 @@ suite('Extension Test Suite', () => {
       mockShowOpenDialog.restore()
       disposable.dispose()
     })
-  })
-
-  describe('git extension', () => {
-    it('should return a usable API', async () => {
-      const disposable = Disposable.fn()
-      const untrackedDir = join(demoFolderLocation, 'folder-with-stuff')
-      const untrackedFile = join(
-        demoFolderLocation,
-        'folder-with-stuff',
-        'text.txt'
-      )
-
-      const gei = new GitExtensionInterface()
-      await gei.ready
-
-      const untrackedChangeEvent = () => {
-        return new Promise(resolve => {
-          const listener: Disposable = gei.onDidChange((event: Uri[]) => {
-            return resolve(event)
-          })
-          disposable.track(listener)
-        })
-      }
-
-      const untrackedChanges = untrackedChangeEvent()
-
-      await ensureFile(untrackedFile)
-      expect(accessSync(untrackedFile)).not.to.throw
-
-      expect(await untrackedChanges).to.have.lengthOf.at.least(1)
-      remove(untrackedDir)
-      disposable.dispose()
-    }).timeout(5000)
   })
 })
