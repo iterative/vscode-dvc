@@ -9,6 +9,8 @@
   "command.initNoScm": "Init DVC --no-scm",
   "command.push": "Push",
   "command.runExperiment": "Run Experiment",
-  "command.selectDvcPath": "Select DVC Path",
-  "command.showExperiments": "Show Experiments"
+  "command.selectDvcPath": "Select DVC CLI Path",
+  "command.showExperiments": "Show Experiments",
+  "config.dvcPath.title": "DVC CLI Path",
+  "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank."
 }

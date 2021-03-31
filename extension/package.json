@@ -85,9 +85,9 @@
       "title": "DVC",
       "properties": {
         "dvc.dvcPath": {
+          "title": "%config.dvcPath.title%",
+          "description": "%config.dvcPath.description%",
           "type": "string",
-          "description": "Path to DVC.",
-          "default": "dvc",
           "scope": "resource"
         }
       }
