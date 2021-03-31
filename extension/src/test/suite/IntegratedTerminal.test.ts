@@ -26,11 +26,9 @@ suite('Integrated Terminal Test Suite', () => {
         })
       }
 
-      const event = openTerminalPromise()
+      IntegratedTerminal.openCurrentInstance()
 
-      await IntegratedTerminal.openCurrentInstance()
-
-      const terminal = await event
+      const terminal = await openTerminalPromise()
       expect(terminal.creationOptions?.name).to.equal('DVC')
       disposable.dispose()
     }).timeout(12000)
@@ -55,11 +53,9 @@ suite('Integrated Terminal Test Suite', () => {
         })
       }
 
-      const event = writeToTerminalPromise(text)
-
       IntegratedTerminal.run('echo ' + text)
 
-      const eventStream = await event
+      const eventStream = await writeToTerminalPromise(text)
       expect(eventStream.includes(text)).to.be.true
       disposable.dispose()
     }).timeout(12000)
