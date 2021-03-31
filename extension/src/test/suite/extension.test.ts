@@ -21,8 +21,6 @@ const { expect } = chai
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
-  const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
-
   before(async () => {
     stub(DvcReader, 'listDvcOnlyRecursive').resolves([
       join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
@@ -38,6 +36,8 @@ suite('Extension Test Suite', () => {
       'model.pt'
     ])
   })
+
+  const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
