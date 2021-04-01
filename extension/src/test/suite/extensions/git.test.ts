@@ -14,33 +14,16 @@ suite('Git Extension Test Suite', () => {
   window.showInformationMessage('Start all git extension tests.')
 
   describe('git extension', () => {
-    const demoFolderLocation = resolve(
-      __dirname,
-      '..',
-      '..',
-      '..',
-      '..',
-      '..',
-      'demo'
-    )
+    const workspacePath = resolve(__dirname, '..', '..', '..', '..', '..')
+    const dvcDemoPath = join(workspacePath, 'demo')
 
     it('should return Uris of untracked files', async () => {
       const disposable = Disposable.fn()
-      const untrackedDir = join(demoFolderLocation, 'folder-with-stuff')
-      const untrackedFile = join(
-        demoFolderLocation,
-        'folder-with-stuff',
-        'text.txt'
-      )
-
-      const gitExtensionWrapper = new GitExtensionInterface()
+      const gitExtensionWrapper = disposable.track(new GitExtensionInterface())
       await gitExtensionWrapper.ready
-      const gitRepoRoot = gitExtensionWrapper.repositories.map(
-        repository => repository.rootUri.fsPath
-      )
-      expect(gitRepoRoot).to.deep.equal([
-        resolve(__dirname, '..', '..', '..', '..', '..')
-      ])
+
+      const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
+      const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
       const untrackedChangeEvent = (): Promise<Uri[]> => {
         return new Promise(resolve => {
@@ -64,5 +47,16 @@ suite('Git Extension Test Suite', () => {
       remove(untrackedDir)
       disposable.dispose()
     }).timeout(10000)
+
+    it('should return the rootUri of each open repository', async () => {
+      const disposable = Disposable.fn()
+      const gitExtensionWrapper = disposable.track(new GitExtensionInterface())
+      await gitExtensionWrapper.ready
+      const gitRepoRoot = gitExtensionWrapper.repositories.map(
+        repository => repository.rootUri.fsPath
+      )
+      expect(gitRepoRoot).to.deep.equal([workspacePath])
+      disposable.dispose()
+    })
   })
 })
