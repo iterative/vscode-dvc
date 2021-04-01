@@ -14,8 +14,12 @@
   "cSpell.words": [
     "DVCPATH",
     "MNIST",
+    "submodules",
     "symlinked",
     "toplevel",
+    "treeish",
+    "unshallow",
+    "untracked",
     "venv",
     "virtualenv"
   ]

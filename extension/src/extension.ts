@@ -22,6 +22,7 @@ import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
+import { Git } from './extensions/Git'
 
 export { Disposable, Disposer }
 
@@ -39,6 +40,7 @@ export class Extension {
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
   private readonly scm?: SourceControlManagement
+  private readonly git: Git
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -144,6 +146,9 @@ export class Extension {
 
     this.scm = this.dispose.track(new SourceControlManagement())
     this.scm.dvcScmFilesView()
+
+    this.git = this.dispose.track(new Git())
+    this.git.ready.then()
   }
 }
 
