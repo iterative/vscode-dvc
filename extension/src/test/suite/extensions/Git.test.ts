@@ -19,19 +19,17 @@ suite('Git Extension Test Suite', () => {
 
     it('should return Uris of untracked files', async () => {
       const disposable = Disposable.fn()
-      const gitExtensionWrapper = disposable.track(new Git())
-      await gitExtensionWrapper.ready
+      const git = disposable.track(new Git())
+      await git.ready
 
       const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
       const untrackedChangeEvent = (): Promise<Uri[]> => {
         return new Promise(resolve => {
-          const listener: Disposable = gitExtensionWrapper.onDidChange(
-            (event: Uri[]) => {
-              return resolve(event)
-            }
-          )
+          const listener: Disposable = git.onDidChange((event: Uri[]) => {
+            return resolve(event)
+          })
           disposable.track(listener)
         })
       }
@@ -50,12 +48,9 @@ suite('Git Extension Test Suite', () => {
 
     it('should return the rootUri of each open repository', async () => {
       const disposable = Disposable.fn()
-      const gitExtensionWrapper = disposable.track(new Git())
-      await gitExtensionWrapper.ready
-      const gitRepoRoots = gitExtensionWrapper.repositories.map(
-        repository => repository.rootUri.fsPath
-      )
-      expect(gitRepoRoots).to.deep.equal([workspacePath])
+      const git = disposable.track(new Git())
+      await git.ready
+      expect(git.getRepositoriesRoots()).to.deep.equal([workspacePath])
       disposable.dispose()
     })
   })

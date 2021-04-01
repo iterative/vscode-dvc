@@ -71,12 +71,18 @@ export class Git {
 
   private readonly initialized = this._initialized.promise
 
-  repositories: Repository[] = []
+  private repositories: Repository[] = []
   private externalApi?: API
-  repositoriesState: RepositoryState[] = []
+  private repositoriesState: RepositoryState[] = []
+
+  private repositoriesRoots: string[] = []
 
   public get ready() {
     return this.initialized
+  }
+
+  public getRepositoriesRoots(): string[] {
+    return this.repositoriesRoots
   }
 
   private getExtensionAPI = async (): Promise<API> => {
@@ -96,10 +102,17 @@ export class Git {
 
   private initialize(gitExtensionAPI: API) {
     this.externalApi = gitExtensionAPI
+
     this.repositories = this.externalApi.repositories
+
     this.repositoriesState = this.externalApi.repositories.map(
       repository => repository.state
     )
+
+    this.repositoriesRoots = this.repositories.map(
+      repository => repository.rootUri.fsPath
+    )
+
     this.repositoriesState.map(state => {
       this.dispose.track(
         state.onDidChange(() => {
@@ -110,6 +123,7 @@ export class Git {
         })
       )
     })
+
     this._initialized.resolve()
   }
 
