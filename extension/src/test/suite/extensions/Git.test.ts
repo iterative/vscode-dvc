@@ -13,7 +13,7 @@ const { expect } = chai
 suite('Git Extension Test Suite', () => {
   window.showInformationMessage('Start all git extension tests.')
 
-  describe('git extension', () => {
+  describe('Git', () => {
     const workspacePath = resolve(__dirname, '..', '..', '..', '..', '..')
     const dvcDemoPath = join(workspacePath, 'demo')
 
