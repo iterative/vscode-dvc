@@ -27,7 +27,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const demoFolderLocation = resolve(__dirname, '..', '..', 'demo')
+const dvcDemoPath = resolve(__dirname, '..', '..', 'demo')
 
 describe('addFileChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
@@ -95,15 +95,15 @@ describe('getWatcher', () => {
 })
 
 describe('findDvcRootPaths', () => {
-  const dataRoot = resolve(demoFolderLocation, 'data')
+  const dataRoot = resolve(dvcDemoPath, 'data')
   const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
     mockGetRoot.mockResolvedValueOnce('.')
-    const dvcRoots = await findDvcRootPaths(demoFolderLocation, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
 
     expect(mockGetRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([demoFolderLocation])
+    expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should find multiple roots if available in the given folder', async () => {
@@ -111,12 +111,12 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(dataRoot, '.dvc')
     mkdirSync(mockDvcRoot)
 
-    const dvcRoots = await findDvcRootPaths(demoFolderLocation, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
 
     rmdir(mockDvcRoot)
 
     expect(mockGetRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([demoFolderLocation, dataRoot].sort())
+    expect(dvcRoots).toEqual([dvcDemoPath, dataRoot].sort())
   })
 
   it('should find multiple roots if one is above and one is below the given folder', async () => {
@@ -129,14 +129,14 @@ describe('findDvcRootPaths', () => {
     rmdir(mockDvcRoot)
 
     expect(mockGetRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([demoFolderLocation, dirname(mockDvcRoot)].sort())
+    expect(dvcRoots).toEqual([dvcDemoPath, dirname(mockDvcRoot)].sort())
   })
 
   it('should find the dvc root if it exists above the given folder', async () => {
     mockGetRoot.mockResolvedValueOnce('..')
     const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath)
     expect(mockGetRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([demoFolderLocation])
+    expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
@@ -148,20 +148,20 @@ describe('findDvcRootPaths', () => {
 describe('getAbsoluteTrackedPath', () => {
   it('should return a list of tracked absolute paths given a list of .dvc files', async () => {
     const tracked = getAbsoluteTrackedPath([
-      join(demoFolderLocation, 'somefile.txt.dvc')
+      join(dvcDemoPath, 'somefile.txt.dvc')
     ])
 
-    expect(tracked).toEqual([join(demoFolderLocation, 'somefile.txt')])
+    expect(tracked).toEqual([join(dvcDemoPath, 'somefile.txt')])
   })
 })
 
 describe('findDvcTrackedPaths', () => {
   it('should find the paths in the workspace corresponding to .dvc files and return them in a Set', async () => {
     mockListDvcOnlyRecursive.mockResolvedValueOnce([])
-    const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
+    const tracked = await findDvcTrackedPaths(dvcDemoPath, 'dvc')
 
     expect(tracked).toEqual(
-      new Set([resolve(demoFolderLocation, 'data', 'MNIST', 'raw')])
+      new Set([resolve(dvcDemoPath, 'data', 'MNIST', 'raw')])
     )
   })
 
@@ -171,15 +171,15 @@ describe('findDvcTrackedPaths', () => {
     const logLoss = join(logFolder, 'loss.tsv')
     const model = 'model.pt'
     mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
-    const tracked = await findDvcTrackedPaths(demoFolderLocation, 'dvc')
+    const tracked = await findDvcTrackedPaths(dvcDemoPath, 'dvc')
 
     expect(tracked).toEqual(
       new Set([
-        resolve(demoFolderLocation, 'data', 'MNIST', 'raw'),
-        resolve(demoFolderLocation, logAcc),
-        resolve(demoFolderLocation, logLoss),
-        resolve(demoFolderLocation, logFolder),
-        resolve(demoFolderLocation, model)
+        resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+        resolve(dvcDemoPath, logAcc),
+        resolve(dvcDemoPath, logLoss),
+        resolve(dvcDemoPath, logFolder),
+        resolve(dvcDemoPath, model)
       ])
     )
   })

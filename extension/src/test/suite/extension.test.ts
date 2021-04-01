@@ -37,7 +37,7 @@ suite('Extension Test Suite', () => {
     ])
   })
 
-  const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
+  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   beforeEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
@@ -63,7 +63,7 @@ suite('Extension Test Suite', () => {
 
     it('should only be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(resolve(demoFolderLocation, 'train.py'))
+      const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
 
       const mockReader = stub(DvcReader, 'getExperiments').resolves(
         complexExperimentsOutput
