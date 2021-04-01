@@ -52,10 +52,10 @@ suite('Git Extension Test Suite', () => {
       const disposable = Disposable.fn()
       const gitExtensionWrapper = disposable.track(new Git())
       await gitExtensionWrapper.ready
-      const gitRepoRoot = gitExtensionWrapper.repositories.map(
+      const gitRepoRoots = gitExtensionWrapper.repositories.map(
         repository => repository.rootUri.fsPath
       )
-      expect(gitRepoRoot).to.deep.equal([workspacePath])
+      expect(gitRepoRoots).to.deep.equal([workspacePath])
       disposable.dispose()
     })
   })
