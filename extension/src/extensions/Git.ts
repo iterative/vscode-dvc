@@ -103,12 +103,8 @@ export class Git {
     this.repositoriesState.map(state => {
       this.dispose.track(
         state.onDidChange(() => {
-          const uris = [
-            ...this.getUntrackedChanges(state.mergeChanges),
-            ...this.getUntrackedChanges(state.indexChanges),
-            ...this.getUntrackedChanges(state.workingTreeChanges)
-          ]
-          this.onDidChangeEmitter.fire(uris)
+          const untrackedUris = this.getUntrackedChanges(state.indexChanges)
+          this.onDidChangeEmitter.fire(untrackedUris)
         })
       )
     })
