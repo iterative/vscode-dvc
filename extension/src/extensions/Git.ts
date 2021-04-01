@@ -51,7 +51,7 @@ interface Repository {
 
 type APIState = 'uninitialized' | 'initialized'
 
-interface API {
+interface GitExtensionAPI {
   readonly state: APIState
   readonly onDidChangeState: Event<APIState>
   readonly repositories: Repository[]
@@ -59,11 +59,9 @@ interface API {
   toGitUri(uri: Uri, ref: string): Uri
 }
 
-interface GitExtensionAPI {
-  getAPI(version: number): Thenable<API>
+interface GitExtension {
+  getAPI(version: number): Thenable<GitExtensionAPI>
 }
-
-export type GitExtension = Extension<GitExtensionAPI>
 
 export class Git {
   dispose = Disposable.fn()
@@ -71,11 +69,10 @@ export class Git {
 
   private readonly initialized = this._initialized.promise
 
+  private gitExtensionAPI?: GitExtensionAPI
   private repositories: Repository[] = []
-  private externalApi?: API
-  private repositoriesState: RepositoryState[] = []
-
   private repositoriesRoots: string[] = []
+  private repositoriesState: RepositoryState[] = []
 
   public get ready() {
     return this.initialized
@@ -85,8 +82,10 @@ export class Git {
     return this.repositoriesRoots
   }
 
-  private getExtensionAPI = async (): Promise<API> => {
-    const extension = extensions.getExtension('vscode.git') as GitExtension
+  private getGitExtensionAPI = async (): Promise<GitExtensionAPI> => {
+    const extension = extensions.getExtension('vscode.git') as Extension<
+      GitExtension
+    >
     const activatedExtension = await extension.activate()
     return activatedExtension.getAPI(1)
   }
@@ -100,12 +99,12 @@ export class Git {
       .map(change => change.uri)
   }
 
-  private initialize(gitExtensionAPI: API) {
-    this.externalApi = gitExtensionAPI
+  private initializeClass(gitExtensionAPI: GitExtensionAPI) {
+    this.gitExtensionAPI = gitExtensionAPI
 
-    this.repositories = this.externalApi.repositories
+    this.repositories = this.gitExtensionAPI.repositories
 
-    this.repositoriesState = this.externalApi.repositories.map(
+    this.repositoriesState = this.gitExtensionAPI.repositories.map(
       repository => repository.state
     )
 
@@ -127,25 +126,23 @@ export class Git {
     this._initialized.resolve()
   }
 
-  private setup(gitExtensionAPI: API) {
-    if (gitExtensionAPI.state === 'initialized') {
-      this.initialize(gitExtensionAPI)
-      this._initialized.resolve()
-    } else {
-      gitExtensionAPI.onDidChangeState(state => {
-        if (state === 'initialized') {
-          this.initialize(gitExtensionAPI)
-        }
-      })
+  private initialize(extensionAPI: GitExtensionAPI) {
+    if (extensionAPI.state === 'initialized') {
+      return this.initializeClass(extensionAPI)
     }
+    return extensionAPI.onDidChangeState(state => {
+      if (state === 'initialized') {
+        this.initializeClass(extensionAPI)
+      }
+    })
   }
 
   constructor() {
     this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
     this.onDidChange = this.onDidChangeEmitter.event
 
-    this.getExtensionAPI().then(gitExtensionAPI => {
-      this.setup(gitExtensionAPI)
+    this.getGitExtensionAPI().then(gitExtensionAPI => {
+      this.initialize(gitExtensionAPI)
     })
   }
 }
