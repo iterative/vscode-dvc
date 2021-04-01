@@ -5,7 +5,7 @@ import { ensureFile, accessSync, remove } from 'fs-extra'
 import { Uri, window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
-import { Git } from '../../../extensions/git'
+import { Git } from '../../../extensions/Git'
 
 chai.use(sinonChai)
 const { expect } = chai
