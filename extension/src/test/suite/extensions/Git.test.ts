@@ -46,7 +46,7 @@ suite('Git Extension Test Suite', () => {
       disposable.dispose()
     }).timeout(10000)
 
-    it('should return the rootUri of each open repository', async () => {
+    it('should return the root path of each open repository', async () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
