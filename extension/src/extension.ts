@@ -1,5 +1,5 @@
 import { window, commands, ExtensionContext } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
   hotRequireExportedFn,
@@ -24,7 +24,7 @@ import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { Git } from './extensions/Git'
 
-export { Disposable }
+export { Disposable, Disposer }
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
