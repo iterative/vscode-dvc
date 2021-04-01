@@ -4,6 +4,7 @@ import sinonChai from 'sinon-chai'
 import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { Disposable } from '../../extension'
+import { delay } from '../../util'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -11,10 +12,16 @@ const { expect } = chai
 suite('Integrated Terminal Test Suite', () => {
   window.showInformationMessage('Start all integrated terminal tests.')
 
+  const fullyDispose = (disposable: Disposable) => {
+    disposable.dispose()
+    return delay(500)
+  }
+
   describe('IntegratedTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
 
+      disposable.track(IntegratedTerminal)
       const openTerminalEvent = (): Promise<Terminal> => {
         return new Promise(resolve => {
           const listener: Disposable = window.onDidOpenTerminal(
@@ -30,11 +37,13 @@ suite('Integrated Terminal Test Suite', () => {
 
       const terminal = await openTerminalEvent()
       expect(terminal.creationOptions?.name).to.equal('DVC')
-      disposable.dispose()
+
+      return fullyDispose(disposable)
     }).timeout(12000)
 
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
+      disposable.track(IntegratedTerminal)
 
       const text = 'some-really-long-string'
 
@@ -57,11 +66,14 @@ suite('Integrated Terminal Test Suite', () => {
 
       const eventStream = await terminalDataWriteEventStream(text)
       expect(eventStream.includes(text)).to.be.true
-      disposable.dispose()
+
+      return fullyDispose(disposable)
     }).timeout(12000)
 
     it('should be able to run multiple commands in the same terminal', async () => {
       const disposable = Disposable.fn()
+      disposable.track(IntegratedTerminal)
+
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
       const terminalDataWriteEventStream = (text: string): Promise<string> => {
@@ -93,7 +105,7 @@ suite('Integrated Terminal Test Suite', () => {
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
 
-      disposable.dispose()
+      return fullyDispose(disposable)
     }).timeout(12000)
   })
 })
