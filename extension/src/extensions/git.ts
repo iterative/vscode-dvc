@@ -65,7 +65,7 @@ interface GitExtensionAPI {
 
 export type GitExtension = Extension<GitExtensionAPI>
 
-export class GitExtensionInterface {
+export class Git {
   dispose = Disposable.fn()
   private readonly _initialized = new Deferred()
 

@@ -5,7 +5,7 @@ import { ensureFile, accessSync, remove } from 'fs-extra'
 import { Uri, window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
-import { GitExtensionInterface } from '../../../extensions/git'
+import { Git } from '../../../extensions/git'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -19,7 +19,7 @@ suite('Git Extension Test Suite', () => {
 
     it('should return Uris of untracked files', async () => {
       const disposable = Disposable.fn()
-      const gitExtensionWrapper = disposable.track(new GitExtensionInterface())
+      const gitExtensionWrapper = disposable.track(new Git())
       await gitExtensionWrapper.ready
 
       const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
@@ -50,7 +50,7 @@ suite('Git Extension Test Suite', () => {
 
     it('should return the rootUri of each open repository', async () => {
       const disposable = Disposable.fn()
-      const gitExtensionWrapper = disposable.track(new GitExtensionInterface())
+      const gitExtensionWrapper = disposable.track(new Git())
       await gitExtensionWrapper.ready
       const gitRepoRoot = gitExtensionWrapper.repositories.map(
         repository => repository.rootUri.fsPath
