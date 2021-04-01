@@ -3,8 +3,7 @@ import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
-import { Disposable } from '../../extension'
-import { Disposer } from '@hediet/std/disposable'
+import { Disposable, Disposer } from '../../extension'
 
 chai.use(sinonChai)
 const { expect } = chai
