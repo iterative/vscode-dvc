@@ -4,7 +4,6 @@ import sinonChai from 'sinon-chai'
 import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { Disposable } from '../../extension'
-import { delay } from '../../util'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -12,16 +11,11 @@ const { expect } = chai
 suite('Integrated Terminal Test Suite', () => {
   window.showInformationMessage('Start all integrated terminal tests.')
 
-  const fullyDispose = (disposable: Disposable) => {
-    disposable.dispose()
-    return delay(500)
-  }
-
   describe('IntegratedTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
-
       disposable.track(IntegratedTerminal)
+
       const openTerminalEvent = (): Promise<Terminal> => {
         return new Promise(resolve => {
           const listener: Disposable = window.onDidOpenTerminal(
@@ -38,7 +32,18 @@ suite('Integrated Terminal Test Suite', () => {
       const terminal = await openTerminalEvent()
       expect(terminal.creationOptions?.name).to.equal('DVC')
 
-      return fullyDispose(disposable)
+      const closeTerminalEvent = (): Promise<Terminal> => {
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidCloseTerminal(
+            (event: Terminal) => {
+              return resolve(event)
+            }
+          )
+          disposable.track(listener)
+        })
+      }
+      disposable.dispose()
+      return closeTerminalEvent()
     }).timeout(12000)
 
     it('should be able to run a command', async () => {
@@ -67,7 +72,18 @@ suite('Integrated Terminal Test Suite', () => {
       const eventStream = await terminalDataWriteEventStream(text)
       expect(eventStream.includes(text)).to.be.true
 
-      return fullyDispose(disposable)
+      const closeTerminalEvent = (): Promise<Terminal> => {
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidCloseTerminal(
+            (event: Terminal) => {
+              return resolve(event)
+            }
+          )
+          disposable.track(listener)
+        })
+      }
+      disposable.dispose()
+      return closeTerminalEvent()
     }).timeout(12000)
 
     it('should be able to run multiple commands in the same terminal', async () => {
@@ -105,7 +121,18 @@ suite('Integrated Terminal Test Suite', () => {
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
 
-      return fullyDispose(disposable)
+      const closeTerminalEvent = (): Promise<Terminal> => {
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidCloseTerminal(
+            (event: Terminal) => {
+              return resolve(event)
+            }
+          )
+          disposable.track(listener)
+        })
+      }
+      disposable.dispose()
+      return closeTerminalEvent()
     }).timeout(12000)
   })
 })
