@@ -4,6 +4,7 @@ import sinonChai from 'sinon-chai'
 import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { IntegratedTerminal } from '../../IntegratedTerminal'
 import { Disposable } from '../../extension'
+import { Disposer } from '@hediet/std/disposable'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -11,10 +12,41 @@ const { expect } = chai
 suite('Integrated Terminal Test Suite', () => {
   window.showInformationMessage('Start all integrated terminal tests.')
 
+  const closeTerminalEvent = (): Promise<Terminal> => {
+    return new Promise(resolve => {
+      const listener: Disposable = window.onDidCloseTerminal(
+        (event: Terminal) => {
+          listener.dispose()
+          return resolve(event)
+        }
+      )
+    })
+  }
+
+  const terminalDataWriteEventStream = (
+    text: string,
+    disposer: Disposer
+  ): Promise<string> => {
+    let eventStream = ''
+    return new Promise(resolve => {
+      const listener: Disposable = window.onDidWriteTerminalData(
+        (event: TerminalDataWriteEvent) => {
+          eventStream += event.data
+          if (eventStream.includes(text)) {
+            return resolve(eventStream)
+          }
+        }
+      )
+      disposer.track(listener)
+    })
+  }
+
   describe('IntegratedTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
       disposable.track(IntegratedTerminal)
+
+      IntegratedTerminal.openCurrentInstance()
 
       const openTerminalEvent = (): Promise<Terminal> => {
         return new Promise(resolve => {
@@ -27,21 +59,9 @@ suite('Integrated Terminal Test Suite', () => {
         })
       }
 
-      IntegratedTerminal.openCurrentInstance()
-
       const terminal = await openTerminalEvent()
       expect(terminal.creationOptions?.name).to.equal('DVC')
 
-      const closeTerminalEvent = (): Promise<Terminal> => {
-        return new Promise(resolve => {
-          const listener: Disposable = window.onDidCloseTerminal(
-            (event: Terminal) => {
-              return resolve(event)
-            }
-          )
-          disposable.track(listener)
-        })
-      }
       disposable.dispose()
       return closeTerminalEvent()
     }).timeout(12000)
@@ -52,36 +72,11 @@ suite('Integrated Terminal Test Suite', () => {
 
       const text = 'some-really-long-string'
 
-      const terminalDataWriteEventStream = (text: string): Promise<string> => {
-        let eventStream = ''
-        return new Promise(resolve => {
-          const listener: Disposable = window.onDidWriteTerminalData(
-            (event: TerminalDataWriteEvent) => {
-              eventStream += event.data
-              if (eventStream.includes(text)) {
-                return resolve(eventStream)
-              }
-            }
-          )
-          disposable.track(listener)
-        })
-      }
-
       IntegratedTerminal.run('echo ' + text)
 
-      const eventStream = await terminalDataWriteEventStream(text)
+      const eventStream = await terminalDataWriteEventStream(text, disposable)
       expect(eventStream.includes(text)).to.be.true
 
-      const closeTerminalEvent = (): Promise<Terminal> => {
-        return new Promise(resolve => {
-          const listener: Disposable = window.onDidCloseTerminal(
-            (event: Terminal) => {
-              return resolve(event)
-            }
-          )
-          disposable.track(listener)
-        })
-      }
       disposable.dispose()
       return closeTerminalEvent()
     }).timeout(12000)
@@ -92,23 +87,9 @@ suite('Integrated Terminal Test Suite', () => {
 
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
-      const terminalDataWriteEventStream = (text: string): Promise<string> => {
-        let eventStream = ''
-        return new Promise(resolve => {
-          const listener: Disposable = window.onDidWriteTerminalData(
-            (event: TerminalDataWriteEvent) => {
-              eventStream += event.data
-              if (eventStream.includes(text)) {
-                return resolve(eventStream)
-              }
-            }
-          )
-          disposable.track(listener)
-        })
-      }
 
-      const firstEvent = terminalDataWriteEventStream(firstText)
-      const secondEvent = terminalDataWriteEventStream(secondText)
+      const firstEvent = terminalDataWriteEventStream(firstText, disposable)
+      const secondEvent = terminalDataWriteEventStream(secondText, disposable)
       await IntegratedTerminal.run('echo ' + firstText)
       await IntegratedTerminal.run('echo ' + secondText)
 
@@ -121,16 +102,6 @@ suite('Integrated Terminal Test Suite', () => {
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
 
-      const closeTerminalEvent = (): Promise<Terminal> => {
-        return new Promise(resolve => {
-          const listener: Disposable = window.onDidCloseTerminal(
-            (event: Terminal) => {
-              return resolve(event)
-            }
-          )
-          disposable.track(listener)
-        })
-      }
       disposable.dispose()
       return closeTerminalEvent()
     }).timeout(12000)
