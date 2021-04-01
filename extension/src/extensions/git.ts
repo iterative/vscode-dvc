@@ -45,6 +45,7 @@ interface RepositoryState {
 }
 
 interface Repository {
+  readonly rootUri: Uri
   readonly state: RepositoryState
 }
 

@@ -35,6 +35,12 @@ suite('Git Extension Test Suite', () => {
 
       const gitExtensionWrapper = new GitExtensionInterface()
       await gitExtensionWrapper.ready
+      const gitRepoRoot = gitExtensionWrapper.repositories.map(
+        repository => repository.rootUri.fsPath
+      )
+      expect(gitRepoRoot).to.deep.equal([
+        resolve(__dirname, '..', '..', '..', '..', '..')
+      ])
 
       const untrackedChangeEvent = (): Promise<Uri[]> => {
         return new Promise(resolve => {
