@@ -140,7 +140,7 @@ export class Extension {
       })
     )
 
-    this.scm = new SourceControlManagement()
+    this.scm = this.dispose.track(new SourceControlManagement())
     this.scm.dvcScmFilesView()
   }
 }
