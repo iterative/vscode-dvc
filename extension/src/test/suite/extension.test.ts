@@ -1,7 +1,8 @@
-import { describe, it, before, beforeEach } from 'mocha'
+import { before, afterEach, describe, it } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
+import { join, resolve } from 'path'
 import {
   window,
   commands,
@@ -10,7 +11,6 @@ import {
   ConfigurationChangeEvent
 } from 'vscode'
 import { Disposable } from '../../extension'
-import { join, resolve } from 'path'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
@@ -39,7 +39,7 @@ suite('Extension Test Suite', () => {
 
   const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
-  beforeEach(async () => {
+  afterEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
