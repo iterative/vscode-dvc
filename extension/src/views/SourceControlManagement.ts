@@ -20,25 +20,18 @@ export class SourceControlManagement {
   constructor(repositoryRoot: string, untracked: string[]) {
     makeObservable(this)
 
-    const c = this.dispose.track(
+    const scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
     )
-    c.acceptInputCommand = {
+    scmView.acceptInputCommand = {
       command: 'workbench.action.output.toggleOutput',
       title: 'foo'
     }
 
-    c.inputBox.visible = false
-
-    c.statusBarCommands = [
-      {
-        command: 'test',
-        title: 'DVC'
-      }
-    ]
+    scmView.inputBox.visible = false
 
     this.resourceGroup = this.dispose.track(
-      c.createResourceGroup('group1', 'Changes')
+      scmView.createResourceGroup('group1', 'Changes')
     )
 
     this.resourceGroup.resourceStates = untracked.map(change => ({
