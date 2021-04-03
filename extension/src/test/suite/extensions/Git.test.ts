@@ -1,11 +1,11 @@
-import { describe, it } from 'mocha'
+import { after, describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { ensureFile, accessSync, remove } from 'fs-extra'
-import { Uri, window } from 'vscode'
+import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
-import { Git } from '../../../extensions/Git'
+import { Git, GitRepository } from '../../../extensions/Git'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -13,36 +13,46 @@ const { expect } = chai
 suite('Git Extension Test Suite', () => {
   window.showInformationMessage('Start all git extension tests.')
 
-  describe('Git', () => {
-    const workspacePath = resolve(__dirname, '..', '..', '..', '..', '..')
-    const dvcDemoPath = join(workspacePath, 'demo')
+  const workspacePath = resolve(__dirname, '..', '..', '..', '..', '..')
+  const dvcDemoPath = join(workspacePath, 'demo')
+  const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
 
-    it('should return Uris of untracked files', async () => {
+  after(() => {
+    remove(untrackedDir)
+  })
+
+  describe('Git', () => {
+    it('should return a list of untracked paths', async () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
 
-      const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
+      const gitRepository = disposable.track(
+        new GitRepository(git.repositories[0])
+      )
+
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
-      const untrackedChangeEvent = (): Promise<Uri[]> => {
+      const repositoryChangeEvent = (): Promise<string[]> => {
         return new Promise(resolve => {
-          const listener: Disposable = git.onDidChange((event: Uri[]) => {
-            return resolve(event)
-          })
+          const listener: Disposable = gitRepository.onDidChange(
+            (event: string[]) => {
+              return resolve(event)
+            }
+          )
           disposable.track(listener)
         })
       }
 
-      const untrackedChanges = untrackedChangeEvent()
+      const changes = repositoryChangeEvent()
 
       await ensureFile(untrackedFile)
       expect(accessSync(untrackedFile)).not.to.throw
 
-      expect(await untrackedChanges).to.have.lengthOf.at.least(1)
-      expect((await untrackedChanges).find(uri => uri.fsPath === untrackedFile))
-        .not.to.be.undefined
-      remove(untrackedDir)
+      const untrackedChanges = await changes
+      expect(untrackedChanges).to.have.lengthOf.at.least(1)
+      expect(untrackedChanges.find(path => path === untrackedFile)).not.to.be
+        .undefined
       disposable.dispose()
     }).timeout(10000)
 
@@ -50,7 +60,10 @@ suite('Git Extension Test Suite', () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
-      expect(git.getRepositoriesRoots()).to.deep.equal([workspacePath])
+      const gitRepository = disposable.track(
+        new GitRepository(git.repositories[0])
+      )
+      expect(gitRepository.getRepositoryRoot()).to.equal(workspacePath)
       disposable.dispose()
     })
   })
