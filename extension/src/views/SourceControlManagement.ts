@@ -1,71 +1,56 @@
 import { Disposable } from '@hediet/std/disposable'
-import { scm, Uri, workspace } from 'vscode'
+import { scm, SourceControlResourceGroup, Uri } from 'vscode'
+import { makeObservable, observable } from 'mobx'
+import { GitRepository } from '../extensions/Git'
 
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
-  constructor(private readonly workspaceFolders = workspace.workspaceFolders) {
-    this.workspaceFolders = workspaceFolders
+  @observable
+  resourceGroup: SourceControlResourceGroup
+
+  updateUntracked(untracked: string[]) {
+    if (this.resourceGroup) {
+      this.resourceGroup.resourceStates = untracked.map(u => ({
+        resourceUri: Uri.file(u),
+        contextValue: 'untracked'
+      }))
+    }
   }
 
-  dvcScmFilesView(): void {
-    this.workspaceFolders?.forEach(folder => {
-      const uri = `${folder.uri.fsPath}/`
+  constructor(repository: GitRepository) {
+    makeObservable(this)
 
-      const c = this.dispose.track(
-        scm.createSourceControl('dvc', 'DVC', Uri.file(uri))
+    const c = this.dispose.track(
+      scm.createSourceControl(
+        'dvc',
+        'DVC',
+        Uri.file(repository.getRepositoryRoot())
       )
-      c.acceptInputCommand = {
-        command: 'workbench.action.output.toggleOutput',
-        title: 'foo'
+    )
+    c.acceptInputCommand = {
+      command: 'workbench.action.output.toggleOutput',
+      title: 'foo'
+    }
+
+    c.inputBox.visible = false
+
+    c.statusBarCommands = [
+      {
+        command: 'test',
+        title: 'DVC'
       }
+    ]
 
-      c.inputBox.visible = false
+    this.resourceGroup = this.dispose.track(
+      c.createResourceGroup('group1', 'Changes')
+    )
 
-      c.statusBarCommands = [
-        {
-          command: 'test',
-          title: 'DVC'
-        }
-      ]
-
-      const resourceGroup = this.dispose.track(
-        c.createResourceGroup('group1', 'Unchanged')
-      )
-
-      resourceGroup.resourceStates = [
-        {
-          resourceUri: Uri.file(`${uri}path/file.ts`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/file2.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/sub/file.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        }
-      ]
-    })
+    this.resourceGroup.resourceStates = repository
+      .getUntrackedChanges()
+      .map(change => ({
+        resourceUri: Uri.file(change),
+        contextValue: 'untracked'
+      }))
   }
 }

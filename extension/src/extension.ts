@@ -22,7 +22,7 @@ import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
-import { Git } from './extensions/Git'
+import { Git, GitRepository } from './extensions/Git'
 
 export { Disposable, Disposer }
 
@@ -39,7 +39,7 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
-  private readonly scm?: SourceControlManagement
+  private scm: SourceControlManagement[] = []
   private readonly git: Git
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
@@ -144,11 +144,20 @@ export class Extension {
       })
     )
 
-    this.scm = this.dispose.track(new SourceControlManagement())
-    this.scm.dvcScmFilesView()
-
     this.git = this.dispose.track(new Git())
-    this.git.ready.then()
+    this.git.ready.then(() => {
+      this.git.repositories.forEach(repository => {
+        const gitRepository = this.dispose.track(new GitRepository(repository))
+        const scm = this.dispose.track(
+          new SourceControlManagement(gitRepository)
+        )
+        this.scm.push(scm)
+
+        gitRepository.onDidChange(untrackedChanges => {
+          scm.updateUntracked(untrackedChanges)
+        })
+      })
+    })
   }
 }
 
