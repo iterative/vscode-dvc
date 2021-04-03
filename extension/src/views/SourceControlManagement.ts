@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { GitRepository } from '../extensions/Git'
 
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
@@ -18,15 +17,11 @@ export class SourceControlManagement {
     }
   }
 
-  constructor(repository: GitRepository) {
+  constructor(repositoryRoot: string, untracked: string[]) {
     makeObservable(this)
 
     const c = this.dispose.track(
-      scm.createSourceControl(
-        'dvc',
-        'DVC',
-        Uri.file(repository.getRepositoryRoot())
-      )
+      scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
     )
     c.acceptInputCommand = {
       command: 'workbench.action.output.toggleOutput',
@@ -46,11 +41,9 @@ export class SourceControlManagement {
       c.createResourceGroup('group1', 'Changes')
     )
 
-    this.resourceGroup.resourceStates = repository
-      .getUntrackedChanges()
-      .map(change => ({
-        resourceUri: Uri.file(change),
-        contextValue: 'untracked'
-      }))
+    this.resourceGroup.resourceStates = untracked.map(change => ({
+      resourceUri: Uri.file(change),
+      contextValue: 'untracked'
+    }))
   }
 }

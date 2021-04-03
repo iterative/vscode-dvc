@@ -149,11 +149,15 @@ export class Extension {
       this.git.repositories.forEach(repository => {
         const gitRepository = this.dispose.track(new GitRepository(repository))
         const scm = this.dispose.track(
-          new SourceControlManagement(gitRepository)
+          new SourceControlManagement(
+            gitRepository.getRepositoryRoot(),
+            gitRepository.getUntrackedChanges()
+          )
         )
         this.scm.push(scm)
 
-        gitRepository.onDidChange(untrackedChanges => {
+        gitRepository.onDidChange(() => {
+          const untrackedChanges = gitRepository.getUntrackedChanges()
           scm.updateUntracked(untrackedChanges)
         })
       })

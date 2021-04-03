@@ -72,7 +72,7 @@ export class Git {
 
   private gitExtensionAPI?: GitExtensionAPI
 
-  @observable
+  //   @observable
   public repositories: Repository[] = []
 
   public get ready() {
@@ -107,7 +107,7 @@ export class Git {
   }
 
   constructor() {
-    makeObservable(this)
+    // makeObservable(this)
 
     this.getGitExtensionAPI().then(gitExtensionAPI => {
       this.initialize(gitExtensionAPI)
@@ -118,8 +118,8 @@ export class Git {
 export class GitRepository {
   public dispose = Disposable.fn()
 
-  private onDidChangeEmitter: EventEmitter<string[]>
-  readonly onDidChange: Event<string[]>
+  private onDidChangeEmitter: EventEmitter<void>
+  readonly onDidChange: Event<void>
 
   @observable
   private repositoryState: RepositoryState
@@ -150,7 +150,8 @@ export class GitRepository {
 
     this.dispose.track(
       this.repositoryState.onDidChange(() => {
-        this.onDidChangeEmitter.fire(this.getUntrackedChanges())
+        this.repositoryState = repository.state
+        this.onDidChangeEmitter.fire()
       })
     )
   }
