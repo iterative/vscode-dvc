@@ -13,7 +13,7 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC tracked'
   }
 
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   private trackedFiles?: Set<string>
   readonly onDidChangeFileDecorations: Event<Uri[]>
