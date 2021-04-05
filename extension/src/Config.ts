@@ -11,17 +11,10 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
-import { findDvcRootPaths } from './fileSystem'
-import { Deferred } from '@hediet/std/synchronization'
 
 export class Config {
-  private readonly _initialized = new Deferred()
-
-  private readonly initialized = this._initialized.promise
-
   public readonly dispose = Disposable.fn()
   public readonly workspaceRoot: string
-  public dvcRootPaths: string[] = []
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
   readonly onDidChange: Event<ConfigurationChangeEvent>
@@ -34,10 +27,6 @@ export class Config {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
-  }
-
-  public get ready() {
-    return this.initialized
   }
 
   @observable
@@ -115,11 +104,6 @@ export class Config {
     }
   }
 
-  private findDvcRoots = async () => {
-    const rootPaths = await findDvcRootPaths(this.workspaceRoot, this.dvcPath)
-    this.dvcRootPaths = rootPaths
-  }
-
   constructor() {
     makeObservable(this)
 
@@ -149,9 +133,7 @@ export class Config {
     this.dispose.track(
       this.onDidChange(() => {
         this.updateDvcPathStatusBarItem()
-        this.findDvcRoots()
       })
     )
-    this._initialized.resolve()
   }
 }

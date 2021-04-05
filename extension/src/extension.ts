@@ -26,7 +26,7 @@ import {
 import { getAllUntracked, getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
-import { Git } from './extensions/Git'
+import { Git as GitExtension } from './extensions/Git'
 
 export { Disposable, Disposer }
 
@@ -44,7 +44,7 @@ export class Extension {
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
   private scm: SourceControlManagement[] = []
-  private readonly git: Git
+  private readonly gitExtension: GitExtension
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -79,37 +79,35 @@ export class Extension {
 
     this.resourceLocator = new ResourceLocator(context.extensionPath)
 
-    this.git = this.dispose.track(new Git())
+    this.gitExtension = this.dispose.track(new GitExtension())
     this.config = new Config()
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
-    this.config.ready.then(() => {
-      this.git.ready.then(() => {
-        this.git.repositories.forEach(async gitRepository => {
-          const gitRoot = gitRepository.getRepositoryRoot()
-          const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
-          dvcRoots.forEach(async dvcRoot => {
-            const untracked = await getAllUntracked(dvcRoot)
-            const scm = this.dispose.track(
-              new SourceControlManagement(dvcRoot, untracked)
-            )
-            this.scm.push(scm)
+    this.gitExtension.ready.then(() => {
+      this.gitExtension.repositories.forEach(async gitRepository => {
+        const gitRoot = gitRepository.getRepositoryRoot()
+        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+        dvcRoots.forEach(async dvcRoot => {
+          const untracked = await getAllUntracked(dvcRoot)
+          const scm = this.dispose.track(
+            new SourceControlManagement(dvcRoot, untracked)
+          )
+          this.scm.push(scm)
 
-            gitRepository.onDidChange(async () => {
-              const untrackedChanges = await getAllUntracked(dvcRoot)
-              return scm.updateUntracked(untrackedChanges)
-            })
+          gitRepository.onDidChange(async () => {
+            const untrackedChanges = await getAllUntracked(dvcRoot)
+            return scm.updateUntracked(untrackedChanges)
           })
         })
       })
-
-      findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-        files => {
-          this.decorationProvider.setTrackedFiles(files)
-        }
-      )
     })
+
+    findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
+      files => {
+        this.decorationProvider.setTrackedFiles(files)
+      }
+    )
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
