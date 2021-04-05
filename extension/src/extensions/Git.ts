@@ -25,7 +25,7 @@ interface GitExtension {
   getAPI(version: number): Thenable<GitExtensionAPI>
 }
 
-class GitRepository {
+class GitExtensionRepository {
   public dispose = Disposable.fn()
 
   private onDidChangeEmitter: EventEmitter<void>
@@ -59,7 +59,7 @@ export class Git {
 
   private gitExtensionAPI?: GitExtensionAPI
 
-  public repositories: GitRepository[] = []
+  public repositories: GitExtensionRepository[] = []
 
   public get ready() {
     return this.initialized
@@ -77,7 +77,7 @@ export class Git {
     this.gitExtensionAPI = gitExtensionAPI
 
     this.repositories = this.gitExtensionAPI.repositories.map(repository =>
-      this.dispose.track(new GitRepository(repository))
+      this.dispose.track(new GitExtensionRepository(repository))
     )
 
     this._initialized.resolve()
