@@ -28,7 +28,7 @@ suite('Git Extension Test Suite', () => {
       const git = disposable.track(new Git())
       await git.ready
 
-      const gitRepository = git.repositories[0]
+      const [gitRepository] = git.repositories
       const gitRoot = gitRepository.getRepositoryRoot()
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
@@ -61,7 +61,7 @@ suite('Git Extension Test Suite', () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
-      const gitRepository = git.repositories[0]
+      const [gitRepository] = git.repositories
       expect(gitRepository.getRepositoryRoot()).to.equal(workspacePath)
       disposable.dispose()
     })
