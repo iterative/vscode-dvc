@@ -1,5 +1,5 @@
 import { getAllUntracked, getExperimentsRefsPath, getRepoRootPath } from './git'
-import { ensureDir, ensureFile, lstatSync } from 'fs-extra'
+import { ensureDir, ensureFile, lstatSync, remove } from 'fs-extra'
 import { join, resolve } from 'path'
 
 describe('getExperimentsRefsPath', () => {
@@ -57,9 +57,13 @@ describe('getAllUntracked', () => {
     await ensureFile(untrackedPython)
     await ensureFile(untrackedText)
 
-    expect(await getAllUntracked(repositoryRoot)).toEqual(
+    const untracked = await getAllUntracked(repositoryRoot)
+
+    await Promise.all([remove(untrackedDir), remove(untrackedPython)])
+
+    expect(untracked).toEqual(
       expect.arrayContaining([
-        resolve(repositoryRoot, 'demo/data/weeeee/'),
+        untrackedDir,
         untrackedPerl,
         untrackedText,
         untrackedPython
