@@ -43,7 +43,7 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
-  private scm: SourceControlManagement[] = []
+  private readonly scm: SourceControlManagement[] = []
   private readonly gitExtension: GitExtension
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
