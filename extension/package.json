@@ -68,7 +68,8 @@
       {
         "title": "%command.add%",
         "command": "dvc.add",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(add)"
       },
       {
         "title": "%command.checkout%",
@@ -107,8 +108,9 @@
       ],
       "scm/resourceState/context": [
         {
-          "command": "dvc.push",
-          "group": "inline"
+          "command": "dvc.add",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState == untracked"
         }
       ]
     }
