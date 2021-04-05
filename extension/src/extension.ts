@@ -19,7 +19,7 @@ import {
 import { add } from './cli'
 
 import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
-import { getExperimentsRefsPath } from './git'
+import { getAllUntracked, getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { Git } from './extensions/Git'
@@ -146,18 +146,17 @@ export class Extension {
 
     this.git = this.dispose.track(new Git())
     this.git.ready.then(() => {
-      this.git.repositories.forEach(gitRepository => {
+      this.git.repositories.forEach(async gitRepository => {
+        const repositoryRoot = gitRepository.getRepositoryRoot()
+        const untracked = await getAllUntracked(repositoryRoot)
         const scm = this.dispose.track(
-          new SourceControlManagement(
-            gitRepository.getRepositoryRoot(),
-            gitRepository.getUntrackedChanges()
-          )
+          new SourceControlManagement(repositoryRoot, untracked)
         )
         this.scm.push(scm)
 
-        gitRepository.onDidChange(() => {
-          const untrackedChanges = gitRepository.getUntrackedChanges()
-          scm.updateUntracked(untrackedChanges)
+        gitRepository.onDidChange(async () => {
+          const untrackedChanges = await getAllUntracked(repositoryRoot)
+          return scm.updateUntracked(untrackedChanges)
         })
       })
     })
