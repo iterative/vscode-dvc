@@ -26,7 +26,7 @@ import {
 import { getAllUntracked, getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
-import { Git as GitExtension } from './extensions/Git'
+import { GitExtension } from './extensions/Git'
 
 export { Disposable, Disposer }
 
@@ -149,8 +149,8 @@ export class Extension {
     this.gitExtension = this.dispose.track(new GitExtension())
 
     this.gitExtension.ready.then(() => {
-      this.gitExtension.repositories.forEach(async gitRepository => {
-        const gitRoot = gitRepository.getRepositoryRoot()
+      this.gitExtension.repositories.forEach(async gitExtensionRepository => {
+        const gitRoot = gitExtensionRepository.getRepositoryRoot()
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
           const untracked = await getAllUntracked(dvcRoot)
@@ -159,7 +159,7 @@ export class Extension {
           )
           this.scm.push(scm)
 
-          gitRepository.onDidUntrackedChange(async () => {
+          gitExtensionRepository.onDidUntrackedChange(async () => {
             const untrackedChanges = await getAllUntracked(dvcRoot)
             return scm.updateUntracked(untrackedChanges)
           })

@@ -5,7 +5,7 @@ import { ensureFile, accessSync, remove } from 'fs-extra'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
-import { Git } from '../../../extensions/Git'
+import { GitExtension } from '../../../extensions/Git'
 import { getAllUntracked } from '../../../git'
 
 chai.use(sinonChai)
@@ -22,20 +22,20 @@ suite('Git Extension Test Suite', () => {
     remove(untrackedDir)
   })
 
-  describe('Git', () => {
+  describe('GitExtension', () => {
     it("should provide an onDidUntrackedChange callback for each of it's repositories", async () => {
       const disposable = Disposable.fn()
-      const git = disposable.track(new Git())
-      await git.ready
+      const gitExtension = disposable.track(new GitExtension())
+      await gitExtension.ready
 
-      const [gitRepository] = git.repositories
-      const gitRoot = gitRepository.getRepositoryRoot()
+      const [gitExtensionRepository] = gitExtension.repositories
+      const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
       const repositoryChangeEvent = (): Promise<void> => {
         return new Promise(resolve => {
-          const listener: Disposable = gitRepository.onDidUntrackedChange(
+          const listener: Disposable = gitExtensionRepository.onDidUntrackedChange(
             (event: void) => {
               return resolve(event)
             }
@@ -59,10 +59,10 @@ suite('Git Extension Test Suite', () => {
 
     it('should be able to return the root path of each open repository', async () => {
       const disposable = Disposable.fn()
-      const git = disposable.track(new Git())
-      await git.ready
-      const [gitRepository] = git.repositories
-      expect(gitRepository.getRepositoryRoot()).to.equal(workspacePath)
+      const gitExtension = disposable.track(new GitExtension())
+      await gitExtension.ready
+      const [gitExtensionRepository] = gitExtension.repositories
+      expect(gitExtensionRepository.getRepositoryRoot()).to.equal(workspacePath)
       disposable.dispose()
     })
   })
