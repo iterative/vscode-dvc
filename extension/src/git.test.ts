@@ -49,7 +49,8 @@ describe('getAllUntracked', () => {
       'y.py'
     )
 
-    const untrackedDir = join(repositoryRoot, 'demo', 'data', 'weeeee')
+    const dvcRoot = join(repositoryRoot, 'demo')
+    const untrackedDir = join(dvcRoot, 'data', 'weeeee')
     const untrackedPerl = join(untrackedDir, 'fun.pl')
     const untrackedText = join(untrackedDir, 'text.txt')
 
@@ -57,11 +58,12 @@ describe('getAllUntracked', () => {
     await ensureFile(untrackedPython)
     await ensureFile(untrackedText)
 
-    const untracked = await getAllUntracked(repositoryRoot)
+    const gitUntracked = await getAllUntracked(repositoryRoot)
+    const dvcUntracked = await getAllUntracked(dvcRoot)
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
-    expect(untracked).toEqual(
+    expect(gitUntracked).toEqual(
       expect.arrayContaining([
         untrackedDir,
         untrackedPerl,
@@ -69,5 +71,10 @@ describe('getAllUntracked', () => {
         untrackedPython
       ])
     )
+
+    expect(dvcUntracked).toEqual(
+      expect.arrayContaining([untrackedDir, untrackedPerl, untrackedText])
+    )
+    expect(dvcUntracked).not.toEqual(expect.arrayContaining([untrackedPython]))
   })
 })
