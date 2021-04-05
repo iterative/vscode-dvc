@@ -6,7 +6,7 @@ interface RepositoryState {
   readonly onDidChange: Event<void>
 }
 
-export interface Repository {
+interface Repository {
   readonly rootUri: Uri
   readonly state: RepositoryState
 }
