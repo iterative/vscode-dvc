@@ -23,7 +23,7 @@ suite('Git Extension Test Suite', () => {
   })
 
   describe('Git', () => {
-    it('should return a list of untracked paths', async () => {
+    it("should provide an onDidChange callback for each of it's repositories", async () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
@@ -57,7 +57,7 @@ suite('Git Extension Test Suite', () => {
       disposable.dispose()
     }).timeout(10000)
 
-    it('should return the root path of each open repository', async () => {
+    it('should be able to return the root path of each open repository', async () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
