@@ -79,29 +79,9 @@ export class Extension {
 
     this.resourceLocator = new ResourceLocator(context.extensionPath)
 
-    this.gitExtension = this.dispose.track(new GitExtension())
     this.config = new Config()
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
-
-    this.gitExtension.ready.then(() => {
-      this.gitExtension.repositories.forEach(async gitRepository => {
-        const gitRoot = gitRepository.getRepositoryRoot()
-        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
-        dvcRoots.forEach(async dvcRoot => {
-          const untracked = await getAllUntracked(dvcRoot)
-          const scm = this.dispose.track(
-            new SourceControlManagement(dvcRoot, untracked)
-          )
-          this.scm.push(scm)
-
-          gitRepository.onDidChange(async () => {
-            const untrackedChanges = await getAllUntracked(dvcRoot)
-            return scm.updateUntracked(untrackedChanges)
-          })
-        })
-      })
-    })
 
     findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
       files => {
@@ -165,6 +145,27 @@ export class Extension {
         checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcPath })
       })
     )
+
+    this.gitExtension = this.dispose.track(new GitExtension())
+
+    this.gitExtension.ready.then(() => {
+      this.gitExtension.repositories.forEach(async gitRepository => {
+        const gitRoot = gitRepository.getRepositoryRoot()
+        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+        dvcRoots.forEach(async dvcRoot => {
+          const untracked = await getAllUntracked(dvcRoot)
+          const scm = this.dispose.track(
+            new SourceControlManagement(dvcRoot, untracked)
+          )
+          this.scm.push(scm)
+
+          gitRepository.onDidChange(async () => {
+            const untrackedChanges = await getAllUntracked(dvcRoot)
+            return scm.updateUntracked(untrackedChanges)
+          })
+        })
+      })
+    })
   }
 }
 
