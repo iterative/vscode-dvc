@@ -22,7 +22,7 @@ import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
-import { Git, GitRepository } from './extensions/Git'
+import { Git } from './extensions/Git'
 
 export { Disposable, Disposer }
 
@@ -146,8 +146,7 @@ export class Extension {
 
     this.git = this.dispose.track(new Git())
     this.git.ready.then(() => {
-      this.git.repositories.forEach(repository => {
-        const gitRepository = this.dispose.track(new GitRepository(repository))
+      this.git.repositories.forEach(gitRepository => {
         const scm = this.dispose.track(
           new SourceControlManagement(
             gitRepository.getRepositoryRoot(),

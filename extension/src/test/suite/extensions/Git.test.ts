@@ -5,7 +5,7 @@ import { ensureFile, accessSync, remove } from 'fs-extra'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
-import { Git, GitRepository } from '../../../extensions/Git'
+import { Git } from '../../../extensions/Git'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -27,9 +27,7 @@ suite('Git Extension Test Suite', () => {
       const git = disposable.track(new Git())
       await git.ready
 
-      const gitRepository = disposable.track(
-        new GitRepository(git.repositories[0])
-      )
+      const gitRepository = git.repositories[0]
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
@@ -61,9 +59,7 @@ suite('Git Extension Test Suite', () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
-      const gitRepository = disposable.track(
-        new GitRepository(git.repositories[0])
-      )
+      const gitRepository = git.repositories[0]
       expect(gitRepository.getRepositoryRoot()).to.equal(workspacePath)
       disposable.dispose()
     })

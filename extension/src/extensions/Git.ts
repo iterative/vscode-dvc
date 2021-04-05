@@ -64,58 +64,7 @@ interface GitExtension {
   getAPI(version: number): Thenable<GitExtensionAPI>
 }
 
-export class Git {
-  public dispose = Disposable.fn()
-
-  private readonly _initialized = new Deferred()
-  private readonly initialized = this._initialized.promise
-
-  private gitExtensionAPI?: GitExtensionAPI
-
-  //   @observable
-  public repositories: Repository[] = []
-
-  public get ready() {
-    return this.initialized
-  }
-
-  private getGitExtensionAPI = async (): Promise<GitExtensionAPI> => {
-    const extension = extensions.getExtension('vscode.git') as Extension<
-      GitExtension
-    >
-    const activatedExtension = await extension.activate()
-    return activatedExtension.getAPI(1)
-  }
-
-  private initializeClass(gitExtensionAPI: GitExtensionAPI) {
-    this.gitExtensionAPI = gitExtensionAPI
-
-    this.repositories = this.gitExtensionAPI.repositories
-
-    this._initialized.resolve()
-  }
-
-  private initialize(extensionAPI: GitExtensionAPI) {
-    if (extensionAPI.state === 'initialized') {
-      return this.initializeClass(extensionAPI)
-    }
-    return extensionAPI.onDidChangeState(state => {
-      if (state === 'initialized') {
-        this.initializeClass(extensionAPI)
-      }
-    })
-  }
-
-  constructor() {
-    // makeObservable(this)
-
-    this.getGitExtensionAPI().then(gitExtensionAPI => {
-      this.initialize(gitExtensionAPI)
-    })
-  }
-}
-
-export class GitRepository {
+class GitRepository {
   public dispose = Disposable.fn()
 
   private onDidChangeEmitter: EventEmitter<void>
@@ -154,5 +103,57 @@ export class GitRepository {
         this.onDidChangeEmitter.fire()
       })
     )
+  }
+}
+
+export class Git {
+  public dispose = Disposable.fn()
+
+  private readonly _initialized = new Deferred()
+  private readonly initialized = this._initialized.promise
+
+  private gitExtensionAPI?: GitExtensionAPI
+
+  @observable
+  public repositories: GitRepository[] = []
+
+  public get ready() {
+    return this.initialized
+  }
+
+  private getGitExtensionAPI = async (): Promise<GitExtensionAPI> => {
+    const extension = extensions.getExtension('vscode.git') as Extension<
+      GitExtension
+    >
+    const activatedExtension = await extension.activate()
+    return activatedExtension.getAPI(1)
+  }
+
+  private initializeClass(gitExtensionAPI: GitExtensionAPI) {
+    this.gitExtensionAPI = gitExtensionAPI
+
+    this.repositories = this.gitExtensionAPI.repositories.map(repository =>
+      this.dispose.track(new GitRepository(repository))
+    )
+
+    this._initialized.resolve()
+  }
+
+  private initialize(extensionAPI: GitExtensionAPI) {
+    if (extensionAPI.state === 'initialized') {
+      return this.initializeClass(extensionAPI)
+    }
+    return extensionAPI.onDidChangeState(state => {
+      if (state === 'initialized') {
+        this.initializeClass(extensionAPI)
+      }
+    })
+  }
+
+  constructor() {
+    makeObservable(this)
+    this.getGitExtensionAPI().then(gitExtensionAPI => {
+      this.initialize(gitExtensionAPI)
+    })
   }
 }
