@@ -247,14 +247,13 @@ const getUntrackedDirectories = async (
   return stdout
     .trim()
     .split('\n')
-    .filter(path => extname(path) === '')
+    .filter(path => path && extname(path) === '')
     .map(path => resolve(repositoryRoot, path))
-    .sort()
 }
 
 const getUntrackedFiles = async (repositoryRoot: string): Promise<string[]> => {
   const { stdout } = await execPromise(
-    'git ls-files . --others --exclude-standard',
+    'git ls-files --others --exclude-standard',
     {
       cwd: repositoryRoot
     }
@@ -262,8 +261,8 @@ const getUntrackedFiles = async (repositoryRoot: string): Promise<string[]> => {
   return stdout
     .trim()
     .split('\n')
+    .filter(path => path)
     .map(path => resolve(repositoryRoot, path))
-    .sort()
 }
 
 export const getAllUntracked = async (
@@ -274,5 +273,5 @@ export const getAllUntracked = async (
 
     getUntrackedDirectories(repositoryRoot)
   ])
-  return [...files, ...dirs].sort()
+  return [...files, ...dirs]
 }
