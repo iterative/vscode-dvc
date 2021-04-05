@@ -1,8 +1,48 @@
 import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
+import isEqual from 'lodash.isequal'
+import { makeObservable, observable } from 'mobx'
+
+export const enum GitStatus {
+  INDEX_MODIFIED,
+  INDEX_ADDED,
+  INDEX_DELETED,
+  INDEX_RENAMED,
+  INDEX_COPIED,
+
+  MODIFIED,
+  DELETED,
+  UNTRACKED,
+  IGNORED,
+  INTENT_TO_ADD,
+
+  ADDED_BY_US,
+  ADDED_BY_THEM,
+  DELETED_BY_US,
+  DELETED_BY_THEM,
+  BOTH_ADDED,
+  BOTH_DELETED,
+  BOTH_MODIFIED
+}
+
+export interface Change {
+  /**
+   * Returns either `originalUri` or `renameUri`, depending
+   * on whether this change is a rename change. When
+   * in doubt always use `uri` over the other two alternatives.
+   */
+  readonly uri: Uri
+  readonly originalUri: Uri
+  readonly renameUri: Uri | undefined
+  readonly status: GitStatus
+}
 
 interface RepositoryState {
+  readonly mergeChanges: Change[]
+  readonly indexChanges: Change[]
+  readonly workingTreeChanges: Change[]
+
   readonly onDidChange: Event<void>
 }
 
@@ -28,8 +68,18 @@ interface GitExtension {
 class GitExtensionRepository {
   public dispose = Disposable.fn()
 
-  private onDidChangeEmitter: EventEmitter<void>
-  readonly onDidChange: Event<void>
+  private onDidUntrackedChangeEmitter: EventEmitter<void>
+  readonly onDidUntrackedChange: Event<void>
+
+  @observable
+  private untrackedChanges: string[]
+
+  private getUntrackedChanges(changes: Change[]): string[] {
+    return changes
+      .filter(change => change.status === GitStatus.UNTRACKED)
+      .map(change => change.uri.fsPath)
+      .sort()
+  }
 
   private repositoryRoot: string
 
@@ -38,14 +88,25 @@ class GitExtensionRepository {
   }
 
   constructor(repository: Repository) {
+    makeObservable(this)
     this.repositoryRoot = repository.rootUri.fsPath
 
-    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
-    this.onDidChange = this.onDidChangeEmitter.event
+    this.untrackedChanges = this.getUntrackedChanges(
+      repository.state.workingTreeChanges
+    )
+
+    this.onDidUntrackedChangeEmitter = this.dispose.track(new EventEmitter())
+    this.onDidUntrackedChange = this.onDidUntrackedChangeEmitter.event
 
     this.dispose.track(
       repository.state.onDidChange(() => {
-        this.onDidChangeEmitter.fire()
+        const currentUntrackedChanges = this.getUntrackedChanges(
+          repository.state.workingTreeChanges
+        )
+        if (!isEqual(this.untrackedChanges, currentUntrackedChanges)) {
+          this.untrackedChanges = currentUntrackedChanges
+          this.onDidUntrackedChangeEmitter.fire()
+        }
       })
     )
   }

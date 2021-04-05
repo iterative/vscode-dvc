@@ -23,7 +23,7 @@ suite('Git Extension Test Suite', () => {
   })
 
   describe('Git', () => {
-    it("should provide an onDidChange callback for each of it's repositories", async () => {
+    it("should provide an onDidUntrackedChange callback for each of it's repositories", async () => {
       const disposable = Disposable.fn()
       const git = disposable.track(new Git())
       await git.ready
@@ -35,7 +35,7 @@ suite('Git Extension Test Suite', () => {
 
       const repositoryChangeEvent = (): Promise<void> => {
         return new Promise(resolve => {
-          const listener: Disposable = gitRepository.onDidChange(
+          const listener: Disposable = gitRepository.onDidUntrackedChange(
             (event: void) => {
               return resolve(event)
             }

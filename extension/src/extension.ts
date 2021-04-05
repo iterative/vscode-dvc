@@ -159,7 +159,7 @@ export class Extension {
           )
           this.scm.push(scm)
 
-          gitRepository.onDidChange(async () => {
+          gitRepository.onDidUntrackedChange(async () => {
             const untrackedChanges = await getAllUntracked(dvcRoot)
             return scm.updateUntracked(untrackedChanges)
           })
