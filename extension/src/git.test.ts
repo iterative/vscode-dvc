@@ -1,6 +1,6 @@
-import { getExperimentsRefsPath, getRepoRootPath } from './git'
-import { ensureDir, lstatSync } from 'fs-extra'
-import { resolve } from 'path'
+import { getAllUntracked, getExperimentsRefsPath, getRepoRootPath } from './git'
+import { ensureDir, ensureFile, lstatSync } from 'fs-extra'
+import { join, resolve } from 'path'
 
 describe('getExperimentsRefsPath', () => {
   it('should find the path of the custom experiments refs given a directory in this project', async () => {
@@ -34,5 +34,36 @@ describe('getRepoRootPath', () => {
   it('should return undefined given a non-existent path', async () => {
     const gitRoot = await getRepoRootPath('/some/path/that/does/not/exist')
     expect(gitRoot).toBeUndefined()
+  })
+})
+
+describe('getAllUntracked', () => {
+  it('should return a list of all untracked paths', async () => {
+    const repositoryRoot = resolve(__dirname, '..', '..')
+
+    const untrackedPython = join(
+      repositoryRoot,
+      'extension',
+      'src',
+      'views',
+      'y.py'
+    )
+
+    const untrackedDir = join(repositoryRoot, 'demo', 'data', 'weeeee')
+    const untrackedPerl = join(untrackedDir, 'fun.pl')
+    const untrackedText = join(untrackedDir, 'text.txt')
+
+    await ensureFile(untrackedPerl)
+    await ensureFile(untrackedPython)
+    await ensureFile(untrackedText)
+
+    expect(await getAllUntracked(repositoryRoot)).toEqual(
+      expect.arrayContaining([
+        resolve(repositoryRoot, 'demo/data/weeeee/'),
+        untrackedPerl,
+        untrackedText,
+        untrackedPython
+      ])
+    )
   })
 })

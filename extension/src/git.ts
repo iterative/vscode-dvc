@@ -1,7 +1,7 @@
 import { pathExists, realpath } from 'fs-extra'
 import { execPromise } from './util'
 import { Uri, window } from 'vscode'
-import { dirname, resolve } from 'path'
+import { dirname, extname, resolve } from 'path'
 import { Logger } from './common/Logger'
 
 const enum CharCode {
@@ -233,4 +233,46 @@ export const getExperimentsRefsPath = async (
     return
   }
   return resolve(rootPath, '.git', 'refs', 'exps')
+}
+
+const getUntrackedDirectories = async (
+  repositoryRoot: string
+): Promise<string[]> => {
+  const { stdout } = await execPromise(
+    'git ls-files --others --exclude-standard --directory --no-empty-directory',
+    {
+      cwd: repositoryRoot
+    }
+  )
+  return stdout
+    .trim()
+    .split('\n')
+    .filter(path => extname(path) === '')
+    .map(path => resolve(repositoryRoot, path))
+    .sort()
+}
+
+const getUntrackedFiles = async (repositoryRoot: string): Promise<string[]> => {
+  const { stdout } = await execPromise(
+    'git ls-files . --others --exclude-standard',
+    {
+      cwd: repositoryRoot
+    }
+  )
+  return stdout
+    .trim()
+    .split('\n')
+    .map(path => resolve(repositoryRoot, path))
+    .sort()
+}
+
+export const getAllUntracked = async (
+  repositoryRoot: string
+): Promise<string[]> => {
+  const [files, dirs] = await Promise.all([
+    getUntrackedFiles(repositoryRoot),
+
+    getUntrackedDirectories(repositoryRoot)
+  ])
+  return [...files, ...dirs].sort()
 }
