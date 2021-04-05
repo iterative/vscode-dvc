@@ -110,33 +110,6 @@
           "command": "dvc.push",
           "group": "inline"
         }
-      ],
-      "explorer/context": [
-        {
-          "command": "dvc.runExperiment",
-          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml",
-          "group": "8_dvc@1"
-        },
-        {
-          "command": "dvc.initializeDirectory",
-          "when": "explorerResourceIsFolder",
-          "group": "8_dvc@1"
-        },
-        {
-          "command": "dvc.add",
-          "when": "isFileSystemResource",
-          "group": "8_dvc@2"
-        },
-        {
-          "command": "dvc.checkout",
-          "when": "resourceExtname == .dvc",
-          "group": "8_dvc@3"
-        },
-        {
-          "command": "dvc.checkoutRecursive",
-          "when": "explorerResourceIsFolder",
-          "group": "8_dvc@4"
-        }
       ]
     }
   },
