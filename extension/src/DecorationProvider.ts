@@ -1,8 +1,8 @@
+import { Disposable } from '@hediet/std/disposable'
 import {
   window,
   Event,
   EventEmitter,
-  Disposable,
   FileDecorationProvider,
   FileDecoration,
   Uri
@@ -13,7 +13,7 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC tracked'
   }
 
-  private disposables: Disposable[] = []
+  public readonly dispose = Disposable.fn()
 
   private trackedFiles?: Set<string>
   readonly onDidChangeFileDecorations: Event<Uri[]>
@@ -30,16 +30,12 @@ export class DecorationProvider implements FileDecorationProvider {
     this.onDidChangeDecorations = new EventEmitter<Uri[]>()
     this.onDidChangeFileDecorations = this.onDidChangeDecorations.event
 
-    this.disposables.push(window.registerFileDecorationProvider(this))
+    this.dispose.track(window.registerFileDecorationProvider(this))
   }
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
     if (this.trackedFiles?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
-  }
-
-  dispose(): void {
-    this.disposables.forEach(d => d.dispose())
   }
 }
