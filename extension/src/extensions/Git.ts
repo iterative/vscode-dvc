@@ -1,47 +1,8 @@
 import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { makeObservable, observable } from 'mobx'
-
-export const enum GitStatus {
-  INDEX_MODIFIED,
-  INDEX_ADDED,
-  INDEX_DELETED,
-  INDEX_RENAMED,
-  INDEX_COPIED,
-
-  MODIFIED,
-  DELETED,
-  UNTRACKED,
-  IGNORED,
-  INTENT_TO_ADD,
-
-  ADDED_BY_US,
-  ADDED_BY_THEM,
-  DELETED_BY_US,
-  DELETED_BY_THEM,
-  BOTH_ADDED,
-  BOTH_DELETED,
-  BOTH_MODIFIED
-}
-
-export interface Change {
-  /**
-   * Returns either `originalUri` or `renameUri`, depending
-   * on whether this change is a rename change. When
-   * in doubt always use `uri` over the other two alternatives.
-   */
-  readonly uri: Uri
-  readonly originalUri: Uri
-  readonly renameUri: Uri | undefined
-  readonly status: GitStatus
-}
 
 interface RepositoryState {
-  readonly mergeChanges: Change[]
-  readonly indexChanges: Change[]
-  readonly workingTreeChanges: Change[]
-
   readonly onDidChange: Event<void>
 }
 
@@ -70,19 +31,6 @@ class GitRepository {
   private onDidChangeEmitter: EventEmitter<void>
   readonly onDidChange: Event<void>
 
-  @observable
-  private repositoryState: RepositoryState
-
-  private get workingTreeChanges() {
-    return this.repositoryState.workingTreeChanges
-  }
-
-  public getUntrackedChanges() {
-    return this.workingTreeChanges
-      .filter(change => change.status === GitStatus.UNTRACKED)
-      .map(change => change.uri.fsPath)
-  }
-
   private repositoryRoot: string
 
   public getRepositoryRoot() {
@@ -90,16 +38,13 @@ class GitRepository {
   }
 
   constructor(repository: Repository) {
-    makeObservable(this)
-    this.repositoryState = repository.state
     this.repositoryRoot = repository.rootUri.fsPath
 
     this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
     this.onDidChange = this.onDidChangeEmitter.event
 
     this.dispose.track(
-      this.repositoryState.onDidChange(() => {
-        this.repositoryState = repository.state
+      repository.state.onDidChange(() => {
         this.onDidChangeEmitter.fire()
       })
     )
@@ -114,7 +59,6 @@ export class Git {
 
   private gitExtensionAPI?: GitExtensionAPI
 
-  @observable
   public repositories: GitRepository[] = []
 
   public get ready() {
@@ -151,7 +95,6 @@ export class Git {
   }
 
   constructor() {
-    makeObservable(this)
     this.getGitExtensionAPI().then(gitExtensionAPI => {
       this.initialize(gitExtensionAPI)
     })

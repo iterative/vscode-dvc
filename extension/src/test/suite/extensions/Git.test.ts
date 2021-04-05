@@ -6,6 +6,7 @@ import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
 import { Git } from '../../../extensions/Git'
+import { getAllUntracked } from '../../../git'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -28,6 +29,7 @@ suite('Git Extension Test Suite', () => {
       await git.ready
 
       const gitRepository = git.repositories[0]
+      const gitRoot = gitRepository.getRepositoryRoot()
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
@@ -48,7 +50,7 @@ suite('Git Extension Test Suite', () => {
       expect(accessSync(untrackedFile)).not.to.throw
 
       await change
-      const untrackedChanges = gitRepository.getUntrackedChanges()
+      const untrackedChanges = await getAllUntracked(gitRoot)
       expect(untrackedChanges).to.have.lengthOf.at.least(1)
       expect(untrackedChanges.find(path => path === untrackedFile)).not.to.be
         .undefined
