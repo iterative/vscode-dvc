@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import isEqual from 'lodash.isequal'
 import { makeObservable, observable } from 'mobx'
 
-export const enum GitStatus {
+const enum GitStatus {
   INDEX_MODIFIED,
   INDEX_ADDED,
   INDEX_DELETED,
@@ -26,7 +26,7 @@ export const enum GitStatus {
   BOTH_MODIFIED
 }
 
-export interface Change {
+interface Change {
   /**
    * Returns either `originalUri` or `renameUri`, depending
    * on whether this change is a rename change. When
