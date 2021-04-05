@@ -85,12 +85,6 @@ export class Extension {
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
     this.config.ready.then(() => {
-      findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-        files => {
-          this.decorationProvider.setTrackedFiles(files)
-        }
-      )
-
       this.git.ready.then(() => {
         this.git.repositories.forEach(async gitRepository => {
           const gitRoot = gitRepository.getRepositoryRoot()
@@ -109,6 +103,12 @@ export class Extension {
           })
         })
       })
+
+      findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
+        files => {
+          this.decorationProvider.setTrackedFiles(files)
+        }
+      )
     })
 
     this.webviewManager = this.dispose.track(
