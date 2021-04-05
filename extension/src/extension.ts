@@ -129,10 +129,9 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.add', ({ resourceUri }) => {
-        const fsPath = resourceUri.fsPath
-        add({ fsPath, cliPath: this.config.dvcPath })
-      })
+      commands.registerCommand('dvc.add', ({ resourceUri }) =>
+        add({ fsPath: resourceUri.fsPath, cliPath: this.config.dvcPath })
+      )
     )
 
     this.dispose.track(
