@@ -18,7 +18,11 @@ import {
 } from './cli/reader'
 import { add } from './cli'
 
-import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
+import {
+  addFileChangeHandler,
+  findDvcRootPaths,
+  findDvcTrackedPaths
+} from './fileSystem'
 import { getAllUntracked, getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
@@ -75,6 +79,7 @@ export class Extension {
 
     this.resourceLocator = new ResourceLocator(context.extensionPath)
 
+    this.git = this.dispose.track(new Git())
     this.config = new Config()
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
@@ -85,6 +90,25 @@ export class Extension {
           this.decorationProvider.setTrackedFiles(files)
         }
       )
+
+      this.git.ready.then(() => {
+        this.git.repositories.forEach(async gitRepository => {
+          const gitRoot = gitRepository.getRepositoryRoot()
+          const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+          dvcRoots.forEach(async dvcRoot => {
+            const untracked = await getAllUntracked(dvcRoot)
+            const scm = this.dispose.track(
+              new SourceControlManagement(dvcRoot, untracked)
+            )
+            this.scm.push(scm)
+
+            gitRepository.onDidChange(async () => {
+              const untrackedChanges = await getAllUntracked(dvcRoot)
+              return scm.updateUntracked(untrackedChanges)
+            })
+          })
+        })
+      })
     })
 
     this.webviewManager = this.dispose.track(
@@ -143,23 +167,6 @@ export class Extension {
         checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcPath })
       })
     )
-
-    this.git = this.dispose.track(new Git())
-    this.git.ready.then(() => {
-      this.git.repositories.forEach(async gitRepository => {
-        const repositoryRoot = gitRepository.getRepositoryRoot()
-        const untracked = await getAllUntracked(repositoryRoot)
-        const scm = this.dispose.track(
-          new SourceControlManagement(repositoryRoot, untracked)
-        )
-        this.scm.push(scm)
-
-        gitRepository.onDidChange(async () => {
-          const untrackedChanges = await getAllUntracked(repositoryRoot)
-          return scm.updateUntracked(untrackedChanges)
-        })
-      })
-    })
   }
 }
 

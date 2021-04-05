@@ -152,5 +152,6 @@ export class Config {
         this.findDvcRoots()
       })
     )
+    this._initialized.resolve()
   }
 }
