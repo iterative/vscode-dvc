@@ -33,7 +33,7 @@ suite('Git Extension Test Suite', () => {
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
-      const repositoryChangeEvent = (): Promise<void> => {
+      const repositoryUntrackedChangeEvent = (): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = gitExtensionRepository.onDidUntrackedChange(
             (event: void) => {
@@ -44,16 +44,15 @@ suite('Git Extension Test Suite', () => {
         })
       }
 
-      const change = repositoryChangeEvent()
+      const change = repositoryUntrackedChangeEvent()
 
       await ensureFile(untrackedFile)
       expect(accessSync(untrackedFile)).not.to.throw
 
       await change
       const untrackedChanges = await getAllUntracked(gitRoot)
-      expect(untrackedChanges).to.have.lengthOf.at.least(1)
-      expect(untrackedChanges.find(path => path === untrackedFile)).not.to.be
-        .undefined
+      expect(untrackedChanges).to.have.lengthOf.at.least(2)
+      expect(untrackedChanges).to.include(untrackedFile, untrackedDir)
       disposable.dispose()
     }).timeout(10000)
 
