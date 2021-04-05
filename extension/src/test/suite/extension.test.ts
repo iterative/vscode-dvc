@@ -1,28 +1,22 @@
-import { describe, it, before, beforeEach } from 'mocha'
+import { afterEach, before, describe, it } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import * as vscode from 'vscode'
-import { ConfigurationChangeEvent, Disposable } from 'vscode'
 import { join, resolve } from 'path'
+import {
+  window,
+  commands,
+  workspace,
+  Uri,
+  ConfigurationChangeEvent
+} from 'vscode'
+import { Disposable } from '../../extension'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
-const { window, commands, workspace, Uri } = vscode
 
 chai.use(sinonChai)
 const { expect } = chai
-
-const configChangePromise = () => {
-  return new Promise(resolve => {
-    const listener: Disposable = workspace.onDidChangeConfiguration(
-      (event: ConfigurationChangeEvent) => {
-        listener.dispose()
-        return resolve(event)
-      }
-    )
-  })
-}
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -43,9 +37,9 @@ suite('Extension Test Suite', () => {
     ])
   })
 
-  const demoFolderLocation = resolve(__dirname, '..', '..', '..', '..', 'demo')
+  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
-  beforeEach(async () => {
+  afterEach(async () => {
     await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
@@ -69,7 +63,7 @@ suite('Extension Test Suite', () => {
 
     it('should only be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(resolve(demoFolderLocation, 'train.py'))
+      const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
 
       const mockReader = stub(DvcReader, 'getExperiments').resolves(
         complexExperimentsOutput
@@ -131,23 +125,36 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option', async () => {
+      const disposable = Disposable.fn()
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         fileResolve
       )
 
+      const configurationChangeEvent = () => {
+        return new Promise(resolve => {
+          const listener: Disposable = workspace.onDidChangeConfiguration(
+            (event: ConfigurationChangeEvent) => {
+              return resolve(event)
+            }
+          )
+          disposable.track(listener)
+        })
+      }
+
       await selectDvcPathItem(1)
 
       expect(mockShowOpenDialog).to.have.been.called
 
-      await configChangePromise()
+      await configurationChangeEvent()
 
       expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
         testUri.fsPath
       )
 
       mockShowOpenDialog.restore()
+      disposable.dispose()
     })
   })
 })

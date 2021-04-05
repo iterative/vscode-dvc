@@ -1,5 +1,5 @@
-import { workspace, window, commands, scm, Uri, ExtensionContext } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
+import { window, commands, ExtensionContext } from 'vscode'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
   hotRequireExportedFn,
@@ -7,7 +7,7 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
-
+import { SourceControlManagement } from './views/SourceControlManagement'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import {
@@ -22,8 +22,9 @@ import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
 import { getExperimentsRefsPath } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
+import { Git } from './extensions/Git'
 
-export { Disposable }
+export { Disposable, Disposer }
 
 if (process.env.HOT_RELOAD) {
   enableHotReload({ entryModule: module, loggingEnabled: true })
@@ -38,6 +39,8 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
+  private readonly scm?: SourceControlManagement
+  private readonly git: Git
 
   private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
     const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
@@ -76,13 +79,11 @@ export class Extension {
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
-    this.config.ready.then(() => {
-      findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-        files => {
-          this.decorationProvider.setTrackedFiles(files)
-        }
-      )
-    })
+    findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
+      files => {
+        this.decorationProvider.setTrackedFiles(files)
+      }
+    )
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
@@ -141,73 +142,11 @@ export class Extension {
       })
     )
 
-    this.dvcScmFilesView()
-  }
+    this.scm = this.dispose.track(new SourceControlManagement())
+    this.scm.dvcScmFilesView()
 
-  dvcScmFilesView(): void {
-    const { workspaceFolders } = workspace
-    if (!workspaceFolders) {
-      return
-    }
-
-    workspaceFolders.forEach(folder => {
-      const uri = `${folder.uri.fsPath}/`
-
-      const c = this.dispose.track(
-        scm.createSourceControl('dvc', 'DVC', Uri.file(uri))
-      )
-      c.acceptInputCommand = {
-        command: 'workbench.action.output.toggleOutput',
-        title: 'foo'
-      }
-
-      c.inputBox.visible = false
-
-      c.statusBarCommands = [
-        {
-          command: 'test',
-          title: 'DVC'
-        }
-      ]
-
-      const resourceGroup = this.dispose.track(
-        c.createResourceGroup('group1', 'Unchanged')
-      )
-
-      resourceGroup.resourceStates = [
-        {
-          resourceUri: Uri.file(`${uri}path/file.ts`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/file2.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/sub/file.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        }
-      ]
-    })
+    this.git = this.dispose.track(new Git())
+    this.git.ready.then()
   }
 }
 
