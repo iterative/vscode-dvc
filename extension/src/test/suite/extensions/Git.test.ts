@@ -52,7 +52,10 @@ suite('Git Extension Test Suite', () => {
       await change
       const untrackedChanges = await getAllUntracked(gitRoot)
       expect(untrackedChanges).to.have.lengthOf.at.least(2)
-      expect(untrackedChanges).to.include(untrackedFile, untrackedDir)
+      expect(untrackedChanges.map(uri => uri.fsPath)).to.include(
+        untrackedFile,
+        untrackedDir
+      )
       disposable.dispose()
     }).timeout(10000)
 
