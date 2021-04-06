@@ -1,6 +1,8 @@
 import { Uri } from 'vscode'
-import { extname, resolve } from 'path'
+import { resolve } from 'path'
+import uniq from 'lodash.uniq'
 import { execPromise, trimAndSplit } from './util'
+import { isDirectory } from './fileSystem'
 
 const getUris = (repositoryRoot: string, relativePaths: string[]) =>
   relativePaths.map(path => Uri.file(resolve(repositoryRoot, path)))
@@ -14,9 +16,8 @@ const getUntrackedDirectories = async (
       cwd: repositoryRoot
     }
   )
-  return getUris(
-    repositoryRoot,
-    trimAndSplit(stdout).filter(path => extname(path) === '')
+  return getUris(repositoryRoot, trimAndSplit(stdout)).filter(Uri =>
+    isDirectory(Uri.fsPath)
   )
 }
 
@@ -37,5 +38,5 @@ export const getAllUntracked = async (
     getUntrackedFiles(repositoryRoot),
     getUntrackedDirectories(repositoryRoot)
   ])
-  return [...files, ...dirs]
+  return uniq([...files, ...dirs])
 }

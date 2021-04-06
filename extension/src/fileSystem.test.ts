@@ -11,7 +11,8 @@ const {
   findDvcRootPaths,
   findDvcTrackedPaths,
   getAbsoluteTrackedPath,
-  getWatcher
+  getWatcher,
+  isDirectory
 } = fileSystem
 
 jest.mock('chokidar')
@@ -182,5 +183,17 @@ describe('findDvcTrackedPaths', () => {
         resolve(dvcDemoPath, model)
       ])
     )
+  })
+})
+
+describe('isDirectory', () => {
+  it('should return true for a directory', () => {
+    expect(isDirectory(__dirname)).toBe(true)
+  })
+  it('should return false for a file', () => {
+    expect(isDirectory(__filename)).toBe(false)
+  })
+  it('should return false for an empty string', () => {
+    expect(isDirectory('')).toBe(false)
   })
 })

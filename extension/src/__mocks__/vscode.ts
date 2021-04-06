@@ -13,4 +13,8 @@ export const workspace = {
     }
   ]
 }
-export const Uri = { file: jest.fn().mockImplementation(file => file) }
+export const Uri = {
+  file: jest.fn().mockImplementation(file => ({
+    fsPath: file
+  }))
+}

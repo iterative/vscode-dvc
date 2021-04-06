@@ -23,8 +23,10 @@ describe('getAllUntracked', () => {
     await ensureFile(untrackedPython)
     await ensureFile(untrackedText)
 
-    const gitUntracked = await getAllUntracked(repositoryRoot)
-    const dvcUntracked = await getAllUntracked(dvcRoot)
+    const gitUntracked = (await getAllUntracked(repositoryRoot)).map(
+      uri => uri.fsPath
+    )
+    const dvcUntracked = (await getAllUntracked(dvcRoot)).map(uri => uri.fsPath)
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
