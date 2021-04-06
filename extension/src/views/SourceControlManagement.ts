@@ -9,7 +9,7 @@ export class SourceControlManagement {
   @observable
   resourceGroup: SourceControlResourceGroup
 
-  public updateUntracked(untracked: string[]) {
+  public updateUntracked(untracked: Uri[]) {
     if (this.resourceGroup) {
       this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
         untracked
@@ -18,20 +18,21 @@ export class SourceControlManagement {
   }
 
   private getUntrackedResourceStates(
-    untracked: string[]
+    untracked: Uri[]
   ): { resourceUri: Uri; contextValue: 'untracked' }[] {
     return untracked
       .filter(
         untracked =>
-          extname(untracked) !== '.dvc' && basename(untracked) !== '.gitignore'
+          extname(untracked.fsPath) !== '.dvc' &&
+          basename(untracked.fsPath) !== '.gitignore'
       )
       .map(untracked => ({
-        resourceUri: Uri.file(untracked),
+        resourceUri: untracked,
         contextValue: 'untracked'
       }))
   }
 
-  constructor(repositoryRoot: string, untracked: string[]) {
+  constructor(repositoryRoot: string, untracked: Uri[]) {
     makeObservable(this)
 
     const scmView = this.dispose.track(
