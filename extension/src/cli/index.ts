@@ -2,7 +2,7 @@ import { basename } from 'path'
 import { Commands } from './commands'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
-import { commands } from 'vscode'
+import { commands, Uri } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { execPromise } from '../util'
@@ -77,8 +77,9 @@ export const registerDvcCommands = ({
   )
 
   dispose.track(
-    commands.registerCommand('dvc.add', ({ resourceUri }) =>
-      add(config, resourceUri)
+    commands.registerCommand(
+      'dvc.add',
+      ({ resourceUri }: { resourceUri: Uri }) => add(config, resourceUri.fsPath)
     )
   )
 

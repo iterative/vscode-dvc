@@ -10,7 +10,7 @@ import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments } from './cli'
+import { getExperiments, registerDvcCommands } from './cli'
 
 import {
   addFileChangeHandler,
@@ -106,6 +106,11 @@ export class Extension {
         this.showExperimentsWebview()
       })
     )
+
+    registerDvcCommands({
+      dispose: this.dispose,
+      config: this.config
+    })
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
