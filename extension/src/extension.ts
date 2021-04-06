@@ -23,10 +23,11 @@ import {
   findDvcRootPaths,
   findDvcTrackedPaths
 } from './fileSystem'
-import { getAllUntracked, getExperimentsRefsPath } from './git'
+import { getAllUntracked } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
+import { resolve } from 'path'
 
 export { Disposable, Disposer }
 
@@ -46,13 +47,15 @@ export class Extension {
   private readonly scm: SourceControlManagement[] = []
   private readonly gitExtension: GitExtension
 
-  private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
-    const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
-    if (!refsPath) {
+  private onChangeExperimentsUpdateWebview = async (
+    gitRoot: string
+  ): Promise<Disposable> => {
+    if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
+    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
     return addFileChangeHandler(refsPath, this.refreshExperimentsWebview)
   }
 
@@ -91,10 +94,6 @@ export class Extension {
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
-    )
-
-    this.onChangeExperimentsUpdateWebview().then(disposable =>
-      this.dispose.track(disposable)
     )
 
     this.dispose.track(IntegratedTerminal)
@@ -151,6 +150,11 @@ export class Extension {
     this.gitExtension.ready.then(() => {
       this.gitExtension.repositories.forEach(async gitExtensionRepository => {
         const gitRoot = gitExtensionRepository.getRepositoryRoot()
+
+        this.onChangeExperimentsUpdateWebview(gitRoot).then(disposable =>
+          this.dispose.track(disposable)
+        )
+
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
           const untracked = await getAllUntracked(dvcRoot)
