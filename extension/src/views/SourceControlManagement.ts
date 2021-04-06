@@ -8,16 +8,16 @@ export class SourceControlManagement {
   @observable
   resourceGroup: SourceControlResourceGroup
 
-  updateUntracked(untracked: string[]) {
+  updateUntracked(untracked: Uri[]) {
     if (this.resourceGroup) {
       this.resourceGroup.resourceStates = untracked.map(u => ({
-        resourceUri: Uri.file(u),
+        resourceUri: u,
         contextValue: 'untracked'
       }))
     }
   }
 
-  constructor(repositoryRoot: string, untracked: string[]) {
+  constructor(repositoryRoot: string, untracked: Uri[]) {
     makeObservable(this)
 
     const scmView = this.dispose.track(
@@ -35,7 +35,7 @@ export class SourceControlManagement {
     )
 
     this.resourceGroup.resourceStates = untracked.map(change => ({
-      resourceUri: Uri.file(change),
+      resourceUri: change,
       contextValue: 'untracked'
     }))
   }
