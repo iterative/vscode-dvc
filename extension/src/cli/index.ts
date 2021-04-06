@@ -1,5 +1,4 @@
 import { basename } from 'path'
-import { Commands } from './commands'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
 import { commands, Uri } from 'vscode'
@@ -35,31 +34,31 @@ export const add = (config: Config, fsPath: string): Promise<string> => {
 export const getExperiments = async (
   config: Config
 ): Promise<ExperimentsRepoJSONOutput> => {
-  const output = await execCommand(config, Commands.experiment_show)
+  const output = await execCommand(config, 'exp show --show-json')
   return JSON.parse(output)
 }
 
 export const initializeDirectory = async (config: Config): Promise<string> => {
-  return execCommand(config, Commands.initialize_subdirectory)
+  return execCommand(config, 'init --subdir')
 }
 
 export const checkout = async (config: Config): Promise<string> => {
-  return execCommand(config, Commands.checkout)
+  return execCommand(config, 'checkout')
 }
 
 export const checkoutRecursive = async (config: Config): Promise<string> => {
-  return execCommand(config, Commands.checkout_recursive)
+  return execCommand(config, 'checkout --recursive')
 }
 
 export const getRoot = async (config: Config, cwd: string): Promise<string> => {
-  const output = await execCommand(config, Commands.root, { cwd })
+  const output = await execCommand(config, 'root', { cwd })
   return output.trim()
 }
 
 export const listDvcOnlyRecursive = async (
   config: Config
 ): Promise<string[]> => {
-  const output = await execCommand(config, `list . --dvc-only -R`)
+  const output = await execCommand(config, 'list . --dvc-only -R')
   return output.trim().split('\n')
 }
 

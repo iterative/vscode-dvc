@@ -1,5 +1,4 @@
 import { Terminal, window, workspace } from 'vscode'
-import { getRunExperimentCommand } from './cli/commands'
 import { getReadyPythonExtension } from './extensions/python'
 import { delay } from './util'
 
@@ -65,6 +64,5 @@ export class IntegratedTerminal {
 }
 
 export const runExperiment = (): Promise<void> => {
-  const runExperimentCommand = getRunExperimentCommand()
-  return IntegratedTerminal.run(runExperimentCommand)
+  return IntegratedTerminal.run('dvc exp run')
 }
