@@ -1,6 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
+import { basename, extname } from 'path'
 
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
@@ -8,13 +9,27 @@ export class SourceControlManagement {
   @observable
   resourceGroup: SourceControlResourceGroup
 
-  updateUntracked(untracked: Uri[]) {
+  public updateUntracked(untracked: Uri[]) {
     if (this.resourceGroup) {
-      this.resourceGroup.resourceStates = untracked.map(u => ({
-        resourceUri: u,
+      this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
+        untracked
+      )
+    }
+  }
+
+  private getUntrackedResourceStates(
+    untracked: Uri[]
+  ): { resourceUri: Uri; contextValue: 'untracked' }[] {
+    return untracked
+      .filter(
+        untracked =>
+          extname(untracked.fsPath) !== '.dvc' &&
+          basename(untracked.fsPath) !== '.gitignore'
+      )
+      .map(untracked => ({
+        resourceUri: untracked,
         contextValue: 'untracked'
       }))
-    }
   }
 
   constructor(repositoryRoot: string, untracked: Uri[]) {
@@ -34,9 +49,8 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.resourceGroup.resourceStates = untracked.map(change => ({
-      resourceUri: change,
-      contextValue: 'untracked'
-    }))
+    this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
+      untracked
+    )
   }
 }
