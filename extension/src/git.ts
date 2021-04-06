@@ -1,6 +1,7 @@
 import { Uri } from 'vscode'
 import { resolve } from 'path'
-import uniq from 'lodash.uniq'
+import uniqWith from 'lodash.uniqwith'
+import isEqual from 'lodash.isequal'
 import { execPromise, trimAndSplit } from './util'
 import { isDirectory } from './fileSystem'
 
@@ -38,5 +39,5 @@ export const getAllUntracked = async (
     getUntrackedFiles(repositoryRoot),
     getUntrackedDirectories(repositoryRoot)
   ])
-  return uniq([...files, ...dirs])
+  return uniqWith([...files, ...dirs], isEqual)
 }
