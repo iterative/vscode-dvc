@@ -8,16 +8,14 @@ import {
   listDvcOnlyRecursive,
   getDvcInvocation
 } from './reader'
-import { execPromise } from '../util'
+import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
 import { getPythonExecutionDetails } from '../extensions/python'
 
 jest.mock('fs')
-jest.mock('../util')
 jest.mock('../extensions/python')
 
-const mockedExecPromise = mocked(execPromise)
 const mockedGetPythonExecutionDetails = mocked(getPythonExecutionDetails)
 
 beforeEach(() => {
@@ -50,17 +48,19 @@ describe('getDvcInvocation', () => {
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
     const cwd = resolve()
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: JSON.stringify(complexExperimentsOutput),
-      stderr: ''
-    })
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout: JSON.stringify(complexExperimentsOutput),
+        stderr: ''
+      })
 
     const experiments = await getExperiments({
       cliPath: 'dvc',
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(mockedExecPromise).toBeCalledWith('dvc exp show --show-json', {
+    expect(execPromiseSpy).toBeCalledWith('dvc exp show --show-json', {
       cwd
     })
   })
@@ -88,10 +88,12 @@ describe('initializeDirectory', () => {
 	- Star us on GitHub: <https://github.com/iterative/dvc>
 	`
 
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout,
+        stderr: ''
+      })
 
     const output = await initializeDirectory({
       cliPath: 'dvc',
@@ -99,7 +101,7 @@ describe('initializeDirectory', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc init --subdir', {
+    expect(execPromiseSpy).toBeCalledWith('dvc init --subdir', {
       cwd: fsPath
     })
   })
@@ -108,10 +110,12 @@ describe('checkout', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\n\rM       logs/\n\r`
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout,
+        stderr: ''
+      })
 
     const output = await checkout({
       cliPath: 'dvc',
@@ -119,7 +123,7 @@ describe('checkout', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc checkout', {
+    expect(execPromiseSpy).toBeCalledWith('dvc checkout', {
       cwd: fsPath
     })
   })
@@ -129,10 +133,12 @@ describe('checkoutRecursive', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\n\rM       logs/\n\r`
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout,
+        stderr: ''
+      })
 
     const output = await checkoutRecursive({
       cliPath: 'dvc',
@@ -140,7 +146,7 @@ describe('checkoutRecursive', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc checkout --recursive', {
+    expect(execPromiseSpy).toBeCalledWith('dvc checkout --recursive', {
       cwd: fsPath
     })
   })
@@ -151,16 +157,18 @@ describe('getRoot', () => {
     const mockRelativeRoot = join('..', '..')
     const mockStdout = mockRelativeRoot + '\n\r'
     const cwd = resolve()
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: mockStdout,
-      stderr: ''
-    })
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout: mockStdout,
+        stderr: ''
+      })
     const relativeRoot = await getRoot({
       cwd,
       cliPath: 'dvc'
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
-    expect(mockedExecPromise).toBeCalledWith('dvc root', {
+    expect(execPromiseSpy).toBeCalledWith('dvc root', {
       cwd
     })
   })
@@ -181,10 +189,12 @@ describe('getTracked', () => {
       `logs/loss.tsv\n` +
       `model.pt`
     const cwd = resolve()
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: stdout,
-      stderr: ''
-    })
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout: stdout,
+        stderr: ''
+      })
     const tracked = await listDvcOnlyRecursive({
       cwd,
       cliPath: 'dvc'
@@ -204,7 +214,7 @@ describe('getTracked', () => {
       'model.pt'
     ])
 
-    expect(mockedExecPromise).toBeCalledWith('dvc list . --dvc-only -R', {
+    expect(execPromiseSpy).toBeCalledWith('dvc list . --dvc-only -R', {
       cwd
     })
   })
