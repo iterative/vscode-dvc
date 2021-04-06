@@ -1,6 +1,6 @@
 import { Uri } from 'vscode'
 import { extname, resolve } from 'path'
-import { execPromise } from './util'
+import { execPromise, trimAndSplit } from './util'
 
 const getUntrackedDirectories = async (
   repositoryRoot: string
@@ -11,10 +11,8 @@ const getUntrackedDirectories = async (
       cwd: repositoryRoot
     }
   )
-  return stdout
-    .trim()
-    .split('\n')
-    .filter(path => path && extname(path) === '')
+  return trimAndSplit(stdout)
+    .filter(path => extname(path) === '')
     .map(path => Uri.file(resolve(repositoryRoot, path)))
 }
 
@@ -25,11 +23,9 @@ const getUntrackedFiles = async (repositoryRoot: string): Promise<Uri[]> => {
       cwd: repositoryRoot
     }
   )
-  return stdout
-    .trim()
-    .split('\n')
-    .filter(path => path)
-    .map(path => Uri.file(resolve(repositoryRoot, path)))
+  return trimAndSplit(stdout).map(path =>
+    Uri.file(resolve(repositoryRoot, path))
+  )
 }
 
 export const getAllUntracked = async (
@@ -37,7 +33,6 @@ export const getAllUntracked = async (
 ): Promise<Uri[]> => {
   const [files, dirs] = await Promise.all([
     getUntrackedFiles(repositoryRoot),
-
     getUntrackedDirectories(repositoryRoot)
   ])
   return [...files, ...dirs]
