@@ -1,5 +1,6 @@
-import { execPromise } from './util'
+import { Uri } from 'vscode'
 import { extname, resolve } from 'path'
+import { execPromise } from './util'
 
 const getUntrackedDirectories = async (
   repositoryRoot: string
