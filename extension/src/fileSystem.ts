@@ -3,7 +3,8 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { dirname, join, resolve, basename } from 'path'
 import glob from 'tiny-glob'
-import { getRoot, listDvcOnlyRecursive } from './cli/reader'
+import { getRoot, listDvcOnlyRecursive } from './cli'
+import { Config } from './Config'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -40,14 +41,11 @@ const filterRootDir = (dirs: string[], rootDir: string) =>
   dirs.filter(dir => dir !== rootDir)
 
 const findDvcAbsoluteRootPath = async (
-  cwd: string,
-  cliPath: string | undefined
+  config: Config,
+  cwd: string
 ): Promise<string | undefined> => {
   try {
-    const root = await getRoot({
-      cliPath,
-      cwd
-    })
+    const root = await getRoot(config, cwd)
     return resolve(cwd, root)
   } catch (e) {}
 }
@@ -66,12 +64,12 @@ const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
 }
 
 export const findDvcRootPaths = async (
-  cwd: string,
-  cliPath: string | undefined
+  config: Config,
+  cwd: string
 ): Promise<string[]> => {
   const [subRoots, absoluteRoot] = await Promise.all([
     findDvcSubRootPaths(cwd),
-    findDvcAbsoluteRootPath(cwd, cliPath)
+    findDvcAbsoluteRootPath(config, cwd)
   ])
 
   const roots = [...subRoots, absoluteRoot].filter(v => v).sort() as string[]
@@ -93,9 +91,9 @@ const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
 }
 
 export const findDvcTrackedPaths = async (
-  cwd: string,
-  cliPath: string | undefined
+  config: Config
 ): Promise<Set<string>> => {
+  const cwd = config.workspaceRoot
   const [dotDvcFiles, dvcListFiles] = await Promise.all([
     glob(join('**', '*.dvc'), {
       absolute: true,
@@ -104,7 +102,7 @@ export const findDvcTrackedPaths = async (
       filesOnly: true
     }),
 
-    listDvcOnlyRecursive({ cwd, cliPath })
+    listDvcOnlyRecursive(config)
   ])
 
   return new Set([

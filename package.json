@@ -22,7 +22,8 @@
     "extension-dev-server": "yarn workspace dvc dev",
     "webview-dev-server": "yarn workspace dvc-vscode-webview dev",
     "dev-server": "run-p extension-dev-server webview-dev-server",
-    "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true code --extensionDevelopmentPath $PWD/extension demo",
+    "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true DVCPATH='.env/bin/dvc' code --extensionDevelopmentPath $PWD/extension demo",
+    "dev-ui-win": "HOT_RELOAD=true USE_DEV_UI=true DVCPATH='.env\\Scripts\\dvc.exe' code --extensionDevelopmentPath $PWD/extension demo",
     "postinstall": "husky install",
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
@@ -52,6 +53,7 @@
     "prettier": "^1.19.1",
     "prettier-config-standard": "^4.0.0",
     "ts-jest": "^26.4.4",
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "vscode-uri": "^3.0.2"
   }
 }

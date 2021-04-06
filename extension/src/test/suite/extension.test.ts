@@ -11,7 +11,7 @@ import {
   ConfigurationChangeEvent
 } from 'vscode'
 import { Disposable } from '../../extension'
-import * as DvcReader from '../../cli/reader'
+import * as DvcReader from '../../cli'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
 

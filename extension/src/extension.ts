@@ -10,13 +10,7 @@ import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import {
-  getExperiments,
-  initializeDirectory,
-  checkout,
-  checkoutRecursive
-} from './cli/reader'
-import { add } from './cli'
+import { getExperiments } from './cli'
 
 import {
   addFileChangeHandler,
@@ -60,10 +54,7 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
-    const experiments = await getExperiments({
-      cwd: this.config.workspaceRoot,
-      cliPath: this.config.dvcPath
-    })
+    const experiments = await getExperiments(this.config)
     return this.webviewManager.refreshExperiments(experiments)
   }
 
@@ -86,11 +77,9 @@ export class Extension {
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
-    findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-      files => {
-        this.decorationProvider.setTrackedFiles(files)
-      }
-    )
+    findDvcTrackedPaths(this.config).then(files => {
+      this.decorationProvider.setTrackedFiles(files)
+    })
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
@@ -118,33 +107,6 @@ export class Extension {
       })
     )
 
-    this.dispose.track(
-      commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory({
-          cwd: fsPath,
-          cliPath: this.config.dvcPath
-        })
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.add', ({ resourceUri }) =>
-        add({ fsPath: resourceUri.fsPath, cliPath: this.config.dvcPath })
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout({ cwd: fsPath, cliPath: this.config.dvcPath })
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcPath })
-      })
-    )
-
     this.gitExtension = this.dispose.track(new GitExtension())
 
     this.gitExtension.ready.then(() => {
@@ -155,7 +117,7 @@ export class Extension {
           this.dispose.track(disposable)
         )
 
-        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+        const dvcRoots = await findDvcRootPaths(this.config, gitRoot)
         dvcRoots.forEach(async dvcRoot => {
           const untracked = await getAllUntracked(dvcRoot)
           const scm = this.dispose.track(

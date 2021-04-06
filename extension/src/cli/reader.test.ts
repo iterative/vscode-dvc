@@ -7,11 +7,12 @@ import {
   getRoot,
   listDvcOnlyRecursive,
   getDvcInvocation
-} from './reader'
+} from './index'
 import { execPromise } from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
 import { getPythonExecutionDetails } from '../extensions/python'
+import { Config } from '../Config'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -28,40 +29,45 @@ describe('getDvcInvocation', () => {
   it('should utilize an interpreter path from the Python extension by default', async () => {
     const testPythonBin = '/custom/path/to/python'
     mockedGetPythonExecutionDetails.mockResolvedValue([testPythonBin])
-    expect(await getDvcInvocation({ cliPath: '', cwd: './' })).toEqual(
-      `${testPythonBin} -m dvc`
-    )
+    expect(
+      await getDvcInvocation({ dvcPath: '', workspaceRoot: './' } as Config)
+    ).toEqual(`${testPythonBin} -m dvc`)
   })
 
-  it('should ignore a path from the Python extension when cliPath is defined', async () => {
+  it('should ignore a path from the Python extension when dvcPath is defined', async () => {
     const testPythonBin = '/custom/path/to/python'
     mockedGetPythonExecutionDetails.mockResolvedValue(['/wrong/python/bin'])
     expect(
-      await getDvcInvocation({ cliPath: testPythonBin, cwd: './' })
+      await getDvcInvocation({
+        dvcPath: testPythonBin,
+        workspaceRoot: './'
+      } as Config)
     ).toEqual(testPythonBin)
   })
 
   it('should return a simple dvc call when no Python extension is present', async () => {
     mockedGetPythonExecutionDetails.mockResolvedValue(undefined)
-    expect(await getDvcInvocation({ cliPath: '', cwd: './' })).toEqual('dvc')
+    expect(
+      await getDvcInvocation({ dvcPath: '', workspaceRoot: './' } as Config)
+    ).toEqual('dvc')
   })
 })
 
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
-    const cwd = resolve()
+    const workspaceRoot = resolve()
     mockedExecPromise.mockResolvedValueOnce({
       stdout: JSON.stringify(complexExperimentsOutput),
       stderr: ''
     })
 
     const experiments = await getExperiments({
-      cliPath: 'dvc',
-      cwd
-    })
+      dvcPath: 'dvc',
+      workspaceRoot
+    } as Config)
     expect(experiments).toMatchSnapshot()
     expect(mockedExecPromise).toBeCalledWith('dvc exp show --show-json', {
-      cwd
+      cwd: workspaceRoot
     })
   })
 })
@@ -94,9 +100,9 @@ describe('initializeDirectory', () => {
     })
 
     const output = await initializeDirectory({
-      cliPath: 'dvc',
-      cwd: fsPath
-    })
+      dvcPath: 'dvc',
+      workspaceRoot: fsPath
+    } as Config)
     expect(output).toEqual(stdout)
 
     expect(mockedExecPromise).toBeCalledWith('dvc init --subdir', {
@@ -114,9 +120,9 @@ describe('checkout', () => {
     })
 
     const output = await checkout({
-      cliPath: 'dvc',
-      cwd: fsPath
-    })
+      dvcPath: 'dvc',
+      workspaceRoot: fsPath
+    } as Config)
     expect(output).toEqual(stdout)
 
     expect(mockedExecPromise).toBeCalledWith('dvc checkout', {
@@ -135,9 +141,9 @@ describe('checkoutRecursive', () => {
     })
 
     const output = await checkoutRecursive({
-      cliPath: 'dvc',
-      cwd: fsPath
-    })
+      dvcPath: 'dvc',
+      workspaceRoot: fsPath
+    } as Config)
     expect(output).toEqual(stdout)
 
     expect(mockedExecPromise).toBeCalledWith('dvc checkout --recursive', {
@@ -148,6 +154,7 @@ describe('checkoutRecursive', () => {
 
 describe('getRoot', () => {
   it('should return the root relative to the cwd', async () => {
+    const mockConfig = { dvcPath: 'dvc' } as Config
     const mockRelativeRoot = join('..', '..')
     const mockStdout = mockRelativeRoot + '\n\r'
     const cwd = resolve()
@@ -155,10 +162,7 @@ describe('getRoot', () => {
       stdout: mockStdout,
       stderr: ''
     })
-    const relativeRoot = await getRoot({
-      cwd,
-      cliPath: 'dvc'
-    })
+    const relativeRoot = await getRoot(mockConfig, cwd)
     expect(relativeRoot).toEqual(mockRelativeRoot)
     expect(mockedExecPromise).toBeCalledWith('dvc root', {
       cwd
@@ -180,15 +184,15 @@ describe('getTracked', () => {
       `logs/acc.tsv\n` +
       `logs/loss.tsv\n` +
       `model.pt`
-    const cwd = resolve()
+    const workspaceRoot = resolve()
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
     })
     const tracked = await listDvcOnlyRecursive({
-      cwd,
-      cliPath: 'dvc'
-    })
+      workspaceRoot,
+      dvcPath: 'dvc'
+    } as Config)
 
     expect(tracked).toEqual([
       'data/MNIST/raw/t10k-images-idx3-ubyte',
@@ -205,7 +209,7 @@ describe('getTracked', () => {
     ])
 
     expect(mockedExecPromise).toBeCalledWith('dvc list . --dvc-only -R', {
-      cwd
+      cwd: workspaceRoot
     })
   })
 })

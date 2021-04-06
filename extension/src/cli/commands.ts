@@ -4,7 +4,8 @@ export enum Commands {
   initialize_subdirectory = 'init --subdir',
   add = 'add',
   checkout = 'checkout',
-  checkout_recursive = 'checkout --recursive'
+  checkout_recursive = 'checkout --recursive',
+  root = 'root'
 }
 
 const getCliCommand = (command: string, ...options: string[]): string => {
@@ -13,8 +14,4 @@ const getCliCommand = (command: string, ...options: string[]): string => {
 
 export const getRunExperimentCommand = (): string => {
   return getCliCommand(Commands.experiment_run)
-}
-
-export const getAddCommand = (toAdd: string): string => {
-  return `${Commands.add} ${toAdd}`
 }
