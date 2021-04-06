@@ -79,7 +79,7 @@ export class Extension {
 
     this.resourceLocator = new ResourceLocator(context.extensionPath)
 
-    this.config = new Config()
+    this.config = this.dispose.track(new Config())
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
