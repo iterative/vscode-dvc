@@ -21,10 +21,10 @@ export const getStatus = async (
   options: ReaderOptions
 ): Promise<Record<string, string>> => {
   const { stdout } = await execCommand(options, Commands.status)
-  const fullStatus = JSON.parse(stdout)
+  const status = JSON.parse(stdout)
 
   const excludeAlwaysChanged = (key: string): boolean =>
-    !fullStatus[key].includes('always changed')
+    !status[key].includes('always changed')
 
   const getChanges = (
     status: Record<string, Record<string, string>>[]
@@ -37,11 +37,11 @@ export const getStatus = async (
     changed: Record<string, string>,
     key: string
   ): Record<string, string> => {
-    const status = getChanges(fullStatus[key])
-    return Object.assign(changed, ...status)
+    const reducedStatus = getChanges(status[key])
+    return Object.assign(changed, ...reducedStatus)
   }
 
-  const changed = Object.keys(fullStatus)
+  const changed = Object.keys(status)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
 
