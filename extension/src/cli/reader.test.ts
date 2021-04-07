@@ -6,7 +6,8 @@ import {
   checkoutRecursive,
   getRoot,
   listDvcOnlyRecursive,
-  getDvcInvocation
+  getDvcInvocation,
+  getStatus
 } from './reader'
 import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
@@ -215,6 +216,39 @@ describe('getTracked', () => {
     ])
 
     expect(execPromiseSpy).toBeCalledWith('dvc list . --dvc-only -R', {
+      cwd
+    })
+  })
+})
+
+describe('getStatus', () => {
+  it('should run a object from the dvc output', async () => {
+    const status = {
+      train: [
+        { 'changed deps': { 'data/MNIST': 'modified' } },
+        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+        'always changed'
+      ],
+      'data/MNIST/raw.dvc': [
+        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+      ]
+    }
+    const stdout = JSON.stringify(status)
+    const cwd = resolve()
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout: stdout,
+        stderr: ''
+      })
+
+    expect(
+      await getStatus({
+        cwd,
+        cliPath: 'dvc'
+      })
+    ).toEqual(status)
+    expect(execPromiseSpy).toBeCalledWith('dvc status', {
       cwd
     })
   })
