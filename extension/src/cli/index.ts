@@ -22,20 +22,28 @@ export const getStatus = async (
 ): Promise<Record<string, string>> => {
   const { stdout } = await execCommand(options, Commands.status)
   const fullStatus = JSON.parse(stdout)
+
+  const excludeAlwaysChanged = (key: string): boolean =>
+    !fullStatus[key].includes('always changed')
+
+  const getChanges = (
+    status: Record<string, Record<string, string>>[]
+  ): Record<string, string>[] =>
+    status
+      .map(entry => entry?.['changed outs'] || entry?.['changed deps'])
+      .filter(value => value)
+
+  const statusReducer = (
+    changed: Record<string, string>,
+    key: string
+  ): Record<string, string> => {
+    const status = getChanges(fullStatus[key])
+    return Object.assign(changed, ...status)
+  }
+
   const changed = Object.keys(fullStatus)
-    .filter(key => !fullStatus[key].includes('always changed'))
-    .reduce((obj: Record<string, string>, key: string): Record<
-      string,
-      string
-    > => {
-      const status = fullStatus[key]
-        .map(
-          (entry: Record<string, Record<string, string>>) =>
-            entry?.['changed outs'] || entry?.['changed deps']
-        )
-        .filter((value: Record<string, string> | undefined) => value)
-      return Object.assign(obj, ...status)
-    }, {})
+    .filter(excludeAlwaysChanged)
+    .reduce(statusReducer, {})
 
   return changed
 }
