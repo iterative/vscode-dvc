@@ -4,8 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { dirname, join, resolve } from 'path'
 import { mkdirSync, rmdir } from 'fs-extra'
-import { getRoot, listDvcOnlyRecursive } from './cli'
-import { Config } from './Config'
+import { getRoot, listDvcOnlyRecursive } from './cli/reader'
 
 const {
   addFileChangeHandler,
@@ -17,7 +16,7 @@ const {
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
-jest.mock('./cli')
+jest.mock('./cli/reader')
 
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
@@ -97,13 +96,11 @@ describe('getWatcher', () => {
 
 describe('findDvcRootPaths', () => {
   const dataRoot = resolve(dvcDemoPath, 'data')
-  const mockConfig = {
-    dvcPath: 'dvc'
-  } as Config
+  const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
     mockGetRoot.mockResolvedValueOnce('.')
-    const dvcRoots = await findDvcRootPaths(mockConfig, dvcDemoPath)
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
 
     expect(mockGetRoot).toBeCalledTimes(1)
     expect(dvcRoots).toEqual([dvcDemoPath])
@@ -114,7 +111,7 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(dataRoot, '.dvc')
     mkdirSync(mockDvcRoot)
 
-    const dvcRoots = await findDvcRootPaths(mockConfig, dvcDemoPath)
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
 
     rmdir(mockDvcRoot)
 
@@ -127,7 +124,7 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(dataRoot, 'MNIST', '.dvc')
     mkdirSync(mockDvcRoot)
 
-    const dvcRoots = await findDvcRootPaths(mockConfig, dataRoot)
+    const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath)
 
     rmdir(mockDvcRoot)
 
@@ -137,13 +134,13 @@ describe('findDvcRootPaths', () => {
 
   it('should find the dvc root if it exists above the given folder', async () => {
     mockGetRoot.mockResolvedValueOnce('..')
-    const dvcRoots = await findDvcRootPaths(mockConfig, dataRoot)
+    const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath)
     expect(mockGetRoot).toBeCalledTimes(1)
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
-    const dvcRoots = await findDvcRootPaths(mockConfig, __dirname)
+    const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath)
     expect(dvcRoots).toEqual([])
   })
 })
@@ -159,14 +156,9 @@ describe('getAbsoluteTrackedPath', () => {
 })
 
 describe('findDvcTrackedPaths', () => {
-  const mockConfig = {
-    dvcPath: 'dvc',
-    workspaceRoot: dvcDemoPath
-  } as Config
-
   it('should find the paths in the workspace corresponding to .dvc files and return them in a Set', async () => {
     mockListDvcOnlyRecursive.mockResolvedValueOnce([])
-    const tracked = await findDvcTrackedPaths(mockConfig)
+    const tracked = await findDvcTrackedPaths(dvcDemoPath, 'dvc')
 
     expect(tracked).toEqual(
       new Set([resolve(dvcDemoPath, 'data', 'MNIST', 'raw')])
@@ -179,7 +171,7 @@ describe('findDvcTrackedPaths', () => {
     const logLoss = join(logFolder, 'loss.tsv')
     const model = 'model.pt'
     mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
-    const tracked = await findDvcTrackedPaths(mockConfig)
+    const tracked = await findDvcTrackedPaths(dvcDemoPath, 'dvc')
 
     expect(tracked).toEqual(
       new Set([

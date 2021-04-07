@@ -1,6 +1,11 @@
 import { getAllUntracked } from './git'
 import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
+import { Uri } from 'vscode'
+
+function mapPaths(uris: Uri[]): string[] {
+  return uris.map(x => x.path)
+}
 
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
@@ -28,7 +33,7 @@ describe('getAllUntracked', () => {
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
-    expect(gitUntracked.map(x => x.path)).toEqual(
+    expect(mapPaths(gitUntracked)).toEqual(
       expect.arrayContaining([
         untrackedDir,
         untrackedPerl,
@@ -37,9 +42,11 @@ describe('getAllUntracked', () => {
       ])
     )
 
-    expect(dvcUntracked.map(x => x.path)).toEqual(
+    expect(mapPaths(dvcUntracked)).toEqual(
       expect.arrayContaining([untrackedDir, untrackedPerl, untrackedText])
     )
-    expect(dvcUntracked).not.toEqual(expect.arrayContaining([untrackedPython]))
+    expect(mapPaths(dvcUntracked)).not.toEqual(
+      expect.arrayContaining([untrackedPython])
+    )
   })
 })

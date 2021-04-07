@@ -2,7 +2,6 @@ import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
 import { basename, resolve } from 'path'
 import { add } from '.'
-import { Config } from '../Config'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -17,7 +16,6 @@ describe('add', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __filename
     const dir = resolve(fsPath, '..')
-    const mockConfig = { dvcPath: 'dvc', workspaceRoot: dir } as Config
     const file = basename(__filename)
     const stdout =
       `100% Add|████████████████████████████████████████████████` +
@@ -32,7 +30,10 @@ describe('add', () => {
       stderr: ''
     })
 
-    const output = await add(mockConfig, fsPath)
+    const output = await add({
+      cliPath: 'dvc',
+      fsPath
+    })
     expect(output).toEqual(stdout)
 
     expect(mockedExecPromise).toBeCalledWith(`dvc add ${file}`, {
