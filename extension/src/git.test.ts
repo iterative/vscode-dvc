@@ -1,7 +1,7 @@
 import { getAllUntracked } from './git'
 import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
-import { mapPaths } from './test/util'
+import { mapPaths } from './util/testHelpers'
 
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
