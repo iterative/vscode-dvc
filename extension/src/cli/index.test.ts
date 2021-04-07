@@ -43,7 +43,7 @@ describe('add', () => {
 })
 
 describe('getStatus', () => {
-  it('should run a object from the dvc output', async () => {
+  it('should return an object containing modified paths', async () => {
     const status = {
       train: [
         { 'changed deps': { 'data/MNIST': 'modified' } },
@@ -66,7 +66,37 @@ describe('getStatus', () => {
         cwd,
         cliPath: 'dvc'
       })
-    ).toEqual(status)
+    ).toEqual({ 'data/MNIST/raw': 'modified' })
+    expect(mockedExecPromise).toBeCalledWith('dvc status', {
+      cwd
+    })
+  })
+
+  it('should return an object containing modified and deleted paths', async () => {
+    const status = {
+      'baz.dvc': [{ 'changed outs': { baz: 'modified' } }],
+      dofoo: [
+        { 'changed deps': { baz: 'modified' } },
+        { 'changed outs': { foo: 'modified' } }
+      ],
+      dobar: [
+        { 'changed deps': { foo: 'modified' } },
+        { 'changed outs': { bar: 'deleted' } }
+      ]
+    }
+    const stdout = JSON.stringify(status)
+    const cwd = resolve()
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: stdout,
+      stderr: ''
+    })
+
+    expect(
+      await getStatus({
+        cwd,
+        cliPath: 'dvc'
+      })
+    ).toEqual({ bar: 'deleted', baz: 'modified', foo: 'modified' })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
       cwd
     })

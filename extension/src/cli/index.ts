@@ -19,8 +19,23 @@ export const add = async (options: {
 
 export const getStatus = async (
   options: ReaderOptions
-): Promise<Record<string, unknown>> => {
+): Promise<Record<string, string>> => {
   const { stdout } = await execCommand(options, Commands.status)
   const fullStatus = JSON.parse(stdout)
-  return fullStatus
+  const changed = Object.keys(fullStatus)
+    .filter(key => !fullStatus[key].includes('always changed'))
+    .reduce((obj: Record<string, string>, key: string): Record<
+      string,
+      string
+    > => {
+      const status = fullStatus[key]
+        .map(
+          (entry: Record<string, Record<string, string>>) =>
+            entry?.['changed outs'] || entry?.['changed deps']
+        )
+        .filter((value: Record<string, string> | undefined) => value)
+      return Object.assign(obj, ...status)
+    }, {})
+
+  return changed
 }
