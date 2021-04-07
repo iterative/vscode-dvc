@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { URI, Utils } from 'vscode-uri'
 
 export const Extension = jest.fn()
 export const extensions = jest.fn()
@@ -13,4 +14,7 @@ export const workspace = {
     }
   ]
 }
-export const Uri = { file: jest.fn().mockImplementation(file => file) }
+export const Uri = {
+  file: jest.fn(URI.file),
+  joinPath: jest.fn(Utils.joinPath)
+}
