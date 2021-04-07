@@ -9,6 +9,6 @@ describe('runExperiment', () => {
     const undef = await runExperiment()
     expect(undef).toBeUndefined()
 
-    expect(terminalSpy).toBeCalledWith('dvc exp run')
+    expect(terminalSpy).toBeCalledWith('dvc exp run ')
   })
 })
