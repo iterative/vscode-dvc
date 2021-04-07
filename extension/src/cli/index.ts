@@ -1,6 +1,6 @@
 import { basename, dirname } from 'path'
-import { getAddCommand } from './commands'
-import { execCommand } from './reader'
+import { Commands, getAddCommand } from './commands'
+import { execCommand, ReaderOptions } from './reader'
 
 export const add = async (options: {
   fsPath: string
@@ -15,4 +15,12 @@ export const add = async (options: {
 
   const { stdout } = await execCommand({ cwd, cliPath }, addCommand)
   return stdout
+}
+
+export const getStatus = async (
+  options: ReaderOptions
+): Promise<Record<string, unknown>> => {
+  const { stdout } = await execCommand(options, Commands.status)
+  const fullStatus = JSON.parse(stdout)
+  return fullStatus
 }

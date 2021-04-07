@@ -1,7 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
 import { basename, resolve } from 'path'
-import { add } from '.'
+import { add, getStatus } from '.'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -38,6 +38,37 @@ describe('add', () => {
 
     expect(mockedExecPromise).toBeCalledWith(`dvc add ${file}`, {
       cwd: dir
+    })
+  })
+})
+
+describe('getStatus', () => {
+  it('should run a object from the dvc output', async () => {
+    const status = {
+      train: [
+        { 'changed deps': { 'data/MNIST': 'modified' } },
+        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+        'always changed'
+      ],
+      'data/MNIST/raw.dvc': [
+        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+      ]
+    }
+    const stdout = JSON.stringify(status)
+    const cwd = resolve()
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: stdout,
+      stderr: ''
+    })
+
+    expect(
+      await getStatus({
+        cwd,
+        cliPath: 'dvc'
+      })
+    ).toEqual(status)
+    expect(mockedExecPromise).toBeCalledWith('dvc status', {
+      cwd
     })
   })
 })
