@@ -26,7 +26,7 @@ export const getStatus = async (
   const excludeAlwaysChanged = (key: string): boolean =>
     !status[key].includes('always changed')
 
-  const getChanges = (
+  const getChanged = (
     status: Record<string, Record<string, string>>[]
   ): Record<string, string>[] =>
     status
@@ -37,13 +37,11 @@ export const getStatus = async (
     reducedStatus: Record<string, string>,
     key: string
   ): Record<string, string> => {
-    const changed = getChanges(status[key])
+    const changed = getChanged(status[key])
     return Object.assign(reducedStatus, ...changed)
   }
 
-  const changed = Object.keys(status)
+  return Object.keys(status)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
-
-  return changed
 }
