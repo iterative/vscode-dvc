@@ -101,4 +101,53 @@ describe('getStatus', () => {
       cwd
     })
   })
+
+  it('should return an object with an entry for each path', async () => {
+    const status = {
+      prepare: [
+        { 'changed deps': { 'data/data.xml': 'not in cache' } },
+        { 'changed outs': { 'data/prepared': 'not in cache' } }
+      ],
+      featurize: [
+        { 'changed deps': { 'data/prepared': 'not in cache' } },
+        { 'changed outs': { 'data/features': 'modified' } }
+      ],
+      train: [
+        { 'changed deps': { 'data/features': 'modified' } },
+        { 'changed outs': { 'model.pkl': 'deleted' } }
+      ],
+      evaluate: [
+        {
+          'changed deps': {
+            'data/features': 'modified',
+            'model.pkl': 'deleted'
+          }
+        }
+      ],
+      'data/data.xml.dvc': [
+        { 'changed outs': { 'data/data.xml': 'not in cache' } }
+      ]
+    }
+    const stdout = JSON.stringify(status)
+    const cwd = resolve()
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: stdout,
+      stderr: ''
+    })
+
+    expect(
+      await getStatus({
+        cwd,
+        cliPath: 'dvc'
+      })
+    ).toEqual({
+      'data/data.xml': 'not in cache',
+      'data/features': 'modified',
+      'data/prepared': 'not in cache',
+      'model.pkl': 'deleted'
+    })
+    expect(mockedExecPromise).toBeCalledWith('dvc status', {
+      cwd
+    })
+  })
 })
