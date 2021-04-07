@@ -1,6 +1,7 @@
 import { getAllUntracked } from './git'
 import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
+import map from 'lodash/map'
 
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
@@ -23,14 +24,15 @@ describe('getAllUntracked', () => {
     await ensureFile(untrackedPython)
     await ensureFile(untrackedText)
 
-    const gitUntracked = (await getAllUntracked(repositoryRoot)).map(
-      uri => uri.fsPath
+    const gitUntrackedPaths = map(
+      await getAllUntracked(repositoryRoot),
+      'fsPath'
     )
-    const dvcUntracked = (await getAllUntracked(dvcRoot)).map(uri => uri.fsPath)
+    const dvcUntrackedPaths = map(await getAllUntracked(dvcRoot), 'fsPath')
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
-    expect(gitUntracked).toEqual(
+    expect(gitUntrackedPaths).toEqual(
       expect.arrayContaining([
         untrackedDir,
         untrackedPerl,
@@ -39,9 +41,11 @@ describe('getAllUntracked', () => {
       ])
     )
 
-    expect(dvcUntracked).toEqual(
+    expect(dvcUntrackedPaths).toEqual(
       expect.arrayContaining([untrackedDir, untrackedPerl, untrackedText])
     )
-    expect(dvcUntracked).not.toEqual(expect.arrayContaining([untrackedPython]))
+    expect(dvcUntrackedPaths).not.toEqual(
+      expect.arrayContaining([untrackedPython])
+    )
   })
 })
