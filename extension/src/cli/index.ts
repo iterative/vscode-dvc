@@ -34,11 +34,11 @@ export const getStatus = async (
       .filter(value => value)
 
   const statusReducer = (
-    changed: Record<string, string>,
+    reducedStatus: Record<string, string>,
     key: string
   ): Record<string, string> => {
-    const reducedStatus = getChanges(status[key])
-    return Object.assign(changed, ...reducedStatus)
+    const changed = getChanges(status[key])
+    return Object.assign(reducedStatus, ...changed)
   }
 
   const changed = Object.keys(status)
