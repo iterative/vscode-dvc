@@ -1,7 +1,7 @@
 import { getAllUntracked } from './git'
 import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
-import map from 'lodash/map'
+import { mapPaths } from './util/testHelpers'
 
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
@@ -24,11 +24,8 @@ describe('getAllUntracked', () => {
     await ensureFile(untrackedPython)
     await ensureFile(untrackedText)
 
-    const gitUntrackedPaths = map(
-      await getAllUntracked(repositoryRoot),
-      'fsPath'
-    )
-    const dvcUntrackedPaths = map(await getAllUntracked(dvcRoot), 'fsPath')
+    const gitUntrackedPaths = mapPaths(await getAllUntracked(repositoryRoot))
+    const dvcUntrackedPaths = mapPaths(await getAllUntracked(dvcRoot))
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
