@@ -1,11 +1,7 @@
 import { getAllUntracked } from './git'
 import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
-import { Uri } from 'vscode'
-
-function mapPaths(uris: Uri[]): string[] {
-  return uris.map(x => x.path)
-}
+import { mapPaths } from './test/util'
 
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
