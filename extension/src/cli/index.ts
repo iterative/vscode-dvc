@@ -1,4 +1,7 @@
+import { uniqWith } from 'lodash'
+import isEqual from 'lodash.isequal'
 import { basename, dirname, join } from 'path'
+import { Uri } from 'vscode'
 import { Commands, getAddCommand } from './commands'
 import { execCommand } from './reader'
 
@@ -17,10 +20,17 @@ export const add = async (options: {
   return stdout
 }
 
+enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'not in cache'
+}
+
 export const getStatus = async (options: {
   dvcRoot: string
   cliPath: string | undefined
-}): Promise<Record<string, string[]>> => {
+}): Promise<Partial<Record<Status, Uri[]>>> => {
   const { dvcRoot, cliPath } = options
 
   const { stdout } = await execCommand(
@@ -33,30 +43,30 @@ export const getStatus = async (options: {
     !statusOutput[stageOrFile].includes('always changed')
 
   const getStatuses = (
-    status: Record<string, Record<string, string>>[]
-  ): Record<string, string>[] =>
+    status: Record<string, Record<string, Status>>[]
+  ): Record<string, Status>[] =>
     status
       .map(entry => entry?.['changed outs'] || entry?.['changed deps'])
       .filter(value => value)
 
   const reduceStatuses = (
-    reducedStatus: Record<string, string[]>,
-    statuses: Record<string, string>[]
+    reducedStatus: Partial<Record<Status, Uri[]>>,
+    statuses: Record<string, Status>[]
   ) =>
     statuses.map(entry =>
       Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = join(dvcRoot, relativePath)
+        const absolutePath = Uri.file(join(dvcRoot, relativePath))
 
         const existingPaths = reducedStatus[status] || []
-        const uniquePaths = [...new Set([...existingPaths, absolutePath])]
+        const uniquePaths = uniqWith([...existingPaths, absolutePath], isEqual)
         reducedStatus[status] = uniquePaths
       })
     )
 
   const statusReducer = (
-    reducedStatus: Record<string, string[]>,
+    reducedStatus: Partial<Record<Status, Uri[]>>,
     stageOrFile: string
-  ): Record<string, string[]> => {
+  ): Partial<Record<Status, Uri[]>> => {
     const statuses = getStatuses(statusOutput[stageOrFile])
 
     reduceStatuses(reducedStatus, statuses)
