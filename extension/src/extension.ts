@@ -80,7 +80,7 @@ export class Extension {
       i.show()
     }
 
-    this.resourceLocator = new ResourceLocator(context.extensionPath)
+    this.resourceLocator = new ResourceLocator(context.extensionUri)
 
     this.config = this.dispose.track(new Config())
 
