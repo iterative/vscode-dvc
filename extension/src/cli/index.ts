@@ -1,5 +1,3 @@
-import { uniqWith } from 'lodash'
-import isEqual from 'lodash.isequal'
 import { basename, dirname, join } from 'path'
 import { Uri } from 'vscode'
 import { Commands, getAddCommand } from './commands'
@@ -50,23 +48,21 @@ export const getStatus = async (options: {
       .filter(value => value)
 
   const reduceStatuses = (
-    reducedStatus: Partial<Record<Status, Uri[]>>,
+    reducedStatus: Partial<Record<Status, string[]>>,
     statuses: Record<string, Status>[]
   ) =>
     statuses.map(entry =>
       Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = Uri.file(join(dvcRoot, relativePath))
-
+        const absolutePath = join(dvcRoot, relativePath)
         const existingPaths = reducedStatus[status] || []
-        const uniquePaths = uniqWith([...existingPaths, absolutePath], isEqual)
-        reducedStatus[status] = uniquePaths
+        reducedStatus[status] = [...new Set([...existingPaths, absolutePath])]
       })
     )
 
   const statusReducer = (
-    reducedStatus: Partial<Record<Status, Uri[]>>,
+    reducedStatus: Partial<Record<Status, string[]>>,
     stageOrFile: string
-  ): Partial<Record<Status, Uri[]>> => {
+  ): Partial<Record<Status, string[]>> => {
     const statuses = getStatuses(statusOutput[stageOrFile])
 
     reduceStatuses(reducedStatus, statuses)
@@ -74,7 +70,14 @@ export const getStatus = async (options: {
     return reducedStatus
   }
 
-  return Object.keys(statusOutput)
+  const pathStatuses = Object.keys(statusOutput)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
+
+  const uriStatuses = {} as Partial<Record<Status, Uri[]>>
+  Object.entries(pathStatuses).forEach(([s, paths]) => {
+    const status = s as Status
+    uriStatuses[status] = paths?.map(path => Uri.file(path))
+  })
+  return uriStatuses
 }
