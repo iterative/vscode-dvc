@@ -38,13 +38,14 @@ export const getStatus = async (
     key: string
   ): Record<string, string[]> => {
     const changed = getChanged(status[key])
+
     changed.map(obj =>
       Object.entries(obj).map(([relativePath, status]) => {
         const absolutePath = join(options.cwd, relativePath)
-        reducedStatus[status] = reducedStatus[status] || []
-        if (!reducedStatus[status].includes(absolutePath)) {
-          reducedStatus[status].push(absolutePath)
-        }
+
+        reducedStatus[status] = [
+          ...new Set([...(reducedStatus[status] || []), absolutePath])
+        ]
       })
     )
 
