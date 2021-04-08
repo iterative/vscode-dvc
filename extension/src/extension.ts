@@ -129,7 +129,7 @@ export class Extension {
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
           const untracked = await getAllUntracked(dvcRoot)
-          const status = new Status(this.config, dvcRoot)
+          const status = this.dispose.track(new Status(this.config, dvcRoot))
           const scm = this.dispose.track(
             new SourceControlManagement(dvcRoot, untracked, status)
           )
