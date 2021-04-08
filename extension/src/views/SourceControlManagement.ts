@@ -2,9 +2,11 @@ import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
+import { Status } from '../Status'
 
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
+  public readonly status: Status
 
   @observable
   resourceGroup: SourceControlResourceGroup
@@ -32,8 +34,10 @@ export class SourceControlManagement {
       }))
   }
 
-  constructor(repositoryRoot: string, untracked: Uri[]) {
+  constructor(repositoryRoot: string, untracked: Uri[], status: Status) {
     makeObservable(this)
+
+    this.status = status
 
     const scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
@@ -49,8 +53,14 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
-      untracked
-    )
+    this.status.ready.then(() => {
+      this.resourceGroup.resourceStates = [
+        ...this.getUntrackedResourceStates(untracked),
+        ...this.status.modified.map(uri => ({
+          resourceUri: uri,
+          contextValue: 'modified'
+        }))
+      ]
+    })
   }
 }

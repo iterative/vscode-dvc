@@ -23,6 +23,7 @@ import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
+import { Status } from './Status'
 
 export { Disposable, Disposer }
 
@@ -128,8 +129,9 @@ export class Extension {
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
           const untracked = await getAllUntracked(dvcRoot)
+          const status = new Status(this.config, dvcRoot)
           const scm = this.dispose.track(
-            new SourceControlManagement(dvcRoot, untracked)
+            new SourceControlManagement(dvcRoot, untracked, status)
           )
           this.scm.push(scm)
 
