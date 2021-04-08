@@ -14,8 +14,6 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-// const getTestUri = (path: string): Uri => Uri.file(resolve(__dirname, path))
-
 describe('add', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __filename
