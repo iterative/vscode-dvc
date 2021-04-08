@@ -1,7 +1,7 @@
 import { basename, dirname, join } from 'path'
 import { Uri } from 'vscode'
-import { Commands, getAddCommand } from './commands'
-import { execCommand } from './reader'
+import { getAddCommand } from './commands'
+import { execCommand, status } from './reader'
 
 export const add = async (options: {
   fsPath: string
@@ -25,18 +25,13 @@ enum Status {
   NOT_IN_CACHE = 'not in cache'
 }
 
-export const getStatus = async (options: {
+const reduceToPathStatuses = (
+  statusOutput: Record<
+    string,
+    (Record<string, Record<string, Status>> | string)[]
+  >,
   dvcRoot: string
-  cliPath: string | undefined
-}): Promise<Partial<Record<Status, Uri[]>>> => {
-  const { dvcRoot, cliPath } = options
-
-  const { stdout } = await execCommand(
-    { cliPath, cwd: dvcRoot },
-    Commands.status
-  )
-  const statusOutput = JSON.parse(stdout)
-
+): Partial<Record<Status, string[]>> => {
   const excludeAlwaysChanged = (stageOrFile: string): boolean =>
     !statusOutput[stageOrFile].includes('always changed')
 
@@ -63,21 +58,42 @@ export const getStatus = async (options: {
     reducedStatus: Partial<Record<Status, string[]>>,
     stageOrFile: string
   ): Partial<Record<Status, string[]>> => {
-    const statuses = getStatuses(statusOutput[stageOrFile])
+    const entry = statusOutput[stageOrFile] as Record<
+      string,
+      Record<string, Status>
+    >[]
+    const statuses = getStatuses(entry)
 
     reduceStatuses(reducedStatus, statuses)
 
     return reducedStatus
   }
-
-  const pathStatuses = Object.keys(statusOutput)
+  return Object.keys(statusOutput)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
+}
 
-  const uriStatuses = {} as Partial<Record<Status, Uri[]>>
-  Object.entries(pathStatuses).forEach(([s, paths]) => {
-    const status = s as Status
-    uriStatuses[status] = paths?.map(path => Uri.file(path))
-  })
-  return uriStatuses
+const getUriStatuses = (
+  pathStatuses: Partial<Record<Status, string[]>>
+): Partial<Record<Status, Uri[]>> => {
+  return Object.entries(pathStatuses).reduce((uriStatuses, [status, paths]) => {
+    uriStatuses[status as Status] = paths?.map(path => Uri.file(path))
+    return uriStatuses
+  }, {} as Partial<Record<Status, Uri[]>>)
+}
+
+export const getStatus = async (options: {
+  dvcRoot: string
+  cliPath: string | undefined
+}): Promise<Partial<Record<Status, Uri[]>>> => {
+  const { dvcRoot, cliPath } = options
+
+  const statusOutput = (await status({ cliPath, cwd: dvcRoot })) as Record<
+    string,
+    (Record<string, Record<string, Status>> | string)[]
+  >
+
+  const pathStatuses = reduceToPathStatuses(statusOutput, dvcRoot)
+
+  return getUriStatuses(pathStatuses)
 }

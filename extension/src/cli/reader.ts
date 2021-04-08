@@ -68,3 +68,13 @@ export const listDvcOnlyRecursive = async (
   const { stdout } = await execCommand(options, `list . --dvc-only -R`)
   return trimAndSplit(stdout)
 }
+
+export const status = async (
+  options: ReaderOptions
+): Promise<Record<
+  string,
+  (Record<string, Record<string, string>> | string)[]
+>> => {
+  const { stdout } = await execCommand(options, Commands.status)
+  return JSON.parse(stdout)
+}
