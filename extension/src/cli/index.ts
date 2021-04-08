@@ -52,14 +52,19 @@ const filterExcludedStagesOrFiles = (
   const excludeAlwaysChanged = (stageOrFile: string): boolean =>
     !statusOutput[stageOrFile].includes('always changed')
 
+  const reduceToFiltered = (
+    filteredStatusOutput: FilteredStatusOutput,
+    stageOrFile: string
+  ) => {
+    filteredStatusOutput[stageOrFile] = statusOutput[
+      stageOrFile
+    ] as ValidStageOrFileStatuses[]
+    return filteredStatusOutput
+  }
+
   return Object.keys(statusOutput)
     .filter(excludeAlwaysChanged)
-    .reduce((filteredStatusOutput, stageOrFile: string) => {
-      filteredStatusOutput[stageOrFile] = statusOutput[
-        stageOrFile
-      ] as ValidStageOrFileStatuses[]
-      return filteredStatusOutput
-    }, {} as FilteredStatusOutput)
+    .reduce(reduceToFiltered, {})
 }
 
 const getFileOrStageStatuses = (
