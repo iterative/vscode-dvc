@@ -45,9 +45,12 @@ export const getStatus = async (
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
 
-  return Object.entries(reducedStatus).reduce((r, [k, v]) => {
-    r[v] = r[v] || []
-    r[v].push(join(options.cwd, k))
-    return r
-  }, {} as Record<string, string[]>)
+  return Object.entries(reducedStatus).reduce(
+    (statusObj, [relativePath, status]) => {
+      statusObj[status] = statusObj[status] || []
+      statusObj[status].push(join(options.cwd, relativePath))
+      return statusObj
+    },
+    {} as Record<string, string[]>
+  )
 }
