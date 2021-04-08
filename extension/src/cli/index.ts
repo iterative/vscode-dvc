@@ -1,7 +1,15 @@
 import { basename, dirname, join } from 'path'
-import { Uri } from 'vscode'
+import { commands, Uri } from 'vscode'
+import { Disposer } from '@hediet/std/disposable'
+import { Config } from '../Config'
 import { getAddCommand } from './commands'
-import { execCommand, status } from './reader'
+import {
+  execCommand,
+  initializeDirectory,
+  checkout,
+  checkoutRecursive,
+  status
+} from './reader'
 
 export const add = async (options: {
   fsPath: string
@@ -119,4 +127,33 @@ export const getStatus = async (options: {
   const pathStatuses = reduceToPathStatuses(filteredStatusOutput)
 
   return getUriStatuses(pathStatuses, dvcRoot)
+}
+
+export const registerCommands = (config: Config, disposer: Disposer) => {
+  disposer.track(
+    commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
+      initializeDirectory({
+        cwd: fsPath,
+        cliPath: config.dvcPath
+      })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.add', ({ resourceUri }) =>
+      add({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.checkout', ({ fsPath }) => {
+      checkout({ cwd: fsPath, cliPath: config.dvcPath })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
+      checkoutRecursive({ cwd: fsPath, cliPath: config.dvcPath })
+    })
+  )
 }
