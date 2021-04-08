@@ -24,12 +24,12 @@ describe('getAllUntracked', () => {
     await ensureFile(untrackedPython)
     await ensureFile(untrackedText)
 
-    const gitUntracked = await getAllUntracked(repositoryRoot)
-    const dvcUntracked = await getAllUntracked(dvcRoot)
+    const gitUntrackedPaths = mapPaths(await getAllUntracked(repositoryRoot))
+    const dvcUntrackedPaths = mapPaths(await getAllUntracked(dvcRoot))
 
     await Promise.all([remove(untrackedDir), remove(untrackedPython)])
 
-    expect(mapPaths(gitUntracked)).toEqual(
+    expect(gitUntrackedPaths).toEqual(
       expect.arrayContaining([
         untrackedDir,
         untrackedPerl,
@@ -38,10 +38,10 @@ describe('getAllUntracked', () => {
       ])
     )
 
-    expect(mapPaths(dvcUntracked)).toEqual(
+    expect(dvcUntrackedPaths).toEqual(
       expect.arrayContaining([untrackedDir, untrackedPerl, untrackedText])
     )
-    expect(mapPaths(dvcUntracked)).not.toEqual(
+    expect(dvcUntrackedPaths).not.toEqual(
       expect.arrayContaining([untrackedPython])
     )
   })
