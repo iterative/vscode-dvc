@@ -43,9 +43,9 @@ export const getStatus = async (
       Object.entries(obj).map(([relativePath, status]) => {
         const absolutePath = join(options.cwd, relativePath)
 
-        reducedStatus[status] = [
-          ...new Set([...(reducedStatus[status] || []), absolutePath])
-        ]
+        const existingPaths = reducedStatus[status] || []
+        const uniquePaths = [...new Set([...existingPaths, absolutePath])]
+        reducedStatus[status] = uniquePaths
       })
     )
 
