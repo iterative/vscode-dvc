@@ -1,6 +1,6 @@
 import { basename, dirname, join } from 'path'
 import { Commands, getAddCommand } from './commands'
-import { execCommand, ReaderOptions } from './reader'
+import { execCommand } from './reader'
 
 export const add = async (options: {
   fsPath: string
@@ -17,10 +17,16 @@ export const add = async (options: {
   return stdout
 }
 
-export const getStatus = async (
-  options: ReaderOptions
-): Promise<Record<string, string[]>> => {
-  const { stdout } = await execCommand(options, Commands.status)
+export const getStatus = async (options: {
+  dvcRoot: string
+  cliPath: string | undefined
+}): Promise<Record<string, string[]>> => {
+  const { dvcRoot, cliPath } = options
+
+  const { stdout } = await execCommand(
+    { cliPath, cwd: dvcRoot },
+    Commands.status
+  )
   const statusOutput = JSON.parse(stdout)
 
   const excludeAlwaysChanged = (stageOrFile: string): boolean =>
@@ -39,7 +45,7 @@ export const getStatus = async (
   ) =>
     statuses.map(entry =>
       Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = join(options.cwd, relativePath)
+        const absolutePath = join(dvcRoot, relativePath)
 
         const existingPaths = reducedStatus[status] || []
         const uniquePaths = [...new Set([...existingPaths, absolutePath])]

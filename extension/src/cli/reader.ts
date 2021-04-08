@@ -3,7 +3,7 @@ import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
 
-export interface ReaderOptions {
+interface ReaderOptions {
   cliPath: string | undefined
   cwd: string
 }

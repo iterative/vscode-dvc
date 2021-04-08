@@ -55,7 +55,7 @@ describe('getStatus', () => {
       ]
     }
     const stdout = JSON.stringify(status)
-    const cwd = __dirname
+    const dvcRoot = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
@@ -63,12 +63,12 @@ describe('getStatus', () => {
 
     expect(
       await getStatus({
-        cwd,
+        dvcRoot,
         cliPath: 'dvc'
       })
     ).toEqual({ modified: [join(__dirname, 'data/MNIST/raw')] })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
-      cwd
+      cwd: dvcRoot
     })
   })
 
@@ -85,7 +85,7 @@ describe('getStatus', () => {
       ]
     }
     const stdout = JSON.stringify(status)
-    const cwd = __dirname
+    const dvcRoot = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
@@ -93,7 +93,7 @@ describe('getStatus', () => {
 
     expect(
       await getStatus({
-        cwd,
+        dvcRoot,
         cliPath: 'dvc'
       })
     ).toEqual({
@@ -101,7 +101,7 @@ describe('getStatus', () => {
       modified: [join(__dirname, 'baz'), join(__dirname, 'foo')]
     })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
-      cwd
+      cwd: dvcRoot
     })
   })
 
@@ -132,7 +132,7 @@ describe('getStatus', () => {
       ]
     }
     const stdout = JSON.stringify(status)
-    const cwd = __dirname
+    const dvcRoot = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
@@ -140,7 +140,7 @@ describe('getStatus', () => {
 
     expect(
       await getStatus({
-        cwd,
+        dvcRoot,
         cliPath: 'dvc'
       })
     ).toEqual({
@@ -152,7 +152,7 @@ describe('getStatus', () => {
       deleted: [join(__dirname, 'model.pkl')]
     })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
-      cwd
+      cwd: dvcRoot
     })
   })
 })
