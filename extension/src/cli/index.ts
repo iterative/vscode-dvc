@@ -21,26 +21,24 @@ export const getStatus = async (
   options: ReaderOptions
 ): Promise<Record<string, string[]>> => {
   const { stdout } = await execCommand(options, Commands.status)
-  const status = JSON.parse(stdout)
+  const statusOutput = JSON.parse(stdout)
 
-  const excludeAlwaysChanged = (key: string): boolean =>
-    !status[key].includes('always changed')
+  const excludeAlwaysChanged = (stageOrFile: string): boolean =>
+    !statusOutput[stageOrFile].includes('always changed')
 
-  const getChanged = (
+  const getStatuses = (
     status: Record<string, Record<string, string>>[]
   ): Record<string, string>[] =>
     status
       .map(entry => entry?.['changed outs'] || entry?.['changed deps'])
       .filter(value => value)
 
-  const statusReducer = (
+  const reduceStatuses = (
     reducedStatus: Record<string, string[]>,
-    key: string
-  ): Record<string, string[]> => {
-    const changed = getChanged(status[key])
-
-    changed.map(obj =>
-      Object.entries(obj).map(([relativePath, status]) => {
+    statuses: Record<string, string>[]
+  ) =>
+    statuses.map(entry =>
+      Object.entries(entry).map(([relativePath, status]) => {
         const absolutePath = join(options.cwd, relativePath)
 
         const existingPaths = reducedStatus[status] || []
@@ -49,10 +47,18 @@ export const getStatus = async (
       })
     )
 
+  const statusReducer = (
+    reducedStatus: Record<string, string[]>,
+    stageOrFile: string
+  ): Record<string, string[]> => {
+    const statuses = getStatuses(statusOutput[stageOrFile])
+
+    reduceStatuses(reducedStatus, statuses)
+
     return reducedStatus
   }
 
-  return Object.keys(status)
+  return Object.keys(statusOutput)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
 }
