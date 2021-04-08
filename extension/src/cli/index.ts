@@ -1,6 +1,15 @@
+import { Disposer } from '@hediet/std/disposable'
 import { basename, dirname } from 'path'
+import { commands } from 'vscode'
+import { Config } from '../Config'
 import { Commands, getAddCommand } from './commands'
-import { execCommand, ReaderOptions } from './reader'
+import {
+  execCommand,
+  ReaderOptions,
+  initializeDirectory,
+  checkout,
+  checkoutRecursive
+} from './reader'
 
 export const add = async (options: {
   fsPath: string
@@ -44,4 +53,33 @@ export const getStatus = async (
   return Object.keys(status)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
+}
+
+export const registerCommands = (config: Config, disposer: Disposer) => {
+  disposer.track(
+    commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
+      initializeDirectory({
+        cwd: fsPath,
+        cliPath: config.dvcPath
+      })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.add', ({ resourceUri }) =>
+      add({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.checkout', ({ fsPath }) => {
+      checkout({ cwd: fsPath, cliPath: config.dvcPath })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
+      checkoutRecursive({ cwd: fsPath, cliPath: config.dvcPath })
+    })
+  )
 }

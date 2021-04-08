@@ -10,13 +10,8 @@ import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import {
-  getExperiments,
-  initializeDirectory,
-  checkout,
-  checkoutRecursive
-} from './cli/reader'
-import { add } from './cli'
+import { getExperiments } from './cli/reader'
+import { registerCommands as registerCliCommands } from './cli'
 
 import {
   addFileChangeHandler,
@@ -98,6 +93,8 @@ export class Extension {
 
     this.dispose.track(IntegratedTerminal)
 
+    registerCliCommands(this.config, this.dispose)
+
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
       commands.registerCommand('dvc.selectDvcPath', async () =>
@@ -115,33 +112,6 @@ export class Extension {
       commands.registerCommand('dvc.runExperiment', async () => {
         runExperiment()
         this.showExperimentsWebview()
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-        initializeDirectory({
-          cwd: fsPath,
-          cliPath: this.config.dvcPath
-        })
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.add', ({ resourceUri }) =>
-        add({ fsPath: resourceUri.fsPath, cliPath: this.config.dvcPath })
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-        checkout({ cwd: fsPath, cliPath: this.config.dvcPath })
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-        checkoutRecursive({ cwd: fsPath, cliPath: this.config.dvcPath })
       })
     )
 
