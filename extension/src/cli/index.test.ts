@@ -1,6 +1,6 @@
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
-import { basename, resolve } from 'path'
+import { basename, join, resolve } from 'path'
 import { add, getStatus } from '.'
 
 jest.mock('fs')
@@ -55,7 +55,7 @@ describe('getStatus', () => {
       ]
     }
     const stdout = JSON.stringify(status)
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
@@ -66,7 +66,7 @@ describe('getStatus', () => {
         cwd,
         cliPath: 'dvc'
       })
-    ).toEqual({ 'data/MNIST/raw': 'modified' })
+    ).toEqual({ modified: [join(__dirname, 'data/MNIST/raw')] })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
       cwd
     })
@@ -85,7 +85,7 @@ describe('getStatus', () => {
       ]
     }
     const stdout = JSON.stringify(status)
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
@@ -96,7 +96,10 @@ describe('getStatus', () => {
         cwd,
         cliPath: 'dvc'
       })
-    ).toEqual({ bar: 'deleted', baz: 'modified', foo: 'modified' })
+    ).toEqual({
+      deleted: [join(__dirname, 'bar')],
+      modified: [join(__dirname, 'baz'), join(__dirname, 'foo')]
+    })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
       cwd
     })
@@ -129,7 +132,7 @@ describe('getStatus', () => {
       ]
     }
     const stdout = JSON.stringify(status)
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
@@ -141,10 +144,12 @@ describe('getStatus', () => {
         cliPath: 'dvc'
       })
     ).toEqual({
-      'data/data.xml': 'not in cache',
-      'data/features': 'modified',
-      'data/prepared': 'not in cache',
-      'model.pkl': 'deleted'
+      modified: [join(__dirname, 'data/features')],
+      'not in cache': [
+        join(__dirname, 'data/data.xml'),
+        join(__dirname, 'data/prepared')
+      ],
+      deleted: [join(__dirname, 'model.pkl')]
     })
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
       cwd

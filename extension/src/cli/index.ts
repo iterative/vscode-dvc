@@ -1,4 +1,4 @@
-import { basename, dirname } from 'path'
+import { basename, dirname, join } from 'path'
 import { Commands, getAddCommand } from './commands'
 import { execCommand, ReaderOptions } from './reader'
 
@@ -19,7 +19,7 @@ export const add = async (options: {
 
 export const getStatus = async (
   options: ReaderOptions
-): Promise<Record<string, string>> => {
+): Promise<Record<string, string[]>> => {
   const { stdout } = await execCommand(options, Commands.status)
   const status = JSON.parse(stdout)
 
@@ -41,7 +41,13 @@ export const getStatus = async (
     return Object.assign(reducedStatus, ...changed)
   }
 
-  return Object.keys(status)
+  const reducedStatus = Object.keys(status)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
+
+  return Object.entries(reducedStatus).reduce((r, [k, v]) => {
+    r[v] = r[v] || []
+    r[v].push(join(options.cwd, k))
+    return r
+  }, {} as Record<string, string[]>)
 }
