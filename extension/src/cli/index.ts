@@ -25,11 +25,16 @@ enum Status {
   NOT_IN_CACHE = 'not in cache'
 }
 
+enum ChangedType {
+  CHANGED_OUTS = 'changed outs',
+  CHANGED_DEPS = 'changed deps'
+}
+
 type StatusOutput = Record<string, (ValidStageOrFileStatuses | string)[]>
 
 type FilteredStatusOutput = Record<string, ValidStageOrFileStatuses[]>
 
-type ValidStageOrFileStatuses = Record<string, PathStatus>
+type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type PathStatus = Record<string, Status>
 
@@ -53,7 +58,10 @@ const getFileOrStageStatuses = (
   fileOrStage: ValidStageOrFileStatuses[]
 ): PathStatus[] =>
   fileOrStage
-    .map(entry => entry?.['changed outs'] || entry?.['changed deps'])
+    .map(
+      entry =>
+        entry?.[ChangedType.CHANGED_DEPS] || entry?.[ChangedType.CHANGED_OUTS]
+    )
     .filter(value => value)
 
 const reduceStatuses = (
