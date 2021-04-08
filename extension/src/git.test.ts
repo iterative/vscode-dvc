@@ -1,38 +1,48 @@
-import { getExperimentsRefsPath, getRepoRootPath } from './git'
-import { ensureDir, lstatSync } from 'fs-extra'
-import { resolve } from 'path'
+import { getAllUntracked } from './git'
+import { ensureFile, remove } from 'fs-extra'
+import { join, resolve } from 'path'
+import { mapPaths } from './util/testHelpers'
 
-describe('getExperimentsRefsPath', () => {
-  it('should find the path of the custom experiments refs given a directory in this project', async () => {
-    const refsPath = (await getExperimentsRefsPath(__dirname)) as string
-    expect(refsPath).toBeDefined()
-    const isValidPath = await ensureDir(refsPath)
-    const existing = undefined
-    const created = refsPath
+describe('getAllUntracked', () => {
+  it('should return a list of all untracked paths', async () => {
+    const repositoryRoot = resolve(__dirname, '..', '..')
 
-    expect([existing, created]).toContain(isValidPath)
-    expect(lstatSync(refsPath).isDirectory).toBeTruthy()
-  })
-
-  it('should return undefined given a non-existent path', async () => {
-    const refsPath = await getExperimentsRefsPath(
-      '/some/path/that/does/not/exist'
+    const untrackedPython = join(
+      repositoryRoot,
+      'extension',
+      'src',
+      'views',
+      'y.py'
     )
-    expect(refsPath).toBeUndefined()
-  })
-})
 
-describe('getRepoRootPath', () => {
-  it('should find the root directory given a directory in this project', async () => {
-    const gitRoot = (await getRepoRootPath(__dirname)) as string
+    const dvcRoot = join(repositoryRoot, 'demo')
+    const untrackedDir = join(dvcRoot, 'data', 'weeeee')
+    const untrackedPerl = join(untrackedDir, 'fun.pl')
+    const untrackedText = join(untrackedDir, 'text.txt')
 
-    expect(gitRoot).toBeDefined()
-    const gitDir = resolve(gitRoot, '.git')
-    expect(lstatSync(gitDir).isDirectory).toBeTruthy()
-  })
+    await ensureFile(untrackedPerl)
+    await ensureFile(untrackedPython)
+    await ensureFile(untrackedText)
 
-  it('should return undefined given a non-existent path', async () => {
-    const gitRoot = await getRepoRootPath('/some/path/that/does/not/exist')
-    expect(gitRoot).toBeUndefined()
+    const gitUntrackedPaths = mapPaths(await getAllUntracked(repositoryRoot))
+    const dvcUntrackedPaths = mapPaths(await getAllUntracked(dvcRoot))
+
+    await Promise.all([remove(untrackedDir), remove(untrackedPython)])
+
+    expect(gitUntrackedPaths).toEqual(
+      expect.arrayContaining([
+        untrackedDir,
+        untrackedPerl,
+        untrackedText,
+        untrackedPython
+      ])
+    )
+
+    expect(dvcUntrackedPaths).toEqual(
+      expect.arrayContaining([untrackedDir, untrackedPerl, untrackedText])
+    )
+    expect(dvcUntrackedPaths).not.toEqual(
+      expect.arrayContaining([untrackedPython])
+    )
   })
 })

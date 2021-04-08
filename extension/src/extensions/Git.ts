@@ -1,8 +1,10 @@
 import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
+import isEqual from 'lodash.isequal'
+import { makeObservable, observable } from 'mobx'
 
-export const enum GitStatus {
+const enum GitStatus {
   INDEX_MODIFIED,
   INDEX_ADDED,
   INDEX_DELETED,
@@ -51,7 +53,7 @@ interface Repository {
 
 type APIState = 'uninitialized' | 'initialized'
 
-interface GitExtensionAPI {
+interface ExtensionAPI {
   readonly state: APIState
   readonly onDidChangeState: Event<APIState>
   readonly repositories: Repository[]
@@ -59,74 +61,90 @@ interface GitExtensionAPI {
   toGitUri(uri: Uri, ref: string): Uri
 }
 
-interface GitExtension {
-  getAPI(version: number): Thenable<GitExtensionAPI>
+interface VscodeGit {
+  getAPI(version: number): Thenable<ExtensionAPI>
 }
 
-export class Git {
-  dispose = Disposable.fn()
-  private readonly _initialized = new Deferred()
+class GitExtensionRepository {
+  public dispose = Disposable.fn()
 
+  private onDidUntrackedChangeEmitter: EventEmitter<void>
+  readonly onDidUntrackedChange: Event<void>
+
+  @observable
+  private untrackedChanges: string[]
+
+  private getUntrackedChanges(changes: Change[]): string[] {
+    return changes
+      .filter(change => change.status === GitStatus.UNTRACKED)
+      .map(change => change.uri.fsPath)
+      .sort()
+  }
+
+  private repositoryRoot: string
+
+  public getRepositoryRoot() {
+    return this.repositoryRoot
+  }
+
+  constructor(repository: Repository) {
+    makeObservable(this)
+    this.repositoryRoot = repository.rootUri.fsPath
+
+    this.untrackedChanges = this.getUntrackedChanges(
+      repository.state.workingTreeChanges
+    )
+
+    this.onDidUntrackedChangeEmitter = this.dispose.track(new EventEmitter())
+    this.onDidUntrackedChange = this.onDidUntrackedChangeEmitter.event
+
+    this.dispose.track(
+      repository.state.onDidChange(() => {
+        const currentUntrackedChanges = this.getUntrackedChanges(
+          repository.state.workingTreeChanges
+        )
+        if (!isEqual(this.untrackedChanges, currentUntrackedChanges)) {
+          this.untrackedChanges = currentUntrackedChanges
+          this.onDidUntrackedChangeEmitter.fire()
+        }
+      })
+    )
+  }
+}
+
+export class GitExtension {
+  public dispose = Disposable.fn()
+
+  private readonly _initialized = new Deferred()
   private readonly initialized = this._initialized.promise
 
-  private gitExtensionAPI?: GitExtensionAPI
-  private repositories: Repository[] = []
-  private repositoriesRoots: string[] = []
-  private repositoriesState: RepositoryState[] = []
+  private gitExtensionAPI?: ExtensionAPI
+
+  public repositories: GitExtensionRepository[] = []
 
   public get ready() {
     return this.initialized
   }
 
-  public getRepositoriesRoots(): string[] {
-    return this.repositoriesRoots
-  }
-
-  private getGitExtensionAPI = async (): Promise<GitExtensionAPI> => {
+  private getExtensionAPI = async (): Promise<ExtensionAPI> => {
     const extension = extensions.getExtension('vscode.git') as Extension<
-      GitExtension
+      VscodeGit
     >
     const activatedExtension = await extension.activate()
     return activatedExtension.getAPI(1)
   }
 
-  private onDidChangeEmitter: EventEmitter<Uri[]>
-  readonly onDidChange: Event<Uri[]>
-
-  private getUntrackedChanges(changes: Change[]): Uri[] {
-    return changes
-      .filter(change => change.status === GitStatus.UNTRACKED)
-      .map(change => change.uri)
-  }
-
-  private initializeClass(gitExtensionAPI: GitExtensionAPI) {
+  private initializeClass(gitExtensionAPI: ExtensionAPI) {
     this.gitExtensionAPI = gitExtensionAPI
 
-    this.repositories = this.gitExtensionAPI.repositories
-
-    this.repositoriesState = this.gitExtensionAPI.repositories.map(
-      repository => repository.state
+    this.repositories = this.gitExtensionAPI.repositories.map(repository =>
+      this.dispose.track(new GitExtensionRepository(repository))
     )
-
-    this.repositoriesRoots = this.repositories.map(
-      repository => repository.rootUri.fsPath
-    )
-
-    this.repositoriesState.map(state => {
-      this.dispose.track(
-        state.onDidChange(() => {
-          const untrackedUris = this.getUntrackedChanges(
-            state.workingTreeChanges
-          )
-          this.onDidChangeEmitter.fire(untrackedUris)
-        })
-      )
-    })
 
     this._initialized.resolve()
   }
 
-  private initialize(extensionAPI: GitExtensionAPI) {
+  private initialize(extensionAPI: ExtensionAPI) {
     if (extensionAPI.state === 'initialized') {
       return this.initializeClass(extensionAPI)
     }
@@ -138,10 +156,7 @@ export class Git {
   }
 
   constructor() {
-    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
-    this.onDidChange = this.onDidChangeEmitter.event
-
-    this.getGitExtensionAPI().then(gitExtensionAPI => {
+    this.getExtensionAPI().then(gitExtensionAPI => {
       this.initialize(gitExtensionAPI)
     })
   }

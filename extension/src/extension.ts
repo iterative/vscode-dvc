@@ -18,11 +18,16 @@ import {
 } from './cli/reader'
 import { add } from './cli'
 
-import { addFileChangeHandler, findDvcTrackedPaths } from './fileSystem'
-import { getExperimentsRefsPath } from './git'
+import {
+  addFileChangeHandler,
+  findDvcRootPaths,
+  findDvcTrackedPaths
+} from './fileSystem'
+import { getAllUntracked } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
-import { Git } from './extensions/Git'
+import { GitExtension } from './extensions/Git'
+import { resolve } from 'path'
 
 export { Disposable, Disposer }
 
@@ -39,16 +44,18 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly decorationProvider: DecorationProvider
-  private readonly scm?: SourceControlManagement
-  private readonly git: Git
+  private readonly scm: SourceControlManagement[] = []
+  private readonly gitExtension: GitExtension
 
-  private onChangeExperimentsUpdateWebview = async (): Promise<Disposable> => {
-    const refsPath = await getExperimentsRefsPath(this.config.workspaceRoot)
-    if (!refsPath) {
+  private onChangeExperimentsUpdateWebview = async (
+    gitRoot: string
+  ): Promise<Disposable> => {
+    if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
+    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
     return addFileChangeHandler(refsPath, this.refreshExperimentsWebview)
   }
 
@@ -75,7 +82,7 @@ export class Extension {
 
     this.resourceLocator = new ResourceLocator(context.extensionUri)
 
-    this.config = new Config()
+    this.config = this.dispose.track(new Config())
 
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
@@ -87,10 +94,6 @@ export class Extension {
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
-    )
-
-    this.onChangeExperimentsUpdateWebview().then(disposable =>
-      this.dispose.track(disposable)
     )
 
     this.dispose.track(IntegratedTerminal)
@@ -125,9 +128,9 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.add', ({ fsPath }) => {
-        add({ fsPath, cliPath: this.config.dvcPath })
-      })
+      commands.registerCommand('dvc.add', ({ resourceUri }) =>
+        add({ fsPath: resourceUri.fsPath, cliPath: this.config.dvcPath })
+      )
     )
 
     this.dispose.track(
@@ -142,11 +145,31 @@ export class Extension {
       })
     )
 
-    this.scm = this.dispose.track(new SourceControlManagement())
-    this.scm.dvcScmFilesView()
+    this.gitExtension = this.dispose.track(new GitExtension())
 
-    this.git = this.dispose.track(new Git())
-    this.git.ready.then()
+    this.gitExtension.ready.then(() => {
+      this.gitExtension.repositories.forEach(async gitExtensionRepository => {
+        const gitRoot = gitExtensionRepository.getRepositoryRoot()
+
+        this.onChangeExperimentsUpdateWebview(gitRoot).then(disposable =>
+          this.dispose.track(disposable)
+        )
+
+        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+        dvcRoots.forEach(async dvcRoot => {
+          const untracked = await getAllUntracked(dvcRoot)
+          const scm = this.dispose.track(
+            new SourceControlManagement(dvcRoot, untracked)
+          )
+          this.scm.push(scm)
+
+          gitExtensionRepository.onDidUntrackedChange(async () => {
+            const untrackedChanges = await getAllUntracked(dvcRoot)
+            return scm.updateUntracked(untrackedChanges)
+          })
+        })
+      })
+    })
   }
 }
 

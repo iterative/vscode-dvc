@@ -4,7 +4,8 @@ export enum Commands {
   initialize_subdirectory = 'init --subdir',
   add = 'add',
   checkout = 'checkout',
-  checkout_recursive = 'checkout --recursive'
+  checkout_recursive = 'checkout --recursive',
+  status = 'status'
 }
 
 const getCliCommand = (command: string, ...options: string[]): string => {

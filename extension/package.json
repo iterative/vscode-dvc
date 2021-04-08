@@ -68,7 +68,8 @@
       {
         "title": "%command.add%",
         "command": "dvc.add",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(add)"
       },
       {
         "title": "%command.checkout%",
@@ -107,35 +108,9 @@
       ],
       "scm/resourceState/context": [
         {
-          "command": "dvc.push",
-          "group": "inline"
-        }
-      ],
-      "explorer/context": [
-        {
-          "command": "dvc.runExperiment",
-          "when": "resourceFilename == params.yaml || resourceFilename == dvc.yaml",
-          "group": "8_dvc@1"
-        },
-        {
-          "command": "dvc.initializeDirectory",
-          "when": "explorerResourceIsFolder",
-          "group": "8_dvc@1"
-        },
-        {
           "command": "dvc.add",
-          "when": "isFileSystemResource",
-          "group": "8_dvc@2"
-        },
-        {
-          "command": "dvc.checkout",
-          "when": "resourceExtname == .dvc",
-          "group": "8_dvc@3"
-        },
-        {
-          "command": "dvc.checkoutRecursive",
-          "when": "explorerResourceIsFolder",
-          "group": "8_dvc@4"
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState == untracked"
         }
       ]
     }
@@ -164,6 +139,8 @@
     "fs-extra": "^9.1.0",
     "glob": "^7.1.6",
     "lodash.debounce": "^4.0.8",
+    "lodash.isequal": "^4.5.0",
+    "lodash.uniqwith": "^4.5.0",
     "mobx": "^6.0.4",
     "tiny-glob": "^0.2.8",
     "utf-8-validate": "^5.0.3"
@@ -174,6 +151,8 @@
     "@types/fs-extra": "^9.0.7",
     "@types/jest": "^26.0.19",
     "@types/lodash.debounce": "^4.0.6",
+    "@types/lodash.isequal": "^4.5.5",
+    "@types/lodash.uniqwith": "^4.5.6",
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
     "@types/sinon-chai": "^3.2.5",

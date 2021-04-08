@@ -1,6 +1,6 @@
 import { basename, dirname } from 'path'
-import { getAddCommand } from './commands'
-import { execCommand } from './reader'
+import { Commands, getAddCommand } from './commands'
+import { execCommand, ReaderOptions } from './reader'
 
 export const add = async (options: {
   fsPath: string
@@ -15,4 +15,33 @@ export const add = async (options: {
 
   const { stdout } = await execCommand({ cwd, cliPath }, addCommand)
   return stdout
+}
+
+export const getStatus = async (
+  options: ReaderOptions
+): Promise<Record<string, string>> => {
+  const { stdout } = await execCommand(options, Commands.status)
+  const status = JSON.parse(stdout)
+
+  const excludeAlwaysChanged = (key: string): boolean =>
+    !status[key].includes('always changed')
+
+  const getChanged = (
+    status: Record<string, Record<string, string>>[]
+  ): Record<string, string>[] =>
+    status
+      .map(entry => entry?.['changed outs'] || entry?.['changed deps'])
+      .filter(value => value)
+
+  const statusReducer = (
+    reducedStatus: Record<string, string>,
+    key: string
+  ): Record<string, string> => {
+    const changed = getChanged(status[key])
+    return Object.assign(reducedStatus, ...changed)
+  }
+
+  return Object.keys(status)
+    .filter(excludeAlwaysChanged)
+    .reduce(statusReducer, {})
 }

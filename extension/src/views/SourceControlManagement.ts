@@ -1,71 +1,56 @@
 import { Disposable } from '@hediet/std/disposable'
-import { scm, Uri, workspace } from 'vscode'
+import { scm, SourceControlResourceGroup, Uri } from 'vscode'
+import { makeObservable, observable } from 'mobx'
+import { basename, extname } from 'path'
 
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
-  constructor(private readonly workspaceFolders = workspace.workspaceFolders) {
-    this.workspaceFolders = workspaceFolders
+  @observable
+  resourceGroup: SourceControlResourceGroup
+
+  public updateUntracked(untracked: Uri[]) {
+    if (this.resourceGroup) {
+      this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
+        untracked
+      )
+    }
   }
 
-  dvcScmFilesView(): void {
-    this.workspaceFolders?.forEach(folder => {
-      const uri = `${folder.uri.fsPath}/`
-
-      const c = this.dispose.track(
-        scm.createSourceControl('dvc', 'DVC', Uri.file(uri))
+  private getUntrackedResourceStates(
+    untracked: Uri[]
+  ): { resourceUri: Uri; contextValue: 'untracked' }[] {
+    return untracked
+      .filter(
+        untracked =>
+          extname(untracked.fsPath) !== '.dvc' &&
+          basename(untracked.fsPath) !== '.gitignore'
       )
-      c.acceptInputCommand = {
-        command: 'workbench.action.output.toggleOutput',
-        title: 'foo'
-      }
+      .map(untracked => ({
+        resourceUri: untracked,
+        contextValue: 'untracked'
+      }))
+  }
 
-      c.inputBox.visible = false
+  constructor(repositoryRoot: string, untracked: Uri[]) {
+    makeObservable(this)
 
-      c.statusBarCommands = [
-        {
-          command: 'test',
-          title: 'DVC'
-        }
-      ]
+    const scmView = this.dispose.track(
+      scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
+    )
+    scmView.acceptInputCommand = {
+      command: 'workbench.action.output.toggleOutput',
+      title: 'foo'
+    }
 
-      const resourceGroup = this.dispose.track(
-        c.createResourceGroup('group1', 'Unchanged')
-      )
+    scmView.inputBox.visible = false
 
-      resourceGroup.resourceStates = [
-        {
-          resourceUri: Uri.file(`${uri}path/file.ts`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
+    this.resourceGroup = this.dispose.track(
+      scmView.createResourceGroup('group1', 'Changes')
+    )
 
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/file2.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        },
-        {
-          resourceUri: Uri.file(`${uri}path/sub/file.txt`),
-          command: {
-            command: 'workbench.action.output.toggleOutput',
-            title: 'group1-file1'
-          },
-          decorations: {
-            strikeThrough: false
-          }
-        }
-      ]
-    })
+    this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
+      untracked
+    )
   }
 }

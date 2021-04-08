@@ -1,6 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
+import { lstatSync } from 'fs'
 import { dirname, join, resolve, basename } from 'path'
 import glob from 'tiny-glob'
 import { getRoot, listDvcOnlyRecursive } from './cli/reader'
@@ -112,4 +113,12 @@ export const findDvcTrackedPaths = async (
     ...getAbsolutePath(cwd, dvcListFiles),
     ...getAbsoluteParentPath(cwd, dvcListFiles)
   ])
+}
+
+export const isDirectory = (path: string): boolean => {
+  try {
+    return lstatSync(path).isDirectory()
+  } catch {
+    return false
+  }
 }
