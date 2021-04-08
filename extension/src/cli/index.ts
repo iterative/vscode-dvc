@@ -25,15 +25,13 @@ enum Status {
   NOT_IN_CACHE = 'not in cache'
 }
 
-type StatusOutput = Record<
-  string,
-  (Record<string, Record<string, Status>> | string)[]
->
+type StatusOutput = Record<string, (ValidStageOrFileStatuses | string)[]>
 
-type FilteredStatusOutput = Record<
-  string,
-  Record<string, Record<string, Status>>[]
->
+type FilteredStatusOutput = Record<string, ValidStageOrFileStatuses[]>
+
+type ValidStageOrFileStatuses = Record<string, PathStatus>
+
+type PathStatus = Record<string, Status>
 
 const filterExcludedStagesOrFiles = (
   statusOutput: StatusOutput
@@ -44,24 +42,23 @@ const filterExcludedStagesOrFiles = (
   return Object.keys(statusOutput)
     .filter(excludeAlwaysChanged)
     .reduce((filteredStatusOutput, stageOrFile: string) => {
-      filteredStatusOutput[stageOrFile] = statusOutput[stageOrFile] as Record<
-        string,
-        Record<string, Status>
-      >[]
+      filteredStatusOutput[stageOrFile] = statusOutput[
+        stageOrFile
+      ] as ValidStageOrFileStatuses[]
       return filteredStatusOutput
     }, {} as FilteredStatusOutput)
 }
 
 const getFileOrStageStatuses = (
-  fileOrStage: Record<string, Record<string, Status>>[]
-): Record<string, Status>[] =>
+  fileOrStage: ValidStageOrFileStatuses[]
+): PathStatus[] =>
   fileOrStage
     .map(entry => entry?.['changed outs'] || entry?.['changed deps'])
     .filter(value => value)
 
 const reduceStatuses = (
   reducedStatus: Partial<Record<Status, string[]>>,
-  statuses: Record<string, Status>[]
+  statuses: PathStatus[]
 ) =>
   statuses.map(entry =>
     Object.entries(entry).map(([relativePath, status]) => {
@@ -75,7 +72,7 @@ const reduceToPathStatuses = (
 ): Partial<Record<Status, string[]>> => {
   const statusReducer = (
     reducedStatus: Partial<Record<Status, string[]>>,
-    entry: Record<string, Record<string, Status>>[]
+    entry: ValidStageOrFileStatuses[]
   ): Partial<Record<Status, string[]>> => {
     const statuses = getFileOrStageStatuses(entry)
 
@@ -107,7 +104,7 @@ export const getStatus = async (options: {
 
   const statusOutput = (await status({ cliPath, cwd: dvcRoot })) as Record<
     string,
-    (Record<string, Record<string, Status>> | string)[]
+    (ValidStageOrFileStatuses | string)[]
   >
 
   const filteredStatusOutput = filterExcludedStagesOrFiles(statusOutput)
