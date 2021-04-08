@@ -34,23 +34,24 @@ export const getStatus = async (
       .filter(value => value)
 
   const statusReducer = (
-    reducedStatus: Record<string, string>,
+    reducedStatus: Record<string, string[]>,
     key: string
-  ): Record<string, string> => {
+  ): Record<string, string[]> => {
     const changed = getChanged(status[key])
-    return Object.assign(reducedStatus, ...changed)
+    changed.map(obj =>
+      Object.entries(obj).map(([relativePath, status]) => {
+        const absolutePath = join(options.cwd, relativePath)
+        reducedStatus[status] = reducedStatus[status] || []
+        if (!reducedStatus[status].includes(absolutePath)) {
+          reducedStatus[status].push(absolutePath)
+        }
+      })
+    )
+
+    return reducedStatus
   }
 
-  const reducedStatus = Object.keys(status)
+  return Object.keys(status)
     .filter(excludeAlwaysChanged)
     .reduce(statusReducer, {})
-
-  return Object.entries(reducedStatus).reduce(
-    (statusObj, [relativePath, status]) => {
-      statusObj[status] = statusObj[status] || []
-      statusObj[status].push(join(options.cwd, relativePath))
-      return statusObj
-    },
-    {} as Record<string, string[]>
-  )
 }
