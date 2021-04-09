@@ -2,6 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { lstatSync } from 'fs'
+import { readdir } from 'fs-extra'
 import { dirname, join, resolve, basename } from 'path'
 import glob from 'tiny-glob'
 import { getRoot, listDvcOnlyRecursive } from './cli/reader'
@@ -53,29 +54,40 @@ const findDvcAbsoluteRootPath = async (
   } catch (e) {}
 }
 
-const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
-  const files = await glob(join('**', '.dvc'), {
-    absolute: true,
-    cwd,
-    dot: true
-  })
+export const isDirectory = (path: string): boolean => {
+  try {
+    return lstatSync(path).isDirectory()
+  } catch {
+    return false
+  }
+}
 
-  return filterRootDir(
-    files.map(file => dirname(file)),
-    cwd
-  )
+export const findDvcSubRootPaths = async (
+  cwd: string
+): Promise<string[] | undefined> => {
+  const children = await readdir(cwd)
+  if (children.filter(child => child === '.dvc').length) {
+    return [cwd]
+  }
+
+  return children
+    .filter(child => isDirectory(join(cwd, child, '.dvc')))
+    .map(child => join(cwd, child))
 }
 
 export const findDvcRootPaths = async (
   cwd: string,
   cliPath: string | undefined
 ): Promise<string[]> => {
-  const [subRoots, absoluteRoot] = await Promise.all([
-    findDvcSubRootPaths(cwd),
-    findDvcAbsoluteRootPath(cwd, cliPath)
-  ])
+  const subRoots = await findDvcSubRootPaths(cwd)
 
-  const roots = [...subRoots, absoluteRoot].filter(v => v).sort() as string[]
+  if (subRoots?.length) {
+    return subRoots
+  }
+
+  const absoluteRoot = await findDvcAbsoluteRootPath(cwd, cliPath)
+
+  const roots = [absoluteRoot].filter(v => v).sort() as string[]
 
   return roots
 }
@@ -113,12 +125,4 @@ export const findDvcTrackedPaths = async (
     ...getAbsolutePath(cwd, dvcListFiles),
     ...getAbsoluteParentPath(cwd, dvcListFiles)
   ])
-}
-
-export const isDirectory = (path: string): boolean => {
-  try {
-    return lstatSync(path).isDirectory()
-  } catch {
-    return false
-  }
 }

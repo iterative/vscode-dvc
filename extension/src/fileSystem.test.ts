@@ -2,8 +2,8 @@ import * as fileSystem from './fileSystem'
 import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
-import { dirname, join, resolve } from 'path'
-import { mkdirSync, rmdir } from 'fs-extra'
+import { join, resolve } from 'path'
+import { ensureDirSync, remove } from 'fs-extra'
 import { getRoot, listDvcOnlyRecursive } from './cli/reader'
 
 const {
@@ -100,37 +100,23 @@ describe('findDvcRootPaths', () => {
   const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
-    mockGetRoot.mockResolvedValueOnce('.')
     const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
 
-    expect(mockGetRoot).toBeCalledTimes(1)
+    expect(mockGetRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
-  it('should find multiple roots if available in the given folder', async () => {
-    mockGetRoot.mockResolvedValueOnce('.')
-    const mockDvcRoot = join(dataRoot, '.dvc')
-    mkdirSync(mockDvcRoot)
+  it('should find multiple roots if available one directory below the given folder', async () => {
+    const parentDir = resolve(dvcDemoPath, '..')
+    const mockDvcRoot = join(parentDir, 'mockDvc')
+    ensureDirSync(join(mockDvcRoot, '.dvc'))
 
-    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(parentDir, mockCliPath)
 
-    rmdir(mockDvcRoot)
+    remove(mockDvcRoot)
 
-    expect(mockGetRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([dvcDemoPath, dataRoot].sort())
-  })
-
-  it('should find multiple roots if one is above and one is below the given folder', async () => {
-    mockGetRoot.mockResolvedValueOnce('..')
-    const mockDvcRoot = join(dataRoot, 'MNIST', '.dvc')
-    mkdirSync(mockDvcRoot)
-
-    const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath)
-
-    rmdir(mockDvcRoot)
-
-    expect(mockGetRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([dvcDemoPath, dirname(mockDvcRoot)].sort())
+    expect(mockGetRoot).not.toBeCalled()
+    expect(dvcRoots).toEqual([dvcDemoPath, mockDvcRoot].sort())
   })
 
   it('should find the dvc root if it exists above the given folder', async () => {
