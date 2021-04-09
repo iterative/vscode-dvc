@@ -65,10 +65,10 @@ export const isDirectory = (path: string): boolean => {
 export const findDvcSubRootPaths = async (
   cwd: string
 ): Promise<string[] | undefined> => {
-  const children = await readdir(cwd)
-  if (children.filter(child => child === '.dvc').length) {
+  if (isDirectory(join(cwd, '.dvc'))) {
     return [cwd]
   }
+  const children = await readdir(cwd)
 
   return children
     .filter(child => isDirectory(join(cwd, child, '.dvc')))
