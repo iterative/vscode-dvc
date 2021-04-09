@@ -1,4 +1,4 @@
-import { window, commands, ExtensionContext } from 'vscode'
+import { window, commands, ExtensionContext, workspace } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -12,11 +12,7 @@ import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import { registerCommands as registerCliCommands } from './cli'
 
-import {
-  addFileChangeHandler,
-  findDvcRootPaths,
-  findDvcTrackedPaths
-} from './fileSystem'
+import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
@@ -38,7 +34,8 @@ export class Extension {
   private readonly config: Config
   private readonly webviewManager: WebviewManager
   private readonly repositories: Repository[] = []
-  private readonly decorationProvider: DecorationProvider
+  private dvcRoots: string[] = []
+  private decorationMap = new Map<string, DecorationProvider>()
   private readonly gitExtension: GitExtension
 
   private onChangeExperimentsUpdateWebview = async (
@@ -78,13 +75,23 @@ export class Extension {
 
     this.config = this.dispose.track(new Config())
 
-    this.decorationProvider = this.dispose.track(new DecorationProvider())
-
-    findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-      files => {
-        this.decorationProvider.setTrackedFiles(files)
-      }
+    Promise.all(
+      (workspace.workspaceFolders || []).map(async folder => {
+        const workspaceRoot = folder.uri.fsPath
+        const dvcRoots = await findDvcRootPaths(
+          workspaceRoot,
+          this.config.dvcPath
+        )
+        dvcRoots.map(child =>
+          this.decorationMap.set(
+            child,
+            this.dispose.track(new DecorationProvider())
+          )
+        )
+        this.dvcRoots.push(...dvcRoots)
+      })
     )
+
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
@@ -125,8 +132,14 @@ export class Extension {
 
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
+          const decorator = this.decorationMap.get(dvcRoot)
           const repository = this.dispose.track(
-            new Repository(this.config, dvcRoot, gitExtensionRepository)
+            new Repository(
+              this.config,
+              dvcRoot,
+              gitExtensionRepository,
+              decorator
+            )
           )
           this.repositories.push(repository)
         })
