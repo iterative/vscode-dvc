@@ -15,6 +15,6 @@ export const workspace = {
   ]
 }
 export const Uri = {
-  file: URI.file,
+  file: jest.fn(URI.file),
   joinPath: jest.fn(Utils.joinPath)
 }

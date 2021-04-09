@@ -10,10 +10,6 @@ jest.mock('vscode')
 
 const mockedExecPromise = mocked(execPromise)
 
-beforeEach(() => {
-  jest.resetAllMocks()
-})
-
 describe('add', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __filename
