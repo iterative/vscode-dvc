@@ -1,10 +1,12 @@
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
-import { basename, resolve } from 'path'
+import { basename, join, resolve } from 'path'
 import { add, getStatus } from '.'
+import { mapPaths } from '../util/testHelpers'
 
 jest.mock('fs')
 jest.mock('../util')
+jest.mock('vscode')
 
 const mockedExecPromise = mocked(execPromise)
 
@@ -44,7 +46,7 @@ describe('add', () => {
 
 describe('getStatus', () => {
   it('should return an object containing modified paths', async () => {
-    const status = {
+    const statusOutput = {
       train: [
         { 'changed deps': { 'data/MNIST': 'modified' } },
         { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -54,26 +56,27 @@ describe('getStatus', () => {
         { 'changed outs': { 'data/MNIST/raw': 'modified' } }
       ]
     }
-    const stdout = JSON.stringify(status)
-    const cwd = resolve()
+    const stdout = JSON.stringify(statusOutput)
+    const dvcRoot = resolve(__dirname, '..', '..', '..', 'demo')
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
     })
 
-    expect(
-      await getStatus({
-        cwd,
-        cliPath: 'dvc'
-      })
-    ).toEqual({ 'data/MNIST/raw': 'modified' })
+    const status = await getStatus({
+      dvcRoot,
+      cliPath: 'dvc'
+    })
+
+    expect(Object.keys(status)).toEqual(['modified'])
+    expect(mapPaths(status.modified)).toEqual([join(dvcRoot, 'data/MNIST/raw')])
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
-      cwd
+      cwd: dvcRoot
     })
   })
 
   it('should return an object containing modified and deleted paths', async () => {
-    const status = {
+    const statusOutput = {
       'baz.dvc': [{ 'changed outs': { baz: 'modified' } }],
       dofoo: [
         { 'changed deps': { baz: 'modified' } },
@@ -84,26 +87,31 @@ describe('getStatus', () => {
         { 'changed outs': { bar: 'deleted' } }
       ]
     }
-    const stdout = JSON.stringify(status)
-    const cwd = resolve()
+    const stdout = JSON.stringify(statusOutput)
+    const dvcRoot = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
     })
 
-    expect(
-      await getStatus({
-        cwd,
-        cliPath: 'dvc'
-      })
-    ).toEqual({ bar: 'deleted', baz: 'modified', foo: 'modified' })
+    const status = await getStatus({
+      dvcRoot,
+      cliPath: 'dvc'
+    })
+
+    expect(Object.keys(status).sort()).toEqual(['deleted', 'modified'])
+    expect(mapPaths(status.deleted)).toEqual([join(dvcRoot, 'bar')])
+    expect(mapPaths(status.modified)).toEqual([
+      join(dvcRoot, 'baz'),
+      join(dvcRoot, 'foo')
+    ])
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
-      cwd
+      cwd: dvcRoot
     })
   })
 
   it('should return an object with an entry for each path', async () => {
-    const status = {
+    const statusOutput = {
       prepare: [
         { 'changed deps': { 'data/data.xml': 'not in cache' } },
         { 'changed outs': { 'data/prepared': 'not in cache' } }
@@ -128,26 +136,31 @@ describe('getStatus', () => {
         { 'changed outs': { 'data/data.xml': 'not in cache' } }
       ]
     }
-    const stdout = JSON.stringify(status)
-    const cwd = resolve()
+    const stdout = JSON.stringify(statusOutput)
+    const dvcRoot = __dirname
     mockedExecPromise.mockResolvedValueOnce({
       stdout: stdout,
       stderr: ''
     })
 
-    expect(
-      await getStatus({
-        cwd,
-        cliPath: 'dvc'
-      })
-    ).toEqual({
-      'data/data.xml': 'not in cache',
-      'data/features': 'modified',
-      'data/prepared': 'not in cache',
-      'model.pkl': 'deleted'
+    const status = await getStatus({
+      dvcRoot,
+      cliPath: 'dvc'
     })
+
+    expect(Object.keys(status).sort()).toEqual([
+      'deleted',
+      'modified',
+      'not in cache'
+    ])
+    expect(mapPaths(status.modified)).toEqual([join(dvcRoot, 'data/features')])
+    expect(mapPaths(status['not in cache'])).toEqual([
+      join(dvcRoot, 'data/data.xml'),
+      join(dvcRoot, 'data/prepared')
+    ])
+    expect(mapPaths(status.deleted)).toEqual([join(dvcRoot, 'model.pkl')])
     expect(mockedExecPromise).toBeCalledWith('dvc status', {
-      cwd
+      cwd: dvcRoot
     })
   })
 })

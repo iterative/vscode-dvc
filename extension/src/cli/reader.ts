@@ -3,7 +3,7 @@ import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
 
-export interface ReaderOptions {
+interface ReaderOptions {
   cliPath: string | undefined
   cwd: string
 }
@@ -67,4 +67,14 @@ export const listDvcOnlyRecursive = async (
 ): Promise<string[]> => {
   const { stdout } = await execCommand(options, `list . --dvc-only -R`)
   return trimAndSplit(stdout)
+}
+
+export const status = async (
+  options: ReaderOptions
+): Promise<Record<
+  string,
+  (Record<string, Record<string, string>> | string)[]
+>> => {
+  const { stdout } = await execCommand(options, Commands.status)
+  return JSON.parse(stdout)
 }
