@@ -60,12 +60,13 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
+    this.untracked = this.getUntrackedResourceStates(untracked)
+
     this.status.ready.then(() => {
       this.modified = this.status.modified.map(uri => ({
         resourceUri: uri,
         contextValue: 'modified'
       }))
-      this.untracked = this.getUntrackedResourceStates(untracked)
       this.setResourceStates()
     })
   }
