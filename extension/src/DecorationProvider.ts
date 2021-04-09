@@ -15,14 +15,14 @@ export class DecorationProvider implements FileDecorationProvider {
 
   public readonly dispose = Disposable.fn()
 
-  private trackedFiles?: Set<string>
+  private tracked?: Set<string>
   readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly onDidChangeDecorations: EventEmitter<Uri[]>
 
-  public setTrackedFiles = (trackedFiles: Set<string>) => {
-    this.trackedFiles = trackedFiles
+  public setTracked = (tracked: Set<string>) => {
+    this.tracked = tracked
     this.onDidChangeDecorations.fire(
-      [...this.trackedFiles.values()].map(value => Uri.file(value))
+      [...this.tracked.values()].map(value => Uri.file(value))
     )
   }
 
@@ -34,7 +34,7 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
-    if (this.trackedFiles?.has(uri.path)) {
+    if (this.tracked?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
   }

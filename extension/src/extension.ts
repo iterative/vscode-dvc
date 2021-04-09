@@ -7,7 +7,6 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
-import { SourceControlManagement } from './views/SourceControlManagement'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
@@ -18,12 +17,11 @@ import {
   findDvcRootPaths,
   findDvcTrackedPaths
 } from './fileSystem'
-import { getAllUntracked } from './git'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
-import { Status } from './Status'
+import { Repository } from './Repository'
 
 export { Disposable, Disposer }
 
@@ -39,8 +37,8 @@ export class Extension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly webviewManager: WebviewManager
+  private readonly repositories: Repository[] = []
   private readonly decorationProvider: DecorationProvider
-  private readonly scm: SourceControlManagement[] = []
   private readonly gitExtension: GitExtension
 
   private onChangeExperimentsUpdateWebview = async (
@@ -83,11 +81,10 @@ export class Extension {
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
     findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-      files => {
-        this.decorationProvider.setTrackedFiles(files)
+      paths => {
+        this.decorationProvider.setTracked(paths)
       }
     )
-
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
@@ -128,17 +125,10 @@ export class Extension {
 
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
-          const untracked = await getAllUntracked(dvcRoot)
-          const status = this.dispose.track(new Status(this.config, dvcRoot))
-          const scm = this.dispose.track(
-            new SourceControlManagement(dvcRoot, untracked, status)
+          const repository = this.dispose.track(
+            new Repository(this.config, dvcRoot, gitExtensionRepository)
           )
-          this.scm.push(scm)
-
-          gitExtensionRepository.onDidUntrackedChange(async () => {
-            const untrackedChanges = await getAllUntracked(dvcRoot)
-            return scm.updateUntracked(untrackedChanges)
-          })
+          this.repositories.push(repository)
         })
       })
     })
