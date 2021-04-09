@@ -143,15 +143,6 @@ describe('getAbsoluteTrackedPath', () => {
 })
 
 describe('findDvcTrackedPaths', () => {
-  it('should find the paths in the workspace corresponding to .dvc files and return them in a Set', async () => {
-    mockListDvcOnlyRecursive.mockResolvedValueOnce([])
-    const tracked = await findDvcTrackedPaths(dvcDemoPath, 'dvc')
-
-    expect(tracked).toEqual(
-      new Set([resolve(dvcDemoPath, 'data', 'MNIST', 'raw')])
-    )
-  })
-
   it('should return a Set of tracked paths, their folders (if files) and any paths corresponding .dvc files', async () => {
     const logFolder = 'logs'
     const logAcc = join(logFolder, 'acc.tsv')
@@ -162,7 +153,6 @@ describe('findDvcTrackedPaths', () => {
 
     expect(tracked).toEqual(
       new Set([
-        resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
         resolve(dvcDemoPath, logAcc),
         resolve(dvcDemoPath, logLoss),
         resolve(dvcDemoPath, logFolder),
