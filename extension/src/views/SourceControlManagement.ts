@@ -2,19 +2,28 @@ import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
+import { Status } from '../Status'
 
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
+  public readonly status: Status
 
   @observable
-  resourceGroup: SourceControlResourceGroup
+  private resourceGroup: SourceControlResourceGroup
 
-  public updateUntracked(untracked: Uri[]) {
-    if (this.resourceGroup) {
-      this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
-        untracked
-      )
-    }
+  @observable
+  private untracked: { resourceUri: Uri; contextValue: 'untracked' }[] = []
+
+  @observable
+  private modified: { resourceUri: Uri; contextValue: 'modified' }[] = []
+
+  private setResourceStates() {
+    this.resourceGroup.resourceStates = [...this.untracked, ...this.modified]
+  }
+
+  public setUntracked(untracked: Uri[]) {
+    this.untracked = this.getUntrackedResourceStates(untracked)
+    this.setResourceStates()
   }
 
   private getUntrackedResourceStates(
@@ -32,8 +41,10 @@ export class SourceControlManagement {
       }))
   }
 
-  constructor(repositoryRoot: string, untracked: Uri[]) {
+  constructor(repositoryRoot: string, untracked: Uri[], status: Status) {
     makeObservable(this)
+
+    this.status = status
 
     const scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
@@ -49,8 +60,14 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
-      untracked
-    )
+    this.untracked = this.getUntrackedResourceStates(untracked)
+
+    this.status.ready.then(() => {
+      this.modified = this.status.modified.map(uri => ({
+        resourceUri: uri,
+        contextValue: 'modified'
+      }))
+      this.setResourceStates()
+    })
   }
 }
