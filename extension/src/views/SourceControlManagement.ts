@@ -9,14 +9,21 @@ export class SourceControlManagement {
   public readonly status: Status
 
   @observable
-  resourceGroup: SourceControlResourceGroup
+  private resourceGroup: SourceControlResourceGroup
 
-  public updateUntracked(untracked: Uri[]) {
-    if (this.resourceGroup) {
-      this.resourceGroup.resourceStates = this.getUntrackedResourceStates(
-        untracked
-      )
-    }
+  @observable
+  private untracked: { resourceUri: Uri; contextValue: 'untracked' }[] = []
+
+  @observable
+  private modified: { resourceUri: Uri; contextValue: 'modified' }[] = []
+
+  private setResourceStates() {
+    this.resourceGroup.resourceStates = [...this.untracked, ...this.modified]
+  }
+
+  public setUntracked(untracked: Uri[]) {
+    this.untracked = this.getUntrackedResourceStates(untracked)
+    this.setResourceStates()
   }
 
   private getUntrackedResourceStates(
@@ -53,15 +60,13 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.status.ready.then(
-      () =>
-        (this.resourceGroup.resourceStates = [
-          ...this.getUntrackedResourceStates(untracked),
-          ...this.status.modified.map(uri => ({
-            resourceUri: uri,
-            contextValue: 'modified'
-          }))
-        ])
-    )
+    this.status.ready.then(() => {
+      this.modified = this.status.modified.map(uri => ({
+        resourceUri: uri,
+        contextValue: 'modified'
+      }))
+      this.untracked = this.getUntrackedResourceStates(untracked)
+      this.setResourceStates()
+    })
   }
 }

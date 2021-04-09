@@ -23,7 +23,7 @@ export class Repository {
 
       gitExtensionRepository.onDidUntrackedChange(async () => {
         const untrackedChanges = await getAllUntracked(dvcRoot)
-        return scm.updateUntracked(untrackedChanges)
+        return scm.setUntracked(untrackedChanges)
       })
     })
   }
