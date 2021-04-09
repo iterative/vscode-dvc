@@ -11,7 +11,6 @@ import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import { registerCommands as registerCliCommands } from './cli'
-
 import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
