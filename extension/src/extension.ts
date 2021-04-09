@@ -81,8 +81,8 @@ export class Extension {
     this.decorationProvider = this.dispose.track(new DecorationProvider())
 
     findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-      paths => {
-        this.decorationProvider.setTracked(paths)
+      files => {
+        this.decorationProvider.setTrackedFiles(files)
       }
     )
     this.webviewManager = this.dispose.track(
