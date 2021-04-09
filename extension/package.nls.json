@@ -9,6 +9,7 @@
   "command.initNoScm": "Init DVC --no-scm",
   "command.push": "Push",
   "command.runExperiment": "Run Experiment",
+  "command.queueExperiment": "Queue Experiment",
   "command.selectDvcPath": "Select DVC CLI Path",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.title": "DVC CLI Path",

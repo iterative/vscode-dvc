@@ -1,5 +1,5 @@
 import { basename, dirname, join } from 'path'
-import { commands, Uri } from 'vscode'
+import { commands, Uri, window } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { getAddCommand } from './commands'
@@ -8,7 +8,8 @@ import {
   initializeDirectory,
   checkout,
   checkoutRecursive,
-  status
+  status,
+  queueExperiment
 } from './reader'
 
 export const add = async (options: {
@@ -159,6 +160,20 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   disposer.track(
     commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
       checkoutRecursive({ cwd: fsPath, cliPath: config.dvcPath })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.queueExperiment', async () => {
+      try {
+        const stdout = await queueExperiment({
+          cwd: config.workspaceRoot,
+          cliPath: config.dvcPath
+        })
+        window.showInformationMessage(stdout)
+      } catch (e) {
+        window.showErrorMessage(`Failed to queue an Experiment!\n${e.message}`)
+      }
     })
   )
 }
