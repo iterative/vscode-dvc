@@ -8,6 +8,10 @@ jest.mock('vscode')
 const mockedJoinPath = mocked(Uri.joinPath)
 const mockedUriFile = mocked(Uri.file)
 
+beforeEach(() => {
+  jest.resetAllMocks()
+})
+
 describe('ResourceLocator', () => {
   it('should be able to find the dvcIconPath', () => {
     mockedJoinPath.mockImplementation(Utils.joinPath)
