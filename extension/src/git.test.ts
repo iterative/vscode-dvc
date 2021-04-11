@@ -3,10 +3,6 @@ import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
 import { mapPaths } from './util/testHelpers'
 
-beforeEach(() => {
-  jest.resetAllMocks()
-})
-
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
     const repositoryRoot = resolve(__dirname, '..', '..')
