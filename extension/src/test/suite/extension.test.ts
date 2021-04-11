@@ -3,13 +3,8 @@ import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { join, resolve } from 'path'
-import {
-  window,
-  commands,
-  workspace,
-  Uri,
-  ConfigurationChangeEvent
-} from 'vscode'
+import { window, commands, workspace, ConfigurationChangeEvent } from 'vscode'
+import { URI } from 'vscode-uri'
 import { Disposable } from '../../extension'
 import * as DvcReader from '../../cli/reader'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
@@ -63,7 +58,7 @@ suite('Extension Test Suite', () => {
 
     it('should only be able to open a single experiments webview', async () => {
       const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
+      const uri = URI.file(resolve(dvcDemoPath, 'train.py'))
 
       const mockReader = stub(DvcReader, 'getExperiments').resolves(
         complexExperimentsOutput
@@ -126,7 +121,7 @@ suite('Extension Test Suite', () => {
 
     it('should invoke the file picker with the second option', async () => {
       const disposable = Disposable.fn()
-      const testUri = Uri.file('/file/picked/path/to/dvc')
+      const testUri = URI.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         fileResolve

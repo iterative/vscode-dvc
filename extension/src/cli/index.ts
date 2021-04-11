@@ -1,5 +1,6 @@
 import { basename, dirname, join } from 'path'
-import { commands, Uri } from 'vscode'
+import { commands } from 'vscode'
+import { URI } from 'vscode-uri'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { getAddCommand } from './commands'
@@ -108,19 +109,19 @@ const reduceToPathStatuses = (
 const getUriStatuses = (
   pathStatuses: Partial<Record<Status, string[]>>,
   dvcRoot: string
-): Partial<Record<Status, Uri[]>> => {
+): Partial<Record<Status, URI[]>> => {
   return Object.entries(pathStatuses).reduce((uriStatuses, [status, paths]) => {
     uriStatuses[status as Status] = paths?.map(path =>
-      Uri.file(join(dvcRoot, path))
+      URI.file(join(dvcRoot, path))
     )
     return uriStatuses
-  }, {} as Partial<Record<Status, Uri[]>>)
+  }, {} as Partial<Record<Status, URI[]>>)
 }
 
 export const getStatus = async (options: {
   dvcRoot: string
   cliPath: string | undefined
-}): Promise<Partial<Record<Status, Uri[]>>> => {
+}): Promise<Partial<Record<Status, URI[]>>> => {
   const { dvcRoot, cliPath } = options
 
   const statusOutput = (await status({ cliPath, cwd: dvcRoot })) as Record<

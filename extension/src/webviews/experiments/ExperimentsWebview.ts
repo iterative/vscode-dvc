@@ -1,4 +1,5 @@
-import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
+import { window, ViewColumn, WebviewPanel, commands } from 'vscode'
+import { URI } from 'vscode-uri'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -43,7 +44,7 @@ export class ExperimentsWebview {
       {
         enableScripts: true,
         retainContextWhenHidden: true,
-        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)]
+        localResourceRoots: [URI.file(dvcVscodeWebview.distPath)]
       }
     )
 
@@ -109,10 +110,10 @@ export class ExperimentsWebview {
     } else {
       urls = {
         mainJsUrl: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.mainJsFilename))
+          .asWebviewUri(URI.file(dvcVscodeWebview.mainJsFilename))
           .toString(),
         publicPath: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.distPath))
+          .asWebviewUri(URI.file(dvcVscodeWebview.distPath))
           .toString()
       }
     }

@@ -1,13 +1,13 @@
-import { Uri } from 'vscode'
+import { URI, Utils } from 'vscode-uri'
 
 export class ResourceLocator {
-  public dvcIconPath: { dark: Uri; light: Uri }
+  public dvcIconPath: { dark: URI; light: URI }
 
-  constructor(extensionUri: Uri) {
+  constructor(extensionUri: URI) {
     this.dvcIconPath = {
       // placeholders for different svgs
-      dark: Uri.joinPath(extensionUri, 'media', 'dvc-color.svg'),
-      light: Uri.joinPath(extensionUri, 'media', 'dvc-color.svg')
+      dark: Utils.joinPath(extensionUri, 'media', 'dvc-color.svg'),
+      light: Utils.joinPath(extensionUri, 'media', 'dvc-color.svg')
     }
   }
 }

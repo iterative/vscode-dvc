@@ -1,5 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
-import { scm, SourceControlResourceGroup, Uri } from 'vscode'
+import { scm, SourceControlResourceGroup } from 'vscode'
+import { URI } from 'vscode-uri'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 import { Status } from '../Status'
@@ -12,23 +13,23 @@ export class SourceControlManagement {
   private resourceGroup: SourceControlResourceGroup
 
   @observable
-  private untracked: { resourceUri: Uri; contextValue: 'untracked' }[] = []
+  private untracked: { resourceUri: URI; contextValue: 'untracked' }[] = []
 
   @observable
-  private modified: { resourceUri: Uri; contextValue: 'modified' }[] = []
+  private modified: { resourceUri: URI; contextValue: 'modified' }[] = []
 
   private setResourceStates() {
     this.resourceGroup.resourceStates = [...this.untracked, ...this.modified]
   }
 
-  public setUntracked(untracked: Uri[]) {
+  public setUntracked(untracked: URI[]) {
     this.untracked = this.getUntrackedResourceStates(untracked)
     this.setResourceStates()
   }
 
   private getUntrackedResourceStates(
-    untracked: Uri[]
-  ): { resourceUri: Uri; contextValue: 'untracked' }[] {
+    untracked: URI[]
+  ): { resourceUri: URI; contextValue: 'untracked' }[] {
     return untracked
       .filter(
         untracked =>
@@ -41,13 +42,13 @@ export class SourceControlManagement {
       }))
   }
 
-  constructor(repositoryRoot: string, untracked: Uri[], status: Status) {
+  constructor(repositoryRoot: string, untracked: URI[], status: Status) {
     makeObservable(this)
 
     this.status = status
 
     const scmView = this.dispose.track(
-      scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
+      scm.createSourceControl('dvc', 'DVC', URI.file(repositoryRoot))
     )
     scmView.acceptInputCommand = {
       command: 'workbench.action.output.toggleOutput',

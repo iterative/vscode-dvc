@@ -1,4 +1,4 @@
-import { Uri } from 'vscode'
+import { URI } from 'vscode-uri'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { getStatus } from './cli'
@@ -17,10 +17,10 @@ export class Status {
   dvcRoot: string
   config: Config
 
-  deleted: Uri[] = []
-  modified: Uri[] = []
-  new: Uri[] = []
-  notInCache: Uri[] = []
+  deleted: URI[] = []
+  modified: URI[] = []
+  new: URI[] = []
+  notInCache: URI[] = []
 
   public async updateStatus() {
     const status = await getStatus({

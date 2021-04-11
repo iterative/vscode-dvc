@@ -1,12 +1,7 @@
 import { getAllUntracked } from './git'
 import { ensureFile, remove } from 'fs-extra'
 import { join, resolve } from 'path'
-import { URI } from 'vscode-uri'
-import { Uri } from 'vscode'
 import { mapPaths } from './util/testHelpers'
-import { mocked } from 'ts-jest/utils'
-
-const mockedUriFile = mocked(Uri.file)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -14,7 +9,6 @@ beforeEach(() => {
 
 describe('getAllUntracked', () => {
   it('should return a list of all untracked paths', async () => {
-    mockedUriFile.mockImplementation(URI.file)
     const repositoryRoot = resolve(__dirname, '..', '..')
 
     const untrackedPython = join(
