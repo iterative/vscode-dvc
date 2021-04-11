@@ -32,11 +32,28 @@ export class Extension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly webviewManager: WebviewManager
-  private readonly repositories: Repository[] = []
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
   private readonly gitExtension: GitExtension
+
+  private initializeDecorationProvidersEarly(dvcRoots: string[]) {
+    dvcRoots.map(
+      dvcRoot =>
+        (this.decorationProviders[dvcRoot] = this.dispose.track(
+          new DecorationProvider()
+        ))
+    )
+  }
+
+  private initializeDvcRepositories(dvcRoots: string[]) {
+    return dvcRoots.map(dvcRoot => {
+      const repository = this.dispose.track(
+        new Repository(this.config, dvcRoot, this.decorationProviders[dvcRoot])
+      )
+      this.dvcRepositories[dvcRoot] = repository
+    })
+  }
 
   private onChangeExperimentsUpdateWebview = async (
     gitRoot: string
@@ -82,23 +99,12 @@ export class Extension {
           workspaceRoot,
           this.config.dvcPath
         )
-        dvcRoots.map(
-          dvcRoot =>
-            (this.decorationProviders[dvcRoot] = this.dispose.track(
-              new DecorationProvider()
-            ))
-        )
-        dvcRoots.map(dvcRoot => {
-          const repository = this.dispose.track(
-            new Repository(
-              this.config,
-              dvcRoot,
-              this.decorationProviders[dvcRoot]
-            )
-          )
-          this.repositories.push(repository)
-        })
-        this.dvcRoots.push(...dvcRoots)
+
+        this.initializeDecorationProvidersEarly(dvcRoots)
+
+        this.initializeDvcRepositories(dvcRoots)
+
+        return this.dvcRoots.push(...dvcRoots)
       })
     )
 
@@ -145,7 +151,7 @@ export class Extension {
           const repository = this.dvcRepositories[dvcRoot]
 
           gitExtensionRepository.onDidUntrackedChange(async () => {
-            repository.updateTracked()
+            repository?.updateTracked()
           })
         })
       })
