@@ -1,4 +1,5 @@
-import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
+import { Event, EventEmitter, Extension, extensions } from 'vscode'
+import { URI } from 'vscode-uri'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import isEqual from 'lodash.isequal'
@@ -32,9 +33,9 @@ interface Change {
    * on whether this change is a rename change. When
    * in doubt always use `uri` over the other two alternatives.
    */
-  readonly uri: Uri
-  readonly originalUri: Uri
-  readonly renameUri: Uri | undefined
+  readonly uri: URI
+  readonly originalUri: URI
+  readonly renameUri: URI | undefined
   readonly status: GitStatus
 }
 
@@ -47,7 +48,7 @@ interface RepositoryState {
 }
 
 interface Repository {
-  readonly rootUri: Uri
+  readonly rootUri: URI
   readonly state: RepositoryState
 }
 
@@ -58,7 +59,7 @@ interface ExtensionAPI {
   readonly onDidChangeState: Event<APIState>
   readonly repositories: Repository[]
 
-  toGitUri(uri: Uri, ref: string): Uri
+  toGitUri(uri: URI, ref: string): URI
 }
 
 interface VscodeGit {
