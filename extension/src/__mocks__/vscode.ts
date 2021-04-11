@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { URI } from 'vscode-uri'
 
 export const Extension = jest.fn()
 export const extensions = jest.fn()
@@ -15,6 +14,6 @@ export const workspace = {
   ]
 }
 export const Uri = {
-  file: URI.file,
+  file: jest.fn(),
   joinPath: jest.fn()
 }

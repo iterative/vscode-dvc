@@ -1,4 +1,6 @@
 import { mocked } from 'ts-jest/utils'
+import { Uri } from 'vscode'
+import { URI } from 'vscode-uri'
 import { execPromise } from '../util'
 import { basename, join, resolve } from 'path'
 import { add, getStatus } from '.'
@@ -9,6 +11,7 @@ jest.mock('../util')
 jest.mock('vscode')
 
 const mockedExecPromise = mocked(execPromise)
+const mockedUriFile = mocked(Uri.file)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -46,6 +49,7 @@ describe('add', () => {
 
 describe('getStatus', () => {
   it('should return an object containing modified paths', async () => {
+    mockedUriFile.mockImplementation(URI.file)
     const statusOutput = {
       train: [
         { 'changed deps': { 'data/MNIST': 'modified' } },
@@ -76,6 +80,7 @@ describe('getStatus', () => {
   })
 
   it('should return an object containing modified and deleted paths', async () => {
+    mockedUriFile.mockImplementation(URI.file)
     const statusOutput = {
       'baz.dvc': [{ 'changed outs': { baz: 'modified' } }],
       dofoo: [
@@ -111,6 +116,8 @@ describe('getStatus', () => {
   })
 
   it('should return an object with an entry for each path', async () => {
+    mockedUriFile.mockImplementation(URI.file)
+
     const statusOutput = {
       prepare: [
         { 'changed deps': { 'data/data.xml': 'not in cache' } },
