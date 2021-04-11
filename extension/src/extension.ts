@@ -34,7 +34,8 @@ export class Extension {
   private readonly webviewManager: WebviewManager
   private readonly repositories: Repository[] = []
   private dvcRoots: string[] = []
-  private decorationMap = new Map<string, DecorationProvider>()
+  private decorationProviders: Record<string, DecorationProvider> = {}
+  private dvcRepositories: Record<string, Repository> = {}
   private readonly gitExtension: GitExtension
 
   private onChangeExperimentsUpdateWebview = async (
@@ -81,12 +82,22 @@ export class Extension {
           workspaceRoot,
           this.config.dvcPath
         )
-        dvcRoots.map(child =>
-          this.decorationMap.set(
-            child,
-            this.dispose.track(new DecorationProvider())
-          )
+        dvcRoots.map(
+          dvcRoot =>
+            (this.decorationProviders[dvcRoot] = this.dispose.track(
+              new DecorationProvider()
+            ))
         )
+        dvcRoots.map(dvcRoot => {
+          const repository = this.dispose.track(
+            new Repository(
+              this.config,
+              dvcRoot,
+              this.decorationProviders[dvcRoot]
+            )
+          )
+          this.repositories.push(repository)
+        })
         this.dvcRoots.push(...dvcRoots)
       })
     )
@@ -131,16 +142,11 @@ export class Extension {
 
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
-          const decorator = this.decorationMap.get(dvcRoot)
-          const repository = this.dispose.track(
-            new Repository(
-              this.config,
-              dvcRoot,
-              gitExtensionRepository,
-              decorator
-            )
-          )
-          this.repositories.push(repository)
+          const repository = this.dvcRepositories[dvcRoot]
+
+          gitExtensionRepository.onDidUntrackedChange(async () => {
+            repository.updateTracked()
+          })
         })
       })
     })
