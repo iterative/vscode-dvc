@@ -191,14 +191,24 @@ export class Repository {
     })
   }
 
-  public async setup() {
-    await Promise.all([
+  public updateState() {
+    return Promise.all([
       this.updateTracked(),
       this.updateUntracked(),
       this.updateStatus()
     ])
+  }
 
-    this.decorationProvider?.setTrackedFiles(this.tracked)
+  public async setup() {
+    await this.updateState()
+
+    this.decorationProvider?.setState({
+      tracked: this.tracked,
+      deleted: new Set<string>(),
+      modified: new Set<string>(),
+      new: new Set<string>(),
+      notInCache: new Set<string>()
+    })
     this.scm = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
         deleted: this.deleted,
