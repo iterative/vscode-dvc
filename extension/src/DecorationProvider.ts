@@ -8,6 +8,7 @@ import {
   FileDecoration,
   Uri
 } from 'vscode'
+import { isStringInEnum } from './util'
 
 export type DecorationState = Record<Status, Set<string>>
 
@@ -33,7 +34,7 @@ export class DecorationProvider implements FileDecorationProvider {
   private readonly onDidChangeDecorations: EventEmitter<Uri[]>
 
   private isValidStatus(status: string): boolean {
-    return Object.values(Status).includes(status as Status)
+    return isStringInEnum(status, Status)
   }
 
   public setState = (state: DecorationState) => {

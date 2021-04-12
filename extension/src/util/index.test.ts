@@ -1,4 +1,4 @@
-import { delay, trimAndSplit } from '.'
+import { delay, isStringInEnum, trimAndSplit } from '.'
 
 describe('delay', () => {
   it('should provide a delay in execution', async () => {
@@ -9,6 +9,25 @@ describe('delay', () => {
     expect(changedAfterDelay).toEqual(false)
     await delayThenChangePromise
     expect(changedAfterDelay).toEqual(true)
+  })
+})
+
+describe('isStringInEnum', () => {
+  enum Animals {
+    CAT = 'cat',
+    DOG = 'dog',
+    FISH = 'fish'
+  }
+  it('should return true when the string is in the enum', () => {
+    expect(isStringInEnum('fish', Animals)).toBe(true)
+  })
+
+  it('should false when it is not', () => {
+    expect(isStringInEnum('brick', Animals)).toBe(false)
+  })
+
+  it('should false when the string has the wrong case', () => {
+    expect(isStringInEnum('fIsh', Animals)).toBe(false)
   })
 })
 

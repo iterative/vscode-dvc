@@ -2,6 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
+import { isStringInEnum } from '../util'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
@@ -36,7 +37,7 @@ export class SourceControlManagement {
   }
 
   private isValidStatus(status: string): boolean {
-    return Object.values(Status).includes(status as Status)
+    return isStringInEnum(status, Status)
   }
 
   private getResourceStates(
