@@ -3,7 +3,7 @@ import { Config } from './Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository } from './Repository'
+import { Repository, RepositoryState } from './Repository'
 import { listDvcOnlyRecursive, status } from './cli/reader'
 import { getAllUntracked } from './git'
 
@@ -192,6 +192,8 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
+      expect(repository.getState()).toEqual(new RepositoryState())
+
       await repository.updateState()
 
       expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
@@ -208,11 +210,6 @@ describe('Repository', () => {
         deleted,
         tracked,
         untracked
-      })
-
-      expect(mockedStatus).toBeCalledWith({
-        cwd: dvcRoot,
-        cliPath: undefined
       })
     })
   })

@@ -30,7 +30,8 @@ type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type PathStatus = Record<string, Status>
 
-class RepositoryState implements DecorationState, SourceControlManagementState {
+export class RepositoryState
+  implements DecorationState, SourceControlManagementState {
   public tracked: Set<string>
   public deleted: Set<string>
   public modified: Set<string>
