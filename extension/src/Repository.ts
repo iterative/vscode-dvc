@@ -48,18 +48,21 @@ export class Repository {
   new: Uri[] = []
   notInCache: Uri[] = []
 
-  private filterRootDir(dirs: string[], rootDir: string) {
+  private filterRootDir(rootDir: string, dirs: string[] = []) {
     return dirs.filter(dir => dir !== rootDir)
   }
 
-  private getAbsolutePath(rootDir: string, files: string[]): string[] {
+  private getAbsolutePath(rootDir: string, files: string[] = []): string[] {
     return files.map(file => join(rootDir, file))
   }
 
-  private getAbsoluteParentPath(rootDir: string, files: string[]): string[] {
+  private getAbsoluteParentPath(
+    rootDir: string,
+    files: string[] = []
+  ): string[] {
     return this.filterRootDir(
-      files.map(file => join(rootDir, dirname(file))),
-      rootDir
+      rootDir,
+      files.map(file => join(rootDir, dirname(file)))
     )
   }
 
@@ -68,7 +71,6 @@ export class Repository {
     cliPath: string | undefined
   ): Promise<Set<string>> {
     const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
-
     return new Set([
       ...this.getAbsolutePath(cwd, dvcListFiles),
       ...this.getAbsoluteParentPath(cwd, dvcListFiles)
@@ -185,6 +187,27 @@ export class Repository {
     return this.scm?.setUntracked(untrackedChanges)
   }
 
+  public async setup() {
+    const [files, untracked, status] = await Promise.all([
+      this.getDvcTracked(this.dvcRoot, this.config.dvcPath),
+      getAllUntracked(this.dvcRoot),
+      this.getStatus({
+        dvcRoot: this.dvcRoot,
+        cliPath: this.config.dvcPath
+      })
+    ])
+
+    this.decorationProvider?.setTrackedFiles(files)
+    this.scm = this.dispose.track(
+      new SourceControlManagement(this.dvcRoot, {
+        modified: status.modified || [],
+        untracked
+      })
+    )
+
+    this._initialized.resolve()
+  }
+
   constructor(
     dvcRoot: string,
     config: Config,
@@ -193,27 +216,5 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-
-    Promise.all([
-      this.getDvcTracked(dvcRoot, this.config.dvcPath),
-      getAllUntracked(dvcRoot),
-      this.getStatus({
-        dvcRoot: this.dvcRoot,
-        cliPath: this.config.dvcPath
-      })
-    ])
-      .then(promises => {
-        const [files, untracked, status] = promises
-
-        this.decorationProvider?.setTrackedFiles(files)
-
-        this.scm = this.dispose.track(
-          new SourceControlManagement(dvcRoot, {
-            modified: status.modified || [],
-            untracked
-          })
-        )
-      })
-      .then(() => this._initialized.resolve())
   }
 }

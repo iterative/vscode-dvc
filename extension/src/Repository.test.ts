@@ -23,12 +23,11 @@ beforeEach(() => {
 })
 
 describe('Repository', () => {
-  mockListDvcOnlyRecursive.mockRejectedValueOnce([])
+  mockListDvcOnlyRecursive.mockResolvedValueOnce([])
   mockedStatus.mockResolvedValue({})
   const config = new Config()
   const decorationProvider = new DecorationProvider()
   const repository = new Repository(dvcRoot, config, decorationProvider)
-
   it('should be able to be instantiated', async () => {
     expect(repository.ready).toBeDefined()
   })
