@@ -11,3 +11,9 @@ export const trimAndSplit = (stdout: string): string[] =>
     .trim()
     .split('\n')
     .filter(i => i)
+
+export const definedAndNonEmpty = (
+  maybeArray: unknown[] | undefined
+): maybeArray is unknown[] => {
+  return !!maybeArray?.length
+}

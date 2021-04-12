@@ -5,6 +5,7 @@ import { lstatSync } from 'fs'
 import { readdir } from 'fs-extra'
 import { dirname, join, resolve, basename } from 'path'
 import { getRoot, listDvcOnlyRecursive } from './cli/reader'
+import { definedAndNonEmpty } from './util'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -80,15 +81,17 @@ export const findDvcRootPaths = async (
 ): Promise<string[]> => {
   const subRoots = await findDvcSubRootPaths(cwd)
 
-  if (subRoots?.length) {
+  if (definedAndNonEmpty(subRoots)) {
     return subRoots
   }
 
   const absoluteRoot = await findDvcAbsoluteRootPath(cwd, cliPath)
 
-  const roots = [absoluteRoot].filter(v => v).sort() as string[]
+  if (!absoluteRoot) {
+    return []
+  }
 
-  return roots
+  return [absoluteRoot]
 }
 
 export const getAbsoluteTrackedPath = (files: string[]): string[] =>
