@@ -3,13 +3,19 @@ import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 
-export interface SourceControlManagementState {
-  deleted: Set<string>
-  modified: Set<string>
-  new: Set<string>
-  notInCache: Set<string>
-  untracked: Set<string>
+export type SourceControlManagementState = {
+  [key in Status]: Set<string>
 }
+
+enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'notInCache',
+  UNTRACKED = 'untracked'
+}
+
+type ResourceState = { resourceUri: Uri; contextValue: Status }
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
@@ -17,19 +23,27 @@ export class SourceControlManagement {
   private resourceGroup: SourceControlResourceGroup
 
   public setResourceStates(state: SourceControlManagementState) {
-    this.resourceGroup.resourceStates = [
-      ...this.getResourceStates('deleted', state.deleted),
-      ...this.getResourceStates('modified', state.modified),
-      ...this.getResourceStates('new', state.new),
-      ...this.getResourceStates('notInCache', state.notInCache),
-      ...this.getResourceStates('untracked', state.untracked)
-    ]
+    const reduceResourceStates = (
+      resourceStates: ResourceState[],
+      entry: [string, Set<string>]
+    ): ResourceState[] => {
+      const [s, resources] = entry
+      return [
+        ...resourceStates,
+        ...this.getResourceStates(s as Status, resources)
+      ]
+    }
+
+    this.resourceGroup.resourceStates = Object.entries(state).reduce(
+      reduceResourceStates,
+      []
+    )
   }
 
   private getResourceStates(
-    contextValue: string,
+    contextValue: Status,
     paths: Set<string>
-  ): { resourceUri: Uri; contextValue: string }[] {
+  ): ResourceState[] {
     return [...paths]
       .filter(
         path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
