@@ -190,6 +190,7 @@ export class Repository {
     ])
 
     return Promise.all([
+      // filter tracked here and add test
       this.sourceControlManagement?.setResourceStates(this.state),
       this.decorationProvider?.setState(this.state)
     ])
