@@ -37,11 +37,19 @@ describe('Repository', () => {
 
   describe('updateState', () => {
     it('should update the repository state', async () => {
-      const logFolder = 'logs'
-      const logAcc = join(logFolder, 'acc.tsv')
-      const logLoss = join(logFolder, 'loss.tsv')
+      const logDir = 'logs'
+      const logAcc = join(logDir, 'acc.tsv')
+      const logLoss = join(logDir, 'loss.tsv')
+      const MNISTDataDir = join('data', 'MNIST')
+      const rawDataDir = join(MNISTDataDir, 'raw')
       const model = 'model.pt'
-      mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
+
+      mockListDvcOnlyRecursive.mockResolvedValueOnce([
+        logAcc,
+        logLoss,
+        model,
+        rawDataDir
+      ])
 
       const statusOutput = {
         train: [
@@ -61,19 +69,25 @@ describe('Repository', () => {
       mockedAllUntracked.mockResolvedValueOnce(untracked)
       await repository.updateState()
 
+      const modified = new Set([resolve(dvcRoot, rawDataDir)])
+      const tracked = new Set([
+        resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logLoss),
+        resolve(dvcRoot, model),
+        resolve(dvcRoot, rawDataDir),
+        resolve(dvcRoot, logDir),
+        resolve(dvcRoot, MNISTDataDir)
+      ])
+      const emptySet = new Set()
+
       expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
 
       expect(repository.getState()).toEqual({
-        deleted: new Set(),
-        notInCache: new Set(),
-        new: new Set(),
-        modified: new Set([join(dvcRoot, 'data/MNIST/raw')]),
-        tracked: new Set([
-          resolve(dvcRoot, logAcc),
-          resolve(dvcRoot, logLoss),
-          resolve(dvcRoot, model),
-          resolve(dvcRoot, logFolder)
-        ]),
+        deleted: emptySet,
+        notInCache: emptySet,
+        new: emptySet,
+        modified,
+        tracked,
         untracked
       })
     })
