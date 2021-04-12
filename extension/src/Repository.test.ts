@@ -2,7 +2,7 @@ import { join, resolve } from 'path'
 import { Config } from './Config'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { getStatus, Repository } from './Repository'
+import { Repository } from './Repository'
 import { window } from 'vscode'
 import { listDvcOnlyRecursive, status } from './cli/reader'
 import { mapPaths } from './util/testHelpers'
@@ -23,19 +23,16 @@ beforeEach(() => {
 })
 
 describe('Repository', () => {
+  const config = new Config()
+  const decorationProvider = new DecorationProvider()
+  const repository = new Repository(dvcRoot, config, decorationProvider)
+
   it('should be able to be instantiated', async () => {
-    const config = new Config()
-    const decorationProvider = new DecorationProvider()
-    const repository = new Repository(dvcRoot, config, decorationProvider)
     expect(repository.ready).toBeDefined()
   })
 
   describe('getDvcTracked', () => {
     it('should return a Set of tracked paths, their folders (if files) and any paths corresponding .dvc files', async () => {
-      const config = new Config()
-      const decorationProvider = new DecorationProvider()
-      const repository = new Repository(dvcRoot, config, decorationProvider)
-
       const logFolder = 'logs'
       const logAcc = join(logFolder, 'acc.tsv')
       const logLoss = join(logFolder, 'loss.tsv')
@@ -70,7 +67,7 @@ describe('Repository', () => {
       const dvcRoot = resolve(__dirname, '..', '..', '..', 'demo')
       mockedStatus.mockResolvedValueOnce(statusOutput)
 
-      const status = await getStatus({
+      const status = await repository.getStatus({
         dvcRoot,
         cliPath: 'dvc'
       })
@@ -97,7 +94,7 @@ describe('Repository', () => {
       const dvcRoot = __dirname
       mockedStatus.mockResolvedValueOnce(statusOutput)
 
-      const status = await getStatus({
+      const status = await repository.getStatus({
         dvcRoot,
         cliPath: undefined
       })
@@ -143,7 +140,7 @@ describe('Repository', () => {
       const dvcRoot = __dirname
       mockedStatus.mockResolvedValueOnce(statusOutput)
 
-      const status = await getStatus({
+      const status = await repository.getStatus({
         dvcRoot,
         cliPath: 'dvc'
       })

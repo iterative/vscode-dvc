@@ -28,94 +28,6 @@ type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type PathStatus = Record<string, Status>
 
-const filterExcludedStagesOrFiles = (
-  statusOutput: StatusOutput
-): FilteredStatusOutput => {
-  const excludeAlwaysChanged = (stageOrFile: string): boolean =>
-    !statusOutput[stageOrFile].includes('always changed')
-
-  const reduceToFiltered = (
-    filteredStatusOutput: FilteredStatusOutput,
-    stageOrFile: string
-  ) => {
-    filteredStatusOutput[stageOrFile] = statusOutput[
-      stageOrFile
-    ] as ValidStageOrFileStatuses[]
-    return filteredStatusOutput
-  }
-
-  return Object.keys(statusOutput)
-    .filter(excludeAlwaysChanged)
-    .reduce(reduceToFiltered, {})
-}
-
-const getFileOrStageStatuses = (
-  fileOrStage: ValidStageOrFileStatuses[]
-): PathStatus[] =>
-  fileOrStage
-    .map(
-      entry =>
-        entry?.[ChangedType.CHANGED_DEPS] || entry?.[ChangedType.CHANGED_OUTS]
-    )
-    .filter(value => value)
-
-const reduceStatuses = (
-  reducedStatus: Partial<Record<Status, string[]>>,
-  statuses: PathStatus[]
-) =>
-  statuses.map(entry =>
-    Object.entries(entry).map(([relativePath, status]) => {
-      const existingPaths = reducedStatus[status] || []
-      reducedStatus[status] = [...new Set([...existingPaths, relativePath])]
-    })
-  )
-
-const reduceToPathStatuses = (
-  filteredStatusOutput: FilteredStatusOutput
-): Partial<Record<Status, string[]>> => {
-  const statusReducer = (
-    reducedStatus: Partial<Record<Status, string[]>>,
-    entry: ValidStageOrFileStatuses[]
-  ): Partial<Record<Status, string[]>> => {
-    const statuses = getFileOrStageStatuses(entry)
-
-    reduceStatuses(reducedStatus, statuses)
-
-    return reducedStatus
-  }
-
-  return Object.values(filteredStatusOutput).reduce(statusReducer, {})
-}
-
-const getUriStatuses = (
-  pathStatuses: Partial<Record<Status, string[]>>,
-  dvcRoot: string
-): Partial<Record<Status, Uri[]>> => {
-  return Object.entries(pathStatuses).reduce((uriStatuses, [status, paths]) => {
-    uriStatuses[status as Status] = paths?.map(path =>
-      Uri.file(join(dvcRoot, path))
-    )
-    return uriStatuses
-  }, {} as Partial<Record<Status, Uri[]>>)
-}
-
-export const getStatus = async (options: {
-  dvcRoot: string
-  cliPath: string | undefined
-}): Promise<Partial<Record<Status, Uri[]>>> => {
-  const { dvcRoot, cliPath } = options
-
-  const statusOutput = (await status({ cliPath, cwd: dvcRoot })) as Record<
-    string,
-    (ValidStageOrFileStatuses | string)[]
-  >
-
-  const filteredStatusOutput = filterExcludedStagesOrFiles(statusOutput)
-  const pathStatuses = reduceToPathStatuses(filteredStatusOutput)
-
-  return getUriStatuses(pathStatuses, dvcRoot)
-}
-
 export class Repository {
   public readonly dispose = Disposable.fn()
 
@@ -163,8 +75,101 @@ export class Repository {
     ])
   }
 
+  private filterExcludedStagesOrFiles(
+    statusOutput: StatusOutput
+  ): FilteredStatusOutput {
+    const excludeAlwaysChanged = (stageOrFile: string): boolean =>
+      !statusOutput[stageOrFile].includes('always changed')
+
+    const reduceToFiltered = (
+      filteredStatusOutput: FilteredStatusOutput,
+      stageOrFile: string
+    ) => {
+      filteredStatusOutput[stageOrFile] = statusOutput[
+        stageOrFile
+      ] as ValidStageOrFileStatuses[]
+      return filteredStatusOutput
+    }
+
+    return Object.keys(statusOutput)
+      .filter(excludeAlwaysChanged)
+      .reduce(reduceToFiltered, {})
+  }
+
+  private getFileOrStageStatuses(
+    fileOrStage: ValidStageOrFileStatuses[]
+  ): PathStatus[] {
+    return fileOrStage
+      .map(
+        entry =>
+          entry?.[ChangedType.CHANGED_DEPS] || entry?.[ChangedType.CHANGED_OUTS]
+      )
+      .filter(value => value)
+  }
+
+  private reduceStatuses(
+    reducedStatus: Partial<Record<Status, string[]>>,
+    statuses: PathStatus[]
+  ) {
+    return statuses.map(entry =>
+      Object.entries(entry).map(([relativePath, status]) => {
+        const existingPaths = reducedStatus[status] || []
+        reducedStatus[status] = [...new Set([...existingPaths, relativePath])]
+      })
+    )
+  }
+
+  private reduceToPathStatuses(
+    filteredStatusOutput: FilteredStatusOutput
+  ): Partial<Record<Status, string[]>> {
+    const statusReducer = (
+      reducedStatus: Partial<Record<Status, string[]>>,
+      entry: ValidStageOrFileStatuses[]
+    ): Partial<Record<Status, string[]>> => {
+      const statuses = this.getFileOrStageStatuses(entry)
+
+      this.reduceStatuses(reducedStatus, statuses)
+
+      return reducedStatus
+    }
+
+    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
+  }
+
+  private getUriStatuses(
+    pathStatuses: Partial<Record<Status, string[]>>,
+    dvcRoot: string
+  ): Partial<Record<Status, Uri[]>> {
+    return Object.entries(pathStatuses).reduce(
+      (uriStatuses, [status, paths]) => {
+        uriStatuses[status as Status] = paths?.map(path =>
+          Uri.file(join(dvcRoot, path))
+        )
+        return uriStatuses
+      },
+      {} as Partial<Record<Status, Uri[]>>
+    )
+  }
+
+  public async getStatus(options: {
+    dvcRoot: string
+    cliPath: string | undefined
+  }): Promise<Partial<Record<Status, Uri[]>>> {
+    const { dvcRoot, cliPath } = options
+
+    const statusOutput = (await status({ cliPath, cwd: dvcRoot })) as Record<
+      string,
+      (ValidStageOrFileStatuses | string)[]
+    >
+
+    const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
+    const pathStatuses = this.reduceToPathStatuses(filteredStatusOutput)
+
+    return this.getUriStatuses(pathStatuses, dvcRoot)
+  }
+
   public async updateStatus() {
-    const status = await getStatus({
+    const status = await this.getStatus({
       dvcRoot: this.dvcRoot,
       cliPath: this.config.dvcPath
     })
@@ -192,7 +197,7 @@ export class Repository {
     Promise.all([
       this.getDvcTracked(dvcRoot, this.config.dvcPath),
       getAllUntracked(dvcRoot),
-      getStatus({
+      this.getStatus({
         dvcRoot: this.dvcRoot,
         cliPath: this.config.dvcPath
       })
