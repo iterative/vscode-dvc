@@ -1,4 +1,3 @@
-import { mocked } from 'ts-jest/utils'
 import { Uri } from 'vscode'
 import { ResourceLocator } from './ResourceLocator'
 
@@ -12,12 +11,9 @@ describe('ResourceLocator', () => {
     const dark = Uri.file('some/path/media/dvc-color.svg')
     const light = Uri.file('some/path/media/dvc-color.svg')
 
-    const mockedUriClass = mocked(Uri)
-
     expect(resourceLocator.dvcIconPath).toEqual({
       dark,
       light
     })
-    expect(mockedUriClass.joinPath).toBeCalledTimes(2)
   })
 })
