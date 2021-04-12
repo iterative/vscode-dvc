@@ -1,4 +1,10 @@
-import { window, commands, ExtensionContext, workspace } from 'vscode'
+import {
+  window,
+  commands,
+  ExtensionContext,
+  workspace,
+  WorkspaceFolder
+} from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -36,6 +42,17 @@ export class Extension {
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
   private readonly gitExtension: GitExtension
+
+  private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
+    const workspaceRoot = workspaceFolder.uri.fsPath
+    const dvcRoots = await findDvcRootPaths(workspaceRoot, this.config.dvcPath)
+
+    this.initializeDecorationProvidersEarly(dvcRoots)
+
+    this.initializeDvcRepositories(dvcRoots)
+
+    return this.dvcRoots.push(...dvcRoots)
+  }
 
   private initializeDecorationProvidersEarly(dvcRoots: string[]) {
     dvcRoots.map(
@@ -93,19 +110,9 @@ export class Extension {
     this.config = this.dispose.track(new Config())
 
     Promise.all(
-      (workspace.workspaceFolders || []).map(async folder => {
-        const workspaceRoot = folder.uri.fsPath
-        const dvcRoots = await findDvcRootPaths(
-          workspaceRoot,
-          this.config.dvcPath
-        )
-
-        this.initializeDecorationProvidersEarly(dvcRoots)
-
-        this.initializeDvcRepositories(dvcRoots)
-
-        return this.dvcRoots.push(...dvcRoots)
-      })
+      (workspace.workspaceFolders || []).map(async workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      )
     )
 
     this.webviewManager = this.dispose.track(
