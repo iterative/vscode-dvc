@@ -28,7 +28,7 @@ describe('Repository', () => {
     expect(repository.ready).toBeDefined()
   })
 
-  describe('findDvcTrackedPaths', () => {
+  describe('getDvcTracked', () => {
     it('should return a Set of tracked paths, their folders (if files) and any paths corresponding .dvc files', async () => {
       const config = new Config()
       const decorationProvider = new DecorationProvider()
@@ -39,7 +39,7 @@ describe('Repository', () => {
       const logLoss = join(logFolder, 'loss.tsv')
       const model = 'model.pt'
       mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
-      const tracked = await repository.findDvcTrackedPaths(dvcRoot, 'dvc')
+      const tracked = await repository.getDvcTracked(dvcRoot, 'dvc')
 
       expect(tracked).toEqual(
         new Set([

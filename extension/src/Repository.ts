@@ -44,7 +44,7 @@ export class Repository {
     )
   }
 
-  public async findDvcTrackedPaths(
+  public async getDvcTracked(
     cwd: string,
     cliPath: string | undefined
   ): Promise<Set<string>> {
@@ -83,7 +83,7 @@ export class Repository {
     this.dvcRoot = dvcRoot
 
     Promise.all([
-      this.findDvcTrackedPaths(dvcRoot, this.config.dvcPath),
+      this.getDvcTracked(dvcRoot, this.config.dvcPath),
       getAllUntracked(dvcRoot),
       getStatus({
         dvcRoot: this.dvcRoot,
