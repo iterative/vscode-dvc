@@ -66,8 +66,9 @@ export class Extension {
   private initializeDvcRepositories(dvcRoots: string[]) {
     dvcRoots.forEach(dvcRoot => {
       const repository = this.dispose.track(
-        new Repository(this.config, dvcRoot, this.decorationProviders[dvcRoot])
+        new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
       )
+      repository.setup()
       this.dvcRepositories[dvcRoot] = repository
     })
   }

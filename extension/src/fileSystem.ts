@@ -3,8 +3,8 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { lstatSync } from 'fs'
 import { readdir } from 'fs-extra'
-import { dirname, join, resolve, basename } from 'path'
-import { getRoot, listDvcOnlyRecursive } from './cli/reader'
+import { join, resolve } from 'path'
+import { getRoot } from './cli/reader'
 import { definedAndNonEmpty } from './util'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
@@ -37,9 +37,6 @@ export const addFileChangeHandler = (
     }
   }
 }
-
-const filterRootDir = (dirs: string[], rootDir: string) =>
-  dirs.filter(dir => dir !== rootDir)
 
 const findDvcAbsoluteRootPath = async (
   cwd: string,
@@ -92,29 +89,4 @@ export const findDvcRootPaths = async (
   }
 
   return [absoluteRoot]
-}
-
-export const getAbsoluteTrackedPath = (files: string[]): string[] =>
-  files.map(file => resolve(dirname(file), basename(file, '.dvc')))
-
-const getAbsolutePath = (rootDir: string, files: string[]): string[] =>
-  files.map(file => join(rootDir, file))
-
-const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
-  return filterRootDir(
-    files.map(file => join(rootDir, dirname(file))),
-    rootDir
-  )
-}
-
-export const findDvcTrackedPaths = async (
-  cwd: string,
-  cliPath: string | undefined
-): Promise<Set<string>> => {
-  const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
-
-  return new Set([
-    ...getAbsolutePath(cwd, dvcListFiles),
-    ...getAbsoluteParentPath(cwd, dvcListFiles)
-  ])
 }
