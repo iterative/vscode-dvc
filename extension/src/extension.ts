@@ -68,7 +68,6 @@ export class Extension {
       const repository = this.dispose.track(
         new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
       )
-      repository.setup()
       this.dvcRepositories[dvcRoot] = repository
     })
   }
@@ -159,8 +158,7 @@ export class Extension {
           const repository = this.dvcRepositories[dvcRoot]
 
           gitExtensionRepository.onDidChange(async () => {
-            repository?.updateUntracked()
-            repository?.updateStatus()
+            repository?.updateState()
           })
         })
       })
