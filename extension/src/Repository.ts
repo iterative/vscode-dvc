@@ -9,31 +9,6 @@ import { Deferred } from '@hediet/std/synchronization'
 import { listDvcOnlyRecursive } from './cli/reader'
 import { dirname, join } from 'path'
 
-const filterRootDir = (dirs: string[], rootDir: string) =>
-  dirs.filter(dir => dir !== rootDir)
-
-const getAbsolutePath = (rootDir: string, files: string[]): string[] =>
-  files.map(file => join(rootDir, file))
-
-const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
-  return filterRootDir(
-    files.map(file => join(rootDir, dirname(file))),
-    rootDir
-  )
-}
-
-export const findDvcTrackedPaths = async (
-  cwd: string,
-  cliPath: string | undefined
-): Promise<Set<string>> => {
-  const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
-
-  return new Set([
-    ...getAbsolutePath(cwd, dvcListFiles),
-    ...getAbsoluteParentPath(cwd, dvcListFiles)
-  ])
-}
-
 export class Repository {
   public readonly dispose = Disposable.fn()
 
@@ -53,6 +28,33 @@ export class Repository {
   modified: Uri[] = []
   new: Uri[] = []
   notInCache: Uri[] = []
+
+  private filterRootDir(dirs: string[], rootDir: string) {
+    return dirs.filter(dir => dir !== rootDir)
+  }
+
+  private getAbsolutePath(rootDir: string, files: string[]): string[] {
+    return files.map(file => join(rootDir, file))
+  }
+
+  private getAbsoluteParentPath(rootDir: string, files: string[]): string[] {
+    return this.filterRootDir(
+      files.map(file => join(rootDir, dirname(file))),
+      rootDir
+    )
+  }
+
+  public async findDvcTrackedPaths(
+    cwd: string,
+    cliPath: string | undefined
+  ): Promise<Set<string>> {
+    const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
+
+    return new Set([
+      ...this.getAbsolutePath(cwd, dvcListFiles),
+      ...this.getAbsoluteParentPath(cwd, dvcListFiles)
+    ])
+  }
 
   public async updateStatus() {
     const status = await getStatus({
@@ -81,7 +83,7 @@ export class Repository {
     this.dvcRoot = dvcRoot
 
     Promise.all([
-      findDvcTrackedPaths(dvcRoot, this.config.dvcPath),
+      this.findDvcTrackedPaths(dvcRoot, this.config.dvcPath),
       getAllUntracked(dvcRoot),
       getStatus({
         dvcRoot: this.dvcRoot,
