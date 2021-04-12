@@ -1,8 +1,11 @@
 import { Config } from './Config'
 import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from './git'
-import { SourceControlManagement } from './views/SourceControlManagement'
-import { DecorationProvider } from './DecorationProvider'
+import {
+  SourceControlManagementState,
+  SourceControlManagement
+} from './views/SourceControlManagement'
+import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from './cli/reader'
 import { dirname, join } from 'path'
@@ -27,6 +30,24 @@ type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type PathStatus = Record<string, Status>
 
+class RepositoryState implements DecorationState, SourceControlManagementState {
+  public tracked: Set<string>
+  public deleted: Set<string>
+  public modified: Set<string>
+  public new: Set<string>
+  public notInCache: Set<string>
+  public untracked: Set<string>
+
+  constructor() {
+    this.tracked = new Set<string>()
+    this.deleted = new Set<string>()
+    this.modified = new Set<string>()
+    this.new = new Set<string>()
+    this.notInCache = new Set<string>()
+    this.untracked = new Set<string>()
+  }
+}
+
 export class Repository {
   public readonly dispose = Disposable.fn()
 
@@ -37,17 +58,16 @@ export class Repository {
     return this.initialized
   }
 
+  public getState() {
+    return this.state
+  }
+
+  private state: RepositoryState
+
   private config: Config
   private dvcRoot: string
   private decorationProvider?: DecorationProvider
   private scm?: SourceControlManagement
-
-  tracked = new Set<string>()
-  deleted = new Set<string>()
-  modified = new Set<string>()
-  new = new Set<string>()
-  notInCache = new Set<string>()
-  untracked = new Set<string>()
 
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
@@ -68,7 +88,7 @@ export class Repository {
       cwd: this.dvcRoot,
       cliPath: this.config.dvcPath
     })
-    this.tracked = new Set([
+    this.state.tracked = new Set([
       ...this.getAbsolutePath(dvcListFiles),
       ...this.getAbsoluteParentPath(dvcListFiles)
     ])
@@ -149,29 +169,18 @@ export class Repository {
   public async updateStatus() {
     const status = await this.getStatus()
 
-    this.modified = status.modified || new Set<string>()
-    this.deleted = status.deleted || new Set<string>()
-    this.new = status.new || new Set<string>()
-    this.notInCache = status['not in cache'] || new Set<string>()
+    this.state.modified = status.modified || new Set<string>()
+    this.state.deleted = status.deleted || new Set<string>()
+    this.state.new = status.new || new Set<string>()
+    this.state.notInCache = status['not in cache'] || new Set<string>()
 
-    this.scm?.setResourceStates({
-      deleted: this.deleted,
-      modified: this.modified,
-      new: this.new,
-      notInCache: this.notInCache,
-      untracked: this.untracked
-    })
+    this.scm?.setResourceStates(this.state)
   }
 
   public async updateUntracked() {
-    this.untracked = await getAllUntracked(this.dvcRoot)
-    return this.scm?.setResourceStates({
-      deleted: this.deleted,
-      modified: this.modified,
-      new: this.new,
-      notInCache: this.notInCache,
-      untracked: this.untracked
-    })
+    this.state.untracked = await getAllUntracked(this.dvcRoot)
+
+    return this.scm?.setResourceStates(this.state)
   }
 
   public updateState() {
@@ -185,22 +194,10 @@ export class Repository {
   public async setup() {
     await this.updateState()
 
-    this.decorationProvider?.setState({
-      tracked: this.tracked,
-      deleted: new Set<string>(),
-      modified: new Set<string>(),
-      new: new Set<string>(),
-      notInCache: new Set<string>()
-    })
+    this.decorationProvider?.setState(this.state)
 
     this.scm = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, {
-        deleted: this.deleted,
-        modified: this.modified,
-        new: this.new,
-        notInCache: this.notInCache,
-        untracked: this.untracked
-      })
+      new SourceControlManagement(this.dvcRoot, this.state)
     )
 
     this._initialized.resolve()
@@ -214,5 +211,6 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
+    this.state = new RepositoryState()
   }
 }

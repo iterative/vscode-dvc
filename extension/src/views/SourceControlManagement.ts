@@ -3,7 +3,7 @@ import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 
-interface scmResourceState {
+export interface SourceControlManagementState {
   deleted: Set<string>
   modified: Set<string>
   new: Set<string>
@@ -16,7 +16,7 @@ export class SourceControlManagement {
   @observable
   private resourceGroup: SourceControlResourceGroup
 
-  public setResourceStates(state: scmResourceState) {
+  public setResourceStates(state: SourceControlManagementState) {
     this.resourceGroup.resourceStates = [
       ...this.getResourceStates('deleted', state.deleted),
       ...this.getResourceStates('modified', state.modified),
@@ -40,7 +40,7 @@ export class SourceControlManagement {
       }))
   }
 
-  constructor(repositoryRoot: string, state: scmResourceState) {
+  constructor(repositoryRoot: string, state: SourceControlManagementState) {
     makeObservable(this)
 
     const scmView = this.dispose.track(
