@@ -1,4 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
+import { makeObservable, observable } from 'mobx'
 import {
   window,
   Event,
@@ -8,13 +9,18 @@ import {
   Uri
 } from 'vscode'
 
-export interface DecorationState {
-  deleted: Set<string>
-  modified: Set<string>
-  new: Set<string>
-  notInCache: Set<string>
-  tracked: Set<string>
+export type DecorationState = {
+  [key in Status]: Set<string>
 }
+
+enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'notInCache',
+  TRACKED = 'tracked'
+}
+
 export class DecorationProvider implements FileDecorationProvider {
   private static DecorationTracked: FileDecoration = {
     tooltip: 'DVC tracked'
@@ -22,6 +28,7 @@ export class DecorationProvider implements FileDecorationProvider {
 
   public readonly dispose = Disposable.fn()
 
+  @observable
   private state: DecorationState
 
   readonly onDidChangeFileDecorations: Event<Uri[]>
@@ -30,17 +37,17 @@ export class DecorationProvider implements FileDecorationProvider {
   public setState = (state: DecorationState) => {
     this.state = state
     this.onDidChangeDecorations.fire(
-      [
-        ...this.state.deleted,
-        ...this.state.modified,
-        ...this.state.new,
-        ...this.state.notInCache,
-        ...this.state.tracked
-      ].map(value => Uri.file(value))
+      Object.values(this.state)
+        .reduce((toDecorate: string[], paths: Set<string>): string[] => {
+          return [...toDecorate, ...paths]
+        }, [])
+        .map(value => Uri.file(value))
     )
   }
 
   constructor() {
+    makeObservable(this)
+
     this.onDidChangeDecorations = new EventEmitter<Uri[]>()
     this.onDidChangeFileDecorations = this.onDidChangeDecorations.event
 
