@@ -49,32 +49,28 @@ export class Repository {
   notInCache: Uri[] = []
   untracked: Uri[] = []
 
-  private filterRootDir(rootDir: string, dirs: string[] = []) {
-    return dirs.filter(dir => dir !== rootDir)
+  private filterRootDir(dirs: string[] = []) {
+    return dirs.filter(dir => dir !== this.dvcRoot)
   }
 
-  private getAbsolutePath(rootDir: string, files: string[] = []): string[] {
-    return files.map(file => join(rootDir, file))
+  private getAbsolutePath(files: string[] = []): string[] {
+    return files.map(file => join(this.dvcRoot, file))
   }
 
-  private getAbsoluteParentPath(
-    rootDir: string,
-    files: string[] = []
-  ): string[] {
+  private getAbsoluteParentPath(files: string[] = []): string[] {
     return this.filterRootDir(
-      rootDir,
-      files.map(file => join(rootDir, dirname(file)))
+      files.map(file => join(this.dvcRoot, dirname(file)))
     )
   }
 
-  public async getDvcTracked(
-    cwd: string,
-    cliPath: string | undefined
-  ): Promise<Set<string>> {
-    const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
+  public async getDvcTracked(): Promise<Set<string>> {
+    const dvcListFiles = await listDvcOnlyRecursive({
+      cwd: this.dvcRoot,
+      cliPath: this.config.dvcPath
+    })
     return new Set([
-      ...this.getAbsolutePath(cwd, dvcListFiles),
-      ...this.getAbsoluteParentPath(cwd, dvcListFiles)
+      ...this.getAbsolutePath(dvcListFiles),
+      ...this.getAbsoluteParentPath(dvcListFiles)
     ])
   }
 
@@ -154,28 +150,20 @@ export class Repository {
     )
   }
 
-  private async getStatus(options: {
-    dvcRoot: string
-    cliPath: string | undefined
-  }): Promise<Partial<Record<Status, Uri[]>>> {
-    const { dvcRoot, cliPath } = options
-
-    const statusOutput = (await status({ cliPath, cwd: dvcRoot })) as Record<
-      string,
-      (ValidStageOrFileStatuses | string)[]
-    >
+  private async getStatus(): Promise<Partial<Record<Status, Uri[]>>> {
+    const statusOutput = (await status({
+      cliPath: this.config.dvcPath,
+      cwd: this.dvcRoot
+    })) as Record<string, (ValidStageOrFileStatuses | string)[]>
 
     const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
     const pathStatuses = this.reduceToPathStatuses(filteredStatusOutput)
 
-    return this.getUriStatuses(pathStatuses, dvcRoot)
+    return this.getUriStatuses(pathStatuses, this.dvcRoot)
   }
 
   public async updateStatus() {
-    const status = await this.getStatus({
-      dvcRoot: this.dvcRoot,
-      cliPath: this.config.dvcPath
-    })
+    const status = await this.getStatus()
 
     this.modified = status.modified || []
     this.deleted = status.deleted || []
@@ -204,7 +192,7 @@ export class Repository {
 
   public async setup() {
     const [files] = await Promise.all([
-      this.getDvcTracked(this.dvcRoot, this.config.dvcPath),
+      this.getDvcTracked(),
       this.updateUntracked(),
       this.updateStatus()
     ])
