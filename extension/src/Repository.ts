@@ -2,16 +2,43 @@ import { Config } from './Config'
 import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from './git'
 import { SourceControlManagement } from './views/SourceControlManagement'
-import { Status } from './Status'
 import { DecorationProvider } from './DecorationProvider'
 import { findDvcTrackedPaths } from './fileSystem'
+import { Uri } from 'vscode'
+import { getStatus } from './cli'
+import { Deferred } from '@hediet/std/synchronization'
 
 export class Repository {
+  public readonly dispose = Disposable.fn()
+
+  private readonly _initialized = new Deferred()
+  private readonly initialized = this._initialized.promise
+
+  public get ready() {
+    return this.initialized
+  }
+
   private config: Config
   private dvcRoot: string
   private decorationProvider?: DecorationProvider
   private scm?: SourceControlManagement
-  public readonly dispose = Disposable.fn()
+
+  deleted: Uri[] = []
+  modified: Uri[] = []
+  new: Uri[] = []
+  notInCache: Uri[] = []
+
+  public async updateStatus() {
+    const status = await getStatus({
+      dvcRoot: this.dvcRoot,
+      cliPath: this.config.dvcPath
+    })
+
+    this.modified = status.modified || []
+    this.deleted = status.deleted || []
+    this.new = status.new || []
+    this.notInCache = status['not in cache'] || []
+  }
 
   public async updateTracked() {
     const untrackedChanges = await getAllUntracked(this.dvcRoot)
@@ -26,18 +53,27 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
+
     Promise.all([
       findDvcTrackedPaths(dvcRoot, this.config.dvcPath),
-      getAllUntracked(dvcRoot)
-    ]).then(promises => {
-      const [files, untracked] = promises
+      getAllUntracked(dvcRoot),
+      getStatus({
+        dvcRoot: this.dvcRoot,
+        cliPath: this.config.dvcPath
+      })
+    ])
+      .then(promises => {
+        const [files, untracked, status] = promises
 
-      this.decorationProvider?.setTrackedFiles(files)
+        this.decorationProvider?.setTrackedFiles(files)
 
-      const status = this.dispose.track(new Status(this.config, dvcRoot))
-      this.scm = this.dispose.track(
-        new SourceControlManagement(dvcRoot, untracked, status)
-      )
-    })
+        this.scm = this.dispose.track(
+          new SourceControlManagement(dvcRoot, {
+            modified: status.modified || [],
+            untracked
+          })
+        )
+      })
+      .then(() => this._initialized.resolve())
   }
 }
