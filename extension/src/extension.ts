@@ -159,7 +159,7 @@ export class Extension {
           const repository = this.dvcRepositories[dvcRoot]
 
           gitExtensionRepository.onDidChange(async () => {
-            repository?.updateTracked()
+            repository?.updateUntracked()
           })
         })
       })

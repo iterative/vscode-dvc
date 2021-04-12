@@ -153,7 +153,7 @@ export class Repository {
     )
   }
 
-  public async getStatus(options: {
+  private async getStatus(options: {
     dvcRoot: string
     cliPath: string | undefined
   }): Promise<Partial<Record<Status, Uri[]>>> {
@@ -182,7 +182,7 @@ export class Repository {
     this.notInCache = status['not in cache'] || []
   }
 
-  public async updateTracked() {
+  public async updateUntracked() {
     const untrackedChanges = await getAllUntracked(this.dvcRoot)
     return this.scm?.setUntracked(untrackedChanges)
   }
