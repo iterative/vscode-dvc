@@ -67,6 +67,7 @@ describe('Repository', () => {
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
       ])
       mockedAllUntracked.mockResolvedValueOnce(untracked)
+
       await repository.updateState()
 
       const modified = new Set([resolve(dvcRoot, rawDataDir)])
@@ -93,124 +94,82 @@ describe('Repository', () => {
     })
   })
 
-  //   describe('updateTracked', () => {
-  //     it("should update the repository's tracked paths", async () => {
-  //       const logFolder = 'logs'
-  //       const logAcc = join(logFolder, 'acc.tsv')
-  //       const logLoss = join(logFolder, 'loss.tsv')
-  //       const model = 'model.pt'
-  //       mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
-  //       await repository.updateTracked()
+  it('should return an object with an entry for each path', async () => {
+    const logDir = 'logs'
+    const logAcc = join(logDir, 'acc.tsv')
+    const logLoss = join(logDir, 'loss.tsv')
+    const dataDir = 'data'
+    const model = 'model.pt'
 
-  //       expect(repository.getState()).toEqual({
-  //         tracked: new Set([
-  //           resolve(dvcRoot, logAcc),
-  //           resolve(dvcRoot, logLoss),
-  //           resolve(dvcRoot, logFolder),
-  //           resolve(dvcRoot, model)
-  //         ])
-  //       })
-  //     })
-  //   })
+    mockListDvcOnlyRecursive.mockResolvedValueOnce([
+      logAcc,
+      logLoss,
+      model,
+      dataDir
+    ])
 
-  //   describe('updateStatus', () => {
-  //     const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+    const tracked = new Set([
+      resolve(dvcRoot, logAcc),
+      resolve(dvcRoot, logLoss),
+      resolve(dvcRoot, model),
+      resolve(dvcRoot, dataDir),
+      resolve(dvcRoot, logDir)
+    ])
 
-  //     it('should return an object containing modified paths', async () => {
-  //       const statusOutput = {
-  //         train: [
-  //           { 'changed deps': { 'data/MNIST': 'modified' } },
-  //           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-  //           'always changed'
-  //         ],
-  //         'data/MNIST/raw.dvc': [
-  //           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-  //         ]
-  //       } as Record<string, (Record<string, Record<string, string>> | string)[]>
-  //       mockedStatus.mockResolvedValueOnce(statusOutput)
+    const statusOutput = {
+      prepare: [
+        { 'changed deps': { 'data/data.xml': 'not in cache' } },
+        { 'changed outs': { 'data/prepared': 'not in cache' } }
+      ],
+      featurize: [
+        { 'changed deps': { 'data/prepared': 'not in cache' } },
+        { 'changed outs': { 'data/features': 'modified' } }
+      ],
+      train: [
+        { 'changed deps': { 'data/features': 'modified' } },
+        { 'changed outs': { 'model.pkl': 'deleted' } }
+      ],
+      evaluate: [
+        {
+          'changed deps': {
+            'data/features': 'modified',
+            'model.pkl': 'deleted'
+          }
+        }
+      ],
+      'data/data.xml.dvc': [
+        { 'changed outs': { 'data/data.xml': 'not in cache' } }
+      ]
+    } as Record<string, (Record<string, Record<string, string>> | string)[]>
+    mockedStatus.mockResolvedValueOnce(statusOutput)
+    const deleted = new Set([join(dvcRoot, 'model.pkl')])
+    const modified = new Set([join(dvcRoot, 'data/features')])
+    const notInCache = new Set([
+      join(dvcRoot, 'data/data.xml'),
+      join(dvcRoot, 'data/prepared')
+    ])
 
-  //       await repository.updateStatus()
+    const untracked = new Set([
+      resolve(dvcRoot, 'some', 'untracked', 'python.py'),
+      resolve(dvcRoot, 'some', 'untracked', 'go.go'),
+      resolve(dvcRoot, 'some', 'untracked', 'perl.pl')
+    ])
+    mockedAllUntracked.mockResolvedValueOnce(untracked)
 
-  //       expect(repository.getState()).toEqual({
-  //         deleted: new Set(),
-  //         notInCache: new Set(),
-  //         new: new Set(),
-  //         modified: new Set([join(dvcRoot, 'data/MNIST/raw')])
-  //       })
-  //       expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
-  //     })
+    await repository.updateState()
 
-  //     it('should return an object containing modified and deleted paths', async () => {
-  //       const statusOutput = {
-  //         'baz.dvc': [{ 'changed outs': { baz: 'modified' } }],
-  //         dofoo: [
-  //           { 'changed deps': { baz: 'modified' } },
-  //           { 'changed outs': { foo: 'modified' } }
-  //         ],
-  //         dobar: [
-  //           { 'changed deps': { foo: 'modified' } },
-  //           { 'changed outs': { bar: 'deleted' } }
-  //         ]
-  //       } as Record<string, (Record<string, Record<string, string>> | string)[]>
-  //       mockedStatus.mockResolvedValueOnce(statusOutput)
+    expect(repository.getState()).toEqual({
+      new: new Set(),
+      modified,
+      notInCache,
+      deleted,
+      tracked,
+      untracked
+    })
 
-  //       await repository.updateStatus()
-
-  //       expect(repository.getState()).toEqual({
-  //         new: new Set(),
-  //         notInCache: new Set(),
-  //         deleted: new Set([join(dvcRoot, 'bar')]),
-  //         modified: new Set([join(dvcRoot, 'baz'), join(dvcRoot, 'foo')])
-  //       })
-  //       expect(mockedStatus).toBeCalledWith({
-  //         cwd: dvcRoot,
-  //         cliPath: undefined
-  //       })
-  //     })
-
-  //     it('should return an object with an entry for each path', async () => {
-  //       const statusOutput = {
-  //         prepare: [
-  //           { 'changed deps': { 'data/data.xml': 'not in cache' } },
-  //           { 'changed outs': { 'data/prepared': 'not in cache' } }
-  //         ],
-  //         featurize: [
-  //           { 'changed deps': { 'data/prepared': 'not in cache' } },
-  //           { 'changed outs': { 'data/features': 'modified' } }
-  //         ],
-  //         train: [
-  //           { 'changed deps': { 'data/features': 'modified' } },
-  //           { 'changed outs': { 'model.pkl': 'deleted' } }
-  //         ],
-  //         evaluate: [
-  //           {
-  //             'changed deps': {
-  //               'data/features': 'modified',
-  //               'model.pkl': 'deleted'
-  //             }
-  //           }
-  //         ],
-  //         'data/data.xml.dvc': [
-  //           { 'changed outs': { 'data/data.xml': 'not in cache' } }
-  //         ]
-  //       } as Record<string, (Record<string, Record<string, string>> | string)[]>
-  //       mockedStatus.mockResolvedValueOnce(statusOutput)
-
-  //       await repository.updateStatus()
-
-  //       expect(repository.getState()).toEqual({
-  //         new: new Set(),
-  //         modified: new Set([join(dvcRoot, 'data/features')]),
-  //         notInCache: new Set([
-  //           join(dvcRoot, 'data/data.xml'),
-  //           join(dvcRoot, 'data/prepared')
-  //         ]),
-  //         deleted: new Set([join(dvcRoot, 'model.pkl')])
-  //       })
-  //       expect(mockedStatus).toBeCalledWith({
-  //         cwd: dvcRoot,
-  //         cliPath: undefined
-  //       })
-  //     })
-  //   })
+    expect(mockedStatus).toBeCalledWith({
+      cwd: dvcRoot,
+      cliPath: undefined
+    })
+  })
 })
