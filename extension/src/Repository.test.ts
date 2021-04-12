@@ -23,6 +23,8 @@ beforeEach(() => {
 })
 
 describe('Repository', () => {
+  mockListDvcOnlyRecursive.mockRejectedValueOnce([])
+  mockedStatus.mockResolvedValue({})
   const config = new Config()
   const decorationProvider = new DecorationProvider()
   const repository = new Repository(dvcRoot, config, decorationProvider)
