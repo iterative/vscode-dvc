@@ -13,7 +13,7 @@ export class Repository {
   private scm?: SourceControlManagement
   public readonly dispose = Disposable.fn()
 
-  public async updateTracked() {
+  public async updateUntracked() {
     const untrackedChanges = await getAllUntracked(this.dvcRoot)
     return this.scm?.setUntracked(untrackedChanges)
   }
