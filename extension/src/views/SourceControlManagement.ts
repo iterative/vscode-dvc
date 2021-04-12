@@ -3,19 +3,20 @@ import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 
+type scmResourceState = {
+  deleted: Uri[]
+  modified: Uri[]
+  new: Uri[]
+  notInCache: Uri[]
+  untracked: Uri[]
+}
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
   @observable
   private resourceGroup: SourceControlResourceGroup
 
-  public setResourceStates(state: {
-    deleted: Uri[]
-    modified: Uri[]
-    new: Uri[]
-    notInCache: Uri[]
-    untracked: Uri[]
-  }) {
+  public setResourceStates(state: scmResourceState) {
     this.resourceGroup.resourceStates = [
       ...this.getResourceStates('deleted', state.deleted),
       ...this.getResourceStates('modified', state.modified),
@@ -41,16 +42,7 @@ export class SourceControlManagement {
       }))
   }
 
-  constructor(
-    repositoryRoot: string,
-    state: {
-      deleted: Uri[]
-      modified: Uri[]
-      new: Uri[]
-      notInCache: Uri[]
-      untracked: Uri[]
-    }
-  ) {
+  constructor(repositoryRoot: string, state: scmResourceState) {
     makeObservable(this)
 
     const scmView = this.dispose.track(
