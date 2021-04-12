@@ -70,7 +70,7 @@ describe('getStatus', () => {
 
     expect(Object.keys(status)).toEqual(['modified'])
     expect(mapPaths(status.modified)).toEqual([join(dvcRoot, 'data/MNIST/raw')])
-    expect(mockedExecPromise).toBeCalledWith('dvc status', {
+    expect(mockedExecPromise).toBeCalledWith('dvc status --show-json', {
       cwd: dvcRoot
     })
   })
@@ -105,7 +105,7 @@ describe('getStatus', () => {
       join(dvcRoot, 'baz'),
       join(dvcRoot, 'foo')
     ])
-    expect(mockedExecPromise).toBeCalledWith('dvc status', {
+    expect(mockedExecPromise).toBeCalledWith('dvc status --show-json', {
       cwd: dvcRoot
     })
   })
@@ -159,7 +159,7 @@ describe('getStatus', () => {
       join(dvcRoot, 'data/prepared')
     ])
     expect(mapPaths(status.deleted)).toEqual([join(dvcRoot, 'model.pkl')])
-    expect(mockedExecPromise).toBeCalledWith('dvc status', {
+    expect(mockedExecPromise).toBeCalledWith('dvc status --show-json', {
       cwd: dvcRoot
     })
   })
