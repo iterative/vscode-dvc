@@ -3,9 +3,7 @@ import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 
-export type SourceControlManagementState = {
-  [key in Status]: Set<string>
-}
+export type SourceControlManagementState = Record<Status, Set<string>>
 
 enum Status {
   DELETED = 'deleted',
@@ -40,10 +38,17 @@ export class SourceControlManagement {
     )
   }
 
+  private isValidStatus(status: string): boolean {
+    return Object.values(Status).includes(status as Status)
+  }
+
   private getResourceStates(
     contextValue: Status,
     paths: Set<string>
   ): ResourceState[] {
+    if (!this.isValidStatus(contextValue)) {
+      return []
+    }
     return [...paths]
       .filter(
         path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'

@@ -9,9 +9,7 @@ import {
   Uri
 } from 'vscode'
 
-export type DecorationState = {
-  [key in Status]: Set<string>
-}
+export type DecorationState = Record<Status, Set<string>>
 
 enum Status {
   DELETED = 'deleted',
