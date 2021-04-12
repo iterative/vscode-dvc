@@ -15,7 +15,7 @@ describe('Repository', () => {
     const config = new Config()
     const dvcRoot = resolve(__dirname, '..', '..', 'demo')
     const decorationProvider = new DecorationProvider()
-    const repository = new Repository(config, dvcRoot, decorationProvider)
+    const repository = new Repository(dvcRoot, config, decorationProvider)
     expect(repository.ready).toBeDefined()
   })
 })

@@ -66,7 +66,7 @@ export class Extension {
   private initializeDvcRepositories(dvcRoots: string[]) {
     return dvcRoots.map(dvcRoot => {
       const repository = this.dispose.track(
-        new Repository(this.config, dvcRoot, this.decorationProviders[dvcRoot])
+        new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
       )
       this.dvcRepositories[dvcRoot] = repository
     })

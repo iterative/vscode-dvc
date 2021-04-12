@@ -46,8 +46,8 @@ export class Repository {
   }
 
   constructor(
-    config: Config,
     dvcRoot: string,
+    config: Config,
     decorationProvider?: DecorationProvider
   ) {
     this.config = config
