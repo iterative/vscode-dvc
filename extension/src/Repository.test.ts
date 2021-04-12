@@ -52,7 +52,9 @@ describe('Repository', () => {
     })
   })
 
-  describe('getStatus', () => {
+  describe('updateStatus', () => {
+    const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+
     it('should return an object containing modified paths', async () => {
       const statusOutput = {
         train: [
@@ -64,20 +66,17 @@ describe('Repository', () => {
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
       } as Record<string, (Record<string, Record<string, string>> | string)[]>
-
-      const dvcRoot = resolve(__dirname, '..', '..', '..', 'demo')
       mockedStatus.mockResolvedValueOnce(statusOutput)
 
-      const status = await repository.getStatus({
-        dvcRoot,
-        cliPath: 'dvc'
-      })
+      await repository.updateStatus()
 
-      expect(Object.keys(status)).toEqual(['modified'])
-      expect(mapPaths(status.modified)).toEqual([
+      expect(repository.deleted).toEqual([])
+      expect(repository.notInCache).toEqual([])
+      expect(repository.new).toEqual([])
+      expect(mapPaths(repository.modified)).toEqual([
         join(dvcRoot, 'data/MNIST/raw')
       ])
-      expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: 'dvc' })
+      expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
     })
 
     it('should return an object containing modified and deleted paths', async () => {
@@ -92,17 +91,14 @@ describe('Repository', () => {
           { 'changed outs': { bar: 'deleted' } }
         ]
       } as Record<string, (Record<string, Record<string, string>> | string)[]>
-      const dvcRoot = __dirname
       mockedStatus.mockResolvedValueOnce(statusOutput)
 
-      const status = await repository.getStatus({
-        dvcRoot,
-        cliPath: undefined
-      })
+      await repository.updateStatus()
 
-      expect(Object.keys(status).sort()).toEqual(['deleted', 'modified'])
-      expect(mapPaths(status.deleted)).toEqual([join(dvcRoot, 'bar')])
-      expect(mapPaths(status.modified)).toEqual([
+      expect(repository.new).toEqual([])
+      expect(repository.notInCache).toEqual([])
+      expect(mapPaths(repository.deleted)).toEqual([join(dvcRoot, 'bar')])
+      expect(mapPaths(repository.modified)).toEqual([
         join(dvcRoot, 'baz'),
         join(dvcRoot, 'foo')
       ])
@@ -138,30 +134,22 @@ describe('Repository', () => {
           { 'changed outs': { 'data/data.xml': 'not in cache' } }
         ]
       } as Record<string, (Record<string, Record<string, string>> | string)[]>
-      const dvcRoot = __dirname
       mockedStatus.mockResolvedValueOnce(statusOutput)
 
-      const status = await repository.getStatus({
-        dvcRoot,
-        cliPath: 'dvc'
-      })
+      await repository.updateStatus()
 
-      expect(Object.keys(status).sort()).toEqual([
-        'deleted',
-        'modified',
-        'not in cache'
-      ])
-      expect(mapPaths(status.modified)).toEqual([
+      expect(repository.new).toEqual([])
+      expect(mapPaths(repository.modified)).toEqual([
         join(dvcRoot, 'data/features')
       ])
-      expect(mapPaths(status['not in cache'])).toEqual([
+      expect(mapPaths(repository.notInCache)).toEqual([
         join(dvcRoot, 'data/data.xml'),
         join(dvcRoot, 'data/prepared')
       ])
-      expect(mapPaths(status.deleted)).toEqual([join(dvcRoot, 'model.pkl')])
+      expect(mapPaths(repository.deleted)).toEqual([join(dvcRoot, 'model.pkl')])
       expect(mockedStatus).toBeCalledWith({
         cwd: dvcRoot,
-        cliPath: 'dvc'
+        cliPath: undefined
       })
     })
   })

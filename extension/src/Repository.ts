@@ -153,7 +153,7 @@ export class Repository {
     )
   }
 
-  public async getStatus(options: {
+  private async getStatus(options: {
     dvcRoot: string
     cliPath: string | undefined
   }): Promise<Partial<Record<Status, Uri[]>>> {
