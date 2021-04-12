@@ -4,11 +4,11 @@ import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 
 interface scmResourceState {
-  deleted: Uri[]
-  modified: Uri[]
-  new: Uri[]
-  notInCache: Uri[]
-  untracked: Uri[]
+  deleted: Set<string>
+  modified: Set<string>
+  new: Set<string>
+  notInCache: Set<string>
+  untracked: Set<string>
 }
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
@@ -28,16 +28,14 @@ export class SourceControlManagement {
 
   private getResourceStates(
     contextValue: string,
-    uris: Uri[]
+    paths: Set<string>
   ): { resourceUri: Uri; contextValue: string }[] {
-    return uris
+    return [...paths]
       .filter(
-        uri =>
-          extname(uri.fsPath) !== '.dvc' &&
-          basename(uri.fsPath) !== '.gitignore'
+        path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
       )
-      .map(uri => ({
-        resourceUri: uri,
+      .map(path => ({
+        resourceUri: Uri.file(path),
         contextValue
       }))
   }

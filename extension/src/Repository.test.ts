@@ -5,7 +5,6 @@ import { DecorationProvider } from './DecorationProvider'
 import { Repository } from './Repository'
 import { window } from 'vscode'
 import { listDvcOnlyRecursive, status } from './cli/reader'
-import { mapPaths } from './util/testHelpers'
 
 jest.mock('./Config')
 jest.mock('./cli/reader')
@@ -70,12 +69,12 @@ describe('Repository', () => {
 
       await repository.updateStatus()
 
-      expect(repository.deleted).toEqual([])
-      expect(repository.notInCache).toEqual([])
-      expect(repository.new).toEqual([])
-      expect(mapPaths(repository.modified)).toEqual([
-        join(dvcRoot, 'data/MNIST/raw')
-      ])
+      expect(repository.deleted).toEqual(new Set())
+      expect(repository.notInCache).toEqual(new Set())
+      expect(repository.new).toEqual(new Set())
+      expect(repository.modified).toEqual(
+        new Set([join(dvcRoot, 'data/MNIST/raw')])
+      )
       expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
     })
 
@@ -95,13 +94,12 @@ describe('Repository', () => {
 
       await repository.updateStatus()
 
-      expect(repository.new).toEqual([])
-      expect(repository.notInCache).toEqual([])
-      expect(mapPaths(repository.deleted)).toEqual([join(dvcRoot, 'bar')])
-      expect(mapPaths(repository.modified)).toEqual([
-        join(dvcRoot, 'baz'),
-        join(dvcRoot, 'foo')
-      ])
+      expect(repository.new).toEqual(new Set())
+      expect(repository.notInCache).toEqual(new Set())
+      expect(repository.deleted).toEqual(new Set([join(dvcRoot, 'bar')]))
+      expect(repository.modified).toEqual(
+        new Set([join(dvcRoot, 'baz'), join(dvcRoot, 'foo')])
+      )
       expect(mockedStatus).toBeCalledWith({
         cwd: dvcRoot,
         cliPath: undefined
@@ -138,15 +136,17 @@ describe('Repository', () => {
 
       await repository.updateStatus()
 
-      expect(repository.new).toEqual([])
-      expect(mapPaths(repository.modified)).toEqual([
-        join(dvcRoot, 'data/features')
-      ])
-      expect(mapPaths(repository.notInCache)).toEqual([
-        join(dvcRoot, 'data/data.xml'),
-        join(dvcRoot, 'data/prepared')
-      ])
-      expect(mapPaths(repository.deleted)).toEqual([join(dvcRoot, 'model.pkl')])
+      expect(repository.new).toEqual(new Set())
+      expect(repository.modified).toEqual(
+        new Set([join(dvcRoot, 'data/features')])
+      )
+      expect(repository.notInCache).toEqual(
+        new Set([
+          join(dvcRoot, 'data/data.xml'),
+          join(dvcRoot, 'data/prepared')
+        ])
+      )
+      expect(repository.deleted).toEqual(new Set([join(dvcRoot, 'model.pkl')]))
       expect(mockedStatus).toBeCalledWith({
         cwd: dvcRoot,
         cliPath: undefined

@@ -3,7 +3,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from './git'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { DecorationProvider } from './DecorationProvider'
-import { Uri } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from './cli/reader'
 import { dirname, join } from 'path'
@@ -44,11 +43,11 @@ export class Repository {
   private scm?: SourceControlManagement
 
   tracked = new Set<string>()
-  deleted: Uri[] = []
-  modified: Uri[] = []
-  new: Uri[] = []
-  notInCache: Uri[] = []
-  untracked: Uri[] = []
+  deleted = new Set<string>()
+  modified = new Set<string>()
+  new = new Set<string>()
+  notInCache = new Set<string>()
+  untracked = new Set<string>()
 
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
@@ -108,24 +107,25 @@ export class Repository {
   }
 
   private reduceStatuses(
-    reducedStatus: Partial<Record<Status, string[]>>,
+    reducedStatus: Partial<Record<Status, Set<string>>>,
     statuses: PathStatus[]
   ) {
     return statuses.map(entry =>
       Object.entries(entry).map(([relativePath, status]) => {
-        const existingPaths = reducedStatus[status] || []
-        reducedStatus[status] = [...new Set([...existingPaths, relativePath])]
+        const absolutePath = join(this.dvcRoot, relativePath)
+        const existingPaths = reducedStatus[status] || new Set<string>()
+        reducedStatus[status] = existingPaths.add(absolutePath)
       })
     )
   }
 
   private reduceToPathStatuses(
     filteredStatusOutput: FilteredStatusOutput
-  ): Partial<Record<Status, string[]>> {
+  ): Partial<Record<Status, Set<string>>> {
     const statusReducer = (
-      reducedStatus: Partial<Record<Status, string[]>>,
+      reducedStatus: Partial<Record<Status, Set<string>>>,
       entry: ValidStageOrFileStatuses[]
-    ): Partial<Record<Status, string[]>> => {
+    ): Partial<Record<Status, Set<string>>> => {
       const statuses = this.getFileOrStageStatuses(entry)
 
       this.reduceStatuses(reducedStatus, statuses)
@@ -136,40 +136,23 @@ export class Repository {
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  private getUriStatuses(
-    pathStatuses: Partial<Record<Status, string[]>>,
-    dvcRoot: string
-  ): Partial<Record<Status, Uri[]>> {
-    return Object.entries(pathStatuses).reduce(
-      (uriStatuses, [status, paths]) => {
-        uriStatuses[status as Status] = paths?.map(path =>
-          Uri.file(join(dvcRoot, path))
-        )
-        return uriStatuses
-      },
-      {} as Partial<Record<Status, Uri[]>>
-    )
-  }
-
-  private async getStatus(): Promise<Partial<Record<Status, Uri[]>>> {
+  private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
     const statusOutput = (await status({
       cliPath: this.config.dvcPath,
       cwd: this.dvcRoot
     })) as Record<string, (ValidStageOrFileStatuses | string)[]>
 
     const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
-    const pathStatuses = this.reduceToPathStatuses(filteredStatusOutput)
-
-    return this.getUriStatuses(pathStatuses, this.dvcRoot)
+    return this.reduceToPathStatuses(filteredStatusOutput)
   }
 
   public async updateStatus() {
     const status = await this.getStatus()
 
-    this.modified = status.modified || []
-    this.deleted = status.deleted || []
-    this.new = status.new || []
-    this.notInCache = status['not in cache'] || []
+    this.modified = status.modified || new Set<string>()
+    this.deleted = status.deleted || new Set<string>()
+    this.new = status.new || new Set<string>()
+    this.notInCache = status['not in cache'] || new Set<string>()
 
     this.scm?.setResourceStates({
       deleted: this.deleted,
@@ -209,6 +192,7 @@ export class Repository {
       new: new Set<string>(),
       notInCache: new Set<string>()
     })
+
     this.scm = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
         deleted: this.deleted,
