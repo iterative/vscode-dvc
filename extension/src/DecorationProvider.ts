@@ -32,14 +32,25 @@ export class DecorationProvider implements FileDecorationProvider {
   readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly onDidChangeDecorations: EventEmitter<Uri[]>
 
+  private isValidStatus(status: string): boolean {
+    return Object.values(Status).includes(status as Status)
+  }
+
   public setState = (state: DecorationState) => {
     this.state = state
     this.onDidChangeDecorations.fire(
-      Object.values(this.state)
-        .reduce((toDecorate: string[], paths: Set<string>): string[] => {
-          return [...toDecorate, ...paths]
-        }, [])
-        .map(value => Uri.file(value))
+      Object.entries(this.state)
+        .reduce(
+          (toDecorate: string[], entry: [string, Set<string>]): string[] => {
+            const [status, paths] = entry as [Status, Set<string>]
+            if (!this.isValidStatus(status)) {
+              return toDecorate
+            }
+            return [...toDecorate, ...paths]
+          },
+          []
+        )
+        .map(path => Uri.file(path))
     )
   }
 
@@ -55,19 +66,19 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
-    if (this.state?.deleted?.has(uri.path)) {
+    if (this.state.deleted?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
-    if (this.state?.modified?.has(uri.path)) {
+    if (this.state.modified?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
-    if (this.state?.new?.has(uri.path)) {
+    if (this.state.new?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
-    if (this.state?.notInCache?.has(uri.path)) {
+    if (this.state.notInCache?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
-    if (this.state?.tracked?.has(uri.path)) {
+    if (this.state.tracked?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
   }
