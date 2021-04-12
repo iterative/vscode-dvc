@@ -9,6 +9,7 @@ import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from './cli/reader'
 import { dirname, join } from 'path'
+import { observable, makeObservable } from 'mobx'
 
 enum Status {
   DELETED = 'deleted',
@@ -63,6 +64,7 @@ export class Repository {
     return this.state
   }
 
+  @observable
   private state: RepositoryState
 
   private config: Config
@@ -203,6 +205,7 @@ export class Repository {
     config: Config,
     decorationProvider?: DecorationProvider
   ) {
+    makeObservable(this)
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
