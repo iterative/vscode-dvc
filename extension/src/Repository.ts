@@ -43,6 +43,7 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private scm?: SourceControlManagement
 
+  tracked = new Set<string>()
   deleted: Uri[] = []
   modified: Uri[] = []
   new: Uri[] = []
@@ -63,12 +64,12 @@ export class Repository {
     )
   }
 
-  public async getDvcTracked(): Promise<Set<string>> {
+  public async updateTracked(): Promise<void> {
     const dvcListFiles = await listDvcOnlyRecursive({
       cwd: this.dvcRoot,
       cliPath: this.config.dvcPath
     })
-    return new Set([
+    this.tracked = new Set([
       ...this.getAbsolutePath(dvcListFiles),
       ...this.getAbsoluteParentPath(dvcListFiles)
     ])
@@ -191,13 +192,13 @@ export class Repository {
   }
 
   public async setup() {
-    const [files] = await Promise.all([
-      this.getDvcTracked(),
+    await Promise.all([
+      this.updateTracked(),
       this.updateUntracked(),
       this.updateStatus()
     ])
 
-    this.decorationProvider?.setTrackedFiles(files)
+    this.decorationProvider?.setTrackedFiles(this.tracked)
     this.scm = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
         deleted: this.deleted,

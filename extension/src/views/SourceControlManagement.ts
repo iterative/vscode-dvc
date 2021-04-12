@@ -3,7 +3,7 @@ import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 
-type scmResourceState = {
+interface scmResourceState {
   deleted: Uri[]
   modified: Uri[]
   new: Uri[]
