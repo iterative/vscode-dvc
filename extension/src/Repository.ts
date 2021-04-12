@@ -47,6 +47,7 @@ export class Repository {
   modified: Uri[] = []
   new: Uri[] = []
   notInCache: Uri[] = []
+  untracked: Uri[] = []
 
   private filterRootDir(rootDir: string, dirs: string[] = []) {
     return dirs.filter(dir => dir !== rootDir)
@@ -180,28 +181,42 @@ export class Repository {
     this.deleted = status.deleted || []
     this.new = status.new || []
     this.notInCache = status['not in cache'] || []
+
+    this.scm?.setResourceStates({
+      deleted: this.deleted,
+      modified: this.modified,
+      new: this.new,
+      notInCache: this.notInCache,
+      untracked: this.untracked
+    })
   }
 
   public async updateUntracked() {
-    const untrackedChanges = await getAllUntracked(this.dvcRoot)
-    return this.scm?.setUntracked(untrackedChanges)
+    this.untracked = await getAllUntracked(this.dvcRoot)
+    return this.scm?.setResourceStates({
+      deleted: this.deleted,
+      modified: this.modified,
+      new: this.new,
+      notInCache: this.notInCache,
+      untracked: this.untracked
+    })
   }
 
   public async setup() {
-    const [files, untracked, status] = await Promise.all([
+    const [files] = await Promise.all([
       this.getDvcTracked(this.dvcRoot, this.config.dvcPath),
-      getAllUntracked(this.dvcRoot),
-      this.getStatus({
-        dvcRoot: this.dvcRoot,
-        cliPath: this.config.dvcPath
-      })
+      this.updateUntracked(),
+      this.updateStatus()
     ])
 
     this.decorationProvider?.setTrackedFiles(files)
     this.scm = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, {
-        modified: status.modified || [],
-        untracked
+        deleted: this.deleted,
+        modified: this.modified,
+        new: this.new,
+        notInCache: this.notInCache,
+        untracked: this.untracked
       })
     )
 

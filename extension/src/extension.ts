@@ -160,6 +160,7 @@ export class Extension {
 
           gitExtensionRepository.onDidChange(async () => {
             repository?.updateUntracked()
+            repository?.updateStatus()
           })
         })
       })

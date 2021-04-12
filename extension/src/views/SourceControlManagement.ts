@@ -9,39 +9,47 @@ export class SourceControlManagement {
   @observable
   private resourceGroup: SourceControlResourceGroup
 
-  @observable
-  private untracked: { resourceUri: Uri; contextValue: 'untracked' }[] = []
-
-  @observable
-  private modified: { resourceUri: Uri; contextValue: 'modified' }[] = []
-
-  private setResourceStates() {
-    this.resourceGroup.resourceStates = [...this.untracked, ...this.modified]
-  }
-
-  public setUntracked(untracked: Uri[]) {
-    this.untracked = this.getUntrackedResourceStates(untracked)
-    this.setResourceStates()
-  }
-
-  private getUntrackedResourceStates(
+  public setResourceStates(state: {
+    deleted: Uri[]
+    modified: Uri[]
+    new: Uri[]
+    notInCache: Uri[]
     untracked: Uri[]
-  ): { resourceUri: Uri; contextValue: 'untracked' }[] {
-    return untracked
+  }) {
+    this.resourceGroup.resourceStates = [
+      ...this.getResourceStates('deleted', state.deleted),
+      ...this.getResourceStates('modified', state.modified),
+      ...this.getResourceStates('new', state.new),
+      ...this.getResourceStates('notInCache', state.notInCache),
+      ...this.getResourceStates('untracked', state.untracked)
+    ]
+  }
+
+  private getResourceStates(
+    contextValue: string,
+    uris: Uri[]
+  ): { resourceUri: Uri; contextValue: string }[] {
+    return uris
       .filter(
-        untracked =>
-          extname(untracked.fsPath) !== '.dvc' &&
-          basename(untracked.fsPath) !== '.gitignore'
+        uri =>
+          extname(uri.fsPath) !== '.dvc' &&
+          basename(uri.fsPath) !== '.gitignore'
       )
-      .map(untracked => ({
-        resourceUri: untracked,
-        contextValue: 'untracked'
+      .map(uri => ({
+        resourceUri: uri,
+        contextValue
       }))
   }
 
   constructor(
     repositoryRoot: string,
-    { modified, untracked }: Record<string, Uri[]>
+    state: {
+      deleted: Uri[]
+      modified: Uri[]
+      new: Uri[]
+      notInCache: Uri[]
+      untracked: Uri[]
+    }
   ) {
     makeObservable(this)
 
@@ -59,12 +67,6 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.untracked = this.getUntrackedResourceStates(untracked)
-    this.modified = modified.map(uri => ({
-      resourceUri: uri,
-      contextValue: 'modified'
-    }))
-
-    this.setResourceStates()
+    this.setResourceStates(state)
   }
 }
