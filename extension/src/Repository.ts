@@ -67,7 +67,7 @@ export class Repository {
   private config: Config
   private dvcRoot: string
   private decorationProvider?: DecorationProvider
-  private scm?: SourceControlManagement
+  private sourceControlManagement: SourceControlManagement
 
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
@@ -84,13 +84,13 @@ export class Repository {
   }
 
   public async updateTracked(): Promise<void> {
-    const dvcListFiles = await listDvcOnlyRecursive({
+    const tracked = await listDvcOnlyRecursive({
       cwd: this.dvcRoot,
       cliPath: this.config.dvcPath
     })
     this.state.tracked = new Set([
-      ...this.getAbsolutePath(dvcListFiles),
-      ...this.getAbsoluteParentPath(dvcListFiles)
+      ...this.getAbsolutePath(tracked),
+      ...this.getAbsoluteParentPath(tracked)
     ])
   }
 
@@ -173,33 +173,27 @@ export class Repository {
     this.state.deleted = status.deleted || new Set<string>()
     this.state.new = status.new || new Set<string>()
     this.state.notInCache = status['not in cache'] || new Set<string>()
-
-    this.scm?.setResourceStates(this.state)
   }
 
   public async updateUntracked() {
     this.state.untracked = await getAllUntracked(this.dvcRoot)
-
-    return this.scm?.setResourceStates(this.state)
   }
 
-  public updateState() {
-    return Promise.all([
+  public async updateState() {
+    await Promise.all([
       this.updateTracked(),
       this.updateUntracked(),
       this.updateStatus()
     ])
+
+    return Promise.all([
+      this.sourceControlManagement?.setResourceStates(this.state),
+      this.decorationProvider?.setState(this.state)
+    ])
   }
 
-  public async setup() {
+  private async setup() {
     await this.updateState()
-
-    this.decorationProvider?.setState(this.state)
-
-    this.scm = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, this.state)
-    )
-
     this._initialized.resolve()
   }
 
@@ -212,5 +206,11 @@ export class Repository {
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
     this.state = new RepositoryState()
+
+    this.sourceControlManagement = this.dispose?.track(
+      new SourceControlManagement(this.dvcRoot, this.state)
+    )
+
+    this.setup()
   }
 }

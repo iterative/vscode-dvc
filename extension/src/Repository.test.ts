@@ -1,42 +1,56 @@
 import { join, resolve } from 'path'
 import { Config } from './Config'
+import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
 import { Repository } from './Repository'
-import { window } from 'vscode'
 import { listDvcOnlyRecursive, status } from './cli/reader'
 import { getAllUntracked } from './git'
 
 jest.mock('./Config')
+jest.mock('@hediet/std/disposable')
+jest.mock('./views/SourceControlManagement')
+jest.mock('./DecorationProvider')
 jest.mock('./cli/reader')
 jest.mock('./git')
 
-const mockedWindow = mocked(window)
-mockedWindow.registerFileDecorationProvider = jest.fn()
-
-const mockListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
+const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
-
-const mockedAllUntracked = mocked(getAllUntracked)
+const mockedGetAllUntracked = mocked(getAllUntracked)
+const mockedDecorationProvider = mocked(DecorationProvider)
+const mockedConfig = mocked(Config)
+const mockedSourceControlManagement = mocked(SourceControlManagement)
 
 const dvcRoot = resolve(__dirname, '..', '..', 'demo')
 
 beforeEach(() => {
-  jest.resetAllMocks()
+  jest.clearAllMocks()
 })
 
 describe('Repository', () => {
-  mockListDvcOnlyRecursive.mockResolvedValueOnce([])
-  mockedStatus.mockResolvedValue({})
-  const config = new Config()
-  const decorationProvider = new DecorationProvider()
-  const repository = new Repository(dvcRoot, config, decorationProvider)
-  it('should be able to be instantiated', async () => {
-    expect(repository.ready).toBeDefined()
-  })
-
   describe('updateState', () => {
     it('should update the repository state', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedStatus.mockResolvedValue({})
+      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+      mockedDecorationProvider.mockImplementation(function() {
+        return ({ setState: jest.fn() } as unknown) as DecorationProvider
+      })
+      mockedSourceControlManagement.mockImplementation(function() {
+        return ({
+          setResourceStates: jest.fn()
+        } as unknown) as SourceControlManagement
+      })
+      mockedConfig.mockImplementation(function() {
+        return ({
+          dvcPath: undefined
+        } as unknown) as Config
+      })
+
+      const config = new Config()
+      const decorationProvider = new DecorationProvider()
+      const repository = new Repository(dvcRoot, config, decorationProvider)
+
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
@@ -44,7 +58,7 @@ describe('Repository', () => {
       const rawDataDir = join(MNISTDataDir, 'raw')
       const model = 'model.pt'
 
-      mockListDvcOnlyRecursive.mockResolvedValueOnce([
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         logAcc,
         logLoss,
         model,
@@ -66,7 +80,7 @@ describe('Repository', () => {
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
       ])
-      mockedAllUntracked.mockResolvedValueOnce(untracked)
+      mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
       await repository.updateState()
 
@@ -82,6 +96,11 @@ describe('Repository', () => {
       const emptySet = new Set()
 
       expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
+      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith({
+        cwd: dvcRoot,
+        cliPath: undefined
+      })
 
       expect(repository.getState()).toEqual({
         deleted: emptySet,
@@ -95,13 +114,34 @@ describe('Repository', () => {
   })
 
   it('should return an object with an entry for each path', async () => {
+    mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+    mockedStatus.mockResolvedValue({})
+    mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+    mockedDecorationProvider.mockImplementation(function() {
+      return ({ setState: jest.fn() } as unknown) as DecorationProvider
+    })
+    mockedSourceControlManagement.mockImplementation(function() {
+      return ({
+        setResourceStates: jest.fn()
+      } as unknown) as SourceControlManagement
+    })
+    mockedConfig.mockImplementation(function() {
+      return ({
+        dvcPath: undefined
+      } as unknown) as Config
+    })
+
+    const config = new Config()
+    const decorationProvider = new DecorationProvider()
+    const repository = new Repository(dvcRoot, config, decorationProvider)
+
     const logDir = 'logs'
     const logAcc = join(logDir, 'acc.tsv')
     const logLoss = join(logDir, 'loss.tsv')
     const dataDir = 'data'
     const model = 'model.pt'
 
-    mockListDvcOnlyRecursive.mockResolvedValueOnce([
+    mockedListDvcOnlyRecursive.mockResolvedValueOnce([
       logAcc,
       logLoss,
       model,
@@ -154,9 +194,16 @@ describe('Repository', () => {
       resolve(dvcRoot, 'some', 'untracked', 'go.go'),
       resolve(dvcRoot, 'some', 'untracked', 'perl.pl')
     ])
-    mockedAllUntracked.mockResolvedValueOnce(untracked)
+    mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
     await repository.updateState()
+
+    expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
+    expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
+    expect(mockedListDvcOnlyRecursive).toBeCalledWith({
+      cwd: dvcRoot,
+      cliPath: undefined
+    })
 
     expect(repository.getState()).toEqual({
       new: new Set(),
