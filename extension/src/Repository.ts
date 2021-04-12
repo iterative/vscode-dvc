@@ -182,7 +182,7 @@ export class Repository {
     this.notInCache = status['not in cache'] || []
   }
 
-  public async updateTracked() {
+  public async updateUntracked() {
     const untrackedChanges = await getAllUntracked(this.dvcRoot)
     return this.scm?.setUntracked(untrackedChanges)
   }
