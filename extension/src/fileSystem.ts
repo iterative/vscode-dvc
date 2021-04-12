@@ -2,9 +2,10 @@ import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { lstatSync } from 'fs'
+import { readdir } from 'fs-extra'
 import { dirname, join, resolve, basename } from 'path'
-import glob from 'tiny-glob'
 import { getRoot, listDvcOnlyRecursive } from './cli/reader'
+import { definedAndNonEmpty } from './util'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -53,31 +54,44 @@ const findDvcAbsoluteRootPath = async (
   } catch (e) {}
 }
 
-const findDvcSubRootPaths = async (cwd: string): Promise<string[]> => {
-  const files = await glob(join('**', '.dvc'), {
-    absolute: true,
-    cwd,
-    dot: true
-  })
+export const isDirectory = (path: string): boolean => {
+  try {
+    return lstatSync(path).isDirectory()
+  } catch {
+    return false
+  }
+}
 
-  return filterRootDir(
-    files.map(file => dirname(file)),
-    cwd
-  )
+export const findDvcSubRootPaths = async (
+  cwd: string
+): Promise<string[] | undefined> => {
+  if (isDirectory(join(cwd, '.dvc'))) {
+    return [cwd]
+  }
+  const children = await readdir(cwd)
+
+  return children
+    .filter(child => isDirectory(join(cwd, child, '.dvc')))
+    .map(child => join(cwd, child))
 }
 
 export const findDvcRootPaths = async (
   cwd: string,
   cliPath: string | undefined
 ): Promise<string[]> => {
-  const [subRoots, absoluteRoot] = await Promise.all([
-    findDvcSubRootPaths(cwd),
-    findDvcAbsoluteRootPath(cwd, cliPath)
-  ])
+  const subRoots = await findDvcSubRootPaths(cwd)
 
-  const roots = [...subRoots, absoluteRoot].filter(v => v).sort() as string[]
+  if (definedAndNonEmpty(subRoots)) {
+    return subRoots
+  }
 
-  return roots
+  const absoluteRoot = await findDvcAbsoluteRootPath(cwd, cliPath)
+
+  if (!absoluteRoot) {
+    return []
+  }
+
+  return [absoluteRoot]
 }
 
 export const getAbsoluteTrackedPath = (files: string[]): string[] =>
@@ -97,28 +111,10 @@ export const findDvcTrackedPaths = async (
   cwd: string,
   cliPath: string | undefined
 ): Promise<Set<string>> => {
-  const [dotDvcFiles, dvcListFiles] = await Promise.all([
-    glob(join('**', '*.dvc'), {
-      absolute: true,
-      cwd,
-      dot: true,
-      filesOnly: true
-    }),
-
-    listDvcOnlyRecursive({ cwd, cliPath })
-  ])
+  const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
 
   return new Set([
-    ...getAbsoluteTrackedPath(dotDvcFiles),
     ...getAbsolutePath(cwd, dvcListFiles),
     ...getAbsoluteParentPath(cwd, dvcListFiles)
   ])
-}
-
-export const isDirectory = (path: string): boolean => {
-  try {
-    return lstatSync(path).isDirectory()
-  } catch {
-    return false
-  }
 }

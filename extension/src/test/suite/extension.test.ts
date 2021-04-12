@@ -35,6 +35,16 @@ suite('Extension Test Suite', () => {
       join('logs', 'loss.tsv'),
       'model.pt'
     ])
+    stub(DvcReader, 'status').resolves({
+      train: [
+        { 'changed deps': { 'data/MNIST': 'modified' } },
+        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+        'always changed'
+      ],
+      'data/MNIST/raw.dvc': [
+        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+      ]
+    })
   })
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')

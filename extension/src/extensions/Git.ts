@@ -65,7 +65,7 @@ interface VscodeGit {
   getAPI(version: number): Thenable<ExtensionAPI>
 }
 
-export class GitExtensionRepository {
+class GitExtensionRepository {
   public dispose = Disposable.fn()
 
   private onDidUntrackedChangeEmitter: EventEmitter<void>
