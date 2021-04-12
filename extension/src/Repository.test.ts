@@ -39,7 +39,7 @@ describe('Repository', () => {
       const logLoss = join(logFolder, 'loss.tsv')
       const model = 'model.pt'
       mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
-      const tracked = await repository.getDvcTracked(dvcRoot, 'dvc')
+      const tracked = await repository.getDvcTracked()
 
       expect(tracked).toEqual(
         new Set([
