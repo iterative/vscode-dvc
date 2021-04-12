@@ -158,7 +158,7 @@ export class Extension {
         dvcRoots.forEach(async dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 
-          gitExtensionRepository.onDidUntrackedChange(() => {
+          gitExtensionRepository.onDidChange(() => {
             repository?.updateUntracked()
           })
         })
