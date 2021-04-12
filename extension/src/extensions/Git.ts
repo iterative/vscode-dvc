@@ -1,8 +1,6 @@
 import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import isEqual from 'lodash.isequal'
-import { makeObservable, observable } from 'mobx'
 
 const enum GitStatus {
   INDEX_MODIFIED,
@@ -68,18 +66,8 @@ interface VscodeGit {
 class GitExtensionRepository {
   public dispose = Disposable.fn()
 
-  private onDidUntrackedChangeEmitter: EventEmitter<void>
-  readonly onDidUntrackedChange: Event<void>
-
-  @observable
-  private untrackedChanges: string[]
-
-  private getUntrackedChanges(changes: Change[]): string[] {
-    return changes
-      .filter(change => change.status === GitStatus.UNTRACKED)
-      .map(change => change.uri.fsPath)
-      .sort()
-  }
+  private onDidChangeEmitter: EventEmitter<void>
+  readonly onDidChange: Event<void>
 
   private repositoryRoot: string
 
@@ -88,25 +76,14 @@ class GitExtensionRepository {
   }
 
   constructor(repository: Repository) {
-    makeObservable(this)
     this.repositoryRoot = repository.rootUri.fsPath
 
-    this.untrackedChanges = this.getUntrackedChanges(
-      repository.state.workingTreeChanges
-    )
-
-    this.onDidUntrackedChangeEmitter = this.dispose.track(new EventEmitter())
-    this.onDidUntrackedChange = this.onDidUntrackedChangeEmitter.event
+    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
+    this.onDidChange = this.onDidChangeEmitter.event
 
     this.dispose.track(
       repository.state.onDidChange(() => {
-        const currentUntrackedChanges = this.getUntrackedChanges(
-          repository.state.workingTreeChanges
-        )
-        if (!isEqual(this.untrackedChanges, currentUntrackedChanges)) {
-          this.untrackedChanges = currentUntrackedChanges
-          this.onDidUntrackedChangeEmitter.fire()
-        }
+        this.onDidChangeEmitter.fire()
       })
     )
   }
