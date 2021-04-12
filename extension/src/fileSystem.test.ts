@@ -4,13 +4,11 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
-import { getRoot, listDvcOnlyRecursive } from './cli/reader'
+import { getRoot } from './cli/reader'
 
 const {
   addFileChangeHandler,
   findDvcRootPaths,
-  findDvcTrackedPaths,
-  getAbsoluteTrackedPath,
   getWatcher,
   isDirectory
 } = fileSystem
@@ -22,7 +20,6 @@ jest.mock('./cli/reader')
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
 const mockGetRoot = mocked(getRoot)
-const mockListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -129,36 +126,6 @@ describe('findDvcRootPaths', () => {
   it('should return an empty array given no dvc root in or above the given directory', async () => {
     const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath)
     expect(dvcRoots).toEqual([])
-  })
-})
-
-describe('getAbsoluteTrackedPath', () => {
-  it('should return a list of tracked absolute paths given a list of .dvc files', async () => {
-    const tracked = getAbsoluteTrackedPath([
-      join(dvcDemoPath, 'somefile.txt.dvc')
-    ])
-
-    expect(tracked).toEqual([join(dvcDemoPath, 'somefile.txt')])
-  })
-})
-
-describe('findDvcTrackedPaths', () => {
-  it('should return a Set of tracked paths, their folders (if files) and any paths corresponding .dvc files', async () => {
-    const logFolder = 'logs'
-    const logAcc = join(logFolder, 'acc.tsv')
-    const logLoss = join(logFolder, 'loss.tsv')
-    const model = 'model.pt'
-    mockListDvcOnlyRecursive.mockResolvedValueOnce([logAcc, logLoss, model])
-    const tracked = await findDvcTrackedPaths(dvcDemoPath, 'dvc')
-
-    expect(tracked).toEqual(
-      new Set([
-        resolve(dvcDemoPath, logAcc),
-        resolve(dvcDemoPath, logLoss),
-        resolve(dvcDemoPath, logFolder),
-        resolve(dvcDemoPath, model)
-      ])
-    )
   })
 })
 

@@ -3,10 +3,36 @@ import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from './git'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { DecorationProvider } from './DecorationProvider'
-import { findDvcTrackedPaths } from './fileSystem'
 import { Uri } from 'vscode'
 import { getStatus } from './cli'
 import { Deferred } from '@hediet/std/synchronization'
+import { listDvcOnlyRecursive } from './cli/reader'
+import { dirname, join } from 'path'
+
+const filterRootDir = (dirs: string[], rootDir: string) =>
+  dirs.filter(dir => dir !== rootDir)
+
+const getAbsolutePath = (rootDir: string, files: string[]): string[] =>
+  files.map(file => join(rootDir, file))
+
+const getAbsoluteParentPath = (rootDir: string, files: string[]): string[] => {
+  return filterRootDir(
+    files.map(file => join(rootDir, dirname(file))),
+    rootDir
+  )
+}
+
+export const findDvcTrackedPaths = async (
+  cwd: string,
+  cliPath: string | undefined
+): Promise<Set<string>> => {
+  const dvcListFiles = await listDvcOnlyRecursive({ cwd, cliPath })
+
+  return new Set([
+    ...getAbsolutePath(cwd, dvcListFiles),
+    ...getAbsoluteParentPath(cwd, dvcListFiles)
+  ])
+}
 
 export class Repository {
   public readonly dispose = Disposable.fn()
