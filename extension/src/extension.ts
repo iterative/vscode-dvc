@@ -55,7 +55,7 @@ export class Extension {
   }
 
   private initializeDecorationProvidersEarly(dvcRoots: string[]) {
-    dvcRoots.map(
+    dvcRoots.forEach(
       dvcRoot =>
         (this.decorationProviders[dvcRoot] = this.dispose.track(
           new DecorationProvider()
@@ -64,7 +64,7 @@ export class Extension {
   }
 
   private initializeDvcRepositories(dvcRoots: string[]) {
-    return dvcRoots.map(dvcRoot => {
+    dvcRoots.forEach(dvcRoot => {
       const repository = this.dispose.track(
         new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
       )
