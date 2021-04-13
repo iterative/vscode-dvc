@@ -90,6 +90,7 @@ export const gc = async (
   options: ReaderOptions,
   preserveFlags: DvcGcPreserveFlag[]
 ): Promise<string> => {
-  const preserveFlagsString = preserveFlags.map(flag => ` --${flag}`).join('')
-  return (await execCommand(options, Commands.GC + preserveFlagsString)).stdout
+  return (
+    await execCommand(options, [Commands.EXP_GC, ...preserveFlags].join(' '))
+  ).stdout
 }
