@@ -76,8 +76,8 @@
         "category": "DVC"
       },
       {
-        "title": "%command.add%",
-        "command": "dvc.add",
+        "title": "%command.addTarget%",
+        "command": "dvc.addTarget",
         "category": "DVC",
         "icon": "$(add)"
       },
@@ -90,6 +90,18 @@
         "title": "%command.checkoutRecursive%",
         "command": "dvc.checkoutRecursive",
         "category": "DVC"
+      },
+      {
+        "title": "%command.pullTarget%",
+        "command": "dvc.pullTarget",
+        "category": "DVC",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "title": "%command.pushTarget%",
+        "command": "dvc.pushTarget",
+        "category": "DVC",
+        "icon": "$(cloud-upload)"
       }
     ],
     "configuration": {
@@ -104,6 +116,20 @@
       }
     },
     "menus": {
+      "commandPalette": [
+        {
+          "command": "dvc.addTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.pushTarget",
+          "when": "false"
+        }
+      ],
       "scm/title": [
         {
           "command": "dvc.showExperiments",
@@ -118,9 +144,19 @@
       ],
       "scm/resourceState/context": [
         {
-          "command": "dvc.add",
+          "command": "dvc.addTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState == untracked"
+        },
+        {
+          "command": "dvc.pushTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState != untracked"
         }
       ]
     }

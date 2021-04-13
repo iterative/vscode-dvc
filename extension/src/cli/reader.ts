@@ -31,7 +31,7 @@ export const execCommand = async (
 export const getExperiments = async (
   options: ReaderOptions
 ): Promise<ExperimentsRepoJSONOutput> => {
-  const { stdout } = await execCommand(options, Commands.experiment_show)
+  const { stdout } = await execCommand(options, Commands.EXPERIMENT_SHOW)
   return JSON.parse(stdout)
 }
 
@@ -40,20 +40,20 @@ export const initializeDirectory = async (
 ): Promise<string> => {
   const { stdout } = await execCommand(
     options,
-    Commands.initialize_subdirectory
+    Commands.INITIALIZE_SUBDIRECTORY
   )
   return stdout
 }
 
 export const checkout = async (options: ReaderOptions): Promise<string> => {
-  const { stdout } = await execCommand(options, Commands.checkout)
+  const { stdout } = await execCommand(options, Commands.CHECKOUT)
   return stdout
 }
 
 export const checkoutRecursive = async (
   options: ReaderOptions
 ): Promise<string> => {
-  const { stdout } = await execCommand(options, Commands.checkout_recursive)
+  const { stdout } = await execCommand(options, Commands.CHECKOUT_RECURSIVE)
   return stdout
 }
 
@@ -75,13 +75,13 @@ export const status = async (
   string,
   (Record<string, Record<string, string>> | string)[]
 >> => {
-  const { stdout } = await execCommand(options, Commands.status)
+  const { stdout } = await execCommand(options, Commands.STATUS)
   return JSON.parse(stdout)
 }
 
 export const queueExperiment = async (
   options: ReaderOptions
 ): Promise<string> => {
-  const { stdout } = await execCommand(options, Commands.queue_experiment)
+  const { stdout } = await execCommand(options, Commands.QUEUE_EXPERIMENT)
   return stdout
 }

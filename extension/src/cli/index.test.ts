@@ -3,7 +3,7 @@ import { queueExperimentCommand } from './index'
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
 import { basename, resolve } from 'path'
-import { add } from '.'
+import { addTarget } from '.'
 import { window } from 'vscode'
 
 jest.mock('fs')
@@ -36,7 +36,7 @@ describe('add', () => {
       stderr: ''
     })
 
-    const output = await add({
+    const output = await addTarget({
       cliPath: 'dvc',
       fsPath
     })

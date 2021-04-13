@@ -69,9 +69,9 @@ export class IntegratedTerminal {
 }
 
 export const runExperiment = (): Promise<void> => {
-  return IntegratedTerminal.runDvcCommand(Commands.experiment_run)
+  return IntegratedTerminal.runDvcCommand(Commands.EXPERIMENT_RUN)
 }
 
 export const runQueuedExperiments = (): Promise<void> => {
-  return IntegratedTerminal.runDvcCommand(Commands.run_all_experiments)
+  return IntegratedTerminal.runDvcCommand(Commands.RUN_ALL_EXPERIMENTS)
 }
