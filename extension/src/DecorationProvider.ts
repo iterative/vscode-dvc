@@ -1,4 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
+import { makeObservable, observable } from 'mobx'
 import {
   window,
   Event,
@@ -7,6 +8,17 @@ import {
   FileDecoration,
   Uri
 } from 'vscode'
+import { isStringInEnum } from './util'
+
+export type DecorationState = Record<Status, Set<string>>
+
+enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'notInCache',
+  TRACKED = 'tracked'
+}
 
 export class DecorationProvider implements FileDecorationProvider {
   private static DecorationTracked: FileDecoration = {
@@ -15,26 +27,65 @@ export class DecorationProvider implements FileDecorationProvider {
 
   public readonly dispose = Disposable.fn()
 
-  private trackedFiles?: Set<string>
+  @observable
+  private state: DecorationState
+
   readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly onDidChangeDecorations: EventEmitter<Uri[]>
 
-  public setTrackedFiles = (trackedFiles: Set<string>) => {
-    this.trackedFiles = trackedFiles
-    this.onDidChangeDecorations.fire(
-      [...this.trackedFiles.values()].map(value => Uri.file(value))
-    )
+  private isValidStatus(status: string): boolean {
+    return isStringInEnum(status, Status)
+  }
+
+  private getUrisFromSet(paths: Set<string>): Uri[] {
+    return [...paths].map(path => Uri.file(path))
+  }
+
+  private getUrisFromState() {
+    const reduceState = (
+      toDecorate: Uri[],
+      entry: [string, Set<string>]
+    ): Uri[] => {
+      const [status, paths] = entry as [Status, Set<string>]
+      if (!this.isValidStatus(status)) {
+        return toDecorate
+      }
+      return [...toDecorate, ...this.getUrisFromSet(paths)]
+    }
+
+    return Object.entries(this.state).reduce(reduceState, [])
+  }
+
+  public setState = (state: DecorationState) => {
+    this.state = state
+    this.onDidChangeDecorations.fire(this.getUrisFromState())
   }
 
   constructor() {
+    makeObservable(this)
+
     this.onDidChangeDecorations = new EventEmitter<Uri[]>()
     this.onDidChangeFileDecorations = this.onDidChangeDecorations.event
+
+    this.state = {} as DecorationState
 
     this.dispose.track(window.registerFileDecorationProvider(this))
   }
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
-    if (this.trackedFiles?.has(uri.path)) {
+    if (this.state.deleted?.has(uri.path)) {
+      return DecorationProvider.DecorationTracked
+    }
+    if (this.state.modified?.has(uri.path)) {
+      return DecorationProvider.DecorationTracked
+    }
+    if (this.state.new?.has(uri.path)) {
+      return DecorationProvider.DecorationTracked
+    }
+    if (this.state.notInCache?.has(uri.path)) {
+      return DecorationProvider.DecorationTracked
+    }
+    if (this.state.tracked?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
     }
   }

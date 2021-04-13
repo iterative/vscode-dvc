@@ -1,28 +1,25 @@
-import { Uri } from 'vscode'
 import { resolve } from 'path'
-import uniqWith from 'lodash.uniqwith'
-import isEqual from 'lodash.isequal'
 import { execPromise, trimAndSplit } from './util'
 import { isDirectory } from './fileSystem'
 
 const getUris = (repositoryRoot: string, relativePaths: string[]) =>
-  relativePaths.map(path => Uri.file(resolve(repositoryRoot, path)))
+  relativePaths.map(path => resolve(repositoryRoot, path))
 
 const getUntrackedDirectories = async (
   repositoryRoot: string
-): Promise<Uri[]> => {
+): Promise<string[]> => {
   const { stdout } = await execPromise(
     'git ls-files --others --exclude-standard --directory --no-empty-directory',
     {
       cwd: repositoryRoot
     }
   )
-  return getUris(repositoryRoot, trimAndSplit(stdout)).filter(Uri =>
-    isDirectory(Uri.fsPath)
+  return getUris(repositoryRoot, trimAndSplit(stdout)).filter(path =>
+    isDirectory(path)
   )
 }
 
-const getUntrackedFiles = async (repositoryRoot: string): Promise<Uri[]> => {
+const getUntrackedFiles = async (repositoryRoot: string): Promise<string[]> => {
   const { stdout } = await execPromise(
     'git ls-files --others --exclude-standard',
     {
@@ -34,10 +31,10 @@ const getUntrackedFiles = async (repositoryRoot: string): Promise<Uri[]> => {
 
 export const getAllUntracked = async (
   repositoryRoot: string
-): Promise<Uri[]> => {
+): Promise<Set<string>> => {
   const [files, dirs] = await Promise.all([
     getUntrackedFiles(repositoryRoot),
     getUntrackedDirectories(repositoryRoot)
   ])
-  return uniqWith([...files, ...dirs], isEqual)
+  return new Set([...files, ...dirs])
 }

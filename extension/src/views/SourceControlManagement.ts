@@ -2,47 +2,62 @@ import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
+import { isStringInEnum } from '../util'
 
+export type SourceControlManagementState = Record<Status, Set<string>>
+
+enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'notInCache',
+  UNTRACKED = 'untracked'
+}
+
+type ResourceState = { resourceUri: Uri; contextValue: Status }
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
   @observable
   private resourceGroup: SourceControlResourceGroup
 
-  @observable
-  private untracked: { resourceUri: Uri; contextValue: 'untracked' }[] = []
+  public setState(state: SourceControlManagementState) {
+    const reduceResourceStates = (
+      resourceStates: ResourceState[],
+      entry: [string, Set<string>]
+    ): ResourceState[] => {
+      const [status, resources] = entry as [Status, Set<string>]
+      return [...resourceStates, ...this.getResourceStates(status, resources)]
+    }
 
-  @observable
-  private modified: { resourceUri: Uri; contextValue: 'modified' }[] = []
-
-  private setResourceStates() {
-    this.resourceGroup.resourceStates = [...this.untracked, ...this.modified]
+    this.resourceGroup.resourceStates = Object.entries(state).reduce(
+      reduceResourceStates,
+      []
+    )
   }
 
-  public setUntracked(untracked: Uri[]) {
-    this.untracked = this.getUntrackedResourceStates(untracked)
-    this.setResourceStates()
+  private isValidStatus(status: string): boolean {
+    return isStringInEnum(status, Status)
   }
 
-  private getUntrackedResourceStates(
-    untracked: Uri[]
-  ): { resourceUri: Uri; contextValue: 'untracked' }[] {
-    return untracked
+  private getResourceStates(
+    contextValue: Status,
+    paths: Set<string>
+  ): ResourceState[] {
+    if (!this.isValidStatus(contextValue)) {
+      return []
+    }
+    return [...paths]
       .filter(
-        untracked =>
-          extname(untracked.fsPath) !== '.dvc' &&
-          basename(untracked.fsPath) !== '.gitignore'
+        path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
       )
-      .map(untracked => ({
-        resourceUri: untracked,
-        contextValue: 'untracked'
+      .map(path => ({
+        resourceUri: Uri.file(path),
+        contextValue
       }))
   }
 
-  constructor(
-    repositoryRoot: string,
-    { modified, untracked }: Record<string, Uri[]>
-  ) {
+  constructor(repositoryRoot: string, state: SourceControlManagementState) {
     makeObservable(this)
 
     const scmView = this.dispose.track(
@@ -59,12 +74,6 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.untracked = this.getUntrackedResourceStates(untracked)
-    this.modified = modified.map(uri => ({
-      resourceUri: uri,
-      contextValue: 'modified'
-    }))
-
-    this.setResourceStates()
+    this.setState(state)
   }
 }

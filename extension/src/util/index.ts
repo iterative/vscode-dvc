@@ -12,6 +12,9 @@ export const trimAndSplit = (stdout: string): string[] =>
     .split('\n')
     .filter(i => i)
 
+export const isStringInEnum = (s: string, E: Record<string, string>) =>
+  Object.values(E).includes(s)
+
 export const definedAndNonEmpty = (
   maybeArray: unknown[] | undefined
 ): maybeArray is unknown[] => {
