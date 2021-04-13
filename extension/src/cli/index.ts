@@ -152,7 +152,7 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
-    commands.registerCommand('dvc.gcExperiments', () => {
+    commands.registerCommand('dvc.experimentGarbageCollect', () => {
       return experimentGcCommand(config)
     })
   )

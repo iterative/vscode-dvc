@@ -66,8 +66,8 @@
         "category": "DVC"
       },
       {
-        "title": "%command.gcExperiments%",
-        "command": "dvc.gcExperiments",
+        "title": "%command.experimentGarbageCollect%",
+        "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
       },
       {
