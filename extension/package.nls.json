@@ -7,6 +7,7 @@
   "command.commit": "Commit",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
+  "command.pull": "Pull",
   "command.push": "Push",
   "command.runExperiment": "Run Experiment",
   "command.selectDvcPath": "Select DVC CLI Path",

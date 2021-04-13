@@ -60,6 +60,18 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
+    commands.registerCommand('dvc.push', ({ resourceUri }) =>
+      pushTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.pull', ({ resourceUri }) =>
+      pullTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    )
+  )
+
+  disposer.track(
     commands.registerCommand('dvc.checkout', ({ fsPath }) => {
       checkout({ cwd: fsPath, cliPath: config.dvcPath })
     })

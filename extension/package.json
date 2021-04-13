@@ -80,6 +80,18 @@
         "title": "%command.checkoutRecursive%",
         "command": "dvc.checkoutRecursive",
         "category": "DVC"
+      },
+      {
+        "title": "%command.pull%",
+        "command": "dvc.pull",
+        "category": "DVC",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "title": "%command.push%",
+        "command": "dvc.push",
+        "category": "DVC",
+        "icon": "$(arrow-up)"
       }
     ],
     "configuration": {
@@ -111,6 +123,11 @@
           "command": "dvc.add",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState == untracked"
+        },
+        {
+          "command": "dvc.pull",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState != untracked"
         }
       ]
     }
