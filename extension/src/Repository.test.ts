@@ -17,9 +17,8 @@ jest.mock('./git')
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
-const mockedDecorationProvider = mocked(DecorationProvider)
-const mockedSourceControlManagement = mocked(SourceControlManagement)
 
+const mockedSourceControlManagement = mocked(SourceControlManagement)
 const mockedSetResourceStates = jest.fn()
 mockedSourceControlManagement.mockImplementation(function() {
   return ({
@@ -27,6 +26,7 @@ mockedSourceControlManagement.mockImplementation(function() {
   } as unknown) as SourceControlManagement
 })
 
+const mockedDecorationProvider = mocked(DecorationProvider)
 const mockedSetState = jest.fn()
 mockedDecorationProvider.mockImplementation(function() {
   return ({ setState: mockedSetState } as unknown) as DecorationProvider
