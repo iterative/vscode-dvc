@@ -1,5 +1,5 @@
 import { Terminal, window, workspace } from 'vscode'
-import { getRunExperimentCommand } from './cli/commands'
+import { Commands } from './cli/commands'
 import { getReadyPythonExtension } from './extensions/python'
 import { delay } from './util'
 
@@ -19,6 +19,10 @@ export class IntegratedTerminal {
   static run = async (command: string): Promise<void> => {
     const currentTerminal = await IntegratedTerminal.openCurrentInstance()
     return currentTerminal?.sendText(command, true)
+  }
+
+  static runDvcCommand = async (command: string): Promise<void> => {
+    return IntegratedTerminal.run(`dvc ${command}`)
   }
 
   static dispose = (): void => {
@@ -65,6 +69,9 @@ export class IntegratedTerminal {
 }
 
 export const runExperiment = (): Promise<void> => {
-  const runExperimentCommand = getRunExperimentCommand()
-  return IntegratedTerminal.run(runExperimentCommand)
+  return IntegratedTerminal.runDvcCommand(Commands.experiment_run)
+}
+
+export const runQueuedExperiments = (): Promise<void> => {
+  return IntegratedTerminal.runDvcCommand(Commands.run_all_experiments)
 }

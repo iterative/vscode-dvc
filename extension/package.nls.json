@@ -10,6 +10,7 @@
   "command.push": "Push",
   "command.runExperiment": "Run Experiment",
   "command.queueExperiment": "Queue Experiment",
+  "command.runQueuedExperiments": "Run Queued Experiments",
   "command.selectDvcPath": "Select DVC CLI Path",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.title": "DVC CLI Path",

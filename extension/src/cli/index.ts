@@ -2,7 +2,7 @@ import { basename, dirname } from 'path'
 import { commands, window } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
-import { getAddCommand } from './commands'
+import { Commands } from './commands'
 import {
   execCommand,
   initializeDirectory,
@@ -20,7 +20,7 @@ export const add = async (options: {
   const cwd = dirname(fsPath)
 
   const toAdd = basename(fsPath)
-  const addCommand = getAddCommand(toAdd)
+  const addCommand = `${Commands.add} ${toAdd}`
 
   const { stdout } = await execCommand({ cwd, cliPath }, addCommand)
   return stdout

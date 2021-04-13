@@ -6,17 +6,6 @@ export enum Commands {
   checkout = 'checkout',
   checkout_recursive = 'checkout --recursive',
   status = 'status --show-json',
-  queue_experiment = 'exp run --queue'
-}
-
-const getCliCommand = (command: string, ...options: string[]): string => {
-  return `dvc ${command} ${options.join(' ')}`
-}
-
-export const getRunExperimentCommand = (): string => {
-  return getCliCommand(Commands.experiment_run)
-}
-
-export const getAddCommand = (toAdd: string): string => {
-  return `${Commands.add} ${toAdd}`
+  queue_experiment = 'exp run --queue',
+  run_all_experiments = 'exp run --run-all'
 }
