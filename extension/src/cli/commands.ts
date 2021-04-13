@@ -8,7 +8,7 @@ export enum Commands {
   PULL = 'pull',
   PUSH = 'push',
   STATUS = 'status --show-json',
-  queue_experiment = 'exp run --queue'
+  QUEUE_EXPERIMENT = 'exp run --queue'
 }
 
 const getCliCommand = (command: string, ...options: string[]): string => {
