@@ -43,10 +43,12 @@ export const queueExperimentCommand = async (config: Config) => {
   }
 }
 
+export interface DvcGcQuickPickItem extends QuickPickItem {
+  flag: DvcGcPreserveFlag
+}
+
 export const experimentGcCommand = async (config: Config) => {
-  const quickPickResult = await window.showQuickPick<
-    QuickPickItem & { flag: DvcGcPreserveFlag }
-  >(
+  const quickPickResult = await window.showQuickPick<DvcGcQuickPickItem>(
     [
       {
         label: 'All Branches',
