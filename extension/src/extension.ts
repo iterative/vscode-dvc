@@ -1,4 +1,10 @@
-import { window, commands, ExtensionContext } from 'vscode'
+import {
+  window,
+  commands,
+  ExtensionContext,
+  workspace,
+  WorkspaceFolder
+} from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -11,12 +17,7 @@ import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import { registerCommands as registerCliCommands } from './cli'
-
-import {
-  addFileChangeHandler,
-  findDvcRootPaths,
-  findDvcTrackedPaths
-} from './fileSystem'
+import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
@@ -37,9 +38,40 @@ export class Extension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly webviewManager: WebviewManager
-  private readonly repositories: Repository[] = []
-  private readonly decorationProvider: DecorationProvider
+  private dvcRoots: string[] = []
+  private decorationProviders: Record<string, DecorationProvider> = {}
+  private dvcRepositories: Record<string, Repository> = {}
   private readonly gitExtension: GitExtension
+
+  private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
+    const workspaceRoot = workspaceFolder.uri.fsPath
+    const dvcRoots = await findDvcRootPaths(workspaceRoot, this.config.dvcPath)
+
+    this.initializeDecorationProvidersEarly(dvcRoots)
+
+    this.initializeDvcRepositories(dvcRoots)
+
+    return this.dvcRoots.push(...dvcRoots)
+  }
+
+  private initializeDecorationProvidersEarly(dvcRoots: string[]) {
+    dvcRoots.forEach(
+      dvcRoot =>
+        (this.decorationProviders[dvcRoot] = this.dispose.track(
+          new DecorationProvider()
+        ))
+    )
+  }
+
+  private initializeDvcRepositories(dvcRoots: string[]) {
+    dvcRoots.forEach(dvcRoot => {
+      const repository = this.dispose.track(
+        new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
+      )
+      repository.setup()
+      this.dvcRepositories[dvcRoot] = repository
+    })
+  }
 
   private onChangeExperimentsUpdateWebview = async (
     gitRoot: string
@@ -78,13 +110,12 @@ export class Extension {
 
     this.config = this.dispose.track(new Config())
 
-    this.decorationProvider = this.dispose.track(new DecorationProvider())
-
-    findDvcTrackedPaths(this.config.workspaceRoot, this.config.dvcPath).then(
-      files => {
-        this.decorationProvider.setTrackedFiles(files)
-      }
+    Promise.all(
+      (workspace.workspaceFolders || []).map(async workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      )
     )
+
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
@@ -125,10 +156,11 @@ export class Extension {
 
         const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
         dvcRoots.forEach(async dvcRoot => {
-          const repository = this.dispose.track(
-            new Repository(this.config, dvcRoot, gitExtensionRepository)
-          )
-          this.repositories.push(repository)
+          const repository = this.dvcRepositories[dvcRoot]
+
+          gitExtensionRepository.onDidChange(() => {
+            repository?.updateUntracked()
+          })
         })
       })
     })

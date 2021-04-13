@@ -35,7 +35,7 @@ suite('Git Extension Test Suite', () => {
 
       const repositoryUntrackedChangeEvent = (): Promise<void> => {
         return new Promise(resolve => {
-          const listener: Disposable = gitExtensionRepository.onDidUntrackedChange(
+          const listener: Disposable = gitExtensionRepository.onDidChange(
             (event: void) => {
               return resolve(event)
             }
