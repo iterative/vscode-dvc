@@ -157,7 +157,7 @@ export class Extension {
         dvcRoots.forEach(async dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 
-          gitExtensionRepository.onDidChange(async () => {
+          gitExtensionRepository.onDidChange(() => {
             repository?.updateState()
           })
         })
