@@ -23,8 +23,22 @@ const mockedSourceControlManagement = mocked(SourceControlManagement)
 
 const dvcRoot = resolve(__dirname, '..', '..', 'demo')
 
+mockedDecorationProvider.mockImplementation(function() {
+  return ({ setState: jest.fn() } as unknown) as DecorationProvider
+})
+mockedSourceControlManagement.mockImplementation(function() {
+  return ({
+    setResourceStates: jest.fn()
+  } as unknown) as SourceControlManagement
+})
+mockedConfig.mockImplementation(function() {
+  return ({
+    dvcPath: undefined
+  } as unknown) as Config
+})
+
 beforeEach(() => {
-  jest.resetAllMocks()
+  jest.clearAllMocks()
 })
 
 describe('Repository', () => {
@@ -36,7 +50,6 @@ describe('Repository', () => {
       const MNISTDataDir = join('data', 'MNIST')
       const rawDataDir = join(MNISTDataDir, 'raw')
       const model = 'model.pt'
-
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         logAcc,
         logLoss,
@@ -44,7 +57,7 @@ describe('Repository', () => {
         rawDataDir
       ])
 
-      const statusOutput = {
+      mockedStatus.mockResolvedValueOnce({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -53,29 +66,16 @@ describe('Repository', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>
-      mockedStatus.mockResolvedValueOnce(statusOutput)
+      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
-      mockedDecorationProvider.mockImplementation(function() {
-        return ({ setState: jest.fn() } as unknown) as DecorationProvider
-      })
-      mockedSourceControlManagement.mockImplementation(function() {
-        return ({
-          setResourceStates: jest.fn()
-        } as unknown) as SourceControlManagement
-      })
-      mockedConfig.mockImplementation(function() {
-        return ({
-          dvcPath: undefined
-        } as unknown) as Config
-      })
 
       const config = new Config()
       const decorationProvider = new DecorationProvider()
+
       const repository = new Repository(dvcRoot, config, decorationProvider)
       await repository.ready
 
@@ -111,24 +111,12 @@ describe('Repository', () => {
   describe('updateState', () => {
     it("should update the classes state and call it's dependents", async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
-      mockedStatus.mockResolvedValue({})
+      mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
-      mockedDecorationProvider.mockImplementation(function() {
-        return ({ setState: jest.fn() } as unknown) as DecorationProvider
-      })
-      mockedSourceControlManagement.mockImplementation(function() {
-        return ({
-          setResourceStates: jest.fn()
-        } as unknown) as SourceControlManagement
-      })
-      mockedConfig.mockImplementation(function() {
-        return ({
-          dvcPath: undefined
-        } as unknown) as Config
-      })
 
       const config = new Config()
       const decorationProvider = new DecorationProvider()
+
       const repository = new Repository(dvcRoot, config, decorationProvider)
 
       const logDir = 'logs'
@@ -136,7 +124,6 @@ describe('Repository', () => {
       const logLoss = join(logDir, 'loss.tsv')
       const dataDir = 'data'
       const model = 'model.pt'
-
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         logAcc,
         logLoss,
@@ -144,15 +131,7 @@ describe('Repository', () => {
         dataDir
       ])
 
-      const tracked = new Set([
-        resolve(dvcRoot, logAcc),
-        resolve(dvcRoot, logLoss),
-        resolve(dvcRoot, model),
-        resolve(dvcRoot, dataDir),
-        resolve(dvcRoot, logDir)
-      ])
-
-      const statusOutput = {
+      mockedStatus.mockResolvedValueOnce({
         prepare: [
           { 'changed deps': { 'data/data.xml': 'not in cache' } },
           { 'changed outs': { 'data/prepared': 'not in cache' } }
@@ -176,14 +155,7 @@ describe('Repository', () => {
         'data/data.xml.dvc': [
           { 'changed outs': { 'data/data.xml': 'not in cache' } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>
-      mockedStatus.mockResolvedValueOnce(statusOutput)
-      const deleted = new Set([join(dvcRoot, 'model.pkl')])
-      const modified = new Set([join(dvcRoot, 'data/features')])
-      const notInCache = new Set([
-        join(dvcRoot, 'data/data.xml'),
-        join(dvcRoot, 'data/prepared')
-      ])
+      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py'),
@@ -195,6 +167,20 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual(new RepositoryState())
 
       await repository.updateState()
+
+      const deleted = new Set([join(dvcRoot, 'model.pkl')])
+      const modified = new Set([join(dvcRoot, 'data/features')])
+      const notInCache = new Set([
+        join(dvcRoot, 'data/data.xml'),
+        join(dvcRoot, 'data/prepared')
+      ])
+      const tracked = new Set([
+        resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logLoss),
+        resolve(dvcRoot, model),
+        resolve(dvcRoot, dataDir),
+        resolve(dvcRoot, logDir)
+      ])
 
       expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
