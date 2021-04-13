@@ -193,7 +193,7 @@ export class Repository {
     const extraPromiseForDecoration = this.updateTracked()
 
     await promisesForScm
-    this.sourceControlManagement.setResourceStates(this.state)
+    this.sourceControlManagement.setState(this.state)
 
     if (this.decorationProvider) {
       await extraPromiseForDecoration

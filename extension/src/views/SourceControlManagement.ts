@@ -21,7 +21,7 @@ export class SourceControlManagement {
   @observable
   private resourceGroup: SourceControlResourceGroup
 
-  public setResourceStates(state: SourceControlManagementState) {
+  public setState(state: SourceControlManagementState) {
     const reduceResourceStates = (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
@@ -74,6 +74,6 @@ export class SourceControlManagement {
       scmView.createResourceGroup('group1', 'Changes')
     )
 
-    this.setResourceStates(state)
+    this.setState(state)
   }
 }

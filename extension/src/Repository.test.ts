@@ -19,17 +19,19 @@ const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
-const mockedSetResourceStates = jest.fn()
+const mockedSetScmState = jest.fn()
 mockedSourceControlManagement.mockImplementation(function() {
   return ({
-    setResourceStates: mockedSetResourceStates
+    setState: mockedSetScmState
   } as unknown) as SourceControlManagement
 })
 
 const mockedDecorationProvider = mocked(DecorationProvider)
-const mockedSetState = jest.fn()
+const mockedSetDecorationState = jest.fn()
 mockedDecorationProvider.mockImplementation(function() {
-  return ({ setState: mockedSetState } as unknown) as DecorationProvider
+  return ({
+    setState: mockedSetDecorationState
+  } as unknown) as DecorationProvider
 })
 
 beforeEach(() => {
@@ -201,10 +203,10 @@ describe('Repository', () => {
         untracked
       })
 
-      expect(mockedSetState).toHaveBeenLastCalledWith(repository.getState())
-      expect(mockedSetResourceStates).toHaveBeenLastCalledWith(
+      expect(mockedSetDecorationState).toHaveBeenLastCalledWith(
         repository.getState()
       )
+      expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
     })
   })
 })
