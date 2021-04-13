@@ -6,7 +6,8 @@ import {
   EventEmitter,
   FileDecorationProvider,
   FileDecoration,
-  Uri
+  Uri,
+  ThemeColor
 } from 'vscode'
 import { isStringInEnum } from './util'
 
@@ -21,6 +22,30 @@ enum Status {
 }
 
 export class DecorationProvider implements FileDecorationProvider {
+  private static DecorationDeleted: FileDecoration = {
+    badge: 'D',
+    color: new ThemeColor('gitDecoration.deletedResourceForeground'),
+    tooltip: 'DVC deleted'
+  }
+
+  private static DecorationModified: FileDecoration = {
+    badge: 'M',
+    color: new ThemeColor('gitDecoration.modifiedResourceForeground'),
+    tooltip: 'DVC modified'
+  }
+
+  private static DecorationNew: FileDecoration = {
+    badge: 'A',
+    color: new ThemeColor('gitDecoration.addedResourceForeground'),
+    tooltip: 'DVC added'
+  }
+
+  private static DecorationNotInCache: FileDecoration = {
+    badge: 'NC',
+    color: new ThemeColor('gitDecoration.renamedResourceForeground'),
+    tooltip: 'DVC not in cache'
+  }
+
   private static DecorationTracked: FileDecoration = {
     tooltip: 'DVC tracked'
   }
@@ -74,16 +99,16 @@ export class DecorationProvider implements FileDecorationProvider {
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
     if (this.state.deleted?.has(uri.path)) {
-      return DecorationProvider.DecorationTracked
-    }
-    if (this.state.modified?.has(uri.path)) {
-      return DecorationProvider.DecorationTracked
+      return DecorationProvider.DecorationDeleted
     }
     if (this.state.new?.has(uri.path)) {
-      return DecorationProvider.DecorationTracked
+      return DecorationProvider.DecorationNew
     }
     if (this.state.notInCache?.has(uri.path)) {
-      return DecorationProvider.DecorationTracked
+      return DecorationProvider.DecorationNotInCache
+    }
+    if (this.state.modified?.has(uri.path)) {
+      return DecorationProvider.DecorationModified
     }
     if (this.state.tracked?.has(uri.path)) {
       return DecorationProvider.DecorationTracked
