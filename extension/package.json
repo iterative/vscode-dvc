@@ -66,6 +66,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.gcExperiments%",
+        "command": "dvc.gcExperiments",
+        "category": "DVC"
+      },
+      {
         "title": "%command.selectDvcPath%",
         "command": "dvc.selectDvcPath",
         "category": "DVC"

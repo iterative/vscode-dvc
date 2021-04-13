@@ -1,4 +1,4 @@
-import { Commands } from './commands'
+import { Commands, DvcGcPreserveFlag } from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
@@ -84,4 +84,12 @@ export const queueExperiment = async (
 ): Promise<string> => {
   const { stdout } = await execCommand(options, Commands.QUEUE_EXPERIMENT)
   return stdout
+}
+
+export const gc = async (
+  options: ReaderOptions,
+  preserveFlags: DvcGcPreserveFlag[]
+): Promise<string> => {
+  const preserveFlagsString = preserveFlags.map(flag => ` --${flag}`).join('')
+  return (await execCommand(options, Commands.GC + preserveFlagsString)).stdout
 }

@@ -9,7 +9,15 @@ export enum Commands {
   PUSH = 'push',
   STATUS = 'status --show-json',
   QUEUE_EXPERIMENT = 'exp run --queue',
-  RUN_ALL_EXPERIMENTS = 'exp run --run-all'
+  RUN_ALL_EXPERIMENTS = 'exp run --run-all',
+  GC = 'gc -f -w'
+}
+
+export enum DvcGcPreserveFlag {
+  ALL_BRANCHES = 'all-branches',
+  ALL_TAGS = 'all-tags',
+  ALL_COMMITS = 'all-commits',
+  QUEUED = 'queued'
 }
 
 export const getCommandWithTarget = (
