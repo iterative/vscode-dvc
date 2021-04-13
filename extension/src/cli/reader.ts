@@ -86,11 +86,14 @@ export const queueExperiment = async (
   return stdout
 }
 
-export const gc = async (
+export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: DvcGcPreserveFlag[]
 ): Promise<string> => {
   return (
-    await execCommand(options, [Commands.EXP_GC, ...preserveFlags].join(' '))
+    await execCommand(
+      options,
+      [Commands.EXPERIMENT_GC, ...preserveFlags].join(' ')
+    )
   ).stdout
 }

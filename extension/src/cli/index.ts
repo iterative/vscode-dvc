@@ -9,7 +9,7 @@ import {
   checkout,
   checkoutRecursive,
   queueExperiment,
-  gc
+  experimentGarbageCollect
 } from './reader'
 
 const runTargetCommand = async (
@@ -76,7 +76,7 @@ export const experimentGcCommand = async (config: Config) => {
 
   if (quickPickResult) {
     try {
-      const stdout = await gc(
+      const stdout = await experimentGarbageCollect(
         {
           cwd: config.workspaceRoot,
           cliPath: config.dvcPath

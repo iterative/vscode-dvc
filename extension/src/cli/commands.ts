@@ -10,7 +10,7 @@ export enum Commands {
   STATUS = 'status --show-json',
   QUEUE_EXPERIMENT = 'exp run --queue',
   RUN_ALL_EXPERIMENTS = 'exp run --run-all',
-  EXP_GC = 'exp gc -f -w'
+  EXPERIMENT_GC = 'exp gc -f -w'
 }
 
 export enum DvcGcPreserveFlag {
