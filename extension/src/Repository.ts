@@ -33,6 +33,8 @@ type PathStatus = Record<string, Status>
 
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
+  public dispose = Disposable.fn()
+
   public tracked: Set<string>
   public deleted: Set<string>
   public modified: Set<string>
@@ -191,15 +193,17 @@ export class Repository {
     const extraPromiseForDecoration = this.updateTracked()
 
     await promisesForScm
-    this.sourceControlManagement?.setResourceStates(this.state)
+    this.sourceControlManagement.setResourceStates(this.state)
 
-    await extraPromiseForDecoration
-    this.decorationProvider?.setState(this.state)
+    if (this.decorationProvider) {
+      await extraPromiseForDecoration
+      this.decorationProvider.setState(this.state)
+    }
   }
 
   private async setup() {
     await this.updateState()
-    this._initialized.resolve()
+    return this._initialized.resolve()
   }
 
   constructor(
@@ -211,9 +215,9 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-    this.state = new RepositoryState()
+    this.state = this.dispose.track(new RepositoryState())
 
-    this.sourceControlManagement = this.dispose?.track(
+    this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, this.state)
     )
 

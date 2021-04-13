@@ -1,3 +1,4 @@
+import { Disposable } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
 import { Config } from './Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
@@ -7,7 +8,6 @@ import { Repository, RepositoryState } from './Repository'
 import { listDvcOnlyRecursive, status } from './cli/reader'
 import { getAllUntracked } from './git'
 
-jest.mock('./Config')
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/SourceControlManagement')
 jest.mock('./DecorationProvider')
@@ -18,21 +18,18 @@ const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
 const mockedDecorationProvider = mocked(DecorationProvider)
-const mockedConfig = mocked(Config)
 const mockedSourceControlManagement = mocked(SourceControlManagement)
 
-mockedDecorationProvider.mockImplementation(function() {
-  return ({ setState: jest.fn() } as unknown) as DecorationProvider
-})
+const mockedSetResourceStates = jest.fn()
 mockedSourceControlManagement.mockImplementation(function() {
   return ({
-    setResourceStates: jest.fn()
+    setResourceStates: mockedSetResourceStates
   } as unknown) as SourceControlManagement
 })
-mockedConfig.mockImplementation(function() {
-  return ({
-    dvcPath: undefined
-  } as unknown) as Config
+
+const mockedSetState = jest.fn()
+mockedDecorationProvider.mockImplementation(function() {
+  return ({ setState: mockedSetState } as unknown) as DecorationProvider
 })
 
 beforeEach(() => {
@@ -73,7 +70,9 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      const config = new Config()
+      const config = ({
+        dvcPath: undefined
+      } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
@@ -98,6 +97,7 @@ describe('Repository', () => {
       })
 
       expect(repository.getState()).toEqual({
+        dispose: Disposable.fn(),
         deleted: emptySet,
         notInCache: emptySet,
         new: emptySet,
@@ -114,7 +114,9 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
-      const config = new Config()
+      const config = ({
+        dvcPath: undefined
+      } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
@@ -190,6 +192,7 @@ describe('Repository', () => {
       })
 
       expect(repository.getState()).toEqual({
+        dispose: Disposable.fn(),
         new: new Set(),
         modified,
         notInCache,
@@ -197,6 +200,11 @@ describe('Repository', () => {
         tracked,
         untracked
       })
+
+      expect(mockedSetState).toHaveBeenLastCalledWith(repository.getState())
+      expect(mockedSetResourceStates).toHaveBeenLastCalledWith(
+        repository.getState()
+      )
     })
   })
 })
