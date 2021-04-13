@@ -21,8 +21,6 @@ const mockedDecorationProvider = mocked(DecorationProvider)
 const mockedConfig = mocked(Config)
 const mockedSourceControlManagement = mocked(SourceControlManagement)
 
-const dvcRoot = resolve(__dirname, '..', '..', 'demo')
-
 mockedDecorationProvider.mockImplementation(function() {
   return ({ setState: jest.fn() } as unknown) as DecorationProvider
 })
@@ -42,6 +40,8 @@ beforeEach(() => {
 })
 
 describe('Repository', () => {
+  const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
       const logDir = 'logs'
