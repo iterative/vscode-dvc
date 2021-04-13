@@ -22,11 +22,11 @@ describe('isStringInEnum', () => {
     expect(isStringInEnum('fish', Animals)).toBe(true)
   })
 
-  it('should false when it is not', () => {
+  it('should return false when it is not', () => {
     expect(isStringInEnum('brick', Animals)).toBe(false)
   })
 
-  it('should false when the string has the wrong case', () => {
+  it('should return false when the string has the wrong case', () => {
     expect(isStringInEnum('fIsh', Animals)).toBe(false)
   })
 })
