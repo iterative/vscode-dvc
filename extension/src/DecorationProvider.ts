@@ -37,22 +37,28 @@ export class DecorationProvider implements FileDecorationProvider {
     return isStringInEnum(status, Status)
   }
 
+  private getUrisFromSet(paths: Set<string>): Uri[] {
+    return [...paths].map(path => Uri.file(path))
+  }
+
+  private getUrisFromState() {
+    const reduceState = (
+      toDecorate: Uri[],
+      entry: [string, Set<string>]
+    ): Uri[] => {
+      const [status, paths] = entry as [Status, Set<string>]
+      if (!this.isValidStatus(status)) {
+        return toDecorate
+      }
+      return [...toDecorate, ...this.getUrisFromSet(paths)]
+    }
+
+    return Object.entries(this.state).reduce(reduceState, [])
+  }
+
   public setState = (state: DecorationState) => {
     this.state = state
-    this.onDidChangeDecorations.fire(
-      Object.entries(this.state)
-        .reduce(
-          (toDecorate: string[], entry: [string, Set<string>]): string[] => {
-            const [status, paths] = entry as [Status, Set<string>]
-            if (!this.isValidStatus(status)) {
-              return toDecorate
-            }
-            return [...toDecorate, ...paths]
-          },
-          []
-        )
-        .map(path => Uri.file(path))
-    )
+    this.onDidChangeDecorations.fire(this.getUrisFromState())
   }
 
   constructor() {
