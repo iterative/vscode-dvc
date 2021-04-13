@@ -183,16 +183,18 @@ export class Repository {
   }
 
   public async updateState() {
-    await Promise.all([
-      this.updateTracked(),
+    const promisesForScm = Promise.all([
       this.updateUntracked(),
       this.updateStatus()
     ])
 
-    return Promise.all([
-      this.sourceControlManagement?.setResourceStates(this.state),
-      this.decorationProvider?.setState(this.state)
-    ])
+    const extraPromiseForDecoration = this.updateTracked()
+
+    await promisesForScm
+    this.sourceControlManagement?.setResourceStates(this.state)
+
+    await extraPromiseForDecoration
+    this.decorationProvider?.setState(this.state)
   }
 
   private async setup() {
