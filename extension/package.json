@@ -85,13 +85,13 @@
         "title": "%command.pullTarget%",
         "command": "dvc.pullTarget",
         "category": "DVC",
-        "icon": "$(arrow-down)"
+        "icon": "$(cloud-download)"
       },
       {
         "title": "%command.pushTarget%",
         "command": "dvc.pushTarget",
         "category": "DVC",
-        "icon": "$(arrow-up)"
+        "icon": "$(cloud-upload)"
       }
     ],
     "configuration": {
