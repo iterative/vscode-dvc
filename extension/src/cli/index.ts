@@ -2,7 +2,7 @@ import { basename, dirname } from 'path'
 import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
-import { getAddCommand } from './commands'
+import { Commands, getCommandWithTarget } from './commands'
 import {
   execCommand,
   initializeDirectory,
@@ -10,20 +10,38 @@ import {
   checkoutRecursive
 } from './reader'
 
-export const add = async (options: {
-  fsPath: string
-  cliPath: string | undefined
-}): Promise<string> => {
+const runTargetCommand = async (
+  options: {
+    fsPath: string
+    cliPath: string | undefined
+  },
+  command: Commands
+): Promise<string> => {
   const { fsPath, cliPath } = options
 
   const cwd = dirname(fsPath)
 
-  const toAdd = basename(fsPath)
-  const addCommand = getAddCommand(toAdd)
+  const target = basename(fsPath)
+  const commandWithTarget = getCommandWithTarget(command, target)
 
-  const { stdout } = await execCommand({ cwd, cliPath }, addCommand)
+  const { stdout } = await execCommand({ cwd, cliPath }, commandWithTarget)
   return stdout
 }
+
+export const addTarget = async (options: {
+  fsPath: string
+  cliPath: string | undefined
+}): Promise<string> => runTargetCommand(options, Commands.ADD)
+
+export const pushTarget = async (options: {
+  fsPath: string
+  cliPath: string | undefined
+}): Promise<string> => runTargetCommand(options, Commands.PUSH)
+
+export const pullTarget = async (options: {
+  fsPath: string
+  cliPath: string | undefined
+}): Promise<string> => runTargetCommand(options, Commands.PULL)
 
 export const registerCommands = (config: Config, disposer: Disposer) => {
   disposer.track(
@@ -36,8 +54,20 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
-    commands.registerCommand('dvc.add', ({ resourceUri }) =>
-      add({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
+      addTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
+      pushTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.pullTarget', ({ resourceUri }) =>
+      pullTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
     )
   )
 
