@@ -82,6 +82,6 @@ export const status = async (
 export const queueExperiment = async (
   options: ReaderOptions
 ): Promise<string> => {
-  const { stdout } = await execCommand(options, 'exp run --queue')
+  const { stdout } = await execCommand(options, Commands.queue_experiment)
   return stdout
 }

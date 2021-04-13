@@ -5,7 +5,8 @@ export enum Commands {
   add = 'add',
   checkout = 'checkout',
   checkout_recursive = 'checkout --recursive',
-  status = 'status --show-json'
+  status = 'status --show-json',
+  queue_experiment = 'exp run --queue'
 }
 
 const getCliCommand = (command: string, ...options: string[]): string => {
