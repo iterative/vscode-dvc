@@ -1,12 +1,15 @@
 import { Config } from './Config'
 import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from './git'
-import { SourceControlManagement } from './views/SourceControlManagement'
-import { DecorationProvider } from './DecorationProvider'
-import { Uri } from 'vscode'
+import {
+  SourceControlManagementState,
+  SourceControlManagement
+} from './views/SourceControlManagement'
+import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from './cli/reader'
 import { dirname, join } from 'path'
+import { observable, makeObservable } from 'mobx'
 
 enum Status {
   DELETED = 'deleted',
@@ -28,6 +31,27 @@ type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type PathStatus = Record<string, Status>
 
+export class RepositoryState
+  implements DecorationState, SourceControlManagementState {
+  public dispose = Disposable.fn()
+
+  public tracked: Set<string>
+  public deleted: Set<string>
+  public modified: Set<string>
+  public new: Set<string>
+  public notInCache: Set<string>
+  public untracked: Set<string>
+
+  constructor() {
+    this.tracked = new Set<string>()
+    this.deleted = new Set<string>()
+    this.modified = new Set<string>()
+    this.new = new Set<string>()
+    this.notInCache = new Set<string>()
+    this.untracked = new Set<string>()
+  }
+}
+
 export class Repository {
   public readonly dispose = Disposable.fn()
 
@@ -38,15 +62,17 @@ export class Repository {
     return this.initialized
   }
 
+  public getState() {
+    return this.state
+  }
+
+  @observable
+  private state: RepositoryState
+
   private config: Config
   private dvcRoot: string
   private decorationProvider?: DecorationProvider
-  private scm?: SourceControlManagement
-
-  deleted: Uri[] = []
-  modified: Uri[] = []
-  new: Uri[] = []
-  notInCache: Uri[] = []
+  private sourceControlManagement: SourceControlManagement
 
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
@@ -62,14 +88,14 @@ export class Repository {
     )
   }
 
-  public async getDvcTracked(): Promise<Set<string>> {
-    const dvcListFiles = await listDvcOnlyRecursive({
+  public async updateTracked(): Promise<void> {
+    const tracked = await listDvcOnlyRecursive({
       cwd: this.dvcRoot,
       cliPath: this.config.dvcPath
     })
-    return new Set([
-      ...this.getAbsolutePath(dvcListFiles),
-      ...this.getAbsoluteParentPath(dvcListFiles)
+    this.state.tracked = new Set([
+      ...this.getAbsolutePath(tracked),
+      ...this.getAbsoluteParentPath(tracked)
     ])
   }
 
@@ -106,24 +132,25 @@ export class Repository {
   }
 
   private reduceStatuses(
-    reducedStatus: Partial<Record<Status, string[]>>,
+    reducedStatus: Partial<Record<Status, Set<string>>>,
     statuses: PathStatus[]
   ) {
     return statuses.map(entry =>
       Object.entries(entry).map(([relativePath, status]) => {
-        const existingPaths = reducedStatus[status] || []
-        reducedStatus[status] = [...new Set([...existingPaths, relativePath])]
+        const absolutePath = join(this.dvcRoot, relativePath)
+        const existingPaths = reducedStatus[status] || new Set<string>()
+        reducedStatus[status] = existingPaths.add(absolutePath)
       })
     )
   }
 
   private reduceToPathStatuses(
     filteredStatusOutput: FilteredStatusOutput
-  ): Partial<Record<Status, string[]>> {
+  ): Partial<Record<Status, Set<string>>> {
     const statusReducer = (
-      reducedStatus: Partial<Record<Status, string[]>>,
+      reducedStatus: Partial<Record<Status, Set<string>>>,
       entry: ValidStageOrFileStatuses[]
-    ): Partial<Record<Status, string[]>> => {
+    ): Partial<Record<Status, Set<string>>> => {
       const statuses = this.getFileOrStageStatuses(entry)
 
       this.reduceStatuses(reducedStatus, statuses)
@@ -134,63 +161,49 @@ export class Repository {
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  private getUriStatuses(
-    pathStatuses: Partial<Record<Status, string[]>>,
-    dvcRoot: string
-  ): Partial<Record<Status, Uri[]>> {
-    return Object.entries(pathStatuses).reduce(
-      (uriStatuses, [status, paths]) => {
-        uriStatuses[status as Status] = paths?.map(path =>
-          Uri.file(join(dvcRoot, path))
-        )
-        return uriStatuses
-      },
-      {} as Partial<Record<Status, Uri[]>>
-    )
-  }
-
-  private async getStatus(): Promise<Partial<Record<Status, Uri[]>>> {
+  private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
     const statusOutput = (await status({
       cliPath: this.config.dvcPath,
       cwd: this.dvcRoot
     })) as Record<string, (ValidStageOrFileStatuses | string)[]>
 
     const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
-    const pathStatuses = this.reduceToPathStatuses(filteredStatusOutput)
-
-    return this.getUriStatuses(pathStatuses, this.dvcRoot)
+    return this.reduceToPathStatuses(filteredStatusOutput)
   }
 
   public async updateStatus() {
     const status = await this.getStatus()
 
-    this.modified = status.modified || []
-    this.deleted = status.deleted || []
-    this.new = status.new || []
-    this.notInCache = status['not in cache'] || []
+    this.state.modified = status.modified || new Set<string>()
+    this.state.deleted = status.deleted || new Set<string>()
+    this.state.new = status.new || new Set<string>()
+    this.state.notInCache = status['not in cache'] || new Set<string>()
   }
 
   public async updateUntracked() {
-    const untrackedChanges = await getAllUntracked(this.dvcRoot)
-    return this.scm?.setUntracked(untrackedChanges)
+    this.state.untracked = await getAllUntracked(this.dvcRoot)
   }
 
-  public async setup() {
-    const [files, untracked, status] = await Promise.all([
-      this.getDvcTracked(),
-      getAllUntracked(this.dvcRoot),
-      this.getStatus()
+  public async updateState() {
+    const promisesForScm = Promise.all([
+      this.updateUntracked(),
+      this.updateStatus()
     ])
 
-    this.decorationProvider?.setTrackedFiles(files)
-    this.scm = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, {
-        modified: status.modified || [],
-        untracked
-      })
-    )
+    const extraPromiseForDecoration = this.updateTracked()
 
-    this._initialized.resolve()
+    await promisesForScm
+    this.sourceControlManagement.setState(this.state)
+
+    if (this.decorationProvider) {
+      await extraPromiseForDecoration
+      this.decorationProvider.setState(this.state)
+    }
+  }
+
+  private async setup() {
+    await this.updateState()
+    return this._initialized.resolve()
   }
 
   constructor(
@@ -198,8 +211,16 @@ export class Repository {
     config: Config,
     decorationProvider?: DecorationProvider
   ) {
+    makeObservable(this)
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
+    this.state = this.dispose.track(new RepositoryState())
+
+    this.sourceControlManagement = this.dispose.track(
+      new SourceControlManagement(this.dvcRoot, this.state)
+    )
+
+    this.setup()
   }
 }

@@ -1,11 +1,13 @@
 export enum Commands {
-  experiment_run = 'exp run',
-  experiment_show = 'exp show --show-json',
-  initialize_subdirectory = 'init --subdir',
-  add = 'add',
-  checkout = 'checkout',
-  checkout_recursive = 'checkout --recursive',
-  status = 'status --show-json',
+  ADD = 'add',
+  CHECKOUT = 'checkout',
+  CHECKOUT_RECURSIVE = 'checkout --recursive',
+  EXPERIMENT_RUN = 'exp run',
+  EXPERIMENT_SHOW = 'exp show --show-json',
+  INITIALIZE_SUBDIRECTORY = 'init --subdir',
+  PULL = 'pull',
+  PUSH = 'push',
+  STATUS = 'status --show-json',
   queue_experiment = 'exp run --queue'
 }
 
@@ -14,9 +16,10 @@ const getCliCommand = (command: string, ...options: string[]): string => {
 }
 
 export const getRunExperimentCommand = (): string => {
-  return getCliCommand(Commands.experiment_run)
+  return getCliCommand(Commands.EXPERIMENT_RUN)
 }
 
-export const getAddCommand = (toAdd: string): string => {
-  return `${Commands.add} ${toAdd}`
-}
+export const getCommandWithTarget = (
+  command: Commands,
+  target: string
+): string => `${command} ${target}`

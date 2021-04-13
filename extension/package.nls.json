@@ -1,17 +1,20 @@
 {
   "displayName": "DVC",
   "description": "DVC VSCode extension",
-  "command.add": "Add",
+  "command.addTarget": "Add Target",
   "command.checkout": "Checkout",
   "command.checkoutRecursive": "Checkout Recursive",
   "command.commit": "Commit",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
+  "command.pull": "Pull",
+  "command.pullTarget": "Pull Target",
   "command.push": "Push",
+  "command.pushTarget": "Push Target",
   "command.runExperiment": "Run Experiment",
   "command.queueExperiment": "Queue Experiment",
   "command.selectDvcPath": "Select DVC CLI Path",
   "command.showExperiments": "Show Experiments",
-  "config.dvcPath.title": "DVC CLI Path",
-  "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank."
+  "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
+  "config.dvcPath.title": "DVC CLI Path"
 }
