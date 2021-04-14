@@ -2,7 +2,7 @@ import { basename, dirname } from 'path'
 import { commands, QuickPickItem, window } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
-import { Commands, DvcGcPreserveFlag, getCommandWithTarget } from './commands'
+import { Commands, GcPreserveFlag, getCommandWithTarget } from './commands'
 import {
   execCommand,
   initializeDirectory,
@@ -42,32 +42,32 @@ export const queueExperimentCommand = async (config: Config) => {
   }
 }
 
-export interface DvcGcQuickPickItem extends QuickPickItem {
-  flag: DvcGcPreserveFlag
+export interface GcQuickPickItem extends QuickPickItem {
+  flag: GcPreserveFlag
 }
 
 export const experimentGcCommand = async (config: Config) => {
-  const quickPickResult = await window.showQuickPick<DvcGcQuickPickItem>(
+  const quickPickResult = await window.showQuickPick<GcQuickPickItem>(
     [
       {
         label: 'All Branches',
         detail: 'Preserve Experiments derived from all Git branches',
-        flag: DvcGcPreserveFlag.ALL_BRANCHES
+        flag: GcPreserveFlag.ALL_BRANCHES
       },
       {
         label: 'All Tags',
         detail: 'Preserve Experiments derived from all Git tags',
-        flag: DvcGcPreserveFlag.ALL_TAGS
+        flag: GcPreserveFlag.ALL_TAGS
       },
       {
         label: 'All Commits',
         detail: 'Preserve Experiments derived from all Git commits',
-        flag: DvcGcPreserveFlag.ALL_COMMITS
+        flag: GcPreserveFlag.ALL_COMMITS
       },
       {
         label: 'Queued Experiments',
         detail: 'Preserve all queued Experiments',
-        flag: DvcGcPreserveFlag.QUEUED
+        flag: GcPreserveFlag.QUEUED
       }
     ],
     { canPickMany: true, placeHolder: 'Select which Experiments to preserve' }

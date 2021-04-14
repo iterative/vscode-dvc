@@ -1,4 +1,4 @@
-import { Commands, DvcGcPreserveFlag } from './commands'
+import { Commands, GcPreserveFlag } from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
@@ -66,6 +66,6 @@ export const queueExperiment = async (
 
 export const experimentGarbageCollect = async (
   options: ReaderOptions,
-  preserveFlags: DvcGcPreserveFlag[]
+  preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
   execCommand(options, [Commands.EXPERIMENT_GC, ...preserveFlags].join(' '))

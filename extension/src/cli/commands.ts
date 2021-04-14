@@ -13,7 +13,7 @@ export enum Commands {
   EXPERIMENT_GC = 'exp gc -f -w'
 }
 
-export enum DvcGcPreserveFlag {
+export enum GcPreserveFlag {
   ALL_BRANCHES = '--all-branches',
   ALL_TAGS = '--all-tags',
   ALL_COMMITS = '--all-commits',
