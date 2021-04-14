@@ -12,7 +12,11 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { IntegratedTerminal, runExperiment } from './IntegratedTerminal'
+import {
+  IntegratedTerminal,
+  runExperiment,
+  runQueuedExperiments
+} from './IntegratedTerminal'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
@@ -139,6 +143,13 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async () => {
         runExperiment()
+        this.showExperimentsWebview()
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.runQueuedExperiments', async () => {
+        runQueuedExperiments()
         this.showExperimentsWebview()
       })
     )
