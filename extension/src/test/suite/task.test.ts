@@ -91,6 +91,6 @@ suite('Task Test Suite', () => {
           expect(true).to.be.true
         })
       })
-    }).timeout(60000000)
+    })
   })
 })
