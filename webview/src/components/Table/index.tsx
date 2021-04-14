@@ -3,7 +3,7 @@ import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { Experiment } from '../../util/parse-experiments'
 import styles from './styles.module.scss'
-import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu/index'
+import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 import SortIconToggle from '../SortIconToggle'
 
 export interface InstanceProp {

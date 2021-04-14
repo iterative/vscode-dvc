@@ -2,12 +2,12 @@ import { Config } from '../Config'
 import {
   GcQuickPickItem,
   experimentGcCommand,
-  queueExperimentCommand
-} from './index'
+  queueExperimentCommand,
+  addTarget
+} from '.'
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
 import { basename, resolve } from 'path'
-import { addTarget } from '.'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from './commands'
 
