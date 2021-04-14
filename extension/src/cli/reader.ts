@@ -62,7 +62,7 @@ export const status = async (
 
 export const queueExperiment = async (
   options: ReaderOptions
-): Promise<string> => execCommand(options, Commands.QUEUE_EXPERIMENT)
+): Promise<string> => execCommand(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentGarbageCollect = async (
   options: ReaderOptions,

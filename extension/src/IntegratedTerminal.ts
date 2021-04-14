@@ -73,5 +73,5 @@ export const runExperiment = (): Promise<void> => {
 }
 
 export const runQueuedExperiments = (): Promise<void> => {
-  return IntegratedTerminal.runCommand(Commands.RUN_ALL_EXPERIMENTS)
+  return IntegratedTerminal.runCommand(Commands.EXPERIMENT_RUN_ALL)
 }
