@@ -14,6 +14,7 @@
   "command.runExperiment": "Run Experiment",
   "command.queueExperiment": "Queue Experiment",
   "command.runQueuedExperiments": "Run Queued Experiments",
+  "command.experimentGarbageCollect": "Garbage Collect Experiments",
   "command.selectDvcPath": "Select DVC CLI Path",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
