@@ -26,8 +26,7 @@ const runTargetCommand = async (
   const target = basename(fsPath)
   const commandWithTarget = getCommandWithTarget(command, target)
 
-  const { stdout } = await execCommand({ cwd, cliPath }, commandWithTarget)
-  return stdout
+  return execCommand({ cwd, cliPath }, commandWithTarget)
 }
 
 export const queueExperimentCommand = async (config: Config) => {
