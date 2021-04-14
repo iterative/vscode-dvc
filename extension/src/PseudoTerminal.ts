@@ -1,9 +1,7 @@
-import { Terminal, window, workspace } from 'vscode'
+import { Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
-import { getReadyPythonExtension } from './extensions/python'
 import { delay } from './util'
 
-// Static class that creates and holds a reference to an integrated terminal and can run commands in it.
 export class PseudoTerminal {
   static termName = 'DVC'
   private static instance: Terminal | undefined
@@ -35,15 +33,6 @@ export class PseudoTerminal {
 
   private static initializeInstance = async (): Promise<void> => {
     PseudoTerminal.deleteReferenceOnClose()
-
-    const pythonExtension = await getReadyPythonExtension()
-    if (
-      pythonExtension &&
-      workspace.getConfiguration().get('python.terminal.activateEnvironment')
-    ) {
-      return PseudoTerminal.createInstance(5000)
-    }
-
     return PseudoTerminal.createInstance(2000)
   }
 
@@ -58,8 +47,6 @@ export class PseudoTerminal {
   private static createInstance = async (ms: number): Promise<void> => {
     PseudoTerminal.instance = window.createTerminal({
       name: PseudoTerminal.termName
-      // hideFromUser: true <- cannot use this as the python extension will not activate the environment
-      // https://github.com/microsoft/vscode-python/issues/11122
     })
     return delay(ms)
   }
