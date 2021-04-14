@@ -1,14 +1,15 @@
 import { basename, dirname } from 'path'
-import { commands, window } from 'vscode'
+import { commands, QuickPickItem, window } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
-import { Commands, getCommandWithTarget } from './commands'
+import { Commands, GcPreserveFlag, getCommandWithTarget } from './commands'
 import {
   execCommand,
   initializeDirectory,
   checkout,
   checkoutRecursive,
-  queueExperiment
+  queueExperiment,
+  experimentGarbageCollect
 } from './reader'
 
 const runTargetCommand = async (
@@ -25,8 +26,7 @@ const runTargetCommand = async (
   const target = basename(fsPath)
   const commandWithTarget = getCommandWithTarget(command, target)
 
-  const { stdout } = await execCommand({ cwd, cliPath }, commandWithTarget)
-  return stdout
+  return execCommand({ cwd, cliPath }, commandWithTarget)
 }
 
 export const queueExperimentCommand = async (config: Config) => {
@@ -41,6 +41,54 @@ export const queueExperimentCommand = async (config: Config) => {
     return window.showErrorMessage(e.stderr || e.message)
   }
 }
+
+export interface GcQuickPickItem extends QuickPickItem {
+  flag: GcPreserveFlag
+}
+
+export const experimentGcCommand = async (config: Config) => {
+  const quickPickResult = await window.showQuickPick<GcQuickPickItem>(
+    [
+      {
+        label: 'All Branches',
+        detail: 'Preserve Experiments derived from all Git branches',
+        flag: GcPreserveFlag.ALL_BRANCHES
+      },
+      {
+        label: 'All Tags',
+        detail: 'Preserve Experiments derived from all Git tags',
+        flag: GcPreserveFlag.ALL_TAGS
+      },
+      {
+        label: 'All Commits',
+        detail: 'Preserve Experiments derived from all Git commits',
+        flag: GcPreserveFlag.ALL_COMMITS
+      },
+      {
+        label: 'Queued Experiments',
+        detail: 'Preserve all queued Experiments',
+        flag: GcPreserveFlag.QUEUED
+      }
+    ],
+    { canPickMany: true, placeHolder: 'Select which Experiments to preserve' }
+  )
+
+  if (quickPickResult) {
+    try {
+      const stdout = await experimentGarbageCollect(
+        {
+          cwd: config.workspaceRoot,
+          cliPath: config.dvcPath
+        },
+        quickPickResult.map(({ flag }) => flag)
+      )
+      window.showInformationMessage(stdout)
+    } catch (e) {
+      window.showErrorMessage(e.stderr || e.message)
+    }
+  }
+}
+
 export const addTarget = async (options: {
   fsPath: string
   cliPath: string | undefined
@@ -97,8 +145,14 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
-    commands.registerCommand('dvc.queueExperiment', async () => {
+    commands.registerCommand('dvc.queueExperiment', () => {
       return queueExperimentCommand(config)
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.experimentGarbageCollect', () => {
+      return experimentGcCommand(config)
     })
   )
 }
