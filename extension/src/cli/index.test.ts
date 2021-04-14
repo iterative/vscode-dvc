@@ -65,14 +65,14 @@ describe('queueExperimentCommand', () => {
     cwd: resolve()
   } as unknown) as Config
 
-  test('it displays an info message with the contents of stdout when the command succeeds', async () => {
+  it('displays an info message with the contents of stdout when the command succeeds', async () => {
     const stdout = 'Example stdout that will be resolved literally\n'
     mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
     await queueExperimentCommand(exampleConfig)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
-  test('it displays an error message with the contents of stderr when the command fails', async () => {
+  it('displays an error message with the contents of stderr when the command fails', async () => {
     const stderr = 'Example stderr that will be resolved literally\n'
     mockedExecPromise.mockRejectedValue({ stderr, stdout: '' })
     await queueExperimentCommand(exampleConfig)
@@ -86,7 +86,7 @@ describe('experimentGcCommand', () => {
     cwd: resolve()
   } as unknown) as Config
 
-  test('it invokes a QuickPick with snapshotted options', async () => {
+  it('invokes a QuickPick with snapshotted options', async () => {
     await experimentGcCommand(exampleConfig)
     expect(mockedShowQuickPick.mock.calls).toMatchInlineSnapshot(`
       Array [
@@ -122,7 +122,7 @@ describe('experimentGcCommand', () => {
     `)
   })
 
-  test('it executes the proper command given a mocked selection', async () => {
+  it('executes the proper command given a mocked selection', async () => {
     mockedShowQuickPick.mockResolvedValue([
       {
         detail: 'Preserve Experiments derived from all Git tags',
@@ -146,7 +146,7 @@ describe('experimentGcCommand', () => {
     )
   })
 
-  test('it reports stdout from the executed command via showInformationMessage', async () => {
+  it('reports stdout from the executed command via showInformationMessage', async () => {
     const stdout = 'example stdout that will be passed on'
     mockedShowQuickPick.mockResolvedValue([])
     mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
@@ -154,7 +154,7 @@ describe('experimentGcCommand', () => {
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
-  test('it reports stderr from the executed command via showInformationMessage', async () => {
+  it('reports stderr from the executed command via showInformationMessage', async () => {
     const stderr = 'example stderr that will be passed on'
     mockedShowQuickPick.mockResolvedValue([])
     mockedExecPromise.mockRejectedValue({ stderr, stdout: '' })
@@ -162,7 +162,7 @@ describe('experimentGcCommand', () => {
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 
-  test('it reports the message from a non-shell Exception', async () => {
+  it('reports the message from a non-shell Exception', async () => {
     const message = 'example message that will be passed on'
     mockedShowQuickPick.mockResolvedValue([])
     mockedExecPromise.mockImplementation(() => {
@@ -172,7 +172,7 @@ describe('experimentGcCommand', () => {
     expect(mockedShowErrorMessage).toBeCalledWith(message)
   })
 
-  test('it executes the proper default command given no selections', async () => {
+  it('executes the proper default command given no selections', async () => {
     mockedShowQuickPick.mockResolvedValue([])
 
     await experimentGcCommand(exampleConfig)
@@ -182,7 +182,7 @@ describe('experimentGcCommand', () => {
     })
   })
 
-  test('it does not execute a command if the QuickPick is dismissed', async () => {
+  it('does not execute a command if the QuickPick is dismissed', async () => {
     mockedShowQuickPick.mockResolvedValue(undefined)
     await experimentGcCommand(exampleConfig)
     expect(mockedExecPromise).not.toBeCalled()
