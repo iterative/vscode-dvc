@@ -11,6 +11,7 @@ import {
   window,
   TaskProcessStartEvent
 } from 'vscode'
+import { resolve } from 'path'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -19,6 +20,17 @@ suite('Task Test Suite', () => {
   window.showInformationMessage('Start all task tests.')
 
   describe('Task', () => {
+    const dvcPath = resolve(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      '..',
+      'demo',
+      '.env',
+      'bin'
+    )
+
     it('Execution from onDidEndTaskProcess and onDidStartTaskProcess are equal to original', async () => {
       const disposables = []
       return new Promise<void>(resolve => {
@@ -27,9 +39,11 @@ suite('Task Test Suite', () => {
           TaskScope.Workspace,
           'echo',
           'testTask',
-          new ShellExecution(
-            'PATH=/Users/mattseddon/PP/vscode-dvc/demo/.env/bin:$PATH dvc exp run'
-          )
+          new ShellExecution('dvc exp show --show-json', {
+            env: {
+              PATH: `${dvcPath}:$PATH`
+            }
+          })
         )
         // eslint-disable-next-line prefer-const
         let taskExecution: TaskExecution
