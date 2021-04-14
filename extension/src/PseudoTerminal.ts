@@ -1,6 +1,5 @@
 import { Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
-import { delay } from './util'
 
 export class PseudoTerminal {
   static termName = 'DVC'
@@ -33,7 +32,7 @@ export class PseudoTerminal {
 
   private static initializeInstance = async (): Promise<void> => {
     PseudoTerminal.deleteReferenceOnClose()
-    return PseudoTerminal.createInstance(2000)
+    return PseudoTerminal.createInstance()
   }
 
   private static deleteReferenceOnClose = (): void => {
@@ -44,11 +43,10 @@ export class PseudoTerminal {
     })
   }
 
-  private static createInstance = async (ms: number): Promise<void> => {
+  private static createInstance = async (): Promise<void> => {
     PseudoTerminal.instance = window.createTerminal({
       name: PseudoTerminal.termName
     })
-    return delay(ms)
   }
 }
 
