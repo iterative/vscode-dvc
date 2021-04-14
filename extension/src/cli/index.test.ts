@@ -1,6 +1,6 @@
 import { Config } from '../Config'
 import {
-  DvcGcQuickPickItem,
+  GcQuickPickItem,
   experimentGcCommand,
   queueExperimentCommand
 } from './index'
@@ -9,7 +9,7 @@ import { execPromise } from '../util'
 import { basename, resolve } from 'path'
 import { addTarget } from '.'
 import { QuickPickOptions, window } from 'vscode'
-import { DvcGcPreserveFlag } from './commands'
+import { GcPreserveFlag } from './commands'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -20,9 +20,9 @@ const mockedShowErrorMessage = mocked(window.showErrorMessage)
 const mockedShowInformationMessage = mocked(window.showInformationMessage)
 const mockedShowQuickPick = mocked<
   (
-    items: DvcGcQuickPickItem[],
+    items: GcQuickPickItem[],
     options: QuickPickOptions
-  ) => Thenable<DvcGcQuickPickItem[] | undefined>
+  ) => Thenable<GcQuickPickItem[] | undefined>
 >(window.showQuickPick)
 
 beforeEach(() => {
@@ -126,12 +126,12 @@ describe('experimentGcCommand', () => {
     mockedShowQuickPick.mockResolvedValue([
       {
         detail: 'Preserve Experiments derived from all Git tags',
-        flag: DvcGcPreserveFlag.ALL_TAGS,
+        flag: GcPreserveFlag.ALL_TAGS,
         label: 'All Tags'
       },
       {
         detail: 'Preserve Experiments derived from all Git commits',
-        flag: DvcGcPreserveFlag.ALL_COMMITS,
+        flag: GcPreserveFlag.ALL_COMMITS,
         label: 'All Commits'
       }
     ])

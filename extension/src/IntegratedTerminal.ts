@@ -21,7 +21,7 @@ export class IntegratedTerminal {
     return currentTerminal?.sendText(command, true)
   }
 
-  static runDvcCommand = async (command: string): Promise<void> => {
+  static runCommand = async (command: string): Promise<void> => {
     return IntegratedTerminal.run(`dvc ${command}`)
   }
 
@@ -69,9 +69,9 @@ export class IntegratedTerminal {
 }
 
 export const runExperiment = (): Promise<void> => {
-  return IntegratedTerminal.runDvcCommand(Commands.EXPERIMENT_RUN)
+  return IntegratedTerminal.runCommand(Commands.EXPERIMENT_RUN)
 }
 
 export const runQueuedExperiments = (): Promise<void> => {
-  return IntegratedTerminal.runDvcCommand(Commands.RUN_ALL_EXPERIMENTS)
+  return IntegratedTerminal.runCommand(Commands.EXPERIMENT_RUN_ALL)
 }
