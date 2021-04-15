@@ -16,6 +16,7 @@
     "MNIST",
     "featurize",
     "isequal",
+    "pseudoterminal",
     "submodules",
     "symlinked",
     "toplevel",
