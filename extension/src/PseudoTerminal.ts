@@ -1,5 +1,6 @@
 import { spawn } from 'child_process'
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
+import { cliExecutionDetails } from './cli/shellExecution'
 
 const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
@@ -14,12 +15,7 @@ export class PseudoTerminal {
     return PseudoTerminal.instance
   }
 
-  static run = async (executionDetails: {
-    executionCommand: string
-    outputCommand: string
-    env: NodeJS.ProcessEnv
-    cwd: string
-  }): Promise<void> =>
+  static run = async (executionDetails: cliExecutionDetails): Promise<void> =>
     new Promise(resolve => {
       const { cwd, env, executionCommand, outputCommand } = executionDetails
       PseudoTerminal.openCurrentInstance().then(() => {
