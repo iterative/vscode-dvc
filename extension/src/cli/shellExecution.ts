@@ -1,15 +1,21 @@
 import { Config } from '../Config'
 import { Commands } from './commands'
+import { getPATH } from '../env'
 
-const getPATH = (pythonBinPath?: string): string => {
+const getPATHString = (pythonBinPath?: string): string => {
+  const existingPath = getPATH()
   if (!pythonBinPath) {
-    return '$PATH'
+    return existingPath
   }
-  return [pythonBinPath, '$PATH'].join(':')
+  if (!existingPath) {
+    return pythonBinPath
+  }
+
+  return [pythonBinPath, existingPath].join(':')
 }
 
 export const getCommand = (config: Config, command: Commands): string => {
   const cliPath = config.dvcPath || 'dvc'
-  const PATH = getPATH(config.pythonBinPath)
+  const PATH = getPATHString(config.pythonBinPath)
   return `PATH=${PATH} ${cliPath} ${command}`
 }
