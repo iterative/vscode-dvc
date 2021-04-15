@@ -6,7 +6,8 @@ import {
   checkoutRecursive,
   getRoot,
   listDvcOnlyRecursive,
-  getDvcInvocation
+  getDvcInvocation,
+  experimentApply
 } from './reader'
 import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
@@ -217,5 +218,22 @@ describe('getTracked', () => {
     expect(execPromiseSpy).toBeCalledWith('dvc list . --dvc-only -R', {
       cwd
     })
+  })
+})
+
+describe('apply', () => {
+  it('builds the correct command and returns stdout', async () => {
+    const cwd = ''
+    const stdout = 'Test output that will be passed along'
+    const execPromiseSpy = jest
+      .spyOn(Util, 'execPromise')
+      .mockResolvedValueOnce({
+        stdout,
+        stderr: ''
+      })
+    expect(await experimentApply({ cwd, cliPath: 'dvc' }, 'exp-test')).toEqual(
+      stdout
+    )
+    expect(execPromiseSpy).toBeCalledWith('dvc exp apply exp-test', { cwd })
   })
 })
