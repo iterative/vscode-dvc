@@ -15,6 +15,8 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonExecutionDetails
 } from './extensions/python'
+import { execPromise } from './util'
+import { join } from 'path'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -23,7 +25,7 @@ export class Config {
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
   readonly onDidChange: Event<ConfigurationChangeEvent>
 
-  public pythonExecutionDetails: string[] | undefined
+  public pythonExecutionDetails: string | undefined
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -110,18 +112,31 @@ export class Config {
     }
   }
 
+  private async setPythonExecutionDetails(
+    executionDetails: string[] | undefined
+  ): Promise<void> {
+    const pythonBin = executionDetails?.join(' ')
+    if (pythonBin) {
+      const { stdout } = await execPromise(
+        `${pythonBin} -c 'import sys; print(sys.prefix)'`
+      )
+      this.pythonExecutionDetails = join(stdout.trim(), 'bin')
+    }
+  }
+
   constructor() {
     makeObservable(this)
 
     getPythonExecutionDetails().then(executionDetails => {
-      this.pythonExecutionDetails = executionDetails
+      this.setPythonExecutionDetails(executionDetails)
     })
 
     getOnDidChangePythonExecutionDetails().then(
       onDidChangePythonExecutionDetails =>
         this.dispose.track(
           onDidChangePythonExecutionDetails?.(async () => {
-            this.pythonExecutionDetails = await getPythonExecutionDetails()
+            const executionDetails = await getPythonExecutionDetails()
+            this.setPythonExecutionDetails(executionDetails)
           })
         )
     )
