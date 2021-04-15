@@ -1,10 +1,10 @@
 import { Config } from '../Config'
+import { addTarget } from '.'
 import {
   GcQuickPickItem,
   experimentGcCommand,
-  queueExperimentCommand,
-  addTarget
-} from '.'
+  queueExperimentCommand
+} from './vscode'
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
 import { basename, resolve } from 'path'

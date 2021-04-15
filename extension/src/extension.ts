@@ -20,7 +20,7 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
-import { registerCommands as registerCliCommands } from './cli'
+import { registerCommands as registerCliCommands } from './cli/vscode'
 import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
