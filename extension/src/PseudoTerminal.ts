@@ -36,7 +36,6 @@ export class PseudoTerminal {
           writeEmitter.fire(
             '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
           )
-
           resolve()
         })
       })
