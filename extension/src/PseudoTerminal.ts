@@ -1,6 +1,6 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
-import { delay } from './util'
+import { delay, execPromise } from './util'
 
 const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
@@ -16,9 +16,13 @@ export class PseudoTerminal {
   }
 
   static run = async (command: string): Promise<void> => {
-    await PseudoTerminal.openCurrentInstance()
-    await delay(500)
-    return writeEmitter.fire(command)
+    const term = await PseudoTerminal.openCurrentInstance()
+    term?.show()
+    await delay(200)
+    writeEmitter.fire(`${command}\r\n`)
+    const { stdout } = await execPromise(command)
+    writeEmitter.fire(stdout)
+    return writeEmitter.fire('\r\n')
   }
 
   static runCommand = async (command: string): Promise<void> => {
@@ -49,7 +53,9 @@ export class PseudoTerminal {
   private static createInstance = async (): Promise<void> => {
     const pty: Pseudoterminal = {
       onDidWrite: writeEmitter.event,
-      open: () => {},
+      open: () => {
+        writeEmitter.fire('>>>> DVC Terminal >>>>\r\n')
+      },
       close: () => {},
       handleInput: data => writeEmitter.fire(data === '\r' ? '\r\n' : data)
     }
