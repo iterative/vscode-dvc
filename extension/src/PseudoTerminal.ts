@@ -1,6 +1,6 @@
-import { spawn } from 'child_process'
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
+import { execPromise } from './util'
 
 const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
@@ -20,12 +20,12 @@ export class PseudoTerminal {
       PseudoTerminal.openCurrentInstance().then(() => {
         writeEmitter.fire(`${command}\r\n`)
 
-        const stream = spawn(command, {
-          shell: true,
+        const childProcess = execPromise(command, {
           env: { PATH: '$PATH' },
           cwd: __dirname
-        })
-        stream.stdout?.on('data', stdout => {
+        }).child
+
+        childProcess.stdout?.on('data', stdout => {
           const output = stdout
             .toString()
             .split(/(\r?\n)/g)
@@ -33,7 +33,7 @@ export class PseudoTerminal {
           writeEmitter.fire(output)
         })
 
-        stream.on('close', () => {
+        childProcess.on('close', () => {
           writeEmitter.fire(
             '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
           )
