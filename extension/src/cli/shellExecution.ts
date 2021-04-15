@@ -13,9 +13,7 @@ const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   return [pythonBinPath, existingPath].join(':')
 }
 
-type envWithPath = Record<string, unknown> & { PATH: string }
-
-const getEnv = (config: Config): envWithPath => {
+const getEnv = (config: Config): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
   const existingPath = (env?.PATH as string) || ''
   const PATH = getPATH(existingPath, config.pythonBinPath)
@@ -27,17 +25,20 @@ const getEnv = (config: Config): envWithPath => {
 
 export const getExecutionDetails = (
   config: Config,
-  command: Commands
+  command: Commands,
+  cwd: string
 ): {
   executionCommand: string
   outputCommand: string
-  env: envWithPath
+  env: NodeJS.ProcessEnv
+  cwd: string
 } => {
   const cliPath = config.dvcPath || 'dvc'
   const env = getEnv(config)
   return {
     executionCommand: `${cliPath} ${command}`,
     outputCommand: `dvc ${command}`,
-    env
+    env,
+    cwd
   }
 }

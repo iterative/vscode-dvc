@@ -21,11 +21,12 @@ describe('getExecutionDetails', () => {
     } as Config
     mockedGetEnv.mockReturnValue(processEnv)
     const expectedCommand = `dvc ${Commands.CHECKOUT}`
-    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    const command = getExecutionDetails(config, Commands.CHECKOUT, __dirname)
     expect(command).toEqual({
+      cwd: __dirname,
+      env: processEnv,
       executionCommand: expectedCommand,
-      outputCommand: expectedCommand,
-      env: processEnv
+      outputCommand: expectedCommand
     })
   })
 
@@ -36,11 +37,12 @@ describe('getExecutionDetails', () => {
       dvcPath
     } as Config
     mockedGetEnv.mockReturnValue({ PATH: existingPath })
-    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    const command = getExecutionDetails(config, Commands.CHECKOUT, __dirname)
     expect(command).toEqual({
+      cwd: __dirname,
+      env: { PATH: existingPath },
       executionCommand: `${dvcPath} ${Commands.CHECKOUT}`,
-      outputCommand: `dvc ${Commands.CHECKOUT}`,
-      env: { PATH: existingPath }
+      outputCommand: `dvc ${Commands.CHECKOUT}`
     })
   })
 
@@ -56,11 +58,12 @@ describe('getExecutionDetails', () => {
       dvcPath,
       pythonBinPath
     } as Config
-    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    const command = getExecutionDetails(config, Commands.CHECKOUT, __dirname)
     expect(command).toEqual({
+      cwd: __dirname,
+      env: { PATH: `${pythonBinPath}:${existingPath}` },
       executionCommand: `${dvcPath} ${Commands.CHECKOUT}`,
-      outputCommand: `dvc ${Commands.CHECKOUT}`,
-      env: { PATH: `${pythonBinPath}:${existingPath}` }
+      outputCommand: `dvc ${Commands.CHECKOUT}`
     })
   })
 
@@ -73,11 +76,12 @@ describe('getExecutionDetails', () => {
       dvcPath,
       pythonBinPath
     } as Config
-    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    const command = getExecutionDetails(config, Commands.CHECKOUT, __dirname)
     expect(command).toEqual({
+      cwd: __dirname,
+      env: { PATH: `${pythonBinPath}` },
       executionCommand: `${dvcPath} ${Commands.CHECKOUT}`,
-      outputCommand: `dvc ${Commands.CHECKOUT}`,
-      env: { PATH: `${pythonBinPath}` }
+      outputCommand: `dvc ${Commands.CHECKOUT}`
     })
   })
 })
