@@ -1,5 +1,3 @@
-import { Config } from '../Config'
-
 export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
@@ -26,16 +24,3 @@ export const getCommandWithTarget = (
   command: Commands,
   target: string
 ): string => `${command} ${target}`
-
-const getPATH = (pythonBinPath?: string): string => {
-  if (!pythonBinPath) {
-    return '$PATH'
-  }
-  return [pythonBinPath, '$PATH'].join(':')
-}
-
-export const getCommand = (config: Config, command: Commands): string => {
-  const cliPath = config.dvcPath || 'dvc'
-  const PATH = getPATH(config.pythonBinPath)
-  return `PATH=${PATH} ${cliPath} ${command}`
-}

@@ -1,4 +1,5 @@
-import { getCommand, Commands } from './commands'
+import { Commands } from './commands'
+import { getCommand } from './shellExecution'
 import { Config } from '../Config'
 
 describe('getCommand', () => {
