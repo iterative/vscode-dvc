@@ -1,6 +1,6 @@
+import execa from 'execa'
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
-import { execPromise } from './util'
 
 const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
@@ -15,13 +15,22 @@ export class PseudoTerminal {
     return PseudoTerminal.instance
   }
 
-  static run = async (command: string): Promise<void> => {
-    await PseudoTerminal.openCurrentInstance()
-    writeEmitter.fire(`${command}\r\n`)
-    const { stdout } = await execPromise(command)
-    writeEmitter.fire(stdout)
-    return writeEmitter.fire('\r\n')
-  }
+  static run = async (command: string): Promise<void> =>
+    new Promise(resolve => {
+      PseudoTerminal.openCurrentInstance().then(() => {
+        writeEmitter.fire(`${command}\r\n`)
+        const stream = execa(command, { shell: true })
+        stream.on('stdout', stdout => {
+          writeEmitter.fire(stdout)
+        })
+        stream.on('close', () => {
+          writeEmitter.fire(
+            '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
+          )
+          resolve()
+        })
+      })
+    })
 
   static runCommand = async (command: string): Promise<void> => {
     return PseudoTerminal.run(`dvc ${command}`)
