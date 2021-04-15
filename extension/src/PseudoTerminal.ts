@@ -1,6 +1,6 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
-import { delay, execPromise } from './util'
+import { execPromise } from './util'
 
 const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
@@ -16,9 +16,7 @@ export class PseudoTerminal {
   }
 
   static run = async (command: string): Promise<void> => {
-    const term = await PseudoTerminal.openCurrentInstance()
-    term?.show()
-    await delay(200)
+    await PseudoTerminal.openCurrentInstance()
     writeEmitter.fire(`${command}\r\n`)
     const { stdout } = await execPromise(command)
     writeEmitter.fire(stdout)
@@ -50,21 +48,23 @@ export class PseudoTerminal {
     })
   }
 
-  private static createInstance = async (): Promise<void> => {
-    const pty: Pseudoterminal = {
-      onDidWrite: writeEmitter.event,
-      open: () => {
-        writeEmitter.fire('>>>> DVC Terminal >>>>\r\n')
-      },
-      close: () => {},
-      handleInput: data => writeEmitter.fire(data === '\r' ? '\r\n' : data)
-    }
+  private static createInstance = async (): Promise<void> =>
+    new Promise<void>(resolve => {
+      const pty: Pseudoterminal = {
+        onDidWrite: writeEmitter.event,
+        open: () => {
+          writeEmitter.fire('>>>> DVC Terminal >>>>\r\n')
+          resolve()
+        },
+        close: () => {},
+        handleInput: data => writeEmitter.fire(data === '\r' ? '\r\n' : data)
+      }
 
-    PseudoTerminal.instance = window.createTerminal({
-      name: PseudoTerminal.termName,
-      pty
+      PseudoTerminal.instance = window.createTerminal({
+        name: PseudoTerminal.termName,
+        pty
+      })
     })
-  }
 }
 
 export const runExperiment = (): Promise<void> => {
