@@ -1,8 +1,9 @@
-import { commands, QuickPickItem, window } from 'vscode'
+import { commands, window } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { pushTarget, pullTarget, addTarget } from '.'
 import { Config } from '../Config'
 import { GcPreserveFlag } from './commands'
+import { quickPickManyValues } from '../util/quickPick'
 import {
   initializeDirectory,
   checkout,
@@ -10,10 +11,6 @@ import {
   queueExperiment,
   experimentGarbageCollect
 } from './reader'
-
-export interface GcQuickPickItem extends QuickPickItem {
-  flag: GcPreserveFlag
-}
 
 export const queueExperimentCommand = async (config: Config) => {
   try {
@@ -29,31 +26,31 @@ export const queueExperimentCommand = async (config: Config) => {
 }
 
 export const experimentGcCommand = async (config: Config) => {
-  const quickPickResult = await window.showQuickPick<GcQuickPickItem>(
+  const quickPickResult = (await quickPickManyValues(
     [
       {
         label: 'All Branches',
         detail: 'Preserve Experiments derived from all Git branches',
-        flag: GcPreserveFlag.ALL_BRANCHES
+        value: GcPreserveFlag.ALL_BRANCHES
       },
       {
         label: 'All Tags',
         detail: 'Preserve Experiments derived from all Git tags',
-        flag: GcPreserveFlag.ALL_TAGS
+        value: GcPreserveFlag.ALL_TAGS
       },
       {
         label: 'All Commits',
         detail: 'Preserve Experiments derived from all Git commits',
-        flag: GcPreserveFlag.ALL_COMMITS
+        value: GcPreserveFlag.ALL_COMMITS
       },
       {
         label: 'Queued Experiments',
         detail: 'Preserve all queued Experiments',
-        flag: GcPreserveFlag.QUEUED
+        value: GcPreserveFlag.QUEUED
       }
     ],
-    { canPickMany: true, placeHolder: 'Select which Experiments to preserve' }
-  )
+    { placeHolder: 'Select which Experiments to preserve' }
+  )) as GcPreserveFlag[]
 
   if (quickPickResult) {
     try {
@@ -62,7 +59,7 @@ export const experimentGcCommand = async (config: Config) => {
           cwd: config.workspaceRoot,
           cliPath: config.dvcPath
         },
-        quickPickResult.map(({ flag }) => flag)
+        quickPickResult
       )
       window.showInformationMessage(stdout)
     } catch (e) {

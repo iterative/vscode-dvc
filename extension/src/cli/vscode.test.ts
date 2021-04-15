@@ -1,14 +1,11 @@
 import { Config } from '../Config'
-import {
-  GcQuickPickItem,
-  experimentGcCommand,
-  queueExperimentCommand
-} from './vscode'
+import { experimentGcCommand, queueExperimentCommand } from './vscode'
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
 import { resolve } from 'path'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from './commands'
+import { QuickPickItemWithValue } from '../util/quickPick'
 
 jest.mock('fs')
 jest.mock('../util')
@@ -19,9 +16,9 @@ const mockedShowErrorMessage = mocked(window.showErrorMessage)
 const mockedShowInformationMessage = mocked(window.showInformationMessage)
 const mockedShowQuickPick = mocked<
   (
-    items: GcQuickPickItem[],
+    items: QuickPickItemWithValue[],
     options: QuickPickOptions
-  ) => Thenable<GcQuickPickItem[] | undefined>
+  ) => Thenable<QuickPickItemWithValue[] | undefined>
 >(window.showQuickPick)
 
 beforeEach(() => {
@@ -63,23 +60,23 @@ describe('experimentGcCommand', () => {
           Array [
             Object {
               "detail": "Preserve Experiments derived from all Git branches",
-              "flag": "--all-branches",
               "label": "All Branches",
+              "value": "--all-branches",
             },
             Object {
               "detail": "Preserve Experiments derived from all Git tags",
-              "flag": "--all-tags",
               "label": "All Tags",
+              "value": "--all-tags",
             },
             Object {
               "detail": "Preserve Experiments derived from all Git commits",
-              "flag": "--all-commits",
               "label": "All Commits",
+              "value": "--all-commits",
             },
             Object {
               "detail": "Preserve all queued Experiments",
-              "flag": "--queued",
               "label": "Queued Experiments",
+              "value": "--queued",
             },
           ],
           Object {
@@ -95,12 +92,12 @@ describe('experimentGcCommand', () => {
     mockedShowQuickPick.mockResolvedValue([
       {
         detail: 'Preserve Experiments derived from all Git tags',
-        flag: GcPreserveFlag.ALL_TAGS,
+        value: GcPreserveFlag.ALL_TAGS,
         label: 'All Tags'
       },
       {
         detail: 'Preserve Experiments derived from all Git commits',
-        flag: GcPreserveFlag.ALL_COMMITS,
+        value: GcPreserveFlag.ALL_COMMITS,
         label: 'All Commits'
       }
     ])
