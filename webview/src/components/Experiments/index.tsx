@@ -15,7 +15,7 @@ import {
   SortByFn
 } from 'react-table'
 import dayjs from '../../dayjs'
-import { Table } from '../Table/index'
+import { Table } from '../Table'
 import parseExperiments, { Experiment } from '../../util/parse-experiments'
 
 import styles from '../Table/styles.module.scss'
@@ -23,8 +23,8 @@ import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/build-dynamic-columns'
 
 import { VsCodeApi } from '../../model/Model'
-import SortIndicator from '../SortIndicator/index'
-import ManageColumns from '../ManageColumns/index'
+import SortIndicator from '../SortIndicator'
+import ManageColumns from '../ManageColumns'
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],

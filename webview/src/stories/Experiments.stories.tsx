@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 
-import Experiments from '../components/Experiments/index'
+import Experiments from '../components/Experiments'
 
 import complexExperimentsData from 'dvc/src/webviews/experiments/complex-output-example.json'
 

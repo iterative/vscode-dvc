@@ -1,5 +1,5 @@
 import React from 'react'
-import { InstanceProp } from '../Table/index'
+import { InstanceProp } from '../Table'
 import styles from './styles.module.scss'
 
 const SortIndicator: React.FC<InstanceProp> = ({ instance }) => {
