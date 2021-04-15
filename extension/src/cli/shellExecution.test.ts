@@ -1,5 +1,5 @@
 import { Commands } from './commands'
-import { getCommand } from './shellExecution'
+import { getExecutionDetails } from './shellExecution'
 import { Config } from '../Config'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
@@ -12,29 +12,39 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('getCommand', () => {
-  it('should return the correct string given no path or execution details', () => {
+describe('getExecutionDetails', () => {
+  it('should return the correct execution details given no path or python binary path', () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
+    const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const config = {
       dvcPath: ''
     } as Config
-    mockedGetEnv.mockReturnValue({ PATH: existingPath })
-    const command = getCommand(config, Commands.CHECKOUT)
-    expect(command).toEqual(`PATH=${existingPath} dvc checkout`)
+    mockedGetEnv.mockReturnValue(processEnv)
+    const expectedCommand = `dvc ${Commands.CHECKOUT}`
+    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    expect(command).toEqual({
+      executionCommand: expectedCommand,
+      outputCommand: expectedCommand,
+      env: processEnv
+    })
   })
 
-  it('should return the correct string given a path to the cli but no execution details', () => {
+  it('should return the execution details given a path to the cli but no python binary path', () => {
     const existingPath = '/do/not/need/a/path'
     const dvcPath = '/some/path/to/dvc'
     const config = {
       dvcPath
     } as Config
     mockedGetEnv.mockReturnValue({ PATH: existingPath })
-    const command = getCommand(config, Commands.CHECKOUT)
-    expect(command).toEqual(`PATH=${existingPath} ${dvcPath} checkout`)
+    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    expect(command).toEqual({
+      executionCommand: `${dvcPath} ${Commands.CHECKOUT}`,
+      outputCommand: `dvc ${Commands.CHECKOUT}`,
+      env: { PATH: existingPath }
+    })
   })
 
-  it('should return the correct string given a path to the cli and execution details', () => {
+  it('should return the correct execution details given a path to the cli and a python binary path', () => {
     const existingPath =
       '/var/folders/q_/jpcf1bld2vz9fs5n62mgqshc0000gq/T/yarn--1618526061412-0.878957498634626:' +
       '/Users/robot/PP/vscode-dvc/extension/node_modules/.bin:' +
@@ -46,10 +56,12 @@ describe('getCommand', () => {
       dvcPath,
       pythonBinPath
     } as Config
-    const command = getCommand(config, Commands.CHECKOUT)
-    expect(command).toEqual(
-      `PATH=${pythonBinPath}:${existingPath} ${dvcPath} checkout`
-    )
+    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    expect(command).toEqual({
+      executionCommand: `${dvcPath} ${Commands.CHECKOUT}`,
+      outputCommand: `dvc ${Commands.CHECKOUT}`,
+      env: { PATH: `${pythonBinPath}:${existingPath}` }
+    })
   })
 
   it('should return a sane path without an existing one if execution details are provided', () => {
@@ -61,7 +73,11 @@ describe('getCommand', () => {
       dvcPath,
       pythonBinPath
     } as Config
-    const command = getCommand(config, Commands.CHECKOUT)
-    expect(command).toEqual(`PATH=${pythonBinPath} ${dvcPath} checkout`)
+    const command = getExecutionDetails(config, Commands.CHECKOUT)
+    expect(command).toEqual({
+      executionCommand: `${dvcPath} ${Commands.CHECKOUT}`,
+      outputCommand: `dvc ${Commands.CHECKOUT}`,
+      env: { PATH: `${pythonBinPath}` }
+    })
   })
 })
