@@ -1,1 +1,1 @@
-export const getPATH = (): string => process.env.PATH || ''
+export const getProcessEnv = (): Record<string, unknown> => process.env

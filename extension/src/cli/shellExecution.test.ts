@@ -2,11 +2,11 @@ import { Commands } from './commands'
 import { getCommand } from './shellExecution'
 import { Config } from '../Config'
 import { mocked } from 'ts-jest/utils'
-import { getPATH } from '../env'
+import { getProcessEnv } from '../env'
 
 jest.mock('../env')
 
-const mockedGetPATH = mocked(getPATH)
+const mockedGetEnv = mocked(getProcessEnv)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -18,7 +18,7 @@ describe('getCommand', () => {
     const config = {
       dvcPath: ''
     } as Config
-    mockedGetPATH.mockReturnValue(existingPath)
+    mockedGetEnv.mockReturnValue({ PATH: existingPath })
     const command = getCommand(config, Commands.CHECKOUT)
     expect(command).toEqual(`PATH=${existingPath} dvc checkout`)
   })
@@ -29,7 +29,7 @@ describe('getCommand', () => {
     const config = {
       dvcPath
     } as Config
-    mockedGetPATH.mockReturnValue(existingPath)
+    mockedGetEnv.mockReturnValue({ PATH: existingPath })
     const command = getCommand(config, Commands.CHECKOUT)
     expect(command).toEqual(`PATH=${existingPath} ${dvcPath} checkout`)
   })
@@ -41,7 +41,7 @@ describe('getCommand', () => {
       '/Users/robot/.config/yarn/link/node_modules/.bin:/Users/robot/.nvm/versions/node/v12.20.1/libexec/lib/node_modules/npm/bin/node-gyp-bin'
     const dvcPath = '/some/path/to/dvc'
     const pythonBinPath = '/some/conda/path/bin'
-    mockedGetPATH.mockReturnValue(existingPath)
+    mockedGetEnv.mockReturnValue({ PATH: existingPath })
     const config = {
       dvcPath,
       pythonBinPath
@@ -56,7 +56,7 @@ describe('getCommand', () => {
     const existingPath = ''
     const dvcPath = '/some/path/to/dvc'
     const pythonBinPath = '/some/conda/path/bin'
-    mockedGetPATH.mockReturnValue(existingPath)
+    mockedGetEnv.mockReturnValue({ PATH: existingPath })
     const config = {
       dvcPath,
       pythonBinPath
