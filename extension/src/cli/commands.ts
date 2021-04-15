@@ -10,7 +10,8 @@ export enum Commands {
   EXPERIMENT_SHOW = 'exp show --show-json',
   EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT_RUN_ALL = 'exp run --run-all',
-  EXPERIMENT_GC = 'exp gc -f -w'
+  EXPERIMENT_GC = 'exp gc -f -w',
+  EXPERIMENT_APPLY = 'exp apply'
 }
 
 export enum GcPreserveFlag {
@@ -24,3 +25,6 @@ export const getCommandWithTarget = (
   command: Commands,
   target: string
 ): string => `${command} ${target}`
+
+export const joinCommand = (command: Commands, targets: string[]): string =>
+  [command, ...targets].join(' ')

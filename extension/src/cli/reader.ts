@@ -1,4 +1,9 @@
-import { Commands, GcPreserveFlag } from './commands'
+import {
+  Commands,
+  GcPreserveFlag,
+  getCommandWithTarget,
+  joinCommand
+} from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
@@ -68,4 +73,13 @@ export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  execCommand(options, [Commands.EXPERIMENT_GC, ...preserveFlags].join(' '))
+  execCommand(options, joinCommand(Commands.EXPERIMENT_GC, preserveFlags))
+
+export const experimentApply = async (
+  options: ReaderOptions,
+  experiment: string
+): Promise<string> =>
+  execCommand(
+    options,
+    getCommandWithTarget(Commands.EXPERIMENT_APPLY, experiment)
+  )
