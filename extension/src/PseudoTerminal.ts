@@ -1,4 +1,4 @@
-import execa from 'execa'
+import { spawn } from 'child_process'
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Commands } from './cli/commands'
 
@@ -19,9 +19,9 @@ export class PseudoTerminal {
     new Promise(resolve => {
       PseudoTerminal.openCurrentInstance().then(() => {
         writeEmitter.fire(`${command}\r\n`)
-        const stream = execa(command, { shell: true })
-        stream.on('stdout', stdout => {
-          writeEmitter.fire(stdout)
+        const stream = spawn(command, { shell: true })
+        stream.stdout?.on('data', stdout => {
+          writeEmitter.fire(`${stdout}`)
         })
         stream.on('close', () => {
           writeEmitter.fire(
