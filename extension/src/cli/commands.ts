@@ -1,3 +1,5 @@
+import { Config } from '../Config'
+
 export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
@@ -24,3 +26,12 @@ export const getCommandWithTarget = (
   command: Commands,
   target: string
 ): string => `${command} ${target}`
+
+export const getCommand = (config: Config, command: Commands): string => {
+  const cliPath = config.dvcPath || 'dvc'
+  const executionDetails = config.pythonExecutionDetails
+  const PATH = executionDetails
+    ? [executionDetails, '$PATH'].join(':')
+    : '$PATH'
+  return `PATH=${PATH} ${cliPath} ${command}`
+}
