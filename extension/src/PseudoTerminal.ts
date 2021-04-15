@@ -18,7 +18,8 @@ export class PseudoTerminal {
   static run = async (command: string): Promise<void> =>
     new Promise(resolve => {
       PseudoTerminal.openCurrentInstance().then(() => {
-        // writeEmitter.fire(`${command}\r\n`)
+        writeEmitter.fire(`${command}\r\n`)
+
         const stream = spawn(command, {
           shell: true,
           env: { PATH: '$PATH' },
