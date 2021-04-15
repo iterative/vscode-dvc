@@ -27,11 +27,15 @@ export const getCommandWithTarget = (
   target: string
 ): string => `${command} ${target}`
 
+const getPATH = (pythonExecutionDetails?: string): string => {
+  if (!pythonExecutionDetails) {
+    return '$PATH'
+  }
+  return [pythonExecutionDetails, '$PATH'].join(':')
+}
+
 export const getCommand = (config: Config, command: Commands): string => {
   const cliPath = config.dvcPath || 'dvc'
-  const executionDetails = config.pythonExecutionDetails
-  const PATH = executionDetails
-    ? [executionDetails, '$PATH'].join(':')
-    : '$PATH'
+  const PATH = getPATH(config.pythonExecutionDetails)
   return `PATH=${PATH} ${cliPath} ${command}`
 }
