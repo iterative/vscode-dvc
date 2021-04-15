@@ -21,14 +21,12 @@ describe('getCommand', () => {
 
   it('should return the correct string given a path to the cli and execution details', () => {
     const dvcPath = '/some/path/to/dvc'
-    const pythonExecutionDetails = '/some/conda/path/bin'
+    const pythonBinPath = '/some/conda/path/bin'
     const config = {
       dvcPath,
-      pythonExecutionDetails
+      pythonBinPath
     } as Config
     const command = getCommand(config, Commands.CHECKOUT)
-    expect(command).toEqual(
-      `PATH=${pythonExecutionDetails}:$PATH ${dvcPath} checkout`
-    )
+    expect(command).toEqual(`PATH=${pythonBinPath}:$PATH ${dvcPath} checkout`)
   })
 })
