@@ -118,11 +118,12 @@ export class Config {
     })
 
     getOnDidChangePythonExecutionDetails().then(
-      onDidChangePythonExecutionDetails => {
-        onDidChangePythonExecutionDetails?.(async () => {
-          this.pythonExecutionDetails = await getPythonExecutionDetails()
-        })
-      }
+      onDidChangePythonExecutionDetails =>
+        this.dispose.track(
+          onDidChangePythonExecutionDetails?.(async () => {
+            this.pythonExecutionDetails = await getPythonExecutionDetails()
+          })
+        )
     )
 
     this.workspaceRoot = this.getWorkspaceRoot()
