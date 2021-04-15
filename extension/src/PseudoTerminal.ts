@@ -1,6 +1,5 @@
+import { spawn } from 'child_process'
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
-import { Commands } from './cli/commands'
-import { execPromise } from './util'
 
 const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
@@ -15,17 +14,33 @@ export class PseudoTerminal {
     return PseudoTerminal.instance
   }
 
-  static run = async (command: string): Promise<void> =>
+  static run = async (executionDetails: {
+    executionCommand: string
+    outputCommand: string
+    env: NodeJS.ProcessEnv
+    cwd: string
+  }): Promise<void> =>
     new Promise(resolve => {
+      const { cwd, env, executionCommand, outputCommand } = executionDetails
       PseudoTerminal.openCurrentInstance().then(() => {
-        writeEmitter.fire(`${command}\r\n`)
+        writeEmitter.fire(`${outputCommand}\r\n`)
 
-        const childProcess = execPromise(command, {
-          env: { PATH: '$PATH' },
-          cwd: __dirname
-        }).child
+        const options = {
+          cwd,
+          env,
+          shell: true
+        }
+        const childProcess = spawn(`${executionCommand}`, options)
 
         childProcess.stdout?.on('data', stdout => {
+          const output = stdout
+            .toString()
+            .split(/(\r?\n)/g)
+            .join('\r')
+          writeEmitter.fire(output)
+        })
+
+        childProcess.stderr?.on('data', stdout => {
           const output = stdout
             .toString()
             .split(/(\r?\n)/g)
@@ -41,10 +56,6 @@ export class PseudoTerminal {
         })
       })
     })
-
-  static runCommand = async (command: string): Promise<void> => {
-    return PseudoTerminal.run(`dvc ${command}`)
-  }
 
   static dispose = (): void => {
     const currentTerminal = PseudoTerminal.instance
@@ -84,12 +95,4 @@ export class PseudoTerminal {
         pty
       })
     })
-}
-
-export const runExperiment = (): Promise<void> => {
-  return PseudoTerminal.runCommand(Commands.EXPERIMENT_RUN)
-}
-
-export const runQueuedExperiments = (): Promise<void> => {
-  return PseudoTerminal.runCommand(Commands.EXPERIMENT_RUN_ALL)
 }

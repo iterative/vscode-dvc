@@ -71,7 +71,16 @@ suite('Pseudo Terminal Test Suite', () => {
 
       const text = 'some-really-long-string'
 
-      PseudoTerminal.run('echo ' + text)
+      const command = 'echo ' + text
+
+      const executionDetails = {
+        cwd: __dirname,
+        env: process.env,
+        executionCommand: command,
+        outputCommand: command
+      }
+
+      PseudoTerminal.run(executionDetails)
 
       const eventStream = await terminalDataWriteEventStream(text, disposable)
       expect(eventStream.includes(text)).to.be.true
@@ -88,9 +97,25 @@ suite('Pseudo Terminal Test Suite', () => {
       const secondText = ':weeeee:'
 
       const firstEvent = terminalDataWriteEventStream(firstText, disposable)
+      const firstCommand = 'echo ' + firstText
+      const firstExecutionDetails = {
+        cwd: __dirname,
+        env: process.env,
+        executionCommand: firstCommand,
+        outputCommand: firstCommand
+      }
+
       const secondEvent = terminalDataWriteEventStream(secondText, disposable)
-      await PseudoTerminal.run('echo ' + firstText)
-      await PseudoTerminal.run('echo ' + secondText)
+      const secondCommand = 'echo ' + secondText
+      const secondExecutionDetails = {
+        cwd: __dirname,
+        env: process.env,
+        executionCommand: secondCommand,
+        outputCommand: secondCommand
+      }
+
+      await PseudoTerminal.run(firstExecutionDetails)
+      await PseudoTerminal.run(secondExecutionDetails)
 
       const firstStream = await Promise.race([firstEvent, secondEvent])
       let eventStream = await firstEvent
