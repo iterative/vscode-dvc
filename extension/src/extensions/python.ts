@@ -1,8 +1,9 @@
-import { extensions, Extension } from 'vscode'
+import { Event, extensions, Extension, Uri } from 'vscode'
 
 export interface PythonExtensionAPI {
   ready: Thenable<void>
   settings: {
+    onDidChangeExecutionDetails: Event<Uri | undefined>
     getExecutionDetails: () => {
       execCommand: string[] | undefined
     }
@@ -33,3 +34,7 @@ export const getPythonExecutionDetails: () => Thenable<
 > = async () =>
   (await getReadyPythonExtension())?.exports.settings.getExecutionDetails()
     .execCommand
+
+export const getOnDidChangePythonExecutionDetails = async () =>
+  (await getReadyPythonExtension())?.exports.settings
+    .onDidChangeExecutionDetails
