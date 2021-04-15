@@ -23,6 +23,7 @@ export class Config {
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
   readonly onDidChange: Event<ConfigurationChangeEvent>
 
+  @observable
   public pythonBinPath: string | undefined
 
   @observable
