@@ -23,22 +23,24 @@ const getEnv = (config: Config): NodeJS.ProcessEnv => {
   }
 }
 
+export interface cliExecutionDetails {
+  cwd: string
+  env: NodeJS.ProcessEnv
+  executionCommand: string
+  outputCommand: string
+}
+
 export const getExecutionDetails = (
   config: Config,
   command: Commands,
   cwd: string
-): {
-  executionCommand: string
-  outputCommand: string
-  env: NodeJS.ProcessEnv
-  cwd: string
-} => {
+): cliExecutionDetails => {
   const cliPath = config.dvcPath || 'dvc'
   const env = getEnv(config)
   return {
-    executionCommand: `${cliPath} ${command}`,
-    outputCommand: `dvc ${command}`,
+    cwd,
     env,
-    cwd
+    executionCommand: `${cliPath} ${command}`,
+    outputCommand: `dvc ${command}`
   }
 }
