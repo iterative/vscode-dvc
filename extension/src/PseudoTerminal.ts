@@ -18,15 +18,25 @@ export class PseudoTerminal {
   static run = async (command: string): Promise<void> =>
     new Promise(resolve => {
       PseudoTerminal.openCurrentInstance().then(() => {
-        writeEmitter.fire(`${command}\r\n`)
-        const stream = spawn(command, { shell: true })
-        stream.stdout?.on('data', stdout => {
-          writeEmitter.fire(`${stdout}`)
+        // writeEmitter.fire(`${command}\r\n`)
+        const stream = spawn(command, {
+          shell: true,
+          env: { PATH: '$PATH' },
+          cwd: __dirname
         })
+        stream.stdout?.on('data', stdout => {
+          const output = stdout
+            .toString()
+            .split(/(\r?\n)/g)
+            .join('\r')
+          writeEmitter.fire(output)
+        })
+
         stream.on('close', () => {
           writeEmitter.fire(
             '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
           )
+
           resolve()
         })
       })
@@ -62,7 +72,7 @@ export class PseudoTerminal {
       const pty: Pseudoterminal = {
         onDidWrite: writeEmitter.event,
         open: () => {
-          writeEmitter.fire('>>>> DVC Terminal >>>>\r\n')
+          writeEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
           resolve()
         },
         close: () => {},
