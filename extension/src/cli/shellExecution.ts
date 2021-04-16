@@ -1,5 +1,6 @@
 import { spawn } from 'child_process'
 import { EventEmitter } from 'vscode'
+import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { Commands } from './commands'
 import { getProcessEnv } from '../env'
@@ -10,7 +11,10 @@ interface cliExecutionDetails {
   executionCommand: string
   outputCommand: string
 }
+
 export class ShellExecution {
+  public readonly dispose = Disposable.fn()
+
   private readonly config: Config
   private readonly completedEventEmitter?: EventEmitter<void>
   private readonly outputEventEmitter?: EventEmitter<string>
