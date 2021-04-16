@@ -1,45 +1,16 @@
 import { describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
-import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
-import { run } from '../../../cli/shellExecution'
+import { Event, EventEmitter, window } from 'vscode'
+import { ShellExecution } from '../../../cli/shellExecution'
 import { Disposable, Disposer } from '../../../extension'
 import { PseudoTerminal } from '../../../PseudoTerminal'
 
 chai.use(sinonChai)
 const { expect } = chai
 
-suite('Pseudo Terminal Test Suite', () => {
-  window.showInformationMessage('Start all integrated terminal tests.')
-
-  const closeTerminalEvent = (): Promise<Terminal> => {
-    return new Promise(resolve => {
-      const listener: Disposable = window.onDidCloseTerminal(
-        (event: Terminal) => {
-          listener.dispose()
-          return resolve(event)
-        }
-      )
-    })
-  }
-
-  const terminalDataWriteEventStream = (
-    text: string,
-    disposer: Disposer
-  ): Promise<string> => {
-    let eventStream = ''
-    return new Promise(resolve => {
-      const listener: Disposable = window.onDidWriteTerminalData(
-        (event: TerminalDataWriteEvent) => {
-          eventStream += event.data
-          if (eventStream.includes(text)) {
-            return resolve(eventStream)
-          }
-        }
-      )
-      disposer.track(listener)
-    })
-  }
+suite('ShellExecution', () => {
+  window.showInformationMessage('Start all shell execution tests.')
 
   describe('shellExecution', () => {
     it('should be able to run a command', async () => {
@@ -58,55 +29,54 @@ suite('Pseudo Terminal Test Suite', () => {
         outputCommand: command
       }
 
-      run(executionDetails, pseudoTerminal)
+      const completedEventEmitter = new EventEmitter<void>()
+      const outputEventEmitter = new EventEmitter<string>()
+      const startedEventEmitter = new EventEmitter<void>()
 
-      const eventStream = await terminalDataWriteEventStream(text, disposable)
-      expect(eventStream.includes(text)).to.be.true
+      const onDidComplete = completedEventEmitter.event
+      const onDidOutput = outputEventEmitter.event
 
-      disposable.dispose()
-      return closeTerminalEvent()
-    }).timeout(12000)
+      const shellExecuter = new ShellExecution({
+        completedEventEmitter,
+        outputEventEmitter,
+        startedEventEmitter
+      })
 
-    it('should be able to run multiple commands in the same terminal', async () => {
-      const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal()
-      disposable.track(pseudoTerminal)
+      shellExecuter.run(executionDetails)
 
-      const firstText = 'some-really-long-string'
-      const secondText = ':weeeee:'
-
-      const firstEvent = terminalDataWriteEventStream(firstText, disposable)
-      const firstCommand = 'echo ' + firstText
-      const firstExecutionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: firstCommand,
-        outputCommand: firstCommand
+      const shellExecutionOutputEvent = (
+        text: string,
+        event: Event<string>,
+        disposer: Disposer
+      ): Promise<string> => {
+        let eventStream = ''
+        return new Promise(resolve => {
+          const listener: Disposable = event((event: string) => {
+            eventStream += event
+            if (eventStream.includes(text)) {
+              return resolve(eventStream)
+            }
+          })
+          disposer.track(listener)
+        })
       }
-
-      const secondEvent = terminalDataWriteEventStream(secondText, disposable)
-      const secondCommand = 'echo ' + secondText
-      const secondExecutionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: secondCommand,
-        outputCommand: secondCommand
+      const startOrCompletedEvent = (event: Event<void>): Promise<void> => {
+        return new Promise(resolve => {
+          const listener: Disposable = event(() => {
+            listener.dispose()
+            return resolve()
+          })
+        })
       }
-
-      await run(firstExecutionDetails, pseudoTerminal)
-      await run(secondExecutionDetails, pseudoTerminal)
-
-      const firstStream = await Promise.race([firstEvent, secondEvent])
-      let eventStream = await firstEvent
-      expect(firstStream).to.equal(eventStream)
-
-      eventStream += await secondEvent
-
-      expect(eventStream.includes(firstText)).to.be.true
-      expect(eventStream.includes(secondText)).to.be.true
-
+      const completed = startOrCompletedEvent(onDidComplete)
+      const eventStream = shellExecutionOutputEvent(
+        text,
+        onDidOutput,
+        disposable
+      )
+      expect((await eventStream).includes(text)).to.be.true
+      await completed
       disposable.dispose()
-      return closeTerminalEvent()
     }).timeout(12000)
   })
 })
