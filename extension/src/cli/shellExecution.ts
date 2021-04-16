@@ -1,8 +1,8 @@
+import { spawn } from 'child_process'
+import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { Commands } from './commands'
 import { getProcessEnv } from '../env'
-import { spawn } from 'child_process'
-import { EventEmitter } from 'vscode'
 
 interface cliExecutionDetails {
   cwd: string
