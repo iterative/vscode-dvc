@@ -25,9 +25,10 @@ suite('Pseudo Terminal Test Suite', () => {
   describe('PseudoTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
-      disposable.track(PseudoTerminal)
+      const pseudoTerminal = new PseudoTerminal()
+      disposable.track(pseudoTerminal)
 
-      PseudoTerminal.openCurrentInstance()
+      pseudoTerminal.openCurrentInstance()
 
       const openTerminalEvent = (): Promise<Terminal> => {
         return new Promise(resolve => {

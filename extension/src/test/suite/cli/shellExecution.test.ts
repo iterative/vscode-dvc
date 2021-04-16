@@ -44,7 +44,8 @@ suite('Pseudo Terminal Test Suite', () => {
   describe('shellExecution', () => {
     it('should be able to run a command', async () => {
       const disposable = Disposable.fn()
-      disposable.track(PseudoTerminal)
+      const pseudoTerminal = new PseudoTerminal()
+      disposable.track(pseudoTerminal)
 
       const text = 'some-really-long-string'
 
@@ -57,7 +58,7 @@ suite('Pseudo Terminal Test Suite', () => {
         outputCommand: command
       }
 
-      run(executionDetails)
+      run(executionDetails, pseudoTerminal)
 
       const eventStream = await terminalDataWriteEventStream(text, disposable)
       expect(eventStream.includes(text)).to.be.true
@@ -68,7 +69,8 @@ suite('Pseudo Terminal Test Suite', () => {
 
     it('should be able to run multiple commands in the same terminal', async () => {
       const disposable = Disposable.fn()
-      disposable.track(PseudoTerminal)
+      const pseudoTerminal = new PseudoTerminal()
+      disposable.track(pseudoTerminal)
 
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
@@ -91,8 +93,8 @@ suite('Pseudo Terminal Test Suite', () => {
         outputCommand: secondCommand
       }
 
-      await run(firstExecutionDetails)
-      await run(secondExecutionDetails)
+      await run(firstExecutionDetails, pseudoTerminal)
+      await run(secondExecutionDetails, pseudoTerminal)
 
       const firstStream = await Promise.race([firstEvent, secondEvent])
       let eventStream = await firstEvent

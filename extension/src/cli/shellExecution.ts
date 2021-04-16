@@ -1,7 +1,7 @@
 import { Config } from '../Config'
 import { Commands } from './commands'
 import { getProcessEnv } from '../env'
-import { writeEmitter, PseudoTerminal } from '../PseudoTerminal'
+import { PseudoTerminal } from '../PseudoTerminal'
 import { spawn } from 'child_process'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
@@ -48,12 +48,13 @@ export const getExecutionDetails = (
 }
 
 export const run = async (
-  executionDetails: cliExecutionDetails
+  executionDetails: cliExecutionDetails,
+  pseudoTerminal: PseudoTerminal
 ): Promise<void> =>
   new Promise(resolve => {
     const { cwd, env, executionCommand, outputCommand } = executionDetails
-    PseudoTerminal.openCurrentInstance().then(() => {
-      writeEmitter.fire(`${outputCommand}\r\n`)
+    pseudoTerminal.openCurrentInstance().then(() => {
+      pseudoTerminal.writeEmitter.fire(`${outputCommand}\r\n`)
 
       const stream = spawn(`${executionCommand}`, {
         cwd,
@@ -66,7 +67,7 @@ export const run = async (
           .toString()
           .split(/(\r?\n)/g)
           .join('\r')
-        writeEmitter.fire(output)
+        pseudoTerminal.writeEmitter.fire(output)
       })
 
       stream.stderr?.on('data', stdout => {
@@ -74,11 +75,11 @@ export const run = async (
           .toString()
           .split(/(\r?\n)/g)
           .join('\r')
-        writeEmitter.fire(output)
+        pseudoTerminal.writeEmitter.fire(output)
       })
 
       stream.on('close', () => {
-        writeEmitter.fire(
+        pseudoTerminal.writeEmitter.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )
         resolve()
