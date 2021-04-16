@@ -45,39 +45,39 @@ const getOutput = (data: string | Buffer): string =>
     .join('\r')
 
 export class ShellExecution {
-  private readonly completedEventEmitter: EventEmitter<void>
-  private readonly outputEventEmitter: EventEmitter<string>
-  private readonly startedEventEmitter: EventEmitter<void>
+  private readonly completedEventEmitter?: EventEmitter<void>
+  private readonly outputEventEmitter?: EventEmitter<string>
+  private readonly startedEventEmitter?: EventEmitter<void>
 
   public async run(executionDetails: cliExecutionDetails): Promise<void> {
     const { cwd, env, executionCommand, outputCommand } = executionDetails
 
-    this.outputEventEmitter.fire(`${outputCommand}\r\n`)
+    this.outputEventEmitter?.fire(`${outputCommand}\r\n`)
 
     const stream = spawn(`${executionCommand}`, {
       cwd,
       env,
       shell: true
     })
-    this.startedEventEmitter.fire()
+    this.startedEventEmitter?.fire()
 
     const outputListener = (chunk: string | Buffer) => {
       const output = getOutput(chunk)
-      this.outputEventEmitter.fire(output)
+      this.outputEventEmitter?.fire(output)
     }
     stream.stdout?.on('data', outputListener)
 
     stream.stderr?.on('data', outputListener)
 
     stream.on('close', () => {
-      this.completedEventEmitter.fire()
+      this.completedEventEmitter?.fire()
     })
   }
 
   constructor(emitters: {
-    completedEventEmitter: EventEmitter<void>
-    outputEventEmitter: EventEmitter<string>
-    startedEventEmitter: EventEmitter<void>
+    completedEventEmitter?: EventEmitter<void>
+    outputEventEmitter?: EventEmitter<string>
+    startedEventEmitter?: EventEmitter<void>
   }) {
     this.completedEventEmitter = emitters.completedEventEmitter
     this.outputEventEmitter = emitters.outputEventEmitter
