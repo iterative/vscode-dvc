@@ -10,13 +10,6 @@ interface cliExecutionDetails {
   executionCommand: string
   outputCommand: string
 }
-
-const getOutput = (data: string | Buffer): string =>
-  data
-    .toString()
-    .split(/(\r?\n)/g)
-    .join('\r')
-
 export class ShellExecution {
   private readonly config: Config
   private readonly completedEventEmitter?: EventEmitter<void>
@@ -54,6 +47,13 @@ export class ShellExecution {
     }
   }
 
+  private getOutput(data: string | Buffer): string {
+    return data
+      .toString()
+      .split(/(\r?\n)/g)
+      .join('\r')
+  }
+
   public async run(
     command: Commands,
     currentWorkingDirectory: string
@@ -75,7 +75,7 @@ export class ShellExecution {
     this.startedEventEmitter?.fire()
 
     const outputListener = (chunk: string | Buffer) => {
-      const output = getOutput(chunk)
+      const output = this.getOutput(chunk)
       this.outputEventEmitter?.fire(output)
     }
     stream.stdout?.on('data', outputListener)
