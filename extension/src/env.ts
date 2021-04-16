@@ -1,1 +1,1 @@
-export const getProcessEnv = (): Record<string, unknown> => process.env
+export const getProcessEnv = (): NodeJS.ProcessEnv => process.env
