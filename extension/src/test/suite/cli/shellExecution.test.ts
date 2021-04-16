@@ -13,7 +13,7 @@ suite('ShellExecution', () => {
   window.showInformationMessage('Start all shell execution tests.')
 
   describe('shellExecution', () => {
-    it('should be able to run a command', async () => {
+    it('should be able to execute a shell command', async () => {
       const disposable = Disposable.fn()
       const pseudoTerminal = new PseudoTerminal()
       disposable.track(pseudoTerminal)
@@ -33,16 +33,9 @@ suite('ShellExecution', () => {
       const outputEventEmitter = new EventEmitter<string>()
       const startedEventEmitter = new EventEmitter<void>()
 
+      const onDidStart = startedEventEmitter.event
       const onDidComplete = completedEventEmitter.event
       const onDidOutput = outputEventEmitter.event
-
-      const shellExecuter = new ShellExecution({
-        completedEventEmitter,
-        outputEventEmitter,
-        startedEventEmitter
-      })
-
-      shellExecuter.run(executionDetails)
 
       const shellExecutionOutputEvent = (
         text: string,
@@ -53,7 +46,7 @@ suite('ShellExecution', () => {
         return new Promise(resolve => {
           const listener: Disposable = event((event: string) => {
             eventStream += event
-            if (eventStream.includes(text)) {
+            if (eventStream.includes(`\r\n${text}`)) {
               return resolve(eventStream)
             }
           })
@@ -68,12 +61,23 @@ suite('ShellExecution', () => {
           })
         })
       }
+      const started = startOrCompletedEvent(onDidStart)
       const completed = startOrCompletedEvent(onDidComplete)
       const eventStream = shellExecutionOutputEvent(
         text,
         onDidOutput,
         disposable
       )
+
+      const shellExecuter = new ShellExecution({
+        completedEventEmitter,
+        outputEventEmitter,
+        startedEventEmitter
+      })
+
+      shellExecuter.run(executionDetails)
+
+      await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
       disposable.dispose()

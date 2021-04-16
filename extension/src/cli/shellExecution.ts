@@ -62,15 +62,13 @@ export class ShellExecution {
       })
       this.startedEventEmitter.fire()
 
-      stream.stdout?.on('data', chunk => {
+      const outputListener = (chunk: string | Buffer) => {
         const output = getOutput(chunk)
         this.outputEventEmitter.fire(output)
-      })
+      }
+      stream.stdout?.on('data', outputListener)
 
-      stream.stderr?.on('data', chunk => {
-        const output = getOutput(chunk)
-        this.outputEventEmitter.fire(output)
-      })
+      stream.stderr?.on('data', outputListener)
 
       stream.on('close', () => {
         this.completedEventEmitter.fire()
