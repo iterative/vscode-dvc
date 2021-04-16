@@ -12,7 +12,9 @@ const mockedGetEnv = mocked(getProcessEnv)
 const mockedSpawn = mocked(spawn)
 
 mockedSpawn.mockReturnValue(({
-  on: jest.fn()
+  on: jest.fn(),
+  stderr: { on: jest.fn() },
+  stdout: { on: jest.fn() }
 } as unknown) as ChildProcess)
 
 beforeEach(() => {
