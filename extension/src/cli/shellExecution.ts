@@ -4,38 +4,11 @@ import { getProcessEnv } from '../env'
 import { spawn } from 'child_process'
 import { EventEmitter } from 'vscode'
 
-const getPATH = (existingPath: string, pythonBinPath?: string): string =>
-  [pythonBinPath, existingPath].filter(Boolean).join(':')
-
-const getEnv = (config: Config): NodeJS.ProcessEnv => {
-  const env = getProcessEnv()
-  const PATH = getPATH(env?.PATH as string, config.pythonBinPath)
-  return {
-    ...env,
-    PATH
-  }
-}
-
 interface cliExecutionDetails {
   cwd: string
   env: NodeJS.ProcessEnv
   executionCommand: string
   outputCommand: string
-}
-
-export const getExecutionDetails = (
-  config: Config,
-  command: Commands,
-  cwd: string
-): cliExecutionDetails => {
-  const cliPath = config.dvcPath || 'dvc'
-  const env = getEnv(config)
-  return {
-    cwd,
-    env,
-    executionCommand: `${cliPath} ${command}`,
-    outputCommand: `dvc ${command}`
-  }
 }
 
 const getOutput = (data: string | Buffer): string =>
@@ -45,12 +18,52 @@ const getOutput = (data: string | Buffer): string =>
     .join('\r')
 
 export class ShellExecution {
+  private readonly config: Config
   private readonly completedEventEmitter?: EventEmitter<void>
   private readonly outputEventEmitter?: EventEmitter<string>
   private readonly startedEventEmitter?: EventEmitter<void>
 
-  public async run(executionDetails: cliExecutionDetails): Promise<void> {
-    const { cwd, env, executionCommand, outputCommand } = executionDetails
+  private getPATH(existingPath: string): string {
+    return [this.config.pythonBinPath, existingPath].filter(Boolean).join(':')
+  }
+
+  private getEnv(): NodeJS.ProcessEnv {
+    const env = getProcessEnv()
+    const PATH = this.getPATH(env?.PATH as string)
+    return {
+      ...env,
+      PATH
+    }
+  }
+
+  public getCommand(cliPath: string, command: Commands) {
+    return `${cliPath} ${command}`
+  }
+
+  private getExecutionDetails(
+    command: Commands,
+    cwd: string
+  ): cliExecutionDetails {
+    const cliPath = this.config.dvcPath || 'dvc'
+    const env = this.getEnv()
+    return {
+      cwd,
+      env,
+      executionCommand: this.getCommand(cliPath, command),
+      outputCommand: `dvc ${command}`
+    }
+  }
+
+  public async run(
+    command: Commands,
+    currentWorkingDirectory: string
+  ): Promise<void> {
+    const {
+      cwd,
+      env,
+      executionCommand,
+      outputCommand
+    } = this.getExecutionDetails(command, currentWorkingDirectory)
 
     this.outputEventEmitter?.fire(`${outputCommand}\r\n`)
 
@@ -74,13 +87,17 @@ export class ShellExecution {
     })
   }
 
-  constructor(emitters: {
-    completedEventEmitter?: EventEmitter<void>
-    outputEventEmitter?: EventEmitter<string>
-    startedEventEmitter?: EventEmitter<void>
-  }) {
-    this.completedEventEmitter = emitters.completedEventEmitter
-    this.outputEventEmitter = emitters.outputEventEmitter
-    this.startedEventEmitter = emitters.startedEventEmitter
+  constructor(
+    config: Config,
+    emitters?: {
+      completedEventEmitter?: EventEmitter<void>
+      outputEventEmitter?: EventEmitter<string>
+      startedEventEmitter?: EventEmitter<void>
+    }
+  ) {
+    this.config = config
+    this.completedEventEmitter = emitters?.completedEventEmitter
+    this.outputEventEmitter = emitters?.outputEventEmitter
+    this.startedEventEmitter = emitters?.startedEventEmitter
   }
 }

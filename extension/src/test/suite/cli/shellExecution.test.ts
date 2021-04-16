@@ -5,6 +5,9 @@ import { Event, EventEmitter, window } from 'vscode'
 import { ShellExecution } from '../../../cli/shellExecution'
 import { Disposable, Disposer } from '../../../extension'
 import { PseudoTerminal } from '../../../PseudoTerminal'
+import { Config } from '../../../Config'
+import { Commands } from '../../../cli/commands'
+import { stub } from 'sinon'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -21,13 +24,6 @@ suite('ShellExecution', () => {
       const text = 'some-really-long-string'
 
       const command = 'echo ' + text
-
-      const executionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: command,
-        outputCommand: command
-      }
 
       const completedEventEmitter = new EventEmitter<void>()
       const outputEventEmitter = new EventEmitter<string>()
@@ -46,7 +42,7 @@ suite('ShellExecution', () => {
         return new Promise(resolve => {
           const listener: Disposable = event((event: string) => {
             eventStream += event
-            if (eventStream.includes(`${command}\r\n${text}`)) {
+            if (eventStream.includes(`${text}`)) {
               return resolve(eventStream)
             }
           })
@@ -69,13 +65,15 @@ suite('ShellExecution', () => {
         disposable
       )
 
-      const shellExecuter = new ShellExecution({
+      const shellExecuter = new ShellExecution({} as Config, {
         completedEventEmitter,
         outputEventEmitter,
         startedEventEmitter
       })
 
-      shellExecuter.run(executionDetails)
+      stub(shellExecuter, 'getCommand').returns(command)
+
+      shellExecuter.run(Commands.EXPERIMENT_GC, __dirname)
 
       await started
       expect((await eventStream).includes(text)).to.be.true
