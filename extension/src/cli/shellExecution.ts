@@ -1,6 +1,8 @@
 import { Config } from '../Config'
 import { Commands } from './commands'
 import { getProcessEnv } from '../env'
+import { writeEmitter, PseudoTerminal } from '../PseudoTerminal'
+import { spawn } from 'child_process'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   if (!pythonBinPath) {
@@ -23,7 +25,7 @@ const getEnv = (config: Config): NodeJS.ProcessEnv => {
   }
 }
 
-export interface cliExecutionDetails {
+interface cliExecutionDetails {
   cwd: string
   env: NodeJS.ProcessEnv
   executionCommand: string
@@ -44,3 +46,42 @@ export const getExecutionDetails = (
     outputCommand: `dvc ${command}`
   }
 }
+
+export const run = async (
+  executionDetails: cliExecutionDetails
+): Promise<void> =>
+  new Promise(resolve => {
+    const { cwd, env, executionCommand, outputCommand } = executionDetails
+    PseudoTerminal.openCurrentInstance().then(() => {
+      writeEmitter.fire(`${outputCommand}\r\n`)
+
+      const stream = spawn(`${executionCommand}`, {
+        cwd,
+        env,
+        shell: true
+      })
+
+      stream.stdout?.on('data', stdout => {
+        const output = stdout
+          .toString()
+          .split(/(\r?\n)/g)
+          .join('\r')
+        writeEmitter.fire(output)
+      })
+
+      stream.stderr?.on('data', stdout => {
+        const output = stdout
+          .toString()
+          .split(/(\r?\n)/g)
+          .join('\r')
+        writeEmitter.fire(output)
+      })
+
+      stream.on('close', () => {
+        writeEmitter.fire(
+          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
+        )
+        resolve()
+      })
+    })
+  })
