@@ -202,14 +202,6 @@ describe('applyExperimentFromQuickPick', () => {
     expect(mockedExecPromise.mock.calls).toEqual([])
     */
     expect(mockedExecPromise).toBeCalledTimes(1)
-    expect(mockedExecPromise.mock.calls).toEqual([
-      [
-        'dvc exp list --names-only',
-        {
-          cwd: '/home/roger/Projects/vscode-dvc/extension'
-        }
-      ]
-    ])
   })
 
   it('does not execute a command if the QuickPick is dismissed', async () => {
