@@ -13,7 +13,7 @@ suite('ShellExecution', () => {
   window.showInformationMessage('Start all shell execution tests.')
 
   describe('shellExecution', () => {
-    it('should be able to execute a shell command', async () => {
+    it('should be able to execute a shell command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
       const pseudoTerminal = new PseudoTerminal()
       disposable.track(pseudoTerminal)
