@@ -46,7 +46,7 @@ suite('ShellExecution', () => {
         return new Promise(resolve => {
           const listener: Disposable = event((event: string) => {
             eventStream += event
-            if (eventStream.includes(`\r\n${text}`)) {
+            if (eventStream.includes(`${command}\r\n${text}`)) {
               return resolve(eventStream)
             }
           })
