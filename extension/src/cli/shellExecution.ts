@@ -4,21 +4,12 @@ import { getProcessEnv } from '../env'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { spawn } from 'child_process'
 
-const getPATH = (existingPath: string, pythonBinPath?: string): string => {
-  if (!pythonBinPath) {
-    return existingPath
-  }
-  if (!existingPath) {
-    return pythonBinPath
-  }
-
-  return [pythonBinPath, existingPath].join(':')
-}
+const getPATH = (existingPath: string, pythonBinPath?: string): string =>
+  [pythonBinPath, existingPath].filter(Boolean).join(':')
 
 const getEnv = (config: Config): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
-  const existingPath = (env?.PATH as string) || ''
-  const PATH = getPATH(existingPath, config.pythonBinPath)
+  const PATH = getPATH(env?.PATH as string, config.pythonBinPath)
   return {
     ...env,
     PATH
