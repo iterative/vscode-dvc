@@ -28,7 +28,7 @@ describe('run', () => {
     const config = { dvcPath: '' } as Config
     const expectedCommand = `dvc ${Commands.CHECKOUT}`
     const cwd = __dirname
-    mockedGetEnv.mockReturnValue(processEnv)
+    mockedGetEnv.mockReturnValueOnce(processEnv)
 
     const shellExecution = new ShellExecution(config)
 
@@ -47,7 +47,7 @@ describe('run', () => {
     const dvcPath = '/some/path/to/dvc'
     const config = { dvcPath } as Config
     const cwd = __dirname
-    mockedGetEnv.mockReturnValue(processEnv)
+    mockedGetEnv.mockReturnValueOnce(processEnv)
 
     const shellExecution = new ShellExecution(config)
 
@@ -65,7 +65,7 @@ describe('run', () => {
       '/var/folders/q_/jpcf1bld2vz9fs5n62mgqshc0000gq/T/yarn--1618526061412-0.878957498634626:' +
       '/Users/robot/PP/vscode-dvc/extension/node_modules/.bin:' +
       '/Users/robot/.config/yarn/link/node_modules/.bin:/Users/robot/.nvm/versions/node/v12.20.1/libexec/lib/node_modules/npm/bin/node-gyp-bin'
-    mockedGetEnv.mockReturnValue({ PATH: existingPath })
+    mockedGetEnv.mockReturnValueOnce({ PATH: existingPath })
 
     const dvcPath = '/some/path/to/dvc'
     const pythonBinPath = '/some/conda/path/bin'
@@ -86,7 +86,7 @@ describe('run', () => {
 
   it('should pass a sane path to spawn without if there is a python binary path but no existing PATH variable', () => {
     const existingPath = ''
-    mockedGetEnv.mockReturnValue({ PATH: existingPath })
+    mockedGetEnv.mockReturnValueOnce({ PATH: existingPath })
 
     const pythonBinPath = '/some/conda/path/bin'
     const config = {
