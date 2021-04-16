@@ -21,14 +21,13 @@ export class PseudoTerminal {
       PseudoTerminal.openCurrentInstance().then(() => {
         writeEmitter.fire(`${outputCommand}\r\n`)
 
-        const options = {
+        const stream = spawn(`${executionCommand}`, {
           cwd,
           env,
           shell: true
-        }
-        const childProcess = spawn(`${executionCommand}`, options)
+        })
 
-        childProcess.stdout?.on('data', stdout => {
+        stream.stdout?.on('data', stdout => {
           const output = stdout
             .toString()
             .split(/(\r?\n)/g)
@@ -36,7 +35,7 @@ export class PseudoTerminal {
           writeEmitter.fire(output)
         })
 
-        childProcess.stderr?.on('data', stdout => {
+        stream.stderr?.on('data', stdout => {
           const output = stdout
             .toString()
             .split(/(\r?\n)/g)
@@ -44,7 +43,7 @@ export class PseudoTerminal {
           writeEmitter.fire(output)
         })
 
-        childProcess.on('close', () => {
+        stream.on('close', () => {
           writeEmitter.fire(
             '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
           )
