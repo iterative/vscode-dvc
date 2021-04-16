@@ -69,6 +69,13 @@ export const queueExperiment = async (
   options: ReaderOptions
 ): Promise<string> => execCommand(options, Commands.EXPERIMENT_QUEUE)
 
+export const experimentListCurrent = async (
+  readerOptions: ReaderOptions
+): Promise<string[]> =>
+  trimAndSplit(
+    await execCommand(readerOptions, Commands.EXPERIMENT_LIST_NAMES_ONLY)
+  )
+
 export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: GcPreserveFlag[]

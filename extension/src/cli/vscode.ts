@@ -9,7 +9,9 @@ import {
   checkout,
   checkoutRecursive,
   queueExperiment,
-  experimentGarbageCollect
+  experimentGarbageCollect,
+  experimentListCurrent,
+  experimentApply
 } from './reader'
 
 export const queueExperimentCommand = async (config: Config) => {
@@ -25,7 +27,7 @@ export const queueExperimentCommand = async (config: Config) => {
   }
 }
 
-export const experimentGcCommand = async (config: Config) => {
+export const experimentGcQuickPick = async (config: Config) => {
   const quickPickResult = (await quickPickManyValues(
     [
       {
@@ -65,6 +67,30 @@ export const experimentGcCommand = async (config: Config) => {
     } catch (e) {
       window.showErrorMessage(e.stderr || e.message)
     }
+  }
+}
+
+export const applyExperimentFromQuickPick = async (config: Config) => {
+  const readerOptions = {
+    cwd: config.workspaceRoot,
+    cliPath: config.dvcPath
+  }
+
+  try {
+    const experiments = await experimentListCurrent(readerOptions)
+
+    if (experiments.length === 0) {
+      window.showInformationMessage('There are no experiments to select!')
+    } else {
+      const selectedExperimentName = await window.showQuickPick(experiments)
+      if (selectedExperimentName !== undefined) {
+        window.showInformationMessage(
+          await experimentApply(readerOptions, selectedExperimentName)
+        )
+      }
+    }
+  } catch (e) {
+    window.showErrorMessage(e.stderr)
   }
 }
 
@@ -109,14 +135,20 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
-    commands.registerCommand('dvc.queueExperiment', () => {
-      return queueExperimentCommand(config)
-    })
+    commands.registerCommand('dvc.queueExperiment', () =>
+      queueExperimentCommand(config)
+    )
   )
 
   disposer.track(
-    commands.registerCommand('dvc.experimentGarbageCollect', () => {
-      return experimentGcCommand(config)
-    })
+    commands.registerCommand('dvc.experimentGarbageCollect', () =>
+      experimentGcQuickPick(config)
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.applyExperiment', () =>
+      applyExperimentFromQuickPick(config)
+    )
   )
 }

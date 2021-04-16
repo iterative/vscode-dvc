@@ -13,6 +13,7 @@
   "command.pushTarget": "Push Target",
   "command.runExperiment": "Run Experiment",
   "command.queueExperiment": "Queue Experiment",
+  "command.applyExperiment": "Apply Experiment",
   "command.runQueuedExperiments": "Run Queued Experiments",
   "command.experimentGarbageCollect": "Garbage Collect Experiments",
   "command.selectDvcPath": "Select DVC CLI Path",
