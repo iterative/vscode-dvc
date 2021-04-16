@@ -65,7 +65,10 @@ export const experimentGcQuickPick = async (config: Config) => {
       )
       window.showInformationMessage(stdout)
     } catch (e) {
-      window.showErrorMessage(e.stderr || e.message)
+      if (e.stderr) {
+        return window.showErrorMessage(e.stderr)
+      }
+      throw e
     }
   }
 }
@@ -90,7 +93,10 @@ export const applyExperimentFromQuickPick = async (config: Config) => {
       }
     }
   } catch (e) {
-    window.showErrorMessage(e.stderr)
+    if (e.stderr) {
+      return window.showErrorMessage(e.stderr)
+    }
+    throw e
   }
 }
 
