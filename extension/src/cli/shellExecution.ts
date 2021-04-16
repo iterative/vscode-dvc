@@ -47,6 +47,12 @@ export const getExecutionDetails = (
   }
 }
 
+const getOutput = (data: string | Buffer): string =>
+  data
+    .toString()
+    .split(/(\r?\n)/g)
+    .join('\r')
+
 export const run = async (
   executionDetails: cliExecutionDetails,
   pseudoTerminal: PseudoTerminal
@@ -62,21 +68,13 @@ export const run = async (
         shell: true
       })
 
-      stream.stdout?.on('data', stdout => {
-        const output = stdout
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
+      const outputListener = (chunk: string | Buffer) => {
+        const output = getOutput(chunk)
         pseudoTerminal.writeEmitter.fire(output)
-      })
+      }
+      stream.stdout?.on('data', outputListener)
 
-      stream.stderr?.on('data', stdout => {
-        const output = stdout
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
-        pseudoTerminal.writeEmitter.fire(output)
-      })
+      stream.stderr?.on('data', outputListener)
 
       stream.on('close', () => {
         pseudoTerminal.writeEmitter.fire(
