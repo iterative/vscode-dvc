@@ -15,7 +15,7 @@ const { expect } = chai
 suite('ShellExecution', () => {
   window.showInformationMessage('Start all shell execution tests.')
 
-  describe('shellExecution', () => {
+  describe('ShellExecution', () => {
     it('should be able to execute a shell command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
       const pseudoTerminal = new PseudoTerminal()
@@ -65,11 +65,13 @@ suite('ShellExecution', () => {
         disposable
       )
 
-      const shellExecuter = new ShellExecution({} as Config, {
-        completedEventEmitter,
-        outputEventEmitter,
-        startedEventEmitter
-      })
+      const shellExecuter = disposable.track(
+        new ShellExecution({} as Config, {
+          completedEventEmitter,
+          outputEventEmitter,
+          startedEventEmitter
+        })
+      )
 
       stub(shellExecuter, 'getCommand').returns(command)
 
