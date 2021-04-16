@@ -49,31 +49,28 @@ export class ShellExecution {
   private readonly outputEventEmitter: EventEmitter<string>
   private readonly startedEventEmitter: EventEmitter<void>
 
-  async run(executionDetails: cliExecutionDetails): Promise<void> {
-    return new Promise(resolve => {
-      const { cwd, env, executionCommand, outputCommand } = executionDetails
+  public async run(executionDetails: cliExecutionDetails): Promise<void> {
+    const { cwd, env, executionCommand, outputCommand } = executionDetails
 
-      this.outputEventEmitter.fire(`${outputCommand}\r\n`)
+    this.outputEventEmitter.fire(`${outputCommand}\r\n`)
 
-      const stream = spawn(`${executionCommand}`, {
-        cwd,
-        env,
-        shell: true
-      })
-      this.startedEventEmitter.fire()
+    const stream = spawn(`${executionCommand}`, {
+      cwd,
+      env,
+      shell: true
+    })
+    this.startedEventEmitter.fire()
 
-      const outputListener = (chunk: string | Buffer) => {
-        const output = getOutput(chunk)
-        this.outputEventEmitter.fire(output)
-      }
-      stream.stdout?.on('data', outputListener)
+    const outputListener = (chunk: string | Buffer) => {
+      const output = getOutput(chunk)
+      this.outputEventEmitter.fire(output)
+    }
+    stream.stdout?.on('data', outputListener)
 
-      stream.stderr?.on('data', outputListener)
+    stream.stderr?.on('data', outputListener)
 
-      stream.on('close', () => {
-        this.completedEventEmitter.fire()
-        resolve()
-      })
+    stream.on('close', () => {
+      this.completedEventEmitter.fire()
     })
   }
 
