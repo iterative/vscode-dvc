@@ -22,6 +22,9 @@ interface cliExecutionDetails {
   command: string
 }
 
+export const getCommand = (cliPath: string, command: string): string =>
+  `${cliPath} ${command}`
+
 const getExecutionDetails = (
   config: Config,
   command: Commands
@@ -30,7 +33,7 @@ const getExecutionDetails = (
   const env = getEnv(config)
   return {
     env,
-    command: `${cliPath} ${command}`
+    command: getCommand(cliPath, command)
   }
 }
 
