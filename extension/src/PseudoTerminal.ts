@@ -57,8 +57,8 @@ export class PseudoTerminal {
       )
     })
 
-  constructor() {
+  constructor(writeEmitter = new EventEmitter<string>()) {
     this.termName = 'DVC'
-    this.writeEmitter = new EventEmitter<string>()
+    this.writeEmitter = writeEmitter
   }
 }
