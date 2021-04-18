@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
-import { run } from '../../../cli/shellExecution'
+import { executeInShell } from '../../../cli/shellExecution'
 import { Disposable, Disposer } from '../../../extension'
 import { PseudoTerminal } from '../../../PseudoTerminal'
 
@@ -58,7 +58,7 @@ suite('Pseudo Terminal Test Suite', () => {
         outputCommand: command
       }
 
-      run(executionDetails, pseudoTerminal)
+      executeInShell(executionDetails, pseudoTerminal)
 
       const eventStream = await terminalDataWriteEventStream(text, disposable)
       expect(eventStream.includes(text)).to.be.true
@@ -93,8 +93,8 @@ suite('Pseudo Terminal Test Suite', () => {
         outputCommand: secondCommand
       }
 
-      await run(firstExecutionDetails, pseudoTerminal)
-      await run(secondExecutionDetails, pseudoTerminal)
+      await executeInShell(firstExecutionDetails, pseudoTerminal)
+      await executeInShell(secondExecutionDetails, pseudoTerminal)
 
       const firstStream = await Promise.race([firstEvent, secondEvent])
       let eventStream = await firstEvent

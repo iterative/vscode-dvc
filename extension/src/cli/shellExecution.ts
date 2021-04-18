@@ -44,7 +44,7 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const run = async (
+export const executeInShell = async (
   executionDetails: cliExecutionDetails,
   pseudoTerminal: PseudoTerminal
 ): Promise<void> =>
