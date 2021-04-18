@@ -1,5 +1,8 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
+import { Disposable } from '@hediet/std/disposable'
 export class PseudoTerminal {
+  public dispose = Disposable.fn()
+
   private termName: string
   private instance: Terminal | undefined
   public writeEmitter: EventEmitter<string>
@@ -12,7 +15,7 @@ export class PseudoTerminal {
     return this.instance
   }
 
-  public dispose = (): void => {
+  public close = (): void => {
     const currentTerminal = this.instance
     if (currentTerminal) {
       currentTerminal.dispose()
@@ -46,10 +49,12 @@ export class PseudoTerminal {
           this.writeEmitter.fire(data === '\r' ? '\r\n' : data)
       }
 
-      this.instance = window.createTerminal({
-        name: this.termName,
-        pty
-      })
+      this.instance = this.dispose.track(
+        window.createTerminal({
+          name: this.termName,
+          pty
+        })
+      )
     })
 
   constructor() {

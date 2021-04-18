@@ -9,8 +9,8 @@ import { PseudoTerminal } from '../../../PseudoTerminal'
 chai.use(sinonChai)
 const { expect } = chai
 
-suite('Pseudo Terminal Test Suite', () => {
-  window.showInformationMessage('Start all integrated terminal tests.')
+suite('Shell Execution Test Suite', () => {
+  window.showInformationMessage('Start all shell execution tests.')
 
   const closeTerminalEvent = (): Promise<Terminal> => {
     return new Promise(resolve => {
@@ -58,52 +58,10 @@ suite('Pseudo Terminal Test Suite', () => {
         outputCommand: command
       }
 
+      const eventStream = terminalDataWriteEventStream(text, disposable)
       executeInShell(executionDetails, pseudoTerminal)
 
-      const eventStream = await terminalDataWriteEventStream(text, disposable)
-      expect(eventStream.includes(text)).to.be.true
-
-      disposable.dispose()
-      return closeTerminalEvent()
-    }).timeout(12000)
-
-    it('should be able to run multiple commands in the same terminal', async () => {
-      const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal()
-      disposable.track(pseudoTerminal)
-
-      const firstText = 'some-really-long-string'
-      const secondText = ':weeeee:'
-
-      const firstEvent = terminalDataWriteEventStream(firstText, disposable)
-      const firstCommand = 'echo ' + firstText
-      const firstExecutionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: firstCommand,
-        outputCommand: firstCommand
-      }
-
-      const secondEvent = terminalDataWriteEventStream(secondText, disposable)
-      const secondCommand = 'echo ' + secondText
-      const secondExecutionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: secondCommand,
-        outputCommand: secondCommand
-      }
-
-      await executeInShell(firstExecutionDetails, pseudoTerminal)
-      await executeInShell(secondExecutionDetails, pseudoTerminal)
-
-      const firstStream = await Promise.race([firstEvent, secondEvent])
-      let eventStream = await firstEvent
-      expect(firstStream).to.equal(eventStream)
-
-      eventStream += await secondEvent
-
-      expect(eventStream.includes(firstText)).to.be.true
-      expect(eventStream.includes(secondText)).to.be.true
+      expect((await eventStream).includes(text)).to.be.true
 
       disposable.dispose()
       return closeTerminalEvent()

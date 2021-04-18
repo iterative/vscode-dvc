@@ -47,31 +47,29 @@ const getOutput = (data: string | Buffer): string =>
 export const executeInShell = async (
   executionDetails: cliExecutionDetails,
   pseudoTerminal: PseudoTerminal
-): Promise<void> =>
-  new Promise(resolve => {
-    const { cwd, env, executionCommand, outputCommand } = executionDetails
-    pseudoTerminal.openCurrentInstance().then(() => {
-      pseudoTerminal.writeEmitter.fire(`${outputCommand}\r\n`)
+): Promise<void> => {
+  const { cwd, env, executionCommand, outputCommand } = executionDetails
+  pseudoTerminal.openCurrentInstance().then(() => {
+    pseudoTerminal.writeEmitter.fire(`${outputCommand}\r\n`)
 
-      const stream = spawn(`${executionCommand}`, {
-        cwd,
-        env,
-        shell: true
-      })
+    const stream = spawn(`${executionCommand}`, {
+      cwd,
+      env,
+      shell: true
+    })
 
-      const outputListener = (chunk: string | Buffer) => {
-        const output = getOutput(chunk)
-        pseudoTerminal.writeEmitter.fire(output)
-      }
-      stream.stdout?.on('data', outputListener)
+    const outputListener = (chunk: string | Buffer) => {
+      const output = getOutput(chunk)
+      pseudoTerminal.writeEmitter.fire(output)
+    }
+    stream.stdout?.on('data', outputListener)
 
-      stream.stderr?.on('data', outputListener)
+    stream.stderr?.on('data', outputListener)
 
-      stream.on('close', () => {
-        pseudoTerminal.writeEmitter.fire(
-          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
-        )
-        resolve()
-      })
+    stream.on('close', () => {
+      pseudoTerminal.writeEmitter.fire(
+        '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
+      )
     })
   })
+}
