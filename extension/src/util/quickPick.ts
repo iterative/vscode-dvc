@@ -1,21 +1,21 @@
 import { QuickPickOptions, QuickPickItem, window } from 'vscode'
 
-export interface QuickPickItemWithValue extends QuickPickItem {
-  value: string
+export interface QuickPickItemWithValue<T = string> extends QuickPickItem {
+  value: T
 }
 
-export const quickPickValue: (
-  items: QuickPickItemWithValue[],
+export const quickPickValue: <T = string>(
+  items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptions, 'canPickMany'>
-) => Thenable<string | undefined> = async (items, options) =>
-  (await window.showQuickPick<QuickPickItemWithValue>(items, options))?.value
+) => Thenable<T | undefined> = async (items, options) =>
+  (await window.showQuickPick(items, options))?.value
 
-export const quickPickManyValues: (
-  items: QuickPickItemWithValue[],
+export const quickPickManyValues: <T = string>(
+  items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptions, 'canPickMany'>
-) => Thenable<string[] | undefined> = async (items, options = {}) =>
+) => Thenable<T[] | undefined> = async (items, options = {}) =>
   (
-    await window.showQuickPick<QuickPickItemWithValue>(items, {
+    await window.showQuickPick(items, {
       ...options,
       canPickMany: true
     })
