@@ -146,12 +146,12 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async context => {
-        const cwd = await pickSingleRepositoryRoot(
+        const dvcRoot = await pickSingleRepositoryRoot(
           this.dvcRoots,
           context?.rootUri?.fsPath
         )
-        if (cwd) {
-          this.runner.run(Commands.EXPERIMENT_RUN, cwd)
+        if (dvcRoot) {
+          this.runner.run(Commands.EXPERIMENT_RUN, dvcRoot)
           this.showExperimentsWebview()
         }
       })
