@@ -93,13 +93,15 @@ export const findDvcRootPaths = async (
 }
 
 export const pickSingleRepositoryRoot = async (
-  dvcRoots: string[],
+  cwd: string,
+  cliPath: string | undefined,
   providedRoot?: string
 ): Promise<string | undefined> => {
   if (providedRoot) {
     return providedRoot
   }
 
+  const dvcRoots = await findDvcRootPaths(cwd, cliPath)
   if (dvcRoots.length === 1) {
     return dvcRoots[0]
   }

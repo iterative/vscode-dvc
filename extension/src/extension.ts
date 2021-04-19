@@ -110,7 +110,8 @@ export class Extension {
     context?: { rootUri?: Uri }
   ) {
     const dvcRoot = await pickSingleRepositoryRoot(
-      this.dvcRoots,
+      this.config.workspaceRoot,
+      this.config.dvcPath,
       context?.rootUri?.fsPath
     )
     if (dvcRoot) {

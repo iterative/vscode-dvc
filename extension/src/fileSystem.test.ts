@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
-import * as fileSystem from './fileSystem'
+import * as FileSystem from './fileSystem'
 import { getRoot } from './cli/reader'
 
 const {
@@ -13,7 +13,7 @@ const {
   getWatcher,
   isDirectory,
   pickSingleRepositoryRoot
-} = fileSystem
+} = FileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -45,7 +45,7 @@ describe('addFileChangeHandler', () => {
     mockedWatch.mockReturnValue(mockedWatcher)
 
     const getWatcherSpy = jest
-      .spyOn(fileSystem, 'getWatcher')
+      .spyOn(FileSystem, 'getWatcher')
       .mockImplementationOnce(e => e)
 
     mockedDebounce.mockImplementationOnce(
@@ -153,8 +153,10 @@ describe('isDirectory', () => {
 describe('pickSingleRepositoryRoot', () => {
   it('should return the optional repository if provided', async () => {
     const optionallyProvidedRepo = '/some/path/to/repo/b'
+
     const repoRoot = await pickSingleRepositoryRoot(
-      ['/some/path/to/repo/a', optionallyProvidedRepo],
+      '/some/path/to',
+      undefined,
       optionallyProvidedRepo
     )
     expect(repoRoot).toEqual(optionallyProvidedRepo)
@@ -162,7 +164,12 @@ describe('pickSingleRepositoryRoot', () => {
 
   it('should return the only repository if only one is provided', async () => {
     const singleRepo = '/some/path/to/repo/a'
-    const repoRoot = await pickSingleRepositoryRoot([singleRepo])
+
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([singleRepo])
+
+    const repoRoot = await pickSingleRepositoryRoot(singleRepo, undefined)
     expect(repoRoot).toEqual(singleRepo)
   })
 
@@ -170,13 +177,14 @@ describe('pickSingleRepositoryRoot', () => {
     const selectedRepo = '/some/path/to/repo/a'
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
+
     mockedShowRepoQuickPick.mockResolvedValue(selectedRepo)
 
-    const repoRoot = await pickSingleRepositoryRoot([
-      selectedRepo,
-      unselectedRepoB,
-      unselectedRepoC
-    ])
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
+
+    const repoRoot = await pickSingleRepositoryRoot('/some/path/to', undefined)
     expect(repoRoot).toEqual(selectedRepo)
   })
 
@@ -184,13 +192,14 @@ describe('pickSingleRepositoryRoot', () => {
     const selectedRepo = '/some/path/to/repo/a'
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
+
     mockedShowRepoQuickPick.mockResolvedValue(undefined)
 
-    const repoRoot = await pickSingleRepositoryRoot([
-      selectedRepo,
-      unselectedRepoB,
-      unselectedRepoC
-    ])
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
+
+    const repoRoot = await pickSingleRepositoryRoot('/some/path/to', undefined)
     expect(repoRoot).toBeUndefined()
   })
 })
