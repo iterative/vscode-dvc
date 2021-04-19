@@ -92,7 +92,8 @@ export class Extension {
 
   private refreshExperimentsWebview = async () => {
     const experiments = await getExperiments({
-      config: this.config,
+      pythonBinPath: this.config.pythonBinPath,
+      cliPath: this.config.dvcPath,
       cwd: this.config.workspaceRoot
     })
     return this.webviewManager.refreshExperiments(experiments)

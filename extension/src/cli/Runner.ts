@@ -27,9 +27,12 @@ export class Runner {
       await this.pseudoTerminal.openCurrentInstance()
       this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
       this.currentProcess = await executeInShell({
-        config: this.config,
+        options: {
+          pythonBinPath: this.config.pythonBinPath,
+          cliPath: this.config.dvcPath,
+          cwd
+        },
         command,
-        cwd,
         emitters: {
           completedEventEmitter: this.completedEventEmitter,
           stdOutEventEmitter: this.stdOutEventEmitter,

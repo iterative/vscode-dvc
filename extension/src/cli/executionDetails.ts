@@ -1,33 +1,36 @@
-import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { Commands } from './commands'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
 
-const getEnv = (config: Config): NodeJS.ProcessEnv => {
+const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
-  const PATH = getPATH(env?.PATH as string, config.pythonBinPath)
+  const PATH = getPATH(env?.PATH as string, pythonBinPath)
   return {
     ...env,
     PATH
   }
 }
 
-export const getCommand = (config: Config, command: Commands): string => {
-  const cliPath = config.dvcPath || 'dvc'
-  return `${cliPath} ${command}`
+export const getCommand = (command: Commands, cliPath?: string): string =>
+  `${cliPath || 'dvc'} ${command}`
+
+export interface ExecutionOptions {
+  cliPath: string | undefined
+  pythonBinPath: string | undefined
+  cwd: string
 }
 
 export const getExecutionDetails = (
-  config: Config,
+  options: ExecutionOptions,
   command: Commands
 ): {
   env: NodeJS.ProcessEnv
   command: string
 } => {
   return {
-    env: getEnv(config),
-    command: getCommand(config, command)
+    env: getEnv(options.pythonBinPath),
+    command: getCommand(command, options.cliPath)
   }
 }

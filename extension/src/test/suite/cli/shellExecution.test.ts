@@ -7,7 +7,6 @@ import * as ExecutionDetails from '../../../cli/executionDetails'
 import { executeInShell } from '../../../cli/shellExecution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
-import { Config } from '../../../Config'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -69,9 +68,12 @@ suite('Shell Execution Test Suite', () => {
       const cwd = __dirname
 
       executeInShell({
-        config: {} as Config,
+        options: {
+          cliPath: undefined,
+          cwd,
+          pythonBinPath: undefined
+        },
         command: Commands.STATUS,
-        cwd,
         emitters: {
           completedEventEmitter,
           stdOutEventEmitter,
@@ -83,7 +85,10 @@ suite('Shell Execution Test Suite', () => {
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
-      expect(stubbedGetCommand).to.be.calledWith({}, 'status --show-json')
+      expect(stubbedGetCommand).to.be.calledWith(
+        'status --show-json',
+        undefined
+      )
       disposable.dispose()
     }).timeout(12000)
   })

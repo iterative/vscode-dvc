@@ -12,7 +12,6 @@ import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
 import { getPythonExecutionDetails } from '../extensions/python'
-import { Config } from '../Config'
 
 jest.mock('fs')
 jest.mock('../extensions/python')
@@ -57,7 +56,8 @@ describe('getExperiments', () => {
       })
 
     const experiments = await getExperiments({
-      config: {} as Config,
+      cliPath: undefined,
+      pythonBinPath: undefined,
       cwd
     })
     expect(experiments).toMatchSnapshot()
@@ -197,7 +197,11 @@ describe('listDvcOnlyRecursive', () => {
         stdout: stdout,
         stderr: ''
       })
-    const tracked = await listDvcOnlyRecursive({ config: {} as Config, cwd })
+    const tracked = await listDvcOnlyRecursive({
+      cliPath: undefined,
+      pythonBinPath: undefined,
+      cwd
+    })
 
     expect(tracked).toEqual([
       'data/MNIST/raw/t10k-images-idx3-ubyte',

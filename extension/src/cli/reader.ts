@@ -2,8 +2,7 @@ import { Commands, GcPreserveFlag } from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
-import { getExecutionDetails } from './executionDetails'
-import { Config } from '../Config'
+import { ExecutionOptions, getExecutionDetails } from './executionDetails'
 
 interface ReaderOptions {
   cliPath: string | undefined
@@ -45,16 +44,11 @@ export const checkoutRecursive = async (
 export const getRoot = async (options: ReaderOptions): Promise<string> =>
   (await execCommand(options, 'root')).trim()
 
-interface ExecutionOptions {
-  config: Config
-  cwd: string
-}
-
 const executeProcess = async (
   options: ExecutionOptions,
   command: Commands
 ): Promise<string> => {
-  const executionDetails = getExecutionDetails(options.config, command)
+  const executionDetails = getExecutionDetails(options, command)
   const { stdout } = await execPromise(executionDetails.command, {
     cwd: options.cwd,
     env: executionDetails.env

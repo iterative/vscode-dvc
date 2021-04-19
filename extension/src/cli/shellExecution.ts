@@ -1,9 +1,8 @@
 import { EventEmitter } from 'vscode'
-import { Config } from '../Config'
 import { Commands } from './commands'
 import { ChildProcess, spawn } from 'child_process'
 import { Logger } from '../common/Logger'
-import { getExecutionDetails } from './executionDetails'
+import { ExecutionOptions, getExecutionDetails } from './executionDetails'
 
 const getOutput = (data: string | Buffer): string =>
   data
@@ -12,28 +11,23 @@ const getOutput = (data: string | Buffer): string =>
     .join('\r')
 
 export const executeInShell = async ({
-  config,
+  options,
   command,
-  cwd,
   emitters
 }: {
-  config: Config
+  options: ExecutionOptions
   command: Commands
-  cwd: string
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
     stdOutEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
 }): Promise<ChildProcess> => {
-  const { env: execEnv, command: execCommand } = getExecutionDetails(
-    config,
-    command
-  )
+  const { env, command: execCommand } = getExecutionDetails(options, command)
 
   const childProcess = spawn(execCommand, {
-    cwd,
-    env: execEnv,
+    cwd: options.cwd,
+    env,
     shell: true
   })
 
