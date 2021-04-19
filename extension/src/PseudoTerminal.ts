@@ -1,11 +1,21 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { Deferred } from '@hediet/std/synchronization'
+
 export class PseudoTerminal {
   public dispose = Disposable.fn()
 
+  private readonly _initialized = new Deferred()
+  private readonly initialized = this._initialized.promise
+
+  public get ready() {
+    return this.initialized
+  }
+
   private termName: string
   private instance: Terminal | undefined
-  public writeEmitter: EventEmitter<string>
+
+  private readonly stdOutEventEmitter: EventEmitter<string>
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
     if (!this.instance) {
@@ -39,14 +49,14 @@ export class PseudoTerminal {
   private createInstance = async (): Promise<void> =>
     new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
-        onDidWrite: this.writeEmitter.event,
+        onDidWrite: this.stdOutEventEmitter.event,
         open: () => {
-          this.writeEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
+          this.stdOutEventEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
           resolve()
         },
         close: () => {},
         handleInput: data =>
-          this.writeEmitter.fire(data === '\r' ? '\r\n' : data)
+          this.stdOutEventEmitter.fire(data === '\r' ? '\r\n' : data)
       }
 
       this.instance = this.dispose.track(
@@ -57,8 +67,10 @@ export class PseudoTerminal {
       )
     })
 
-  constructor(writeEmitter = new EventEmitter<string>()) {
+  constructor(stdOutEventEmitter: EventEmitter<string>) {
     this.termName = 'DVC'
-    this.writeEmitter = writeEmitter
+    this.stdOutEventEmitter = stdOutEventEmitter
+
+    this.openCurrentInstance().then(() => this._initialized.resolve())
   }
 }

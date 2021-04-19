@@ -1,15 +1,15 @@
 import { describe, it } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
-import { Terminal, window } from 'vscode'
+import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { PseudoTerminal } from '../../PseudoTerminal'
-import { Disposable } from '../../extension'
+import { Disposable, Disposer } from '../../extension'
 
 chai.use(sinonChai)
 const { expect } = chai
 
 suite('Pseudo Terminal Test Suite', () => {
-  window.showInformationMessage('Start all integrated terminal tests.')
+  window.showInformationMessage('Start all pseudo terminal tests.')
 
   const closeTerminalEvent = (): Promise<Terminal> => {
     return new Promise(resolve => {
@@ -25,7 +25,7 @@ suite('Pseudo Terminal Test Suite', () => {
   describe('PseudoTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal()
+      const pseudoTerminal = new PseudoTerminal(new EventEmitter<string>())
       disposable.track(pseudoTerminal)
 
       pseudoTerminal.openCurrentInstance()
@@ -43,6 +43,52 @@ suite('Pseudo Terminal Test Suite', () => {
 
       const terminal = await openTerminalEvent()
       expect(terminal.creationOptions?.name).to.equal('DVC')
+
+      disposable.dispose()
+      return closeTerminalEvent()
+    }).timeout(12000)
+
+    it('should be able to handle multiple output events', async () => {
+      const stdOutEventEmitter = new EventEmitter<string>()
+      const terminalDataWriteEventStream = (
+        text: string,
+        disposer: Disposer
+      ): Promise<string> => {
+        let eventStream = ''
+        return new Promise(resolve => {
+          const listener: Disposable = window.onDidWriteTerminalData(
+            (event: TerminalDataWriteEvent) => {
+              eventStream += event.data
+              if (eventStream.includes(text)) {
+                return resolve(eventStream)
+              }
+            }
+          )
+          disposer.track(listener)
+        })
+      }
+
+      const disposable = Disposable.fn()
+      const pseudoTerminal = new PseudoTerminal(stdOutEventEmitter)
+      disposable.track(pseudoTerminal)
+
+      await pseudoTerminal.ready
+      const firstText = 'some-really-long-string'
+      const secondText = ':weeeee:'
+
+      const firstEvent = terminalDataWriteEventStream(firstText, disposable)
+      const secondEvent = terminalDataWriteEventStream(secondText, disposable)
+      stdOutEventEmitter.fire('echo ' + firstText)
+      stdOutEventEmitter.fire('echo ' + secondText)
+
+      const firstStream = await Promise.race([firstEvent, secondEvent])
+      let eventStream = await firstEvent
+      expect(firstStream).to.equal(eventStream)
+
+      eventStream += await secondEvent
+
+      expect(eventStream.includes(firstText)).to.be.true
+      expect(eventStream.includes(secondText)).to.be.true
 
       disposable.dispose()
       return closeTerminalEvent()
