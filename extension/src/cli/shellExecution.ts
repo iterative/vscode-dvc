@@ -17,24 +17,9 @@ const getEnv = (config: Config): NodeJS.ProcessEnv => {
   }
 }
 
-interface cliExecutionDetails {
-  env: NodeJS.ProcessEnv
-  command: string
-}
-
-export const getCommand = (cliPath: string, command: string): string =>
-  `${cliPath} ${command}`
-
-const getExecutionDetails = (
-  config: Config,
-  command: Commands
-): cliExecutionDetails => {
+export const getCommand = (config: Config, command: Commands): string => {
   const cliPath = config.dvcPath || 'dvc'
-  const env = getEnv(config)
-  return {
-    env,
-    command: getCommand(cliPath, command)
-  }
+  return `${cliPath} ${command}`
 }
 
 const getOutput = (data: string | Buffer): string =>
@@ -58,11 +43,11 @@ export const executeInShell = async ({
     startedEventEmitter?: EventEmitter<void>
   }
 }): Promise<void> => {
-  const executionDetails = getExecutionDetails(config, command)
+  const execCommand = getCommand(config, command)
 
-  const childProcess = spawn(`${executionDetails.command}`, {
+  const childProcess = spawn(execCommand, {
     cwd,
-    env: executionDetails.env,
+    env: getEnv(config),
     shell: true
   })
   emitters?.startedEventEmitter?.fire()
