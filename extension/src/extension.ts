@@ -143,7 +143,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async ({ rootUri }) => {
-        this.runner.run(Commands.EXPERIMENT_RUN, rootUri.path)
+        this.runner.run(Commands.EXPERIMENT_RUN, rootUri?.fsPath)
         this.showExperimentsWebview()
       })
     )

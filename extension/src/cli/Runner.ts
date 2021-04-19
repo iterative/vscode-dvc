@@ -17,8 +17,11 @@ export class Runner {
   private pseudoTerminal: PseudoTerminal
   private config: Config
 
-  public async run(command: Commands, cwd: string) {
+  public async run(command: Commands, cwd?: string) {
     if (!this.pseudoTerminal.isBlocked) {
+      if (!cwd) {
+        return
+      }
       this.pseudoTerminal.setBlocked(true)
       await this.pseudoTerminal.openCurrentInstance()
       this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
