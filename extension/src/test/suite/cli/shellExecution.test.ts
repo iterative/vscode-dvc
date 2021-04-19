@@ -83,7 +83,7 @@ suite('Shell Execution Test Suite', () => {
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
-      expect(stubbedGetCommand).to.be.calledWith('dvc', 'status --show-json')
+      expect(stubbedGetCommand).to.be.calledWith({}, 'status --show-json')
       disposable.dispose()
     }).timeout(12000)
   })
