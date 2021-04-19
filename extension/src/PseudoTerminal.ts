@@ -57,8 +57,11 @@ export class PseudoTerminal {
           resolve()
         },
         close: () => {},
-        handleInput: data =>
-          this.stdOutEventEmitter.fire(data === '\r' ? '\r\n' : data)
+        handleInput: data => {
+          if (!this.isBlocked && data) {
+            this.close()
+          }
+        }
       }
 
       this.instance = this.dispose.track(

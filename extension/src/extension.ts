@@ -3,7 +3,8 @@ import {
   commands,
   ExtensionContext,
   workspace,
-  WorkspaceFolder
+  WorkspaceFolder,
+  Uri
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
@@ -12,15 +13,16 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import {
-  IntegratedTerminal,
-  runExperiment,
-  runQueuedExperiments
-} from './IntegratedTerminal'
+import { IntegratedTerminal } from './IntegratedTerminal'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
-import { registerCommands as registerCliCommands } from './cli/vscode'
+import { Commands } from './cli/commands'
+import { Runner } from './cli/Runner'
+import {
+  pickSingleRepositoryRoot,
+  registerCommands as registerCliCommands
+} from './cli/vscode'
 import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
@@ -46,6 +48,7 @@ export class Extension {
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
   private readonly gitExtension: GitExtension
+  private readonly runner: Runner
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -102,6 +105,20 @@ export class Extension {
     return webview
   }
 
+  private async runExperimentCommand(
+    command: Commands,
+    context?: { rootUri?: Uri }
+  ) {
+    const dvcRoot = await pickSingleRepositoryRoot(
+      this.dvcRoots,
+      context?.rootUri?.fsPath
+    )
+    if (dvcRoot) {
+      this.runner.run(command, dvcRoot)
+      this.showExperimentsWebview()
+    }
+  }
+
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -112,6 +129,8 @@ export class Extension {
     this.resourceLocator = new ResourceLocator(context.extensionUri)
 
     this.config = this.dispose.track(new Config())
+
+    this.runner = this.dispose.track(new Runner(this.config))
 
     Promise.all(
       (workspace.workspaceFolders || []).map(async workspaceFolder =>
@@ -141,17 +160,15 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', async () => {
-        runExperiment()
-        this.showExperimentsWebview()
-      })
+      commands.registerCommand('dvc.runExperiment', async context =>
+        this.runExperimentCommand(Commands.EXPERIMENT_RUN, context)
+      )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runQueuedExperiments', async () => {
-        runQueuedExperiments()
-        this.showExperimentsWebview()
-      })
+      commands.registerCommand('dvc.runQueuedExperiments', async context =>
+        this.runExperimentCommand(Commands.EXPERIMENT_RUN_ALL, context)
+      )
     )
 
     this.gitExtension = this.dispose.track(new GitExtension())
