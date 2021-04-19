@@ -12,14 +12,12 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import {
-  IntegratedTerminal,
-  runExperiment,
-  runQueuedExperiments
-} from './IntegratedTerminal'
+import { IntegratedTerminal, runQueuedExperiments } from './IntegratedTerminal'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
+import { Commands } from './cli/commands'
+import { Runner } from './cli/Runner'
 import { registerCommands as registerCliCommands } from './cli/vscode'
 import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
@@ -46,6 +44,7 @@ export class Extension {
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
   private readonly gitExtension: GitExtension
+  private readonly runner: Runner
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -113,6 +112,8 @@ export class Extension {
 
     this.config = this.dispose.track(new Config())
 
+    this.runner = this.dispose.track(new Runner(this.config))
+
     Promise.all(
       (workspace.workspaceFolders || []).map(async workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
@@ -141,8 +142,8 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', async () => {
-        runExperiment()
+      commands.registerCommand('dvc.runExperiment', async ({ rootUri }) => {
+        this.runner.run(Commands.EXPERIMENT_RUN, rootUri.path)
         this.showExperimentsWebview()
       })
     )
