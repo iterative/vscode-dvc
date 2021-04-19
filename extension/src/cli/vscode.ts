@@ -14,6 +14,15 @@ import {
   experimentApply
 } from './reader'
 
+const reportStderrOrThrow = (
+  error: Error & { stdout?: string; stderr?: string }
+) => {
+  if (error.stderr) {
+    return window.showErrorMessage(error.stderr)
+  }
+  throw error
+}
+
 export const queueExperimentCommand = async (config: Config) => {
   try {
     return window.showInformationMessage(
@@ -23,7 +32,7 @@ export const queueExperimentCommand = async (config: Config) => {
       })
     )
   } catch (e) {
-    return window.showErrorMessage(e.stderr || e.message)
+    reportStderrOrThrow(e)
   }
 }
 
@@ -65,10 +74,7 @@ export const experimentGcQuickPick = async (config: Config) => {
       )
       window.showInformationMessage(stdout)
     } catch (e) {
-      if (e.stderr) {
-        return window.showErrorMessage(e.stderr)
-      }
-      throw e
+      reportStderrOrThrow(e)
     }
   }
 }
@@ -93,10 +99,7 @@ export const applyExperimentFromQuickPick = async (config: Config) => {
       }
     }
   } catch (e) {
-    if (e.stderr) {
-      return window.showErrorMessage(e.stderr)
-    }
-    throw e
+    reportStderrOrThrow(e)
   }
 }
 
