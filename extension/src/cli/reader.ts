@@ -55,36 +55,48 @@ interface ExecutionOptions {
   cwd: string
 }
 
-export const listDvcOnlyRecursive = async (
-  executionOptions: ExecutionOptions
-): Promise<string[]> => {
-  const { command, env } = getExecutionDetails(
-    executionOptions.config,
-    Commands.LIST_DVC_ONLY_RECURSIVE
-  )
-  const { stdout } = await execPromise(command, {
+const executeProcess = async (
+  executionOptions: ExecutionOptions,
+  command: Commands
+): Promise<string> => {
+  const executionDetails = getExecutionDetails(executionOptions.config, command)
+  const { stdout } = await execPromise(executionDetails.command, {
     cwd: executionOptions.cwd,
-    env
+    env: executionDetails.env
   })
+  return stdout
+}
+
+const executeWithTrimAndSplit = async (
+  executionOptions: ExecutionOptions,
+  command: Commands
+): Promise<string[]> => {
+  const stdout = await executeProcess(executionOptions, command)
   return trimAndSplit(stdout)
 }
 
-export const status = async (
-  executionOptions: ExecutionOptions
-): Promise<Record<
-  string,
-  (Record<string, Record<string, string>> | string)[]
->> => {
-  const { command, env } = getExecutionDetails(
-    executionOptions.config,
-    Commands.STATUS
-  )
-  const { stdout } = await execPromise(command, {
-    cwd: executionOptions.cwd,
-    env
-  })
+const executeAndParseJson = async <T>(
+  executionOptions: ExecutionOptions,
+  command: Commands
+): Promise<T> => {
+  const stdout = await executeProcess(executionOptions, command)
   return JSON.parse(stdout)
 }
+
+export const listDvcOnlyRecursive = async (
+  executionOptions: ExecutionOptions
+): Promise<string[]> =>
+  executeWithTrimAndSplit(executionOptions, Commands.LIST_DVC_ONLY_RECURSIVE)
+
+type Status = Record<
+  string,
+  (Record<string, Record<string, string>> | string)[]
+>
+
+export const status = async (
+  executionOptions: ExecutionOptions
+): Promise<Status> =>
+  executeAndParseJson<Status>(executionOptions, Commands.STATUS)
 
 export const queueExperiment = async (
   options: ReaderOptions
