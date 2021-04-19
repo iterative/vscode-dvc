@@ -15,7 +15,7 @@ const { executeInShell } = shellExecuter
 suite('Shell Execution Test Suite', () => {
   window.showInformationMessage('Start all shell execution tests.')
 
-  describe('ShellExecution', () => {
+  describe('shellExecution', () => {
     it('should be able to execute a shell command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
 
@@ -78,7 +78,6 @@ suite('Shell Execution Test Suite', () => {
           startedEventEmitter
         }
       })
-
       stubbedGetCommand.restore()
 
       await started

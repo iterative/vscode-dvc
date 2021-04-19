@@ -7,6 +7,16 @@ export class PseudoTerminal {
   private termName: string
   private instance: Terminal | undefined
 
+  private blocked: boolean
+
+  public get isBlocked() {
+    return this.blocked
+  }
+
+  public setBlocked(blocked: boolean) {
+    this.blocked = blocked
+  }
+
   private readonly stdOutEventEmitter: EventEmitter<string>
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
@@ -62,5 +72,6 @@ export class PseudoTerminal {
   constructor(stdOutEventEmitter: EventEmitter<string>) {
     this.termName = 'DVC'
     this.stdOutEventEmitter = stdOutEventEmitter
+    this.blocked = false
   }
 }
