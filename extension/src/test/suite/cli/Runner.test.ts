@@ -26,12 +26,14 @@ suite('Runner Test Suite', () => {
       )
 
       const firstRun = runner.run(Commands.STATUS, __dirname)
-      const secondRun = runner.run(Commands.STATUS, __dirname)
+      const secondRun = runner.run(Commands.CHECKOUT, __dirname)
 
       await firstRun
-      expect(stubbedGetCommand).to.be.called
       await secondRun
       stubbedGetCommand.restore()
+
+      expect(stubbedGetCommand).to.be.calledWith('dvc', Commands.STATUS)
+      expect(stubbedGetCommand).not.to.be.calledWith('dvc', Commands.CHECKOUT)
       expect(windowErrorMessageSpy).to.be.called
       disposable.dispose()
     }).timeout(6000)
