@@ -32,8 +32,8 @@ suite('Runner Test Suite', () => {
       await secondRun
       stubbedGetCommand.restore()
 
-      expect(stubbedGetCommand).to.be.calledWith('dvc', Commands.STATUS)
-      expect(stubbedGetCommand).not.to.be.calledWith('dvc', Commands.CHECKOUT)
+      expect(stubbedGetCommand).to.be.calledWith({}, Commands.STATUS)
+      expect(stubbedGetCommand).not.to.be.calledWith({}, Commands.CHECKOUT)
       expect(windowErrorMessageSpy).to.be.called
       disposable.dispose()
     }).timeout(6000)
