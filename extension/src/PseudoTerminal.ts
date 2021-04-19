@@ -1,16 +1,8 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 
 export class PseudoTerminal {
   public dispose = Disposable.fn()
-
-  private readonly _initialized = new Deferred()
-  private readonly initialized = this._initialized.promise
-
-  public get ready() {
-    return this.initialized
-  }
 
   private termName: string
   private instance: Terminal | undefined
@@ -70,7 +62,5 @@ export class PseudoTerminal {
   constructor(stdOutEventEmitter: EventEmitter<string>) {
     this.termName = 'DVC'
     this.stdOutEventEmitter = stdOutEventEmitter
-
-    this.openCurrentInstance().then(() => this._initialized.resolve())
   }
 }
