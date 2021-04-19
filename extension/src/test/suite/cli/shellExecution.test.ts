@@ -1,112 +1,91 @@
 import { describe, it } from 'mocha'
 import chai from 'chai'
+import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { Terminal, TerminalDataWriteEvent, window } from 'vscode'
-import { run } from '../../../cli/shellExecution'
+import { Event, EventEmitter, window } from 'vscode'
+import * as shellExecuter from '../../../cli/shellExecution'
+import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
-import { PseudoTerminal } from '../../../PseudoTerminal'
+import { Config } from '../../../Config'
 
 chai.use(sinonChai)
 const { expect } = chai
+const { executeInShell } = shellExecuter
 
-suite('Pseudo Terminal Test Suite', () => {
-  window.showInformationMessage('Start all integrated terminal tests.')
+suite('Shell Execution Test Suite', () => {
+  window.showInformationMessage('Start all shell execution tests.')
 
-  const closeTerminalEvent = (): Promise<Terminal> => {
-    return new Promise(resolve => {
-      const listener: Disposable = window.onDidCloseTerminal(
-        (event: Terminal) => {
-          listener.dispose()
-          return resolve(event)
-        }
-      )
-    })
-  }
-
-  const terminalDataWriteEventStream = (
-    text: string,
-    disposer: Disposer
-  ): Promise<string> => {
-    let eventStream = ''
-    return new Promise(resolve => {
-      const listener: Disposable = window.onDidWriteTerminalData(
-        (event: TerminalDataWriteEvent) => {
-          eventStream += event.data
-          if (eventStream.includes(text)) {
-            return resolve(eventStream)
-          }
-        }
-      )
-      disposer.track(listener)
-    })
-  }
-
-  describe('shellExecution', () => {
-    it('should be able to run a command', async () => {
+  describe('ShellExecution', () => {
+    it('should be able to execute a shell command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal()
-      disposable.track(pseudoTerminal)
 
-      const text = 'some-really-long-string'
-
+      const text = ':weeeee:'
       const command = 'echo ' + text
 
-      const executionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: command,
-        outputCommand: command
+      const completedEventEmitter = new EventEmitter<void>()
+      const stdOutEventEmitter = new EventEmitter<string>()
+      const startedEventEmitter = new EventEmitter<void>()
+
+      const onDidStart = startedEventEmitter.event
+      const onDidComplete = completedEventEmitter.event
+      const onDidOutput = stdOutEventEmitter.event
+
+      const shellExecutionOutputEvent = (
+        text: string,
+        event: Event<string>,
+        disposer: Disposer
+      ): Promise<string> => {
+        let eventStream = ''
+        return new Promise(resolve => {
+          const listener: Disposable = event((event: string) => {
+            eventStream += event
+            if (eventStream.includes(`${text}`)) {
+              return resolve(eventStream)
+            }
+          })
+          disposer.track(listener)
+        })
       }
+      const startedOrCompletedEvent = (event: Event<void>): Promise<void> => {
+        return new Promise(resolve => {
+          const listener: Disposable = event(() => {
+            listener.dispose()
+            return resolve()
+          })
+        })
+      }
+      const started = startedOrCompletedEvent(onDidStart)
+      const completed = startedOrCompletedEvent(onDidComplete)
+      const eventStream = shellExecutionOutputEvent(
+        text,
+        onDidOutput,
+        disposable
+      )
 
-      run(executionDetails, pseudoTerminal)
+      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
+        command
+      )
 
-      const eventStream = await terminalDataWriteEventStream(text, disposable)
-      expect(eventStream.includes(text)).to.be.true
+      const cwd = __dirname
 
+      executeInShell({
+        config: {} as Config,
+        command: Commands.STATUS,
+        cwd,
+        emitters: {
+          completedEventEmitter,
+          stdOutEventEmitter,
+          startedEventEmitter
+        }
+      })
+
+      stubbedGetCommand.restore()
+
+      await started
+      expect((await eventStream).includes(text)).to.be.true
+      await completed
+      expect(stubbedGetCommand).to.be.calledWith({}, 'status --show-json')
       disposable.dispose()
-      return closeTerminalEvent()
-    }).timeout(12000)
-
-    it('should be able to run multiple commands in the same terminal', async () => {
-      const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal()
-      disposable.track(pseudoTerminal)
-
-      const firstText = 'some-really-long-string'
-      const secondText = ':weeeee:'
-
-      const firstEvent = terminalDataWriteEventStream(firstText, disposable)
-      const firstCommand = 'echo ' + firstText
-      const firstExecutionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: firstCommand,
-        outputCommand: firstCommand
-      }
-
-      const secondEvent = terminalDataWriteEventStream(secondText, disposable)
-      const secondCommand = 'echo ' + secondText
-      const secondExecutionDetails = {
-        cwd: __dirname,
-        env: process.env,
-        executionCommand: secondCommand,
-        outputCommand: secondCommand
-      }
-
-      await run(firstExecutionDetails, pseudoTerminal)
-      await run(secondExecutionDetails, pseudoTerminal)
-
-      const firstStream = await Promise.race([firstEvent, secondEvent])
-      let eventStream = await firstEvent
-      expect(firstStream).to.equal(eventStream)
-
-      eventStream += await secondEvent
-
-      expect(eventStream.includes(firstText)).to.be.true
-      expect(eventStream.includes(secondText)).to.be.true
-
-      disposable.dispose()
-      return closeTerminalEvent()
     }).timeout(12000)
   })
 })

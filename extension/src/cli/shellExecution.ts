@@ -1,8 +1,9 @@
+import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { Commands } from './commands'
 import { getProcessEnv } from '../env'
-import { PseudoTerminal } from '../PseudoTerminal'
 import { spawn } from 'child_process'
+import { Logger } from '../common/Logger'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
@@ -16,26 +17,9 @@ const getEnv = (config: Config): NodeJS.ProcessEnv => {
   }
 }
 
-interface cliExecutionDetails {
-  cwd: string
-  env: NodeJS.ProcessEnv
-  executionCommand: string
-  outputCommand: string
-}
-
-export const getExecutionDetails = (
-  config: Config,
-  command: Commands,
-  cwd: string
-): cliExecutionDetails => {
+export const getCommand = (config: Config, command: Commands): string => {
   const cliPath = config.dvcPath || 'dvc'
-  const env = getEnv(config)
-  return {
-    cwd,
-    env,
-    executionCommand: `${cliPath} ${command}`,
-    outputCommand: `dvc ${command}`
-  }
+  return `${cliPath} ${command}`
 }
 
 const getOutput = (data: string | Buffer): string =>
@@ -44,34 +28,42 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const run = async (
-  executionDetails: cliExecutionDetails,
-  pseudoTerminal: PseudoTerminal
-): Promise<void> =>
-  new Promise(resolve => {
-    const { cwd, env, executionCommand, outputCommand } = executionDetails
-    pseudoTerminal.openCurrentInstance().then(() => {
-      pseudoTerminal.writeEmitter.fire(`${outputCommand}\r\n`)
+export const executeInShell = async ({
+  config,
+  command,
+  cwd,
+  emitters
+}: {
+  config: Config
+  command: Commands
+  cwd: string
+  emitters?: {
+    completedEventEmitter?: EventEmitter<void>
+    stdOutEventEmitter?: EventEmitter<string>
+    startedEventEmitter?: EventEmitter<void>
+  }
+}): Promise<void> => {
+  const execCommand = getCommand(config, command)
+  const execEnv = getEnv(config)
 
-      const stream = spawn(`${executionCommand}`, {
-        cwd,
-        env,
-        shell: true
-      })
-
-      const outputListener = (chunk: string | Buffer) => {
-        const output = getOutput(chunk)
-        pseudoTerminal.writeEmitter.fire(output)
-      }
-      stream.stdout?.on('data', outputListener)
-
-      stream.stderr?.on('data', outputListener)
-
-      stream.on('close', () => {
-        pseudoTerminal.writeEmitter.fire(
-          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
-        )
-        resolve()
-      })
-    })
+  const childProcess = spawn(execCommand, {
+    cwd,
+    env: execEnv,
+    shell: true
   })
+  emitters?.startedEventEmitter?.fire()
+
+  childProcess.stdout?.on('data', chunk => {
+    const output = getOutput(chunk)
+    emitters?.stdOutEventEmitter?.fire(output)
+  })
+
+  childProcess.stderr?.on('data', chunk => {
+    const output = getOutput(chunk)
+    Logger.error(output)
+  })
+
+  childProcess.on('close', () => {
+    emitters?.completedEventEmitter?.fire()
+  })
+}
