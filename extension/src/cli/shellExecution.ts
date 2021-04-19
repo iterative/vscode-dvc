@@ -51,6 +51,7 @@ export const executeInShell = async ({
     env: execEnv,
     shell: true
   })
+
   emitters?.startedEventEmitter?.fire()
 
   childProcess.stdout?.on('data', chunk => {
