@@ -90,8 +90,8 @@ export class Repository {
 
   public async updateTracked(): Promise<void> {
     const tracked = await listDvcOnlyRecursive({
-      cwd: this.dvcRoot,
-      cliPath: this.config.dvcPath
+      config: this.config,
+      cwd: this.dvcRoot
     })
     this.state.tracked = new Set([
       ...this.getAbsolutePath(tracked),
@@ -162,10 +162,10 @@ export class Repository {
   }
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const statusOutput = (await status(this.config, this.dvcRoot)) as Record<
-      string,
-      (ValidStageOrFileStatuses | string)[]
-    >
+    const statusOutput = (await status({
+      config: this.config,
+      cwd: this.dvcRoot
+    })) as Record<string, (ValidStageOrFileStatuses | string)[]>
 
     const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
     return this.reduceToPathStatuses(filteredStatusOutput)

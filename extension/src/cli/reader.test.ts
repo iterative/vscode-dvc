@@ -12,6 +12,7 @@ import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
 import { getPythonExecutionDetails } from '../extensions/python'
+import { Config } from '../Config'
 
 jest.mock('fs')
 jest.mock('../extensions/python')
@@ -195,10 +196,7 @@ describe('getTracked', () => {
         stdout: stdout,
         stderr: ''
       })
-    const tracked = await listDvcOnlyRecursive({
-      cwd,
-      cliPath: 'dvc'
-    })
+    const tracked = await listDvcOnlyRecursive({ config: {} as Config, cwd })
 
     expect(tracked).toEqual([
       'data/MNIST/raw/t10k-images-idx3-ubyte',
@@ -215,7 +213,8 @@ describe('getTracked', () => {
     ])
 
     expect(execPromiseSpy).toBeCalledWith('dvc list . --dvc-only -R', {
-      cwd
+      cwd,
+      env: process.env
     })
   })
 })

@@ -50,22 +50,37 @@ export const checkoutRecursive = async (
 export const getRoot = async (options: ReaderOptions): Promise<string> =>
   (await execCommand(options, 'root')).trim()
 
+interface ExecutionOptions {
+  config: Config
+  cwd: string
+}
+
 export const listDvcOnlyRecursive = async (
-  options: ReaderOptions
-): Promise<string[]> =>
-  trimAndSplit(await execCommand(options, `list . --dvc-only -R`))
+  executionOptions: ExecutionOptions
+): Promise<string[]> => {
+  const { config, cwd } = executionOptions
+  const { command, env } = getExecutionDetails(
+    config,
+    Commands.LIST_DVC_ONLY_RECURSIVE
+  )
+  const { stdout } = await execPromise(command, {
+    cwd,
+    env
+  })
+  return trimAndSplit(stdout)
+}
 
 export const status = async (
-  config: Config,
-  cwd: string
+  executionOptions: ExecutionOptions
 ): Promise<Record<
   string,
   (Record<string, Record<string, string>> | string)[]
 >> => {
-  const executionDetails = getExecutionDetails(config, Commands.STATUS)
-  const { stdout } = await execPromise(executionDetails.command, {
+  const { config, cwd } = executionOptions
+  const { command, env } = getExecutionDetails(config, Commands.STATUS)
+  const { stdout } = await execPromise(command, {
     cwd,
-    env: executionDetails.env
+    env
   })
   return JSON.parse(stdout)
 }
