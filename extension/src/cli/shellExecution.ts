@@ -60,24 +60,24 @@ export const executeInShell = async ({
 }): Promise<void> => {
   const executionDetails = getExecutionDetails(config, command)
 
-  const stream = spawn(`${executionDetails.command}`, {
+  const childProcess = spawn(`${executionDetails.command}`, {
     cwd,
     env: executionDetails.env,
     shell: true
   })
   emitters?.startedEventEmitter?.fire()
 
-  stream.stdout?.on('data', chunk => {
+  childProcess.stdout?.on('data', chunk => {
     const output = getOutput(chunk)
     emitters?.stdOutEventEmitter?.fire(output)
   })
 
-  stream.stderr?.on('data', chunk => {
+  childProcess.stderr?.on('data', chunk => {
     const output = getOutput(chunk)
     Logger.error(output)
   })
 
-  stream.on('close', () => {
+  childProcess.on('close', () => {
     emitters?.completedEventEmitter?.fire()
   })
 }
