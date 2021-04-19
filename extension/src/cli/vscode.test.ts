@@ -176,7 +176,7 @@ describe('applyExperimentFromQuickPick', () => {
 
   const exampleListStdout = exampleExperimentsList.join('\n') + '\n'
 
-  it('invokes a QuickPick with the current experiment names as strings', async () => {
+  it('invokes a quickpick with a list of names from stdout and executes a constructed command', async () => {
     mockedExecPromise.mockResolvedValue({
       stdout: 'output from apply',
       stderr: ''
@@ -188,16 +188,6 @@ describe('applyExperimentFromQuickPick', () => {
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     await applyExperimentFromQuickPick(exampleConfig)
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
-  })
-
-  it('executes the proper command given a mocked selection', async () => {
-    mockedShowQuickPick.mockResolvedValue(exampleExpName)
-    mockedExecPromise.mockResolvedValue({
-      stdout: exampleListStdout,
-      stderr: ''
-    })
-
-    await applyExperimentFromQuickPick(exampleConfig)
 
     expect(mockedExecPromise).toBeCalledWith('dvc exp list --names-only', {
       cwd: '/home/user/project'
@@ -206,6 +196,36 @@ describe('applyExperimentFromQuickPick', () => {
     expect(mockedExecPromise).toBeCalledWith('dvc exp apply exp-2021', {
       cwd: '/home/user/project'
     })
+  })
+
+  it('displays an error message when there are no experiments to select', async () => {
+    mockedExecPromise.mockResolvedValue({
+      stdout: 'output from apply',
+      stderr: ''
+    })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: '',
+      stderr: ''
+    })
+    mockedShowQuickPick.mockResolvedValue(exampleExpName)
+    await applyExperimentFromQuickPick(exampleConfig)
+    expect(mockedShowQuickPick).not.toBeCalled()
+    expect(mockedShowErrorMessage).toBeCalledWith(
+      'There are no experiments to select!'
+    )
+  })
+
+  it('throws when catching an error without stderr', async () => {
+    mockedExecPromise.mockImplementation(() => {
+      throw new Error("This didn't work!")
+    })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: exampleListStdout,
+      stderr: ''
+    })
+
+    mockedShowQuickPick.mockResolvedValue(exampleExpName)
+    await expect(applyExperimentFromQuickPick(exampleConfig)).rejects.toThrow()
   })
 
   it('does not execute a command if the QuickPick is dismissed', async () => {

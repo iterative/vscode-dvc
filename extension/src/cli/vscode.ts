@@ -89,7 +89,7 @@ export const applyExperimentFromQuickPick = async (config: Config) => {
     const experiments = await experimentListCurrent(readerOptions)
 
     if (experiments.length === 0) {
-      window.showInformationMessage('There are no experiments to select!')
+      window.showErrorMessage('There are no experiments to select!')
     } else {
       const selectedExperimentName = await window.showQuickPick(experiments)
       if (selectedExperimentName !== undefined) {
