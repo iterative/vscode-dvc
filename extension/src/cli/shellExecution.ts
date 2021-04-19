@@ -2,7 +2,7 @@ import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { Commands } from './commands'
 import { getProcessEnv } from '../env'
-import { spawn } from 'child_process'
+import { ChildProcess, spawn } from 'child_process'
 import { Logger } from '../common/Logger'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
@@ -57,7 +57,7 @@ export const executeInShell = async ({
     stdOutEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
-}): Promise<void> => {
+}): Promise<ChildProcess> => {
   const executionDetails = getExecutionDetails(config, command)
 
   const stream = spawn(`${executionDetails.command}`, {
@@ -80,4 +80,5 @@ export const executeInShell = async ({
   stream.on('close', () => {
     emitters?.completedEventEmitter?.fire()
   })
+  return stream
 }

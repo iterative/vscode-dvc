@@ -18,6 +18,7 @@ export class PseudoTerminal {
   }
 
   private readonly stdOutEventEmitter: EventEmitter<string>
+  private readonly terminatedEventEmitter: EventEmitter<void>
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
     if (!this.instance) {
@@ -56,7 +57,9 @@ export class PseudoTerminal {
           this.stdOutEventEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
           resolve()
         },
-        close: () => {},
+        close: () => {
+          this.terminatedEventEmitter.fire()
+        },
         handleInput: data => {
           if (!this.isBlocked && data) {
             this.close()
@@ -72,9 +75,13 @@ export class PseudoTerminal {
       )
     })
 
-  constructor(stdOutEventEmitter: EventEmitter<string>) {
+  constructor(
+    stdOutEventEmitter: EventEmitter<string>,
+    terminatedEventEmitter: EventEmitter<void>
+  ) {
     this.termName = 'DVC'
     this.stdOutEventEmitter = stdOutEventEmitter
+    this.terminatedEventEmitter = terminatedEventEmitter
     this.blocked = false
   }
 }
