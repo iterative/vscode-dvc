@@ -28,7 +28,7 @@ export const queueExperimentCommand = async (config: Config) => {
 }
 
 export const experimentGcQuickPick = async (config: Config) => {
-  const quickPickResult = (await quickPickManyValues(
+  const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
     [
       {
         label: 'All Branches',
@@ -52,7 +52,7 @@ export const experimentGcQuickPick = async (config: Config) => {
       }
     ],
     { placeHolder: 'Select which Experiments to preserve' }
-  )) as GcPreserveFlag[]
+  )
 
   if (quickPickResult) {
     try {
