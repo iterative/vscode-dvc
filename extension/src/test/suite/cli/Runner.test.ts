@@ -12,7 +12,7 @@ import { Runner } from '../../../cli/Runner'
 chai.use(sinonChai)
 const { expect } = chai
 
-suite.only('Runner Test Suite', () => {
+suite('Runner Test Suite', () => {
   window.showInformationMessage('Start all runner tests.')
 
   describe('Runner', () => {
