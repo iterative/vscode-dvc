@@ -25,9 +25,9 @@ const mockGetRoot = mocked(getRoot)
 
 const mockedShowRepoQuickPick = mocked<
   (
-    items: { label: string }[],
+    items: string[],
     options: { canPickMany: false }
-  ) => Thenable<{ label: string } | undefined>
+  ) => Thenable<string | undefined>
 >(window.showQuickPick)
 
 beforeEach(() => {
@@ -170,9 +170,7 @@ describe('pickSingleRepositoryRoot', () => {
     const selectedRepo = '/some/path/to/repo/a'
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
-    mockedShowRepoQuickPick.mockResolvedValue({
-      label: selectedRepo
-    })
+    mockedShowRepoQuickPick.mockResolvedValue(selectedRepo)
 
     const repoRoot = await pickSingleRepositoryRoot([
       selectedRepo,

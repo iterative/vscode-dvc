@@ -104,13 +104,8 @@ export const pickSingleRepositoryRoot = async (
     return dvcRoots[0]
   }
 
-  const option = await window.showQuickPick(
-    dvcRoots.map(root => ({ label: root })),
-    {
-      canPickMany: false,
-      placeHolder: 'Select which repository to run experiments in'
-    }
-  )
-
-  return option?.label
+  return window.showQuickPick(dvcRoots, {
+    canPickMany: false,
+    placeHolder: 'Select which repository to run experiments in'
+  })
 }
