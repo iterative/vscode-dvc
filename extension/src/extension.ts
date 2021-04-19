@@ -18,7 +18,10 @@ import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import { Commands } from './cli/commands'
 import { Runner } from './cli/Runner'
-import { registerCommands as registerCliCommands } from './cli/vscode'
+import {
+  pickSingleRepositoryRoot,
+  registerCommands as registerCliCommands
+} from './cli/vscode'
 import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
@@ -101,28 +104,6 @@ export class Extension {
     return webview
   }
 
-  private async getSingleRepositoryRoot(
-    cwd?: string
-  ): Promise<string | undefined> {
-    if (cwd) {
-      return cwd
-    }
-
-    if (this.dvcRoots.length === 1) {
-      return this.dvcRoots[0]
-    }
-
-    const option = await window.showQuickPick(
-      this.dvcRoots.map(root => ({ label: root })),
-      {
-        canPickMany: false,
-        placeHolder: 'Select which repository to run experiments in'
-      }
-    )
-
-    return option?.label
-  }
-
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -165,7 +146,10 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async context => {
-        const cwd = await this.getSingleRepositoryRoot(context?.rootUri?.fsPath)
+        const cwd = await pickSingleRepositoryRoot(
+          this.dvcRoots,
+          context?.rootUri?.fsPath
+        )
         if (cwd) {
           this.runner.run(Commands.EXPERIMENT_RUN, cwd)
           this.showExperimentsWebview()

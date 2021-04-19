@@ -2,7 +2,8 @@ import { Config } from '../Config'
 import {
   GcQuickPickItem,
   experimentGcCommand,
-  queueExperimentCommand
+  queueExperimentCommand,
+  pickSingleRepositoryRoot
 } from './vscode'
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
@@ -17,11 +18,18 @@ jest.mock('vscode')
 const mockedExecPromise = mocked(execPromise)
 const mockedShowErrorMessage = mocked(window.showErrorMessage)
 const mockedShowInformationMessage = mocked(window.showInformationMessage)
-const mockedShowQuickPick = mocked<
+const mockedShowGCQuickPick = mocked<
   (
     items: GcQuickPickItem[],
     options: QuickPickOptions
   ) => Thenable<GcQuickPickItem[] | undefined>
+>(window.showQuickPick)
+
+const mockedShowRepoQuickPick = mocked<
+  (
+    items: { label: string }[],
+    options: { canPickMany: false }
+  ) => Thenable<{ label: string } | undefined>
 >(window.showQuickPick)
 
 beforeEach(() => {
@@ -57,7 +65,7 @@ describe('experimentGcCommand', () => {
 
   it('invokes a QuickPick with snapshotted options', async () => {
     await experimentGcCommand(exampleConfig)
-    expect(mockedShowQuickPick.mock.calls).toMatchInlineSnapshot(`
+    expect(mockedShowGCQuickPick.mock.calls).toMatchInlineSnapshot(`
       Array [
         Array [
           Array [
@@ -92,7 +100,7 @@ describe('experimentGcCommand', () => {
   })
 
   it('executes the proper command given a mocked selection', async () => {
-    mockedShowQuickPick.mockResolvedValue([
+    mockedShowGCQuickPick.mockResolvedValue([
       {
         detail: 'Preserve Experiments derived from all Git tags',
         flag: GcPreserveFlag.ALL_TAGS,
@@ -117,7 +125,7 @@ describe('experimentGcCommand', () => {
 
   it('reports stdout from the executed command via showInformationMessage', async () => {
     const stdout = 'example stdout that will be passed on'
-    mockedShowQuickPick.mockResolvedValue([])
+    mockedShowGCQuickPick.mockResolvedValue([])
     mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
     await experimentGcCommand(exampleConfig)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
@@ -125,7 +133,7 @@ describe('experimentGcCommand', () => {
 
   it('reports stderr from the executed command via showInformationMessage', async () => {
     const stderr = 'example stderr that will be passed on'
-    mockedShowQuickPick.mockResolvedValue([])
+    mockedShowGCQuickPick.mockResolvedValue([])
     mockedExecPromise.mockRejectedValue({ stderr, stdout: '' })
     await experimentGcCommand(exampleConfig)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
@@ -133,7 +141,7 @@ describe('experimentGcCommand', () => {
 
   it('reports the message from a non-shell Exception', async () => {
     const message = 'example message that will be passed on'
-    mockedShowQuickPick.mockResolvedValue([])
+    mockedShowGCQuickPick.mockResolvedValue([])
     mockedExecPromise.mockImplementation(() => {
       throw new Error(message)
     })
@@ -142,7 +150,7 @@ describe('experimentGcCommand', () => {
   })
 
   it('executes the proper default command given no selections', async () => {
-    mockedShowQuickPick.mockResolvedValue([])
+    mockedShowGCQuickPick.mockResolvedValue([])
 
     await experimentGcCommand(exampleConfig)
 
@@ -152,8 +160,55 @@ describe('experimentGcCommand', () => {
   })
 
   it('does not execute a command if the QuickPick is dismissed', async () => {
-    mockedShowQuickPick.mockResolvedValue(undefined)
+    mockedShowGCQuickPick.mockResolvedValue(undefined)
     await experimentGcCommand(exampleConfig)
     expect(mockedExecPromise).not.toBeCalled()
+  })
+})
+
+describe('pickSingleRepositoryRoot', () => {
+  it('should return the optional repository if provided', async () => {
+    const optionallyProvidedRepo = '/some/path/to/repo/b'
+    const repoRoot = await pickSingleRepositoryRoot(
+      ['/some/path/to/repo/a', optionallyProvidedRepo],
+      optionallyProvidedRepo
+    )
+    expect(repoRoot).toEqual(optionallyProvidedRepo)
+  })
+
+  it('should return the only repository if only one is provided', async () => {
+    const singleRepo = '/some/path/to/repo/a'
+    const repoRoot = await pickSingleRepositoryRoot([singleRepo])
+    expect(repoRoot).toEqual(singleRepo)
+  })
+
+  it('should return the selected option if multiple repositories are available and one is selected', async () => {
+    const selectedRepo = '/some/path/to/repo/a'
+    const unselectedRepoB = '/some/path/to/repo/b'
+    const unselectedRepoC = '/some/path/to/repo/c'
+    mockedShowRepoQuickPick.mockResolvedValue({
+      label: selectedRepo
+    })
+
+    const repoRoot = await pickSingleRepositoryRoot([
+      selectedRepo,
+      unselectedRepoB,
+      unselectedRepoC
+    ])
+    expect(repoRoot).toEqual(selectedRepo)
+  })
+
+  it('should return undefined if multiple repositories are available and none are selected', async () => {
+    const selectedRepo = '/some/path/to/repo/a'
+    const unselectedRepoB = '/some/path/to/repo/b'
+    const unselectedRepoC = '/some/path/to/repo/c'
+    mockedShowRepoQuickPick.mockResolvedValue(undefined)
+
+    const repoRoot = await pickSingleRepositoryRoot([
+      selectedRepo,
+      unselectedRepoB,
+      unselectedRepoC
+    ])
+    expect(repoRoot).toBeUndefined()
   })
 })
