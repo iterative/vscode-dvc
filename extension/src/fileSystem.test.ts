@@ -162,7 +162,7 @@ describe('pickSingleRepositoryRoot', () => {
     expect(repoRoot).toEqual(optionallyProvidedRepo)
   })
 
-  it('should return the only repository if only one is provided', async () => {
+  it('should return the single repository if only one is found', async () => {
     const singleRepo = '/some/path/to/repo/a'
 
     jest
@@ -173,7 +173,7 @@ describe('pickSingleRepositoryRoot', () => {
     expect(repoRoot).toEqual(singleRepo)
   })
 
-  it('should return the selected option if multiple repositories are available and one is selected', async () => {
+  it('should return the selected option if multiple repositories are found and one is selected', async () => {
     const selectedRepo = '/some/path/to/repo/a'
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
@@ -188,7 +188,7 @@ describe('pickSingleRepositoryRoot', () => {
     expect(repoRoot).toEqual(selectedRepo)
   })
 
-  it('should return undefined if multiple repositories are available and none are selected', async () => {
+  it('should return undefined if multiple repositories are found but none are selected', async () => {
     const selectedRepo = '/some/path/to/repo/a'
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
