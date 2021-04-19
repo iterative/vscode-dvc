@@ -57,12 +57,13 @@ describe('getExperiments', () => {
       })
 
     const experiments = await getExperiments({
-      cliPath: 'dvc',
+      config: {} as Config,
       cwd
     })
     expect(experiments).toMatchSnapshot()
     expect(execPromiseSpy).toBeCalledWith('dvc exp show --show-json', {
-      cwd
+      cwd,
+      env: process.env
     })
   })
 })

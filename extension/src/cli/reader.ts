@@ -31,11 +31,6 @@ export const execCommand = async (
   return stdout
 }
 
-export const getExperiments = async (
-  options: ReaderOptions
-): Promise<ExperimentsRepoJSONOutput> =>
-  JSON.parse(await execCommand(options, Commands.EXPERIMENT_SHOW))
-
 export const initializeDirectory = async (
   options: ReaderOptions
 ): Promise<string> => execCommand(options, Commands.INITIALIZE_SUBDIRECTORY)
@@ -82,6 +77,14 @@ const executeAndParseJson = async <T>(
   const stdout = await executeProcess(options, command)
   return JSON.parse(stdout)
 }
+
+export const getExperiments = async (
+  options: ExecutionOptions
+): Promise<ExperimentsRepoJSONOutput> =>
+  executeAndParseJson<ExperimentsRepoJSONOutput>(
+    options,
+    Commands.EXPERIMENT_SHOW
+  )
 
 export const listDvcOnlyRecursive = async (
   options: ExecutionOptions
