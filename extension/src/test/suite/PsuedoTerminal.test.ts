@@ -72,7 +72,7 @@ suite('Pseudo Terminal Test Suite', () => {
       const pseudoTerminal = new PseudoTerminal(stdOutEventEmitter)
       disposable.track(pseudoTerminal)
 
-      await pseudoTerminal.ready
+      await pseudoTerminal.openCurrentInstance()
       const firstText = 'some-really-long-string'
       const secondText = ':weeeee:'
 
