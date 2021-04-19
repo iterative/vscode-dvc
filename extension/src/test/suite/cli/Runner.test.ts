@@ -37,5 +37,24 @@ suite('Runner Test Suite', () => {
       expect(windowErrorMessageSpy).to.be.called
       disposable.dispose()
     }).timeout(6000)
+
+    it('should be able to stop a started command', async () => {
+      const disposable = Disposable.fn()
+      const runner = disposable.track(new Runner({} as Config))
+
+      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
+        'sleep 10'
+      )
+
+      await runner.run(Commands.STATUS, __dirname)
+      stubbedGetCommand.restore()
+
+      expect(runner.isRunning()).to.be.true
+
+      runner.stop()
+
+      expect(runner.isRunning()).to.be.false
+      disposable.dispose()
+    }).timeout(2000)
   })
 })
