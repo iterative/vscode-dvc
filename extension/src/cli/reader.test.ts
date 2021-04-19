@@ -175,7 +175,7 @@ describe('getRoot', () => {
   })
 })
 
-describe('getTracked', () => {
+describe('listDvcOnlyRecursive', () => {
   it('should return all relative tracked paths', async () => {
     const stdout =
       `data/MNIST/raw/t10k-images-idx3-ubyte\n` +
