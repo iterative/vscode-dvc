@@ -2,7 +2,7 @@ import { Commands, GcPreserveFlag } from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
-import { getExecutionDetails } from './shellExecution'
+import { getExecutionDetails } from './executionDetails'
 import { Config } from '../Config'
 
 interface ReaderOptions {
@@ -58,13 +58,12 @@ interface ExecutionOptions {
 export const listDvcOnlyRecursive = async (
   executionOptions: ExecutionOptions
 ): Promise<string[]> => {
-  const { config, cwd } = executionOptions
   const { command, env } = getExecutionDetails(
-    config,
+    executionOptions.config,
     Commands.LIST_DVC_ONLY_RECURSIVE
   )
   const { stdout } = await execPromise(command, {
-    cwd,
+    cwd: executionOptions.cwd,
     env
   })
   return trimAndSplit(stdout)
@@ -76,10 +75,12 @@ export const status = async (
   string,
   (Record<string, Record<string, string>> | string)[]
 >> => {
-  const { config, cwd } = executionOptions
-  const { command, env } = getExecutionDetails(config, Commands.STATUS)
+  const { command, env } = getExecutionDetails(
+    executionOptions.config,
+    Commands.STATUS
+  )
   const { stdout } = await execPromise(command, {
-    cwd,
+    cwd: executionOptions.cwd,
     env
   })
   return JSON.parse(stdout)

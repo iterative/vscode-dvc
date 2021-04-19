@@ -3,14 +3,14 @@ import chai from 'chai'
 import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
-import * as shellExecuter from '../../../cli/shellExecution'
+import * as ExecutionDetails from '../../../cli/executionDetails'
+import { executeInShell } from '../../../cli/shellExecution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
 
 chai.use(sinonChai)
 const { expect } = chai
-const { executeInShell } = shellExecuter
 
 suite('Shell Execution Test Suite', () => {
   window.showInformationMessage('Start all shell execution tests.')
@@ -62,7 +62,7 @@ suite('Shell Execution Test Suite', () => {
         disposable
       )
 
-      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
+      const stubbedGetCommand = stub(ExecutionDetails, 'getCommand').returns(
         command
       )
 

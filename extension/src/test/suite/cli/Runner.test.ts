@@ -3,7 +3,7 @@ import chai from 'chai'
 import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
-import * as shellExecuter from '../../../cli/shellExecution'
+import * as ExecutionDetails from '../../../cli/executionDetails'
 import { Commands } from '../../../cli/commands'
 import { Disposable } from '../../../extension'
 import { Config } from '../../../Config'
@@ -21,7 +21,7 @@ suite('Runner Test Suite', () => {
       const runner = disposable.track(new Runner({} as Config))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
-      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
+      const stubbedGetCommand = stub(ExecutionDetails, 'getCommand').returns(
         'sleep 3'
       )
 
@@ -42,7 +42,7 @@ suite('Runner Test Suite', () => {
       const disposable = Disposable.fn()
       const runner = disposable.track(new Runner({} as Config))
 
-      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
+      const stubbedGetCommand = stub(ExecutionDetails, 'getCommand').returns(
         'sleep 10'
       )
 
