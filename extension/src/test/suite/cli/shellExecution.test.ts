@@ -78,6 +78,7 @@ suite('Shell Execution Test Suite', () => {
           startedEventEmitter
         }
       })
+      stubbedGetCommand.restore()
 
       await started
       expect((await eventStream).includes(text)).to.be.true

@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha'
 import chai from 'chai'
-import { stub } from 'sinon'
+import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import * as shellExecuter from '../../../cli/shellExecution'
@@ -16,19 +16,24 @@ suite('Runner Test Suite', () => {
   window.showInformationMessage('Start all runner tests.')
 
   describe('Runner', () => {
-    it("should be able to run a single command and send the ouput to it's pseudoTerminal", async () => {
+    it('should only be able to run a single command at a time', async () => {
       const disposable = Disposable.fn()
       const runner = disposable.track(new Runner({} as Config))
 
+      const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
-        'echo tessssssst'
+        'sleep 3'
       )
 
-      const x = await runner.run(Commands.STATUS, __dirname)
+      const firstRun = runner.run(Commands.STATUS, __dirname)
+      const secondRun = runner.run(Commands.STATUS, __dirname)
 
-      expect(x).not.to.throw
+      await firstRun
       expect(stubbedGetCommand).to.be.called
+      await secondRun
+      stubbedGetCommand.restore()
+      expect(windowErrorMessageSpy).to.be.called
       disposable.dispose()
-    })
+    }).timeout(6000)
   })
 })
