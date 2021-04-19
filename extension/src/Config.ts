@@ -11,6 +11,10 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
+import {
+  getOnDidChangePythonExecutionDetails,
+  getPythonBinPath
+} from './extensions/python'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -18,6 +22,9 @@ export class Config {
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
   readonly onDidChange: Event<ConfigurationChangeEvent>
+
+  @observable
+  public pythonBinPath: string | undefined
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -106,6 +113,19 @@ export class Config {
 
   constructor() {
     makeObservable(this)
+
+    getPythonBinPath().then(path => {
+      this.pythonBinPath = path
+    })
+
+    getOnDidChangePythonExecutionDetails().then(
+      onDidChangePythonExecutionDetails =>
+        this.dispose.track(
+          onDidChangePythonExecutionDetails?.(async () => {
+            this.pythonBinPath = await getPythonBinPath()
+          })
+        )
+    )
 
     this.workspaceRoot = this.getWorkspaceRoot()
 

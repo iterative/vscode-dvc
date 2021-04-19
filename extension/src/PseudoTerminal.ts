@@ -1,95 +1,59 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
-import { Commands } from './cli/commands'
-import { execPromise } from './util'
-
-const writeEmitter = new EventEmitter<string>()
 export class PseudoTerminal {
-  static termName = 'DVC'
-  private static instance: Terminal | undefined
+  private termName: string
+  private instance: Terminal | undefined
+  public writeEmitter: EventEmitter<string>
 
-  static openCurrentInstance = async (): Promise<Terminal | undefined> => {
-    if (!PseudoTerminal.instance) {
-      await PseudoTerminal.initializeInstance()
+  public openCurrentInstance = async (): Promise<Terminal | undefined> => {
+    if (!this.instance) {
+      await this.initializeInstance()
     }
-    PseudoTerminal.instance?.show(true)
-    return PseudoTerminal.instance
+    this.instance?.show(true)
+    return this.instance
   }
 
-  static run = async (command: string): Promise<void> =>
-    new Promise(resolve => {
-      PseudoTerminal.openCurrentInstance().then(() => {
-        writeEmitter.fire(`${command}\r\n`)
-
-        const childProcess = execPromise(command, {
-          env: { PATH: '$PATH' },
-          cwd: __dirname
-        }).child
-
-        childProcess.stdout?.on('data', stdout => {
-          const output = stdout
-            .toString()
-            .split(/(\r?\n)/g)
-            .join('\r')
-          writeEmitter.fire(output)
-        })
-
-        childProcess.on('close', () => {
-          writeEmitter.fire(
-            '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
-          )
-          resolve()
-        })
-      })
-    })
-
-  static runCommand = async (command: string): Promise<void> => {
-    return PseudoTerminal.run(`dvc ${command}`)
-  }
-
-  static dispose = (): void => {
-    const currentTerminal = PseudoTerminal.instance
+  public dispose = (): void => {
+    const currentTerminal = this.instance
     if (currentTerminal) {
       currentTerminal.dispose()
-      PseudoTerminal.instance = undefined
+      this.instance = undefined
     }
   }
 
-  private static initializeInstance = async (): Promise<void> => {
-    PseudoTerminal.deleteReferenceOnClose()
-    return PseudoTerminal.createInstance()
+  private initializeInstance = async (): Promise<void> => {
+    this.deleteReferenceOnClose()
+    return this.createInstance()
   }
 
-  private static deleteReferenceOnClose = (): void => {
+  private deleteReferenceOnClose = (): void => {
     window.onDidCloseTerminal(async event => {
-      if (PseudoTerminal.instance && event.name === PseudoTerminal.termName) {
-        PseudoTerminal.instance = undefined
+      if (this.instance && event.name === this.termName) {
+        this.instance = undefined
       }
     })
   }
 
-  private static createInstance = async (): Promise<void> =>
+  private createInstance = async (): Promise<void> =>
     new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
-        onDidWrite: writeEmitter.event,
+        onDidWrite: this.writeEmitter.event,
         open: () => {
-          writeEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
+          this.writeEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
           resolve()
         },
         close: () => {},
-        handleInput: data => writeEmitter.fire(data === '\r' ? '\r\n' : data)
+        handleInput: data =>
+          this.writeEmitter.fire(data === '\r' ? '\r\n' : data)
       }
 
-      PseudoTerminal.instance = window.createTerminal({
-        name: PseudoTerminal.termName,
+      this.instance = window.createTerminal({
+        name: this.termName,
         pty
       })
     })
-}
 
-export const runExperiment = (): Promise<void> => {
-  return PseudoTerminal.runCommand(Commands.EXPERIMENT_RUN)
-}
-
-export const runQueuedExperiments = (): Promise<void> => {
-  return PseudoTerminal.runCommand(Commands.EXPERIMENT_RUN_ALL)
+  constructor() {
+    this.termName = 'DVC'
+    this.writeEmitter = new EventEmitter<string>()
+  }
 }
