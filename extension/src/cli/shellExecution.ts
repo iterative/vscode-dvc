@@ -44,10 +44,11 @@ export const executeInShell = async ({
   }
 }): Promise<void> => {
   const execCommand = getCommand(config, command)
+  const execEnv = getEnv(config)
 
   const childProcess = spawn(execCommand, {
     cwd,
-    env: getEnv(config),
+    env: execEnv,
     shell: true
   })
   emitters?.startedEventEmitter?.fire()
