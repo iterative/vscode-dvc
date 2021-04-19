@@ -13,7 +13,6 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { IntegratedTerminal } from './IntegratedTerminal'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
@@ -141,8 +140,6 @@ export class Extension {
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
-
-    this.dispose.track(IntegratedTerminal)
 
     registerCliCommands(this.config, this.dispose)
 
