@@ -2,8 +2,7 @@ import { Config } from '../Config'
 import {
   GcQuickPickItem,
   experimentGcCommand,
-  queueExperimentCommand,
-  pickSingleRepositoryRoot
+  queueExperimentCommand
 } from './vscode'
 import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util'
@@ -23,13 +22,6 @@ const mockedShowGCQuickPick = mocked<
     items: GcQuickPickItem[],
     options: QuickPickOptions
   ) => Thenable<GcQuickPickItem[] | undefined>
->(window.showQuickPick)
-
-const mockedShowRepoQuickPick = mocked<
-  (
-    items: { label: string }[],
-    options: { canPickMany: false }
-  ) => Thenable<{ label: string } | undefined>
 >(window.showQuickPick)
 
 beforeEach(() => {
@@ -163,52 +155,5 @@ describe('experimentGcCommand', () => {
     mockedShowGCQuickPick.mockResolvedValue(undefined)
     await experimentGcCommand(exampleConfig)
     expect(mockedExecPromise).not.toBeCalled()
-  })
-})
-
-describe('pickSingleRepositoryRoot', () => {
-  it('should return the optional repository if provided', async () => {
-    const optionallyProvidedRepo = '/some/path/to/repo/b'
-    const repoRoot = await pickSingleRepositoryRoot(
-      ['/some/path/to/repo/a', optionallyProvidedRepo],
-      optionallyProvidedRepo
-    )
-    expect(repoRoot).toEqual(optionallyProvidedRepo)
-  })
-
-  it('should return the only repository if only one is provided', async () => {
-    const singleRepo = '/some/path/to/repo/a'
-    const repoRoot = await pickSingleRepositoryRoot([singleRepo])
-    expect(repoRoot).toEqual(singleRepo)
-  })
-
-  it('should return the selected option if multiple repositories are available and one is selected', async () => {
-    const selectedRepo = '/some/path/to/repo/a'
-    const unselectedRepoB = '/some/path/to/repo/b'
-    const unselectedRepoC = '/some/path/to/repo/c'
-    mockedShowRepoQuickPick.mockResolvedValue({
-      label: selectedRepo
-    })
-
-    const repoRoot = await pickSingleRepositoryRoot([
-      selectedRepo,
-      unselectedRepoB,
-      unselectedRepoC
-    ])
-    expect(repoRoot).toEqual(selectedRepo)
-  })
-
-  it('should return undefined if multiple repositories are available and none are selected', async () => {
-    const selectedRepo = '/some/path/to/repo/a'
-    const unselectedRepoB = '/some/path/to/repo/b'
-    const unselectedRepoC = '/some/path/to/repo/c'
-    mockedShowRepoQuickPick.mockResolvedValue(undefined)
-
-    const repoRoot = await pickSingleRepositoryRoot([
-      selectedRepo,
-      unselectedRepoB,
-      unselectedRepoC
-    ])
-    expect(repoRoot).toBeUndefined()
   })
 })

@@ -1,16 +1,18 @@
-import * as fileSystem from './fileSystem'
+import { window } from 'vscode'
 import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
+import * as fileSystem from './fileSystem'
 import { getRoot } from './cli/reader'
 
 const {
   addFileChangeHandler,
   findDvcRootPaths,
   getWatcher,
-  isDirectory
+  isDirectory,
+  pickSingleRepositoryRoot
 } = fileSystem
 
 jest.mock('chokidar')
@@ -20,6 +22,13 @@ jest.mock('./cli/reader')
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
 const mockGetRoot = mocked(getRoot)
+
+const mockedShowRepoQuickPick = mocked<
+  (
+    items: { label: string }[],
+    options: { canPickMany: false }
+  ) => Thenable<{ label: string } | undefined>
+>(window.showQuickPick)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -138,5 +147,52 @@ describe('isDirectory', () => {
   })
   it('should return false for an empty string', () => {
     expect(isDirectory('')).toBe(false)
+  })
+})
+
+describe('pickSingleRepositoryRoot', () => {
+  it('should return the optional repository if provided', async () => {
+    const optionallyProvidedRepo = '/some/path/to/repo/b'
+    const repoRoot = await pickSingleRepositoryRoot(
+      ['/some/path/to/repo/a', optionallyProvidedRepo],
+      optionallyProvidedRepo
+    )
+    expect(repoRoot).toEqual(optionallyProvidedRepo)
+  })
+
+  it('should return the only repository if only one is provided', async () => {
+    const singleRepo = '/some/path/to/repo/a'
+    const repoRoot = await pickSingleRepositoryRoot([singleRepo])
+    expect(repoRoot).toEqual(singleRepo)
+  })
+
+  it('should return the selected option if multiple repositories are available and one is selected', async () => {
+    const selectedRepo = '/some/path/to/repo/a'
+    const unselectedRepoB = '/some/path/to/repo/b'
+    const unselectedRepoC = '/some/path/to/repo/c'
+    mockedShowRepoQuickPick.mockResolvedValue({
+      label: selectedRepo
+    })
+
+    const repoRoot = await pickSingleRepositoryRoot([
+      selectedRepo,
+      unselectedRepoB,
+      unselectedRepoC
+    ])
+    expect(repoRoot).toEqual(selectedRepo)
+  })
+
+  it('should return undefined if multiple repositories are available and none are selected', async () => {
+    const selectedRepo = '/some/path/to/repo/a'
+    const unselectedRepoB = '/some/path/to/repo/b'
+    const unselectedRepoC = '/some/path/to/repo/c'
+    mockedShowRepoQuickPick.mockResolvedValue(undefined)
+
+    const repoRoot = await pickSingleRepositoryRoot([
+      selectedRepo,
+      unselectedRepoB,
+      unselectedRepoC
+    ])
+    expect(repoRoot).toBeUndefined()
   })
 })

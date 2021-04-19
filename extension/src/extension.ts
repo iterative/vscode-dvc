@@ -18,11 +18,12 @@ import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import { Commands } from './cli/commands'
 import { Runner } from './cli/Runner'
+import { registerCommands as registerCliCommands } from './cli/vscode'
 import {
-  pickSingleRepositoryRoot,
-  registerCommands as registerCliCommands
-} from './cli/vscode'
-import { addFileChangeHandler, findDvcRootPaths } from './fileSystem'
+  addFileChangeHandler,
+  findDvcRootPaths,
+  pickSingleRepositoryRoot
+} from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
