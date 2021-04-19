@@ -12,6 +12,10 @@ export class PseudoTerminal {
     return this.initialized
   }
 
+  public get isOpen(): boolean {
+    return !!this.instance
+  }
+
   private termName: string
   private instance: Terminal | undefined
 
