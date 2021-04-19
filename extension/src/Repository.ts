@@ -162,10 +162,10 @@ export class Repository {
   }
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const statusOutput = (await status({
-      cliPath: this.config.dvcPath,
-      cwd: this.dvcRoot
-    })) as Record<string, (ValidStageOrFileStatuses | string)[]>
+    const statusOutput = (await status(this.config, this.dvcRoot)) as Record<
+      string,
+      (ValidStageOrFileStatuses | string)[]
+    >
 
     const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
     return this.reduceToPathStatuses(filteredStatusOutput)

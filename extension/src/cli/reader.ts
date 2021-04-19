@@ -2,6 +2,8 @@ import { Commands, GcPreserveFlag } from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
+import { getExecutionDetails } from './shellExecution'
+import { Config } from '../Config'
 
 interface ReaderOptions {
   cliPath: string | undefined
@@ -54,11 +56,19 @@ export const listDvcOnlyRecursive = async (
   trimAndSplit(await execCommand(options, `list . --dvc-only -R`))
 
 export const status = async (
-  options: ReaderOptions
+  config: Config,
+  cwd: string
 ): Promise<Record<
   string,
   (Record<string, Record<string, string>> | string)[]
->> => JSON.parse(await execCommand(options, Commands.STATUS))
+>> => {
+  const executionDetails = getExecutionDetails(config, Commands.STATUS)
+  const { stdout } = await execPromise(executionDetails.command, {
+    cwd,
+    env: executionDetails.env
+  })
+  return JSON.parse(stdout)
+}
 
 export const queueExperiment = async (
   options: ReaderOptions

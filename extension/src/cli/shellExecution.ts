@@ -22,6 +22,19 @@ export const getCommand = (config: Config, command: Commands): string => {
   return `${cliPath} ${command}`
 }
 
+export const getExecutionDetails = (
+  config: Config,
+  command: Commands
+): {
+  env: NodeJS.ProcessEnv
+  command: string
+} => {
+  return {
+    env: getEnv(config),
+    command: getCommand(config, command)
+  }
+}
+
 const getOutput = (data: string | Buffer): string =>
   data
     .toString()

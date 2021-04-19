@@ -91,7 +91,7 @@ describe('Repository', () => {
       ])
       const emptySet = new Set()
 
-      expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
+      expect(mockedStatus).toBeCalledWith(config, dvcRoot)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith({
         cwd: dvcRoot,
@@ -186,7 +186,7 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir)
       ])
 
-      expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
+      expect(mockedStatus).toBeCalledWith(config, dvcRoot)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith({
         cwd: dvcRoot,
