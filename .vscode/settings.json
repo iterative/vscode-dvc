@@ -14,9 +14,11 @@
   "cSpell.words": [
     "DVCPATH",
     "MNIST",
+    "conda",
     "featurize",
     "isequal",
     "pseudoterminal",
+    "subdir",
     "submodules",
     "symlinked",
     "toplevel",
