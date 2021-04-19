@@ -17,24 +17,9 @@ const getEnv = (config: Config): NodeJS.ProcessEnv => {
   }
 }
 
-interface cliExecutionDetails {
-  env: NodeJS.ProcessEnv
-  command: string
-}
-
-export const getCommand = (cliPath: string, command: string): string =>
-  `${cliPath} ${command}`
-
-const getExecutionDetails = (
-  config: Config,
-  command: Commands
-): cliExecutionDetails => {
+export const getCommand = (config: Config, command: Commands): string => {
   const cliPath = config.dvcPath || 'dvc'
-  const env = getEnv(config)
-  return {
-    env,
-    command: getCommand(cliPath, command)
-  }
+  return `${cliPath} ${command}`
 }
 
 const getOutput = (data: string | Buffer): string =>
@@ -58,27 +43,29 @@ export const executeInShell = async ({
     startedEventEmitter?: EventEmitter<void>
   }
 }): Promise<ChildProcess> => {
-  const executionDetails = getExecutionDetails(config, command)
+  const execCommand = getCommand(config, command)
+  const execEnv = getEnv(config)
 
-  const stream = spawn(`${executionDetails.command}`, {
+  const childProcess = spawn(execCommand, {
     cwd,
-    env: executionDetails.env,
+    env: execEnv,
     shell: true
   })
   emitters?.startedEventEmitter?.fire()
 
-  stream.stdout?.on('data', chunk => {
+  childProcess.stdout?.on('data', chunk => {
     const output = getOutput(chunk)
     emitters?.stdOutEventEmitter?.fire(output)
   })
 
-  stream.stderr?.on('data', chunk => {
+  childProcess.stderr?.on('data', chunk => {
     const output = getOutput(chunk)
     Logger.error(output)
   })
 
-  stream.on('close', () => {
+  childProcess.on('close', () => {
     emitters?.completedEventEmitter?.fire()
   })
-  return stream
+
+  return childProcess
 }
