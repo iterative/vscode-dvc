@@ -22,9 +22,9 @@ export class Runner {
   private config: Config
 
   public async run(command: Commands, cwd: string) {
+    await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
       this.pseudoTerminal.setBlocked(true)
-      await this.pseudoTerminal.openCurrentInstance()
       this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
       this.currentProcess = await executeInShell({
         options: {
