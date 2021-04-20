@@ -71,29 +71,6 @@ export const experimentGcCommand = async (config: Config) => {
   }
 }
 
-export const pickSingleRepositoryRoot = async (
-  dvcRoots: string[],
-  providedRoot?: string
-): Promise<string | undefined> => {
-  if (providedRoot) {
-    return providedRoot
-  }
-
-  if (dvcRoots.length === 1) {
-    return dvcRoots[0]
-  }
-
-  const option = await window.showQuickPick(
-    dvcRoots.map(root => ({ label: root })),
-    {
-      canPickMany: false,
-      placeHolder: 'Select which repository to run experiments in'
-    }
-  )
-
-  return option?.label
-}
-
 export const registerCommands = (config: Config, disposer: Disposer) => {
   disposer.track(
     commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {

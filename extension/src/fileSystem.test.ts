@@ -1,17 +1,19 @@
-import * as fileSystem from './fileSystem'
+import { window } from 'vscode'
 import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
+import * as FileSystem from './fileSystem'
 import { getRoot } from './cli/reader'
 
 const {
   addFileChangeHandler,
   findDvcRootPaths,
   getWatcher,
-  isDirectory
-} = fileSystem
+  isDirectory,
+  pickSingleRepositoryRoot
+} = FileSystem
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
@@ -20,6 +22,13 @@ jest.mock('./cli/reader')
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
 const mockGetRoot = mocked(getRoot)
+
+const mockedShowRepoQuickPick = mocked<
+  (
+    items: string[],
+    options: { canPickMany: false }
+  ) => Thenable<string | undefined>
+>(window.showQuickPick)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -36,7 +45,7 @@ describe('addFileChangeHandler', () => {
     mockedWatch.mockReturnValue(mockedWatcher)
 
     const getWatcherSpy = jest
-      .spyOn(fileSystem, 'getWatcher')
+      .spyOn(FileSystem, 'getWatcher')
       .mockImplementationOnce(e => e)
 
     mockedDebounce.mockImplementationOnce(
@@ -138,5 +147,59 @@ describe('isDirectory', () => {
   })
   it('should return false for an empty string', () => {
     expect(isDirectory('')).toBe(false)
+  })
+})
+
+describe('pickSingleRepositoryRoot', () => {
+  it('should return the optional repository if provided', async () => {
+    const optionallyProvidedRepo = '/some/path/to/repo/b'
+
+    const repoRoot = await pickSingleRepositoryRoot(
+      '/some/path/to',
+      undefined,
+      optionallyProvidedRepo
+    )
+    expect(repoRoot).toEqual(optionallyProvidedRepo)
+  })
+
+  it('should return the single repository if only one is found', async () => {
+    const singleRepo = '/some/path/to/repo/a'
+
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([singleRepo])
+
+    const repoRoot = await pickSingleRepositoryRoot(singleRepo, undefined)
+    expect(repoRoot).toEqual(singleRepo)
+  })
+
+  it('should return the selected option if multiple repositories are found and one is selected', async () => {
+    const selectedRepo = '/some/path/to/repo/a'
+    const unselectedRepoB = '/some/path/to/repo/b'
+    const unselectedRepoC = '/some/path/to/repo/c'
+
+    mockedShowRepoQuickPick.mockResolvedValue(selectedRepo)
+
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
+
+    const repoRoot = await pickSingleRepositoryRoot('/some/path/to', undefined)
+    expect(repoRoot).toEqual(selectedRepo)
+  })
+
+  it('should return undefined if multiple repositories are found but none are selected', async () => {
+    const selectedRepo = '/some/path/to/repo/a'
+    const unselectedRepoB = '/some/path/to/repo/b'
+    const unselectedRepoC = '/some/path/to/repo/c'
+
+    mockedShowRepoQuickPick.mockResolvedValue(undefined)
+
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
+
+    const repoRoot = await pickSingleRepositoryRoot('/some/path/to', undefined)
+    expect(repoRoot).toBeUndefined()
   })
 })

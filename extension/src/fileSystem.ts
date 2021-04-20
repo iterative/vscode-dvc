@@ -6,6 +6,7 @@ import { readdir } from 'fs-extra'
 import { join, resolve } from 'path'
 import { getRoot } from './cli/reader'
 import { definedAndNonEmpty } from './util'
+import { window } from 'vscode'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -89,4 +90,24 @@ export const findDvcRootPaths = async (
   }
 
   return [absoluteRoot]
+}
+
+export const pickSingleRepositoryRoot = async (
+  cwd: string,
+  cliPath: string | undefined,
+  providedRoot?: string
+): Promise<string | undefined> => {
+  if (providedRoot) {
+    return providedRoot
+  }
+
+  const dvcRoots = await findDvcRootPaths(cwd, cliPath)
+  if (dvcRoots.length === 1) {
+    return dvcRoots[0]
+  }
+
+  return window.showQuickPick(dvcRoots, {
+    canPickMany: false,
+    placeHolder: 'Select which repository to run experiments in'
+  })
 }
