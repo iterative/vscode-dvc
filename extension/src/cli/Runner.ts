@@ -33,8 +33,8 @@ export class Runner {
       },
       emitters: {
         completedEventEmitter: this.completedEventEmitter,
-        stdOutEventEmitter: this.stdOutEventEmitter,
-        startedEventEmitter: this.startedEventEmitter
+        startedEventEmitter: this.startedEventEmitter,
+        stdOutEventEmitter: this.stdOutEventEmitter
       }
     })
   }
