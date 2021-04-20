@@ -99,12 +99,14 @@ describe('initializeDirectory', () => {
 
     const output = await initializeDirectory({
       cliPath: 'dvc',
-      cwd: fsPath
+      cwd: fsPath,
+      pythonBinPath: undefined
     })
     expect(output).toEqual(stdout)
 
     expect(execPromiseSpy).toBeCalledWith('dvc init --subdir', {
-      cwd: fsPath
+      cwd: fsPath,
+      env: process.env
     })
   })
 })

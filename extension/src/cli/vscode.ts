@@ -99,7 +99,8 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
       initializeDirectory({
         cwd: fsPath,
-        cliPath: config.dvcPath
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
       })
     })
   )

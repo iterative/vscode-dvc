@@ -30,10 +30,6 @@ export const execCommand = async (
   return stdout
 }
 
-export const initializeDirectory = async (
-  options: ReaderOptions
-): Promise<string> => execCommand(options, Commands.INITIALIZE_SUBDIRECTORY)
-
 const executeProcess = async (
   options: ExecutionOptions,
   command: Commands
@@ -87,6 +83,10 @@ export const getExperiments = async (
     options,
     Commands.EXPERIMENT_SHOW
   )
+
+export const initializeDirectory = async (
+  options: ExecutionOptions
+): Promise<string> => executeProcess(options, Commands.INITIALIZE_SUBDIRECTORY)
 
 export const listDvcOnlyRecursive = async (
   options: ExecutionOptions
