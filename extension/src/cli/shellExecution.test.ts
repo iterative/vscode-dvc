@@ -1,7 +1,6 @@
 import { ChildProcess, spawn } from 'child_process'
 import { Commands } from './commands'
 import { executeInShell } from './shellExecution'
-import { Config } from '../Config'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
@@ -25,15 +24,17 @@ describe('executeInShell', () => {
   it('should pass the correct details to spawn given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
-    const config = { dvcPath: '' } as Config
     const expectedCommand = `dvc ${Commands.CHECKOUT}`
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
     await executeInShell({
-      config,
-      cwd,
-      command: Commands.CHECKOUT
+      options: {
+        command: Commands.CHECKOUT,
+        cliPath: '',
+        cwd,
+        pythonBinPath: undefined
+      }
     })
 
     expect(mockedSpawn).toBeCalledWith(expectedCommand, {
@@ -46,18 +47,20 @@ describe('executeInShell', () => {
   it('should pass the correct details to spawn given a path to the cli but no python binary path', async () => {
     const existingPath = '/do/not/need/a/path'
     const processEnv = { PATH: existingPath }
-    const dvcPath = '/some/path/to/dvc'
-    const config = { dvcPath } as Config
+    const cliPath = '/some/path/to/dvc'
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
     await executeInShell({
-      config,
-      cwd,
-      command: Commands.CHECKOUT
+      options: {
+        command: Commands.CHECKOUT,
+        cliPath,
+        cwd,
+        pythonBinPath: undefined
+      }
     })
 
-    expect(mockedSpawn).toBeCalledWith(`${dvcPath} ${Commands.CHECKOUT}`, {
+    expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
       cwd,
       env: processEnv,
       shell: true
@@ -71,19 +74,21 @@ describe('executeInShell', () => {
       '/Users/robot/.config/yarn/link/node_modules/.bin:/Users/robot/.nvm/versions/node/v12.20.1/libexec/lib/node_modules/npm/bin/node-gyp-bin'
     mockedGetEnv.mockReturnValueOnce({ PATH: existingPath })
 
-    const dvcPath = '/some/path/to/dvc'
+    const cliPath = '/some/path/to/dvc'
     const pythonBinPath = '/some/conda/path/bin'
-    const config = { dvcPath, pythonBinPath } as Config
 
     const cwd = __dirname
 
     await executeInShell({
-      config,
-      cwd,
-      command: Commands.CHECKOUT
+      options: {
+        cliPath,
+        command: Commands.CHECKOUT,
+        cwd,
+        pythonBinPath
+      }
     })
 
-    expect(mockedSpawn).toBeCalledWith(`${dvcPath} ${Commands.CHECKOUT}`, {
+    expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
       cwd,
       env: { PATH: `${pythonBinPath}:${existingPath}` },
       shell: true
@@ -95,16 +100,16 @@ describe('executeInShell', () => {
     mockedGetEnv.mockReturnValueOnce({ PATH: existingPath })
 
     const pythonBinPath = '/some/conda/path/bin'
-    const config = {
-      pythonBinPath
-    } as Config
 
     const cwd = __dirname
 
     await executeInShell({
-      config,
-      cwd,
-      command: Commands.CHECKOUT
+      options: {
+        cliPath: undefined,
+        command: Commands.CHECKOUT,
+        cwd,
+        pythonBinPath
+      }
     })
 
     expect(mockedSpawn).toBeCalledWith(`dvc ${Commands.CHECKOUT}`, {

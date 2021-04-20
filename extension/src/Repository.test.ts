@@ -91,12 +91,17 @@ describe('Repository', () => {
       ])
       const emptySet = new Set()
 
-      expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
-      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith({
+      const expectedExecutionOptions = {
+        cliPath: undefined,
         cwd: dvcRoot,
-        cliPath: undefined
-      })
+        pythonBinPath: undefined
+      }
+
+      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
+        expectedExecutionOptions
+      )
 
       expect(repository.getState()).toEqual({
         dispose: Disposable.fn(),
@@ -186,12 +191,17 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir)
       ])
 
-      expect(mockedStatus).toBeCalledWith({ cwd: dvcRoot, cliPath: undefined })
-      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith({
+      const expectedExecutionOptions = {
+        cliPath: undefined,
         cwd: dvcRoot,
-        cliPath: undefined
-      })
+        pythonBinPath: undefined
+      }
+
+      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
+        expectedExecutionOptions
+      )
 
       expect(repository.getState()).toEqual({
         dispose: Disposable.fn(),

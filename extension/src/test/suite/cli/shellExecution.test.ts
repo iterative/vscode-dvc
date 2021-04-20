@@ -3,14 +3,13 @@ import chai from 'chai'
 import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
-import * as shellExecuter from '../../../cli/shellExecution'
+import * as ExecutionDetails from '../../../cli/executionDetails'
+import { executeInShell } from '../../../cli/shellExecution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
-import { Config } from '../../../Config'
 
 chai.use(sinonChai)
 const { expect } = chai
-const { executeInShell } = shellExecuter
 
 suite('Shell Execution Test Suite', () => {
   window.showInformationMessage('Start all shell execution tests.')
@@ -62,28 +61,37 @@ suite('Shell Execution Test Suite', () => {
         disposable
       )
 
-      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
-        command
-      )
-
       const cwd = __dirname
 
+      const stubbedGetExecutionDetails = stub(
+        ExecutionDetails,
+        'getExecutionDetails'
+      ).returns({ command, cwd, env: {} })
+
       executeInShell({
-        config: {} as Config,
-        command: Commands.STATUS,
-        cwd,
+        options: {
+          command: Commands.STATUS,
+          cliPath: undefined,
+          cwd,
+          pythonBinPath: undefined
+        },
         emitters: {
           completedEventEmitter,
           stdOutEventEmitter,
           startedEventEmitter
         }
       })
-      stubbedGetCommand.restore()
+      stubbedGetExecutionDetails.restore()
 
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
-      expect(stubbedGetCommand).to.be.calledWith({}, 'status --show-json')
+      expect(stubbedGetExecutionDetails).to.be.calledWith({
+        cliPath: undefined,
+        command: 'status --show-json',
+        cwd,
+        pythonBinPath: undefined
+      })
       disposable.dispose()
     }).timeout(12000)
   })

@@ -3,7 +3,7 @@ import chai from 'chai'
 import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
-import * as shellExecuter from '../../../cli/shellExecution'
+import * as ExecutionDetails from '../../../cli/executionDetails'
 import { Commands } from '../../../cli/commands'
 import { Disposable } from '../../../extension'
 import { Config } from '../../../Config'
@@ -21,19 +21,35 @@ suite('Runner Test Suite', () => {
       const runner = disposable.track(new Runner({} as Config))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
-      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
-        'sleep 3'
-      )
+      const cwd = __dirname
+      const stubbedGetExecutionDetails = stub(
+        ExecutionDetails,
+        'getExecutionDetails'
+      ).returns({
+        command: 'sleep 3',
+        cwd,
+        env: {}
+      })
 
-      const firstRun = runner.run(Commands.STATUS, __dirname)
-      const secondRun = runner.run(Commands.CHECKOUT, __dirname)
+      const firstRun = runner.run(Commands.STATUS, cwd)
+      const secondRun = runner.run(Commands.CHECKOUT, cwd)
 
       await firstRun
       await secondRun
-      stubbedGetCommand.restore()
+      stubbedGetExecutionDetails.restore()
 
-      expect(stubbedGetCommand).to.be.calledWith({}, Commands.STATUS)
-      expect(stubbedGetCommand).not.to.be.calledWith({}, Commands.CHECKOUT)
+      expect(stubbedGetExecutionDetails).to.be.calledWith({
+        cliPath: undefined,
+        command: Commands.STATUS,
+        cwd,
+        pythonBinPath: undefined
+      })
+      expect(stubbedGetExecutionDetails).not.to.be.calledWith({
+        cliPath: undefined,
+        command: Commands.CHECKOUT,
+        cwd,
+        pythonBinPath: undefined
+      })
       expect(windowErrorMessageSpy).to.be.called
       disposable.dispose()
     }).timeout(6000)
@@ -41,13 +57,18 @@ suite('Runner Test Suite', () => {
     it('should be able to stop a started command', async () => {
       const disposable = Disposable.fn()
       const runner = disposable.track(new Runner({} as Config))
+      const cwd = __dirname
+      const stubbedGetExecutionDetails = stub(
+        ExecutionDetails,
+        'getExecutionDetails'
+      ).returns({
+        command: 'sleep 10',
+        cwd,
+        env: {}
+      })
 
-      const stubbedGetCommand = stub(shellExecuter, 'getCommand').returns(
-        'sleep 10'
-      )
-
-      await runner.run(Commands.STATUS, __dirname)
-      stubbedGetCommand.restore()
+      await runner.run(Commands.STATUS, cwd)
+      stubbedGetExecutionDetails.restore()
 
       expect(runner.isRunning()).to.be.true
 

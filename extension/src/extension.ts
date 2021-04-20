@@ -52,7 +52,11 @@ export class Extension {
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await findDvcRootPaths(workspaceRoot, this.config.dvcPath)
+    const dvcRoots = await findDvcRootPaths({
+      cliPath: this.config.dvcPath,
+      cwd: workspaceRoot,
+      pythonBinPath: this.config.pythonBinPath
+    })
 
     this.initializeDecorationProvidersEarly(dvcRoots)
 
@@ -93,8 +97,9 @@ export class Extension {
 
   private refreshExperimentsWebview = async () => {
     const experiments = await getExperiments({
-      cwd: this.config.workspaceRoot,
-      cliPath: this.config.dvcPath
+      pythonBinPath: this.config.pythonBinPath,
+      cliPath: this.config.dvcPath,
+      cwd: this.config.workspaceRoot
     })
     return this.webviewManager.refreshExperiments(experiments)
   }
@@ -110,8 +115,11 @@ export class Extension {
     context?: { rootUri?: Uri }
   ) {
     const dvcRoot = await pickSingleRepositoryRoot(
-      this.config.workspaceRoot,
-      this.config.dvcPath,
+      {
+        cliPath: this.config.dvcPath,
+        cwd: this.config.workspaceRoot,
+        pythonBinPath: this.config.pythonBinPath
+      },
       context?.rootUri?.fsPath
     )
     if (dvcRoot) {
@@ -180,7 +188,11 @@ export class Extension {
           this.dispose.track(disposable)
         )
 
-        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+        const dvcRoots = await findDvcRootPaths({
+          cliPath: this.config.dvcPath,
+          cwd: gitRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
         dvcRoots.forEach(async dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 

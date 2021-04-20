@@ -1,48 +1,19 @@
-import { mocked } from 'ts-jest/utils'
 import {
-  getExperiments,
   checkout,
-  initializeDirectory,
   checkoutRecursive,
+  getExperiments,
   getRoot,
-  listDvcOnlyRecursive,
-  getDvcInvocation
+  initializeDirectory,
+  listDvcOnlyRecursive
 } from './reader'
 import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
-import { getPythonExecutionDetails } from '../extensions/python'
 
 jest.mock('fs')
-jest.mock('../extensions/python')
-
-const mockedGetPythonExecutionDetails = mocked(getPythonExecutionDetails)
 
 beforeEach(() => {
   jest.resetAllMocks()
-})
-
-describe('getDvcInvocation', () => {
-  it('should utilize an interpreter path from the Python extension by default', async () => {
-    const testPythonBin = '/custom/path/to/python'
-    mockedGetPythonExecutionDetails.mockResolvedValue([testPythonBin])
-    expect(await getDvcInvocation({ cliPath: '', cwd: './' })).toEqual(
-      `${testPythonBin} -m dvc`
-    )
-  })
-
-  it('should ignore a path from the Python extension when cliPath is defined', async () => {
-    const testPythonBin = '/custom/path/to/python'
-    mockedGetPythonExecutionDetails.mockResolvedValue(['/wrong/python/bin'])
-    expect(
-      await getDvcInvocation({ cliPath: testPythonBin, cwd: './' })
-    ).toEqual(testPythonBin)
-  })
-
-  it('should return a simple dvc call when no Python extension is present', async () => {
-    mockedGetPythonExecutionDetails.mockResolvedValue(undefined)
-    expect(await getDvcInvocation({ cliPath: '', cwd: './' })).toEqual('dvc')
-  })
 })
 
 describe('getExperiments', () => {
@@ -56,13 +27,17 @@ describe('getExperiments', () => {
       })
 
     const experiments = await getExperiments({
-      cliPath: 'dvc',
+      cliPath: undefined,
+      pythonBinPath: undefined,
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(execPromiseSpy).toBeCalledWith('dvc exp show --show-json', {
-      cwd
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc exp show --show-json',
+      expect.objectContaining({
+        cwd
+      })
+    )
   })
 })
 
@@ -97,19 +72,23 @@ describe('initializeDirectory', () => {
 
     const output = await initializeDirectory({
       cliPath: 'dvc',
-      cwd: fsPath
+      cwd: fsPath,
+      pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout)
+    expect(output).toEqual(stdout.trim())
 
-    expect(execPromiseSpy).toBeCalledWith('dvc init --subdir', {
-      cwd: fsPath
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc init --subdir',
+      expect.objectContaining({
+        cwd: fsPath
+      })
+    )
   })
 })
 describe('checkout', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
-    const stdout = `M       model.pt\n\rM       logs/\n\r`
+    const stdout = `M       model.pt\nM       logs/\n`
     const execPromiseSpy = jest
       .spyOn(Util, 'execPromise')
       .mockResolvedValueOnce({
@@ -119,20 +98,24 @@ describe('checkout', () => {
 
     const output = await checkout({
       cliPath: 'dvc',
-      cwd: fsPath
+      cwd: fsPath,
+      pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout)
+    expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
-    expect(execPromiseSpy).toBeCalledWith('dvc checkout', {
-      cwd: fsPath
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc checkout',
+      expect.objectContaining({
+        cwd: fsPath
+      })
+    )
   })
 })
 
 describe('checkoutRecursive', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
-    const stdout = `M       model.pt\n\rM       logs/\n\r`
+    const stdout = `M       model.pt\nM       logs/\n`
     const execPromiseSpy = jest
       .spyOn(Util, 'execPromise')
       .mockResolvedValueOnce({
@@ -142,13 +125,17 @@ describe('checkoutRecursive', () => {
 
     const output = await checkoutRecursive({
       cliPath: 'dvc',
-      cwd: fsPath
+      cwd: fsPath,
+      pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout)
+    expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
-    expect(execPromiseSpy).toBeCalledWith('dvc checkout --recursive', {
-      cwd: fsPath
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc checkout --recursive',
+      expect.objectContaining({
+        cwd: fsPath
+      })
+    )
   })
 })
 
@@ -164,17 +151,21 @@ describe('getRoot', () => {
         stderr: ''
       })
     const relativeRoot = await getRoot({
+      cliPath: 'dvc',
       cwd,
-      cliPath: 'dvc'
+      pythonBinPath: undefined
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
-    expect(execPromiseSpy).toBeCalledWith('dvc root', {
-      cwd
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc root',
+      expect.objectContaining({
+        cwd
+      })
+    )
   })
 })
 
-describe('getTracked', () => {
+describe('listDvcOnlyRecursive', () => {
   it('should return all relative tracked paths', async () => {
     const stdout =
       `data/MNIST/raw/t10k-images-idx3-ubyte\n` +
@@ -196,8 +187,9 @@ describe('getTracked', () => {
         stderr: ''
       })
     const tracked = await listDvcOnlyRecursive({
-      cwd,
-      cliPath: 'dvc'
+      cliPath: undefined,
+      pythonBinPath: undefined,
+      cwd
     })
 
     expect(tracked).toEqual([
@@ -214,8 +206,11 @@ describe('getTracked', () => {
       'model.pt'
     ])
 
-    expect(execPromiseSpy).toBeCalledWith('dvc list . --dvc-only -R', {
-      cwd
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc list . --dvc-only -R',
+      expect.objectContaining({
+        cwd
+      })
+    )
   })
 })

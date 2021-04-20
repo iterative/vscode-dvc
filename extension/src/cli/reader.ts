@@ -1,71 +1,76 @@
 import { Commands, GcPreserveFlag } from './commands'
-import { execPromise, trimAndSplit } from '../util'
+import { execPromise } from '../util'
+import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { getPythonExecutionDetails } from '../extensions/python'
+import { getExecutionDetails, ReaderOptions } from './executionDetails'
 
-interface ReaderOptions {
-  cliPath: string | undefined
-  cwd: string
-}
-
-export const getDvcInvocation = async (options: ReaderOptions) => {
-  const { cliPath } = options
-  if (cliPath) {
-    return cliPath
-  }
-  const executionDetails = await getPythonExecutionDetails()
-  return executionDetails ? `${executionDetails.join(' ')} -m dvc` : 'dvc'
-}
-
-export const execCommand = async (
+export const executeProcess = async <T>(
   options: ReaderOptions,
-  command: string
-): Promise<string> => {
-  const { cwd } = options
-  const fullCommandString = `${await getDvcInvocation(options)} ${command}`
-  const { stdout } = await execPromise(fullCommandString, {
-    cwd
+  partialCommand: Commands,
+  formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
+): Promise<T> => {
+  const { command, cwd, env } = getExecutionDetails({
+    ...options,
+    command: partialCommand
   })
-  return stdout
+  const { stdout } = await execPromise(command, {
+    cwd,
+    env
+  })
+  return (formatter(stdout) as unknown) as T
 }
+
+export const checkout = async (options: ReaderOptions): Promise<string[]> =>
+  executeProcess<string[]>(options, Commands.CHECKOUT, trimAndSplit)
+
+export const checkoutRecursive = async (
+  options: ReaderOptions
+): Promise<string[]> =>
+  executeProcess<string[]>(options, Commands.CHECKOUT_RECURSIVE, trimAndSplit)
+
+export const getRoot = async (options: ReaderOptions): Promise<string> =>
+  executeProcess<string>(options, Commands.ROOT)
 
 export const getExperiments = async (
   options: ReaderOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  JSON.parse(await execCommand(options, Commands.EXPERIMENT_SHOW))
+  executeProcess<ExperimentsRepoJSONOutput>(
+    options,
+    Commands.EXPERIMENT_SHOW,
+    JSON.parse
+  )
 
 export const initializeDirectory = async (
   options: ReaderOptions
-): Promise<string> => execCommand(options, Commands.INITIALIZE_SUBDIRECTORY)
-
-export const checkout = async (options: ReaderOptions): Promise<string> =>
-  execCommand(options, Commands.CHECKOUT)
-
-export const checkoutRecursive = async (
-  options: ReaderOptions
-): Promise<string> => execCommand(options, Commands.CHECKOUT_RECURSIVE)
-
-export const getRoot = async (options: ReaderOptions): Promise<string> =>
-  (await execCommand(options, 'root')).trim()
+): Promise<string> =>
+  executeProcess<string>(options, Commands.INITIALIZE_SUBDIRECTORY)
 
 export const listDvcOnlyRecursive = async (
   options: ReaderOptions
 ): Promise<string[]> =>
-  trimAndSplit(await execCommand(options, `list . --dvc-only -R`))
+  executeProcess<string[]>(
+    options,
+    Commands.LIST_DVC_ONLY_RECURSIVE,
+    trimAndSplit
+  )
 
-export const status = async (
-  options: ReaderOptions
-): Promise<Record<
+type Status = Record<
   string,
   (Record<string, Record<string, string>> | string)[]
->> => JSON.parse(await execCommand(options, Commands.STATUS))
+>
+
+export const status = async (options: ReaderOptions): Promise<Status> =>
+  executeProcess<Status>(options, Commands.STATUS, JSON.parse)
 
 export const queueExperiment = async (
   options: ReaderOptions
-): Promise<string> => execCommand(options, Commands.EXPERIMENT_QUEUE)
+): Promise<string> => executeProcess<string>(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  execCommand(options, [Commands.EXPERIMENT_GC, ...preserveFlags].join(' '))
+  executeProcess<string>(
+    options,
+    [Commands.EXPERIMENT_GC, ...preserveFlags].join(' ') as Commands
+  )

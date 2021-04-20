@@ -1,26 +1,7 @@
 import { EventEmitter } from 'vscode'
-import { Config } from '../Config'
-import { Commands } from './commands'
-import { getProcessEnv } from '../env'
 import { ChildProcess, spawn } from 'child_process'
 import { Logger } from '../common/Logger'
-
-const getPATH = (existingPath: string, pythonBinPath?: string): string =>
-  [pythonBinPath, existingPath].filter(Boolean).join(':')
-
-const getEnv = (config: Config): NodeJS.ProcessEnv => {
-  const env = getProcessEnv()
-  const PATH = getPATH(env?.PATH as string, config.pythonBinPath)
-  return {
-    ...env,
-    PATH
-  }
-}
-
-export const getCommand = (config: Config, command: Commands): string => {
-  const cliPath = config.dvcPath || 'dvc'
-  return `${cliPath} ${command}`
-}
+import { ExecutionOptions, getExecutionDetails } from './executionDetails'
 
 const getOutput = (data: string | Buffer): string =>
   data
@@ -29,26 +10,21 @@ const getOutput = (data: string | Buffer): string =>
     .join('\r')
 
 export const executeInShell = async ({
-  config,
-  command,
-  cwd,
+  options,
   emitters
 }: {
-  config: Config
-  command: Commands
-  cwd: string
+  options: ExecutionOptions
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
     stdOutEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
 }): Promise<ChildProcess> => {
-  const execCommand = getCommand(config, command)
-  const execEnv = getEnv(config)
+  const { command, cwd, env } = getExecutionDetails(options)
 
-  const childProcess = spawn(execCommand, {
+  const childProcess = spawn(command, {
     cwd,
-    env: execEnv,
+    env,
     shell: true
   })
 

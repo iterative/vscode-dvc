@@ -74,6 +74,14 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private sourceControlManagement: SourceControlManagement
 
+  private getCliReaderOptions() {
+    return {
+      cliPath: this.config.dvcPath,
+      pythonBinPath: this.config.pythonBinPath,
+      cwd: this.dvcRoot
+    }
+  }
+
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
   }
@@ -89,10 +97,8 @@ export class Repository {
   }
 
   public async updateTracked(): Promise<void> {
-    const tracked = await listDvcOnlyRecursive({
-      cwd: this.dvcRoot,
-      cliPath: this.config.dvcPath
-    })
+    const options = this.getCliReaderOptions()
+    const tracked = await listDvcOnlyRecursive(options)
     this.state.tracked = new Set([
       ...this.getAbsolutePath(tracked),
       ...this.getAbsoluteParentPath(tracked)
@@ -162,10 +168,11 @@ export class Repository {
   }
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const statusOutput = (await status({
-      cliPath: this.config.dvcPath,
-      cwd: this.dvcRoot
-    })) as Record<string, (ValidStageOrFileStatuses | string)[]>
+    const options = this.getCliReaderOptions()
+    const statusOutput = (await status(options)) as Record<
+      string,
+      (ValidStageOrFileStatuses | string)[]
+    >
 
     const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
     return this.reduceToPathStatuses(filteredStatusOutput)
