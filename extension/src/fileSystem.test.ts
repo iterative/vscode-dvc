@@ -106,7 +106,11 @@ describe('findDvcRootPaths', () => {
   const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
-    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath, undefined)
+    const dvcRoots = await findDvcRootPaths({
+      cliPath: mockCliPath,
+      cwd: dvcDemoPath,
+      pythonBinPath: undefined
+    })
 
     expect(mockGetRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath])
@@ -117,7 +121,11 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(parentDir, 'mockDvc')
     ensureDirSync(join(mockDvcRoot, '.dvc'))
 
-    const dvcRoots = await findDvcRootPaths(parentDir, mockCliPath, undefined)
+    const dvcRoots = await findDvcRootPaths({
+      cliPath: mockCliPath,
+      cwd: parentDir,
+      pythonBinPath: undefined
+    })
 
     remove(mockDvcRoot)
 
@@ -127,13 +135,21 @@ describe('findDvcRootPaths', () => {
 
   it('should find the dvc root if it exists above the given folder', async () => {
     mockGetRoot.mockResolvedValueOnce('..')
-    const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath, undefined)
+    const dvcRoots = await findDvcRootPaths({
+      cliPath: mockCliPath,
+      cwd: dataRoot,
+      pythonBinPath: undefined
+    })
     expect(mockGetRoot).toBeCalledTimes(1)
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
-    const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath, undefined)
+    const dvcRoots = await findDvcRootPaths({
+      cliPath: mockCliPath,
+      cwd: __dirname,
+      pythonBinPath: undefined
+    })
     expect(dvcRoots).toEqual([])
   })
 })
@@ -155,8 +171,7 @@ describe('pickSingleRepositoryRoot', () => {
     const optionallyProvidedRepo = '/some/path/to/repo/b'
 
     const repoRoot = await pickSingleRepositoryRoot(
-      '/some/path/to',
-      undefined,
+      { cliPath: undefined, cwd: '/some/path/to', pythonBinPath: undefined },
       optionallyProvidedRepo
     )
     expect(repoRoot).toEqual(optionallyProvidedRepo)
@@ -169,7 +184,11 @@ describe('pickSingleRepositoryRoot', () => {
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([singleRepo])
 
-    const repoRoot = await pickSingleRepositoryRoot(singleRepo, undefined)
+    const repoRoot = await pickSingleRepositoryRoot({
+      cliPath: undefined,
+      cwd: singleRepo,
+      pythonBinPath: undefined
+    })
     expect(repoRoot).toEqual(singleRepo)
   })
 
@@ -184,7 +203,11 @@ describe('pickSingleRepositoryRoot', () => {
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
 
-    const repoRoot = await pickSingleRepositoryRoot('/some/path/to', undefined)
+    const repoRoot = await pickSingleRepositoryRoot({
+      cliPath: undefined,
+      cwd: '/some/path/to',
+      pythonBinPath: undefined
+    })
     expect(repoRoot).toEqual(selectedRepo)
   })
 
@@ -199,7 +222,11 @@ describe('pickSingleRepositoryRoot', () => {
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
 
-    const repoRoot = await pickSingleRepositoryRoot('/some/path/to', undefined)
+    const repoRoot = await pickSingleRepositoryRoot({
+      cliPath: undefined,
+      cwd: '/some/path/to',
+      pythonBinPath: undefined
+    })
     expect(repoRoot).toBeUndefined()
   })
 })
