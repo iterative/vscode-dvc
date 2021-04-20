@@ -166,8 +166,9 @@ describe('getRoot', () => {
         stderr: ''
       })
     const relativeRoot = await getRoot({
+      cliPath: 'dvc',
       cwd,
-      cliPath: 'dvc'
+      pythonBinPath: undefined
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
     expect(execPromiseSpy).toBeCalledWith('dvc root', {

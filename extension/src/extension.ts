@@ -51,7 +51,11 @@ export class Extension {
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await findDvcRootPaths(workspaceRoot, this.config.dvcPath)
+    const dvcRoots = await findDvcRootPaths(
+      workspaceRoot,
+      this.config.dvcPath,
+      this.config.pythonBinPath
+    )
 
     this.initializeDecorationProvidersEarly(dvcRoots)
 
@@ -179,7 +183,11 @@ export class Extension {
           this.dispose.track(disposable)
         )
 
-        const dvcRoots = await findDvcRootPaths(gitRoot, this.config.dvcPath)
+        const dvcRoots = await findDvcRootPaths(
+          gitRoot,
+          this.config.dvcPath,
+          this.config.pythonBinPath
+        )
         dvcRoots.forEach(async dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 

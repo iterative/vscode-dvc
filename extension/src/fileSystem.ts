@@ -40,12 +40,14 @@ export const addFileChangeHandler = (
 
 const findDvcAbsoluteRootPath = async (
   cwd: string,
-  cliPath: string | undefined
+  cliPath: string | undefined,
+  pythonBinPath: string | undefined
 ): Promise<string | undefined> => {
   try {
     const root = await getRoot({
       cliPath,
-      cwd
+      cwd,
+      pythonBinPath
     })
     return resolve(cwd, root)
   } catch (e) {}
@@ -74,7 +76,8 @@ export const findDvcSubRootPaths = async (
 
 export const findDvcRootPaths = async (
   cwd: string,
-  cliPath: string | undefined
+  cliPath: string | undefined,
+  pythonBinPath: string | undefined
 ): Promise<string[]> => {
   const subRoots = await findDvcSubRootPaths(cwd)
 
@@ -82,7 +85,11 @@ export const findDvcRootPaths = async (
     return subRoots
   }
 
-  const absoluteRoot = await findDvcAbsoluteRootPath(cwd, cliPath)
+  const absoluteRoot = await findDvcAbsoluteRootPath(
+    cwd,
+    cliPath,
+    pythonBinPath
+  )
 
   if (!absoluteRoot) {
     return []

@@ -41,9 +41,6 @@ export const checkoutRecursive = async (
   options: ReaderOptions
 ): Promise<string> => execCommand(options, Commands.CHECKOUT_RECURSIVE)
 
-export const getRoot = async (options: ReaderOptions): Promise<string> =>
-  (await execCommand(options, 'root')).trim()
-
 const executeProcess = async (
   options: ExecutionOptions,
   command: Commands
@@ -71,6 +68,17 @@ const executeAndParseJson = async <T>(
   const stdout = await executeProcess(options, command)
   return JSON.parse(stdout)
 }
+
+const executeAndTrim = async (
+  options: ExecutionOptions,
+  command: Commands
+): Promise<string> => {
+  const stdout = await execCommand(options, command)
+  return stdout.trim()
+}
+
+export const getRoot = async (options: ExecutionOptions): Promise<string> =>
+  executeAndTrim(options, Commands.ROOT)
 
 export const getExperiments = async (
   options: ExecutionOptions

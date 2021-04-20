@@ -11,6 +11,7 @@ export enum Commands {
   LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
   PUSH = 'push',
+  ROOT = 'root',
   STATUS = 'status --show-json'
 }
 

@@ -97,7 +97,7 @@ describe('findDvcRootPaths', () => {
   const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
-    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath, mockCliPath, undefined)
 
     expect(mockGetRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath])
@@ -108,7 +108,7 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(parentDir, 'mockDvc')
     ensureDirSync(join(mockDvcRoot, '.dvc'))
 
-    const dvcRoots = await findDvcRootPaths(parentDir, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(parentDir, mockCliPath, undefined)
 
     remove(mockDvcRoot)
 
@@ -118,13 +118,13 @@ describe('findDvcRootPaths', () => {
 
   it('should find the dvc root if it exists above the given folder', async () => {
     mockGetRoot.mockResolvedValueOnce('..')
-    const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(dataRoot, mockCliPath, undefined)
     expect(mockGetRoot).toBeCalledTimes(1)
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
-    const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath)
+    const dvcRoots = await findDvcRootPaths(__dirname, mockCliPath, undefined)
     expect(dvcRoots).toEqual([])
   })
 })
