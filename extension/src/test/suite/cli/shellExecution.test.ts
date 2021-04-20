@@ -61,11 +61,12 @@ suite('Shell Execution Test Suite', () => {
         disposable
       )
 
-      const stubbedGetCommand = stub(ExecutionDetails, 'getCommand').returns(
-        command
-      )
-
       const cwd = __dirname
+
+      const stubbedGetExecutionDetails = stub(
+        ExecutionDetails,
+        'getExecutionDetails'
+      ).returns({ command, cwd, env: {} })
 
       executeInShell({
         options: {
@@ -80,15 +81,17 @@ suite('Shell Execution Test Suite', () => {
           startedEventEmitter
         }
       })
-      stubbedGetCommand.restore()
+      stubbedGetExecutionDetails.restore()
 
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
-      expect(stubbedGetCommand).to.be.calledWith(
-        'status --show-json',
-        undefined
-      )
+      expect(stubbedGetExecutionDetails).to.be.calledWith({
+        cliPath: undefined,
+        command: 'status --show-json',
+        cwd,
+        pythonBinPath: undefined
+      })
       disposable.dispose()
     }).timeout(12000)
   })

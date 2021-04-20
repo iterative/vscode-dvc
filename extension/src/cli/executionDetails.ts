@@ -23,7 +23,7 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   }
 }
 
-export const getCommand = (command: Commands, cliPath?: string): string =>
+const getCommand = (command: Commands, cliPath?: string): string =>
   `${cliPath || 'dvc'} ${command}`
 
 export const getExecutionDetails = (
