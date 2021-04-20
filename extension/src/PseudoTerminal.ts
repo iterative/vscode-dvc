@@ -45,6 +45,7 @@ export class PseudoTerminal {
     this.dispose.track(
       window.onDidCloseTerminal(async event => {
         if (this.instance && event.name === this.termName) {
+          this.dispose.untrack(this.instance)
           this.instance = undefined
         }
       })
