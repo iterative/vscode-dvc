@@ -99,7 +99,7 @@ export const experimentApply = async (
 export const experimentRemove = async (
   options: ReaderOptions,
   experiment: string
-): Promise<string> =>
+): Promise<void> =>
   executeProcess(
     options,
     getCommandWithTarget(Commands.EXPERIMENT_REMOVE, experiment)

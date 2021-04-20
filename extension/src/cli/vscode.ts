@@ -130,8 +130,9 @@ export const removeExperimentFromQuickPick = async (config: Config) =>
   experimentsQuickPickCommand(
     config,
     async (readerOptions, selectedExperimentName) => {
+      await experimentRemove(readerOptions, selectedExperimentName)
       window.showInformationMessage(
-        await experimentRemove(readerOptions, selectedExperimentName)
+        `Experiment ${selectedExperimentName} has been removed!`
       )
     }
   )

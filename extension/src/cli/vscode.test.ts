@@ -257,6 +257,9 @@ describe('removeExperimentFromQuickPick', () => {
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     await removeExperimentFromQuickPick(exampleConfig)
 
+    expect(mockedShowInformationMessage).toBeCalledWith(
+      'Experiment exp-2021 has been removed!'
+    )
     expect(mockedExecPromise).toBeCalledWith(
       'dvc exp remove exp-2021',
       expect.objectContaining({
