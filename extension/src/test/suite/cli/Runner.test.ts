@@ -31,11 +31,8 @@ suite('Runner Test Suite', () => {
         env: {}
       })
 
-      const firstRun = runner.run(Commands.STATUS, cwd)
-      const secondRun = runner.run(Commands.CHECKOUT, cwd)
-
-      await firstRun
-      await secondRun
+      await runner.run(Commands.STATUS, cwd)
+      await runner.run(Commands.CHECKOUT, cwd)
       stubbedGetExecutionDetails.restore()
 
       expect(stubbedGetExecutionDetails).to.be.calledWith({
@@ -50,7 +47,7 @@ suite('Runner Test Suite', () => {
         cwd,
         pythonBinPath: undefined
       })
-      expect(windowErrorMessageSpy).to.be.called
+      expect(windowErrorMessageSpy).to.be.calledOnce
       disposable.dispose()
     }).timeout(6000)
 

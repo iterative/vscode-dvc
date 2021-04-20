@@ -42,11 +42,14 @@ export class PseudoTerminal {
   }
 
   private deleteReferenceOnClose = (): void => {
-    window.onDidCloseTerminal(async event => {
-      if (this.instance && event.name === this.termName) {
-        this.instance = undefined
-      }
-    })
+    this.dispose.track(
+      window.onDidCloseTerminal(async event => {
+        if (this.instance && event.name === this.termName) {
+          this.dispose.untrack(this.instance)
+          this.instance = undefined
+        }
+      })
+    )
   }
 
   private createInstance = async (): Promise<void> =>
@@ -59,6 +62,7 @@ export class PseudoTerminal {
         },
         close: () => {
           this.terminatedEventEmitter.fire()
+          this.setBlocked(false)
         },
         handleInput: data => {
           if (!this.isBlocked && data) {

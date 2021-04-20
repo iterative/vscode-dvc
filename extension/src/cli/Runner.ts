@@ -21,24 +21,28 @@ export class Runner {
   private currentProcess: ChildProcess | undefined
   private config: Config
 
+  private async startProcess(command: Commands, cwd: string) {
+    this.pseudoTerminal.setBlocked(true)
+    this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
+    this.currentProcess = await executeInShell({
+      options: {
+        cliPath: this.config.dvcPath,
+        command,
+        cwd,
+        pythonBinPath: this.config.pythonBinPath
+      },
+      emitters: {
+        completedEventEmitter: this.completedEventEmitter,
+        startedEventEmitter: this.startedEventEmitter,
+        stdOutEventEmitter: this.stdOutEventEmitter
+      }
+    })
+  }
+
   public async run(command: Commands, cwd: string) {
+    await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
-      this.pseudoTerminal.setBlocked(true)
-      await this.pseudoTerminal.openCurrentInstance()
-      this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
-      this.currentProcess = await executeInShell({
-        options: {
-          pythonBinPath: this.config.pythonBinPath,
-          cliPath: this.config.dvcPath,
-          cwd,
-          command
-        },
-        emitters: {
-          completedEventEmitter: this.completedEventEmitter,
-          stdOutEventEmitter: this.stdOutEventEmitter,
-          startedEventEmitter: this.startedEventEmitter
-        }
-      })
+      return this.startProcess(command, cwd)
     }
     window.showErrorMessage(
       `Cannot start ${command} as the output terminal is already occupied`
