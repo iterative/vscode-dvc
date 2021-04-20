@@ -30,9 +30,9 @@ export class Runner {
         options: {
           pythonBinPath: this.config.pythonBinPath,
           cliPath: this.config.dvcPath,
-          cwd
+          cwd,
+          command
         },
-        command,
         emitters: {
           completedEventEmitter: this.completedEventEmitter,
           stdOutEventEmitter: this.stdOutEventEmitter,

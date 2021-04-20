@@ -69,11 +69,11 @@ suite('Shell Execution Test Suite', () => {
 
       executeInShell({
         options: {
+          command: Commands.STATUS,
           cliPath: undefined,
           cwd,
           pythonBinPath: undefined
         },
-        command: Commands.STATUS,
         emitters: {
           completedEventEmitter,
           stdOutEventEmitter,

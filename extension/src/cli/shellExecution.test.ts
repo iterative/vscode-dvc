@@ -30,11 +30,11 @@ describe('executeInShell', () => {
 
     await executeInShell({
       options: {
+        command: Commands.CHECKOUT,
         cliPath: '',
         cwd,
         pythonBinPath: undefined
-      },
-      command: Commands.CHECKOUT
+      }
     })
 
     expect(mockedSpawn).toBeCalledWith(expectedCommand, {
@@ -53,11 +53,11 @@ describe('executeInShell', () => {
 
     await executeInShell({
       options: {
+        command: Commands.CHECKOUT,
         cliPath,
         cwd,
         pythonBinPath: undefined
-      },
-      command: Commands.CHECKOUT
+      }
     })
 
     expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
@@ -82,10 +82,10 @@ describe('executeInShell', () => {
     await executeInShell({
       options: {
         cliPath,
+        command: Commands.CHECKOUT,
         cwd,
         pythonBinPath
-      },
-      command: Commands.CHECKOUT
+      }
     })
 
     expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
@@ -105,11 +105,11 @@ describe('executeInShell', () => {
 
     await executeInShell({
       options: {
-        pythonBinPath,
         cliPath: undefined,
-        cwd
-      },
-      command: Commands.CHECKOUT
+        command: Commands.CHECKOUT,
+        cwd,
+        pythonBinPath
+      }
     })
 
     expect(mockedSpawn).toBeCalledWith(`dvc ${Commands.CHECKOUT}`, {
