@@ -54,12 +54,12 @@ export const executeInShell = async ({
 
   emitters?.startedEventEmitter?.fire()
 
-  childProcess.stdout?.on('data', chunk => {
+  childProcess.stdout.on('data', chunk => {
     const output = getOutput(chunk)
     emitters?.stdOutEventEmitter?.fire(output)
   })
 
-  childProcess.stderr?.on('data', chunk => {
+  childProcess.stderr.on('data', chunk => {
     const output = getOutput(chunk)
     Logger.error(output)
   })
