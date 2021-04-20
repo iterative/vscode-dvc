@@ -9,8 +9,8 @@ export class PseudoTerminal {
 
   private blocked: boolean
 
-  public isBlocked() {
-    return this.blocked
+  public get isBlocked() {
+    return !!(this.blocked === undefined || this.blocked)
   }
 
   public setBlocked(blocked: boolean) {
@@ -65,7 +65,7 @@ export class PseudoTerminal {
           this.setBlocked(false)
         },
         handleInput: data => {
-          if (!this.isBlocked() && data) {
+          if (!this.isBlocked && data) {
             this.close()
           }
         }
