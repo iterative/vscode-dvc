@@ -10,13 +10,13 @@ export enum Commands {
   EXPERIMENT_APPLY = 'exp apply',
   EXPERIMENT_BRANCH = 'exp branch',
   EXPERIMENT_REMOVE = 'exp remove',
+  EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
   LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
   PUSH = 'push',
   ROOT = 'root',
-  STATUS = 'status --show-json',
-  EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only'
+  STATUS = 'status --show-json'
 }
 
 export enum GcPreserveFlag {
@@ -31,5 +31,5 @@ export const getCommandWithTarget = (
   target: string
 ): string => `${command} ${target}`
 
-export const joinCommand = <T extends string>(segments: T[]): string =>
+export const joinCommand = (segments: string[]): string =>
   segments.filter(Boolean).join(' ')
