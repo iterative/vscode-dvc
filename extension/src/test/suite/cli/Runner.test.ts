@@ -47,7 +47,7 @@ suite('Runner Test Suite', () => {
         cwd,
         pythonBinPath: undefined
       })
-      expect(windowErrorMessageSpy).to.be.called
+      expect(windowErrorMessageSpy).to.be.calledOnce
       disposable.dispose()
     }).timeout(6000)
 
