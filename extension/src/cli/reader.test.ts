@@ -75,7 +75,7 @@ describe('initializeDirectory', () => {
       cwd: fsPath,
       pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout)
+    expect(output).toEqual(stdout.trim())
 
     expect(execPromiseSpy).toBeCalledWith(
       'dvc init --subdir',
@@ -88,7 +88,7 @@ describe('initializeDirectory', () => {
 describe('checkout', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
-    const stdout = `M       model.pt\n\rM       logs/\n\r`
+    const stdout = `M       model.pt\nM       logs/\n`
     const execPromiseSpy = jest
       .spyOn(Util, 'execPromise')
       .mockResolvedValueOnce({
@@ -101,7 +101,7 @@ describe('checkout', () => {
       cwd: fsPath,
       pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout)
+    expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
     expect(execPromiseSpy).toBeCalledWith(
       'dvc checkout',
@@ -115,7 +115,7 @@ describe('checkout', () => {
 describe('checkoutRecursive', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
-    const stdout = `M       model.pt\n\rM       logs/\n\r`
+    const stdout = `M       model.pt\nM       logs/\n`
     const execPromiseSpy = jest
       .spyOn(Util, 'execPromise')
       .mockResolvedValueOnce({
@@ -128,7 +128,7 @@ describe('checkoutRecursive', () => {
       cwd: fsPath,
       pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout)
+    expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
     expect(execPromiseSpy).toBeCalledWith(
       'dvc checkout --recursive',

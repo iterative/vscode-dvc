@@ -1,12 +1,13 @@
 import { Commands, GcPreserveFlag } from './commands'
-import { execPromise, trim, trimAndSplit } from '../util'
+import { execPromise } from '../util'
+import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getExecutionDetails, ReaderOptions } from './executionDetails'
 
 export const executeProcess = async <T>(
   options: ReaderOptions,
   partialCommand: Commands,
-  formatter?: typeof trimAndSplit | typeof trim | typeof JSON.parse
+  formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
 ): Promise<T> => {
   const { command, cwd, env } = getExecutionDetails({
     ...options,
@@ -16,19 +17,19 @@ export const executeProcess = async <T>(
     cwd,
     env
   })
-  return ((formatter ? formatter(stdout) : stdout) as unknown) as T
+  return (formatter(stdout) as unknown) as T
 }
 
-export const checkout = async (options: ReaderOptions): Promise<string> =>
-  executeProcess<string>(options, Commands.CHECKOUT)
+export const checkout = async (options: ReaderOptions): Promise<string[]> =>
+  executeProcess<string[]>(options, Commands.CHECKOUT, trimAndSplit)
 
 export const checkoutRecursive = async (
   options: ReaderOptions
-): Promise<string> =>
-  executeProcess<string>(options, Commands.CHECKOUT_RECURSIVE)
+): Promise<string[]> =>
+  executeProcess<string[]>(options, Commands.CHECKOUT_RECURSIVE, trimAndSplit)
 
 export const getRoot = async (options: ReaderOptions): Promise<string> =>
-  executeProcess<string>(options, Commands.ROOT, trim)
+  executeProcess<string>(options, Commands.ROOT)
 
 export const getExperiments = async (
   options: ReaderOptions

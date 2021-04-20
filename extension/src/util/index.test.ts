@@ -1,4 +1,4 @@
-import { delay, isStringInEnum, trimAndSplit } from '.'
+import { delay, isStringInEnum } from '.'
 
 describe('delay', () => {
   it('should provide a delay in execution', async () => {
@@ -28,19 +28,5 @@ describe('isStringInEnum', () => {
 
   it('should return false when the string has the wrong case', () => {
     expect(isStringInEnum('fIsh', Animals)).toBe(false)
-  })
-})
-
-describe('trimAndSplit', () => {
-  it('should return an empty array given an empty string', () => {
-    expect(trimAndSplit('')).toEqual([])
-  })
-
-  it('should return an empty array given an newline', () => {
-    expect(trimAndSplit('\n')).toEqual([])
-  })
-
-  it('should return an array given a string separated by newlines', () => {
-    expect(trimAndSplit('a\nb\nc\n')).toEqual(['a', 'b', 'c'])
   })
 })

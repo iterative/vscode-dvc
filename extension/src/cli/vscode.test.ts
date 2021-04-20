@@ -38,7 +38,7 @@ describe('queueExperimentCommand', () => {
     const stdout = 'Example stdout that will be resolved literally\n'
     mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
     await queueExperimentCommand(exampleConfig)
-    expect(mockedShowInformationMessage).toBeCalledWith(stdout)
+    expect(mockedShowInformationMessage).toBeCalledWith(stdout.trim())
   })
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
