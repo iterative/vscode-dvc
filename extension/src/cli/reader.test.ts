@@ -32,10 +32,12 @@ describe('getExperiments', () => {
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(execPromiseSpy).toBeCalledWith('dvc exp show --show-json', {
-      cwd,
-      env: process.env
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc exp show --show-json',
+      expect.objectContaining({
+        cwd
+      })
+    )
   })
 })
 
@@ -75,10 +77,12 @@ describe('initializeDirectory', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(execPromiseSpy).toBeCalledWith('dvc init --subdir', {
-      cwd: fsPath,
-      env: process.env
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc init --subdir',
+      expect.objectContaining({
+        cwd: fsPath
+      })
+    )
   })
 })
 describe('checkout', () => {
@@ -99,10 +103,12 @@ describe('checkout', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(execPromiseSpy).toBeCalledWith('dvc checkout', {
-      cwd: fsPath,
-      env: process.env
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc checkout',
+      expect.objectContaining({
+        cwd: fsPath
+      })
+    )
   })
 })
 
@@ -124,10 +130,12 @@ describe('checkoutRecursive', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(execPromiseSpy).toBeCalledWith('dvc checkout --recursive', {
-      cwd: fsPath,
-      env: process.env
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc checkout --recursive',
+      expect.objectContaining({
+        cwd: fsPath
+      })
+    )
   })
 })
 
@@ -148,10 +156,12 @@ describe('getRoot', () => {
       pythonBinPath: undefined
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
-    expect(execPromiseSpy).toBeCalledWith('dvc root', {
-      cwd,
-      env: process.env
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc root',
+      expect.objectContaining({
+        cwd
+      })
+    )
   })
 })
 
@@ -196,9 +206,11 @@ describe('listDvcOnlyRecursive', () => {
       'model.pt'
     ])
 
-    expect(execPromiseSpy).toBeCalledWith('dvc list . --dvc-only -R', {
-      cwd,
-      env: process.env
-    })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc list . --dvc-only -R',
+      expect.objectContaining({
+        cwd
+      })
+    )
   })
 })

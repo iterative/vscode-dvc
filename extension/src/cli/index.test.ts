@@ -38,9 +38,11 @@ describe('add', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedExecPromise).toBeCalledWith(`dvc add ${file}`, {
-      cwd: dir,
-      env: process.env
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      `dvc add ${file}`,
+      expect.objectContaining({
+        cwd: dir
+      })
+    )
   })
 })

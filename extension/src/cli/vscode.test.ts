@@ -109,10 +109,9 @@ describe('experimentGcCommand', () => {
 
     expect(mockedExecPromise).toBeCalledWith(
       'dvc exp gc -f -w --all-tags --all-commits',
-      {
-        cwd: exampleConfig.workspaceRoot,
-        env: process.env
-      }
+      expect.objectContaining({
+        cwd: exampleConfig.workspaceRoot
+      })
     )
   })
 
@@ -147,10 +146,12 @@ describe('experimentGcCommand', () => {
 
     await experimentGcCommand(exampleConfig)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc exp gc -f -w', {
-      cwd: exampleConfig.workspaceRoot,
-      env: process.env
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      'dvc exp gc -f -w',
+      expect.objectContaining({
+        cwd: exampleConfig.workspaceRoot
+      })
+    )
   })
 
   it('does not execute a command if the QuickPick is dismissed', async () => {
