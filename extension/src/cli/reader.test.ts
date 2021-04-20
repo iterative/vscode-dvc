@@ -232,6 +232,9 @@ describe('apply', () => {
         'exp-test'
       )
     ).toEqual(stdout)
-    expect(execPromiseSpy).toBeCalledWith('dvc exp apply exp-test', { cwd })
+    expect(execPromiseSpy).toBeCalledWith(
+      'dvc exp apply exp-test',
+      expect.objectContaining({ cwd })
+    )
   })
 })
