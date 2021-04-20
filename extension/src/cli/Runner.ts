@@ -15,30 +15,34 @@ export class Runner {
   private terminatedEventEmitter: EventEmitter<void>
 
   private onDidComplete: Event<void>
-  private onDidStart: Event<void>
   public onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
   private currentProcess: ChildProcess | undefined
   private config: Config
 
+  private async startProcess(command: Commands, cwd: string) {
+    this.pseudoTerminal.setBlocked(true)
+    this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
+    this.currentProcess = await executeInShell({
+      options: {
+        cliPath: this.config.dvcPath,
+        command,
+        cwd,
+        pythonBinPath: this.config.pythonBinPath
+      },
+      emitters: {
+        completedEventEmitter: this.completedEventEmitter,
+        stdOutEventEmitter: this.stdOutEventEmitter,
+        startedEventEmitter: this.startedEventEmitter
+      }
+    })
+  }
+
   public async run(command: Commands, cwd: string) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
-      this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
-      this.currentProcess = await executeInShell({
-        options: {
-          pythonBinPath: this.config.pythonBinPath,
-          cliPath: this.config.dvcPath,
-          cwd,
-          command
-        },
-        emitters: {
-          completedEventEmitter: this.completedEventEmitter,
-          stdOutEventEmitter: this.stdOutEventEmitter,
-          startedEventEmitter: this.startedEventEmitter
-        }
-      })
+      return this.startProcess(command, cwd)
     }
     window.showErrorMessage(
       `Cannot start ${command} as the output terminal is already occupied`
@@ -71,12 +75,6 @@ export class Runner {
     this.stdOutEventEmitter = this.dispose.track(new EventEmitter<string>())
 
     this.startedEventEmitter = this.dispose.track(new EventEmitter<void>())
-    this.onDidStart = this.startedEventEmitter.event
-    this.dispose.track(
-      this.onDidStart(() => {
-        this.pseudoTerminal.setBlocked(true)
-      })
-    )
 
     this.terminatedEventEmitter = this.dispose.track(new EventEmitter<void>())
     this.onDidTerminate = this.terminatedEventEmitter.event
