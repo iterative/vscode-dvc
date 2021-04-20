@@ -20,7 +20,8 @@ export const queueExperimentCommand = async (config: Config) => {
     return window.showInformationMessage(
       await queueExperiment({
         cwd: config.workspaceRoot,
-        cliPath: config.dvcPath
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
       })
     )
   } catch (e) {

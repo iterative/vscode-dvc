@@ -102,8 +102,8 @@ export const status = async (options: ExecutionOptions): Promise<Status> =>
   executeAndParseJson<Status>(options, Commands.STATUS)
 
 export const queueExperiment = async (
-  options: ReaderOptions
-): Promise<string> => execCommand(options, Commands.EXPERIMENT_QUEUE)
+  options: ExecutionOptions
+): Promise<string> => executeProcess(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentGarbageCollect = async (
   options: ExecutionOptions,
