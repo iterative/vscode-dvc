@@ -33,12 +33,14 @@ describe('add', () => {
 
     const output = await addTarget({
       cliPath: 'dvc',
-      fsPath
+      fsPath,
+      pythonBinPath: undefined
     })
     expect(output).toEqual(stdout)
 
     expect(mockedExecPromise).toBeCalledWith(`dvc add ${file}`, {
-      cwd: dir
+      cwd: dir,
+      env: process.env
     })
   })
 })

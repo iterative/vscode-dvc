@@ -1,48 +1,19 @@
-import { mocked } from 'ts-jest/utils'
 import {
-  getExperiments,
   checkout,
-  initializeDirectory,
   checkoutRecursive,
+  getExperiments,
   getRoot,
-  listDvcOnlyRecursive,
-  getDvcInvocation
+  initializeDirectory,
+  listDvcOnlyRecursive
 } from './reader'
 import * as Util from '../util'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
-import { getPythonExecutionDetails } from '../extensions/python'
 
 jest.mock('fs')
-jest.mock('../extensions/python')
-
-const mockedGetPythonExecutionDetails = mocked(getPythonExecutionDetails)
 
 beforeEach(() => {
   jest.resetAllMocks()
-})
-
-describe('getDvcInvocation', () => {
-  it('should utilize an interpreter path from the Python extension by default', async () => {
-    const testPythonBin = '/custom/path/to/python'
-    mockedGetPythonExecutionDetails.mockResolvedValue([testPythonBin])
-    expect(await getDvcInvocation({ cliPath: '', cwd: './' })).toEqual(
-      `${testPythonBin} -m dvc`
-    )
-  })
-
-  it('should ignore a path from the Python extension when cliPath is defined', async () => {
-    const testPythonBin = '/custom/path/to/python'
-    mockedGetPythonExecutionDetails.mockResolvedValue(['/wrong/python/bin'])
-    expect(
-      await getDvcInvocation({ cliPath: testPythonBin, cwd: './' })
-    ).toEqual(testPythonBin)
-  })
-
-  it('should return a simple dvc call when no Python extension is present', async () => {
-    mockedGetPythonExecutionDetails.mockResolvedValue(undefined)
-    expect(await getDvcInvocation({ cliPath: '', cwd: './' })).toEqual('dvc')
-  })
 })
 
 describe('getExperiments', () => {
@@ -178,7 +149,8 @@ describe('getRoot', () => {
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
     expect(execPromiseSpy).toBeCalledWith('dvc root', {
-      cwd
+      cwd,
+      env: process.env
     })
   })
 })

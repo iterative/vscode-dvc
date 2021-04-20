@@ -1,36 +1,9 @@
 import { Commands, GcPreserveFlag } from './commands'
 import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { getPythonExecutionDetails } from '../extensions/python'
 import { ExecutionOptions, getExecutionDetails } from './executionDetails'
 
-interface ReaderOptions {
-  cliPath: string | undefined
-  cwd: string
-}
-
-export const getDvcInvocation = async (options: ReaderOptions) => {
-  const { cliPath } = options
-  if (cliPath) {
-    return cliPath
-  }
-  const executionDetails = await getPythonExecutionDetails()
-  return executionDetails ? `${executionDetails.join(' ')} -m dvc` : 'dvc'
-}
-
-export const execCommand = async (
-  options: ReaderOptions,
-  command: string
-): Promise<string> => {
-  const { cwd } = options
-  const fullCommandString = `${await getDvcInvocation(options)} ${command}`
-  const { stdout } = await execPromise(fullCommandString, {
-    cwd
-  })
-  return stdout
-}
-
-const executeProcess = async (
+export const executeProcess = async (
   options: ExecutionOptions,
   command: Commands
 ): Promise<string> => {
@@ -62,7 +35,7 @@ const executeAndTrim = async (
   options: ExecutionOptions,
   command: Commands
 ): Promise<string> => {
-  const stdout = await execCommand(options, command)
+  const stdout = await executeProcess(options, command)
   return stdout.trim()
 }
 

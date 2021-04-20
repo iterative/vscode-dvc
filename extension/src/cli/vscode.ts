@@ -109,19 +109,31 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
 
   disposer.track(
     commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
-      addTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+      addTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
-      pushTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+      pushTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.pullTarget', ({ resourceUri }) =>
-      pullTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+      pullTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     )
   )
 
