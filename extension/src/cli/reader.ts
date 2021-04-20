@@ -34,9 +34,6 @@ export const initializeDirectory = async (
   options: ReaderOptions
 ): Promise<string> => execCommand(options, Commands.INITIALIZE_SUBDIRECTORY)
 
-export const checkout = async (options: ReaderOptions): Promise<string> =>
-  execCommand(options, Commands.CHECKOUT)
-
 const executeProcess = async (
   options: ExecutionOptions,
   command: Commands
@@ -72,6 +69,9 @@ const executeAndTrim = async (
   const stdout = await execCommand(options, command)
   return stdout.trim()
 }
+
+export const checkout = async (options: ExecutionOptions): Promise<string> =>
+  executeProcess(options, Commands.CHECKOUT)
 
 export const checkoutRecursive = async (
   options: ExecutionOptions

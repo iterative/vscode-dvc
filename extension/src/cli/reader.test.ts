@@ -121,12 +121,14 @@ describe('checkout', () => {
 
     const output = await checkout({
       cliPath: 'dvc',
-      cwd: fsPath
+      cwd: fsPath,
+      pythonBinPath: undefined
     })
     expect(output).toEqual(stdout)
 
     expect(execPromiseSpy).toBeCalledWith('dvc checkout', {
-      cwd: fsPath
+      cwd: fsPath,
+      env: process.env
     })
   })
 })
