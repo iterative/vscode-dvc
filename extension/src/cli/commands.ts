@@ -12,6 +12,8 @@ export enum Commands {
   EXPERIMENT_RUN_ALL = 'exp run --run-all',
   EXPERIMENT_GC = 'exp gc -f -w',
   EXPERIMENT_APPLY = 'exp apply',
+  EXPERIMENT_BRANCH = 'exp branch',
+  EXPERIMENT_REMOVE = 'exp remove',
   EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only'
 }
 
@@ -27,5 +29,5 @@ export const getCommandWithTarget = (
   target: string
 ): string => `${command} ${target}`
 
-export const joinCommand = (command: Commands, args: string[]): string =>
-  [command, ...args].join(' ')
+export const joinCommand = (segments: string[]): string =>
+  segments.filter(Boolean).join(' ')

@@ -5,13 +5,16 @@ import { Config } from '../Config'
 import { GcPreserveFlag } from './commands'
 import { quickPickManyValues } from '../util/quickPick'
 import {
+  ReaderOptions,
   initializeDirectory,
   checkout,
   checkoutRecursive,
   queueExperiment,
   experimentGarbageCollect,
   experimentListCurrent,
-  experimentApply
+  experimentApply,
+  experimentBranch,
+  experimentRemove
 } from './reader'
 
 const reportStderrOrThrow = (
@@ -79,29 +82,75 @@ export const experimentGcQuickPick = async (config: Config) => {
   }
 }
 
-export const applyExperimentFromQuickPick = async (config: Config) => {
+const experimentsQuickPick = async (readerOptions: ReaderOptions) => {
+  const experiments = await experimentListCurrent(readerOptions)
+
+  if (experiments.length === 0) {
+    window.showErrorMessage('There are no experiments to select!')
+  } else {
+    return window.showQuickPick(experiments)
+  }
+}
+
+const experimentsQuickPickCommand = async <T = void>(
+  config: Config,
+  callback: (
+    readerOptions: ReaderOptions,
+    selectedExperiment: string
+  ) => Promise<T>
+) => {
   const readerOptions = {
     cwd: config.workspaceRoot,
     cliPath: config.dvcPath
   }
-
   try {
-    const experiments = await experimentListCurrent(readerOptions)
-
-    if (experiments.length === 0) {
-      window.showErrorMessage('There are no experiments to select!')
-    } else {
-      const selectedExperimentName = await window.showQuickPick(experiments)
-      if (selectedExperimentName !== undefined) {
-        window.showInformationMessage(
-          await experimentApply(readerOptions, selectedExperimentName)
-        )
-      }
+    const selectedExperimentName = await experimentsQuickPick(readerOptions)
+    if (selectedExperimentName) {
+      return callback(readerOptions, selectedExperimentName)
     }
   } catch (e) {
     reportStderrOrThrow(e)
   }
 }
+
+export const applyExperimentFromQuickPick = async (config: Config) =>
+  experimentsQuickPickCommand(
+    config,
+    async (readerOptions, selectedExperimentName) => {
+      window.showInformationMessage(
+        await experimentApply(readerOptions, selectedExperimentName)
+      )
+    }
+  )
+
+export const removeExperimentFromQuickPick = async (config: Config) =>
+  experimentsQuickPickCommand(
+    config,
+    async (readerOptions, selectedExperimentName) => {
+      window.showInformationMessage(
+        await experimentRemove(readerOptions, selectedExperimentName)
+      )
+    }
+  )
+
+export const branchExperimentFromQuickPick = async (config: Config) =>
+  experimentsQuickPickCommand(
+    config,
+    async (readerOptions, selectedExperimentName) => {
+      const branchName = await window.showInputBox({
+        prompt: 'Name the new branch'
+      })
+      if (branchName) {
+        window.showInformationMessage(
+          await experimentBranch(
+            readerOptions,
+            selectedExperimentName,
+            branchName
+          )
+        )
+      }
+    }
+  )
 
 export const registerCommands = (config: Config, disposer: Disposer) => {
   disposer.track(
@@ -158,6 +207,18 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
       applyExperimentFromQuickPick(config)
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.branchExperiment', () =>
+      branchExperimentFromQuickPick(config)
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.removeExperiment', () =>
+      removeExperimentFromQuickPick(config)
     )
   )
 }

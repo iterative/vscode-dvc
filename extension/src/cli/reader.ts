@@ -8,7 +8,7 @@ import { execPromise, trimAndSplit } from '../util'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getPythonExecutionDetails } from '../extensions/python'
 
-interface ReaderOptions {
+export interface ReaderOptions {
   cliPath: string | undefined
   cwd: string
 }
@@ -80,7 +80,7 @@ export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  execCommand(options, joinCommand(Commands.EXPERIMENT_GC, preserveFlags))
+  execCommand(options, joinCommand([Commands.EXPERIMENT_GC, ...preserveFlags]))
 
 export const experimentApply = async (
   options: ReaderOptions,
@@ -89,4 +89,23 @@ export const experimentApply = async (
   execCommand(
     options,
     getCommandWithTarget(Commands.EXPERIMENT_APPLY, experiment)
+  )
+
+export const experimentRemove = async (
+  options: ReaderOptions,
+  experiment: string
+): Promise<string> =>
+  execCommand(
+    options,
+    getCommandWithTarget(Commands.EXPERIMENT_REMOVE, experiment)
+  )
+
+export const experimentBranch = async (
+  options: ReaderOptions,
+  experiment: string,
+  branchName: string
+): Promise<string> =>
+  execCommand(
+    options,
+    joinCommand([Commands.EXPERIMENT_BRANCH, experiment, branchName])
   )
