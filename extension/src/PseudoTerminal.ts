@@ -10,7 +10,7 @@ export class PseudoTerminal {
   private blocked: boolean
 
   public get isBlocked() {
-    return !!(this.blocked === undefined || this.blocked)
+    return this.blocked
   }
 
   public setBlocked(blocked: boolean) {

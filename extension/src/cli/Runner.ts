@@ -15,6 +15,7 @@ export class Runner {
   private terminatedEventEmitter: EventEmitter<void>
 
   private onDidComplete: Event<void>
+  private onDidStart: Event<void>
   public onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
@@ -24,7 +25,6 @@ export class Runner {
   public async run(command: Commands, cwd: string) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
-      this.pseudoTerminal.setBlocked(true)
       this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
       this.currentProcess = await executeInShell({
         options: {
@@ -71,6 +71,12 @@ export class Runner {
     this.stdOutEventEmitter = this.dispose.track(new EventEmitter<string>())
 
     this.startedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.onDidStart = this.startedEventEmitter.event
+    this.dispose.track(
+      this.onDidStart(() => {
+        this.pseudoTerminal.setBlocked(true)
+      })
+    )
 
     this.terminatedEventEmitter = this.dispose.track(new EventEmitter<void>())
     this.onDidTerminate = this.terminatedEventEmitter.event
