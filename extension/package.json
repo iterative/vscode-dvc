@@ -76,6 +76,16 @@
         "category": "DVC"
       },
       {
+        "title": "%command.branchExperiment%",
+        "command": "dvc.branchExperiment",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.removeExperiment%",
+        "command": "dvc.removeExperiment",
+        "category": "DVC"
+      },
+      {
         "title": "%command.selectDvcPath%",
         "command": "dvc.selectDvcPath",
         "category": "DVC"
