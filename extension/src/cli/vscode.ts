@@ -130,7 +130,11 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
 
   disposer.track(
     commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-      checkoutRecursive({ cwd: fsPath, cliPath: config.dvcPath })
+      checkoutRecursive({
+        cwd: fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     })
   )
 

@@ -144,12 +144,14 @@ describe('checkoutRecursive', () => {
 
     const output = await checkoutRecursive({
       cliPath: 'dvc',
-      cwd: fsPath
+      cwd: fsPath,
+      pythonBinPath: undefined
     })
     expect(output).toEqual(stdout)
 
     expect(execPromiseSpy).toBeCalledWith('dvc checkout --recursive', {
-      cwd: fsPath
+      cwd: fsPath,
+      env: process.env
     })
   })
 })
