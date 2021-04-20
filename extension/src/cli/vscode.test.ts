@@ -61,7 +61,7 @@ describe('queueExperimentCommand', () => {
     const stdout = 'Example stdout that will be resolved literally\n'
     mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
     await queueExperimentCommand(exampleConfig)
-    expect(mockedShowInformationMessage).toBeCalledWith(stdout)
+    expect(mockedShowInformationMessage).toBeCalledWith(stdout.trim())
   })
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
@@ -75,36 +75,34 @@ describe('queueExperimentCommand', () => {
 describe('experimentGcCommand', () => {
   it('invokes a QuickPick with the correct options', async () => {
     await experimentGcQuickPick(exampleConfig)
-    expect(mockedShowQuickPick.mock.calls).toEqual([
+    expect(mockedShowQuickPick).toBeCalledWith(
       [
-        [
-          {
-            detail: 'Preserve Experiments derived from all Git branches',
-            label: 'All Branches',
-            value: '--all-branches'
-          },
-          {
-            detail: 'Preserve Experiments derived from all Git tags',
-            label: 'All Tags',
-            value: '--all-tags'
-          },
-          {
-            detail: 'Preserve Experiments derived from all Git commits',
-            label: 'All Commits',
-            value: '--all-commits'
-          },
-          {
-            detail: 'Preserve all queued Experiments',
-            label: 'Queued Experiments',
-            value: '--queued'
-          }
-        ],
         {
-          canPickMany: true,
-          placeHolder: 'Select which Experiments to preserve'
+          detail: 'Preserve Experiments derived from all Git branches',
+          label: 'All Branches',
+          value: '--all-branches'
+        },
+        {
+          detail: 'Preserve Experiments derived from all Git tags',
+          label: 'All Tags',
+          value: '--all-tags'
+        },
+        {
+          detail: 'Preserve Experiments derived from all Git commits',
+          label: 'All Commits',
+          value: '--all-commits'
+        },
+        {
+          detail: 'Preserve all queued Experiments',
+          label: 'Queued Experiments',
+          value: '--queued'
         }
-      ]
-    ])
+      ],
+      {
+        canPickMany: true,
+        placeHolder: 'Select which Experiments to preserve'
+      }
+    )
   })
 
   it('executes the proper command given a mocked selection', async () => {
@@ -126,9 +124,9 @@ describe('experimentGcCommand', () => {
 
     expect(mockedExecPromise).toBeCalledWith(
       'dvc exp gc -f -w --all-tags --all-commits',
-      {
+      expect.objectContaining({
         cwd: exampleConfig.workspaceRoot
-      }
+      })
     )
   })
 
@@ -164,9 +162,12 @@ describe('experimentGcCommand', () => {
 
     await experimentGcQuickPick(exampleConfig)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc exp gc -f -w', {
-      cwd: exampleConfig.workspaceRoot
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      'dvc exp gc -f -w',
+      expect.objectContaining({
+        cwd: exampleConfig.workspaceRoot
+      })
+    )
   })
 
   it('does not execute a command if the QuickPick is dismissed', async () => {
@@ -190,13 +191,19 @@ describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
     await applyExperimentFromQuickPick(exampleConfig)
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc exp list --names-only', {
-      cwd: '/home/user/project'
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      'dvc exp list --names-only',
+      expect.objectContaining({
+        cwd: '/home/user/project'
+      })
+    )
 
-    expect(mockedExecPromise).toBeCalledWith('dvc exp apply exp-2021', {
-      cwd: '/home/user/project'
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      'dvc exp apply exp-2021',
+      expect.objectContaining({
+        cwd: '/home/user/project'
+      })
+    )
   })
 
   it('throws from a non-shell Exception', async () => {
@@ -250,9 +257,12 @@ describe('removeExperimentFromQuickPick', () => {
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     await removeExperimentFromQuickPick(exampleConfig)
 
-    expect(mockedExecPromise).toBeCalledWith('dvc exp remove exp-2021', {
-      cwd: '/home/user/project'
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      'dvc exp remove exp-2021',
+      expect.objectContaining({
+        cwd: '/home/user/project'
+      })
+    )
   })
 })
 
@@ -276,9 +286,9 @@ describe('branchExperimentFromQuickPick', () => {
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
     expect(mockedExecPromise).toBeCalledWith(
       'dvc exp branch exp-2021 test-branch-name',
-      {
+      expect.objectContaining({
         cwd: '/home/user/project'
-      }
+      })
     )
   })
 

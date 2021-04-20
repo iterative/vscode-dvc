@@ -4,8 +4,10 @@ import debounce from 'lodash.debounce'
 import { lstatSync } from 'fs'
 import { readdir } from 'fs-extra'
 import { join, resolve } from 'path'
+import { ReaderOptions } from './cli/executionDetails'
 import { getRoot } from './cli/reader'
 import { definedAndNonEmpty } from './util'
+import { window } from 'vscode'
 
 export const getWatcher = (handler: () => void) => (path: string): void => {
   if (path) {
@@ -39,15 +41,11 @@ export const addFileChangeHandler = (
 }
 
 const findDvcAbsoluteRootPath = async (
-  cwd: string,
-  cliPath: string | undefined
+  options: ReaderOptions
 ): Promise<string | undefined> => {
   try {
-    const root = await getRoot({
-      cliPath,
-      cwd
-    })
-    return resolve(cwd, root)
+    const root = await getRoot(options)
+    return resolve(options?.cwd, root)
   } catch (e) {}
 }
 
@@ -73,20 +71,38 @@ export const findDvcSubRootPaths = async (
 }
 
 export const findDvcRootPaths = async (
-  cwd: string,
-  cliPath: string | undefined
+  options: ReaderOptions
 ): Promise<string[]> => {
-  const subRoots = await findDvcSubRootPaths(cwd)
+  const subRoots = await findDvcSubRootPaths(options.cwd)
 
   if (definedAndNonEmpty(subRoots)) {
     return subRoots
   }
 
-  const absoluteRoot = await findDvcAbsoluteRootPath(cwd, cliPath)
+  const absoluteRoot = await findDvcAbsoluteRootPath(options)
 
   if (!absoluteRoot) {
     return []
   }
 
   return [absoluteRoot]
+}
+
+export const pickSingleRepositoryRoot = async (
+  options: ReaderOptions,
+  providedRoot?: string
+): Promise<string | undefined> => {
+  if (providedRoot) {
+    return providedRoot
+  }
+
+  const dvcRoots = await findDvcRootPaths(options)
+  if (dvcRoots.length === 1) {
+    return dvcRoots[0]
+  }
+
+  return window.showQuickPick(dvcRoots, {
+    canPickMany: false,
+    placeHolder: 'Select which repository to run experiments in'
+  })
 }

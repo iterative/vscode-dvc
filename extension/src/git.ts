@@ -1,5 +1,6 @@
 import { resolve } from 'path'
-import { execPromise, trimAndSplit } from './util'
+import { execPromise } from './util'
+import { trimAndSplit } from './util/stdout'
 import { isDirectory } from './fileSystem'
 
 const getUris = (repositoryRoot: string, relativePaths: string[]) =>

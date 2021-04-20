@@ -2,18 +2,20 @@ export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
   CHECKOUT_RECURSIVE = 'checkout --recursive',
-  INITIALIZE_SUBDIRECTORY = 'init --subdir',
-  PULL = 'pull',
-  PUSH = 'push',
-  STATUS = 'status --show-json',
-  EXPERIMENT_RUN = 'exp run',
-  EXPERIMENT_SHOW = 'exp show --show-json',
-  EXPERIMENT_QUEUE = 'exp run --queue',
-  EXPERIMENT_RUN_ALL = 'exp run --run-all',
   EXPERIMENT_GC = 'exp gc -f -w',
+  EXPERIMENT_QUEUE = 'exp run --queue',
+  EXPERIMENT_RUN = 'exp run',
+  EXPERIMENT_RUN_ALL = 'exp run --run-all',
+  EXPERIMENT_SHOW = 'exp show --show-json',
   EXPERIMENT_APPLY = 'exp apply',
   EXPERIMENT_BRANCH = 'exp branch',
   EXPERIMENT_REMOVE = 'exp remove',
+  INITIALIZE_SUBDIRECTORY = 'init --subdir',
+  LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
+  PULL = 'pull',
+  PUSH = 'push',
+  ROOT = 'root',
+  STATUS = 'status --show-json',
   EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only'
 }
 
@@ -29,5 +31,5 @@ export const getCommandWithTarget = (
   target: string
 ): string => `${command} ${target}`
 
-export const joinCommand = (segments: string[]): string =>
+export const joinCommand = <T extends string>(segments: T[]): string =>
   segments.filter(Boolean).join(' ')

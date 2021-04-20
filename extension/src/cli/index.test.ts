@@ -1,10 +1,10 @@
 import { addTarget } from '.'
 import { mocked } from 'ts-jest/utils'
-import { execPromise } from '../util'
+import { execPromise } from '../util/exec'
 import { basename, resolve } from 'path'
 
 jest.mock('fs')
-jest.mock('../util')
+jest.mock('../util/exec')
 jest.mock('vscode')
 
 const mockedExecPromise = mocked(execPromise)
@@ -33,12 +33,16 @@ describe('add', () => {
 
     const output = await addTarget({
       cliPath: 'dvc',
-      fsPath
+      fsPath,
+      pythonBinPath: undefined
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedExecPromise).toBeCalledWith(`dvc add ${file}`, {
-      cwd: dir
-    })
+    expect(mockedExecPromise).toBeCalledWith(
+      `dvc add ${file}`,
+      expect.objectContaining({
+        cwd: dir
+      })
+    )
   })
 })

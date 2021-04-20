@@ -5,7 +5,6 @@ import { Config } from '../Config'
 import { GcPreserveFlag } from './commands'
 import { quickPickManyValues } from '../util/quickPick'
 import {
-  ReaderOptions,
   initializeDirectory,
   checkout,
   checkoutRecursive,
@@ -16,6 +15,7 @@ import {
   experimentBranch,
   experimentRemove
 } from './reader'
+import { ReaderOptions } from './executionDetails'
 
 const reportStderrOrThrow = (
   error: Error & { stdout?: string; stderr?: string }
@@ -31,7 +31,8 @@ export const queueExperimentCommand = async (config: Config) => {
     return window.showInformationMessage(
       await queueExperiment({
         cwd: config.workspaceRoot,
-        cliPath: config.dvcPath
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
       })
     )
   } catch (e) {
@@ -71,7 +72,8 @@ export const experimentGcQuickPick = async (config: Config) => {
       const stdout = await experimentGarbageCollect(
         {
           cwd: config.workspaceRoot,
-          cliPath: config.dvcPath
+          cliPath: config.dvcPath,
+          pythonBinPath: config.pythonBinPath
         },
         quickPickResult
       )
@@ -101,7 +103,8 @@ const experimentsQuickPickCommand = async <T = void>(
 ) => {
   const readerOptions = {
     cwd: config.workspaceRoot,
-    cliPath: config.dvcPath
+    cliPath: config.dvcPath,
+    pythonBinPath: config.pythonBinPath
   }
   try {
     const selectedExperimentName = await experimentsQuickPick(readerOptions)
@@ -157,38 +160,59 @@ export const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
       initializeDirectory({
         cwd: fsPath,
-        cliPath: config.dvcPath
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
       })
     })
   )
 
   disposer.track(
     commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
-      addTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+      addTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
-      pushTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+      pushTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.pullTarget', ({ resourceUri }) =>
-      pullTarget({ fsPath: resourceUri.fsPath, cliPath: config.dvcPath })
+      pullTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-      checkout({ cwd: fsPath, cliPath: config.dvcPath })
+      checkout({
+        cwd: fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     })
   )
 
   disposer.track(
     commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-      checkoutRecursive({ cwd: fsPath, cliPath: config.dvcPath })
+      checkoutRecursive({
+        cwd: fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
     })
   )
 

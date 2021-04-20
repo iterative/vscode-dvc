@@ -150,6 +150,11 @@
           "command": "dvc.runExperiment",
           "group": "experiments",
           "when": "scmProvider == dvc"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "group": "experiments",
+          "when": "scmProvider == dvc"
         }
       ],
       "scm/resourceState/context": [
