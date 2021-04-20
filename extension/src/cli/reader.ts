@@ -106,7 +106,10 @@ export const queueExperiment = async (
 ): Promise<string> => execCommand(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentGarbageCollect = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  execCommand(options, [Commands.EXPERIMENT_GC, ...preserveFlags].join(' '))
+  executeProcess(
+    options,
+    [Commands.EXPERIMENT_GC, ...preserveFlags].join(' ') as Commands
+  )

@@ -118,7 +118,8 @@ describe('experimentGcCommand', () => {
     expect(mockedExecPromise).toBeCalledWith(
       'dvc exp gc -f -w --all-tags --all-commits',
       {
-        cwd: exampleConfig.workspaceRoot
+        cwd: exampleConfig.workspaceRoot,
+        env: process.env
       }
     )
   })
@@ -155,7 +156,8 @@ describe('experimentGcCommand', () => {
     await experimentGcCommand(exampleConfig)
 
     expect(mockedExecPromise).toBeCalledWith('dvc exp gc -f -w', {
-      cwd: exampleConfig.workspaceRoot
+      cwd: exampleConfig.workspaceRoot,
+      env: process.env
     })
   })
 

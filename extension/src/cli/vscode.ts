@@ -60,7 +60,8 @@ export const experimentGcCommand = async (config: Config) => {
       const stdout = await experimentGarbageCollect(
         {
           cwd: config.workspaceRoot,
-          cliPath: config.dvcPath
+          cliPath: config.dvcPath,
+          pythonBinPath: config.pythonBinPath
         },
         quickPickResult.map(({ flag }) => flag)
       )
