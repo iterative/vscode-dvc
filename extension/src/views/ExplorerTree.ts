@@ -12,7 +12,7 @@ import {
 import { join, relative } from 'path'
 import { listDvcOnly_HackedRemote } from '../cli/reader'
 import { Config } from '../Config'
-import { isDirectory } from '../fileSystem'
+import { exists, isDirectory } from '../fileSystem'
 
 interface DvcTrackedItem {
   uri: Uri
@@ -21,6 +21,9 @@ interface DvcTrackedItem {
 
 export const isDirOrFile = (path: string): FileType => {
   try {
+    if (!exists(path)) {
+      return FileType.Unknown
+    }
     if (isDirectory(path)) {
       return FileType.Directory
     }
@@ -90,7 +93,7 @@ export class ExplorerTreeViewItemProvider
   getTreeItem(element: DvcTrackedItem): TreeItem {
     const treeItem = new TreeItem(
       element.uri,
-      element.type === FileType.Directory
+      element.type === FileType.Directory || element.type === FileType.Unknown
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
