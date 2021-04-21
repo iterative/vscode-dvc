@@ -9,6 +9,7 @@ export enum Commands {
   EXPERIMENT_SHOW = 'exp show --show-json',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
   LIST = 'list .',
+  LIST_HR = 'list https://github.com/iterative/vscode-dvc',
   LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
   PUSH = 'push',
@@ -22,6 +23,9 @@ export enum ListFlag {
 
 export const getListCommand = (relativePath: string): Commands =>
   [Commands.LIST, relativePath, ListFlag.DVC_ONLY].join(' ') as Commands
+
+export const getListCommand_HR = (relativePath: string): Commands =>
+  [Commands.LIST_HR, relativePath, ListFlag.DVC_ONLY].join(' ') as Commands
 
 export enum GcPreserveFlag {
   ALL_BRANCHES = '--all-branches',

@@ -1,4 +1,9 @@
-import { Commands, GcPreserveFlag, getListCommand } from './commands'
+import {
+  Commands,
+  GcPreserveFlag,
+  getListCommand,
+  getListCommand_HR
+} from './commands'
 import { execPromise } from '../util'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -59,6 +64,16 @@ export const listDvcOnly = async (
   relativePath: string
 ): Promise<string[]> =>
   executeProcess<string[]>(options, getListCommand(relativePath), trimAndSplit)
+
+export const listDvcOnly_HackedRemote = async (
+  options: ReaderOptions,
+  relativePath: string
+): Promise<string[]> =>
+  executeProcess<string[]>(
+    options,
+    getListCommand_HR(relativePath),
+    trimAndSplit
+  )
 
 type Status = Record<
   string,

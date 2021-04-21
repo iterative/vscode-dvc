@@ -10,7 +10,7 @@ import {
   workspace
 } from 'vscode'
 import { join, relative } from 'path'
-import { listDvcOnly } from '../cli/reader'
+import { listDvcOnly_HackedRemote } from '../cli/reader'
 import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
 
@@ -110,13 +110,13 @@ export class ExplorerTreeViewItemProvider
 
   private async readDirectory(uri: Uri): Promise<[string, FileType][]> {
     await this.config.ready
-    const children = await listDvcOnly(
+    const children = await listDvcOnly_HackedRemote(
       {
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
         cwd: uri.fsPath
       },
-      relative(this.workspaceRoot, uri.fsPath)
+      join('demo', relative(this.workspaceRoot, uri.fsPath))
     )
 
     const result: [string, FileType][] = children.map(child => {
