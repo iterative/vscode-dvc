@@ -22,9 +22,6 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   }
 }
 
-const getCommand = (command: string, cliPath?: string): string =>
-  `${cliPath || 'dvc'} ${command}`
-
 export const getExecutionDetails = (
   options: ExecutionOptions
 ): {
@@ -32,9 +29,10 @@ export const getExecutionDetails = (
   cwd: string
   env: NodeJS.ProcessEnv
 } => {
+  const { command, cliPath, pythonBinPath } = options
   return {
-    env: getEnv(options.pythonBinPath),
-    command: getCommand(options.command, options.cliPath),
+    env: getEnv(pythonBinPath),
+    command: `${cliPath || 'dvc'} ${command}`,
     cwd: options.cwd
   }
 }
