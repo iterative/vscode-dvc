@@ -1,4 +1,4 @@
-import { Commands, GcPreserveFlag } from './commands'
+import { Commands, GcPreserveFlag, getListCommand } from './commands'
 import { execPromise } from '../util'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -54,8 +54,11 @@ export const listDvcOnlyRecursive = async (
     trimAndSplit
   )
 
-export const listDvcOnly = async (options: ReaderOptions): Promise<string[]> =>
-  executeProcess<string[]>(options, Commands.LIST_DVC_ONLY, trimAndSplit)
+export const listDvcOnly = async (
+  options: ReaderOptions,
+  relativePath: string
+): Promise<string[]> =>
+  executeProcess<string[]>(options, getListCommand(relativePath), trimAndSplit)
 
 type Status = Record<
   string,

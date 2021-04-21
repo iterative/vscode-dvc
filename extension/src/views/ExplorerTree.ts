@@ -9,7 +9,7 @@ import {
   window,
   workspace
 } from 'vscode'
-import { join } from 'path'
+import { join, relative } from 'path'
 import { lstatSync } from 'fs-extra'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
@@ -111,20 +111,20 @@ export class ExplorerTreeViewItemProvider
 
   private async readDirectory(uri: Uri): Promise<[string, FileType][]> {
     await this.config.ready
-    const children = await listDvcOnly({
-      pythonBinPath: this.config.pythonBinPath,
-      cliPath: this.config.dvcPath,
-      cwd: uri.fsPath
+    const children = await listDvcOnly(
+      {
+        pythonBinPath: this.config.pythonBinPath,
+        cliPath: this.config.dvcPath,
+        cwd: uri.fsPath
+      },
+      relative(this.workspaceRoot, uri.fsPath)
+    )
+
+    const result: [string, FileType][] = children.map(child => {
+      const path = join(uri.fsPath, child)
+      const stat = isDirOrFile(path)
+      return [child, stat]
     })
-
-    const result: [string, FileType][] = []
-
-    for (let i = 0; i < children.length - 1; i++) {
-      const child = children[i]
-      const stat = isDirOrFile(join(uri.fsPath, child))
-
-      result.push([child, stat])
-    }
 
     return Promise.resolve(result)
   }

@@ -8,13 +8,20 @@ export enum Commands {
   EXPERIMENT_RUN_ALL = 'exp run --run-all',
   EXPERIMENT_SHOW = 'exp show --show-json',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
-  LIST_DVC_ONLY = 'list . --dvc-only',
+  LIST = 'list .',
   LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
   PUSH = 'push',
   ROOT = 'root',
   STATUS = 'status --show-json'
 }
+
+export enum ListFlag {
+  DVC_ONLY = '--dvc-only'
+}
+
+export const getListCommand = (relativePath: string): Commands =>
+  [Commands.LIST, relativePath, ListFlag.DVC_ONLY].join(' ') as Commands
 
 export enum GcPreserveFlag {
   ALL_BRANCHES = '--all-branches',
