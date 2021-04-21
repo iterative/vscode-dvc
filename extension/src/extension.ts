@@ -18,7 +18,7 @@ import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import { Commands } from './cli/commands'
 import { Runner } from './cli/Runner'
-import { registerCommands as registerCliCommands } from './cli/vscode'
+import registerCliCommands from './cli/register'
 import {
   addFileChangeHandler,
   findDvcRootPaths,

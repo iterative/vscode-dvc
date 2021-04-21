@@ -1,5 +1,14 @@
 import { QuickPickOptions, QuickPickItem, window } from 'vscode'
 
+export const reportStderrOrThrow = (
+  error: Error & { stdout?: string; stderr?: string }
+) => {
+  if (error.stderr) {
+    return window.showErrorMessage(error.stderr)
+  }
+  throw error
+}
+
 export interface QuickPickItemWithValue<T = string> extends QuickPickItem {
   value: T
 }
