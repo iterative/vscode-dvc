@@ -181,7 +181,8 @@ export class Extension {
     )
 
     this.explorerView = new ExplorerTreeViewItemProvider(
-      this.config.workspaceRoot
+      this.config.workspaceRoot,
+      this.config
     )
     this.dispose.track(
       window.registerTreeDataProvider('explorerTreeView', this.explorerView)

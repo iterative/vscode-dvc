@@ -12,6 +12,7 @@ import {
 import { join } from 'path'
 import { lstatSync } from 'fs-extra'
 import { listDvcOnly } from '../cli/reader'
+import { Config } from '../Config'
 
 interface DvcTrackedItem {
   uri: Uri
@@ -36,12 +37,17 @@ export class ExplorerTreeViewItemProvider
     DvcTrackedItem | undefined | void
   > = new EventEmitter<DvcTrackedItem | undefined | void>()
 
+  private workspaceRoot: string
+  private config: Config
+
   readonly onDidChangeTreeData: Event<DvcTrackedItem | undefined | void> = this
     ._onDidChangeTreeData.event
 
   readonly workspaceUri: Uri
 
-  constructor(private workspaceRoot: string) {
+  constructor(workspaceRoot: string, config: Config) {
+    this.workspaceRoot = workspaceRoot
+    this.config = config
     this.workspaceUri = Uri.file(this.workspaceRoot)
     workspace.onDidDeleteFiles(() => this.refresh())
     workspace.onDidCreateFiles(() => this.refresh())
@@ -104,9 +110,10 @@ export class ExplorerTreeViewItemProvider
   }
 
   private async readDirectory(uri: Uri): Promise<[string, FileType][]> {
+    await this.config.ready
     const children = await listDvcOnly({
-      pythonBinPath: undefined,
-      cliPath: undefined,
+      pythonBinPath: this.config.pythonBinPath,
+      cliPath: this.config.dvcPath,
       cwd: uri.fsPath
     })
 
