@@ -9,6 +9,7 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
+import { exists } from './fileSystem'
 import { isStringInEnum } from './util'
 
 export type DecorationState = Record<Status, Set<string>>
@@ -22,6 +23,12 @@ enum Status {
 }
 
 export class DecorationProvider implements FileDecorationProvider {
+  private static DecorationNotOnDisk: FileDecoration = {
+    badge: 'N',
+    color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
+    tooltip: 'DVC remote only'
+  }
+
   private static DecorationDeleted: FileDecoration = {
     badge: 'D',
     color: new ThemeColor('gitDecoration.deletedResourceForeground'),
@@ -100,6 +107,9 @@ export class DecorationProvider implements FileDecorationProvider {
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
     if (this.state.deleted?.has(uri.path)) {
       return DecorationProvider.DecorationDeleted
+    }
+    if (!exists(uri.fsPath)) {
+      return DecorationProvider.DecorationNotOnDisk
     }
     if (this.state.new?.has(uri.path)) {
       return DecorationProvider.DecorationNew

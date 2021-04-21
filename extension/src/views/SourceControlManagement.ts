@@ -11,7 +11,8 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
-  UNTRACKED = 'untracked'
+  UNTRACKED = 'untracked',
+  TRACKED = 'tracked'
 }
 
 type ResourceState = { resourceUri: Uri; contextValue: Status }
