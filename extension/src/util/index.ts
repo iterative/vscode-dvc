@@ -1,8 +1,5 @@
 export { execPromise } from './exec'
 
-export const delay = (ms: number): Promise<void> =>
-  new Promise(resolve => setTimeout(resolve, ms))
-
 export const isStringInEnum = (s: string, E: Record<string, string>) =>
   Object.values(E).includes(s)
 
