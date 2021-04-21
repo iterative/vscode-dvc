@@ -75,12 +75,18 @@ export class Extension {
   }
 
   private initializeDvcRepositories(dvcRoots: string[]) {
-    dvcRoots.forEach(dvcRoot => {
-      const repository = this.dispose.track(
-        new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
-      )
-      this.dvcRepositories[dvcRoot] = repository
-    })
+    this.config.ready.then(() =>
+      dvcRoots.forEach(dvcRoot => {
+        const repository = this.dispose.track(
+          new Repository(
+            dvcRoot,
+            this.config,
+            this.decorationProviders[dvcRoot]
+          )
+        )
+        this.dvcRepositories[dvcRoot] = repository
+      })
+    )
   }
 
   private onChangeExperimentsUpdateWebview = async (
@@ -182,6 +188,7 @@ export class Extension {
 
     this.gitExtension.ready.then(() => {
       this.gitExtension.repositories.forEach(async gitExtensionRepository => {
+        await this.config.ready
         const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
         this.onChangeExperimentsUpdateWebview(gitRoot).then(disposable =>
