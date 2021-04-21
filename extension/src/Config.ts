@@ -9,6 +9,7 @@ import {
   workspace
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { WebviewColorTheme } from './webviews/experiments/contract'
 import {
@@ -18,6 +19,14 @@ import {
 
 export class Config {
   public readonly dispose = Disposable.fn()
+
+  private readonly _initialized = new Deferred()
+  private readonly initialized = this._initialized.promise
+
+  public get ready() {
+    return this.initialized
+  }
+
   public readonly workspaceRoot: string
 
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
@@ -116,6 +125,7 @@ export class Config {
 
     getPythonBinPath().then(path => {
       this.pythonBinPath = path
+      return this._initialized.resolve()
     })
 
     getOnDidChangePythonExecutionDetails().then(
