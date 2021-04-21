@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { execPromise } from './util'
+import { execPromise } from './util/exec'
 import { trimAndSplit } from './util/stdout'
 import { isDirectory } from './fileSystem'
 
