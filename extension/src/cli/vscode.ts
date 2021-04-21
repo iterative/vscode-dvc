@@ -1,19 +1,17 @@
-import { commands, QuickPickItem, window } from 'vscode'
-import { Disposer } from '@hediet/std/disposable'
-import { pushTarget, pullTarget, addTarget } from '.'
+import { window } from 'vscode'
 import { Config } from '../Config'
 import { GcPreserveFlag } from './commands'
+import { quickPickManyValues } from '../vscode/quickpick'
+import { reportStderrOrThrow } from '../vscode/reporting'
 import {
-  initializeDirectory,
-  checkout,
-  checkoutRecursive,
   queueExperiment,
-  experimentGarbageCollect
+  experimentGarbageCollect,
+  experimentListCurrent,
+  experimentApply,
+  experimentBranch,
+  experimentRemove
 } from './reader'
-
-export interface GcQuickPickItem extends QuickPickItem {
-  flag: GcPreserveFlag
-}
+import { ReaderOptions } from './executionDetails'
 
 export const queueExperimentCommand = async (config: Config) => {
   try {
@@ -25,35 +23,35 @@ export const queueExperimentCommand = async (config: Config) => {
       })
     )
   } catch (e) {
-    return window.showErrorMessage(e.stderr || e.message)
+    reportStderrOrThrow(e)
   }
 }
 
-export const experimentGcCommand = async (config: Config) => {
-  const quickPickResult = await window.showQuickPick<GcQuickPickItem>(
+export const experimentGcQuickPick = async (config: Config) => {
+  const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
     [
       {
         label: 'All Branches',
         detail: 'Preserve Experiments derived from all Git branches',
-        flag: GcPreserveFlag.ALL_BRANCHES
+        value: GcPreserveFlag.ALL_BRANCHES
       },
       {
         label: 'All Tags',
         detail: 'Preserve Experiments derived from all Git tags',
-        flag: GcPreserveFlag.ALL_TAGS
+        value: GcPreserveFlag.ALL_TAGS
       },
       {
         label: 'All Commits',
         detail: 'Preserve Experiments derived from all Git commits',
-        flag: GcPreserveFlag.ALL_COMMITS
+        value: GcPreserveFlag.ALL_COMMITS
       },
       {
         label: 'Queued Experiments',
         detail: 'Preserve all queued Experiments',
-        flag: GcPreserveFlag.QUEUED
+        value: GcPreserveFlag.QUEUED
       }
     ],
-    { canPickMany: true, placeHolder: 'Select which Experiments to preserve' }
+    { placeHolder: 'Select which Experiments to preserve' }
   )
 
   if (quickPickResult) {
@@ -64,85 +62,83 @@ export const experimentGcCommand = async (config: Config) => {
           cliPath: config.dvcPath,
           pythonBinPath: config.pythonBinPath
         },
-        quickPickResult.map(({ flag }) => flag)
+        quickPickResult
       )
       window.showInformationMessage(stdout)
     } catch (e) {
-      window.showErrorMessage(e.stderr || e.message)
+      reportStderrOrThrow(e)
     }
   }
 }
 
-export const registerCommands = (config: Config, disposer: Disposer) => {
-  disposer.track(
-    commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-      initializeDirectory({
-        cwd: fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
+const experimentsQuickPick = async (readerOptions: ReaderOptions) => {
+  const experiments = await experimentListCurrent(readerOptions)
 
-  disposer.track(
-    commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
-      addTarget({
-        fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
-      pushTarget({
-        fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.pullTarget', ({ resourceUri }) =>
-      pullTarget({
-        fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.checkout', ({ fsPath }) => {
-      checkout({
-        cwd: fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-      checkoutRecursive({
-        cwd: fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.queueExperiment', () => {
-      return queueExperimentCommand(config)
-    })
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.experimentGarbageCollect', () => {
-      return experimentGcCommand(config)
-    })
-  )
+  if (experiments.length === 0) {
+    window.showErrorMessage('There are no experiments to select!')
+  } else {
+    return window.showQuickPick(experiments)
+  }
 }
+
+const experimentsQuickPickCommand = async <T = void>(
+  config: Config,
+  callback: (
+    readerOptions: ReaderOptions,
+    selectedExperiment: string
+  ) => Promise<T>
+) => {
+  const readerOptions = {
+    cwd: config.workspaceRoot,
+    cliPath: config.dvcPath,
+    pythonBinPath: config.pythonBinPath
+  }
+  try {
+    const selectedExperimentName = await experimentsQuickPick(readerOptions)
+    if (selectedExperimentName) {
+      return callback(readerOptions, selectedExperimentName)
+    }
+  } catch (e) {
+    reportStderrOrThrow(e)
+  }
+}
+
+export const applyExperimentFromQuickPick = async (config: Config) =>
+  experimentsQuickPickCommand(
+    config,
+    async (readerOptions, selectedExperimentName) => {
+      window.showInformationMessage(
+        await experimentApply(readerOptions, selectedExperimentName)
+      )
+    }
+  )
+
+export const removeExperimentFromQuickPick = async (config: Config) =>
+  experimentsQuickPickCommand(
+    config,
+    async (readerOptions, selectedExperimentName) => {
+      await experimentRemove(readerOptions, selectedExperimentName)
+      window.showInformationMessage(
+        `Experiment ${selectedExperimentName} has been removed!`
+      )
+    }
+  )
+
+export const branchExperimentFromQuickPick = async (config: Config) =>
+  experimentsQuickPickCommand(
+    config,
+    async (readerOptions, selectedExperimentName) => {
+      const branchName = await window.showInputBox({
+        prompt: 'Name the new branch'
+      })
+      if (branchName) {
+        window.showInformationMessage(
+          await experimentBranch(
+            readerOptions,
+            selectedExperimentName,
+            branchName
+          )
+        )
+      }
+    }
+  )

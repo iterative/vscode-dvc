@@ -1,14 +1,16 @@
 import {
   checkout,
   checkoutRecursive,
+  experimentApply,
   getExperiments,
   getRoot,
   initializeDirectory,
   listDvcOnlyRecursive
 } from './reader'
-import * as Util from '../util'
+import { execPromise } from '../util/exec'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
+import { mocked } from 'ts-jest/utils'
 
 jest.mock('fs')
 
@@ -16,15 +18,17 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
+jest.mock('../util/exec')
+
+const mockedExecPromise = mocked(execPromise)
+
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
     const cwd = resolve()
-    const execPromiseSpy = jest
-      .spyOn(Util, 'execPromise')
-      .mockResolvedValueOnce({
-        stdout: JSON.stringify(complexExperimentsOutput),
-        stderr: ''
-      })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: JSON.stringify(complexExperimentsOutput),
+      stderr: ''
+    })
 
     const experiments = await getExperiments({
       cliPath: undefined,
@@ -32,7 +36,7 @@ describe('getExperiments', () => {
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(execPromiseSpy).toBeCalledWith(
+    expect(mockedExecPromise).toBeCalledWith(
       'dvc exp show --show-json',
       expect.objectContaining({
         cwd
@@ -63,12 +67,10 @@ describe('initializeDirectory', () => {
 	- Star us on GitHub: <https://github.com/iterative/dvc>
 	`
 
-    const execPromiseSpy = jest
-      .spyOn(Util, 'execPromise')
-      .mockResolvedValueOnce({
-        stdout,
-        stderr: ''
-      })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await initializeDirectory({
       cliPath: 'dvc',
@@ -77,7 +79,7 @@ describe('initializeDirectory', () => {
     })
     expect(output).toEqual(stdout.trim())
 
-    expect(execPromiseSpy).toBeCalledWith(
+    expect(mockedExecPromise).toBeCalledWith(
       'dvc init --subdir',
       expect.objectContaining({
         cwd: fsPath
@@ -89,12 +91,10 @@ describe('checkout', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\nM       logs/\n`
-    const execPromiseSpy = jest
-      .spyOn(Util, 'execPromise')
-      .mockResolvedValueOnce({
-        stdout,
-        stderr: ''
-      })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await checkout({
       cliPath: 'dvc',
@@ -103,7 +103,7 @@ describe('checkout', () => {
     })
     expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
-    expect(execPromiseSpy).toBeCalledWith(
+    expect(mockedExecPromise).toBeCalledWith(
       'dvc checkout',
       expect.objectContaining({
         cwd: fsPath
@@ -116,12 +116,10 @@ describe('checkoutRecursive', () => {
   it('should call execPromise with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\nM       logs/\n`
-    const execPromiseSpy = jest
-      .spyOn(Util, 'execPromise')
-      .mockResolvedValueOnce({
-        stdout,
-        stderr: ''
-      })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
 
     const output = await checkoutRecursive({
       cliPath: 'dvc',
@@ -130,7 +128,7 @@ describe('checkoutRecursive', () => {
     })
     expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
-    expect(execPromiseSpy).toBeCalledWith(
+    expect(mockedExecPromise).toBeCalledWith(
       'dvc checkout --recursive',
       expect.objectContaining({
         cwd: fsPath
@@ -144,19 +142,17 @@ describe('getRoot', () => {
     const mockRelativeRoot = join('..', '..')
     const mockStdout = mockRelativeRoot + '\n\r'
     const cwd = resolve()
-    const execPromiseSpy = jest
-      .spyOn(Util, 'execPromise')
-      .mockResolvedValueOnce({
-        stdout: mockStdout,
-        stderr: ''
-      })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: mockStdout,
+      stderr: ''
+    })
     const relativeRoot = await getRoot({
       cliPath: 'dvc',
       cwd,
       pythonBinPath: undefined
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
-    expect(execPromiseSpy).toBeCalledWith(
+    expect(mockedExecPromise).toBeCalledWith(
       'dvc root',
       expect.objectContaining({
         cwd
@@ -180,12 +176,10 @@ describe('listDvcOnlyRecursive', () => {
       `logs/loss.tsv\n` +
       `model.pt`
     const cwd = resolve()
-    const execPromiseSpy = jest
-      .spyOn(Util, 'execPromise')
-      .mockResolvedValueOnce({
-        stdout: stdout,
-        stderr: ''
-      })
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout: stdout,
+      stderr: ''
+    })
     const tracked = await listDvcOnlyRecursive({
       cliPath: undefined,
       pythonBinPath: undefined,
@@ -206,11 +200,32 @@ describe('listDvcOnlyRecursive', () => {
       'model.pt'
     ])
 
-    expect(execPromiseSpy).toBeCalledWith(
+    expect(mockedExecPromise).toBeCalledWith(
       'dvc list . --dvc-only -R',
       expect.objectContaining({
         cwd
       })
+    )
+  })
+})
+
+describe('apply', () => {
+  it('builds the correct command and returns stdout', async () => {
+    const cwd = ''
+    const stdout = 'Test output that will be passed along'
+    mockedExecPromise.mockResolvedValueOnce({
+      stdout,
+      stderr: ''
+    })
+    expect(
+      await experimentApply(
+        { cwd, cliPath: 'dvc', pythonBinPath: undefined },
+        'exp-test'
+      )
+    ).toEqual(stdout)
+    expect(mockedExecPromise).toBeCalledWith(
+      'dvc exp apply exp-test',
+      expect.objectContaining({ cwd })
     )
   })
 })

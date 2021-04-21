@@ -1,10 +1,10 @@
 import { addTarget } from '.'
 import { mocked } from 'ts-jest/utils'
-import { execPromise } from '../util'
+import { execPromise } from '../util/exec'
 import { basename, resolve } from 'path'
 
 jest.mock('fs')
-jest.mock('../util')
+jest.mock('../util/exec')
 jest.mock('vscode')
 
 const mockedExecPromise = mocked(execPromise)

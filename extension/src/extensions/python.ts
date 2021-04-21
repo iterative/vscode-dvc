@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { Event, extensions, Extension, Uri } from 'vscode'
-import { execPromise } from '../util'
+import { execPromise } from '../util/exec'
 
 export interface PythonExtensionAPI {
   ready: Thenable<void>

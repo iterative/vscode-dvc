@@ -7,6 +7,7 @@ export const extensions = jest.fn()
 export const ThemeColor = jest.fn()
 export const Terminal = jest.fn()
 export const window = {
+  showInputBox: jest.fn(),
   showInformationMessage: jest.fn(),
   showErrorMessage: jest.fn(),
   showQuickPick: jest.fn()
