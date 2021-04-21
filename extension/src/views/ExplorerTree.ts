@@ -10,9 +10,9 @@ import {
   workspace
 } from 'vscode'
 import { join, relative } from 'path'
-import { lstatSync } from 'fs-extra'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
+import { isDirectory } from '../fileSystem'
 
 interface DvcTrackedItem {
   uri: Uri
@@ -21,8 +21,7 @@ interface DvcTrackedItem {
 
 export const isDirOrFile = (path: string): FileType => {
   try {
-    const stat = lstatSync(path)
-    if (stat.isDirectory()) {
+    if (isDirectory(path)) {
       return FileType.Directory
     }
     return FileType.File
