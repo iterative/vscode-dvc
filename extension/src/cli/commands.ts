@@ -29,7 +29,7 @@ export enum GcPreserveFlag {
 export const getCommandWithTarget = (
   command: Commands,
   target: string
-): string => `${command} ${target}`
+): Commands => `${command} ${target}` as Commands
 
-export const joinCommand = (segments: string[]): string =>
-  segments.filter(Boolean).join(' ')
+export const joinCommand = (segments: string[]): Commands =>
+  segments.filter(Boolean).join(' ') as Commands
