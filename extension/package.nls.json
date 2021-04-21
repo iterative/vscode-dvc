@@ -12,6 +12,7 @@
   "command.push": "Push",
   "command.pushTarget": "Push Target",
   "command.runExperiment": "Run Experiment",
+  "command.runResetExperiment": "Run and Reset Experiment",
   "command.queueExperiment": "Queue Experiment",
   "command.applyExperiment": "Apply Experiment",
   "command.branchExperiment": "Branch Experiment",
