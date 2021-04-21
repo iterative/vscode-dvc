@@ -1,12 +1,17 @@
-import { Commands, GcPreserveFlag } from './commands'
-import { execPromise } from '../util'
+import {
+  Commands,
+  GcPreserveFlag,
+  getCommandWithTarget,
+  joinCommand
+} from './commands'
+import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { getExecutionDetails, ReaderOptions } from './executionDetails'
 
 export const executeProcess = async <T>(
   options: ReaderOptions,
-  partialCommand: Commands,
+  partialCommand: string,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
 ): Promise<T> => {
   const { command, cwd, env } = getExecutionDetails({
@@ -66,11 +71,46 @@ export const queueExperiment = async (
   options: ReaderOptions
 ): Promise<string> => executeProcess<string>(options, Commands.EXPERIMENT_QUEUE)
 
+export const experimentListCurrent = async (
+  readerOptions: ReaderOptions
+): Promise<string[]> =>
+  trimAndSplit(
+    await executeProcess(readerOptions, Commands.EXPERIMENT_LIST_NAMES_ONLY)
+  )
+
 export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  executeProcess<string>(
+  executeProcess(
     options,
-    [Commands.EXPERIMENT_GC, ...preserveFlags].join(' ') as Commands
+    joinCommand([Commands.EXPERIMENT_GC, ...preserveFlags])
+  )
+
+export const experimentApply = async (
+  options: ReaderOptions,
+  experiment: string
+): Promise<string> =>
+  executeProcess(
+    options,
+    getCommandWithTarget(Commands.EXPERIMENT_APPLY, experiment)
+  )
+
+export const experimentRemove = async (
+  options: ReaderOptions,
+  experiment: string
+): Promise<void> =>
+  executeProcess(
+    options,
+    getCommandWithTarget(Commands.EXPERIMENT_REMOVE, experiment)
+  )
+
+export const experimentBranch = async (
+  options: ReaderOptions,
+  experiment: string,
+  branchName: string
+): Promise<string> =>
+  executeProcess(
+    options,
+    joinCommand([Commands.EXPERIMENT_BRANCH, experiment, branchName])
   )

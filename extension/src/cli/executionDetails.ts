@@ -1,5 +1,4 @@
 import { getProcessEnv } from '../env'
-import { Commands } from './commands'
 
 export interface ReaderOptions {
   cliPath: string | undefined
@@ -8,7 +7,7 @@ export interface ReaderOptions {
 }
 
 export type ExecutionOptions = ReaderOptions & {
-  command: Commands
+  command: string
 }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
@@ -23,9 +22,6 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   }
 }
 
-const getCommand = (command: Commands, cliPath?: string): string =>
-  `${cliPath || 'dvc'} ${command}`
-
 export const getExecutionDetails = (
   options: ExecutionOptions
 ): {
@@ -33,9 +29,10 @@ export const getExecutionDetails = (
   cwd: string
   env: NodeJS.ProcessEnv
 } => {
+  const { command, cliPath, pythonBinPath } = options
   return {
-    env: getEnv(options.pythonBinPath),
-    command: getCommand(options.command, options.cliPath),
+    env: getEnv(pythonBinPath),
+    command: `${cliPath || 'dvc'} ${command}`,
     cwd: options.cwd
   }
 }

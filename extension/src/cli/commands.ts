@@ -7,6 +7,10 @@ export enum Commands {
   EXPERIMENT_RUN = 'exp run',
   EXPERIMENT_RUN_ALL = 'exp run --run-all',
   EXPERIMENT_SHOW = 'exp show --show-json',
+  EXPERIMENT_APPLY = 'exp apply',
+  EXPERIMENT_BRANCH = 'exp branch',
+  EXPERIMENT_REMOVE = 'exp remove',
+  EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
   LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
@@ -25,4 +29,7 @@ export enum GcPreserveFlag {
 export const getCommandWithTarget = (
   command: Commands,
   target: string
-): Commands => `${command} ${target}` as Commands
+): string => `${command} ${target}`
+
+export const joinCommand = (segments: string[]): string =>
+  segments.filter(Boolean).join(' ')
