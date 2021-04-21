@@ -26,5 +26,5 @@ export enum GcPreserveFlag {
   QUEUED = '--queued'
 }
 
-export const addToCommand = (command: Commands, ...args: string[]): Commands =>
+export const buildCommand = (command: Commands, ...args: string[]): Commands =>
   [command, ...args].filter(Boolean).join(' ') as Commands

@@ -1,4 +1,4 @@
-import { Commands, GcPreserveFlag, addToCommand } from './commands'
+import { buildCommand, Commands, GcPreserveFlag } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -79,20 +79,20 @@ export const experimentGarbageCollect = async (
 ): Promise<string> =>
   executeProcess(
     options,
-    addToCommand(Commands.EXPERIMENT_GC, ...preserveFlags)
+    buildCommand(Commands.EXPERIMENT_GC, ...preserveFlags)
   )
 
 export const experimentApply = async (
   options: ReaderOptions,
   experiment: string
 ): Promise<string> =>
-  executeProcess(options, addToCommand(Commands.EXPERIMENT_APPLY, experiment))
+  executeProcess(options, buildCommand(Commands.EXPERIMENT_APPLY, experiment))
 
 export const experimentRemove = async (
   options: ReaderOptions,
   experiment: string
 ): Promise<void> =>
-  executeProcess(options, addToCommand(Commands.EXPERIMENT_REMOVE, experiment))
+  executeProcess(options, buildCommand(Commands.EXPERIMENT_REMOVE, experiment))
 
 export const experimentBranch = async (
   options: ReaderOptions,
@@ -101,5 +101,5 @@ export const experimentBranch = async (
 ): Promise<string> =>
   executeProcess(
     options,
-    addToCommand(Commands.EXPERIMENT_BRANCH, experiment, branchName)
+    buildCommand(Commands.EXPERIMENT_BRANCH, experiment, branchName)
   )
