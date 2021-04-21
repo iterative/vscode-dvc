@@ -54,6 +54,9 @@ export const listDvcOnlyRecursive = async (
     trimAndSplit
   )
 
+export const listDvcOnly = async (options: ReaderOptions): Promise<string[]> =>
+  executeProcess<string[]>(options, Commands.LIST_DVC_ONLY, trimAndSplit)
+
 type Status = Record<
   string,
   (Record<string, Record<string, string>> | string)[]

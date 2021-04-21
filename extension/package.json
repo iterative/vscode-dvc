@@ -169,6 +169,14 @@
           "when": "scmProvider == dvc && scmResourceState != untracked"
         }
       ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "explorerTreeView",
+          "name": "DVC Tracked Files"
+        }
+      ]
     }
   },
   "enableProposedApi": true,

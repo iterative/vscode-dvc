@@ -29,6 +29,7 @@ import { DecorationProvider } from './DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
+import { ExplorerTreeViewItemProvider } from './views/ExplorerTree'
 
 export { Disposable, Disposer }
 
@@ -47,6 +48,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
+  private explorerView: ExplorerTreeViewItemProvider
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
 
@@ -175,6 +177,18 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runQueuedExperiments', async context =>
         this.runExperimentCommand(Commands.EXPERIMENT_RUN_ALL, context)
+      )
+    )
+
+    this.explorerView = new ExplorerTreeViewItemProvider(
+      this.config.workspaceRoot
+    )
+    this.dispose.track(
+      window.registerTreeDataProvider('explorerTreeView', this.explorerView)
+    )
+    this.dispose.track(
+      commands.registerCommand('explorerTreeView.openFile', resource =>
+        this.explorerView.openResource(resource)
       )
     )
 

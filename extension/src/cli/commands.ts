@@ -8,6 +8,7 @@ export enum Commands {
   EXPERIMENT_RUN_ALL = 'exp run --run-all',
   EXPERIMENT_SHOW = 'exp show --show-json',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
+  LIST_DVC_ONLY = 'list . --dvc-only',
   LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
   PUSH = 'push',
