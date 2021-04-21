@@ -26,10 +26,5 @@ export enum GcPreserveFlag {
   QUEUED = '--queued'
 }
 
-export const getCommandWithTarget = (
-  command: Commands,
-  target: string
-): Commands => `${command} ${target}` as Commands
-
-export const joinCommand = (segments: string[]): Commands =>
-  segments.filter(Boolean).join(' ') as Commands
+export const addToCommand = (command: Commands, ...args: string[]): Commands =>
+  [command, ...args].filter(Boolean).join(' ') as Commands

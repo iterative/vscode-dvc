@@ -1,9 +1,4 @@
-import {
-  Commands,
-  GcPreserveFlag,
-  getCommandWithTarget,
-  joinCommand
-} from './commands'
+import { Commands, GcPreserveFlag, addToCommand } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -84,26 +79,20 @@ export const experimentGarbageCollect = async (
 ): Promise<string> =>
   executeProcess(
     options,
-    joinCommand([Commands.EXPERIMENT_GC, ...preserveFlags])
+    addToCommand(Commands.EXPERIMENT_GC, ...preserveFlags)
   )
 
 export const experimentApply = async (
   options: ReaderOptions,
   experiment: string
 ): Promise<string> =>
-  executeProcess(
-    options,
-    getCommandWithTarget(Commands.EXPERIMENT_APPLY, experiment)
-  )
+  executeProcess(options, addToCommand(Commands.EXPERIMENT_APPLY, experiment))
 
 export const experimentRemove = async (
   options: ReaderOptions,
   experiment: string
 ): Promise<void> =>
-  executeProcess(
-    options,
-    getCommandWithTarget(Commands.EXPERIMENT_REMOVE, experiment)
-  )
+  executeProcess(options, addToCommand(Commands.EXPERIMENT_REMOVE, experiment))
 
 export const experimentBranch = async (
   options: ReaderOptions,
@@ -112,5 +101,5 @@ export const experimentBranch = async (
 ): Promise<string> =>
   executeProcess(
     options,
-    joinCommand([Commands.EXPERIMENT_BRANCH, experiment, branchName])
+    addToCommand(Commands.EXPERIMENT_BRANCH, experiment, branchName)
   )
