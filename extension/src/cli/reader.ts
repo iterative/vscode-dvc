@@ -11,7 +11,7 @@ import { getExecutionDetails, ReaderOptions } from './executionDetails'
 
 export const executeProcess = async <T>(
   options: ReaderOptions,
-  partialCommand: Commands | string,
+  partialCommand: string,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
 ): Promise<T> => {
   const { command, cwd, env } = getExecutionDetails({
