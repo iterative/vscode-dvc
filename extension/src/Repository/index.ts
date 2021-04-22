@@ -5,7 +5,7 @@ import {
   SourceControlManagementState,
   SourceControlManagement
 } from './views/SourceControlManagement'
-import { DecorationProvider, DecorationState } from '../DecorationProvider'
+import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
