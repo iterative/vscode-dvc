@@ -27,8 +27,8 @@ export class SourceControlManagement {
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
     ): ResourceState[] => {
-      const [resource, resources] = entry as [Status, Set<string>]
-      return [...resourceStates, ...this.getResourceStates(resource, resources)]
+      const [status, resources] = entry as [Status, Set<string>]
+      return [...resourceStates, ...this.getResourceStates(status, resources)]
     }
   }
 
