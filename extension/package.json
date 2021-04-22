@@ -56,6 +56,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.runResetExperiment%",
+        "command": "dvc.runResetExperiment",
+        "category": "DVC"
+      },
+      {
         "title": "%command.queueExperiment%",
         "command": "dvc.queueExperiment",
         "category": "DVC"
@@ -162,6 +167,11 @@
           "when": "scmProvider == dvc"
         },
         {
+          "command": "dvc.runResetExperiment",
+          "group": "experiments",
+          "when": "scmProvider == dvc"
+        },
+        {
           "command": "dvc.runQueuedExperiments",
           "group": "experiments",
           "when": "scmProvider == dvc"
@@ -176,7 +186,7 @@
         {
           "command": "dvc.pushTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && scmResourceState != remoteOnly"
         },
         {
           "command": "dvc.pullTarget",

@@ -48,13 +48,7 @@ const findDvcAbsoluteRootPath = async (
   } catch (e) {}
 }
 
-export const exists = (path: string): boolean => {
-  try {
-    return existsSync(path)
-  } catch {
-    return false
-  }
-}
+export const exists = (path: string): boolean => existsSync(path)
 
 export const isDirectory = (path: string): boolean => {
   try {

@@ -1,11 +1,4 @@
-import {
-  getCommandWithTarget,
-  joinCommand,
-  Commands,
-  GcPreserveFlag,
-  getListCommand,
-  getListCommand_HR
-} from './commands'
+import { buildCommand, Commands, GcPreserveFlag } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -13,7 +6,7 @@ import { getExecutionDetails, ReaderOptions } from './executionDetails'
 
 export const executeProcess = async <T>(
   options: ReaderOptions,
-  partialCommand: string,
+  partialCommand: Commands,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
 ): Promise<T> => {
   const { command, cwd, env } = getExecutionDetails({
@@ -61,22 +54,6 @@ export const listDvcOnlyRecursive = async (
     trimAndSplit
   )
 
-export const listDvcOnly = async (
-  options: ReaderOptions,
-  relativePath: string
-): Promise<string[]> =>
-  executeProcess<string[]>(options, getListCommand(relativePath), trimAndSplit)
-
-export const listDvcOnly_HackedRemote = async (
-  options: ReaderOptions,
-  relativePath: string
-): Promise<string[]> =>
-  executeProcess<string[]>(
-    options,
-    getListCommand_HR(relativePath),
-    trimAndSplit
-  )
-
 type Status = Record<
   string,
   (Record<string, Record<string, string>> | string)[]
@@ -102,26 +79,20 @@ export const experimentGarbageCollect = async (
 ): Promise<string> =>
   executeProcess(
     options,
-    joinCommand([Commands.EXPERIMENT_GC, ...preserveFlags])
+    buildCommand(Commands.EXPERIMENT_GC, ...preserveFlags)
   )
 
 export const experimentApply = async (
   options: ReaderOptions,
   experiment: string
 ): Promise<string> =>
-  executeProcess(
-    options,
-    getCommandWithTarget(Commands.EXPERIMENT_APPLY, experiment)
-  )
+  executeProcess(options, buildCommand(Commands.EXPERIMENT_APPLY, experiment))
 
 export const experimentRemove = async (
   options: ReaderOptions,
   experiment: string
 ): Promise<void> =>
-  executeProcess(
-    options,
-    getCommandWithTarget(Commands.EXPERIMENT_REMOVE, experiment)
-  )
+  executeProcess(options, buildCommand(Commands.EXPERIMENT_REMOVE, experiment))
 
 export const experimentBranch = async (
   options: ReaderOptions,
@@ -130,5 +101,5 @@ export const experimentBranch = async (
 ): Promise<string> =>
   executeProcess(
     options,
-    joinCommand([Commands.EXPERIMENT_BRANCH, experiment, branchName])
+    buildCommand(Commands.EXPERIMENT_BRANCH, experiment, branchName)
   )

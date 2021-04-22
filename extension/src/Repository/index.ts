@@ -1,15 +1,16 @@
-import { Config } from './Config'
+import { Config } from '../Config'
 import { Disposable } from '@hediet/std/disposable'
-import { getAllUntracked } from './git'
+import { getAllUntracked } from '../git'
 import {
   SourceControlManagementState,
   SourceControlManagement
 } from './views/SourceControlManagement'
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { status, listDvcOnlyRecursive } from './cli/reader'
+import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
+import { exists } from '../fileSystem'
 
 enum Status {
   DELETED = 'deleted',
@@ -40,6 +41,7 @@ export class RepositoryState
   public modified: Set<string>
   public new: Set<string>
   public notInCache: Set<string>
+  public remoteOnly: Set<string>
   public untracked: Set<string>
 
   constructor() {
@@ -48,6 +50,7 @@ export class RepositoryState
     this.modified = new Set<string>()
     this.new = new Set<string>()
     this.notInCache = new Set<string>()
+    this.remoteOnly = new Set<string>()
     this.untracked = new Set<string>()
   }
 }
@@ -96,12 +99,19 @@ export class Repository {
     )
   }
 
-  public async updateTracked(): Promise<void> {
+  public async updateList(): Promise<void> {
     const options = this.getCliReaderOptions()
     const tracked = await listDvcOnlyRecursive(options)
-    this.state.tracked = new Set([
-      ...this.getAbsolutePath(tracked),
-      ...this.getAbsoluteParentPath(tracked)
+
+    const absoluteTrackedPaths = this.getAbsolutePath(tracked)
+    Promise.all([
+      (this.state.tracked = new Set([
+        ...absoluteTrackedPaths,
+        ...this.getAbsoluteParentPath(tracked)
+      ])),
+      (this.state.remoteOnly = new Set(
+        absoluteTrackedPaths.filter(tracked => !exists(tracked))
+      ))
     ])
   }
 
@@ -197,15 +207,16 @@ export class Repository {
       this.updateStatus()
     ])
 
-    const extraPromiseForDecoration = this.updateTracked()
+    const slowerListPromise = this.updateList()
 
     await promisesForScm
     this.sourceControlManagement.setState(this.state)
 
+    await slowerListPromise
     if (this.decorationProvider) {
-      await extraPromiseForDecoration
       this.decorationProvider.setState(this.state)
     }
+    this.sourceControlManagement.setState(this.state)
   }
 
   private async setup() {

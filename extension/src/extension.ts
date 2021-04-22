@@ -25,7 +25,7 @@ import {
   pickSingleRepositoryRoot
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
-import { DecorationProvider } from './DecorationProvider'
+import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
@@ -177,6 +177,12 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async context =>
         this.runExperimentCommand(Commands.EXPERIMENT_RUN, context)
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.runResetExperiment', async context =>
+        this.runExperimentCommand(Commands.EXPERIMENT_RUN_RESET, context)
       )
     )
 

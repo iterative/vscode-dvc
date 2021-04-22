@@ -2,7 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
-import { isStringInEnum } from '../util'
+import { isStringInEnum } from '../../util'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
@@ -11,8 +11,8 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
-  UNTRACKED = 'untracked',
-  TRACKED = 'tracked'
+  REMOTE_ONLY = 'remoteOnly',
+  UNTRACKED = 'untracked'
 }
 
 type ResourceState = { resourceUri: Uri; contextValue: Status }
@@ -20,21 +20,27 @@ export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
   @observable
-  private resourceGroup: SourceControlResourceGroup
+  private changedResourceGroup: SourceControlResourceGroup
 
-  public setState(state: SourceControlManagementState) {
-    const reduceResourceStates = (
+  private getResourceStatesReducer() {
+    return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
     ): ResourceState[] => {
       const [status, resources] = entry as [Status, Set<string>]
       return [...resourceStates, ...this.getResourceStates(status, resources)]
     }
+  }
 
-    this.resourceGroup.resourceStates = Object.entries(state).reduce(
-      reduceResourceStates,
+  public setState(state: SourceControlManagementState) {
+    this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
+      this.getResourceStatesReducer(),
       []
     )
+  }
+
+  public getState() {
+    return this.changedResourceGroup.resourceStates
   }
 
   private isValidStatus(status: string): boolean {
@@ -64,14 +70,10 @@ export class SourceControlManagement {
     const scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
     )
-    scmView.acceptInputCommand = {
-      command: 'workbench.action.output.toggleOutput',
-      title: 'foo'
-    }
 
     scmView.inputBox.visible = false
 
-    this.resourceGroup = this.dispose.track(
+    this.changedResourceGroup = this.dispose.track(
       scmView.createResourceGroup('group1', 'Changes')
     )
 

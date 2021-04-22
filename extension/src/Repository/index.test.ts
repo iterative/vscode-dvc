@@ -1,18 +1,20 @@
 import { Disposable } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
-import { Config } from './Config'
+import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository, RepositoryState } from './Repository'
-import { listDvcOnlyRecursive, status } from './cli/reader'
-import { getAllUntracked } from './git'
+import { Repository, RepositoryState } from '.'
+import { listDvcOnlyRecursive, status } from '../cli/reader'
+import { getAllUntracked } from '../git'
+import { exists } from '../fileSystem'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/SourceControlManagement')
 jest.mock('./DecorationProvider')
-jest.mock('./cli/reader')
-jest.mock('./git')
+jest.mock('../cli/reader')
+jest.mock('../git')
+jest.mock('../fileSystem')
 
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
@@ -33,6 +35,9 @@ mockedDecorationProvider.mockImplementation(function() {
     setState: mockedSetDecorationState
   } as unknown) as DecorationProvider
 })
+
+const mockedExists = mocked(exists)
+mockedExists.mockReturnValue(true)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -103,15 +108,18 @@ describe('Repository', () => {
         expectedExecutionOptions
       )
 
-      expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        deleted: emptySet,
-        notInCache: emptySet,
-        new: emptySet,
-        modified,
-        tracked,
-        untracked
-      })
+      expect(repository.getState()).toEqual(
+        expect.objectContaining({
+          dispose: Disposable.fn(),
+          deleted: emptySet,
+          notInCache: emptySet,
+          remoteOnly: emptySet,
+          new: emptySet,
+          modified,
+          tracked,
+          untracked
+        })
+      )
     })
   })
 
@@ -208,6 +216,7 @@ describe('Repository', () => {
         new: new Set(),
         modified,
         notInCache,
+        remoteOnly: new Set(),
         deleted,
         tracked,
         untracked
