@@ -1,8 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
-import { lstatSync } from 'fs'
-import { readdir } from 'fs-extra'
+import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { join, resolve } from 'path'
 import { ReaderOptions } from './cli/executionDetails'
 import { getRoot } from './cli/reader'
@@ -15,27 +14,33 @@ export const getWatcher = (handler: () => void) => (path: string): void => {
   }
 }
 
-export const addFileChangeHandler = (
-  file: string,
+export const matchDotDirectoryPath = /.*?[\\|/]\.\S+[\\|/].*/
+
+export const addOnFileSystemChangeHandler = (
+  path: string,
   handler: () => void
 ): Disposable => {
   const watcher = getWatcher(handler)
 
   const debouncedWatcher = debounce(watcher, 500, {
-    leading: false,
-    trailing: true
+    leading: true,
+    trailing: false
   })
 
-  const fileWatcher = chokidar.watch(file)
+  const pathWatcher = chokidar.watch(path, {
+    ignored: matchDotDirectoryPath
+  })
 
-  fileWatcher.on('ready', debouncedWatcher)
-  fileWatcher.on('add', debouncedWatcher)
-  fileWatcher.on('change', debouncedWatcher)
-  fileWatcher.on('unlink', debouncedWatcher)
+  pathWatcher.on('ready', debouncedWatcher)
+  pathWatcher.on('add', debouncedWatcher)
+  pathWatcher.on('addDir', debouncedWatcher)
+  pathWatcher.on('change', debouncedWatcher)
+  pathWatcher.on('unlink', debouncedWatcher)
+  pathWatcher.on('unlinkDir', debouncedWatcher)
 
   return {
     dispose: () => {
-      fileWatcher.close()
+      pathWatcher.close()
     }
   }
 }
@@ -48,6 +53,8 @@ const findDvcAbsoluteRootPath = async (
     return resolve(options?.cwd, root)
   } catch (e) {}
 }
+
+export const exists = (path: string): boolean => existsSync(path)
 
 export const isDirectory = (path: string): boolean => {
   try {

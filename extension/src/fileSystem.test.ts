@@ -8,10 +8,12 @@ import * as FileSystem from './fileSystem'
 import { getRoot } from './cli/reader'
 
 const {
-  addFileChangeHandler,
+  addOnFileSystemChangeHandler,
+  exists,
   findDvcRootPaths,
   getWatcher,
   isDirectory,
+  matchDotDirectoryPath,
   pickSingleRepositoryRoot
 } = FileSystem
 
@@ -36,7 +38,7 @@ beforeEach(() => {
 
 const dvcDemoPath = resolve(__dirname, '..', '..', 'demo')
 
-describe('addFileChangeHandler', () => {
+describe('addOnFileSystemChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
@@ -57,7 +59,7 @@ describe('addFileChangeHandler', () => {
         }
     )
 
-    const { dispose } = addFileChangeHandler(file, func)
+    const { dispose } = addOnFileSystemChangeHandler(file, func)
 
     expect(dispose).toBeDefined()
 
@@ -65,18 +67,60 @@ describe('addFileChangeHandler', () => {
 
     expect(mockedDebounce).toBeCalledTimes(1)
     expect(mockedDebounce).toBeCalledWith(func, 500, {
-      leading: false,
-      trailing: true
+      leading: true,
+      trailing: false
     })
 
-    expect(mockedWatch).toBeCalledWith(file)
+    expect(mockedWatch).toBeCalledWith(file, {
+      ignored: /.*?[\\|/]\.\S+[\\|/].*/
+    })
     expect(mockedWatch).toBeCalledTimes(1)
 
-    expect(mockedWatcher.on).toBeCalledTimes(4)
+    expect(mockedWatcher.on).toBeCalledTimes(6)
     expect(mockedWatcher.on).toBeCalledWith('ready', func)
     expect(mockedWatcher.on).toBeCalledWith('add', func)
+    expect(mockedWatcher.on).toBeCalledWith('addDir', func)
     expect(mockedWatcher.on).toBeCalledWith('change', func)
     expect(mockedWatcher.on).toBeCalledWith('unlink', func)
+    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', func)
+  })
+})
+
+describe('matchDotDirectoryPath', () => {
+  it('should match all paths under dot directories', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/.dvc/tmp'
+      )
+    ).toBe(true)
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/.env/bin'
+      )
+    ).toBe(true)
+  })
+  it('should not match dot files', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/.gitignore'
+      )
+    ).toBe(false)
+  })
+
+  it('should not match normal directories', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/data/MNIST'
+      )
+    ).toBe(false)
+  })
+
+  it('should not match normal files', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/train.py'
+      )
+    ).toBe(false)
   })
 })
 
@@ -151,6 +195,21 @@ describe('findDvcRootPaths', () => {
       pythonBinPath: undefined
     })
     expect(dvcRoots).toEqual([])
+  })
+})
+
+describe('exists', () => {
+  it('should return true for a directory on disk', () => {
+    expect(exists(__dirname)).toBe(true)
+  })
+  it('should return true for a file on disk', () => {
+    expect(exists(__filename)).toBe(true)
+  })
+  it('should return false for an empty string', () => {
+    expect(exists(join(__dirname, __dirname))).toBe(false)
+  })
+  it('should return false for a path not on disk', () => {
+    expect(exists('')).toBe(false)
   })
 })
 
