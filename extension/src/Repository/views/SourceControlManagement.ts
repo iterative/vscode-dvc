@@ -11,6 +11,7 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
+  NOT_ON_DISK = 'notOnDisk',
   UNTRACKED = 'untracked'
 }
 
