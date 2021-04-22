@@ -1,7 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
 import { Config } from '../Config'
-import { SourceControlManagement } from '../views/SourceControlManagement'
+import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from '../DecorationProvider'
 import { Repository, RepositoryState } from '.'
@@ -9,7 +9,7 @@ import { listDvcOnlyRecursive, status } from '../cli/reader'
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
-jest.mock('../views/SourceControlManagement')
+jest.mock('./views/SourceControlManagement')
 jest.mock('../DecorationProvider')
 jest.mock('../cli/reader')
 jest.mock('../git')

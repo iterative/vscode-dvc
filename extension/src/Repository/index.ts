@@ -4,7 +4,7 @@ import { getAllUntracked } from '../git'
 import {
   SourceControlManagementState,
   SourceControlManagement
-} from '../views/SourceControlManagement'
+} from './views/SourceControlManagement'
 import { DecorationProvider, DecorationState } from '../DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from '../cli/reader'
