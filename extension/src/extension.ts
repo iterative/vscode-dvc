@@ -20,7 +20,7 @@ import { Commands } from './cli/commands'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
-  addFileChangeHandler,
+  addOnFileSystemChangeHandler,
   findDvcRootPaths,
   pickSingleRepositoryRoot
 } from './fileSystem'
@@ -86,6 +86,13 @@ export class Extension {
             this.decorationProviders[dvcRoot]
           )
         )
+
+        this.dispose.track(
+          addOnFileSystemChangeHandler(dvcRoot, () => {
+            repository.updateState()
+          })
+        )
+
         this.dvcRepositories[dvcRoot] = repository
       })
     )
@@ -100,7 +107,10 @@ export class Extension {
       )
     }
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return addFileChangeHandler(refsPath, this.refreshExperimentsWebview)
+    return addOnFileSystemChangeHandler(
+      refsPath,
+      this.refreshExperimentsWebview
+    )
   }
 
   private refreshExperimentsWebview = async () => {
@@ -192,6 +202,12 @@ export class Extension {
       )
     )
 
+    this.dispose.track(
+      commands.registerCommand('dvc.stopRunningExperiment', () =>
+        this.runner.stop()
+      )
+    )
+
     this.explorerView = new ExplorerTreeViewItemProvider(
       this.config.workspaceRoot,
       this.config
@@ -224,9 +240,11 @@ export class Extension {
         dvcRoots.forEach(async dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 
-          gitExtensionRepository.onDidChange(() => {
-            repository?.updateState()
-          })
+          this.dispose.track(
+            gitExtensionRepository.onDidChange(() => {
+              repository?.updateState()
+            })
+          )
         })
       })
     })
