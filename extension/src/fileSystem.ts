@@ -1,8 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
-import { lstatSync } from 'fs'
-import { readdir } from 'fs-extra'
+import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { join, resolve } from 'path'
 import { ReaderOptions } from './cli/executionDetails'
 import { getRoot } from './cli/reader'
@@ -48,6 +47,8 @@ const findDvcAbsoluteRootPath = async (
     return resolve(options?.cwd, root)
   } catch (e) {}
 }
+
+export const exists = (path: string): boolean => existsSync(path)
 
 export const isDirectory = (path: string): boolean => {
   try {
