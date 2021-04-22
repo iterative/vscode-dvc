@@ -189,6 +189,12 @@ export class Extension {
     )
 
     this.dispose.track(
+      commands.registerCommand('dvc.runResetExperiment', async context =>
+        this.runExperimentCommand(Commands.EXPERIMENT_RUN_RESET, context)
+      )
+    )
+
+    this.dispose.track(
       commands.registerCommand('dvc.runQueuedExperiments', async context =>
         this.runExperimentCommand(Commands.EXPERIMENT_RUN_ALL, context)
       )
