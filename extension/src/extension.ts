@@ -84,9 +84,13 @@ export class Extension {
             this.decorationProviders[dvcRoot]
           )
         )
+
         this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, repository.updateState)
+          addOnFileSystemChangeHandler(dvcRoot, () => {
+            repository.updateState()
+          })
         )
+
         this.dvcRepositories[dvcRoot] = repository
       })
     )
@@ -209,9 +213,11 @@ export class Extension {
         dvcRoots.forEach(async dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 
-          gitExtensionRepository.onDidChange(() => {
-            repository?.updateState()
-          })
+          this.dispose.track(
+            gitExtensionRepository.onDidChange(() => {
+              repository?.updateState()
+            })
+          )
         })
       })
     })
