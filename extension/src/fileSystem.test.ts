@@ -89,37 +89,27 @@ describe('addOnFileSystemChangeHandler', () => {
 describe('matchDotDirectoryPath', () => {
   it('should match all paths under dot directories', () => {
     expect(
-      matchDotDirectoryPath.test(
-        '/Users/mattseddon/PP/vscode-dvc/demo/.dvc/tmp'
-      )
+      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.dvc/tmp')
     ).toBe(true)
     expect(
-      matchDotDirectoryPath.test(
-        '/Users/mattseddon/PP/vscode-dvc/demo/.env/bin'
-      )
+      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.env/bin')
     ).toBe(true)
   })
   it('should not match dot files', () => {
     expect(
-      matchDotDirectoryPath.test(
-        '/Users/mattseddon/PP/vscode-dvc/demo/.gitignore'
-      )
+      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.gitignore')
     ).toBe(false)
   })
 
   it('should not match normal directories', () => {
     expect(
-      matchDotDirectoryPath.test(
-        '/Users/mattseddon/PP/vscode-dvc/demo/data/MNIST'
-      )
+      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/data/MNIST')
     ).toBe(false)
   })
 
   it('should not match normal files', () => {
     expect(
-      matchDotDirectoryPath.test(
-        '/Users/mattseddon/PP/vscode-dvc/demo/train.py'
-      )
+      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/train.py')
     ).toBe(false)
   })
 })
