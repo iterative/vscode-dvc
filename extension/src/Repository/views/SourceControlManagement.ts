@@ -11,6 +11,7 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
+  REMOTE_ONLY = 'remoteOnly',
   UNTRACKED = 'untracked'
 }
 
@@ -19,21 +20,27 @@ export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
   @observable
-  private resourceGroup: SourceControlResourceGroup
+  private changedResourceGroup: SourceControlResourceGroup
 
-  public setState(state: SourceControlManagementState) {
-    const reduceResourceStates = (
+  private getResourceStatesReducer() {
+    return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
     ): ResourceState[] => {
       const [status, resources] = entry as [Status, Set<string>]
       return [...resourceStates, ...this.getResourceStates(status, resources)]
     }
+  }
 
-    this.resourceGroup.resourceStates = Object.entries(state).reduce(
-      reduceResourceStates,
+  public setState(state: SourceControlManagementState) {
+    this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
+      this.getResourceStatesReducer(),
       []
     )
+  }
+
+  public getState() {
+    return this.changedResourceGroup.resourceStates
   }
 
   private isValidStatus(status: string): boolean {
@@ -63,14 +70,10 @@ export class SourceControlManagement {
     const scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
     )
-    scmView.acceptInputCommand = {
-      command: 'workbench.action.output.toggleOutput',
-      title: 'foo'
-    }
 
     scmView.inputBox.visible = false
 
-    this.resourceGroup = this.dispose.track(
+    this.changedResourceGroup = this.dispose.track(
       scmView.createResourceGroup('group1', 'Changes')
     )
 
