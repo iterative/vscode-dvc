@@ -1,13 +1,13 @@
-import { Config } from './Config'
+import { Config } from '../Config'
 import { Disposable } from '@hediet/std/disposable'
-import { getAllUntracked } from './git'
+import { getAllUntracked } from '../git'
 import {
   SourceControlManagementState,
   SourceControlManagement
-} from './views/SourceControlManagement'
-import { DecorationProvider, DecorationState } from './DecorationProvider'
+} from '../views/SourceControlManagement'
+import { DecorationProvider, DecorationState } from '../DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { status, listDvcOnlyRecursive } from './cli/reader'
+import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
 
