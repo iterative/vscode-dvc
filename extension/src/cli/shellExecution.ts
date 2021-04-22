@@ -17,6 +17,7 @@ export const executeInShell = async ({
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
     stdOutEventEmitter?: EventEmitter<string>
+    stdErrEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
 }): Promise<ChildProcess> => {
@@ -36,10 +37,17 @@ export const executeInShell = async ({
     emitters?.stdOutEventEmitter?.fire(output)
   })
 
-  childProcess.stderr.on('data', chunk => {
-    const output = getOutput(chunk)
-    Logger.error(output)
-  })
+  if (emitters?.stdErrEventEmitter) {
+    childProcess.stderr.on('data', chunk => {
+      const output = getOutput(chunk)
+      emitters?.stdErrEventEmitter?.fire(output)
+    })
+  } else {
+    childProcess.stderr.on('data', chunk => {
+      const output = getOutput(chunk)
+      Logger.error(output)
+    })
+  }
 
   childProcess.on('close', () => {
     emitters?.completedEventEmitter?.fire()
