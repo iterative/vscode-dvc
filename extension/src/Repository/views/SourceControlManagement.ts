@@ -39,8 +39,8 @@ export class SourceControlManagement {
     )
   }
 
-  private isValidStatus(resource: string): boolean {
-    return isStringInEnum(resource, Status)
+  private isValidStatus(status: string): boolean {
+    return isStringInEnum(status, Status)
   }
 
   private getResourceStates(
