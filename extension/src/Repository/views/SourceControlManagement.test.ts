@@ -14,14 +14,6 @@ mockedScm.createSourceControl = jest.fn().mockReturnValue({
 })
 
 describe('SourceControlManagement', () => {
-  it('should be able to be instantiated', () => {
-    const sourceControlManagement = new SourceControlManagement(
-      __dirname,
-      {} as SourceControlManagementState
-    )
-    expect(sourceControlManagement).toBeDefined()
-  })
-
   describe('setState', () => {
     it('should be able to set the state', async () => {
       const initialState = {} as SourceControlManagementState
