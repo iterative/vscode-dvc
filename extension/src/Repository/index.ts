@@ -103,10 +103,12 @@ export class Repository {
   public async updateTracked(): Promise<void> {
     const options = this.getCliReaderOptions()
     const tracked = await listDvcOnlyRecursive(options)
+
     this.state.tracked = new Set([
       ...this.getAbsolutePath(tracked),
       ...this.getAbsoluteParentPath(tracked)
     ])
+
     this.state.notOnDisk = new Set(tracked.filter(tracked => !exists(tracked)))
   }
 
