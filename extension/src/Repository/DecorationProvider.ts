@@ -29,10 +29,10 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC deleted'
   }
 
-  private static DecorationremoteOnly: FileDecoration = {
-    badge: 'S',
+  private static DecorationRemoteOnly: FileDecoration = {
+    badge: 'R',
     color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
-    tooltip: 'DVC not on disk'
+    tooltip: 'DVC remote only'
   }
 
   private static DecorationModified: FileDecoration = {
@@ -109,7 +109,7 @@ export class DecorationProvider implements FileDecorationProvider {
       return DecorationProvider.DecorationDeleted
     }
     if (this.state.remoteOnly?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationremoteOnly
+      return DecorationProvider.DecorationRemoteOnly
     }
     if (this.state.new?.has(uri.fsPath)) {
       return DecorationProvider.DecorationNew
