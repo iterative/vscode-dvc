@@ -24,17 +24,20 @@ describe('SourceControlManagement', () => {
 
   describe('setState', () => {
     it('should be able to set the state', async () => {
+      const initialState = {} as SourceControlManagementState
       const sourceControlManagement = new SourceControlManagement(
         __dirname,
-        {} as SourceControlManagementState
+        initialState
       )
       expect(sourceControlManagement.getState()).toEqual([])
 
-      const newState = ({
+      const updatedState = ({
         deleted: new Set(['/some/deleted/path', '/some/other/deleted/path']),
         dispose: () => undefined
       } as unknown) as SourceControlManagementState
-      sourceControlManagement.setState(newState)
+
+      sourceControlManagement.setState(updatedState)
+
       expect(sourceControlManagement.getState()).toEqual([
         {
           resourceUri: Uri.file('/some/deleted/path'),
