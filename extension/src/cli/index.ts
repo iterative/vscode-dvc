@@ -1,5 +1,5 @@
 import { basename, dirname } from 'path'
-import { Commands, getCommandWithTarget } from './commands'
+import { buildCommand, Commands } from './commands'
 import { executeProcess } from './reader'
 
 const runTargetCommand = async (
@@ -15,7 +15,7 @@ const runTargetCommand = async (
   const cwd = dirname(fsPath)
 
   const target = basename(fsPath)
-  const commandWithTarget = getCommandWithTarget(command, target)
+  const commandWithTarget = buildCommand(command, target)
 
   return executeProcess({ cwd, cliPath, pythonBinPath }, commandWithTarget)
 }

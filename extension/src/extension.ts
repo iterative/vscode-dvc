@@ -25,7 +25,7 @@ import {
   pickSingleRepositoryRoot
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
-import { DecorationProvider } from './DecorationProvider'
+import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
