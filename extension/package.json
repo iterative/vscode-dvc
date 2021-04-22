@@ -56,6 +56,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.runResetExperiment%",
+        "command": "dvc.runResetExperiment",
+        "category": "DVC"
+      },
+      {
         "title": "%command.queueExperiment%",
         "command": "dvc.queueExperiment",
         "category": "DVC"
@@ -158,6 +163,11 @@
         },
         {
           "command": "dvc.runExperiment",
+          "group": "experiments",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "command": "dvc.runResetExperiment",
           "group": "experiments",
           "when": "scmProvider == dvc"
         },

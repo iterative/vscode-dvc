@@ -5,6 +5,7 @@ export enum Commands {
   EXPERIMENT_GC = 'exp gc -f -w',
   EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT_RUN = 'exp run',
+  EXPERIMENT_RUN_RESET = 'exp run --reset',
   EXPERIMENT_RUN_ALL = 'exp run --run-all',
   EXPERIMENT_SHOW = 'exp show --show-json',
   EXPERIMENT_APPLY = 'exp apply',
