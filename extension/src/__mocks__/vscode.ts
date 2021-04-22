@@ -25,3 +25,4 @@ export const Uri = {
   file: URI.file,
   joinPath: Utils.joinPath
 }
+export const scm = jest.fn()
