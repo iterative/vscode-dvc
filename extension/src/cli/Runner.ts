@@ -80,8 +80,7 @@ export class Runner {
     this.onDidTerminate = this.terminatedEventEmitter.event
     this.dispose.track(
       this.onDidTerminate(() => {
-        this.currentProcess?.kill()
-        this.completedEventEmitter.fire()
+        this.currentProcess?.kill('SIGINT')
       })
     )
 
