@@ -104,12 +104,15 @@ export class Repository {
     const options = this.getCliReaderOptions()
     const tracked = await listDvcOnlyRecursive(options)
 
+    const absoluteTrackedPaths = this.getAbsolutePath(tracked)
     this.state.tracked = new Set([
-      ...this.getAbsolutePath(tracked),
+      ...absoluteTrackedPaths,
       ...this.getAbsoluteParentPath(tracked)
     ])
 
-    this.state.notOnDisk = new Set(tracked.filter(tracked => !exists(tracked)))
+    this.state.notOnDisk = new Set(
+      absoluteTrackedPaths.filter(tracked => !exists(tracked))
+    )
   }
 
   private filterExcludedStagesOrFiles(
@@ -209,10 +212,11 @@ export class Repository {
     await promisesForScm
     this.sourceControlManagement.setState(this.state)
 
+    await extraPromiseForDecoration
     if (this.decorationProvider) {
-      await extraPromiseForDecoration
       this.decorationProvider.setState(this.state)
     }
+    this.sourceControlManagement.setState(this.state)
   }
 
   private async setup() {

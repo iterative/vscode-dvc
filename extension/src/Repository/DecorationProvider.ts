@@ -18,6 +18,7 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
+  NOT_ON_DISK = 'notOnDisk',
   TRACKED = 'tracked'
 }
 
@@ -26,6 +27,12 @@ export class DecorationProvider implements FileDecorationProvider {
     badge: 'D',
     color: new ThemeColor('gitDecoration.deletedResourceForeground'),
     tooltip: 'DVC deleted'
+  }
+
+  private static DecorationNotOnDisk: FileDecoration = {
+    badge: 'ND',
+    color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
+    tooltip: 'DVC not on disk'
   }
 
   private static DecorationModified: FileDecoration = {
@@ -98,19 +105,22 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
-    if (this.state.deleted?.has(uri.path)) {
+    if (this.state.deleted?.has(uri.fsPath)) {
       return DecorationProvider.DecorationDeleted
     }
-    if (this.state.new?.has(uri.path)) {
+    if (this.state.notOnDisk?.has(uri.fsPath)) {
+      return DecorationProvider.DecorationNotOnDisk
+    }
+    if (this.state.new?.has(uri.fsPath)) {
       return DecorationProvider.DecorationNew
     }
-    if (this.state.notInCache?.has(uri.path)) {
+    if (this.state.notInCache?.has(uri.fsPath)) {
       return DecorationProvider.DecorationNotInCache
     }
-    if (this.state.modified?.has(uri.path)) {
+    if (this.state.modified?.has(uri.fsPath)) {
       return DecorationProvider.DecorationModified
     }
-    if (this.state.tracked?.has(uri.path)) {
+    if (this.state.tracked?.has(uri.fsPath)) {
       return DecorationProvider.DecorationTracked
     }
   }
