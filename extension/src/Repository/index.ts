@@ -100,7 +100,7 @@ export class Repository {
     )
   }
 
-  public async updateTracked(): Promise<void> {
+  public async updateList(): Promise<void> {
     const options = this.getCliReaderOptions()
     const tracked = await listDvcOnlyRecursive(options)
 
@@ -208,12 +208,12 @@ export class Repository {
       this.updateStatus()
     ])
 
-    const extraPromiseForDecoration = this.updateTracked()
+    const slowerListPromise = this.updateList()
 
     await promisesForScm
     this.sourceControlManagement.setState(this.state)
 
-    await extraPromiseForDecoration
+    await slowerListPromise
     if (this.decorationProvider) {
       this.decorationProvider.setState(this.state)
     }
