@@ -105,14 +105,15 @@ export class Repository {
     const tracked = await listDvcOnlyRecursive(options)
 
     const absoluteTrackedPaths = this.getAbsolutePath(tracked)
-    this.state.tracked = new Set([
-      ...absoluteTrackedPaths,
-      ...this.getAbsoluteParentPath(tracked)
+    Promise.all([
+      (this.state.tracked = new Set([
+        ...absoluteTrackedPaths,
+        ...this.getAbsoluteParentPath(tracked)
+      ])),
+      (this.state.notOnDisk = new Set(
+        absoluteTrackedPaths.filter(tracked => !exists(tracked))
+      ))
     ])
-
-    this.state.notOnDisk = new Set(
-      absoluteTrackedPaths.filter(tracked => !exists(tracked))
-    )
   }
 
   private filterExcludedStagesOrFiles(
