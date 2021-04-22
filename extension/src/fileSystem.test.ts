@@ -66,8 +66,8 @@ describe('addOnFileSystemChangeHandler', () => {
 
     expect(mockedDebounce).toBeCalledTimes(1)
     expect(mockedDebounce).toBeCalledWith(func, 500, {
-      leading: false,
-      trailing: true
+      leading: true,
+      trailing: false
     })
 
     expect(mockedWatch).toBeCalledWith(file, {

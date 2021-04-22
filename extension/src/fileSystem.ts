@@ -24,8 +24,8 @@ export const addOnFileSystemChangeHandler = (
   const watcher = getWatcher(handler)
 
   const debouncedWatcher = debounce(watcher, 500, {
-    leading: false,
-    trailing: true
+    leading: true,
+    trailing: false
   })
 
   const pathWatcher = chokidar.watch(path, {
