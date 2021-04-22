@@ -8,7 +8,7 @@ import * as FileSystem from './fileSystem'
 import { getRoot } from './cli/reader'
 
 const {
-  addFileChangeHandler,
+  addOnFileSystemChangeHandler,
   findDvcRootPaths,
   getWatcher,
   isDirectory,
@@ -36,7 +36,7 @@ beforeEach(() => {
 
 const dvcDemoPath = resolve(__dirname, '..', '..', 'demo')
 
-describe('addFileChangeHandler', () => {
+describe('addOnFileSystemChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
@@ -57,7 +57,7 @@ describe('addFileChangeHandler', () => {
         }
     )
 
-    const { dispose } = addFileChangeHandler(file, func)
+    const { dispose } = addOnFileSystemChangeHandler(file, func)
 
     expect(dispose).toBeDefined()
 

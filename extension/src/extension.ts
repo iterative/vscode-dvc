@@ -20,7 +20,7 @@ import { Commands } from './cli/commands'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
-  addFileChangeHandler,
+  addOnFileSystemChangeHandler,
   findDvcRootPaths,
   pickSingleRepositoryRoot
 } from './fileSystem'
@@ -85,7 +85,7 @@ export class Extension {
           )
         )
         this.dispose.track(
-          addFileChangeHandler(dvcRoot, () => {
+          addOnFileSystemChangeHandler(dvcRoot, () => {
             repository.updateState()
           })
         )
@@ -103,7 +103,10 @@ export class Extension {
       )
     }
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return addFileChangeHandler(refsPath, this.refreshExperimentsWebview)
+    return addOnFileSystemChangeHandler(
+      refsPath,
+      this.refreshExperimentsWebview
+    )
   }
 
   private refreshExperimentsWebview = async () => {
