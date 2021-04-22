@@ -30,9 +30,10 @@ describe('SourceControlManagement', () => {
       )
       expect(sourceControlManagement.getState()).toEqual([])
 
-      const newState = {
-        deleted: new Set(['/some/deleted/path', '/some/other/deleted/path'])
-      } as SourceControlManagementState
+      const newState = ({
+        deleted: new Set(['/some/deleted/path', '/some/other/deleted/path']),
+        dispose: () => undefined
+      } as unknown) as SourceControlManagementState
       sourceControlManagement.setState(newState)
       expect(sourceControlManagement.getState()).toEqual([
         {
