@@ -100,7 +100,7 @@ export class SourceControlManagement {
     )
 
     this.remoteOnlyResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('group2', 'Remote Only')
+      scmView.createResourceGroup('group2', 'Available From Storage')
     )
 
     this.setState(state)

@@ -30,7 +30,7 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   private static DecorationNotOnDisk: FileDecoration = {
-    badge: 'ND',
+    badge: 'S',
     color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
     tooltip: 'DVC not on disk'
   }
