@@ -2,7 +2,7 @@ import {
   SourceControlManagement,
   SourceControlManagementState
 } from './SourceControlManagement'
-import { scm } from 'vscode'
+import { scm, Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('vscode')
@@ -20,5 +20,30 @@ describe('SourceControlManagement', () => {
       {} as SourceControlManagementState
     )
     expect(sourceControlManagement).toBeDefined()
+  })
+
+  describe('setState', () => {
+    it('should be able to set the state', async () => {
+      const sourceControlManagement = new SourceControlManagement(
+        __dirname,
+        {} as SourceControlManagementState
+      )
+      expect(sourceControlManagement.getState()).toEqual([])
+
+      const newState = {
+        deleted: new Set(['/some/deleted/path', '/some/other/deleted/path'])
+      } as SourceControlManagementState
+      sourceControlManagement.setState(newState)
+      expect(sourceControlManagement.getState()).toEqual([
+        {
+          resourceUri: Uri.file('/some/deleted/path'),
+          contextValue: 'deleted'
+        },
+        {
+          resourceUri: Uri.file('/some/other/deleted/path'),
+          contextValue: 'deleted'
+        }
+      ])
+    })
   })
 })
