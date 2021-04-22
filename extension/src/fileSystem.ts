@@ -15,6 +15,8 @@ export const getWatcher = (handler: () => void) => (path: string): void => {
   }
 }
 
+export const matchDotDirectoryPath = /.*?[\\|/]\.\S+[\\|/].*/
+
 export const addOnFileSystemChangeHandler = (
   path: string,
   handler: () => void
@@ -26,12 +28,16 @@ export const addOnFileSystemChangeHandler = (
     trailing: true
   })
 
-  const pathWatcher = chokidar.watch(path)
+  const pathWatcher = chokidar.watch(path, {
+    ignored: matchDotDirectoryPath
+  })
 
   pathWatcher.on('ready', debouncedWatcher)
   pathWatcher.on('add', debouncedWatcher)
+  pathWatcher.on('addDir', debouncedWatcher)
   pathWatcher.on('change', debouncedWatcher)
   pathWatcher.on('unlink', debouncedWatcher)
+  pathWatcher.on('unlinkDir', debouncedWatcher)
 
   return {
     dispose: () => {

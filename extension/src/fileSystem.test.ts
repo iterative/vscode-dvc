@@ -12,6 +12,7 @@ const {
   findDvcRootPaths,
   getWatcher,
   isDirectory,
+  matchDotDirectoryPath,
   pickSingleRepositoryRoot
 } = FileSystem
 
@@ -69,14 +70,56 @@ describe('addOnFileSystemChangeHandler', () => {
       trailing: true
     })
 
-    expect(mockedWatch).toBeCalledWith(file)
+    expect(mockedWatch).toBeCalledWith(file, {
+      ignored: /.*?[\\|/]\.\S+[\\|/].*/
+    })
     expect(mockedWatch).toBeCalledTimes(1)
 
-    expect(mockedWatcher.on).toBeCalledTimes(4)
+    expect(mockedWatcher.on).toBeCalledTimes(6)
     expect(mockedWatcher.on).toBeCalledWith('ready', func)
     expect(mockedWatcher.on).toBeCalledWith('add', func)
+    expect(mockedWatcher.on).toBeCalledWith('addDir', func)
     expect(mockedWatcher.on).toBeCalledWith('change', func)
     expect(mockedWatcher.on).toBeCalledWith('unlink', func)
+    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', func)
+  })
+})
+
+describe('matchDotDirectoryPath', () => {
+  it('should match all paths under dot directories', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/.dvc/tmp'
+      )
+    ).toBe(true)
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/.env/bin'
+      )
+    ).toBe(true)
+  })
+  it('should not match dot files', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/.gitignore'
+      )
+    ).toBe(false)
+  })
+
+  it('should not match normal directories', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/data/MNIST'
+      )
+    ).toBe(false)
+  })
+
+  it('should not match normal files', () => {
+    expect(
+      matchDotDirectoryPath.test(
+        '/Users/mattseddon/PP/vscode-dvc/demo/train.py'
+      )
+    ).toBe(false)
   })
 })
 
