@@ -9,7 +9,7 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
-import { isStringInEnum } from './util'
+import { isStringInEnum } from '../util'
 
 export type DecorationState = Record<Status, Set<string>>
 

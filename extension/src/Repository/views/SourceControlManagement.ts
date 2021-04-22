@@ -2,7 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
-import { isStringInEnum } from '../util'
+import { isStringInEnum } from '../../util'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
