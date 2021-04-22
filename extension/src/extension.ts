@@ -84,6 +84,11 @@ export class Extension {
             this.decorationProviders[dvcRoot]
           )
         )
+        this.dispose.track(
+          addFileChangeHandler(dvcRoot, () => {
+            repository.updateState()
+          })
+        )
         this.dvcRepositories[dvcRoot] = repository
       })
     )
