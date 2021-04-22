@@ -200,6 +200,12 @@ export class Extension {
       )
     )
 
+    this.dispose.track(
+      commands.registerCommand('dvc.stopRunningExperiment', () =>
+        this.runner.stop()
+      )
+    )
+
     this.gitExtension = this.dispose.track(new GitExtension())
 
     this.gitExtension.ready.then(() => {

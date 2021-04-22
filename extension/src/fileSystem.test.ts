@@ -9,6 +9,7 @@ import { getRoot } from './cli/reader'
 
 const {
   addOnFileSystemChangeHandler,
+  exists,
   findDvcRootPaths,
   getWatcher,
   isDirectory,
@@ -194,6 +195,21 @@ describe('findDvcRootPaths', () => {
       pythonBinPath: undefined
     })
     expect(dvcRoots).toEqual([])
+  })
+})
+
+describe('exists', () => {
+  it('should return true for a directory on disk', () => {
+    expect(exists(__dirname)).toBe(true)
+  })
+  it('should return true for a file on disk', () => {
+    expect(exists(__filename)).toBe(true)
+  })
+  it('should return false for an empty string', () => {
+    expect(exists(join(__dirname, __dirname))).toBe(false)
+  })
+  it('should return false for a path not on disk', () => {
+    expect(exists('')).toBe(false)
   })
 })
 
