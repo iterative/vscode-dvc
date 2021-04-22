@@ -18,7 +18,7 @@ enum RemoteOnly {
   NOT_ON_DISK = 'notOnDisk'
 }
 
-type ResourceState = { resourceUri: Uri; contextValue: Status | RemoteOnly }
+type ResourceState = { resourceUri: Uri; contextValue: RemoteOnly | Status }
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
@@ -28,49 +28,41 @@ export class SourceControlManagement {
   @observable
   private remoteOnlyResourceGroup: SourceControlResourceGroup
 
-  public setState(state: SourceControlManagementState) {
-    const reduceChangedResourceStates = (
+  private getResourceStatesReducer(E: typeof RemoteOnly | typeof Status) {
+    return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
     ): ResourceState[] => {
-      const [status, resources] = entry as [RemoteOnly, Set<string>]
+      const [resource, resources] = entry as [RemoteOnly | Status, Set<string>]
       return [
         ...resourceStates,
-        ...this.getResourceStates(status, Status, resources)
+        ...this.getResourceStates(resource, E, resources)
       ]
     }
+  }
 
+  public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
-      reduceChangedResourceStates,
+      this.getResourceStatesReducer(Status),
       []
     )
-    const reduceRemoteOnlyResourceStates = (
-      resourceStates: ResourceState[],
-      entry: [string, Set<string>]
-    ): ResourceState[] => {
-      const [remoteOnly, resources] = entry as [Status, Set<string>]
-      return [
-        ...resourceStates,
-        ...this.getResourceStates(remoteOnly, RemoteOnly, resources)
-      ]
-    }
 
     this.remoteOnlyResourceGroup.resourceStates = Object.entries(state).reduce(
-      reduceRemoteOnlyResourceStates,
+      this.getResourceStatesReducer(RemoteOnly),
       []
     )
   }
 
   private isValidStatus(
     s: string,
-    E: typeof Status | typeof RemoteOnly
+    E: typeof RemoteOnly | typeof Status
   ): boolean {
     return isStringInEnum(s, E)
   }
 
   private getResourceStates(
     contextValue: Status | RemoteOnly,
-    filter: typeof Status | typeof RemoteOnly,
+    filter: typeof RemoteOnly | typeof Status,
     paths: Set<string>
   ): ResourceState[] {
     if (!this.isValidStatus(contextValue, filter)) {
