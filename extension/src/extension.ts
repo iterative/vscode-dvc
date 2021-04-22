@@ -85,9 +85,7 @@ export class Extension {
           )
         )
         this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, () => {
-            repository.updateState()
-          })
+          addOnFileSystemChangeHandler(dvcRoot, repository.updateState)
         )
         this.dvcRepositories[dvcRoot] = repository
       })
