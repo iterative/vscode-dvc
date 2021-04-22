@@ -91,19 +91,32 @@ describe('matchDotDirectoryPath', () => {
     expect(
       matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.dvc/tmp')
     ).toBe(true)
+    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\.env\\bin')).toBe(
+      true
+    )
+
     expect(
       matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.env/bin')
     ).toBe(true)
+    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\.env\\bin')).toBe(
+      true
+    )
   })
   it('should not match dot files', () => {
     expect(
       matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.gitignore')
     ).toBe(false)
+    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\.gitignore')).toBe(
+      false
+    )
   })
 
   it('should not match normal directories', () => {
     expect(
       matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/data/MNIST')
+    ).toBe(false)
+    expect(
+      matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\data\\MNIST')
     ).toBe(false)
   })
 
@@ -111,6 +124,9 @@ describe('matchDotDirectoryPath', () => {
     expect(
       matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/train.py')
     ).toBe(false)
+    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\train.py')).toBe(
+      false
+    )
   })
 })
 
