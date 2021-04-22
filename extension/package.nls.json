@@ -18,7 +18,7 @@
   "command.applyExperiment": "Apply Experiment",
   "command.branchExperiment": "Branch Experiment",
   "command.removeExperiment": "Remove Experiment",
-  "command.runQueuedExperiments": "Run Queued Experiments",
+  "command.runQueuedExperiments": "Run All Queued Experiments",
   "command.experimentGarbageCollect": "Garbage Collect Experiments",
   "command.selectDvcPath": "Select DVC CLI Path",
   "command.showExperiments": "Show Experiments",
