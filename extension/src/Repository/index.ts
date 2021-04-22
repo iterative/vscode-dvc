@@ -10,12 +10,14 @@ import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
+import { exists } from '../fileSystem'
 
 enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NEW = 'new',
-  NOT_IN_CACHE = 'not in cache'
+  NOT_IN_CACHE = 'not in cache',
+  NOT_ON_DISK = 'not on disk'
 }
 
 enum ChangedType {
@@ -40,6 +42,7 @@ export class RepositoryState
   public modified: Set<string>
   public new: Set<string>
   public notInCache: Set<string>
+  public notOnDisk: Set<string>
   public untracked: Set<string>
 
   constructor() {
@@ -48,6 +51,7 @@ export class RepositoryState
     this.modified = new Set<string>()
     this.new = new Set<string>()
     this.notInCache = new Set<string>()
+    this.notOnDisk = new Set<string>()
     this.untracked = new Set<string>()
   }
 }
@@ -103,6 +107,7 @@ export class Repository {
       ...this.getAbsolutePath(tracked),
       ...this.getAbsoluteParentPath(tracked)
     ])
+    this.state.notOnDisk = new Set(tracked.filter(tracked => !exists(tracked)))
   }
 
   private filterExcludedStagesOrFiles(
