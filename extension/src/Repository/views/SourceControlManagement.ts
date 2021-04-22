@@ -4,7 +4,7 @@ import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 import { isStringInEnum } from '../../util'
 
-export type SourceControlManagementState = Record<AllStates, Set<string>>
+export type SourceControlManagementState = Record<State, Set<string>>
 
 enum Status {
   DELETED = 'deleted',
@@ -18,7 +18,8 @@ enum RemoteOnly {
   REMOTE_ONLY = 'remoteOnly'
 }
 
-type AllStates = Status | RemoteOnly
+type State = Status | RemoteOnly
+type StateType = typeof RemoteOnly | typeof Status
 
 type ResourceState = { resourceUri: Uri; contextValue: RemoteOnly | Status }
 export class SourceControlManagement {
@@ -30,7 +31,7 @@ export class SourceControlManagement {
   @observable
   private remoteOnlyResourceGroup: SourceControlResourceGroup
 
-  private getResourceStatesReducer(E: typeof RemoteOnly | typeof Status) {
+  private getResourceStatesReducer(filter: StateType) {
     return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
@@ -38,7 +39,7 @@ export class SourceControlManagement {
       const [resource, resources] = entry as [RemoteOnly | Status, Set<string>]
       return [
         ...resourceStates,
-        ...this.getResourceStates(resource, E, resources)
+        ...this.getResourceStates(resource, filter, resources)
       ]
     }
   }
@@ -55,19 +56,16 @@ export class SourceControlManagement {
     )
   }
 
-  private isValidStatus(
-    s: string,
-    E: typeof RemoteOnly | typeof Status
-  ): boolean {
-    return isStringInEnum(s, E)
+  private isResourceInGroup(resource: string, filter: StateType): boolean {
+    return isStringInEnum(resource, filter)
   }
 
   private getResourceStates(
-    contextValue: Status | RemoteOnly,
-    filter: typeof RemoteOnly | typeof Status,
+    contextValue: State,
+    filter: StateType,
     paths: Set<string>
   ): ResourceState[] {
-    if (!this.isValidStatus(contextValue, filter)) {
+    if (!this.isResourceInGroup(contextValue, filter)) {
       return []
     }
     return [...paths]
@@ -96,7 +94,6 @@ export class SourceControlManagement {
     this.remoteOnlyResourceGroup = this.dispose.track(
       scmView.createResourceGroup('group2', 'Remote Only')
     )
-    this.remoteOnlyResourceGroup.hideWhenEmpty = true
 
     this.setState(state)
   }
