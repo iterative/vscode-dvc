@@ -32,7 +32,9 @@ describe('SourceControlManagement', () => {
 
       const updatedState = ({
         deleted: new Set(['/some/deleted/path', '/some/other/deleted/path']),
-        dispose: () => undefined
+        dispose: () => undefined,
+        new: new Set(['/some/new/path']),
+        tracked: new Set(['/some/excluded/tracked/path'])
       } as unknown) as SourceControlManagementState
 
       sourceControlManagement.setState(updatedState)
@@ -45,8 +47,12 @@ describe('SourceControlManagement', () => {
         {
           resourceUri: Uri.file('/some/other/deleted/path'),
           contextValue: 'deleted'
-        }
+        },
+        { resourceUri: Uri.file('/some/new/path'), contextValue: 'new' }
       ])
+
+      sourceControlManagement.setState(initialState)
+      expect(sourceControlManagement.getState()).toEqual([])
     })
   })
 })
