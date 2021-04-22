@@ -1,4 +1,5 @@
 import { getProcessEnv } from '../env'
+import { Commands } from './commands'
 
 export interface ReaderOptions {
   cliPath: string | undefined
@@ -7,7 +8,7 @@ export interface ReaderOptions {
 }
 
 export type ExecutionOptions = ReaderOptions & {
-  command: string
+  command: Commands
 }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
