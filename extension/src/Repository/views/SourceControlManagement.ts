@@ -4,68 +4,50 @@ import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 import { isStringInEnum } from '../../util'
 
-export type SourceControlManagementState = Record<State, Set<string>>
+export type SourceControlManagementState = Record<Status, Set<string>>
 
 enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
+  REMOTE_ONLY = 'remoteOnly',
   UNTRACKED = 'untracked'
 }
 
-enum RemoteOnly {
-  REMOTE_ONLY = 'remoteOnly'
-}
-
-type State = Status | RemoteOnly
-type StateType = typeof RemoteOnly | typeof Status
-
-type ResourceState = { resourceUri: Uri; contextValue: RemoteOnly | Status }
+type ResourceState = { resourceUri: Uri; contextValue: Status }
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
 
   @observable
   private changedResourceGroup: SourceControlResourceGroup
 
-  @observable
-  private remoteOnlyResourceGroup: SourceControlResourceGroup
-
-  private getResourceStatesReducer(filter: StateType) {
+  private getResourceStatesReducer() {
     return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
     ): ResourceState[] => {
-      const [resource, resources] = entry as [RemoteOnly | Status, Set<string>]
-      return [
-        ...resourceStates,
-        ...this.getResourceStates(resource, filter, resources)
-      ]
+      const [resource, resources] = entry as [Status, Set<string>]
+      return [...resourceStates, ...this.getResourceStates(resource, resources)]
     }
   }
 
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer(Status),
-      []
-    )
-
-    this.remoteOnlyResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer(RemoteOnly),
+      this.getResourceStatesReducer(),
       []
     )
   }
 
-  private isResourceInGroup(resource: string, filter: StateType): boolean {
-    return isStringInEnum(resource, filter)
+  private isValidStatus(resource: string): boolean {
+    return isStringInEnum(resource, Status)
   }
 
   private getResourceStates(
-    contextValue: State,
-    filter: StateType,
+    contextValue: Status,
     paths: Set<string>
   ): ResourceState[] {
-    if (!this.isResourceInGroup(contextValue, filter)) {
+    if (!this.isValidStatus(contextValue)) {
       return []
     }
     return [...paths]
@@ -89,10 +71,6 @@ export class SourceControlManagement {
 
     this.changedResourceGroup = this.dispose.track(
       scmView.createResourceGroup('group1', 'Changes')
-    )
-
-    this.remoteOnlyResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('group2', 'Remote Only')
     )
 
     this.setState(state)
