@@ -18,7 +18,7 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
-  NOT_ON_DISK = 'notOnDisk',
+  REMOTE_ONLY = 'remoteOnly',
   TRACKED = 'tracked'
 }
 
@@ -29,7 +29,7 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC deleted'
   }
 
-  private static DecorationNotOnDisk: FileDecoration = {
+  private static DecorationremoteOnly: FileDecoration = {
     badge: 'S',
     color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
     tooltip: 'DVC not on disk'
@@ -108,8 +108,8 @@ export class DecorationProvider implements FileDecorationProvider {
     if (this.state.deleted?.has(uri.fsPath)) {
       return DecorationProvider.DecorationDeleted
     }
-    if (this.state.notOnDisk?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationNotOnDisk
+    if (this.state.remoteOnly?.has(uri.fsPath)) {
+      return DecorationProvider.DecorationremoteOnly
     }
     if (this.state.new?.has(uri.fsPath)) {
       return DecorationProvider.DecorationNew

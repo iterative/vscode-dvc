@@ -113,7 +113,7 @@ describe('Repository', () => {
           dispose: Disposable.fn(),
           deleted: emptySet,
           notInCache: emptySet,
-          notOnDisk: emptySet,
+          remoteOnly: emptySet,
           new: emptySet,
           modified,
           tracked,
@@ -216,7 +216,7 @@ describe('Repository', () => {
         new: new Set(),
         modified,
         notInCache,
-        notOnDisk: new Set(),
+        remoteOnly: new Set(),
         deleted,
         tracked,
         untracked

@@ -16,8 +16,7 @@ enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NEW = 'new',
-  NOT_IN_CACHE = 'not in cache',
-  NOT_ON_DISK = 'not on disk'
+  NOT_IN_CACHE = 'not in cache'
 }
 
 enum ChangedType {
@@ -42,7 +41,7 @@ export class RepositoryState
   public modified: Set<string>
   public new: Set<string>
   public notInCache: Set<string>
-  public notOnDisk: Set<string>
+  public remoteOnly: Set<string>
   public untracked: Set<string>
 
   constructor() {
@@ -51,7 +50,7 @@ export class RepositoryState
     this.modified = new Set<string>()
     this.new = new Set<string>()
     this.notInCache = new Set<string>()
-    this.notOnDisk = new Set<string>()
+    this.remoteOnly = new Set<string>()
     this.untracked = new Set<string>()
   }
 }
@@ -110,7 +109,7 @@ export class Repository {
         ...absoluteTrackedPaths,
         ...this.getAbsoluteParentPath(tracked)
       ])),
-      (this.state.notOnDisk = new Set(
+      (this.state.remoteOnly = new Set(
         absoluteTrackedPaths.filter(tracked => !exists(tracked))
       ))
     ])

@@ -4,7 +4,7 @@ import { makeObservable, observable } from 'mobx'
 import { basename, extname } from 'path'
 import { isStringInEnum } from '../../util'
 
-export type SourceControlManagementState = Record<Status, Set<string>>
+export type SourceControlManagementState = Record<AllStates, Set<string>>
 
 enum Status {
   DELETED = 'deleted',
@@ -15,8 +15,10 @@ enum Status {
 }
 
 enum RemoteOnly {
-  NOT_ON_DISK = 'notOnDisk'
+  REMOTE_ONLY = 'remoteOnly'
 }
+
+type AllStates = Status | RemoteOnly
 
 type ResourceState = { resourceUri: Uri; contextValue: RemoteOnly | Status }
 export class SourceControlManagement {
@@ -92,8 +94,9 @@ export class SourceControlManagement {
     )
 
     this.remoteOnlyResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('group2', 'Available From Storage')
+      scmView.createResourceGroup('group2', 'Remote Only')
     )
+    this.remoteOnlyResourceGroup.hideWhenEmpty = true
 
     this.setState(state)
   }
