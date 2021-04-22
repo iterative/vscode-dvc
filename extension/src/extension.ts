@@ -192,7 +192,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.stopRunningExperiment', () =>
-        this.runner?.stop()
+        this.runner.stop()
       )
     )
 
