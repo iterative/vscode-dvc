@@ -4,7 +4,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
-import { executeInShell } from './shellExecution'
+import { executeInShell } from './execution'
 
 export class Runner {
   public readonly dispose = Disposable.fn()

@@ -4,7 +4,7 @@ import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
 import * as ExecutionDetails from '../../../cli/executionDetails'
-import { executeInShell } from '../../../cli/shellExecution'
+import { executeInShell } from '../../../cli/execution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 

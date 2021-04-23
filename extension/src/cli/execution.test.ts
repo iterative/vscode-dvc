@@ -1,6 +1,6 @@
 import { ChildProcess, spawn } from 'child_process'
 import { Commands } from './commands'
-import { executeInShell } from './shellExecution'
+import { executeInShell } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
