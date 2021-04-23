@@ -1,6 +1,6 @@
 import { ChildProcess, spawn } from 'child_process'
 import { Commands } from './commands'
-import { executeInShell } from './execution'
+import { executeNonBlocking } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
@@ -20,7 +20,7 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
-describe('executeInShell', () => {
+describe('executeNonBlocking', () => {
   it('should pass the correct details to spawn given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
@@ -28,7 +28,7 @@ describe('executeInShell', () => {
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await executeInShell({
+    await executeNonBlocking({
       options: {
         command: Commands.CHECKOUT,
         cliPath: '',
@@ -39,8 +39,7 @@ describe('executeInShell', () => {
 
     expect(mockedSpawn).toBeCalledWith(expectedCommand, {
       cwd,
-      env: processEnv,
-      shell: true
+      env: processEnv
     })
   })
 
@@ -51,7 +50,7 @@ describe('executeInShell', () => {
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await executeInShell({
+    await executeNonBlocking({
       options: {
         command: Commands.CHECKOUT,
         cliPath,
@@ -62,8 +61,7 @@ describe('executeInShell', () => {
 
     expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
       cwd,
-      env: processEnv,
-      shell: true
+      env: processEnv
     })
   })
 
@@ -79,7 +77,7 @@ describe('executeInShell', () => {
 
     const cwd = __dirname
 
-    await executeInShell({
+    await executeNonBlocking({
       options: {
         cliPath,
         command: Commands.CHECKOUT,
@@ -90,8 +88,7 @@ describe('executeInShell', () => {
 
     expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
       cwd,
-      env: { PATH: `${pythonBinPath}:${existingPath}` },
-      shell: true
+      env: { PATH: `${pythonBinPath}:${existingPath}` }
     })
   })
 
@@ -103,7 +100,7 @@ describe('executeInShell', () => {
 
     const cwd = __dirname
 
-    await executeInShell({
+    await executeNonBlocking({
       options: {
         cliPath: undefined,
         command: Commands.CHECKOUT,
@@ -114,8 +111,7 @@ describe('executeInShell', () => {
 
     expect(mockedSpawn).toBeCalledWith(`dvc ${Commands.CHECKOUT}`, {
       cwd,
-      env: { PATH: `${pythonBinPath}` },
-      shell: true
+      env: { PATH: `${pythonBinPath}` }
     })
   })
 })

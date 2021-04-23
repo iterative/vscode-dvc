@@ -9,7 +9,7 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const executeInShell = async ({
+export const executeNonBlocking = async ({
   options,
   emitters
 }: {
@@ -24,8 +24,7 @@ export const executeInShell = async ({
 
   const childProcess = spawn(command, {
     cwd,
-    env,
-    shell: true
+    env
   })
 
   emitters?.startedEventEmitter?.fire()
