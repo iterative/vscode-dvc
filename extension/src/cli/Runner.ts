@@ -24,6 +24,7 @@ export class Runner {
   private async startProcess(command: Commands, cwd: string) {
     this.pseudoTerminal.setBlocked(true)
     this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
+    await this.config.ready
     this.currentProcess = await executeInShell({
       options: {
         cliPath: this.config.dvcPath,
