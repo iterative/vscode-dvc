@@ -22,6 +22,7 @@ async function main() {
     })
   } catch (err) {
     Logger.error('Failed to run tests')
+    Logger.error((err.message || err.code) ?? err)
     process.exit(1)
   }
 }

@@ -1,17 +1,16 @@
-import { EventEmitter } from 'vscode'
-import { ChildProcess, spawn } from 'child_process'
-import { Logger } from '../common/Logger'
+import { spawn } from 'child_process'
 import { getProcessEnv } from '../env'
 import { Commands } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
+import { PromiseWithChild } from 'node:child_process'
 export interface ReaderOptions {
   cliPath: string | undefined
   pythonBinPath: string | undefined
   cwd: string
 }
 
-export type ExecutionOptions = ReaderOptions & {
+type ExecutionOptions = ReaderOptions & {
   command: Commands
 }
 
@@ -42,24 +41,19 @@ export const getExecutionDetails = (
   }
 }
 
-const getOutput = (data: string | Buffer): string =>
-  data
-    .toString()
-    .split(/(\r?\n)/g)
-    .join('\r')
+interface CompletionEvent {
+  code: number | null
+  signal: NodeJS.Signals | null
+}
 
-export const executeNonBlocking = async ({
-  options,
-  emitters
-}: {
-  options: ExecutionOptions
-  emitters?: {
-    completedEventEmitter?: EventEmitter<void>
-    stdOutEventEmitter?: EventEmitter<string>
-    startedEventEmitter?: EventEmitter<void>
-  }
-}): Promise<ChildProcess> => {
-  const { command, cwd, env } = getExecutionDetails(options)
+export const spawnProcess = (
+  options: ReaderOptions,
+  partialCommand: Commands
+): PromiseWithChild<CompletionEvent> => {
+  const { command, cwd, env } = getExecutionDetails({
+    ...options,
+    command: partialCommand
+  })
 
   const [executable, ...args] = command.split(' ')
 
@@ -68,37 +62,51 @@ export const executeNonBlocking = async ({
     env
   })
 
-  emitters?.startedEventEmitter?.fire()
-
-  childProcess.stdout.on('data', chunk => {
-    const output = getOutput(chunk)
-    emitters?.stdOutEventEmitter?.fire(output)
+  const promise: Promise<CompletionEvent> = new Promise(resolve => {
+    childProcess.on('close', (code, signal) => resolve({ code, signal }))
   })
+  ;(promise as PromiseWithChild<CompletionEvent>).child = childProcess
 
-  childProcess.stderr.on('data', chunk => {
-    const output = getOutput(chunk)
-    Logger.error(output)
-  })
-
-  childProcess.on('close', () => {
-    emitters?.completedEventEmitter?.fire()
-  })
-
-  return childProcess
+  return promise as PromiseWithChild<CompletionEvent>
 }
 
-export const executeBlocking = async <T>(
+export const execProcess = <T>(
   options: ReaderOptions,
   partialCommand: Commands,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
-): Promise<T> => {
+): PromiseWithChild<T> => {
   const { command, cwd, env } = getExecutionDetails({
     ...options,
     command: partialCommand
   })
-  const { stdout } = await execPromise(command, {
+  const basePromiseWithChild = execPromise(command, {
     cwd,
     env
   })
-  return (formatter(stdout) as unknown) as T
+  const { child } = basePromiseWithChild
+
+  const promise: Promise<T> | PromiseWithChild<T> = new Promise(
+    (resolve, reject) => {
+      basePromiseWithChild
+        .then(({ stdout }) => {
+          resolve((formatter(stdout) as unknown) as T)
+        })
+        .catch(({ stdout, stderr }) => {
+          const err = Object.assign(new Error(), {
+            stdout,
+            stderr
+          })
+          if (child) {
+            Object.assign(err, {
+              code: child.exitCode,
+              signal: child.signalCode
+            })
+          }
+          reject(err)
+        })
+    }
+  )
+  ;(promise as PromiseWithChild<T>).child = child
+
+  return promise as PromiseWithChild<T>
 }

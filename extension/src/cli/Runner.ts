@@ -4,7 +4,13 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
-import { executeNonBlocking } from './execution'
+import { spawnProcess } from './execution'
+
+const getOutput = (data: string | Buffer): string =>
+  data
+    .toString()
+    .split(/(\r?\n)/g)
+    .join('\r')
 
 export class Runner {
   public readonly dispose = Disposable.fn()
@@ -25,19 +31,24 @@ export class Runner {
     this.pseudoTerminal.setBlocked(true)
     this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
     await this.config.ready
-    this.currentProcess = await executeNonBlocking({
-      options: {
+    const promise = spawnProcess(
+      {
         cliPath: this.config.dvcPath,
-        command,
         cwd,
         pythonBinPath: this.config.pythonBinPath
       },
-      emitters: {
-        completedEventEmitter: this.completedEventEmitter,
-        startedEventEmitter: this.startedEventEmitter,
-        stdOutEventEmitter: this.stdOutEventEmitter
-      }
-    })
+      command
+    )
+    const childProcess = promise.child
+    this.startedEventEmitter.fire()
+    childProcess.stdout?.on('data', data =>
+      this.stdOutEventEmitter.fire(getOutput(data))
+    )
+    childProcess.stderr?.on('data', data =>
+      this.stdOutEventEmitter.fire(getOutput(data))
+    )
+    childProcess.on('close', () => this.completedEventEmitter.fire())
+    this.currentProcess = childProcess
   }
 
   public async run(command: Commands, cwd: string) {

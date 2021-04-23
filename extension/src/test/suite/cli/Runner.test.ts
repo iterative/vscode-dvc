@@ -1,9 +1,9 @@
-import { describe, it } from 'mocha'
+import { describe, it, after } from 'mocha'
 import chai from 'chai'
 import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
-import * as Execution from '../../../cli/execution'
+import * as CliExecution from '../../../cli/execution'
 import { Commands } from '../../../cli/commands'
 import { Disposable } from '../../../extension'
 import { Config } from '../../../Config'
@@ -23,7 +23,7 @@ suite('Runner Test Suite', () => {
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
       const stubbedGetExecutionDetails = stub(
-        Execution,
+        CliExecution,
         'getExecutionDetails'
       ).returns({
         command: 'sleep 3',
@@ -48,7 +48,11 @@ suite('Runner Test Suite', () => {
         pythonBinPath: undefined
       })
       expect(windowErrorMessageSpy).to.be.calledOnce
-      disposable.dispose()
+
+      after(() => {
+        disposable.dispose()
+        stubbedGetExecutionDetails.restore()
+      })
     }).timeout(6000)
 
     it('should be able to stop a started command', async () => {
@@ -56,7 +60,7 @@ suite('Runner Test Suite', () => {
       const runner = disposable.track(new Runner({} as Config))
       const cwd = __dirname
       const stubbedGetExecutionDetails = stub(
-        Execution,
+        CliExecution,
         'getExecutionDetails'
       ).returns({
         command: 'sleep 10',
@@ -72,7 +76,10 @@ suite('Runner Test Suite', () => {
       runner.stop()
 
       expect(runner.isRunning()).to.be.false
-      disposable.dispose()
+      after(() => {
+        disposable.dispose()
+        stubbedGetExecutionDetails.restore()
+      })
     }).timeout(2000)
   })
 })

@@ -1,11 +1,13 @@
-import { describe, it } from 'mocha'
+import { describe, it, afterEach } from 'mocha'
 import chai from 'chai'
-import { stub } from 'sinon'
+import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { Event, EventEmitter, window } from 'vscode'
+import { window } from 'vscode'
 import * as Execution from '../../../cli/execution'
+import ChildProcessModule from 'child_process'
 import { Commands } from '../../../cli/commands'
-import { Disposable, Disposer } from '../../../extension'
+import { EventEmitter } from 'events'
+import { ChildProcess } from 'node:child_process'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -13,50 +15,17 @@ const { expect } = chai
 suite('Execution Test Suite', () => {
   window.showInformationMessage('Start all execution tests.')
 
-  const { executeNonBlocking } = Execution
+  const { spawnProcess } = Execution
 
-  describe('executeNonBlocking', () => {
-    it('should be able to execute a command and provide the correct events in the correct order', async () => {
-      const disposable = Disposable.fn()
+  describe('spawnProcess', () => {
+    it('should be able to execute a command', async (): Promise<void> => {
+      const childProcess = new EventEmitter() as ChildProcess
+      const stubbedSpawn = stub(ChildProcessModule, 'spawn').returns(
+        childProcess
+      )
 
       const text = ':weeeee:'
       const command = 'echo ' + text
-
-      const completedEventEmitter = new EventEmitter<void>()
-      const stdOutEventEmitter = new EventEmitter<string>()
-      const startedEventEmitter = new EventEmitter<void>()
-
-      const onDidStart = startedEventEmitter.event
-      const onDidComplete = completedEventEmitter.event
-      const onDidOutput = stdOutEventEmitter.event
-
-      const executionOutputEvent = (
-        text: string,
-        event: Event<string>,
-        disposer: Disposer
-      ): Promise<string> => {
-        let eventStream = ''
-        return new Promise(resolve => {
-          const listener: Disposable = event((event: string) => {
-            eventStream += event
-            if (eventStream.includes(`${text}`)) {
-              return resolve(eventStream)
-            }
-          })
-          disposer.track(listener)
-        })
-      }
-      const startedOrCompletedEvent = (event: Event<void>): Promise<void> => {
-        return new Promise(resolve => {
-          const listener: Disposable = event(() => {
-            listener.dispose()
-            return resolve()
-          })
-        })
-      }
-      const started = startedOrCompletedEvent(onDidStart)
-      const completed = startedOrCompletedEvent(onDidComplete)
-      const eventStream = executionOutputEvent(text, onDidOutput, disposable)
 
       const cwd = __dirname
 
@@ -65,31 +34,31 @@ suite('Execution Test Suite', () => {
         'getExecutionDetails'
       ).returns({ command, cwd, env: {} })
 
-      executeNonBlocking({
-        options: {
-          command: Commands.STATUS,
+      const promise = spawnProcess(
+        {
           cliPath: undefined,
           cwd,
           pythonBinPath: undefined
         },
-        emitters: {
-          completedEventEmitter,
-          stdOutEventEmitter,
-          startedEventEmitter
-        }
-      })
-      stubbedGetExecutionDetails.restore()
+        Commands.STATUS
+      )
 
-      await started
-      expect((await eventStream).includes(text)).to.be.true
-      await completed
+      childProcess.emit('close')
+
+      await promise
+
+      expect(stubbedSpawn).to.be.called
+
       expect(stubbedGetExecutionDetails).to.be.calledWith({
         cliPath: undefined,
         command: 'status --show-json',
         cwd,
         pythonBinPath: undefined
       })
-      disposable.dispose()
-    }).timeout(12000)
+    })
   })
+})
+
+afterEach(() => {
+  restore()
 })
