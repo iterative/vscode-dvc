@@ -1,6 +1,6 @@
 import { basename, dirname } from 'path'
 import { buildCommand, Commands } from './commands'
-import { executeProcess } from './reader'
+import { executeProcess } from './execution'
 
 const runTargetCommand = async (
   options: {

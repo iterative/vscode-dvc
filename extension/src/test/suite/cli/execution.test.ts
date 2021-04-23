@@ -3,8 +3,7 @@ import chai from 'chai'
 import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
-import * as ExecutionDetails from '../../../cli/executionDetails'
-import { executeNonBlocking } from '../../../cli/execution'
+import * as Execution from '../../../cli/execution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 
@@ -13,6 +12,8 @@ const { expect } = chai
 
 suite('Execution Test Suite', () => {
   window.showInformationMessage('Start all execution tests.')
+
+  const { executeNonBlocking } = Execution
 
   describe('executeNonBlocking', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
@@ -60,7 +61,7 @@ suite('Execution Test Suite', () => {
       const cwd = __dirname
 
       const stubbedGetExecutionDetails = stub(
-        ExecutionDetails,
+        Execution,
         'getExecutionDetails'
       ).returns({ command, cwd, env: {} })
 

@@ -1,24 +1,7 @@
 import { buildCommand, Commands, GcPreserveFlag } from './commands'
-import { execPromise } from '../util/exec'
-import { trim, trimAndSplit } from '../util/stdout'
+import { trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { getExecutionDetails, ReaderOptions } from './executionDetails'
-
-export const executeProcess = async <T>(
-  options: ReaderOptions,
-  partialCommand: Commands,
-  formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
-): Promise<T> => {
-  const { command, cwd, env } = getExecutionDetails({
-    ...options,
-    command: partialCommand
-  })
-  const { stdout } = await execPromise(command, {
-    cwd,
-    env
-  })
-  return (formatter(stdout) as unknown) as T
-}
+import { executeProcess, ReaderOptions } from './execution'
 
 export const checkout = async (options: ReaderOptions): Promise<string[]> =>
   executeProcess<string[]>(options, Commands.CHECKOUT, trimAndSplit)
