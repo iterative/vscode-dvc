@@ -4,10 +4,9 @@ import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import * as Execution from '../../../cli/execution'
-import ChildProcessModule from 'child_process'
+import ChildProcessModule, { ChildProcess } from 'child_process'
 import { Commands } from '../../../cli/commands'
 import { EventEmitter } from 'events'
-import { ChildProcess } from 'node:child_process'
 
 chai.use(sinonChai)
 const { expect } = chai

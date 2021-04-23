@@ -1,9 +1,8 @@
-import { spawn } from 'child_process'
+import { spawn, PromiseWithChild } from 'child_process'
 import { getProcessEnv } from '../env'
 import { Commands } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
-import { PromiseWithChild } from 'node:child_process'
 export interface ReaderOptions {
   cliPath: string | undefined
   pythonBinPath: string | undefined
