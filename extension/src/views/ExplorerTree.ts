@@ -87,7 +87,7 @@ export class ExplorerTreeViewItemProvider
   getTreeItem(element: DvcTrackedItem): TreeItem {
     const treeItem = new TreeItem(
       element.resourceUri,
-      element.type === FileType.Directory || element.type === FileType.Unknown
+      element.type === FileType.Directory
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
