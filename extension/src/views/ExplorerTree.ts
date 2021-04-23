@@ -6,8 +6,7 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
   Uri,
-  window,
-  workspace
+  window
 } from 'vscode'
 import { join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
@@ -15,7 +14,7 @@ import { Config } from '../Config'
 import { exists, isDirectory } from '../fileSystem'
 
 interface DvcTrackedItem {
-  uri: Uri
+  resourceUri: Uri
   type: FileType
 }
 
@@ -51,8 +50,6 @@ export class ExplorerTreeViewItemProvider
     this.workspaceRoot = workspaceRoot
     this.config = config
     this.workspaceUri = Uri.file(this.workspaceRoot)
-    workspace.onDidDeleteFiles(() => this.refresh())
-    workspace.onDidCreateFiles(() => this.refresh())
   }
 
   refresh(): void {
@@ -65,9 +62,9 @@ export class ExplorerTreeViewItemProvider
 
   async getChildren(element?: DvcTrackedItem): Promise<DvcTrackedItem[]> {
     if (element) {
-      const children = await this.readDirectory(element.uri)
+      const children = await this.readDirectory(element.resourceUri)
       return children.map(([name, type]) => ({
-        uri: Uri.file(join(element.uri.fsPath, name)),
+        resourceUri: Uri.file(join(element.resourceUri.fsPath, name)),
         type
       }))
     }
@@ -82,7 +79,7 @@ export class ExplorerTreeViewItemProvider
       })
 
       return children.map(([name, type]) => ({
-        uri: Uri.file(join(this.workspaceUri.fsPath, name)),
+        resourceUri: Uri.file(join(this.workspaceUri.fsPath, name)),
         type
       }))
     }
@@ -92,7 +89,7 @@ export class ExplorerTreeViewItemProvider
 
   getTreeItem(element: DvcTrackedItem): TreeItem {
     const treeItem = new TreeItem(
-      element.uri,
+      element.resourceUri,
       element.type === FileType.Directory || element.type === FileType.Unknown
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
@@ -102,11 +99,10 @@ export class ExplorerTreeViewItemProvider
       treeItem.command = {
         command: 'explorerTreeView.openFile',
         title: 'Open File',
-        arguments: [element.uri]
+        arguments: [element.resourceUri]
       }
       treeItem.contextValue = 'file'
     }
-    treeItem.resourceUri = element.uri.with({ scheme: 'dvcItem' })
 
     return treeItem
   }
