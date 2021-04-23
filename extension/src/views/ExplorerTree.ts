@@ -9,8 +9,8 @@ import {
   window,
   workspace
 } from 'vscode'
-import { join } from 'path'
-import { listDvcOnlyRecursive } from '../cli/reader'
+import { join, relative } from 'path'
+import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { exists, isDirectory } from '../fileSystem'
 
@@ -113,11 +113,14 @@ export class ExplorerTreeViewItemProvider
 
   private async readDirectory(uri: Uri): Promise<[string, FileType][]> {
     await this.config.ready
-    const children = await listDvcOnlyRecursive({
-      pythonBinPath: this.config.pythonBinPath,
-      cliPath: this.config.dvcPath,
-      cwd: uri.fsPath
-    })
+    const children = await listDvcOnly(
+      {
+        pythonBinPath: this.config.pythonBinPath,
+        cliPath: this.config.dvcPath,
+        cwd: uri.fsPath
+      },
+      relative(this.workspaceRoot, uri.fsPath)
+    )
 
     const result: [string, FileType][] = children.map(child => {
       const path = join(uri.fsPath, child)
