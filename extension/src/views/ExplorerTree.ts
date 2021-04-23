@@ -11,7 +11,7 @@ import {
 import { join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
-import { exists, isDirectory } from '../fileSystem'
+import { isDirectory } from '../fileSystem'
 
 interface DvcTrackedItem {
   resourceUri: Uri
@@ -20,9 +20,6 @@ interface DvcTrackedItem {
 
 export const isDirOrFile = (path: string): FileType => {
   try {
-    if (!exists(path)) {
-      return FileType.Unknown
-    }
     if (isDirectory(path)) {
       return FileType.Directory
     }
