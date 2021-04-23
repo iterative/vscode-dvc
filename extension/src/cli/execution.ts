@@ -85,7 +85,7 @@ export const executeNonBlocking = async ({
   return childProcess
 }
 
-export const executeProcess = async <T>(
+export const executeBlocking = async <T>(
   options: ReaderOptions,
   partialCommand: Commands,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim

@@ -1,6 +1,6 @@
 import { basename, dirname } from 'path'
 import { buildCommand, Commands } from './commands'
-import { executeProcess } from './execution'
+import { executeBlocking } from './execution'
 
 const runTargetCommand = async (
   options: {
@@ -17,7 +17,7 @@ const runTargetCommand = async (
   const target = basename(fsPath)
   const commandWithTarget = buildCommand(command, target)
 
-  return executeProcess({ cwd, cliPath, pythonBinPath }, commandWithTarget)
+  return executeBlocking({ cwd, cliPath, pythonBinPath }, commandWithTarget)
 }
 
 export const addTarget = async (options: {
