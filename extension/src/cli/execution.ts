@@ -69,7 +69,7 @@ export const spawnProcess = (
   return promise as PromiseWithChild<CompletionEvent>
 }
 
-export const execProcess = <T>(
+export const executeProcess = <T>(
   options: ReaderOptions,
   partialCommand: Commands,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
