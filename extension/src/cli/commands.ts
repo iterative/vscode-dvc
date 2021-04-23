@@ -14,7 +14,6 @@ export enum Commands {
   EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
   LIST = 'list .',
-  LIST_DVC_ONLY_RECURSIVE = 'list . --dvc-only -R',
   PULL = 'pull',
   PUSH = 'push',
   ROOT = 'root',
@@ -22,7 +21,8 @@ export enum Commands {
 }
 
 export enum ListFlag {
-  DVC_ONLY = '--dvc-only'
+  DVC_ONLY = '--dvc-only',
+  RECURSIVE = '-R'
 }
 
 export enum GcPreserveFlag {

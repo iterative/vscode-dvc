@@ -60,7 +60,7 @@ export const listDvcOnlyRecursive = async (
 ): Promise<string[]> =>
   executeProcess<string[]>(
     options,
-    Commands.LIST_DVC_ONLY_RECURSIVE,
+    buildCommand(Commands.LIST, ListFlag.DVC_ONLY, ListFlag.RECURSIVE),
     trimAndSplit
   )
 
