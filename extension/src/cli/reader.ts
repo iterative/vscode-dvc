@@ -1,4 +1,4 @@
-import { buildCommand, Commands, GcPreserveFlag } from './commands'
+import { buildCommand, Commands, GcPreserveFlag, ListFlag } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -44,6 +44,16 @@ export const initializeDirectory = async (
   options: ReaderOptions
 ): Promise<string> =>
   executeProcess<string>(options, Commands.INITIALIZE_SUBDIRECTORY)
+
+export const listDvcOnly = async (
+  options: ReaderOptions,
+  relativePath: string
+): Promise<string[]> =>
+  executeProcess<string[]>(
+    options,
+    buildCommand(Commands.LIST, relativePath, ListFlag.DVC_ONLY),
+    trimAndSplit
+  )
 
 export const listDvcOnlyRecursive = async (
   options: ReaderOptions
