@@ -24,7 +24,6 @@ describe('executeNonBlocking', () => {
   it('should pass the correct details to spawn given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
-    const expectedCommand = `dvc ${Commands.CHECKOUT}`
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
@@ -37,7 +36,7 @@ describe('executeNonBlocking', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith(expectedCommand, {
+    expect(mockedSpawn).toBeCalledWith('dvc', [Commands.CHECKOUT], {
       cwd,
       env: processEnv
     })
@@ -59,7 +58,7 @@ describe('executeNonBlocking', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
+    expect(mockedSpawn).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
       cwd,
       env: processEnv
     })
@@ -86,7 +85,7 @@ describe('executeNonBlocking', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith(`${cliPath} ${Commands.CHECKOUT}`, {
+    expect(mockedSpawn).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
       cwd,
       env: { PATH: `${pythonBinPath}:${existingPath}` }
     })
@@ -109,7 +108,7 @@ describe('executeNonBlocking', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith(`dvc ${Commands.CHECKOUT}`, {
+    expect(mockedSpawn).toBeCalledWith('dvc', [Commands.CHECKOUT], {
       cwd,
       env: { PATH: `${pythonBinPath}` }
     })

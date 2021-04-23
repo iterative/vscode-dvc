@@ -61,7 +61,9 @@ export const executeNonBlocking = async ({
 }): Promise<ChildProcess> => {
   const { command, cwd, env } = getExecutionDetails(options)
 
-  const childProcess = spawn(command, {
+  const [executable, ...args] = command.split(' ')
+
+  const childProcess = spawn(executable, args, {
     cwd,
     env
   })
