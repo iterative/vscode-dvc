@@ -48,7 +48,7 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const executeNonBlocking = async ({
+export const spawnProcess = async ({
   options,
   emitters
 }: {
@@ -87,7 +87,7 @@ export const executeNonBlocking = async ({
   return childProcess
 }
 
-export const executeBlocking = async <T>(
+export const execProcess = async <T>(
   options: ReaderOptions,
   partialCommand: Commands,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim

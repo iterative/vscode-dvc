@@ -1,6 +1,6 @@
 import { ChildProcess, spawn } from 'child_process'
 import { Commands } from './commands'
-import { executeNonBlocking } from './execution'
+import { spawnProcess } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
@@ -20,14 +20,14 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
-describe('executeNonBlocking', () => {
+describe('spawnProcess', () => {
   it('should pass the correct details to spawn given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await executeNonBlocking({
+    await spawnProcess({
       options: {
         command: Commands.CHECKOUT,
         cliPath: '',
@@ -49,7 +49,7 @@ describe('executeNonBlocking', () => {
     const cwd = __dirname
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await executeNonBlocking({
+    await spawnProcess({
       options: {
         command: Commands.CHECKOUT,
         cliPath,
@@ -76,7 +76,7 @@ describe('executeNonBlocking', () => {
 
     const cwd = __dirname
 
-    await executeNonBlocking({
+    await spawnProcess({
       options: {
         cliPath,
         command: Commands.CHECKOUT,
@@ -99,7 +99,7 @@ describe('executeNonBlocking', () => {
 
     const cwd = __dirname
 
-    await executeNonBlocking({
+    await spawnProcess({
       options: {
         cliPath: undefined,
         command: Commands.CHECKOUT,

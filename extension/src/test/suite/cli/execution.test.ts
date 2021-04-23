@@ -13,9 +13,9 @@ const { expect } = chai
 suite('Execution Test Suite', () => {
   window.showInformationMessage('Start all execution tests.')
 
-  const { executeNonBlocking } = Execution
+  const { spawnProcess } = Execution
 
-  describe('executeNonBlocking', () => {
+  describe('spawnProcess', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
 
@@ -65,7 +65,7 @@ suite('Execution Test Suite', () => {
         'getExecutionDetails'
       ).returns({ command, cwd, env: {} })
 
-      executeNonBlocking({
+      spawnProcess({
         options: {
           command: Commands.STATUS,
           cliPath: undefined,
