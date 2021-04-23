@@ -220,6 +220,9 @@ export class Extension {
         this.explorerView.openResource(resource)
       )
     )
+    addOnFileSystemChangeHandler(this.config.workspaceRoot, () => {
+      this.explorerView.refresh()
+    })
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
