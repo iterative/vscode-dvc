@@ -66,10 +66,17 @@ export class Runner {
     )
     this.onDidComplete = this.completedEventEmitter.event
     this.dispose.track(
-      this.onDidComplete(() => {
+      this.onDidComplete(({ code, signal }) => {
         this.pseudoTerminal.setBlocked(false)
+        const exitString = [
+          'Process completed',
+          code !== null && `with code ${code}`,
+          signal !== null && `after ${signal}`
+        ]
+          .filter(Boolean)
+          .join(' ')
         this.outputEventEmitter.fire(
-          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
+          `\r\n${exitString}\r\nTerminal will be reused by DVC, press any key to close it\r\n\n`
         )
         this.currentProcess = undefined
       })
