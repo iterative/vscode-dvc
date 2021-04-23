@@ -4,7 +4,10 @@ import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
 import * as ExecutionDetails from '../../../cli/executionDetails'
-import { executeInShell } from '../../../cli/shellExecution'
+import {
+  executeInShell,
+  ProcessCompletedEvent
+} from '../../../cli/shellExecution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 
@@ -21,7 +24,7 @@ suite('Shell Execution Test Suite', () => {
       const text = ':weeeee:'
       const command = 'echo ' + text
 
-      const completedEventEmitter = new EventEmitter<void>()
+      const completedEventEmitter = new EventEmitter<ProcessCompletedEvent>()
       const stdOutEventEmitter = new EventEmitter<string>()
       const startedEventEmitter = new EventEmitter<void>()
 
@@ -45,7 +48,9 @@ suite('Shell Execution Test Suite', () => {
           disposer.track(listener)
         })
       }
-      const startedOrCompletedEvent = (event: Event<void>): Promise<void> => {
+      const startedOrCompletedEvent = (
+        event: Event<unknown>
+      ): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = event(() => {
             listener.dispose()

@@ -4,17 +4,17 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
-import { executeInShell } from './shellExecution'
+import { executeInShell, ProcessCompletedEvent } from './shellExecution'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
 
   private outputEventEmitter: EventEmitter<string>
-  private completedEventEmitter: EventEmitter<void>
+  private completedEventEmitter: EventEmitter<ProcessCompletedEvent>
   private startedEventEmitter: EventEmitter<void>
   private terminatedEventEmitter: EventEmitter<void>
 
-  private onDidComplete: Event<void>
+  private onDidComplete: Event<ProcessCompletedEvent>
   public onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
@@ -61,7 +61,9 @@ export class Runner {
   constructor(config: Config) {
     this.config = config
 
-    this.completedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.completedEventEmitter = this.dispose.track(
+      new EventEmitter<ProcessCompletedEvent>()
+    )
     this.onDidComplete = this.completedEventEmitter.event
     this.dispose.track(
       this.onDidComplete(() => {

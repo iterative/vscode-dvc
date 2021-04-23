@@ -9,13 +9,18 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
+export interface ProcessCompletedEvent {
+  code: number | null
+  signal: string | null
+}
+
 export const executeInShell = async ({
   options,
   emitters
 }: {
   options: ExecutionOptions
   emitters?: {
-    completedEventEmitter?: EventEmitter<void>
+    completedEventEmitter?: EventEmitter<ProcessCompletedEvent>
     stdOutEventEmitter?: EventEmitter<string>
     stdErrEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
@@ -49,8 +54,8 @@ export const executeInShell = async ({
     })
   }
 
-  childProcess.on('close', () => {
-    emitters?.completedEventEmitter?.fire()
+  childProcess.on('close', (code, signal) => {
+    emitters?.completedEventEmitter?.fire({ code, signal })
   })
 
   return childProcess
