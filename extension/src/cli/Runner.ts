@@ -56,7 +56,8 @@ export class Runner {
       await this.currentProcess
       return false
     } catch (e) {
-      const stopped = e.isCanceled && this.currentProcess?.killed
+      const stopped =
+        (e.isCanceled && this.currentProcess?.killed) || !this.currentProcess
       if (stopped) {
         this.terminatedEventEmitter.fire()
         this.currentProcess = undefined
