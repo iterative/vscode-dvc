@@ -5,7 +5,6 @@ import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
 jest.mock('../env')
-jest.mock('child_process')
 jest.mock('execa')
 
 const mockedGetEnv = mocked(getProcessEnv)
