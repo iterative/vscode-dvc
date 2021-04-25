@@ -1,4 +1,4 @@
-import { ChildProcess, spawn } from 'child_process'
+import execa, { ExecaChildProcess } from 'execa'
 import { Commands } from './commands'
 import { spawnProcess } from './execution'
 import { mocked } from 'ts-jest/utils'
@@ -6,15 +6,16 @@ import { getProcessEnv } from '../env'
 
 jest.mock('../env')
 jest.mock('child_process')
+jest.mock('execa')
 
 const mockedGetEnv = mocked(getProcessEnv)
-const mockedSpawn = mocked(spawn)
+const mockedSpawn = mocked(execa)
 
 mockedSpawn.mockReturnValue(({
   on: jest.fn(),
   stderr: { on: jest.fn() },
   stdout: { on: jest.fn() }
-} as unknown) as ChildProcess)
+} as unknown) as ExecaChildProcess<Buffer>)
 
 beforeEach(() => {
   jest.clearAllMocks()

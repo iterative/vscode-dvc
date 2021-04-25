@@ -69,10 +69,11 @@ suite('Runner Test Suite', () => {
 
       expect(runner.isRunning()).to.be.true
 
-      runner.stop()
+      const stopped = await runner.stop()
+      expect(stopped).to.be.true
 
       expect(runner.isRunning()).to.be.false
       disposable.dispose()
-    }).timeout(2000)
+    })
   })
 })

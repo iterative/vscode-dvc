@@ -1,10 +1,11 @@
 import { EventEmitter } from 'vscode'
-import { ChildProcess, spawn } from 'child_process'
 import { Logger } from '../common/Logger'
 import { getProcessEnv } from '../env'
 import { Commands } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
+import execa, { ExecaChildProcess } from 'execa'
+
 export interface ReaderOptions {
   cliPath: string | undefined
   pythonBinPath: string | undefined
@@ -48,7 +49,7 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const spawnProcess = async ({
+export const spawnProcess = ({
   options,
   emitters
 }: {
@@ -58,24 +59,24 @@ export const spawnProcess = async ({
     stdOutEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
-}): Promise<ChildProcess> => {
+}): ExecaChildProcess<string> => {
   const { command, cwd, env } = getExecutionDetails(options)
 
   const [executable, ...args] = command.split(' ')
 
-  const childProcess = spawn(executable, args, {
+  const childProcess = execa(executable, args, {
     cwd,
     env
   })
 
   emitters?.startedEventEmitter?.fire()
 
-  childProcess.stdout.on('data', chunk => {
+  childProcess.stdout?.on('data', chunk => {
     const output = getOutput(chunk)
     emitters?.stdOutEventEmitter?.fire(output)
   })
 
-  childProcess.stderr.on('data', chunk => {
+  childProcess.stderr?.on('data', chunk => {
     const output = getOutput(chunk)
     Logger.error(output)
   })

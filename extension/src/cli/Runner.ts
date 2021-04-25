@@ -1,10 +1,10 @@
 import { EventEmitter, Event, window } from 'vscode'
-import { ChildProcess } from 'child_process'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
 import { spawnProcess } from './execution'
+import { ExecaChildProcess } from 'execa'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
@@ -18,26 +18,30 @@ export class Runner {
   public onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
-  private currentProcess: ChildProcess | undefined
+  private currentProcess: ExecaChildProcess | undefined
   private config: Config
 
   private async startProcess(command: Commands, cwd: string) {
     this.pseudoTerminal.setBlocked(true)
     this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
     await this.config.ready
-    this.currentProcess = await spawnProcess({
-      options: {
-        cliPath: this.config.dvcPath,
-        command,
-        cwd,
-        pythonBinPath: this.config.pythonBinPath
-      },
-      emitters: {
-        completedEventEmitter: this.completedEventEmitter,
-        startedEventEmitter: this.startedEventEmitter,
-        stdOutEventEmitter: this.stdOutEventEmitter
-      }
-    })
+    try {
+      this.currentProcess = spawnProcess({
+        options: {
+          cliPath: this.config.dvcPath,
+          command,
+          cwd,
+          pythonBinPath: this.config.pythonBinPath
+        },
+        emitters: {
+          completedEventEmitter: this.completedEventEmitter,
+          startedEventEmitter: this.startedEventEmitter,
+          stdOutEventEmitter: this.stdOutEventEmitter
+        }
+      })
+    } catch (e) {
+      this.stdOutEventEmitter.fire(e)
+    }
   }
 
   public async run(command: Commands, cwd: string) {
@@ -50,8 +54,19 @@ export class Runner {
     )
   }
 
-  public stop() {
-    return this.terminatedEventEmitter.fire()
+  public async stop() {
+    try {
+      this.currentProcess?.cancel()
+      await this.currentProcess
+      return false
+    } catch (e) {
+      const stopped = e.isCanceled && this.currentProcess?.killed
+      if (stopped) {
+        this.terminatedEventEmitter.fire()
+        this.currentProcess = undefined
+      }
+      return stopped
+    }
   }
 
   public isRunning() {
@@ -81,8 +96,7 @@ export class Runner {
     this.onDidTerminate = this.terminatedEventEmitter.event
     this.dispose.track(
       this.onDidTerminate(() => {
-        this.currentProcess?.kill()
-        this.completedEventEmitter.fire()
+        this.pseudoTerminal.close()
       })
     )
 
