@@ -52,12 +52,11 @@ export class Runner {
 
   public async stop() {
     try {
-      this.currentProcess?.cancel()
+      this.currentProcess?.kill('SIGINT')
       await this.currentProcess
       return false
     } catch (e) {
-      const stopped =
-        (e.isCanceled && this.currentProcess?.killed) || !this.currentProcess
+      const stopped = this.currentProcess?.killed || !this.currentProcess
       if (stopped) {
         this.terminatedEventEmitter.fire()
         this.currentProcess = undefined
