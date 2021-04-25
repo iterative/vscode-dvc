@@ -69,23 +69,16 @@ suite('Runner Test Suite', () => {
           disposable.track(runner.onDidComplete(() => resolve()))
         )
 
-      const processTerminatedEvent = (): Promise<void> =>
-        new Promise(resolve =>
-          disposable.track(runner.onDidTerminate(() => resolve()))
-        )
-
       await runner.run(Commands.STATUS, cwd)
       stubbedGetExecutionDetails.restore()
 
       const completedEvent = processCompletedEvent()
-      const terminatedEvent = processTerminatedEvent()
 
       expect(runner.isRunning()).to.be.true
 
       const stopped = await runner.stop()
       expect(stopped).to.be.true
 
-      await terminatedEvent
       await completedEvent
 
       expect(runner.isRunning()).to.be.false

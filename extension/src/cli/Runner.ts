@@ -15,7 +15,7 @@ export class Runner {
   private terminatedEventEmitter: EventEmitter<void>
 
   public onDidComplete: Event<void>
-  public onDidTerminate: Event<void>
+  private onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
   private currentProcess: ExecaChildProcess | undefined
@@ -58,7 +58,7 @@ export class Runner {
     } catch (e) {
       const stopped = this.currentProcess?.killed || !this.currentProcess
       if (stopped) {
-        this.terminatedEventEmitter.fire()
+        this.pseudoTerminal.close()
       }
       return stopped
     }
@@ -95,7 +95,7 @@ export class Runner {
     this.onDidTerminate = this.terminatedEventEmitter.event
     this.dispose.track(
       this.onDidTerminate(() => {
-        this.pseudoTerminal.close()
+        this.stop()
       })
     )
 
