@@ -59,7 +59,6 @@ export class Runner {
       const stopped = this.currentProcess?.killed || !this.currentProcess
       if (stopped) {
         this.terminatedEventEmitter.fire()
-        this.currentProcess = undefined
       }
       return stopped
     }
@@ -67,6 +66,10 @@ export class Runner {
 
   public isRunning() {
     return !!this.currentProcess
+  }
+
+  public getRunningProcess() {
+    return this.currentProcess
   }
 
   constructor(config: Config) {

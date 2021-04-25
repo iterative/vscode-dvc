@@ -64,14 +64,24 @@ suite('Runner Test Suite', () => {
         env: {}
       })
 
+      const processClosedEvent = (): Promise<void> => {
+        return new Promise(resolve => {
+          const currentProcess = runner.getRunningProcess()
+          currentProcess?.on('close', () => {
+            return resolve()
+          })
+        })
+      }
+
       await runner.run(Commands.STATUS, cwd)
       stubbedGetExecutionDetails.restore()
-
+      const closedEvent = processClosedEvent()
       expect(runner.isRunning()).to.be.true
 
       const stopped = await runner.stop()
       expect(stopped).to.be.true
 
+      await closedEvent
       expect(runner.isRunning()).to.be.false
       disposable.dispose()
     })
