@@ -22,7 +22,7 @@ beforeEach(() => {
 })
 
 describe('spawnProcess', () => {
-  it('should pass the correct details to spawn given no path to the cli or python binary path', async () => {
+  it('should pass the correct details to execa given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const cwd = __dirname
@@ -43,7 +43,7 @@ describe('spawnProcess', () => {
     })
   })
 
-  it('should pass the correct details to spawn given a path to the cli but no python binary path', async () => {
+  it('should pass the correct details to execa given a path to the cli but no python binary path', async () => {
     const existingPath = '/do/not/need/a/path'
     const processEnv = { PATH: existingPath }
     const cliPath = '/some/path/to/dvc'
@@ -65,7 +65,7 @@ describe('spawnProcess', () => {
     })
   })
 
-  it('should pass the correct details to spawn given a path to the cli, an existing PATH variable and a python binary path', async () => {
+  it('should pass the correct details to execa given a path to the cli, an existing PATH variable and a python binary path', async () => {
     const existingPath =
       '/var/folders/q_/jpcf1bld2vz9fs5n62mgqshc0000gq/T/yarn--1618526061412-0.878957498634626:' +
       '/Users/robot/PP/vscode-dvc/extension/node_modules/.bin:' +
