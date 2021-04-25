@@ -14,7 +14,7 @@ export class Runner {
   private startedEventEmitter: EventEmitter<void>
   private terminatedEventEmitter: EventEmitter<void>
 
-  private onDidComplete: Event<void>
+  public onDidComplete: Event<void>
   public onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
