@@ -9,9 +9,9 @@ jest.mock('child_process')
 jest.mock('execa')
 
 const mockedGetEnv = mocked(getProcessEnv)
-const mockedSpawn = mocked(execa)
+const mockedExeca = mocked(execa)
 
-mockedSpawn.mockReturnValue(({
+mockedExeca.mockReturnValue(({
   on: jest.fn(),
   stderr: { on: jest.fn() },
   stdout: { on: jest.fn() }
@@ -37,7 +37,7 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith('dvc', [Commands.CHECKOUT], {
+    expect(mockedExeca).toBeCalledWith('dvc', [Commands.CHECKOUT], {
       cwd,
       env: processEnv
     })
@@ -59,7 +59,7 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
+    expect(mockedExeca).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
       cwd,
       env: processEnv
     })
@@ -86,7 +86,7 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
+    expect(mockedExeca).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
       cwd,
       env: { PATH: `${pythonBinPath}:${existingPath}` }
     })
@@ -109,7 +109,7 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedSpawn).toBeCalledWith('dvc', [Commands.CHECKOUT], {
+    expect(mockedExeca).toBeCalledWith('dvc', [Commands.CHECKOUT], {
       cwd,
       env: { PATH: `${pythonBinPath}` }
     })
