@@ -59,7 +59,7 @@ suite('Runner Test Suite', () => {
         Execution,
         'getExecutionDetails'
       ).returns({
-        command: 'sleep 10',
+        command: 'sleep 100000000000000000000000',
         cwd,
         env: {}
       })
