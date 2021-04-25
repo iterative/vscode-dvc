@@ -25,23 +25,19 @@ export class Runner {
     this.pseudoTerminal.setBlocked(true)
     this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
     await this.config.ready
-    try {
-      this.currentProcess = spawnProcess({
-        options: {
-          cliPath: this.config.dvcPath,
-          command,
-          cwd,
-          pythonBinPath: this.config.pythonBinPath
-        },
-        emitters: {
-          completedEventEmitter: this.completedEventEmitter,
-          startedEventEmitter: this.startedEventEmitter,
-          stdOutEventEmitter: this.stdOutEventEmitter
-        }
-      })
-    } catch (e) {
-      this.stdOutEventEmitter.fire(e)
-    }
+    this.currentProcess = spawnProcess({
+      options: {
+        cliPath: this.config.dvcPath,
+        command,
+        cwd,
+        pythonBinPath: this.config.pythonBinPath
+      },
+      emitters: {
+        completedEventEmitter: this.completedEventEmitter,
+        startedEventEmitter: this.startedEventEmitter,
+        stdOutEventEmitter: this.stdOutEventEmitter
+      }
+    })
   }
 
   public async run(command: Commands, cwd: string) {
