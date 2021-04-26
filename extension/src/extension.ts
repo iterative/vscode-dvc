@@ -89,7 +89,7 @@ export class Extension {
 
         this.dispose.track(
           addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
-            this.dvcRepositories[dvcRoot].updateState()
+            repository.updateState()
             this.trackedExplorerTree.refresh(path)
           })
         )
