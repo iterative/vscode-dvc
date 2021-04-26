@@ -1,10 +1,10 @@
 import { EventEmitter, Event, window } from 'vscode'
-import { ChildProcess } from 'child_process'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
 import { spawnProcess } from './execution'
+import { ExecaChildProcess } from 'execa'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
@@ -14,18 +14,18 @@ export class Runner {
   private startedEventEmitter: EventEmitter<void>
   private terminatedEventEmitter: EventEmitter<void>
 
-  private onDidComplete: Event<void>
-  public onDidTerminate: Event<void>
+  public onDidComplete: Event<void>
+  private onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
-  private currentProcess: ChildProcess | undefined
+  private currentProcess: ExecaChildProcess | undefined
   private config: Config
 
   private async startProcess(command: Commands, cwd: string) {
     this.pseudoTerminal.setBlocked(true)
     this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
     await this.config.ready
-    this.currentProcess = await spawnProcess({
+    this.currentProcess = spawnProcess({
       options: {
         cliPath: this.config.dvcPath,
         command,
@@ -50,12 +50,26 @@ export class Runner {
     )
   }
 
-  public stop() {
-    return this.terminatedEventEmitter.fire()
+  public async stop() {
+    try {
+      this.currentProcess?.kill('SIGINT')
+      await this.currentProcess
+      return false
+    } catch (e) {
+      const stopped = this.currentProcess?.killed || !this.currentProcess
+      if (stopped) {
+        this.pseudoTerminal.close()
+      }
+      return stopped
+    }
   }
 
   public isRunning() {
     return !!this.currentProcess
+  }
+
+  public getRunningProcess() {
+    return this.currentProcess
   }
 
   constructor(config: Config) {
@@ -81,8 +95,7 @@ export class Runner {
     this.onDidTerminate = this.terminatedEventEmitter.event
     this.dispose.track(
       this.onDidTerminate(() => {
-        this.currentProcess?.kill()
-        this.completedEventEmitter.fire()
+        this.stop()
       })
     )
 

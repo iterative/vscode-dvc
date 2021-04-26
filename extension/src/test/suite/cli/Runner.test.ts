@@ -59,20 +59,30 @@ suite('Runner Test Suite', () => {
         Execution,
         'getExecutionDetails'
       ).returns({
-        command: 'sleep 10',
+        command: 'sleep 100000000000000000000000',
         cwd,
         env: {}
       })
 
+      const processCompletedEvent = (): Promise<void> =>
+        new Promise(resolve =>
+          disposable.track(runner.onDidComplete(() => resolve()))
+        )
+
       await runner.run(Commands.STATUS, cwd)
       stubbedGetExecutionDetails.restore()
 
+      const completedEvent = processCompletedEvent()
+
       expect(runner.isRunning()).to.be.true
 
-      runner.stop()
+      const stopped = await runner.stop()
+      expect(stopped).to.be.true
+
+      await completedEvent
 
       expect(runner.isRunning()).to.be.false
       disposable.dispose()
-    }).timeout(2000)
+    })
   })
 })
