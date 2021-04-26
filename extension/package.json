@@ -114,12 +114,14 @@
       {
         "title": "%command.checkout%",
         "command": "dvc.checkout",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(discard)"
       },
       {
-        "title": "%command.checkoutRecursive%",
-        "command": "dvc.checkoutRecursive",
-        "category": "DVC"
+        "title": "%command.checkoutTarget%",
+        "command": "dvc.checkoutTarget",
+        "category": "DVC",
+        "icon": "$(discard)"
       },
       {
         "title": "%command.pullTarget%",
@@ -152,6 +154,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.checkout",
+          "when": "false"
+        },
+        {
+          "command": "dvc.checkoutTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.pullTarget",
           "when": "false"
         },
@@ -160,7 +170,19 @@
           "when": "false"
         }
       ],
+      "scm/change/title": [
+        {
+          "command": "dvc.addTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc"
+        }
+      ],
       "scm/title": [
+        {
+          "command": "dvc.checkout",
+          "group": "navigation",
+          "when": "scmProvider == dvc"
+        },
         {
           "command": "dvc.showExperiments",
           "group": "experiments",
@@ -192,6 +214,11 @@
           "command": "dvc.addTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState == untracked"
+        },
+        {
+          "command": "dvc.checkoutTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
         },
         {
           "command": "dvc.pushTarget",
