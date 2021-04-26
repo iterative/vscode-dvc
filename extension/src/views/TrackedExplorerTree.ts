@@ -38,25 +38,29 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     window.showTextDocument(resource)
   }
 
+  private async getRootElements() {
+    const rootElements = await Promise.all(
+      this.dvcRoots.map(async dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
+    )
+    return rootElements
+      .reduce((a, b) => a.concat(b), [])
+      .sort((a, b) => {
+        const aIsDirectory = isDirectory(a)
+        const bIsDirectory = isDirectory(b)
+        if (aIsDirectory === bIsDirectory) {
+          return a.localeCompare(b)
+        }
+        return aIsDirectory ? -1 : 1
+      })
+  }
+
   public async getChildren(element?: string): Promise<string[]> {
     if (element) {
       return this.readDirectory(this.pathRoots[element], element)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
-      const rootElements = await Promise.all(
-        this.dvcRoots.map(async dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
-      )
-      return rootElements
-        .reduce((a, b) => a.concat(b), [])
-        .sort((a, b) => {
-          const aIsDirectory = isDirectory(a)
-          const bIsDirectory = isDirectory(b)
-          if (aIsDirectory === bIsDirectory) {
-            return a.localeCompare(b)
-          }
-          return aIsDirectory ? -1 : 1
-        })
+      return this.getRootElements()
     }
 
     return []
@@ -86,7 +90,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private async readDirectory(root: string, path: string): Promise<string[]> {
     await this.config.ready
-    const children = await listDvcOnly(
+    const relativePaths = await listDvcOnly(
       {
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
@@ -95,10 +99,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       relative(root, path)
     )
 
-    return children.map(child => {
-      const childPath = join(path, child)
-      this.pathRoots[childPath] = root
-      return childPath
+    return relativePaths.map(relativePath => {
+      const absolutePath = join(path, relativePath)
+      this.pathRoots[absolutePath] = root
+      return absolutePath
     })
   }
 
