@@ -87,6 +87,13 @@ export class Extension {
           )
         )
 
+        this.dispose.track(
+          addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
+            this.dvcRepositories[dvcRoot].updateState()
+            this.explorerView.refresh(path)
+          })
+        )
+
         this.dvcRepositories[dvcRoot] = repository
       })
     )
@@ -153,22 +160,13 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    Promise.all(
-      (workspace.workspaceFolders || []).map(async workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
-      )
-    )
-
     this.explorerView = this.dispose.track(
       new ExplorerTree(this.config.workspaceRoot, this.config)
     )
 
-    this.dvcRoots.forEach(dvcRoot =>
-      this.dispose.track(
-        addOnFileSystemChangeHandler(dvcRoot, () => {
-          this.dvcRepositories[dvcRoot].updateState()
-          this.explorerView.refresh()
-        })
+    Promise.all(
+      (workspace.workspaceFolders || []).map(async workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
       )
     )
 

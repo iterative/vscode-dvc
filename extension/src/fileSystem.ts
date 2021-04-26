@@ -8,9 +8,11 @@ import { getRoot } from './cli/reader'
 import { definedAndNonEmpty } from './util'
 import { window } from 'vscode'
 
-export const getWatcher = (handler: () => void) => (path: string): void => {
+export const getWatcher = (handler: (path: string) => void) => (
+  path: string
+): void => {
   if (path) {
-    return handler()
+    return handler(path)
   }
 }
 
@@ -18,7 +20,7 @@ export const matchDotDirectoryPath = /.*?[\\|/]\.\S+[\\|/].*/
 
 export const addOnFileSystemChangeHandler = (
   path: string,
-  handler: () => void
+  handler: (path: string) => void
 ): Disposable => {
   const watcher = getWatcher(handler)
 

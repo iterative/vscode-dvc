@@ -9,15 +9,10 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { join, relative } from 'path'
+import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
-
-interface TrackedItem {
-  resourceUri: Uri
-  type: FileType
-}
 
 export const isDirOrFile = (path: string): FileType => {
   try {
@@ -30,75 +25,60 @@ export const isDirOrFile = (path: string): FileType => {
   }
 }
 
-export class ExplorerTree implements TreeDataProvider<TrackedItem> {
+export class ExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
-  private _onDidChangeTreeData: EventEmitter<
-    TrackedItem | undefined | void
-  > = new EventEmitter<TrackedItem | undefined | void>()
+  private changeTreeDataEventEmitter: EventEmitter<string>
+  readonly onDidChangeTreeData: Event<string>
 
   private workspaceRoot: string
   private config: Config
 
-  readonly onDidChangeTreeData: Event<TrackedItem | undefined | void> = this
-    ._onDidChangeTreeData.event
-
-  readonly workspaceUri: Uri
-
-  constructor(workspaceRoot: string, config: Config) {
-    this.workspaceRoot = workspaceRoot
-    this.config = config
-    this.workspaceUri = Uri.file(this.workspaceRoot)
-  }
-
-  refresh(): void {
-    this._onDidChangeTreeData.fire()
+  refresh(path: string): void {
+    this.changeTreeDataEventEmitter.fire(dirname(path))
   }
 
   openResource(resource: Uri): void {
     window.showTextDocument(resource)
   }
 
-  async getChildren(element?: TrackedItem): Promise<TrackedItem[]> {
+  async getChildren(element?: string): Promise<string[]> {
     if (element) {
-      const children = await this.readDirectory(element.resourceUri)
-      return children.map(([name, type]) => ({
-        resourceUri: Uri.file(join(element.resourceUri.fsPath, name)),
-        type
-      }))
+      return this.readDirectory(element)
     }
 
     if (this.workspaceRoot) {
-      const children = await this.readDirectory(this.workspaceUri)
+      const children = await this.readDirectory(this.workspaceRoot)
       children.sort((a, b) => {
-        if (a[1] === b[1]) {
-          return a[0].localeCompare(b[0])
+        const aFileType = isDirOrFile(a)
+        const bFileType = isDirOrFile(b)
+        if (aFileType === bFileType) {
+          return a.localeCompare(b)
         }
-        return a[1] === FileType.Directory ? -1 : 1
+        return aFileType === FileType.Directory ? -1 : 1
       })
 
-      return children.map(([name, type]) => ({
-        resourceUri: Uri.file(join(this.workspaceUri.fsPath, name)),
-        type
-      }))
+      return children
     }
 
     return []
   }
 
-  getTreeItem(element: TrackedItem): TreeItem {
+  getTreeItem(element: string): TreeItem {
+    const fileType = isDirOrFile(element)
+    const resourceUri = Uri.file(element)
     const treeItem = new TreeItem(
-      element.resourceUri,
-      element.type === FileType.Directory
+      resourceUri,
+      fileType === FileType.Directory
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
 
-    if (element.type === FileType.File) {
+    if (fileType === FileType.File) {
       treeItem.command = {
         command: 'explorerTreeView.openFile',
         title: 'Open File',
-        arguments: [element.resourceUri]
+        arguments: [resourceUri]
       }
       treeItem.contextValue = 'file'
     }
@@ -106,23 +86,25 @@ export class ExplorerTree implements TreeDataProvider<TrackedItem> {
     return treeItem
   }
 
-  private async readDirectory(uri: Uri): Promise<[string, FileType][]> {
+  private async readDirectory(path: string): Promise<string[]> {
     await this.config.ready
     const children = await listDvcOnly(
       {
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
-        cwd: uri.fsPath
+        cwd: path
       },
-      relative(this.workspaceRoot, uri.fsPath)
+      relative(this.workspaceRoot, path)
     )
 
-    const result = children.map(child => {
-      const path = join(uri.fsPath, child)
-      const type = isDirOrFile(path)
-      return [child, type] as [string, FileType]
-    })
+    return children.map(child => join(path, child))
+  }
 
-    return result
+  constructor(workspaceRoot: string, config: Config) {
+    this.workspaceRoot = workspaceRoot
+    this.config = config
+
+    this.changeTreeDataEventEmitter = new EventEmitter<string>()
+    this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
   }
 }
