@@ -23,11 +23,6 @@ export const executeProcess = async <T>(
 export const checkout = async (options: ReaderOptions): Promise<string[]> =>
   executeProcess<string[]>(options, Commands.CHECKOUT, trimAndSplit)
 
-export const checkoutRecursive = async (
-  options: ReaderOptions
-): Promise<string[]> =>
-  executeProcess<string[]>(options, Commands.CHECKOUT_RECURSIVE, trimAndSplit)
-
 export const getRoot = async (options: ReaderOptions): Promise<string> =>
   executeProcess<string>(options, Commands.ROOT)
 

@@ -117,11 +117,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.checkoutRecursive%",
-        "command": "dvc.checkoutRecursive",
-        "category": "DVC"
-      },
-      {
         "title": "%command.pullTarget%",
         "command": "dvc.pullTarget",
         "category": "DVC",
@@ -153,10 +148,6 @@
         },
         {
           "command": "dvc.checkout",
-          "when": "false"
-        },
-        {
-          "command": "dvc.checkoutRecursive",
           "when": "false"
         },
         {

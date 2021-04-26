@@ -2,7 +2,7 @@ import { commands } from 'vscode'
 import { addTarget, pullTarget, pushTarget } from '.'
 import { Config } from '../Config'
 import { Disposer } from '../extension'
-import { checkout, checkoutRecursive, initializeDirectory } from './reader'
+import { checkout, initializeDirectory } from './reader'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
@@ -55,16 +55,6 @@ const registerCommands = (config: Config, disposer: Disposer) => {
   disposer.track(
     commands.registerCommand('dvc.checkout', ({ fsPath }) => {
       checkout({
-        cwd: fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.checkoutRecursive', ({ fsPath }) => {
-      checkoutRecursive({
         cwd: fsPath,
         cliPath: config.dvcPath,
         pythonBinPath: config.pythonBinPath

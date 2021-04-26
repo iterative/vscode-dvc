@@ -1,7 +1,6 @@
 export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
-  CHECKOUT_RECURSIVE = 'checkout --recursive',
   EXPERIMENT_GC = 'exp gc -f -w',
   EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT_RUN = 'exp run',
