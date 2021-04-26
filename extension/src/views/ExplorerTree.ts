@@ -8,6 +8,7 @@ import {
   Uri,
   window
 } from 'vscode'
+import { Disposable } from '@hediet/std/disposable'
 import { join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
@@ -31,6 +32,8 @@ export const isDirOrFile = (path: string): FileType => {
 
 export class ExplorerTreeViewItemProvider
   implements TreeDataProvider<DvcTrackedItem> {
+  public dispose = Disposable.fn()
+
   private _onDidChangeTreeData: EventEmitter<
     DvcTrackedItem | undefined | void
   > = new EventEmitter<DvcTrackedItem | undefined | void>()
