@@ -14,7 +14,7 @@ import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
 import { definedAndNonEmpty } from '../util'
 
-export class ExplorerTree implements TreeDataProvider<string> {
+export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   private changeTreeDataEventEmitter: EventEmitter<string | void>
@@ -74,7 +74,7 @@ export class ExplorerTree implements TreeDataProvider<string> {
 
     if (!elementIsDirectory) {
       treeItem.command = {
-        command: 'explorerTreeView.openFile',
+        command: 'dvc.views.trackedExplorerTree.openFile',
         title: 'Open File',
         arguments: [resourceUri]
       }

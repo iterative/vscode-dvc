@@ -29,7 +29,7 @@ import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
-import { ExplorerTree } from './views/ExplorerTree'
+import { TrackedExplorerTree } from './views/ExplorerTree'
 
 export { Disposable, Disposer }
 
@@ -48,7 +48,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private explorerView: ExplorerTree
+  private trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
 
@@ -90,7 +90,7 @@ export class Extension {
         this.dispose.track(
           addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
             this.dvcRepositories[dvcRoot].updateState()
-            this.explorerView.refresh(path)
+            this.trackedExplorerTree.refresh(path)
           })
         )
 
@@ -160,23 +160,29 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.explorerView = this.dispose.track(new ExplorerTree(this.config))
+    this.trackedExplorerTree = this.dispose.track(
+      new TrackedExplorerTree(this.config)
+    )
 
     Promise.all(
       (workspace.workspaceFolders || []).map(async workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       )
     ).then(() => {
-      this.explorerView.setDvcRoots(this.dvcRoots)
+      this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
     })
 
     this.dispose.track(
-      window.registerTreeDataProvider('explorerTreeView', this.explorerView)
+      window.registerTreeDataProvider(
+        'dvc.views.trackedExplorerTree',
+        this.trackedExplorerTree
+      )
     )
 
     this.dispose.track(
-      commands.registerCommand('explorerTreeView.openFile', resource =>
-        this.explorerView.openResource(resource)
+      commands.registerCommand(
+        'dvc.views.trackedExplorerTree.openFile',
+        resource => this.trackedExplorerTree.openResource(resource)
       )
     )
 

@@ -208,8 +208,8 @@
     "views": {
       "explorer": [
         {
-          "id": "explorerTreeView",
-          "name": "DVC Tracked Files"
+          "id": "dvc.views.trackedExplorerTree",
+          "name": "DVC Tracked"
         }
       ]
     }
