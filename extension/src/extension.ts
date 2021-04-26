@@ -146,8 +146,9 @@ export class Extension {
       this.runner.run(command, dvcRoot)
       const listener = this.dispose.track(
         this.runner.onDidComplete(() => {
-          listener.dispose()
           this.refreshExperimentsWebview()
+          this.dispose.untrack(listener)
+          listener.dispose()
         })
       )
     }
