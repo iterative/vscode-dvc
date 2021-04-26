@@ -17,7 +17,7 @@ export class PseudoTerminal {
     this.blocked = blocked
   }
 
-  private readonly stdOutEventEmitter: EventEmitter<string>
+  private readonly outputEventEmitter: EventEmitter<string>
   private readonly terminatedEventEmitter: EventEmitter<void>
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
@@ -55,9 +55,9 @@ export class PseudoTerminal {
   private createInstance = async (): Promise<void> =>
     new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
-        onDidWrite: this.stdOutEventEmitter.event,
+        onDidWrite: this.outputEventEmitter.event,
         open: () => {
-          this.stdOutEventEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
+          this.outputEventEmitter.fire('>>>> DVC Terminal >>>>\r\n\n')
           resolve()
         },
         close: () => {
@@ -80,11 +80,11 @@ export class PseudoTerminal {
     })
 
   constructor(
-    stdOutEventEmitter: EventEmitter<string>,
+    outputEventEmitter: EventEmitter<string>,
     terminatedEventEmitter: EventEmitter<void>
   ) {
     this.termName = 'DVC'
-    this.stdOutEventEmitter = stdOutEventEmitter
+    this.outputEventEmitter = outputEventEmitter
     this.terminatedEventEmitter = terminatedEventEmitter
     this.blocked = false
   }

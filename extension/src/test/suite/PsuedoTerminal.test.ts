@@ -52,7 +52,7 @@ suite('Pseudo Terminal Test Suite', () => {
     }).timeout(12000)
 
     it('should be able to handle multiple output events', async () => {
-      const stdOutEventEmitter = new EventEmitter<string>()
+      const outputEventEmitter = new EventEmitter<string>()
       const terminalDataWriteEventStream = (
         text: string,
         disposer: Disposer
@@ -73,7 +73,7 @@ suite('Pseudo Terminal Test Suite', () => {
 
       const disposable = Disposable.fn()
       const pseudoTerminal = new PseudoTerminal(
-        stdOutEventEmitter,
+        outputEventEmitter,
         new EventEmitter<void>()
       )
       disposable.track(pseudoTerminal)
@@ -84,8 +84,8 @@ suite('Pseudo Terminal Test Suite', () => {
 
       const firstEvent = terminalDataWriteEventStream(firstText, disposable)
       const secondEvent = terminalDataWriteEventStream(secondText, disposable)
-      stdOutEventEmitter.fire('echo ' + firstText)
-      stdOutEventEmitter.fire('echo ' + secondText)
+      outputEventEmitter.fire('echo ' + firstText)
+      outputEventEmitter.fire('echo ' + secondText)
 
       const firstStream = await Promise.race([firstEvent, secondEvent])
       let eventStream = await firstEvent

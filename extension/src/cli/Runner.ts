@@ -9,7 +9,7 @@ import { ExecaChildProcess } from 'execa'
 export class Runner {
   public readonly dispose = Disposable.fn()
 
-  private stdOutEventEmitter: EventEmitter<string>
+  private outputEventEmitter: EventEmitter<string>
   private completedEventEmitter: EventEmitter<void>
   private startedEventEmitter: EventEmitter<void>
   private terminatedEventEmitter: EventEmitter<void>
@@ -23,7 +23,7 @@ export class Runner {
 
   private async startProcess(command: Commands, cwd: string) {
     this.pseudoTerminal.setBlocked(true)
-    this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
+    this.outputEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
     await this.config.ready
     this.currentProcess = spawnProcess({
       options: {
@@ -35,7 +35,7 @@ export class Runner {
       emitters: {
         completedEventEmitter: this.completedEventEmitter,
         startedEventEmitter: this.startedEventEmitter,
-        stdOutEventEmitter: this.stdOutEventEmitter
+        outputEventEmitter: this.outputEventEmitter
       }
     })
   }
@@ -80,14 +80,14 @@ export class Runner {
     this.dispose.track(
       this.onDidComplete(() => {
         this.pseudoTerminal.setBlocked(false)
-        this.stdOutEventEmitter.fire(
+        this.outputEventEmitter.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )
         this.currentProcess = undefined
       })
     )
 
-    this.stdOutEventEmitter = this.dispose.track(new EventEmitter<string>())
+    this.outputEventEmitter = this.dispose.track(new EventEmitter<string>())
 
     this.startedEventEmitter = this.dispose.track(new EventEmitter<void>())
 
@@ -100,7 +100,7 @@ export class Runner {
     )
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.stdOutEventEmitter, this.terminatedEventEmitter)
+      new PseudoTerminal(this.outputEventEmitter, this.terminatedEventEmitter)
     )
   }
 }
