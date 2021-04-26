@@ -33,6 +33,16 @@ const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
+    commands.registerCommand('dvc.checkout', context => {
+      checkout({
+        cwd: context?.rootUri?.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
+    })
+  )
+
+  disposer.track(
     commands.registerCommand('dvc.checkoutTarget', ({ resourceUri }) =>
       checkoutTarget({
         fsPath: resourceUri.fsPath,
@@ -59,16 +69,6 @@ const registerCommands = (config: Config, disposer: Disposer) => {
         pythonBinPath: config.pythonBinPath
       })
     )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.checkout', context => {
-      checkout({
-        cwd: context?.rootUri?.fsPath,
-        cliPath: config.dvcPath,
-        pythonBinPath: config.pythonBinPath
-      })
-    })
   )
 
   disposer.track(
