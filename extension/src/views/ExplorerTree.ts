@@ -38,12 +38,12 @@ export class ExplorerTree implements TreeDataProvider<string> {
     if (this.workspaceRoot) {
       const children = await this.readDirectory(this.workspaceRoot)
       children.sort((a, b) => {
-        const aFileType = isDirectory(a)
-        const bFileType = isDirectory(b)
-        if (aFileType === bFileType) {
+        const aIsDirectory = isDirectory(a)
+        const bIsDirectory = isDirectory(b)
+        if (aIsDirectory === bIsDirectory) {
           return a.localeCompare(b)
         }
-        return aFileType ? -1 : 1
+        return aIsDirectory ? -1 : 1
       })
 
       return children
@@ -53,14 +53,16 @@ export class ExplorerTree implements TreeDataProvider<string> {
   }
 
   getTreeItem(element: string): TreeItem {
-    const isDir = isDirectory(element)
+    const elementIsDirectory = isDirectory(element)
     const resourceUri = Uri.file(element)
     const treeItem = new TreeItem(
       resourceUri,
-      isDir ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
+      elementIsDirectory
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
     )
 
-    if (!isDir) {
+    if (!elementIsDirectory) {
       treeItem.command = {
         command: 'explorerTreeView.openFile',
         title: 'Open File',
