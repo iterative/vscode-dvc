@@ -144,6 +144,12 @@ export class Extension {
     if (dvcRoot) {
       await this.showExperimentsWebview()
       this.runner.run(command, dvcRoot)
+      const listener = this.dispose.track(
+        this.runner.onDidComplete(() => {
+          listener.dispose()
+          this.refreshExperimentsWebview()
+        })
+      )
     }
   }
 
