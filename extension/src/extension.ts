@@ -125,7 +125,7 @@ export class Extension {
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
-    this.refreshExperimentsWebview()
+    await this.refreshExperimentsWebview()
     return webview
   }
 
@@ -142,8 +142,8 @@ export class Extension {
       context?.rootUri?.fsPath
     )
     if (dvcRoot) {
+      await this.showExperimentsWebview()
       this.runner.run(command, dvcRoot)
-      this.showExperimentsWebview()
     }
   }
 
