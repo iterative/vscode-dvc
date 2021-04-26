@@ -1,4 +1,4 @@
-import { buildCommand, Commands, GcPreserveFlag } from './commands'
+import { buildCommand, Commands, GcPreserveFlag, ListFlag } from './commands'
 import { trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { execProcess, ReaderOptions } from './execution'
@@ -23,10 +23,24 @@ export const initializeDirectory = async (
 ): Promise<string> =>
   execProcess<string>(options, Commands.INITIALIZE_SUBDIRECTORY)
 
+export const listDvcOnly = async (
+  options: ReaderOptions,
+  relativePath: string
+): Promise<string[]> =>
+  execProcess<string[]>(
+    options,
+    buildCommand(Commands.LIST, relativePath, ListFlag.DVC_ONLY),
+    trimAndSplit
+  )
+
 export const listDvcOnlyRecursive = async (
   options: ReaderOptions
 ): Promise<string[]> =>
-  execProcess<string[]>(options, Commands.LIST_DVC_ONLY_RECURSIVE, trimAndSplit)
+  execProcess<string[]>(
+    options,
+    buildCommand(Commands.LIST, ListFlag.DVC_ONLY, ListFlag.RECURSIVE),
+    trimAndSplit
+  )
 
 type Status = Record<
   string,

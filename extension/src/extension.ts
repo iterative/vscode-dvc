@@ -29,6 +29,7 @@ import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
+import { TrackedExplorerTree } from './views/TrackedExplorerTree'
 
 export { Disposable, Disposer }
 
@@ -47,6 +48,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
+  private trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
 
@@ -86,8 +88,9 @@ export class Extension {
         )
 
         this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, () => {
+          addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
             repository.updateState()
+            this.trackedExplorerTree.refresh(path)
           })
         )
 
@@ -157,9 +160,29 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
+    this.trackedExplorerTree = this.dispose.track(
+      new TrackedExplorerTree(this.config)
+    )
+
     Promise.all(
       (workspace.workspaceFolders || []).map(async workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
+      )
+    ).then(() => {
+      this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
+    })
+
+    this.dispose.track(
+      window.registerTreeDataProvider(
+        'dvc.views.trackedExplorerTree',
+        this.trackedExplorerTree
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.trackedExplorerTree.openFile',
+        resource => this.trackedExplorerTree.openResource(resource)
       )
     )
 
