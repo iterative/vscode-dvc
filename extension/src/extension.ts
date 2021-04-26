@@ -115,6 +115,7 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
+    await this.config.ready
     const experiments = await getExperiments({
       pythonBinPath: this.config.pythonBinPath,
       cliPath: this.config.dvcPath,
