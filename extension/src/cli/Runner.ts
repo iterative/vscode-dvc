@@ -4,7 +4,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
-import { executeInShell } from './shellExecution'
+import { spawnProcess } from './execution'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
@@ -25,7 +25,7 @@ export class Runner {
     this.pseudoTerminal.setBlocked(true)
     this.stdOutEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
     await this.config.ready
-    this.currentProcess = await executeInShell({
+    this.currentProcess = await spawnProcess({
       options: {
         cliPath: this.config.dvcPath,
         command,
