@@ -14,7 +14,7 @@ import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
 
-interface DvcTrackedItem {
+interface TrackedItem {
   resourceUri: Uri
   type: FileType
 }
@@ -30,18 +30,17 @@ export const isDirOrFile = (path: string): FileType => {
   }
 }
 
-export class ExplorerTreeViewItemProvider
-  implements TreeDataProvider<DvcTrackedItem> {
+export class ExplorerTree implements TreeDataProvider<TrackedItem> {
   public dispose = Disposable.fn()
 
   private _onDidChangeTreeData: EventEmitter<
-    DvcTrackedItem | undefined | void
-  > = new EventEmitter<DvcTrackedItem | undefined | void>()
+    TrackedItem | undefined | void
+  > = new EventEmitter<TrackedItem | undefined | void>()
 
   private workspaceRoot: string
   private config: Config
 
-  readonly onDidChangeTreeData: Event<DvcTrackedItem | undefined | void> = this
+  readonly onDidChangeTreeData: Event<TrackedItem | undefined | void> = this
     ._onDidChangeTreeData.event
 
   readonly workspaceUri: Uri
@@ -60,7 +59,7 @@ export class ExplorerTreeViewItemProvider
     window.showTextDocument(resource)
   }
 
-  async getChildren(element?: DvcTrackedItem): Promise<DvcTrackedItem[]> {
+  async getChildren(element?: TrackedItem): Promise<TrackedItem[]> {
     if (element) {
       const children = await this.readDirectory(element.resourceUri)
       return children.map(([name, type]) => ({
@@ -87,7 +86,7 @@ export class ExplorerTreeViewItemProvider
     return []
   }
 
-  getTreeItem(element: DvcTrackedItem): TreeItem {
+  getTreeItem(element: TrackedItem): TreeItem {
     const treeItem = new TreeItem(
       element.resourceUri,
       element.type === FileType.Directory

@@ -29,7 +29,7 @@ import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
-import { ExplorerTreeViewItemProvider } from './views/ExplorerTree'
+import { ExplorerTree } from './views/ExplorerTree'
 
 export { Disposable, Disposer }
 
@@ -48,7 +48,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private explorerView: ExplorerTreeViewItemProvider
+  private explorerView: ExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
 
@@ -90,6 +90,7 @@ export class Extension {
         this.dispose.track(
           addOnFileSystemChangeHandler(dvcRoot, () => {
             repository.updateState()
+            this.explorerView.refresh()
           })
         )
 
@@ -209,16 +210,19 @@ export class Extension {
     )
 
     this.explorerView = this.dispose.track(
-      new ExplorerTreeViewItemProvider(this.config.workspaceRoot, this.config)
+      new ExplorerTree(this.config.workspaceRoot, this.config)
     )
+
     this.dispose.track(
       window.registerTreeDataProvider('explorerTreeView', this.explorerView)
     )
+
     this.dispose.track(
       commands.registerCommand('explorerTreeView.openFile', resource =>
         this.explorerView.openResource(resource)
       )
     )
+
     addOnFileSystemChangeHandler(this.config.workspaceRoot, () => {
       this.explorerView.refresh()
     })
