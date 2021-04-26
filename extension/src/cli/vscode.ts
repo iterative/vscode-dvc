@@ -11,7 +11,7 @@ import {
   experimentBranch,
   experimentRemove
 } from './reader'
-import { ReaderOptions } from './executionDetails'
+import { ReaderOptions } from './execution'
 
 export const queueExperimentCommand = async (config: Config) => {
   try {

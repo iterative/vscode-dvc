@@ -1,7 +1,7 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
 import { buildCommand, Commands } from './commands'
-import { executeProcess } from './reader'
+import { execProcess } from './execution'
 
 const runTargetCommand = async (
   options: {
@@ -19,7 +19,7 @@ const runTargetCommand = async (
   const commandWithTarget = buildCommand(command, target)
   await ensureDir(cwd)
 
-  return executeProcess({ cwd, cliPath, pythonBinPath }, commandWithTarget)
+  return execProcess({ cwd, cliPath, pythonBinPath }, commandWithTarget)
 }
 
 export const addTarget = async (options: {
