@@ -29,7 +29,7 @@ import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
-import { TrackedExplorerTree } from './views/ExplorerTree'
+import { TrackedExplorerTree } from './views/TrackedExplorerTree'
 
 export { Disposable, Disposer }
 
