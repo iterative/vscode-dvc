@@ -115,12 +115,12 @@ export class ExplorerTreeViewItemProvider
       relative(this.workspaceRoot, uri.fsPath)
     )
 
-    const result: [string, FileType][] = children.map(child => {
+    const result = children.map(child => {
       const path = join(uri.fsPath, child)
-      const stat = isDirOrFile(path)
-      return [child, stat]
+      const type = isDirOrFile(path)
+      return [child, type] as [string, FileType]
     })
 
-    return Promise.resolve(result)
+    return result
   }
 }
