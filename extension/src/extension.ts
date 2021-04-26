@@ -87,13 +87,6 @@ export class Extension {
           )
         )
 
-        this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, () => {
-            repository.updateState()
-            this.explorerView.refresh()
-          })
-        )
-
         this.dvcRepositories[dvcRoot] = repository
       })
     )
@@ -166,6 +159,29 @@ export class Extension {
       )
     )
 
+    this.explorerView = this.dispose.track(
+      new ExplorerTree(this.config.workspaceRoot, this.config)
+    )
+
+    this.dvcRoots.forEach(dvcRoot =>
+      this.dispose.track(
+        addOnFileSystemChangeHandler(dvcRoot, () => {
+          this.dvcRepositories[dvcRoot].updateState()
+          this.explorerView.refresh()
+        })
+      )
+    )
+
+    this.dispose.track(
+      window.registerTreeDataProvider('explorerTreeView', this.explorerView)
+    )
+
+    this.dispose.track(
+      commands.registerCommand('explorerTreeView.openFile', resource =>
+        this.explorerView.openResource(resource)
+      )
+    )
+
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
@@ -208,24 +224,6 @@ export class Extension {
         this.runner.stop()
       )
     )
-
-    this.explorerView = this.dispose.track(
-      new ExplorerTree(this.config.workspaceRoot, this.config)
-    )
-
-    this.dispose.track(
-      window.registerTreeDataProvider('explorerTreeView', this.explorerView)
-    )
-
-    this.dispose.track(
-      commands.registerCommand('explorerTreeView.openFile', resource =>
-        this.explorerView.openResource(resource)
-      )
-    )
-
-    addOnFileSystemChangeHandler(this.config.workspaceRoot, () => {
-      this.explorerView.refresh()
-    })
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
