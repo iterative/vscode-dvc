@@ -1,6 +1,5 @@
 import {
   checkout,
-  checkoutRecursive,
   experimentApply,
   getExperiments,
   getRoot,
@@ -105,31 +104,6 @@ describe('checkout', () => {
 
     expect(mockedExecPromise).toBeCalledWith(
       'dvc checkout',
-      expect.objectContaining({
-        cwd: fsPath
-      })
-    )
-  })
-})
-
-describe('checkoutRecursive', () => {
-  it('should call execPromise with the correct parameters', async () => {
-    const fsPath = __dirname
-    const stdout = `M       model.pt\nM       logs/\n`
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
-
-    const output = await checkoutRecursive({
-      cliPath: 'dvc',
-      cwd: fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(['M       model.pt', 'M       logs/'])
-
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc checkout --recursive',
       expect.objectContaining({
         cwd: fsPath
       })

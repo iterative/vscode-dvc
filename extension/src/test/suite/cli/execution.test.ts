@@ -3,19 +3,20 @@ import chai from 'chai'
 import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
-import * as ExecutionDetails from '../../../cli/executionDetails'
-import { executeInShell } from '../../../cli/shellExecution'
+import * as Execution from '../../../cli/execution'
 import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 
 chai.use(sinonChai)
 const { expect } = chai
 
-suite('Shell Execution Test Suite', () => {
-  window.showInformationMessage('Start all shell execution tests.')
+suite('Execution Test Suite', () => {
+  window.showInformationMessage('Start all execution tests.')
 
-  describe('shellExecution', () => {
-    it('should be able to execute a shell command and provide the correct events in the correct order', async () => {
+  const { spawnProcess } = Execution
+
+  describe('spawnProcess', () => {
+    it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
 
       const text = ':weeeee:'
@@ -29,7 +30,7 @@ suite('Shell Execution Test Suite', () => {
       const onDidComplete = completedEventEmitter.event
       const onDidOutput = stdOutEventEmitter.event
 
-      const shellExecutionOutputEvent = (
+      const executionOutputEvent = (
         text: string,
         event: Event<string>,
         disposer: Disposer
@@ -55,20 +56,16 @@ suite('Shell Execution Test Suite', () => {
       }
       const started = startedOrCompletedEvent(onDidStart)
       const completed = startedOrCompletedEvent(onDidComplete)
-      const eventStream = shellExecutionOutputEvent(
-        text,
-        onDidOutput,
-        disposable
-      )
+      const eventStream = executionOutputEvent(text, onDidOutput, disposable)
 
       const cwd = __dirname
 
       const stubbedGetExecutionDetails = stub(
-        ExecutionDetails,
+        Execution,
         'getExecutionDetails'
       ).returns({ command, cwd, env: {} })
 
-      executeInShell({
+      spawnProcess({
         options: {
           command: Commands.STATUS,
           cliPath: undefined,

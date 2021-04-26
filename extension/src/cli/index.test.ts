@@ -3,7 +3,7 @@ import { mocked } from 'ts-jest/utils'
 import { execPromise } from '../util/exec'
 import { basename, resolve } from 'path'
 
-jest.mock('fs')
+jest.mock('fs-extra')
 jest.mock('../util/exec')
 jest.mock('vscode')
 

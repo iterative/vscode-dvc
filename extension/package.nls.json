@@ -3,7 +3,7 @@
   "description": "DVC VSCode extension",
   "command.addTarget": "Add Target",
   "command.checkout": "Checkout",
-  "command.checkoutRecursive": "Checkout Recursive",
+  "command.checkoutTarget": "Checkout Target",
   "command.commit": "Commit",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",

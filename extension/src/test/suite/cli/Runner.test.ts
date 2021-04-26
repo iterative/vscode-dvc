@@ -3,7 +3,7 @@ import chai from 'chai'
 import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
-import * as ExecutionDetails from '../../../cli/executionDetails'
+import * as Execution from '../../../cli/execution'
 import { Commands } from '../../../cli/commands'
 import { Disposable } from '../../../extension'
 import { Config } from '../../../Config'
@@ -23,7 +23,7 @@ suite('Runner Test Suite', () => {
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
       const stubbedGetExecutionDetails = stub(
-        ExecutionDetails,
+        Execution,
         'getExecutionDetails'
       ).returns({
         command: 'sleep 3',
@@ -56,23 +56,33 @@ suite('Runner Test Suite', () => {
       const runner = disposable.track(new Runner({} as Config))
       const cwd = __dirname
       const stubbedGetExecutionDetails = stub(
-        ExecutionDetails,
+        Execution,
         'getExecutionDetails'
       ).returns({
-        command: 'sleep 10',
+        command: 'sleep 100000000000000000000000',
         cwd,
         env: {}
       })
 
+      const processCompletedEvent = (): Promise<void> =>
+        new Promise(resolve =>
+          disposable.track(runner.onDidComplete(() => resolve()))
+        )
+
       await runner.run(Commands.STATUS, cwd)
       stubbedGetExecutionDetails.restore()
 
+      const completedEvent = processCompletedEvent()
+
       expect(runner.isRunning()).to.be.true
 
-      runner.stop()
+      const stopped = await runner.stop()
+      expect(stopped).to.be.true
+
+      await completedEvent
 
       expect(runner.isRunning()).to.be.false
       disposable.dispose()
-    }).timeout(2000)
+    })
   })
 })

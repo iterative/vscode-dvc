@@ -15,6 +15,7 @@
     "DVCPATH",
     "MNIST",
     "conda",
+    "execa",
     "featurize",
     "isequal",
     "pseudoterminal",
