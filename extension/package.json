@@ -152,6 +152,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.checkout",
+          "when": "false"
+        },
+        {
+          "command": "dvc.checkoutRecursive",
+          "when": "false"
+        },
+        {
           "command": "dvc.pullTarget",
           "when": "false"
         },
