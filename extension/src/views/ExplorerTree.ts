@@ -12,41 +12,51 @@ import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
+import { definedAndNonEmpty } from '../util'
 
 export class ExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
-  private changeTreeDataEventEmitter: EventEmitter<string>
-  readonly onDidChangeTreeData: Event<string>
+  private changeTreeDataEventEmitter: EventEmitter<string | void>
+  readonly onDidChangeTreeData: Event<string | void>
 
-  private workspaceRoot: string
   private config: Config
+  private dvcRoots: string[] = []
 
-  refresh(path: string): void {
+  private pathRoots: Record<string, string> = {}
+
+  public refresh(path: string): void {
     this.changeTreeDataEventEmitter.fire(dirname(path))
   }
 
-  openResource(resource: Uri): void {
+  public setDvcRoots(dvcRoots: string[]) {
+    this.dvcRoots = dvcRoots
+    this.changeTreeDataEventEmitter.fire()
+  }
+
+  public openResource(resource: Uri): void {
     window.showTextDocument(resource)
   }
 
-  async getChildren(element?: string): Promise<string[]> {
+  public async getChildren(element?: string): Promise<string[]> {
     if (element) {
-      return this.readDirectory(element)
+      return this.readDirectory(this.pathRoots[element], element)
     }
 
-    if (this.workspaceRoot) {
-      const children = await this.readDirectory(this.workspaceRoot)
-      children.sort((a, b) => {
-        const aIsDirectory = isDirectory(a)
-        const bIsDirectory = isDirectory(b)
-        if (aIsDirectory === bIsDirectory) {
-          return a.localeCompare(b)
-        }
-        return aIsDirectory ? -1 : 1
-      })
-
-      return children
+    if (definedAndNonEmpty(this.dvcRoots)) {
+      const rootElements = await Promise.all(
+        this.dvcRoots.map(async dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
+      )
+      return rootElements
+        .reduce((a, b) => a.concat(b), [])
+        .sort((a, b) => {
+          const aIsDirectory = isDirectory(a)
+          const bIsDirectory = isDirectory(b)
+          if (aIsDirectory === bIsDirectory) {
+            return a.localeCompare(b)
+          }
+          return aIsDirectory ? -1 : 1
+        })
     }
 
     return []
@@ -74,7 +84,7 @@ export class ExplorerTree implements TreeDataProvider<string> {
     return treeItem
   }
 
-  private async readDirectory(path: string): Promise<string[]> {
+  private async readDirectory(root: string, path: string): Promise<string[]> {
     await this.config.ready
     const children = await listDvcOnly(
       {
@@ -82,17 +92,20 @@ export class ExplorerTree implements TreeDataProvider<string> {
         cliPath: this.config.dvcPath,
         cwd: path
       },
-      relative(this.workspaceRoot, path)
+      relative(root, path)
     )
 
-    return children.map(child => join(path, child))
+    return children.map(child => {
+      const childPath = join(path, child)
+      this.pathRoots[childPath] = root
+      return childPath
+    })
   }
 
-  constructor(workspaceRoot: string, config: Config) {
-    this.workspaceRoot = workspaceRoot
+  constructor(config: Config) {
     this.config = config
 
-    this.changeTreeDataEventEmitter = new EventEmitter<string>()
+    this.changeTreeDataEventEmitter = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
   }
 }

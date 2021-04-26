@@ -160,15 +160,15 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.explorerView = this.dispose.track(
-      new ExplorerTree(this.config.workspaceRoot, this.config)
-    )
+    this.explorerView = this.dispose.track(new ExplorerTree(this.config))
 
     Promise.all(
       (workspace.workspaceFolders || []).map(async workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       )
-    )
+    ).then(() => {
+      this.explorerView.setDvcRoots(this.dvcRoots)
+    })
 
     this.dispose.track(
       window.registerTreeDataProvider('explorerTreeView', this.explorerView)
