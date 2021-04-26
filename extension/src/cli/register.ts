@@ -62,9 +62,9 @@ const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
-    commands.registerCommand('dvc.checkout', ({ fsPath }) => {
+    commands.registerCommand('dvc.checkout', context => {
       checkout({
-        cwd: fsPath,
+        cwd: context?.rootUri?.fsPath,
         cliPath: config.dvcPath,
         pythonBinPath: config.pythonBinPath
       })
