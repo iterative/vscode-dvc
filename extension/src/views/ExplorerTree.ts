@@ -1,7 +1,6 @@
 import {
   Event,
   EventEmitter,
-  FileType,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -13,17 +12,6 @@ import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
-
-export const isDirOrFile = (path: string): FileType => {
-  try {
-    if (isDirectory(path)) {
-      return FileType.Directory
-    }
-    return FileType.File
-  } catch (e) {
-    return FileType.File
-  }
-}
 
 export class ExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -50,12 +38,12 @@ export class ExplorerTree implements TreeDataProvider<string> {
     if (this.workspaceRoot) {
       const children = await this.readDirectory(this.workspaceRoot)
       children.sort((a, b) => {
-        const aFileType = isDirOrFile(a)
-        const bFileType = isDirOrFile(b)
+        const aFileType = isDirectory(a)
+        const bFileType = isDirectory(b)
         if (aFileType === bFileType) {
           return a.localeCompare(b)
         }
-        return aFileType === FileType.Directory ? -1 : 1
+        return aFileType ? -1 : 1
       })
 
       return children
@@ -65,16 +53,14 @@ export class ExplorerTree implements TreeDataProvider<string> {
   }
 
   getTreeItem(element: string): TreeItem {
-    const fileType = isDirOrFile(element)
+    const isDir = isDirectory(element)
     const resourceUri = Uri.file(element)
     const treeItem = new TreeItem(
       resourceUri,
-      fileType === FileType.Directory
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
+      isDir ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None
     )
 
-    if (fileType === FileType.File) {
+    if (!isDir) {
       treeItem.command = {
         command: 'explorerTreeView.openFile',
         title: 'Open File',
