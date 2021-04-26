@@ -117,6 +117,12 @@
         "category": "DVC"
       },
       {
+        "title": "%command.checkoutTarget%",
+        "command": "dvc.checkoutTarget",
+        "category": "DVC",
+        "icon": "$(discard)"
+      },
+      {
         "title": "%command.pullTarget%",
         "command": "dvc.pullTarget",
         "category": "DVC",
@@ -148,6 +154,10 @@
         },
         {
           "command": "dvc.checkout",
+          "when": "false"
+        },
+        {
+          "command": "dvc.checkoutTarget",
           "when": "false"
         },
         {
@@ -191,6 +201,11 @@
           "command": "dvc.addTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState == untracked"
+        },
+        {
+          "command": "dvc.checkoutTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
         },
         {
           "command": "dvc.pushTarget",

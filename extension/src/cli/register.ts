@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { addTarget, pullTarget, pushTarget } from '.'
+import { addTarget, checkoutTarget, pullTarget, pushTarget } from '.'
 import { Config } from '../Config'
 import { Disposer } from '../extension'
 import { checkout, initializeDirectory } from './reader'
@@ -32,6 +32,15 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     )
   )
 
+  disposer.track(
+    commands.registerCommand('dvc.checkoutTarget', ({ resourceUri }) =>
+      checkoutTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
+    )
+  )
   disposer.track(
     commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
       pushTarget({

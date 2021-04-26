@@ -26,6 +26,12 @@ export const addTarget = async (options: {
   pythonBinPath: string | undefined
 }): Promise<string> => runTargetCommand(options, Commands.ADD)
 
+export const checkoutTarget = (options: {
+  fsPath: string
+  cliPath: string | undefined
+  pythonBinPath: string | undefined
+}): Promise<string> => runTargetCommand(options, Commands.CHECKOUT)
+
 export const pushTarget = async (options: {
   fsPath: string
   cliPath: string | undefined
