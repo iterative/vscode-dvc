@@ -1,6 +1,7 @@
 export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
+  COMMIT = 'commit',
   EXPERIMENT_GC = 'exp gc -f -w',
   EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT_RUN = 'exp run',
@@ -22,6 +23,10 @@ export enum Commands {
 export enum ListFlag {
   DVC_ONLY = '--dvc-only',
   RECURSIVE = '-R'
+}
+
+export enum CommitFlag {
+  FORCE = '-f'
 }
 
 export enum GcPreserveFlag {

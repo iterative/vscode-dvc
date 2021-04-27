@@ -1,6 +1,6 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
-import { buildCommand, Commands } from './commands'
+import { buildCommand, Commands, CommitFlag } from './commands'
 import { execProcess } from './execution'
 
 const runTargetCommand = async (
@@ -27,6 +27,13 @@ export const addTarget = async (options: {
   cliPath: string | undefined
   pythonBinPath: string | undefined
 }): Promise<string> => runTargetCommand(options, Commands.ADD)
+
+export const commitTarget = (options: {
+  fsPath: string
+  cliPath: string | undefined
+  pythonBinPath: string | undefined
+}): Promise<string> =>
+  runTargetCommand(options, buildCommand(Commands.COMMIT, CommitFlag.FORCE))
 
 export const checkoutTarget = (options: {
   fsPath: string

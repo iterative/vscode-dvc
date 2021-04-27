@@ -1,8 +1,14 @@
 import { commands } from 'vscode'
-import { addTarget, checkoutTarget, pullTarget, pushTarget } from '.'
+import {
+  addTarget,
+  checkoutTarget,
+  commitTarget,
+  pullTarget,
+  pushTarget
+} from '.'
 import { Config } from '../Config'
 import { Disposer } from '../extension'
-import { checkout, initializeDirectory } from './reader'
+import { checkout, commit, initializeDirectory } from './reader'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
@@ -51,6 +57,27 @@ const registerCommands = (config: Config, disposer: Disposer) => {
       })
     )
   )
+
+  disposer.track(
+    commands.registerCommand('dvc.commit', ({ rootUri }) => {
+      commit({
+        cwd: rootUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.commitTarget', ({ resourceUri }) =>
+      commitTarget({
+        fsPath: resourceUri.fsPath,
+        cliPath: config.dvcPath,
+        pythonBinPath: config.pythonBinPath
+      })
+    )
+  )
+
   disposer.track(
     commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
       pushTarget({
