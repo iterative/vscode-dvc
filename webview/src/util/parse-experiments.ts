@@ -30,8 +30,11 @@ const buildExperimentFromEntry: (
   entry: [string, ExperimentJSONOutput]
 ) => Experiment = ([id, experiment]) => addIdToExperiment(id, experiment)
 
-const isExperiment: (row: ExperimentWithId) => boolean = row =>
-  row.queued || row.id === row.checkpoint_tip
+const isTopLevelExperiment: (row: ExperimentWithId) => boolean = ({
+  queued,
+  id,
+  checkpoint_tip
+}) => Boolean(queued || (checkpoint_tip ? id === checkpoint_tip : true))
 
 const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
   let currentTip: Experiment | undefined
@@ -49,7 +52,7 @@ const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
     }
   }
   for (const row of rows) {
-    if (isExperiment(row)) {
+    if (isTopLevelExperiment(row)) {
       pushResult()
       currentTip = row
       currentEpochs = []
