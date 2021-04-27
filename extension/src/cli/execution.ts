@@ -1,5 +1,4 @@
 import { EventEmitter } from 'vscode'
-import { Logger } from '../common/Logger'
 import { getProcessEnv } from '../env'
 import { Commands } from './commands'
 import { execPromise } from '../util/exec'
@@ -56,7 +55,7 @@ export const spawnProcess = ({
   options: ExecutionOptions
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
-    stdOutEventEmitter?: EventEmitter<string>
+    outputEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
 }): ExecaChildProcess<string> => {
@@ -65,20 +64,16 @@ export const spawnProcess = ({
   const [executable, ...args] = command.split(' ')
 
   const childProcess = execa(executable, args, {
+    all: true,
     cwd,
     env
   })
 
   emitters?.startedEventEmitter?.fire()
 
-  childProcess.stdout?.on('data', chunk => {
+  childProcess.all?.on('data', chunk => {
     const output = getOutput(chunk)
-    emitters?.stdOutEventEmitter?.fire(output)
-  })
-
-  childProcess.stderr?.on('data', chunk => {
-    const output = getOutput(chunk)
-    Logger.error(output)
+    emitters?.outputEventEmitter?.fire(output)
   })
 
   childProcess.on('close', () => {

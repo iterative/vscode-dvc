@@ -12,8 +12,7 @@ const mockedExeca = mocked(execa)
 
 mockedExeca.mockReturnValue(({
   on: jest.fn(),
-  stderr: { on: jest.fn() },
-  stdout: { on: jest.fn() }
+  all: { on: jest.fn() }
 } as unknown) as ExecaChildProcess<Buffer>)
 
 beforeEach(() => {
@@ -37,6 +36,7 @@ describe('spawnProcess', () => {
     })
 
     expect(mockedExeca).toBeCalledWith('dvc', [Commands.CHECKOUT], {
+      all: true,
       cwd,
       env: processEnv
     })
@@ -59,6 +59,7 @@ describe('spawnProcess', () => {
     })
 
     expect(mockedExeca).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
+      all: true,
       cwd,
       env: processEnv
     })
@@ -86,6 +87,7 @@ describe('spawnProcess', () => {
     })
 
     expect(mockedExeca).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
+      all: true,
       cwd,
       env: { PATH: `${pythonBinPath}:${existingPath}` }
     })
@@ -109,6 +111,7 @@ describe('spawnProcess', () => {
     })
 
     expect(mockedExeca).toBeCalledWith('dvc', [Commands.CHECKOUT], {
+      all: true,
       cwd,
       env: { PATH: `${pythonBinPath}` }
     })

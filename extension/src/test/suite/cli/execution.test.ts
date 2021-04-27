@@ -23,12 +23,12 @@ suite('Execution Test Suite', () => {
       const command = 'echo ' + text
 
       const completedEventEmitter = new EventEmitter<void>()
-      const stdOutEventEmitter = new EventEmitter<string>()
+      const outputEventEmitter = new EventEmitter<string>()
       const startedEventEmitter = new EventEmitter<void>()
 
       const onDidStart = startedEventEmitter.event
       const onDidComplete = completedEventEmitter.event
-      const onDidOutput = stdOutEventEmitter.event
+      const onDidOutput = outputEventEmitter.event
 
       const executionOutputEvent = (
         text: string,
@@ -74,7 +74,7 @@ suite('Execution Test Suite', () => {
         },
         emitters: {
           completedEventEmitter,
-          stdOutEventEmitter,
+          outputEventEmitter: outputEventEmitter,
           startedEventEmitter
         }
       })
