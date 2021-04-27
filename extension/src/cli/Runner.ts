@@ -2,7 +2,7 @@ import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
-import { Commands, ExperimentSubCommands, Flags } from './commands'
+import { Args } from './commands'
 import { spawnProcess } from './execution'
 import { Process } from '../processExecution'
 
@@ -21,10 +21,7 @@ export class Runner {
   private currentProcess: Process | undefined
   private config: Config
 
-  private async startProcess(
-    args: (Commands | ExperimentSubCommands | Flags)[],
-    cwd: string
-  ) {
+  private async startProcess(args: Args, cwd: string) {
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
@@ -43,10 +40,7 @@ export class Runner {
     })
   }
 
-  public async run(
-    args: (Commands | ExperimentSubCommands | Flags)[],
-    cwd: string
-  ) {
+  public async run(args: Args, cwd: string) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
       return this.startProcess(args, cwd)

@@ -16,7 +16,7 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
-import { Commands, ExperimentSubCommands, Flags } from './cli/commands'
+import { Args, Commands, ExperimentSubCommands, Flags } from './cli/commands'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
@@ -130,10 +130,7 @@ export class Extension {
     return webview
   }
 
-  private async runExperimentCommand(
-    args: (Commands | ExperimentSubCommands | Flags)[],
-    context?: { rootUri?: Uri }
-  ) {
+  private async runExperimentCommand(args: Args, context?: { rootUri?: Uri }) {
     const dvcRoot = await pickSingleRepositoryRoot(
       {
         cliPath: this.config.dvcPath,

@@ -40,5 +40,7 @@ export enum GcPreserveFlag {
   QUEUED = '--queued'
 }
 
-export const buildArgs = (command: Commands, ...args: string[]): Commands[] =>
-  [command, ...args].filter(Boolean) as Commands[]
+export type Args = (Commands | ExperimentSubCommands | Flags)[]
+
+export const buildArgs = (command: Commands, ...args: string[]): Args =>
+  [command, ...args].filter(Boolean) as Args

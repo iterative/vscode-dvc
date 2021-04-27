@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
-import { Commands, ExperimentSubCommands, Flags } from './commands'
+import { Args } from './commands'
 import { trim, trimAndSplit } from '../util/stdout'
 import { createProcess, Process, runProcess } from '../processExecution'
 
@@ -11,7 +11,7 @@ export interface ReaderOptions {
 }
 
 export type ExecutionOptions = ReaderOptions & {
-  args: (Commands | ExperimentSubCommands | Flags)[]
+  args: Args
 }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
@@ -85,7 +85,7 @@ export const spawnProcess = ({
 
 export const execProcess = async <T>(
   options: ReaderOptions,
-  args: (Commands | ExperimentSubCommands | Flags)[],
+  args: Args,
   formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
 ): Promise<T> => {
   const { executable, cwd, env } = getExecutionDetails({
