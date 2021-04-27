@@ -115,6 +115,7 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () => {
+    await this.config.ready
     const experiments = await getExperiments({
       pythonBinPath: this.config.pythonBinPath,
       cliPath: this.config.dvcPath,
@@ -125,7 +126,7 @@ export class Extension {
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
-    this.refreshExperimentsWebview()
+    await this.refreshExperimentsWebview()
     return webview
   }
 
@@ -142,8 +143,15 @@ export class Extension {
       context?.rootUri?.fsPath
     )
     if (dvcRoot) {
+      await this.showExperimentsWebview()
       this.runner.run(command, dvcRoot)
-      this.showExperimentsWebview()
+      const listener = this.dispose.track(
+        this.runner.onDidComplete(() => {
+          this.refreshExperimentsWebview()
+          this.dispose.untrack(listener)
+          listener.dispose()
+        })
+      )
     }
   }
 
