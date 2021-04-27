@@ -1,19 +1,19 @@
-import execa, { ExecaChildProcess } from 'execa'
+import { createProcess, Process } from '../processExecution'
 import { Commands } from './commands'
 import { spawnProcess } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
 jest.mock('../env')
-jest.mock('execa')
+jest.mock('../processExecution')
 
 const mockedGetEnv = mocked(getProcessEnv)
-const mockedExeca = mocked(execa)
+const mockedCreateProcess = mocked(createProcess)
 
-mockedExeca.mockReturnValue(({
+mockedCreateProcess.mockReturnValue(({
   on: jest.fn(),
   all: { on: jest.fn() }
-} as unknown) as ExecaChildProcess<Buffer>)
+} as unknown) as Process)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -35,8 +35,9 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedExeca).toBeCalledWith('dvc', [Commands.CHECKOUT], {
-      all: true,
+    expect(mockedCreateProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: [Commands.CHECKOUT],
       cwd,
       env: processEnv
     })
@@ -58,8 +59,9 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedExeca).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
-      all: true,
+    expect(mockedCreateProcess).toBeCalledWith({
+      executable: cliPath,
+      args: [Commands.CHECKOUT],
       cwd,
       env: processEnv
     })
@@ -86,8 +88,9 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedExeca).toBeCalledWith(cliPath, [Commands.CHECKOUT], {
-      all: true,
+    expect(mockedCreateProcess).toBeCalledWith({
+      executable: cliPath,
+      args: [Commands.CHECKOUT],
       cwd,
       env: { PATH: `${pythonBinPath}:${existingPath}` }
     })
@@ -110,8 +113,9 @@ describe('spawnProcess', () => {
       }
     })
 
-    expect(mockedExeca).toBeCalledWith('dvc', [Commands.CHECKOUT], {
-      all: true,
+    expect(mockedCreateProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: [Commands.CHECKOUT],
       cwd,
       env: { PATH: `${pythonBinPath}` }
     })

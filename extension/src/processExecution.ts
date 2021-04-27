@@ -14,13 +14,13 @@ interface ProcessResult {
   signal?: string
 }
 
-type Process = RunningProcess & Promise<ProcessResult>
+export type Process = RunningProcess & Promise<ProcessResult>
 
 export interface ProcessOptions {
   executable: string
   args: string[]
   cwd: string
-  env?: Record<string, string>
+  env?: NodeJS.ProcessEnv
 }
 
 export const createProcess = ({

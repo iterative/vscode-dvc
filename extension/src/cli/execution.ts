@@ -3,7 +3,7 @@ import { getProcessEnv } from '../env'
 import { Commands } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
-import execa, { ExecaChildProcess } from 'execa'
+import { createProcess, Process } from '../processExecution'
 
 export interface ReaderOptions {
   cliPath: string | undefined
@@ -58,16 +58,12 @@ export const spawnProcess = ({
     outputEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
-}): ExecaChildProcess<string> => {
+}): Process => {
   const { command, cwd, env } = getExecutionDetails(options)
 
   const [executable, ...args] = command.split(' ')
 
-  const childProcess = execa(executable, args, {
-    all: true,
-    cwd,
-    env
-  })
+  const childProcess = createProcess({ executable, args, cwd, env })
 
   emitters?.startedEventEmitter?.fire()
 
