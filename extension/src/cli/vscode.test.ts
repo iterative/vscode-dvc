@@ -7,16 +7,16 @@ import {
   removeExperimentFromQuickPick
 } from './vscode'
 import { mocked } from 'ts-jest/utils'
-import { execPromise } from '../util/exec'
+import { runProcess } from '../processExecution'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from './commands'
 import { QuickPickItemWithValue } from '../vscode/quickpick'
 
 jest.mock('fs')
-jest.mock('../util/exec')
+jest.mock('../processExecution')
 jest.mock('vscode')
 
-const mockedExecPromise = mocked(execPromise)
+const mockedExecPromise = mocked(runProcess)
 const mockedShowErrorMessage = mocked(window.showErrorMessage)
 const mockedShowInformationMessage = mocked(window.showInformationMessage)
 const mockedShowQuickPick = mocked<
@@ -59,7 +59,7 @@ const exampleListStdout = exampleExperimentsList.join('\n') + '\n'
 describe('queueExperimentCommand', () => {
   it('displays an info message with the contents of stdout when the command succeeds', async () => {
     const stdout = 'Example stdout that will be resolved literally\n'
-    mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
+    mockedExecPromise.mockResolvedValue(stdout)
     await queueExperimentCommand(exampleConfig)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout.trim())
   })
@@ -106,7 +106,7 @@ describe('experimentGcCommand', () => {
   })
 
   it('executes the proper command given a mocked selection', async () => {
-    mockedExecPromise.mockResolvedValue({ stdout: '', stderr: '' })
+    mockedExecPromise.mockResolvedValue('')
     mockedShowQuickPick.mockResolvedValue([
       {
         detail: 'Preserve Experiments derived from all Git tags',
@@ -123,8 +123,9 @@ describe('experimentGcCommand', () => {
     await experimentGcQuickPick(exampleConfig)
 
     expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp gc -f -w --all-tags --all-commits',
       expect.objectContaining({
+        executable: 'dvc',
+        args: ['exp gc -f -w', '--all-tags', '--all-commits'],
         cwd: exampleConfig.workspaceRoot
       })
     )
@@ -133,7 +134,7 @@ describe('experimentGcCommand', () => {
   it('reports stdout from the executed command via showInformationMessage', async () => {
     const stdout = 'example stdout that will be passed on'
     mockedShowQuickPick.mockResolvedValue([])
-    mockedExecPromise.mockResolvedValue({ stdout, stderr: '' })
+    mockedExecPromise.mockResolvedValue(stdout)
     await experimentGcQuickPick(exampleConfig)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
@@ -157,14 +158,15 @@ describe('experimentGcCommand', () => {
   })
 
   it('executes the proper default command given no selections', async () => {
-    mockedExecPromise.mockResolvedValue({ stdout: '', stderr: '' })
+    mockedExecPromise.mockResolvedValue('')
     mockedShowQuickPick.mockResolvedValue([])
 
     await experimentGcQuickPick(exampleConfig)
 
     expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp gc -f -w',
       expect.objectContaining({
+        executable: 'dvc',
+        args: ['exp gc -f -w'],
         cwd: exampleConfig.workspaceRoot
       })
     )
@@ -179,28 +181,24 @@ describe('experimentGcCommand', () => {
 
 describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
   it('invokes a quickpick with a list of names from stdout and executes a constructed command', async () => {
-    mockedExecPromise.mockResolvedValue({
-      stdout: 'output from apply',
-      stderr: ''
-    })
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: exampleListStdout,
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValue('output from apply')
+    mockedExecPromise.mockResolvedValueOnce(exampleListStdout)
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     await applyExperimentFromQuickPick(exampleConfig)
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
 
     expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp list --names-only',
       expect.objectContaining({
+        executable: 'dvc',
+        args: ['exp', 'list', '--names-only'],
         cwd: '/home/user/project'
       })
     )
 
     expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp apply exp-2021',
       expect.objectContaining({
+        executable: 'dvc',
+        args: ['exp', 'apply', 'exp-2021'],
         cwd: '/home/user/project'
       })
     )
@@ -217,14 +215,8 @@ describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
   })
 
   it('displays an error message when there are no experiments to select', async () => {
-    mockedExecPromise.mockResolvedValue({
-      stdout: 'output from apply',
-      stderr: ''
-    })
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: '',
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValue('output from apply')
+    mockedExecPromise.mockResolvedValueOnce('')
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     await applyExperimentFromQuickPick(exampleConfig)
     expect(mockedShowQuickPick).not.toBeCalled()
@@ -235,10 +227,7 @@ describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
 
   it('does not execute a command if the QuickPick is dismissed', async () => {
     mockedShowQuickPick.mockResolvedValue(undefined)
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: exampleListStdout,
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValueOnce(exampleListStdout)
     await applyExperimentFromQuickPick(exampleConfig)
     expect(mockedExecPromise).toBeCalledTimes(1)
   })
@@ -246,14 +235,8 @@ describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
 
 describe('removeExperimentFromQuickPick', () => {
   it('executes a constructed command', async () => {
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: exampleListStdout,
-      stderr: ''
-    })
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: 'output from remove',
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValueOnce(exampleListStdout)
+    mockedExecPromise.mockResolvedValueOnce('output from remove')
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     await removeExperimentFromQuickPick(exampleConfig)
 
@@ -261,8 +244,9 @@ describe('removeExperimentFromQuickPick', () => {
       'Experiment exp-2021 has been removed!'
     )
     expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp remove exp-2021',
       expect.objectContaining({
+        executable: 'dvc',
+        args: ['exp remove', 'exp-2021'],
         cwd: '/home/user/project'
       })
     )
@@ -273,14 +257,8 @@ describe('branchExperimentFromQuickPick', () => {
   const testBranchName = 'test-branch-name'
 
   it('gets a name from showInputBox and executes a constructed command', async () => {
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: exampleListStdout,
-      stderr: ''
-    })
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: 'output from branch',
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValueOnce(exampleListStdout)
+    mockedExecPromise.mockResolvedValueOnce('output from branch')
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     mockedShowInputBox.mockResolvedValue(testBranchName)
 
@@ -288,8 +266,9 @@ describe('branchExperimentFromQuickPick', () => {
 
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
     expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp branch exp-2021 test-branch-name',
       expect.objectContaining({
+        executable: 'dvc',
+        args: ['exp branch', 'exp-2021', 'test-branch-name'],
         cwd: '/home/user/project'
       })
     )
@@ -297,16 +276,11 @@ describe('branchExperimentFromQuickPick', () => {
 
   it('does not execute a command if the InputBox is dismissed', async () => {
     mockedShowQuickPick.mockResolvedValue(undefined)
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: exampleListStdout,
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValueOnce(exampleListStdout)
     mockedShowQuickPick.mockResolvedValue(exampleExpName)
     mockedShowInputBox.mockResolvedValue(undefined)
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: 'output from branch',
-      stderr: ''
-    })
+    mockedExecPromise.mockResolvedValueOnce('output from branch')
+
     await branchExperimentFromQuickPick(exampleConfig)
     expect(mockedExecPromise).toBeCalledTimes(1)
   })

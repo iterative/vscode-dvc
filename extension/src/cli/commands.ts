@@ -5,10 +5,8 @@ export enum Commands {
   EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT = 'exp',
   EXPERIMENT_SHOW = 'exp show --show-json',
-  EXPERIMENT_APPLY = 'exp apply',
   EXPERIMENT_BRANCH = 'exp branch',
   EXPERIMENT_REMOVE = 'exp remove',
-  EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only',
   INITIALIZE_SUBDIRECTORY = 'init --subdir',
   LIST = 'list .',
   PULL = 'pull',
@@ -18,11 +16,14 @@ export enum Commands {
 }
 
 export enum ExperimentSubCommands {
+  APPLY = 'apply',
+  LIST = 'list',
   RUN = 'run',
   GARBAGE_COLLECT = 'gc'
 }
 
 export enum Flags {
+  NAMES_ONLY = '--names-only',
   RESET = '--reset',
   RUN_ALL = '--run-all'
 }
@@ -39,5 +40,5 @@ export enum GcPreserveFlag {
   QUEUED = '--queued'
 }
 
-export const buildCommand = (command: Commands, ...args: string[]): Commands =>
-  [command, ...args].filter(Boolean).join(' ') as Commands
+export const buildArgs = (command: Commands, ...args: string[]): Commands[] =>
+  [command, ...args].filter(Boolean) as Commands[]

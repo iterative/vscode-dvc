@@ -1,6 +1,6 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
-import { buildCommand, Commands } from './commands'
+import { buildArgs, Commands } from './commands'
 import { execProcess } from './execution'
 
 const runTargetCommand = async (
@@ -16,7 +16,7 @@ const runTargetCommand = async (
   const cwd = dirname(fsPath)
 
   const target = basename(fsPath)
-  const commandWithTarget = buildCommand(command, target)
+  const commandWithTarget = buildArgs(command, target)
   await ensureDir(cwd)
 
   return execProcess({ cwd, cliPath, pythonBinPath }, commandWithTarget)
