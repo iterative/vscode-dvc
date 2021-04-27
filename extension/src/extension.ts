@@ -16,7 +16,7 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
-import { Commands } from './cli/commands'
+import { Commands, ExperimentSubCommands, Flags } from './cli/commands'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
@@ -131,7 +131,7 @@ export class Extension {
   }
 
   private async runExperimentCommand(
-    command: Commands,
+    args: (Commands | ExperimentSubCommands | Flags)[],
     context?: { rootUri?: Uri }
   ) {
     const dvcRoot = await pickSingleRepositoryRoot(
@@ -144,7 +144,7 @@ export class Extension {
     )
     if (dvcRoot) {
       await this.showExperimentsWebview()
-      this.runner.run(command, dvcRoot)
+      this.runner.run(args, dvcRoot)
       const listener = this.dispose.track(
         this.runner.onDidComplete(() => {
           this.refreshExperimentsWebview()
@@ -215,19 +215,28 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async context =>
-        this.runExperimentCommand(Commands.EXPERIMENT_RUN, context)
+        this.runExperimentCommand(
+          [Commands.EXPERIMENT, ExperimentSubCommands.RUN],
+          context
+        )
       )
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.runResetExperiment', async context =>
-        this.runExperimentCommand(Commands.EXPERIMENT_RUN_RESET, context)
+        this.runExperimentCommand(
+          [Commands.EXPERIMENT, ExperimentSubCommands.RUN, Flags.RESET],
+          context
+        )
       )
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.runQueuedExperiments', async context =>
-        this.runExperimentCommand(Commands.EXPERIMENT_RUN_ALL, context)
+        this.runExperimentCommand(
+          [Commands.EXPERIMENT, ExperimentSubCommands.RUN, Flags.RUN_ALL],
+          context
+        )
       )
     )
 

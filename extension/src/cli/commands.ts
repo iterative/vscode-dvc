@@ -3,9 +3,7 @@ export enum Commands {
   CHECKOUT = 'checkout',
   EXPERIMENT_GC = 'exp gc -f -w',
   EXPERIMENT_QUEUE = 'exp run --queue',
-  EXPERIMENT_RUN = 'exp run',
-  EXPERIMENT_RUN_RESET = 'exp run --reset',
-  EXPERIMENT_RUN_ALL = 'exp run --run-all',
+  EXPERIMENT = 'exp',
   EXPERIMENT_SHOW = 'exp show --show-json',
   EXPERIMENT_APPLY = 'exp apply',
   EXPERIMENT_BRANCH = 'exp branch',
@@ -17,6 +15,16 @@ export enum Commands {
   PUSH = 'push',
   ROOT = 'root',
   STATUS = 'status --show-json'
+}
+
+export enum ExperimentSubCommands {
+  RUN = 'run',
+  GARBAGE_COLLECT = 'gc'
+}
+
+export enum Flags {
+  RESET = '--reset',
+  RUN_ALL = '--run-all'
 }
 
 export enum ListFlag {

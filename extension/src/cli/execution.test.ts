@@ -24,11 +24,12 @@ describe('spawnProcess', () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const cwd = __dirname
+    const args = [Commands.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
     await spawnProcess({
       options: {
-        command: Commands.CHECKOUT,
+        args,
         cliPath: '',
         cwd,
         pythonBinPath: undefined
@@ -37,7 +38,7 @@ describe('spawnProcess', () => {
 
     expect(mockedCreateProcess).toBeCalledWith({
       executable: 'dvc',
-      args: [Commands.CHECKOUT],
+      args,
       cwd,
       env: processEnv
     })
@@ -48,11 +49,12 @@ describe('spawnProcess', () => {
     const processEnv = { PATH: existingPath }
     const cliPath = '/some/path/to/dvc'
     const cwd = __dirname
+    const args = [Commands.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
     await spawnProcess({
       options: {
-        command: Commands.CHECKOUT,
+        args,
         cliPath,
         cwd,
         pythonBinPath: undefined
@@ -61,7 +63,7 @@ describe('spawnProcess', () => {
 
     expect(mockedCreateProcess).toBeCalledWith({
       executable: cliPath,
-      args: [Commands.CHECKOUT],
+      args,
       cwd,
       env: processEnv
     })
@@ -78,11 +80,12 @@ describe('spawnProcess', () => {
     const pythonBinPath = '/some/conda/path/bin'
 
     const cwd = __dirname
+    const args = [Commands.PUSH]
 
     await spawnProcess({
       options: {
         cliPath,
-        command: Commands.CHECKOUT,
+        args,
         cwd,
         pythonBinPath
       }
@@ -90,7 +93,7 @@ describe('spawnProcess', () => {
 
     expect(mockedCreateProcess).toBeCalledWith({
       executable: cliPath,
-      args: [Commands.CHECKOUT],
+      args,
       cwd,
       env: { PATH: `${pythonBinPath}:${existingPath}` }
     })
@@ -103,11 +106,12 @@ describe('spawnProcess', () => {
     const pythonBinPath = '/some/conda/path/bin'
 
     const cwd = __dirname
+    const args = [Commands.PULL]
 
     await spawnProcess({
       options: {
         cliPath: undefined,
-        command: Commands.CHECKOUT,
+        args,
         cwd,
         pythonBinPath
       }
@@ -115,7 +119,7 @@ describe('spawnProcess', () => {
 
     expect(mockedCreateProcess).toBeCalledWith({
       executable: 'dvc',
-      args: [Commands.CHECKOUT],
+      args,
       cwd,
       env: { PATH: `${pythonBinPath}` }
     })

@@ -20,7 +20,6 @@ suite('Execution Test Suite', () => {
       const disposable = Disposable.fn()
 
       const text = ':weeeee:'
-      const command = 'echo ' + text
 
       const completedEventEmitter = new EventEmitter<void>()
       const outputEventEmitter = new EventEmitter<string>()
@@ -59,15 +58,16 @@ suite('Execution Test Suite', () => {
       const eventStream = executionOutputEvent(text, onDidOutput, disposable)
 
       const cwd = __dirname
+      const args = [Commands.STATUS]
 
       const stubbedGetExecutionDetails = stub(
         Execution,
         'getExecutionDetails'
-      ).returns({ command, cwd, env: {} })
+      ).returns({ executable: 'echo', args: [text], cwd, env: {} })
 
       spawnProcess({
         options: {
-          command: Commands.STATUS,
+          args,
           cliPath: undefined,
           cwd,
           pythonBinPath: undefined
@@ -85,7 +85,7 @@ suite('Execution Test Suite', () => {
       await completed
       expect(stubbedGetExecutionDetails).to.be.calledWith({
         cliPath: undefined,
-        command: 'status --show-json',
+        args,
         cwd,
         pythonBinPath: undefined
       })

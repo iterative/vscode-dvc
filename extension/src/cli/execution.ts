@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
-import { Commands } from './commands'
+import { Commands, ExperimentSubCommands, Flags } from './commands'
 import { execPromise } from '../util/exec'
 import { trim, trimAndSplit } from '../util/stdout'
 import { createProcess, Process } from '../processExecution'
@@ -12,7 +12,8 @@ export interface ReaderOptions {
 }
 
 export type ExecutionOptions = ReaderOptions & {
-  command: Commands
+  command?: (Commands | ExperimentSubCommands | Flags)[] | Commands
+  args?: (Commands | ExperimentSubCommands | Flags)[]
 }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
@@ -30,15 +31,19 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
 export const getExecutionDetails = (
   options: ExecutionOptions
 ): {
-  command: string
+  command?: string
   cwd: string
   env: NodeJS.ProcessEnv
+  executable: string
+  args?: string[]
 } => {
-  const { command, cliPath, pythonBinPath } = options
+  const { command, cliPath, pythonBinPath, args } = options
   return {
     env: getEnv(pythonBinPath),
     command: `${cliPath || 'dvc'} ${command}`,
-    cwd: options.cwd
+    cwd: options.cwd,
+    executable: `${cliPath || 'dvc'}`,
+    args
   }
 }
 
@@ -59,11 +64,14 @@ export const spawnProcess = ({
     startedEventEmitter?: EventEmitter<void>
   }
 }): Process => {
-  const { command, cwd, env } = getExecutionDetails(options)
+  const { executable, args, cwd, env } = getExecutionDetails(options)
 
-  const [executable, ...args] = command.split(' ')
-
-  const childProcess = createProcess({ executable, args, cwd, env })
+  const childProcess = createProcess({
+    executable,
+    args: args || [],
+    cwd,
+    env
+  })
 
   emitters?.startedEventEmitter?.fire()
 
@@ -88,7 +96,7 @@ export const execProcess = async <T>(
     ...options,
     command: partialCommand
   })
-  const { stdout } = await execPromise(command, {
+  const { stdout } = await execPromise(command || '', {
     cwd,
     env
   })
