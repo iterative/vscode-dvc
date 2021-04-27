@@ -8,7 +8,7 @@ import torchvision
 import dvclive
 
 
-EPOCHS = 2
+EPOCHS = 10
 
 
 class ConvNet(torch.nn.Module):
