@@ -1,7 +1,16 @@
-import { buildCommand, Commands, GcPreserveFlag, ListFlag } from './commands'
+import {
+  buildCommand,
+  CommitFlag,
+  Commands,
+  GcPreserveFlag,
+  ListFlag
+} from './commands'
 import { trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { execProcess, ReaderOptions } from './execution'
+
+export const commit = async (options: ReaderOptions): Promise<string> =>
+  execProcess<string>(options, buildCommand(Commands.COMMIT, CommitFlag.FORCE))
 
 export const checkout = async (options: ReaderOptions): Promise<string[]> =>
   execProcess<string[]>(options, Commands.CHECKOUT, trimAndSplit)
