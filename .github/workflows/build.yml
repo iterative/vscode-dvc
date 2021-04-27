@@ -46,7 +46,7 @@ jobs:
       - run: yarn install
 
       - name: Update package.json version
-        uses: jossef/action-set-json-field@v1
+        uses: rogermparent/action-set-json-field@master
         with:
           file: extension/package.json
           field: version
