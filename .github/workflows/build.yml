@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
 
       - name: Update package.json version
-        uses: rogermparent/action-set-json-field@master
+        uses: rogermparent/action-set-json-field@v1
         with:
           file: extension/package.json
           field: version
