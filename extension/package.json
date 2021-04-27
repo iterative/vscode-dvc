@@ -239,6 +239,11 @@
           "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
         },
         {
+          "command": "dvc.commitTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc"
+        },
+        {
           "command": "dvc.pushTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && scmResourceState != remoteOnly"
