@@ -124,6 +124,18 @@
         "icon": "$(discard)"
       },
       {
+        "title": "%command.commit%",
+        "command": "dvc.commit",
+        "category": "DVC",
+        "icon": "$(check)"
+      },
+      {
+        "title": "%command.commitTarget%",
+        "command": "dvc.commitTarget",
+        "category": "DVC",
+        "icon": "$(check)"
+      },
+      {
         "title": "%command.pullTarget%",
         "command": "dvc.pullTarget",
         "category": "DVC",
@@ -162,6 +174,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.commit",
+          "when": "false"
+        },
+        {
+          "command": "dvc.commitTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.pullTarget",
           "when": "false"
         },
@@ -170,16 +190,14 @@
           "when": "false"
         }
       ],
-      "scm/change/title": [
-        {
-          "command": "dvc.addTarget",
-          "group": "inline",
-          "when": "scmProvider == dvc"
-        }
-      ],
       "scm/title": [
         {
           "command": "dvc.checkout",
+          "group": "navigation",
+          "when": "scmProvider == dvc"
+        },
+        {
+          "command": "dvc.commit",
           "group": "navigation",
           "when": "scmProvider == dvc"
         },
