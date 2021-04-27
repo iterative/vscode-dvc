@@ -2,15 +2,22 @@ import { addTarget } from '.'
 import { mocked } from 'ts-jest/utils'
 import { runProcess } from '../processExecution'
 import { basename, resolve } from 'path'
+import { getProcessEnv } from '../env'
 
 jest.mock('fs-extra')
 jest.mock('../processExecution')
+jest.mock('../env')
 jest.mock('vscode')
 
 const mockedRunProcess = mocked(runProcess)
+const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedEnv = {
+  PATH: '/all/of/the/goodies:/in/my/path'
+}
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
 
 describe('add', () => {
@@ -35,12 +42,11 @@ describe('add', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['add', file],
-        cwd: dir
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['add', file],
+      cwd: dir,
+      env: mockedEnv
+    })
   })
 })

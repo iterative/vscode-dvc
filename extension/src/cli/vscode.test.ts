@@ -8,12 +8,14 @@ import {
 } from './vscode'
 import { mocked } from 'ts-jest/utils'
 import { runProcess } from '../processExecution'
+import { getProcessEnv } from '../env'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from './commands'
 import { QuickPickItemWithValue } from '../vscode/quickpick'
 
 jest.mock('fs')
 jest.mock('../processExecution')
+jest.mock('../env')
 jest.mock('vscode')
 
 const mockedRunProcess = mocked(runProcess)
@@ -28,9 +30,14 @@ const mockedShowQuickPick = mocked<
   >
 >(window.showQuickPick)
 const mockedShowInputBox = mocked(window.showInputBox)
+const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedEnv = {
+  PATH: '/all/of/the/goodies:/in/my/path'
+}
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedGetProcessEnv.mockReturnValue(mockedEnv)
 })
 
 const exampleConfig = {
@@ -122,13 +129,12 @@ describe('experimentGcCommand', () => {
 
     await experimentGcQuickPick(exampleConfig)
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp gc -f -w', '--all-tags', '--all-commits'],
-        cwd: exampleConfig.workspaceRoot
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp gc -f -w', '--all-tags', '--all-commits'],
+      cwd: exampleConfig.workspaceRoot,
+      env: mockedEnv
+    })
   })
 
   it('reports stdout from the executed command via showInformationMessage', async () => {
@@ -163,13 +169,12 @@ describe('experimentGcCommand', () => {
 
     await experimentGcQuickPick(exampleConfig)
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp gc -f -w'],
-        cwd: exampleConfig.workspaceRoot
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp gc -f -w'],
+      cwd: exampleConfig.workspaceRoot,
+      env: mockedEnv
+    })
   })
 
   it('does not execute a command if the QuickPick is dismissed', async () => {
@@ -187,21 +192,19 @@ describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
     await applyExperimentFromQuickPick(exampleConfig)
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp', 'list', '--names-only'],
-        cwd: '/home/user/project'
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp', 'list', '--names-only'],
+      cwd: '/home/user/project',
+      env: mockedEnv
+    })
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp', 'apply', 'exp-2021'],
-        cwd: '/home/user/project'
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp', 'apply', 'exp-2021'],
+      cwd: '/home/user/project',
+      env: mockedEnv
+    })
   })
 
   it('throws from a non-shell Exception', async () => {
@@ -243,13 +246,12 @@ describe('removeExperimentFromQuickPick', () => {
     expect(mockedShowInformationMessage).toBeCalledWith(
       'Experiment exp-2021 has been removed!'
     )
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp remove', 'exp-2021'],
-        cwd: '/home/user/project'
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp remove', 'exp-2021'],
+      cwd: '/home/user/project',
+      env: mockedEnv
+    })
   })
 })
 
@@ -265,13 +267,12 @@ describe('branchExperimentFromQuickPick', () => {
     await branchExperimentFromQuickPick(exampleConfig)
 
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp branch', 'exp-2021', 'test-branch-name'],
-        cwd: '/home/user/project'
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp branch', 'exp-2021', 'test-branch-name'],
+      cwd: '/home/user/project',
+      env: mockedEnv
+    })
   })
 
   it('does not execute a command if the InputBox is dismissed', async () => {

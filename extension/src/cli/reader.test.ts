@@ -7,19 +7,25 @@ import {
   listDvcOnlyRecursive
 } from './reader'
 import { runProcess } from '../processExecution'
+import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('fs')
+jest.mock('../processExecution')
+jest.mock('../env')
+
+const mockedRunProcess = mocked(runProcess)
+const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedEnv = {
+  PATH: '/all/of/the/goodies:/in/my/path'
+}
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
-
-jest.mock('../processExecution')
-
-const mockedRunProcess = mocked(runProcess)
 
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
@@ -34,13 +40,12 @@ describe('getExperiments', () => {
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp show --show-json'],
-        cwd
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp show --show-json'],
+      cwd,
+      env: mockedEnv
+    })
   })
 })
 
@@ -75,13 +80,12 @@ describe('initializeDirectory', () => {
     })
     expect(output).toEqual(stdout.trim())
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['init --subdir'],
-        cwd: fsPath
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['init --subdir'],
+      cwd: fsPath,
+      env: mockedEnv
+    })
   })
 })
 describe('checkout', () => {
@@ -97,13 +101,12 @@ describe('checkout', () => {
     })
     expect(output).toEqual(['M       model.pt', 'M       logs/'])
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['checkout'],
-        cwd: fsPath
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['checkout'],
+      cwd: fsPath,
+      env: mockedEnv
+    })
   })
 })
 
@@ -119,13 +122,12 @@ describe('getRoot', () => {
       pythonBinPath: undefined
     })
     expect(relativeRoot).toEqual(mockRelativeRoot)
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['root'],
-        cwd
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['root'],
+      cwd,
+      env: mockedEnv
+    })
   })
 })
 
@@ -165,13 +167,12 @@ describe('listDvcOnlyRecursive', () => {
       'model.pt'
     ])
 
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['list .', '--dvc-only', '-R'],
-        cwd
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['list .', '--dvc-only', '-R'],
+      cwd,
+      env: mockedEnv
+    })
   })
 })
 
@@ -186,12 +187,11 @@ describe('experimentApply', () => {
         'exp-test'
       )
     ).toEqual(stdout)
-    expect(mockedRunProcess).toBeCalledWith(
-      expect.objectContaining({
-        executable: 'dvc',
-        args: ['exp', 'apply', 'exp-test'],
-        cwd
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp', 'apply', 'exp-test'],
+      cwd,
+      env: mockedEnv
+    })
   })
 })
