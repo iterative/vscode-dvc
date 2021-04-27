@@ -50,7 +50,7 @@ jobs:
         with:
           file: extension/package.json
           field: version
-          value: '{{ original }}-${{ github.sha }}'
+          value: ${{ github.sha }}
 
       - run: xvfb-run -a yarn run-p lint test
 
