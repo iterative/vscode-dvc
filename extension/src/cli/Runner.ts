@@ -4,7 +4,7 @@ import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Commands } from './commands'
 import { spawnProcess } from './execution'
-import { ExecaChildProcess } from 'execa'
+import { Process } from '../processExecution'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
@@ -18,7 +18,7 @@ export class Runner {
   private onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
-  private currentProcess: ExecaChildProcess | undefined
+  private currentProcess: Process | undefined
   private config: Config
 
   private async startProcess(command: Commands, cwd: string) {
