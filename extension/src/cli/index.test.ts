@@ -14,7 +14,7 @@ beforeEach(() => {
 })
 
 describe('add', () => {
-  it('should call execPromise with the correct parameters', async () => {
+  it('should call runProcess with the correct parameters', async () => {
     const fsPath = __filename
     const dir = resolve(fsPath, '..')
     const file = basename(__filename)

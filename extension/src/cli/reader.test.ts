@@ -45,7 +45,7 @@ describe('getExperiments', () => {
 })
 
 describe('initializeDirectory', () => {
-  it('should call execPromise with the correct parameters', async () => {
+  it('should call runProcess with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `
 	Initialized DVC repository.
@@ -85,7 +85,7 @@ describe('initializeDirectory', () => {
   })
 })
 describe('checkout', () => {
-  it('should call execPromise with the correct parameters', async () => {
+  it('should call runProcess with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\nM       logs/\n`
     mockedRunProcess.mockResolvedValueOnce(stdout)
