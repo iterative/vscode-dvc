@@ -34,7 +34,7 @@ const isTopLevelExperiment: (row: ExperimentWithId) => boolean = ({
   queued,
   id,
   checkpoint_tip
-}) => Boolean(queued || (checkpoint_tip ? id === checkpoint_tip : true))
+}) => queued || (checkpoint_tip ? id === checkpoint_tip : true)
 
 const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
   let currentTip: Experiment | undefined
