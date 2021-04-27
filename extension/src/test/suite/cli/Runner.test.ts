@@ -38,13 +38,13 @@ suite('Runner Test Suite', () => {
 
       expect(stubbedGetExecutionDetails).to.be.calledWith({
         cliPath: undefined,
-        command: [Commands.STATUS],
+        args: [Commands.STATUS],
         cwd,
         pythonBinPath: undefined
       })
       expect(stubbedGetExecutionDetails).not.to.be.calledWith({
         cliPath: undefined,
-        command: [Commands.CHECKOUT],
+        args: [Commands.CHECKOUT],
         cwd,
         pythonBinPath: undefined
       })
