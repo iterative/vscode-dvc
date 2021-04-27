@@ -14,6 +14,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Update package.json version
+        uses: rogermparent/action-set-json-field@master
+        with:
+          file: extension/package.json
+          field: version
+          value: '{{ original }}-${{ github.sha }}'
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.4
 
@@ -44,13 +51,6 @@ jobs:
           key: vscode-test
 
       - run: yarn install
-
-      - name: Update package.json version
-        uses: rogermparent/action-set-json-field@master
-        with:
-          file: extension/package.json
-          field: version
-          value: '{{ original }}-${{ github.sha }}'
 
       - run: xvfb-run -a yarn run-p lint test
 
