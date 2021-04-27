@@ -66,7 +66,7 @@ export const spawnProcess = ({
 }): Process => {
   const { executable, args, cwd, env } = getExecutionDetails(options)
 
-  const childProcess = createProcess({
+  const process = createProcess({
     executable,
     args: args || [],
     cwd,
@@ -75,16 +75,16 @@ export const spawnProcess = ({
 
   emitters?.startedEventEmitter?.fire()
 
-  childProcess.all?.on('data', chunk => {
+  process.all?.on('data', chunk => {
     const output = getOutput(chunk)
     emitters?.outputEventEmitter?.fire(output)
   })
 
-  childProcess.on('close', () => {
+  process.on('close', () => {
     emitters?.completedEventEmitter?.fire()
   })
 
-  return childProcess
+  return process
 }
 
 export const execProcess = async <T>(
