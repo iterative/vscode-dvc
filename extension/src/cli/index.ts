@@ -1,6 +1,6 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
-import { Args, Command, Flag } from './commands'
+import { Args, Command, Flag } from './args'
 import { runCliProcess } from './execution'
 
 const runTargetCommand = async (

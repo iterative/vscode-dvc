@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
-import { Args } from './commands'
+import { Args } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, runProcess } from '../processExecution'
 

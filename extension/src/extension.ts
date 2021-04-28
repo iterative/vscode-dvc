@@ -21,7 +21,7 @@ import {
   Command,
   ExperimentFlag,
   ExperimentSubCommands
-} from './cli/commands'
+} from './cli/args'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {

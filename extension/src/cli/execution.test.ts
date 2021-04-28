@@ -1,5 +1,5 @@
 import { createProcess, Process } from '../processExecution'
-import { Command } from './commands'
+import { Command } from './args'
 import { createCliProcess } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
