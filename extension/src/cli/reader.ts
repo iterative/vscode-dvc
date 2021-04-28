@@ -66,16 +66,3 @@ export const experimentListCurrent = async (
     ExperimentSubCommands.LIST,
     ExperimentFlag.NAMES_ONLY
   )
-
-export const experimentBranch = async (
-  options: ExecutionOptions,
-  experiment: string,
-  branchName: string
-): Promise<string> =>
-  runCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.BRANCH,
-    experiment,
-    branchName
-  )

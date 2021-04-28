@@ -31,6 +31,19 @@ export const experimentApply = async (
     experiment
   )
 
+export const experimentBranch = async (
+  options: ExecutionOptions,
+  experiment: string,
+  branchName: string
+): Promise<string> =>
+  runCliProcess(
+    options,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.BRANCH,
+    experiment,
+    branchName
+  )
+
 export const experimentGarbageCollect = async (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]

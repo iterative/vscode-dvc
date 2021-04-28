@@ -3,9 +3,10 @@ import { Config } from '../Config'
 import { GcPreserveFlag } from './args'
 import { quickPickManyValues } from '../vscode/quickpick'
 import { reportStderrOrThrow } from '../vscode/reporting'
-import { experimentListCurrent, experimentBranch } from './reader'
+import { experimentListCurrent } from './reader'
 import {
   experimentApply,
+  experimentBranch,
   experimentGarbageCollect,
   experimentRemove,
   queueExperiment
