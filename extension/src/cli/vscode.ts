@@ -3,14 +3,11 @@ import { Config } from '../Config'
 import { GcPreserveFlag } from './args'
 import { quickPickManyValues } from '../vscode/quickpick'
 import { reportStderrOrThrow } from '../vscode/reporting'
-import {
-  experimentListCurrent,
-  experimentBranch,
-  experimentRemove
-} from './reader'
+import { experimentListCurrent, experimentBranch } from './reader'
 import {
   experimentApply,
   experimentGarbageCollect,
+  experimentRemove,
   queueExperiment
 } from './writer'
 import { ExecutionOptions } from './execution'

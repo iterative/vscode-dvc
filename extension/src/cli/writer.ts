@@ -44,6 +44,17 @@ export const experimentGarbageCollect = async (
     ...preserveFlags
   )
 
+export const experimentRemove = async (
+  options: ExecutionOptions,
+  experiment: string
+): Promise<string> =>
+  runCliProcess(
+    options,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.REMOVE,
+    experiment
+  )
+
 export const initializeDirectory = async (
   options: ExecutionOptions
 ): Promise<string> =>
