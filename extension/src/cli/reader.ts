@@ -4,8 +4,7 @@ import {
   ExperimentSubCommands,
   Flag,
   GcPreserveFlag,
-  ListFlag,
-  Target
+  ListFlag
 } from './commands'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { ExecutionOptions, readCliProcess, runCliProcess } from './execution'
@@ -45,7 +44,7 @@ export const listDvcOnly = async (
     trimAndSplit,
     Commands.LIST,
     ListFlag.LOCAL_REPO,
-    relativePath as Target,
+    relativePath,
     ListFlag.DVC_ONLY
   )
 
@@ -122,7 +121,7 @@ export const experimentRemove = async (
     options,
     Commands.EXPERIMENT,
     ExperimentSubCommands.REMOVE,
-    experiment as Target
+    experiment
   )
 
 export const experimentBranch = async (
