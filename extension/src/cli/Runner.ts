@@ -2,8 +2,8 @@ import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
-import { Commands } from './commands'
-import { spawnProcess } from './execution'
+import { Args } from './args'
+import { createCliProcess } from './execution'
 import { Process } from '../processExecution'
 
 export class Runner {
@@ -21,14 +21,13 @@ export class Runner {
   private currentProcess: Process | undefined
   private config: Config
 
-  private async startProcess(command: Commands, cwd: string) {
+  private async startProcess(cwd: string, args: Args) {
     this.pseudoTerminal.setBlocked(true)
-    this.outputEventEmitter.fire(`Running: dvc ${command}\r\n\n`)
+    this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
-    this.currentProcess = spawnProcess({
+    this.currentProcess = createCliProcess({
       options: {
         cliPath: this.config.dvcPath,
-        command,
         cwd,
         pythonBinPath: this.config.pythonBinPath
       },
@@ -36,17 +35,20 @@ export class Runner {
         completedEventEmitter: this.completedEventEmitter,
         startedEventEmitter: this.startedEventEmitter,
         outputEventEmitter: this.outputEventEmitter
-      }
+      },
+      args
     })
   }
 
-  public async run(command: Commands, cwd: string) {
+  public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
-      return this.startProcess(command, cwd)
+      return this.startProcess(cwd, args)
     }
     window.showErrorMessage(
-      `Cannot start ${command} as the output terminal is already occupied`
+      `Cannot start dvc ${args.join(
+        ' '
+      )} as the output terminal is already occupied`
     )
   }
 

@@ -16,7 +16,12 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
-import { Commands } from './cli/commands'
+import {
+  Args,
+  Command,
+  ExperimentFlag,
+  ExperimentSubCommands
+} from './cli/args'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
@@ -131,8 +136,8 @@ export class Extension {
   }
 
   private async runExperimentCommand(
-    command: Commands,
-    context?: { rootUri?: Uri }
+    context: { rootUri?: Uri } | undefined,
+    ...args: Args
   ) {
     const dvcRoot = await pickSingleRepositoryRoot(
       {
@@ -144,7 +149,7 @@ export class Extension {
     )
     if (dvcRoot) {
       await this.showExperimentsWebview()
-      this.runner.run(command, dvcRoot)
+      this.runner.run(dvcRoot, ...args)
       const listener = this.dispose.track(
         this.runner.onDidComplete(() => {
           this.refreshExperimentsWebview()
@@ -215,19 +220,33 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.runExperiment', async context =>
-        this.runExperimentCommand(Commands.EXPERIMENT_RUN, context)
+        this.runExperimentCommand(
+          context,
+          Command.EXPERIMENT,
+          ExperimentSubCommands.RUN
+        )
       )
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.runResetExperiment', async context =>
-        this.runExperimentCommand(Commands.EXPERIMENT_RUN_RESET, context)
+        this.runExperimentCommand(
+          context,
+          Command.EXPERIMENT,
+          ExperimentSubCommands.RUN,
+          ExperimentFlag.RESET
+        )
       )
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.runQueuedExperiments', async context =>
-        this.runExperimentCommand(Commands.EXPERIMENT_RUN_ALL, context)
+        this.runExperimentCommand(
+          context,
+          Command.EXPERIMENT,
+          ExperimentSubCommands.RUN,
+          ExperimentFlag.RUN_ALL
+        )
       )
     )
 

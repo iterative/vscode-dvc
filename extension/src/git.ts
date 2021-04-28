@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { runProcess } from './processExecution'
+import { executeProcess } from './processExecution'
 import { trimAndSplit } from './util/stdout'
 import { isDirectory } from './fileSystem'
 
@@ -9,7 +9,7 @@ const getUris = (repositoryRoot: string, relativePaths: string[]) =>
 const getUntrackedDirectories = async (
   repositoryRoot: string
 ): Promise<string[]> => {
-  const output = await runProcess({
+  const output = await executeProcess({
     executable: 'git',
     args: [
       'ls-files',
@@ -26,7 +26,7 @@ const getUntrackedDirectories = async (
 }
 
 const getUntrackedFiles = async (repositoryRoot: string): Promise<string[]> => {
-  const output = await runProcess({
+  const output = await executeProcess({
     executable: 'git',
     args: ['ls-files', '--others', '--exclude-standard'],
     cwd: repositoryRoot

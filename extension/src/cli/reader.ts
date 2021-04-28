@@ -1,54 +1,51 @@
 import {
-  buildCommand,
-  CommitFlag,
-  Commands,
-  GcPreserveFlag,
+  Command,
+  ExperimentFlag,
+  ExperimentSubCommands,
+  Flag,
   ListFlag
-} from './commands'
-import { trimAndSplit } from '../util/stdout'
+} from './args'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { execProcess, ReaderOptions } from './execution'
+import { ExecutionOptions, readCliProcess } from './execution'
+import { trimAndSplit } from '../util/stdout'
 
-export const checkout = async (options: ReaderOptions): Promise<string[]> =>
-  execProcess<string[]>(options, Commands.CHECKOUT, trimAndSplit)
-
-export const commit = async (options: ReaderOptions): Promise<string> =>
-  execProcess<string>(options, buildCommand(Commands.COMMIT, CommitFlag.FORCE))
-
-export const getRoot = async (options: ReaderOptions): Promise<string> =>
-  execProcess<string>(options, Commands.ROOT)
+export const root = async (options: ExecutionOptions): Promise<string> =>
+  readCliProcess(options, undefined, Command.ROOT)
 
 export const getExperiments = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  execProcess<ExperimentsRepoJSONOutput>(
+  readCliProcess<ExperimentsRepoJSONOutput>(
     options,
-    Commands.EXPERIMENT_SHOW,
-    JSON.parse
+    JSON.parse,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.SHOW,
+    Flag.SHOW_JSON
   )
 
-export const initializeDirectory = async (
-  options: ReaderOptions
-): Promise<string> =>
-  execProcess<string>(options, Commands.INITIALIZE_SUBDIRECTORY)
-
 export const listDvcOnly = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   relativePath: string
 ): Promise<string[]> =>
-  execProcess<string[]>(
+  readCliProcess<string[]>(
     options,
-    buildCommand(Commands.LIST, relativePath, ListFlag.DVC_ONLY),
-    trimAndSplit
+    trimAndSplit,
+    Command.LIST,
+    ListFlag.LOCAL_REPO,
+    relativePath,
+    ListFlag.DVC_ONLY
   )
 
 export const listDvcOnlyRecursive = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string[]> =>
-  execProcess<string[]>(
+  readCliProcess<string[]>(
     options,
-    buildCommand(Commands.LIST, ListFlag.DVC_ONLY, ListFlag.RECURSIVE),
-    trimAndSplit
+    trimAndSplit,
+    Command.LIST,
+    ListFlag.LOCAL_REPO,
+    ListFlag.DVC_ONLY,
+    Flag.RECURSIVE
   )
 
 type Status = Record<
@@ -56,44 +53,16 @@ type Status = Record<
   (Record<string, Record<string, string>> | string)[]
 >
 
-export const status = async (options: ReaderOptions): Promise<Status> =>
-  execProcess<Status>(options, Commands.STATUS, JSON.parse)
-
-export const queueExperiment = async (
-  options: ReaderOptions
-): Promise<string> => execProcess<string>(options, Commands.EXPERIMENT_QUEUE)
+export const status = async (options: ExecutionOptions): Promise<Status> =>
+  readCliProcess<Status>(options, JSON.parse, Command.STATUS, Flag.SHOW_JSON)
 
 export const experimentListCurrent = async (
-  readerOptions: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string[]> =>
-  trimAndSplit(
-    await execProcess(readerOptions, Commands.EXPERIMENT_LIST_NAMES_ONLY)
-  )
-
-export const experimentGarbageCollect = async (
-  options: ReaderOptions,
-  preserveFlags: GcPreserveFlag[]
-): Promise<string> =>
-  execProcess(options, buildCommand(Commands.EXPERIMENT_GC, ...preserveFlags))
-
-export const experimentApply = async (
-  options: ReaderOptions,
-  experiment: string
-): Promise<string> =>
-  execProcess(options, buildCommand(Commands.EXPERIMENT_APPLY, experiment))
-
-export const experimentRemove = async (
-  options: ReaderOptions,
-  experiment: string
-): Promise<void> =>
-  execProcess(options, buildCommand(Commands.EXPERIMENT_REMOVE, experiment))
-
-export const experimentBranch = async (
-  options: ReaderOptions,
-  experiment: string,
-  branchName: string
-): Promise<string> =>
-  execProcess(
+  readCliProcess<string[]>(
     options,
-    buildCommand(Commands.EXPERIMENT_BRANCH, experiment, branchName)
+    trimAndSplit,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.LIST,
+    ExperimentFlag.NAMES_ONLY
   )

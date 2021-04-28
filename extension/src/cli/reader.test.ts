@@ -1,34 +1,31 @@
-import {
-  checkout,
-  commit,
-  experimentApply,
-  getExperiments,
-  getRoot,
-  initializeDirectory,
-  listDvcOnlyRecursive
-} from './reader'
-import { execPromise } from '../util/exec'
+import { getExperiments, root, listDvcOnlyRecursive } from './reader'
+import { executeProcess } from '../processExecution'
+import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('fs')
+jest.mock('../processExecution')
+jest.mock('../env')
+
+const mockedExecuteProcess = mocked(executeProcess)
+const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedEnv = {
+  PATH: '/all/of/the/goodies:/in/my/path'
+}
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
-
-jest.mock('../util/exec')
-
-const mockedExecPromise = mocked(execPromise)
 
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
     const cwd = resolve()
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: JSON.stringify(complexExperimentsOutput),
-      stderr: ''
-    })
+    mockedExecuteProcess.mockResolvedValueOnce(
+      JSON.stringify(complexExperimentsOutput)
+    )
 
     const experiments = await getExperiments({
       cliPath: undefined,
@@ -36,129 +33,32 @@ describe('getExperiments', () => {
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp show --show-json',
-      expect.objectContaining({
-        cwd
-      })
-    )
-  })
-})
-
-describe('initializeDirectory', () => {
-  it('should call execPromise with the correct parameters', async () => {
-    const fsPath = __dirname
-    const stdout = `
-	Initialized DVC repository.
-	You can now commit the changes to git.
-	
-	+---------------------------------------------------------------------+
-	|                                                                     |
-	|        DVC has enabled anonymous aggregate usage analytics.         |
-	|     Read the analytics documentation (and how to opt-out) here:     |
-	|             <https://dvc.org/doc/user-guide/analytics>              |
-	|                                                                     |
-	+---------------------------------------------------------------------+
-	
-	What's next?
-	------------
-	- Check out the documentation: <https://dvc.org/doc>
-	- Get help and share ideas: <https://dvc.org/chat>
-	- Star us on GitHub: <https://github.com/iterative/dvc>
-	`
-
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
-
-    const output = await initializeDirectory({
-      cliPath: 'dvc',
-      cwd: fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout.trim())
-
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc init --subdir',
-      expect.objectContaining({
-        cwd: fsPath
-      })
-    )
-  })
-})
-
-describe('checkout', () => {
-  it('should call execPromise with the correct parameters', async () => {
-    const fsPath = __dirname
-    const stdout = `M       model.pt\nM       logs/\n`
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
-
-    const output = await checkout({
-      cliPath: 'dvc',
-      cwd: fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(['M       model.pt', 'M       logs/'])
-
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc checkout',
-      expect.objectContaining({
-        cwd: fsPath
-      })
-    )
-  })
-})
-
-describe('commit', () => {
-  it('should call execPromise with the correct parameters', async () => {
-    const cwd = __dirname
-    const stdout = "Updating lock file 'dvc.lock'"
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
-
-    const output = await commit({
-      cliPath: 'dvc',
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp', 'show', '--show-json'],
       cwd,
-      pythonBinPath: undefined
+      env: mockedEnv
     })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc commit -f',
-      expect.objectContaining({
-        cwd
-      })
-    )
   })
 })
 
-describe('getRoot', () => {
+describe('root', () => {
   it('should return the root relative to the cwd', async () => {
-    const mockRelativeRoot = join('..', '..')
-    const mockStdout = mockRelativeRoot + '\n\r'
+    const stdout = join('..', '..')
     const cwd = resolve()
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: mockStdout,
-      stderr: ''
-    })
-    const relativeRoot = await getRoot({
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+    const relativeRoot = await root({
       cliPath: 'dvc',
       cwd,
       pythonBinPath: undefined
     })
-    expect(relativeRoot).toEqual(mockRelativeRoot)
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc root',
-      expect.objectContaining({
-        cwd
-      })
-    )
+    expect(relativeRoot).toEqual(stdout)
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['root'],
+      cwd,
+      env: mockedEnv
+    })
   })
 })
 
@@ -177,10 +77,7 @@ describe('listDvcOnlyRecursive', () => {
       `logs/loss.tsv\n` +
       `model.pt`
     const cwd = resolve()
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout: stdout,
-      stderr: ''
-    })
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
     const tracked = await listDvcOnlyRecursive({
       cliPath: undefined,
       pythonBinPath: undefined,
@@ -201,32 +98,11 @@ describe('listDvcOnlyRecursive', () => {
       'model.pt'
     ])
 
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc list . --dvc-only -R',
-      expect.objectContaining({
-        cwd
-      })
-    )
-  })
-})
-
-describe('apply', () => {
-  it('builds the correct command and returns stdout', async () => {
-    const cwd = ''
-    const stdout = 'Test output that will be passed along'
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['list', '.', '--dvc-only', '-R'],
+      cwd,
+      env: mockedEnv
     })
-    expect(
-      await experimentApply(
-        { cwd, cliPath: 'dvc', pythonBinPath: undefined },
-        'exp-test'
-      )
-    ).toEqual(stdout)
-    expect(mockedExecPromise).toBeCalledWith(
-      'dvc exp apply exp-test',
-      expect.objectContaining({ cwd })
-    )
   })
 })

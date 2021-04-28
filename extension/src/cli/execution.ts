@@ -1,19 +1,19 @@
 import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
-import { Commands } from './commands'
-import { execPromise } from '../util/exec'
-import { trim, trimAndSplit } from '../util/stdout'
-import { createProcess, Process } from '../processExecution'
+import { Args } from './args'
+import { trimAndSplit } from '../util/stdout'
+import { createProcess, Process, executeProcess } from '../processExecution'
 
-export interface ReaderOptions {
+export type BaseExecutionOptions = {
   cliPath: string | undefined
   pythonBinPath: string | undefined
+}
+
+type CwdOption = {
   cwd: string
 }
 
-export type ExecutionOptions = ReaderOptions & {
-  command: Commands
-}
+export type ExecutionOptions = BaseExecutionOptions & CwdOption
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
@@ -30,15 +30,15 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
 export const getExecutionDetails = (
   options: ExecutionOptions
 ): {
-  command: string
   cwd: string
   env: NodeJS.ProcessEnv
+  executable: string
 } => {
-  const { command, cliPath, pythonBinPath } = options
+  const { cliPath, pythonBinPath, cwd } = options
   return {
+    cwd,
     env: getEnv(pythonBinPath),
-    command: `${cliPath || 'dvc'} ${command}`,
-    cwd: options.cwd
+    executable: cliPath || 'dvc'
   }
 }
 
@@ -48,49 +48,63 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const spawnProcess = ({
+export const createCliProcess = ({
   options,
-  emitters
+  emitters,
+  args
 }: {
   options: ExecutionOptions
+  args: Args
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
     outputEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
 }): Process => {
-  const { command, cwd, env } = getExecutionDetails(options)
+  const { executable, cwd, env } = getExecutionDetails(options)
 
-  const [executable, ...args] = command.split(' ')
-
-  const childProcess = createProcess({ executable, args, cwd, env })
+  const process = createProcess({
+    executable,
+    args,
+    cwd,
+    env
+  })
 
   emitters?.startedEventEmitter?.fire()
 
-  childProcess.all?.on('data', chunk => {
+  process.all?.on('data', chunk => {
     const output = getOutput(chunk)
     emitters?.outputEventEmitter?.fire(output)
   })
 
-  childProcess.on('close', () => {
+  process.on('close', () => {
     emitters?.completedEventEmitter?.fire()
   })
 
-  return childProcess
+  return process
 }
 
-export const execProcess = async <T>(
-  options: ReaderOptions,
-  partialCommand: Commands,
-  formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
-): Promise<T> => {
-  const { command, cwd, env } = getExecutionDetails({
-    ...options,
-    command: partialCommand
-  })
-  const { stdout } = await execPromise(command, {
+export const executeCliProcess = async (
+  options: ExecutionOptions,
+  ...args: Args
+): Promise<string> => {
+  const { executable, cwd, env } = getExecutionDetails(options)
+  return executeProcess({
+    executable,
+    args,
     cwd,
     env
   })
-  return (formatter(stdout) as unknown) as T
+}
+
+export const readCliProcess = async <T = string>(
+  options: ExecutionOptions,
+  formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
+  ...args: Args
+): Promise<T> => {
+  const output = await executeCliProcess(options, ...args)
+  if (!formatter) {
+    return (output as unknown) as T
+  }
+  return (formatter(output) as unknown) as T
 }

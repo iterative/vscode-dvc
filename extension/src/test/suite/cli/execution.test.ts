@@ -4,7 +4,6 @@ import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
 import * as Execution from '../../../cli/execution'
-import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 
 chai.use(sinonChai)
@@ -13,14 +12,13 @@ const { expect } = chai
 suite('Execution Test Suite', () => {
   window.showInformationMessage('Start all execution tests.')
 
-  const { spawnProcess } = Execution
+  const { createCliProcess } = Execution
 
-  describe('spawnProcess', () => {
+  describe('createCliProcess', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
 
       const text = ':weeeee:'
-      const command = 'echo ' + text
 
       const completedEventEmitter = new EventEmitter<void>()
       const outputEventEmitter = new EventEmitter<string>()
@@ -59,15 +57,15 @@ suite('Execution Test Suite', () => {
       const eventStream = executionOutputEvent(text, onDidOutput, disposable)
 
       const cwd = __dirname
+      const args = [text]
 
       const stubbedGetExecutionDetails = stub(
         Execution,
         'getExecutionDetails'
-      ).returns({ command, cwd, env: {} })
+      ).returns({ executable: 'echo', cwd, env: {} })
 
-      spawnProcess({
+      createCliProcess({
         options: {
-          command: Commands.STATUS,
           cliPath: undefined,
           cwd,
           pythonBinPath: undefined
@@ -76,7 +74,8 @@ suite('Execution Test Suite', () => {
           completedEventEmitter,
           outputEventEmitter: outputEventEmitter,
           startedEventEmitter
-        }
+        },
+        args
       })
       stubbedGetExecutionDetails.restore()
 
@@ -85,7 +84,6 @@ suite('Execution Test Suite', () => {
       await completed
       expect(stubbedGetExecutionDetails).to.be.calledWith({
         cliPath: undefined,
-        command: 'status --show-json',
         cwd,
         pythonBinPath: undefined
       })
