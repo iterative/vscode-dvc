@@ -69,7 +69,8 @@
       {
         "title": "%command.runQueuedExperiments%",
         "command": "dvc.runQueuedExperiments",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-execute-all)"
       },
       {
         "title": "%command.stopRunningExperiment%",
@@ -258,7 +259,11 @@
       "editor/title": [
         {
           "command": "dvc.runExperiment",
-          "group": "navigation"
+          "group": "0_navigation"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "group": "1_navigation"
         }
       ]
     },
