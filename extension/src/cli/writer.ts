@@ -18,12 +18,12 @@ export const initializeDirectory = async (
 ): Promise<string> =>
   runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
-type TargetExecutionOptions = BaseExecutionOptions & {
+type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string
 }
 
-const runTargetCommand = async (
-  options: TargetExecutionOptions,
+const runCliProcessOnTarget = async (
+  options: ExecutionOnTargetOptions,
   ...args: Args
 ): Promise<string> => {
   const { fsPath, cliPath, pythonBinPath } = options
@@ -37,21 +37,21 @@ const runTargetCommand = async (
 }
 
 export const addTarget = async (
-  options: TargetExecutionOptions
-): Promise<string> => runTargetCommand(options, Command.ADD)
+  options: ExecutionOnTargetOptions
+): Promise<string> => runCliProcessOnTarget(options, Command.ADD)
 
 export const checkoutTarget = (
-  options: TargetExecutionOptions
-): Promise<string> => runTargetCommand(options, Command.CHECKOUT)
+  options: ExecutionOnTargetOptions
+): Promise<string> => runCliProcessOnTarget(options, Command.CHECKOUT)
 
 export const commitTarget = (
-  options: TargetExecutionOptions
-): Promise<string> => runTargetCommand(options, Command.COMMIT, Flag.FORCE)
+  options: ExecutionOnTargetOptions
+): Promise<string> => runCliProcessOnTarget(options, Command.COMMIT, Flag.FORCE)
 
 export const pullTarget = async (
-  options: TargetExecutionOptions
-): Promise<string> => runTargetCommand(options, Command.PULL)
+  options: ExecutionOnTargetOptions
+): Promise<string> => runCliProcessOnTarget(options, Command.PULL)
 
 export const pushTarget = async (
-  options: TargetExecutionOptions
-): Promise<string> => runTargetCommand(options, Command.PUSH)
+  options: ExecutionOnTargetOptions
+): Promise<string> => runCliProcessOnTarget(options, Command.PUSH)
