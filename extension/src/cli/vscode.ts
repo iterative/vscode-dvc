@@ -3,14 +3,14 @@ import { Config } from '../Config'
 import { GcPreserveFlag } from './args'
 import { quickPickManyValues } from '../vscode/quickpick'
 import { reportStderrOrThrow } from '../vscode/reporting'
+import { experimentListCurrent } from './reader'
 import {
-  queueExperiment,
-  experimentGarbageCollect,
-  experimentListCurrent,
   experimentApply,
   experimentBranch,
-  experimentRemove
-} from './reader'
+  experimentGarbageCollect,
+  experimentRemove,
+  queueExperiment
+} from './writer'
 import { ExecutionOptions } from './execution'
 
 export const queueExperimentCommand = async (config: Config) => {

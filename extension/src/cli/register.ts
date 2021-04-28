@@ -1,14 +1,16 @@
 import { commands } from 'vscode'
-import {
-  addTarget,
-  checkoutTarget,
-  commitTarget,
-  pullTarget,
-  pushTarget
-} from '.'
 import { Config } from '../Config'
 import { Disposer } from '../extension'
-import { checkout, commit, initializeDirectory } from './reader'
+import {
+  addTarget,
+  checkout,
+  checkoutTarget,
+  commit,
+  commitTarget,
+  initializeDirectory,
+  pullTarget,
+  pushTarget
+} from './writer'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
