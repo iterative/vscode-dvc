@@ -3,7 +3,6 @@ import {
   ExperimentFlag,
   ExperimentSubCommands,
   Flag,
-  GcPreserveFlag,
   ListFlag
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
@@ -66,19 +65,6 @@ export const experimentListCurrent = async (
     Command.EXPERIMENT,
     ExperimentSubCommands.LIST,
     ExperimentFlag.NAMES_ONLY
-  )
-
-export const experimentGarbageCollect = async (
-  options: ExecutionOptions,
-  preserveFlags: GcPreserveFlag[]
-): Promise<string> =>
-  runCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.GARBAGE_COLLECT,
-    Flag.FORCE,
-    ExperimentFlag.WORKSPACE,
-    ...preserveFlags
   )
 
 export const experimentApply = async (

@@ -5,7 +5,8 @@ import {
   Command,
   ExperimentFlag,
   ExperimentSubCommands,
-  Flag
+  Flag,
+  GcPreserveFlag
 } from './args'
 import {
   BaseExecutionOptions,
@@ -18,6 +19,19 @@ export const checkout = async (options: ExecutionOptions): Promise<string> =>
 
 export const commit = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Command.COMMIT, Flag.FORCE)
+
+export const experimentGarbageCollect = async (
+  options: ExecutionOptions,
+  preserveFlags: GcPreserveFlag[]
+): Promise<string> =>
+  runCliProcess(
+    options,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.GARBAGE_COLLECT,
+    Flag.FORCE,
+    ExperimentFlag.WORKSPACE,
+    ...preserveFlags
+  )
 
 export const initializeDirectory = async (
   options: ExecutionOptions
