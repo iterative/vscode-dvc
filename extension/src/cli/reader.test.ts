@@ -1,5 +1,4 @@
 import {
-  checkout,
   commit,
   experimentApply,
   getExperiments,
@@ -83,28 +82,6 @@ describe('initializeDirectory', () => {
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['init', '--subdir'],
-      cwd: fsPath,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('checkout', () => {
-  it('should call runProcess with the correct parameters', async () => {
-    const fsPath = __dirname
-    const stdout = `M       model.pt\nM       logs/\n`
-    mockedRunProcess.mockResolvedValueOnce(stdout)
-
-    const output = await checkout({
-      cliPath: 'dvc',
-      cwd: fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(['M       model.pt', 'M       logs/'])
-
-    expect(mockedRunProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['checkout'],
       cwd: fsPath,
       env: mockedEnv
     })
