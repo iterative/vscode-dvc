@@ -9,7 +9,7 @@ import {
 } from './commands'
 import { trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { execProcess, ReaderOptions } from './execution'
+import { execProcess, execProcessJson, ReaderOptions } from './execution'
 
 export const checkout = async (options: ReaderOptions): Promise<string[]> =>
   execProcess<string[]>(options, [Commands.CHECKOUT], trimAndSplit)
@@ -23,11 +23,7 @@ export const getRoot = async (options: ReaderOptions): Promise<string> =>
 export const getExperiments = async (
   options: ReaderOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  execProcess<ExperimentsRepoJSONOutput>(
-    options,
-    [Commands.EXPERIMENT_SHOW],
-    JSON.parse
-  )
+  execProcessJson<ExperimentsRepoJSONOutput>(options, Commands.EXPERIMENT_SHOW)
 
 export const initializeDirectory = async (
   options: ReaderOptions
@@ -59,7 +55,7 @@ type Status = Record<
 >
 
 export const status = async (options: ReaderOptions): Promise<Status> =>
-  execProcess<Status>(options, [Commands.STATUS], JSON.parse)
+  execProcessJson<Status>(options, Commands.STATUS)
 
 export const queueExperiment = async (
   options: ReaderOptions

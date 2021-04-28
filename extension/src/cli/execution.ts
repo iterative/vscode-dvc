@@ -42,6 +42,20 @@ export const getExecutionDetails = (
     executable: cliPath || 'dvc'
   }
 }
+export const getExecutionDetails_ = (
+  options: ReaderOptions
+): {
+  cwd: string
+  env: NodeJS.ProcessEnv
+  executable: string
+} => {
+  const { cliPath, pythonBinPath, cwd } = options
+  return {
+    cwd,
+    env: getEnv(pythonBinPath),
+    executable: cliPath || 'dvc'
+  }
+}
 
 const getOutput = (data: string | Buffer): string =>
   data
@@ -99,4 +113,18 @@ export const execProcess = async <T>(
     env
   })
   return (formatter(output) as unknown) as T
+}
+
+export const execProcessJson = async <T>(
+  options: ReaderOptions,
+  ...args: Args
+): Promise<T> => {
+  const { executable, cwd, env } = getExecutionDetails_(options)
+  const output = await runProcess({
+    executable,
+    args,
+    cwd,
+    env
+  })
+  return (JSON.parse(output) as unknown) as T
 }
