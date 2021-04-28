@@ -31,8 +31,8 @@ suite('Runner Test Suite', () => {
         env: {}
       })
 
-      await runner.run(['3'], cwd)
-      await runner.run([Commands.CHECKOUT], cwd)
+      await runner.run(cwd, '3')
+      await runner.run(cwd, Commands.CHECKOUT)
       stubbedGetExecutionDetails.restore()
 
       expect(stubbedGetExecutionDetails).to.be.calledWith({
@@ -50,7 +50,6 @@ suite('Runner Test Suite', () => {
       const disposable = Disposable.fn()
       const runner = disposable.track(new Runner({} as Config))
       const cwd = __dirname
-      const args = ['100000000000000000000000']
       const stubbedGetExecutionDetails = stub(
         Execution,
         'getExecutionDetails'
@@ -65,7 +64,7 @@ suite('Runner Test Suite', () => {
           disposable.track(runner.onDidComplete(() => resolve()))
         )
 
-      await runner.run(args, cwd)
+      await runner.run(cwd, '100000000000000000000000')
       stubbedGetExecutionDetails.restore()
 
       const completedEvent = processCompletedEvent()

@@ -21,7 +21,7 @@ export class Runner {
   private currentProcess: Process | undefined
   private config: Config
 
-  private async startProcess(args: Args, cwd: string) {
+  private async startProcess(cwd: string, args: Args) {
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
@@ -40,13 +40,13 @@ export class Runner {
     })
   }
 
-  public async run(args: Args, cwd: string) {
+  public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked) {
-      return this.startProcess(args, cwd)
+      return this.startProcess(cwd, args)
     }
     window.showErrorMessage(
-      `Cannot start ${args.join(
+      `Cannot start dvc ${args.join(
         ' '
       )} as the output terminal is already occupied`
     )
