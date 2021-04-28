@@ -1,9 +1,10 @@
 import { commands } from 'vscode'
-import { addTarget, checkoutTarget, commitTarget } from '.'
+import { addTarget, commitTarget } from '.'
 import { Config } from '../Config'
 import { Disposer } from '../extension'
 import {
   checkout,
+  checkoutTarget,
   commit,
   initializeDirectory,
   pullTarget,

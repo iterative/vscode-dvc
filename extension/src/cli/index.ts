@@ -32,9 +32,3 @@ export const commitTarget = (options: {
   cliPath: string | undefined
   pythonBinPath: string | undefined
 }): Promise<string> => runTargetCommand(options, Command.COMMIT, Flag.FORCE)
-
-export const checkoutTarget = (options: {
-  fsPath: string
-  cliPath: string | undefined
-  pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Command.CHECKOUT)
