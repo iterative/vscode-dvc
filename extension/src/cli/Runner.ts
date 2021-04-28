@@ -28,7 +28,6 @@ export class Runner {
     this.currentProcess = spawnProcess({
       options: {
         cliPath: this.config.dvcPath,
-        args,
         cwd,
         pythonBinPath: this.config.pythonBinPath
       },
@@ -36,7 +35,8 @@ export class Runner {
         completedEventEmitter: this.completedEventEmitter,
         startedEventEmitter: this.startedEventEmitter,
         outputEventEmitter: this.outputEventEmitter
-      }
+      },
+      args
     })
   }
 

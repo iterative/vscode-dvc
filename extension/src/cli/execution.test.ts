@@ -29,11 +29,11 @@ describe('spawnProcess', () => {
 
     await spawnProcess({
       options: {
-        args,
         cliPath: '',
         cwd,
         pythonBinPath: undefined
-      }
+      },
+      args
     })
 
     expect(mockedCreateProcess).toBeCalledWith({
@@ -54,11 +54,11 @@ describe('spawnProcess', () => {
 
     await spawnProcess({
       options: {
-        args,
         cliPath,
         cwd,
         pythonBinPath: undefined
-      }
+      },
+      args
     })
 
     expect(mockedCreateProcess).toBeCalledWith({
@@ -85,10 +85,10 @@ describe('spawnProcess', () => {
     await spawnProcess({
       options: {
         cliPath,
-        args,
         cwd,
         pythonBinPath
-      }
+      },
+      args
     })
 
     expect(mockedCreateProcess).toBeCalledWith({
@@ -111,10 +111,10 @@ describe('spawnProcess', () => {
     await spawnProcess({
       options: {
         cliPath: undefined,
-        args,
         cwd,
         pythonBinPath
-      }
+      },
+      args
     })
 
     expect(mockedCreateProcess).toBeCalledWith({

@@ -27,22 +27,6 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
 }
 
 export const getExecutionDetails = (
-  options: ExecutionOptions
-): {
-  args: string[]
-  cwd: string
-  env: NodeJS.ProcessEnv
-  executable: string
-} => {
-  const { cliPath, pythonBinPath, args, cwd } = options
-  return {
-    args,
-    cwd,
-    env: getEnv(pythonBinPath),
-    executable: cliPath || 'dvc'
-  }
-}
-export const getExecutionDetails_ = (
   options: ReaderOptions
 ): {
   cwd: string
@@ -65,20 +49,22 @@ const getOutput = (data: string | Buffer): string =>
 
 export const spawnProcess = ({
   options,
-  emitters
+  emitters,
+  args
 }: {
-  options: ExecutionOptions
+  options: ReaderOptions
+  args: Args
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
     outputEventEmitter?: EventEmitter<string>
     startedEventEmitter?: EventEmitter<void>
   }
 }): Process => {
-  const { executable, args, cwd, env } = getExecutionDetails(options)
+  const { executable, cwd, env } = getExecutionDetails(options)
 
   const process = createProcess({
     executable,
-    args: args || [],
+    args,
     cwd,
     env
   })
@@ -101,7 +87,7 @@ export const execProcess = async (
   options: ReaderOptions,
   ...args: Args
 ): Promise<string> => {
-  const { executable, cwd, env } = getExecutionDetails_(options)
+  const { executable, cwd, env } = getExecutionDetails(options)
   return runProcess({
     executable,
     args,
@@ -114,7 +100,7 @@ export const execProcessJson = async <T>(
   options: ReaderOptions,
   ...args: Args
 ): Promise<T> => {
-  const { executable, cwd, env } = getExecutionDetails_(options)
+  const { executable, cwd, env } = getExecutionDetails(options)
   const output = await runProcess({
     executable,
     args,
@@ -128,7 +114,7 @@ export const execProcessSplit = async (
   options: ReaderOptions,
   ...args: Args
 ): Promise<string[]> => {
-  const { executable, cwd, env } = getExecutionDetails_(options)
+  const { executable, cwd, env } = getExecutionDetails(options)
   const output = await runProcess({
     executable,
     args,

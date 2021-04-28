@@ -4,7 +4,6 @@ import { stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { Event, EventEmitter, window } from 'vscode'
 import * as Execution from '../../../cli/execution'
-import { Commands } from '../../../cli/commands'
 import { Disposable, Disposer } from '../../../extension'
 
 chai.use(sinonChai)
@@ -58,16 +57,15 @@ suite('Execution Test Suite', () => {
       const eventStream = executionOutputEvent(text, onDidOutput, disposable)
 
       const cwd = __dirname
-      const args = [Commands.STATUS]
+      const args = [text]
 
       const stubbedGetExecutionDetails = stub(
         Execution,
         'getExecutionDetails'
-      ).returns({ executable: 'echo', args: [text], cwd, env: {} })
+      ).returns({ executable: 'echo', cwd, env: {} })
 
       spawnProcess({
         options: {
-          args,
           cliPath: undefined,
           cwd,
           pythonBinPath: undefined
@@ -76,7 +74,8 @@ suite('Execution Test Suite', () => {
           completedEventEmitter,
           outputEventEmitter: outputEventEmitter,
           startedEventEmitter
-        }
+        },
+        args
       })
       stubbedGetExecutionDetails.restore()
 
@@ -85,7 +84,6 @@ suite('Execution Test Suite', () => {
       await completed
       expect(stubbedGetExecutionDetails).to.be.calledWith({
         cliPath: undefined,
-        args,
         cwd,
         pythonBinPath: undefined
       })
