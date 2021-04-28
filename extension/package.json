@@ -59,7 +59,8 @@
       {
         "title": "%command.runResetExperiment%",
         "command": "dvc.runResetExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-revert)"
       },
       {
         "title": "%command.queueExperiment%",
@@ -259,11 +260,12 @@
       "editor/title": [
         {
           "command": "dvc.runExperiment",
-          "group": "0_navigation"
+          "alt": "dvc.runResetExperiment",
+          "group": "navigation@0"
         },
         {
           "command": "dvc.runQueuedExperiments",
-          "group": "1_navigation"
+          "group": "navigation@1"
         }
       ]
     },
