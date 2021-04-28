@@ -12,29 +12,29 @@ import {
   execProcess,
   execProcessJson,
   execProcessSplit,
-  ReaderOptions
+  ExecutionOptions
 } from './execution'
 
-export const checkout = async (options: ReaderOptions): Promise<string[]> =>
+export const checkout = async (options: ExecutionOptions): Promise<string[]> =>
   execProcessSplit(options, Commands.CHECKOUT)
 
-export const commit = async (options: ReaderOptions): Promise<string> =>
+export const commit = async (options: ExecutionOptions): Promise<string> =>
   execProcess(options, Commands.COMMIT, Flag.FORCE)
 
-export const getRoot = async (options: ReaderOptions): Promise<string> =>
+export const getRoot = async (options: ExecutionOptions): Promise<string> =>
   execProcess(options, Commands.ROOT)
 
 export const getExperiments = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
   execProcessJson<ExperimentsRepoJSONOutput>(options, Commands.EXPERIMENT_SHOW)
 
 export const initializeDirectory = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string> => execProcess(options, Commands.INITIALIZE_SUBDIRECTORY)
 
 export const listDvcOnly = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   relativePath: string
 ): Promise<string[]> =>
   execProcessSplit(
@@ -45,7 +45,7 @@ export const listDvcOnly = async (
   )
 
 export const listDvcOnlyRecursive = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string[]> =>
   execProcessSplit(options, Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE)
 
@@ -54,15 +54,15 @@ type Status = Record<
   (Record<string, Record<string, string>> | string)[]
 >
 
-export const status = async (options: ReaderOptions): Promise<Status> =>
+export const status = async (options: ExecutionOptions): Promise<Status> =>
   execProcessJson<Status>(options, Commands.STATUS)
 
 export const queueExperiment = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string> => execProcess(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentListCurrent = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string[]> =>
   execProcessSplit(
     options,
@@ -72,13 +72,13 @@ export const experimentListCurrent = async (
   )
 
 export const experimentGarbageCollect = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
   execProcess(options, Commands.EXPERIMENT_GC, ...preserveFlags)
 
 export const experimentApply = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
   execProcess(
@@ -89,13 +89,13 @@ export const experimentApply = async (
   )
 
 export const experimentRemove = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
   execProcess(options, Commands.EXPERIMENT_REMOVE, experiment as Target)
 
 export const experimentBranch = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   experiment: string,
   branchName: string
 ): Promise<string> =>

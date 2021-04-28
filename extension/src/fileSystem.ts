@@ -3,7 +3,7 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { join, resolve } from 'path'
-import { ReaderOptions } from './cli/execution'
+import { ExecutionOptions } from './cli/execution'
 import { getRoot } from './cli/reader'
 import { definedAndNonEmpty } from './util'
 import { window } from 'vscode'
@@ -48,7 +48,7 @@ export const addOnFileSystemChangeHandler = (
 }
 
 const findDvcAbsoluteRootPath = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string | undefined> => {
   try {
     const root = await getRoot(options)
@@ -80,7 +80,7 @@ export const findDvcSubRootPaths = async (
 }
 
 export const findDvcRootPaths = async (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): Promise<string[]> => {
   const subRoots = await findDvcSubRootPaths(options.cwd)
 
@@ -98,7 +98,7 @@ export const findDvcRootPaths = async (
 }
 
 export const pickSingleRepositoryRoot = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   providedRoot?: string
 ): Promise<string | undefined> => {
   if (providedRoot) {

@@ -11,7 +11,7 @@ import {
   experimentBranch,
   experimentRemove
 } from './reader'
-import { ReaderOptions } from './execution'
+import { ExecutionOptions } from './execution'
 
 export const queueExperimentCommand = async (config: Config) => {
   try {
@@ -71,7 +71,7 @@ export const experimentGcQuickPick = async (config: Config) => {
   }
 }
 
-const experimentsQuickPick = async (readerOptions: ReaderOptions) => {
+const experimentsQuickPick = async (readerOptions: ExecutionOptions) => {
   const experiments = await experimentListCurrent(readerOptions)
 
   if (experiments.length === 0) {
@@ -84,7 +84,7 @@ const experimentsQuickPick = async (readerOptions: ReaderOptions) => {
 const experimentsQuickPickCommand = async <T = void>(
   config: Config,
   callback: (
-    readerOptions: ReaderOptions,
+    readerOptions: ExecutionOptions,
     selectedExperiment: string
   ) => Promise<T>
 ) => {

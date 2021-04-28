@@ -4,14 +4,10 @@ import { Args } from './commands'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, runProcess } from '../processExecution'
 
-export interface ReaderOptions {
+export interface ExecutionOptions {
   cliPath: string | undefined
   pythonBinPath: string | undefined
   cwd: string
-}
-
-export type ExecutionOptions = ReaderOptions & {
-  args: Args
 }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
@@ -27,7 +23,7 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
 }
 
 export const getExecutionDetails = (
-  options: ReaderOptions
+  options: ExecutionOptions
 ): {
   cwd: string
   env: NodeJS.ProcessEnv
@@ -52,7 +48,7 @@ export const spawnProcess = ({
   emitters,
   args
 }: {
-  options: ReaderOptions
+  options: ExecutionOptions
   args: Args
   emitters?: {
     completedEventEmitter?: EventEmitter<void>
@@ -84,7 +80,7 @@ export const spawnProcess = ({
 }
 
 export const execProcess = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   ...args: Args
 ): Promise<string> => {
   const { executable, cwd, env } = getExecutionDetails(options)
@@ -97,7 +93,7 @@ export const execProcess = async (
 }
 
 export const execProcessJson = async <T>(
-  options: ReaderOptions,
+  options: ExecutionOptions,
   ...args: Args
 ): Promise<T> => {
   const { executable, cwd, env } = getExecutionDetails(options)
@@ -111,7 +107,7 @@ export const execProcessJson = async <T>(
 }
 
 export const execProcessSplit = async (
-  options: ReaderOptions,
+  options: ExecutionOptions,
   ...args: Args
 ): Promise<string[]> => {
   const { executable, cwd, env } = getExecutionDetails(options)
