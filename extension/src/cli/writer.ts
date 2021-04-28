@@ -2,8 +2,8 @@ import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
 import { Args, Command, Flag } from './args'
 import {
+  BaseExecutionOptions,
   ExecutionOptions,
-  ExecutionOptionsTarget,
   runCliProcess
 } from './execution'
 
@@ -18,8 +18,12 @@ export const initializeDirectory = async (
 ): Promise<string> =>
   runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
+type TargetExecutionOptions = BaseExecutionOptions & {
+  fsPath: string
+}
+
 const runTargetCommand = async (
-  options: ExecutionOptionsTarget,
+  options: TargetExecutionOptions,
   ...args: Args
 ): Promise<string> => {
   const { fsPath, cliPath, pythonBinPath } = options
@@ -33,21 +37,21 @@ const runTargetCommand = async (
 }
 
 export const addTarget = async (
-  options: ExecutionOptionsTarget
+  options: TargetExecutionOptions
 ): Promise<string> => runTargetCommand(options, Command.ADD)
 
 export const checkoutTarget = (
-  options: ExecutionOptionsTarget
+  options: TargetExecutionOptions
 ): Promise<string> => runTargetCommand(options, Command.CHECKOUT)
 
 export const commitTarget = (
-  options: ExecutionOptionsTarget
+  options: TargetExecutionOptions
 ): Promise<string> => runTargetCommand(options, Command.COMMIT, Flag.FORCE)
 
 export const pullTarget = async (
-  options: ExecutionOptionsTarget
+  options: TargetExecutionOptions
 ): Promise<string> => runTargetCommand(options, Command.PULL)
 
 export const pushTarget = async (
-  options: ExecutionOptionsTarget
+  options: TargetExecutionOptions
 ): Promise<string> => runTargetCommand(options, Command.PUSH)
