@@ -1,19 +1,20 @@
 import { basename, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
-import { runProcess } from '../processExecution'
+import { executeProcess } from '../processExecution'
 import {
   addTarget,
   checkout,
   commit,
   experimentApply,
   initializeDirectory
-} from './writer'
+} from './executor'
 
+jest.mock('fs-extra')
 jest.mock('../processExecution')
 jest.mock('../env')
 
-const mockedRunProcess = mocked(runProcess)
+const mockedExecuteProcess = mocked(executeProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   PATH: '/some/special/path'
@@ -25,7 +26,7 @@ beforeEach(() => {
 })
 
 describe('add', () => {
-  it('should call runProcess with the correct parameters', async () => {
+  it('should call executeProcess with the correct parameters', async () => {
     const fsPath = __filename
     const dir = resolve(fsPath, '..')
     const file = basename(__filename)
@@ -37,7 +38,7 @@ describe('add', () => {
       `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
       `\n\rgit add ${file} .gitignore`
 
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
     const output = await addTarget({
       cliPath: 'dvc',
@@ -46,7 +47,7 @@ describe('add', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['add', file],
       cwd: dir,
@@ -56,10 +57,10 @@ describe('add', () => {
 })
 
 describe('checkout', () => {
-  it('should call runProcess with the correct parameters', async () => {
+  it('should call executeProcess with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\nM       logs/\n`
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
     const output = await checkout({
       cliPath: 'dvc',
@@ -68,7 +69,7 @@ describe('checkout', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['checkout'],
       cwd: fsPath,
@@ -81,7 +82,7 @@ describe('commit', () => {
   it('should call execPromise with the correct parameters', async () => {
     const cwd = __dirname
     const stdout = "Updating lock file 'dvc.lock'"
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
     const output = await commit({
       cliPath: 'dvc',
@@ -90,7 +91,7 @@ describe('commit', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['commit', '-f'],
       cwd,
@@ -103,14 +104,14 @@ describe('experimentApply', () => {
   it('builds the correct command and returns stdout', async () => {
     const cwd = ''
     const stdout = 'Test output that will be passed along'
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
     expect(
       await experimentApply(
         { cwd, cliPath: 'dvc', pythonBinPath: undefined },
         'exp-test'
       )
     ).toEqual(stdout)
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'apply', 'exp-test'],
       cwd,
@@ -120,7 +121,7 @@ describe('experimentApply', () => {
 })
 
 describe('initializeDirectory', () => {
-  it('should call runProcess with the correct parameters', async () => {
+  it('should call executeProcess with the correct parameters', async () => {
     const fsPath = __dirname
     const stdout = `
 	  Initialized DVC repository.
@@ -140,7 +141,7 @@ describe('initializeDirectory', () => {
 	  - Get help and share ideas: <https://dvc.org/chat>
 	  - Star us on GitHub: <https://github.com/iterative/dvc>`
 
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
     const output = await initializeDirectory({
       cliPath: 'dvc',
@@ -149,7 +150,7 @@ describe('initializeDirectory', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['init', '--subdir'],
       cwd: fsPath,

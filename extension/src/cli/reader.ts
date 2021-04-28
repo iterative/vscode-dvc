@@ -6,11 +6,11 @@ import {
   ListFlag
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { ExecutionOptions, readCliProcess, runCliProcess } from './execution'
+import { ExecutionOptions, readCliProcess } from './execution'
 import { trimAndSplit } from '../util/stdout'
 
 export const root = async (options: ExecutionOptions): Promise<string> =>
-  runCliProcess(options, Command.ROOT)
+  readCliProcess(options, undefined, Command.ROOT)
 
 export const getExperiments = async (
   options: ExecutionOptions

@@ -10,7 +10,7 @@ import {
   experimentGarbageCollect,
   experimentRemove,
   queueExperiment
-} from './writer'
+} from './executor'
 import { ExecutionOptions } from './execution'
 
 export const queueExperimentCommand = async (config: Config) => {
