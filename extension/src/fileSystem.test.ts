@@ -5,7 +5,7 @@ import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from './fileSystem'
-import { getRoot } from './cli/reader'
+import { root } from './cli/reader'
 
 const {
   addOnFileSystemChangeHandler,
@@ -23,7 +23,7 @@ jest.mock('./cli/reader')
 
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
-const mockGetRoot = mocked(getRoot)
+const mockedRoot = mocked(root)
 
 const mockedShowRepoQuickPick = mocked<
   (
@@ -162,7 +162,7 @@ describe('findDvcRootPaths', () => {
       pythonBinPath: undefined
     })
 
-    expect(mockGetRoot).not.toBeCalled()
+    expect(mockedRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
@@ -179,18 +179,18 @@ describe('findDvcRootPaths', () => {
 
     remove(mockDvcRoot)
 
-    expect(mockGetRoot).not.toBeCalled()
+    expect(mockedRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath, mockDvcRoot].sort())
   })
 
   it('should find the dvc root if it exists above the given folder', async () => {
-    mockGetRoot.mockResolvedValueOnce('..')
+    mockedRoot.mockResolvedValueOnce('..')
     const dvcRoots = await findDvcRootPaths({
       cliPath: mockCliPath,
       cwd: dataRoot,
       pythonBinPath: undefined
     })
-    expect(mockGetRoot).toBeCalledTimes(1)
+    expect(mockedRoot).toBeCalledTimes(1)
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 

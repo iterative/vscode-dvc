@@ -77,7 +77,7 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private sourceControlManagement: SourceControlManagement
 
-  private getCliReaderOptions() {
+  private getCliExecutionOptions() {
     return {
       cliPath: this.config.dvcPath,
       pythonBinPath: this.config.pythonBinPath,
@@ -100,7 +100,7 @@ export class Repository {
   }
 
   public async updateList(): Promise<void> {
-    const options = this.getCliReaderOptions()
+    const options = this.getCliExecutionOptions()
     const tracked = await listDvcOnlyRecursive(options)
 
     const absoluteTrackedPaths = this.getAbsolutePath(tracked)
@@ -178,7 +178,7 @@ export class Repository {
   }
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const options = this.getCliReaderOptions()
+    const options = this.getCliExecutionOptions()
     const statusOutput = (await status(options)) as Record<
       string,
       (ValidStageOrFileStatuses | string)[]

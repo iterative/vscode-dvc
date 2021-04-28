@@ -26,27 +26,22 @@ suite('Runner Test Suite', () => {
         Execution,
         'getExecutionDetails'
       ).returns({
-        command: 'sleep 3',
+        executable: 'sleep',
         cwd,
         env: {}
       })
 
-      await runner.run(Commands.STATUS, cwd)
-      await runner.run(Commands.CHECKOUT, cwd)
+      await runner.run(cwd, '3')
+      await runner.run(cwd, Commands.CHECKOUT)
       stubbedGetExecutionDetails.restore()
 
       expect(stubbedGetExecutionDetails).to.be.calledWith({
         cliPath: undefined,
-        command: Commands.STATUS,
         cwd,
         pythonBinPath: undefined
       })
-      expect(stubbedGetExecutionDetails).not.to.be.calledWith({
-        cliPath: undefined,
-        command: Commands.CHECKOUT,
-        cwd,
-        pythonBinPath: undefined
-      })
+      expect(stubbedGetExecutionDetails).to.be.calledOnce
+
       expect(windowErrorMessageSpy).to.be.calledOnce
       disposable.dispose()
     }).timeout(6000)
@@ -59,7 +54,7 @@ suite('Runner Test Suite', () => {
         Execution,
         'getExecutionDetails'
       ).returns({
-        command: 'sleep 100000000000000000000000',
+        executable: 'sleep',
         cwd,
         env: {}
       })
@@ -69,7 +64,7 @@ suite('Runner Test Suite', () => {
           disposable.track(runner.onDidComplete(() => resolve()))
         )
 
-      await runner.run(Commands.STATUS, cwd)
+      await runner.run(cwd, '100000000000000000000000')
       stubbedGetExecutionDetails.restore()
 
       const completedEvent = processCompletedEvent()

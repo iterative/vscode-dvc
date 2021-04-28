@@ -1,20 +1,27 @@
 import { addTarget } from '.'
 import { mocked } from 'ts-jest/utils'
-import { execPromise } from '../util/exec'
+import { runProcess } from '../processExecution'
 import { basename, resolve } from 'path'
+import { getProcessEnv } from '../env'
 
 jest.mock('fs-extra')
-jest.mock('../util/exec')
+jest.mock('../processExecution')
+jest.mock('../env')
 jest.mock('vscode')
 
-const mockedExecPromise = mocked(execPromise)
+const mockedRunProcess = mocked(runProcess)
+const mockedGetProcessEnv = mocked(getProcessEnv)
+const mockedEnv = {
+  PATH: '/all/of/the/goodies:/in/my/path'
+}
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
 
 describe('add', () => {
-  it('should call execPromise with the correct parameters', async () => {
+  it('should call runProcess with the correct parameters', async () => {
     const fsPath = __filename
     const dir = resolve(fsPath, '..')
     const file = basename(__filename)
@@ -26,10 +33,7 @@ describe('add', () => {
       `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
       `\n\rgit add ${file} .gitignore`
 
-    mockedExecPromise.mockResolvedValueOnce({
-      stdout,
-      stderr: ''
-    })
+    mockedRunProcess.mockResolvedValueOnce(stdout)
 
     const output = await addTarget({
       cliPath: 'dvc',
@@ -38,11 +42,11 @@ describe('add', () => {
     })
     expect(output).toEqual(stdout)
 
-    expect(mockedExecPromise).toBeCalledWith(
-      `dvc add ${file}`,
-      expect.objectContaining({
-        cwd: dir
-      })
-    )
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['add', file],
+      cwd: dir,
+      env: mockedEnv
+    })
   })
 })

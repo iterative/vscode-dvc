@@ -2,31 +2,38 @@ export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
-  EXPERIMENT_GC = 'exp gc -f -w',
-  EXPERIMENT_QUEUE = 'exp run --queue',
-  EXPERIMENT_RUN = 'exp run',
-  EXPERIMENT_RUN_RESET = 'exp run --reset',
-  EXPERIMENT_RUN_ALL = 'exp run --run-all',
-  EXPERIMENT_SHOW = 'exp show --show-json',
-  EXPERIMENT_APPLY = 'exp apply',
-  EXPERIMENT_BRANCH = 'exp branch',
-  EXPERIMENT_REMOVE = 'exp remove',
-  EXPERIMENT_LIST_NAMES_ONLY = 'exp list --names-only',
-  INITIALIZE_SUBDIRECTORY = 'init --subdir',
-  LIST = 'list .',
+  EXPERIMENT = 'exp',
+  INITIALIZE = 'init',
+  LIST = 'list',
   PULL = 'pull',
   PUSH = 'push',
   ROOT = 'root',
-  STATUS = 'status --show-json'
+  STATUS = 'status'
 }
 
-export enum ListFlag {
-  DVC_ONLY = '--dvc-only',
-  RECURSIVE = '-R'
+export enum Flag {
+  FORCE = '-f',
+  RECURSIVE = '-R',
+  SHOW_JSON = '--show-json',
+  SUBDIRECTORY = '--subdir'
 }
 
-export enum CommitFlag {
-  FORCE = '-f'
+export enum ExperimentSubCommands {
+  APPLY = 'apply',
+  BRANCH = 'branch',
+  GARBAGE_COLLECT = 'gc',
+  LIST = 'list',
+  SHOW = 'show',
+  REMOVE = 'remove',
+  RUN = 'run'
+}
+
+export enum ExperimentFlag {
+  NAMES_ONLY = '--names-only',
+  QUEUE = '--queue',
+  RESET = '--reset',
+  RUN_ALL = '--run-all',
+  WORKSPACE = '-w'
 }
 
 export enum GcPreserveFlag {
@@ -36,5 +43,13 @@ export enum GcPreserveFlag {
   QUEUED = '--queued'
 }
 
-export const buildCommand = (command: Commands, ...args: string[]): Commands =>
-  [command, ...args].filter(Boolean).join(' ') as Commands
+export enum ListFlag {
+  LOCAL_REPO = '.',
+  DVC_ONLY = '--dvc-only'
+}
+
+type Target = string
+
+type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
+
+export type Args = (Commands | Target | ExperimentSubCommands | Flags)[]
