@@ -16,7 +16,7 @@ export const checkout = async (options: ExecutionOptions): Promise<string[]> =>
 export const commit = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Commands.COMMIT, Flag.FORCE)
 
-export const getRoot = async (options: ExecutionOptions): Promise<string> =>
+export const root = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Commands.ROOT)
 
 export const getExperiments = async (

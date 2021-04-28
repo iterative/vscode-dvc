@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { join, resolve } from 'path'
 import { ExecutionOptions } from './cli/execution'
-import { getRoot } from './cli/reader'
+import { root } from './cli/reader'
 import { definedAndNonEmpty } from './util'
 import { window } from 'vscode'
 
@@ -51,8 +51,8 @@ const findDvcAbsoluteRootPath = async (
   options: ExecutionOptions
 ): Promise<string | undefined> => {
   try {
-    const root = await getRoot(options)
-    return resolve(options?.cwd, root)
+    const dvcRoot = await root(options)
+    return resolve(options?.cwd, dvcRoot)
   } catch (e) {}
 }
 

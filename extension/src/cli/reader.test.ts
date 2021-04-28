@@ -3,7 +3,7 @@ import {
   commit,
   experimentApply,
   getExperiments,
-  getRoot,
+  root,
   initializeDirectory,
   listDvcOnlyRecursive
 } from './reader'
@@ -133,12 +133,12 @@ describe('commit', () => {
   })
 })
 
-describe('getRoot', () => {
+describe('root', () => {
   it('should return the root relative to the cwd', async () => {
     const stdout = join('..', '..')
     const cwd = resolve()
     mockedRunProcess.mockResolvedValueOnce(stdout)
-    const relativeRoot = await getRoot({
+    const relativeRoot = await root({
       cliPath: 'dvc',
       cwd,
       pythonBinPath: undefined
