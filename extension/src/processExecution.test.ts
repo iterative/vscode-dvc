@@ -23,8 +23,8 @@ describe('runProcess', () => {
   it('should return the stderr if the process throws with stderr', async () => {
     await expect(
       runProcess({
-        executable: 'read',
-        args: ['-t', '0.1', '-p', 'Off we go to stderr'],
+        executable: 'find',
+        args: ['me', 'outside'],
         cwd: __dirname
       })
     ).rejects.toBeTruthy()
