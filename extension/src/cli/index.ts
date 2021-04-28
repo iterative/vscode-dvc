@@ -38,9 +38,3 @@ export const checkoutTarget = (options: {
   cliPath: string | undefined
   pythonBinPath: string | undefined
 }): Promise<string> => runTargetCommand(options, Command.CHECKOUT)
-
-export const pushTarget = async (options: {
-  fsPath: string
-  cliPath: string | undefined
-  pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Command.PUSH)

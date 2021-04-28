@@ -37,3 +37,9 @@ export const pullTarget = async (options: {
   cliPath: string | undefined
   pythonBinPath: string | undefined
 }): Promise<string> => runTargetCommand(options, Command.PULL)
+
+export const pushTarget = async (options: {
+  fsPath: string
+  cliPath: string | undefined
+  pythonBinPath: string | undefined
+}): Promise<string> => runTargetCommand(options, Command.PUSH)
