@@ -10,6 +10,7 @@ import {
   initializeDirectory
 } from './writer'
 
+jest.mock('fs-extra')
 jest.mock('../processExecution')
 jest.mock('../env')
 
