@@ -1,9 +1,4 @@
-import {
-  experimentApply,
-  getExperiments,
-  root,
-  listDvcOnlyRecursive
-} from './reader'
+import { getExperiments, root, listDvcOnlyRecursive } from './reader'
 import { runProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
@@ -106,26 +101,6 @@ describe('listDvcOnlyRecursive', () => {
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['list', '.', '--dvc-only', '-R'],
-      cwd,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('experimentApply', () => {
-  it('builds the correct command and returns stdout', async () => {
-    const cwd = ''
-    const stdout = 'Test output that will be passed along'
-    mockedRunProcess.mockResolvedValueOnce(stdout)
-    expect(
-      await experimentApply(
-        { cwd, cliPath: 'dvc', pythonBinPath: undefined },
-        'exp-test'
-      )
-    ).toEqual(stdout)
-    expect(mockedRunProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'apply', 'exp-test'],
       cwd,
       env: mockedEnv
     })

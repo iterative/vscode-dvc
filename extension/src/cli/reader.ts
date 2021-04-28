@@ -67,17 +67,6 @@ export const experimentListCurrent = async (
     ExperimentFlag.NAMES_ONLY
   )
 
-export const experimentApply = async (
-  options: ExecutionOptions,
-  experiment: string
-): Promise<string> =>
-  runCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.APPLY,
-    experiment
-  )
-
 export const experimentRemove = async (
   options: ExecutionOptions,
   experiment: string

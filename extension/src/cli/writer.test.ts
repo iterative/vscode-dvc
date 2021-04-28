@@ -2,7 +2,13 @@ import { basename, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 import { runProcess } from '../processExecution'
-import { addTarget, checkout, commit, initializeDirectory } from './writer'
+import {
+  addTarget,
+  checkout,
+  commit,
+  experimentApply,
+  initializeDirectory
+} from './writer'
 
 jest.mock('../processExecution')
 jest.mock('../env')
@@ -87,6 +93,26 @@ describe('commit', () => {
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['commit', '-f'],
+      cwd,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('experimentApply', () => {
+  it('builds the correct command and returns stdout', async () => {
+    const cwd = ''
+    const stdout = 'Test output that will be passed along'
+    mockedRunProcess.mockResolvedValueOnce(stdout)
+    expect(
+      await experimentApply(
+        { cwd, cliPath: 'dvc', pythonBinPath: undefined },
+        'exp-test'
+      )
+    ).toEqual(stdout)
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp', 'apply', 'exp-test'],
       cwd,
       env: mockedEnv
     })

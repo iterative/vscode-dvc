@@ -20,6 +20,17 @@ export const checkout = async (options: ExecutionOptions): Promise<string> =>
 export const commit = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Command.COMMIT, Flag.FORCE)
 
+export const experimentApply = async (
+  options: ExecutionOptions,
+  experiment: string
+): Promise<string> =>
+  runCliProcess(
+    options,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.APPLY,
+    experiment
+  )
+
 export const experimentGarbageCollect = async (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
