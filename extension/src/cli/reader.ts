@@ -57,16 +57,6 @@ type Status = Record<
 export const status = async (options: ExecutionOptions): Promise<Status> =>
   readCliProcess<Status>(options, JSON.parse, Command.STATUS, Flag.SHOW_JSON)
 
-export const queueExperiment = async (
-  options: ExecutionOptions
-): Promise<string> =>
-  runCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.RUN,
-    ExperimentFlag.QUEUE
-  )
-
 export const experimentListCurrent = async (
   options: ExecutionOptions
 ): Promise<string[]> =>

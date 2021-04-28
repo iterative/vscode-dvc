@@ -1,6 +1,12 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
-import { Args, Command, Flag } from './args'
+import {
+  Args,
+  Command,
+  ExperimentFlag,
+  ExperimentSubCommands,
+  Flag
+} from './args'
 import {
   BaseExecutionOptions,
   ExecutionOptions,
@@ -17,6 +23,16 @@ export const initializeDirectory = async (
   options: ExecutionOptions
 ): Promise<string> =>
   runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
+
+export const queueExperiment = async (
+  options: ExecutionOptions
+): Promise<string> =>
+  runCliProcess(
+    options,
+    Command.EXPERIMENT,
+    ExperimentSubCommands.RUN,
+    ExperimentFlag.QUEUE
+  )
 
 type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string
