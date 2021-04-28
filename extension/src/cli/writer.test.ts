@@ -1,7 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 import { runProcess } from '../processExecution'
-import { checkout } from './writer'
+import { checkout, commit } from './writer'
 
 jest.mock('../processExecution')
 jest.mock('../env')
@@ -34,6 +34,28 @@ describe('checkout', () => {
       executable: 'dvc',
       args: ['checkout'],
       cwd: fsPath,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('commit', () => {
+  it('should call execPromise with the correct parameters', async () => {
+    const cwd = __dirname
+    const stdout = "Updating lock file 'dvc.lock'"
+    mockedRunProcess.mockResolvedValueOnce(stdout)
+
+    const output = await commit({
+      cliPath: 'dvc',
+      cwd,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['commit', '-f'],
+      cwd,
       env: mockedEnv
     })
   })

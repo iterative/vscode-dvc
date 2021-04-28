@@ -10,9 +10,6 @@ import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import { ExecutionOptions, readCliProcess, runCliProcess } from './execution'
 import { trimAndSplit } from '../util/stdout'
 
-export const commit = async (options: ExecutionOptions): Promise<string> =>
-  runCliProcess(options, Command.COMMIT, Flag.FORCE)
-
 export const root = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Command.ROOT)
 
