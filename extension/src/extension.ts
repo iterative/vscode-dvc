@@ -18,7 +18,7 @@ import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
 import {
   Args,
-  Commands,
+  Command,
   ExperimentFlag,
   ExperimentSubCommands
 } from './cli/commands'
@@ -222,7 +222,7 @@ export class Extension {
       commands.registerCommand('dvc.runExperiment', async context =>
         this.runExperimentCommand(
           context,
-          Commands.EXPERIMENT,
+          Command.EXPERIMENT,
           ExperimentSubCommands.RUN
         )
       )
@@ -232,7 +232,7 @@ export class Extension {
       commands.registerCommand('dvc.runResetExperiment', async context =>
         this.runExperimentCommand(
           context,
-          Commands.EXPERIMENT,
+          Command.EXPERIMENT,
           ExperimentSubCommands.RUN,
           ExperimentFlag.RESET
         )
@@ -243,7 +243,7 @@ export class Extension {
       commands.registerCommand('dvc.runQueuedExperiments', async context =>
         this.runExperimentCommand(
           context,
-          Commands.EXPERIMENT,
+          Command.EXPERIMENT,
           ExperimentSubCommands.RUN,
           ExperimentFlag.RUN_ALL
         )

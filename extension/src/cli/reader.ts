@@ -1,5 +1,5 @@
 import {
-  Commands,
+  Command,
   ExperimentFlag,
   ExperimentSubCommands,
   Flag,
@@ -11,13 +11,13 @@ import { ExecutionOptions, readCliProcess, runCliProcess } from './execution'
 import { trimAndSplit } from '../util/stdout'
 
 export const checkout = async (options: ExecutionOptions): Promise<string[]> =>
-  readCliProcess(options, trimAndSplit, Commands.CHECKOUT)
+  readCliProcess(options, trimAndSplit, Command.CHECKOUT)
 
 export const commit = async (options: ExecutionOptions): Promise<string> =>
-  runCliProcess(options, Commands.COMMIT, Flag.FORCE)
+  runCliProcess(options, Command.COMMIT, Flag.FORCE)
 
 export const root = async (options: ExecutionOptions): Promise<string> =>
-  runCliProcess(options, Commands.ROOT)
+  runCliProcess(options, Command.ROOT)
 
 export const getExperiments = async (
   options: ExecutionOptions
@@ -25,7 +25,7 @@ export const getExperiments = async (
   readCliProcess<ExperimentsRepoJSONOutput>(
     options,
     JSON.parse,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.SHOW,
     Flag.SHOW_JSON
   )
@@ -33,7 +33,7 @@ export const getExperiments = async (
 export const initializeDirectory = async (
   options: ExecutionOptions
 ): Promise<string> =>
-  runCliProcess(options, Commands.INITIALIZE, Flag.SUBDIRECTORY)
+  runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
 export const listDvcOnly = async (
   options: ExecutionOptions,
@@ -42,7 +42,7 @@ export const listDvcOnly = async (
   readCliProcess<string[]>(
     options,
     trimAndSplit,
-    Commands.LIST,
+    Command.LIST,
     ListFlag.LOCAL_REPO,
     relativePath,
     ListFlag.DVC_ONLY
@@ -54,7 +54,7 @@ export const listDvcOnlyRecursive = async (
   readCliProcess<string[]>(
     options,
     trimAndSplit,
-    Commands.LIST,
+    Command.LIST,
     ListFlag.LOCAL_REPO,
     ListFlag.DVC_ONLY,
     Flag.RECURSIVE
@@ -66,14 +66,14 @@ type Status = Record<
 >
 
 export const status = async (options: ExecutionOptions): Promise<Status> =>
-  readCliProcess<Status>(options, JSON.parse, Commands.STATUS, Flag.SHOW_JSON)
+  readCliProcess<Status>(options, JSON.parse, Command.STATUS, Flag.SHOW_JSON)
 
 export const queueExperiment = async (
   options: ExecutionOptions
 ): Promise<string> =>
   runCliProcess(
     options,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.RUN,
     ExperimentFlag.QUEUE
   )
@@ -84,7 +84,7 @@ export const experimentListCurrent = async (
   readCliProcess<string[]>(
     options,
     trimAndSplit,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.LIST,
     ExperimentFlag.NAMES_ONLY
   )
@@ -95,7 +95,7 @@ export const experimentGarbageCollect = async (
 ): Promise<string> =>
   runCliProcess(
     options,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.GARBAGE_COLLECT,
     Flag.FORCE,
     ExperimentFlag.WORKSPACE,
@@ -108,7 +108,7 @@ export const experimentApply = async (
 ): Promise<string> =>
   runCliProcess(
     options,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.APPLY,
     experiment
   )
@@ -119,7 +119,7 @@ export const experimentRemove = async (
 ): Promise<string> =>
   runCliProcess(
     options,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.REMOVE,
     experiment
   )
@@ -131,7 +131,7 @@ export const experimentBranch = async (
 ): Promise<string> =>
   runCliProcess(
     options,
-    Commands.EXPERIMENT,
+    Command.EXPERIMENT,
     ExperimentSubCommands.BRANCH,
     experiment,
     branchName
