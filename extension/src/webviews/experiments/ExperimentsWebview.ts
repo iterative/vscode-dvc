@@ -1,4 +1,4 @@
-import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
+import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -162,10 +162,6 @@ export class ExperimentsWebview {
     switch (message.type) {
       case MessageFromWebviewType.initialized: {
         this._initialized.resolve()
-        return
-      }
-      case MessageFromWebviewType.onClickRunExperiment: {
-        commands.executeCommand('dvc.runExperiment')
         return
       }
       default: {

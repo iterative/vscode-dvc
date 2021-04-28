@@ -52,8 +52,8 @@ describe('App', () => {
   describe('Given an initial empty state', () => {
     mockGetState.mockReturnValue({})
 
-    describe('When we render the App', () => {
-      it('Then a message should be sent to the extension on the first render', async () => {
+    describe('App', () => {
+      it('should send a message to the extension and display the empty state on the first render', async () => {
         render(<App />)
         expect(mockGetVsCodeApi).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
@@ -61,18 +61,7 @@ describe('App', () => {
         })
 
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
-      })
 
-      it('Then the run experiment button should be displayed', async () => {
-        render(<App />)
-        const runExperimentButton = screen.getByText('Run Experiment')
-        await waitFor(() => runExperimentButton)
-
-        expect(runExperimentButton).toBeInTheDocument()
-      })
-
-      it('Then the empty state should be displayed', async () => {
-        render(<App />)
         const emptyState = screen.getByText('Loading experiments...')
         await waitFor(() => emptyState)
         expect(emptyState).toBeInTheDocument()
