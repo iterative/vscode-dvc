@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './commands'
-import { spawnProcess } from './execution'
+import { createCliProcess } from './execution'
 import { Process } from '../processExecution'
 
 export class Runner {
@@ -25,7 +25,7 @@ export class Runner {
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
-    this.currentProcess = spawnProcess({
+    this.currentProcess = createCliProcess({
       options: {
         cliPath: this.config.dvcPath,
         cwd,

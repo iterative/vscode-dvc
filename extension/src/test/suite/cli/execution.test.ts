@@ -12,9 +12,9 @@ const { expect } = chai
 suite('Execution Test Suite', () => {
   window.showInformationMessage('Start all execution tests.')
 
-  const { spawnProcess } = Execution
+  const { createCliProcess } = Execution
 
-  describe('spawnProcess', () => {
+  describe('createCliProcess', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const disposable = Disposable.fn()
 
@@ -64,7 +64,7 @@ suite('Execution Test Suite', () => {
         'getExecutionDetails'
       ).returns({ executable: 'echo', cwd, env: {} })
 
-      spawnProcess({
+      createCliProcess({
         options: {
           cliPath: undefined,
           cwd,

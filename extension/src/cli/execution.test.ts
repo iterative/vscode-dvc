@@ -1,6 +1,6 @@
 import { createProcess, Process } from '../processExecution'
 import { Commands } from './commands'
-import { spawnProcess } from './execution'
+import { createCliProcess } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
@@ -19,7 +19,7 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
-describe('spawnProcess', () => {
+describe('createCliProcess', () => {
   it('should pass the correct details to execa given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
@@ -27,7 +27,7 @@ describe('spawnProcess', () => {
     const args = [Commands.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await spawnProcess({
+    await createCliProcess({
       options: {
         cliPath: '',
         cwd,
@@ -52,7 +52,7 @@ describe('spawnProcess', () => {
     const args = [Commands.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await spawnProcess({
+    await createCliProcess({
       options: {
         cliPath,
         cwd,
@@ -82,7 +82,7 @@ describe('spawnProcess', () => {
     const cwd = __dirname
     const args = [Commands.PUSH]
 
-    await spawnProcess({
+    await createCliProcess({
       options: {
         cliPath,
         cwd,
@@ -108,7 +108,7 @@ describe('spawnProcess', () => {
     const cwd = __dirname
     const args = [Commands.PULL]
 
-    await spawnProcess({
+    await createCliProcess({
       options: {
         cliPath: undefined,
         cwd,

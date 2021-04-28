@@ -43,7 +43,7 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const spawnProcess = ({
+export const createCliProcess = ({
   options,
   emitters,
   args
@@ -79,7 +79,7 @@ export const spawnProcess = ({
   return process
 }
 
-export const execProcess = async (
+export const runCliProcess = async (
   options: ExecutionOptions,
   ...args: Args
 ): Promise<string> => {
@@ -92,7 +92,7 @@ export const execProcess = async (
   })
 }
 
-export const execProcessJson = async <T>(
+export const readCliProcessJson = async <T>(
   options: ExecutionOptions,
   ...args: Args
 ): Promise<T> => {
@@ -106,7 +106,7 @@ export const execProcessJson = async <T>(
   return (JSON.parse(output) as unknown) as T
 }
 
-export const execProcessSplit = async (
+export const readCliProcessSplit = async (
   options: ExecutionOptions,
   ...args: Args
 ): Promise<string[]> => {

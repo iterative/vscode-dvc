@@ -51,13 +51,3 @@ export type Target = string
 type Flags = Flag | Target | ExperimentFlag | ListFlag | GcPreserveFlag
 
 export type Args = (Commands | ExperimentSubCommands | Flags | string)[]
-
-export const buildArgs = (
-  command: Commands | Args,
-  ...args: string[]
-): Args => {
-  if (Array.isArray(command)) {
-    return [...command, ...args].filter(Boolean) as Args
-  }
-  return [command, ...args].filter(Boolean) as Args
-}

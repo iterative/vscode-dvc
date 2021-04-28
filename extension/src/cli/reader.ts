@@ -9,35 +9,38 @@ import {
 } from './commands'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import {
-  execProcess,
-  execProcessJson,
-  execProcessSplit,
+  runCliProcess,
+  readCliProcessJson,
+  readCliProcessSplit,
   ExecutionOptions
 } from './execution'
 
 export const checkout = async (options: ExecutionOptions): Promise<string[]> =>
-  execProcessSplit(options, Commands.CHECKOUT)
+  readCliProcessSplit(options, Commands.CHECKOUT)
 
 export const commit = async (options: ExecutionOptions): Promise<string> =>
-  execProcess(options, Commands.COMMIT, Flag.FORCE)
+  runCliProcess(options, Commands.COMMIT, Flag.FORCE)
 
 export const getRoot = async (options: ExecutionOptions): Promise<string> =>
-  execProcess(options, Commands.ROOT)
+  runCliProcess(options, Commands.ROOT)
 
 export const getExperiments = async (
   options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  execProcessJson<ExperimentsRepoJSONOutput>(options, Commands.EXPERIMENT_SHOW)
+  readCliProcessJson<ExperimentsRepoJSONOutput>(
+    options,
+    Commands.EXPERIMENT_SHOW
+  )
 
 export const initializeDirectory = async (
   options: ExecutionOptions
-): Promise<string> => execProcess(options, Commands.INITIALIZE_SUBDIRECTORY)
+): Promise<string> => runCliProcess(options, Commands.INITIALIZE_SUBDIRECTORY)
 
 export const listDvcOnly = async (
   options: ExecutionOptions,
   relativePath: string
 ): Promise<string[]> =>
-  execProcessSplit(
+  readCliProcessSplit(
     options,
     Commands.LIST,
     relativePath as Target,
@@ -47,7 +50,7 @@ export const listDvcOnly = async (
 export const listDvcOnlyRecursive = async (
   options: ExecutionOptions
 ): Promise<string[]> =>
-  execProcessSplit(options, Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE)
+  readCliProcessSplit(options, Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE)
 
 type Status = Record<
   string,
@@ -55,16 +58,16 @@ type Status = Record<
 >
 
 export const status = async (options: ExecutionOptions): Promise<Status> =>
-  execProcessJson<Status>(options, Commands.STATUS)
+  readCliProcessJson<Status>(options, Commands.STATUS)
 
 export const queueExperiment = async (
   options: ExecutionOptions
-): Promise<string> => execProcess(options, Commands.EXPERIMENT_QUEUE)
+): Promise<string> => runCliProcess(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentListCurrent = async (
   options: ExecutionOptions
 ): Promise<string[]> =>
-  execProcessSplit(
+  readCliProcessSplit(
     options,
     Commands.EXPERIMENT,
     ExperimentSubCommands.LIST,
@@ -75,13 +78,13 @@ export const experimentGarbageCollect = async (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  execProcess(options, Commands.EXPERIMENT_GC, ...preserveFlags)
+  runCliProcess(options, Commands.EXPERIMENT_GC, ...preserveFlags)
 
 export const experimentApply = async (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
-  execProcess(
+  runCliProcess(
     options,
     Commands.EXPERIMENT,
     ExperimentSubCommands.APPLY,
@@ -92,11 +95,11 @@ export const experimentRemove = async (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
-  execProcess(options, Commands.EXPERIMENT_REMOVE, experiment as Target)
+  runCliProcess(options, Commands.EXPERIMENT_REMOVE, experiment as Target)
 
 export const experimentBranch = async (
   options: ExecutionOptions,
   experiment: string,
   branchName: string
 ): Promise<string> =>
-  execProcess(options, Commands.EXPERIMENT_BRANCH, experiment, branchName)
+  runCliProcess(options, Commands.EXPERIMENT_BRANCH, experiment, branchName)
