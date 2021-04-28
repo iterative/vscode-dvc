@@ -1,9 +1,9 @@
 import {
   buildArgs,
   Commands,
-  CommitFlag,
+  ExperimentFlag,
   ExperimentSubCommands,
-  Flags,
+  Flag,
   GcPreserveFlag,
   ListFlag
 } from './commands'
@@ -15,7 +15,7 @@ export const checkout = async (options: ReaderOptions): Promise<string[]> =>
   execProcess<string[]>(options, [Commands.CHECKOUT], trimAndSplit)
 
 export const commit = async (options: ReaderOptions): Promise<string> =>
-  execProcess<string>(options, buildArgs(Commands.COMMIT, CommitFlag.FORCE))
+  execProcess<string>(options, buildArgs(Commands.COMMIT, Flag.FORCE))
 
 export const getRoot = async (options: ReaderOptions): Promise<string> =>
   execProcess<string>(options, [Commands.ROOT])
@@ -49,7 +49,7 @@ export const listDvcOnlyRecursive = async (
 ): Promise<string[]> =>
   execProcess<string[]>(
     options,
-    buildArgs(Commands.LIST, ListFlag.DVC_ONLY, ListFlag.RECURSIVE),
+    buildArgs(Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE),
     trimAndSplit
   )
 
@@ -74,7 +74,7 @@ export const experimentListCurrent = async (
       buildArgs(
         Commands.EXPERIMENT,
         ExperimentSubCommands.LIST,
-        Flags.NAMES_ONLY
+        ExperimentFlag.NAMES_ONLY
       )
     )
   )

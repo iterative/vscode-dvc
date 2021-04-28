@@ -16,6 +16,12 @@ export enum Commands {
   STATUS = 'status --show-json'
 }
 
+export enum Flag {
+  RECURSIVE = '-R',
+  SHOW_JSON = '--show-json',
+  FORCE = '-f'
+}
+
 export enum ExperimentSubCommands {
   APPLY = 'apply',
   LIST = 'list',
@@ -23,19 +29,10 @@ export enum ExperimentSubCommands {
   GARBAGE_COLLECT = 'gc'
 }
 
-export enum Flags {
+export enum ExperimentFlag {
   NAMES_ONLY = '--names-only',
   RESET = '--reset',
   RUN_ALL = '--run-all'
-}
-
-export enum ListFlag {
-  DVC_ONLY = '--dvc-only',
-  RECURSIVE = '-R'
-}
-
-export enum CommitFlag {
-  FORCE = '-f'
 }
 
 export enum GcPreserveFlag {
@@ -44,6 +41,12 @@ export enum GcPreserveFlag {
   ALL_COMMITS = '--all-commits',
   QUEUED = '--queued'
 }
+
+export enum ListFlag {
+  DVC_ONLY = '--dvc-only'
+}
+
+type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
 
 export type Args = (Commands | ExperimentSubCommands | Flags)[]
 

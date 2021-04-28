@@ -16,7 +16,12 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { getExperiments } from './cli/reader'
-import { Args, Commands, ExperimentSubCommands, Flags } from './cli/commands'
+import {
+  Args,
+  Commands,
+  ExperimentFlag,
+  ExperimentSubCommands
+} from './cli/commands'
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
@@ -222,7 +227,11 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runResetExperiment', async context =>
         this.runExperimentCommand(
-          [Commands.EXPERIMENT, ExperimentSubCommands.RUN, Flags.RESET],
+          [
+            Commands.EXPERIMENT,
+            ExperimentSubCommands.RUN,
+            ExperimentFlag.RESET
+          ],
           context
         )
       )
@@ -231,7 +240,11 @@ export class Extension {
     this.dispose.track(
       commands.registerCommand('dvc.runQueuedExperiments', async context =>
         this.runExperimentCommand(
-          [Commands.EXPERIMENT, ExperimentSubCommands.RUN, Flags.RUN_ALL],
+          [
+            Commands.EXPERIMENT,
+            ExperimentSubCommands.RUN,
+            ExperimentFlag.RUN_ALL
+          ],
           context
         )
       )
