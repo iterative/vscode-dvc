@@ -53,7 +53,8 @@
       {
         "title": "%command.runExperiment%",
         "command": "dvc.runExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-execute)"
       },
       {
         "title": "%command.runResetExperiment%",
@@ -252,6 +253,12 @@
           "command": "dvc.pullTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState != untracked"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "dvc.runExperiment",
+          "group": "navigation"
         }
       ]
     },
