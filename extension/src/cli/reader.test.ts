@@ -43,7 +43,7 @@ describe('getExperiments', () => {
     expect(experiments).toMatchSnapshot()
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp show --show-json'],
+      args: ['exp', 'show', '--show-json'],
       cwd,
       env: mockedEnv
     })
@@ -82,7 +82,7 @@ describe('initializeDirectory', () => {
 
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['init --subdir'],
+      args: ['init', '--subdir'],
       cwd: fsPath,
       env: mockedEnv
     })
@@ -191,7 +191,7 @@ describe('listDvcOnlyRecursive', () => {
 
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['list .', '--dvc-only', '-R'],
+      args: ['list', '.', '--dvc-only', '-R'],
       cwd,
       env: mockedEnv
     })

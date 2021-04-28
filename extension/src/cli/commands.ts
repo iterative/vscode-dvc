@@ -2,37 +2,38 @@ export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
-  EXPERIMENT_GC = 'exp gc -f -w',
-  EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT = 'exp',
-  EXPERIMENT_SHOW = 'exp show --show-json',
-  EXPERIMENT_BRANCH = 'exp branch',
-  EXPERIMENT_REMOVE = 'exp remove',
-  INITIALIZE_SUBDIRECTORY = 'init --subdir',
-  LIST = 'list .',
+  INITIALIZE = 'init',
+  LIST = 'list',
   PULL = 'pull',
   PUSH = 'push',
   ROOT = 'root',
-  STATUS = 'status --show-json'
+  STATUS = 'status'
 }
 
 export enum Flag {
+  FORCE = '-f',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
-  FORCE = '-f'
+  SUBDIRECTORY = '--subdir'
 }
 
 export enum ExperimentSubCommands {
   APPLY = 'apply',
+  BRANCH = 'branch',
+  GARBAGE_COLLECT = 'gc',
   LIST = 'list',
-  RUN = 'run',
-  GARBAGE_COLLECT = 'gc'
+  SHOW = 'show',
+  REMOVE = 'remove',
+  RUN = 'run'
 }
 
 export enum ExperimentFlag {
   NAMES_ONLY = '--names-only',
+  QUEUE = '--queue',
   RESET = '--reset',
-  RUN_ALL = '--run-all'
+  RUN_ALL = '--run-all',
+  WORKSPACE = '-w'
 }
 
 export enum GcPreserveFlag {
@@ -43,6 +44,7 @@ export enum GcPreserveFlag {
 }
 
 export enum ListFlag {
+  LOCAL_REPO = '.',
   DVC_ONLY = '--dvc-only'
 }
 

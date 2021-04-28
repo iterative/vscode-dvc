@@ -131,7 +131,7 @@ describe('experimentGcCommand', () => {
 
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp gc -f -w', '--all-tags', '--all-commits'],
+      args: ['exp', 'gc', '-f', '-w', '--all-tags', '--all-commits'],
       cwd: exampleConfig.workspaceRoot,
       env: mockedEnv
     })
@@ -171,7 +171,7 @@ describe('experimentGcCommand', () => {
 
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp gc -f -w'],
+      args: ['exp', 'gc', '-f', '-w'],
       cwd: exampleConfig.workspaceRoot,
       env: mockedEnv
     })
@@ -248,7 +248,7 @@ describe('removeExperimentFromQuickPick', () => {
     )
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp remove', 'exp-2021'],
+      args: ['exp', 'remove', 'exp-2021'],
       cwd: '/home/user/project',
       env: mockedEnv
     })
@@ -269,7 +269,7 @@ describe('branchExperimentFromQuickPick', () => {
     expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp branch', 'exp-2021', 'test-branch-name'],
+      args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
       cwd: '/home/user/project',
       env: mockedEnv
     })
