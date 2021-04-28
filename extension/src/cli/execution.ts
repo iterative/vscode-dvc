@@ -4,11 +4,21 @@ import { Args } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, runProcess } from '../processExecution'
 
-export interface ExecutionOptions {
+type BaseExecutionOptions = {
   cliPath: string | undefined
   pythonBinPath: string | undefined
+}
+
+type CwdOption = {
   cwd: string
 }
+
+type FsPathOption = {
+  fsPath: string
+}
+
+export type ExecutionOptions = BaseExecutionOptions & CwdOption
+export type ExecutionOptionsTarget = BaseExecutionOptions & FsPathOption
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
