@@ -8,15 +8,11 @@ import {
   Target
 } from './commands'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import {
-  runCliProcess,
-  readCliProcessJson,
-  readCliProcessSplit,
-  ExecutionOptions
-} from './execution'
+import { ExecutionOptions, readCliProcess, runCliProcess } from './execution'
+import { trimAndSplit } from '../util/stdout'
 
 export const checkout = async (options: ExecutionOptions): Promise<string[]> =>
-  readCliProcessSplit(options, Commands.CHECKOUT)
+  readCliProcess(options, trimAndSplit, Commands.CHECKOUT)
 
 export const commit = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Commands.COMMIT, Flag.FORCE)
@@ -27,8 +23,9 @@ export const getRoot = async (options: ExecutionOptions): Promise<string> =>
 export const getExperiments = async (
   options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  readCliProcessJson<ExperimentsRepoJSONOutput>(
+  readCliProcess<ExperimentsRepoJSONOutput>(
     options,
+    JSON.parse,
     Commands.EXPERIMENT_SHOW
   )
 
@@ -40,8 +37,9 @@ export const listDvcOnly = async (
   options: ExecutionOptions,
   relativePath: string
 ): Promise<string[]> =>
-  readCliProcessSplit(
+  readCliProcess<string[]>(
     options,
+    trimAndSplit,
     Commands.LIST,
     relativePath as Target,
     ListFlag.DVC_ONLY
@@ -50,7 +48,13 @@ export const listDvcOnly = async (
 export const listDvcOnlyRecursive = async (
   options: ExecutionOptions
 ): Promise<string[]> =>
-  readCliProcessSplit(options, Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE)
+  readCliProcess<string[]>(
+    options,
+    trimAndSplit,
+    Commands.LIST,
+    ListFlag.DVC_ONLY,
+    Flag.RECURSIVE
+  )
 
 type Status = Record<
   string,
@@ -58,7 +62,7 @@ type Status = Record<
 >
 
 export const status = async (options: ExecutionOptions): Promise<Status> =>
-  readCliProcessJson<Status>(options, Commands.STATUS)
+  readCliProcess<Status>(options, JSON.parse, Commands.STATUS)
 
 export const queueExperiment = async (
   options: ExecutionOptions
@@ -67,8 +71,9 @@ export const queueExperiment = async (
 export const experimentListCurrent = async (
   options: ExecutionOptions
 ): Promise<string[]> =>
-  readCliProcessSplit(
+  readCliProcess<string[]>(
     options,
+    trimAndSplit,
     Commands.EXPERIMENT,
     ExperimentSubCommands.LIST,
     ExperimentFlag.NAMES_ONLY

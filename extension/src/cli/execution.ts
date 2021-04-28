@@ -92,30 +92,14 @@ export const runCliProcess = async (
   })
 }
 
-export const readCliProcessJson = async <T>(
+export const readCliProcess = async <T = string>(
   options: ExecutionOptions,
+  formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
   ...args: Args
 ): Promise<T> => {
-  const { executable, cwd, env } = getExecutionDetails(options)
-  const output = await runProcess({
-    executable,
-    args,
-    cwd,
-    env
-  })
-  return (JSON.parse(output) as unknown) as T
-}
-
-export const readCliProcessSplit = async (
-  options: ExecutionOptions,
-  ...args: Args
-): Promise<string[]> => {
-  const { executable, cwd, env } = getExecutionDetails(options)
-  const output = await runProcess({
-    executable,
-    args,
-    cwd,
-    env
-  })
-  return trimAndSplit(output)
+  const output = await runCliProcess(options, ...args)
+  if (!formatter) {
+    return (output as unknown) as T
+  }
+  return (formatter(output) as unknown) as T
 }
