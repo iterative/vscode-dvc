@@ -11,20 +11,20 @@ import {
 import {
   BaseExecutionOptions,
   ExecutionOptions,
-  runCliProcess
+  executeCliProcess
 } from './execution'
 
 export const checkout = async (options: ExecutionOptions): Promise<string> =>
-  runCliProcess(options, Command.CHECKOUT)
+  executeCliProcess(options, Command.CHECKOUT)
 
 export const commit = async (options: ExecutionOptions): Promise<string> =>
-  runCliProcess(options, Command.COMMIT, Flag.FORCE)
+  executeCliProcess(options, Command.COMMIT, Flag.FORCE)
 
 export const experimentApply = async (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
-  runCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.APPLY,
@@ -36,7 +36,7 @@ export const experimentBranch = async (
   experiment: string,
   branchName: string
 ): Promise<string> =>
-  runCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.BRANCH,
@@ -48,7 +48,7 @@ export const experimentGarbageCollect = async (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  runCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.GARBAGE_COLLECT,
@@ -61,7 +61,7 @@ export const experimentRemove = async (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
-  runCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.REMOVE,
@@ -71,12 +71,12 @@ export const experimentRemove = async (
 export const initializeDirectory = async (
   options: ExecutionOptions
 ): Promise<string> =>
-  runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
+  executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
 export const queueExperiment = async (
   options: ExecutionOptions
 ): Promise<string> =>
-  runCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.RUN,
@@ -98,7 +98,7 @@ const runCliProcessOnTarget = async (
   const target = basename(fsPath)
   await ensureDir(cwd)
 
-  return runCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
+  return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
 
 export const addTarget = async (

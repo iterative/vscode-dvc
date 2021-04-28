@@ -10,7 +10,7 @@ import {
   initializeDirectory,
   pullTarget,
   pushTarget
-} from './writer'
+} from './executor'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,

@@ -1,5 +1,5 @@
 import { getExperiments, root, listDvcOnlyRecursive } from './reader'
-import { runProcess } from '../processExecution'
+import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
 import { join, resolve } from 'path'
@@ -9,7 +9,7 @@ jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
 
-const mockedRunProcess = mocked(runProcess)
+const mockedExecuteProcess = mocked(executeProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   PATH: '/all/of/the/goodies:/in/my/path'
@@ -23,7 +23,7 @@ beforeEach(() => {
 describe('getExperiments', () => {
   it('should match a snapshot when parsed', async () => {
     const cwd = resolve()
-    mockedRunProcess.mockResolvedValueOnce(
+    mockedExecuteProcess.mockResolvedValueOnce(
       JSON.stringify(complexExperimentsOutput)
     )
 
@@ -33,7 +33,7 @@ describe('getExperiments', () => {
       cwd
     })
     expect(experiments).toMatchSnapshot()
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'show', '--show-json'],
       cwd,
@@ -46,14 +46,14 @@ describe('root', () => {
   it('should return the root relative to the cwd', async () => {
     const stdout = join('..', '..')
     const cwd = resolve()
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
     const relativeRoot = await root({
       cliPath: 'dvc',
       cwd,
       pythonBinPath: undefined
     })
     expect(relativeRoot).toEqual(stdout)
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['root'],
       cwd,
@@ -77,7 +77,7 @@ describe('listDvcOnlyRecursive', () => {
       `logs/loss.tsv\n` +
       `model.pt`
     const cwd = resolve()
-    mockedRunProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
     const tracked = await listDvcOnlyRecursive({
       cliPath: undefined,
       pythonBinPath: undefined,
@@ -98,7 +98,7 @@ describe('listDvcOnlyRecursive', () => {
       'model.pt'
     ])
 
-    expect(mockedRunProcess).toBeCalledWith({
+    expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['list', '.', '--dvc-only', '-R'],
       cwd,

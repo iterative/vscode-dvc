@@ -1,8 +1,8 @@
-import { runProcess } from './processExecution'
+import { executeProcess } from './processExecution'
 
-describe('runProcess', () => {
+describe('executeProcess', () => {
   it('should be able to run a process', async () => {
-    const output = await runProcess({
+    const output = await executeProcess({
       executable: 'echo',
       args: ['some', 'text'],
       cwd: __dirname
@@ -12,7 +12,7 @@ describe('runProcess', () => {
 
   it('should throw an empty error if the underlying process throws without stderr', async () => {
     await expect(
-      runProcess({
+      executeProcess({
         executable: 'echo1',
         args: ['I', 'deed'],
         cwd: __dirname
@@ -22,7 +22,7 @@ describe('runProcess', () => {
 
   it('should return the stderr if the process throws with stderr', async () => {
     await expect(
-      runProcess({
+      executeProcess({
         executable: 'find',
         args: ['me', 'outside'],
         cwd: __dirname

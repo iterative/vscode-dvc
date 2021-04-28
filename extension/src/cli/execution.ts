@@ -2,7 +2,7 @@ import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
 import { Args } from './args'
 import { trimAndSplit } from '../util/stdout'
-import { createProcess, Process, runProcess } from '../processExecution'
+import { createProcess, Process, executeProcess } from '../processExecution'
 
 export type BaseExecutionOptions = {
   cliPath: string | undefined
@@ -84,12 +84,12 @@ export const createCliProcess = ({
   return process
 }
 
-export const runCliProcess = async (
+export const executeCliProcess = async (
   options: ExecutionOptions,
   ...args: Args
 ): Promise<string> => {
   const { executable, cwd, env } = getExecutionDetails(options)
-  return runProcess({
+  return executeProcess({
     executable,
     args,
     cwd,
@@ -102,7 +102,7 @@ export const readCliProcess = async <T = string>(
   formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
   ...args: Args
 ): Promise<T> => {
-  const output = await runCliProcess(options, ...args)
+  const output = await executeCliProcess(options, ...args)
   if (!formatter) {
     return (output as unknown) as T
   }
