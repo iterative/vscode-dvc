@@ -32,6 +32,12 @@ const runTargetCommand = async (
   return runCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
 
+export const addTarget = async (options: {
+  fsPath: string
+  cliPath: string | undefined
+  pythonBinPath: string | undefined
+}): Promise<string> => runTargetCommand(options, Command.ADD)
+
 export const checkoutTarget = (options: {
   fsPath: string
   cliPath: string | undefined
