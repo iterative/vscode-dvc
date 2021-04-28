@@ -6,3 +6,8 @@ export const checkout = async (options: ExecutionOptions): Promise<string> =>
 
 export const commit = async (options: ExecutionOptions): Promise<string> =>
   runCliProcess(options, Command.COMMIT, Flag.FORCE)
+
+export const initializeDirectory = async (
+  options: ExecutionOptions
+): Promise<string> =>
+  runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)

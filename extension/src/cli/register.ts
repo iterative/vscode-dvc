@@ -8,8 +8,7 @@ import {
 } from '.'
 import { Config } from '../Config'
 import { Disposer } from '../extension'
-import { initializeDirectory } from './reader'
-import { checkout, commit } from './writer'
+import { checkout, commit, initializeDirectory } from './writer'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,

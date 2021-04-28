@@ -24,11 +24,6 @@ export const getExperiments = async (
     Flag.SHOW_JSON
   )
 
-export const initializeDirectory = async (
-  options: ExecutionOptions
-): Promise<string> =>
-  runCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
-
 export const listDvcOnly = async (
   options: ExecutionOptions,
   relativePath: string
