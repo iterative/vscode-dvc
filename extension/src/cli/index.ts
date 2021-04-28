@@ -1,6 +1,6 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
-import { Args, Commands, Flag } from './commands'
+import { Args, Command, Flag } from './args'
 import { runCliProcess } from './execution'
 
 const runTargetCommand = async (
@@ -25,28 +25,28 @@ export const addTarget = async (options: {
   fsPath: string
   cliPath: string | undefined
   pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Commands.ADD)
+}): Promise<string> => runTargetCommand(options, Command.ADD)
 
 export const commitTarget = (options: {
   fsPath: string
   cliPath: string | undefined
   pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Commands.COMMIT, Flag.FORCE)
+}): Promise<string> => runTargetCommand(options, Command.COMMIT, Flag.FORCE)
 
 export const checkoutTarget = (options: {
   fsPath: string
   cliPath: string | undefined
   pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Commands.CHECKOUT)
+}): Promise<string> => runTargetCommand(options, Command.CHECKOUT)
 
 export const pushTarget = async (options: {
   fsPath: string
   cliPath: string | undefined
   pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Commands.PUSH)
+}): Promise<string> => runTargetCommand(options, Command.PUSH)
 
 export const pullTarget = async (options: {
   fsPath: string
   cliPath: string | undefined
   pythonBinPath: string | undefined
-}): Promise<string> => runTargetCommand(options, Commands.PULL)
+}): Promise<string> => runTargetCommand(options, Command.PULL)

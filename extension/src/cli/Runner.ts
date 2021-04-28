@@ -2,7 +2,7 @@ import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
-import { Args } from './commands'
+import { Args } from './args'
 import { createCliProcess } from './execution'
 import { Process } from '../processExecution'
 

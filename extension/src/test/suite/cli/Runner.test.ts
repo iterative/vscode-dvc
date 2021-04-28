@@ -4,7 +4,7 @@ import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import * as Execution from '../../../cli/execution'
-import { Commands } from '../../../cli/commands'
+import { Command } from '../../../cli/args'
 import { Disposable } from '../../../extension'
 import { Config } from '../../../Config'
 import { Runner } from '../../../cli/Runner'
@@ -32,7 +32,7 @@ suite('Runner Test Suite', () => {
       })
 
       await runner.run(cwd, '3')
-      await runner.run(cwd, Commands.CHECKOUT)
+      await runner.run(cwd, Command.CHECKOUT)
       stubbedGetExecutionDetails.restore()
 
       expect(stubbedGetExecutionDetails).to.be.calledWith({

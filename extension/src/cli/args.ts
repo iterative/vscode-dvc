@@ -1,4 +1,4 @@
-export enum Commands {
+export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
@@ -52,4 +52,4 @@ type Target = string
 
 type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
 
-export type Args = (Commands | Target | ExperimentSubCommands | Flags)[]
+export type Args = (Command | Target | ExperimentSubCommands | Flags)[]

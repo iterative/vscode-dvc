@@ -1,5 +1,5 @@
 import { createProcess, Process } from '../processExecution'
-import { Commands } from './commands'
+import { Command } from './args'
 import { createCliProcess } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
@@ -24,7 +24,7 @@ describe('createCliProcess', () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const cwd = __dirname
-    const args = [Commands.CHECKOUT]
+    const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
     await createCliProcess({
@@ -49,7 +49,7 @@ describe('createCliProcess', () => {
     const processEnv = { PATH: existingPath }
     const cliPath = '/some/path/to/dvc'
     const cwd = __dirname
-    const args = [Commands.CHECKOUT]
+    const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
     await createCliProcess({
@@ -80,7 +80,7 @@ describe('createCliProcess', () => {
     const pythonBinPath = '/some/conda/path/bin'
 
     const cwd = __dirname
-    const args = [Commands.PUSH]
+    const args = [Command.PUSH]
 
     await createCliProcess({
       options: {
@@ -106,7 +106,7 @@ describe('createCliProcess', () => {
     const pythonBinPath = '/some/conda/path/bin'
 
     const cwd = __dirname
-    const args = [Commands.PULL]
+    const args = [Command.PULL]
 
     await createCliProcess({
       options: {

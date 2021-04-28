@@ -10,7 +10,7 @@ import { mocked } from 'ts-jest/utils'
 import { runProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import { QuickPickOptions, window } from 'vscode'
-import { GcPreserveFlag } from './commands'
+import { GcPreserveFlag } from './args'
 import { QuickPickItemWithValue } from '../vscode/quickpick'
 
 jest.mock('fs')

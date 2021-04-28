@@ -1,6 +1,6 @@
 import { window } from 'vscode'
 import { Config } from '../Config'
-import { GcPreserveFlag } from './commands'
+import { GcPreserveFlag } from './args'
 import { quickPickManyValues } from '../vscode/quickpick'
 import { reportStderrOrThrow } from '../vscode/reporting'
 import {
