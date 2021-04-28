@@ -24,7 +24,7 @@ describe('runProcess', () => {
     await expect(
       runProcess({
         executable: 'read',
-        args: ['-z', 'is', 'not', 'a', 'flag'],
+        args: ['-t', '0.1', '-p', 'Off we go to stderr'],
         cwd: __dirname
       })
     ).rejects.toBeTruthy()
