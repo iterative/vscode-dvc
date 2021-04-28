@@ -46,7 +46,9 @@ export enum ListFlag {
   DVC_ONLY = '--dvc-only'
 }
 
-type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
+export type Target = string
+
+type Flags = Flag | Target | ExperimentFlag | ListFlag | GcPreserveFlag
 
 export type Args = (Commands | ExperimentSubCommands | Flags | string)[]
 

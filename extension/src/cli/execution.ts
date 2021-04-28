@@ -1,7 +1,7 @@
 import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
 import { Args } from './commands'
-import { trim, trimAndSplit } from '../util/stdout'
+import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, runProcess } from '../processExecution'
 
 export interface ReaderOptions {
@@ -97,22 +97,17 @@ export const spawnProcess = ({
   return process
 }
 
-export const execProcess = async <T>(
+export const execProcess = async (
   options: ReaderOptions,
-  args: Args,
-  formatter: typeof trimAndSplit | typeof trim | typeof JSON.parse = trim
-): Promise<T> => {
-  const { executable, cwd, env } = getExecutionDetails({
-    ...options,
-    args
-  })
-  const output = await runProcess({
+  ...args: Args
+): Promise<string> => {
+  const { executable, cwd, env } = getExecutionDetails_(options)
+  return runProcess({
     executable,
     args,
     cwd,
     env
   })
-  return (formatter(output) as unknown) as T
 }
 
 export const execProcessJson = async <T>(

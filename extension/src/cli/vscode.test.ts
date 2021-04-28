@@ -65,14 +65,14 @@ const exampleListStdout = exampleExperimentsList.join('\n') + '\n'
 
 describe('queueExperimentCommand', () => {
   it('displays an info message with the contents of stdout when the command succeeds', async () => {
-    const stdout = 'Example stdout that will be resolved literally\n'
+    const stdout = 'Example stdout that will be resolved literally'
     mockedRunProcess.mockResolvedValue(stdout)
     await queueExperimentCommand(exampleConfig)
-    expect(mockedShowInformationMessage).toBeCalledWith(stdout.trim())
+    expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
-    const stderr = 'Example stderr that will be resolved literally\n'
+    const stderr = 'Example stderr that will be resolved literally'
     mockedRunProcess.mockRejectedValue({ stderr, stdout: '' })
     await queueExperimentCommand(exampleConfig)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)

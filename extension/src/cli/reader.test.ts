@@ -69,8 +69,7 @@ describe('initializeDirectory', () => {
 	------------
 	- Check out the documentation: <https://dvc.org/doc>
 	- Get help and share ideas: <https://dvc.org/chat>
-	- Star us on GitHub: <https://github.com/iterative/dvc>
-	`
+	- Star us on GitHub: <https://github.com/iterative/dvc>`
 
     mockedRunProcess.mockResolvedValueOnce(stdout)
 
@@ -79,7 +78,7 @@ describe('initializeDirectory', () => {
       cwd: fsPath,
       pythonBinPath: undefined
     })
-    expect(output).toEqual(stdout.trim())
+    expect(output).toEqual(stdout)
 
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
@@ -136,16 +135,15 @@ describe('commit', () => {
 
 describe('getRoot', () => {
   it('should return the root relative to the cwd', async () => {
-    const mockRelativeRoot = join('..', '..')
-    const mockStdout = mockRelativeRoot + '\n\r'
+    const stdout = join('..', '..')
     const cwd = resolve()
-    mockedRunProcess.mockResolvedValueOnce(mockStdout)
+    mockedRunProcess.mockResolvedValueOnce(stdout)
     const relativeRoot = await getRoot({
       cliPath: 'dvc',
       cwd,
       pythonBinPath: undefined
     })
-    expect(relativeRoot).toEqual(mockRelativeRoot)
+    expect(relativeRoot).toEqual(stdout)
     expect(mockedRunProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['root'],

@@ -1,11 +1,11 @@
 import {
-  buildArgs,
   Commands,
   ExperimentFlag,
   ExperimentSubCommands,
   Flag,
   GcPreserveFlag,
-  ListFlag
+  ListFlag,
+  Target
 } from './commands'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 import {
@@ -19,10 +19,10 @@ export const checkout = async (options: ReaderOptions): Promise<string[]> =>
   execProcessSplit(options, Commands.CHECKOUT)
 
 export const commit = async (options: ReaderOptions): Promise<string> =>
-  execProcess<string>(options, buildArgs(Commands.COMMIT, Flag.FORCE))
+  execProcess(options, Commands.COMMIT, Flag.FORCE)
 
 export const getRoot = async (options: ReaderOptions): Promise<string> =>
-  execProcess<string>(options, [Commands.ROOT])
+  execProcess(options, Commands.ROOT)
 
 export const getExperiments = async (
   options: ReaderOptions
@@ -31,14 +31,18 @@ export const getExperiments = async (
 
 export const initializeDirectory = async (
   options: ReaderOptions
-): Promise<string> =>
-  execProcess<string>(options, [Commands.INITIALIZE_SUBDIRECTORY])
+): Promise<string> => execProcess(options, Commands.INITIALIZE_SUBDIRECTORY)
 
 export const listDvcOnly = async (
   options: ReaderOptions,
   relativePath: string
 ): Promise<string[]> =>
-  execProcessSplit(options, Commands.LIST, relativePath, ListFlag.DVC_ONLY)
+  execProcessSplit(
+    options,
+    Commands.LIST,
+    relativePath as Target,
+    ListFlag.DVC_ONLY
+  )
 
 export const listDvcOnlyRecursive = async (
   options: ReaderOptions
@@ -55,7 +59,7 @@ export const status = async (options: ReaderOptions): Promise<Status> =>
 
 export const queueExperiment = async (
   options: ReaderOptions
-): Promise<string> => execProcess<string>(options, [Commands.EXPERIMENT_QUEUE])
+): Promise<string> => execProcess(options, Commands.EXPERIMENT_QUEUE)
 
 export const experimentListCurrent = async (
   options: ReaderOptions
@@ -71,7 +75,7 @@ export const experimentGarbageCollect = async (
   options: ReaderOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  execProcess(options, buildArgs(Commands.EXPERIMENT_GC, ...preserveFlags))
+  execProcess(options, Commands.EXPERIMENT_GC, ...preserveFlags)
 
 export const experimentApply = async (
   options: ReaderOptions,
@@ -79,21 +83,20 @@ export const experimentApply = async (
 ): Promise<string> =>
   execProcess(
     options,
-    buildArgs(Commands.EXPERIMENT, ExperimentSubCommands.APPLY, experiment)
+    Commands.EXPERIMENT,
+    ExperimentSubCommands.APPLY,
+    experiment
   )
 
 export const experimentRemove = async (
   options: ReaderOptions,
   experiment: string
-): Promise<void> =>
-  execProcess(options, buildArgs(Commands.EXPERIMENT_REMOVE, experiment))
+): Promise<string> =>
+  execProcess(options, Commands.EXPERIMENT_REMOVE, experiment as Target)
 
 export const experimentBranch = async (
   options: ReaderOptions,
   experiment: string,
   branchName: string
 ): Promise<string> =>
-  execProcess(
-    options,
-    buildArgs(Commands.EXPERIMENT_BRANCH, experiment, branchName)
-  )
+  execProcess(options, Commands.EXPERIMENT_BRANCH, experiment, branchName)

@@ -19,7 +19,7 @@ const runTargetCommand = async (
   const commandWithTarget = buildArgs(command, target)
   await ensureDir(cwd)
 
-  return execProcess({ cwd, cliPath, pythonBinPath }, commandWithTarget)
+  return execProcess({ cwd, cliPath, pythonBinPath }, ...commandWithTarget)
 }
 
 export const addTarget = async (options: {
