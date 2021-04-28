@@ -7,12 +7,16 @@ import {
   GcPreserveFlag,
   ListFlag
 } from './commands'
-import { trimAndSplit } from '../util/stdout'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
-import { execProcess, execProcessJson, ReaderOptions } from './execution'
+import {
+  execProcess,
+  execProcessJson,
+  execProcessSplit,
+  ReaderOptions
+} from './execution'
 
 export const checkout = async (options: ReaderOptions): Promise<string[]> =>
-  execProcess<string[]>(options, [Commands.CHECKOUT], trimAndSplit)
+  execProcessSplit(options, Commands.CHECKOUT)
 
 export const commit = async (options: ReaderOptions): Promise<string> =>
   execProcess<string>(options, buildArgs(Commands.COMMIT, Flag.FORCE))
@@ -34,20 +38,12 @@ export const listDvcOnly = async (
   options: ReaderOptions,
   relativePath: string
 ): Promise<string[]> =>
-  execProcess<string[]>(
-    options,
-    buildArgs(Commands.LIST, relativePath, ListFlag.DVC_ONLY),
-    trimAndSplit
-  )
+  execProcessSplit(options, Commands.LIST, relativePath, ListFlag.DVC_ONLY)
 
 export const listDvcOnlyRecursive = async (
   options: ReaderOptions
 ): Promise<string[]> =>
-  execProcess<string[]>(
-    options,
-    buildArgs(Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE),
-    trimAndSplit
-  )
+  execProcessSplit(options, Commands.LIST, ListFlag.DVC_ONLY, Flag.RECURSIVE)
 
 type Status = Record<
   string,
@@ -62,17 +58,13 @@ export const queueExperiment = async (
 ): Promise<string> => execProcess<string>(options, [Commands.EXPERIMENT_QUEUE])
 
 export const experimentListCurrent = async (
-  readerOptions: ReaderOptions
+  options: ReaderOptions
 ): Promise<string[]> =>
-  trimAndSplit(
-    await execProcess(
-      readerOptions,
-      buildArgs(
-        Commands.EXPERIMENT,
-        ExperimentSubCommands.LIST,
-        ExperimentFlag.NAMES_ONLY
-      )
-    )
+  execProcessSplit(
+    options,
+    Commands.EXPERIMENT,
+    ExperimentSubCommands.LIST,
+    ExperimentFlag.NAMES_ONLY
   )
 
 export const experimentGarbageCollect = async (

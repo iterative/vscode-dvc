@@ -48,7 +48,7 @@ export enum ListFlag {
 
 type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
 
-export type Args = (Commands | ExperimentSubCommands | Flags)[]
+export type Args = (Commands | ExperimentSubCommands | Flags | string)[]
 
 export const buildArgs = (
   command: Commands | Args,

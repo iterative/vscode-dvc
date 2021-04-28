@@ -128,3 +128,17 @@ export const execProcessJson = async <T>(
   })
   return (JSON.parse(output) as unknown) as T
 }
+
+export const execProcessSplit = async (
+  options: ReaderOptions,
+  ...args: Args
+): Promise<string[]> => {
+  const { executable, cwd, env } = getExecutionDetails_(options)
+  const output = await runProcess({
+    executable,
+    args,
+    cwd,
+    env
+  })
+  return trimAndSplit(output)
+}
