@@ -1,5 +1,6 @@
 import {
   checkout,
+  commit,
   experimentApply,
   getExperiments,
   getRoot,
@@ -88,6 +89,7 @@ describe('initializeDirectory', () => {
     })
   })
 })
+
 describe('checkout', () => {
   it('should call runProcess with the correct parameters', async () => {
     const fsPath = __dirname
@@ -105,6 +107,28 @@ describe('checkout', () => {
       executable: 'dvc',
       args: ['checkout'],
       cwd: fsPath,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('commit', () => {
+  it('should call execPromise with the correct parameters', async () => {
+    const cwd = __dirname
+    const stdout = "Updating lock file 'dvc.lock'"
+    mockedRunProcess.mockResolvedValueOnce(stdout)
+
+    const output = await commit({
+      cliPath: 'dvc',
+      cwd,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedRunProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['commit', '-f'],
+      cwd,
       env: mockedEnv
     })
   })

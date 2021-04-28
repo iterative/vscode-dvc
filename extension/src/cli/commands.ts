@@ -1,6 +1,7 @@
 export enum Commands {
   ADD = 'add',
   CHECKOUT = 'checkout',
+  COMMIT = 'commit',
   EXPERIMENT_GC = 'exp gc -f -w',
   EXPERIMENT_QUEUE = 'exp run --queue',
   EXPERIMENT = 'exp',
@@ -33,6 +34,10 @@ export enum ListFlag {
   RECURSIVE = '-R'
 }
 
+export enum CommitFlag {
+  FORCE = '-f'
+}
+
 export enum GcPreserveFlag {
   ALL_BRANCHES = '--all-branches',
   ALL_TAGS = '--all-tags',
@@ -42,5 +47,12 @@ export enum GcPreserveFlag {
 
 export type Args = (Commands | ExperimentSubCommands | Flags)[]
 
-export const buildArgs = (command: Commands, ...args: string[]): Args =>
-  [command, ...args].filter(Boolean) as Args
+export const buildArgs = (
+  command: Commands | Args,
+  ...args: string[]
+): Args => {
+  if (Array.isArray(command)) {
+    return [...command, ...args].filter(Boolean) as Args
+  }
+  return [command, ...args].filter(Boolean) as Args
+}

@@ -39,7 +39,7 @@ export class ExperimentsWebview {
     const webviewPanel = window.createWebviewPanel(
       ExperimentsWebview.viewKey,
       Experiments,
-      ViewColumn.Two,
+      ViewColumn.Active,
       {
         enableScripts: true,
         retainContextWhenHidden: true,

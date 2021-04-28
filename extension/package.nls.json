@@ -5,6 +5,7 @@
   "command.checkout": "Checkout",
   "command.checkoutTarget": "Checkout Target",
   "command.commit": "Commit",
+  "command.commitTarget": "Commit Target",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
   "command.pull": "Pull",
