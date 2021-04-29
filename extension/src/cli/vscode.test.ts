@@ -3,7 +3,7 @@ import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
   experimentGcQuickPick,
-  queueExperimentCommand,
+  experimentRunQueueCommand,
   removeExperimentFromQuickPick
 } from './vscode'
 import { mocked } from 'ts-jest/utils'
@@ -63,18 +63,18 @@ const exampleExpName = 'exp-2021'
 
 const exampleListStdout = exampleExperimentsList.join('\n') + '\n'
 
-describe('queueExperimentCommand', () => {
+describe('experimentRunQueueCommand', () => {
   it('displays an info message with the contents of stdout when the command succeeds', async () => {
     const stdout = 'Example stdout that will be resolved literally'
     mockedExecuteProcess.mockResolvedValue(stdout)
-    await queueExperimentCommand(exampleConfig)
+    await experimentRunQueueCommand(exampleConfig)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
     const stderr = 'Example stderr that will be resolved literally'
     mockedExecuteProcess.mockRejectedValue(stderr)
-    await queueExperimentCommand(exampleConfig)
+    await experimentRunQueueCommand(exampleConfig)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 })

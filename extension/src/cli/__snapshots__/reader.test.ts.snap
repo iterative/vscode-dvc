@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getExperiments should match a snapshot when parsed 1`] = `
+exports[`experimentShow should match a snapshot when parsed 1`] = `
 Object {
   "42b8736b08170529903cd203a1f40382a4b4a8cd": Object {
     "baseline": Object {

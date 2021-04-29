@@ -14,7 +14,7 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments } from './cli/reader'
+import { experimentShow } from './cli/reader'
 import {
   Args,
   Command,
@@ -133,7 +133,7 @@ export class Extension {
 
   private refreshExperimentsWebview = async () => {
     await this.config.ready
-    const experiments = await getExperiments({
+    const experiments = await experimentShow({
       pythonBinPath: this.config.pythonBinPath,
       cliPath: this.config.dvcPath,
       cwd: this.config.workspaceRoot

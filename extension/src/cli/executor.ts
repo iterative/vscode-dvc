@@ -73,7 +73,7 @@ export const initializeDirectory = async (
 ): Promise<string> =>
   executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
-export const queueExperiment = async (
+export const experimentRunQueue = async (
   options: ExecutionOptions
 ): Promise<string> =>
   executeCliProcess(
