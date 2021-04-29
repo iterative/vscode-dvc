@@ -3,8 +3,7 @@ import {
   commands,
   ExtensionContext,
   workspace,
-  WorkspaceFolder,
-  Uri
+  WorkspaceFolder
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
@@ -148,18 +147,13 @@ export class Extension {
     return webview
   }
 
-  private async runExperimentCommand(
-    context: { rootUri?: Uri } | undefined,
-    ...args: Args
-  ) {
-    const dvcRoot = await pickSingleRepositoryRoot(
-      {
-        cliPath: this.config.dvcPath,
-        cwd: this.config.workspaceRoot,
-        pythonBinPath: this.config.pythonBinPath
-      },
-      context?.rootUri?.fsPath
-    )
+  private async runExperimentCommand(...args: Args) {
+    const dvcRoot = await pickSingleRepositoryRoot({
+      cliPath: this.config.dvcPath,
+      cwd: this.config.workspaceRoot,
+      pythonBinPath: this.config.pythonBinPath
+    })
+
     if (dvcRoot) {
       await this.showExperimentsWebview()
       this.runner.run(dvcRoot, ...args)
@@ -232,19 +226,14 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', async context =>
-        this.runExperimentCommand(
-          context,
-          Command.EXPERIMENT,
-          ExperimentSubCommands.RUN
-        )
+      commands.registerCommand('dvc.runExperiment', () =>
+        this.runExperimentCommand(Command.EXPERIMENT, ExperimentSubCommands.RUN)
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runResetExperiment', async context =>
+      commands.registerCommand('dvc.runResetExperiment', () =>
         this.runExperimentCommand(
-          context,
           Command.EXPERIMENT,
           ExperimentSubCommands.RUN,
           ExperimentFlag.RESET
@@ -253,9 +242,8 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runQueuedExperiments', async context =>
+      commands.registerCommand('dvc.runQueuedExperiments', () =>
         this.runExperimentCommand(
-          context,
           Command.EXPERIMENT,
           ExperimentSubCommands.RUN,
           ExperimentFlag.RUN_ALL
