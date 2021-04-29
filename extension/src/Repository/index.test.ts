@@ -244,8 +244,7 @@ describe('Repository', () => {
           {
             'changed deps': {
               'data/features': 'modified',
-              'model.pkl': 'deleted',
-              'will not turn up after reduction': 'deleted'
+              'model.pkl': 'deleted'
             }
           }
         ],
