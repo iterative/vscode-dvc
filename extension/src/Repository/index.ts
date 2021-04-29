@@ -118,9 +118,6 @@ export class Repository {
   private filterExcludedStagesOrFiles(
     statusOutput: StatusOutput
   ): FilteredStatusOutput {
-    const excludeAlwaysChanged = (stageOrFile: string): boolean =>
-      !statusOutput[stageOrFile].includes('always changed')
-
     const reduceToFiltered = (
       filteredStatusOutput: FilteredStatusOutput,
       stageOrFile: string
@@ -131,19 +128,14 @@ export class Repository {
       return filteredStatusOutput
     }
 
-    return Object.keys(statusOutput)
-      .filter(excludeAlwaysChanged)
-      .reduce(reduceToFiltered, {})
+    return Object.keys(statusOutput).reduce(reduceToFiltered, {})
   }
 
   private getFileOrStageStatuses(
     fileOrStage: ValidStageOrFileStatuses[]
   ): PathStatus[] {
     return fileOrStage
-      .map(
-        entry =>
-          entry?.[ChangedType.CHANGED_DEPS] || entry?.[ChangedType.CHANGED_OUTS]
-      )
+      .map(entry => entry?.[ChangedType.CHANGED_OUTS])
       .filter(value => value)
   }
 
