@@ -105,7 +105,7 @@ export class Extension {
           tracked.forEach(trackedPath => {
             this.dispose.track(
               addOnFileSystemChangeHandler(trackedPath, (path: string) => {
-                repository.updateState()
+                repository.quickUpdateState()
                 this.trackedExplorerTree.refresh(path)
               })
             )

@@ -187,6 +187,20 @@ export class Repository {
     }
   }
 
+  public async quickUpdateState() {
+    const promisesForScm = Promise.all([
+      this.updateUntracked(),
+      this.updateStatus()
+    ])
+
+    await promisesForScm
+    this.sourceControlManagement.setState(this.state)
+
+    if (this.decorationProvider) {
+      this.decorationProvider.setState(this.state)
+    }
+  }
+
   private async setup() {
     await this.updateState()
     return this._initialized.resolve()
