@@ -246,7 +246,7 @@
         {
           "command": "dvc.pushTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && scmResourceState != remoteOnly"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
         },
         {
           "command": "dvc.pullTarget",

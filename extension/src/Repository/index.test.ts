@@ -7,7 +7,6 @@ import { DecorationProvider } from './DecorationProvider'
 import { Repository, RepositoryState } from '.'
 import { listDvcOnlyRecursive, status } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { exists } from '../fileSystem'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/SourceControlManagement')
@@ -35,9 +34,6 @@ mockedDecorationProvider.mockImplementation(function() {
     setState: mockedSetDecorationState
   } as unknown) as DecorationProvider
 })
-
-const mockedExists = mocked(exists)
-mockedExists.mockReturnValue(true)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -113,7 +109,6 @@ describe('Repository', () => {
           dispose: Disposable.fn(),
           deleted: emptySet,
           notInCache: emptySet,
-          remoteOnly: emptySet,
           new: emptySet,
           modified,
           tracked,
@@ -202,7 +197,6 @@ describe('Repository', () => {
         new: emptySet,
         modified: emptySet,
         notInCache: emptySet,
-        remoteOnly: emptySet,
         deleted,
         tracked,
         untracked: emptySet
@@ -302,7 +296,6 @@ describe('Repository', () => {
         new: new Set(),
         modified,
         notInCache,
-        remoteOnly: new Set(),
         deleted,
         tracked,
         untracked

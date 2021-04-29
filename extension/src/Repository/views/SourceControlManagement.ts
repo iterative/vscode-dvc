@@ -11,7 +11,6 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
-  REMOTE_ONLY = 'remoteOnly',
   UNTRACKED = 'untracked'
 }
 
