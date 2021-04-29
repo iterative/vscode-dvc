@@ -92,12 +92,25 @@ export class Extension {
           )
         )
 
-        this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
+        addOnFileSystemChangeHandler(
+          resolve(dvcRoot, '.dvc', 'cache'),
+          (path: string) => {
             repository.updateState()
             this.trackedExplorerTree.refresh(path)
-          })
+          }
         )
+
+        repository.ready.then(() => {
+          const tracked = repository.getTracked()
+          tracked.forEach(trackedPath => {
+            this.dispose.track(
+              addOnFileSystemChangeHandler(trackedPath, (path: string) => {
+                repository.updateState()
+                this.trackedExplorerTree.refresh(path)
+              })
+            )
+          })
+        })
 
         this.dvcRepositories[dvcRoot] = repository
       })

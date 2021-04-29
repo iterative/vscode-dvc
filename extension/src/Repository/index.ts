@@ -66,6 +66,10 @@ export class Repository {
     return this.state
   }
 
+  public getTracked() {
+    return this.state.tracked
+  }
+
   @observable
   private state: RepositoryState
 
