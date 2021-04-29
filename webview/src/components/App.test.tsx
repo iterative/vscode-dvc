@@ -53,7 +53,7 @@ describe('App', () => {
     mockGetState.mockReturnValue({})
 
     describe('When we render the App', () => {
-      it('Then a message should be sent to the extension on the first render', async () => {
+      it('Then a message should be sent to the extension on the first render', () => {
         render(<App />)
         expect(mockGetVsCodeApi).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({

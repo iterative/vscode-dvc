@@ -116,9 +116,7 @@ export class Extension {
     )
   }
 
-  private onChangeExperimentsUpdateWebview = async (
-    gitRoot: string
-  ): Promise<Disposable> => {
+  private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
     if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
@@ -185,7 +183,7 @@ export class Extension {
     )
 
     Promise.all(
-      (workspace.workspaceFolders || []).map(async workspaceFolder =>
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       )
     ).then(() => {
@@ -214,13 +212,13 @@ export class Extension {
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', async () =>
+      commands.registerCommand('dvc.selectDvcPath', () =>
         this.config.selectDvcPath()
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.showExperiments', async () => {
+      commands.registerCommand('dvc.showExperiments', () => {
         return this.showExperimentsWebview()
       })
     )
@@ -264,16 +262,14 @@ export class Extension {
         await this.config.ready
         const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
-        this.onChangeExperimentsUpdateWebview(gitRoot).then(disposable =>
-          this.dispose.track(disposable)
-        )
+        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
 
         const dvcRoots = await findDvcRootPaths({
           cliPath: this.config.dvcPath,
           cwd: gitRoot,
           pythonBinPath: this.config.pythonBinPath
         })
-        dvcRoots.forEach(async dvcRoot => {
+        dvcRoots.forEach(dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 
           this.dispose.track(

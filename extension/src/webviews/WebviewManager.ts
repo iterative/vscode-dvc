@@ -23,9 +23,8 @@ export class WebviewManager {
     this.dispose.track(
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (panel: WebviewPanel) => {
-          ExperimentsWebview.restore(panel, this.config).then(view => {
-            this.addExperiments(view)
-          })
+          const view = await ExperimentsWebview.restore(panel, this.config)
+          this.addExperiments(view)
         }
       })
     )

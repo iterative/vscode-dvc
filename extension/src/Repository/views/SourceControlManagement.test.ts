@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe('SourceControlManagement', () => {
   describe('setState', () => {
-    it('should be able to set the state', async () => {
+    it('should be able to set the state', () => {
       const initialState = {} as SourceControlManagementState
       const sourceControlManagement = new SourceControlManagement(
         __dirname,
