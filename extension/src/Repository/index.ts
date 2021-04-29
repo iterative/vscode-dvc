@@ -23,13 +23,13 @@ enum ChangedType {
   CHANGED_DEPS = 'changed deps'
 }
 
-type StatusOutput = Record<string, (ValidStageOrFileStatuses | string)[]>
-
-type FilteredStatusOutput = Record<string, ValidStageOrFileStatuses[]>
-
-type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
-
 type PathStatus = Record<string, Status>
+
+type StageOrFileStatuses = Record<ChangedType, PathStatus>
+
+type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
+
+type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
@@ -108,35 +108,11 @@ export class Repository {
     ])
   }
 
-  private filterExcludedStagesOrFiles(
-    statusOutput: StatusOutput
-  ): FilteredStatusOutput {
-    const excludeAlwaysChanged = (stageOrFile: string): boolean =>
-      !statusOutput[stageOrFile].includes('always changed')
-
-    const reduceToFiltered = (
-      filteredStatusOutput: FilteredStatusOutput,
-      stageOrFile: string
-    ) => {
-      filteredStatusOutput[stageOrFile] = statusOutput[
-        stageOrFile
-      ] as ValidStageOrFileStatuses[]
-      return filteredStatusOutput
-    }
-
-    return Object.keys(statusOutput)
-      .filter(excludeAlwaysChanged)
-      .reduce(reduceToFiltered, {})
-  }
-
-  private getFileOrStageStatuses(
-    fileOrStage: ValidStageOrFileStatuses[]
+  private getChangedOutsStatuses(
+    fileOrStage: StatusesOrAlwaysChanged[]
   ): PathStatus[] {
     return fileOrStage
-      .map(
-        entry =>
-          entry?.[ChangedType.CHANGED_DEPS] || entry?.[ChangedType.CHANGED_OUTS]
-      )
+      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
       .filter(value => value)
   }
 
@@ -153,14 +129,14 @@ export class Repository {
     )
   }
 
-  private reduceToPathStatuses(
-    filteredStatusOutput: FilteredStatusOutput
+  private reduceToChangedOutsStatuses(
+    filteredStatusOutput: StatusOutput
   ): Partial<Record<Status, Set<string>>> {
     const statusReducer = (
       reducedStatus: Partial<Record<Status, Set<string>>>,
-      entry: ValidStageOrFileStatuses[]
+      entry: StatusesOrAlwaysChanged[]
     ): Partial<Record<Status, Set<string>>> => {
-      const statuses = this.getFileOrStageStatuses(entry)
+      const statuses = this.getChangedOutsStatuses(entry)
 
       this.reduceStatuses(reducedStatus, statuses)
 
@@ -172,13 +148,9 @@ export class Repository {
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
     const options = this.getCliExecutionOptions()
-    const statusOutput = (await status(options)) as Record<
-      string,
-      (ValidStageOrFileStatuses | string)[]
-    >
+    const statusOutput = (await status(options)) as StatusOutput
 
-    const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
-    return this.reduceToPathStatuses(filteredStatusOutput)
+    return this.reduceToChangedOutsStatuses(statusOutput)
   }
 
   public async updateStatus() {
