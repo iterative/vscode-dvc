@@ -23,15 +23,13 @@ enum ChangedType {
   CHANGED_DEPS = 'changed deps'
 }
 
-type StatusesOrAlwaysChanged =
-  | Record<ChangedType, PathStatus>
-  | 'always changed'
-
-type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
+type PathStatus = Record<string, Status>
 
 type StageOrFileStatuses = Record<ChangedType, PathStatus>
 
-type PathStatus = Record<string, Status>
+type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
+
+type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
