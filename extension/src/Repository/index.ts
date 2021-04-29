@@ -170,16 +170,16 @@ export class Repository {
     this.state.untracked = await getAllUntracked(this.dvcRoot)
   }
 
-  private updateScmStatuses() {
+  private updateStatuses() {
     return Promise.all([this.updateUntracked(), this.updateStatus()])
   }
 
   public async resetState() {
-    const scmStatusesUpdated = this.updateScmStatuses()
+    const statusesUpdated = this.updateStatuses()
 
     const slowerTrackedUpdated = this.updateList()
 
-    await scmStatusesUpdated
+    await statusesUpdated
     this.sourceControlManagement.setState(this.state)
 
     await slowerTrackedUpdated
@@ -192,7 +192,7 @@ export class Repository {
   }
 
   public async updateState() {
-    await this.updateScmStatuses()
+    await this.updateStatuses()
     this.setState()
   }
 
