@@ -73,7 +73,9 @@ export const initializeDirectory = (
 ): Promise<string> =>
   executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
-export const queueExperiment = (options: ExecutionOptions): Promise<string> =>
+export const experimentRunQueue = (
+  options: ExecutionOptions
+): Promise<string> =>
   executeCliProcess(
     options,
     Command.EXPERIMENT,

@@ -12,7 +12,7 @@ import { trimAndSplit } from '../util/stdout'
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
 
-export const getExperiments = (
+export const experimentShow = (
   options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
   readCliProcess<ExperimentsRepoJSONOutput>(

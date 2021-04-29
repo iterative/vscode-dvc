@@ -9,14 +9,14 @@ import {
   experimentBranch,
   experimentGarbageCollect,
   experimentRemove,
-  queueExperiment
+  experimentRunQueue
 } from './executor'
 import { ExecutionOptions } from './execution'
 
-export const queueExperimentCommand = async (config: Config) => {
+export const experimentRunQueueCommand = async (config: Config) => {
   try {
     return window.showInformationMessage(
-      await queueExperiment({
+      await experimentRunQueue({
         cwd: config.workspaceRoot,
         cliPath: config.dvcPath,
         pythonBinPath: config.pythonBinPath

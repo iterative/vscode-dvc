@@ -56,7 +56,7 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.showExperiments', () => {
     it('should be able to make the experiments webview visible', async () => {
-      const mockReader = stub(DvcReader, 'getExperiments').resolves(
+      const mockReader = stub(DvcReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
@@ -75,7 +75,7 @@ suite('Extension Test Suite', () => {
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
 
-      const mockReader = stub(DvcReader, 'getExperiments').resolves(
+      const mockReader = stub(DvcReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 

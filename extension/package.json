@@ -200,31 +200,6 @@
           "command": "dvc.commit",
           "group": "navigation",
           "when": "scmProvider == dvc"
-        },
-        {
-          "command": "dvc.showExperiments",
-          "group": "experiments",
-          "when": "scmProvider == dvc"
-        },
-        {
-          "command": "dvc.runExperiment",
-          "group": "experiments",
-          "when": "scmProvider == dvc"
-        },
-        {
-          "command": "dvc.runResetExperiment",
-          "group": "experiments",
-          "when": "scmProvider == dvc"
-        },
-        {
-          "command": "dvc.runQueuedExperiments",
-          "group": "experiments",
-          "when": "scmProvider == dvc"
-        },
-        {
-          "command": "dvc.stopRunningExperiment",
-          "group": "experiments",
-          "when": "scmProvider == dvc"
         }
       ],
       "scm/resourceState/context": [
@@ -241,12 +216,12 @@
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc"
+          "when": "scmProvider == dvc && scmResourceState != deleted"
         },
         {
           "command": "dvc.pushTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && scmResourceState != remoteOnly"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
         },
         {
           "command": "dvc.pullTarget",
