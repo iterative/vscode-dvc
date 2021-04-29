@@ -104,7 +104,7 @@ export class DecorationProvider implements FileDecorationProvider {
     this.dispose.track(window.registerFileDecorationProvider(this))
   }
 
-  async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
+  public provideFileDecoration(uri: Uri): FileDecoration | undefined {
     if (this.state.deleted?.has(uri.fsPath)) {
       return DecorationProvider.DecorationDeleted
     }

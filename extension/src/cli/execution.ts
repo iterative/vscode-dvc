@@ -84,7 +84,7 @@ export const createCliProcess = ({
   return process
 }
 
-export const executeCliProcess = async (
+export const executeCliProcess = (
   options: ExecutionOptions,
   ...args: Args
 ): Promise<string> => {

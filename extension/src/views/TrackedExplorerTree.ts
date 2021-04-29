@@ -40,7 +40,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private async getRootElements() {
     const rootElements = await Promise.all(
-      this.dvcRoots.map(async dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
+      this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
     )
     return rootElements
       .reduce((a, b) => a.concat(b), [])
@@ -54,7 +54,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       })
   }
 
-  public async getChildren(element?: string): Promise<string[]> {
+  public getChildren(element?: string): Promise<string[]> {
     if (element) {
       return this.readDirectory(this.pathRoots[element], element)
     }
@@ -63,7 +63,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return this.getRootElements()
     }
 
-    return []
+    return Promise.resolve([])
   }
 
   getTreeItem(element: string): TreeItem {

@@ -47,7 +47,8 @@ module.exports = {
     // This project doesn't use prop types
     'react/prop-types': 'off',
     curly: ['error', 'all'],
-    '@typescript-eslint/prefer-optional-chain': 'error'
+    '@typescript-eslint/prefer-optional-chain': 'error',
+    'require-await': 'error'
   },
   env: {
     'jest/globals': true
