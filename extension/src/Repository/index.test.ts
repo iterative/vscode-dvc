@@ -7,7 +7,6 @@ import { DecorationProvider } from './DecorationProvider'
 import { Repository, RepositoryState } from '.'
 import { listDvcOnlyRecursive, status } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { exists } from '../fileSystem'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/SourceControlManagement')
@@ -35,9 +34,6 @@ mockedDecorationProvider.mockImplementation(function() {
     setState: mockedSetDecorationState
   } as unknown) as DecorationProvider
 })
-
-const mockedExists = mocked(exists)
-mockedExists.mockReturnValue(true)
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -113,7 +109,6 @@ describe('Repository', () => {
           dispose: Disposable.fn(),
           deleted: emptySet,
           notInCache: emptySet,
-          remoteOnly: emptySet,
           new: emptySet,
           modified,
           tracked,
@@ -123,7 +118,92 @@ describe('Repository', () => {
     })
   })
 
-  describe('updateState', () => {
+  describe('resetState', () => {
+    it('will not exclude changed outs from stages that are always changed', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedStatus.mockResolvedValueOnce({})
+      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+
+      const config = ({
+        dvcPath: undefined
+      } as unknown) as Config
+      const decorationProvider = new DecorationProvider()
+
+      const repository = new Repository(dvcRoot, config, decorationProvider)
+      await repository.ready
+
+      const dataDir = 'data/MNIST/raw'
+      const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
+      const dataset = join(dataDir, 't10k-images-idx3-ubyte')
+      const logDir = 'logs'
+      const logAcc = join(logDir, 'acc.tsv')
+      const logLoss = join(logDir, 'loss.tsv')
+      const model = 'model.pt'
+
+      mockedStatus.mockResolvedValueOnce({
+        train: [
+          {
+            'changed deps': { 'data/MNIST': 'modified', 'train.py': 'modified' }
+          },
+          { 'changed outs': { 'model.pt': 'deleted' } },
+          'always changed'
+        ],
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
+        ]
+      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+
+      const emptySet = new Set<string>()
+
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
+
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([
+        compressedDataset,
+        dataset,
+        logAcc,
+        logLoss,
+        model
+      ])
+
+      expect(repository.getState()).toEqual(new RepositoryState())
+
+      await repository.resetState()
+
+      const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
+
+      const tracked = new Set([
+        resolve(dvcRoot, compressedDataset),
+        resolve(dvcRoot, dataset),
+        resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logLoss),
+        resolve(dvcRoot, model),
+        resolve(dvcRoot, dataDir),
+        resolve(dvcRoot, logDir)
+      ])
+
+      const expectedExecutionOptions = {
+        cliPath: undefined,
+        cwd: dvcRoot,
+        pythonBinPath: undefined
+      }
+
+      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
+        expectedExecutionOptions
+      )
+
+      expect(repository.getState()).toEqual({
+        dispose: Disposable.fn(),
+        new: emptySet,
+        modified: emptySet,
+        notInCache: emptySet,
+        deleted,
+        tracked,
+        untracked: emptySet
+      })
+    })
+
     it("should update the classes state and call it's dependents", async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
@@ -135,6 +215,7 @@ describe('Repository', () => {
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
+      await repository.ready
 
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')
@@ -183,7 +264,7 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(new RepositoryState())
 
-      await repository.updateState()
+      await repository.resetState()
 
       const deleted = new Set([join(dvcRoot, 'model.pkl')])
       const modified = new Set([join(dvcRoot, 'data/features')])
@@ -216,7 +297,6 @@ describe('Repository', () => {
         new: new Set(),
         modified,
         notInCache,
-        remoteOnly: new Set(),
         deleted,
         tracked,
         untracked

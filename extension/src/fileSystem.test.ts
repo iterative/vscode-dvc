@@ -13,7 +13,6 @@ const {
   findDvcRootPaths,
   getWatcher,
   isDirectory,
-  matchDotDirectoryPath,
   pickSingleRepositoryRoot
 } = FileSystem
 
@@ -71,9 +70,7 @@ describe('addOnFileSystemChangeHandler', () => {
       trailing: false
     })
 
-    expect(mockedWatch).toBeCalledWith(file, {
-      ignored: /.*?[\\|/]\.\S+[\\|/].*/
-    })
+    expect(mockedWatch).toBeCalledWith(file)
     expect(mockedWatch).toBeCalledTimes(1)
 
     expect(mockedWatcher.on).toBeCalledTimes(6)
@@ -83,50 +80,6 @@ describe('addOnFileSystemChangeHandler', () => {
     expect(mockedWatcher.on).toBeCalledWith('change', func)
     expect(mockedWatcher.on).toBeCalledWith('unlink', func)
     expect(mockedWatcher.on).toBeCalledWith('unlinkDir', func)
-  })
-})
-
-describe('matchDotDirectoryPath', () => {
-  it('should match all paths under dot directories', () => {
-    expect(
-      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.dvc/tmp')
-    ).toBe(true)
-    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\.env\\bin')).toBe(
-      true
-    )
-
-    expect(
-      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.env/bin')
-    ).toBe(true)
-    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\.env\\bin')).toBe(
-      true
-    )
-  })
-  it('should not match dot files', () => {
-    expect(
-      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/.gitignore')
-    ).toBe(false)
-    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\.gitignore')).toBe(
-      false
-    )
-  })
-
-  it('should not match normal directories', () => {
-    expect(
-      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/data/MNIST')
-    ).toBe(false)
-    expect(
-      matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\data\\MNIST')
-    ).toBe(false)
-  })
-
-  it('should not match normal files', () => {
-    expect(
-      matchDotDirectoryPath.test('/Users/robot/vscode-dvc/demo/train.py')
-    ).toBe(false)
-    expect(matchDotDirectoryPath.test('C:\\vscode-dvc\\demo\\train.py')).toBe(
-      false
-    )
   })
 })
 

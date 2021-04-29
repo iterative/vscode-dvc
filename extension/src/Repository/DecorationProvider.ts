@@ -18,7 +18,6 @@ enum Status {
   MODIFIED = 'modified',
   NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
-  REMOTE_ONLY = 'remoteOnly',
   TRACKED = 'tracked'
 }
 
@@ -27,12 +26,6 @@ export class DecorationProvider implements FileDecorationProvider {
     badge: 'D',
     color: new ThemeColor('gitDecoration.deletedResourceForeground'),
     tooltip: 'DVC deleted'
-  }
-
-  private static DecorationRemoteOnly: FileDecoration = {
-    badge: 'R',
-    color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
-    tooltip: 'DVC remote only'
   }
 
   private static DecorationModified: FileDecoration = {
@@ -107,9 +100,6 @@ export class DecorationProvider implements FileDecorationProvider {
   async provideFileDecoration(uri: Uri): Promise<FileDecoration | undefined> {
     if (this.state.deleted?.has(uri.fsPath)) {
       return DecorationProvider.DecorationDeleted
-    }
-    if (this.state.remoteOnly?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationRemoteOnly
     }
     if (this.state.new?.has(uri.fsPath)) {
       return DecorationProvider.DecorationNew
