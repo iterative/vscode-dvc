@@ -67,9 +67,7 @@ const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
 const parseExperiments: (
   experimentsData: ExperimentsRepoJSONOutput
 ) => ParseExperimentsOutput = experimentsData => {
-  const parsedEntries = Object.entries(experimentsData).reduce<
-    ParseExperimentsOutput
-  >(
+  return Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
     (
       { experiments, flatExperiments },
       [commitId, { baseline, ...childExperiments }]
@@ -98,7 +96,6 @@ const parseExperiments: (
       flatExperiments: []
     }
   )
-  return parsedEntries
 }
 
 export default parseExperiments

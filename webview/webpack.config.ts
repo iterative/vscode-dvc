@@ -72,15 +72,13 @@ module.exports = {
     fs: 'empty'
   },
   plugins: (() => {
-    const plugins: Plugin[] = [
+    return [
       new HtmlWebpackPlugin({
         title: WebviewType
       }),
       new ForkTsCheckerWebpackPlugin(),
       new CleanWebpackPlugin()
     ]
-
-    return plugins
   })(),
   devServer: {
     disableHostCheck: true,

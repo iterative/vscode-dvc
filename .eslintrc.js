@@ -3,14 +3,15 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jest', 'react-hooks', 'jsx-a11y'],
+  plugins: ['@typescript-eslint', 'jest', 'react-hooks', 'jsx-a11y', 'sonarjs'],
   extends: [
     'prettier-standard/prettier-file',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
     'plugin:jest/recommended',
-    'plugin:jsx-a11y/recommended'
+    'plugin:jsx-a11y/recommended',
+    'plugin:sonarjs/recommended'
   ],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 'off',
@@ -47,7 +48,10 @@ module.exports = {
     // This project doesn't use prop types
     'react/prop-types': 'off',
     curly: ['error', 'all'],
-    '@typescript-eslint/prefer-optional-chain': 'error'
+    '@typescript-eslint/prefer-optional-chain': 'error',
+    'max-nested-callbacks': ['error', 4],
+    'sonarjs/cognitive-complexity': ['error', 5],
+    complexity: ['error', 3]
   },
   env: {
     'jest/globals': true

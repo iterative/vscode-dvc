@@ -225,12 +225,10 @@ const buildDynamicColumnsFromExperiments: (
   const paramsProperties = convertObjectsToProperties(params as ValueTree[])
   const metricsProperties = convertObjectsToProperties(metrics as ValueTree[])
 
-  const columns = [
+  return [
     ...buildColumnsFromSchemaProperties(paramsProperties, ['params']),
     ...buildColumnsFromSchemaProperties(metricsProperties, ['metrics'])
   ]
-
-  return columns
 }
 
 export default buildDynamicColumnsFromExperiments
