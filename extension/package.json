@@ -241,7 +241,7 @@
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc"
+          "when": "scmProvider == dvc && scmResourceState != deleted"
         },
         {
           "command": "dvc.pushTarget",
