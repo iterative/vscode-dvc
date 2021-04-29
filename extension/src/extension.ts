@@ -290,7 +290,7 @@ export class Extension {
 
           this.dispose.track(
             gitExtensionRepository.onDidChange(() => {
-              repository?.resetState()
+              repository?.updateState()
             })
           )
         })
