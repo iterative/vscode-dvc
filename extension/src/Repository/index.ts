@@ -66,6 +66,10 @@ export class Repository {
     return this.state
   }
 
+  public getTracked() {
+    return this.state.tracked
+  }
+
   @observable
   private state: RepositoryState
 
@@ -166,25 +170,34 @@ export class Repository {
     this.state.untracked = await getAllUntracked(this.dvcRoot)
   }
 
-  public async updateState() {
-    const promisesForScm = Promise.all([
-      this.updateUntracked(),
-      this.updateStatus()
-    ])
+  private updateStatuses() {
+    return Promise.all([this.updateUntracked(), this.updateStatus()])
+  }
 
-    const slowerListPromise = this.updateList()
+  public async resetState() {
+    const statusesUpdated = this.updateStatuses()
 
-    await promisesForScm
+    const slowerTrackedUpdated = this.updateList()
+
+    await statusesUpdated
     this.sourceControlManagement.setState(this.state)
 
-    await slowerListPromise
-    if (this.decorationProvider) {
-      this.decorationProvider.setState(this.state)
-    }
+    await slowerTrackedUpdated
+    this.decorationProvider?.setState(this.state)
+  }
+
+  private setState() {
+    this.sourceControlManagement.setState(this.state)
+    this.decorationProvider?.setState(this.state)
+  }
+
+  public async updateState() {
+    await this.updateStatuses()
+    this.setState()
   }
 
   private async setup() {
-    await this.updateState()
+    await this.resetState()
     return this._initialized.resolve()
   }
 
