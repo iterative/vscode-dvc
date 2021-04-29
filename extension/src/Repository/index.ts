@@ -23,11 +23,13 @@ enum ChangedType {
   CHANGED_DEPS = 'changed deps'
 }
 
-type StatusOrAlwaysChanged = Record<ChangedType, PathStatus> | 'always changed'
+type StatusesOrAlwaysChanged =
+  | Record<ChangedType, PathStatus>
+  | 'always changed'
 
-type StatusOutput = Record<string, StatusOrAlwaysChanged[]>
+type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
-type StageOrFileStatus = Record<ChangedType, PathStatus>
+type StageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type PathStatus = Record<string, Status>
 
@@ -109,10 +111,10 @@ export class Repository {
   }
 
   private getChangedOutsStatuses(
-    fileOrStage: StatusOrAlwaysChanged[]
+    fileOrStage: StatusesOrAlwaysChanged[]
   ): PathStatus[] {
     return fileOrStage
-      .map(entry => (entry as StageOrFileStatus)?.[ChangedType.CHANGED_OUTS])
+      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
       .filter(value => value)
   }
 
@@ -134,7 +136,7 @@ export class Repository {
   ): Partial<Record<Status, Set<string>>> {
     const statusReducer = (
       reducedStatus: Partial<Record<Status, Set<string>>>,
-      entry: StatusOrAlwaysChanged[]
+      entry: StatusesOrAlwaysChanged[]
     ): Partial<Record<Status, Set<string>>> => {
       const statuses = this.getChangedOutsStatuses(entry)
 
