@@ -1,4 +1,4 @@
-import { getExperiments, root, listDvcOnlyRecursive } from './reader'
+import { experimentShow, root, listDvcOnlyRecursive } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
@@ -20,14 +20,14 @@ beforeEach(() => {
   mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
 
-describe('getExperiments', () => {
+describe('experimentShow', () => {
   it('should match a snapshot when parsed', async () => {
     const cwd = resolve()
     mockedExecuteProcess.mockResolvedValueOnce(
       JSON.stringify(complexExperimentsOutput)
     )
 
-    const experiments = await getExperiments({
+    const experiments = await experimentShow({
       cliPath: undefined,
       pythonBinPath: undefined,
       cwd
