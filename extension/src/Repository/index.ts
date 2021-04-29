@@ -209,7 +209,6 @@ export class Repository {
     if (this.decorationProvider) {
       this.decorationProvider.setState(this.state)
     }
-    this.sourceControlManagement.setState(this.state)
   }
 
   private async setup() {
