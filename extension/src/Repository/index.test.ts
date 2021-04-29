@@ -118,7 +118,7 @@ describe('Repository', () => {
     })
   })
 
-  describe('updateState', () => {
+  describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
@@ -130,6 +130,7 @@ describe('Repository', () => {
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
+      await repository.ready
 
       const dataDir = 'data/MNIST/raw'
       const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
@@ -166,7 +167,7 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(new RepositoryState())
 
-      await repository.updateState()
+      await repository.resetState()
 
       const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
 
@@ -214,6 +215,7 @@ describe('Repository', () => {
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
+      await repository.ready
 
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')
@@ -262,7 +264,7 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(new RepositoryState())
 
-      await repository.updateState()
+      await repository.resetState()
 
       const deleted = new Set([join(dvcRoot, 'model.pkl')])
       const modified = new Set([join(dvcRoot, 'data/features')])

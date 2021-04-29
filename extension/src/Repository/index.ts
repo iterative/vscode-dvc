@@ -170,39 +170,34 @@ export class Repository {
     this.state.untracked = await getAllUntracked(this.dvcRoot)
   }
 
-  public async updateState() {
-    const promisesForScm = Promise.all([
-      this.updateUntracked(),
-      this.updateStatus()
-    ])
-
-    const slowerListPromise = this.updateList()
-
-    await promisesForScm
-    this.sourceControlManagement.setState(this.state)
-
-    await slowerListPromise
-    if (this.decorationProvider) {
-      this.decorationProvider.setState(this.state)
-    }
+  private updateScmStatuses() {
+    return Promise.all([this.updateUntracked(), this.updateStatus()])
   }
 
-  public async quickUpdateState() {
-    const promisesForScm = Promise.all([
-      this.updateUntracked(),
-      this.updateStatus()
-    ])
+  public async resetState() {
+    const scmStatusesUpdated = this.updateScmStatuses()
 
-    await promisesForScm
+    const slowerTrackedUpdated = this.updateList()
+
+    await scmStatusesUpdated
     this.sourceControlManagement.setState(this.state)
 
-    if (this.decorationProvider) {
-      this.decorationProvider.setState(this.state)
-    }
+    await slowerTrackedUpdated
+    this.decorationProvider?.setState(this.state)
+  }
+
+  private setState() {
+    this.sourceControlManagement.setState(this.state)
+    this.decorationProvider?.setState(this.state)
+  }
+
+  public async updateState() {
+    await this.updateScmStatuses()
+    this.setState()
   }
 
   private async setup() {
-    await this.updateState()
+    await this.resetState()
     return this._initialized.resolve()
   }
 
