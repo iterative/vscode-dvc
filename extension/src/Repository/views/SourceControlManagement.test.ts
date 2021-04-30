@@ -9,11 +9,6 @@ jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
 const mockedScm = mocked(scm)
-const mockedCreateSourceControl = jest.fn().mockReturnValue({
-  inputBox: { visible: true },
-  createResourceGroup: jest.fn().mockReturnValue({})
-})
-mockedScm.createSourceControl = mockedCreateSourceControl
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -22,6 +17,12 @@ beforeEach(() => {
 describe('SourceControlManagement', () => {
   describe('setState', () => {
     it('should be able to set the state', () => {
+      const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
+        inputBox: { visible: true },
+        createResourceGroup: jest.fn().mockReturnValueOnce({})
+      })
+      mockedScm.createSourceControl = mockedCreateSourceControl
+
       const initialState = {} as SourceControlManagementState
       const sourceControlManagement = new SourceControlManagement(
         __dirname,

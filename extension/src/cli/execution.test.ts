@@ -10,13 +10,12 @@ jest.mock('../processExecution')
 const mockedGetEnv = mocked(getProcessEnv)
 const mockedCreateProcess = mocked(createProcess)
 
-mockedCreateProcess.mockReturnValue(({
-  on: jest.fn(),
-  all: { on: jest.fn() }
-} as unknown) as Process)
-
 beforeEach(() => {
-  jest.clearAllMocks()
+  jest.resetAllMocks()
+  mockedCreateProcess.mockReturnValue(({
+    on: jest.fn(),
+    all: { on: jest.fn() }
+  } as unknown) as Process)
 })
 
 describe('createCliProcess', () => {

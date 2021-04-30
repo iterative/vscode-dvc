@@ -43,7 +43,7 @@ describe('addOnFileSystemChangeHandler', () => {
     const func = () => undefined
 
     const mockedWatcher = mocked(new FSWatcher())
-    mockedWatch.mockReturnValue(mockedWatcher)
+    mockedWatch.mockReturnValueOnce(mockedWatcher)
 
     const getWatcherSpy = jest
       .spyOn(FileSystem, 'getWatcher')
