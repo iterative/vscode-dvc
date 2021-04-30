@@ -73,7 +73,7 @@ describe('experimentRunQueueCommand', () => {
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
     const stderr = 'Example stderr that will be resolved literally'
-    mockedExecuteProcess.mockRejectedValue(stderr)
+    mockedExecuteProcess.mockRejectedValueOnce(stderr)
     await experimentRunQueueCommand(exampleConfig)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
@@ -148,14 +148,14 @@ describe('experimentGcCommand', () => {
   it('reports stderr from the executed command via showInformationMessage', async () => {
     const stderr = 'example stderr that will be passed on'
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValue(stderr)
+    mockedExecuteProcess.mockRejectedValueOnce(stderr)
     await experimentGcQuickPick(exampleConfig)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 
   it('throws from a non-shell Exception', async () => {
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValue('')
+    mockedExecuteProcess.mockRejectedValueOnce('')
     await expect(experimentGcQuickPick(exampleConfig)).rejects.toThrow()
     expect(mockedShowErrorMessage).not.toBeCalled()
   })
@@ -205,7 +205,7 @@ describe('applyExperimentFromQuickPick', () => {
 
   it('throws from a non-shell Exception', async () => {
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValue('')
+    mockedExecuteProcess.mockRejectedValueOnce('')
     await expect(applyExperimentFromQuickPick(exampleConfig)).rejects.toThrow()
     expect(mockedShowErrorMessage).not.toBeCalled()
   })
