@@ -215,7 +215,7 @@ describe('pickSingleRepositoryRoot', () => {
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
 
-    mockedShowRepoQuickPick.mockResolvedValue(selectedRepo)
+    mockedShowRepoQuickPick.mockResolvedValueOnce(selectedRepo)
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
@@ -234,7 +234,7 @@ describe('pickSingleRepositoryRoot', () => {
     const unselectedRepoB = '/some/path/to/repo/b'
     const unselectedRepoC = '/some/path/to/repo/c'
 
-    mockedShowRepoQuickPick.mockResolvedValue(undefined)
+    mockedShowRepoQuickPick.mockResolvedValueOnce(undefined)
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
