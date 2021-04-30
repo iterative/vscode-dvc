@@ -29,16 +29,19 @@ const mockedDisposable = mocked(Disposable)
 
 beforeEach(() => {
   jest.resetAllMocks()
+
   mockedSourceControlManagement.mockImplementationOnce(function() {
     return ({
       setState: mockedSetScmState
     } as unknown) as SourceControlManagement
   })
+
   mockedDecorationProvider.mockImplementationOnce(function() {
     return ({
       setState: mockedSetDecorationState
     } as unknown) as DecorationProvider
   })
+
   mockedDisposable.fn.mockReturnValueOnce(({
     track: function<T>(disposable: T): T {
       return disposable
