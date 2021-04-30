@@ -14,6 +14,7 @@ export function run(): Promise<void> {
 
   const testsRoot = resolvePath(__dirname, '..')
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   return new Promise((resolve, reject) => {
     glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
       if (err) {

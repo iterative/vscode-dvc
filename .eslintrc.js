@@ -49,9 +49,7 @@ module.exports = {
     'react/prop-types': 'off',
     curly: ['error', 'all'],
     '@typescript-eslint/prefer-optional-chain': 'error',
-    'max-nested-callbacks': ['error', 4],
-    'sonarjs/cognitive-complexity': ['error', 5],
-    complexity: ['error', 3]
+    'sonarjs/cognitive-complexity': ['error', 5]
   },
   env: {
     'jest/globals': true

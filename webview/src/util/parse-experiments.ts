@@ -36,7 +36,7 @@ const isTopLevelExperiment: (row: ExperimentWithId) => boolean = ({
   checkpoint_tip
 }) => queued || (checkpoint_tip ? id === checkpoint_tip : true)
 
-const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
+const groupCheckpoints = (rows: Experiment[]): Experiment[] => {
   let currentTip: Experiment | undefined
   let currentEpochs: Experiment[] = []
   const result: Experiment[] = []

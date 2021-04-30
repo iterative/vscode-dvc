@@ -40,9 +40,11 @@ beforeEach(() => {
   mockedGetProcessEnv.mockReturnValue(mockedEnv)
 })
 
+const defaultPath = '/home/user/project'
+
 const exampleConfig = {
   dvcPath: 'dvc',
-  workspaceRoot: '/home/user/project'
+  workspaceRoot: defaultPath
 } as Config
 
 const exampleExperimentsList = [
@@ -192,14 +194,14 @@ describe('experimentsQuickPickCommand and applyExperimentFromQuickPick', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'list', '--names-only'],
-      cwd: '/home/user/project',
+      cwd: defaultPath,
       env: mockedEnv
     })
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'apply', 'exp-2021'],
-      cwd: '/home/user/project',
+      cwd: defaultPath,
       env: mockedEnv
     })
   })
@@ -243,7 +245,7 @@ describe('removeExperimentFromQuickPick', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'remove', 'exp-2021'],
-      cwd: '/home/user/project',
+      cwd: defaultPath,
       env: mockedEnv
     })
   })
@@ -264,7 +266,7 @@ describe('branchExperimentFromQuickPick', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
-      cwd: '/home/user/project',
+      cwd: defaultPath,
       env: mockedEnv
     })
   })

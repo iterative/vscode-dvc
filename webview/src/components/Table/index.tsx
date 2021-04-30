@@ -43,11 +43,10 @@ export const ParentHeaderGroup: React.FC<{
   )
 }
 
-export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
-  cell
-}) => {
-  const { row } = cell
-
+const getFirstCellProps = (
+  cell: Cell<Experiment, unknown>,
+  row: Row<Experiment>
+) => {
   const baseFirstCellProps = cell.getCellProps({
     className: cx(
       styles.firstCell,
@@ -58,18 +57,29 @@ export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
       cell.isGrouped && styles.groupedCell
     )
   })
-  const firstCellProps = row.canExpand
-    ? row.getToggleRowExpandedProps({
-        ...baseFirstCellProps,
-        className: cx(
-          baseFirstCellProps.className,
-          styles.expandableExperimentCell,
-          row.isExpanded
-            ? styles.expandedExperimentCell
-            : styles.contractedExperimentCell
-        )
-      })
-    : baseFirstCellProps
+
+  if (!row.canExpand) {
+    return baseFirstCellProps
+  }
+
+  return row.getToggleRowExpandedProps({
+    ...baseFirstCellProps,
+    className: cx(
+      baseFirstCellProps.className,
+      styles.expandableExperimentCell,
+      row.isExpanded
+        ? styles.expandedExperimentCell
+        : styles.contractedExperimentCell
+    )
+  })
+}
+
+export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
+  cell
+}) => {
+  const { row } = cell
+
+  const firstCellProps = getFirstCellProps(cell, row)
 
   return (
     <div {...firstCellProps}>
@@ -154,10 +164,29 @@ export const PrimaryHeaderGroup: React.FC<{
   )
 }
 
+const getCells = (cells: Cell<Experiment, unknown>[]) =>
+  cells.map(cell => {
+    return (
+      <div
+        {...cell.getCellProps({
+          className: cx(
+            styles.td,
+            cell.isPlaceholder && styles.groupPlaceholder,
+            cell.column.isGrouped && styles.groupedColumnCell,
+            cell.isGrouped && styles.groupedCell
+          )
+        })}
+        key={`${cell.column.id}___${cell.row.id}`}
+      >
+        {cell.isPlaceholder ? null : cell.render('Cell')}
+      </div>
+    )
+  })
+
 export const RowContent: React.FC<RowProp & { className?: string }> = ({
   row,
   className
-}) => {
+}): JSX.Element => {
   const [firstCell, ...cells] = row.cells
   return (
     <div
@@ -174,23 +203,7 @@ export const RowContent: React.FC<RowProp & { className?: string }> = ({
       })}
     >
       <FirstCell cell={firstCell} />
-      {cells.map(cell => {
-        return (
-          <div
-            {...cell.getCellProps({
-              className: cx(
-                styles.td,
-                cell.isPlaceholder && styles.groupPlaceholder,
-                cell.column.isGrouped && styles.groupedColumnCell,
-                cell.isGrouped && styles.groupedCell
-              )
-            })}
-            key={`${cell.column.id}___${cell.row.id}`}
-          >
-            {cell.isPlaceholder ? null : cell.render('Cell')}
-          </div>
-        )
-      })}
+      {getCells(cells)}
     </div>
   )
 }

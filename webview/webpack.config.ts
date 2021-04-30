@@ -7,6 +7,9 @@ import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
 
+const styleLoader = 'style-loader'
+const cssLoader = 'css-loader'
+
 module.exports = {
   entry: [r('src/index.tsx')],
   output: {
@@ -30,14 +33,14 @@ module.exports = {
     rules: [
       {
         test: /\.less$/,
-        loaders: ['style-loader', 'css-loader', 'less-loader']
+        loaders: [styleLoader, cssLoader, 'less-loader']
       },
       {
         test: /\.css$/,
         loaders: [
-          'style-loader',
+          styleLoader,
           {
-            loader: 'css-loader',
+            loader: cssLoader,
             options: {
               modules: { auto: true }
             }
@@ -47,9 +50,9 @@ module.exports = {
       {
         test: /\.scss$/,
         loaders: [
-          'style-loader',
+          styleLoader,
           {
-            loader: 'css-loader',
+            loader: cssLoader,
             options: {
               modules: { auto: true }
             }

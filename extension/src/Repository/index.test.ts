@@ -4,7 +4,7 @@ import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository, RepositoryState } from '.'
+import { Repository, RepositoryState, Status } from '.'
 import { listDvcOnlyRecursive, status } from '../cli/reader'
 import { getAllUntracked } from '../git'
 
@@ -231,11 +231,11 @@ describe('Repository', () => {
 
       mockedStatus.mockResolvedValueOnce({
         prepare: [
-          { 'changed deps': { 'data/data.xml': 'not in cache' } },
-          { 'changed outs': { 'data/prepared': 'not in cache' } }
+          { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
+          { 'changed outs': { 'data/prepared': Status.NOT_IN_CACHE } }
         ],
         featurize: [
-          { 'changed deps': { 'data/prepared': 'not in cache' } },
+          { 'changed deps': { 'data/prepared': Status.NOT_IN_CACHE } },
           { 'changed outs': { 'data/features': 'modified' } }
         ],
         train: [
@@ -251,7 +251,7 @@ describe('Repository', () => {
           }
         ],
         'data/data.xml.dvc': [
-          { 'changed outs': { 'data/data.xml': 'not in cache' } }
+          { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
         ]
       } as Record<string, (Record<string, Record<string, string>> | string)[]>)
 

@@ -81,12 +81,10 @@ const getCellComponent: (
   if (Array.isArray(propertyType)) {
     return makeMixedCellComponent(schemaProperty)
   }
-  switch (propertyType) {
-    case 'number':
-      return getNumberCellComponent(schemaProperty)
-    default:
-      return StringCell
+  if (propertyType === 'number') {
+    return getNumberCellComponent(schemaProperty)
   }
+  return StringCell
 }
 
 const buildColumnIdFromPath = (objectPath: string[]) =>
@@ -204,14 +202,8 @@ const buildColumnsFromSchemaProperties: (
   })
 }
 
-const buildDynamicColumnsFromExperiments: (
-  data: Experiment[]
-) => Column<Experiment>[] = data => {
-  if (!data || data.length === 0) {
-    return []
-  }
-
-  const { params, metrics } = data.reduce<{
+const dataReducer = (data: Experiment[]) =>
+  data.reduce<{
     params: DataDictRoot[]
     metrics: DataDictRoot[]
   }>(
@@ -221,6 +213,15 @@ const buildDynamicColumnsFromExperiments: (
     }),
     { params: [], metrics: [] }
   )
+
+const buildDynamicColumnsFromExperiments = (
+  data: Experiment[]
+): Column<Experiment>[] => {
+  if (!data || data?.length === 0) {
+    return []
+  }
+
+  const { params, metrics } = dataReducer(data)
 
   const paramsProperties = convertObjectsToProperties(params as ValueTree[])
   const metricsProperties = convertObjectsToProperties(metrics as ValueTree[])
