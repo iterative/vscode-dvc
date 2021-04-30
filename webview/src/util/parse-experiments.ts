@@ -36,40 +36,44 @@ const isTopLevelExperiment: (row: ExperimentWithId) => boolean = ({
   checkpoint_tip
 }) => queued || (checkpoint_tip ? id === checkpoint_tip : true)
 
-const groupCheckpoints: (rows: Experiment[]) => Experiment[] = rows => {
+const pushResult = (
+  currentTip: Experiment | undefined,
+  currentEpochs: Experiment[],
+  result: Experiment[]
+): void => {
+  if (currentTip) {
+    const resultToPush = {
+      ...currentTip
+    }
+    if (currentEpochs.length > 0) {
+      resultToPush.subRows = currentEpochs
+    }
+    result.push(resultToPush)
+  }
+}
+
+const groupCheckpoints = (rows: Experiment[]): Experiment[] => {
   let currentTip: Experiment | undefined
   let currentEpochs: Experiment[] = []
   const result: Experiment[] = []
-  const pushResult: () => void = () => {
-    if (currentTip) {
-      const resultToPush = {
-        ...currentTip
-      }
-      if (currentEpochs.length > 0) {
-        resultToPush.subRows = currentEpochs
-      }
-      result.push(resultToPush)
-    }
-  }
+
   for (const row of rows) {
     if (isTopLevelExperiment(row)) {
-      pushResult()
+      pushResult(currentTip, currentEpochs, result)
       currentTip = row
       currentEpochs = []
     } else {
       currentEpochs.push({ ...row })
     }
   }
-  pushResult()
+  pushResult(currentTip, currentEpochs, result)
   return result
 }
 
 const parseExperiments: (
   experimentsData: ExperimentsRepoJSONOutput
 ) => ParseExperimentsOutput = experimentsData => {
-  const parsedEntries = Object.entries(experimentsData).reduce<
-    ParseExperimentsOutput
-  >(
+  return Object.entries(experimentsData).reduce<ParseExperimentsOutput>(
     (
       { experiments, flatExperiments },
       [commitId, { baseline, ...childExperiments }]
@@ -98,7 +102,6 @@ const parseExperiments: (
       flatExperiments: []
     }
   )
-  return parsedEntries
 }
 
 export default parseExperiments

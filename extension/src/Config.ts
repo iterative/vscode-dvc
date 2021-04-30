@@ -61,12 +61,14 @@ export class Config {
     return workspaceFolders[0].uri.fsPath
   }
 
+  private dvcPathOption = 'dvc.dvcPath'
+
   public get dvcPath(): string {
-    return workspace.getConfiguration().get('dvc.dvcPath', '')
+    return workspace.getConfiguration().get(this.dvcPathOption, '')
   }
 
   private setDvcPath(path?: string): Thenable<void> {
-    return workspace.getConfiguration().update('dvc.dvcPath', path)
+    return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
   private createDvcPathStatusBarItem = () => {
@@ -79,37 +81,39 @@ export class Config {
     return dvcPathStatusBarItem
   }
 
-  public selectDvcPath = async (): Promise<void> => {
-    const result = await window.showQuickPick(
-      [
-        {
-          label: 'Default',
-          description: 'Use Python Extension virtual environment if available',
-          picked: true,
-          value: undefined
-        },
-        {
-          label: 'Find',
-          description: 'Browse the filesystem for a DVC executable',
-          value: async () => {
-            const result = await window.showOpenDialog({
-              title: 'Select a DVC executable'
-            })
-            if (result) {
-              const [input] = result
-              const { fsPath } = input
-              this.setDvcPath(fsPath)
-              return fsPath
-            } else {
-              return undefined
-            }
+  private getDvcPathQuickPickOptions() {
+    return [
+      {
+        label: 'Default',
+        description: 'Use Python Extension virtual environment if available',
+        picked: true,
+        value: undefined
+      },
+      {
+        label: 'Find',
+        description: 'Browse the filesystem for a DVC executable',
+        value: async () => {
+          const result = await window.showOpenDialog({
+            title: 'Select a DVC executable'
+          })
+          if (result) {
+            const [input] = result
+            const { fsPath } = input
+            this.setDvcPath(fsPath)
+            return fsPath
+          } else {
+            return undefined
           }
         }
-      ],
-      {
-        placeHolder: 'Please choose...'
       }
-    )
+    ]
+  }
+
+  public selectDvcPath = async (): Promise<void> => {
+    const quickPickOptions = this.getDvcPathQuickPickOptions()
+    const result = await window.showQuickPick(quickPickOptions, {
+      placeHolder: 'Please choose...'
+    })
     if (result) {
       const { value } = result
       if (typeof value === 'function') {
@@ -154,7 +158,7 @@ export class Config {
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration('dvc.dvcPath')) {
+        if (e.affectsConfiguration(this.dvcPathOption)) {
           this.onDidChangeEmitter.fire(e)
         }
       })
