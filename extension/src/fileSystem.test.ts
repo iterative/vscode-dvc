@@ -186,17 +186,18 @@ describe('isDirectory', () => {
 
 describe('pickSingleRepositoryRoot', () => {
   it('should return the optional repository if provided', async () => {
-    const optionallyProvidedRepo = '/some/path/to/repo/b'
+    const cwd = '/some/path/to'
+    const optionallyProvidedRepo = `${cwd}/repo/b`
 
     const repoRoot = await pickSingleRepositoryRoot(
-      { cliPath: undefined, cwd: '/some/path/to', pythonBinPath: undefined },
+      { cliPath: undefined, cwd, pythonBinPath: undefined },
       optionallyProvidedRepo
     )
     expect(repoRoot).toEqual(optionallyProvidedRepo)
   })
 
   it('should return the single repository if only one is found', async () => {
-    const singleRepo = '/some/path/to/repo/a'
+    const singleRepo = '/some/other/path/to/repo/a'
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
@@ -211,9 +212,9 @@ describe('pickSingleRepositoryRoot', () => {
   })
 
   it('should return the selected option if multiple repositories are found and one is selected', async () => {
-    const selectedRepo = '/some/path/to/repo/a'
-    const unselectedRepoB = '/some/path/to/repo/b'
-    const unselectedRepoC = '/some/path/to/repo/c'
+    const selectedRepo = '/path/to/repo/a'
+    const unselectedRepoB = '/path/to/repo/b'
+    const unselectedRepoC = '/path/to/repo/c'
 
     mockedShowRepoQuickPick.mockResolvedValueOnce(selectedRepo)
 
@@ -223,16 +224,16 @@ describe('pickSingleRepositoryRoot', () => {
 
     const repoRoot = await pickSingleRepositoryRoot({
       cliPath: undefined,
-      cwd: '/some/path/to',
+      cwd: '/path/to',
       pythonBinPath: undefined
     })
     expect(repoRoot).toEqual(selectedRepo)
   })
 
   it('should return undefined if multiple repositories are found but none are selected', async () => {
-    const selectedRepo = '/some/path/to/repo/a'
-    const unselectedRepoB = '/some/path/to/repo/b'
-    const unselectedRepoC = '/some/path/to/repo/c'
+    const selectedRepo = '/repo/path/a'
+    const unselectedRepoB = '/repo/path/b'
+    const unselectedRepoC = '/repo/path/c'
 
     mockedShowRepoQuickPick.mockResolvedValueOnce(undefined)
 

@@ -11,7 +11,7 @@ import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
 
-enum Status {
+export enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NEW = 'new',

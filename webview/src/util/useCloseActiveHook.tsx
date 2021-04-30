@@ -1,5 +1,21 @@
 import React from 'react'
 
+const addEventListeners = (
+  onClick: (e: Event) => void,
+  onEscape: (e: KeyboardEvent) => void
+) => {
+  window.addEventListener('click', onClick)
+  window.addEventListener('keydown', onEscape)
+}
+
+const removeEventListeners = (
+  onClick: (e: Event) => void,
+  onEscape: (e: KeyboardEvent) => void
+) => {
+  window.removeEventListener('click', onClick)
+  window.removeEventListener('keydown', onEscape)
+}
+
 export const useCloseActiveHook = (
   el: React.RefObject<HTMLElement>,
   initialState: boolean
@@ -9,7 +25,7 @@ export const useCloseActiveHook = (
   React.useEffect(() => {
     const onClick = (e: Event) => {
       const activeElement = el.current
-      if (activeElement && !activeElement.contains(e.target as HTMLElement)) {
+      if (!activeElement?.contains(e.target as HTMLElement)) {
         setIsActive(!isActive)
       }
     }
@@ -21,13 +37,11 @@ export const useCloseActiveHook = (
     }
 
     if (isActive) {
-      window.addEventListener('click', onClick)
-      window.addEventListener('keydown', onEscape)
+      addEventListeners(onClick, onEscape)
     }
 
     return () => {
-      window.removeEventListener('click', onClick)
-      window.removeEventListener('keydown', onEscape)
+      removeEventListeners(onClick, onEscape)
     }
   }, [isActive, el])
 

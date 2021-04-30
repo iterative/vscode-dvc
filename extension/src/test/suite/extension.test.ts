@@ -21,6 +21,8 @@ const { expect } = chai
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
+  const dvcPathOption = 'dvc.dvcPath'
+
   before(() => {
     stub(DvcReader, 'listDvcOnlyRecursive').resolves([
       join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
@@ -50,18 +52,19 @@ suite('Extension Test Suite', () => {
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   afterEach(async () => {
-    await workspace.getConfiguration().update('dvc.dvcPath', undefined, false)
+    await workspace.getConfiguration().update(dvcPathOption, undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
-  describe('dvc.showExperiments', () => {
+  describe('showExperiments', () => {
+    const showExperimentsCommand = 'dvc.showExperiments'
     it('should be able to make the experiments webview visible', async () => {
       const mockReader = stub(DvcReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
       const experimentsWebview = (await commands.executeCommand(
-        'dvc.showExperiments'
+        showExperimentsCommand
       )) as ExperimentsWebview
 
       expect(experimentsWebview.isActive()).to.be.true
@@ -85,7 +88,7 @@ suite('Extension Test Suite', () => {
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
       const experimentsWebview = (await commands.executeCommand(
-        'dvc.showExperiments'
+        showExperimentsCommand
       )) as ExperimentsWebview
 
       expect(windowSpy).to.have.been.calledOnce
@@ -127,7 +130,7 @@ suite('Extension Test Suite', () => {
       const mockShowInputBox = stub(window, 'showInputBox')
       await selectDvcPathItem(0)
 
-      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal('')
+      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
 
       expect(mockShowInputBox).not.to.have.been.called
 
@@ -159,7 +162,7 @@ suite('Extension Test Suite', () => {
 
       await configurationChangeEvent()
 
-      expect(await workspace.getConfiguration().get('dvc.dvcPath')).to.equal(
+      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         testUri.fsPath
       )
 

@@ -26,7 +26,7 @@ beforeEach(() => {
 })
 
 describe('add', () => {
-  it('should call executeProcess with the correct parameters', async () => {
+  it('should call executeProcess with the correct parameters to add a file', async () => {
     const fsPath = __filename
     const dir = resolve(fsPath, '..')
     const file = basename(__filename)
@@ -57,7 +57,7 @@ describe('add', () => {
 })
 
 describe('checkout', () => {
-  it('should call executeProcess with the correct parameters', async () => {
+  it('should call executeProcess with the correct parameters to checkout a repo', async () => {
     const fsPath = __dirname
     const stdout = `M       model.pt\nM       logs/\n`
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -79,7 +79,7 @@ describe('checkout', () => {
 })
 
 describe('commit', () => {
-  it('should call execPromise with the correct parameters', async () => {
+  it('should call execPromise with the correct parameters to commit a repo', async () => {
     const cwd = __dirname
     const stdout = "Updating lock file 'dvc.lock'"
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -121,7 +121,7 @@ describe('experimentApply', () => {
 })
 
 describe('initializeDirectory', () => {
-  it('should call executeProcess with the correct parameters', async () => {
+  it('should call executeProcess with the correct parameters to initialize a directory', async () => {
     const fsPath = __dirname
     const stdout = `
 	  Initialized DVC repository.
