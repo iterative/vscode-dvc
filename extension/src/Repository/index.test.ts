@@ -1,4 +1,4 @@
-import { Disposable } from '@hediet/std/disposable'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
 import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
@@ -21,22 +21,29 @@ const mockedGetAllUntracked = mocked(getAllUntracked)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
 const mockedSetScmState = jest.fn()
-mockedSourceControlManagement.mockImplementation(function() {
-  return ({
-    setState: mockedSetScmState
-  } as unknown) as SourceControlManagement
-})
 
 const mockedDecorationProvider = mocked(DecorationProvider)
 const mockedSetDecorationState = jest.fn()
-mockedDecorationProvider.mockImplementation(function() {
-  return ({
-    setState: mockedSetDecorationState
-  } as unknown) as DecorationProvider
-})
+
+const mockedDisposable = mocked(Disposable)
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  jest.resetAllMocks()
+  mockedSourceControlManagement.mockImplementationOnce(function() {
+    return ({
+      setState: mockedSetScmState
+    } as unknown) as SourceControlManagement
+  })
+  mockedDecorationProvider.mockImplementationOnce(function() {
+    return ({
+      setState: mockedSetDecorationState
+    } as unknown) as DecorationProvider
+  })
+  mockedDisposable.fn.mockReturnValueOnce(({
+    track: function<T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown) as (() => void) & Disposer)
 })
 
 describe('Repository', () => {

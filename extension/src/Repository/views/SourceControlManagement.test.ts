@@ -1,5 +1,6 @@
 import { scm, Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   SourceControlManagement,
   SourceControlManagementState
@@ -9,9 +10,15 @@ jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
 const mockedScm = mocked(scm)
+const mockedDisposable = mocked(Disposable)
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  jest.resetAllMocks()
+  mockedDisposable.fn.mockReturnValueOnce(({
+    track: function<T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown) as (() => void) & Disposer)
 })
 
 describe('SourceControlManagement', () => {
