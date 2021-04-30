@@ -12,7 +12,7 @@ const mockedCreateProcess = mocked(createProcess)
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedCreateProcess.mockReturnValue(({
+  mockedCreateProcess.mockReturnValueOnce(({
     on: jest.fn(),
     all: { on: jest.fn() }
   } as unknown) as Process)
