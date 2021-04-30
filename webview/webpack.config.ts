@@ -1,5 +1,5 @@
 import { WebviewType } from 'dvc/src/webviews/experiments/contract'
-import webpack, { Plugin } from 'webpack'
+import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { resolve } from 'path'
 import HtmlWebpackPlugin = require('html-webpack-plugin')
