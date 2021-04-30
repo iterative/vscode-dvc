@@ -37,6 +37,7 @@ interface CustomWindow extends Window {
 let customWindow: CustomWindow
 beforeEach(() => {
   jest.clearAllMocks()
+  mockGetState.mockReturnValueOnce({})
   customWindow = (window as unknown) as CustomWindow
   customWindow.webviewData = {
     publicPath: '/some/path',
@@ -50,8 +51,6 @@ afterEach(() => {
 
 describe('App', () => {
   describe('Given an initial empty state', () => {
-    mockGetState.mockReturnValue({})
-
     describe('When we render the App', () => {
       it('Then a message should be sent to the extension on the first render', () => {
         render(<App />)

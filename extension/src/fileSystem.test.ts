@@ -43,7 +43,7 @@ describe('addOnFileSystemChangeHandler', () => {
     const func = () => undefined
 
     const mockedWatcher = mocked(new FSWatcher())
-    mockedWatch.mockReturnValue(mockedWatcher)
+    mockedWatch.mockReturnValueOnce(mockedWatcher)
 
     const getWatcherSpy = jest
       .spyOn(FileSystem, 'getWatcher')
@@ -216,7 +216,7 @@ describe('pickSingleRepositoryRoot', () => {
     const unselectedRepoB = '/path/to/repo/b'
     const unselectedRepoC = '/path/to/repo/c'
 
-    mockedShowRepoQuickPick.mockResolvedValue(selectedRepo)
+    mockedShowRepoQuickPick.mockResolvedValueOnce(selectedRepo)
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
@@ -235,7 +235,7 @@ describe('pickSingleRepositoryRoot', () => {
     const unselectedRepoB = '/repo/path/b'
     const unselectedRepoC = '/repo/path/c'
 
-    mockedShowRepoQuickPick.mockResolvedValue(undefined)
+    mockedShowRepoQuickPick.mockResolvedValueOnce(undefined)
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
