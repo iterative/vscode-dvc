@@ -49,6 +49,7 @@ module.exports = {
     'react/prop-types': 'off',
     curly: ['error', 'all'],
     '@typescript-eslint/prefer-optional-chain': 'error',
+    'require-await': 'error',
     'sonarjs/cognitive-complexity': ['error', 5]
   },
   env: {

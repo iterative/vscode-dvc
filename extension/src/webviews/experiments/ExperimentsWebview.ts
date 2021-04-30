@@ -62,7 +62,7 @@ export class ExperimentsWebview {
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
 
-  public reveal = async () => {
+  public reveal = () => {
     this.webviewPanel.reveal()
     return this
   }

@@ -36,14 +36,14 @@ export class PseudoTerminal {
     }
   }
 
-  private initializeInstance = async (): Promise<void> => {
+  private initializeInstance = (): Promise<void> => {
     this.deleteReferenceOnClose()
     return this.createInstance()
   }
 
   private deleteReferenceOnClose = (): void => {
     this.dispose.track(
-      window.onDidCloseTerminal(async event => {
+      window.onDidCloseTerminal(event => {
         if (this.instance && event.name === this.termName) {
           this.dispose.untrack(this.instance)
           this.instance = undefined
@@ -52,7 +52,7 @@ export class PseudoTerminal {
     )
   }
 
-  private createInstance = async (): Promise<void> =>
+  private createInstance = (): Promise<void> =>
     new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
         onDidWrite: this.outputEventEmitter.event,
