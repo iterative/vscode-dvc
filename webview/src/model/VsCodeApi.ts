@@ -27,6 +27,7 @@ export function getVsCodeApi<
   // This hack makes hot reload possible.
   const w = window as { vscodeApi?: InternalVsCodeApi }
   if (!w.vscodeApi) {
+    // eslint-disable-next-line sonarjs/no-use-of-empty-return-value
     w.vscodeApi = acquireVsCodeApi()
   }
   const api = w.vscodeApi

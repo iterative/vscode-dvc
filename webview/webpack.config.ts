@@ -1,11 +1,14 @@
 import { WebviewType } from 'dvc/src/webviews/experiments/contract'
-import webpack, { Plugin } from 'webpack'
+import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { resolve } from 'path'
 import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
+
+const styleLoader = 'style-loader'
+const cssLoader = 'css-loader'
 
 module.exports = {
   entry: [r('src/index.tsx')],
@@ -30,14 +33,14 @@ module.exports = {
     rules: [
       {
         test: /\.less$/,
-        loaders: ['style-loader', 'css-loader', 'less-loader']
+        loaders: [styleLoader, cssLoader, 'less-loader']
       },
       {
         test: /\.css$/,
         loaders: [
-          'style-loader',
+          styleLoader,
           {
-            loader: 'css-loader',
+            loader: cssLoader,
             options: {
               modules: { auto: true }
             }
@@ -47,9 +50,9 @@ module.exports = {
       {
         test: /\.scss$/,
         loaders: [
-          'style-loader',
+          styleLoader,
           {
-            loader: 'css-loader',
+            loader: cssLoader,
             options: {
               modules: { auto: true }
             }
@@ -72,15 +75,13 @@ module.exports = {
     fs: 'empty'
   },
   plugins: (() => {
-    const plugins: Plugin[] = [
+    return [
       new HtmlWebpackPlugin({
         title: WebviewType
       }),
       new ForkTsCheckerWebpackPlugin(),
       new CleanWebpackPlugin()
     ]
-
-    return plugins
   })(),
   devServer: {
     disableHostCheck: true,
