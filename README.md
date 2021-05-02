@@ -1,6 +1,7 @@
 # DVC for Visual Studio Code
 
 [![Build plugin](https://github.com/iterative/vscode-dvc/workflows/Build%20plugin/badge.svg)](https://github.com/iterative/vscode-dvc/actions?query=workflow%3A%22Build+plugin%22)
+[![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 
 This extension adds first-class support for DVC experiments in Visual Studio
 Code
