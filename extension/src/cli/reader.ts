@@ -23,7 +23,7 @@ export const experimentShow = (
     Flag.SHOW_JSON
   )
 
-export interface ListOutput {
+export type ListOutput = {
   isdir: boolean
   isexec: boolean
   isout: boolean
