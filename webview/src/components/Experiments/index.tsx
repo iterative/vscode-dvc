@@ -85,34 +85,37 @@ const orderByFn = (
   }
 }
 
-const getColumns = (flatExperiments: ExperimentWithId[]) => [
-  {
-    Header: 'Experiment',
-    id: 'id',
-    accessor: ({ name, id }: { name: string | undefined; id: string }) => {
-      if (name) {
-        return name
-      }
-      if (id === 'workspace') {
-        return id
-      }
-      return id.slice(0, 7)
+const getColumns = (
+  flatExperiments: ExperimentWithId[]
+): Column<Experiment>[] =>
+  [
+    {
+      Header: 'Experiment',
+      id: 'id',
+      accessor: ({ name, id }: { name: string | undefined; id: string }) => {
+        if (name) {
+          return name
+        }
+        if (id === 'workspace') {
+          return id
+        }
+        return id.slice(0, 7)
+      },
+      width: 150
     },
-    width: 150
-  },
-  {
-    Header: 'Timestamp',
-    accessor: 'timestamp',
-    Cell: ({ value }: { value: string }) => {
-      if (!value || value === '') {
-        return null
+    {
+      Header: 'Timestamp',
+      accessor: 'timestamp',
+      Cell: ({ value }: { value: string }) => {
+        if (!value || value === '') {
+          return null
+        }
+        const time = dayjs(value)
+        return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
       }
-      const time = dayjs(value)
-      return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
-    }
-  },
-  ...buildDynamicColumns(flatExperiments)
-]
+    },
+    ...buildDynamicColumns(flatExperiments)
+  ] as Column<Experiment>[]
 
 export const ExperimentsTable: React.FC<{
   experiments: ExperimentsRepoJSONOutput
@@ -127,7 +130,7 @@ export const ExperimentsTable: React.FC<{
 
   const [data, columns] = React.useMemo(() => {
     const { experiments, flatExperiments } = parseExperiments(rawExperiments)
-    const columns = getColumns(flatExperiments) as Column<Experiment>[]
+    const columns = getColumns(flatExperiments)
     return [experiments, columns]
   }, [rawExperiments])
 
