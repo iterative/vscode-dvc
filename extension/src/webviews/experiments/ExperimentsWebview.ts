@@ -33,14 +33,6 @@ export class ExperimentsWebview {
     return view
   }
 
-  private readonly _disposer = Disposable.fn()
-
-  private readonly _initialized = new Deferred()
-
-  protected readonly initialized = this._initialized.promise
-
-  public readonly onDidDispose = this.webviewPanel.onDidDispose
-
   public static async create(
     config: Config,
     resourceLocator: ResourceLocator
@@ -62,6 +54,14 @@ export class ExperimentsWebview {
     await view.initialized
     return view
   }
+
+  private readonly _disposer = Disposable.fn()
+
+  private readonly _initialized = new Deferred()
+
+  protected readonly initialized = this._initialized.promise
+
+  public readonly onDidDispose = this.webviewPanel.onDidDispose
 
   public reveal = () => {
     this.webviewPanel.reveal()
