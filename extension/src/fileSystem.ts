@@ -17,7 +17,7 @@ export const getWatcher = (handler: (path: string) => void) => (
 }
 
 export const addOnFileSystemChangeHandler = (
-  path: string,
+  path: string | string[],
   handler: (path: string) => void
 ): Disposable => {
   const watcher = getWatcher(handler)
@@ -41,6 +41,15 @@ export const addOnFileSystemChangeHandler = (
       pathWatcher.close()
     }
   }
+}
+
+export const addOnFileTypeChangeHandler = (
+  path: string,
+  types: string[],
+  handler: (path: string) => void
+): Disposable => {
+  const globs = types.map(type => resolve(path, '**', type))
+  return addOnFileSystemChangeHandler(globs, handler)
 }
 
 const findDvcAbsoluteRootPath = async (
