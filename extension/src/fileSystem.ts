@@ -115,7 +115,7 @@ export const pickSingleRepositoryRoot = async (
 
 export const findDvcPathsToWatch = (dvcRoot: string): Promise<string[]> => {
   // eslint-disable-next-line new-cap
-  const crawler = new fdir()
+  const paths = new fdir()
     .withFullPaths()
     .filter(
       path =>
@@ -124,5 +124,6 @@ export const findDvcPathsToWatch = (dvcRoot: string): Promise<string[]> => {
         basename(path) === 'dvc.yaml'
     )
     .crawl(dvcRoot)
-  return crawler.withPromise() as Promise<string[]>
+    .withPromise()
+  return paths as Promise<string[]>
 }
