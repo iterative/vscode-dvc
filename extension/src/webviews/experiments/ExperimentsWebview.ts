@@ -18,7 +18,7 @@ import { ResourceLocator } from '../../ResourceLocator'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
-  private static contextKey = 'dvc.experimentsWebview.active'
+  private static contextKey = 'dvc.experiments.webviewActive'
 
   public isActive = () => this.webviewPanel.active
 
@@ -73,6 +73,7 @@ export class ExperimentsWebview {
     private readonly config: Config
   ) {
     webviewPanel.onDidDispose(() => {
+      this.setPanelActiveContext(false)
       this._disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
@@ -104,7 +105,6 @@ export class ExperimentsWebview {
   }
 
   public dispose(): void {
-    this.setPanelActiveContext(false)
     this.webviewPanel.dispose()
   }
 

@@ -238,17 +238,17 @@
           "command": "dvc.runExperiment",
           "alt": "dvc.runResetExperiment",
           "group": "navigation@0",
-          "when": "dvc.experimentsWebview.active"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.stopRunningExperiment",
+          "group": "navigation@0",
+          "when": "dvc.experiments.webviewActive && dvc.runner.running"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1",
-          "when": "dvc.experimentsWebview.active"
-        },
-        {
-          "command": "dvc.stopRunningExperiment",
-          "group": "navigation@2",
-          "when": "dvc.experimentsWebview.active"
+          "when": "dvc.experiments.webviewActive"
         }
       ]
     },
