@@ -13,28 +13,23 @@ import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { definedAndNonEmpty } from '../util'
 
-interface TrackedPath {
-  path: string
-  isDirectory: boolean
-}
-
-export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
+export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
-  private changeTreeDataEventEmitter: EventEmitter<TrackedPath | void>
+  private changeTreeDataEventEmitter: EventEmitter<string | void>
 
-  readonly onDidChangeTreeData: Event<TrackedPath | void>
+  readonly onDidChangeTreeData: Event<string | void>
 
   private config: Config
   private dvcRoots: string[] = []
 
   private pathRoots: Record<string, string> = {}
+  private pathIsDirectory: Record<string, boolean> = {}
 
-  public refresh(path: string): void {
-    this.changeTreeDataEventEmitter.fire({
-      path: dirname(path),
-      isDirectory: true
-    })
+  public refresh(path?: string): void {
+    if (path) {
+      this.changeTreeDataEventEmitter.fire(dirname(path))
+    }
   }
 
   public setDvcRoots(dvcRoots: string[]) {
@@ -53,16 +48,17 @@ export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
     return rootElements
       .reduce((a, b) => a.concat(b), [])
       .sort((a, b) => {
-        if (a.isDirectory === b.isDirectory) {
-          return a.path.localeCompare(b.path)
+        const aIsDirectory = this.pathIsDirectory[a]
+        if (aIsDirectory === this.pathIsDirectory[b]) {
+          return a.localeCompare(b)
         }
-        return a.isDirectory ? -1 : 1
+        return aIsDirectory ? -1 : 1
       })
   }
 
-  public getChildren(element?: TrackedPath): Promise<TrackedPath[]> {
+  public getChildren(element?: string): Promise<string[]> {
     if (element) {
-      return this.readDirectory(this.pathRoots[element.path], element.path)
+      return this.readDirectory(this.pathRoots[element], element)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
@@ -72,16 +68,17 @@ export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
     return Promise.resolve([])
   }
 
-  public getTreeItem(element: TrackedPath): TreeItem {
-    const resourceUri = Uri.file(element.path)
+  public getTreeItem(element: string): TreeItem {
+    const resourceUri = Uri.file(element)
+    const elementIsDirectory = this.pathIsDirectory[element]
     const treeItem = new TreeItem(
       resourceUri,
-      element.isDirectory
+      elementIsDirectory
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
 
-    if (!element.isDirectory) {
+    if (!elementIsDirectory) {
       treeItem.command = {
         command: 'dvc.views.trackedExplorerTree.openFile',
         title: 'Open File',
@@ -93,10 +90,10 @@ export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
     return treeItem
   }
 
-  private async readDirectory(
-    root: string,
-    path: string
-  ): Promise<TrackedPath[]> {
+  private async readDirectory(root: string, path: string): Promise<string[]> {
+    if (!root) {
+      return []
+    }
     await this.config.ready
     const relatives = await listDvcOnly(
       {
@@ -110,14 +107,15 @@ export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
     return relatives.map(relative => {
       const absolutePath = join(path, relative.path)
       this.pathRoots[absolutePath] = root
-      return { path: absolutePath, isDirectory: relative.isdir }
+      this.pathIsDirectory[absolutePath] = relative.isdir
+      return absolutePath
     })
   }
 
   constructor(config: Config) {
     this.config = config
 
-    this.changeTreeDataEventEmitter = new EventEmitter<TrackedPath | void>()
+    this.changeTreeDataEventEmitter = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
   }
 }
