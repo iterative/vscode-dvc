@@ -25,6 +25,7 @@ import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
   addOnFileSystemChangeHandler,
+  findDvcPathsToWatch,
   findDvcRootPaths,
   pickSingleRepositoryRoot
 } from './fileSystem'
@@ -91,13 +92,14 @@ export class Extension {
           )
         )
 
-        addOnFileSystemChangeHandler(
-          resolve(dvcRoot, '.dvc', 'cache'),
-          (path: string) => {
-            repository.resetState()
-            this.trackedExplorerTree.refresh(path)
-          }
-        )
+        findDvcPathsToWatch(dvcRoot).then(paths => {
+          paths.forEach(path =>
+            addOnFileSystemChangeHandler(path, (path: string) => {
+              repository.resetState()
+              this.trackedExplorerTree.refresh(path)
+            })
+          )
+        })
 
         repository.ready.then(() => {
           const tracked = repository.getTracked()
