@@ -17,7 +17,6 @@
     "bufferutil",
     "conda",
     "execa",
-    "fdir",
     "featurize",
     "isequal",
     "pseudoterminal",
