@@ -18,7 +18,7 @@ import { ResourceLocator } from '../../ResourceLocator'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
-  private static contextKey = 'dvc.experimentsWebview.focused'
+  private static contextKey = 'dvc.experimentsWebview.active'
 
   public isActive = () => this.webviewPanel.active
 
@@ -83,7 +83,7 @@ export class ExperimentsWebview {
 
     this._disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
-        this.setVisibilityContext(webviewPanel.visible)
+        this.setPanelActiveContext(webviewPanel.active)
       })
     )
 
@@ -97,12 +97,12 @@ export class ExperimentsWebview {
     })
   }
 
-  private setVisibilityContext(state: boolean) {
+  private setPanelActiveContext(state: boolean) {
     commands.executeCommand('setContext', ExperimentsWebview.contextKey, state)
   }
 
   public dispose(): void {
-    this.setVisibilityContext(false)
+    this.setPanelActiveContext(false)
     this.webviewPanel.dispose()
   }
 
