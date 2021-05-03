@@ -72,7 +72,7 @@ export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
     return Promise.resolve([])
   }
 
-  getTreeItem(element: TrackedPath): TreeItem {
+  public getTreeItem(element: TrackedPath): TreeItem {
     const resourceUri = Uri.file(element.path)
     const treeItem = new TreeItem(
       resourceUri,
