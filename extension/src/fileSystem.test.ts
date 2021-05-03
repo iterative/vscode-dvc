@@ -106,7 +106,7 @@ describe('getWatcher', () => {
 })
 
 describe('findDvcPathsToWatch', () => {
-  it('should find stuff', async () => {
+  it('should find the expected paths from the demo project', async () => {
     const pathsToWatch = await findDvcPathsToWatch(dvcDemoPath)
     expect(pathsToWatch).toEqual([
       resolve(dvcDemoPath, 'dvc.lock'),
