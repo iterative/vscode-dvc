@@ -55,6 +55,21 @@ const findDvcAbsoluteRootPath = async (
 
 export const exists = (path: string): boolean => existsSync(path)
 
+export const findDvcPathsToWatch = (dvcRoot: string): Promise<string[]> => {
+  // eslint-disable-next-line new-cap
+  const paths = new fdir()
+    .withFullPaths()
+    .filter(
+      path =>
+        extname(path) === '.dvc' ||
+        basename(path) === 'dvc.lock' ||
+        basename(path) === 'dvc.yaml'
+    )
+    .crawl(dvcRoot)
+    .withPromise()
+  return paths as Promise<string[]>
+}
+
 export const isDirectory = (path: string): boolean => {
   try {
     return lstatSync(path).isDirectory()
@@ -111,19 +126,4 @@ export const pickSingleRepositoryRoot = async (
     canPickMany: false,
     placeHolder: 'Select which repository to run experiments in'
   })
-}
-
-export const findDvcPathsToWatch = (dvcRoot: string): Promise<string[]> => {
-  // eslint-disable-next-line new-cap
-  const paths = new fdir()
-    .withFullPaths()
-    .filter(
-      path =>
-        extname(path) === '.dvc' ||
-        basename(path) === 'dvc.lock' ||
-        basename(path) === 'dvc.yaml'
-    )
-    .crawl(dvcRoot)
-    .withPromise()
-  return paths as Promise<string[]>
 }
