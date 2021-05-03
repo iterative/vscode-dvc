@@ -64,18 +64,59 @@ describe('root', () => {
 
 describe('listDvcOnlyRecursive', () => {
   it('should return all relative tracked paths', async () => {
-    const stdout =
-      `data/MNIST/raw/t10k-images-idx3-ubyte\n` +
-      `data/MNIST/raw/t10k-images-idx3-ubyte.gz\n` +
-      `data/MNIST/raw/t10k-labels-idx1-ubyte\n` +
-      `data/MNIST/raw/t10k-labels-idx1-ubyte.gz\n` +
-      `data/MNIST/raw/train-images-idx3-ubyte\n` +
-      `data/MNIST/raw/train-images-idx3-ubyte.gz\n` +
-      `data/MNIST/raw/train-labels-idx1-ubyte\n` +
-      `data/MNIST/raw/train-labels-idx1-ubyte.gz\n` +
-      `logs/acc.tsv\n` +
-      `logs/loss.tsv\n` +
-      `model.pt`
+    const stdout = JSON.stringify([
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/train-images-idx3-ubyte'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/train-labels-idx1-ubyte'
+      },
+      {
+        isout: false,
+        isdir: false,
+        isexec: false,
+        path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
+      },
+      { isout: false, isdir: false, isexec: false, path: 'logs/acc.tsv' },
+      { isout: false, isdir: false, isexec: false, path: 'logs/loss.tsv' },
+      { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+    ])
     const cwd = resolve()
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
     const tracked = await listDvcOnlyRecursive({
@@ -84,23 +125,11 @@ describe('listDvcOnlyRecursive', () => {
       cwd
     })
 
-    expect(tracked).toEqual([
-      'data/MNIST/raw/t10k-images-idx3-ubyte',
-      'data/MNIST/raw/t10k-images-idx3-ubyte.gz',
-      'data/MNIST/raw/t10k-labels-idx1-ubyte',
-      'data/MNIST/raw/t10k-labels-idx1-ubyte.gz',
-      'data/MNIST/raw/train-images-idx3-ubyte',
-      'data/MNIST/raw/train-images-idx3-ubyte.gz',
-      'data/MNIST/raw/train-labels-idx1-ubyte',
-      'data/MNIST/raw/train-labels-idx1-ubyte.gz',
-      'logs/acc.tsv',
-      'logs/loss.tsv',
-      'model.pt'
-    ])
+    expect(tracked).toEqual(JSON.parse(stdout))
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['list', '.', '--dvc-only', '-R'],
+      args: ['list', '.', '--dvc-only', '-R', '--show-json'],
       cwd,
       env: mockedEnv
     })

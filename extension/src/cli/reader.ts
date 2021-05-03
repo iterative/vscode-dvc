@@ -23,6 +23,13 @@ export const experimentShow = (
     Flag.SHOW_JSON
   )
 
+export interface ListOutput {
+  isdir: boolean
+  isexec: boolean
+  isout: boolean
+  path: string
+}
+
 export const listDvcOnly = (
   options: ExecutionOptions,
   relativePath: string
@@ -38,14 +45,15 @@ export const listDvcOnly = (
 
 export const listDvcOnlyRecursive = (
   options: ExecutionOptions
-): Promise<string[]> =>
-  readCliProcess<string[]>(
+): Promise<ListOutput[]> =>
+  readCliProcess<ListOutput[]>(
     options,
-    trimAndSplit,
+    JSON.parse,
     Command.LIST,
     ListFlag.LOCAL_REPO,
     ListFlag.DVC_ONLY,
-    Flag.RECURSIVE
+    Flag.RECURSIVE,
+    Flag.SHOW_JSON
   )
 
 type Status = Record<

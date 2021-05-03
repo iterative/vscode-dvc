@@ -103,12 +103,13 @@ export class Repository {
   public async updateList(): Promise<void> {
     const options = this.getCliExecutionOptions()
     const tracked = await listDvcOnlyRecursive(options)
+    const trackedPaths = tracked.map(track => track.path)
 
-    const absoluteTrackedPaths = this.getAbsolutePath(tracked)
+    const absoluteTrackedPaths = this.getAbsolutePath(trackedPaths)
 
     this.state.tracked = new Set([
       ...absoluteTrackedPaths,
-      ...this.getAbsoluteParentPath(tracked)
+      ...this.getAbsoluteParentPath(trackedPaths)
     ])
   }
 
