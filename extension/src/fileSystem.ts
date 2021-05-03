@@ -44,6 +44,14 @@ export const addOnFileSystemChangeHandler = (
   }
 }
 
+export const addOnFileTypeChangeHandler = (
+  path: string,
+  type: string,
+  handler: (path: string) => void
+): Disposable => {
+  return addOnFileSystemChangeHandler(resolve(path, '**', type), handler)
+}
+
 const findDvcAbsoluteRootPath = async (
   options: ExecutionOptions
 ): Promise<string | undefined> => {
