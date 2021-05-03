@@ -14,6 +14,7 @@ import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { isDirectory } from '../fileSystem'
 import { definedAndNonEmpty } from '../util'
+import { reportStderrOrThrow } from '../vscode/reporting'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -35,8 +36,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.changeTreeDataEventEmitter.fire()
   }
 
-  public openResource(resource: Uri): void {
-    window.showTextDocument(resource)
+  public openResource(resource: Uri) {
+    return window.showTextDocument(resource).then(
+      textEditor => textEditor,
+      error => {
+        reportStderrOrThrow(error.message)
+      }
+    )
   }
 
   private async getRootElements() {
