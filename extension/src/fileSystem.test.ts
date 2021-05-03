@@ -10,7 +10,7 @@ import { Disposable } from './extension'
 
 const {
   addOnFileSystemChangeHandler,
-  addOnGlobChangeHandler,
+  addOnFileTypeChangeHandler,
   exists,
   findDvcRootPaths,
   getWatcher,
@@ -85,7 +85,7 @@ describe('addOnFileSystemChangeHandler', () => {
   })
 })
 
-describe('addOnGlobChangeHandler', () => {
+describe('addOnFileTypeChangeHandler', () => {
   it('should called addOnFileSystemChangeHandler with the correct parameters', () => {
     const addSpy = jest
       .spyOn(FileSystem, 'addOnFileSystemChangeHandler')
@@ -93,10 +93,18 @@ describe('addOnGlobChangeHandler', () => {
 
     const handler = () => {}
 
-    addOnGlobChangeHandler(dvcDemoPath, '(*.dvc|dvc.lock|dvc.yaml)', handler)
+    addOnFileTypeChangeHandler(
+      dvcDemoPath,
+      ['*.dvc', 'dvc.lock', 'dvc.yaml'],
+      handler
+    )
     expect(addSpy).toBeCalledTimes(1)
     expect(addSpy).toBeCalledWith(
-      resolve(dvcDemoPath, '**', '(*.dvc|dvc.lock|dvc.yaml)'),
+      [
+        join(dvcDemoPath, '**', '*.dvc'),
+        join(dvcDemoPath, '**', 'dvc.lock'),
+        join(dvcDemoPath, '**', 'dvc.yaml')
+      ],
       handler
     )
   })
