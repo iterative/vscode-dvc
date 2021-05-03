@@ -98,17 +98,12 @@ export class Extension {
           })
         )
 
-        repository.ready.then(() => {
-          const tracked = repository.getTracked()
-          tracked.forEach(path => {
-            this.dispose.track(
-              addOnFileSystemChangeHandler(path, (path: string) => {
-                repository.updateState()
-                this.trackedExplorerTree.refresh(path)
-              })
-            )
+        this.dispose.track(
+          addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
+            repository.updateState()
+            this.trackedExplorerTree.refresh(path)
           })
-        })
+        )
 
         this.dvcRepositories[dvcRoot] = repository
       })
