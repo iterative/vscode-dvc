@@ -10,6 +10,7 @@ import { root } from './cli/reader'
 const {
   addOnFileSystemChangeHandler,
   exists,
+  findDvcPathsToWatch,
   findDvcRootPaths,
   getWatcher,
   isDirectory,
@@ -101,6 +102,17 @@ describe('getWatcher', () => {
     watcher('')
 
     expect(mockHandler).not.toBeCalled()
+  })
+})
+
+describe('findDvcPathsToWatch', () => {
+  it('should find stuff', async () => {
+    const pathsToWatch = await findDvcPathsToWatch(dvcDemoPath)
+    expect(pathsToWatch).toEqual([
+      resolve(dvcDemoPath, 'dvc.lock'),
+      resolve(dvcDemoPath, 'dvc.yaml'),
+      resolve(dvcDemoPath, 'data', 'MNIST', 'raw.dvc')
+    ])
   })
 })
 

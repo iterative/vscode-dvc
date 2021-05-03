@@ -1,8 +1,9 @@
+import { fdir } from 'fdir'
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
-import { join, resolve } from 'path'
+import { basename, extname, join, resolve } from 'path'
 import { ExecutionOptions } from './cli/execution'
 import { root } from './cli/reader'
 import { definedAndNonEmpty } from './util'
@@ -110,4 +111,18 @@ export const pickSingleRepositoryRoot = async (
     canPickMany: false,
     placeHolder: 'Select which repository to run experiments in'
   })
+}
+
+export const findDvcPathsToWatch = (dvcRoot: string): Promise<string[]> => {
+  // eslint-disable-next-line new-cap
+  const crawler = new fdir()
+    .withFullPaths()
+    .filter(
+      path =>
+        extname(path) === '.dvc' ||
+        basename(path) === 'dvc.lock' ||
+        basename(path) === 'dvc.yaml'
+    )
+    .crawl(dvcRoot)
+  return crawler.withPromise() as Promise<string[]>
 }
