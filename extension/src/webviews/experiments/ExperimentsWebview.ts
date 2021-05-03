@@ -87,6 +87,8 @@ export class ExperimentsWebview {
       })
     )
 
+    this.setPanelActiveContext(webviewPanel.active)
+
     this._disposer.track({
       dispose: autorun(async () => {
         // Update theme changes
