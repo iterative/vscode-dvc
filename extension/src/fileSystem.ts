@@ -1,9 +1,8 @@
-import { fdir } from 'fdir'
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
-import { basename, extname, join, resolve } from 'path'
+import { join, resolve } from 'path'
 import { ExecutionOptions } from './cli/execution'
 import { root } from './cli/reader'
 import { definedAndNonEmpty } from './util'
@@ -62,21 +61,6 @@ const findDvcAbsoluteRootPath = async (
 }
 
 export const exists = (path: string): boolean => existsSync(path)
-
-export const findDvcPathsToWatch = (dvcRoot: string): Promise<string[]> => {
-  // eslint-disable-next-line new-cap
-  const paths = new fdir()
-    .withFullPaths()
-    .filter(
-      path =>
-        extname(path) === '.dvc' ||
-        basename(path) === 'dvc.lock' ||
-        basename(path) === 'dvc.yaml'
-    )
-    .crawl(dvcRoot)
-    .withPromise()
-  return paths as Promise<string[]>
-}
 
 export const isDirectory = (path: string): boolean => {
   try {
