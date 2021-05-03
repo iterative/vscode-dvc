@@ -43,7 +43,7 @@ export const addOnFileSystemChangeHandler = (
   }
 }
 
-export const addOnFileTypeChangeHandler = (
+export const addOnGlobChangeHandler = (
   path: string,
   type: string,
   handler: (path: string) => void

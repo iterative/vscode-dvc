@@ -25,7 +25,7 @@ import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
   addOnFileSystemChangeHandler,
-  addOnFileTypeChangeHandler,
+  addOnGlobChangeHandler,
   findDvcRootPaths,
   pickSingleRepositoryRoot
 } from './fileSystem'
@@ -93,13 +93,9 @@ export class Extension {
         )
 
         this.dispose.track(
-          addOnFileTypeChangeHandler(
-            dvcRoot,
-            '(*.dvc|dvc.lock|dvc.yaml)',
-            () => {
-              repository.resetState()
-            }
-          )
+          addOnGlobChangeHandler(dvcRoot, '(*.dvc|dvc.lock|dvc.yaml)', () => {
+            repository.resetState()
+          })
         )
 
         repository.ready.then(() => {
