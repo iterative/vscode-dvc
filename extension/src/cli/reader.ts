@@ -33,14 +33,15 @@ export interface ListOutput {
 export const listDvcOnly = (
   options: ExecutionOptions,
   relativePath: string
-): Promise<string[]> =>
-  readCliProcess<string[]>(
+): Promise<ListOutput[]> =>
+  readCliProcess<ListOutput[]>(
     options,
-    trimAndSplit,
+    JSON.parse,
     Command.LIST,
     ListFlag.LOCAL_REPO,
     relativePath,
-    ListFlag.DVC_ONLY
+    ListFlag.DVC_ONLY,
+    Flag.SHOW_JSON
   )
 
 export const listDvcOnlyRecursive = (

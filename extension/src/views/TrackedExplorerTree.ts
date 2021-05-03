@@ -11,14 +11,19 @@ import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
-import { isDirectory } from '../fileSystem'
 import { definedAndNonEmpty } from '../util'
 
-export class TrackedExplorerTree implements TreeDataProvider<string> {
+interface TrackedPath {
+  path: string
+  isDirectory: boolean
+}
+
+export class TrackedExplorerTree implements TreeDataProvider<TrackedPath> {
   public dispose = Disposable.fn()
 
-  private changeTreeDataEventEmitter: EventEmitter<string | void>
-  readonly onDidChangeTreeData: Event<string | void>
+  private changeTreeDataEventEmitter: EventEmitter<TrackedPath | void>
+
+  readonly onDidChangeTreeData: Event<TrackedPath | void>
 
   private config: Config
   private dvcRoots: string[] = []
@@ -26,7 +31,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private pathRoots: Record<string, string> = {}
 
   public refresh(path: string): void {
-    this.changeTreeDataEventEmitter.fire(dirname(path))
+    this.changeTreeDataEventEmitter.fire({
+      path: dirname(path),
+      isDirectory: true
+    })
   }
 
   public setDvcRoots(dvcRoots: string[]) {
@@ -45,18 +53,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return rootElements
       .reduce((a, b) => a.concat(b), [])
       .sort((a, b) => {
-        const aIsDirectory = isDirectory(a)
-        const bIsDirectory = isDirectory(b)
-        if (aIsDirectory === bIsDirectory) {
-          return a.localeCompare(b)
+        if (a.isDirectory === b.isDirectory) {
+          return a.path.localeCompare(b.path)
         }
-        return aIsDirectory ? -1 : 1
+        return a.isDirectory ? -1 : 1
       })
   }
 
-  public getChildren(element?: string): Promise<string[]> {
+  public getChildren(element?: TrackedPath): Promise<TrackedPath[]> {
     if (element) {
-      return this.readDirectory(this.pathRoots[element], element)
+      return this.readDirectory(this.pathRoots[element.path], element.path)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
@@ -66,17 +72,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return Promise.resolve([])
   }
 
-  getTreeItem(element: string): TreeItem {
-    const elementIsDirectory = isDirectory(element)
-    const resourceUri = Uri.file(element)
+  getTreeItem(element: TrackedPath): TreeItem {
+    const resourceUri = Uri.file(element.path)
     const treeItem = new TreeItem(
       resourceUri,
-      elementIsDirectory
+      element.isDirectory
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
 
-    if (!elementIsDirectory) {
+    if (!element.isDirectory) {
       treeItem.command = {
         command: 'dvc.views.trackedExplorerTree.openFile',
         title: 'Open File',
@@ -88,9 +93,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return treeItem
   }
 
-  private async readDirectory(root: string, path: string): Promise<string[]> {
+  private async readDirectory(
+    root: string,
+    path: string
+  ): Promise<TrackedPath[]> {
     await this.config.ready
-    const relativePaths = await listDvcOnly(
+    const relatives = await listDvcOnly(
       {
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
@@ -99,17 +107,17 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       relative(root, path)
     )
 
-    return relativePaths.map(relativePath => {
-      const absolutePath = join(path, relativePath)
+    return relatives.map(relative => {
+      const absolutePath = join(path, relative.path)
       this.pathRoots[absolutePath] = root
-      return absolutePath
+      return { path: absolutePath, isDirectory: relative.isdir }
     })
   }
 
   constructor(config: Config) {
     this.config = config
 
-    this.changeTreeDataEventEmitter = new EventEmitter<string | void>()
+    this.changeTreeDataEventEmitter = new EventEmitter<TrackedPath | void>()
     this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
   }
 }
