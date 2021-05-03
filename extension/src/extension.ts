@@ -195,13 +195,6 @@ export class Extension {
       )
     )
 
-    this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.trackedExplorerTree.openFile',
-        resource => this.trackedExplorerTree.openResource(resource)
-      )
-    )
-
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )

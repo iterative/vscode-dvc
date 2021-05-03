@@ -1,4 +1,5 @@
 import {
+  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -111,5 +112,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     this.changeTreeDataEventEmitter = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.trackedExplorerTree.openFile',
+        resource => this.openResource(resource)
+      )
+    )
   }
 }
