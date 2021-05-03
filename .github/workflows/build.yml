@@ -62,6 +62,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           storybookBuildDir: 'webview/storybook-static'
+          exitOnceUploaded: true
 
       - name: Upload
         uses: actions/upload-artifact@v2
