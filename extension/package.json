@@ -65,7 +65,11 @@
       {
         "title": "%command.queueExperiment%",
         "command": "dvc.queueExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": {
+          "dark": "media/queue-experiment/dark.svg",
+          "light": "media/queue-experiment/light.svg"
+        }
       },
       {
         "title": "%command.runQueuedExperiments%",
@@ -248,6 +252,11 @@
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1",
+          "when": "dvc.experiments.webviewActive"
+        },
+        {
+          "command": "dvc.queueExperiment",
+          "group": "navigation@2",
           "when": "dvc.experiments.webviewActive"
         }
       ]
