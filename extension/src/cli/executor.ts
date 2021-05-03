@@ -14,13 +14,13 @@ import {
   executeCliProcess
 } from './execution'
 
-export const checkout = async (options: ExecutionOptions): Promise<string> =>
+export const checkout = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.CHECKOUT)
 
-export const commit = async (options: ExecutionOptions): Promise<string> =>
+export const commit = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.COMMIT, Flag.FORCE)
 
-export const experimentApply = async (
+export const experimentApply = (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
@@ -31,7 +31,7 @@ export const experimentApply = async (
     experiment
   )
 
-export const experimentBranch = async (
+export const experimentBranch = (
   options: ExecutionOptions,
   experiment: string,
   branchName: string
@@ -44,7 +44,7 @@ export const experimentBranch = async (
     branchName
   )
 
-export const experimentGarbageCollect = async (
+export const experimentGarbageCollect = (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
@@ -57,7 +57,7 @@ export const experimentGarbageCollect = async (
     ...preserveFlags
   )
 
-export const experimentRemove = async (
+export const experimentRemove = (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
@@ -68,12 +68,12 @@ export const experimentRemove = async (
     experiment
   )
 
-export const initializeDirectory = async (
+export const initializeDirectory = (
   options: ExecutionOptions
 ): Promise<string> =>
   executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
-export const queueExperiment = async (
+export const experimentRunQueue = (
   options: ExecutionOptions
 ): Promise<string> =>
   executeCliProcess(
@@ -101,9 +101,8 @@ const runCliProcessOnTarget = async (
   return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
 
-export const addTarget = async (
-  options: ExecutionOnTargetOptions
-): Promise<string> => runCliProcessOnTarget(options, Command.ADD)
+export const addTarget = (options: ExecutionOnTargetOptions): Promise<string> =>
+  runCliProcessOnTarget(options, Command.ADD)
 
 export const checkoutTarget = (
   options: ExecutionOnTargetOptions
@@ -113,10 +112,10 @@ export const commitTarget = (
   options: ExecutionOnTargetOptions
 ): Promise<string> => runCliProcessOnTarget(options, Command.COMMIT, Flag.FORCE)
 
-export const pullTarget = async (
+export const pullTarget = (
   options: ExecutionOnTargetOptions
 ): Promise<string> => runCliProcessOnTarget(options, Command.PULL)
 
-export const pushTarget = async (
+export const pushTarget = (
   options: ExecutionOnTargetOptions
 ): Promise<string> => runCliProcessOnTarget(options, Command.PUSH)

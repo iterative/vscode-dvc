@@ -15,7 +15,7 @@ import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
   experimentGcQuickPick,
-  queueExperimentCommand,
+  experimentRunQueueCommand,
   removeExperimentFromQuickPick
 } from './vscode'
 
@@ -102,7 +102,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
 
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      queueExperimentCommand(config)
+      experimentRunQueueCommand(config)
     )
   )
 

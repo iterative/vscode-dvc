@@ -62,7 +62,7 @@ export class ExperimentsWebview {
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
 
-  public reveal = async () => {
+  public reveal = () => {
     this.webviewPanel.reveal()
     return this
   }
@@ -159,14 +159,10 @@ export class ExperimentsWebview {
   }
 
   private handleMessage(message: MessageFromWebview) {
-    switch (message.type) {
-      case MessageFromWebviewType.initialized: {
-        this._initialized.resolve()
-        return
-      }
-      default: {
-        Logger.error(`Unexpected message: ${message}`)
-      }
+    if (message.type === MessageFromWebviewType.initialized) {
+      this._initialized.resolve()
+    } else {
+      Logger.error(`Unexpected message: ${message}`)
     }
   }
 

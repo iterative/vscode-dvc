@@ -1,5 +1,6 @@
 import { scm, Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   SourceControlManagement,
   SourceControlManagementState
@@ -9,19 +10,26 @@ jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
 const mockedScm = mocked(scm)
-const mockedCreateSourceControl = jest.fn().mockReturnValue({
-  inputBox: { visible: true },
-  createResourceGroup: jest.fn().mockReturnValue({})
-})
-mockedScm.createSourceControl = mockedCreateSourceControl
+const mockedDisposable = mocked(Disposable)
 
 beforeEach(() => {
-  jest.clearAllMocks()
+  jest.resetAllMocks()
+  mockedDisposable.fn.mockReturnValueOnce(({
+    track: function<T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown) as (() => void) & Disposer)
 })
 
 describe('SourceControlManagement', () => {
   describe('setState', () => {
-    it('should be able to set the state', async () => {
+    it('should be able to set the state', () => {
+      const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
+        inputBox: { visible: true },
+        createResourceGroup: jest.fn().mockReturnValueOnce({})
+      })
+      mockedScm.createSourceControl = mockedCreateSourceControl
+
       const initialState = {} as SourceControlManagementState
       const sourceControlManagement = new SourceControlManagement(
         __dirname,

@@ -3,8 +3,7 @@ import {
   commands,
   ExtensionContext,
   workspace,
-  WorkspaceFolder,
-  Uri
+  WorkspaceFolder
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
@@ -15,7 +14,7 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { getExperiments } from './cli/reader'
+import { experimentShow } from './cli/reader'
 import {
   Args,
   Command,
@@ -92,21 +91,32 @@ export class Extension {
           )
         )
 
-        this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
-            repository.updateState()
+        addOnFileSystemChangeHandler(
+          resolve(dvcRoot, '.dvc', 'cache'),
+          (path: string) => {
+            repository.resetState()
             this.trackedExplorerTree.refresh(path)
-          })
+          }
         )
+
+        repository.ready.then(() => {
+          const tracked = repository.getTracked()
+          tracked.forEach(path => {
+            this.dispose.track(
+              addOnFileSystemChangeHandler(path, (path: string) => {
+                repository.updateState()
+                this.trackedExplorerTree.refresh(path)
+              })
+            )
+          })
+        })
 
         this.dvcRepositories[dvcRoot] = repository
       })
     )
   }
 
-  private onChangeExperimentsUpdateWebview = async (
-    gitRoot: string
-  ): Promise<Disposable> => {
+  private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
     if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
@@ -121,7 +131,7 @@ export class Extension {
 
   private refreshExperimentsWebview = async () => {
     await this.config.ready
-    const experiments = await getExperiments({
+    const experiments = await experimentShow({
       pythonBinPath: this.config.pythonBinPath,
       cliPath: this.config.dvcPath,
       cwd: this.config.workspaceRoot
@@ -135,18 +145,13 @@ export class Extension {
     return webview
   }
 
-  private async runExperimentCommand(
-    context: { rootUri?: Uri } | undefined,
-    ...args: Args
-  ) {
-    const dvcRoot = await pickSingleRepositoryRoot(
-      {
-        cliPath: this.config.dvcPath,
-        cwd: this.config.workspaceRoot,
-        pythonBinPath: this.config.pythonBinPath
-      },
-      context?.rootUri?.fsPath
-    )
+  private async runExperimentCommand(...args: Args) {
+    const dvcRoot = await pickSingleRepositoryRoot({
+      cliPath: this.config.dvcPath,
+      cwd: this.config.workspaceRoot,
+      pythonBinPath: this.config.pythonBinPath
+    })
+
     if (dvcRoot) {
       await this.showExperimentsWebview()
       this.runner.run(dvcRoot, ...args)
@@ -178,7 +183,7 @@ export class Extension {
     )
 
     Promise.all(
-      (workspace.workspaceFolders || []).map(async workspaceFolder =>
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       )
     ).then(() => {
@@ -207,31 +212,26 @@ export class Extension {
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', async () =>
+      commands.registerCommand('dvc.selectDvcPath', () =>
         this.config.selectDvcPath()
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.showExperiments', async () => {
+      commands.registerCommand('dvc.showExperiments', () => {
         return this.showExperimentsWebview()
       })
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', async context =>
-        this.runExperimentCommand(
-          context,
-          Command.EXPERIMENT,
-          ExperimentSubCommands.RUN
-        )
+      commands.registerCommand('dvc.runExperiment', () =>
+        this.runExperimentCommand(Command.EXPERIMENT, ExperimentSubCommands.RUN)
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runResetExperiment', async context =>
+      commands.registerCommand('dvc.runResetExperiment', () =>
         this.runExperimentCommand(
-          context,
           Command.EXPERIMENT,
           ExperimentSubCommands.RUN,
           ExperimentFlag.RESET
@@ -240,9 +240,8 @@ export class Extension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.runQueuedExperiments', async context =>
+      commands.registerCommand('dvc.runQueuedExperiments', () =>
         this.runExperimentCommand(
-          context,
           Command.EXPERIMENT,
           ExperimentSubCommands.RUN,
           ExperimentFlag.RUN_ALL
@@ -263,16 +262,14 @@ export class Extension {
         await this.config.ready
         const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
-        this.onChangeExperimentsUpdateWebview(gitRoot).then(disposable =>
-          this.dispose.track(disposable)
-        )
+        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
 
         const dvcRoots = await findDvcRootPaths({
           cliPath: this.config.dvcPath,
           cwd: gitRoot,
           pythonBinPath: this.config.pythonBinPath
         })
-        dvcRoots.forEach(async dvcRoot => {
+        dvcRoots.forEach(dvcRoot => {
           const repository = this.dvcRepositories[dvcRoot]
 
           this.dispose.track(

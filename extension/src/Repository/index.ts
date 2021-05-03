@@ -10,9 +10,8 @@ import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
-import { exists } from '../fileSystem'
 
-enum Status {
+export enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NEW = 'new',
@@ -24,13 +23,13 @@ enum ChangedType {
   CHANGED_DEPS = 'changed deps'
 }
 
-type StatusOutput = Record<string, (ValidStageOrFileStatuses | string)[]>
-
-type FilteredStatusOutput = Record<string, ValidStageOrFileStatuses[]>
-
-type ValidStageOrFileStatuses = Record<ChangedType, PathStatus>
-
 type PathStatus = Record<string, Status>
+
+type StageOrFileStatuses = Record<ChangedType, PathStatus>
+
+type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
+
+type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
@@ -41,7 +40,6 @@ export class RepositoryState
   public modified: Set<string>
   public new: Set<string>
   public notInCache: Set<string>
-  public remoteOnly: Set<string>
   public untracked: Set<string>
 
   constructor() {
@@ -50,7 +48,6 @@ export class RepositoryState
     this.modified = new Set<string>()
     this.new = new Set<string>()
     this.notInCache = new Set<string>()
-    this.remoteOnly = new Set<string>()
     this.untracked = new Set<string>()
   }
 }
@@ -67,6 +64,10 @@ export class Repository {
 
   public getState() {
     return this.state
+  }
+
+  public getTracked() {
+    return this.state.tracked
   }
 
   @observable
@@ -104,46 +105,18 @@ export class Repository {
     const tracked = await listDvcOnlyRecursive(options)
 
     const absoluteTrackedPaths = this.getAbsolutePath(tracked)
-    Promise.all([
-      (this.state.tracked = new Set([
-        ...absoluteTrackedPaths,
-        ...this.getAbsoluteParentPath(tracked)
-      ])),
-      (this.state.remoteOnly = new Set(
-        absoluteTrackedPaths.filter(tracked => !exists(tracked))
-      ))
+
+    this.state.tracked = new Set([
+      ...absoluteTrackedPaths,
+      ...this.getAbsoluteParentPath(tracked)
     ])
   }
 
-  private filterExcludedStagesOrFiles(
-    statusOutput: StatusOutput
-  ): FilteredStatusOutput {
-    const excludeAlwaysChanged = (stageOrFile: string): boolean =>
-      !statusOutput[stageOrFile].includes('always changed')
-
-    const reduceToFiltered = (
-      filteredStatusOutput: FilteredStatusOutput,
-      stageOrFile: string
-    ) => {
-      filteredStatusOutput[stageOrFile] = statusOutput[
-        stageOrFile
-      ] as ValidStageOrFileStatuses[]
-      return filteredStatusOutput
-    }
-
-    return Object.keys(statusOutput)
-      .filter(excludeAlwaysChanged)
-      .reduce(reduceToFiltered, {})
-  }
-
-  private getFileOrStageStatuses(
-    fileOrStage: ValidStageOrFileStatuses[]
+  private getChangedOutsStatuses(
+    fileOrStage: StatusesOrAlwaysChanged[]
   ): PathStatus[] {
     return fileOrStage
-      .map(
-        entry =>
-          entry?.[ChangedType.CHANGED_DEPS] || entry?.[ChangedType.CHANGED_OUTS]
-      )
+      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
       .filter(value => value)
   }
 
@@ -160,14 +133,14 @@ export class Repository {
     )
   }
 
-  private reduceToPathStatuses(
-    filteredStatusOutput: FilteredStatusOutput
+  private reduceToChangedOutsStatuses(
+    filteredStatusOutput: StatusOutput
   ): Partial<Record<Status, Set<string>>> {
     const statusReducer = (
       reducedStatus: Partial<Record<Status, Set<string>>>,
-      entry: ValidStageOrFileStatuses[]
+      entry: StatusesOrAlwaysChanged[]
     ): Partial<Record<Status, Set<string>>> => {
-      const statuses = this.getFileOrStageStatuses(entry)
+      const statuses = this.getChangedOutsStatuses(entry)
 
       this.reduceStatuses(reducedStatus, statuses)
 
@@ -179,13 +152,9 @@ export class Repository {
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
     const options = this.getCliExecutionOptions()
-    const statusOutput = (await status(options)) as Record<
-      string,
-      (ValidStageOrFileStatuses | string)[]
-    >
+    const statusOutput = (await status(options)) as StatusOutput
 
-    const filteredStatusOutput = this.filterExcludedStagesOrFiles(statusOutput)
-    return this.reduceToPathStatuses(filteredStatusOutput)
+    return this.reduceToChangedOutsStatuses(statusOutput)
   }
 
   public async updateStatus() {
@@ -201,26 +170,34 @@ export class Repository {
     this.state.untracked = await getAllUntracked(this.dvcRoot)
   }
 
+  private updateStatuses() {
+    return Promise.all([this.updateUntracked(), this.updateStatus()])
+  }
+
+  public async resetState() {
+    const statusesUpdated = this.updateStatuses()
+
+    const slowerTrackedUpdated = this.updateList()
+
+    await statusesUpdated
+    this.sourceControlManagement.setState(this.state)
+
+    await slowerTrackedUpdated
+    this.decorationProvider?.setState(this.state)
+  }
+
+  private setState() {
+    this.sourceControlManagement.setState(this.state)
+    this.decorationProvider?.setState(this.state)
+  }
+
   public async updateState() {
-    const promisesForScm = Promise.all([
-      this.updateUntracked(),
-      this.updateStatus()
-    ])
-
-    const slowerListPromise = this.updateList()
-
-    await promisesForScm
-    this.sourceControlManagement.setState(this.state)
-
-    await slowerListPromise
-    if (this.decorationProvider) {
-      this.decorationProvider.setState(this.state)
-    }
-    this.sourceControlManagement.setState(this.state)
+    await this.updateStatuses()
+    this.setState()
   }
 
   private async setup() {
-    await this.updateState()
+    await this.resetState()
     return this._initialized.resolve()
   }
 
