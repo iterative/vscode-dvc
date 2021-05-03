@@ -45,10 +45,10 @@ export const addOnFileSystemChangeHandler = (
 
 export const addOnGlobChangeHandler = (
   path: string,
-  type: string,
+  glob: string,
   handler: (path: string) => void
 ): Disposable => {
-  return addOnFileSystemChangeHandler(resolve(path, '**', type), handler)
+  return addOnFileSystemChangeHandler(resolve(path, '**', glob), handler)
 }
 
 const findDvcAbsoluteRootPath = async (
