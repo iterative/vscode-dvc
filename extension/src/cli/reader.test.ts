@@ -64,7 +64,7 @@ describe('root', () => {
 
 describe('listDvcOnlyRecursive', () => {
   it('should return all relative tracked paths', async () => {
-    const stdout = JSON.stringify([
+    const listOutput = [
       {
         isout: false,
         isdir: false,
@@ -116,16 +116,16 @@ describe('listDvcOnlyRecursive', () => {
       { isout: false, isdir: false, isexec: false, path: 'logs/acc.tsv' },
       { isout: false, isdir: false, isexec: false, path: 'logs/loss.tsv' },
       { isout: true, isdir: false, isexec: false, path: 'model.pt' }
-    ])
+    ]
     const cwd = resolve()
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+    mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
     const tracked = await listDvcOnlyRecursive({
       cliPath: undefined,
       pythonBinPath: undefined,
       cwd
     })
 
-    expect(tracked).toEqual(JSON.parse(stdout))
+    expect(tracked).toEqual(listOutput)
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
