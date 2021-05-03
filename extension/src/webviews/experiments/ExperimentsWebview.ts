@@ -1,4 +1,4 @@
-import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
+import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -18,6 +18,7 @@ import { ResourceLocator } from '../../ResourceLocator'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
+  private static contextKey = 'dvc.experimentsWebview.focused'
 
   public isActive = () => this.webviewPanel.active
 
@@ -31,6 +32,14 @@ export class ExperimentsWebview {
     await view.initialized
     return view
   }
+
+  private readonly _disposer = Disposable.fn()
+
+  private readonly _initialized = new Deferred()
+
+  protected readonly initialized = this._initialized.promise
+
+  public readonly onDidDispose = this.webviewPanel.onDidDispose
 
   public static async create(
     config: Config,
@@ -54,14 +63,6 @@ export class ExperimentsWebview {
     return view
   }
 
-  private readonly _disposer = Disposable.fn()
-
-  private readonly _initialized = new Deferred()
-
-  protected readonly initialized = this._initialized.promise
-
-  public readonly onDidDispose = this.webviewPanel.onDidDispose
-
   public reveal = () => {
     this.webviewPanel.reveal()
     return this
@@ -80,6 +81,12 @@ export class ExperimentsWebview {
 
     webviewPanel.webview.html = this.getHtml()
 
+    this._disposer.track(
+      webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
+        this.setVisibilityContext(webviewPanel.visible)
+      })
+    )
+
     this._disposer.track({
       dispose: autorun(async () => {
         // Update theme changes
@@ -90,7 +97,12 @@ export class ExperimentsWebview {
     })
   }
 
+  private setVisibilityContext(state: boolean) {
+    commands.executeCommand('setContext', ExperimentsWebview.contextKey, state)
+  }
+
   public dispose(): void {
+    this.setVisibilityContext(false)
     this.webviewPanel.dispose()
   }
 
