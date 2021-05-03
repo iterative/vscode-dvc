@@ -6,9 +6,11 @@ import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from './fileSystem'
 import { root } from './cli/reader'
+import { Disposable } from './extension'
 
 const {
   addOnFileSystemChangeHandler,
+  addOnFileTypeChangeHandler,
   exists,
   findDvcRootPaths,
   getWatcher,
@@ -80,6 +82,31 @@ describe('addOnFileSystemChangeHandler', () => {
     expect(mockedWatcher.on).toBeCalledWith('change', func)
     expect(mockedWatcher.on).toBeCalledWith('unlink', func)
     expect(mockedWatcher.on).toBeCalledWith('unlinkDir', func)
+  })
+})
+
+describe('addOnFileTypeChangeHandler', () => {
+  it('should called addOnFileSystemChangeHandler with the correct parameters', () => {
+    const addSpy = jest
+      .spyOn(FileSystem, 'addOnFileSystemChangeHandler')
+      .mockReturnValueOnce(Disposable.fn())
+
+    const handler = () => {}
+
+    addOnFileTypeChangeHandler(
+      dvcDemoPath,
+      ['*.dvc', 'dvc.lock', 'dvc.yaml'],
+      handler
+    )
+    expect(addSpy).toBeCalledTimes(1)
+    expect(addSpy).toBeCalledWith(
+      [
+        join(dvcDemoPath, '**', '*.dvc'),
+        join(dvcDemoPath, '**', 'dvc.lock'),
+        join(dvcDemoPath, '**', 'dvc.yaml')
+      ],
+      handler
+    )
   })
 })
 
