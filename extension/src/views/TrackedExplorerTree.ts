@@ -95,7 +95,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return []
     }
     await this.config.ready
-    const relatives = await listDvcOnly(
+    const listOutput = await listDvcOnly(
       {
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
@@ -104,7 +104,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       relative(root, path)
     )
 
-    return relatives.map(relative => {
+    return listOutput.map(relative => {
       const absolutePath = join(path, relative.path)
       this.pathRoots[absolutePath] = root
       this.pathIsDirectory[absolutePath] = relative.isdir
