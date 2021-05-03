@@ -29,9 +29,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.changeTreeDataEventEmitter.fire(dirname(path))
   }
 
+  public reset(): void {
+    this.changeTreeDataEventEmitter.fire()
+  }
+
   public setDvcRoots(dvcRoots: string[]) {
     this.dvcRoots = dvcRoots
-    this.changeTreeDataEventEmitter.fire()
+    this.reset()
   }
 
   public openResource(resource: Uri): void {
