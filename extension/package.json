@@ -76,7 +76,8 @@
       {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-stop)"
       },
       {
         "title": "%command.experimentGarbageCollect%",
@@ -266,6 +267,10 @@
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1"
+        },
+        {
+          "command": "dvc.stopRunningExperiment",
+          "group": "navigation@2"
         }
       ]
     },
