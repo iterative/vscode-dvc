@@ -16,7 +16,7 @@ export const getWatcher = (handler: (path: string) => void) => (
   }
 }
 
-export const ignored = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
+export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
 export const addOnFileSystemChangeHandler = (
   path: string | string[],
@@ -30,7 +30,7 @@ export const addOnFileSystemChangeHandler = (
   })
 
   const pathWatcher = chokidar.watch(path, {
-    ignored
+    ignored: ignoredDotDirectories
   })
 
   pathWatcher.on('ready', debouncedWatcher)
