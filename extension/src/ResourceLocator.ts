@@ -6,8 +6,8 @@ export class ResourceLocator {
   constructor(extensionUri: Uri) {
     this.dvcIconPath = {
       // placeholders for different svgs
-      dark: Uri.joinPath(extensionUri, 'media', 'dvc-color.svg'),
-      light: Uri.joinPath(extensionUri, 'media', 'dvc-color.svg')
+      dark: Uri.joinPath(extensionUri, 'resources', 'dvc-color.svg'),
+      light: Uri.joinPath(extensionUri, 'resources', 'dvc-color.svg')
     }
   }
 }
