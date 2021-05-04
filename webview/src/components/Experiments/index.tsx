@@ -1,8 +1,5 @@
 import React from 'react'
-import {
-  ExperimentsRepoJSONOutput,
-  MessageFromWebviewType
-} from 'dvc/src/webviews/experiments/contract'
+import { ExperimentsRepoJSONOutput } from 'dvc/src/webviews/experiments/contract'
 import {
   Row,
   Column,
@@ -194,19 +191,9 @@ export const ExperimentsTable: React.FC<{
 const Experiments: React.FC<{
   experiments?: ExperimentsRepoJSONOutput | null
   vsCodeApi: VsCodeApi
-}> = ({ experiments, vsCodeApi }) => {
+}> = ({ experiments }) => {
   return (
     <div className={styles.experiments}>
-      <button
-        className={styles.experimentsButton}
-        onClick={() => {
-          vsCodeApi.postMessage({
-            type: MessageFromWebviewType.onClickRunExperiment
-          })
-        }}
-      >
-        Run Experiment
-      </button>
       {experiments ? (
         <ExperimentsTable experiments={experiments} />
       ) : (

@@ -18,6 +18,7 @@ import { ResourceLocator } from '../../ResourceLocator'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
+  private static contextKey = 'dvc.experiments.webviewActive'
 
   public isActive = () => this.webviewPanel.active
 
@@ -72,6 +73,7 @@ export class ExperimentsWebview {
     private readonly config: Config
   ) {
     webviewPanel.onDidDispose(() => {
+      this.setPanelActiveContext(false)
       this._disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
@@ -79,6 +81,14 @@ export class ExperimentsWebview {
     })
 
     webviewPanel.webview.html = this.getHtml()
+
+    this._disposer.track(
+      webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
+        this.setPanelActiveContext(webviewPanel.active)
+      })
+    )
+
+    this.setPanelActiveContext(webviewPanel.active)
 
     this._disposer.track({
       dispose: autorun(async () => {
@@ -88,6 +98,10 @@ export class ExperimentsWebview {
         this.sendMessage({ type: MessageToWebviewType.setTheme, theme })
       })
     })
+  }
+
+  private setPanelActiveContext(state: boolean) {
+    commands.executeCommand('setContext', ExperimentsWebview.contextKey, state)
   }
 
   public dispose(): void {
@@ -159,18 +173,10 @@ export class ExperimentsWebview {
   }
 
   private handleMessage(message: MessageFromWebview) {
-    switch (message.type) {
-      case MessageFromWebviewType.initialized: {
-        this._initialized.resolve()
-        return
-      }
-      case MessageFromWebviewType.onClickRunExperiment: {
-        commands.executeCommand('dvc.runExperiment')
-        return
-      }
-      default: {
-        Logger.error(`Unexpected message: ${message}`)
-      }
+    if (message.type === MessageFromWebviewType.initialized) {
+      this._initialized.resolve()
+    } else {
+      Logger.error(`Unexpected message: ${message}`)
     }
   }
 
