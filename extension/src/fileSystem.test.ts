@@ -15,6 +15,7 @@ const {
   findDvcRootPaths,
   getWatcher,
   isDirectory,
+  ignored,
   pickSingleRepositoryRoot
 } = FileSystem
 
@@ -72,7 +73,7 @@ describe('addOnFileSystemChangeHandler', () => {
       trailing: false
     })
 
-    expect(mockedWatch).toBeCalledWith(file)
+    expect(mockedWatch).toBeCalledWith(file, { ignored })
     expect(mockedWatch).toBeCalledTimes(1)
 
     expect(mockedWatcher.on).toBeCalledTimes(6)
@@ -128,6 +129,40 @@ describe('getWatcher', () => {
     watcher('')
 
     expect(mockHandler).not.toBeCalled()
+  })
+})
+
+describe('ignored', () => {
+  it('should match all paths under dvc and env directories', () => {
+    expect(ignored.test('/Users/robot/vscode-dvc/demo/.dvc/tmp')).toBe(true)
+    expect(ignored.test('C:\\vscode-dvc\\demo\\.dvc\\tmp')).toBe(true)
+  })
+
+  it('should match all paths under env directories', () => {
+    expect(ignored.test('/Users/robot/vscode-dvc/demo/.env/bin')).toBe(true)
+    expect(ignored.test('C:\\vscode-dvc\\demo\\.env\\bin')).toBe(true)
+  })
+
+  it('should match all paths under venv directories', () => {
+    expect(ignored.test('/Users/robot/vscode-dvc/demo/.venv/bin/python')).toBe(
+      true
+    )
+    expect(ignored.test('C:\\vscode-dvc\\demo\\.venv\\bin\\python')).toBe(true)
+  })
+
+  it('should not match dot files', () => {
+    expect(ignored.test('/Users/robot/vscode-dvc/demo/.gitignore')).toBe(false)
+    expect(ignored.test('C:\\vscode-dvc\\demo\\.gitignore')).toBe(false)
+  })
+
+  it('should not match normal directories', () => {
+    expect(ignored.test('/Users/robot/vscode-dvc/demo/data/MNIST')).toBe(false)
+    expect(ignored.test('C:\\vscode-dvc\\demo\\data\\MNIST')).toBe(false)
+  })
+
+  it('should not match normal files', () => {
+    expect(ignored.test('/Users/robot/vscode-dvc/demo/train.py')).toBe(false)
+    expect(ignored.test('C:\\vscode-dvc\\demo\\train.py')).toBe(false)
   })
 })
 
