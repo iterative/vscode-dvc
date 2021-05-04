@@ -5,7 +5,7 @@ import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
 import { Repository, RepositoryState, Status } from '.'
-import { listDvcOnlyRecursive, status } from '../cli/reader'
+import { listDvcOnlyRecursive, ListOutput, status } from '../cli/reader'
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
@@ -61,11 +61,11 @@ describe('Repository', () => {
       const rawDataDir = join(MNISTDataDir, 'raw')
       const model = 'model.pt'
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
-        logAcc,
-        logLoss,
-        model,
-        rawDataDir
-      ])
+        { path: logAcc },
+        { path: logLoss },
+        { path: model },
+        { path: rawDataDir }
+      ] as ListOutput[])
 
       mockedStatus.mockResolvedValueOnce({
         train: [
@@ -168,12 +168,12 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
-        compressedDataset,
-        dataset,
-        logAcc,
-        logLoss,
-        model
-      ])
+        { path: compressedDataset },
+        { path: dataset },
+        { path: logAcc },
+        { path: logLoss },
+        { path: model }
+      ] as ListOutput[])
 
       expect(repository.getState()).toEqual(new RepositoryState())
 
@@ -233,11 +233,11 @@ describe('Repository', () => {
       const dataDir = 'data'
       const model = 'model.pt'
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
-        logAcc,
-        logLoss,
-        model,
-        dataDir
-      ])
+        { path: logAcc },
+        { path: logLoss },
+        { path: model },
+        { path: dataDir }
+      ] as ListOutput[])
 
       mockedStatus.mockResolvedValueOnce({
         prepare: [
