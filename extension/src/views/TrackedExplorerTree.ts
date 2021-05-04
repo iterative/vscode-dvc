@@ -12,7 +12,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
-import { isDirectory } from '../fileSystem'
 import { definedAndNonEmpty } from '../util'
 import { reportStderrOrThrow } from '../vscode/reporting'
 
@@ -20,15 +19,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   private changeTreeDataEventEmitter: EventEmitter<string | void>
+
   readonly onDidChangeTreeData: Event<string | void>
 
   private config: Config
   private dvcRoots: string[] = []
 
   private pathRoots: Record<string, string> = {}
+  private pathIsDirectory: Record<string, boolean> = {}
 
-  public refresh(path: string): void {
-    this.changeTreeDataEventEmitter.fire(dirname(path))
+  public refresh(path?: string): void {
+    if (path) {
+      this.changeTreeDataEventEmitter.fire(dirname(path))
+    }
   }
 
   public setDvcRoots(dvcRoots: string[]) {
@@ -52,9 +55,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return rootElements
       .reduce((a, b) => a.concat(b), [])
       .sort((a, b) => {
-        const aIsDirectory = isDirectory(a)
-        const bIsDirectory = isDirectory(b)
-        if (aIsDirectory === bIsDirectory) {
+        const aIsDirectory = this.pathIsDirectory[a]
+        if (aIsDirectory === this.pathIsDirectory[b]) {
           return a.localeCompare(b)
         }
         return aIsDirectory ? -1 : 1
@@ -73,9 +75,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return Promise.resolve([])
   }
 
-  getTreeItem(element: string): TreeItem {
-    const elementIsDirectory = isDirectory(element)
+  public getTreeItem(element: string): TreeItem {
     const resourceUri = Uri.file(element)
+    const elementIsDirectory = this.pathIsDirectory[element]
     const treeItem = new TreeItem(
       resourceUri,
       elementIsDirectory
@@ -96,8 +98,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private async readDirectory(root: string, path: string): Promise<string[]> {
+    if (!root) {
+      return []
+    }
     await this.config.ready
-    const relativePaths = await listDvcOnly(
+    const listOutput = await listDvcOnly(
       {
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
@@ -106,9 +111,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       relative(root, path)
     )
 
-    return relativePaths.map(relativePath => {
-      const absolutePath = join(path, relativePath)
+    return listOutput.map(relative => {
+      const absolutePath = join(path, relative.path)
       this.pathRoots[absolutePath] = root
+      this.pathIsDirectory[absolutePath] = relative.isdir
       return absolutePath
     })
   }
