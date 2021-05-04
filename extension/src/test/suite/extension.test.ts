@@ -1,8 +1,8 @@
-import { afterEach, before, describe, it } from 'mocha'
+import { afterEach, describe, it } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import {
   window,
   commands,
@@ -22,32 +22,6 @@ suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
   const dvcPathOption = 'dvc.dvcPath'
-
-  before(() => {
-    stub(DvcReader, 'listDvcOnlyRecursive').resolves([
-      { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
-      { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz') },
-      { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz') },
-      { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz') },
-      { path: join('logs', 'acc.tsv') },
-      { path: join('logs', 'loss.tsv') },
-      { path: 'model.pt' }
-    ] as DvcReader.ListOutput[])
-    stub(DvcReader, 'status').resolves({
-      train: [
-        { 'changed deps': { 'data/MNIST': 'modified' } },
-        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-        'always changed'
-      ],
-      'data/MNIST/raw.dvc': [
-        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-      ]
-    })
-  })
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
