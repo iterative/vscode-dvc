@@ -2,7 +2,7 @@ import { describe, it } from 'mocha'
 import chai from 'chai'
 import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { window } from 'vscode'
+import { window, commands } from 'vscode'
 import * as Execution from '../../../cli/execution'
 import { Command } from '../../../cli/args'
 import { Disposable } from '../../../extension'
@@ -58,6 +58,7 @@ suite('Runner Test Suite', () => {
         cwd,
         env: {}
       })
+      const executeCommandSpy = spy(commands, 'executeCommand')
 
       const processCompletedEvent = (): Promise<void> =>
         new Promise(resolve =>
@@ -70,6 +71,11 @@ suite('Runner Test Suite', () => {
       const completedEvent = processCompletedEvent()
 
       expect(runner.isRunning()).to.be.true
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.runner.running',
+        true
+      )
 
       const stopped = await runner.stop()
       expect(stopped).to.be.true
@@ -77,6 +83,13 @@ suite('Runner Test Suite', () => {
       await completedEvent
 
       expect(runner.isRunning()).to.be.false
+      expect(executeCommandSpy).to.be.calledWith(
+        'setContext',
+        'dvc.runner.running',
+        false
+      )
+
+      executeCommandSpy.restore()
       disposable.dispose()
     })
   })

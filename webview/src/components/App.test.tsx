@@ -62,14 +62,6 @@ describe('App', () => {
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
       })
 
-      it('Then the run experiment button should be displayed', async () => {
-        render(<App />)
-        const runExperimentButton = screen.getByText('Run Experiment')
-        await waitFor(() => runExperimentButton)
-
-        expect(runExperimentButton).toBeInTheDocument()
-      })
-
       it('Then the empty state should be displayed', async () => {
         render(<App />)
         const emptyState = screen.getByText('Loading experiments...')

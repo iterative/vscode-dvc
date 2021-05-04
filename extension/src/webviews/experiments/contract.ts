@@ -17,8 +17,7 @@ export type MessageFromWebview = {
 }
 
 export enum MessageFromWebviewType {
-  initialized = 'initialized',
-  onClickRunExperiment = 'onClickRunExperiment'
+  initialized = 'initialized'
 }
 
 export type MessageToWebview = {

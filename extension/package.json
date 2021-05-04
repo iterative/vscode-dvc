@@ -53,27 +53,35 @@
       {
         "title": "%command.runExperiment%",
         "command": "dvc.runExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-execute)"
       },
       {
         "title": "%command.runResetExperiment%",
         "command": "dvc.runResetExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-revert)"
       },
       {
         "title": "%command.queueExperiment%",
         "command": "dvc.queueExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": {
+          "dark": "media/queue-experiment/dark.svg",
+          "light": "media/queue-experiment/light.svg"
+        }
       },
       {
         "title": "%command.runQueuedExperiments%",
         "command": "dvc.runQueuedExperiments",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-execute-all)"
       },
       {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(notebook-stop)"
       },
       {
         "title": "%command.experimentGarbageCollect%",
@@ -227,6 +235,29 @@
           "command": "dvc.pullTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState != untracked"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "dvc.runExperiment",
+          "alt": "dvc.runResetExperiment",
+          "group": "navigation@0",
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.stopRunningExperiment",
+          "group": "navigation@0",
+          "when": "dvc.experiments.webviewActive && dvc.runner.running"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "group": "navigation@1",
+          "when": "dvc.experiments.webviewActive"
+        },
+        {
+          "command": "dvc.queueExperiment",
+          "group": "navigation@2",
+          "when": "dvc.experiments.webviewActive"
         }
       ]
     },
