@@ -1,4 +1,4 @@
-import { afterEach, describe, it } from 'mocha'
+import { afterEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { stub, spy } from 'sinon'
 import sinonChai from 'sinon-chai'

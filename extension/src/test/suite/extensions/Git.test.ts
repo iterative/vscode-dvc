@@ -1,4 +1,4 @@
-import { after, describe, it } from 'mocha'
+import { after, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { ensureFile, accessSync, remove } from 'fs-extra'

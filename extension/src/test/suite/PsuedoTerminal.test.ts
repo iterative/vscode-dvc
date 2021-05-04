@@ -1,4 +1,4 @@
-import { describe, it } from 'mocha'
+import { describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
