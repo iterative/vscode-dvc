@@ -98,6 +98,7 @@ export class Extension {
             ['*.dvc', 'dvc.lock', 'dvc.yaml'],
             () => {
               repository.resetState()
+              this.trackedExplorerTree.reset()
             }
           )
         )
@@ -192,13 +193,6 @@ export class Extension {
       window.registerTreeDataProvider(
         'dvc.views.trackedExplorerTree',
         this.trackedExplorerTree
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.trackedExplorerTree.openFile',
-        resource => this.trackedExplorerTree.openResource(resource)
       )
     )
 
