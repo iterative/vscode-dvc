@@ -98,6 +98,7 @@ export class Extension {
             ['*.dvc', 'dvc.lock', 'dvc.yaml'],
             () => {
               repository.resetState()
+              this.trackedExplorerTree.reset()
             }
           )
         )
