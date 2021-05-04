@@ -1,4 +1,5 @@
 import {
+  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -12,6 +13,7 @@ import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { definedAndNonEmpty } from '../util'
+import { reportStderrOrThrow } from '../vscode/reporting'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -37,8 +39,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.changeTreeDataEventEmitter.fire()
   }
 
-  public openResource(resource: Uri): void {
-    window.showTextDocument(resource)
+  public openResource(resource: Uri) {
+    return window.showTextDocument(resource).then(
+      textEditor => textEditor,
+      error => {
+        reportStderrOrThrow(error.message)
+      }
+    )
   }
 
   private async getRootElements() {
@@ -117,5 +124,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     this.changeTreeDataEventEmitter = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.trackedExplorerTree.openFile',
+        resource => this.openResource(resource)
+      )
+    )
   }
 }
