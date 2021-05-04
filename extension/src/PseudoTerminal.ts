@@ -1,17 +1,7 @@
-import {
-  EventEmitter,
-  Pseudoterminal,
-  Terminal,
-  window,
-  commands
-} from 'vscode'
+import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 
 export class PseudoTerminal {
-  private static contextKey = 'dvc.runner.running'
-  private setRunningContext = (isRunning: boolean) =>
-    commands.executeCommand('setContext', PseudoTerminal.contextKey, isRunning)
-
   public dispose = Disposable.fn()
 
   private termName: string
@@ -25,7 +15,6 @@ export class PseudoTerminal {
 
   public setBlocked(blocked: boolean) {
     this.blocked = blocked
-    this.setRunningContext(blocked)
   }
 
   private readonly outputEventEmitter: EventEmitter<string>

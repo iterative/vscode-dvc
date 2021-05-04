@@ -73,7 +73,7 @@ export class ExperimentsWebview {
     private readonly config: Config
   ) {
     webviewPanel.onDidDispose(() => {
-      this.setPanelActiveContext(false)
+      ExperimentsWebview.setPanelActiveContext(false)
       this._disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
@@ -84,11 +84,11 @@ export class ExperimentsWebview {
 
     this._disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
-        this.setPanelActiveContext(webviewPanel.active)
+        ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
       })
     )
 
-    this.setPanelActiveContext(webviewPanel.active)
+    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
     this._disposer.track({
       dispose: autorun(async () => {
@@ -100,7 +100,7 @@ export class ExperimentsWebview {
     })
   }
 
-  private setPanelActiveContext(state: boolean) {
+  private static setPanelActiveContext(state: boolean) {
     commands.executeCommand('setContext', ExperimentsWebview.contextKey, state)
   }
 
