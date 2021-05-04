@@ -133,17 +133,17 @@ describe('getWatcher', () => {
 })
 
 describe('ignored', () => {
-  it('should match all paths under dvc and env directories', () => {
+  it('should match all paths under .dvc directories', () => {
     expect(ignored.test('/Users/robot/vscode-dvc/demo/.dvc/tmp')).toBe(true)
     expect(ignored.test('C:\\vscode-dvc\\demo\\.dvc\\tmp')).toBe(true)
   })
 
-  it('should match all paths under env directories', () => {
+  it('should match all paths under .env directories', () => {
     expect(ignored.test('/Users/robot/vscode-dvc/demo/.env/bin')).toBe(true)
     expect(ignored.test('C:\\vscode-dvc\\demo\\.env\\bin')).toBe(true)
   })
 
-  it('should match all paths under venv directories', () => {
+  it('should match all paths under .venv directories', () => {
     expect(ignored.test('/Users/robot/vscode-dvc/demo/.venv/bin/python')).toBe(
       true
     )
