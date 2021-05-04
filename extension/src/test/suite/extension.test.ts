@@ -25,18 +25,18 @@ suite('Extension Test Suite', () => {
 
   before(() => {
     stub(DvcReader, 'listDvcOnlyRecursive').resolves([
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte'),
-      join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte'),
-      join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz'),
-      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte'),
-      join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz'),
-      join('logs', 'acc.tsv'),
-      join('logs', 'loss.tsv'),
-      'model.pt'
-    ])
+      { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
+      { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
+      { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
+      { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz') },
+      { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte') },
+      { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz') },
+      { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte') },
+      { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz') },
+      { path: join('logs', 'acc.tsv') },
+      { path: join('logs', 'loss.tsv') },
+      { path: 'model.pt' }
+    ] as DvcReader.ListOutput[])
     stub(DvcReader, 'status').resolves({
       train: [
         { 'changed deps': { 'data/MNIST': 'modified' } },
