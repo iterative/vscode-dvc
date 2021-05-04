@@ -23,13 +23,12 @@ export class ExperimentsWebview {
 
   public isVisible = () => this.webviewPanel.visible
 
+  // eslint-disable-next-line require-await
   public static async restore(
     webviewPanel: WebviewPanel,
     config: Config
   ): Promise<ExperimentsWebview> {
-    const view = new ExperimentsWebview(webviewPanel, config)
-    await view.initialized
-    return view
+    return new ExperimentsWebview(webviewPanel, config)
   }
 
   public static async create(
