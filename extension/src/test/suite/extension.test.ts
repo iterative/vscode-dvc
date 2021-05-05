@@ -1,6 +1,6 @@
-import { afterEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { stub, spy } from 'sinon'
+import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { resolve } from 'path'
 import {
@@ -25,6 +25,10 @@ suite('Extension Test Suite', () => {
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
+  beforeEach(() => {
+    restore()
+  })
+
   afterEach(async () => {
     await workspace.getConfiguration().update(dvcPathOption, undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
@@ -33,9 +37,7 @@ suite('Extension Test Suite', () => {
   describe('showExperiments', () => {
     const showExperimentsCommand = 'dvc.showExperiments'
     it('should be able to make the experiments webview visible', async () => {
-      const mockReader = stub(DvcReader, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
+      stub(DvcReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const experimentsWebview = (await commands.executeCommand(
         showExperimentsCommand
@@ -44,7 +46,6 @@ suite('Extension Test Suite', () => {
       expect(experimentsWebview.isActive()).to.be.true
       expect(experimentsWebview.isVisible()).to.be.true
 
-      mockReader.restore()
       experimentsWebview.dispose()
     })
 
@@ -81,8 +82,6 @@ suite('Extension Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
       expect(mockReader).to.have.been.calledOnce
 
-      windowSpy.restore()
-      mockReader.restore()
       experimentsWebview.dispose()
     })
   })
@@ -107,8 +106,6 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
 
       expect(mockShowInputBox).not.to.have.been.called
-
-      mockShowInputBox.restore()
     })
 
     it('should invoke the file picker with the second option', async () => {
@@ -140,7 +137,6 @@ suite('Extension Test Suite', () => {
         testUri.fsPath
       )
 
-      mockShowOpenDialog.restore()
       disposable.dispose()
     })
   })
