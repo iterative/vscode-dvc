@@ -24,13 +24,17 @@ export class ExperimentsWebview {
 
   public isVisible = () => this.webviewPanel.visible
 
-  public static async restore(
+  public static restore(
     webviewPanel: WebviewPanel,
     config: Config
   ): Promise<ExperimentsWebview> {
-    const view = new ExperimentsWebview(webviewPanel, config)
-    await view.initialized
-    return view
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(new ExperimentsWebview(webviewPanel, config))
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 
   public static async create(
