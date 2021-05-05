@@ -32,10 +32,10 @@ suite('Runner Test Suite', () => {
       })
 
       await runner.run(cwd, '3')
-      stubbedGetExecutionDetails.restore()
       await runner.run(cwd, Command.CHECKOUT)
 
       expect(windowErrorMessageSpy).to.be.calledOnce
+      stubbedGetExecutionDetails.restore()
       disposable.dispose()
     }).timeout(6000)
 
@@ -61,7 +61,6 @@ suite('Runner Test Suite', () => {
       })
 
       await runner.run(cwd, '100000000000000000000000')
-      stubbedGetExecutionDetails.restore()
 
       const completedEvent = processCompletedEvent()
 
@@ -84,6 +83,7 @@ suite('Runner Test Suite', () => {
         false
       )
 
+      stubbedGetExecutionDetails.restore()
       executeCommandSpy.restore()
       disposable.dispose()
     })
@@ -145,11 +145,12 @@ suite('Runner Test Suite', () => {
       )
 
       runner.run(cwd, text)
-      stubbedGetExecutionDetails.restore()
 
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
+
+      stubbedGetExecutionDetails.restore()
 
       disposable.dispose()
     }).timeout(12000)
