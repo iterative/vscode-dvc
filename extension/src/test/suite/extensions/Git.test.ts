@@ -1,4 +1,4 @@
-import { after, beforeEach, describe, it, suite } from 'mocha'
+import { after, afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { ensureFile, accessSync, remove } from 'fs-extra'
@@ -19,8 +19,14 @@ suite('Git Extension Test Suite', () => {
   const dvcDemoPath = join(workspacePath, 'demo')
   const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
 
+  const disposable = Disposable.fn()
+
   beforeEach(() => {
     restore()
+  })
+
+  afterEach(() => {
+    disposable.dispose()
   })
 
   after(() => {
@@ -29,7 +35,6 @@ suite('Git Extension Test Suite', () => {
 
   describe('GitExtension', () => {
     it("should provide an onDidUntrackedChange callback for each of it's repositories", async () => {
-      const disposable = Disposable.fn()
       const gitExtension = disposable.track(new GitExtension())
       await gitExtension.ready
 
@@ -58,16 +63,13 @@ suite('Git Extension Test Suite', () => {
       const untrackedChanges = await getAllUntracked(gitRoot)
       expect(untrackedChanges).to.have.lengthOf.at.least(2)
       expect(untrackedChanges).to.include(untrackedFile, untrackedDir)
-      disposable.dispose()
     }).timeout(10000)
 
     it('should be able to return the root path of each open repository', async () => {
-      const disposable = Disposable.fn()
       const gitExtension = disposable.track(new GitExtension())
       await gitExtension.ready
       const [gitExtensionRepository] = gitExtension.repositories
       expect(gitExtensionRepository.getRepositoryRoot()).to.equal(workspacePath)
-      disposable.dispose()
     })
   })
 })
