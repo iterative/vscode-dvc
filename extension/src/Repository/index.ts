@@ -80,6 +80,7 @@ export class Repository {
 
   private getCliExecutionOptions() {
     return {
+      cliUnavailable: this.config.cliUnavailable,
       cliPath: this.config.dvcPath,
       pythonBinPath: this.config.pythonBinPath,
       cwd: this.dvcRoot

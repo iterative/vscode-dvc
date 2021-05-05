@@ -108,6 +108,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     await this.config.ready
     const listOutput = await listDvcOnly(
       {
+        cliUnavailable: this.config.cliUnavailable,
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.dvcPath,
         cwd: path
