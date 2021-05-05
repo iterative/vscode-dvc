@@ -1,8 +1,8 @@
-import { afterEach, before, describe, it } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { stub, spy } from 'sinon'
+import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import {
   window,
   commands,
@@ -23,35 +23,16 @@ suite('Extension Test Suite', () => {
 
   const dvcPathOption = 'dvc.dvcPath'
 
-  before(() => {
-    stub(DvcReader, 'listDvcOnlyRecursive').resolves([
-      { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
-      { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz') },
-      { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz') },
-      { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte') },
-      { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz') },
-      { path: join('logs', 'acc.tsv') },
-      { path: join('logs', 'loss.tsv') },
-      { path: 'model.pt' }
-    ] as DvcReader.ListOutput[])
-    stub(DvcReader, 'status').resolves({
-      train: [
-        { 'changed deps': { 'data/MNIST': 'modified' } },
-        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-        'always changed'
-      ],
-      'data/MNIST/raw.dvc': [
-        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-      ]
-    })
-  })
-
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
+  const disposable = Disposable.fn()
+
+  beforeEach(() => {
+    restore()
+  })
+
   afterEach(async () => {
+    disposable.dispose()
     await workspace.getConfiguration().update(dvcPathOption, undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
@@ -59,19 +40,14 @@ suite('Extension Test Suite', () => {
   describe('showExperiments', () => {
     const showExperimentsCommand = 'dvc.showExperiments'
     it('should be able to make the experiments webview visible', async () => {
-      const mockReader = stub(DvcReader, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
+      stub(DvcReader, 'experimentShow').resolves(complexExperimentsOutput)
 
-      const experimentsWebview = (await commands.executeCommand(
-        showExperimentsCommand
-      )) as ExperimentsWebview
+      const experimentsWebview = disposable.track(
+        await commands.executeCommand(showExperimentsCommand)
+      ) as ExperimentsWebview
 
       expect(experimentsWebview.isActive()).to.be.true
       expect(experimentsWebview.isVisible()).to.be.true
-
-      mockReader.restore()
-      experimentsWebview.dispose()
     })
 
     it('should only be able to open a single experiments webview', async () => {
@@ -87,9 +63,9 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const experimentsWebview = (await commands.executeCommand(
-        showExperimentsCommand
-      )) as ExperimentsWebview
+      const experimentsWebview = disposable.track(
+        await commands.executeCommand(showExperimentsCommand)
+      ) as ExperimentsWebview
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockReader).to.have.been.calledOnce
@@ -106,10 +82,6 @@ suite('Extension Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
       expect(mockReader).to.have.been.calledOnce
-
-      windowSpy.restore()
-      mockReader.restore()
-      experimentsWebview.dispose()
     })
   })
 
@@ -133,12 +105,9 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
 
       expect(mockShowInputBox).not.to.have.been.called
-
-      mockShowInputBox.restore()
     })
 
     it('should invoke the file picker with the second option', async () => {
-      const disposable = Disposable.fn()
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
@@ -165,9 +134,6 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         testUri.fsPath
       )
-
-      mockShowOpenDialog.restore()
-      disposable.dispose()
     })
   })
 })
