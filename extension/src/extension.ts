@@ -48,15 +48,15 @@ registerUpdateReconciler(module)
 export class Extension {
   public readonly dispose = Disposable.fn()
 
-  private resourceLocator: ResourceLocator
+  private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private webviewManager?: WebviewManager
+  private readonly webviewManager: WebviewManager
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
   private trackedExplorerTree?: TrackedExplorerTree
-  private gitExtension?: GitExtension
-  private runner?: Runner
+  private readonly gitExtension: GitExtension
+  private readonly runner: Runner
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -80,38 +80,72 @@ export class Extension {
     )
   }
 
-  private initializeDvcRepositories(dvcRoots: string[]) {
-    this.config.ready.then(() =>
-      dvcRoots.forEach(dvcRoot => {
-        const repository = this.dispose.track(
-          new Repository(
-            dvcRoot,
-            this.config,
-            this.decorationProviders[dvcRoot]
-          )
-        )
+  private startup() {
+    this.initializeDvcRepositories(this.dvcRoots)
 
-        this.dispose.track(
-          addOnFileTypeChangeHandler(
-            dvcRoot,
-            ['*.dvc', 'dvc.lock', 'dvc.yaml'],
-            () => {
-              repository.resetState()
-              this.trackedExplorerTree?.reset()
-            }
-          )
-        )
-
-        this.dispose.track(
-          addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
-            repository.updateState()
-            this.trackedExplorerTree?.refresh(path)
-          })
-        )
-
-        this.dvcRepositories[dvcRoot] = repository
-      })
+    this.trackedExplorerTree = this.dispose.track(
+      new TrackedExplorerTree(this.config)
     )
+
+    this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
+
+    this.dispose.track(
+      window.registerTreeDataProvider(
+        'dvc.views.trackedExplorerTree',
+        this.trackedExplorerTree
+      )
+    )
+
+    this.gitExtension.ready.then(() => {
+      this.gitExtension?.repositories.forEach(async gitExtensionRepository => {
+        const gitRoot = gitExtensionRepository.getRepositoryRoot()
+
+        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
+
+        const dvcRoots = await findDvcRootPaths({
+          cliPath: this.config.dvcPath,
+          cwd: gitRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+        dvcRoots.forEach(dvcRoot => {
+          const repository = this.dvcRepositories[dvcRoot]
+
+          this.dispose.track(
+            gitExtensionRepository.onDidChange(() => {
+              repository?.updateState()
+            })
+          )
+        })
+      })
+    })
+  }
+
+  private initializeDvcRepositories(dvcRoots: string[]) {
+    dvcRoots.forEach(dvcRoot => {
+      const repository = this.dispose.track(
+        new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
+      )
+
+      this.dispose.track(
+        addOnFileTypeChangeHandler(
+          dvcRoot,
+          ['*.dvc', 'dvc.lock', 'dvc.yaml'],
+          () => {
+            repository.resetState()
+            this.trackedExplorerTree?.reset()
+          }
+        )
+      )
+
+      this.dispose.track(
+        addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
+          repository.updateState()
+          this.trackedExplorerTree?.refresh(path)
+        })
+      )
+
+      this.dvcRepositories[dvcRoot] = repository
+    })
   }
 
   private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
@@ -162,48 +196,6 @@ export class Extension {
     }
   }
 
-  private startup() {
-    this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.config)
-    )
-
-    this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
-
-    this.initializeDvcRepositories(this.dvcRoots)
-
-    this.dispose.track(
-      window.registerTreeDataProvider(
-        'dvc.views.trackedExplorerTree',
-        this.trackedExplorerTree
-      )
-    )
-
-    this.gitExtension = this.dispose.track(new GitExtension())
-
-    this.gitExtension.ready.then(() => {
-      this.gitExtension?.repositories.forEach(async gitExtensionRepository => {
-        const gitRoot = gitExtensionRepository.getRepositoryRoot()
-
-        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
-
-        const dvcRoots = await findDvcRootPaths({
-          cliPath: this.config.dvcPath,
-          cwd: gitRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
-        dvcRoots.forEach(dvcRoot => {
-          const repository = this.dvcRepositories[dvcRoot]
-
-          this.dispose.track(
-            gitExtensionRepository.onDidChange(() => {
-              repository?.updateState()
-            })
-          )
-        })
-      })
-    })
-  }
-
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -214,6 +206,8 @@ export class Extension {
     this.resourceLocator = new ResourceLocator(context.extensionUri)
 
     this.config = this.dispose.track(new Config())
+
+    this.gitExtension = this.dispose.track(new GitExtension())
 
     Promise.all([
       (workspace.workspaceFolders || []).map(workspaceFolder =>
