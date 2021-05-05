@@ -1,4 +1,4 @@
-import { after, describe, it, suite } from 'mocha'
+import { after, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { ensureFile, accessSync, remove } from 'fs-extra'
@@ -7,6 +7,7 @@ import { Disposable } from '../../../extension'
 import { join, resolve } from 'path'
 import { GitExtension } from '../../../extensions/Git'
 import { getAllUntracked } from '../../../git'
+import { restore } from 'sinon'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -17,6 +18,10 @@ suite('Git Extension Test Suite', () => {
   const workspacePath = resolve(__dirname, '..', '..', '..', '..', '..')
   const dvcDemoPath = join(workspacePath, 'demo')
   const untrackedDir = join(dvcDemoPath, 'folder-with-stuff')
+
+  beforeEach(() => {
+    restore()
+  })
 
   after(() => {
     remove(untrackedDir)
