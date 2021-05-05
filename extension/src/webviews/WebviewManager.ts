@@ -24,6 +24,7 @@ export class WebviewManager {
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (panel: WebviewPanel) => {
           const view = await ExperimentsWebview.restore(panel, this.config)
+          await view.initialized
           this.addExperiments(view)
         }
       })
