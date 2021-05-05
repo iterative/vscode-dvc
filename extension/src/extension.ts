@@ -239,6 +239,20 @@ export class Extension {
       )
     )
 
+    this.config.onDidChangeExecutionDetails(() =>
+      this.canRunCli().then(
+        () => {
+          this.startup()
+        },
+        () => {
+          window.showInformationMessage(
+            'DVC extension is unable to initialize as the cli is not available.\n' +
+              'Update your config options to try again..'
+          )
+        }
+      )
+    )
+
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
