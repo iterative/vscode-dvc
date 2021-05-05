@@ -14,6 +14,8 @@ export class Runner {
   private startedEventEmitter: EventEmitter<void>
   private terminatedEventEmitter: EventEmitter<void>
 
+  private executable: string | undefined
+
   public onDidComplete: Event<void>
   private onDidTerminate: Event<void>
 
@@ -27,7 +29,7 @@ export class Runner {
     await this.config.ready
     this.currentProcess = createCliProcess({
       options: {
-        cliPath: this.config.dvcPath,
+        cliPath: this.executable ? this.executable : this.config.dvcPath,
         cwd,
         pythonBinPath: this.config.pythonBinPath
       },
@@ -76,6 +78,7 @@ export class Runner {
 
   constructor(
     config: Config,
+    executable?: string,
     emitters?: {
       outputEventEmitter: EventEmitter<string>
       completedEventEmitter: EventEmitter<void>
@@ -84,6 +87,8 @@ export class Runner {
     }
   ) {
     this.config = config
+
+    this.executable = executable
 
     this.completedEventEmitter =
       emitters?.completedEventEmitter ||

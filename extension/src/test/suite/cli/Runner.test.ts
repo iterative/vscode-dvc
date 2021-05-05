@@ -1,9 +1,8 @@
-import { beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { restore, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
-import * as Execution from '../../../cli/execution'
 import { Command } from '../../../cli/args'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
@@ -15,35 +14,31 @@ const { expect } = chai
 suite('Runner Test Suite', () => {
   window.showInformationMessage('Start all runner tests.')
 
-  const stubbedGetExecutionDetails = stub(Execution, 'getExecutionDetails')
+  const disposable = Disposable.fn()
 
   beforeEach(() => {
     restore()
   })
 
+  afterEach(() => {
+    disposable.dispose()
+  })
+
   describe('Runner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const disposable = Disposable.fn()
-      const runner = disposable.track(new Runner({} as Config))
+      const runner = disposable.track(new Runner({} as Config, 'sleep'))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
-      stubbedGetExecutionDetails.onFirstCall().returns({
-        executable: 'sleep',
-        cwd,
-        env: {}
-      })
 
       await runner.run(cwd, '3')
       await runner.run(cwd, Command.CHECKOUT)
 
       expect(windowErrorMessageSpy).to.be.calledOnce
-      disposable.dispose()
     }).timeout(6000)
 
     it('should be able to stop a started command', async () => {
-      const disposable = Disposable.fn()
-      const runner = disposable.track(new Runner({} as Config))
+      const runner = disposable.track(new Runner({} as Config, 'sleep'))
       const cwd = __dirname
 
       const executeCommandSpy = spy(commands, 'executeCommand')
@@ -52,12 +47,6 @@ suite('Runner Test Suite', () => {
         new Promise(resolve =>
           disposable.track(runner.onDidComplete(() => resolve()))
         )
-
-      stubbedGetExecutionDetails.onFirstCall().returns({
-        executable: 'sleep',
-        cwd,
-        env: {}
-      })
 
       await runner.run(cwd, '100000000000000000000000')
 
@@ -81,13 +70,9 @@ suite('Runner Test Suite', () => {
         'dvc.runner.running',
         false
       )
-
-      disposable.dispose()
     })
 
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
-      const disposable = Disposable.fn()
-
       const text = ':weeeee:'
 
       const completedEventEmitter = disposable.track(new EventEmitter<void>())
@@ -128,12 +113,8 @@ suite('Runner Test Suite', () => {
 
       const cwd = __dirname
 
-      stubbedGetExecutionDetails
-        .onFirstCall()
-        .returns({ executable: 'echo', cwd, env: {} })
-
       const runner = disposable.track(
-        new Runner({} as Config, {
+        new Runner({} as Config, 'echo', {
           completedEventEmitter,
           outputEventEmitter,
           startedEventEmitter
@@ -144,9 +125,7 @@ suite('Runner Test Suite', () => {
 
       await started
       expect((await eventStream).includes(text)).to.be.true
-      await completed
-
-      disposable.dispose()
+      return completed
     }).timeout(12000)
   })
 })
