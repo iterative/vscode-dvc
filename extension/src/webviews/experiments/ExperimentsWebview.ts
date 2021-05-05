@@ -24,13 +24,17 @@ export class ExperimentsWebview {
 
   public isVisible = () => this.webviewPanel.visible
 
-  public static async restore(
+  public static restore(
     webviewPanel: WebviewPanel,
     config: Config
   ): Promise<ExperimentsWebview> {
-    const view = new ExperimentsWebview(webviewPanel, config)
-    await view.initialized
-    return view
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(new ExperimentsWebview(webviewPanel, config))
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 
   public static async create(
@@ -73,7 +77,7 @@ export class ExperimentsWebview {
     private readonly config: Config
   ) {
     webviewPanel.onDidDispose(() => {
-      this.setPanelActiveContext(false)
+      ExperimentsWebview.setPanelActiveContext(false)
       this._disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
@@ -84,11 +88,11 @@ export class ExperimentsWebview {
 
     this._disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
-        this.setPanelActiveContext(webviewPanel.active)
+        ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
       })
     )
 
-    this.setPanelActiveContext(webviewPanel.active)
+    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
     this._disposer.track({
       dispose: autorun(async () => {
@@ -100,7 +104,7 @@ export class ExperimentsWebview {
     })
   }
 
-  private setPanelActiveContext(state: boolean) {
+  private static setPanelActiveContext(state: boolean) {
     commands.executeCommand('setContext', ExperimentsWebview.contextKey, state)
   }
 
