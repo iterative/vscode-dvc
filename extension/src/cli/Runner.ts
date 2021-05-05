@@ -1,4 +1,4 @@
-import { EventEmitter, Event, window } from 'vscode'
+import { EventEmitter, Event, window, commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
@@ -8,6 +8,10 @@ import { Process } from '../processExecution'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
+
+  private static contextKey = 'dvc.runner.running'
+  private static setRunningContext = (isRunning: boolean) =>
+    commands.executeCommand('setContext', Runner.contextKey, isRunning)
 
   private outputEventEmitter: EventEmitter<string>
   private completedEventEmitter: EventEmitter<void>
@@ -31,6 +35,7 @@ export class Runner {
   }
 
   private async startProcess(cwd: string, args: Args) {
+    Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
@@ -104,6 +109,7 @@ export class Runner {
     this.dispose.track(
       this.onDidComplete(() => {
         this.pseudoTerminal.setBlocked(false)
+        Runner.setRunningContext(false)
         this.outputEventEmitter.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )

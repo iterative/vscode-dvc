@@ -54,7 +54,10 @@
         "title": "%command.runExperiment%",
         "command": "dvc.runExperiment",
         "category": "DVC",
-        "icon": "$(notebook-execute)"
+        "icon": {
+          "light": "resources/light/run-experiment.svg",
+          "dark": "resources/dark/run-experiment.svg"
+        }
       },
       {
         "title": "%command.runResetExperiment%",
@@ -67,21 +70,27 @@
         "command": "dvc.queueExperiment",
         "category": "DVC",
         "icon": {
-          "dark": "media/queue-experiment/dark.svg",
-          "light": "media/queue-experiment/light.svg"
+          "dark": "resources/dark/queue-experiment.svg",
+          "light": "resources/light/queue-experiment.svg"
         }
       },
       {
         "title": "%command.runQueuedExperiments%",
         "command": "dvc.runQueuedExperiments",
         "category": "DVC",
-        "icon": "$(notebook-execute-all)"
+        "icon": {
+          "dark": "resources/dark/run-all.svg",
+          "light": "resources/light/run-all.svg"
+        }
       },
       {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
         "category": "DVC",
-        "icon": "$(notebook-stop)"
+        "icon": {
+          "light": "resources/light/stop-experiment.svg",
+          "dark": "resources/dark/stop-experiment.svg"
+        }
       },
       {
         "title": "%command.experimentGarbageCollect%",
@@ -252,12 +261,37 @@
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1",
-          "when": "dvc.experiments.webviewActive"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "navigation@2",
-          "when": "dvc.experiments.webviewActive"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "group": "1_run@0",
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.stopRunningExperiment",
+          "group": "1_run@0",
+          "when": "dvc.experiments.webviewActive && dvc.runner.running"
+        },
+        {
+          "command": "dvc.queueExperiment",
+          "group": "1_run@1",
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "group": "1_run@2",
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+        },
+        {
+          "command": "dvc.runResetExperiment",
+          "group": "1_run@3",
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
         }
       ]
     },
