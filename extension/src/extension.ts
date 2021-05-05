@@ -167,11 +167,11 @@ export class Extension {
       cliPath: this.config.dvcPath,
       cwd: this.config.workspaceRoot
     })
-    return this.webviewManager?.refreshExperiments(experiments)
+    return this.webviewManager.refreshExperiments(experiments)
   }
 
   private showExperimentsWebview = async () => {
-    const webview = await this.webviewManager?.findOrCreateExperiments()
+    const webview = await this.webviewManager.findOrCreateExperiments()
     await this.refreshExperimentsWebview()
     return webview
   }
