@@ -25,11 +25,14 @@ suite('Extension Test Suite', () => {
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
+  const disposable = Disposable.fn()
+
   beforeEach(() => {
     restore()
   })
 
   afterEach(async () => {
+    disposable.dispose()
     await workspace.getConfiguration().update(dvcPathOption, undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
@@ -39,14 +42,12 @@ suite('Extension Test Suite', () => {
     it('should be able to make the experiments webview visible', async () => {
       stub(DvcReader, 'experimentShow').resolves(complexExperimentsOutput)
 
-      const experimentsWebview = (await commands.executeCommand(
-        showExperimentsCommand
-      )) as ExperimentsWebview
+      const experimentsWebview = disposable.track(
+        await commands.executeCommand(showExperimentsCommand)
+      ) as ExperimentsWebview
 
       expect(experimentsWebview.isActive()).to.be.true
       expect(experimentsWebview.isVisible()).to.be.true
-
-      experimentsWebview.dispose()
     })
 
     it('should only be able to open a single experiments webview', async () => {
@@ -62,9 +63,9 @@ suite('Extension Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const experimentsWebview = (await commands.executeCommand(
-        showExperimentsCommand
-      )) as ExperimentsWebview
+      const experimentsWebview = disposable.track(
+        await commands.executeCommand(showExperimentsCommand)
+      ) as ExperimentsWebview
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockReader).to.have.been.calledOnce
@@ -81,8 +82,6 @@ suite('Extension Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
       expect(mockReader).to.have.been.calledOnce
-
-      experimentsWebview.dispose()
     })
   })
 
@@ -109,7 +108,6 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option', async () => {
-      const disposable = Disposable.fn()
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
@@ -136,8 +134,6 @@ suite('Extension Test Suite', () => {
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         testUri.fsPath
       )
-
-      disposable.dispose()
     })
   })
 })
