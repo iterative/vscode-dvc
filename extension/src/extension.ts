@@ -35,7 +35,7 @@ import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './views/TrackedExplorerTree'
-import { executeCliProcess } from './cli/execution'
+import { canRunCli } from './cli/executor'
 
 export { Disposable, Disposer }
 
@@ -196,17 +196,6 @@ export class Extension {
     }
   }
 
-  canRunCli() {
-    return executeCliProcess(
-      {
-        cwd: this.config.workspaceRoot,
-        cliPath: this.config.dvcPath,
-        pythonBinPath: this.config.pythonBinPath
-      },
-      '-h'
-    )
-  }
-
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -226,7 +215,11 @@ export class Extension {
       ),
       this.config.ready
     ]).then(() =>
-      this.canRunCli().then(
+      canRunCli({
+        cliPath: this.config.dvcPath,
+        pythonBinPath: this.config.pythonBinPath,
+        cwd: this.config.workspaceRoot
+      }).then(
         () => {
           this.startup()
         },
@@ -240,7 +233,11 @@ export class Extension {
     )
 
     this.config.onDidChangeExecutionDetails(() =>
-      this.canRunCli().then(
+      canRunCli({
+        cliPath: this.config.dvcPath,
+        pythonBinPath: this.config.pythonBinPath,
+        cwd: this.config.workspaceRoot
+      }).then(
         () => {
           this.startup()
         },
