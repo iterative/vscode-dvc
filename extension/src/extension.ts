@@ -185,12 +185,12 @@ export class Extension {
 
     if (dvcRoot) {
       await this.showExperimentsWebview()
-      this.runner?.run(dvcRoot, ...args)
+      this.runner.run(dvcRoot, ...args)
       const listener = this.dispose.track(
-        this.runner?.onDidComplete(() => {
+        this.runner.onDidComplete(() => {
           this.refreshExperimentsWebview()
           this.dispose.untrack(listener)
-          listener?.dispose()
+          listener.dispose()
         })
       )
     }
@@ -287,7 +287,7 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.stopRunningExperiment', () =>
-        this.runner?.stop()
+        this.runner.stop()
       )
     )
   }
