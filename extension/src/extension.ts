@@ -196,6 +196,17 @@ export class Extension {
     }
   }
 
+  canRunCli() {
+    return executeCliProcess(
+      {
+        cwd: this.config.workspaceRoot,
+        cliPath: this.config.dvcPath,
+        pythonBinPath: this.config.pythonBinPath
+      },
+      '-h'
+    )
+  }
+
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -215,14 +226,7 @@ export class Extension {
       ),
       this.config.ready
     ]).then(() =>
-      executeCliProcess(
-        {
-          cwd: this.config.workspaceRoot,
-          cliPath: this.config.dvcPath,
-          pythonBinPath: this.config.pythonBinPath
-        },
-        '-h'
-      ).then(
+      this.canRunCli().then(
         () => {
           this.startup()
         },
