@@ -74,10 +74,20 @@ export class Runner {
     return this.currentProcess
   }
 
-  constructor(config: Config) {
+  constructor(
+    config: Config,
+    emitters?: {
+      outputEventEmitter: EventEmitter<string>
+      completedEventEmitter: EventEmitter<void>
+      startedEventEmitter: EventEmitter<void>
+      terminatedEventEmitter?: EventEmitter<void>
+    }
+  ) {
     this.config = config
 
-    this.completedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.completedEventEmitter =
+      emitters?.completedEventEmitter ||
+      this.dispose.track(new EventEmitter<void>())
     this.onDidComplete = this.completedEventEmitter.event
     this.dispose.track(
       this.onDidComplete(() => {
@@ -89,11 +99,17 @@ export class Runner {
       })
     )
 
-    this.outputEventEmitter = this.dispose.track(new EventEmitter<string>())
+    this.outputEventEmitter =
+      emitters?.outputEventEmitter ||
+      this.dispose.track(new EventEmitter<string>())
 
-    this.startedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.startedEventEmitter =
+      emitters?.startedEventEmitter ||
+      this.dispose.track(new EventEmitter<void>())
 
-    this.terminatedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.terminatedEventEmitter =
+      emitters?.terminatedEventEmitter ||
+      this.dispose.track(new EventEmitter<void>())
     this.onDidTerminate = this.terminatedEventEmitter.event
     this.dispose.track(
       this.onDidTerminate(() => {
