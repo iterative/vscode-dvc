@@ -35,6 +35,7 @@ import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './views/TrackedExplorerTree'
+import { executeCliProcess } from './cli/execution'
 
 export { Disposable, Disposer }
 
@@ -47,15 +48,15 @@ registerUpdateReconciler(module)
 export class Extension {
   public readonly dispose = Disposable.fn()
 
-  private readonly resourceLocator: ResourceLocator
+  private resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly webviewManager: WebviewManager
+  private webviewManager?: WebviewManager
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private trackedExplorerTree: TrackedExplorerTree
-  private readonly gitExtension: GitExtension
-  private readonly runner: Runner
+  private trackedExplorerTree?: TrackedExplorerTree
+  private gitExtension?: GitExtension
+  private runner?: Runner
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -66,8 +67,6 @@ export class Extension {
     })
 
     this.initializeDecorationProvidersEarly(dvcRoots)
-
-    this.initializeDvcRepositories(dvcRoots)
 
     return this.dvcRoots.push(...dvcRoots)
   }
@@ -98,7 +97,7 @@ export class Extension {
             ['*.dvc', 'dvc.lock', 'dvc.yaml'],
             () => {
               repository.resetState()
-              this.trackedExplorerTree.reset()
+              this.trackedExplorerTree?.reset()
             }
           )
         )
@@ -106,7 +105,7 @@ export class Extension {
         this.dispose.track(
           addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
             repository.updateState()
-            this.trackedExplorerTree.refresh(path)
+            this.trackedExplorerTree?.refresh(path)
           })
         )
 
@@ -130,16 +129,15 @@ export class Extension {
 
   private refreshExperimentsWebview = async () => {
     const experiments = await experimentShow({
-      cliUnavailable: this.config.cliUnavailable,
       pythonBinPath: this.config.pythonBinPath,
       cliPath: this.config.dvcPath,
       cwd: this.config.workspaceRoot
     })
-    return this.webviewManager.refreshExperiments(experiments)
+    return this.webviewManager?.refreshExperiments(experiments)
   }
 
   private showExperimentsWebview = async () => {
-    const webview = await this.webviewManager.findOrCreateExperiments()
+    const webview = await this.webviewManager?.findOrCreateExperiments()
     await this.refreshExperimentsWebview()
     return webview
   }
@@ -153,15 +151,57 @@ export class Extension {
 
     if (dvcRoot) {
       await this.showExperimentsWebview()
-      this.runner.run(dvcRoot, ...args)
+      this.runner?.run(dvcRoot, ...args)
       const listener = this.dispose.track(
-        this.runner.onDidComplete(() => {
+        this.runner?.onDidComplete(() => {
           this.refreshExperimentsWebview()
           this.dispose.untrack(listener)
-          listener.dispose()
+          listener?.dispose()
         })
       )
     }
+  }
+
+  private startup() {
+    this.trackedExplorerTree = this.dispose.track(
+      new TrackedExplorerTree(this.config)
+    )
+
+    this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
+
+    this.initializeDvcRepositories(this.dvcRoots)
+
+    this.dispose.track(
+      window.registerTreeDataProvider(
+        'dvc.views.trackedExplorerTree',
+        this.trackedExplorerTree
+      )
+    )
+
+    this.gitExtension = this.dispose.track(new GitExtension())
+
+    this.gitExtension.ready.then(() => {
+      this.gitExtension?.repositories.forEach(async gitExtensionRepository => {
+        const gitRoot = gitExtensionRepository.getRepositoryRoot()
+
+        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
+
+        const dvcRoots = await findDvcRootPaths({
+          cliPath: this.config.dvcPath,
+          cwd: gitRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+        dvcRoots.forEach(dvcRoot => {
+          const repository = this.dvcRepositories[dvcRoot]
+
+          this.dispose.track(
+            gitExtensionRepository.onDidChange(() => {
+              repository?.updateState()
+            })
+          )
+        })
+      })
+    })
   }
 
   constructor(context: ExtensionContext) {
@@ -175,30 +215,36 @@ export class Extension {
 
     this.config = this.dispose.track(new Config())
 
-    this.runner = this.dispose.track(new Runner(this.config))
-
-    this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.config)
-    )
-
-    Promise.all(
+    Promise.all([
       (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
-      )
-    ).then(() => {
-      this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
-    })
-
-    this.dispose.track(
-      window.registerTreeDataProvider(
-        'dvc.views.trackedExplorerTree',
-        this.trackedExplorerTree
+      ),
+      this.config.ready
+    ]).then(() =>
+      executeCliProcess(
+        {
+          cwd: this.config.workspaceRoot,
+          cliPath: this.config.dvcPath,
+          pythonBinPath: this.config.pythonBinPath
+        },
+        '-h'
+      ).then(
+        () => {
+          this.startup()
+        },
+        () => {
+          window.showInformationMessage(
+            'DVC extension is unable to initialize as the cli is not available'
+          )
+        }
       )
     )
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
+
+    this.runner = this.dispose.track(new Runner(this.config))
 
     registerCliCommands(this.config, this.dispose)
 
@@ -243,35 +289,9 @@ export class Extension {
 
     this.dispose.track(
       commands.registerCommand('dvc.stopRunningExperiment', () =>
-        this.runner.stop()
+        this.runner?.stop()
       )
     )
-
-    this.gitExtension = this.dispose.track(new GitExtension())
-
-    this.gitExtension.ready.then(() => {
-      this.gitExtension.repositories.forEach(async gitExtensionRepository => {
-        await this.config.ready
-        const gitRoot = gitExtensionRepository.getRepositoryRoot()
-
-        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
-
-        const dvcRoots = await findDvcRootPaths({
-          cliPath: this.config.dvcPath,
-          cwd: gitRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
-        dvcRoots.forEach(dvcRoot => {
-          const repository = this.dvcRepositories[dvcRoot]
-
-          this.dispose.track(
-            gitExtensionRepository.onDidChange(() => {
-              repository?.updateState()
-            })
-          )
-        })
-      })
-    })
   }
 }
 

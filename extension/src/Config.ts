@@ -16,7 +16,6 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
-import { executeCliProcess } from './cli/execution'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -35,9 +34,6 @@ export class Config {
 
   @observable
   public pythonBinPath: string | undefined
-
-  @observable
-  public cliUnavailable: boolean
 
   @observable
   private _vsCodeTheme: ColorTheme
@@ -131,26 +127,9 @@ export class Config {
   constructor() {
     makeObservable(this)
 
-    this.cliUnavailable = true
-
     getPythonBinPath().then(path => {
       this.pythonBinPath = path
-      return executeCliProcess(
-        { cwd: this.workspaceRoot, cliPath: this.dvcPath, pythonBinPath: path },
-        '-h'
-      ).then(
-        () => {
-          this.cliUnavailable = false
-          return this._initialized.resolve()
-        },
-        () => {
-          window.showInformationMessage(
-            'DVC extension is unable to initialize as the cli is not available'
-          )
-          this.cliUnavailable = true
-          return this._initialized.resolve()
-        }
-      )
+      return this._initialized.resolve()
     })
 
     getOnDidChangePythonExecutionDetails().then(

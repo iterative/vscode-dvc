@@ -5,7 +5,6 @@ import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, executeProcess } from '../processExecution'
 
 export type BaseExecutionOptions = {
-  cliUnavailable?: boolean
   cliPath: string | undefined
   pythonBinPath: string | undefined
 }
@@ -103,9 +102,6 @@ export const readCliProcess = async <T = string>(
   formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
   ...args: Args
 ): Promise<T> => {
-  if (options.cliUnavailable) {
-    return {} as T
-  }
   const output = await executeCliProcess(options, ...args)
   if (!formatter) {
     return (output as unknown) as T
