@@ -81,9 +81,10 @@ export class PseudoTerminal {
 
   constructor(
     outputEventEmitter: EventEmitter<string>,
-    terminatedEventEmitter: EventEmitter<void>
+    terminatedEventEmitter: EventEmitter<void>,
+    termName = 'DVC'
   ) {
-    this.termName = 'DVC'
+    this.termName = termName
     this.outputEventEmitter = outputEventEmitter
     this.terminatedEventEmitter = terminatedEventEmitter
     this.blocked = false

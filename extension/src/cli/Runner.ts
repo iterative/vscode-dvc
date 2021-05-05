@@ -18,12 +18,21 @@ export class Runner {
   private startedEventEmitter: EventEmitter<void>
   private terminatedEventEmitter: EventEmitter<void>
 
+  private executable: string | undefined
+
   public onDidComplete: Event<void>
   private onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private config: Config
+
+  private getOverrideOrCliPath() {
+    if (this.executable) {
+      return this.executable
+    }
+    return this.config.dvcPath
+  }
 
   private async startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
@@ -32,7 +41,7 @@ export class Runner {
     await this.config.ready
     this.currentProcess = createCliProcess({
       options: {
-        cliPath: this.config.dvcPath,
+        cliPath: this.getOverrideOrCliPath(),
         cwd,
         pythonBinPath: this.config.pythonBinPath
       },
@@ -79,10 +88,23 @@ export class Runner {
     return this.currentProcess
   }
 
-  constructor(config: Config) {
+  constructor(
+    config: Config,
+    executable?: string,
+    emitters?: {
+      outputEventEmitter: EventEmitter<string>
+      completedEventEmitter: EventEmitter<void>
+      startedEventEmitter: EventEmitter<void>
+      terminatedEventEmitter?: EventEmitter<void>
+    }
+  ) {
     this.config = config
 
-    this.completedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.executable = executable
+
+    this.completedEventEmitter =
+      emitters?.completedEventEmitter ||
+      this.dispose.track(new EventEmitter<void>())
     this.onDidComplete = this.completedEventEmitter.event
     this.dispose.track(
       this.onDidComplete(() => {
@@ -95,11 +117,17 @@ export class Runner {
       })
     )
 
-    this.outputEventEmitter = this.dispose.track(new EventEmitter<string>())
+    this.outputEventEmitter =
+      emitters?.outputEventEmitter ||
+      this.dispose.track(new EventEmitter<string>())
 
-    this.startedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.startedEventEmitter =
+      emitters?.startedEventEmitter ||
+      this.dispose.track(new EventEmitter<void>())
 
-    this.terminatedEventEmitter = this.dispose.track(new EventEmitter<void>())
+    this.terminatedEventEmitter =
+      emitters?.terminatedEventEmitter ||
+      this.dispose.track(new EventEmitter<void>())
     this.onDidTerminate = this.terminatedEventEmitter.event
     this.dispose.track(
       this.onDidTerminate(() => {
