@@ -63,7 +63,7 @@ export class ExperimentsWebview {
 
   private readonly _initialized = new Deferred()
 
-  public readonly initialized = this._initialized.promise
+  protected readonly initialized = this._initialized.promise
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
 
