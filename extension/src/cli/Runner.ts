@@ -23,13 +23,20 @@ export class Runner {
   private currentProcess: Process | undefined
   private config: Config
 
+  private getOverrideOrCliPath() {
+    if (this.executable) {
+      return this.executable
+    }
+    return this.config.dvcPath
+  }
+
   private async startProcess(cwd: string, args: Args) {
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
     this.currentProcess = createCliProcess({
       options: {
-        cliPath: this.executable ? this.executable : this.config.dvcPath,
+        cliPath: this.getOverrideOrCliPath(),
         cwd,
         pythonBinPath: this.config.pythonBinPath
       },
