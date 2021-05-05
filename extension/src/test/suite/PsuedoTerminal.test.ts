@@ -12,6 +12,10 @@ const { expect } = chai
 suite('Pseudo Terminal Test Suite', () => {
   window.showInformationMessage('Start all pseudo terminal tests.')
 
+  beforeEach(() => {
+    restore()
+  })
+
   const closeTerminalEvent = (): Promise<Terminal> => {
     return new Promise(resolve => {
       const listener: Disposable = window.onDidCloseTerminal(
@@ -24,10 +28,6 @@ suite('Pseudo Terminal Test Suite', () => {
   }
 
   describe('PseudoTerminal', () => {
-    beforeEach(() => {
-      restore()
-    })
-
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
 
