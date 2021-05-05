@@ -25,11 +25,16 @@ suite('Pseudo Terminal Test Suite', () => {
   describe('PseudoTerminal', () => {
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal(
-        new EventEmitter<string>(),
-        new EventEmitter<void>()
+
+      const terminalName = 'Open Test Terminal'
+
+      const pseudoTerminal = disposable.track(
+        new PseudoTerminal(
+          disposable.track(new EventEmitter<string>()),
+          disposable.track(new EventEmitter<void>()),
+          terminalName
+        )
       )
-      disposable.track(pseudoTerminal)
 
       pseudoTerminal.openCurrentInstance()
 
@@ -45,14 +50,15 @@ suite('Pseudo Terminal Test Suite', () => {
       }
 
       const terminal = await openTerminalEvent()
-      expect(terminal.creationOptions?.name).to.equal('DVC')
+      expect(terminal.creationOptions?.name).to.equal(terminalName)
 
       disposable.dispose()
       return closeTerminalEvent()
     }).timeout(12000)
 
     it('should be able to handle multiple output events', async () => {
-      const outputEventEmitter = new EventEmitter<string>()
+      const disposable = Disposable.fn()
+      const outputEventEmitter = disposable.track(new EventEmitter<string>())
       const terminalDataWriteEventStream = (
         text: string,
         disposer: Disposer
@@ -71,12 +77,13 @@ suite('Pseudo Terminal Test Suite', () => {
         })
       }
 
-      const disposable = Disposable.fn()
-      const pseudoTerminal = new PseudoTerminal(
-        outputEventEmitter,
-        new EventEmitter<void>()
+      const pseudoTerminal = disposable.track(
+        new PseudoTerminal(
+          outputEventEmitter,
+          disposable.track(new EventEmitter<void>()),
+          'Output Test Terminal'
+        )
       )
-      disposable.track(pseudoTerminal)
 
       await pseudoTerminal.openCurrentInstance()
       const firstText = 'some-really-long-string'
