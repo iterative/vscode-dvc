@@ -51,13 +51,14 @@ suite('Runner Test Suite', () => {
           disposable.track(runner.onDidComplete(() => resolve()))
         )
 
-      const stubbedGetExecutionDetails = stub(Execution, 'getExecutionDetails')
-        .onFirstCall()
-        .returns({
-          executable: 'sleep',
-          cwd,
-          env: {}
-        })
+      const stubbedGetExecutionDetails = stub(
+        Execution,
+        'getExecutionDetails'
+      ).returns({
+        executable: 'sleep',
+        cwd,
+        env: {}
+      })
 
       await runner.run(cwd, '100000000000000000000000')
       stubbedGetExecutionDetails.restore()
@@ -88,14 +89,13 @@ suite('Runner Test Suite', () => {
     })
 
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
-      const { createCliProcess } = Execution
       const disposable = Disposable.fn()
 
       const text = ':weeeee:'
 
-      const completedEventEmitter = new EventEmitter<void>()
-      const outputEventEmitter = new EventEmitter<string>()
-      const startedEventEmitter = new EventEmitter<void>()
+      const completedEventEmitter = disposable.track(new EventEmitter<void>())
+      const outputEventEmitter = disposable.track(new EventEmitter<string>())
+      const startedEventEmitter = disposable.track(new EventEmitter<void>())
 
       const onDidStart = startedEventEmitter.event
       const onDidComplete = completedEventEmitter.event
@@ -130,36 +130,27 @@ suite('Runner Test Suite', () => {
       const eventStream = executionOutputEvent(text, onDidOutput, disposable)
 
       const cwd = __dirname
-      const args = [text]
 
       const stubbedGetExecutionDetails = stub(
         Execution,
         'getExecutionDetails'
       ).returns({ executable: 'echo', cwd, env: {} })
 
-      createCliProcess({
-        options: {
-          cliPath: undefined,
-          cwd,
-          pythonBinPath: undefined
-        },
-        emitters: {
+      const runner = disposable.track(
+        new Runner({} as Config, {
           completedEventEmitter,
-          outputEventEmitter: outputEventEmitter,
+          outputEventEmitter,
           startedEventEmitter
-        },
-        args
-      })
+        })
+      )
+
+      runner.run(cwd, text)
       stubbedGetExecutionDetails.restore()
 
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
-      expect(stubbedGetExecutionDetails).to.be.calledWith({
-        cliPath: undefined,
-        cwd,
-        pythonBinPath: undefined
-      })
+
       disposable.dispose()
     }).timeout(12000)
   })
