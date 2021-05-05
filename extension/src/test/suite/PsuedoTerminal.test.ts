@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
@@ -12,8 +12,14 @@ const { expect } = chai
 suite('Pseudo Terminal Test Suite', () => {
   window.showInformationMessage('Start all pseudo terminal tests.')
 
+  const disposable = Disposable.fn()
+
   beforeEach(() => {
     restore()
+  })
+
+  afterEach(() => {
+    disposable.dispose()
   })
 
   const closeTerminalEvent = (): Promise<Terminal> => {
@@ -29,16 +35,12 @@ suite('Pseudo Terminal Test Suite', () => {
 
   describe('PseudoTerminal', () => {
     it('should be able to open a terminal', async () => {
-      const disposable = Disposable.fn()
-
       const terminalName = 'Open Test Terminal'
 
-      const pseudoTerminal = disposable.track(
-        new PseudoTerminal(
-          disposable.track(new EventEmitter<string>()),
-          disposable.track(new EventEmitter<void>()),
-          terminalName
-        )
+      const pseudoTerminal = new PseudoTerminal(
+        disposable.track(new EventEmitter<string>()),
+        disposable.track(new EventEmitter<void>()),
+        terminalName
       )
 
       pseudoTerminal.openCurrentInstance()
@@ -57,7 +59,8 @@ suite('Pseudo Terminal Test Suite', () => {
       const terminal = await openTerminalEvent()
       expect(terminal.creationOptions?.name).to.equal(terminalName)
 
-      disposable.dispose()
+      pseudoTerminal.dispose()
+
       return closeTerminalEvent()
     }).timeout(12000)
 
@@ -82,12 +85,10 @@ suite('Pseudo Terminal Test Suite', () => {
         })
       }
 
-      const pseudoTerminal = disposable.track(
-        new PseudoTerminal(
-          outputEventEmitter,
-          disposable.track(new EventEmitter<void>()),
-          'Output Test Terminal'
-        )
+      const pseudoTerminal = new PseudoTerminal(
+        outputEventEmitter,
+        disposable.track(new EventEmitter<void>()),
+        'Output Test Terminal'
       )
 
       await pseudoTerminal.openCurrentInstance()
@@ -108,7 +109,8 @@ suite('Pseudo Terminal Test Suite', () => {
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
 
-      disposable.dispose()
+      pseudoTerminal.dispose()
+
       return closeTerminalEvent()
     }).timeout(12000)
   })
