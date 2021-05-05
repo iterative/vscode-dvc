@@ -1,9 +1,10 @@
-import { describe, it, suite } from 'mocha'
+import { beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { PseudoTerminal } from '../../PseudoTerminal'
 import { Disposable, Disposer } from '../../extension'
+import { restore } from 'sinon'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -23,6 +24,10 @@ suite('Pseudo Terminal Test Suite', () => {
   }
 
   describe('PseudoTerminal', () => {
+    beforeEach(() => {
+      restore()
+    })
+
     it('should be able to open a terminal', async () => {
       const disposable = Disposable.fn()
 
