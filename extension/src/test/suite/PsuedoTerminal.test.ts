@@ -1,15 +1,26 @@
-import { describe, it } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { PseudoTerminal } from '../../PseudoTerminal'
 import { Disposable, Disposer } from '../../extension'
+import { restore } from 'sinon'
 
 chai.use(sinonChai)
 const { expect } = chai
 
 suite('Pseudo Terminal Test Suite', () => {
   window.showInformationMessage('Start all pseudo terminal tests.')
+
+  const disposable = Disposable.fn()
+
+  beforeEach(() => {
+    restore()
+  })
+
+  afterEach(() => {
+    disposable.dispose()
+  })
 
   const closeTerminalEvent = (): Promise<Terminal> => {
     return new Promise(resolve => {
@@ -24,12 +35,13 @@ suite('Pseudo Terminal Test Suite', () => {
 
   describe('PseudoTerminal', () => {
     it('should be able to open a terminal', async () => {
-      const disposable = Disposable.fn()
+      const terminalName = 'Open Test Terminal'
+
       const pseudoTerminal = new PseudoTerminal(
-        new EventEmitter<string>(),
-        new EventEmitter<void>()
+        disposable.track(new EventEmitter<string>()),
+        disposable.track(new EventEmitter<void>()),
+        terminalName
       )
-      disposable.track(pseudoTerminal)
 
       pseudoTerminal.openCurrentInstance()
 
@@ -45,14 +57,16 @@ suite('Pseudo Terminal Test Suite', () => {
       }
 
       const terminal = await openTerminalEvent()
-      expect(terminal.creationOptions?.name).to.equal('DVC')
+      expect(terminal.creationOptions?.name).to.equal(terminalName)
 
-      disposable.dispose()
+      pseudoTerminal.dispose()
+
       return closeTerminalEvent()
     }).timeout(12000)
 
     it('should be able to handle multiple output events', async () => {
-      const outputEventEmitter = new EventEmitter<string>()
+      const disposable = Disposable.fn()
+      const outputEventEmitter = disposable.track(new EventEmitter<string>())
       const terminalDataWriteEventStream = (
         text: string,
         disposer: Disposer
@@ -71,12 +85,11 @@ suite('Pseudo Terminal Test Suite', () => {
         })
       }
 
-      const disposable = Disposable.fn()
       const pseudoTerminal = new PseudoTerminal(
         outputEventEmitter,
-        new EventEmitter<void>()
+        disposable.track(new EventEmitter<void>()),
+        'Output Test Terminal'
       )
-      disposable.track(pseudoTerminal)
 
       await pseudoTerminal.openCurrentInstance()
       const firstText = 'some-really-long-string'
@@ -96,7 +109,8 @@ suite('Pseudo Terminal Test Suite', () => {
       expect(eventStream.includes(firstText)).to.be.true
       expect(eventStream.includes(secondText)).to.be.true
 
-      disposable.dispose()
+      pseudoTerminal.dispose()
+
       return closeTerminalEvent()
     }).timeout(12000)
   })

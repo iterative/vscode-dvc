@@ -1,5 +1,3 @@
-/* eslint consistent-return: off */
-/* eslint no-shadow: off */
 import { resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
