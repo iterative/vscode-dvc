@@ -1,6 +1,6 @@
-import { describe, it, suite } from 'mocha'
+import { beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { spy, stub } from 'sinon'
+import { restore, spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import * as Execution from '../../../cli/execution'
@@ -15,6 +15,12 @@ const { expect } = chai
 suite('Runner Test Suite', () => {
   window.showInformationMessage('Start all runner tests.')
 
+  const stubbedGetExecutionDetails = stub(Execution, 'getExecutionDetails')
+
+  beforeEach(() => {
+    restore()
+  })
+
   describe('Runner', () => {
     it('should only be able to run a single command at a time', async () => {
       const disposable = Disposable.fn()
@@ -22,10 +28,7 @@ suite('Runner Test Suite', () => {
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
-      const stubbedGetExecutionDetails = stub(
-        Execution,
-        'getExecutionDetails'
-      ).returns({
+      stubbedGetExecutionDetails.onFirstCall().returns({
         executable: 'sleep',
         cwd,
         env: {}
@@ -35,7 +38,6 @@ suite('Runner Test Suite', () => {
       await runner.run(cwd, Command.CHECKOUT)
 
       expect(windowErrorMessageSpy).to.be.calledOnce
-      stubbedGetExecutionDetails.restore()
       disposable.dispose()
     }).timeout(6000)
 
@@ -51,10 +53,7 @@ suite('Runner Test Suite', () => {
           disposable.track(runner.onDidComplete(() => resolve()))
         )
 
-      const stubbedGetExecutionDetails = stub(
-        Execution,
-        'getExecutionDetails'
-      ).returns({
+      stubbedGetExecutionDetails.onFirstCall().returns({
         executable: 'sleep',
         cwd,
         env: {}
@@ -83,8 +82,6 @@ suite('Runner Test Suite', () => {
         false
       )
 
-      stubbedGetExecutionDetails.restore()
-      executeCommandSpy.restore()
       disposable.dispose()
     })
 
@@ -131,10 +128,9 @@ suite('Runner Test Suite', () => {
 
       const cwd = __dirname
 
-      const stubbedGetExecutionDetails = stub(
-        Execution,
-        'getExecutionDetails'
-      ).returns({ executable: 'echo', cwd, env: {} })
+      stubbedGetExecutionDetails
+        .onFirstCall()
+        .returns({ executable: 'echo', cwd, env: {} })
 
       const runner = disposable.track(
         new Runner({} as Config, {
@@ -149,8 +145,6 @@ suite('Runner Test Suite', () => {
       await started
       expect((await eventStream).includes(text)).to.be.true
       await completed
-
-      stubbedGetExecutionDetails.restore()
 
       disposable.dispose()
     }).timeout(12000)
