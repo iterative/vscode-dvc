@@ -233,8 +233,7 @@ export class Extension {
         () => {
           window.showInformationMessage(
             'DVC extension is unable to initialize as the cli is not available.\n' +
-              'Update your config options to try again.',
-            { modal: true }
+              'Update your config options to try again.'
           )
         }
       )
