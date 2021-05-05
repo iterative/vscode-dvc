@@ -2,10 +2,10 @@ import { describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { window, commands } from 'vscode'
+import { window, commands, Event, EventEmitter } from 'vscode'
 import * as Execution from '../../../cli/execution'
 import { Command } from '../../../cli/args'
-import { Disposable } from '../../../extension'
+import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
 import { Runner } from '../../../cli/Runner'
 
@@ -32,15 +32,8 @@ suite('Runner Test Suite', () => {
       })
 
       await runner.run(cwd, '3')
-      await runner.run(cwd, Command.CHECKOUT)
       stubbedGetExecutionDetails.restore()
-
-      expect(stubbedGetExecutionDetails).to.be.calledWith({
-        cliPath: undefined,
-        cwd,
-        pythonBinPath: undefined
-      })
-      expect(stubbedGetExecutionDetails).to.be.calledOnce
+      await runner.run(cwd, Command.CHECKOUT)
 
       expect(windowErrorMessageSpy).to.be.calledOnce
       disposable.dispose()
@@ -50,20 +43,21 @@ suite('Runner Test Suite', () => {
       const disposable = Disposable.fn()
       const runner = disposable.track(new Runner({} as Config))
       const cwd = __dirname
-      const stubbedGetExecutionDetails = stub(
-        Execution,
-        'getExecutionDetails'
-      ).returns({
-        executable: 'sleep',
-        cwd,
-        env: {}
-      })
+
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       const processCompletedEvent = (): Promise<void> =>
         new Promise(resolve =>
           disposable.track(runner.onDidComplete(() => resolve()))
         )
+
+      const stubbedGetExecutionDetails = stub(Execution, 'getExecutionDetails')
+        .onFirstCall()
+        .returns({
+          executable: 'sleep',
+          cwd,
+          env: {}
+        })
 
       await runner.run(cwd, '100000000000000000000000')
       stubbedGetExecutionDetails.restore()
@@ -92,5 +86,81 @@ suite('Runner Test Suite', () => {
       executeCommandSpy.restore()
       disposable.dispose()
     })
+
+    it('should be able to execute a command and provide the correct events in the correct order', async () => {
+      const { createCliProcess } = Execution
+      const disposable = Disposable.fn()
+
+      const text = ':weeeee:'
+
+      const completedEventEmitter = new EventEmitter<void>()
+      const outputEventEmitter = new EventEmitter<string>()
+      const startedEventEmitter = new EventEmitter<void>()
+
+      const onDidStart = startedEventEmitter.event
+      const onDidComplete = completedEventEmitter.event
+      const onDidOutput = outputEventEmitter.event
+
+      const executionOutputEvent = (
+        text: string,
+        event: Event<string>,
+        disposer: Disposer
+      ): Promise<string> => {
+        let eventStream = ''
+        return new Promise(resolve => {
+          const listener: Disposable = event((event: string) => {
+            eventStream += event
+            if (eventStream.includes(`${text}`)) {
+              return resolve(eventStream)
+            }
+          })
+          disposer.track(listener)
+        })
+      }
+      const startedOrCompletedEvent = (event: Event<void>): Promise<void> => {
+        return new Promise(resolve => {
+          const listener: Disposable = event(() => {
+            listener.dispose()
+            return resolve()
+          })
+        })
+      }
+      const started = startedOrCompletedEvent(onDidStart)
+      const completed = startedOrCompletedEvent(onDidComplete)
+      const eventStream = executionOutputEvent(text, onDidOutput, disposable)
+
+      const cwd = __dirname
+      const args = [text]
+
+      const stubbedGetExecutionDetails = stub(
+        Execution,
+        'getExecutionDetails'
+      ).returns({ executable: 'echo', cwd, env: {} })
+
+      createCliProcess({
+        options: {
+          cliPath: undefined,
+          cwd,
+          pythonBinPath: undefined
+        },
+        emitters: {
+          completedEventEmitter,
+          outputEventEmitter: outputEventEmitter,
+          startedEventEmitter
+        },
+        args
+      })
+      stubbedGetExecutionDetails.restore()
+
+      await started
+      expect((await eventStream).includes(text)).to.be.true
+      await completed
+      expect(stubbedGetExecutionDetails).to.be.calledWith({
+        cliPath: undefined,
+        cwd,
+        pythonBinPath: undefined
+      })
+      disposable.dispose()
+    }).timeout(12000)
   })
 })
