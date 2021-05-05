@@ -17,6 +17,12 @@ export const beforeAll = () => {
     { path: 'model.pt' }
   ] as DvcReader.ListOutput[])
 
+  stub(DvcReader, 'listDvcOnly').resolves([
+    { isout: false, isdir: true, isexec: false, path: 'data' },
+    { isout: true, isdir: true, isexec: false, path: 'logs' },
+    { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+  ])
+
   stub(DvcReader, 'status').resolves({
     train: [
       { 'changed deps': { 'data/MNIST': 'modified' } },
