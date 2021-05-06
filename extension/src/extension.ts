@@ -250,7 +250,7 @@ export class Extension {
       this.config.ready
     ]).then(() => this.initializeOrNotify())
 
-    this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
+    this.config.onExecutionDetailsChanged(() => this.initializeOrNotify())
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)

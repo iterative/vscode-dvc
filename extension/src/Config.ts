@@ -29,11 +29,11 @@ export class Config {
 
   public readonly workspaceRoot: string
 
-  private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
-  readonly onDidChange: Event<ConfigurationChangeEvent>
+  private changed: EventEmitter<ConfigurationChangeEvent>
+  private readonly onChanged: Event<ConfigurationChangeEvent>
 
-  private onDidChangeExecutionDetailsEmitter: EventEmitter<void>
-  public readonly onDidChangeExecutionDetails: Event<void>
+  private executionDetailsChanged: EventEmitter<void>
+  public readonly onExecutionDetailsChanged: Event<void>
 
   @observable
   public pythonBinPath: string | undefined
@@ -75,7 +75,7 @@ export class Config {
     newPath: string | undefined
   ) {
     if (oldPath !== newPath) {
-      this.onDidChangeExecutionDetailsEmitter.fire()
+      this.executionDetailsChanged.fire()
     }
   }
 
@@ -168,24 +168,22 @@ export class Config {
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
 
-    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
-    this.onDidChange = this.onDidChangeEmitter.event
+    this.changed = this.dispose.track(new EventEmitter())
+    this.onChanged = this.changed.event
 
-    this.onDidChangeExecutionDetailsEmitter = this.dispose.track(
-      new EventEmitter<void>()
-    )
-    this.onDidChangeExecutionDetails = this.onDidChangeExecutionDetailsEmitter.event
+    this.executionDetailsChanged = this.dispose.track(new EventEmitter<void>())
+    this.onExecutionDetailsChanged = this.executionDetailsChanged.event
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
-          this.onDidChangeEmitter.fire(e)
+          this.changed.fire(e)
         }
       })
     )
 
     this.dispose.track(
-      this.onDidChange(() => {
+      this.onChanged(() => {
         this.updateDvcPathStatusBarItem()
       })
     )
