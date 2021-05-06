@@ -8,25 +8,24 @@ export class Experiments {
 
   private _currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
+  private _experiments?: ExperimentsRepoJSONOutput
+  public get data() {
+    return this._experiments
+  }
+
   private onStartedUpdateEmitter: EventEmitter<
     Thenable<ExperimentsRepoJSONOutput>
   > = new EventEmitter()
 
-  private _experiments?: ExperimentsRepoJSONOutput
-  public get experiments() {
-    return this._experiments
-  }
+  public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
 
   private onDidUpdateEmitter: EventEmitter<
     ExperimentsRepoJSONOutput
   > = new EventEmitter()
 
-  public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
-
   public readonly onDidUpdate = this.onDidUpdateEmitter.event
 
   private onFailedUpdateEmitter: EventEmitter<Error> = new EventEmitter()
-
   public readonly onFailedUpdate = this.onFailedUpdateEmitter.event
 
   private async performUpdate(): Promise<ExperimentsRepoJSONOutput> {
