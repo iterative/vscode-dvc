@@ -32,6 +32,9 @@ export class Config {
   private onDidChangeEmitter: EventEmitter<ConfigurationChangeEvent>
   readonly onDidChange: Event<ConfigurationChangeEvent>
 
+  private onDidChangeExecutionDetailsEmitter: EventEmitter<void>
+  public readonly onDidChangeExecutionDetails: Event<void>
+
   @observable
   public pythonBinPath: string | undefined
 
@@ -67,7 +70,17 @@ export class Config {
     return workspace.getConfiguration().get(this.dvcPathOption, '')
   }
 
+  private notifyIfChanged(
+    oldPath: string | undefined,
+    newPath: string | undefined
+  ) {
+    if (oldPath !== newPath) {
+      this.onDidChangeExecutionDetailsEmitter.fire()
+    }
+  }
+
   private setDvcPath(path?: string): Thenable<void> {
+    this.notifyIfChanged(this.dvcPath, path)
     return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
@@ -136,7 +149,9 @@ export class Config {
       onDidChangePythonExecutionDetails =>
         this.dispose.track(
           onDidChangePythonExecutionDetails?.(async () => {
+            const oldPath = this.pythonBinPath
             this.pythonBinPath = await getPythonBinPath()
+            this.notifyIfChanged(oldPath, this.pythonBinPath)
           })
         )
     )
@@ -155,6 +170,11 @@ export class Config {
 
     this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
     this.onDidChange = this.onDidChangeEmitter.event
+
+    this.onDidChangeExecutionDetailsEmitter = this.dispose.track(
+      new EventEmitter<void>()
+    )
+    this.onDidChangeExecutionDetails = this.onDidChangeExecutionDetailsEmitter.event
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
