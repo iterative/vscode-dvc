@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { resolve } from 'path'
+import { join, resolve } from 'path'
 import {
   window,
   commands,
@@ -11,7 +11,9 @@ import {
   ConfigurationChangeEvent
 } from 'vscode'
 import { Disposable } from '../../extension'
-import * as DvcReader from '../../cli/reader'
+import * as CliReader from '../../cli/reader'
+import * as CliExecutor from '../../cli/executor'
+import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
 import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
 
@@ -40,7 +42,7 @@ suite('Extension Test Suite', () => {
   describe('showExperiments', () => {
     const showExperimentsCommand = 'dvc.showExperiments'
     it('should be able to make the experiments webview visible', async () => {
-      stub(DvcReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const experimentsWebview = disposable.track(
         await commands.executeCommand(showExperimentsCommand)
@@ -54,7 +56,7 @@ suite('Extension Test Suite', () => {
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
 
-      const mockReader = stub(DvcReader, 'experimentShow').resolves(
+      const mockReader = stub(CliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
@@ -100,19 +102,66 @@ suite('Extension Test Suite', () => {
 
     it('should set dvc.dvcPath to blank on the first option', async () => {
       const mockShowInputBox = stub(window, 'showInputBox')
+      const mockCanRunCli = stub(CliExecutor, 'canRunCli').rejects('ERROR')
       await selectDvcPathItem(0)
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
 
       expect(mockShowInputBox).not.to.have.been.called
+      expect(mockCanRunCli).to.have.been.called
     })
 
-    it('should invoke the file picker with the second option', async () => {
+    it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         fileResolve
       )
+      const mockCanRunCli = stub(CliExecutor, 'canRunCli').resolves(
+        'I WORK NOW'
+      )
+
+      const mockAddOnSystemChangeHandler = stub(
+        FileSystem,
+        'addOnFileSystemChangeHandler'
+      ).returns({
+        dispose: () => undefined
+      } as Disposable)
+
+      const mockListDvcOnlyRecursive = stub(
+        CliReader,
+        'listDvcOnlyRecursive'
+      ).resolves([
+        { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
+        { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
+        { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
+        { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz') },
+        { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte') },
+        { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz') },
+        { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte') },
+        { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz') },
+        { path: join('logs', 'acc.tsv') },
+        { path: join('logs', 'loss.tsv') },
+        { path: 'model.pt' }
+      ] as CliReader.ListOutput[])
+
+      stub(CliReader, 'listDvcOnly').resolves([
+        { isout: false, isdir: true, isexec: false, path: 'data' },
+        { isout: true, isdir: true, isexec: false, path: 'logs' },
+        { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+      ])
+
+      const mockStatus = stub(CliReader, 'status').resolves({
+        train: [
+          { 'changed deps': { 'data/MNIST': 'modified' } },
+          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+          'always changed'
+        ],
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ]
+      })
 
       const configurationChangeEvent = () => {
         return new Promise(resolve => {
@@ -128,12 +177,16 @@ suite('Extension Test Suite', () => {
       await selectDvcPathItem(1)
 
       expect(mockShowOpenDialog).to.have.been.called
+      expect(mockCanRunCli).to.have.been.called
+      expect(mockAddOnSystemChangeHandler).to.have.been.called
 
       await configurationChangeEvent()
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         testUri.fsPath
       )
+      expect(mockListDvcOnlyRecursive).to.have.been.called
+      expect(mockStatus).to.have.been.called
     })
   })
 })

@@ -54,7 +54,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private trackedExplorerTree?: TrackedExplorerTree
+  private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
 
@@ -80,24 +80,13 @@ export class Extension {
     )
   }
 
-  private startup() {
+  private initialize() {
     this.initializeDvcRepositories(this.dvcRoots)
-
-    this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.config)
-    )
 
     this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
 
-    this.dispose.track(
-      window.registerTreeDataProvider(
-        'dvc.views.trackedExplorerTree',
-        this.trackedExplorerTree
-      )
-    )
-
     this.gitExtension.ready.then(() => {
-      this.gitExtension?.repositories.forEach(async gitExtensionRepository => {
+      this.gitExtension.repositories.forEach(async gitExtensionRepository => {
         const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
         this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
@@ -209,6 +198,17 @@ export class Extension {
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
+    this.trackedExplorerTree = this.dispose.track(
+      new TrackedExplorerTree(this.config)
+    )
+
+    this.dispose.track(
+      window.registerTreeDataProvider(
+        'dvc.views.trackedExplorerTree',
+        this.trackedExplorerTree
+      )
+    )
+
     Promise.all([
       (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
@@ -221,7 +221,7 @@ export class Extension {
         cwd: this.config.workspaceRoot
       }).then(
         () => {
-          this.startup()
+          this.initialize()
         },
         () => {
           window.showInformationMessage(
@@ -239,7 +239,7 @@ export class Extension {
         cwd: this.config.workspaceRoot
       }).then(
         () => {
-          this.startup()
+          this.initialize()
         },
         () => {
           window.showInformationMessage(
