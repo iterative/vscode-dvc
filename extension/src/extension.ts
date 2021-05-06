@@ -57,7 +57,7 @@ export class Extension {
   private trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
-  private readonly experimentsManager: Experiments
+  private readonly experiments: Experiments
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -131,9 +131,7 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () =>
-    this.webviewManager.refreshExperiments(
-      await this.experimentsManager.update()
-    )
+    this.webviewManager.refreshExperiments(await this.experiments.update())
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
@@ -174,7 +172,7 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.experimentsManager = this.dispose.track(new Experiments(this.config))
+    this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config)

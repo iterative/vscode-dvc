@@ -12,22 +12,22 @@ export class Experiments {
     Thenable<ExperimentsRepoJSONOutput>
   > = new EventEmitter()
 
-  public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
+  private _experiments?: ExperimentsRepoJSONOutput
+  public get experiments() {
+    return this._experiments
+  }
 
   private onDidUpdateEmitter: EventEmitter<
     ExperimentsRepoJSONOutput
   > = new EventEmitter()
+
+  public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
 
   public readonly onDidUpdate = this.onDidUpdateEmitter.event
 
   private onFailedUpdateEmitter: EventEmitter<Error> = new EventEmitter()
 
   public readonly onFailedUpdate = this.onFailedUpdateEmitter.event
-
-  private _experiments?: ExperimentsRepoJSONOutput
-  public get experiments() {
-    return this._experiments
-  }
 
   private async performUpdate(): Promise<ExperimentsRepoJSONOutput> {
     await this.config.ready
