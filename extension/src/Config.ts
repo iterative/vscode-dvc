@@ -70,7 +70,7 @@ export class Config {
     return workspace.getConfiguration().get(this.dvcPathOption, '')
   }
 
-  private emitEventIfChanged(
+  private notifyIfChanged(
     oldPath: string | undefined,
     newPath: string | undefined
   ) {
@@ -80,7 +80,7 @@ export class Config {
   }
 
   private setDvcPath(path?: string): Thenable<void> {
-    this.emitEventIfChanged(this.dvcPath, path)
+    this.notifyIfChanged(this.dvcPath, path)
     return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
@@ -151,7 +151,7 @@ export class Config {
           onDidChangePythonExecutionDetails?.(async () => {
             const oldPath = this.pythonBinPath
             this.pythonBinPath = await getPythonBinPath()
-            this.emitEventIfChanged(oldPath, this.pythonBinPath)
+            this.notifyIfChanged(oldPath, this.pythonBinPath)
           })
         )
     )
