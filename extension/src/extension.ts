@@ -119,7 +119,7 @@ export class Extension {
           ['*.dvc', 'dvc.lock', 'dvc.yaml'],
           () => {
             repository.resetState()
-            this.trackedExplorerTree?.reset()
+            this.trackedExplorerTree.reset()
           }
         )
       )
@@ -127,7 +127,7 @@ export class Extension {
       this.dispose.track(
         addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
           repository.updateState()
-          this.trackedExplorerTree?.refresh(path)
+          this.trackedExplorerTree.refresh(path)
         })
       )
 
