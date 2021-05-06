@@ -14,7 +14,8 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { experimentShow } from './cli/reader'
+import { Experiments } from './experiments'
+
 import {
   Args,
   Command,
@@ -58,6 +59,7 @@ export class Extension {
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
+  private readonly experiments: Experiments
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -176,14 +178,8 @@ export class Extension {
     )
   }
 
-  private refreshExperimentsWebview = async () => {
-    const experiments = await experimentShow({
-      pythonBinPath: this.config.pythonBinPath,
-      cliPath: this.config.dvcPath,
-      cwd: this.config.workspaceRoot
-    })
-    return this.webviewManager.refreshExperiments(experiments)
-  }
+  private refreshExperimentsWebview = async () =>
+    this.webviewManager.refreshExperiments(await this.experiments.update())
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
@@ -231,6 +227,8 @@ export class Extension {
     this.gitExtension = this.dispose.track(new GitExtension())
 
     this.runner = this.dispose.track(new Runner(this.config))
+
+    this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config)
