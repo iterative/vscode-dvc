@@ -290,7 +290,7 @@
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != deleted && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
         },
         {
           "command": "dvc.pushTarget",
