@@ -19,7 +19,6 @@ import { setContextValue } from '../../vscode/context'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
-  private static contextKey = 'dvc.experiments.webviewActive'
 
   public isActive = () => this.webviewPanel.active
 
@@ -106,7 +105,7 @@ export class ExperimentsWebview {
   }
 
   private static setPanelActiveContext(state: boolean) {
-    setContextValue(ExperimentsWebview.contextKey, state)
+    setContextValue('dvc.experiments.webviewActive', state)
   }
 
   public dispose(): void {

@@ -10,9 +10,8 @@ import { setContextValue } from '../vscode/context'
 export class Runner {
   public readonly dispose = Disposable.fn()
 
-  private static contextKey = 'dvc.runner.running'
   private static setRunningContext = (isRunning: boolean) =>
-    setContextValue(Runner.contextKey, isRunning)
+    setContextValue('dvc.runner.running', isRunning)
 
   private outputEventEmitter: EventEmitter<string>
   private completedEventEmitter: EventEmitter<void>
