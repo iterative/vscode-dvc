@@ -129,6 +129,13 @@ suite('Extension Test Suite', () => {
         dispose: () => undefined
       } as Disposable)
 
+      const mockAddOnTypeChangeHandler = stub(
+        FileSystem,
+        'addOnFileTypeChangeHandler'
+      ).returns({
+        dispose: () => undefined
+      } as Disposable)
+
       const mockListDvcOnlyRecursive = stub(
         CliReader,
         'listDvcOnlyRecursive'
@@ -179,6 +186,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockAddOnSystemChangeHandler).to.have.been.called
+      expect(mockAddOnTypeChangeHandler).to.have.been.called
 
       await configurationChangeEvent()
 

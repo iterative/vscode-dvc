@@ -80,33 +80,31 @@ export class Extension {
     )
   }
 
-  private initialize() {
+  private initializeOrNotify() {
+    return canRunCli({
+      cliPath: this.config.dvcPath,
+      pythonBinPath: this.config.pythonBinPath,
+      cwd: this.config.workspaceRoot
+    }).then(
+      () => {
+        this.initialize()
+      },
+      () => {
+        window.showInformationMessage(
+          'DVC extension is unable to initialize as the cli is not available.\n' +
+            'Update your config options to try again.'
+        )
+      }
+    )
+  }
+
+  private async initialize() {
     this.initializeDvcRepositories(this.dvcRoots)
 
-    this.trackedExplorerTree.setDvcRoots(this.dvcRoots)
+    this.trackedExplorerTree.initialize(this.dvcRoots)
 
-    this.gitExtension.ready.then(() => {
-      this.gitExtension.repositories.forEach(async gitExtensionRepository => {
-        const gitRoot = gitExtensionRepository.getRepositoryRoot()
-
-        this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
-
-        const dvcRoots = await findDvcRootPaths({
-          cliPath: this.config.dvcPath,
-          cwd: gitRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
-        dvcRoots.forEach(dvcRoot => {
-          const repository = this.dvcRepositories[dvcRoot]
-
-          this.dispose.track(
-            gitExtensionRepository.onDidChange(() => {
-              repository?.updateState()
-            })
-          )
-        })
-      })
-    })
+    await this.gitExtension.ready
+    this.initializeGitRepositories()
   }
 
   private initializeDvcRepositories(dvcRoots: string[]) {
@@ -137,22 +135,28 @@ export class Extension {
     })
   }
 
-  private initializeOrNotify() {
-    return canRunCli({
-      cliPath: this.config.dvcPath,
-      pythonBinPath: this.config.pythonBinPath,
-      cwd: this.config.workspaceRoot
-    }).then(
-      () => {
-        this.initialize()
-      },
-      () => {
-        window.showInformationMessage(
-          'DVC extension is unable to initialize as the cli is not available.\n' +
-            'Update your config options to try again.'
+  private initializeGitRepositories() {
+    this.gitExtension.repositories.forEach(async gitExtensionRepository => {
+      const gitRoot = gitExtensionRepository.getRepositoryRoot()
+
+      this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
+
+      const dvcRoots = await findDvcRootPaths({
+        cliPath: this.config.dvcPath,
+        cwd: gitRoot,
+        pythonBinPath: this.config.pythonBinPath
+      })
+
+      dvcRoots.forEach(dvcRoot => {
+        const repository = this.dvcRepositories[dvcRoot]
+
+        this.dispose.track(
+          gitExtensionRepository.onDidChange(() => {
+            repository?.updateState()
+          })
         )
-      }
-    )
+      })
+    })
   }
 
   private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
@@ -216,6 +220,8 @@ export class Extension {
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
+    this.runner = this.dispose.track(new Runner(this.config))
+
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config)
     )
@@ -239,8 +245,6 @@ export class Extension {
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
-
-    this.runner = this.dispose.track(new Runner(this.config))
 
     registerCliCommands(this.config, this.dispose)
 
