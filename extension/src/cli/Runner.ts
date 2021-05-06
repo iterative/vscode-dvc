@@ -1,17 +1,18 @@
-import { EventEmitter, Event, window, commands } from 'vscode'
+import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
 import { createCliProcess } from './execution'
 import { Process } from '../processExecution'
+import { setContextValue } from '../vscode/context'
 
 export class Runner {
   public readonly dispose = Disposable.fn()
 
   private static contextKey = 'dvc.runner.running'
   private static setRunningContext = (isRunning: boolean) =>
-    commands.executeCommand('setContext', Runner.contextKey, isRunning)
+    setContextValue(Runner.contextKey, isRunning)
 
   private outputEventEmitter: EventEmitter<string>
   private completedEventEmitter: EventEmitter<void>
