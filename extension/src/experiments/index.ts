@@ -6,38 +6,50 @@ import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 export class ExperimentsManager {
   private config: Config
 
-  private _currentUpdatePromise?: Thenable<void>
+  private _currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
   private onStartedUpdateEmitter: EventEmitter<
-    Thenable<void>
+    Thenable<ExperimentsRepoJSONOutput>
   > = new EventEmitter()
 
   public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
+
+  private onDidUpdateEmitter: EventEmitter<
+    ExperimentsRepoJSONOutput
+  > = new EventEmitter()
+
+  public readonly onDidUpdate = this.onDidUpdateEmitter.event
 
   private _experiments?: ExperimentsRepoJSONOutput
   public get experiments() {
     return this._experiments
   }
 
-  private async _performUpdate(): Promise<void> {
+  private async performUpdate(): Promise<ExperimentsRepoJSONOutput> {
     await this.config.ready
-    this._experiments = await experimentShow({
+    return experimentShow({
       pythonBinPath: this.config.pythonBinPath,
       cliPath: this.config.dvcPath,
       cwd: this.config.workspaceRoot
     })
   }
 
-  public update(): Thenable<void> {
+  public async update(): Promise<ExperimentsRepoJSONOutput> {
     if (!this._currentUpdatePromise) {
-      const updatePromise = this._performUpdate()
-      this._currentUpdatePromise = updatePromise
-      this.onStartedUpdateEmitter.fire(updatePromise)
-      updatePromise.finally(() => {
+      try {
+        const updatePromise = this.performUpdate()
+        this._currentUpdatePromise = updatePromise
+        this.onStartedUpdateEmitter.fire(updatePromise)
+        const experimentData = await updatePromise
+        this.onDidUpdateEmitter.fire(experimentData)
+        return experimentData
+      } catch (e) {
+        this.onDidUpdateEmitter.fire(e)
+      } finally {
         this._currentUpdatePromise = undefined
-      })
+      }
     }
-    return this._currentUpdatePromise
+    return this._currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
   constructor(config: Config) {

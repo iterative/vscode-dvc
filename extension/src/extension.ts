@@ -15,7 +15,6 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { ExperimentsManager } from './experiments'
-import { ExperimentsRepoJSONOutput } from './webviews/experiments/contract'
 
 import {
   Args,
@@ -131,12 +130,10 @@ export class Extension {
     )
   }
 
-  private refreshExperimentsWebview = async () => {
-    await this.experimentsManager.update()
-    return this.webviewManager.refreshExperiments(
-      this.experimentsManager.experiments as ExperimentsRepoJSONOutput
+  private refreshExperimentsWebview = async () =>
+    this.webviewManager.refreshExperiments(
+      await this.experimentsManager.update()
     )
-  }
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
