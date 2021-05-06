@@ -11,7 +11,7 @@ import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from './args'
-import { QuickPickItemWithValue } from '../vscode/quickpick'
+import { QuickPickItemWithValue } from '../vscode/quickPick'
 
 jest.mock('fs')
 jest.mock('../processExecution')
@@ -184,7 +184,7 @@ describe('experimentGcCommand', () => {
 })
 
 describe('applyExperimentFromQuickPick', () => {
-  it('invokes a quickpick with a list of names from stdout and executes a constructed command', async () => {
+  it('invokes a quick pick with a list of names from stdout and executes a constructed command', async () => {
     mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
     mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
     await applyExperimentFromQuickPick(exampleConfig)
