@@ -184,7 +184,7 @@ describe('experimentGcCommand', () => {
 })
 
 describe('applyExperimentFromQuickPick', () => {
-  it('invokes a quickpick with a list of names from stdout and executes a constructed command', async () => {
+  it('invokes a quick pick with a list of names from stdout and executes a constructed command', async () => {
     mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
     mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
     await applyExperimentFromQuickPick(exampleConfig)
