@@ -1,7 +1,7 @@
 import { window } from 'vscode'
 import { Config } from '../Config'
 import { GcPreserveFlag } from './args'
-import { quickPickManyValues } from '../vscode/quickpick'
+import { quickPickManyValues } from '../vscode/quickPick'
 import { reportStderrOrThrow } from '../vscode/reporting'
 import { experimentListCurrent } from './reader'
 import {
