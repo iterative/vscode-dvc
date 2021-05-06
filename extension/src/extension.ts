@@ -137,6 +137,24 @@ export class Extension {
     })
   }
 
+  private initializeOrNotify() {
+    return canRunCli({
+      cliPath: this.config.dvcPath,
+      pythonBinPath: this.config.pythonBinPath,
+      cwd: this.config.workspaceRoot
+    }).then(
+      () => {
+        this.initialize()
+      },
+      () => {
+        window.showInformationMessage(
+          'DVC extension is unable to initialize as the cli is not available.\n' +
+            'Update your config options to try again.'
+        )
+      }
+    )
+  }
+
   private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
     if (!gitRoot) {
       throw new Error(
@@ -214,41 +232,9 @@ export class Extension {
         this.setupWorkspaceFolder(workspaceFolder)
       ),
       this.config.ready
-    ]).then(() =>
-      canRunCli({
-        cliPath: this.config.dvcPath,
-        pythonBinPath: this.config.pythonBinPath,
-        cwd: this.config.workspaceRoot
-      }).then(
-        () => {
-          this.initialize()
-        },
-        () => {
-          window.showInformationMessage(
-            'DVC extension is unable to initialize as the cli is not available.\n' +
-              'Update your config options to try again.'
-          )
-        }
-      )
-    )
+    ]).then(() => this.initializeOrNotify())
 
-    this.config.onDidChangeExecutionDetails(() =>
-      canRunCli({
-        cliPath: this.config.dvcPath,
-        pythonBinPath: this.config.pythonBinPath,
-        cwd: this.config.workspaceRoot
-      }).then(
-        () => {
-          this.initialize()
-        },
-        () => {
-          window.showInformationMessage(
-            'DVC extension is unable to initialize as the cli is not available.\n' +
-              'Update your config options to try again..'
-          )
-        }
-      )
-    )
+    this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
