@@ -41,11 +41,6 @@
   "contributes": {
     "commands": [
       {
-        "title": "%command.push%",
-        "command": "dvc.push",
-        "category": "DVC"
-      },
-      {
         "title": "%command.showExperiments%",
         "command": "dvc.showExperiments",
         "category": "DVC"
@@ -153,10 +148,20 @@
         "icon": "$(check)"
       },
       {
+        "title": "%command.pull%",
+        "command": "dvc.pull",
+        "category": "DVC"
+      },
+      {
         "title": "%command.pullTarget%",
         "command": "dvc.pullTarget",
         "category": "DVC",
         "icon": "$(cloud-download)"
+      },
+      {
+        "title": "%command.push%",
+        "command": "dvc.push",
+        "category": "DVC"
       },
       {
         "title": "%command.pushTarget%",
@@ -179,6 +184,50 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "dvc.applyExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.branchExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.experimentGarbageCollect",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.initializeDirectory",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.queueExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.removeExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runResetExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.showExperiments",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.stopRunningExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
           "command": "dvc.addTarget",
           "when": "false"
         },
@@ -199,7 +248,15 @@
           "when": "false"
         },
         {
+          "command": "dvc.pull",
+          "when": "false"
+        },
+        {
           "command": "dvc.pullTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.push",
           "when": "false"
         },
         {
@@ -211,39 +268,39 @@
         {
           "command": "dvc.checkout",
           "group": "navigation",
-          "when": "scmProvider == dvc"
+          "when": "scmProvider == dvc && dvc.commands.available == true"
         },
         {
           "command": "dvc.commit",
           "group": "navigation",
-          "when": "scmProvider == dvc"
+          "when": "scmProvider == dvc && dvc.commands.available == true"
         }
       ],
       "scm/resourceState/context": [
         {
           "command": "dvc.addTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState == untracked"
+          "when": "scmProvider == dvc && scmResourceState == untracked && dvc.commands.available == true"
         },
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
         },
         {
           "command": "dvc.pushTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
         },
         {
           "command": "dvc.pullTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked"
+          "when": "scmProvider == dvc && scmResourceState != untracked && dvc.commands.available == true"
         }
       ],
       "editor/title": [
@@ -251,47 +308,47 @@
           "command": "dvc.runExperiment",
           "alt": "dvc.runResetExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.stopRunningExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiments.webviewActive && dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "navigation@2",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.runExperiment",
           "group": "1_run@0",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.stopRunningExperiment",
           "group": "1_run@0",
-          "when": "dvc.experiments.webviewActive && dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "1_run@1",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "1_run@2",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         },
         {
           "command": "dvc.runResetExperiment",
           "group": "1_run@3",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         }
       ]
     },

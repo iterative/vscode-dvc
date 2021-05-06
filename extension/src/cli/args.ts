@@ -13,6 +13,7 @@ export enum Command {
 
 export enum Flag {
   FORCE = '-f',
+  HELP = '-h',
   RECURSIVE = '-R',
   SHOW_JSON = '--show-json',
   SUBDIRECTORY = '--subdir'
