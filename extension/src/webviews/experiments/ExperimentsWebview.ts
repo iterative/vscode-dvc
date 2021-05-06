@@ -1,4 +1,4 @@
-import { window, ViewColumn, WebviewPanel, Uri, commands } from 'vscode'
+import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -15,10 +15,10 @@ import {
 } from './contract'
 import { Logger } from '../../common/Logger'
 import { ResourceLocator } from '../../ResourceLocator'
+import { setContextValue } from '../../vscode/context'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
-  private static contextKey = 'dvc.experiments.webviewActive'
 
   public isActive = () => this.webviewPanel.active
 
@@ -105,7 +105,7 @@ export class ExperimentsWebview {
   }
 
   private static setPanelActiveContext(state: boolean) {
-    commands.executeCommand('setContext', ExperimentsWebview.contextKey, state)
+    setContextValue('dvc.experiments.webviewActive', state)
   }
 
   public dispose(): void {

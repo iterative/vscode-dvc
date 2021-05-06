@@ -36,6 +36,7 @@ import { resolve } from 'path'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
+import { setContextValue } from './vscode/context'
 
 export { Disposable, Disposer }
 
@@ -211,7 +212,7 @@ export class Extension {
   }
 
   private setCommandsAvailability(available: boolean) {
-    commands.executeCommand('setContext', 'dvc.commands.available', available)
+    setContextValue('dvc.commands.available', available)
   }
 
   constructor(context: ExtensionContext) {
