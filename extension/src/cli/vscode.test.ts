@@ -11,7 +11,7 @@ import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from './args'
-import { QuickPickItemWithValue } from '../vscode/quickpick'
+import { QuickPickItemWithValue } from '../vscode/quickPick'
 
 jest.mock('fs')
 jest.mock('../processExecution')
