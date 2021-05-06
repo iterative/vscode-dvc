@@ -3,7 +3,7 @@ import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 
-export class ExperimentsManager {
+export class Experiments {
   private config: Config
 
   private _currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
@@ -19,6 +19,10 @@ export class ExperimentsManager {
   > = new EventEmitter()
 
   public readonly onDidUpdate = this.onDidUpdateEmitter.event
+
+  private onFailedUpdateEmitter: EventEmitter<Error> = new EventEmitter()
+
+  public readonly onFailedUpdate = this.onFailedUpdateEmitter.event
 
   private _experiments?: ExperimentsRepoJSONOutput
   public get experiments() {
@@ -44,7 +48,7 @@ export class ExperimentsManager {
         this.onDidUpdateEmitter.fire(experimentData)
         return experimentData
       } catch (e) {
-        this.onDidUpdateEmitter.fire(e)
+        this.onFailedUpdateEmitter.fire(e)
       } finally {
         this._currentUpdatePromise = undefined
       }

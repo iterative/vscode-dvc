@@ -14,7 +14,7 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { ExperimentsManager } from './experiments'
+import { Experiments } from './experiments'
 
 import {
   Args,
@@ -57,7 +57,7 @@ export class Extension {
   private trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
-  private readonly experimentsManager: ExperimentsManager
+  private readonly experimentsManager: Experiments
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -174,9 +174,7 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.experimentsManager = this.dispose.track(
-      new ExperimentsManager(this.config)
-    )
+    this.experimentsManager = this.dispose.track(new Experiments(this.config))
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config)
