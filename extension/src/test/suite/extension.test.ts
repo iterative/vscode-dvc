@@ -187,14 +187,14 @@ suite('Extension Test Suite', () => {
       expect(mockCanRunCli).to.have.been.called
       expect(mockAddOnSystemChangeHandler).to.have.been.called
       expect(mockAddOnTypeChangeHandler).to.have.been.called
+      expect(mockListDvcOnlyRecursive).to.have.been.called
+      expect(mockStatus).to.have.been.called
 
       await configurationChangeEvent()
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         testUri.fsPath
       )
-      expect(mockListDvcOnlyRecursive).to.have.been.called
-      expect(mockStatus).to.have.been.called
     })
   })
 })
