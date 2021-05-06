@@ -28,19 +28,14 @@ export class Experiments {
   private onFailedUpdateEmitter: EventEmitter<Error> = new EventEmitter()
   public readonly onFailedUpdate = this.onFailedUpdateEmitter.event
 
-  private async performUpdate(): Promise<ExperimentsRepoJSONOutput> {
-    await this.config.ready
-    return experimentShow({
-      pythonBinPath: this.config.pythonBinPath,
-      cliPath: this.config.dvcPath,
-      cwd: this.config.workspaceRoot
-    })
-  }
-
   public async update(): Promise<ExperimentsRepoJSONOutput> {
     if (!this._currentUpdatePromise) {
       try {
-        const updatePromise = this.performUpdate()
+        const updatePromise = experimentShow({
+          pythonBinPath: this.config.pythonBinPath,
+          cliPath: this.config.dvcPath,
+          cwd: this.config.workspaceRoot
+        })
         this._currentUpdatePromise = updatePromise
         this.onStartedUpdateEmitter.fire(updatePromise)
         const experimentData = await updatePromise
