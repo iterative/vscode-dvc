@@ -94,7 +94,7 @@ export class Extension {
           'DVC extension is unable to initialize as the cli is not available.\n' +
             'Update your config options to try again.'
         )
-        return this.setCommandAvailability(false)
+        return this.setCommandsAvailability(false)
       }
     )
   }
@@ -106,7 +106,7 @@ export class Extension {
 
     this.initializeGitRepositories()
 
-    return this.setCommandAvailability(true)
+    return this.setCommandsAvailability(true)
   }
 
   private initializeDvcRepositories(dvcRoots: string[]) {
@@ -210,7 +210,7 @@ export class Extension {
     }
   }
 
-  private setCommandAvailability(available: boolean) {
+  private setCommandsAvailability(available: boolean) {
     commands.executeCommand('setContext', 'dvc.commands.available', available)
   }
 
@@ -221,7 +221,7 @@ export class Extension {
       i.show()
     }
 
-    this.setCommandAvailability(false)
+    this.setCommandsAvailability(false)
 
     this.resourceLocator = new ResourceLocator(context.extensionUri)
 
