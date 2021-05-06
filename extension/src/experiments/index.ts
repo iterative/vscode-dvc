@@ -60,10 +60,11 @@ export class Experiments {
       throw new Error('The Experiments class requires a Config instance!')
     }
     this.config = config
-    this._currentUpdatePromise = this.update()
   }
 
   public dispose() {
     this.onStartedUpdateEmitter.dispose()
+    this.onDidUpdateEmitter.dispose()
+    this.onFailedUpdateEmitter.dispose()
   }
 }
