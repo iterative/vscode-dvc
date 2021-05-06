@@ -98,12 +98,11 @@ export class Extension {
     )
   }
 
-  private async initialize() {
+  private initialize() {
     this.initializeDvcRepositories(this.dvcRoots)
 
     this.trackedExplorerTree.initialize(this.dvcRoots)
 
-    await this.gitExtension.ready
     this.initializeGitRepositories()
   }
 
@@ -135,7 +134,8 @@ export class Extension {
     })
   }
 
-  private initializeGitRepositories() {
+  private async initializeGitRepositories() {
+    await this.gitExtension.ready
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
