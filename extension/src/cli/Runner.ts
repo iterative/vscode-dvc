@@ -34,11 +34,10 @@ export class Runner {
     return this.config.dvcPath
   }
 
-  private async startProcess(cwd: string, args: Args) {
+  private startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    await this.config.ready
     this.currentProcess = createCliProcess({
       options: {
         cliPath: this.getOverrideOrCliPath(),
