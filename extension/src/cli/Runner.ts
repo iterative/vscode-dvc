@@ -46,9 +46,9 @@ export class Runner {
         pythonBinPath: this.config.pythonBinPath
       },
       emitters: {
-        completedEventEmitter: this.completedEventEmitter,
-        startedEventEmitter: this.startedEventEmitter,
-        outputEventEmitter: this.outputEventEmitter
+        processCompleted: this.completedEventEmitter,
+        processStarted: this.startedEventEmitter,
+        processOutput: this.outputEventEmitter
       },
       args
     })
