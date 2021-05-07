@@ -141,7 +141,7 @@ export class Extension {
   }
 
   private async initializeGitRepositories() {
-    await this.gitExtension.ready
+    await this.gitExtension.isReady()
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 

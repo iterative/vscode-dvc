@@ -99,7 +99,7 @@ export class GitExtension {
 
   public repositories: GitExtensionRepository[] = []
 
-  public get ready() {
+  public isReady() {
     return this.initialized
   }
 

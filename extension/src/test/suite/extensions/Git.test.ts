@@ -36,7 +36,7 @@ suite('Git Extension Test Suite', () => {
   describe('GitExtension', () => {
     it("should provide an onDidUntrackedChange callback for each of it's repositories", async () => {
       const gitExtension = disposable.track(new GitExtension())
-      await gitExtension.ready
+      await gitExtension.isReady()
 
       const [gitExtensionRepository] = gitExtension.repositories
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
@@ -67,7 +67,7 @@ suite('Git Extension Test Suite', () => {
 
     it('should be able to return the root path of each open repository', async () => {
       const gitExtension = disposable.track(new GitExtension())
-      await gitExtension.ready
+      await gitExtension.isReady()
       const [gitExtensionRepository] = gitExtension.repositories
       expect(gitExtensionRepository.getRepositoryRoot()).to.equal(workspacePath)
     })
