@@ -31,7 +31,7 @@ export class Runner {
     if (this.executable) {
       return this.executable
     }
-    return this.config.dvcPath
+    return this.config.getCliPath()
   }
 
   private startProcess(cwd: string, args: Args) {
@@ -55,7 +55,7 @@ export class Runner {
 
   public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
-    if (!this.pseudoTerminal.isBlocked) {
+    if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
     }
     window.showErrorMessage(

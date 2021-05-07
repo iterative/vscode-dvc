@@ -59,11 +59,11 @@ export class ExperimentsWebview {
     return view
   }
 
-  private readonly _disposer = Disposable.fn()
+  private readonly disposer = Disposable.fn()
 
-  private readonly _initialized = new Deferred()
+  private readonly deferred = new Deferred()
 
-  protected readonly initialized = this._initialized.promise
+  protected readonly initialized = this.deferred.promise
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
 
@@ -78,7 +78,7 @@ export class ExperimentsWebview {
   ) {
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
-      this._disposer.dispose()
+      this.disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
       this.handleMessage(arg as MessageFromWebview)
@@ -86,7 +86,7 @@ export class ExperimentsWebview {
 
     webviewPanel.webview.html = this.getHtml()
 
-    this._disposer.track(
+    this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
         ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
       })
@@ -94,12 +94,13 @@ export class ExperimentsWebview {
 
     ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
-    this._disposer.track({
+    this.disposer.track({
       dispose: autorun(async () => {
-        // Update theme changes
-        const { theme } = config
         await this.initialized // Read all mobx dependencies before await
-        this.sendMessage({ type: MessageToWebviewType.setTheme, theme })
+        this.sendMessage({
+          type: MessageToWebviewType.setTheme,
+          theme: config.getTheme()
+        })
       })
     })
   }
@@ -137,7 +138,7 @@ export class ExperimentsWebview {
 
     const data: WindowWithWebviewData = {
       webviewData: {
-        theme: this.config.theme,
+        theme: this.config.getTheme(),
         publicPath: urls.publicPath
       }
     }
@@ -168,7 +169,7 @@ export class ExperimentsWebview {
   // TODO: Implement Request/Response Semantic!
 
   private sendMessage(message: MessageToWebview) {
-    if (this._initialized.state !== 'resolved') {
+    if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'
       )
@@ -178,7 +179,7 @@ export class ExperimentsWebview {
 
   private handleMessage(message: MessageFromWebview) {
     if (message.type === MessageFromWebviewType.initialized) {
-      this._initialized.resolve()
+      this.deferred.resolve()
     } else {
       Logger.error(`Unexpected message: ${message}`)
     }
