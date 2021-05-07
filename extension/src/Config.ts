@@ -39,10 +39,10 @@ export class Config {
   public pythonBinPath: string | undefined
 
   @observable
-  private _vsCodeTheme: ColorTheme
+  private vsCodeTheme: ColorTheme
 
-  public get theme(): WebviewColorTheme {
-    if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
+  public getTheme(): WebviewColorTheme {
+    if (this.vsCodeTheme.kind === ColorThemeKind.Dark) {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
@@ -158,11 +158,11 @@ export class Config {
 
     this.workspaceRoot = this.getWorkspaceRoot()
 
-    this._vsCodeTheme = window.activeColorTheme
+    this.vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
       window.onDidChangeActiveColorTheme(() => {
-        this._vsCodeTheme = window.activeColorTheme
+        this.vsCodeTheme = window.activeColorTheme
       })
     )
 

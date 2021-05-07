@@ -96,10 +96,11 @@ export class ExperimentsWebview {
 
     this._disposer.track({
       dispose: autorun(async () => {
-        // Update theme changes
-        const { theme } = config
         await this.initialized // Read all mobx dependencies before await
-        this.sendMessage({ type: MessageToWebviewType.setTheme, theme })
+        this.sendMessage({
+          type: MessageToWebviewType.setTheme,
+          theme: config.getTheme()
+        })
       })
     })
   }
@@ -137,7 +138,7 @@ export class ExperimentsWebview {
 
     const data: WindowWithWebviewData = {
       webviewData: {
-        theme: this.config.theme,
+        theme: this.config.getTheme(),
         publicPath: urls.publicPath
       }
     }
