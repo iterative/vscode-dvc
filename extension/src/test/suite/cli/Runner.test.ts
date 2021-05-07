@@ -3,7 +3,6 @@ import chai from 'chai'
 import { restore, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
-import { Command } from '../../../cli/args'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
 import { Runner } from '../../../cli/Runner'
@@ -32,7 +31,7 @@ suite('Runner Test Suite', () => {
       const cwd = __dirname
 
       await runner.run(cwd, '3')
-      await runner.run(cwd, Command.CHECKOUT)
+      await runner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
     }).timeout(6000)
@@ -43,14 +42,14 @@ suite('Runner Test Suite', () => {
 
       const executeCommandSpy = spy(commands, 'executeCommand')
 
-      const processCompletedEvent = (): Promise<void> =>
+      const onProcessCompleted = (): Promise<void> =>
         new Promise(resolve =>
-          disposable.track(runner.onDidComplete(() => resolve()))
+          disposable.track(runner.onProcessCompleted(() => resolve()))
         )
 
       await runner.run(cwd, '100000000000000000000000')
 
-      const completedEvent = processCompletedEvent()
+      const completed = onProcessCompleted()
 
       expect(runner.isRunning()).to.be.true
       expect(executeCommandSpy).to.be.calledWith(
@@ -62,7 +61,7 @@ suite('Runner Test Suite', () => {
       const stopped = await runner.stop()
       expect(stopped).to.be.true
 
-      await completedEvent
+      await completed
 
       expect(runner.isRunning()).to.be.false
       expect(executeCommandSpy).to.be.calledWith(
@@ -75,15 +74,11 @@ suite('Runner Test Suite', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const text = ':weeeee:'
 
-      const completedEventEmitter = disposable.track(new EventEmitter<void>())
-      const outputEventEmitter = disposable.track(new EventEmitter<string>())
-      const startedEventEmitter = disposable.track(new EventEmitter<void>())
+      const processCompleted = disposable.track(new EventEmitter<void>())
+      const processOutput = disposable.track(new EventEmitter<string>())
+      const processStarted = disposable.track(new EventEmitter<void>())
 
-      const onDidStart = startedEventEmitter.event
-      const onDidComplete = completedEventEmitter.event
-      const onDidOutput = outputEventEmitter.event
-
-      const executionOutputEvent = (
+      const onOutput = (
         text: string,
         event: Event<string>,
         disposer: Disposer
@@ -99,7 +94,7 @@ suite('Runner Test Suite', () => {
           disposer.track(listener)
         })
       }
-      const startedOrCompletedEvent = (event: Event<void>): Promise<void> => {
+      const onStartedOrCompleted = (event: Event<void>): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = event(() => {
             listener.dispose()
@@ -107,17 +102,17 @@ suite('Runner Test Suite', () => {
           })
         })
       }
-      const started = startedOrCompletedEvent(onDidStart)
-      const completed = startedOrCompletedEvent(onDidComplete)
-      const eventStream = executionOutputEvent(text, onDidOutput, disposable)
+      const started = onStartedOrCompleted(processStarted.event)
+      const completed = onStartedOrCompleted(processCompleted.event)
+      const eventStream = onOutput(text, processOutput.event, disposable)
 
       const cwd = __dirname
 
       const runner = disposable.track(
         new Runner({} as Config, 'echo', {
-          completedEventEmitter,
-          outputEventEmitter,
-          startedEventEmitter
+          processCompleted: processCompleted,
+          processOutput: processOutput,
+          processStarted: processStarted
         })
       )
 

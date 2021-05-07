@@ -198,7 +198,7 @@ export class Extension {
       await this.showExperimentsWebview()
       this.runner.run(dvcRoot, ...args)
       const listener = this.dispose.track(
-        this.runner.onDidComplete(() => {
+        this.runner.onProcessCompleted(() => {
           this.refreshExperimentsWebview()
           this.dispose.untrack(listener)
           listener.dispose()

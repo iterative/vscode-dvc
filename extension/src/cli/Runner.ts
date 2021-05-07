@@ -13,15 +13,15 @@ export class Runner {
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
-  private outputEventEmitter: EventEmitter<string>
-  private completedEventEmitter: EventEmitter<void>
-  private startedEventEmitter: EventEmitter<void>
-  private terminatedEventEmitter: EventEmitter<void>
+  private processOutput: EventEmitter<string>
+  private processCompleted: EventEmitter<void>
+  private processStarted: EventEmitter<void>
+  private processTerminated: EventEmitter<void>
 
   private executable: string | undefined
 
-  public onDidComplete: Event<void>
-  private onDidTerminate: Event<void>
+  public onProcessCompleted: Event<void>
+  private onProcessTerminated: Event<void>
 
   private pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
@@ -37,7 +37,7 @@ export class Runner {
   private async startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
-    this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
+    this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     await this.config.ready
     this.currentProcess = createCliProcess({
       options: {
@@ -46,9 +46,9 @@ export class Runner {
         pythonBinPath: this.config.pythonBinPath
       },
       emitters: {
-        processCompleted: this.completedEventEmitter,
-        processStarted: this.startedEventEmitter,
-        processOutput: this.outputEventEmitter
+        processCompleted: this.processCompleted,
+        processStarted: this.processStarted,
+        processOutput: this.processOutput
       },
       args
     })
@@ -92,51 +92,48 @@ export class Runner {
     config: Config,
     executable?: string,
     emitters?: {
-      outputEventEmitter: EventEmitter<string>
-      completedEventEmitter: EventEmitter<void>
-      startedEventEmitter: EventEmitter<void>
-      terminatedEventEmitter?: EventEmitter<void>
+      processCompleted: EventEmitter<void>
+      processOutput: EventEmitter<string>
+      processStarted: EventEmitter<void>
+      processTerminated?: EventEmitter<void>
     }
   ) {
     this.config = config
 
     this.executable = executable
 
-    this.completedEventEmitter =
-      emitters?.completedEventEmitter ||
-      this.dispose.track(new EventEmitter<void>())
-    this.onDidComplete = this.completedEventEmitter.event
+    this.processCompleted =
+      emitters?.processCompleted || this.dispose.track(new EventEmitter<void>())
+    this.onProcessCompleted = this.processCompleted.event
     this.dispose.track(
-      this.onDidComplete(() => {
+      this.onProcessCompleted(() => {
         this.pseudoTerminal.setBlocked(false)
         Runner.setRunningContext(false)
-        this.outputEventEmitter.fire(
+        this.processOutput.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )
         this.currentProcess = undefined
       })
     )
 
-    this.outputEventEmitter =
-      emitters?.outputEventEmitter ||
-      this.dispose.track(new EventEmitter<string>())
+    this.processOutput =
+      emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
 
-    this.startedEventEmitter =
-      emitters?.startedEventEmitter ||
-      this.dispose.track(new EventEmitter<void>())
+    this.processStarted =
+      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
 
-    this.terminatedEventEmitter =
-      emitters?.terminatedEventEmitter ||
+    this.processTerminated =
+      emitters?.processTerminated ||
       this.dispose.track(new EventEmitter<void>())
-    this.onDidTerminate = this.terminatedEventEmitter.event
+    this.onProcessTerminated = this.processTerminated.event
     this.dispose.track(
-      this.onDidTerminate(() => {
+      this.onProcessTerminated(() => {
         this.stop()
       })
     )
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.outputEventEmitter, this.terminatedEventEmitter)
+      new PseudoTerminal(this.processOutput, this.processTerminated)
     )
   }
 }
