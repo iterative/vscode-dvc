@@ -80,7 +80,7 @@ export class Repository {
 
   private getCliExecutionOptions() {
     return {
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       pythonBinPath: this.config.pythonBinPath,
       cwd: this.dvcRoot
     }

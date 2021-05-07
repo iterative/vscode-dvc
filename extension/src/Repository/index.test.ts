@@ -84,7 +84,7 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
       const config = ({
-        dvcPath: undefined
+        getCliPath: () => undefined
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
@@ -135,7 +135,7 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
       const config = ({
-        dvcPath: undefined
+        getCliPath: () => undefined
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
@@ -220,7 +220,7 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
       const config = ({
-        dvcPath: undefined
+        getCliPath: () => undefined
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 

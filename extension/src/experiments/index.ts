@@ -33,7 +33,7 @@ export class Experiments {
       try {
         const updatePromise = experimentShow({
           pythonBinPath: this.config.pythonBinPath,
-          cliPath: this.config.dvcPath,
+          cliPath: this.config.getCliPath(),
           cwd: this.config.workspaceRoot
         })
         this._currentUpdatePromise = updatePromise

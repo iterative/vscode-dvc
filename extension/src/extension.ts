@@ -64,7 +64,7 @@ export class Extension {
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
     const dvcRoots = await findDvcRootPaths({
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       cwd: workspaceRoot,
       pythonBinPath: this.config.pythonBinPath
     })
@@ -85,7 +85,7 @@ export class Extension {
 
   private initializeOrNotify() {
     return canRunCli({
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       pythonBinPath: this.config.pythonBinPath,
       cwd: this.config.workspaceRoot
     }).then(
@@ -148,7 +148,7 @@ export class Extension {
       this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
 
       const dvcRoots = await findDvcRootPaths({
-        cliPath: this.config.dvcPath,
+        cliPath: this.config.getCliPath(),
         cwd: gitRoot,
         pythonBinPath: this.config.pythonBinPath
       })
@@ -189,7 +189,7 @@ export class Extension {
 
   private async runExperimentCommand(...args: Args) {
     const dvcRoot = await pickSingleRepositoryRoot({
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       cwd: this.config.workspaceRoot,
       pythonBinPath: this.config.pythonBinPath
     })

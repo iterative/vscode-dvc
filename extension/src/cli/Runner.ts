@@ -31,7 +31,7 @@ export class Runner {
     if (this.executable) {
       return this.executable
     }
-    return this.config.dvcPath
+    return this.config.getCliPath()
   }
 
   private startProcess(cwd: string, args: Args) {
