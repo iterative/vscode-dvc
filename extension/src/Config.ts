@@ -1,7 +1,6 @@
 import {
   ColorTheme,
   ColorThemeKind,
-  ConfigurationChangeEvent,
   EventEmitter,
   Event,
   StatusBarItem,
@@ -28,9 +27,6 @@ export class Config {
   }
 
   public readonly workspaceRoot: string
-
-  private changed: EventEmitter<ConfigurationChangeEvent>
-  private readonly onChanged: Event<ConfigurationChangeEvent>
 
   private executionDetailsChanged: EventEmitter<void>
   public readonly onExecutionDetailsChanged: Event<void>
@@ -168,23 +164,14 @@ export class Config {
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
 
-    this.changed = this.dispose.track(new EventEmitter())
-    this.onChanged = this.changed.event
-
     this.executionDetailsChanged = this.dispose.track(new EventEmitter<void>())
     this.onExecutionDetailsChanged = this.executionDetailsChanged.event
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
-          this.changed.fire(e)
+          this.updateDvcPathStatusBarItem()
         }
-      })
-    )
-
-    this.dispose.track(
-      this.onChanged(() => {
-        this.updateDvcPathStatusBarItem()
       })
     )
   }
