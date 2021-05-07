@@ -13,15 +13,17 @@ export class Runner {
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
-  private processOutput: EventEmitter<string>
   private processCompleted: EventEmitter<void>
+  public readonly onDidCompleteProcess: Event<void>
+
+  private processOutput: EventEmitter<string>
+
   private processStarted: EventEmitter<void>
+
   private processTerminated: EventEmitter<void>
+  private onDidTerminateProcess: Event<void>
 
   private executable: string | undefined
-
-  public onProcessCompleted: Event<void>
-  private onProcessTerminated: Event<void>
 
   private pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
@@ -104,9 +106,9 @@ export class Runner {
 
     this.processCompleted =
       emitters?.processCompleted || this.dispose.track(new EventEmitter<void>())
-    this.onProcessCompleted = this.processCompleted.event
+    this.onDidCompleteProcess = this.processCompleted.event
     this.dispose.track(
-      this.onProcessCompleted(() => {
+      this.onDidCompleteProcess(() => {
         this.pseudoTerminal.setBlocked(false)
         Runner.setRunningContext(false)
         this.processOutput.fire(
@@ -125,9 +127,9 @@ export class Runner {
     this.processTerminated =
       emitters?.processTerminated ||
       this.dispose.track(new EventEmitter<void>())
-    this.onProcessTerminated = this.processTerminated.event
+    this.onDidTerminateProcess = this.processTerminated.event
     this.dispose.track(
-      this.onProcessTerminated(() => {
+      this.onDidTerminateProcess(() => {
         this.stop()
       })
     )

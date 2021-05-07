@@ -42,14 +42,14 @@ suite('Runner Test Suite', () => {
 
       const executeCommandSpy = spy(commands, 'executeCommand')
 
-      const onProcessCompleted = (): Promise<void> =>
+      const onDidCompleteProcess = (): Promise<void> =>
         new Promise(resolve =>
-          disposable.track(runner.onProcessCompleted(() => resolve()))
+          disposable.track(runner.onDidCompleteProcess(() => resolve()))
         )
 
       await runner.run(cwd, '100000000000000000000000')
 
-      const completed = onProcessCompleted()
+      const completed = onDidCompleteProcess()
 
       expect(runner.isRunning()).to.be.true
       expect(executeCommandSpy).to.be.calledWith(
@@ -78,7 +78,7 @@ suite('Runner Test Suite', () => {
       const processOutput = disposable.track(new EventEmitter<string>())
       const processStarted = disposable.track(new EventEmitter<void>())
 
-      const onOutput = (
+      const onDidOutputProcess = (
         text: string,
         event: Event<string>,
         disposer: Disposer
@@ -94,7 +94,9 @@ suite('Runner Test Suite', () => {
           disposer.track(listener)
         })
       }
-      const onStartedOrCompleted = (event: Event<void>): Promise<void> => {
+      const onDidStartOrCompleteProcess = (
+        event: Event<void>
+      ): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = event(() => {
             listener.dispose()
@@ -102,9 +104,13 @@ suite('Runner Test Suite', () => {
           })
         })
       }
-      const started = onStartedOrCompleted(processStarted.event)
-      const completed = onStartedOrCompleted(processCompleted.event)
-      const eventStream = onOutput(text, processOutput.event, disposable)
+      const started = onDidStartOrCompleteProcess(processStarted.event)
+      const completed = onDidStartOrCompleteProcess(processCompleted.event)
+      const eventStream = onDidOutputProcess(
+        text,
+        processOutput.event,
+        disposable
+      )
 
       const cwd = __dirname
 
