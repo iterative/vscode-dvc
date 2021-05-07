@@ -95,8 +95,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         title: 'Open File',
         arguments: [resourceUri]
       }
-      treeItem.contextValue = 'file'
     }
+
+    treeItem.contextValue = 'dvc'
 
     return treeItem
   }
