@@ -20,8 +20,8 @@ import {
 export class Config {
   public readonly dispose = Disposable.fn()
 
-  private readonly _initialized = new Deferred()
-  private readonly initialized = this._initialized.promise
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
   public isReady() {
     return this.initialized
@@ -142,7 +142,7 @@ export class Config {
 
     getPythonBinPath().then(path => {
       this.pythonBinPath = path
-      return this._initialized.resolve()
+      return this.deferred.resolve()
     })
 
     getOnDidChangePythonExecutionDetails().then(

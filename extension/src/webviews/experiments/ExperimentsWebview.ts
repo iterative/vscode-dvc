@@ -61,9 +61,9 @@ export class ExperimentsWebview {
 
   private readonly _disposer = Disposable.fn()
 
-  private readonly _initialized = new Deferred()
+  private readonly deferred = new Deferred()
 
-  protected readonly initialized = this._initialized.promise
+  protected readonly initialized = this.deferred.promise
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
 
@@ -169,7 +169,7 @@ export class ExperimentsWebview {
   // TODO: Implement Request/Response Semantic!
 
   private sendMessage(message: MessageToWebview) {
-    if (this._initialized.state !== 'resolved') {
+    if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'
       )
@@ -179,7 +179,7 @@ export class ExperimentsWebview {
 
   private handleMessage(message: MessageFromWebview) {
     if (message.type === MessageFromWebviewType.initialized) {
-      this._initialized.resolve()
+      this.deferred.resolve()
     } else {
       Logger.error(`Unexpected message: ${message}`)
     }

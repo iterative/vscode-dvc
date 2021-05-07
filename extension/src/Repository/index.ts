@@ -55,8 +55,8 @@ export class RepositoryState
 export class Repository {
   public readonly dispose = Disposable.fn()
 
-  private readonly _initialized = new Deferred()
-  private readonly initialized = this._initialized.promise
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
   public get ready() {
     return this.initialized
@@ -199,7 +199,7 @@ export class Repository {
 
   private async setup() {
     await this.resetState()
-    return this._initialized.resolve()
+    return this.deferred.resolve()
   }
 
   constructor(
