@@ -245,7 +245,7 @@ export class Extension {
       (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       ),
-      this.config.ready
+      this.config.isReady()
     ]).then(() => this.initializeOrNotify())
 
     this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())

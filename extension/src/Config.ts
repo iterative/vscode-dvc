@@ -23,7 +23,7 @@ export class Config {
   private readonly _initialized = new Deferred()
   private readonly initialized = this._initialized.promise
 
-  public get ready() {
+  public isReady() {
     return this.initialized
   }
 
