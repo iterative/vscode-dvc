@@ -350,6 +350,13 @@
           "group": "1_run@3",
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
         }
+      ],
+      "view/item/context": [
+        {
+          "command": "dvc.pullTarget",
+          "when": "viewItem == dvc",
+          "group": "inline"
+        }
       ]
     },
     "views": {
