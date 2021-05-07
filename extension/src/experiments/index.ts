@@ -8,9 +8,9 @@ export class Experiments {
 
   private _currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
-  private _data?: ExperimentsRepoJSONOutput
-  public get data() {
-    return this._data
+  private data?: ExperimentsRepoJSONOutput
+  public getData() {
+    return this.data
   }
 
   private onStartedUpdateEmitter: EventEmitter<
