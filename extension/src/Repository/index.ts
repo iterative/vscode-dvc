@@ -58,7 +58,7 @@ export class Repository {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  public get ready() {
+  public isReady() {
     return this.initialized
   }
 
