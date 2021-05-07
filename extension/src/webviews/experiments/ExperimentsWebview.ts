@@ -59,7 +59,7 @@ export class ExperimentsWebview {
     return view
   }
 
-  private readonly _disposer = Disposable.fn()
+  private readonly disposer = Disposable.fn()
 
   private readonly deferred = new Deferred()
 
@@ -78,7 +78,7 @@ export class ExperimentsWebview {
   ) {
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
-      this._disposer.dispose()
+      this.disposer.dispose()
     })
     webviewPanel.webview.onDidReceiveMessage(arg => {
       this.handleMessage(arg as MessageFromWebview)
@@ -86,7 +86,7 @@ export class ExperimentsWebview {
 
     webviewPanel.webview.html = this.getHtml()
 
-    this._disposer.track(
+    this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
         ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
       })
@@ -94,7 +94,7 @@ export class ExperimentsWebview {
 
     ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
-    this._disposer.track({
+    this.disposer.track({
       dispose: autorun(async () => {
         await this.initialized // Read all mobx dependencies before await
         this.sendMessage({
