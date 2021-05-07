@@ -122,3 +122,7 @@ export const pullTarget = (
 export const pushTarget = (
   options: ExecutionOnTargetOptions
 ): Promise<string> => runCliProcessOnTarget(options, Command.PUSH)
+
+export const removeTarget = (
+  options: ExecutionOnTargetOptions
+): Promise<string> => runCliProcessOnTarget(options, Command.REMOVE)
