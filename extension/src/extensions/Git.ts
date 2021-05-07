@@ -67,7 +67,7 @@ class GitExtensionRepository {
   public dispose = Disposable.fn()
 
   private changed: EventEmitter<void>
-  readonly onChanged: Event<void>
+  readonly onDidChange: Event<void>
 
   private repositoryRoot: string
 
@@ -79,7 +79,7 @@ class GitExtensionRepository {
     this.repositoryRoot = repository.rootUri.fsPath
 
     this.changed = this.dispose.track(new EventEmitter())
-    this.onChanged = this.changed.event
+    this.onDidChange = this.changed.event
 
     this.dispose.track(
       repository.state.onDidChange(() => {

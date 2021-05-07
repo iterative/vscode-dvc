@@ -157,7 +157,7 @@ export class Extension {
         const repository = this.dvcRepositories[dvcRoot]
 
         this.dispose.track(
-          gitExtensionRepository.onChanged(() => {
+          gitExtensionRepository.onDidChange(() => {
             repository?.updateState()
           })
         )
