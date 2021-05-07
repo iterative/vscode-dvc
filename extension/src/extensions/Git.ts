@@ -78,7 +78,7 @@ class GitExtensionRepository {
   constructor(repository: Repository) {
     this.repositoryRoot = repository.rootUri.fsPath
 
-    this.changed = this.dispose.track(new EventEmitter())
+    this.changed = this.dispose.track(new EventEmitter<void>())
     this.onDidChange = this.changed.event
 
     this.dispose.track(
