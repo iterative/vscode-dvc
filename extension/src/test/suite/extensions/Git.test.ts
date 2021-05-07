@@ -34,7 +34,7 @@ suite('Git Extension Test Suite', () => {
   })
 
   describe('GitExtension', () => {
-    it("should provide an onDidUntrackedChange callback for each of it's repositories", async () => {
+    it("should provide an onChanged callback for each of it's repositories", async () => {
       const gitExtension = disposable.track(new GitExtension())
       await gitExtension.ready
 
@@ -43,9 +43,9 @@ suite('Git Extension Test Suite', () => {
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
-      const repositoryUntrackedChangeEvent = (): Promise<void> => {
+      const onChanged = (): Promise<void> => {
         return new Promise(resolve => {
-          const listener: Disposable = gitExtensionRepository.onDidChange(
+          const listener: Disposable = gitExtensionRepository.onChanged(
             (event: void) => {
               return resolve(event)
             }
@@ -54,12 +54,12 @@ suite('Git Extension Test Suite', () => {
         })
       }
 
-      const change = repositoryUntrackedChangeEvent()
+      const changed = onChanged()
 
       await ensureFile(untrackedFile)
       expect(accessSync(untrackedFile)).not.to.throw
 
-      await change
+      await changed
       const untrackedChanges = await getAllUntracked(gitRoot)
       expect(untrackedChanges).to.have.lengthOf.at.least(2)
       expect(untrackedChanges).to.include(untrackedFile, untrackedDir)
