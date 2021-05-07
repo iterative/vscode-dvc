@@ -31,14 +31,13 @@ export class Runner {
     if (this.executable) {
       return this.executable
     }
-    return this.config.dvcPath
+    return this.config.getCliPath()
   }
 
-  private async startProcess(cwd: string, args: Args) {
+  private startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    await this.config.ready
     this.currentProcess = createCliProcess({
       options: {
         cliPath: this.getOverrideOrCliPath(),
@@ -56,7 +55,7 @@ export class Runner {
 
   public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
-    if (!this.pseudoTerminal.isBlocked) {
+    if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
     }
     window.showErrorMessage(

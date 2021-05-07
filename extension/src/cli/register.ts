@@ -24,7 +24,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
       initializeDirectory({
         cwd: fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     })
@@ -34,7 +34,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
       addTarget({
         fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     )
@@ -44,7 +44,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.checkout', ({ rootUri }) => {
       checkout({
         cwd: rootUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     })
@@ -54,7 +54,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.checkoutTarget', ({ resourceUri }) =>
       checkoutTarget({
         fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     )
@@ -64,7 +64,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.commit', ({ rootUri }) => {
       commit({
         cwd: rootUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     })
@@ -74,7 +74,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.commitTarget', ({ resourceUri }) =>
       commitTarget({
         fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     )
@@ -84,7 +84,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
       pushTarget({
         fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     )
@@ -94,7 +94,7 @@ const registerCommands = (config: Config, disposer: Disposer) => {
     commands.registerCommand('dvc.pullTarget', ({ resourceUri }) =>
       pullTarget({
         fsPath: resourceUri.fsPath,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     )

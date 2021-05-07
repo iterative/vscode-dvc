@@ -43,7 +43,7 @@ beforeEach(() => {
 const defaultPath = '/home/user/project'
 
 const exampleConfig = {
-  dvcPath: 'dvc',
+  getCliPath: () => 'dvc',
   workspaceRoot: defaultPath
 } as Config
 

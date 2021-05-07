@@ -20,10 +20,10 @@ import {
 export class Config {
   public readonly dispose = Disposable.fn()
 
-  private readonly _initialized = new Deferred()
-  private readonly initialized = this._initialized.promise
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
-  public get ready() {
+  public isReady() {
     return this.initialized
   }
 
@@ -39,10 +39,10 @@ export class Config {
   public pythonBinPath: string | undefined
 
   @observable
-  private _vsCodeTheme: ColorTheme
+  private vsCodeTheme: ColorTheme
 
-  public get theme(): WebviewColorTheme {
-    if (this._vsCodeTheme.kind === ColorThemeKind.Dark) {
+  public getTheme(): WebviewColorTheme {
+    if (this.vsCodeTheme.kind === ColorThemeKind.Dark) {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
@@ -51,7 +51,7 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private updateDvcPathStatusBarItem = (path = this.dvcPath): void => {
+  private updateDvcPathStatusBarItem = (path = this.getCliPath()): void => {
     this.dvcPathStatusBarItem.text = path
   }
 
@@ -66,7 +66,7 @@ export class Config {
 
   private dvcPathOption = 'dvc.dvcPath'
 
-  public get dvcPath(): string {
+  public getCliPath(): string {
     return workspace.getConfiguration().get(this.dvcPathOption, '')
   }
 
@@ -80,7 +80,7 @@ export class Config {
   }
 
   private setDvcPath(path?: string): Thenable<void> {
-    this.notifyIfChanged(this.dvcPath, path)
+    this.notifyIfChanged(this.getCliPath(), path)
     return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
@@ -89,7 +89,7 @@ export class Config {
 
     dvcPathStatusBarItem.tooltip = 'Current DVC path.'
     dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
-    dvcPathStatusBarItem.text = this.dvcPath
+    dvcPathStatusBarItem.text = this.getCliPath()
     dvcPathStatusBarItem.show()
     return dvcPathStatusBarItem
   }
@@ -142,7 +142,7 @@ export class Config {
 
     getPythonBinPath().then(path => {
       this.pythonBinPath = path
-      return this._initialized.resolve()
+      return this.deferred.resolve()
     })
 
     getOnDidChangePythonExecutionDetails().then(
@@ -158,11 +158,11 @@ export class Config {
 
     this.workspaceRoot = this.getWorkspaceRoot()
 
-    this._vsCodeTheme = window.activeColorTheme
+    this.vsCodeTheme = window.activeColorTheme
 
     this.dispose.track(
       window.onDidChangeActiveColorTheme(() => {
-        this._vsCodeTheme = window.activeColorTheme
+        this.vsCodeTheme = window.activeColorTheme
       })
     )
 
