@@ -17,16 +17,16 @@ export class Experiments {
     Thenable<ExperimentsRepoJSONOutput>
   > = new EventEmitter()
 
-  public readonly onStartedUpdate = this.dataUpdateStarted.event
+  public readonly onDidStartDataUpdate = this.dataUpdateStarted.event
 
   private dataUpdated: EventEmitter<
     ExperimentsRepoJSONOutput
   > = new EventEmitter()
 
-  public readonly onDataUpdated = this.dataUpdated.event
+  public readonly onDidUpdateData = this.dataUpdated.event
 
   private dataUpdateFailed: EventEmitter<Error> = new EventEmitter()
-  public readonly onDataUpdateFailed = this.dataUpdateFailed.event
+  public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
 
   public async update(): Promise<ExperimentsRepoJSONOutput> {
     if (!this._currentUpdatePromise) {
