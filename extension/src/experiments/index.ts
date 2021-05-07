@@ -6,11 +6,11 @@ import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 export class Experiments {
   private config: Config
 
-  private _currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
+  private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
-  private _data?: ExperimentsRepoJSONOutput
-  public get data() {
-    return this._data
+  private data?: ExperimentsRepoJSONOutput
+  public getData() {
+    return this.data
   }
 
   private dataUpdateStarted: EventEmitter<
@@ -29,14 +29,14 @@ export class Experiments {
   public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
 
   public async update(): Promise<ExperimentsRepoJSONOutput> {
-    if (!this._currentUpdatePromise) {
+    if (!this.currentUpdatePromise) {
       try {
         const updatePromise = experimentShow({
           pythonBinPath: this.config.pythonBinPath,
-          cliPath: this.config.dvcPath,
+          cliPath: this.config.getCliPath(),
           cwd: this.config.workspaceRoot
         })
-        this._currentUpdatePromise = updatePromise
+        this.currentUpdatePromise = updatePromise
         this.dataUpdateStarted.fire(updatePromise)
         const experimentData = await updatePromise
         this.dataUpdated.fire(experimentData)
@@ -44,10 +44,10 @@ export class Experiments {
       } catch (e) {
         this.dataUpdateFailed.fire(e)
       } finally {
-        this._currentUpdatePromise = undefined
+        this.currentUpdatePromise = undefined
       }
     }
-    return this._currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
+    return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
   constructor(config: Config) {

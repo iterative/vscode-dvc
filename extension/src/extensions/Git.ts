@@ -92,14 +92,14 @@ class GitExtensionRepository {
 export class GitExtension {
   public dispose = Disposable.fn()
 
-  private readonly _initialized = new Deferred()
-  private readonly initialized = this._initialized.promise
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
   private gitExtensionAPI?: ExtensionAPI
 
   public repositories: GitExtensionRepository[] = []
 
-  public get ready() {
+  public isReady() {
     return this.initialized
   }
 
@@ -118,7 +118,7 @@ export class GitExtension {
       this.dispose.track(new GitExtensionRepository(repository))
     )
 
-    this._initialized.resolve()
+    this.deferred.resolve()
   }
 
   private initialize(extensionAPI: ExtensionAPI) {

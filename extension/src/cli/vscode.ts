@@ -18,7 +18,7 @@ export const experimentRunQueueCommand = async (config: Config) => {
     return window.showInformationMessage(
       await experimentRunQueue({
         cwd: config.workspaceRoot,
-        cliPath: config.dvcPath,
+        cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
     )
@@ -59,7 +59,7 @@ export const experimentGcQuickPick = async (config: Config) => {
       const stdout = await experimentGarbageCollect(
         {
           cwd: config.workspaceRoot,
-          cliPath: config.dvcPath,
+          cliPath: config.getCliPath(),
           pythonBinPath: config.pythonBinPath
         },
         quickPickResult
@@ -90,7 +90,7 @@ const experimentsQuickPickCommand = async <T = void>(
 ) => {
   const options = {
     cwd: config.workspaceRoot,
-    cliPath: config.dvcPath,
+    cliPath: config.getCliPath(),
     pythonBinPath: config.pythonBinPath
   }
   try {
