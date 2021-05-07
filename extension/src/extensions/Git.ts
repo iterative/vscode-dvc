@@ -66,7 +66,7 @@ interface VscodeGit {
 class GitExtensionRepository {
   public dispose = Disposable.fn()
 
-  private onDidChangeEmitter: EventEmitter<void>
+  private changed: EventEmitter<void>
   readonly onDidChange: Event<void>
 
   private repositoryRoot: string
@@ -78,12 +78,12 @@ class GitExtensionRepository {
   constructor(repository: Repository) {
     this.repositoryRoot = repository.rootUri.fsPath
 
-    this.onDidChangeEmitter = this.dispose.track(new EventEmitter())
-    this.onDidChange = this.onDidChangeEmitter.event
+    this.changed = this.dispose.track(new EventEmitter<void>())
+    this.onDidChange = this.changed.event
 
     this.dispose.track(
       repository.state.onDidChange(() => {
-        this.onDidChangeEmitter.fire()
+        this.changed.fire()
       })
     )
   }

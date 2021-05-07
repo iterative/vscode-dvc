@@ -13,20 +13,20 @@ export class Experiments {
     return this.data
   }
 
-  private onStartedUpdateEmitter: EventEmitter<
+  private dataUpdateStarted: EventEmitter<
     Thenable<ExperimentsRepoJSONOutput>
   > = new EventEmitter()
 
-  public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
+  public readonly onDidStartDataUpdate = this.dataUpdateStarted.event
 
-  private onDidUpdateEmitter: EventEmitter<
+  private dataUpdated: EventEmitter<
     ExperimentsRepoJSONOutput
   > = new EventEmitter()
 
-  public readonly onDidUpdate = this.onDidUpdateEmitter.event
+  public readonly onDidUpdateData = this.dataUpdated.event
 
-  private onFailedUpdateEmitter: EventEmitter<Error> = new EventEmitter()
-  public readonly onFailedUpdate = this.onFailedUpdateEmitter.event
+  private dataUpdateFailed: EventEmitter<Error> = new EventEmitter()
+  public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
 
   public async update(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
@@ -37,12 +37,12 @@ export class Experiments {
           cwd: this.config.workspaceRoot
         })
         this.currentUpdatePromise = updatePromise
-        this.onStartedUpdateEmitter.fire(updatePromise)
+        this.dataUpdateStarted.fire(updatePromise)
         const experimentData = await updatePromise
-        this.onDidUpdateEmitter.fire(experimentData)
+        this.dataUpdated.fire(experimentData)
         return experimentData
       } catch (e) {
-        this.onFailedUpdateEmitter.fire(e)
+        this.dataUpdateFailed.fire(e)
       } finally {
         this.currentUpdatePromise = undefined
       }
@@ -58,8 +58,8 @@ export class Experiments {
   }
 
   public dispose() {
-    this.onStartedUpdateEmitter.dispose()
-    this.onDidUpdateEmitter.dispose()
-    this.onFailedUpdateEmitter.dispose()
+    this.dataUpdateStarted.dispose()
+    this.dataUpdated.dispose()
+    this.dataUpdateFailed.dispose()
   }
 }
