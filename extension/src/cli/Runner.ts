@@ -56,7 +56,7 @@ export class Runner {
 
   public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
-    if (!this.pseudoTerminal.isBlocked) {
+    if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
     }
     window.showErrorMessage(
