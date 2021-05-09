@@ -56,9 +56,9 @@ export const createCliProcess = ({
   options: ExecutionOptions
   args: Args
   emitters?: {
-    completedEventEmitter?: EventEmitter<void>
-    outputEventEmitter?: EventEmitter<string>
-    startedEventEmitter?: EventEmitter<void>
+    processCompleted?: EventEmitter<void>
+    processOutput?: EventEmitter<string>
+    processStarted?: EventEmitter<void>
   }
 }): Process => {
   const { executable, cwd, env } = getExecutionDetails(options)
@@ -70,15 +70,15 @@ export const createCliProcess = ({
     env
   })
 
-  emitters?.startedEventEmitter?.fire()
+  emitters?.processStarted?.fire()
 
   process.all?.on('data', chunk => {
     const output = getOutput(chunk)
-    emitters?.outputEventEmitter?.fire(output)
+    emitters?.processOutput?.fire(output)
   })
 
   process.on('close', () => {
-    emitters?.completedEventEmitter?.fire()
+    emitters?.processCompleted?.fire()
   })
 
   return process

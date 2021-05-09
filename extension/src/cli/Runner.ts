@@ -13,15 +13,17 @@ export class Runner {
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
-  private outputEventEmitter: EventEmitter<string>
-  private completedEventEmitter: EventEmitter<void>
-  private startedEventEmitter: EventEmitter<void>
-  private terminatedEventEmitter: EventEmitter<void>
+  private processCompleted: EventEmitter<void>
+  public readonly onDidCompleteProcess: Event<void>
+
+  private processOutput: EventEmitter<string>
+
+  private processStarted: EventEmitter<void>
+
+  private processTerminated: EventEmitter<void>
+  private onDidTerminateProcess: Event<void>
 
   private executable: string | undefined
-
-  public onDidComplete: Event<void>
-  private onDidTerminate: Event<void>
 
   private pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
@@ -31,14 +33,13 @@ export class Runner {
     if (this.executable) {
       return this.executable
     }
-    return this.config.dvcPath
+    return this.config.getCliPath()
   }
 
-  private async startProcess(cwd: string, args: Args) {
+  private startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
-    this.outputEventEmitter.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    await this.config.ready
+    this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     this.currentProcess = createCliProcess({
       options: {
         cliPath: this.getOverrideOrCliPath(),
@@ -46,9 +47,9 @@ export class Runner {
         pythonBinPath: this.config.pythonBinPath
       },
       emitters: {
-        completedEventEmitter: this.completedEventEmitter,
-        startedEventEmitter: this.startedEventEmitter,
-        outputEventEmitter: this.outputEventEmitter
+        processCompleted: this.processCompleted,
+        processStarted: this.processStarted,
+        processOutput: this.processOutput
       },
       args
     })
@@ -56,7 +57,7 @@ export class Runner {
 
   public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
-    if (!this.pseudoTerminal.isBlocked) {
+    if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
     }
     window.showErrorMessage(
@@ -92,51 +93,48 @@ export class Runner {
     config: Config,
     executable?: string,
     emitters?: {
-      outputEventEmitter: EventEmitter<string>
-      completedEventEmitter: EventEmitter<void>
-      startedEventEmitter: EventEmitter<void>
-      terminatedEventEmitter?: EventEmitter<void>
+      processCompleted: EventEmitter<void>
+      processOutput: EventEmitter<string>
+      processStarted: EventEmitter<void>
+      processTerminated?: EventEmitter<void>
     }
   ) {
     this.config = config
 
     this.executable = executable
 
-    this.completedEventEmitter =
-      emitters?.completedEventEmitter ||
-      this.dispose.track(new EventEmitter<void>())
-    this.onDidComplete = this.completedEventEmitter.event
+    this.processCompleted =
+      emitters?.processCompleted || this.dispose.track(new EventEmitter<void>())
+    this.onDidCompleteProcess = this.processCompleted.event
     this.dispose.track(
-      this.onDidComplete(() => {
+      this.onDidCompleteProcess(() => {
         this.pseudoTerminal.setBlocked(false)
         Runner.setRunningContext(false)
-        this.outputEventEmitter.fire(
+        this.processOutput.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )
         this.currentProcess = undefined
       })
     )
 
-    this.outputEventEmitter =
-      emitters?.outputEventEmitter ||
-      this.dispose.track(new EventEmitter<string>())
+    this.processOutput =
+      emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
 
-    this.startedEventEmitter =
-      emitters?.startedEventEmitter ||
-      this.dispose.track(new EventEmitter<void>())
+    this.processStarted =
+      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
 
-    this.terminatedEventEmitter =
-      emitters?.terminatedEventEmitter ||
+    this.processTerminated =
+      emitters?.processTerminated ||
       this.dispose.track(new EventEmitter<void>())
-    this.onDidTerminate = this.terminatedEventEmitter.event
+    this.onDidTerminateProcess = this.processTerminated.event
     this.dispose.track(
-      this.onDidTerminate(() => {
+      this.onDidTerminateProcess(() => {
         this.stop()
       })
     )
 
     this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.outputEventEmitter, this.terminatedEventEmitter)
+      new PseudoTerminal(this.processOutput, this.processTerminated)
     )
   }
 }

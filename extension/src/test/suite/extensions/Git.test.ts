@@ -34,16 +34,16 @@ suite('Git Extension Test Suite', () => {
   })
 
   describe('GitExtension', () => {
-    it("should provide an onDidUntrackedChange callback for each of it's repositories", async () => {
+    it("should provide an onDidChange callback for each of it's repositories", async () => {
       const gitExtension = disposable.track(new GitExtension())
-      await gitExtension.ready
+      await gitExtension.isReady()
 
       const [gitExtensionRepository] = gitExtension.repositories
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
       const untrackedFile = join(dvcDemoPath, 'folder-with-stuff', 'text.txt')
 
-      const repositoryUntrackedChangeEvent = (): Promise<void> => {
+      const onDidChange = (): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = gitExtensionRepository.onDidChange(
             (event: void) => {
@@ -54,12 +54,12 @@ suite('Git Extension Test Suite', () => {
         })
       }
 
-      const change = repositoryUntrackedChangeEvent()
+      const changed = onDidChange()
 
       await ensureFile(untrackedFile)
       expect(accessSync(untrackedFile)).not.to.throw
 
-      await change
+      await changed
       const untrackedChanges = await getAllUntracked(gitRoot)
       expect(untrackedChanges).to.have.lengthOf.at.least(2)
       expect(untrackedChanges).to.include(untrackedFile, untrackedDir)
@@ -67,7 +67,7 @@ suite('Git Extension Test Suite', () => {
 
     it('should be able to return the root path of each open repository', async () => {
       const gitExtension = disposable.track(new GitExtension())
-      await gitExtension.ready
+      await gitExtension.isReady()
       const [gitExtensionRepository] = gitExtension.repositories
       expect(gitExtensionRepository.getRepositoryRoot()).to.equal(workspacePath)
     })

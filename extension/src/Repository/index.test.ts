@@ -84,12 +84,12 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
       const config = ({
-        dvcPath: undefined
+        getCliPath: () => undefined
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
-      await repository.ready
+      await repository.isReady()
 
       const modified = new Set([resolve(dvcRoot, rawDataDir)])
       const tracked = new Set([
@@ -135,12 +135,12 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
       const config = ({
-        dvcPath: undefined
+        getCliPath: () => undefined
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
-      await repository.ready
+      await repository.isReady()
 
       const dataDir = 'data/MNIST/raw'
       const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
@@ -220,12 +220,12 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
       const config = ({
-        dvcPath: undefined
+        getCliPath: () => undefined
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(dvcRoot, config, decorationProvider)
-      await repository.ready
+      await repository.isReady()
 
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')

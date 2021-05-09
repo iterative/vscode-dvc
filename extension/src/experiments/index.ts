@@ -6,48 +6,48 @@ import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 export class Experiments {
   private config: Config
 
-  private _currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
+  private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
-  private _data?: ExperimentsRepoJSONOutput
-  public get data() {
-    return this._data
+  private data?: ExperimentsRepoJSONOutput
+  public getData() {
+    return this.data
   }
 
-  private onStartedUpdateEmitter: EventEmitter<
+  private dataUpdateStarted: EventEmitter<
     Thenable<ExperimentsRepoJSONOutput>
   > = new EventEmitter()
 
-  public readonly onStartedUpdate = this.onStartedUpdateEmitter.event
+  public readonly onDidStartDataUpdate = this.dataUpdateStarted.event
 
-  private onDidUpdateEmitter: EventEmitter<
+  private dataUpdated: EventEmitter<
     ExperimentsRepoJSONOutput
   > = new EventEmitter()
 
-  public readonly onDidUpdate = this.onDidUpdateEmitter.event
+  public readonly onDidUpdateData = this.dataUpdated.event
 
-  private onFailedUpdateEmitter: EventEmitter<Error> = new EventEmitter()
-  public readonly onFailedUpdate = this.onFailedUpdateEmitter.event
+  private dataUpdateFailed: EventEmitter<Error> = new EventEmitter()
+  public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
 
   public async update(): Promise<ExperimentsRepoJSONOutput> {
-    if (!this._currentUpdatePromise) {
+    if (!this.currentUpdatePromise) {
       try {
         const updatePromise = experimentShow({
           pythonBinPath: this.config.pythonBinPath,
-          cliPath: this.config.dvcPath,
+          cliPath: this.config.getCliPath(),
           cwd: this.config.workspaceRoot
         })
-        this._currentUpdatePromise = updatePromise
-        this.onStartedUpdateEmitter.fire(updatePromise)
+        this.currentUpdatePromise = updatePromise
+        this.dataUpdateStarted.fire(updatePromise)
         const experimentData = await updatePromise
-        this.onDidUpdateEmitter.fire(experimentData)
+        this.dataUpdated.fire(experimentData)
         return experimentData
       } catch (e) {
-        this.onFailedUpdateEmitter.fire(e)
+        this.dataUpdateFailed.fire(e)
       } finally {
-        this._currentUpdatePromise = undefined
+        this.currentUpdatePromise = undefined
       }
     }
-    return this._currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
+    return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
   constructor(config: Config) {
@@ -58,8 +58,8 @@ export class Experiments {
   }
 
   public dispose() {
-    this.onStartedUpdateEmitter.dispose()
-    this.onDidUpdateEmitter.dispose()
-    this.onFailedUpdateEmitter.dispose()
+    this.dataUpdateStarted.dispose()
+    this.dataUpdated.dispose()
+    this.dataUpdateFailed.dispose()
   }
 }

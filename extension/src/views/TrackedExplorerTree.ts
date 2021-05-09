@@ -18,9 +18,8 @@ import { reportStderrOrThrow } from '../vscode/reporting'
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
-  private changeTreeDataEventEmitter: EventEmitter<string | void>
-
-  readonly onDidChangeTreeData: Event<string | void>
+  private treeDataChanged: EventEmitter<string | void>
+  public readonly onDidChangeTreeData: Event<string | void>
 
   private config: Config
   private dvcRoots: string[] = []
@@ -30,12 +29,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public refresh(path?: string): void {
     if (path) {
-      this.changeTreeDataEventEmitter.fire(dirname(path))
+      this.treeDataChanged.fire(dirname(path))
     }
   }
 
   public reset(): void {
-    this.changeTreeDataEventEmitter.fire()
+    this.treeDataChanged.fire()
   }
 
   public initialize(dvcRoots: string[]) {
@@ -106,11 +105,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     if (!root) {
       return []
     }
-    await this.config.ready
+
     const listOutput = await listDvcOnly(
       {
         pythonBinPath: this.config.pythonBinPath,
-        cliPath: this.config.dvcPath,
+        cliPath: this.config.getCliPath(),
         cwd: path
       },
       relative(root, path)
@@ -127,8 +126,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   constructor(config: Config) {
     this.config = config
 
-    this.changeTreeDataEventEmitter = new EventEmitter<string | void>()
-    this.onDidChangeTreeData = this.changeTreeDataEventEmitter.event
+    this.treeDataChanged = new EventEmitter<string | void>()
+    this.onDidChangeTreeData = this.treeDataChanged.event
 
     this.dispose.track(
       commands.registerCommand(

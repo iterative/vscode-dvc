@@ -64,7 +64,7 @@ export class Extension {
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
     const dvcRoots = await findDvcRootPaths({
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       cwd: workspaceRoot,
       pythonBinPath: this.config.pythonBinPath
     })
@@ -85,7 +85,7 @@ export class Extension {
 
   private initializeOrNotify() {
     return canRunCli({
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       pythonBinPath: this.config.pythonBinPath,
       cwd: this.config.workspaceRoot
     }).then(
@@ -141,14 +141,14 @@ export class Extension {
   }
 
   private async initializeGitRepositories() {
-    await this.gitExtension.ready
+    await this.gitExtension.isReady()
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
       this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
 
       const dvcRoots = await findDvcRootPaths({
-        cliPath: this.config.dvcPath,
+        cliPath: this.config.getCliPath(),
         cwd: gitRoot,
         pythonBinPath: this.config.pythonBinPath
       })
@@ -189,7 +189,7 @@ export class Extension {
 
   private async runExperimentCommand(...args: Args) {
     const dvcRoot = await pickSingleRepositoryRoot({
-      cliPath: this.config.dvcPath,
+      cliPath: this.config.getCliPath(),
       cwd: this.config.workspaceRoot,
       pythonBinPath: this.config.pythonBinPath
     })
@@ -198,7 +198,7 @@ export class Extension {
       await this.showExperimentsWebview()
       this.runner.run(dvcRoot, ...args)
       const listener = this.dispose.track(
-        this.runner.onDidComplete(() => {
+        this.runner.onDidCompleteProcess(() => {
           this.refreshExperimentsWebview()
           this.dispose.untrack(listener)
           listener.dispose()
@@ -245,7 +245,7 @@ export class Extension {
       (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       ),
-      this.config.ready
+      this.config.isReady()
     ]).then(() => this.initializeOrNotify())
 
     this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
