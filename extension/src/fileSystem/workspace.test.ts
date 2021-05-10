@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { workspace, WorkspaceEdit } from 'vscode'
-import { deleteTarget } from '.'
+import { deleteTarget } from './workspace'
 
 const mockedWorkspace = mocked(workspace)
 const mockedApplyEdit = jest.fn()

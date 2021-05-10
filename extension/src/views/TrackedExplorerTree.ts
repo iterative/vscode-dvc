@@ -14,7 +14,7 @@ import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { definedAndNonEmpty } from '../util'
 import { reportStderrOrThrow } from '../vscode/reporting'
-import { deleteTarget } from '../workspace'
+import { deleteTarget } from '../fileSystem/workspace'
 import { exists } from '../fileSystem'
 import { removeTarget } from '../cli/executor'
 
