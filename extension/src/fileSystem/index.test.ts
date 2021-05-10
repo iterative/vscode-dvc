@@ -9,11 +9,11 @@ import { root } from '../cli/reader'
 import { Disposable } from '../extension'
 
 const {
-  addOnFileSystemChangeHandler,
-  addOnFileTypeChangeHandler,
   exists,
   findDvcRootPaths,
   getWatcher,
+  handleOnDidChangeFileSystem,
+  handleOnDidChangeFileType,
   ignoredDotDirectories,
   isDirectory,
   pickSingleRepositoryRoot
@@ -40,7 +40,7 @@ beforeEach(() => {
 
 const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
 
-describe('addOnFileSystemChangeHandler', () => {
+describe('handleOnDidChangeFileSystem', () => {
   it('should call fs.watch with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
@@ -61,7 +61,7 @@ describe('addOnFileSystemChangeHandler', () => {
         }
     )
 
-    const { dispose } = addOnFileSystemChangeHandler(file, func)
+    const { dispose } = handleOnDidChangeFileSystem(file, func)
 
     expect(dispose).toBeDefined()
 
@@ -88,15 +88,15 @@ describe('addOnFileSystemChangeHandler', () => {
   })
 })
 
-describe('addOnFileTypeChangeHandler', () => {
-  it('should called addOnFileSystemChangeHandler with the correct parameters', () => {
+describe('handleOnDidChangeFileType', () => {
+  it('should called handleOnDidChangeFileSystem with the correct parameters', () => {
     const addSpy = jest
-      .spyOn(FileSystem, 'addOnFileSystemChangeHandler')
+      .spyOn(FileSystem, 'handleOnDidChangeFileSystem')
       .mockReturnValueOnce(Disposable.fn())
 
     const handler = () => {}
 
-    addOnFileTypeChangeHandler(
+    handleOnDidChangeFileType(
       dvcDemoPath,
       ['*.dvc', 'dvc.lock', 'dvc.yaml'],
       handler

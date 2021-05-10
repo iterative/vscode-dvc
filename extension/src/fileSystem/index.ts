@@ -18,7 +18,7 @@ export const getWatcher = (handler: (path: string) => void) => (
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
-export const addOnFileSystemChangeHandler = (
+export const handleOnDidChangeFileSystem = (
   path: string | string[],
   handler: (path: string) => void
 ): Disposable => {
@@ -47,13 +47,13 @@ export const addOnFileSystemChangeHandler = (
   }
 }
 
-export const addOnFileTypeChangeHandler = (
+export const handleOnDidChangeFileType = (
   path: string,
   types: string[],
   handler: (path: string) => void
 ): Disposable => {
   const globs = types.map(type => resolve(path, '**', type))
-  return addOnFileSystemChangeHandler(globs, handler)
+  return handleOnDidChangeFileSystem(globs, handler)
 }
 
 const findDvcAbsoluteRootPath = async (

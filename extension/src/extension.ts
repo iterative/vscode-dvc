@@ -25,8 +25,8 @@ import {
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
-  addOnFileSystemChangeHandler,
-  addOnFileTypeChangeHandler,
+  handleOnDidChangeFileSystem,
+  handleOnDidChangeFileType,
   findDvcRootPaths,
   pickSingleRepositoryRoot
 } from './fileSystem'
@@ -119,7 +119,7 @@ export class Extension {
       )
 
       this.dispose.track(
-        addOnFileTypeChangeHandler(
+        handleOnDidChangeFileType(
           dvcRoot,
           ['*.dvc', 'dvc.lock', 'dvc.yaml'],
           () => {
@@ -130,7 +130,7 @@ export class Extension {
       )
 
       this.dispose.track(
-        addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
+        handleOnDidChangeFileSystem(dvcRoot, (path: string) => {
           repository.updateState()
           this.trackedExplorerTree.refresh(path)
         })
@@ -145,7 +145,7 @@ export class Extension {
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
-      this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
+      this.dispose.track(this.handleOnDidChangeExperimentsData(gitRoot))
 
       const dvcRoots = await findDvcRootPaths({
         cliPath: this.config.getCliPath(),
@@ -165,17 +165,14 @@ export class Extension {
     })
   }
 
-  private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
+  private handleOnDidChangeExperimentsData = (gitRoot: string): Disposable => {
     if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return addOnFileSystemChangeHandler(
-      refsPath,
-      this.refreshExperimentsWebview
-    )
+    return handleOnDidChangeFileSystem(refsPath, this.refreshExperimentsWebview)
   }
 
   private refreshExperimentsWebview = async () =>
