@@ -170,7 +170,7 @@
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "%command.deleteTracked%",
+        "title": "%command.deleteTarget%",
         "command": "dvc.deleteTarget",
         "category": "DVC",
         "icon": "$(trash)"
