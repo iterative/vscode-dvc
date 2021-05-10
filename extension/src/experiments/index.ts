@@ -1,4 +1,4 @@
-import { EventEmitter } from 'vscode'
+import { workspace, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
@@ -61,5 +61,14 @@ export class Experiments {
       throw new Error('The Experiments class requires a Config instance!')
     }
     this.config = config
+    const paramsWatcher = this.dispose.track(
+      workspace.createFileSystemWatcher('**/params.yaml')
+    )
+    const paramsChangeHandler = () => {
+      this.update()
+    }
+    this.dispose.track(paramsWatcher.onDidDelete(paramsChangeHandler))
+    this.dispose.track(paramsWatcher.onDidCreate(paramsChangeHandler))
+    this.dispose.track(paramsWatcher.onDidChange(paramsChangeHandler))
   }
 }

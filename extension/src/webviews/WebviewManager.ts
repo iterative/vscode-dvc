@@ -5,6 +5,7 @@ import { ResourceLocator } from '../ResourceLocator'
 import { ExperimentsWebview } from './experiments/ExperimentsWebview'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from './experiments/contract'
+import { Experiments } from '../experiments'
 
 export class WebviewManager {
   private readonly openedWebviews: {
@@ -17,7 +18,8 @@ export class WebviewManager {
 
   constructor(
     private readonly config: Config,
-    private readonly resourceLocator: ResourceLocator
+    private readonly resourceLocator: ResourceLocator,
+    readonly experiments: Experiments
   ) {
     this.openedWebviews = {}
     this.dispose.track(
@@ -26,6 +28,12 @@ export class WebviewManager {
           const view = await ExperimentsWebview.restore(panel, this.config)
           this.addExperiments(view)
         }
+      })
+    )
+
+    this.dispose.track(
+      experiments.onDidUpdateData(data => {
+        this.refreshExperiments(data)
       })
     )
 

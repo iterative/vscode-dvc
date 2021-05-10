@@ -251,7 +251,7 @@ export class Extension {
     this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
 
     this.webviewManager = this.dispose.track(
-      new WebviewManager(this.config, this.resourceLocator)
+      new WebviewManager(this.config, this.resourceLocator, this.experiments)
     )
 
     registerCliCommands(this.config, this.dispose)
