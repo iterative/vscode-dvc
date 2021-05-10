@@ -159,13 +159,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.removeTarget', path =>
-        removeTarget({
+      commands.registerCommand('dvc.removeTarget', path => {
+        deleteTarget(path)
+        return removeTarget({
           fsPath: this.getDataPlaceholder(path),
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
         })
-      )
+      })
     )
   }
 }
