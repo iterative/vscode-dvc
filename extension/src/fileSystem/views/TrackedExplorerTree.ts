@@ -10,13 +10,13 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
-import { listDvcOnly } from '../cli/reader'
-import { Config } from '../Config'
-import { definedAndNonEmpty } from '../util'
-import { reportStderrOrThrow } from '../vscode/reporting'
-import { deleteTarget } from '../fileSystem/workspace'
-import { exists } from '../fileSystem'
-import { removeTarget } from '../cli/executor'
+import { listDvcOnly } from '../../cli/reader'
+import { Config } from '../../Config'
+import { definedAndNonEmpty } from '../../util'
+import { reportStderrOrThrow } from '../../vscode/reporting'
+import { deleteTarget } from '../workspace'
+import { exists } from '..'
+import { removeTarget } from '../../cli/executor'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
