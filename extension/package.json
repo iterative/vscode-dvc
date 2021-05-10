@@ -363,7 +363,7 @@
     "viewsWelcome": [
       {
         "view": "dvc.views.trackedExplorerTree",
-        "contents": "DVC currently unavailable, [learn more](https://www.dvc.org/).\n[Set DVC CLI path for workspace](command:dvc.selectDvcPath)",
+        "contents": "DVC is currently unavailable, [learn more](https://www.dvc.org/).\n[Set DVC CLI path for workspace](command:dvc.selectDvcPath)",
         "when": "dvc.commands.available != true"
       }
     ]
