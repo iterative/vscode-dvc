@@ -27,7 +27,7 @@ describe('deletePath', () => {
     const deleted = await deletePath(uri)
 
     expect(mockedWorkspaceEdit).toBeCalledTimes(1)
-    expect(deleted).toBe(true)
     expect(mockedApplyEdit).toBeCalledWith({ deleteFile: mockedDeleteFile })
+    expect(deleted).toBe(true)
   })
 })
