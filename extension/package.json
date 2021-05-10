@@ -148,6 +148,12 @@
         "icon": "$(check)"
       },
       {
+        "title": "%command.deleteTarget%",
+        "command": "dvc.deleteTarget",
+        "category": "DVC",
+        "icon": "$(trash)"
+      },
+      {
         "title": "%command.pull%",
         "command": "dvc.pull",
         "category": "DVC"
@@ -168,12 +174,6 @@
         "command": "dvc.pushTarget",
         "category": "DVC",
         "icon": "$(cloud-upload)"
-      },
-      {
-        "title": "%command.deleteTarget%",
-        "command": "dvc.deleteTarget",
-        "category": "DVC",
-        "icon": "$(trash)"
       },
       {
         "title": "%command.removeTarget%",
@@ -260,6 +260,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.deleteTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.pull",
           "when": "false"
         },
@@ -273,10 +277,6 @@
         },
         {
           "command": "dvc.pushTarget",
-          "when": "false"
-        },
-        {
-          "command": "dvc.deleteTarget",
           "when": "false"
         },
         {
