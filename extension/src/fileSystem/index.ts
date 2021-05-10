@@ -3,9 +3,9 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { join, resolve } from 'path'
-import { ExecutionOptions } from './cli/execution'
-import { root } from './cli/reader'
-import { definedAndNonEmpty } from './util'
+import { ExecutionOptions } from '../cli/execution'
+import { root } from '../cli/reader'
+import { definedAndNonEmpty } from '../util'
 import { window } from 'vscode'
 
 export const getWatcher = (handler: (path: string) => void) => (

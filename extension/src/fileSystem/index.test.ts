@@ -4,9 +4,9 @@ import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
-import * as FileSystem from './fileSystem'
-import { root } from './cli/reader'
-import { Disposable } from './extension'
+import * as FileSystem from '.'
+import { root } from '../cli/reader'
+import { Disposable } from '../extension'
 
 const {
   addOnFileSystemChangeHandler,
@@ -21,7 +21,7 @@ const {
 
 jest.mock('chokidar')
 jest.mock('lodash.debounce')
-jest.mock('./cli/reader')
+jest.mock('../cli/reader')
 
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
@@ -38,7 +38,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const dvcDemoPath = resolve(__dirname, '..', '..', 'demo')
+const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
 
 describe('addOnFileSystemChangeHandler', () => {
   it('should call fs.watch with the correct parameters', () => {
