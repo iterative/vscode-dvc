@@ -35,7 +35,7 @@ import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
 import { resolve } from 'path'
 import { Repository } from './Repository'
-import { TrackedExplorerTree } from './views/TrackedExplorerTree'
+import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
 import { setContextValue } from './vscode/context'
 
