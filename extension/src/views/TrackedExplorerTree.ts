@@ -14,6 +14,9 @@ import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { definedAndNonEmpty } from '../util'
 import { reportStderrOrThrow } from '../vscode/reporting'
+import { deleteTarget } from '../workspace'
+import { exists } from '../fileSystem'
+import { removeTarget } from '../cli/executor'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -78,6 +81,21 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return Promise.resolve([])
   }
 
+  private getDataPlaceholder(path: string): string {
+    return path.trim() + '.dvc'
+  }
+
+  private hasDataPlaceholder(path: string): boolean {
+    return exists(this.getDataPlaceholder(path))
+  }
+
+  private getContextValue(path: string): string {
+    if (this.hasDataPlaceholder(path)) {
+      return 'dvcData'
+    }
+    return 'dvc'
+  }
+
   public getTreeItem(element: string): TreeItem {
     const resourceUri = Uri.file(element)
     const elementIsDirectory = this.pathIsDirectory[element]
@@ -94,8 +112,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         title: 'Open File',
         arguments: [resourceUri]
       }
-      treeItem.contextValue = 'file'
     }
+
+    treeItem.contextValue = this.getContextValue(element)
 
     return treeItem
   }
@@ -133,6 +152,21 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         'dvc.views.trackedExplorerTree.openFile',
         resource => this.openResource(resource)
       )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.deleteTarget', path => deleteTarget(path))
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.removeTarget', path => {
+        deleteTarget(path)
+        return removeTarget({
+          fsPath: this.getDataPlaceholder(path),
+          cliPath: this.config.getCliPath(),
+          pythonBinPath: this.config.pythonBinPath
+        })
+      })
     )
   }
 }

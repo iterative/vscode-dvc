@@ -27,3 +27,4 @@ export const workspace = {
     }
   ]
 }
+export const WorkspaceEdit = jest.fn()
