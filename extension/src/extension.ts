@@ -25,9 +25,9 @@ import {
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
+  findDvcRootPaths,
   handleOnDidChangeFileSystem,
   handleOnDidChangeFileType,
-  findDvcRootPaths,
   pickSingleRepositoryRoot
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
