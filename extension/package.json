@@ -171,7 +171,13 @@
       },
       {
         "title": "%command.deleteTracked%",
-        "command": "dvc.deleteTracked",
+        "command": "dvc.deleteTarget",
+        "category": "DVC",
+        "icon": "$(trash)"
+      },
+      {
+        "title": "%command.removeTarget%",
+        "command": "dvc.removeTarget",
         "category": "DVC",
         "icon": "$(trash)"
       }
@@ -270,7 +276,11 @@
           "when": "false"
         },
         {
-          "command": "dvc.deleteTracked",
+          "command": "dvc.deleteTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.removeTarget",
           "when": "false"
         }
       ],
@@ -363,8 +373,13 @@
       ],
       "view/item/context": [
         {
-          "command": "dvc.deleteTracked",
+          "command": "dvc.deleteTarget",
           "when": "viewItem == dvc",
+          "group": "DVC"
+        },
+        {
+          "command": "dvc.removeTarget",
+          "when": "viewItem == dvcData",
           "group": "DVC"
         }
       ]
