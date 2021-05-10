@@ -1,9 +1,12 @@
 import { EventEmitter } from 'vscode'
+import { Disposable } from '@hediet/std/disposable'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
 
 export class Experiments {
+  public readonly dispose = Disposable.fn()
+
   private config: Config
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
@@ -15,17 +18,20 @@ export class Experiments {
 
   private dataUpdateStarted: EventEmitter<
     Thenable<ExperimentsRepoJSONOutput>
-  > = new EventEmitter()
+  > = this.dispose.track(new EventEmitter())
 
   public readonly onDidStartDataUpdate = this.dataUpdateStarted.event
 
   private dataUpdated: EventEmitter<
     ExperimentsRepoJSONOutput
-  > = new EventEmitter()
+  > = this.dispose.track(new EventEmitter())
 
   public readonly onDidUpdateData = this.dataUpdated.event
 
-  private dataUpdateFailed: EventEmitter<Error> = new EventEmitter()
+  private dataUpdateFailed: EventEmitter<Error> = this.dispose.track(
+    new EventEmitter()
+  )
+
   public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
 
   public async update(): Promise<ExperimentsRepoJSONOutput> {
@@ -55,11 +61,5 @@ export class Experiments {
       throw new Error('The Experiments class requires a Config instance!')
     }
     this.config = config
-  }
-
-  public dispose() {
-    this.dataUpdateStarted.dispose()
-    this.dataUpdated.dispose()
-    this.dataUpdateFailed.dispose()
   }
 }
