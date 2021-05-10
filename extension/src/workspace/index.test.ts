@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { Uri, workspace, WorkspaceEdit } from 'vscode'
+import { workspace, WorkspaceEdit } from 'vscode'
 import { deletePath } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -23,8 +23,8 @@ describe('deletePath', () => {
     })
     mockedWorkspace.applyEdit = mockedApplyEdit.mockResolvedValueOnce(true)
 
-    const uri = Uri.file(join('test', 'path'))
-    const deleted = await deletePath(uri)
+    const path = join('test', 'path')
+    const deleted = await deletePath(path)
 
     expect(mockedWorkspaceEdit).toBeCalledTimes(1)
     expect(mockedApplyEdit).toBeCalledWith({ deleteFile: mockedDeleteFile })

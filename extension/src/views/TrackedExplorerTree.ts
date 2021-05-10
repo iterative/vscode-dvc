@@ -14,6 +14,7 @@ import { listDvcOnly } from '../cli/reader'
 import { Config } from '../Config'
 import { definedAndNonEmpty } from '../util'
 import { reportStderrOrThrow } from '../vscode/reporting'
+import { deletePath } from '../workspace'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -134,6 +135,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         'dvc.views.trackedExplorerTree.openFile',
         resource => this.openResource(resource)
       )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.deleteTracked', path => deletePath(path))
     )
   }
 }

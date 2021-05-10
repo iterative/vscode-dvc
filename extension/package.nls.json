@@ -16,6 +16,7 @@
   "command.runResetExperiment": "Run and Reset Experiment",
   "command.queueExperiment": "Queue Experiment",
   "command.stopRunningExperiment": "Stop Running Experiment",
+  "command.deleteTracked": "Delete",
   "command.applyExperiment": "Apply Experiment",
   "command.branchExperiment": "Branch Experiment",
   "command.removeExperiment": "Remove Experiment",

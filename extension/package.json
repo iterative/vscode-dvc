@@ -168,6 +168,12 @@
         "command": "dvc.pushTarget",
         "category": "DVC",
         "icon": "$(cloud-upload)"
+      },
+      {
+        "title": "%command.deleteTracked%",
+        "command": "dvc.deleteTracked",
+        "category": "DVC",
+        "icon": "$(trash)"
       }
     ],
     "configuration": {
@@ -262,6 +268,10 @@
         {
           "command": "dvc.pushTarget",
           "when": "false"
+        },
+        {
+          "command": "dvc.deleteTracked",
+          "when": "false"
         }
       ],
       "scm/title": [
@@ -353,9 +363,9 @@
       ],
       "view/item/context": [
         {
-          "command": "dvc.pullTarget",
+          "command": "dvc.deleteTracked",
           "when": "viewItem == dvc",
-          "group": "inline"
+          "group": "DVC"
         }
       ]
     },
