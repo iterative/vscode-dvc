@@ -1,7 +1,7 @@
 import { Uri, workspace, WorkspaceEdit } from 'vscode'
 
-export const deletePath = (path: string) => {
+export const deletePath = (uri: Uri) => {
   const edit = new WorkspaceEdit()
-  edit.deleteFile(Uri.file(path), { recursive: true, ignoreIfNotExists: true })
+  edit.deleteFile(uri, { ignoreIfNotExists: true, recursive: true })
   return workspace.applyEdit(edit)
 }
