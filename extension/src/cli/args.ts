@@ -7,6 +7,7 @@ export enum Command {
   LIST = 'list',
   PULL = 'pull',
   PUSH = 'push',
+  REMOVE = 'remove',
   ROOT = 'root',
   STATUS = 'status'
 }

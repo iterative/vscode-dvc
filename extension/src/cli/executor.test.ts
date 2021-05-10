@@ -1,4 +1,4 @@
-import { basename, resolve } from 'path'
+import { basename, join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
@@ -7,7 +7,8 @@ import {
   checkout,
   commit,
   experimentApply,
-  initializeDirectory
+  initializeDirectory,
+  removeTarget
 } from './executor'
 
 jest.mock('fs-extra')
@@ -25,7 +26,7 @@ beforeEach(() => {
   mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
 
-describe('add', () => {
+describe('addTarget', () => {
   it('should call executeProcess with the correct parameters to add a file', async () => {
     const fsPath = __filename
     const dir = resolve(fsPath, '..')
@@ -154,6 +155,31 @@ describe('initializeDirectory', () => {
       executable: 'dvc',
       args: ['init', '--subdir'],
       cwd: fsPath,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('removeTarget', () => {
+  it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+    const file = 'data.dvc'
+    const fsPath = join(__dirname, 'data.dvc')
+
+    const stdout = ''
+
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+    const output = await removeTarget({
+      cliPath: 'dvc',
+      fsPath,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['remove', file],
+      cwd: __dirname,
       env: mockedEnv
     })
   })

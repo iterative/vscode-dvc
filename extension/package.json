@@ -148,6 +148,12 @@
         "icon": "$(check)"
       },
       {
+        "title": "%command.deleteTarget%",
+        "command": "dvc.deleteTarget",
+        "category": "DVC",
+        "icon": "$(trash)"
+      },
+      {
         "title": "%command.pull%",
         "command": "dvc.pull",
         "category": "DVC"
@@ -168,6 +174,12 @@
         "command": "dvc.pushTarget",
         "category": "DVC",
         "icon": "$(cloud-upload)"
+      },
+      {
+        "title": "%command.removeTarget%",
+        "command": "dvc.removeTarget",
+        "category": "DVC",
+        "icon": "$(trash)"
       }
     ],
     "configuration": {
@@ -248,6 +260,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.deleteTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.pull",
           "when": "false"
         },
@@ -261,6 +277,10 @@
         },
         {
           "command": "dvc.pushTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.removeTarget",
           "when": "false"
         }
       ],
@@ -349,6 +369,18 @@
           "command": "dvc.runResetExperiment",
           "group": "1_run@3",
           "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dvc.deleteTarget",
+          "when": "viewItem == dvc",
+          "group": "DVC"
+        },
+        {
+          "command": "dvc.removeTarget",
+          "when": "viewItem == dvcData",
+          "group": "DVC"
         }
       ]
     },
