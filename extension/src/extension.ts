@@ -24,6 +24,7 @@ import {
 } from './cli/args'
 import { Runner } from './cli/Runner'
 import { registerCliCommands } from './cli/register'
+import { registerExperimentCommands } from './experiments/register'
 import { registerRepositoryCommands } from './Repository/register'
 import {
   findDvcRootPaths,
@@ -249,6 +250,8 @@ export class Extension {
     )
 
     registerCliCommands(this.config, this.dispose)
+
+    registerExperimentCommands(this.config, this.dispose)
 
     registerRepositoryCommands(this.config, this.dispose)
 
