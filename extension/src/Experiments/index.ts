@@ -9,16 +9,15 @@ export class Experiments extends AsyncFunctionUpdatableData<
   private config: Config
 
   constructor(config: Config) {
-    super(() =>
+    const getExperimentData = () =>
       experimentShow({
         pythonBinPath: this.config.pythonBinPath,
         cliPath: this.config.getCliPath(),
         cwd: this.config.workspaceRoot
       })
-    )
-    if (!config) {
-      throw new Error('The Experiments class requires a Config instance!')
-    }
+
+    super(getExperimentData)
+
     this.config = config
   }
 }
