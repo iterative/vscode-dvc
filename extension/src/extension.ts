@@ -14,7 +14,7 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
-import { Experiments } from './experiments'
+import { Experiments } from './Experiments'
 
 import {
   Args,
@@ -24,7 +24,7 @@ import {
 } from './cli/args'
 import { Runner } from './cli/Runner'
 import { registerCliCommands } from './cli/register'
-import { registerExperimentCommands } from './experiments/register'
+import { registerExperimentCommands } from './Experiments/register'
 import { registerRepositoryCommands } from './Repository/register'
 import {
   findDvcRootPaths,
