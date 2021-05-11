@@ -122,14 +122,14 @@ suite('Extension Test Suite', () => {
         'I WORK NOW'
       )
 
-      const mockHandleOnDidChangeSystem = stub(
+      const mockOnDidChangeFileSystem = stub(
         FileSystem,
         'onDidChangeFileSystem'
       ).returns({
         dispose: () => undefined
       } as Disposable)
 
-      const mockHandleOnDidChangeType = stub(
+      const mockOnDidChangeFileType = stub(
         FileSystem,
         'onDidChangeFileType'
       ).returns({
@@ -185,8 +185,8 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
-      expect(mockHandleOnDidChangeSystem).to.have.been.called
-      expect(mockHandleOnDidChangeType).to.have.been.called
+      expect(mockOnDidChangeFileSystem).to.have.been.called
+      expect(mockOnDidChangeFileType).to.have.been.called
       expect(mockListDvcOnlyRecursive).to.have.been.called
       expect(mockStatus).to.have.been.called
 
