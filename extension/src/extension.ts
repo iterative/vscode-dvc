@@ -141,7 +141,7 @@ export class Extension {
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
-      this.dispose.track(this.handleOnDidChangeExperimentsData(gitRoot))
+      this.dispose.track(this.onDidChangeExperimentsData(gitRoot))
 
       const dvcRoots = await findDvcRootPaths({
         cliPath: this.config.getCliPath(),
@@ -161,7 +161,7 @@ export class Extension {
     })
   }
 
-  private handleOnDidChangeExperimentsData = (gitRoot: string): Disposable => {
+  private onDidChangeExperimentsData = (gitRoot: string): Disposable => {
     if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
