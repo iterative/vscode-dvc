@@ -22,7 +22,6 @@ import {
   pushTarget,
   removeTarget
 } from '../../cli/executor'
-import { setContextValue } from '../../vscode/context'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -159,16 +158,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.initializeDirectory', async () => {
-        const initialized = await initializeDirectory({
+        await initializeDirectory({
           cwd: this.config.workspaceRoot,
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
         })
 
-        if (initialized) {
-          setContextValue('dvc.project.available', true)
-          workspaceChanged.fire()
-        }
+        workspaceChanged.fire()
       })
     )
 
