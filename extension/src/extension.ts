@@ -23,7 +23,8 @@ import {
   ExperimentSubCommands
 } from './cli/args'
 import { Runner } from './cli/Runner'
-import registerCliCommands from './cli/register'
+import { registerCliCommands } from './cli/register'
+import { registerRepositoryCommands } from './Repository/register'
 import {
   findDvcRootPaths,
   onDidChangeFileSystem,
@@ -248,6 +249,8 @@ export class Extension {
     )
 
     registerCliCommands(this.config, this.dispose)
+
+    registerRepositoryCommands(this.config, this.dispose)
 
     // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
