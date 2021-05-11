@@ -38,6 +38,7 @@ import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
 import { setContextValue } from './vscode/context'
+import { definedAndNonEmpty } from './util'
 
 export { Disposable, Disposer }
 
@@ -70,6 +71,10 @@ export class Extension {
     })
 
     this.initializeDecorationProvidersEarly(dvcRoots)
+
+    if (definedAndNonEmpty(dvcRoots)) {
+      this.setProjectAvailability(true)
+    }
 
     return this.dvcRoots.push(...dvcRoots)
   }
@@ -204,6 +209,10 @@ export class Extension {
     setContextValue('dvc.commands.available', available)
   }
 
+  private setProjectAvailability(available: boolean) {
+    setContextValue('dvc.project.available', available)
+  }
+
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -212,6 +221,7 @@ export class Extension {
     }
 
     this.setCommandsAvailability(false)
+    this.setProjectAvailability(false)
 
     this.resourceLocator = new ResourceLocator(context.extensionUri)
 
