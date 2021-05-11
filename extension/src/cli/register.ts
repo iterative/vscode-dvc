@@ -7,7 +7,9 @@ import {
   checkoutTarget,
   commit,
   commitTarget,
-  initializeDirectory
+  initializeDirectory,
+  pull,
+  push
 } from './executor'
 import {
   applyExperimentFromQuickPick,
@@ -76,6 +78,26 @@ const registerCommands = (config: Config, disposer: Disposer) => {
         pythonBinPath: config.pythonBinPath
       })
     )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.pull', ({ rootUri }) => {
+      pull({
+        cwd: rootUri.fsPath,
+        cliPath: config.getCliPath(),
+        pythonBinPath: config.pythonBinPath
+      })
+    })
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.push', ({ rootUri }) => {
+      push({
+        cwd: rootUri.fsPath,
+        cliPath: config.getCliPath(),
+        pythonBinPath: config.pythonBinPath
+      })
+    })
   )
 
   disposer.track(

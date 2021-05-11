@@ -156,7 +156,8 @@
       {
         "title": "%command.pull%",
         "command": "dvc.pull",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(cloud-download)"
       },
       {
         "title": "%command.pullTarget%",
@@ -167,7 +168,8 @@
       {
         "title": "%command.push%",
         "command": "dvc.push",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(cloud-upload)"
       },
       {
         "title": "%command.pushTarget%",
@@ -292,6 +294,16 @@
         },
         {
           "command": "dvc.commit",
+          "group": "navigation",
+          "when": "scmProvider == dvc && dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.pull",
+          "group": "navigation",
+          "when": "scmProvider == dvc && dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.push",
           "group": "navigation",
           "when": "scmProvider == dvc && dvc.commands.available == true"
         }
