@@ -7,7 +7,7 @@ import {
   checkout,
   commit,
   experimentApply,
-  initializeDirectory,
+  init,
   pull,
   push,
   removeTarget
@@ -123,8 +123,8 @@ describe('experimentApply', () => {
   })
 })
 
-describe('initializeDirectory', () => {
-  it('should call executeProcess with the correct parameters to initialize a directory', async () => {
+describe('init', () => {
+  it('should call executeProcess with the correct parameters to initialize a project', async () => {
     const fsPath = __dirname
     const stdout = `
 	  Initialized DVC repository.
@@ -146,7 +146,7 @@ describe('initializeDirectory', () => {
 
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-    const output = await initializeDirectory({
+    const output = await init({
       cliPath: 'dvc',
       cwd: fsPath,
       pythonBinPath: undefined

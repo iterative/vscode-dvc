@@ -1,7 +1,9 @@
 import {
-  window,
   commands,
+  Event,
+  EventEmitter,
   ExtensionContext,
+  window,
   workspace,
   WorkspaceFolder
 } from 'vscode'
@@ -38,6 +40,7 @@ import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
 import { setContextValue } from './vscode/context'
+import { definedAndNonEmpty } from './util'
 
 export { Disposable, Disposer }
 
@@ -60,6 +63,22 @@ export class Extension {
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
   private readonly experiments: Experiments
+  private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
+    .event
+
+  private async setup() {
+    await Promise.all([
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      ),
+      this.config.isReady()
+    ])
+    return this.initializeOrNotify()
+  }
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -69,7 +88,10 @@ export class Extension {
       pythonBinPath: this.config.pythonBinPath
     })
 
-    this.initializeDecorationProvidersEarly(dvcRoots)
+    if (definedAndNonEmpty(dvcRoots)) {
+      this.initializeDecorationProvidersEarly(dvcRoots)
+      this.setProjectAvailability(true)
+    }
 
     return this.dvcRoots.push(...dvcRoots)
   }
@@ -204,6 +226,10 @@ export class Extension {
     setContextValue('dvc.commands.available', available)
   }
 
+  private setProjectAvailability(available: boolean) {
+    setContextValue('dvc.project.available', available)
+  }
+
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -212,6 +238,7 @@ export class Extension {
     }
 
     this.setCommandsAvailability(false)
+    this.setProjectAvailability(false)
 
     this.resourceLocator = new ResourceLocator(context.extensionUri)
 
@@ -224,24 +251,20 @@ export class Extension {
     this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.config)
+      new TrackedExplorerTree(this.config, this.workspaceChanged)
+    )
+
+    this.setup()
+
+    this.dispose.track(
+      this.onDidChangeWorkspace(() => {
+        this.setup()
+      })
     )
 
     this.dispose.track(
-      window.registerTreeDataProvider(
-        'dvc.views.trackedExplorerTree',
-        this.trackedExplorerTree
-      )
+      this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
     )
-
-    Promise.all([
-      (workspace.workspaceFolders || []).map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
-      ),
-      this.config.isReady()
-    ]).then(() => this.initializeOrNotify())
-
-    this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)

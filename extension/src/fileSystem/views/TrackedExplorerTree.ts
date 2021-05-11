@@ -16,7 +16,7 @@ import { definedAndNonEmpty } from '../../util'
 import { reportStderrOrThrow } from '../../vscode/reporting'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { pullTarget, pushTarget, removeTarget } from '../../cli/executor'
+import { init, pullTarget, pushTarget, removeTarget } from '../../cli/executor'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -150,7 +150,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     })
   }
 
-  private registerCommands() {
+  private registerCommands(workspaceChanged: EventEmitter<void>) {
+    this.dispose.track(
+      commands.registerCommand('dvc.init', async () => {
+        await init({
+          cwd: this.config.workspaceRoot,
+          cliPath: this.config.getCliPath(),
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        workspaceChanged.fire()
+      })
+    )
+
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.trackedExplorerTree.openFile',
@@ -194,12 +206,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
   }
 
-  constructor(config: Config) {
+  constructor(config: Config, workspaceChanged: EventEmitter<void>) {
     this.config = config
 
     this.treeDataChanged = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.treeDataChanged.event
 
-    this.registerCommands()
+    this.registerCommands(workspaceChanged)
+
+    this.dispose.track(
+      window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)
+    )
   }
 }
