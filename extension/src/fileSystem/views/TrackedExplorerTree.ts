@@ -29,6 +29,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private pathRoots: Record<string, string> = {}
   private pathIsDirectory: Record<string, boolean> = {}
+  private pathIsOut: Record<string, boolean> = {}
 
   public refresh(path?: string): void {
     if (path) {
@@ -89,9 +90,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return exists(this.getDataPlaceholder(path))
   }
 
+  private hasRemote(path: string): boolean {
+    return this.pathIsOut[path] || !this.pathIsDirectory[path]
+  }
+
   private getContextValue(path: string): string {
     if (this.hasDataPlaceholder(path)) {
       return 'dvcData'
+    }
+    if (this.hasRemote(path)) {
+      return 'dvcHasRemote'
     }
     return 'dvc'
   }
@@ -137,6 +145,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       const absolutePath = join(path, relative.path)
       this.pathRoots[absolutePath] = root
       this.pathIsDirectory[absolutePath] = relative.isdir
+      this.pathIsOut[absolutePath] = relative.isout
       return absolutePath
     })
   }

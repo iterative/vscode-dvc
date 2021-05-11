@@ -364,7 +364,7 @@
       "view/item/context": [
         {
           "command": "dvc.deleteTarget",
-          "when": "viewItem == dvc",
+          "when": "viewItem != dvcData",
           "group": "DVC"
         },
         {
@@ -374,11 +374,13 @@
         },
         {
           "command": "dvc.pushTarget",
-          "group": "DVC"
+          "group": "DVC",
+          "when": "viewItem != dvc"
         },
         {
           "command": "dvc.pullTarget",
-          "group": "DVC"
+          "group": "DVC",
+          "when": "viewItem != dvc"
         }
       ]
     },
