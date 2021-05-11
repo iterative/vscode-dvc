@@ -71,9 +71,7 @@ export const experimentRemove = (
     experiment
   )
 
-export const initializeDirectory = (
-  options: ExecutionOptions
-): Promise<string> =>
+export const init = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
 export const experimentRunQueue = (
@@ -85,6 +83,12 @@ export const experimentRunQueue = (
     ExperimentSubCommands.RUN,
     ExperimentFlag.QUEUE
   )
+
+export const pull = (options: ExecutionOptions): Promise<string> =>
+  executeCliProcess(options, Command.PULL)
+
+export const push = (options: ExecutionOptions): Promise<string> =>
+  executeCliProcess(options, Command.PUSH)
 
 type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string

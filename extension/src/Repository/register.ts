@@ -1,35 +1,20 @@
 import { commands } from 'vscode'
+import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
-import { Disposer } from '../extension'
 import {
   addTarget,
   checkout,
   checkoutTarget,
   commit,
   commitTarget,
-  initializeDirectory,
-  pullTarget,
-  pushTarget
-} from './executor'
-import {
-  applyExperimentFromQuickPick,
-  branchExperimentFromQuickPick,
-  experimentGcQuickPick,
-  experimentRunQueueCommand,
-  removeExperimentFromQuickPick
-} from './vscode'
+  pull,
+  push
+} from '../cli/executor'
 
-const registerCommands = (config: Config, disposer: Disposer) => {
-  disposer.track(
-    commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-      initializeDirectory({
-        cwd: fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
-
+export const registerRepositoryCommands = (
+  config: Config,
+  disposer: Disposer
+) => {
   disposer.track(
     commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
       addTarget({
@@ -81,54 +66,22 @@ const registerCommands = (config: Config, disposer: Disposer) => {
   )
 
   disposer.track(
-    commands.registerCommand('dvc.pushTarget', ({ resourceUri }) =>
-      pushTarget({
-        fsPath: resourceUri.fsPath,
+    commands.registerCommand('dvc.pull', ({ rootUri }) => {
+      pull({
+        cwd: rootUri.fsPath,
         cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
-    )
+    })
   )
 
   disposer.track(
-    commands.registerCommand('dvc.pullTarget', ({ resourceUri }) =>
-      pullTarget({
-        fsPath: resourceUri.fsPath,
+    commands.registerCommand('dvc.push', ({ rootUri }) => {
+      push({
+        cwd: rootUri.fsPath,
         cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.queueExperiment', () =>
-      experimentRunQueueCommand(config)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      experimentGcQuickPick(config)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.applyExperiment', () =>
-      applyExperimentFromQuickPick(config)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.branchExperiment', () =>
-      branchExperimentFromQuickPick(config)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.removeExperiment', () =>
-      removeExperimentFromQuickPick(config)
-    )
+    })
   )
 }
-
-export default registerCommands
