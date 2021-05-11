@@ -6,7 +6,8 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
   Uri,
-  window
+  window,
+  workspace
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
@@ -16,7 +17,13 @@ import { definedAndNonEmpty } from '../../util'
 import { reportStderrOrThrow } from '../../vscode/reporting'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { pullTarget, pushTarget, removeTarget } from '../../cli/executor'
+import {
+  initializeDirectory,
+  pullTarget,
+  pushTarget,
+  removeTarget
+} from '../../cli/executor'
+import { setContextValue } from '../../vscode/context'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -151,6 +158,26 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private registerCommands() {
+    this.dispose.track(
+      commands.registerCommand('dvc.initializeDirectory', () => {
+        if (workspace?.workspaceFolders?.length !== 1) {
+          return window.showErrorMessage(
+            'Unable to initialize project. Please open a workspace with a single root.'
+          )
+        }
+
+        const initialized = initializeDirectory({
+          cwd: workspace.workspaceFolders[0].uri.fsPath,
+          cliPath: this.config.getCliPath(),
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        if (initialized) {
+          setContextValue('dvc.project.available', true)
+        }
+      })
+    )
+
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.trackedExplorerTree.openFile',
