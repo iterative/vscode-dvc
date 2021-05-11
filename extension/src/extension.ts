@@ -15,7 +15,6 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { Experiments } from './Experiments'
-
 import {
   Args,
   Command,
@@ -23,7 +22,6 @@ import {
   ExperimentSubCommands
 } from './cli/args'
 import { Runner } from './cli/Runner'
-import { registerCliCommands } from './cli/register'
 import { registerExperimentCommands } from './Experiments/register'
 import { registerRepositoryCommands } from './Repository/register'
 import {
@@ -248,8 +246,6 @@ export class Extension {
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)
     )
-
-    registerCliCommands(this.config, this.dispose)
 
     registerExperimentCommands(this.config, this.dispose)
 

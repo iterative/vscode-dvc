@@ -7,6 +7,7 @@ import {
   checkoutTarget,
   commit,
   commitTarget,
+  initializeDirectory,
   pull,
   push
 } from '../cli/executor'
@@ -15,6 +16,16 @@ export const registerRepositoryCommands = (
   config: Config,
   disposer: Disposer
 ) => {
+  disposer.track(
+    commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
+      initializeDirectory({
+        cwd: fsPath,
+        cliPath: config.getCliPath(),
+        pythonBinPath: config.pythonBinPath
+      })
+    })
+  )
+
   disposer.track(
     commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
       addTarget({
