@@ -218,13 +218,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   constructor(config: Config, workspaceChanged: EventEmitter<void>) {
     this.config = config
 
-    this.dispose.track(
-      window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)
-    )
-
     this.treeDataChanged = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.treeDataChanged.event
 
     this.registerCommands(workspaceChanged)
+
+    this.dispose.track(
+      window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)
+    )
   }
 }
