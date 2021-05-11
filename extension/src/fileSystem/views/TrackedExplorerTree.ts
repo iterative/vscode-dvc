@@ -6,8 +6,7 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
   Uri,
-  window,
-  workspace
+  window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
@@ -160,14 +159,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.initializeDirectory', async () => {
-        if (workspace?.workspaceFolders?.length !== 1) {
-          return window.showErrorMessage(
-            'Unable to initialize project. Please open a workspace with a single root.'
-          )
-        }
-
         const initialized = await initializeDirectory({
-          cwd: workspace.workspaceFolders[0].uri.fsPath,
+          cwd: this.config.workspaceRoot,
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
         })
