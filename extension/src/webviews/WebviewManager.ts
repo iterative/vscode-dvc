@@ -5,7 +5,7 @@ import { ResourceLocator } from '../ResourceLocator'
 import { ExperimentsWebview } from './experiments/ExperimentsWebview'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from './experiments/contract'
-import { Experiments } from '../experiments'
+import { Experiments } from '../Experiments'
 
 export class WebviewManager {
   private readonly openedWebviews: {
