@@ -25,9 +25,9 @@ import {
 import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
-  addOnFileSystemChangeHandler,
-  addOnFileTypeChangeHandler,
   findDvcRootPaths,
+  onDidChangeFileSystem,
+  onDidChangeFileType,
   pickSingleRepositoryRoot
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
@@ -119,18 +119,14 @@ export class Extension {
       )
 
       this.dispose.track(
-        addOnFileTypeChangeHandler(
-          dvcRoot,
-          ['*.dvc', 'dvc.lock', 'dvc.yaml'],
-          () => {
-            repository.resetState()
-            this.trackedExplorerTree.reset()
-          }
-        )
+        onDidChangeFileType(dvcRoot, ['*.dvc', 'dvc.lock', 'dvc.yaml'], () => {
+          repository.resetState()
+          this.trackedExplorerTree.reset()
+        })
       )
 
       this.dispose.track(
-        addOnFileSystemChangeHandler(dvcRoot, (path: string) => {
+        onDidChangeFileSystem(dvcRoot, (path: string) => {
           repository.updateState()
           this.trackedExplorerTree.refresh(path)
         })
@@ -145,7 +141,7 @@ export class Extension {
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
-      this.dispose.track(this.onChangeExperimentsUpdateWebview(gitRoot))
+      this.dispose.track(this.onDidChangeExperimentsData(gitRoot))
 
       const dvcRoots = await findDvcRootPaths({
         cliPath: this.config.getCliPath(),
@@ -165,17 +161,14 @@ export class Extension {
     })
   }
 
-  private onChangeExperimentsUpdateWebview = (gitRoot: string): Disposable => {
+  private onDidChangeExperimentsData = (gitRoot: string): Disposable => {
     if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return addOnFileSystemChangeHandler(
-      refsPath,
-      this.refreshExperimentsWebview
-    )
+    return onDidChangeFileSystem(refsPath, this.refreshExperimentsWebview)
   }
 
   private refreshExperimentsWebview = async () =>
