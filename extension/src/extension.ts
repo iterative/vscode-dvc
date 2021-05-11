@@ -1,7 +1,9 @@
 import {
-  window,
   commands,
+  Event,
+  EventEmitter,
   ExtensionContext,
+  window,
   workspace,
   WorkspaceFolder
 } from 'vscode'
@@ -61,6 +63,22 @@ export class Extension {
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
   private readonly experiments: Experiments
+  private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
+    .event
+
+  private async setup() {
+    await Promise.all([
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      ),
+      this.config.isReady()
+    ])
+    return this.initializeOrNotify()
+  }
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceRoot = workspaceFolder.uri.fsPath
@@ -70,9 +88,8 @@ export class Extension {
       pythonBinPath: this.config.pythonBinPath
     })
 
-    this.initializeDecorationProvidersEarly(dvcRoots)
-
     if (definedAndNonEmpty(dvcRoots)) {
+      this.initializeDecorationProvidersEarly(dvcRoots)
       this.setProjectAvailability(true)
     }
 
@@ -234,7 +251,7 @@ export class Extension {
     this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.config)
+      new TrackedExplorerTree(this.config, this.workspaceChanged)
     )
 
     this.dispose.track(
@@ -244,14 +261,17 @@ export class Extension {
       )
     )
 
-    Promise.all([
-      (workspace.workspaceFolders || []).map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
-      ),
-      this.config.isReady()
-    ]).then(() => this.initializeOrNotify())
+    this.setup()
 
-    this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
+    this.dispose.track(
+      this.onDidChangeWorkspace(() => {
+        this.setup()
+      })
+    )
+
+    this.dispose.track(
+      this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
+    )
 
     this.webviewManager = this.dispose.track(
       new WebviewManager(this.config, this.resourceLocator)

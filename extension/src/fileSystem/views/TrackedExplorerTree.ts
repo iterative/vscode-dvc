@@ -157,16 +157,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     })
   }
 
-  private registerCommands() {
+  private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
-      commands.registerCommand('dvc.initializeDirectory', () => {
+      commands.registerCommand('dvc.initializeDirectory', async () => {
         if (workspace?.workspaceFolders?.length !== 1) {
           return window.showErrorMessage(
             'Unable to initialize project. Please open a workspace with a single root.'
           )
         }
 
-        const initialized = initializeDirectory({
+        const initialized = await initializeDirectory({
           cwd: workspace.workspaceFolders[0].uri.fsPath,
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
@@ -174,6 +174,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
         if (initialized) {
           setContextValue('dvc.project.available', true)
+          workspaceChanged.fire()
         }
       })
     )
@@ -221,12 +222,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
   }
 
-  constructor(config: Config) {
+  constructor(config: Config, workspaceChanged: EventEmitter<void>) {
     this.config = config
 
     this.treeDataChanged = new EventEmitter<string | void>()
     this.onDidChangeTreeData = this.treeDataChanged.event
 
-    this.registerCommands()
+    this.registerCommands(workspaceChanged)
   }
 }
