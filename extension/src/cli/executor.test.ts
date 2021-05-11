@@ -188,7 +188,7 @@ describe('pull', () => {
 describe('push', () => {
   it('should call executeProcess with the correct parameters to push the entire repository', async () => {
     const cwd = __dirname
-    const stdout = 'M       data/MNIST/raw/\n1 file modified'
+    const stdout = 'Everything is up to date.'
 
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
