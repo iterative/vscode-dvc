@@ -1,4 +1,4 @@
-import { commands } from 'vscode'
+import { commands, window, workspace } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import {
@@ -17,9 +17,15 @@ export const registerRepositoryCommands = (
   disposer: Disposer
 ) => {
   disposer.track(
-    commands.registerCommand('dvc.initializeDirectory', ({ fsPath }) => {
-      initializeDirectory({
-        cwd: fsPath,
+    commands.registerCommand('dvc.initializeDirectory', () => {
+      if (workspace?.workspaceFolders?.length !== 1) {
+        return window.showErrorMessage(
+          'Unable to initialize project. Please open a workspace with a single root.'
+        )
+      }
+
+      return initializeDirectory({
+        cwd: workspace.workspaceFolders[0].uri.fsPath,
         cliPath: config.getCliPath(),
         pythonBinPath: config.pythonBinPath
       })
