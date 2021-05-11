@@ -26,8 +26,8 @@ import { Runner } from './cli/Runner'
 import registerCliCommands from './cli/register'
 import {
   findDvcRootPaths,
-  handleOnDidChangeFileSystem,
-  handleOnDidChangeFileType,
+  onDidChangeFileSystem,
+  onDidChangeFileType,
   pickSingleRepositoryRoot
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
@@ -119,18 +119,14 @@ export class Extension {
       )
 
       this.dispose.track(
-        handleOnDidChangeFileType(
-          dvcRoot,
-          ['*.dvc', 'dvc.lock', 'dvc.yaml'],
-          () => {
-            repository.resetState()
-            this.trackedExplorerTree.reset()
-          }
-        )
+        onDidChangeFileType(dvcRoot, ['*.dvc', 'dvc.lock', 'dvc.yaml'], () => {
+          repository.resetState()
+          this.trackedExplorerTree.reset()
+        })
       )
 
       this.dispose.track(
-        handleOnDidChangeFileSystem(dvcRoot, (path: string) => {
+        onDidChangeFileSystem(dvcRoot, (path: string) => {
           repository.updateState()
           this.trackedExplorerTree.refresh(path)
         })
@@ -172,7 +168,7 @@ export class Extension {
       )
     }
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return handleOnDidChangeFileSystem(refsPath, this.refreshExperimentsWebview)
+    return onDidChangeFileSystem(refsPath, this.refreshExperimentsWebview)
   }
 
   private refreshExperimentsWebview = async () =>

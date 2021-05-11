@@ -124,14 +124,14 @@ suite('Extension Test Suite', () => {
 
       const mockHandleOnDidChangeSystem = stub(
         FileSystem,
-        'handleOnDidChangeFileSystem'
+        'onDidChangeFileSystem'
       ).returns({
         dispose: () => undefined
       } as Disposable)
 
       const mockHandleOnDidChangeType = stub(
         FileSystem,
-        'handleOnDidChangeFileType'
+        'onDidChangeFileType'
       ).returns({
         dispose: () => undefined
       } as Disposable)

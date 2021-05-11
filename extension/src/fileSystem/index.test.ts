@@ -12,10 +12,10 @@ const {
   exists,
   findDvcRootPaths,
   getWatcher,
-  handleOnDidChangeFileSystem,
-  handleOnDidChangeFileType,
   ignoredDotDirectories,
   isDirectory,
+  onDidChangeFileSystem,
+  onDidChangeFileType,
   pickSingleRepositoryRoot
 } = FileSystem
 
@@ -40,7 +40,7 @@ beforeEach(() => {
 
 const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
 
-describe('handleOnDidChangeFileSystem', () => {
+describe('onDidChangeFileSystem', () => {
   it('should call fs.watch with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
@@ -61,7 +61,7 @@ describe('handleOnDidChangeFileSystem', () => {
         }
     )
 
-    const { dispose } = handleOnDidChangeFileSystem(file, func)
+    const { dispose } = onDidChangeFileSystem(file, func)
 
     expect(dispose).toBeDefined()
 
@@ -88,19 +88,15 @@ describe('handleOnDidChangeFileSystem', () => {
   })
 })
 
-describe('handleOnDidChangeFileType', () => {
-  it('should called handleOnDidChangeFileSystem with the correct parameters', () => {
+describe('onDidChangeFileType', () => {
+  it('should called onDidChangeFileSystem with the correct parameters', () => {
     const addSpy = jest
-      .spyOn(FileSystem, 'handleOnDidChangeFileSystem')
+      .spyOn(FileSystem, 'onDidChangeFileSystem')
       .mockReturnValueOnce(Disposable.fn())
 
     const handler = () => {}
 
-    handleOnDidChangeFileType(
-      dvcDemoPath,
-      ['*.dvc', 'dvc.lock', 'dvc.yaml'],
-      handler
-    )
+    onDidChangeFileType(dvcDemoPath, ['*.dvc', 'dvc.lock', 'dvc.yaml'], handler)
     expect(addSpy).toBeCalledTimes(1)
     expect(addSpy).toBeCalledWith(
       [
