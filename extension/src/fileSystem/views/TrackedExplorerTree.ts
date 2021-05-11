@@ -16,12 +16,7 @@ import { definedAndNonEmpty } from '../../util'
 import { reportStderrOrThrow } from '../../vscode/reporting'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import {
-  initializeDirectory,
-  pullTarget,
-  pushTarget,
-  removeTarget
-} from '../../cli/executor'
+import { init, pullTarget, pushTarget, removeTarget } from '../../cli/executor'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -157,8 +152,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
-      commands.registerCommand('dvc.initializeDirectory', async () => {
-        await initializeDirectory({
+      commands.registerCommand('dvc.init', async () => {
+        await init({
           cwd: this.config.workspaceRoot,
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
