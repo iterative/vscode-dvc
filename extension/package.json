@@ -114,7 +114,7 @@
       },
       {
         "title": "%command.init%",
-        "command": "dvc.initializeDirectory",
+        "command": "dvc.init",
         "category": "DVC"
       },
       {
@@ -156,7 +156,8 @@
       {
         "title": "%command.pull%",
         "command": "dvc.pull",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(cloud-download)"
       },
       {
         "title": "%command.pullTarget%",
@@ -167,7 +168,8 @@
       {
         "title": "%command.push%",
         "command": "dvc.push",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(cloud-upload)"
       },
       {
         "title": "%command.pushTarget%",
@@ -208,7 +210,7 @@
           "when": "dvc.commands.available == true"
         },
         {
-          "command": "dvc.initializeDirectory",
+          "command": "dvc.init",
           "when": "dvc.commands.available == true"
         },
         {
@@ -294,6 +296,16 @@
           "command": "dvc.commit",
           "group": "navigation",
           "when": "scmProvider == dvc && dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.pull",
+          "group": "navigation",
+          "when": "scmProvider == dvc && dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.push",
+          "group": "navigation",
+          "when": "scmProvider == dvc && dvc.commands.available == true"
         }
       ],
       "scm/resourceState/context": [
@@ -311,16 +323,6 @@
           "command": "dvc.commitTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.pushTarget",
-          "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.pullTarget",
-          "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && dvc.commands.available == true"
         }
       ],
       "editor/title": [
@@ -374,13 +376,23 @@
       "view/item/context": [
         {
           "command": "dvc.deleteTarget",
-          "when": "viewItem == dvc",
+          "when": "viewItem != dvcData",
           "group": "DVC"
         },
         {
           "command": "dvc.removeTarget",
           "when": "viewItem == dvcData",
           "group": "DVC"
+        },
+        {
+          "command": "dvc.pushTarget",
+          "group": "DVC",
+          "when": "viewItem != dvc"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "group": "DVC",
+          "when": "viewItem != dvc"
         }
       ]
     },
@@ -397,6 +409,11 @@
         "view": "dvc.views.trackedExplorerTree",
         "contents": "DVC is currently unavailable, [learn more](https://www.dvc.org/).\n[Set DVC CLI path for workspace](command:dvc.selectDvcPath)",
         "when": "dvc.commands.available != true"
+      },
+      {
+        "view": "dvc.views.trackedExplorerTree",
+        "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC and this extension please read [our docs](https://dvc.org/doc).",
+        "when": "dvc.commands.available == true && dvc.project.available == false"
       }
     ]
   },

@@ -7,7 +7,9 @@ import {
   checkout,
   commit,
   experimentApply,
-  initializeDirectory,
+  init,
+  pull,
+  push,
   removeTarget
 } from './executor'
 
@@ -121,8 +123,8 @@ describe('experimentApply', () => {
   })
 })
 
-describe('initializeDirectory', () => {
-  it('should call executeProcess with the correct parameters to initialize a directory', async () => {
+describe('init', () => {
+  it('should call executeProcess with the correct parameters to initialize a project', async () => {
     const fsPath = __dirname
     const stdout = `
 	  Initialized DVC repository.
@@ -144,7 +146,7 @@ describe('initializeDirectory', () => {
 
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-    const output = await initializeDirectory({
+    const output = await init({
       cliPath: 'dvc',
       cwd: fsPath,
       pythonBinPath: undefined
@@ -155,6 +157,52 @@ describe('initializeDirectory', () => {
       executable: 'dvc',
       args: ['init', '--subdir'],
       cwd: fsPath,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('pull', () => {
+  it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
+    const cwd = __dirname
+    const stdout = 'M       data/MNIST/raw/\n1 file modified'
+
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+    const output = await pull({
+      cliPath: 'dvc',
+      cwd,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['pull'],
+      cwd: __dirname,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('push', () => {
+  it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+    const cwd = __dirname
+    const stdout = 'Everything is up to date.'
+
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+    const output = await push({
+      cliPath: 'dvc',
+      cwd,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['push'],
+      cwd: __dirname,
       env: mockedEnv
     })
   })
