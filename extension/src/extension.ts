@@ -254,13 +254,6 @@ export class Extension {
       new TrackedExplorerTree(this.config, this.workspaceChanged)
     )
 
-    this.dispose.track(
-      window.registerTreeDataProvider(
-        'dvc.views.trackedExplorerTree',
-        this.trackedExplorerTree
-      )
-    )
-
     this.setup()
 
     this.dispose.track(
