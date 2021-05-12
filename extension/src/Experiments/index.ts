@@ -106,7 +106,7 @@ export class Experiments {
       this.config,
       this.resourceLocator
     )
-    this.addWebview(webview)
+    this.setWebview(webview)
 
     return webview
   }
@@ -127,7 +127,7 @@ export class Experiments {
     return this.runner.stop()
   }
 
-  public addWebview = (view: ExperimentsWebview) => {
+  public setWebview = (view: ExperimentsWebview) => {
     this.webview = this.dispose.track(view)
     this.dispose.track(
       view.onDidDispose(() => {
