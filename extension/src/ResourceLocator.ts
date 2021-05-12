@@ -1,6 +1,9 @@
+import { Disposable } from '@hediet/std/disposable'
 import { Uri } from 'vscode'
 
 export class ResourceLocator {
+  public dispose = Disposable.fn()
+
   public dvcIconPath: { dark: Uri; light: Uri }
 
   constructor(extensionUri: Uri) {

@@ -1,7 +1,7 @@
 import {
   ExperimentsRepoJSONOutput,
   ExperimentJSONOutput
-} from 'dvc/src/webviews/experiments/contract'
+} from 'dvc/src/Experiments/Webview/contract'
 
 export interface ExperimentWithId extends ExperimentJSONOutput {
   id: string

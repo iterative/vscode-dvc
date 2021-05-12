@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { stub, spy, restore } from 'sinon'
+import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import {
   window,
   commands,
@@ -14,8 +14,7 @@ import { Disposable } from '../../extension'
 import * as CliReader from '../../cli/reader'
 import * as CliExecutor from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
-import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
-import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
+import complexExperimentsOutput from '../../Experiments/Webview/complex-output-example.json'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -24,8 +23,6 @@ suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
   const dvcPathOption = 'dvc.dvcPath'
-
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 
   const disposable = Disposable.fn()
 
@@ -37,54 +34,6 @@ suite('Extension Test Suite', () => {
     disposable.dispose()
     await workspace.getConfiguration().update(dvcPathOption, undefined, false)
     return commands.executeCommand('workbench.action.closeAllEditors')
-  })
-
-  describe('showExperiments', () => {
-    const showExperimentsCommand = 'dvc.showExperiments'
-    it('should be able to make the experiments webview visible', async () => {
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const experimentsWebview = disposable.track(
-        await commands.executeCommand(showExperimentsCommand)
-      ) as ExperimentsWebview
-
-      expect(experimentsWebview.isActive()).to.be.true
-      expect(experimentsWebview.isVisible()).to.be.true
-    })
-
-    it('should only be able to open a single experiments webview', async () => {
-      const windowSpy = spy(window, 'createWebviewPanel')
-      const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
-
-      const mockReader = stub(CliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
-      const document = await workspace.openTextDocument(uri)
-      await window.showTextDocument(document)
-
-      expect(window.activeTextEditor?.document).to.deep.equal(document)
-
-      const experimentsWebview = disposable.track(
-        await commands.executeCommand(showExperimentsCommand)
-      ) as ExperimentsWebview
-
-      expect(windowSpy).to.have.been.calledOnce
-      expect(mockReader).to.have.been.calledOnce
-
-      windowSpy.resetHistory()
-      mockReader.resetHistory()
-
-      await commands.executeCommand('workbench.action.previousEditor')
-      expect(window.activeTextEditor?.document).to.deep.equal(document)
-
-      const sameWebview = await commands.executeCommand('dvc.showExperiments')
-
-      expect(experimentsWebview === sameWebview).to.be.true
-
-      expect(windowSpy).not.to.have.been.called
-      expect(mockReader).to.have.been.calledOnce
-    })
   })
 
   describe('dvc.selectDvcPath', () => {
