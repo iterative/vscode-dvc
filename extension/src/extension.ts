@@ -248,7 +248,9 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.experiments = this.dispose.track(new Experiments(this.config))
+    this.experiments = this.dispose.track(
+      new Experiments(this.config.workspaceRoot, this.config)
+    )
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)

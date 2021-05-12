@@ -8,6 +8,7 @@ export class Experiments {
   public readonly dispose = Disposable.fn()
 
   private config: Config
+  private dvcRoot: string
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
@@ -40,7 +41,7 @@ export class Experiments {
         const updatePromise = experimentShow({
           pythonBinPath: this.config.pythonBinPath,
           cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot
+          cwd: this.dvcRoot
         })
         this.currentUpdatePromise = updatePromise
         this.dataUpdateStarted.fire(updatePromise)
@@ -56,7 +57,9 @@ export class Experiments {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
-  constructor(config: Config) {
+  constructor(dvcRoot: string, config: Config) {
+    this.dvcRoot = dvcRoot
+
     if (!config) {
       throw new Error('The Experiments class requires a Config instance!')
     }
