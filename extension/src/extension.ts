@@ -125,19 +125,19 @@ export class Extension {
   }
 
   private initialize() {
-    this.initializeDvcRepositories(this.dvcRoots)
+    this.initializeDvcRepositories()
 
     this.trackedExplorerTree.initialize(this.dvcRoots)
 
-    this.initializeExperiments(this.dvcRoots)
+    this.initializeExperiments()
 
     this.initializeGitRepositories()
 
     return this.setCommandsAvailability(true)
   }
 
-  private initializeDvcRepositories(dvcRoots: string[]) {
-    dvcRoots.forEach(dvcRoot => {
+  private initializeDvcRepositories() {
+    this.dvcRoots.forEach(dvcRoot => {
       const repository = this.dispose.track(
         new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
       )
@@ -160,8 +160,8 @@ export class Extension {
     })
   }
 
-  private initializeExperiments(dvcRoots: string[]) {
-    dvcRoots.forEach(dvcRoot => {
+  private initializeExperiments() {
+    this.dvcRoots.forEach(dvcRoot => {
       this.experiments[dvcRoot] = this.dispose.track(
         new Experiments(this.config.workspaceRoot, this.config)
       )
