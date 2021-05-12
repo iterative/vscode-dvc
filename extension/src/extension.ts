@@ -59,10 +59,10 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
+  private readonly experiments: Record<string, Experiments> = {}
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
-  private readonly experiments: Experiments[] = []
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter<void>()
   )
@@ -129,6 +129,8 @@ export class Extension {
 
     this.trackedExplorerTree.initialize(this.dvcRoots)
 
+    this.initializeExperiments(this.dvcRoots)
+
     this.initializeGitRepositories()
 
     return this.setCommandsAvailability(true)
@@ -155,6 +157,14 @@ export class Extension {
       )
 
       this.dvcRepositories[dvcRoot] = repository
+    })
+  }
+
+  private initializeExperiments(dvcRoots: string[]) {
+    dvcRoots.forEach(dvcRoot => {
+      this.experiments[dvcRoot] = this.dispose.track(
+        new Experiments(this.config.workspaceRoot, this.config)
+      )
     })
   }
 
@@ -247,12 +257,6 @@ export class Extension {
     this.gitExtension = this.dispose.track(new GitExtension())
 
     this.runner = this.dispose.track(new Runner(this.config))
-
-    this.experiments = [
-      this.dispose.track(
-        new Experiments(this.config.workspaceRoot, this.config)
-      )
-    ]
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)
