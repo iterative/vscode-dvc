@@ -212,86 +212,64 @@ export class Extension {
     setContextValue('dvc.project.available', available)
   }
 
+  private registerExperimentCommand(details: {
+    registeredName: string
+    method: 'stop' | 'run' | 'showWebview'
+    args?: (Command | ExperimentSubCommands | ExperimentFlag)[]
+  }) {
+    this.dispose.track(
+      commands.registerCommand(details.registeredName, async () => {
+        const dvcRoot = await pickSingleRepositoryRoot({
+          cliPath: this.config.getCliPath(),
+          cwd: this.config.workspaceRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        if (dvcRoot && this.experiments[dvcRoot]) {
+          return this.experiments[dvcRoot][details.method](
+            ...(details.args || [])
+          )
+        }
+      })
+    )
+  }
+
   private registerCommands() {
-    this.dispose.track(
-      commands.registerCommand('dvc.showExperiments', async () => {
-        const dvcRoot = await pickSingleRepositoryRoot({
-          cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
-        if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot].showWebview()
-        }
-      })
-    )
+    this.registerExperimentCommand({
+      registeredName: 'dvc.runExperiment',
+      method: 'run',
+      args: [Command.EXPERIMENT, ExperimentSubCommands.RUN]
+    })
 
-    this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', async () => {
-        const dvcRoot = await pickSingleRepositoryRoot({
-          cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
+    this.registerExperimentCommand({
+      registeredName: 'dvc.runResetExperiment',
+      method: 'run',
+      args: [
+        Command.EXPERIMENT,
+        ExperimentSubCommands.RUN,
+        ExperimentFlag.RESET
+      ]
+    })
 
-        if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot].run(
-            Command.EXPERIMENT,
-            ExperimentSubCommands.RUN
-          )
-        }
-      })
-    )
+    this.registerExperimentCommand({
+      registeredName: 'dvc.runQueuedExperiments',
+      method: 'run',
+      args: [
+        Command.EXPERIMENT,
+        ExperimentSubCommands.RUN,
+        ExperimentFlag.RUN_ALL
+      ]
+    })
 
-    this.dispose.track(
-      commands.registerCommand('dvc.runResetExperiment', async () => {
-        const dvcRoot = await pickSingleRepositoryRoot({
-          cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
+    this.registerExperimentCommand({
+      registeredName: 'dvc.showExperiments',
+      method: 'showWebview'
+    })
 
-        if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot].run(
-            Command.EXPERIMENT,
-            ExperimentSubCommands.RUN,
-            ExperimentFlag.RESET
-          )
-        }
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.runQueuedExperiments', async () => {
-        const dvcRoot = await pickSingleRepositoryRoot({
-          cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
-
-        if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot].run(
-            Command.EXPERIMENT,
-            ExperimentSubCommands.RUN,
-            ExperimentFlag.RUN_ALL
-          )
-        }
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.stopRunningExperiment', () => async () => {
-        const dvcRoot = await pickSingleRepositoryRoot({
-          cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
-
-        if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot].stop()
-        }
-      })
-    )
+    this.registerExperimentCommand({
+      registeredName: 'dvc.stopRunningExperiment',
+      method: 'stop'
+    })
   }
 
   constructor(context: ExtensionContext) {
