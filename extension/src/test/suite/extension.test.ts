@@ -14,8 +14,8 @@ import { Disposable } from '../../extension'
 import * as CliReader from '../../cli/reader'
 import * as CliExecutor from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
-import complexExperimentsOutput from '../../webviews/experiments/complex-output-example.json'
-import { ExperimentsWebview } from '../../webviews/experiments/ExperimentsWebview'
+import complexExperimentsOutput from '../../Experiments/Webview/complex-output-example.json'
+import { ExperimentsWebview } from '../../Experiments/Webview/'
 
 chai.use(sinonChai)
 const { expect } = chai

@@ -1,7 +1,7 @@
 import { experimentShow, root, listDvcOnlyRecursive } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
-import complexExperimentsOutput from '../webviews/experiments/complex-output-example.json'
+import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
 import { join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 

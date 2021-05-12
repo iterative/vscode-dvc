@@ -2,9 +2,9 @@ import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
-import { ExperimentsWebview } from './experiments/ExperimentsWebview'
+import { ExperimentsWebview } from '../Experiments/Webview'
 import { Config } from '../Config'
-import { ExperimentsRepoJSONOutput } from './experiments/contract'
+import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
 
 export class WebviewManager {
   private openedWebviews: {

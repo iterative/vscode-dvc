@@ -2,7 +2,7 @@
 import React from 'react'
 import get from 'lodash/get'
 
-import { DataDictRoot } from 'dvc/src/webviews/experiments/contract'
+import { DataDictRoot } from 'dvc/src/Experiments/Webview/contract'
 import { Experiment } from './parse-experiments'
 
 import {
