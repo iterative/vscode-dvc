@@ -72,12 +72,23 @@ export class Experiments {
       .update(JSON.stringify(tableData))
       .digest('base64')
 
-    if (outputHash !== this.lastExperimentsOutputHash) {
+    if (
+      outputHash !== this.lastExperimentsOutputHash &&
+      (await this.dataDelivered(tableData))
+    ) {
       this.lastExperimentsOutputHash = outputHash
-      this.webview?.showExperiments({
-        tableData
-      })
     }
+  }
+
+  private dataDelivered(
+    tableData: ExperimentsRepoJSONOutput
+  ): Thenable<boolean> {
+    if (!this.webview) {
+      return Promise.resolve(false)
+    }
+    return this.webview.showExperiments({
+      tableData
+    })
   }
 
   public showWebview = async () => {
