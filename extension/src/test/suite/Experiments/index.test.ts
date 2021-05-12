@@ -30,7 +30,7 @@ suite('Extension Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('showExperiments', () => {
+  describe('showWebview', () => {
     it('should be able to make the experiments webview visible', async () => {
       const config = disposable.track(new Config())
       const resourceLocator = disposable.track(
