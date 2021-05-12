@@ -73,9 +73,11 @@ export class WebviewManager {
 
   private addExperiments = (dvcRoot: string, view: ExperimentsWebview) => {
     this.openedWebviews.experiments[dvcRoot] = view
-    view.onDidDispose(() => {
-      this.resetExperiments(dvcRoot)
-    })
+    this.dispose.track(
+      view.onDidDispose(() => {
+        this.resetExperiments(dvcRoot)
+      })
+    )
   }
 
   private resetExperiments = (dvcRoot: string) => {
