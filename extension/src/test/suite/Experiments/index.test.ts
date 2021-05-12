@@ -6,6 +6,7 @@ import { resolve } from 'path'
 import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as CliReader from '../../../cli/reader'
+import { Runner } from '../../../cli/Runner'
 import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
 import { Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
@@ -36,8 +37,9 @@ suite('Experiment Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
+      const runner = disposable.track(new Runner(config))
       const experiments = disposable.track(
-        new Experiments(dvcDemoPath, config, resourceLocator)
+        new Experiments(dvcDemoPath, config, runner, resourceLocator)
       )
 
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -53,8 +55,9 @@ suite('Experiment Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
+      const runner = disposable.track(new Runner(config))
       const experiments = disposable.track(
-        new Experiments(dvcDemoPath, config, resourceLocator)
+        new Experiments(dvcDemoPath, config, runner, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

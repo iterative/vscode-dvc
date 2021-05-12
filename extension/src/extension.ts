@@ -35,6 +35,7 @@ import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
+import { Runner } from './cli/Runner'
 
 export { Disposable, Disposer }
 
@@ -55,6 +56,7 @@ export class Extension {
   private dvcRepositories: Record<string, Repository> = {}
   private readonly experiments: Record<string, Experiments> = {}
   private readonly trackedExplorerTree: TrackedExplorerTree
+  private readonly runner: Runner
   private readonly gitExtension: GitExtension
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter<void>()
@@ -156,7 +158,7 @@ export class Extension {
   private initializeExperiments() {
     this.dvcRoots.forEach(dvcRoot => {
       this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(dvcRoot, this.config, this.resourceLocator)
+        new Experiments(dvcRoot, this.config, this.runner, this.resourceLocator)
       )
     })
   }
@@ -282,6 +284,8 @@ export class Extension {
     )
 
     this.config = this.dispose.track(new Config())
+
+    this.runner = this.dispose.track(new Runner(this.config))
 
     this.gitExtension = this.dispose.track(new GitExtension())
 

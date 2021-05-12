@@ -145,15 +145,16 @@ export class Experiments {
   constructor(
     dvcRoot: string,
     config: Config,
+    runner: Runner,
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
+    this.runner = runner
 
     if (!config) {
       throw new Error('The Experiments class requires a Config instance!')
     }
     this.config = config
-    this.runner = this.dispose.track(new Runner(config))
     this.resourceLocator = resourceLocator
   }
 }
