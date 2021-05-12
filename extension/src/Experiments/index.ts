@@ -3,12 +3,17 @@ import { Disposable } from '@hediet/std/disposable'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
+import { Runner } from '../cli/Runner'
+import { WebviewManager } from '../webviews/WebviewManager'
+import { Args } from '../cli/args'
 
 export class Experiments {
   public readonly dispose = Disposable.fn()
 
   private config: Config
   private dvcRoot: string
+  private runner: Runner
+  private webviewManager: WebviewManager
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
@@ -57,12 +62,41 @@ export class Experiments {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
-  constructor(dvcRoot: string, config: Config) {
+  public refreshWebview = async () =>
+    this.webviewManager.refreshExperiments(this.dvcRoot, await this.update())
+
+  public showWebview = async () => {
+    const webview = await this.webviewManager.findOrCreateExperiments(
+      this.dvcRoot
+    )
+    await this.refreshWebview()
+    return webview
+  }
+
+  public async run(...args: Args) {
+    await this.showWebview()
+    this.runner.run(this.dvcRoot, ...args)
+    const listener = this.dispose.track(
+      this.runner.onDidCompleteProcess(() => {
+        this.refreshWebview()
+        this.dispose.untrack(listener)
+        listener.dispose()
+      })
+    )
+  }
+
+  public stop() {
+    return this.runner.stop()
+  }
+
+  constructor(dvcRoot: string, config: Config, webviewManager: WebviewManager) {
     this.dvcRoot = dvcRoot
 
     if (!config) {
       throw new Error('The Experiments class requires a Config instance!')
     }
     this.config = config
+    this.runner = this.dispose.track(new Runner(config))
+    this.webviewManager = webviewManager
   }
 }

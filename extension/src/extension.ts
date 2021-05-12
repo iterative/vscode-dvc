@@ -17,13 +17,7 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { Experiments } from './Experiments'
-import {
-  Args,
-  Command,
-  ExperimentFlag,
-  ExperimentSubCommands
-} from './cli/args'
-import { Runner } from './cli/Runner'
+import { Command, ExperimentFlag, ExperimentSubCommands } from './cli/args'
 import { registerExperimentCommands } from './Experiments/register'
 import { registerRepositoryCommands } from './Repository/register'
 import {
@@ -62,7 +56,6 @@ export class Extension {
   private readonly experiments: Record<string, Experiments> = {}
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
-  private readonly runner: Runner
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter<void>()
   )
@@ -163,7 +156,11 @@ export class Extension {
   private initializeExperiments() {
     this.dvcRoots.forEach(dvcRoot => {
       this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(this.config.workspaceRoot, this.config)
+        new Experiments(
+          this.config.workspaceRoot,
+          this.config,
+          this.webviewManager
+        )
       )
     })
   }
@@ -172,8 +169,6 @@ export class Extension {
     await this.gitExtension.isReady()
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
-
-      this.dispose.track(this.onDidChangeExperimentsData(gitRoot))
 
       const dvcRoots = await findDvcRootPaths({
         cliPath: this.config.getCliPath(),
@@ -184,6 +179,8 @@ export class Extension {
       dvcRoots.forEach(dvcRoot => {
         const repository = this.dvcRepositories[dvcRoot]
 
+        this.dispose.track(this.onDidChangeExperimentsData(dvcRoot, gitRoot))
+
         this.dispose.track(
           gitExtensionRepository.onDidChange(() => {
             repository?.updateState()
@@ -193,56 +190,18 @@ export class Extension {
     })
   }
 
-  private onDidChangeExperimentsData = (gitRoot: string): Disposable => {
+  private onDidChangeExperimentsData = (
+    dvcRoot: string,
+    gitRoot: string
+  ): Disposable => {
     if (!gitRoot) {
       throw new Error(
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
+    const experiments = this.experiments[dvcRoot]
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return onDidChangeFileSystem(refsPath, this.refreshExperimentsWebview)
-  }
-
-  private refreshExperimentsWebview = async (dvcRoot: string) =>
-    this.webviewManager.refreshExperiments(
-      dvcRoot,
-      await this.experiments[dvcRoot]?.update()
-    )
-
-  private showExperimentsWebview = async (dvcRoot?: string) => {
-    if (!dvcRoot) {
-      dvcRoot = await pickSingleRepositoryRoot({
-        cliPath: this.config.getCliPath(),
-        cwd: this.config.workspaceRoot,
-        pythonBinPath: this.config.pythonBinPath
-      })
-      if (!dvcRoot) {
-        return
-      }
-    }
-    const webview = await this.webviewManager.findOrCreateExperiments(dvcRoot)
-    await this.refreshExperimentsWebview(dvcRoot)
-    return webview
-  }
-
-  private async runExperimentCommand(...args: Args) {
-    const dvcRoot = await pickSingleRepositoryRoot({
-      cliPath: this.config.getCliPath(),
-      cwd: this.config.workspaceRoot,
-      pythonBinPath: this.config.pythonBinPath
-    })
-
-    if (dvcRoot) {
-      await this.showExperimentsWebview(dvcRoot)
-      this.runner.run(dvcRoot, ...args)
-      const listener = this.dispose.track(
-        this.runner.onDidCompleteProcess(() => {
-          this.refreshExperimentsWebview(dvcRoot)
-          this.dispose.untrack(listener)
-          listener.dispose()
-        })
-      )
-    }
+    return onDidChangeFileSystem(refsPath, experiments.refreshWebview)
   }
 
   private setCommandsAvailability(available: boolean) {
@@ -251,6 +210,88 @@ export class Extension {
 
   private setProjectAvailability(available: boolean) {
     setContextValue('dvc.project.available', available)
+  }
+
+  private registerCommands() {
+    this.dispose.track(
+      commands.registerCommand('dvc.showExperiments', async () => {
+        const dvcRoot = await pickSingleRepositoryRoot({
+          cliPath: this.config.getCliPath(),
+          cwd: this.config.workspaceRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+        if (dvcRoot && this.experiments[dvcRoot]) {
+          return this.experiments[dvcRoot].showWebview()
+        }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.runExperiment', async () => {
+        const dvcRoot = await pickSingleRepositoryRoot({
+          cliPath: this.config.getCliPath(),
+          cwd: this.config.workspaceRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        if (dvcRoot && this.experiments[dvcRoot]) {
+          return this.experiments[dvcRoot].run(
+            Command.EXPERIMENT,
+            ExperimentSubCommands.RUN
+          )
+        }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.runResetExperiment', async () => {
+        const dvcRoot = await pickSingleRepositoryRoot({
+          cliPath: this.config.getCliPath(),
+          cwd: this.config.workspaceRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        if (dvcRoot && this.experiments[dvcRoot]) {
+          return this.experiments[dvcRoot].run(
+            Command.EXPERIMENT,
+            ExperimentSubCommands.RUN,
+            ExperimentFlag.RESET
+          )
+        }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.runQueuedExperiments', async () => {
+        const dvcRoot = await pickSingleRepositoryRoot({
+          cliPath: this.config.getCliPath(),
+          cwd: this.config.workspaceRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        if (dvcRoot && this.experiments[dvcRoot]) {
+          return this.experiments[dvcRoot].run(
+            Command.EXPERIMENT,
+            ExperimentSubCommands.RUN,
+            ExperimentFlag.RUN_ALL
+          )
+        }
+      })
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.stopRunningExperiment', () => async () => {
+        const dvcRoot = await pickSingleRepositoryRoot({
+          cliPath: this.config.getCliPath(),
+          cwd: this.config.workspaceRoot,
+          pythonBinPath: this.config.pythonBinPath
+        })
+
+        if (dvcRoot && this.experiments[dvcRoot]) {
+          return this.experiments[dvcRoot].stop()
+        }
+      })
+    )
   }
 
   constructor(context: ExtensionContext) {
@@ -268,8 +309,6 @@ export class Extension {
     this.config = this.dispose.track(new Config())
 
     this.gitExtension = this.dispose.track(new GitExtension())
-
-    this.runner = this.dispose.track(new Runner(this.config))
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)
@@ -301,44 +340,7 @@ export class Extension {
         this.config.selectDvcPath()
       )
     )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.showExperiments', () => {
-        return this.showExperimentsWebview()
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.runExperiment', () =>
-        this.runExperimentCommand(Command.EXPERIMENT, ExperimentSubCommands.RUN)
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.runResetExperiment', () =>
-        this.runExperimentCommand(
-          Command.EXPERIMENT,
-          ExperimentSubCommands.RUN,
-          ExperimentFlag.RESET
-        )
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.runQueuedExperiments', () =>
-        this.runExperimentCommand(
-          Command.EXPERIMENT,
-          ExperimentSubCommands.RUN,
-          ExperimentFlag.RUN_ALL
-        )
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.stopRunningExperiment', () =>
-        this.runner.stop()
-      )
-    )
+    this.registerCommands()
   }
 }
 
