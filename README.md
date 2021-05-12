@@ -1,20 +1,68 @@
-# DVC for Visual Studio Code
+# VSCode DVC: Insider Preview
 
-[![Build plugin](https://github.com/iterative/vscode-dvc/workflows/Build%20plugin/badge.svg)](https://github.com/iterative/vscode-dvc/actions?query=workflow%3A%22Build+plugin%22)
+[![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/build.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/build.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 
-This extension adds first-class support for DVC experiments in Visual Studio
-Code
+A Visual Studio Code Extension that aims to allow users of all technical
+backgrounds to effectively use DVC, particularly the new
+[Experiments](https://dvc.org/doc/start/experiments) feature.
 
-## Usage
+This project is in a very early state, and will definitely change in the future.
+With this in mind, the extension is built against the Insiders version of VS
+Code and the latest master of DVC installed from Git. Once we are feature
+complete and all Insider features we depend on move into stable, we'll end up
+building against stable VS Code.
 
-### Commands
+## Setup
 
-Use the main view or VS Code's Command Palette (ctrl+shift+p) to access
-commands.
+### Installing the Extension
 
-- View Tree: show the webview.
-- Run Experiment: run 'dvc exp run' in current workspace.
+This repo is set up with a
+[GitHub Action](https://github.com/iterative/vscode-dvc/actions) that uploads an
+installable vsix build of the extension for every commit, complete with the Git
+SHA appended to the extension version.
+
+You can find the download link in the Artifacts list of any run of the
+Continuous Integration workflow. The easiest way to get to the build for any
+particular branch is to use the GitHub Checks UI to get to the details of the
+"Continuous Integration" run.
+
+### Installing and Integrating With DVC CLI
+
+There are quite a few options for installing DVC, with one big split being
+whether DVC is installed globally or in a virtual environment.
+
+- Virtual environment recognition powered by the
+  [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+  extension.
+
+- The `dvc.dvcPath` setting can be set to a specific binary path in order to use
+  a specific dvc executable and skip all `ms-python` inference.
+
+- Simply calling `dvc` on the CLI is used as a fallback.
+
+Using the Python extension is the easiest way to use virtual environments, and
+using a global install of dvc is the easiest way to not use the Python
+extension. For other niche cases, the `dvc.dvcPath` setting should hopefully
+serve as an escape hatch.
+
+The "Select DVC CLI Path" command in the Command Palette can be used to set the
+`dvc.dvcPath` option from a more user-friendly QuickPick menu.
+
+## How to Use
+
+This extension, especially in this early state, makes extensive use of the
+[Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
+Every feature should be available from the Command Palette, and from there
+additional GUI elements are added to the GUI for convenience.
+
+### Experiments
+
+To open up the Experiments table view for a DVC repo, use the "Show Experiments"
+command from the Command Palette.
+
+To run experiments, use the `Run Experiment` command or use the UI elements
+available when the table is visible.
 
 ## Contributing
 
