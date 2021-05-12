@@ -4,19 +4,23 @@ import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
 import { Runner } from '../cli/Runner'
-import { WebviewManager } from '../webviews/WebviewManager'
 import { Args } from '../cli/args'
+import { ExperimentsWebview } from './Webview'
+import { createHash } from 'crypto'
+import { ResourceLocator } from '../ResourceLocator'
 
 export class Experiments {
   public readonly dispose = Disposable.fn()
 
-  private config: Config
-  private dvcRoot: string
-  private runner: Runner
-  private webviewManager: WebviewManager
+  private readonly config: Config
+  private readonly dvcRoot: string
+  private readonly runner: Runner
+  private webview?: ExperimentsWebview
+  private readonly resourceLocator: ResourceLocator
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
 
+  private lastExperimentsOutputHash = ''
   private data?: ExperimentsRepoJSONOutput
   public getData() {
     return this.data
@@ -40,7 +44,7 @@ export class Experiments {
 
   public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
 
-  public async update(): Promise<ExperimentsRepoJSONOutput> {
+  private async update(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
       try {
         const updatePromise = experimentShow({
@@ -62,14 +66,37 @@ export class Experiments {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
-  public refreshWebview = async () =>
-    this.webviewManager.refreshExperiments(this.dvcRoot, await this.update())
+  public refreshWebview = async () => {
+    const tableData = await this.update()
+    const outputHash = createHash('sha1')
+      .update(JSON.stringify(tableData))
+      .digest('base64')
+
+    if (outputHash !== this.lastExperimentsOutputHash) {
+      this.lastExperimentsOutputHash = outputHash
+      this.webview?.showExperiments({
+        tableData
+      })
+    }
+  }
 
   public showWebview = async () => {
-    const webview = await this.webviewManager.findOrCreateExperiments(
-      this.dvcRoot
-    )
+    const webview = await this.findOrCreateWebview()
     await this.refreshWebview()
+    return webview
+  }
+
+  public findOrCreateWebview = async (): Promise<ExperimentsWebview> => {
+    if (this.webview) {
+      return this.webview.reveal()
+    }
+
+    const webview = await ExperimentsWebview.create(
+      this.config,
+      this.resourceLocator
+    )
+    this.addWebview(webview)
+
     return webview
   }
 
@@ -89,7 +116,26 @@ export class Experiments {
     return this.runner.stop()
   }
 
-  constructor(dvcRoot: string, config: Config, webviewManager: WebviewManager) {
+  public addWebview = (view: ExperimentsWebview) => {
+    this.webview = this.dispose.track(view)
+    this.dispose.track(
+      view.onDidDispose(() => {
+        this.resetWebview()
+      })
+    )
+  }
+
+  private resetWebview = () => {
+    this.dispose.untrack(this.webview)
+    this.webview = undefined
+    this.lastExperimentsOutputHash = ''
+  }
+
+  constructor(
+    dvcRoot: string,
+    config: Config,
+    resourceLocator: ResourceLocator
+  ) {
     this.dvcRoot = dvcRoot
 
     if (!config) {
@@ -97,6 +143,6 @@ export class Experiments {
     }
     this.config = config
     this.runner = this.dispose.track(new Runner(config))
-    this.webviewManager = webviewManager
+    this.resourceLocator = resourceLocator
   }
 }

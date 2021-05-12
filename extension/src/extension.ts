@@ -156,11 +156,7 @@ export class Extension {
   private initializeExperiments() {
     this.dvcRoots.forEach(dvcRoot => {
       this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(
-          this.config.workspaceRoot,
-          this.config,
-          this.webviewManager
-        )
+        new Experiments(dvcRoot, this.config, this.resourceLocator)
       )
     })
   }
@@ -281,7 +277,9 @@ export class Extension {
     this.setCommandsAvailability(false)
     this.setProjectAvailability(false)
 
-    this.resourceLocator = new ResourceLocator(context.extensionUri)
+    this.resourceLocator = this.dispose.track(
+      new ResourceLocator(context.extensionUri)
+    )
 
     this.config = this.dispose.track(new Config())
 
@@ -303,9 +301,8 @@ export class Extension {
       this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
     )
 
-    this.webviewManager = this.dispose.track(
-      new WebviewManager(this.config, this.resourceLocator)
-    )
+    this.webviewManager = new WebviewManager(this.config)
+    this.dispose.track(this.webviewManager)
 
     registerExperimentCommands(this.config, this.dispose)
 

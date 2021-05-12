@@ -9,7 +9,6 @@ import * as CliReader from '../../../cli/reader'
 import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
 import { Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
-import { WebviewManager } from '../../../webviews/WebviewManager'
 import { ResourceLocator } from '../../../ResourceLocator'
 
 chai.use(sinonChai)
@@ -34,17 +33,11 @@ suite('Extension Test Suite', () => {
   describe('showExperiments', () => {
     it('should be able to make the experiments webview visible', async () => {
       const config = disposable.track(new Config())
-      const webviewManager = disposable.track(
-        new WebviewManager(
-          config,
-          new ResourceLocator(Uri.file(resourcePath)),
-          {
-            experiments: 'test'
-          }
-        )
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
       )
       const experiments = disposable.track(
-        new Experiments(dvcDemoPath, config, webviewManager)
+        new Experiments(dvcDemoPath, config, resourceLocator)
       )
 
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -57,17 +50,11 @@ suite('Extension Test Suite', () => {
 
     it('should only be able to open a single experiments webview', async () => {
       const config = disposable.track(new Config())
-      const webviewManager = disposable.track(
-        new WebviewManager(
-          config,
-          new ResourceLocator(Uri.file(resourcePath)),
-          {
-            experiments: 'test'
-          }
-        )
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
       )
       const experiments = disposable.track(
-        new Experiments(dvcDemoPath, config, webviewManager)
+        new Experiments(dvcDemoPath, config, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

@@ -25,13 +25,12 @@ export class ExperimentsWebview {
   public isVisible = () => this.webviewPanel.visible
 
   public static restore(
-    dvcRoot: string,
     webviewPanel: WebviewPanel,
     config: Config
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(dvcRoot, webviewPanel, config))
+        resolve(new ExperimentsWebview(webviewPanel, config))
       } catch (e) {
         reject(e)
       }
@@ -39,7 +38,6 @@ export class ExperimentsWebview {
   }
 
   public static async create(
-    dvcRoot: string,
     config: Config,
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
@@ -56,7 +54,7 @@ export class ExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new ExperimentsWebview(dvcRoot, webviewPanel, config)
+    const view = new ExperimentsWebview(webviewPanel, config)
     await view.initialized
     return view
   }
@@ -75,7 +73,6 @@ export class ExperimentsWebview {
   }
 
   private constructor(
-    public dvcRoot: string,
     private readonly webviewPanel: WebviewPanel,
     private readonly config: Config
   ) {
