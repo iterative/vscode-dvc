@@ -204,7 +204,9 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () =>
-    this.webviewManager.refreshExperiments(await this.experiments[0].update())
+    this.webviewManager.refreshExperiments(
+      await Object.values(this.experiments)[0].update()
+    )
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
