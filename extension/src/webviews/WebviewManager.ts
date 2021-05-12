@@ -30,9 +30,9 @@ export class WebviewManager {
 
     this.dispose.track({
       dispose: () => {
-        Object.values(this.openedWebviews).map(panel => {
-          if (panel) {
-            Object.values(panel).forEach(view => view?.dispose())
+        Object.values(this.openedWebviews).map(panels => {
+          if (panels) {
+            Object.values(panels).forEach(view => view?.dispose())
           }
         })
       }
