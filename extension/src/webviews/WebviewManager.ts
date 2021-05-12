@@ -17,23 +17,26 @@ export class WebviewManager {
 
   constructor(
     private readonly config: Config,
-    private readonly resourceLocator: ResourceLocator
+    private readonly resourceLocator: ResourceLocator,
+    viewKeys?: { experiments: string }
   ) {
     this.dispose.track(
-      window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
-        deserializeWebviewPanel: async (
-          panel: WebviewPanel,
-          state: { dvcRoot: string }
-        ) => {
-          // TODO set dvcRoot into webview state
-          const view = await ExperimentsWebview.restore(
-            state.dvcRoot,
-            panel,
-            this.config
-          )
-          this.addExperiments(state.dvcRoot, view)
+      window.registerWebviewPanelSerializer(
+        viewKeys?.experiments || ExperimentsWebview.viewKey,
+        {
+          deserializeWebviewPanel: async (
+            panel: WebviewPanel,
+            state: { dvcRoot: string }
+          ) => {
+            const view = await ExperimentsWebview.restore(
+              state.dvcRoot,
+              panel,
+              this.config
+            )
+            this.addExperiments(state.dvcRoot, view)
+          }
         }
-      })
+      )
     )
 
     this.dispose.track({
