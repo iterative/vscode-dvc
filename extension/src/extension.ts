@@ -217,8 +217,9 @@ export class Extension {
     method: 'stop' | 'run' | 'showWebview'
     args?: (Command | ExperimentSubCommands | ExperimentFlag)[]
   }) {
+    const { registeredName, method, args } = details
     this.dispose.track(
-      commands.registerCommand(details.registeredName, async () => {
+      commands.registerCommand(registeredName, async () => {
         const dvcRoot = await pickSingleRepositoryRoot({
           cliPath: this.config.getCliPath(),
           cwd: this.config.workspaceRoot,
@@ -226,9 +227,7 @@ export class Extension {
         })
 
         if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot][details.method](
-            ...(details.args || [])
-          )
+          return this.experiments[dvcRoot][method](...(args || []))
         }
       })
     )
