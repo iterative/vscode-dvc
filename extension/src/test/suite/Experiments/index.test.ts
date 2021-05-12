@@ -16,7 +16,7 @@ chai.use(sinonChai)
 const { expect } = chai
 
 suite('Extension Test Suite', () => {
-  window.showInformationMessage('Start all extension tests.')
+  window.showInformationMessage('Start all experiments tests.')
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
