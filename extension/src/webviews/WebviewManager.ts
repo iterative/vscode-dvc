@@ -21,9 +21,17 @@ export class WebviewManager {
   ) {
     this.dispose.track(
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
-        deserializeWebviewPanel: async (panel: WebviewPanel) => {
-          const view = await ExperimentsWebview.restore(panel, this.config)
-          this.addExperiments(ExperimentsWebview.viewKey, view)
+        deserializeWebviewPanel: async (
+          panel: WebviewPanel,
+          state: { dvcRoot: string }
+        ) => {
+          // TODO set dvcRoot into webview state
+          const view = await ExperimentsWebview.restore(
+            state.dvcRoot,
+            panel,
+            this.config
+          )
+          this.addExperiments(state.dvcRoot, view)
         }
       })
     )
@@ -48,6 +56,7 @@ export class WebviewManager {
     }
 
     const experimentsWebview = await ExperimentsWebview.create(
+      dvcRoot,
       this.config,
       this.resourceLocator
     )
