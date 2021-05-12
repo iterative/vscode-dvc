@@ -97,7 +97,7 @@ export class Experiments {
     return webview
   }
 
-  public findOrCreateWebview = async (): Promise<ExperimentsWebview> => {
+  private findOrCreateWebview = async (): Promise<ExperimentsWebview> => {
     if (this.webview) {
       return this.webview.reveal()
     }
