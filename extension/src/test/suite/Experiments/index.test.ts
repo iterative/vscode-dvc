@@ -14,7 +14,7 @@ import { ResourceLocator } from '../../../ResourceLocator'
 chai.use(sinonChai)
 const { expect } = chai
 
-suite('Extension Test Suite', () => {
+suite('Experiment Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
