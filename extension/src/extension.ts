@@ -62,7 +62,7 @@ export class Extension {
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly gitExtension: GitExtension
   private readonly runner: Runner
-  private readonly experiments: Experiments
+  private readonly experiments: Experiments[] = []
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter<void>()
   )
@@ -194,7 +194,7 @@ export class Extension {
   }
 
   private refreshExperimentsWebview = async () =>
-    this.webviewManager.refreshExperiments(await this.experiments.update())
+    this.webviewManager.refreshExperiments(await this.experiments[0].update())
 
   private showExperimentsWebview = async () => {
     const webview = await this.webviewManager.findOrCreateExperiments()
@@ -248,9 +248,11 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.experiments = this.dispose.track(
-      new Experiments(this.config.workspaceRoot, this.config)
-    )
+    this.experiments = [
+      this.dispose.track(
+        new Experiments(this.config.workspaceRoot, this.config)
+      )
+    ]
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)
