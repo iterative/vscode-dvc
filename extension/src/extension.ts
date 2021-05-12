@@ -203,14 +203,25 @@ export class Extension {
     return onDidChangeFileSystem(refsPath, this.refreshExperimentsWebview)
   }
 
-  private refreshExperimentsWebview = async () =>
+  private refreshExperimentsWebview = async (dvcRoot: string) =>
     this.webviewManager.refreshExperiments(
-      await Object.values(this.experiments)[0].update()
+      dvcRoot,
+      await this.experiments[dvcRoot].update()
     )
 
-  private showExperimentsWebview = async () => {
-    const webview = await this.webviewManager.findOrCreateExperiments()
-    await this.refreshExperimentsWebview()
+  private showExperimentsWebview = async (dvcRoot?: string) => {
+    if (!dvcRoot) {
+      dvcRoot = await pickSingleRepositoryRoot({
+        cliPath: this.config.getCliPath(),
+        cwd: this.config.workspaceRoot,
+        pythonBinPath: this.config.pythonBinPath
+      })
+      if (!dvcRoot) {
+        return
+      }
+    }
+    const webview = await this.webviewManager.findOrCreateExperiments(dvcRoot)
+    await this.refreshExperimentsWebview(dvcRoot)
     return webview
   }
 
@@ -222,11 +233,11 @@ export class Extension {
     })
 
     if (dvcRoot) {
-      await this.showExperimentsWebview()
+      await this.showExperimentsWebview(dvcRoot)
       this.runner.run(dvcRoot, ...args)
       const listener = this.dispose.track(
         this.runner.onDidCompleteProcess(() => {
-          this.refreshExperimentsWebview()
+          this.refreshExperimentsWebview(dvcRoot)
           this.dispose.untrack(listener)
           listener.dispose()
         })

@@ -7,24 +7,23 @@ import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from './experiments/contract'
 
 export class WebviewManager {
-  private readonly openedWebviews: {
-    experiments?: ExperimentsWebview
-  }
+  private openedWebviews: {
+    experiments: Record<string, ExperimentsWebview | undefined>
+  } = { experiments: {} }
 
   public readonly dispose = Disposable.fn()
 
-  private lastExperimentsOutputHash = ''
+  private lastExperimentsOutputHash: Record<string, string> = {}
 
   constructor(
     private readonly config: Config,
     private readonly resourceLocator: ResourceLocator
   ) {
-    this.openedWebviews = {}
     this.dispose.track(
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (panel: WebviewPanel) => {
           const view = await ExperimentsWebview.restore(panel, this.config)
-          this.addExperiments(view)
+          this.addExperiments(ExperimentsWebview.viewKey, view)
         }
       })
     )
@@ -32,14 +31,18 @@ export class WebviewManager {
     this.dispose.track({
       dispose: () => {
         Object.values(this.openedWebviews).map(panel => {
-          panel?.dispose()
+          if (panel) {
+            Object.values(panel).forEach(view => view?.dispose())
+          }
         })
       }
     })
   }
 
-  public findOrCreateExperiments = async (): Promise<ExperimentsWebview> => {
-    const experiments = this.openedWebviews.experiments
+  public findOrCreateExperiments = async (
+    dvcRoot: string
+  ): Promise<ExperimentsWebview> => {
+    const experiments = this.openedWebviews.experiments?.[dvcRoot]
     if (experiments) {
       return experiments.reveal()
     }
@@ -48,34 +51,37 @@ export class WebviewManager {
       this.config,
       this.resourceLocator
     )
-    this.addExperiments(experimentsWebview)
+    this.addExperiments(dvcRoot, experimentsWebview)
     return experimentsWebview
   }
 
   public refreshExperiments = (
+    dvcRoot: string,
     tableData: ExperimentsRepoJSONOutput | null
   ): void => {
     const outputHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
 
-    if (outputHash !== this.lastExperimentsOutputHash) {
-      this.lastExperimentsOutputHash = outputHash
-      this.openedWebviews?.experiments?.showExperiments({
+    if (outputHash !== this.lastExperimentsOutputHash[dvcRoot]) {
+      this.lastExperimentsOutputHash[dvcRoot] = outputHash
+      this.openedWebviews?.experiments?.[dvcRoot]?.showExperiments({
         tableData
       })
     }
   }
 
-  private addExperiments = (view: ExperimentsWebview) => {
-    this.openedWebviews.experiments = view
+  private addExperiments = (dvcRoot: string, view: ExperimentsWebview) => {
+    this.openedWebviews.experiments[dvcRoot] = view
     view.onDidDispose(() => {
-      this.resetExperiments()
+      this.resetExperiments(dvcRoot)
     })
   }
 
-  private resetExperiments = () => {
-    this.openedWebviews.experiments = undefined
-    this.lastExperimentsOutputHash = ''
+  private resetExperiments = (dvcRoot: string) => {
+    if (this.openedWebviews?.experiments?.[dvcRoot]) {
+      this.openedWebviews.experiments[dvcRoot] = undefined
+      this.lastExperimentsOutputHash[dvcRoot] = ''
+    }
   }
 }
