@@ -19,10 +19,10 @@ export class Experiments {
   private readonly resourceLocator: ResourceLocator
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
-
+  private data?: ExperimentsRepoJSONOutput
   private lastExperimentsOutputHash = ''
 
-  private update(): Promise<ExperimentsRepoJSONOutput> {
+  private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
       try {
         const experimentData = experimentShow({
@@ -31,6 +31,7 @@ export class Experiments {
           cwd: this.dvcRoot
         })
         this.currentUpdatePromise = experimentData
+        this.data = await experimentData
         return experimentData
       } catch (e) {
         Logger.error(e)
@@ -42,7 +43,7 @@ export class Experiments {
   }
 
   public refreshWebview = async () => {
-    const tableData = await this.update()
+    const tableData = await this.updateData()
     const outputHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
@@ -82,6 +83,12 @@ export class Experiments {
       this.resourceLocator
     )
     this.setWebview(webview)
+
+    if (this.data) {
+      webview.showExperiments({
+        tableData: this.data
+      })
+    }
 
     return webview
   }
@@ -131,5 +138,7 @@ export class Experiments {
     }
     this.config = config
     this.resourceLocator = resourceLocator
+
+    this.updateData()
   }
 }
