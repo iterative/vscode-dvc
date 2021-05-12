@@ -206,7 +206,7 @@ export class Extension {
   private refreshExperimentsWebview = async (dvcRoot: string) =>
     this.webviewManager.refreshExperiments(
       dvcRoot,
-      await this.experiments[dvcRoot].update()
+      await this.experiments[dvcRoot]?.update()
     )
 
   private showExperimentsWebview = async (dvcRoot?: string) => {

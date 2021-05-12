@@ -43,6 +43,7 @@ suite('Extension Test Suite', () => {
     const showExperimentsCommand = 'dvc.showExperiments'
     it('should be able to make the experiments webview visible', async () => {
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(FileSystem, 'pickSingleRepositoryRoot').resolves(dvcDemoPath)
 
       const experimentsWebview = disposable.track(
         await commands.executeCommand(showExperimentsCommand)
@@ -59,6 +60,7 @@ suite('Extension Test Suite', () => {
       const mockReader = stub(CliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
+      stub(FileSystem, 'pickSingleRepositoryRoot').resolves(dvcDemoPath)
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
