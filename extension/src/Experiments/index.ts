@@ -7,6 +7,7 @@ import { Args } from '../cli/args'
 import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
+import { Logger } from '../common/Logger'
 
 export class Experiments {
   public readonly dispose = Disposable.fn()
@@ -32,6 +33,7 @@ export class Experiments {
         this.currentUpdatePromise = experimentData
         return experimentData
       } catch (e) {
+        Logger.error(e)
       } finally {
         this.currentUpdatePromise = undefined
       }
