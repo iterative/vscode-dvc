@@ -6,7 +6,11 @@ import { Config } from '../Config'
 export class WebviewManager {
   public readonly dispose = Disposable.fn()
 
-  constructor(private readonly config: Config) {
+  private readonly config: Config
+
+  constructor(config: Config) {
+    this.config = config
+
     this.dispose.track(
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (panel: WebviewPanel) => {
