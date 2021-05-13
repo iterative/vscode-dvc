@@ -2,7 +2,12 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
-import { deleteTarget, pickDvcRoot, pickDvcRootThenRun } from './workspace'
+import {
+  deleteTarget,
+  getDvcRoot,
+  getDvcRootThenRun,
+  pickDvcRoot
+} from './workspace'
 import { findDvcRootPaths } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -53,19 +58,6 @@ describe('deleteTarget', () => {
 })
 
 describe('pickDvcRoot', () => {
-  it('should return the default project if provided', async () => {
-    const defaultProject = `${mockedCwd}/repo/b`
-    mockedGetExecutionOptions.mockResolvedValueOnce({
-      cliPath: undefined,
-      cwd: mockedCwd,
-      pythonBinPath: undefined
-    })
-    mockedGetDefaultProject.mockResolvedValueOnce(defaultProject)
-
-    const repoRoot = await pickDvcRoot(mockedConfig)
-    expect(repoRoot).toEqual(defaultProject)
-  })
-
   it('should return the single repository if only one is found', async () => {
     const singleRepo = '/some/other/path/to/repo/a'
 
@@ -122,12 +114,27 @@ describe('pickDvcRoot', () => {
   })
 })
 
-describe('pickDvcRootThenRun', () => {
+describe('getDvcRoot', () => {
+  it('should return the default project if it is set', async () => {
+    const defaultProject = `${mockedCwd}/repo/b`
+    mockedGetExecutionOptions.mockResolvedValueOnce({
+      cliPath: undefined,
+      cwd: mockedCwd,
+      pythonBinPath: undefined
+    })
+    mockedGetDefaultProject.mockResolvedValueOnce(defaultProject)
+
+    const repoRoot = await getDvcRoot(mockedConfig)
+    expect(repoRoot).toEqual(defaultProject)
+  })
+})
+
+describe('getDvcRootThenRun', () => {
   it('should run the function if a DVC root is found or provided', async () => {
     mockedFindDvcRootPaths.mockResolvedValueOnce(['/root/nested/repo'])
 
     const mockedFunc = jest.fn()
-    await pickDvcRootThenRun(mockedConfig, mockedFunc)
+    await getDvcRootThenRun(mockedConfig, mockedFunc)
     expect(mockedFunc).toBeCalledTimes(1)
   })
 
@@ -137,7 +144,7 @@ describe('pickDvcRootThenRun', () => {
     mockedFindDvcRootPaths.mockResolvedValueOnce([])
 
     const mockedFunc = jest.fn()
-    await pickDvcRootThenRun(mockedConfig, mockedFunc)
+    await getDvcRootThenRun(mockedConfig, mockedFunc)
     expect(mockedFunc).toBeCalledTimes(0)
   })
 })
