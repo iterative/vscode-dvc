@@ -1,16 +1,16 @@
 import { window } from 'vscode'
-import { GcPreserveFlag } from '../cli/args'
-import { ExecutionOptions } from '../cli/execution'
+import { GcPreserveFlag } from '../../cli/args'
+import { ExecutionOptions } from '../../cli/execution'
 import {
   experimentApply,
   experimentBranch,
   experimentGarbageCollect,
   experimentRemove
-} from '../cli/executor'
-import { experimentListCurrent } from '../cli/reader'
-import { Config } from '../Config'
-import { quickPickManyValues } from '../vscode/quickPick'
-import { reportStderrOrThrow } from '../vscode/reporting'
+} from '../../cli/executor'
+import { experimentListCurrent } from '../../cli/reader'
+import { Config } from '../../Config'
+import { quickPickManyValues } from '../../vscode/quickPick'
+import { reportStderrOrThrow } from '../../vscode/reporting'
 
 export const experimentGcQuickPick = async (config: Config) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(

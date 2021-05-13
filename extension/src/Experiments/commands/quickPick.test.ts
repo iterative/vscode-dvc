@@ -1,10 +1,10 @@
-import { Config } from '../Config'
+import { Config } from '../../Config'
 import { mocked } from 'ts-jest/utils'
-import { executeProcess } from '../processExecution'
-import { getProcessEnv } from '../env'
+import { executeProcess } from '../../processExecution'
+import { getProcessEnv } from '../../env'
 import { QuickPickOptions, window } from 'vscode'
-import { GcPreserveFlag } from '../cli/args'
-import { QuickPickItemWithValue } from '../vscode/quickPick'
+import { GcPreserveFlag } from '../../cli/args'
+import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
@@ -12,8 +12,8 @@ import {
   removeExperimentFromQuickPick
 } from './quickPick'
 
-jest.mock('../processExecution')
-jest.mock('../env')
+jest.mock('../../processExecution')
+jest.mock('../../env')
 jest.mock('vscode')
 
 const mockedExecuteProcess = mocked(executeProcess)
