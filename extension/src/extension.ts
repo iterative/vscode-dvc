@@ -23,9 +23,9 @@ import { registerRepositoryCommands } from './Repository/register'
 import {
   findDvcRootPaths,
   onDidChangeFileSystem,
-  onDidChangeFileType,
-  pickSingleRepositoryRoot
+  onDidChangeFileType
 } from './fileSystem'
+import { pickSingleRepositoryRoot } from './fileSystem/workspace'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'

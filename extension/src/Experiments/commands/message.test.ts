@@ -1,4 +1,4 @@
-import { experimentRunQueueCommand } from './message'
+import { queueExperiment } from './message'
 import { mocked } from 'ts-jest/utils'
 import { executeProcess } from '../../processExecution'
 import { getProcessEnv } from '../../env'
@@ -30,18 +30,18 @@ const exampleExecutionOptions = {
   pythonBinPath: undefined
 }
 
-describe('experimentRunQueueCommand', () => {
+describe('queueExperiment', () => {
   it('displays an info message with the contents of stdout when the command succeeds', async () => {
     const stdout = 'Example stdout that will be resolved literally'
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
-    await experimentRunQueueCommand(exampleExecutionOptions)
+    await queueExperiment(exampleExecutionOptions)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
     const stderr = 'Example stderr that will be resolved literally'
     mockedExecuteProcess.mockRejectedValueOnce(stderr)
-    await experimentRunQueueCommand(exampleExecutionOptions)
+    await queueExperiment(exampleExecutionOptions)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 })
