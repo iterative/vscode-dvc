@@ -12,26 +12,18 @@ import {
   pickRepoThenRun,
   pickSingleRepositoryRoot
 } from '../../fileSystem/workspace'
-import { Command, ExperimentFlag, ExperimentSubCommands } from '../../cli/args'
 import { Experiments } from '..'
 
-const registerExperimentCommand = (
+const pickExperimentsThenRun = async (
+  config: Config,
   experiments: Record<string, Experiments>,
-  details: {
-    registeredName: string
-    method: 'stop' | 'run' | 'showWebview'
-    args?: (Command | ExperimentSubCommands | ExperimentFlag)[]
-    config: Config
-  }
+  method: 'stop' | 'run' | 'runQueued' | 'runReset' | 'showWebview'
 ) => {
-  const { registeredName, method, args, config } = details
-  return commands.registerCommand(registeredName, async () => {
-    const dvcRoot = await pickSingleRepositoryRoot(config)
-
-    if (dvcRoot && experiments[dvcRoot]) {
-      return experiments[dvcRoot][method](...(args || []))
-    }
-  })
+  const dvcRoot = await pickSingleRepositoryRoot(config)
+  if (dvcRoot) {
+    const pickedExperiments = experiments[dvcRoot]
+    return pickedExperiments?.[method]
+  }
 }
 
 export const registerExperimentCommands = (
@@ -70,53 +62,32 @@ export const registerExperimentCommands = (
   )
 
   disposer.track(
-    registerExperimentCommand(experiments, {
-      registeredName: 'dvc.runExperiment',
-      method: 'run',
-      args: [Command.EXPERIMENT, ExperimentSubCommands.RUN],
-      config
-    })
+    commands.registerCommand('dvc.runExperiment', () =>
+      pickExperimentsThenRun(config, experiments, 'run')
+    )
   )
 
   disposer.track(
-    registerExperimentCommand(experiments, {
-      config,
-      registeredName: 'dvc.runResetExperiment',
-      method: 'run',
-      args: [
-        Command.EXPERIMENT,
-        ExperimentSubCommands.RUN,
-        ExperimentFlag.RESET
-      ]
-    })
+    commands.registerCommand('dvc.runResetExperiment', () =>
+      pickExperimentsThenRun(config, experiments, 'runReset')
+    )
   )
 
   disposer.track(
-    registerExperimentCommand(experiments, {
-      config,
-      registeredName: 'dvc.runQueuedExperiments',
-      method: 'run',
-      args: [
-        Command.EXPERIMENT,
-        ExperimentSubCommands.RUN,
-        ExperimentFlag.RUN_ALL
-      ]
-    })
+    commands.registerCommand('dvc.runQueuedExperiments', () =>
+      pickExperimentsThenRun(config, experiments, 'runQueued')
+    )
   )
 
   disposer.track(
-    registerExperimentCommand(experiments, {
-      config,
-      registeredName: 'dvc.showExperiments',
-      method: 'showWebview'
-    })
+    commands.registerCommand('dvc.showExperiments', () =>
+      pickExperimentsThenRun(config, experiments, 'showWebview')
+    )
   )
 
   disposer.track(
-    registerExperimentCommand(experiments, {
-      config,
-      registeredName: 'dvc.stopRunningExperiment',
-      method: 'stop'
-    })
+    commands.registerCommand('dvc.stopRunningExperiment', () =>
+      pickExperimentsThenRun(config, experiments, 'stop')
+    )
   )
 }
