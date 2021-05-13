@@ -149,10 +149,8 @@ export class Config {
     return workspace.getConfiguration().update('dvc.defaultProject', path)
   }
 
-  private updateDefaultProjectStatusBarItem = (
-    path = this.getDefaultProject()
-  ): void => {
-    this.defaultProjectStatusBarItem.text = path
+  private updateDefaultProjectStatusBarItem = (): void => {
+    this.defaultProjectStatusBarItem.text = this.getDefaultProject()
   }
 
   private createStatusBarItem = (
