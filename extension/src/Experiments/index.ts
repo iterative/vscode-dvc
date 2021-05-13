@@ -42,7 +42,7 @@ export class Experiments {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
-  public refreshWebview = async () => {
+  public refresh = async () => {
     const tableData = await this.updateData()
     const outputHash = createHash('sha1')
       .update(JSON.stringify(tableData))
@@ -50,30 +50,20 @@ export class Experiments {
 
     if (
       outputHash !== this.lastExperimentsOutputHash &&
-      (await this.dataDelivered(tableData))
+      (await this.dataDelivered())
     ) {
       this.lastExperimentsOutputHash = outputHash
     }
   }
 
-  private dataDelivered(
-    tableData: ExperimentsRepoJSONOutput
-  ): Thenable<boolean> {
+  private dataDelivered(): Thenable<boolean> {
     if (!this.webview) {
       return Promise.resolve(false)
     }
-    return this.webview.showExperiments({
-      tableData
-    })
+    return this.sendData()
   }
 
   public showWebview = async () => {
-    const webview = await this.findOrCreateWebview()
-    await this.refreshWebview()
-    return webview
-  }
-
-  private findOrCreateWebview = async (): Promise<ExperimentsWebview> => {
     if (this.webview) {
       return this.webview.reveal()
     }
@@ -83,14 +73,18 @@ export class Experiments {
       this.resourceLocator
     )
     this.setWebview(webview)
+    this.sendData()
 
-    if (this.data) {
-      webview.showExperiments({
+    return webview
+  }
+
+  private sendData() {
+    if (this.data && this.webview) {
+      return this.webview.showExperiments({
         tableData: this.data
       })
     }
-
-    return webview
+    return Promise.resolve(false)
   }
 
   public async run(...args: Args) {
@@ -98,7 +92,7 @@ export class Experiments {
     this.runner.run(this.dvcRoot, ...args)
     const listener = this.dispose.track(
       this.runner.onDidCompleteProcess(() => {
-        this.refreshWebview()
+        this.refresh()
         this.dispose.untrack(listener)
         listener.dispose()
       })

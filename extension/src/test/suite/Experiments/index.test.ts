@@ -88,7 +88,7 @@ suite('Experiment Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-      expect(mockReader).to.have.been.calledOnce
+      expect(mockReader).not.to.have.been.called
     })
   })
 })

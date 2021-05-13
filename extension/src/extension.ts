@@ -199,7 +199,7 @@ export class Extension {
     }
     const experiments = this.experiments[dvcRoot]
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return onDidChangeFileSystem(refsPath, experiments.refreshWebview)
+    return onDidChangeFileSystem(refsPath, experiments.refresh)
   }
 
   private setCommandsAvailability(available: boolean) {
