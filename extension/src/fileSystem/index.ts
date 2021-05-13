@@ -6,7 +6,6 @@ import { join, resolve } from 'path'
 import { ExecutionOptions } from '../cli/execution'
 import { root } from '../cli/reader'
 import { definedAndNonEmpty } from '../util'
-import { window } from 'vscode'
 
 export const getWatcher = (handler: (path: string) => void) => (
   path: string
@@ -104,23 +103,4 @@ export const findDvcRootPaths = async (
   }
 
   return [absoluteRoot]
-}
-
-export const pickSingleRepositoryRoot = async (
-  options: ExecutionOptions,
-  providedRoot?: string
-): Promise<string | undefined> => {
-  if (providedRoot) {
-    return providedRoot
-  }
-
-  const dvcRoots = await findDvcRootPaths(options)
-  if (dvcRoots.length === 1) {
-    return dvcRoots[0]
-  }
-
-  return window.showQuickPick(dvcRoots, {
-    canPickMany: false,
-    placeHolder: 'Select which repository to run experiments in'
-  })
 }
