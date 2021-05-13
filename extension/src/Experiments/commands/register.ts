@@ -14,8 +14,13 @@ import { Experiments } from '..'
 const pickExperimentsThenRun = async (
   config: Config,
   experiments: Record<string, Experiments>,
+  activeExperiments: string | undefined,
   method: 'stop' | 'run' | 'runQueued' | 'runReset' | 'showWebview'
 ) => {
+  if (activeExperiments) {
+    const pickedExperiments = experiments[activeExperiments]
+    return pickedExperiments?.[method]()
+  }
   const dvcRoot = await pickDvcRoot(config)
   if (dvcRoot) {
     const pickedExperiments = experiments[dvcRoot]
@@ -25,6 +30,7 @@ const pickExperimentsThenRun = async (
 
 export const registerExperimentCommands = (
   experiments: Record<string, Experiments>,
+  activeExperiments: string | undefined,
   config: Config,
   disposer: Disposer
 ) => {
@@ -60,31 +66,41 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      pickExperimentsThenRun(config, experiments, 'run')
+      pickExperimentsThenRun(config, experiments, activeExperiments, 'run')
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      pickExperimentsThenRun(config, experiments, 'runReset')
+      pickExperimentsThenRun(config, experiments, activeExperiments, 'runReset')
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      pickExperimentsThenRun(config, experiments, 'runQueued')
+      pickExperimentsThenRun(
+        config,
+        experiments,
+        activeExperiments,
+        'runQueued'
+      )
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      pickExperimentsThenRun(config, experiments, 'showWebview')
+      pickExperimentsThenRun(
+        config,
+        experiments,
+        activeExperiments,
+        'showWebview'
+      )
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.stopRunningExperiment', () =>
-      pickExperimentsThenRun(config, experiments, 'stop')
+      pickExperimentsThenRun(config, experiments, activeExperiments, 'stop')
     )
   )
 }

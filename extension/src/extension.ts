@@ -286,7 +286,12 @@ export class Extension {
     )
     this.dispose.track(this.webviewManager)
 
-    registerExperimentCommands(this.experiments, this.config, this.dispose)
+    registerExperimentCommands(
+      this.experiments,
+      this.activeExperiments,
+      this.config,
+      this.dispose
+    )
 
     registerRepositoryCommands(this.config, this.dispose)
 
