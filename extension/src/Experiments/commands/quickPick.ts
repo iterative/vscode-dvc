@@ -8,11 +8,10 @@ import {
   experimentRemove
 } from '../../cli/executor'
 import { experimentListCurrent } from '../../cli/reader'
-import { Config } from '../../Config'
 import { quickPickManyValues } from '../../vscode/quickPick'
 import { reportStderrOrThrow } from '../../vscode/reporting'
 
-export const experimentGcQuickPick = async (config: Config) => {
+export const experimentGcQuickPick = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
     [
       {
@@ -41,14 +40,7 @@ export const experimentGcQuickPick = async (config: Config) => {
 
   if (quickPickResult) {
     try {
-      const stdout = await experimentGarbageCollect(
-        {
-          cwd: config.workspaceRoot,
-          cliPath: config.getCliPath(),
-          pythonBinPath: config.pythonBinPath
-        },
-        quickPickResult
-      )
+      const stdout = await experimentGarbageCollect(options, quickPickResult)
       window.showInformationMessage(stdout)
     } catch (e) {
       reportStderrOrThrow(e)
@@ -67,17 +59,12 @@ const experimentsQuickPick = async (options: ExecutionOptions) => {
 }
 
 const experimentsQuickPickCommand = async <T = void>(
-  config: Config,
+  options: ExecutionOptions,
   callback: (
     options: ExecutionOptions,
     selectedExperiment: string
   ) => Promise<T>
 ) => {
-  const options = {
-    cwd: config.workspaceRoot,
-    cliPath: config.getCliPath(),
-    pythonBinPath: config.pythonBinPath
-  }
   try {
     const selectedExperimentName = await experimentsQuickPick(options)
     if (selectedExperimentName) {
@@ -88,9 +75,9 @@ const experimentsQuickPickCommand = async <T = void>(
   }
 }
 
-export const applyExperimentFromQuickPick = (config: Config) =>
+export const applyExperimentFromQuickPick = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
-    config,
+    options,
     async (options, selectedExperimentName) => {
       window.showInformationMessage(
         await experimentApply(options, selectedExperimentName)
@@ -98,9 +85,9 @@ export const applyExperimentFromQuickPick = (config: Config) =>
     }
   )
 
-export const removeExperimentFromQuickPick = (config: Config) =>
+export const removeExperimentFromQuickPick = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
-    config,
+    options,
     async (options, selectedExperimentName) => {
       await experimentRemove(options, selectedExperimentName)
       window.showInformationMessage(
@@ -109,9 +96,9 @@ export const removeExperimentFromQuickPick = (config: Config) =>
     }
   )
 
-export const branchExperimentFromQuickPick = (config: Config) =>
+export const branchExperimentFromQuickPick = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
-    config,
+    options,
     async (options, selectedExperimentName) => {
       const branchName = await window.showInputBox({
         prompt: 'Name the new branch'

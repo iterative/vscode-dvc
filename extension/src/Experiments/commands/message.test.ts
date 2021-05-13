@@ -1,4 +1,3 @@
-import { Config } from '../../Config'
 import { experimentRunQueueCommand } from './message'
 import { mocked } from 'ts-jest/utils'
 import { executeProcess } from '../../processExecution'
@@ -25,23 +24,24 @@ beforeEach(() => {
 
 const defaultPath = '/home/user/project'
 
-const exampleConfig = {
-  getCliPath: () => 'dvc',
-  workspaceRoot: defaultPath
-} as Config
+const exampleExecutionOptions = {
+  cliPath: 'dvc',
+  cwd: defaultPath,
+  pythonBinPath: undefined
+}
 
 describe('experimentRunQueueCommand', () => {
   it('displays an info message with the contents of stdout when the command succeeds', async () => {
     const stdout = 'Example stdout that will be resolved literally'
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
-    await experimentRunQueueCommand(exampleConfig)
+    await experimentRunQueueCommand(exampleExecutionOptions)
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
   it('displays an error message with the contents of stderr when the command fails', async () => {
     const stderr = 'Example stderr that will be resolved literally'
     mockedExecuteProcess.mockRejectedValueOnce(stderr)
-    await experimentRunQueueCommand(exampleConfig)
+    await experimentRunQueueCommand(exampleExecutionOptions)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 })

@@ -9,14 +9,16 @@ import {
   removeExperimentFromQuickPick
 } from './quickPick'
 import { pickSingleRepositoryRoot } from '../../fileSystem'
+import { ExecutionOptions } from '../../cli/execution'
 
 export const pickRepoThenRun = async (
   config: Config,
-  func: (config: Config) => unknown
+  func: (options: ExecutionOptions) => unknown
 ) => {
   const dvcRoot = await pickSingleRepositoryRoot(config)
   if (dvcRoot) {
-    return func(config)
+    const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
+    return func(options)
   }
 }
 
