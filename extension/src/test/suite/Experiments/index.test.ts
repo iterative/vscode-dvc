@@ -18,7 +18,16 @@ const { expect } = chai
 suite('Experiment Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
 
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
+  const dvcDemoPath = resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'demo',
+    'demo1'
+  )
   const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
 
   const disposable = Disposable.fn()

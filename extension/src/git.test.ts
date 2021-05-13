@@ -14,7 +14,7 @@ describe('getAllUntracked', () => {
       'y.py'
     )
 
-    const dvcRoot = join(repositoryRoot, 'demo')
+    const dvcRoot = join(repositoryRoot, 'demo', 'demo1')
     const untrackedDir = join(dvcRoot, 'data', 'weeeee')
     const untrackedPerl = join(untrackedDir, 'fun.pl')
     const untrackedText = join(untrackedDir, 'text.txt')

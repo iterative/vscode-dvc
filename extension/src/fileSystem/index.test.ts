@@ -3,7 +3,6 @@ import { FSWatcher, watch } from 'chokidar'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
-import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
 import { root } from '../cli/reader'
 import { Disposable } from '../extension'
@@ -38,7 +37,9 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
+const multiDemoRepoPath = resolve(__dirname, '..', '..', '..', 'demo')
+const singleDemoRepoPath = resolve(multiDemoRepoPath, 'demo1')
+const otherDemoRepoPath = resolve(multiDemoRepoPath, 'demo2')
 
 describe('onDidChangeFileSystem', () => {
   it('should call fs.watch with the correct parameters', () => {
@@ -96,13 +97,17 @@ describe('onDidChangeFileType', () => {
 
     const handler = () => {}
 
-    onDidChangeFileType(dvcDemoPath, ['*.dvc', 'dvc.lock', 'dvc.yaml'], handler)
+    onDidChangeFileType(
+      singleDemoRepoPath,
+      ['*.dvc', 'dvc.lock', 'dvc.yaml'],
+      handler
+    )
     expect(addSpy).toBeCalledTimes(1)
     expect(addSpy).toBeCalledWith(
       [
-        join(dvcDemoPath, '**', '*.dvc'),
-        join(dvcDemoPath, '**', 'dvc.lock'),
-        join(dvcDemoPath, '**', 'dvc.yaml')
+        join(singleDemoRepoPath, '**', '*.dvc'),
+        join(singleDemoRepoPath, '**', 'dvc.lock'),
+        join(singleDemoRepoPath, '**', 'dvc.yaml')
       ],
       handler
     )
@@ -189,35 +194,29 @@ describe('ignoredDotDirectories', () => {
 })
 
 describe('findDvcRootPaths', () => {
-  const dataRoot = resolve(dvcDemoPath, 'data')
+  const dataRoot = resolve(singleDemoRepoPath, 'data')
   const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
     const dvcRoots = await findDvcRootPaths({
       cliPath: mockCliPath,
-      cwd: dvcDemoPath,
+      cwd: singleDemoRepoPath,
       pythonBinPath: undefined
     })
 
     expect(mockedRoot).not.toBeCalled()
-    expect(dvcRoots).toEqual([dvcDemoPath])
+    expect(dvcRoots).toEqual([singleDemoRepoPath])
   })
 
   it('should find multiple roots if available one directory below the given folder', async () => {
-    const parentDir = resolve(dvcDemoPath, '..')
-    const mockDvcRoot = join(parentDir, 'mockDvc')
-    ensureDirSync(join(mockDvcRoot, '.dvc'))
-
     const dvcRoots = await findDvcRootPaths({
       cliPath: mockCliPath,
-      cwd: parentDir,
+      cwd: multiDemoRepoPath,
       pythonBinPath: undefined
     })
 
-    remove(mockDvcRoot)
-
     expect(mockedRoot).not.toBeCalled()
-    expect(dvcRoots).toEqual([dvcDemoPath, mockDvcRoot].sort())
+    expect(dvcRoots).toEqual([singleDemoRepoPath, otherDemoRepoPath].sort())
   })
 
   it('should find the dvc root if it exists above the given folder', async () => {
@@ -228,7 +227,7 @@ describe('findDvcRootPaths', () => {
       pythonBinPath: undefined
     })
     expect(mockedRoot).toBeCalledTimes(1)
-    expect(dvcRoots).toEqual([dvcDemoPath])
+    expect(dvcRoots).toEqual([singleDemoRepoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
