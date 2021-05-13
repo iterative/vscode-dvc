@@ -8,7 +8,7 @@ import {
   garbageCollectExperiments,
   removeExperiment
 } from './quickPick'
-import { pickDvcRootThenRun, pickDvcRoot } from '../../fileSystem/workspace'
+import { pickDvcRootThenRun, getDvcRoot } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 
 const pickExperimentsThenRun = async (
@@ -16,7 +16,7 @@ const pickExperimentsThenRun = async (
   experiments: Record<string, Experiments>,
   method: 'stop' | 'run' | 'runQueued' | 'runReset' | 'showWebview'
 ) => {
-  const dvcRoot = await pickDvcRoot(config)
+  const dvcRoot = await getDvcRoot(config)
   if (dvcRoot) {
     const pickedExperiments = experiments[dvcRoot]
     return pickedExperiments?.[method]()

@@ -9,14 +9,7 @@ export const deleteTarget = (path: string) => {
   return workspace.applyEdit(edit)
 }
 
-export const pickDvcRoot = async (
-  config: Config
-): Promise<string | undefined> => {
-  const defaultProject = config.getDefaultProject()
-  if (defaultProject) {
-    return defaultProject
-  }
-
+const pickDvcRoot = async (config: Config): Promise<string | undefined> => {
   const options = config.getExecutionOptions()
 
   const dvcRoots = await findDvcRootPaths(options)
@@ -30,11 +23,14 @@ export const pickDvcRoot = async (
   })
 }
 
+export const getDvcRoot = (config: Config): Promise<string | undefined> =>
+  Promise.resolve(config.getDefaultProject() || pickDvcRoot(config))
+
 export const pickDvcRootThenRun = async (
   config: Config,
   func: (options: ExecutionOptions) => unknown
 ) => {
-  const dvcRoot = await pickDvcRoot(config)
+  const dvcRoot = await getDvcRoot(config)
   if (dvcRoot) {
     const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
     return func(options)

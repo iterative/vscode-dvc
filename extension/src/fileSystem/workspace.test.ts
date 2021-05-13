@@ -2,7 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
-import { deleteTarget, pickDvcRoot, pickDvcRootThenRun } from './workspace'
+import { deleteTarget, getDvcRoot, pickDvcRootThenRun } from './workspace'
 import { findDvcRootPaths } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -62,7 +62,7 @@ describe('pickDvcRoot', () => {
     })
     mockedGetDefaultProject.mockResolvedValueOnce(defaultProject)
 
-    const repoRoot = await pickDvcRoot(mockedConfig)
+    const repoRoot = await getDvcRoot(mockedConfig)
     expect(repoRoot).toEqual(defaultProject)
   })
 
@@ -77,7 +77,7 @@ describe('pickDvcRoot', () => {
 
     mockedFindDvcRootPaths.mockResolvedValueOnce([singleRepo])
 
-    const repoRoot = await pickDvcRoot(mockedConfig)
+    const repoRoot = await getDvcRoot(mockedConfig)
     expect(repoRoot).toEqual(singleRepo)
   })
 
@@ -100,7 +100,7 @@ describe('pickDvcRoot', () => {
       unselectedRepoC
     ])
 
-    const repoRoot = await pickDvcRoot(mockedConfig)
+    const repoRoot = await getDvcRoot(mockedConfig)
     expect(repoRoot).toEqual(selectedRepo)
   })
 
@@ -117,7 +117,7 @@ describe('pickDvcRoot', () => {
       unselectedRepoC
     ])
 
-    const repoRoot = await pickDvcRoot(mockedConfig)
+    const repoRoot = await getDvcRoot(mockedConfig)
     expect(repoRoot).toBeUndefined()
   })
 })
