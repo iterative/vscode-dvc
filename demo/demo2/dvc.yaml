@@ -1,23 +1,50 @@
 stages:
-  train:
-    cmd: python train.py
+  prepare:
+    cmd: python src/prepare.py data/data.xml
     deps:
-    - data/MNIST
-    - train.py
+    - data/data.xml
+    - src/prepare.py
     params:
-    - seed
-    - lr
-    - weight_decay
+    - prepare.seed
+    - prepare.split
     outs:
-    - model.pt:
-        checkpoint: true
-    plots:
-    - predictions.json:
+    - data/prepared
+  featurize:
+    cmd: python src/featurization.py data/prepared data/features
+    deps:
+    - data/prepared
+    - src/featurization.py
+    params:
+    - featurize.max_features
+    - featurize.ngrams
+    outs:
+    - data/features
+  train:
+    cmd: python src/train.py data/features model.pkl
+    deps:
+    - data/features
+    - src/train.py
+    params:
+    - train.min_split
+    - train.n_est
+    - train.seed
+    outs:
+    - model.pkl
+  evaluate:
+    cmd: python src/evaluate.py model.pkl data/features scores.json prc.json roc.json
+    deps:
+    - data/features
+    - model.pkl
+    - src/evaluate.py
+    metrics:
+    - scores.json:
         cache: false
-        template: confusion
-        x: actual
-        y: predicted
-    live:
-      logs:
-        summary: true
-        html: true
+    plots:
+    - prc.json:
+        cache: false
+        x: recall
+        y: precision
+    - roc.json:
+        cache: false
+        x: fpr
+        y: tpr

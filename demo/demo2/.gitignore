@@ -1,3 +1,2 @@
-/model.pt
-/data/MNIST/processed
-/logs
+.venv/
+/model.pkl
