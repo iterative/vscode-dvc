@@ -16,7 +16,7 @@ import {
   getPythonBinPath
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
-import { pickDvcRoot } from './fileSystem/workspace'
+import { getDvcRoot } from './fileSystem/workspace'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -146,7 +146,7 @@ export class Config {
     this.setDefaultProject(undefined)
 
   public selectDefaultProject = async (): Promise<void> => {
-    const dvcRoot = await pickDvcRoot(this)
+    const dvcRoot = await getDvcRoot(this)
     if (dvcRoot) {
       this.setDefaultProject(dvcRoot)
     }
