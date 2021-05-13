@@ -1,13 +1,13 @@
 import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../Config'
+import { experimentRunQueueCommand } from '../cli/vscode'
 import {
   applyExperimentFromQuickPick,
   branchExperimentFromQuickPick,
   experimentGcQuickPick,
-  experimentRunQueueCommand,
   removeExperimentFromQuickPick
-} from '../cli/vscode'
+} from './quickPick'
 
 export const registerExperimentCommands = (
   config: Config,
