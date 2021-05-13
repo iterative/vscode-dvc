@@ -17,7 +17,6 @@ import {
 import { Config } from './Config'
 import { WebviewManager } from './webviews/WebviewManager'
 import { Experiments } from './Experiments'
-import { Command, ExperimentFlag, ExperimentSubCommands } from './cli/args'
 import { registerExperimentCommands } from './Experiments/commands/register'
 import { registerRepositoryCommands } from './Repository/register'
 import {
@@ -25,7 +24,6 @@ import {
   onDidChangeFileSystem,
   onDidChangeFileType
 } from './fileSystem'
-import { pickSingleRepositoryRoot } from './fileSystem/workspace'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
@@ -210,61 +208,6 @@ export class Extension {
     setContextValue('dvc.project.available', available)
   }
 
-  private registerExperimentCommand(details: {
-    registeredName: string
-    method: 'stop' | 'run' | 'showWebview'
-    args?: (Command | ExperimentSubCommands | ExperimentFlag)[]
-  }) {
-    const { registeredName, method, args } = details
-    this.dispose.track(
-      commands.registerCommand(registeredName, async () => {
-        const dvcRoot = await pickSingleRepositoryRoot(this.config)
-
-        if (dvcRoot && this.experiments[dvcRoot]) {
-          return this.experiments[dvcRoot][method](...(args || []))
-        }
-      })
-    )
-  }
-
-  private registerCommands() {
-    this.registerExperimentCommand({
-      registeredName: 'dvc.runExperiment',
-      method: 'run',
-      args: [Command.EXPERIMENT, ExperimentSubCommands.RUN]
-    })
-
-    this.registerExperimentCommand({
-      registeredName: 'dvc.runResetExperiment',
-      method: 'run',
-      args: [
-        Command.EXPERIMENT,
-        ExperimentSubCommands.RUN,
-        ExperimentFlag.RESET
-      ]
-    })
-
-    this.registerExperimentCommand({
-      registeredName: 'dvc.runQueuedExperiments',
-      method: 'run',
-      args: [
-        Command.EXPERIMENT,
-        ExperimentSubCommands.RUN,
-        ExperimentFlag.RUN_ALL
-      ]
-    })
-
-    this.registerExperimentCommand({
-      registeredName: 'dvc.showExperiments',
-      method: 'showWebview'
-    })
-
-    this.registerExperimentCommand({
-      registeredName: 'dvc.stopRunningExperiment',
-      method: 'stop'
-    })
-  }
-
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -304,7 +247,7 @@ export class Extension {
     this.webviewManager = new WebviewManager(this.config)
     this.dispose.track(this.webviewManager)
 
-    registerExperimentCommands(this.config, this.dispose)
+    registerExperimentCommands(this.experiments, this.config, this.dispose)
 
     registerRepositoryCommands(this.config, this.dispose)
 
@@ -314,7 +257,6 @@ export class Extension {
         this.config.selectDvcPath()
       )
     )
-    this.registerCommands()
   }
 }
 
