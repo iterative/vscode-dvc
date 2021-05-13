@@ -274,14 +274,16 @@ describe('pickSingleRepositoryRoot', () => {
     const cwd = '/some/path/to'
     const optionallyProvidedRepo = `${cwd}/repo/b`
 
+    const mockedConfig = ({
+      getExecutionOptions: () => ({
+        cliPath: undefined,
+        cwd,
+        pythonBinPath: undefined
+      })
+    } as unknown) as Config
+
     const repoRoot = await pickSingleRepositoryRoot(
-      ({
-        getExecutionOptions: () => ({
-          cliPath: undefined,
-          cwd,
-          pythonBinPath: undefined
-        })
-      } as unknown) as Config,
+      mockedConfig,
       optionallyProvidedRepo
     )
     expect(repoRoot).toEqual(optionallyProvidedRepo)
@@ -290,17 +292,19 @@ describe('pickSingleRepositoryRoot', () => {
   it('should return the single repository if only one is found', async () => {
     const singleRepo = '/some/other/path/to/repo/a'
 
-    jest
-      .spyOn(FileSystem, 'findDvcRootPaths')
-      .mockResolvedValueOnce([singleRepo])
-
-    const repoRoot = await pickSingleRepositoryRoot(({
+    const mockedConfig = ({
       getExecutionOptions: () => ({
         cliPath: undefined,
         cwd: singleRepo,
         pythonBinPath: undefined
       })
-    } as unknown) as Config)
+    } as unknown) as Config
+
+    jest
+      .spyOn(FileSystem, 'findDvcRootPaths')
+      .mockResolvedValueOnce([singleRepo])
+
+    const repoRoot = await pickSingleRepositoryRoot(mockedConfig)
     expect(repoRoot).toEqual(singleRepo)
   })
 
@@ -309,19 +313,21 @@ describe('pickSingleRepositoryRoot', () => {
     const unselectedRepoB = '/path/to/repo/b'
     const unselectedRepoC = '/path/to/repo/c'
 
+    const mockedConfig = ({
+      getExecutionOptions: () => ({
+        cliPath: undefined,
+        cwd: '/path/to',
+        pythonBinPath: undefined
+      })
+    } as unknown) as Config
+
     mockedShowRepoQuickPick.mockResolvedValueOnce(selectedRepo)
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
 
-    const repoRoot = await pickSingleRepositoryRoot(({
-      getExecutionOptions: () => ({
-        cliPath: undefined,
-        cwd: '/path/to',
-        pythonBinPath: undefined
-      })
-    } as unknown) as Config)
+    const repoRoot = await pickSingleRepositoryRoot(mockedConfig)
     expect(repoRoot).toEqual(selectedRepo)
   })
 
@@ -330,19 +336,21 @@ describe('pickSingleRepositoryRoot', () => {
     const unselectedRepoB = '/repo/path/b'
     const unselectedRepoC = '/repo/path/c'
 
+    const mockedConfig = ({
+      getExecutionOptions: () => ({
+        cliPath: undefined,
+        cwd: '/some/path/to',
+        pythonBinPath: undefined
+      })
+    } as unknown) as Config
+
     mockedShowRepoQuickPick.mockResolvedValueOnce(undefined)
 
     jest
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
 
-    const repoRoot = await pickSingleRepositoryRoot(({
-      getExecutionOptions: () => ({
-        cliPath: undefined,
-        cwd: '/some/path/to',
-        pythonBinPath: undefined
-      })
-    } as unknown) as Config)
+    const repoRoot = await pickSingleRepositoryRoot(mockedConfig)
     expect(repoRoot).toBeUndefined()
   })
 })
