@@ -1,4 +1,4 @@
-import { queueExperiment } from './message'
+import { queueExperiment } from './report'
 import { mocked } from 'ts-jest/utils'
 import { executeProcess } from '../../processExecution'
 import { getProcessEnv } from '../../env'
