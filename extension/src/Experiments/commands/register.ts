@@ -3,10 +3,10 @@ import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import { experimentRunQueueCommand } from './message'
 import {
-  applyExperimentFromQuickPick,
-  branchExperimentFromQuickPick,
-  experimentGcQuickPick,
-  removeExperimentFromQuickPick
+  applyExperiment,
+  branchExperiment,
+  garbageCollectExperiments,
+  removeExperiment
 } from './quickPick'
 import { pickSingleRepositoryRoot } from '../../fileSystem'
 import { ExecutionOptions } from '../../cli/execution'
@@ -34,25 +34,25 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      pickRepoThenRun(config, experimentGcQuickPick)
+      pickRepoThenRun(config, garbageCollectExperiments)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      pickRepoThenRun(config, applyExperimentFromQuickPick)
+      pickRepoThenRun(config, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      pickRepoThenRun(config, branchExperimentFromQuickPick)
+      pickRepoThenRun(config, branchExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      pickRepoThenRun(config, removeExperimentFromQuickPick)
+      pickRepoThenRun(config, removeExperiment)
     )
   )
 }
