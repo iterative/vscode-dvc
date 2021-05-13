@@ -18,7 +18,7 @@ import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
 import { Experiments } from './Experiments'
 import { registerExperimentCommands } from './Experiments/commands/register'
-import { registerRepositoryCommands } from './Repository/register'
+import { registerRepositoryCommands } from './Repository/commands/register'
 import {
   findDvcRootPaths,
   onDidChangeFileSystem,
