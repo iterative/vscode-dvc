@@ -1,7 +1,7 @@
 import { window } from 'vscode'
-import { Config } from '../Config'
-import { reportStderrOrThrow } from '../vscode/reporting'
-import { experimentRunQueue } from './executor'
+import { Config } from '../../Config'
+import { reportStderrOrThrow } from '../../vscode/reporting'
+import { experimentRunQueue } from '../../cli/executor'
 
 export const experimentRunQueueCommand = async (config: Config) => {
   try {

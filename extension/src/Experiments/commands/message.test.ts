@@ -1,12 +1,12 @@
-import { Config } from '../Config'
-import { experimentRunQueueCommand } from './vscode'
+import { Config } from '../../Config'
+import { experimentRunQueueCommand } from './message'
 import { mocked } from 'ts-jest/utils'
-import { executeProcess } from '../processExecution'
-import { getProcessEnv } from '../env'
+import { executeProcess } from '../../processExecution'
+import { getProcessEnv } from '../../env'
 import { window } from 'vscode'
 
-jest.mock('../processExecution')
-jest.mock('../env')
+jest.mock('../../processExecution')
+jest.mock('../../env')
 jest.mock('vscode')
 
 const mockedExecuteProcess = mocked(executeProcess)
