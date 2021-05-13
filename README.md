@@ -38,7 +38,8 @@ check's details and to the summary of the Check run:
 ### Installing and Integrating With DVC CLI
 
 There are quite a few options for installing DVC, with one big split being
-whether DVC is installed globally or in a virtual environment.
+whether DVC is installed globally or in a virtual environment. This extension
+allows for a few different methods for picking how to run DVC.
 
 - Virtual environment recognition powered by the
   [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
