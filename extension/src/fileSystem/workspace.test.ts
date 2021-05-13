@@ -2,7 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
-import { deleteTarget, getDvcRoot, pickDvcRootThenRun } from './workspace'
+import { deleteTarget, getDvcRoot, runWithDvcRoot } from './workspace'
 import { findDvcRootPaths } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -52,7 +52,7 @@ describe('deleteTarget', () => {
   })
 })
 
-describe('pickDvcRoot', () => {
+describe('getDvcRoot', () => {
   it('should return the default project if provided', async () => {
     const defaultProject = `${mockedCwd}/repo/b`
     mockedGetExecutionOptions.mockResolvedValueOnce({
@@ -122,12 +122,12 @@ describe('pickDvcRoot', () => {
   })
 })
 
-describe('pickDvcRootThenRun', () => {
+describe('runWithDvcRoot', () => {
   it('should run the function if a DVC root is found or provided', async () => {
     mockedFindDvcRootPaths.mockResolvedValueOnce(['/root/nested/repo'])
 
     const mockedFunc = jest.fn()
-    await pickDvcRootThenRun(mockedConfig, mockedFunc)
+    await runWithDvcRoot(mockedConfig, mockedFunc)
     expect(mockedFunc).toBeCalledTimes(1)
   })
 
@@ -137,7 +137,7 @@ describe('pickDvcRootThenRun', () => {
     mockedFindDvcRootPaths.mockResolvedValueOnce([])
 
     const mockedFunc = jest.fn()
-    await pickDvcRootThenRun(mockedConfig, mockedFunc)
+    await runWithDvcRoot(mockedConfig, mockedFunc)
     expect(mockedFunc).toBeCalledTimes(0)
   })
 })

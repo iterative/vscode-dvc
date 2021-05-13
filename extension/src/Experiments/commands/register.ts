@@ -8,7 +8,7 @@ import {
   garbageCollectExperiments,
   removeExperiment
 } from './quickPick'
-import { pickDvcRootThenRun, getDvcRoot } from '../../fileSystem/workspace'
+import { runWithDvcRoot, getDvcRoot } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 
 const pickExperimentsThenRun = async (
@@ -30,31 +30,31 @@ export const registerExperimentCommands = (
 ) => {
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      pickDvcRootThenRun(config, queueExperiment)
+      runWithDvcRoot(config, queueExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      pickDvcRootThenRun(config, garbageCollectExperiments)
+      runWithDvcRoot(config, garbageCollectExperiments)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      pickDvcRootThenRun(config, applyExperiment)
+      runWithDvcRoot(config, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      pickDvcRootThenRun(config, branchExperiment)
+      runWithDvcRoot(config, branchExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      pickDvcRootThenRun(config, removeExperiment)
+      runWithDvcRoot(config, removeExperiment)
     )
   )
 

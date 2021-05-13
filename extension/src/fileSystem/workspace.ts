@@ -26,7 +26,7 @@ const pickDvcRoot = async (config: Config): Promise<string | undefined> => {
 export const getDvcRoot = (config: Config): Promise<string | undefined> =>
   Promise.resolve(config.getDefaultProject() || pickDvcRoot(config))
 
-export const pickDvcRootThenRun = async (
+export const runWithDvcRoot = async (
   config: Config,
   func: (options: ExecutionOptions) => unknown
 ) => {
