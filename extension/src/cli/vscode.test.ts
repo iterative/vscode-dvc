@@ -5,7 +5,6 @@ import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import { window } from 'vscode'
 
-jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
 jest.mock('vscode')

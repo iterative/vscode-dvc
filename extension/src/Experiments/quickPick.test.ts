@@ -12,7 +12,6 @@ import {
   removeExperimentFromQuickPick
 } from './quickPick'
 
-jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
 jest.mock('vscode')
