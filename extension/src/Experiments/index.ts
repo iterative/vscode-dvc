@@ -56,11 +56,9 @@ export class Experiments {
     }
   }
 
-  private dataDelivered(): Thenable<boolean> {
-    if (!this.webview) {
-      return Promise.resolve(false)
-    }
-    return this.sendData()
+  private async dataDelivered(): Promise<boolean> {
+    const sent = await this.sendData()
+    return !!sent
   }
 
   public showWebview = async () => {
@@ -84,7 +82,6 @@ export class Experiments {
         tableData: this.data
       })
     }
-    return Promise.resolve(false)
   }
 
   public async run(...args: Args) {
