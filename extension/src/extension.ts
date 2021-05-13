@@ -15,7 +15,7 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { Config } from './Config'
-import { WebviewManager } from './webviews/WebviewManager'
+import { WebviewManager } from './Webviews'
 import { Experiments } from './Experiments'
 import { Command, ExperimentFlag, ExperimentSubCommands } from './cli/args'
 import { registerExperimentCommands } from './Experiments/register'
