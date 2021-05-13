@@ -1,4 +1,5 @@
 import {
+  commands,
   Event,
   EventEmitter,
   ExtensionContext,
@@ -207,6 +208,20 @@ export class Extension {
     setContextValue('dvc.project.available', available)
   }
 
+  private registerConfigCommands() {
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDvcPath', () =>
+        this.config.selectDvcPath()
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDefaultProject', () =>
+        this.config.selectDefaultProject()
+      )
+    )
+  }
+
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
@@ -249,6 +264,8 @@ export class Extension {
     registerExperimentCommands(this.experiments, this.config, this.dispose)
 
     registerRepositoryCommands(this.config, this.dispose)
+
+    this.registerConfigCommands()
   }
 }
 

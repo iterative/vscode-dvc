@@ -5,8 +5,7 @@ import {
   Event,
   StatusBarItem,
   window,
-  workspace,
-  commands
+  workspace
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
@@ -210,21 +209,11 @@ export class Config {
       )
     )
 
-    this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', () => this.selectDvcPath())
-    )
-
     this.defaultProjectStatusBarItem = this.dispose.track(
       this.createStatusBarItem(
         'dvc.selectDefaultProject',
         'Current default project.',
         this.getDefaultProject()
-      )
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.selectDefaultProject', () =>
-        this.selectDefaultProject()
       )
     )
 
