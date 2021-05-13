@@ -1,6 +1,6 @@
 import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
-import { Config } from '../Config'
+import { Config } from '../../Config'
 import {
   addTarget,
   checkout,
@@ -9,7 +9,7 @@ import {
   commitTarget,
   pull,
   push
-} from '../cli/executor'
+} from '../../cli/executor'
 
 export const registerRepositoryCommands = (
   config: Config,
