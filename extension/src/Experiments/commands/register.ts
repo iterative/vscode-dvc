@@ -8,6 +8,17 @@ import {
   experimentGcQuickPick,
   removeExperimentFromQuickPick
 } from './quickPick'
+import { pickSingleRepositoryRoot } from '../../fileSystem'
+
+export const pickRepoThenRun = async (
+  config: Config,
+  func: (config: Config) => unknown
+) => {
+  const dvcRoot = await pickSingleRepositoryRoot(config)
+  if (dvcRoot) {
+    return func(config)
+  }
+}
 
 export const registerExperimentCommands = (
   config: Config,
@@ -15,31 +26,31 @@ export const registerExperimentCommands = (
 ) => {
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      experimentRunQueueCommand(config)
+      pickRepoThenRun(config, experimentRunQueueCommand)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      experimentGcQuickPick(config)
+      pickRepoThenRun(config, experimentGcQuickPick)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      applyExperimentFromQuickPick(config)
+      pickRepoThenRun(config, applyExperimentFromQuickPick)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      branchExperimentFromQuickPick(config)
+      pickRepoThenRun(config, branchExperimentFromQuickPick)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      removeExperimentFromQuickPick(config)
+      pickRepoThenRun(config, removeExperimentFromQuickPick)
     )
   )
 }

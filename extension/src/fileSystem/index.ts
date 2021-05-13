@@ -124,6 +124,6 @@ export const pickSingleRepositoryRoot = async (
 
   return window.showQuickPick(dvcRoots, {
     canPickMany: false,
-    placeHolder: 'Select which repository to run experiments in'
+    placeHolder: 'Select which repository to run command against'
   })
 }
