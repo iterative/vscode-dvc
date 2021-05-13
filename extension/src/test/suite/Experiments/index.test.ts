@@ -33,6 +33,8 @@ suite('Experiment Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiments webview visible', async () => {
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
       const config = disposable.track(new Config())
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -42,8 +44,6 @@ suite('Experiment Test Suite', () => {
         new Experiments(dvcDemoPath, config, runner, resourceLocator)
       )
 
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
       const webview = await experiments.showWebview()
 
       expect(webview.isActive()).to.be.true
@@ -51,6 +51,10 @@ suite('Experiment Test Suite', () => {
     })
 
     it('should only be able to open a single experiments webview', async () => {
+      const mockReader = stub(CliReader, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
       const config = disposable.track(new Config())
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -62,10 +66,6 @@ suite('Experiment Test Suite', () => {
 
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
-
-      const mockReader = stub(CliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
@@ -88,7 +88,7 @@ suite('Experiment Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-      expect(mockReader).to.have.been.calledOnce
+      expect(mockReader).not.to.have.been.called
     })
   })
 })

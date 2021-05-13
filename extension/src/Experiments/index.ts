@@ -1,4 +1,3 @@
-import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
@@ -8,6 +7,7 @@ import { Args } from '../cli/args'
 import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
+import { Logger } from '../common/Logger'
 
 export class Experiments {
   public readonly dispose = Disposable.fn()
@@ -19,46 +19,22 @@ export class Experiments {
   private readonly resourceLocator: ResourceLocator
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
-
-  private lastExperimentsOutputHash = ''
   private data?: ExperimentsRepoJSONOutput
-  public getData() {
-    return this.data
-  }
+  private lastExperimentsOutputHash = ''
 
-  private dataUpdateStarted: EventEmitter<
-    Thenable<ExperimentsRepoJSONOutput>
-  > = this.dispose.track(new EventEmitter())
-
-  public readonly onDidStartDataUpdate = this.dataUpdateStarted.event
-
-  private dataUpdated: EventEmitter<
-    ExperimentsRepoJSONOutput
-  > = this.dispose.track(new EventEmitter())
-
-  public readonly onDidUpdateData = this.dataUpdated.event
-
-  private dataUpdateFailed: EventEmitter<Error> = this.dispose.track(
-    new EventEmitter()
-  )
-
-  public readonly onDidFailDataUpdate = this.dataUpdateFailed.event
-
-  private async update(): Promise<ExperimentsRepoJSONOutput> {
+  private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
       try {
-        const updatePromise = experimentShow({
+        const experimentData = experimentShow({
           pythonBinPath: this.config.pythonBinPath,
           cliPath: this.config.getCliPath(),
           cwd: this.dvcRoot
         })
-        this.currentUpdatePromise = updatePromise
-        this.dataUpdateStarted.fire(updatePromise)
-        const experimentData = await updatePromise
-        this.dataUpdated.fire(experimentData)
+        this.currentUpdatePromise = experimentData
+        this.data = await experimentData
         return experimentData
       } catch (e) {
-        this.dataUpdateFailed.fire(e)
+        Logger.error(e)
       } finally {
         this.currentUpdatePromise = undefined
       }
@@ -66,38 +42,26 @@ export class Experiments {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
-  public refreshWebview = async () => {
-    const tableData = await this.update()
+  public refresh = async () => {
+    const tableData = await this.updateData()
     const outputHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
 
     if (
       outputHash !== this.lastExperimentsOutputHash &&
-      (await this.dataDelivered(tableData))
+      (await this.dataDelivered())
     ) {
       this.lastExperimentsOutputHash = outputHash
     }
   }
 
-  private dataDelivered(
-    tableData: ExperimentsRepoJSONOutput
-  ): Thenable<boolean> {
-    if (!this.webview) {
-      return Promise.resolve(false)
-    }
-    return this.webview.showExperiments({
-      tableData
-    })
+  private async dataDelivered(): Promise<boolean> {
+    const sent = await this.sendData()
+    return !!sent
   }
 
   public showWebview = async () => {
-    const webview = await this.findOrCreateWebview()
-    await this.refreshWebview()
-    return webview
-  }
-
-  private findOrCreateWebview = async (): Promise<ExperimentsWebview> => {
     if (this.webview) {
       return this.webview.reveal()
     }
@@ -107,8 +71,17 @@ export class Experiments {
       this.resourceLocator
     )
     this.setWebview(webview)
+    this.sendData()
 
     return webview
+  }
+
+  private sendData() {
+    if (this.data && this.webview) {
+      return this.webview.showExperiments({
+        tableData: this.data
+      })
+    }
   }
 
   public async run(...args: Args) {
@@ -116,7 +89,7 @@ export class Experiments {
     this.runner.run(this.dvcRoot, ...args)
     const listener = this.dispose.track(
       this.runner.onDidCompleteProcess(() => {
-        this.refreshWebview()
+        this.refresh()
         this.dispose.untrack(listener)
         listener.dispose()
       })
@@ -156,5 +129,7 @@ export class Experiments {
     }
     this.config = config
     this.resourceLocator = resourceLocator
+
+    this.updateData()
   }
 }
