@@ -15,10 +15,10 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { Config } from './Config'
-import { WebviewManager } from './webviews/WebviewManager'
+import { WebviewSerializer } from './WebviewSerializer'
 import { Experiments } from './Experiments'
 import { registerExperimentCommands } from './Experiments/commands/register'
-import { registerRepositoryCommands } from './Repository/register'
+import { registerRepositoryCommands } from './Repository/commands/register'
 import {
   findDvcRootPaths,
   onDidChangeFileSystem,
@@ -48,7 +48,7 @@ export class Extension {
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly webviewManager: WebviewManager
+  private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
@@ -244,8 +244,8 @@ export class Extension {
       this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
     )
 
-    this.webviewManager = new WebviewManager(this.config)
-    this.dispose.track(this.webviewManager)
+    this.webviewSerializer = new WebviewSerializer(this.config)
+    this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments, this.config, this.dispose)
 
