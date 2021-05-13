@@ -60,6 +60,16 @@ export class Extension {
     new EventEmitter<void>()
   )
 
+  protected readonly activeExperimentsChanged: EventEmitter<
+    string | undefined
+  > = this.dispose.track(new EventEmitter())
+
+  private readonly onDidChangeActiveExperiments: Event<
+    string | undefined
+  > = this.activeExperimentsChanged.event
+
+  private activeExperiments: string | undefined
+
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
     .event
 
@@ -256,6 +266,12 @@ export class Extension {
 
     this.dispose.track(
       this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
+    )
+
+    this.dispose.track(
+      this.onDidChangeActiveExperiments(
+        dvcRoot => (this.activeExperiments = dvcRoot)
+      )
     )
 
     this.webviewManager = new WebviewManager(this.config)
