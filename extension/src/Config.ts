@@ -15,6 +15,7 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
+import { ExecutionOptions } from './cli/execution'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -42,6 +43,14 @@ export class Config {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
+  }
+
+  public getExecutionOptions(): ExecutionOptions {
+    return {
+      cliPath: this.getCliPath(),
+      cwd: this.workspaceRoot,
+      pythonBinPath: this.pythonBinPath
+    }
   }
 
   @observable
