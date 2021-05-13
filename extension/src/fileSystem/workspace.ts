@@ -10,11 +10,11 @@ export const deleteTarget = (path: string) => {
 }
 
 export const pickDvcRoot = async (
-  config: Config,
-  providedRoot?: string
+  config: Config
 ): Promise<string | undefined> => {
-  if (providedRoot) {
-    return providedRoot
+  const defaultProject = config.getDefaultProject()
+  if (defaultProject) {
+    return defaultProject
   }
 
   const options = config.getExecutionOptions()
