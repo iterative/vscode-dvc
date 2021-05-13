@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
@@ -17,8 +18,9 @@ import { Logger } from '../common/Logger'
 export class Experiments {
   public readonly dispose = Disposable.fn()
 
-  private readonly config: Config
   private readonly dvcRoot: string
+  private readonly config: Config
+  protected readonly activeExperimentsChanged: EventEmitter<string | undefined>
   private readonly runner: Runner
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
@@ -73,6 +75,7 @@ export class Experiments {
 
     const webview = await ExperimentsWebview.create(
       this.config,
+      this.activeExperimentsChanged,
       this.resourceLocator
     )
     this.setWebview(webview)
@@ -136,11 +139,13 @@ export class Experiments {
   constructor(
     dvcRoot: string,
     config: Config,
+    activeExperimentsChanged: EventEmitter<string | undefined>,
     runner: Runner,
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
     this.runner = runner
+    this.activeExperimentsChanged = activeExperimentsChanged
 
     if (!config) {
       throw new Error('The Experiments class requires a Config instance!')

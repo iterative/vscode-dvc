@@ -3,7 +3,7 @@ import chai from 'chai'
 import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { resolve } from 'path'
-import { window, commands, workspace, Uri } from 'vscode'
+import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as CliReader from '../../../cli/reader'
 import { Runner } from '../../../cli/Runner'
@@ -36,12 +36,22 @@ suite('Experiment Test Suite', () => {
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const config = disposable.track(new Config())
+      const activeExperimentsChanged = disposable.track(
+        new EventEmitter<string | undefined>()
+      )
+      const runner = disposable.track(new Runner(config))
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const runner = disposable.track(new Runner(config))
+
       const experiments = disposable.track(
-        new Experiments(dvcDemoPath, config, runner, resourceLocator)
+        new Experiments(
+          dvcDemoPath,
+          config,
+          activeExperimentsChanged,
+          runner,
+          resourceLocator
+        )
       )
 
       const webview = await experiments.showWebview()
@@ -56,12 +66,22 @@ suite('Experiment Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
+      const runner = disposable.track(new Runner(config))
+      const activeExperimentsChanged = disposable.track(
+        new EventEmitter<string | undefined>()
+      )
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const runner = disposable.track(new Runner(config))
+
       const experiments = disposable.track(
-        new Experiments(dvcDemoPath, config, runner, resourceLocator)
+        new Experiments(
+          dvcDemoPath,
+          config,
+          activeExperimentsChanged,
+          runner,
+          resourceLocator
+        )
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

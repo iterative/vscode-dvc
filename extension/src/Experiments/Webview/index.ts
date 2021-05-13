@@ -1,4 +1,4 @@
-import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
+import { EventEmitter, window, ViewColumn, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -26,11 +26,14 @@ export class ExperimentsWebview {
 
   public static restore(
     webviewPanel: WebviewPanel,
-    config: Config
+    config: Config,
+    activeExperimentsChanged: EventEmitter<string | undefined>
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(webviewPanel, config))
+        resolve(
+          new ExperimentsWebview(webviewPanel, config, activeExperimentsChanged)
+        )
       } catch (e) {
         reject(e)
       }
@@ -39,6 +42,7 @@ export class ExperimentsWebview {
 
   public static async create(
     config: Config,
+    activeExperimentsChanged: EventEmitter<string | undefined>,
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
@@ -54,7 +58,11 @@ export class ExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new ExperimentsWebview(webviewPanel, config)
+    const view = new ExperimentsWebview(
+      webviewPanel,
+      config,
+      activeExperimentsChanged
+    )
     await view.initialized
     return view
   }
@@ -74,7 +82,8 @@ export class ExperimentsWebview {
 
   private constructor(
     private readonly webviewPanel: WebviewPanel,
-    private readonly config: Config
+    private readonly config: Config,
+    activeExperimentsChanged: EventEmitter<string | undefined>
   ) {
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
@@ -88,11 +97,23 @@ export class ExperimentsWebview {
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
-        ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
+        if (webviewPanel.active) {
+          ExperimentsWebview.setPanelActiveContext(true)
+          activeExperimentsChanged.fire('/Users/mattseddon/PP/vscode-dvc/demo')
+        } else {
+          ExperimentsWebview.setPanelActiveContext(false)
+          activeExperimentsChanged.fire(undefined)
+        }
       })
     )
 
-    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
+    if (webviewPanel.active) {
+      ExperimentsWebview.setPanelActiveContext(true)
+      activeExperimentsChanged.fire('/Users/mattseddon/PP/vscode-dvc/demo')
+    } else {
+      ExperimentsWebview.setPanelActiveContext(false)
+      activeExperimentsChanged.fire(undefined)
+    }
 
     this.disposer.track({
       dispose: autorun(async () => {
