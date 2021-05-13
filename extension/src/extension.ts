@@ -210,6 +210,12 @@ export class Extension {
 
   private registerConfigCommands() {
     this.dispose.track(
+      commands.registerCommand('dvc.deselectDefaultProject', () =>
+        this.config.deselectDefaultProject()
+      )
+    )
+
+    this.dispose.track(
       commands.registerCommand('dvc.selectDvcPath', () =>
         this.config.selectDvcPath()
       )

@@ -142,6 +142,9 @@ export class Config {
     return workspace.getConfiguration().get(this.defaultProjectOption, '')
   }
 
+  public deselectDefaultProject = (): Thenable<void> =>
+    this.setDefaultProject(undefined)
+
   public selectDefaultProject = async (): Promise<void> => {
     const dvcRoot = await pickDvcRoot(this)
     if (dvcRoot) {

@@ -108,6 +108,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.deselectDefaultProject%",
+        "command": "dvc.deselectDefaultProject",
+        "category": "DVC"
+      },
+      {
         "title": "%command.selectDefaultProject%",
         "command": "dvc.selectDefaultProject",
         "category": "DVC"
