@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from '../Experiments/Webview'
 import { Config } from '../Config'
 
-export class Webviews {
+export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
 
   private readonly config: Config

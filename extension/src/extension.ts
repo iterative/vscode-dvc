@@ -15,7 +15,7 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { Config } from './Config'
-import { Webviews } from './Webviews'
+import { WebviewSerializer } from './Webviews'
 import { Experiments } from './Experiments'
 import { Command, ExperimentFlag, ExperimentSubCommands } from './cli/args'
 import { registerExperimentCommands } from './Experiments/register'
@@ -50,7 +50,7 @@ export class Extension {
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly webviews: Webviews
+  private readonly webviews: WebviewSerializer
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
@@ -305,7 +305,7 @@ export class Extension {
       this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
     )
 
-    this.webviews = new Webviews(this.config)
+    this.webviews = new WebviewSerializer(this.config)
     this.dispose.track(this.webviews)
 
     registerExperimentCommands(this.config, this.dispose)
