@@ -1,5 +1,4 @@
 import {
-  commands,
   Event,
   EventEmitter,
   ExtensionContext,
@@ -250,13 +249,6 @@ export class Extension {
     registerExperimentCommands(this.experiments, this.config, this.dispose)
 
     registerRepositoryCommands(this.config, this.dispose)
-
-    // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
-    this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', () =>
-        this.config.selectDvcPath()
-      )
-    )
   }
 }
 

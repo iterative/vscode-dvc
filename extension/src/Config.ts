@@ -5,7 +5,8 @@ import {
   Event,
   StatusBarItem,
   window,
-  workspace
+  workspace,
+  commands
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
@@ -136,17 +137,21 @@ export class Config {
   @observable
   private defaultProjectStatusBarItem: StatusBarItem
 
+  private defaultProjectOption = 'dvc.defaultProject'
+
   public getDefaultProject() {
-    return workspace.getConfiguration().get('dvc.defaultProject', '')
+    return workspace.getConfiguration().get(this.defaultProjectOption, '')
   }
 
   public selectDefaultProject = async (): Promise<void> => {
     const dvcRoot = await pickDvcRoot(this)
-    this.setDefaultProject(dvcRoot)
+    if (dvcRoot) {
+      this.setDefaultProject(dvcRoot)
+    }
   }
 
   private setDefaultProject(path?: string): Thenable<void> {
-    return workspace.getConfiguration().update('dvc.defaultProject', path)
+    return workspace.getConfiguration().update(this.defaultProjectOption, path)
   }
 
   private updateDefaultProjectStatusBarItem = (): void => {
@@ -205,11 +210,21 @@ export class Config {
       )
     )
 
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDvcPath', () => this.selectDvcPath())
+    )
+
     this.defaultProjectStatusBarItem = this.dispose.track(
       this.createStatusBarItem(
-        'dvc.selectDvcPath',
+        'dvc.selectDefaultProject',
         'Current default project.',
         this.getDefaultProject()
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDefaultProject', () =>
+        this.selectDefaultProject()
       )
     )
 
@@ -221,7 +236,7 @@ export class Config {
         if (e.affectsConfiguration(this.dvcPathOption)) {
           this.updateDvcPathStatusBarItem()
         }
-        if (e.affectsConfiguration(this.dvcPathOption)) {
+        if (e.affectsConfiguration(this.defaultProjectOption)) {
           this.updateDefaultProjectStatusBarItem()
         }
       })
