@@ -5,7 +5,7 @@ import {
   Flag,
   ListFlag
 } from './args'
-import { ExperimentsRepoJSONOutput } from '../webviews/experiments/contract'
+import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
 import { ExecutionOptions, readCliProcess } from './execution'
 import { trimAndSplit } from '../util/stdout'
 

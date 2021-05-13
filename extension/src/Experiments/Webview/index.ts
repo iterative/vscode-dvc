@@ -174,7 +174,7 @@ export class ExperimentsWebview {
         'Cannot send message when webview is not initialized yet!'
       )
     }
-    this.webviewPanel.webview.postMessage(message)
+    return this.webviewPanel.webview.postMessage(message)
   }
 
   private handleMessage(message: MessageFromWebview) {
@@ -190,8 +190,8 @@ export class ExperimentsWebview {
       tableData?: ExperimentsRepoJSONOutput | null
       errors?: Error[]
     } = {}
-  ): void {
-    this.sendMessage({
+  ): Thenable<boolean> {
+    return this.sendMessage({
       type: MessageToWebviewType.showExperiments,
       ...payload
     })
