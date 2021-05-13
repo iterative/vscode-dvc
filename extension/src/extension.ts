@@ -218,11 +218,7 @@ export class Extension {
     const { registeredName, method, args } = details
     this.dispose.track(
       commands.registerCommand(registeredName, async () => {
-        const dvcRoot = await pickSingleRepositoryRoot({
-          cliPath: this.config.getCliPath(),
-          cwd: this.config.workspaceRoot,
-          pythonBinPath: this.config.pythonBinPath
-        })
+        const dvcRoot = await pickSingleRepositoryRoot(this.config)
 
         if (dvcRoot && this.experiments[dvcRoot]) {
           return this.experiments[dvcRoot][method](...(args || []))

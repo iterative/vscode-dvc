@@ -7,6 +7,7 @@ import { ExecutionOptions } from '../cli/execution'
 import { root } from '../cli/reader'
 import { definedAndNonEmpty } from '../util'
 import { window } from 'vscode'
+import { Config } from '../Config'
 
 export const getWatcher = (handler: (path: string) => void) => (
   path: string
@@ -107,12 +108,14 @@ export const findDvcRootPaths = async (
 }
 
 export const pickSingleRepositoryRoot = async (
-  options: ExecutionOptions,
+  config: Config,
   providedRoot?: string
 ): Promise<string | undefined> => {
   if (providedRoot) {
     return providedRoot
   }
+
+  const options = config.getExecutionOptions()
 
   const dvcRoots = await findDvcRootPaths(options)
   if (dvcRoots.length === 1) {

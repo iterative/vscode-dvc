@@ -7,6 +7,7 @@ import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
 import { root } from '../cli/reader'
 import { Disposable } from '../extension'
+import { Config } from '../Config'
 
 const {
   exists,
@@ -274,7 +275,13 @@ describe('pickSingleRepositoryRoot', () => {
     const optionallyProvidedRepo = `${cwd}/repo/b`
 
     const repoRoot = await pickSingleRepositoryRoot(
-      { cliPath: undefined, cwd, pythonBinPath: undefined },
+      ({
+        getExecutionOptions: () => ({
+          cliPath: undefined,
+          cwd,
+          pythonBinPath: undefined
+        })
+      } as unknown) as Config,
       optionallyProvidedRepo
     )
     expect(repoRoot).toEqual(optionallyProvidedRepo)
@@ -287,11 +294,13 @@ describe('pickSingleRepositoryRoot', () => {
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([singleRepo])
 
-    const repoRoot = await pickSingleRepositoryRoot({
-      cliPath: undefined,
-      cwd: singleRepo,
-      pythonBinPath: undefined
-    })
+    const repoRoot = await pickSingleRepositoryRoot(({
+      getExecutionOptions: () => ({
+        cliPath: undefined,
+        cwd: singleRepo,
+        pythonBinPath: undefined
+      })
+    } as unknown) as Config)
     expect(repoRoot).toEqual(singleRepo)
   })
 
@@ -306,11 +315,13 @@ describe('pickSingleRepositoryRoot', () => {
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
 
-    const repoRoot = await pickSingleRepositoryRoot({
-      cliPath: undefined,
-      cwd: '/path/to',
-      pythonBinPath: undefined
-    })
+    const repoRoot = await pickSingleRepositoryRoot(({
+      getExecutionOptions: () => ({
+        cliPath: undefined,
+        cwd: '/path/to',
+        pythonBinPath: undefined
+      })
+    } as unknown) as Config)
     expect(repoRoot).toEqual(selectedRepo)
   })
 
@@ -325,11 +336,13 @@ describe('pickSingleRepositoryRoot', () => {
       .spyOn(FileSystem, 'findDvcRootPaths')
       .mockResolvedValueOnce([selectedRepo, unselectedRepoB, unselectedRepoC])
 
-    const repoRoot = await pickSingleRepositoryRoot({
-      cliPath: undefined,
-      cwd: '/some/path/to',
-      pythonBinPath: undefined
-    })
+    const repoRoot = await pickSingleRepositoryRoot(({
+      getExecutionOptions: () => ({
+        cliPath: undefined,
+        cwd: '/some/path/to',
+        pythonBinPath: undefined
+      })
+    } as unknown) as Config)
     expect(repoRoot).toBeUndefined()
   })
 })
