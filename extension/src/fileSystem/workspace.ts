@@ -9,7 +9,7 @@ export const deleteTarget = (path: string) => {
   return workspace.applyEdit(edit)
 }
 
-export const pickSingleRepositoryRoot = async (
+export const pickDvcRoot = async (
   config: Config,
   providedRoot?: string
 ): Promise<string | undefined> => {
@@ -30,11 +30,11 @@ export const pickSingleRepositoryRoot = async (
   })
 }
 
-export const pickRepositoryRootThenRun = async (
+export const pickDvcRootThenRun = async (
   config: Config,
   func: (options: ExecutionOptions) => unknown
 ) => {
-  const dvcRoot = await pickSingleRepositoryRoot(config)
+  const dvcRoot = await pickDvcRoot(config)
   if (dvcRoot) {
     const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
     return func(options)
