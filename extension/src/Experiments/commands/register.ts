@@ -19,7 +19,7 @@ const pickExperimentsThenRun = async (
   const dvcRoot = await pickDvcRoot(config)
   if (dvcRoot) {
     const pickedExperiments = experiments[dvcRoot]
-    return pickedExperiments?.[method]
+    return pickedExperiments?.[method]()
   }
 }
 
