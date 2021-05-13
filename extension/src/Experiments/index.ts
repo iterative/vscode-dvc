@@ -75,6 +75,7 @@ export class Experiments {
 
     const webview = await ExperimentsWebview.create(
       this.config,
+      this.dvcRoot,
       this.activeExperimentsChanged,
       this.resourceLocator
     )

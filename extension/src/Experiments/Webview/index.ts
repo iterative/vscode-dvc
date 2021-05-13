@@ -42,6 +42,7 @@ export class ExperimentsWebview {
 
   public static async create(
     config: Config,
+    dvcRoot: string,
     activeExperimentsChanged: EventEmitter<string | undefined>,
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
@@ -61,7 +62,8 @@ export class ExperimentsWebview {
     const view = new ExperimentsWebview(
       webviewPanel,
       config,
-      activeExperimentsChanged
+      activeExperimentsChanged,
+      dvcRoot
     )
     await view.initialized
     return view
@@ -83,7 +85,8 @@ export class ExperimentsWebview {
   private constructor(
     private readonly webviewPanel: WebviewPanel,
     private readonly config: Config,
-    activeExperimentsChanged: EventEmitter<string | undefined>
+    activeExperimentsChanged: EventEmitter<string | undefined>,
+    dvcRoot?: string
   ) {
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
@@ -99,7 +102,7 @@ export class ExperimentsWebview {
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
         if (webviewPanel.active) {
           ExperimentsWebview.setPanelActiveContext(true)
-          activeExperimentsChanged.fire('/Users/mattseddon/PP/vscode-dvc/demo')
+          activeExperimentsChanged.fire(dvcRoot)
         } else {
           ExperimentsWebview.setPanelActiveContext(false)
           activeExperimentsChanged.fire(undefined)
@@ -109,7 +112,7 @@ export class ExperimentsWebview {
 
     if (webviewPanel.active) {
       ExperimentsWebview.setPanelActiveContext(true)
-      activeExperimentsChanged.fire('/Users/mattseddon/PP/vscode-dvc/demo')
+      activeExperimentsChanged.fire(dvcRoot)
     } else {
       ExperimentsWebview.setPanelActiveContext(false)
       activeExperimentsChanged.fire(undefined)
