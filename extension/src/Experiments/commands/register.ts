@@ -9,7 +9,7 @@ import {
   removeExperiment
 } from './quickPick'
 import {
-  pickRepoThenRun,
+  pickRepositoryRootThenRun,
   pickSingleRepositoryRoot
 } from '../../fileSystem/workspace'
 import { Experiments } from '..'
@@ -33,31 +33,31 @@ export const registerExperimentCommands = (
 ) => {
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      pickRepoThenRun(config, queueExperiment)
+      pickRepositoryRootThenRun(config, queueExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      pickRepoThenRun(config, garbageCollectExperiments)
+      pickRepositoryRootThenRun(config, garbageCollectExperiments)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      pickRepoThenRun(config, applyExperiment)
+      pickRepositoryRootThenRun(config, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      pickRepoThenRun(config, branchExperiment)
+      pickRepositoryRootThenRun(config, branchExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      pickRepoThenRun(config, removeExperiment)
+      pickRepositoryRootThenRun(config, removeExperiment)
     )
   )
 

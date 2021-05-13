@@ -30,7 +30,7 @@ export const pickSingleRepositoryRoot = async (
   })
 }
 
-export const pickRepoThenRun = async (
+export const pickRepositoryRootThenRun = async (
   config: Config,
   func: (options: ExecutionOptions) => unknown
 ) => {
