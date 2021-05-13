@@ -1,7 +1,7 @@
 import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../../Config'
-import { queueExperiment } from './message'
+import { queueExperiment } from './report'
 import {
   applyExperiment,
   branchExperiment,
