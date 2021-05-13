@@ -187,6 +187,12 @@
     "configuration": {
       "title": "DVC",
       "properties": {
+        "dvc.defaultProject": {
+          "title": "%config.defaultProject.title%",
+          "description": "%config.defaultProject.description%",
+          "type": "string",
+          "scope": "resource"
+        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",

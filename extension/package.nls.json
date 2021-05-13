@@ -26,5 +26,7 @@
   "command.selectDvcPath": "Select DVC CLI Path",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
-  "config.dvcPath.title": "DVC CLI Path"
+  "config.dvcPath.title": "DVC CLI Path",
+  "config.defaultProject.description": "When enabled all generic commands will be run against this project.",
+  "config.defaultProject.title": "DVC Default Project"
 }
