@@ -23,15 +23,15 @@ installable vsix build of the extension for every commit, complete with the Git
 SHA appended to the extension version.
 
 You can find the download link in the Artifacts list of any run of the
-Continuous Integration workflow. 
+Continuous Integration workflow.
 
 ![Screenshot_2021-05-12 iterative vscode-dvc](https://user-images.githubusercontent.com/9111807/118053924-64d0e000-b353-11eb-8d3d-7e202d741f54.png)
 
-The easiest way to get to the build for any
-particular branch is to use the GitHub Checks UI to get to the details of the
-"Continuous Integration" run: next to any commit, its CI status will show up 
-as an icon next to it. From there, you can get to that commit's vsix in a 
-few clicks:
+The easiest way to get to the build for any particular branch is to use the
+GitHub Checks UI to get to the details of the "Continuous Integration" run: next
+to any commit, its CI status will show up as an icon next to it. From there, you
+can get to that commit's vsix in a few clicks through the Continuous Integration
+check's details and to the summary of the Check run:
 
 ![Guide to get from Checks status to Artifacts](https://user-images.githubusercontent.com/9111807/118057990-19bacb00-b35b-11eb-9030-558e802668f1.png)
 
@@ -76,7 +76,7 @@ available when the table is visible.
 
 ### SCM
 
-The extension also provides a view in the SCM view container, next to the Git 
+The extension also provides a view in the SCM view container, next to the Git
 view, to manage file actions like checkout, pull, push, and add.
 
 ![image](https://user-images.githubusercontent.com/9111807/118057076-19b9cb80-b359-11eb-91bc-9c73a85a83a8.png)
