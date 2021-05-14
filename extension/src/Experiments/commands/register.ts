@@ -14,8 +14,8 @@ import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
 const pickExperimentsThenRun = async (
-  config: Config,
   experiments: Record<string, Experiments>,
+  config: Config,
   runner?: Runner,
   method?: typeof run | typeof runQueued | typeof runReset
 ) => {
@@ -67,25 +67,25 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      pickExperimentsThenRun(config, experiments, runner, run)
+      pickExperimentsThenRun(experiments, config, runner, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      pickExperimentsThenRun(config, experiments, runner, runReset)
+      pickExperimentsThenRun(experiments, config, runner, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      pickExperimentsThenRun(config, experiments, runner, runQueued)
+      pickExperimentsThenRun(experiments, config, runner, runQueued)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      pickExperimentsThenRun(config, experiments)
+      pickExperimentsThenRun(experiments, config)
     )
   )
 
