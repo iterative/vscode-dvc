@@ -295,11 +295,10 @@ export class Extension {
       this.config,
       this.experiments,
       this.activeExperiments,
-      this.runner,
-      this.dispose
+      this.runner
     )
 
-    registerRepositoryCommands(this.config, this.dispose)
+    this.dispose.track(registerRepositoryCommands(this.config))
 
     this.registerConfigCommands()
   }
