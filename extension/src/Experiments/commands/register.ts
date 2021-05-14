@@ -105,5 +105,7 @@ export const registerExperimentCommands = (
     )
   )
 
-  disposer.track(commands.registerCommand('dvc.stopRunningExperiment', stop))
+  disposer.track(
+    commands.registerCommand('dvc.stopRunningExperiment', () => stop(runner))
+  )
 }
