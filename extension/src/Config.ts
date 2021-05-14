@@ -29,8 +29,12 @@ export class Config {
 
   public readonly workspaceRoot: string
 
-  private executionDetailsChanged: EventEmitter<void>
-  public readonly onDidChangeExecutionDetails: Event<void>
+  private executionDetailsChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter()
+  )
+
+  public readonly onDidChangeExecutionDetails: Event<void> = this
+    .executionDetailsChanged.event
 
   @observable
   public pythonBinPath: string | undefined
@@ -172,9 +176,6 @@ export class Config {
     )
 
     this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
-
-    this.executionDetailsChanged = this.dispose.track(new EventEmitter<void>())
-    this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
