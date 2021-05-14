@@ -30,11 +30,11 @@ export const getExperimentsThenRun = async (
   config: Config,
   runner: Runner,
   disposer: Disposer,
-  method: typeof run | typeof runQueued | typeof runReset
+  func: typeof run | typeof runQueued | typeof runReset
 ) => {
   const exps = await getExperiments(experiments, config)
   if (exps) {
-    method(runner, exps.getDvcRoot())
+    func(runner, exps.getDvcRoot())
     const listener = disposer.track(
       runner.onDidCompleteProcess(() => {
         exps.refresh()
