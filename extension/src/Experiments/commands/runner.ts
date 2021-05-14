@@ -34,3 +34,5 @@ export const runReset = (runner: Runner, experiments: Experiments) =>
 
 export const runQueued = (runner: Runner, experiments: Experiments) =>
   runExperiment(runner, experiments, ExperimentFlag.RUN_ALL)
+
+export const stopExperiment = (runner: Runner) => runner.stop()
