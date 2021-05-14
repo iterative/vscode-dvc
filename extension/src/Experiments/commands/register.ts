@@ -18,13 +18,7 @@ const getExperiments = async (
   experiments: Record<string, Experiments>,
   activeExperiments: string | undefined
 ) => {
-  if (activeExperiments) {
-    const pickedExperiments = experiments[activeExperiments]
-    await pickedExperiments?.showWebview()
-    return pickedExperiments
-  }
-
-  const dvcRoot = await getDvcRoot(config)
+  const dvcRoot = activeExperiments || (await getDvcRoot(config))
   if (!dvcRoot) {
     return
   }
