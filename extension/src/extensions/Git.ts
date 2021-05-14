@@ -68,7 +68,7 @@ class GitExtensionRepository {
 
   private changed: EventEmitter<void> = this.dispose.track(new EventEmitter())
 
-  readonly onDidChange: Event<void> = this.changed.event
+  public readonly onDidChange: Event<void> = this.changed.event
 
   private repositoryRoot: string
 
