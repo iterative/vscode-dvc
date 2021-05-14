@@ -146,7 +146,10 @@ export class Config {
     this.setDefaultProject(undefined)
 
   public selectDefaultProject = async (): Promise<void> => {
-    const dvcRoot = await pickDvcRoot(this)
+    const dvcRoot = await pickDvcRoot(
+      this,
+      'Select a default project to run all commands against'
+    )
     if (dvcRoot) {
       this.setDefaultProject(dvcRoot)
     }

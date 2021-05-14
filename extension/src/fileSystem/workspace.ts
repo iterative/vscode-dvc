@@ -10,7 +10,8 @@ export const deleteTarget = (path: string) => {
 }
 
 export const pickDvcRoot = async (
-  config: Config
+  config: Config,
+  placeHolder = 'Select which repository to run against'
 ): Promise<string | undefined> => {
   const options = config.getExecutionOptions()
 
@@ -21,7 +22,7 @@ export const pickDvcRoot = async (
 
   return window.showQuickPick(dvcRoots, {
     canPickMany: false,
-    placeHolder: 'Select which repository to run command against'
+    placeHolder
   })
 }
 
