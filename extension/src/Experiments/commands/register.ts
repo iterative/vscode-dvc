@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { Disposer } from '@hediet/std/disposable'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import { queueExperiment } from './report'
 import {
@@ -52,9 +52,10 @@ export const getExperimentsThenRun = async (
 export const registerExperimentCommands = (
   config: Config,
   experiments: Record<string, Experiments>,
-  runner: Runner,
-  disposer: Disposer
+  runner: Runner
 ) => {
+  const disposer = Disposable.fn()
+
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
       getDvcRootThenRun(config, queueExperiment)
@@ -112,4 +113,6 @@ export const registerExperimentCommands = (
   disposer.track(
     commands.registerCommand('dvc.stopRunningExperiment', () => stop(runner))
   )
+
+  return disposer
 }
