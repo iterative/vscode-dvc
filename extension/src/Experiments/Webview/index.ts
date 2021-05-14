@@ -45,6 +45,11 @@ export class ExperimentsWebview {
   public readonly onDidChangeActiveExperiments: Event<string | undefined> = this
     .activeExperimentsChanged.event
 
+  private readonly webviewPanel: WebviewPanel
+  private readonly config: Config
+
+  public readonly onDidDispose: Event<void>
+
   public static restore(
     webviewPanel: WebviewPanel,
     config: Config,
@@ -82,8 +87,6 @@ export class ExperimentsWebview {
     return view
   }
 
-  public readonly onDidDispose = this.webviewPanel.onDidDispose
-
   public reveal = () => {
     this.webviewPanel.reveal()
     return this
@@ -97,10 +100,14 @@ export class ExperimentsWebview {
   }
 
   private constructor(
-    private readonly webviewPanel: WebviewPanel,
-    private readonly config: Config,
+    webviewPanel: WebviewPanel,
+    config: Config,
     dvcRoot: string
   ) {
+    this.webviewPanel = webviewPanel
+    this.onDidDispose = this.webviewPanel.onDidDispose
+
+    this.config = config
     this.dvcRoot = dvcRoot
 
     webviewPanel.onDidDispose(() => {

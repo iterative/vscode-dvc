@@ -55,8 +55,12 @@ export class DecorationProvider implements FileDecorationProvider {
   @observable
   private state: DecorationState
 
-  private readonly decorationsChanged: EventEmitter<Uri[]>
-  public readonly onDidChangeFileDecorations: Event<Uri[]>
+  private readonly decorationsChanged: EventEmitter<Uri[]> = new EventEmitter<
+    Uri[]
+  >()
+
+  public readonly onDidChangeFileDecorations: Event<Uri[]> = this
+    .decorationsChanged.event
 
   private isValidStatus(status: string): boolean {
     return isStringInEnum(status, Status)
@@ -88,9 +92,6 @@ export class DecorationProvider implements FileDecorationProvider {
 
   constructor() {
     makeObservable(this)
-
-    this.decorationsChanged = new EventEmitter<Uri[]>()
-    this.onDidChangeFileDecorations = this.decorationsChanged.event
 
     this.state = {} as DecorationState
 
