@@ -22,9 +22,9 @@ const getExperiments = async (
     return
   }
 
-  const pickedExperiments = experiments[dvcRoot]
-  await pickedExperiments?.showWebview()
-  return pickedExperiments
+  const exps = experiments[dvcRoot]
+  await exps?.showWebview()
+  return exps
 }
 
 export const getExperimentsThenRun = async (
