@@ -21,9 +21,9 @@ import { init, pullTarget, pushTarget, removeTarget } from '../../cli/executor'
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
-  private treeDataChanged: EventEmitter<string | void> = this.dispose.track(
-    new EventEmitter()
-  )
+  private readonly treeDataChanged: EventEmitter<
+    string | void
+  > = this.dispose.track(new EventEmitter())
 
   public readonly onDidChangeTreeData: Event<string | void> = this
     .treeDataChanged.event

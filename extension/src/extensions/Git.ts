@@ -66,7 +66,9 @@ interface VscodeGit {
 class GitExtensionRepository {
   public dispose = Disposable.fn()
 
-  private changed: EventEmitter<void> = this.dispose.track(new EventEmitter())
+  private readonly changed: EventEmitter<void> = this.dispose.track(
+    new EventEmitter()
+  )
 
   public readonly onDidChange: Event<void> = this.changed.event
 

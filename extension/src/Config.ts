@@ -29,9 +29,9 @@ export class Config {
 
   public readonly workspaceRoot: string
 
-  private executionDetailsChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter()
-  )
+  private readonly executionDetailsChanged: EventEmitter<
+    void
+  > = this.dispose.track(new EventEmitter())
 
   public readonly onDidChangeExecutionDetails: Event<void> = this
     .executionDetailsChanged.event
