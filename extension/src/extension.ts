@@ -60,14 +60,6 @@ export class Extension {
     new EventEmitter<void>()
   )
 
-  protected readonly activeExperimentsChanged: EventEmitter<
-    string | undefined
-  > = this.dispose.track(new EventEmitter())
-
-  private readonly onDidChangeActiveExperiments: Event<
-    string | undefined
-  > = this.activeExperimentsChanged.event
-
   private activeExperiments: string | undefined
 
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
@@ -165,12 +157,15 @@ export class Extension {
 
   private initializeExperiments() {
     this.dvcRoots.forEach(dvcRoot => {
-      this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(
-          dvcRoot,
-          this.config,
-          this.activeExperimentsChanged,
-          this.resourceLocator
+      const experiments = this.dispose.track(
+        new Experiments(dvcRoot, this.config, this.resourceLocator)
+      )
+
+      this.experiments[dvcRoot] = experiments
+
+      this.dispose.track(
+        experiments.onDidChangeActiveExperiments(
+          dvcRoot => (this.activeExperiments = dvcRoot)
         )
       )
     })
@@ -279,16 +274,7 @@ export class Extension {
       this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
     )
 
-    this.dispose.track(
-      this.onDidChangeActiveExperiments(
-        dvcRoot => (this.activeExperiments = dvcRoot)
-      )
-    )
-
-    this.webviewSerializer = new WebviewSerializer(
-      this.config,
-      this.activeExperimentsChanged
-    )
+    this.webviewSerializer = new WebviewSerializer(this.config)
     this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(

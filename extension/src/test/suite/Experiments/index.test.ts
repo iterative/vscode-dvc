@@ -3,7 +3,7 @@ import chai from 'chai'
 import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { resolve } from 'path'
-import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
+import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as CliReader from '../../../cli/reader'
 import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
@@ -35,20 +35,12 @@ suite('Experiment Test Suite', () => {
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const config = disposable.track(new Config())
-      const activeExperimentsChanged = disposable.track(
-        new EventEmitter<string | undefined>()
-      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experiments = disposable.track(
-        new Experiments(
-          dvcDemoPath,
-          config,
-          activeExperimentsChanged,
-          resourceLocator
-        )
+        new Experiments(dvcDemoPath, config, resourceLocator)
       )
 
       const webview = await experiments.showWebview()
@@ -63,20 +55,12 @@ suite('Experiment Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const activeExperimentsChanged = disposable.track(
-        new EventEmitter<string | undefined>()
-      )
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
 
       const experiments = disposable.track(
-        new Experiments(
-          dvcDemoPath,
-          config,
-          activeExperimentsChanged,
-          resourceLocator
-        )
+        new Experiments(dvcDemoPath, config, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

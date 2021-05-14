@@ -1,4 +1,11 @@
-import { EventEmitter, window, ViewColumn, WebviewPanel, Uri } from 'vscode'
+import {
+  Event,
+  EventEmitter,
+  window,
+  ViewColumn,
+  WebviewPanel,
+  Uri
+} from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -20,20 +27,32 @@ import { setContextValue } from '../../vscode/context'
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
 
+  private readonly disposer = Disposable.fn()
+
+  private readonly deferred = new Deferred()
+
+  protected readonly initialized = this.deferred.promise
+
   public isActive = () => this.webviewPanel.active
 
   public isVisible = () => this.webviewPanel.visible
 
+  private dvcRoot: string
+  private readonly activeExperimentsChanged: EventEmitter<
+    string | undefined
+  > = this.disposer.track(new EventEmitter())
+
+  public readonly onDidChangeActiveExperiments: Event<string | undefined> = this
+    .activeExperimentsChanged.event
+
   public static restore(
     webviewPanel: WebviewPanel,
     config: Config,
-    activeExperimentsChanged: EventEmitter<string | undefined>
+    dvcRoot: string
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(
-          new ExperimentsWebview(webviewPanel, config, activeExperimentsChanged)
-        )
+        resolve(new ExperimentsWebview(webviewPanel, config, dvcRoot))
       } catch (e) {
         reject(e)
       }
@@ -43,7 +62,6 @@ export class ExperimentsWebview {
   public static async create(
     config: Config,
     dvcRoot: string,
-    activeExperimentsChanged: EventEmitter<string | undefined>,
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
@@ -59,21 +77,10 @@ export class ExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new ExperimentsWebview(
-      webviewPanel,
-      config,
-      activeExperimentsChanged,
-      dvcRoot
-    )
+    const view = new ExperimentsWebview(webviewPanel, config, dvcRoot)
     await view.initialized
     return view
   }
-
-  private readonly disposer = Disposable.fn()
-
-  private readonly deferred = new Deferred()
-
-  protected readonly initialized = this.deferred.promise
 
   public readonly onDidDispose = this.webviewPanel.onDidDispose
 
@@ -82,12 +89,20 @@ export class ExperimentsWebview {
     return this
   }
 
+  private notifyActive(webviewPanel: WebviewPanel) {
+    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
+
+    const active = webviewPanel.active ? this.dvcRoot : undefined
+    this.activeExperimentsChanged.fire(active)
+  }
+
   private constructor(
     private readonly webviewPanel: WebviewPanel,
     private readonly config: Config,
-    activeExperimentsChanged: EventEmitter<string | undefined>,
-    dvcRoot?: string
+    dvcRoot: string
   ) {
+    this.dvcRoot = dvcRoot
+
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
       this.disposer.dispose()
@@ -100,23 +115,11 @@ export class ExperimentsWebview {
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
-        if (webviewPanel.active) {
-          ExperimentsWebview.setPanelActiveContext(true)
-          activeExperimentsChanged.fire(dvcRoot)
-        } else {
-          ExperimentsWebview.setPanelActiveContext(false)
-          activeExperimentsChanged.fire(undefined)
-        }
+        this.notifyActive(webviewPanel)
       })
     )
 
-    if (webviewPanel.active) {
-      ExperimentsWebview.setPanelActiveContext(true)
-      activeExperimentsChanged.fire(dvcRoot)
-    } else {
-      ExperimentsWebview.setPanelActiveContext(false)
-      activeExperimentsChanged.fire(undefined)
-    }
+    this.notifyActive(webviewPanel)
 
     this.disposer.track({
       dispose: autorun(async () => {
