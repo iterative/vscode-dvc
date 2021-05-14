@@ -71,6 +71,7 @@ export class Experiments {
   }
 
   public showWebview = async () => {
+    this.activeExperimentsChanged.fire(this.dvcRoot)
     if (this.webview) {
       return this.webview.reveal()
     }
