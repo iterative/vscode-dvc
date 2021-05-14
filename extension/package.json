@@ -108,6 +108,16 @@
         "category": "DVC"
       },
       {
+        "title": "%command.deselectDefaultProject%",
+        "command": "dvc.deselectDefaultProject",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.selectDefaultProject%",
+        "command": "dvc.selectDefaultProject",
+        "category": "DVC"
+      },
+      {
         "title": "%command.selectDvcPath%",
         "command": "dvc.selectDvcPath",
         "category": "DVC"
@@ -187,6 +197,12 @@
     "configuration": {
       "title": "DVC",
       "properties": {
+        "dvc.defaultProject": {
+          "title": "%config.defaultProject.title%",
+          "description": "%config.defaultProject.description%",
+          "type": "string",
+          "scope": "resource"
+        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",

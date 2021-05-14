@@ -16,6 +16,7 @@ import {
   getPythonBinPath
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
+import { getDvcRoot } from './fileSystem/workspace'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -89,16 +90,6 @@ export class Config {
     return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
-  private createDvcPathStatusBarItem = () => {
-    const dvcPathStatusBarItem = window.createStatusBarItem()
-
-    dvcPathStatusBarItem.tooltip = 'Current DVC path.'
-    dvcPathStatusBarItem.command = 'dvc.selectDvcPath'
-    dvcPathStatusBarItem.text = this.getCliPath()
-    dvcPathStatusBarItem.show()
-    return dvcPathStatusBarItem
-  }
-
   private getDvcPathQuickPickOptions() {
     return [
       {
@@ -142,6 +133,48 @@ export class Config {
     }
   }
 
+  @observable
+  private defaultProjectStatusBarItem: StatusBarItem
+
+  private defaultProjectOption = 'dvc.defaultProject'
+
+  public getDefaultProject() {
+    return workspace.getConfiguration().get(this.defaultProjectOption, '')
+  }
+
+  public deselectDefaultProject = (): Thenable<void> =>
+    this.setDefaultProject(undefined)
+
+  public selectDefaultProject = async (): Promise<void> => {
+    const dvcRoot = await getDvcRoot(this)
+    if (dvcRoot) {
+      this.setDefaultProject(dvcRoot)
+    }
+  }
+
+  private setDefaultProject(path?: string): Thenable<void> {
+    return workspace.getConfiguration().update(this.defaultProjectOption, path)
+  }
+
+  private updateDefaultProjectStatusBarItem = (): void => {
+    this.defaultProjectStatusBarItem.text = this.getDefaultProject()
+  }
+
+  private createStatusBarItem = (
+    command: string,
+    tooltip: string,
+    text: string
+  ) => {
+    const dvcPathStatusBarItem = window.createStatusBarItem()
+
+    dvcPathStatusBarItem.tooltip = tooltip
+    dvcPathStatusBarItem.command = command
+    dvcPathStatusBarItem.text = text
+    dvcPathStatusBarItem.show()
+
+    return dvcPathStatusBarItem
+  }
+
   constructor() {
     makeObservable(this)
 
@@ -171,7 +204,21 @@ export class Config {
       })
     )
 
-    this.dvcPathStatusBarItem = this.createDvcPathStatusBarItem()
+    this.dvcPathStatusBarItem = this.dispose.track(
+      this.createStatusBarItem(
+        'dvc.selectDvcPath',
+        'Current DVC path.',
+        this.getCliPath()
+      )
+    )
+
+    this.defaultProjectStatusBarItem = this.dispose.track(
+      this.createStatusBarItem(
+        'dvc.selectDefaultProject',
+        'Current default project.',
+        this.getDefaultProject()
+      )
+    )
 
     this.executionDetailsChanged = this.dispose.track(new EventEmitter<void>())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
@@ -180,6 +227,9 @@ export class Config {
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
           this.updateDvcPathStatusBarItem()
+        }
+        if (e.affectsConfiguration(this.defaultProjectOption)) {
+          this.updateDefaultProjectStatusBarItem()
         }
       })
     )
