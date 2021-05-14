@@ -18,11 +18,13 @@ const getExperiments = async (
   config: Config
 ) => {
   const dvcRoot = await getDvcRoot(config)
-  if (dvcRoot) {
-    const pickedExperiments = experiments[dvcRoot]
-    await pickedExperiments?.showWebview()
-    return pickedExperiments
+  if (!dvcRoot) {
+    return
   }
+
+  const pickedExperiments = experiments[dvcRoot]
+  await pickedExperiments?.showWebview()
+  return pickedExperiments
 }
 
 export const getExperimentsThenRun = async (
@@ -33,16 +35,18 @@ export const getExperimentsThenRun = async (
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
   const exps = await getExperiments(experiments, config)
-  if (exps) {
-    func(runner, exps.getDvcRoot())
-    const listener = disposer.track(
-      runner.onDidCompleteProcess(() => {
-        exps.refresh()
-        disposer.untrack(listener)
-        listener.dispose()
-      })
-    )
+  if (!exps) {
+    return
   }
+
+  func(runner, exps.getDvcRoot())
+  const listener = disposer.track(
+    runner.onDidCompleteProcess(() => {
+      exps.refresh()
+      disposer.untrack(listener)
+      listener.dispose()
+    })
+  )
 }
 
 export const registerExperimentCommands = (
