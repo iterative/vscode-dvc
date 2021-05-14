@@ -1,17 +1,17 @@
 import { commands } from 'vscode'
 import { Disposer } from '@hediet/std/disposable'
 import { Config } from '../../Config'
-import { queueExperiment } from './message'
+import { queueExperiment } from './report'
 import {
   applyExperiment,
   branchExperiment,
   garbageCollectExperiments,
   removeExperiment
 } from './quickPick'
-import { pickDvcRootThenRun, pickDvcRoot } from '../../fileSystem/workspace'
+import { getDvcRoot, getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 
-const pickExperimentsThenRun = async (
+const getExperimentsThenRun = async (
   config: Config,
   experiments: Record<string, Experiments>,
   activeExperiments: string | undefined,
@@ -21,7 +21,8 @@ const pickExperimentsThenRun = async (
     const pickedExperiments = experiments[activeExperiments]
     return pickedExperiments?.[method]()
   }
-  const dvcRoot = await pickDvcRoot(config)
+
+  const dvcRoot = await getDvcRoot(config)
   if (dvcRoot) {
     const pickedExperiments = experiments[dvcRoot]
     return pickedExperiments?.[method]()
@@ -36,60 +37,55 @@ export const registerExperimentCommands = (
 ) => {
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      pickDvcRootThenRun(config, queueExperiment)
+      getDvcRootThenRun(config, queueExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      pickDvcRootThenRun(config, garbageCollectExperiments)
+      getDvcRootThenRun(config, garbageCollectExperiments)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      pickDvcRootThenRun(config, applyExperiment)
+      getDvcRootThenRun(config, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      pickDvcRootThenRun(config, branchExperiment)
+      getDvcRootThenRun(config, branchExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      pickDvcRootThenRun(config, removeExperiment)
+      getDvcRootThenRun(config, removeExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      pickExperimentsThenRun(config, experiments, activeExperiments, 'run')
+      getExperimentsThenRun(config, experiments, activeExperiments, 'run')
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      pickExperimentsThenRun(config, experiments, activeExperiments, 'runReset')
+      getExperimentsThenRun(config, experiments, activeExperiments, 'runReset')
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      pickExperimentsThenRun(
-        config,
-        experiments,
-        activeExperiments,
-        'runQueued'
-      )
+      getExperimentsThenRun(config, experiments, activeExperiments, 'runQueued')
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      pickExperimentsThenRun(
+      getExperimentsThenRun(
         config,
         experiments,
         activeExperiments,
@@ -100,7 +96,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.stopRunningExperiment', () =>
-      pickExperimentsThenRun(config, experiments, activeExperiments, 'stop')
+      getExperimentsThenRun(config, experiments, activeExperiments, 'stop')
     )
   )
 }
