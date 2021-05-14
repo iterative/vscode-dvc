@@ -16,7 +16,7 @@ import {
   getPythonBinPath
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
-import { getDvcRoot } from './fileSystem/workspace'
+import { findDvcRootPaths } from './fileSystem'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -145,8 +145,18 @@ export class Config {
   public deselectDefaultProject = (): Thenable<void> =>
     this.setDefaultProject(undefined)
 
+  private async pickDefaultProject(): Promise<string | undefined> {
+    const options = this.getExecutionOptions()
+    const dvcRoots = await findDvcRootPaths(options)
+
+    return window.showQuickPick(dvcRoots, {
+      canPickMany: false,
+      placeHolder: 'Select a default project to run all commands against'
+    })
+  }
+
   public selectDefaultProject = async (): Promise<void> => {
-    const dvcRoot = await getDvcRoot(this)
+    const dvcRoot = await this.pickDefaultProject()
     if (dvcRoot) {
       this.setDefaultProject(dvcRoot)
     }

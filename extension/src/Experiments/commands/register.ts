@@ -14,9 +14,9 @@ import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
 const getExperiments = async (
+  config: Config,
   experiments: Record<string, Experiments>,
-  activeExperiments: string | undefined,
-  config: Config
+  activeExperiments: string | undefined
 ) => {
   if (activeExperiments) {
     const pickedExperiments = experiments[activeExperiments]
@@ -29,20 +29,20 @@ const getExperiments = async (
     return
   }
 
-  const pickedExperiments = experiments[dvcRoot]
-  await pickedExperiments?.showWebview()
-  return pickedExperiments
+  const exps = experiments[dvcRoot]
+  await exps?.showWebview()
+  return exps
 }
 
 export const getExperimentsThenRun = async (
+  config: Config,
   experiments: Record<string, Experiments>,
   activeExperiments: string | undefined,
-  config: Config,
   runner: Runner,
   disposer: Disposer,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
-  const exps = await getExperiments(experiments, activeExperiments, config)
+  const exps = await getExperiments(config, experiments, activeExperiments)
   if (!exps) {
     return
   }
@@ -58,9 +58,9 @@ export const getExperimentsThenRun = async (
 }
 
 export const registerExperimentCommands = (
+  config: Config,
   experiments: Record<string, Experiments>,
   activeExperiments: string | undefined,
-  config: Config,
   runner: Runner,
   disposer: Disposer
 ) => {
@@ -97,9 +97,9 @@ export const registerExperimentCommands = (
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
       getExperimentsThenRun(
+        config,
         experiments,
         activeExperiments,
-        config,
         runner,
         disposer,
         run
@@ -110,9 +110,9 @@ export const registerExperimentCommands = (
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
       getExperimentsThenRun(
+        config,
         experiments,
         activeExperiments,
-        config,
         runner,
         disposer,
         runReset
@@ -123,9 +123,9 @@ export const registerExperimentCommands = (
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
       getExperimentsThenRun(
+        config,
         experiments,
         activeExperiments,
-        config,
         runner,
         disposer,
         runQueued
@@ -135,7 +135,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      getExperiments(experiments, activeExperiments, config)
+      getExperiments(config, experiments, activeExperiments)
     )
   )
 
