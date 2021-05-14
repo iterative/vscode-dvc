@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { Disposer } from '@hediet/std/disposable'
+import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import {
   addTarget,
@@ -11,10 +11,9 @@ import {
   push
 } from '../../cli/executor'
 
-export const registerRepositoryCommands = (
-  config: Config,
-  disposer: Disposer
-) => {
+export const registerRepositoryCommands = (config: Config) => {
+  const disposer = Disposable.fn()
+
   disposer.track(
     commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
       addTarget({
@@ -84,4 +83,5 @@ export const registerRepositoryCommands = (
       })
     })
   )
+  return disposer
 }
