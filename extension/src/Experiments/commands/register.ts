@@ -13,19 +13,35 @@ import { getDvcRoot, getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
-export const getExperimentsThenRun = async (
+const getExperiments = async (
   experiments: Record<string, Experiments>,
-  config: Config,
-  runner?: Runner,
-  method?: typeof run | typeof runQueued | typeof runReset
+  config: Config
 ) => {
   const dvcRoot = await getDvcRoot(config)
   if (dvcRoot) {
     const pickedExperiments = experiments[dvcRoot]
     await pickedExperiments?.showWebview()
-    if (method && runner) {
-      return method(runner, dvcRoot)
-    }
+    return pickedExperiments
+  }
+}
+
+export const getExperimentsThenRun = async (
+  experiments: Record<string, Experiments>,
+  config: Config,
+  runner: Runner,
+  disposer: Disposer,
+  method: typeof run | typeof runQueued | typeof runReset
+) => {
+  const exps = await getExperiments(experiments, config)
+  if (exps) {
+    method(runner, exps.getDvcRoot())
+    const listener = disposer.track(
+      runner.onDidCompleteProcess(() => {
+        exps.refresh()
+        disposer.untrack(listener)
+        listener.dispose()
+      })
+    )
   }
 }
 
@@ -67,25 +83,25 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      getExperimentsThenRun(experiments, config, runner, run)
+      getExperimentsThenRun(experiments, config, runner, disposer, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      getExperimentsThenRun(experiments, config, runner, runReset)
+      getExperimentsThenRun(experiments, config, runner, disposer, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      getExperimentsThenRun(experiments, config, runner, runQueued)
+      getExperimentsThenRun(experiments, config, runner, disposer, runQueued)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      getExperimentsThenRun(experiments, config)
+      getExperiments(experiments, config)
     )
   )
 
