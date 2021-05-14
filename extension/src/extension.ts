@@ -156,7 +156,7 @@ export class Extension {
   private initializeExperiments() {
     this.dvcRoots.forEach(dvcRoot => {
       this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(dvcRoot, this.config, this.runner, this.resourceLocator)
+        new Experiments(dvcRoot, this.config, this.resourceLocator)
       )
     })
   }
