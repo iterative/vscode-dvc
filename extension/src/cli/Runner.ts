@@ -13,15 +13,15 @@ export class Runner {
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
-  private processCompleted: EventEmitter<void>
+  private readonly processCompleted: EventEmitter<void>
   public readonly onDidCompleteProcess: Event<void>
 
-  private processOutput: EventEmitter<string>
+  private readonly processOutput: EventEmitter<string>
 
-  private processStarted: EventEmitter<void>
+  private readonly processStarted: EventEmitter<void>
 
-  private processTerminated: EventEmitter<void>
-  private onDidTerminateProcess: Event<void>
+  private readonly processTerminated: EventEmitter<void>
+  private readonly onDidTerminateProcess: Event<void>
 
   private executable: string | undefined
 

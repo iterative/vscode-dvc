@@ -30,8 +30,12 @@ export class Config {
 
   public readonly workspaceRoot: string
 
-  private executionDetailsChanged: EventEmitter<void>
-  public readonly onDidChangeExecutionDetails: Event<void>
+  private readonly executionDetailsChanged: EventEmitter<
+    void
+  > = this.dispose.track(new EventEmitter())
+
+  public readonly onDidChangeExecutionDetails: Event<void> = this
+    .executionDetailsChanged.event
 
   @observable
   public pythonBinPath: string | undefined
@@ -229,9 +233,6 @@ export class Config {
         this.getDefaultProject()
       )
     )
-
-    this.executionDetailsChanged = this.dispose.track(new EventEmitter<void>())
-    this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {

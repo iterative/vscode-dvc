@@ -56,8 +56,9 @@ export class Extension {
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly gitExtension: GitExtension
+
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter<void>()
+    new EventEmitter()
   )
 
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
