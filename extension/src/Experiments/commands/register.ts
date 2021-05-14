@@ -13,7 +13,7 @@ import { getDvcRoot, getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
-const getExperimentsThenRun = async (
+export const getExperimentsThenRun = async (
   experiments: Record<string, Experiments>,
   config: Config,
   runner?: Runner,
@@ -22,7 +22,7 @@ const getExperimentsThenRun = async (
   const dvcRoot = await getDvcRoot(config)
   if (dvcRoot) {
     const pickedExperiments = experiments[dvcRoot]
-    pickedExperiments?.showWebview()
+    await pickedExperiments?.showWebview()
     if (method && runner) {
       return method(runner, dvcRoot)
     }
