@@ -157,7 +157,7 @@ export class Extension {
   private initializeExperiments() {
     this.dvcRoots.forEach(dvcRoot => {
       this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(dvcRoot, this.config, this.runner, this.resourceLocator)
+        new Experiments(dvcRoot, this.config, this.resourceLocator)
       )
     })
   }
@@ -268,7 +268,12 @@ export class Extension {
     this.webviewSerializer = new WebviewSerializer(this.config)
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(this.experiments, this.config, this.dispose)
+    registerExperimentCommands(
+      this.config,
+      this.experiments,
+      this.runner,
+      this.dispose
+    )
 
     registerRepositoryCommands(this.config, this.dispose)
 

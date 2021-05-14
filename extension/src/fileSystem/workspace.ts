@@ -38,8 +38,10 @@ export const getDvcRootThenRun = async (
   func: (options: ExecutionOptions) => unknown
 ) => {
   const dvcRoot = await getDvcRoot(config)
-  if (dvcRoot) {
-    const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
-    return func(options)
+  if (!dvcRoot) {
+    return
   }
+
+  const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
+  return func(options)
 }
