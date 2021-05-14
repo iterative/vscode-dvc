@@ -34,6 +34,7 @@ import { canRunCli } from './cli/executor'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { Runner } from './cli/Runner'
+import { makeObservable, observable } from 'mobx'
 
 export { Disposable, Disposer }
 
@@ -60,6 +61,7 @@ export class Extension {
     new EventEmitter<void>()
   )
 
+  @observable
   private activeExperiments: string | undefined
 
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
@@ -239,6 +241,8 @@ export class Extension {
   }
 
   constructor(context: ExtensionContext) {
+    makeObservable(this)
+
     if (getReloadCount(module) > 0) {
       const i = this.dispose.track(window.createStatusBarItem())
       i.text = `reload${getReloadCount(module)}`
