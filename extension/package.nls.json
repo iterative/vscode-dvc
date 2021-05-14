@@ -7,6 +7,7 @@
   "command.commit": "Commit",
   "command.commitTarget": "Commit Target",
   "command.deleteTarget": "Delete",
+  "command.deselectDefaultProject": "Deselect Default Project",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
   "command.pull": "Pull",
@@ -23,8 +24,11 @@
   "command.removeExperiment": "Remove Experiment",
   "command.runQueuedExperiments": "Run All Queued Experiments",
   "command.experimentGarbageCollect": "Garbage Collect Experiments",
-  "command.selectDvcPath": "Select DVC CLI Path",
+  "command.selectDefaultProject": "Select Default Project",
+  "command.selectDvcPath": "Select CLI Path",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
-  "config.dvcPath.title": "DVC CLI Path"
+  "config.dvcPath.title": "DVC CLI Path",
+  "config.defaultProject.description": "When enabled all generic commands will be run against this project.",
+  "config.defaultProject.title": "DVC Default Project"
 }
