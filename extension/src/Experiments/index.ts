@@ -3,13 +3,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
-import { Runner } from '../cli/Runner'
-import {
-  Args,
-  Command,
-  ExperimentFlag,
-  ExperimentSubCommands
-} from '../cli/args'
 import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
@@ -21,13 +14,16 @@ export class Experiments {
   private readonly dvcRoot: string
   private readonly config: Config
   protected readonly activeExperimentsChanged: EventEmitter<string | undefined>
-  private readonly runner: Runner
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
   private data?: ExperimentsRepoJSONOutput
   private lastExperimentsOutputHash = ''
+
+  public getDvcRoot() {
+    return this.dvcRoot
+  }
 
   private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
@@ -93,35 +89,6 @@ export class Experiments {
     }
   }
 
-  public runReset() {
-    return this.run(ExperimentFlag.RESET)
-  }
-
-  public runQueued() {
-    return this.run(ExperimentFlag.RUN_ALL)
-  }
-
-  public async run(...args: Args) {
-    await this.showWebview()
-    this.runner.run(
-      this.dvcRoot,
-      Command.EXPERIMENT,
-      ExperimentSubCommands.RUN,
-      ...args
-    )
-    const listener = this.dispose.track(
-      this.runner.onDidCompleteProcess(() => {
-        this.refresh()
-        this.dispose.untrack(listener)
-        listener.dispose()
-      })
-    )
-  }
-
-  public stop() {
-    return this.runner.stop()
-  }
-
   public setWebview = (view: ExperimentsWebview) => {
     this.webview = this.dispose.track(view)
     this.dispose.track(
@@ -141,11 +108,9 @@ export class Experiments {
     dvcRoot: string,
     config: Config,
     activeExperimentsChanged: EventEmitter<string | undefined>,
-    runner: Runner,
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
-    this.runner = runner
     this.activeExperimentsChanged = activeExperimentsChanged
 
     if (!config) {

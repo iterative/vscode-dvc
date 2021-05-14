@@ -8,31 +8,60 @@ import {
   garbageCollectExperiments,
   removeExperiment
 } from './quickPick'
+import { run, runQueued, runReset, stop } from './runner'
 import { getDvcRoot, getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
+import { Runner } from '../../cli/Runner'
 
-const getExperimentsThenRun = async (
-  config: Config,
+const getExperiments = async (
   experiments: Record<string, Experiments>,
   activeExperiments: string | undefined,
-  method: 'stop' | 'run' | 'runQueued' | 'runReset' | 'showWebview'
+  config: Config
 ) => {
   if (activeExperiments) {
     const pickedExperiments = experiments[activeExperiments]
-    return pickedExperiments?.[method]()
+    await pickedExperiments?.showWebview()
+    return pickedExperiments
   }
 
   const dvcRoot = await getDvcRoot(config)
-  if (dvcRoot) {
-    const pickedExperiments = experiments[dvcRoot]
-    return pickedExperiments?.[method]()
+  if (!dvcRoot) {
+    return
   }
+
+  const pickedExperiments = experiments[dvcRoot]
+  await pickedExperiments?.showWebview()
+  return pickedExperiments
+}
+
+export const getExperimentsThenRun = async (
+  experiments: Record<string, Experiments>,
+  activeExperiments: string | undefined,
+  config: Config,
+  runner: Runner,
+  disposer: Disposer,
+  func: typeof run | typeof runQueued | typeof runReset
+) => {
+  const exps = await getExperiments(experiments, activeExperiments, config)
+  if (!exps) {
+    return
+  }
+
+  func(runner, exps.getDvcRoot())
+  const listener = disposer.track(
+    runner.onDidCompleteProcess(() => {
+      exps.refresh()
+      disposer.untrack(listener)
+      listener.dispose()
+    })
+  )
 }
 
 export const registerExperimentCommands = (
   experiments: Record<string, Experiments>,
   activeExperiments: string | undefined,
   config: Config,
+  runner: Runner,
   disposer: Disposer
 ) => {
   disposer.track(
@@ -67,36 +96,50 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      getExperimentsThenRun(config, experiments, activeExperiments, 'run')
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.runResetExperiment', () =>
-      getExperimentsThenRun(config, experiments, activeExperiments, 'runReset')
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.runQueuedExperiments', () =>
-      getExperimentsThenRun(config, experiments, activeExperiments, 'runQueued')
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.showExperiments', () =>
       getExperimentsThenRun(
-        config,
         experiments,
         activeExperiments,
-        'showWebview'
+        config,
+        runner,
+        disposer,
+        run
       )
     )
   )
 
   disposer.track(
-    commands.registerCommand('dvc.stopRunningExperiment', () =>
-      getExperimentsThenRun(config, experiments, activeExperiments, 'stop')
+    commands.registerCommand('dvc.runResetExperiment', () =>
+      getExperimentsThenRun(
+        experiments,
+        activeExperiments,
+        config,
+        runner,
+        disposer,
+        runReset
+      )
     )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.runQueuedExperiments', () =>
+      getExperimentsThenRun(
+        experiments,
+        activeExperiments,
+        config,
+        runner,
+        disposer,
+        runQueued
+      )
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.showExperiments', () =>
+      getExperiments(experiments, activeExperiments, config)
+    )
+  )
+
+  disposer.track(
+    commands.registerCommand('dvc.stopRunningExperiment', () => stop(runner))
   )
 }

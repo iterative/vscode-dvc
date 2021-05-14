@@ -170,7 +170,6 @@ export class Extension {
           dvcRoot,
           this.config,
           this.activeExperimentsChanged,
-          this.runner,
           this.resourceLocator
         )
       )
@@ -296,6 +295,7 @@ export class Extension {
       this.experiments,
       this.activeExperiments,
       this.config,
+      this.runner,
       this.dispose
     )
 

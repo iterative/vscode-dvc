@@ -6,7 +6,6 @@ import { resolve } from 'path'
 import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as CliReader from '../../../cli/reader'
-import { Runner } from '../../../cli/Runner'
 import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
 import { Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
@@ -39,17 +38,15 @@ suite('Experiment Test Suite', () => {
       const activeExperimentsChanged = disposable.track(
         new EventEmitter<string | undefined>()
       )
-      const runner = disposable.track(new Runner(config))
+
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-
       const experiments = disposable.track(
         new Experiments(
           dvcDemoPath,
           config,
           activeExperimentsChanged,
-          runner,
           resourceLocator
         )
       )
@@ -66,7 +63,6 @@ suite('Experiment Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const runner = disposable.track(new Runner(config))
       const activeExperimentsChanged = disposable.track(
         new EventEmitter<string | undefined>()
       )
@@ -79,7 +75,6 @@ suite('Experiment Test Suite', () => {
           dvcDemoPath,
           config,
           activeExperimentsChanged,
-          runner,
           resourceLocator
         )
       )
