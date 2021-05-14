@@ -1,4 +1,4 @@
-import { window, ViewColumn, WebviewPanel, Uri } from 'vscode'
+import { Event, window, ViewColumn, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
@@ -23,6 +23,9 @@ export class ExperimentsWebview {
   public isActive = () => this.webviewPanel.active
 
   public isVisible = () => this.webviewPanel.visible
+
+  private readonly webviewPanel: WebviewPanel
+  private readonly config: Config
 
   public static restore(
     webviewPanel: WebviewPanel,
@@ -65,17 +68,19 @@ export class ExperimentsWebview {
 
   protected readonly initialized = this.deferred.promise
 
-  public readonly onDidDispose = this.webviewPanel.onDidDispose
+  public readonly onDidDispose: Event<void>
 
   public reveal = () => {
     this.webviewPanel.reveal()
     return this
   }
 
-  private constructor(
-    private readonly webviewPanel: WebviewPanel,
-    private readonly config: Config
-  ) {
+  private constructor(webviewPanel: WebviewPanel, config: Config) {
+    this.webviewPanel = webviewPanel
+    this.onDidDispose = this.webviewPanel.onDidDispose
+
+    this.config = config
+
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
       this.disposer.dispose()
