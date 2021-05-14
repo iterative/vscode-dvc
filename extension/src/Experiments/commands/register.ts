@@ -14,8 +14,8 @@ import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
 const getExperiments = async (
-  experiments: Record<string, Experiments>,
-  config: Config
+  config: Config,
+  experiments: Record<string, Experiments>
 ) => {
   const dvcRoot = await getDvcRoot(config)
   if (!dvcRoot) {
@@ -28,13 +28,13 @@ const getExperiments = async (
 }
 
 export const getExperimentsThenRun = async (
-  experiments: Record<string, Experiments>,
   config: Config,
+  experiments: Record<string, Experiments>,
   runner: Runner,
   disposer: Disposer,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
-  const exps = await getExperiments(experiments, config)
+  const exps = await getExperiments(config, experiments)
   if (!exps) {
     return
   }
@@ -50,8 +50,8 @@ export const getExperimentsThenRun = async (
 }
 
 export const registerExperimentCommands = (
-  experiments: Record<string, Experiments>,
   config: Config,
+  experiments: Record<string, Experiments>,
   runner: Runner,
   disposer: Disposer
 ) => {
@@ -87,25 +87,25 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      getExperimentsThenRun(experiments, config, runner, disposer, run)
+      getExperimentsThenRun(config, experiments, runner, disposer, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      getExperimentsThenRun(experiments, config, runner, disposer, runReset)
+      getExperimentsThenRun(config, experiments, runner, disposer, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      getExperimentsThenRun(experiments, config, runner, disposer, runQueued)
+      getExperimentsThenRun(config, experiments, runner, disposer, runQueued)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      getExperiments(experiments, config)
+      getExperiments(config, experiments)
     )
   )
 

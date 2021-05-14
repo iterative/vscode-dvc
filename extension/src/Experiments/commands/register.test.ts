@@ -32,13 +32,14 @@ describe('getExperimentsThenRun', () => {
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
     await getExperimentsThenRun(
+      {} as Config,
       {
         '/my/dvc/root': ({
           showWebview: mockedShowWebview,
           getDvcRoot: () => mockedDvcRoot
         } as unknown) as Experiments
       },
-      {} as Config,
+
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
@@ -55,6 +56,7 @@ describe('getExperimentsThenRun', () => {
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
     await getExperimentsThenRun(
+      {} as Config,
       {
         '/my/dvc/root': ({
           showWebview: mockedShowWebview,
@@ -65,7 +67,6 @@ describe('getExperimentsThenRun', () => {
           getDvcRoot: () => '/my/other/dvc/root'
         } as unknown) as Experiments
       },
-      {} as Config,
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
