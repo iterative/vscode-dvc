@@ -31,7 +31,7 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
-    const undef = await getExperimentsThenRun(
+    await getExperimentsThenRun(
       {
         '/my/dvc/root': ({
           showWebview: mockedShowWebview,
@@ -46,15 +46,15 @@ describe('getExperimentsThenRun', () => {
       mockedDisposer,
       runQueued
     )
+
     expect(mockedShowWebview).toBeCalledTimes(1)
-    expect(undef).toBeUndefined()
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--run-all')
   })
   it('should call the runner with the correct args when runReset is provided', async () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
-    const undef = await getExperimentsThenRun(
+    await getExperimentsThenRun(
       {
         '/my/dvc/root': ({
           showWebview: mockedShowWebview,
@@ -73,8 +73,8 @@ describe('getExperimentsThenRun', () => {
       mockedDisposer,
       runReset
     )
+
     expect(mockedShowWebview).toBeCalledTimes(1)
-    expect(undef).toBeUndefined()
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--reset')
   })
 })
