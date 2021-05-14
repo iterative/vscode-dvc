@@ -27,6 +27,10 @@ export class Experiments {
   private data?: ExperimentsRepoJSONOutput
   private lastExperimentsOutputHash = ''
 
+  public getDvcRoot() {
+    return this.dvcRoot
+  }
+
   private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
       try {
