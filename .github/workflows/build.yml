@@ -54,6 +54,12 @@ jobs:
 
       - run: xvfb-run -a yarn run-p lint test
 
+      - uses: paambaati/codeclimate-action@v2.7.2
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: yarn run test:jest
+
       - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
 
       - name: Publish to Chromatic
