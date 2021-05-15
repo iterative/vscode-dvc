@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { Disposable, Disposer } from '@hediet/std/disposable'
+import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import { queueExperiment } from './report'
 import {
@@ -28,7 +28,6 @@ export const getExperimentsThenRun = async (
   config: Config,
   experiments: Experiments,
   runner: Runner,
-  disposer: Disposer,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
   const exps = await getExperiment(config, experiments)
@@ -37,10 +36,10 @@ export const getExperimentsThenRun = async (
   }
 
   func(runner, exps.getDvcRoot())
-  const listener = disposer.track(
+  const listener = experiments.dispose.track(
     runner.onDidCompleteProcess(() => {
       exps.refresh()
-      disposer.untrack(listener)
+      experiments.dispose.untrack(listener)
       listener.dispose()
     })
   )
@@ -85,19 +84,19 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      getExperimentsThenRun(config, experiments, runner, disposer, run)
+      getExperimentsThenRun(config, experiments, runner, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      getExperimentsThenRun(config, experiments, runner, disposer, runReset)
+      getExperimentsThenRun(config, experiments, runner, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      getExperimentsThenRun(config, experiments, runner, disposer, runQueued)
+      getExperimentsThenRun(config, experiments, runner, runQueued)
     )
   )
 

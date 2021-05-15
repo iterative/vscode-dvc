@@ -29,7 +29,6 @@ beforeEach(() => {
 
 describe('getExperimentsThenRun', () => {
   it('should call the runner with the correct args when runQueued is provided', async () => {
-    const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
     const experiments = new Experiments(mockedConfig, {
@@ -46,7 +45,6 @@ describe('getExperimentsThenRun', () => {
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
       } as unknown) as Runner,
-      mockedDisposer,
       runQueued
     )
 
@@ -54,7 +52,6 @@ describe('getExperimentsThenRun', () => {
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--run-all')
   })
   it('should call the runner with the correct args when runReset is provided', async () => {
-    const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
     const experiments = new Experiments(mockedConfig, {
@@ -75,7 +72,6 @@ describe('getExperimentsThenRun', () => {
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
       } as unknown) as Runner,
-      mockedDisposer,
       runReset
     )
 
