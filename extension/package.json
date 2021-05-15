@@ -446,6 +446,7 @@
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
+    "climate:cover:integration": "nyc --reporter=lcov --no-clean --report-dir=./coverage/climate yarn run test-vscode-run",
     "cover:integration": "nyc --no-clean --temp-dir=./coverage/combined yarn run test-vscode-run",
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
