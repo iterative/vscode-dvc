@@ -16,7 +16,7 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
-import { Experiment, Experiments } from './Experiments'
+import { Experiments } from './Experiments'
 import { registerExperimentCommands } from './Experiments/commands/register'
 import { registerRepositoryCommands } from './Repository/commands/register'
 import {
@@ -157,10 +157,7 @@ export class Extension {
   private initializeExperiments() {
     this.experiments.reset()
     this.dvcRoots.forEach(dvcRoot => {
-      const experiment = this.dispose.track(
-        new Experiment(dvcRoot, this.config, this.resourceLocator)
-      )
-      this.experiments.setExperiment(experiment)
+      this.experiments.createExperiment(dvcRoot, this.resourceLocator)
     })
   }
 

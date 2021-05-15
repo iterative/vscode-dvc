@@ -6,33 +6,6 @@ import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
-
-export class Experiments {
-  public dispose = Disposable.fn()
-
-  private experiments: Record<string, Experiment> = {}
-  private config: Config
-
-  public getExperiment(dvcRoot: string): Experiment {
-    return this.experiments[dvcRoot]
-  }
-
-  public setExperiment(experiment: Experiment): void {
-    this.experiments[experiment.getDvcRoot()] = experiment
-  }
-
-  public reset(): void {
-    this.experiments = {}
-  }
-
-  constructor(config: Config, experiments?: Record<string, Experiment>) {
-    this.config = config
-    if (experiments) {
-      this.experiments = experiments
-    }
-  }
-}
-
 export class Experiment {
   public readonly dispose = Disposable.fn()
 
@@ -140,5 +113,40 @@ export class Experiment {
     this.resourceLocator = resourceLocator
 
     this.updateData()
+  }
+}
+
+export class Experiments {
+  public dispose = Disposable.fn()
+
+  private experiments: Record<string, Experiment> = {}
+  private config: Config
+
+  public getExperiment(dvcRoot: string): Experiment {
+    return this.experiments[dvcRoot]
+  }
+
+  public setExperiment(experiment: Experiment): void {
+    this.experiments[experiment.getDvcRoot()] = experiment
+  }
+
+  public createExperiment(
+    dvcRoot: string,
+    resourceLocator: ResourceLocator
+  ): void {
+    this.experiments[dvcRoot] = this.dispose.track(
+      new Experiment(dvcRoot, this.config, resourceLocator)
+    )
+  }
+
+  public reset(): void {
+    this.experiments = {}
+  }
+
+  constructor(config: Config, experiments?: Record<string, Experiment>) {
+    this.config = config
+    if (experiments) {
+      this.experiments = experiments
+    }
   }
 }
