@@ -54,6 +54,13 @@ jobs:
 
       - run: xvfb-run -a yarn run-p lint cover
 
+      - uses: paambaati/codeclimate-action@v2.7.5
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageCommand: echo done
+          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
+
       - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
 
       - name: Publish to Chromatic
