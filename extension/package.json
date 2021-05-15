@@ -446,9 +446,9 @@
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
-    "cover:integration": "nyc --silent --no-clean --t=./coverage/combined yarn run test-vscode-run",
+    "cover:integration": "nyc --silent --no-clean --temp-dir=./coverage/combined yarn run test-vscode-run",
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
-    "cover:report": "nyc report --reporter=lcov --reporter=text --t=./coverage",
+    "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
     "cover:clean": "rm -rf ./coverage/combined",
     "cover": "yarn run cover:integration && yarn test && yarn run cover:merge && yarn run cover:report && yarn run cover:clean",
     "vscode:prepublish": ""
