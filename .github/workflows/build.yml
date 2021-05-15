@@ -58,9 +58,7 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
-          coverageCommand:
-            xvfb-run -a yarn workspace dvc run climate:cover:integration && yarn
-            run test:jest
+          coverageCommand: xvfb-run -a yarn run "climate:cover"
           coverageLocations: |
             ${{github.workspace}}/extension/coverage/climate/lcov.info:lcov
             ${{github.workspace}}/extension/coverage/lcov.info:lcov
