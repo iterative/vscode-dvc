@@ -12,6 +12,7 @@ const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
 const mockedRun = jest.fn()
 const mockedDvcRoot = '/my/dvc/root'
+const mockedConfig = {} as Config
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../../fileSystem/workspace')
@@ -20,7 +21,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 
   mockedDisposable.fn.mockReturnValueOnce(({
-    track: function<T>(disposable: T): T {
+    track: function <T>(disposable: T): T {
       return disposable
     }
   } as unknown) as (() => void) & Disposer)
@@ -31,7 +32,7 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
-    const experiments = new Experiments()
+    const experiments = new Experiments(mockedConfig)
     experiments.setExperiment(({
       showWebview: mockedShowWebview,
       getDvcRoot: () => mockedDvcRoot
@@ -55,7 +56,7 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
-    const experiments = new Experiments()
+    const experiments = new Experiments(mockedConfig)
     experiments.setExperiment(({
       showWebview: mockedShowWebview,
       getDvcRoot: () => mockedDvcRoot

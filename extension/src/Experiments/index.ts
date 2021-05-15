@@ -9,6 +9,7 @@ import { Logger } from '../common/Logger'
 
 export class Experiments {
   private experiments: Record<string, Experiment> = {}
+  private config: Config
 
   public getExperiment(dvcRoot: string): Experiment {
     return this.experiments[dvcRoot]
@@ -22,7 +23,8 @@ export class Experiments {
     this.experiments = {}
   }
 
-  constructor(experiments?: Record<string, Experiment>) {
+  constructor(config: Config, experiments?: Record<string, Experiment>) {
+    this.config = config
     if (experiments) {
       this.experiments = experiments
     }

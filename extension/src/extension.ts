@@ -52,7 +52,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private readonly experiments: Experiments = new Experiments()
+  private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly gitExtension: GitExtension
@@ -248,6 +248,8 @@ export class Extension {
     this.config = this.dispose.track(new Config())
 
     this.runner = this.dispose.track(new Runner(this.config))
+
+    this.experiments = new Experiments(this.config)
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
