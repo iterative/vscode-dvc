@@ -52,7 +52,7 @@ jobs:
 
       - run: yarn install
 
-      - run: xvfb-run -a yarn run-p lint test
+      - run: xvfb-run -a yarn run-p lint coverage
 
       - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
 
