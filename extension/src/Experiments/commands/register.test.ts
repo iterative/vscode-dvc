@@ -21,7 +21,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 
   mockedDisposable.fn.mockReturnValueOnce(({
-    track: function <T>(disposable: T): T {
+    track: function<T>(disposable: T): T {
       return disposable
     }
   } as unknown) as (() => void) & Disposer)
@@ -32,11 +32,12 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
-    const experiments = new Experiments(mockedConfig)
-    experiments.setExperiment(({
-      showWebview: mockedShowWebview,
-      getDvcRoot: () => mockedDvcRoot
-    } as unknown) as Experiment)
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as Experiment
+    })
 
     await getExperimentsThenRun(
       {} as Config,
@@ -56,15 +57,16 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
-    const experiments = new Experiments(mockedConfig)
-    experiments.setExperiment(({
-      showWebview: mockedShowWebview,
-      getDvcRoot: () => mockedDvcRoot
-    } as unknown) as Experiment)
-    experiments.setExperiment(({
-      showWebview: mockedShowWebview,
-      getDvcRoot: () => '/my/other/dvc/root'
-    } as unknown) as Experiment)
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as Experiment,
+      '/my/other/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => '/my/other/dvc/root'
+      } as unknown) as Experiment
+    })
 
     await getExperimentsThenRun(
       {} as Config,

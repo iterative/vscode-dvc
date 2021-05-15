@@ -126,10 +126,6 @@ export class Experiments {
     return this.experiments[dvcRoot]
   }
 
-  public setExperiment(experiment: Experiment): void {
-    this.experiments[experiment.getDvcRoot()] = experiment
-  }
-
   public createExperiment(
     dvcRoot: string,
     resourceLocator: ResourceLocator
