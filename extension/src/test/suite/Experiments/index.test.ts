@@ -15,7 +15,7 @@ chai.use(sinonChai)
 const { expect } = chai
 
 suite('Experiment Test Suite', () => {
-  window.showInformationMessage('Start all experiments tests.')
+  window.showInformationMessage('Start all experiment tests.')
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
@@ -31,24 +31,24 @@ suite('Experiment Test Suite', () => {
   })
 
   describe('showWebview', () => {
-    it('should be able to make the experiments webview visible', async () => {
+    it('should be able to make the experiment webview visible', async () => {
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const config = disposable.track(new Config())
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experiments = disposable.track(
+      const experiment = disposable.track(
         new Experiment(dvcDemoPath, config, resourceLocator)
       )
 
-      const webview = await experiments.showWebview()
+      const webview = await experiment.showWebview()
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
     })
 
-    it('should only be able to open a single experiments webview', async () => {
+    it('should only be able to open a single experiment webview', async () => {
       const mockReader = stub(CliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
@@ -57,7 +57,7 @@ suite('Experiment Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experiments = disposable.track(
+      const experiment = disposable.track(
         new Experiment(dvcDemoPath, config, resourceLocator)
       )
 
@@ -69,7 +69,7 @@ suite('Experiment Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const webview = await experiments.showWebview()
+      const webview = await experiment.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockReader).to.have.been.calledOnce
@@ -80,7 +80,7 @@ suite('Experiment Test Suite', () => {
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await experiments.showWebview()
+      const sameWebview = await experiment.showWebview()
 
       expect(webview === sameWebview).to.be.true
 
