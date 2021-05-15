@@ -450,7 +450,7 @@
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
     "cover:clean": "rm -rf ./coverage/combined",
-    "cover": "yarn test && yarn run cover:integration && yarn run cover:merge && yarn run cover:report && yarn run cover:clean",
+    "cover": "yarn run test && yarn run cover:integration && yarn run cover:merge && yarn run cover:report && yarn run cover:clean",
     "vscode:prepublish": ""
   },
   "dependencies": {
