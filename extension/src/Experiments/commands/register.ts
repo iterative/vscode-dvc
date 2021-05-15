@@ -13,7 +13,7 @@ import { getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
-export const getExperimentThenRun = async (
+export const showExperimentThenRun = async (
   experiments: Experiments,
   runner: Runner,
   func: typeof run | typeof runQueued | typeof runReset
@@ -72,19 +72,19 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      getExperimentThenRun(experiments, runner, run)
+      showExperimentThenRun(experiments, runner, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      getExperimentThenRun(experiments, runner, runReset)
+      showExperimentThenRun(experiments, runner, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      getExperimentThenRun(experiments, runner, runQueued)
+      showExperimentThenRun(experiments, runner, runQueued)
     )
   )
 

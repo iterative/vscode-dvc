@@ -4,7 +4,7 @@ import { Experiment, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
 import { getDvcRoot } from '../../fileSystem/workspace'
-import { getExperimentThenRun } from './register'
+import { showExperimentThenRun } from './register'
 import { runQueued, runReset } from './runner'
 
 const mockedGetDvcRoot = mocked(getDvcRoot)
@@ -27,7 +27,7 @@ beforeEach(() => {
   } as unknown) as (() => void) & Disposer)
 })
 
-describe('getExperimentThenRun', () => {
+describe('showExperimentThenRun', () => {
   it('should call the runner with the correct args when runQueued is provided', async () => {
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
@@ -38,7 +38,7 @@ describe('getExperimentThenRun', () => {
       } as unknown) as Experiment
     })
 
-    await getExperimentThenRun(
+    await showExperimentThenRun(
       experiments,
       ({
         run: mockedRun,
@@ -59,12 +59,12 @@ describe('getExperimentThenRun', () => {
         getDvcRoot: () => mockedDvcRoot
       } as unknown) as Experiment,
       '/my/other/dvc/root': ({
-        showWebview: mockedShowWebview,
+        showWebview: jest.fn(),
         getDvcRoot: () => '/my/other/dvc/root'
       } as unknown) as Experiment
     })
 
-    await getExperimentThenRun(
+    await showExperimentThenRun(
       experiments,
       ({
         run: mockedRun,
