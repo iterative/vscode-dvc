@@ -52,13 +52,13 @@ jobs:
 
       - run: yarn install
 
-      - run: xvfb-run -a yarn run-s lint cover
+      - run: yarn run lint
 
       - uses: paambaati/codeclimate-action@v2.7.5
         env:
           CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
         with:
-          coverageCommand: echo done
+          coverageCommand: xvfb-run -a yarn run cover
           coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
       - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
