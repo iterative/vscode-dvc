@@ -27,7 +27,6 @@ import {
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
-import { resolve } from 'path'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
@@ -175,7 +174,7 @@ export class Extension {
       dvcRoots.forEach(dvcRoot => {
         const repository = this.dvcRepositories[dvcRoot]
 
-        this.dispose.track(this.onDidChangeExperimentsData(dvcRoot, gitRoot))
+        this.experiments.onDidChangeExperimentsData(dvcRoot, gitRoot)
 
         this.dispose.track(
           gitExtensionRepository.onDidChange(() => {
@@ -184,20 +183,6 @@ export class Extension {
         )
       })
     })
-  }
-
-  private onDidChangeExperimentsData = (
-    dvcRoot: string,
-    gitRoot: string
-  ): Disposable => {
-    if (!gitRoot) {
-      throw new Error(
-        'Live updates for the experiment table are not possible as the Git repo root was not found!'
-      )
-    }
-    const experiment = this.experiments.getExperiment(dvcRoot)
-    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return onDidChangeFileSystem(refsPath, experiment.refresh)
   }
 
   private setCommandsAvailability(available: boolean) {

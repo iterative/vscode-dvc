@@ -4,7 +4,7 @@ import { Experiment, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
 import { getDvcRoot } from '../../fileSystem/workspace'
-import { getExperimentsThenRun } from './register'
+import { getExperimentThenRun } from './register'
 import { runQueued, runReset } from './runner'
 
 const mockedGetDvcRoot = mocked(getDvcRoot)
@@ -27,7 +27,7 @@ beforeEach(() => {
   } as unknown) as (() => void) & Disposer)
 })
 
-describe('getExperimentsThenRun', () => {
+describe('getExperimentThenRun', () => {
   it('should call the runner with the correct args when runQueued is provided', async () => {
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
@@ -38,8 +38,7 @@ describe('getExperimentsThenRun', () => {
       } as unknown) as Experiment
     })
 
-    await getExperimentsThenRun(
-      {} as Config,
+    await getExperimentThenRun(
       experiments,
       ({
         run: mockedRun,
@@ -65,8 +64,7 @@ describe('getExperimentsThenRun', () => {
       } as unknown) as Experiment
     })
 
-    await getExperimentsThenRun(
-      {} as Config,
+    await getExperimentThenRun(
       experiments,
       ({
         run: mockedRun,

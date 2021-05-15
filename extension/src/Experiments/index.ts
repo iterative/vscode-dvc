@@ -1,4 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
+import { resolve } from 'path'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
@@ -6,6 +7,9 @@ import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
+import { getDvcRoot } from '../fileSystem/workspace'
+import { onDidChangeFileSystem } from '../fileSystem'
+
 export class Experiment {
   public readonly dispose = Disposable.fn()
 
@@ -122,8 +126,15 @@ export class Experiments {
   private experiments: Record<string, Experiment> = {}
   private config: Config
 
-  public getExperiment(dvcRoot: string): Experiment {
-    return this.experiments[dvcRoot]
+  public async showExperiment() {
+    const dvcRoot = await getDvcRoot(this.config)
+    if (!dvcRoot) {
+      return
+    }
+
+    const experiment = this.experiments[dvcRoot]
+    await experiment?.showWebview()
+    return experiment
   }
 
   public createExperiment(
@@ -137,6 +148,12 @@ export class Experiments {
 
   public reset(): void {
     this.experiments = {}
+  }
+
+  public onDidChangeExperimentsData(dvcRoot: string, gitRoot: string): void {
+    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
+    const experiment = this.experiments[dvcRoot]
+    this.dispose.track(onDidChangeFileSystem(refsPath, experiment.refresh))
   }
 
   constructor(config: Config, experiments?: Record<string, Experiment>) {
