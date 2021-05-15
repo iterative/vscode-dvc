@@ -231,7 +231,7 @@ export class Extension {
 
     this.runner = this.dispose.track(new Runner(this.config))
 
-    this.experiments = new Experiments(this.config)
+    this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
