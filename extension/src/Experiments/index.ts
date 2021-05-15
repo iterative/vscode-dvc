@@ -8,6 +8,8 @@ import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 
 export class Experiments {
+  public dispose = Disposable.fn()
+
   private experiments: Record<string, Experiment> = {}
   private config: Config
 
