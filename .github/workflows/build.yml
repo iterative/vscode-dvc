@@ -52,7 +52,7 @@ jobs:
 
       - run: yarn install
 
-      - run: xvfb-run -a yarn run-p lint cover
+      - run: xvfb-run -a yarn run-s lint cover
 
       - uses: paambaati/codeclimate-action@v2.7.5
         env:
