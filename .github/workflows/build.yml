@@ -54,12 +54,6 @@ jobs:
 
       - run: xvfb-run -a yarn run-p lint test
 
-      - uses: paambaati/codeclimate-action@v2.2.4
-        env:
-          CC_TEST_REPORTER_ID: 0203812ad15bfebc1ad465645351dd995082fd1f2d31ad9240ff09cb9d1acdc0
-        with:
-          coverageCommand: yarn cover
-
       - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
 
       - name: Publish to Chromatic
