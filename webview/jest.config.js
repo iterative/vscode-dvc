@@ -3,6 +3,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  collectCoverage: true,
   moduleNameMapper: {
     '\\.(scss|css|less)$': 'identity-obj-proxy'
   },

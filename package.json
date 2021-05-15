@@ -16,8 +16,9 @@
     "test:vscode": "run-s test-vscode-build test-vscode-run",
     "test:jest": "yarn workspaces run test",
     "test": "run-p test:*",
-    "coverage:report": "nyc report --reporter=lcov --reporter=text",
-    "coverage": "nyc yarn run test && yarn run coverage:report",
+    "cover:dvc": "yarn workspace dvc run cover",
+    "cover:dvc-vscode-webview": "yarn workspace dvc-vscode-webview run test",
+    "cover": "run-p  cover:*",
     "build": "run-s build-ui build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "build-extension": "yarn workspace dvc build",
@@ -32,6 +33,7 @@
     "setup:venv": "sh ./virtualenv-install.sh"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/jest": "^26.0.19",
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.14.0",
