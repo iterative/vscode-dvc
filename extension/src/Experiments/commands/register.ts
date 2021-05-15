@@ -13,28 +13,25 @@ import { getDvcRoot, getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
-const getExperiments = async (
-  config: Config,
-  experiments: Record<string, Experiments>
-) => {
+const getExperiment = async (config: Config, experiments: Experiments) => {
   const dvcRoot = await getDvcRoot(config)
   if (!dvcRoot) {
     return
   }
 
-  const exps = experiments[dvcRoot]
+  const exps = experiments.getExperiment(dvcRoot)
   await exps?.showWebview()
   return exps
 }
 
 export const getExperimentsThenRun = async (
   config: Config,
-  experiments: Record<string, Experiments>,
+  experiments: Experiments,
   runner: Runner,
   disposer: Disposer,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
-  const exps = await getExperiments(config, experiments)
+  const exps = await getExperiment(config, experiments)
   if (!exps) {
     return
   }
@@ -51,7 +48,7 @@ export const getExperimentsThenRun = async (
 
 export const registerExperimentCommands = (
   config: Config,
-  experiments: Record<string, Experiments>,
+  experiments: Experiments,
   runner: Runner
 ) => {
   const disposer = Disposable.fn()
@@ -106,7 +103,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      getExperiments(config, experiments)
+      getExperiment(config, experiments)
     )
   )
 

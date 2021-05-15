@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { Experiments } from '..'
+import { Experiment, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
 import { getDvcRoot } from '../../fileSystem/workspace'
@@ -31,15 +31,15 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
+    const experiments = new Experiments()
+    experiments.setExperiment(({
+      showWebview: mockedShowWebview,
+      getDvcRoot: () => mockedDvcRoot
+    } as unknown) as Experiment)
+
     await getExperimentsThenRun(
       {} as Config,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as Experiments
-      },
-
+      experiments,
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
@@ -55,18 +55,19 @@ describe('getExperimentsThenRun', () => {
     const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
+    const experiments = new Experiments()
+    experiments.setExperiment(({
+      showWebview: mockedShowWebview,
+      getDvcRoot: () => mockedDvcRoot
+    } as unknown) as Experiment)
+    experiments.setExperiment(({
+      showWebview: mockedShowWebview,
+      getDvcRoot: () => '/my/other/dvc/root'
+    } as unknown) as Experiment)
+
     await getExperimentsThenRun(
       {} as Config,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as Experiments,
-        '/my/other/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => '/my/other/dvc/root'
-        } as unknown) as Experiments
-      },
+      experiments,
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()

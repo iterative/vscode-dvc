@@ -16,7 +16,7 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
-import { Experiments } from './Experiments'
+import { Experiment, Experiments } from './Experiments'
 import { registerExperimentCommands } from './Experiments/commands/register'
 import { registerRepositoryCommands } from './Repository/commands/register'
 import {
@@ -52,7 +52,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private readonly experiments: Record<string, Experiments> = {}
+  private readonly experiments: Experiments = new Experiments()
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly gitExtension: GitExtension
@@ -155,10 +155,12 @@ export class Extension {
   }
 
   private initializeExperiments() {
+    this.experiments.reset()
     this.dvcRoots.forEach(dvcRoot => {
-      this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(dvcRoot, this.config, this.resourceLocator)
+      const experiment = this.dispose.track(
+        new Experiment(dvcRoot, this.config, this.resourceLocator)
       )
+      this.experiments.setExperiment(experiment)
     })
   }
 
@@ -196,9 +198,9 @@ export class Extension {
         'Live updates for the experiment table are not possible as the Git repo root was not found!'
       )
     }
-    const experiments = this.experiments[dvcRoot]
+    const experiment = this.experiments.getExperiment(dvcRoot)
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return onDidChangeFileSystem(refsPath, experiments.refresh)
+    return onDidChangeFileSystem(refsPath, experiment.refresh)
   }
 
   private setCommandsAvailability(available: boolean) {

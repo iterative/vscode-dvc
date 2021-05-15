@@ -8,6 +8,28 @@ import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 
 export class Experiments {
+  private experiments: Record<string, Experiment> = {}
+
+  public getExperiment(dvcRoot: string): Experiment {
+    return this.experiments[dvcRoot]
+  }
+
+  public setExperiment(experiment: Experiment): void {
+    this.experiments[experiment.getDvcRoot()] = experiment
+  }
+
+  public reset(): void {
+    this.experiments = {}
+  }
+
+  constructor(experiments?: Record<string, Experiment>) {
+    if (experiments) {
+      this.experiments = experiments
+    }
+  }
+}
+
+export class Experiment {
   public readonly dispose = Disposable.fn()
 
   private readonly config: Config
