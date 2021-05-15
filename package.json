@@ -22,7 +22,7 @@
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
     "cover:clean": "rm -rf ./coverage/combined && rm -rf ./extension/coverage rm -rf ./webview/coverage",
-    "cover": "yarn run test-vscode-build && yarn run-p cover:test:* && mkdir -p ./coverage/combined && run-p cover:mv:* && yarn run cover:merge && yarn run cover:report && yarn run cover:clean",
+    "cover": "yarn run test-vscode-build && yarn run-p cover:test:* && mkdir -p ./coverage/combined && yarn run-p cover:mv:* && yarn run cover:merge && yarn run cover:report && yarn run cover:clean",
     "build": "run-s build-ui build-extension",
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "build-extension": "yarn workspace dvc build",
