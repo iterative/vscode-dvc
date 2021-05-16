@@ -78,7 +78,7 @@ export class Config {
   private dvcPathOption = 'dvc.dvcPath'
 
   public getCliPath(): string {
-    return workspace.getConfiguration().get(this.dvcPathOption, '')
+    return this.getConfigValue(this.dvcPathOption)
   }
 
   private notifyIfChanged(
@@ -143,8 +143,8 @@ export class Config {
 
   private defaultProjectOption = 'dvc.defaultProject'
 
-  public getDefaultProject() {
-    return workspace.getConfiguration().get(this.defaultProjectOption, '')
+  public getDefaultProject(): string {
+    return this.getConfigValue(this.defaultProjectOption)
   }
 
   public deselectDefaultProject = (): Thenable<void> =>
@@ -192,11 +192,15 @@ export class Config {
     return dvcPathStatusBarItem
   }
 
-  getRelativePathText(path?: string): string {
+  private getRelativePathText(path?: string): string {
     if (!path) {
       return ''
     }
     return relative(this.getWorkspaceRoot(), path)
+  }
+
+  private getConfigValue(key: string): string {
+    return workspace.getConfiguration().get(key, '')
   }
 
   constructor() {
