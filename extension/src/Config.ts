@@ -63,7 +63,7 @@ export class Config {
   private dvcPathStatusBarItem: StatusBarItem
 
   private updateDvcPathStatusBarItem = (path = this.getCliPath()): void => {
-    this.dvcPathStatusBarItem.text = relative(this.getWorkspaceRoot(), path)
+    this.dvcPathStatusBarItem.text = this.getRelativePathText(path)
   }
 
   private getWorkspaceRoot = (): string => {
@@ -172,8 +172,7 @@ export class Config {
   }
 
   private updateDefaultProjectStatusBarItem = (): void => {
-    this.defaultProjectStatusBarItem.text = relative(
-      this.getWorkspaceRoot(),
+    this.defaultProjectStatusBarItem.text = this.getRelativePathText(
       this.getDefaultProject()
     )
   }
@@ -191,6 +190,13 @@ export class Config {
     dvcPathStatusBarItem.show()
 
     return dvcPathStatusBarItem
+  }
+
+  getRelativePathText(path?: string): string {
+    if (!path) {
+      return ''
+    }
+    return relative(this.getWorkspaceRoot(), path)
   }
 
   constructor() {
