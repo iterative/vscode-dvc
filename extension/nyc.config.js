@@ -12,6 +12,7 @@ module.exports = {
     '**/test/**',
     '**/*.config.*',
     '**/__mocks__/**',
-    '**/testHelpers.*'
+    '**/testHelpers.*',
+    '**/.cache/**'
   ]
 }
