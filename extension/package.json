@@ -446,12 +446,13 @@
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
-    "cover:integration": "nyc -t=./coverage/integration --cache true --cache-dir='./.cache/nyc' --cwd='./' yarn run test-vscode-run",
+    "cover:test:unit": "jest --collect-coverage",
+    "cover:test:integration": "nyc -t=./coverage/integration --cache true --cache-dir='./.cache/nyc' --cwd='./' yarn run test-vscode-run",
     "cover:merge:unit": "nyc merge ./coverage/unit coverage/unit-coverage-final.json",
     "cover:merge:integration": "nyc merge ./coverage/integration coverage/integration-coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
     "cover:clean": "rm -rf ./coverage/combined",
-    "cover": "yarn run test && yarn run cover:integration && run-p cover:merge:* && yarn run cover:report && yarn run cover:clean",
+    "cover": "yarn run-p cover:test:* && yarn run-p cover:merge:* && yarn run cover:report && yarn run cover:clean",
     "vscode:prepublish": ""
   },
   "dependencies": {
