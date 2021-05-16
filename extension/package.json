@@ -446,7 +446,7 @@
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
-    "cover:integration": "nyc -t=./coverage/integration --cache true --cache-dir='./.cache/nyc' --cwd='./' yarn run test-vscode-run",
+    "cover:integration": "nyc -t=./coverage/integration --cache true --cache-dir='./.cache/nyc' --cwd='./' xvfb-run -a yarn run test-vscode-run",
     "cover:merge:unit": "nyc merge ./coverage/unit coverage/unit-coverage-final.json",
     "cover:merge:integration": "nyc merge ./coverage/integration coverage/integration-coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
