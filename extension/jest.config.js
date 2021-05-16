@@ -5,5 +5,5 @@ module.exports = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/src/test/', '<rootDir>/dist/'],
   collectCoverage: true,
-  coverageDirectory: 'coverage/combined'
+  coverageDirectory: 'coverage/unit'
 }

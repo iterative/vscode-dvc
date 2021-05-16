@@ -18,7 +18,7 @@
     "test": "run-p test:*",
     "cover:test:dvc": "yarn workspace dvc run cover",
     "cover:test:dvc-vscode-webview": "yarn workspace dvc-vscode-webview run test",
-    "cover:mv:dvc": "mv ./extension/coverage/coverage-final.json ./coverage/combined/dvc-coverage-final.json",
+    "cover:mv:dvc": "nyc merge ./extension/coverage ./coverage/combined/dvc-coverage-final.json",
     "cover:mv:dvc-vscode-webview": "mv ./webview/coverage/coverage-final.json ./coverage/combined/dvc-vscode-webview-coverage-final.json",
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
