@@ -447,12 +447,13 @@
     "test-staged": "lint-staged",
     "test": "jest",
     "cover:unit": "jest --collect-coverage",
+    "cover:instrument": "nyc instrument ./dist --in-place",
     "cover:integration": "nyc -t=./coverage/integration --cache=true --cache-dir='./.cache/nyc' --exclude-after-remap=false yarn run test-vscode-run",
     "cover:merge:unit": "nyc merge ./coverage/unit coverage/unit-coverage-final.json",
     "cover:merge:integration": "nyc merge ./coverage/integration coverage/integration-coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
     "cover:clean": "rm -rf ./coverage/combined",
-    "cover": "yarn run cover:unit && yarn run cover:integration && yarn run-p cover:merge:* && yarn run cover:report && yarn run cover:clean",
+    "cover": "yarn run cover:unit && yarn run cover:instrument && yarn run cover:integration && yarn run-p cover:merge:* && yarn run cover:report && yarn run cover:clean",
     "vscode:prepublish": ""
   },
   "dependencies": {
