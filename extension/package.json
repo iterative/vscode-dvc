@@ -443,7 +443,7 @@
     "format": "prettier --write '**/*.{js,ts,md,json}'",
     "lint": "eslint --cache --fix '**/*.{js,ts}'",
     "test-vscode-build": "tsc -p './'",
-    "test-vscode-run": "node ./dist/test/runTest.js -c './coverage'",
+    "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
     "cover:unit": "jest --collect-coverage",
