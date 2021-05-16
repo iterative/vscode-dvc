@@ -17,6 +17,7 @@ import {
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
+import { relative } from 'path'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -62,7 +63,7 @@ export class Config {
   private dvcPathStatusBarItem: StatusBarItem
 
   private updateDvcPathStatusBarItem = (path = this.getCliPath()): void => {
-    this.dvcPathStatusBarItem.text = path
+    this.dvcPathStatusBarItem.text = relative(this.getWorkspaceRoot(), path)
   }
 
   private getWorkspaceRoot = (): string => {
@@ -171,7 +172,10 @@ export class Config {
   }
 
   private updateDefaultProjectStatusBarItem = (): void => {
-    this.defaultProjectStatusBarItem.text = this.getDefaultProject()
+    this.defaultProjectStatusBarItem.text = relative(
+      this.getWorkspaceRoot(),
+      this.getDefaultProject()
+    )
   }
 
   private createStatusBarItem = (
