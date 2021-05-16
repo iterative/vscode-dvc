@@ -448,7 +448,7 @@
     "test": "jest",
     "cover:unit": "jest --collect-coverage",
     "cover:instrument": "nyc instrument ./dist --in-place",
-    "cover:integration": "nyc -t=./coverage/integration --instrument=false --cache=true --cache-dir='./.cache/nyc' --exclude-after-remap=false yarn run test-vscode-run",
+    "cover:integration": "nyc --no-clean -t=./coverage/integration --instrument=false --cache=true --cache-dir='./.cache/nyc' --exclude-after-remap=false yarn run test-vscode-run",
     "cover:merge:unit": "nyc merge ./coverage/unit coverage/unit-coverage-final.json",
     "cover:merge:integration": "nyc merge ./coverage/integration coverage/integration-coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
