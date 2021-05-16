@@ -447,7 +447,7 @@
     "test-staged": "lint-staged",
     "test": "jest",
     "cover:unit": "jest --collect-coverage",
-    "cover:integration": "nyc -t=./coverage/integration --cache true --cache-dir='./.cache/nyc' --cwd='./' yarn run test-vscode-run",
+    "cover:integration": "nyc -t=./coverage/integration --cache true --cache-dir='./.cache/nyc' --exclude-after-remap false yarn run test-vscode-run",
     "cover:merge:unit": "nyc merge ./coverage/unit coverage/unit-coverage-final.json",
     "cover:merge:integration": "nyc merge ./coverage/integration coverage/integration-coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
@@ -470,7 +470,6 @@
     "utf-8-validate": "^5.0.3"
   },
   "devDependencies": {
-    "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.14",
     "@types/copy-webpack-plugin": "^5.0.0",
     "@types/fs-extra": "^9.0.7",
