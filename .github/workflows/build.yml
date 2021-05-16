@@ -59,7 +59,10 @@ jobs:
 
       - run: yarn install
 
-      - run: yarn run lint
+      - run: yarn run-p lint test-vscode-build
+
+      - run: xvfb-run -a yarn run cover:integration
+        working-directory: extension
 
       - uses: paambaati/codeclimate-action@v2.7.5
         env:
