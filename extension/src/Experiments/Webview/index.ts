@@ -95,7 +95,7 @@ export class ExperimentsWebview {
     return this
   }
 
-  private notifyActive(webviewPanel: WebviewPanel) {
+  private notifyActiveStatus(webviewPanel: WebviewPanel) {
     ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
     const active = webviewPanel.active ? this.dvcRoot : undefined
@@ -125,11 +125,11 @@ export class ExperimentsWebview {
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
-        this.notifyActive(webviewPanel)
+        this.notifyActiveStatus(webviewPanel)
       })
     )
 
-    this.notifyActive(webviewPanel)
+    this.notifyActiveStatus(webviewPanel)
 
     this.disposer.track({
       dispose: autorun(async () => {
