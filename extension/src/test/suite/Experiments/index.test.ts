@@ -114,7 +114,7 @@ suite('Experiments Test Suite', () => {
       expect(webview.isVisible()).to.be.true
     })
 
-    it('should only be able to open a single experiment webview', async () => {
+    it('should only be able to open a single experiments webview', async () => {
       const mockReader = stub(CliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
@@ -123,7 +123,7 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experiment = disposable.track(
+      const experimentsTable = disposable.track(
         new ExperimentsTable(dvcDemoPath, config, resourceLocator)
       )
 
@@ -135,7 +135,7 @@ suite('Experiments Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const webview = await experiment.showWebview()
+      const webview = await experimentsTable.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockReader).to.have.been.calledOnce
@@ -146,7 +146,7 @@ suite('Experiments Test Suite', () => {
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await experiment.showWebview()
+      const sameWebview = await experimentsTable.showWebview()
 
       expect(webview === sameWebview).to.be.true
 

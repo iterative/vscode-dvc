@@ -167,27 +167,27 @@ export class Experiments {
       return
     }
 
-    const experiment = this.experiments[dvcRoot]
-    await experiment.showWebview()
-    return experiment
+    const experimentsTable = this.experiments[dvcRoot]
+    await experimentsTable.showWebview()
+    return experimentsTable
   }
 
   private createExperimentsTable(
     dvcRoot: string,
     resourceLocator: ResourceLocator
   ) {
-    const experiment = this.dispose.track(
+    const experimentsTable = this.dispose.track(
       new ExperimentsTable(dvcRoot, this.config, resourceLocator)
     )
 
-    this.experiments[dvcRoot] = experiment
+    this.experiments[dvcRoot] = experimentsTable
 
     this.dispose.track(
-      experiment.onDidChangeActiveStatus(
+      experimentsTable.onDidChangeActiveStatus(
         dvcRoot => (this.activeDvcRoot = dvcRoot)
       )
     )
-    return experiment
+    return experimentsTable
   }
 
   public create(
@@ -211,13 +211,15 @@ export class Experiments {
   }
 
   public reset(): void {
-    Object.values(this.experiments).forEach(experiment => experiment.dispose())
+    Object.values(this.experiments).forEach(experimentsTable =>
+      experimentsTable.dispose()
+    )
     this.experiments = {}
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experiment = this.experiments[dvcRoot]
-    experiment.onDidChangeData(gitRoot)
+    const experimentsTable = this.experiments[dvcRoot]
+    experimentsTable.onDidChangeData(gitRoot)
   }
 
   constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
