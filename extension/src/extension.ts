@@ -155,7 +155,7 @@ export class Extension {
 
   private initializeExperiments() {
     this.experiments.reset()
-    this.experiments.createExperiments(this.dvcRoots, this.resourceLocator)
+    this.experiments.create(this.dvcRoots, this.resourceLocator)
   }
 
   private async initializeGitRepositories() {

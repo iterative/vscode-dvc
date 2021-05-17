@@ -188,7 +188,7 @@ export class Experiments {
     return experiment
   }
 
-  public createExperiments(
+  public create(
     dvcRoots: string[],
     resourceLocator: ResourceLocator
   ): Experiment[] {

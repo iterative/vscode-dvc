@@ -47,10 +47,7 @@ suite('Experiments Test Suite', () => {
       } as Record<string, Experiment>
 
       const experiments = new Experiments(config, testExperiments)
-      const [experiment] = experiments.createExperiments(
-        [dvcDemoPath],
-        resourceLocator
-      )
+      const [experiment] = experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
 
