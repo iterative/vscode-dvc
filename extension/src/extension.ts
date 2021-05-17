@@ -155,13 +155,11 @@ export class Extension {
 
   private initializeExperiments() {
     this.experiments.reset()
-    this.dvcRoots.forEach(dvcRoot => {
-      this.experiments.createExperiment(dvcRoot, this.resourceLocator)
-    })
+    this.experiments.createExperiments(this.dvcRoots, this.resourceLocator)
   }
 
   private async initializeGitRepositories() {
-    await this.gitExtension.isReady()
+    await Promise.all([this.experiments.isReady(), this.gitExtension.isReady()])
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 

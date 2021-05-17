@@ -30,8 +30,11 @@ export class ExperimentsWebview {
   private readonly disposer = Disposable.fn()
 
   private readonly deferred = new Deferred()
-
   protected readonly initialized = this.deferred.promise
+
+  public isReady() {
+    return this.initialized
+  }
 
   public isActive = () => this.webviewPanel.active
 
@@ -83,7 +86,7 @@ export class ExperimentsWebview {
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
     const view = new ExperimentsWebview(webviewPanel, config, dvcRoot)
-    await view.initialized
+    await view.isReady()
     return view
   }
 

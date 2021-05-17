@@ -1,5 +1,6 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
 import { experimentShow } from '../cli/reader'
@@ -77,7 +78,6 @@ export class Experiment {
   }
 
   public showWebview = async () => {
-    this.activeExperimentsChanged.fire(this.dvcRoot)
     if (this.webview) {
       return this.webview.reveal()
     }
@@ -87,8 +87,11 @@ export class Experiment {
       this.dvcRoot,
       this.resourceLocator
     )
+
     this.setWebview(webview)
     this.sendData()
+
+    this.activeExperimentsChanged.fire(this.dvcRoot)
 
     return webview
   }
@@ -116,6 +119,7 @@ export class Experiment {
   }
 
   private resetWebview = () => {
+    this.activeExperimentsChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
     this.lastDataHash = ''
@@ -127,10 +131,6 @@ export class Experiment {
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
-
-    if (!config) {
-      throw new Error('The Experiments class requires a Config instance!')
-    }
     this.config = config
     this.resourceLocator = resourceLocator
 
@@ -141,27 +141,39 @@ export class Experiment {
 export class Experiments {
   public dispose = Disposable.fn()
 
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
+
+  public isReady() {
+    return this.initialized
+  }
+
   @observable
-  private activeExperiment: string | undefined
+  private activeDvcRoot: string | undefined
+
+  public getActive(): Experiment | undefined {
+    if (!this.activeDvcRoot) {
+      return undefined
+    }
+    return this.experiments[this.activeDvcRoot]
+  }
 
   private experiments: Record<string, Experiment> = {}
   private config: Config
 
   public async showExperiment() {
-    const dvcRoot = this.activeExperiment || (await getDvcRoot(this.config))
+    const dvcRoot = this.activeDvcRoot || (await getDvcRoot(this.config))
+
     if (!dvcRoot) {
       return
     }
 
     const experiment = this.experiments[dvcRoot]
-    await experiment?.showWebview()
+    await experiment.showWebview()
     return experiment
   }
 
-  public createExperiment(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ): void {
+  private createExperiment(dvcRoot: string, resourceLocator: ResourceLocator) {
     const experiment = this.dispose.track(
       new Experiment(dvcRoot, this.config, resourceLocator)
     )
@@ -170,9 +182,21 @@ export class Experiments {
 
     this.dispose.track(
       experiment.onDidChangeActiveExperiments(
-        dvcRoot => (this.activeExperiment = dvcRoot)
+        dvcRoot => (this.activeDvcRoot = dvcRoot)
       )
     )
+    return experiment
+  }
+
+  public createExperiments(
+    dvcRoots: string[],
+    resourceLocator: ResourceLocator
+  ): Experiment[] {
+    const experiments = dvcRoots.map(dvcRoot =>
+      this.createExperiment(dvcRoot, resourceLocator)
+    )
+    this.deferred.resolve()
+    return experiments
   }
 
   public reset(): void {
