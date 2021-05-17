@@ -63,10 +63,6 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private updateDvcPathStatusBarItem = (path = this.getCliPath()): void => {
-    this.dvcPathStatusBarItem.text = this.getRelativePathText(path)
-  }
-
   private getWorkspaceRoot = (): string => {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -199,12 +195,6 @@ export class Config {
     return workspace.getConfiguration().update(this.defaultProjectOption, path)
   }
 
-  private updateDefaultProjectStatusBarItem = (): void => {
-    this.defaultProjectStatusBarItem.text = this.getRelativePathText(
-      this.getDefaultProject()
-    )
-  }
-
   private createStatusBarItem = (
     command: string,
     tooltip: string,
@@ -218,6 +208,13 @@ export class Config {
     dvcPathStatusBarItem.show()
 
     return dvcPathStatusBarItem
+  }
+
+  private setStatusBarItemText(
+    statusBarItem: StatusBarItem,
+    path: string
+  ): void {
+    statusBarItem.text = this.getRelativePathText(path)
   }
 
   private getRelativePathText(path?: string): string {
@@ -279,10 +276,16 @@ export class Config {
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
-          this.updateDvcPathStatusBarItem()
+          this.setStatusBarItemText(
+            this.dvcPathStatusBarItem,
+            this.getCliPath()
+          )
         }
         if (e.affectsConfiguration(this.defaultProjectOption)) {
-          this.updateDefaultProjectStatusBarItem()
+          this.setStatusBarItemText(
+            this.defaultProjectStatusBarItem,
+            this.getDefaultProject()
+          )
         }
       })
     )
