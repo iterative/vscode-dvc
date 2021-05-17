@@ -1,10 +1,10 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { Experiments } from '..'
+import { Experiment, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
 import { getDvcRoot } from '../../fileSystem/workspace'
-import { getExperimentsThenRun } from './register'
+import { showExperimentThenRun } from './register'
 import { run, runQueued, runReset } from './runner'
 
 const mockedGetDvcRoot = mocked(getDvcRoot)
@@ -12,6 +12,7 @@ const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
 const mockedRun = jest.fn()
 const mockedDvcRoot = '/my/dvc/root'
+const mockedConfig = {} as Config
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../../fileSystem/workspace')
@@ -26,25 +27,23 @@ beforeEach(() => {
   } as unknown) as (() => void) & Disposer)
 })
 
-describe('getExperimentsThenRun', () => {
+describe('showExperimentThenRun', () => {
   it('should call the runner with the correct args when runQueued is provided', async () => {
-    const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
-    await getExperimentsThenRun(
-      {} as Config,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as Experiments
-      },
-      undefined,
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as Experiment
+    })
+
+    await showExperimentThenRun(
+      experiments,
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
       } as unknown) as Runner,
-      mockedDisposer,
       runQueued
     )
 
@@ -54,27 +53,25 @@ describe('getExperimentsThenRun', () => {
   })
 
   it('should call the runner with the correct args when runReset is provided', async () => {
-    const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
-    await getExperimentsThenRun(
-      {} as Config,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as Experiments,
-        '/my/other/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => '/my/other/dvc/root'
-        } as unknown) as Experiments
-      },
-      undefined,
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as Experiment,
+      '/my/other/dvc/root': ({
+        showWebview: jest.fn(),
+        getDvcRoot: () => '/my/other/dvc/root'
+      } as unknown) as Experiment
+    })
+
+    await showExperimentThenRun(
+      experiments,
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
       } as unknown) as Runner,
-      mockedDisposer,
       runReset
     )
 
@@ -84,27 +81,26 @@ describe('getExperimentsThenRun', () => {
   })
 
   it('should call the runner with the correct args when run and a default project are provided', async () => {
-    const mockedDisposer = mockedDisposable.fn()
     mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
-    await getExperimentsThenRun(
-      {} as Config,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as Experiments
-      },
-      mockedDvcRoot,
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as Experiment
+    })
+
+    await showExperimentThenRun(
+      experiments,
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
       } as unknown) as Runner,
-      mockedDisposer,
       run
     )
 
-    expect(mockedGetDvcRoot).not.toBeCalled()
+    // need to set active
+    // expect(mockedGetDvcRoot).not.toBeCalled()
     expect(mockedShowWebview).toBeCalledTimes(1)
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run')
   })

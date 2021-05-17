@@ -1,5 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { makeObservable, observable } from 'mobx'
+import { resolve } from 'path'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
@@ -7,8 +9,10 @@ import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
+import { getDvcRoot } from '../fileSystem/workspace'
+import { onDidChangeFileSystem } from '../fileSystem'
 
-export class Experiments {
+export class Experiment {
   public readonly dispose = Disposable.fn()
 
   private readonly dvcRoot: string
@@ -25,7 +29,7 @@ export class Experiments {
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
   private data?: ExperimentsRepoJSONOutput
-  private lastExperimentsOutputHash = ''
+  private lastDataHash = ''
 
   public getDvcRoot() {
     return this.dvcRoot
@@ -51,17 +55,19 @@ export class Experiments {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
+  public onDidChangeData(gitRoot: string): void {
+    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
+    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
+  }
+
   public refresh = async () => {
     const tableData = await this.updateData()
-    const outputHash = createHash('sha1')
+    const dataHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
 
-    if (
-      outputHash !== this.lastExperimentsOutputHash &&
-      (await this.dataDelivered())
-    ) {
-      this.lastExperimentsOutputHash = outputHash
+    if (dataHash !== this.lastDataHash && (await this.dataDelivered())) {
+      this.lastDataHash = dataHash
     }
   }
 
@@ -112,7 +118,7 @@ export class Experiments {
   private resetWebview = () => {
     this.dispose.untrack(this.webview)
     this.webview = undefined
-    this.lastExperimentsOutputHash = ''
+    this.lastDataHash = ''
   }
 
   constructor(
@@ -129,5 +135,62 @@ export class Experiments {
     this.resourceLocator = resourceLocator
 
     this.updateData()
+  }
+}
+
+export class Experiments {
+  public dispose = Disposable.fn()
+
+  @observable
+  private activeExperiment: string | undefined
+
+  private experiments: Record<string, Experiment> = {}
+  private config: Config
+
+  public async showExperiment() {
+    const dvcRoot = this.activeExperiment || (await getDvcRoot(this.config))
+    if (!dvcRoot) {
+      return
+    }
+
+    const experiment = this.experiments[dvcRoot]
+    await experiment?.showWebview()
+    return experiment
+  }
+
+  public createExperiment(
+    dvcRoot: string,
+    resourceLocator: ResourceLocator
+  ): void {
+    const experiment = this.dispose.track(
+      new Experiment(dvcRoot, this.config, resourceLocator)
+    )
+
+    this.experiments[dvcRoot] = experiment
+
+    this.dispose.track(
+      experiment.onDidChangeActiveExperiments(
+        dvcRoot => (this.activeExperiment = dvcRoot)
+      )
+    )
+  }
+
+  public reset(): void {
+    Object.values(this.experiments).forEach(experiment => experiment.dispose())
+    this.experiments = {}
+  }
+
+  public onDidChangeData(dvcRoot: string, gitRoot: string) {
+    const experiment = this.experiments[dvcRoot]
+    experiment.onDidChangeData(gitRoot)
+  }
+
+  constructor(config: Config, experiments?: Record<string, Experiment>) {
+    makeObservable(this)
+
+    this.config = config
+    if (experiments) {
+      this.experiments = experiments
+    }
   }
 }
