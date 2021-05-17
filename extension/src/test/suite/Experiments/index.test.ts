@@ -7,7 +7,7 @@ import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import * as CliReader from '../../../cli/reader'
 import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
-import { Experiment, Experiments } from '../../../Experiments'
+import { ExperimentsTable, Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
 import { ResourceLocator } from '../../../ResourceLocator'
 import * as Workspace from '../../../fileSystem/workspace'
@@ -43,8 +43,8 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const testExperiments = {
-        'other/dvc/root': {} as Experiment
-      } as Record<string, Experiment>
+        'other/dvc/root': {} as ExperimentsTable
+      } as Record<string, ExperimentsTable>
 
       const experiments = new Experiments(config, testExperiments)
       const [experiment] = experiments.create([dvcDemoPath], resourceLocator)
@@ -102,7 +102,7 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experiment = disposable.track(
-        new Experiment(dvcDemoPath, config, resourceLocator)
+        new ExperimentsTable(dvcDemoPath, config, resourceLocator)
       )
 
       const webview = await experiment.showWebview()
@@ -121,7 +121,7 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experiment = disposable.track(
-        new Experiment(dvcDemoPath, config, resourceLocator)
+        new ExperimentsTable(dvcDemoPath, config, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

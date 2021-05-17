@@ -13,7 +13,7 @@ import { Logger } from '../common/Logger'
 import { getDvcRoot } from '../fileSystem/workspace'
 import { onDidChangeFileSystem } from '../fileSystem'
 
-export class Experiment {
+export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   private readonly dvcRoot: string
@@ -151,19 +151,18 @@ export class Experiments {
   @observable
   private activeDvcRoot: string | undefined
 
-  public getActive(): Experiment | undefined {
+  public getActive(): ExperimentsTable | undefined {
     if (!this.activeDvcRoot) {
       return undefined
     }
     return this.experiments[this.activeDvcRoot]
   }
 
-  private experiments: Record<string, Experiment> = {}
+  private experiments: Record<string, ExperimentsTable> = {}
   private config: Config
 
   public async showExperiment() {
-    const dvcRoot = this.activeDvcRoot || (await getDvcRoot(this.config))
-
+    const dvcRoot = await getDvcRoot(this.config)
     if (!dvcRoot) {
       return
     }
@@ -173,9 +172,12 @@ export class Experiments {
     return experiment
   }
 
-  private createExperiment(dvcRoot: string, resourceLocator: ResourceLocator) {
+  private createExperimentsTable(
+    dvcRoot: string,
+    resourceLocator: ResourceLocator
+  ) {
     const experiment = this.dispose.track(
-      new Experiment(dvcRoot, this.config, resourceLocator)
+      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
     )
 
     this.experiments[dvcRoot] = experiment
@@ -191,12 +193,21 @@ export class Experiments {
   public create(
     dvcRoots: string[],
     resourceLocator: ResourceLocator
-  ): Experiment[] {
+  ): ExperimentsTable[] {
     const experiments = dvcRoots.map(dvcRoot =>
-      this.createExperiment(dvcRoot, resourceLocator)
+      this.createExperimentsTable(dvcRoot, resourceLocator)
     )
     this.deferred.resolve()
     return experiments
+  }
+
+  public createExperiment(
+    dvcRoot: string,
+    resourceLocator: ResourceLocator
+  ): void {
+    this.experiments[dvcRoot] = this.dispose.track(
+      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
+    )
   }
 
   public reset(): void {
@@ -209,7 +220,7 @@ export class Experiments {
     experiment.onDidChangeData(gitRoot)
   }
 
-  constructor(config: Config, experiments?: Record<string, Experiment>) {
+  constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
     makeObservable(this)
 
     this.config = config

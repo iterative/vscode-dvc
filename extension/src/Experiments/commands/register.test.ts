@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { Experiment, Experiments } from '..'
+import { ExperimentsTable, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
 import { getDvcRoot } from '../../fileSystem/workspace'
@@ -35,7 +35,7 @@ describe('showExperimentThenRun', () => {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot
-      } as unknown) as Experiment
+      } as unknown) as ExperimentsTable
     })
 
     await showExperimentThenRun(
@@ -59,11 +59,11 @@ describe('showExperimentThenRun', () => {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot
-      } as unknown) as Experiment,
+      } as unknown) as ExperimentsTable,
       '/my/other/dvc/root': ({
         showWebview: jest.fn(),
         getDvcRoot: () => '/my/other/dvc/root'
-      } as unknown) as Experiment
+      } as unknown) as ExperimentsTable
     })
 
     await showExperimentThenRun(
