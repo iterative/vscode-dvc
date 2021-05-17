@@ -154,10 +154,33 @@ export class Config {
     const options = this.getExecutionOptions()
     const dvcRoots = await findDvcRootPaths(options)
 
-    return window.showQuickPick(dvcRoots, {
-      canPickMany: false,
-      placeHolder: 'Select a default project to run all commands against'
-    })
+    if (dvcRoots) {
+      const selected = await window.showQuickPick(
+        [
+          {
+            label: 'Always prompt',
+            description: 'Choose project each time a command is run',
+            picked: true,
+            value: 'reset'
+          },
+          ...dvcRoots.map(dvcRoot => ({
+            label: 'Project',
+            description: dvcRoot,
+            value: dvcRoot
+          }))
+        ],
+        {
+          canPickMany: false,
+          placeHolder: 'Select a default project to run all commands against'
+        }
+      )
+      if (selected?.value === 'reset') {
+        this.deselectDefaultProject()
+        return
+      }
+
+      return selected?.value
+    }
   }
 
   public selectDefaultProject = async (): Promise<void> => {
@@ -196,7 +219,7 @@ export class Config {
     if (!path) {
       return ''
     }
-    return relative(this.getWorkspaceRoot(), path)
+    return relative(this.getWorkspaceRoot(), path) || '.'
   }
 
   private getConfigValue(key: string): string {
