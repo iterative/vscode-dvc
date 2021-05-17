@@ -18,6 +18,10 @@ import {
 import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
 import { relative } from 'path'
+import {
+  QuickPickItemWithFollowup,
+  QuickPickItemWithValue
+} from './vscode/quickPick'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -95,7 +99,7 @@ export class Config {
     return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
-  private getDvcPathQuickPickOptions() {
+  private getDvcPathQuickPickItems(): QuickPickItemWithFollowup[] {
     return [
       {
         label: 'Default',
@@ -124,7 +128,7 @@ export class Config {
   }
 
   public selectDvcPath = async (): Promise<void> => {
-    const quickPickOptions = this.getDvcPathQuickPickOptions()
+    const quickPickOptions = this.getDvcPathQuickPickItems()
     const result = await window.showQuickPick(quickPickOptions, {
       placeHolder: 'Please choose...'
     })
@@ -150,30 +154,37 @@ export class Config {
   public deselectDefaultProject = (): Thenable<void> =>
     this.setDefaultProject(undefined)
 
+  private getDefaultProjectOptions(
+    dvcRoots: string[]
+  ): QuickPickItemWithValue[] {
+    return [
+      {
+        label: 'Always prompt',
+        description: 'Choose project each time a command is run',
+        picked: true,
+        value: 'remove-default'
+      },
+      ...dvcRoots.map(dvcRoot => ({
+        label: 'Project',
+        description: dvcRoot,
+        value: dvcRoot
+      }))
+    ]
+  }
+
   private async pickDefaultProject(): Promise<string | undefined> {
     const options = this.getExecutionOptions()
     const dvcRoots = await findDvcRootPaths(options)
 
     if (dvcRoots) {
       const selected = await window.showQuickPick(
-        [
-          {
-            label: 'Always prompt',
-            description: 'Choose project each time a command is run',
-            picked: true,
-            value: 'remove-default'
-          },
-          ...dvcRoots.map(dvcRoot => ({
-            label: 'Project',
-            description: dvcRoot,
-            value: dvcRoot
-          }))
-        ],
+        this.getDefaultProjectOptions(dvcRoots),
         {
           canPickMany: false,
           placeHolder: 'Select a default project to run all commands against'
         }
       )
+
       if (selected?.value === 'remove-default') {
         this.deselectDefaultProject()
         return
