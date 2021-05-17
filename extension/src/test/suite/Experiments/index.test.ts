@@ -34,7 +34,7 @@ suite('Experiments Test Suite', () => {
 
   describe('showExperiment', () => {
     it('should return the active experiment if the webview is active', async () => {
-      const mockGetDvcRoot = stub(
+      const mockGetDefaultOrPickDvcRoot = stub(
         Workspace,
         'getDefaultOrPickDvcRoot'
       ).resolves(dvcDemoPath)
@@ -73,15 +73,15 @@ suite('Experiments Test Suite', () => {
       await experiments.getExperimentsTableForCommand()
 
       expect(await active).to.equal(dvcDemoPath)
-      expect(mockGetDvcRoot).to.be.calledOnce
+      expect(mockGetDefaultOrPickDvcRoot).to.be.calledOnce
       expect(experiments.getActive()).to.equal(experimentsTable)
 
-      mockGetDvcRoot.resetHistory()
+      mockGetDefaultOrPickDvcRoot.resetHistory()
 
       const alreadyActiveExperiment = await experiments.getExperimentsTableForCommand()
 
       expect(alreadyActiveExperiment).to.equal(experimentsTable)
-      expect(mockGetDvcRoot).not.to.be.called
+      expect(mockGetDefaultOrPickDvcRoot).not.to.be.called
 
       const inactive = onDidChangeActiveStatus()
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
