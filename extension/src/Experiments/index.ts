@@ -147,6 +147,7 @@ export class Experiments {
   }
 
   public reset(): void {
+    Object.values(this.experiments).forEach(experiment => experiment.dispose())
     this.experiments = {}
   }
 
