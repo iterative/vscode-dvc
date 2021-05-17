@@ -41,12 +41,12 @@ export class ExperimentsWebview {
   public isVisible = () => this.webviewPanel.visible
 
   private dvcRoot: string
-  private readonly activeExperimentsChanged: EventEmitter<
+  private readonly activeStatusChanged: EventEmitter<
     string | undefined
   > = this.disposer.track(new EventEmitter())
 
-  public readonly onDidChangeActiveExperiments: Event<string | undefined> = this
-    .activeExperimentsChanged.event
+  public readonly onDidChangeActiveStatus: Event<string | undefined> = this
+    .activeStatusChanged.event
 
   private readonly webviewPanel: WebviewPanel
   private readonly config: Config
@@ -99,7 +99,7 @@ export class ExperimentsWebview {
     ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
     const active = webviewPanel.active ? this.dvcRoot : undefined
-    this.activeExperimentsChanged.fire(active)
+    this.activeStatusChanged.fire(active)
   }
 
   private constructor(

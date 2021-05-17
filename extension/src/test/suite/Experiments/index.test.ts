@@ -54,9 +54,9 @@ suite('Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      const setActiveEvent = (): Promise<string | undefined> => {
+      const onDidChangeActiveStatus = (): Promise<string | undefined> => {
         return new Promise(resolve => {
-          const listener: Disposable = experiment.onDidChangeActiveExperiments(
+          const listener: Disposable = experiment.onDidChangeActiveStatus(
             (event: string | undefined) => {
               listener.dispose()
               return resolve(event)
@@ -65,7 +65,7 @@ suite('Experiments Test Suite', () => {
         })
       }
 
-      const active = setActiveEvent()
+      const active = onDidChangeActiveStatus()
 
       await experiments.showExperiment()
 
@@ -80,7 +80,7 @@ suite('Experiments Test Suite', () => {
       expect(alreadyActiveExperiment).to.equal(experiment)
       expect(mockGetDvcRoot).not.to.be.called
 
-      const inactive = setActiveEvent()
+      const inactive = onDidChangeActiveStatus()
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
 
       const document = await workspace.openTextDocument(uri)
@@ -89,7 +89,7 @@ suite('Experiments Test Suite', () => {
       expect(await inactive).to.be.undefined
       expect(experiments.getActive()).to.be.undefined
 
-      const activeAgain = setActiveEvent()
+      const activeAgain = onDidChangeActiveStatus()
       await commands.executeCommand('workbench.action.previousEditor')
       expect(await activeAgain).to.equal(dvcDemoPath)
     })

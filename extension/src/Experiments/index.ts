@@ -18,12 +18,12 @@ export class Experiment {
 
   private readonly dvcRoot: string
   private readonly config: Config
-  protected readonly activeExperimentsChanged: EventEmitter<
+  protected readonly activeStatusChanged: EventEmitter<
     string | undefined
   > = this.dispose.track(new EventEmitter())
 
-  public readonly onDidChangeActiveExperiments: Event<string | undefined> = this
-    .activeExperimentsChanged.event
+  public readonly onDidChangeActiveStatus: Event<string | undefined> = this
+    .activeStatusChanged.event
 
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
@@ -91,7 +91,7 @@ export class Experiment {
     this.setWebview(webview)
     this.sendData()
 
-    this.activeExperimentsChanged.fire(this.dvcRoot)
+    this.activeStatusChanged.fire(this.dvcRoot)
 
     return webview
   }
@@ -112,14 +112,14 @@ export class Experiment {
       })
     )
     this.dispose.track(
-      view.onDidChangeActiveExperiments(dvcRoot => {
-        this.activeExperimentsChanged.fire(dvcRoot)
+      view.onDidChangeActiveStatus(dvcRoot => {
+        this.activeStatusChanged.fire(dvcRoot)
       })
     )
   }
 
   private resetWebview = () => {
-    this.activeExperimentsChanged.fire(undefined)
+    this.activeStatusChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
     this.lastDataHash = ''
@@ -181,7 +181,7 @@ export class Experiments {
     this.experiments[dvcRoot] = experiment
 
     this.dispose.track(
-      experiment.onDidChangeActiveExperiments(
+      experiment.onDidChangeActiveStatus(
         dvcRoot => (this.activeDvcRoot = dvcRoot)
       )
     )
