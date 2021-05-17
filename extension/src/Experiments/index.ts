@@ -10,7 +10,7 @@ import { Logger } from '../common/Logger'
 import { getDvcRoot } from '../fileSystem/workspace'
 import { onDidChangeFileSystem } from '../fileSystem'
 
-export class Experiment {
+export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   private readonly config: Config
@@ -125,7 +125,7 @@ export class Experiment {
 export class Experiments {
   public dispose = Disposable.fn()
 
-  private experiments: Record<string, Experiment> = {}
+  private experiments: Record<string, ExperimentsTable> = {}
   private config: Config
 
   public async showExperiment() {
@@ -144,7 +144,7 @@ export class Experiments {
     resourceLocator: ResourceLocator
   ): void {
     this.experiments[dvcRoot] = this.dispose.track(
-      new Experiment(dvcRoot, this.config, resourceLocator)
+      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
     )
   }
 
@@ -158,7 +158,7 @@ export class Experiments {
     experiment.onDidChangeData(gitRoot)
   }
 
-  constructor(config: Config, experiments?: Record<string, Experiment>) {
+  constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
     this.config = config
     if (experiments) {
       this.experiments = experiments
