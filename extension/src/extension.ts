@@ -27,7 +27,6 @@ import {
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
-import { resolve } from 'path'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
@@ -52,7 +51,7 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private readonly experiments: Record<string, Experiments> = {}
+  private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly gitExtension: GitExtension
@@ -155,10 +154,9 @@ export class Extension {
   }
 
   private initializeExperiments() {
+    this.experiments.reset()
     this.dvcRoots.forEach(dvcRoot => {
-      this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(dvcRoot, this.config, this.resourceLocator)
-      )
+      this.experiments.createExperiment(dvcRoot, this.resourceLocator)
     })
   }
 
@@ -176,7 +174,7 @@ export class Extension {
       dvcRoots.forEach(dvcRoot => {
         const repository = this.dvcRepositories[dvcRoot]
 
-        this.dispose.track(this.onDidChangeExperimentsData(dvcRoot, gitRoot))
+        this.experiments.onDidChangeData(dvcRoot, gitRoot)
 
         this.dispose.track(
           gitExtensionRepository.onDidChange(() => {
@@ -185,20 +183,6 @@ export class Extension {
         )
       })
     })
-  }
-
-  private onDidChangeExperimentsData = (
-    dvcRoot: string,
-    gitRoot: string
-  ): Disposable => {
-    if (!gitRoot) {
-      throw new Error(
-        'Live updates for the experiment table are not possible as the Git repo root was not found!'
-      )
-    }
-    const experiments = this.experiments[dvcRoot]
-    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return onDidChangeFileSystem(refsPath, experiments.refresh)
   }
 
   private setCommandsAvailability(available: boolean) {
@@ -246,6 +230,8 @@ export class Extension {
     this.config = this.dispose.track(new Config())
 
     this.runner = this.dispose.track(new Runner(this.config))
+
+    this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.gitExtension = this.dispose.track(new GitExtension())
 

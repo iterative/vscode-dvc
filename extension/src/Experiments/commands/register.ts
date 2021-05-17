@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { Disposable, Disposer } from '@hediet/std/disposable'
+import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import { queueExperiment } from './report'
 import {
@@ -9,41 +9,25 @@ import {
   removeExperiment
 } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
-import { getDvcRoot, getDvcRootThenRun } from '../../fileSystem/workspace'
+import { getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
-const getExperiments = async (
-  config: Config,
-  experiments: Record<string, Experiments>
-) => {
-  const dvcRoot = await getDvcRoot(config)
-  if (!dvcRoot) {
-    return
-  }
-
-  const exps = experiments[dvcRoot]
-  await exps?.showWebview()
-  return exps
-}
-
-export const getExperimentsThenRun = async (
-  config: Config,
-  experiments: Record<string, Experiments>,
+export const showExperimentThenRun = async (
+  experiments: Experiments,
   runner: Runner,
-  disposer: Disposer,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
-  const exps = await getExperiments(config, experiments)
-  if (!exps) {
+  const experiment = await experiments.showExperiment()
+  if (!experiment) {
     return
   }
 
-  func(runner, exps.getDvcRoot())
-  const listener = disposer.track(
+  func(runner, experiment.getDvcRoot())
+  const listener = experiments.dispose.track(
     runner.onDidCompleteProcess(() => {
-      exps.refresh()
-      disposer.untrack(listener)
+      experiment.refresh()
+      experiments.dispose.untrack(listener)
       listener.dispose()
     })
   )
@@ -51,7 +35,7 @@ export const getExperimentsThenRun = async (
 
 export const registerExperimentCommands = (
   config: Config,
-  experiments: Record<string, Experiments>,
+  experiments: Experiments,
   runner: Runner
 ) => {
   const disposer = Disposable.fn()
@@ -88,25 +72,25 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      getExperimentsThenRun(config, experiments, runner, disposer, run)
+      showExperimentThenRun(experiments, runner, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      getExperimentsThenRun(config, experiments, runner, disposer, runReset)
+      showExperimentThenRun(experiments, runner, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      getExperimentsThenRun(config, experiments, runner, disposer, runQueued)
+      showExperimentThenRun(experiments, runner, runQueued)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      getExperiments(config, experiments)
+      experiments.showExperiment()
     )
   )
 
