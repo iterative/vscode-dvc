@@ -10,7 +10,7 @@ import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
-import { getDvcRoot } from '../fileSystem/workspace'
+import { getDefaultOrPickDvcRoot } from '../fileSystem/workspace'
 import { onDidChangeFileSystem } from '../fileSystem'
 
 export class ExperimentsTable {
@@ -161,12 +161,33 @@ export class Experiments {
   private experiments: Record<string, ExperimentsTable> = {}
   private config: Config
 
-  public async showExperiment() {
-    const dvcRoot = this.activeDvcRoot || (await getDvcRoot(this.config))
+  public async showExperimentsTable() {
+    const dvcRoot = await getDefaultOrPickDvcRoot(this.config)
     if (!dvcRoot) {
       return
     }
 
+    return this.showExperimentsWebview(dvcRoot)
+  }
+
+  private getFocusedOrDefaultOrPickProject() {
+    return this.activeDvcRoot || getDefaultOrPickDvcRoot(this.config)
+  }
+
+  public async getExperimentsTableForCommand(): Promise<
+    ExperimentsTable | undefined
+  > {
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.showExperimentsWebview(dvcRoot)
+  }
+
+  private async showExperimentsWebview(
+    dvcRoot: string
+  ): Promise<ExperimentsTable> {
     const experimentsTable = this.experiments[dvcRoot]
     await experimentsTable.showWebview()
     return experimentsTable

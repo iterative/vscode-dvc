@@ -4,7 +4,7 @@ import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
 import {
   deleteTarget,
-  getDvcRoot,
+  getDefaultOrPickDvcRoot,
   getDvcRootThenRun,
   pickDvcRoot
 } from './workspace'
@@ -114,7 +114,7 @@ describe('pickDvcRoot', () => {
   })
 })
 
-describe('getDvcRoot', () => {
+describe('getDefaultOrPickDvcRoot', () => {
   it('should return the default project if it is set', async () => {
     const defaultProject = `${mockedCwd}/repo/b`
     mockedGetExecutionOptions.mockResolvedValueOnce({
@@ -124,7 +124,7 @@ describe('getDvcRoot', () => {
     })
     mockedGetDefaultProject.mockResolvedValueOnce(defaultProject)
 
-    const repoRoot = await getDvcRoot(mockedConfig)
+    const repoRoot = await getDefaultOrPickDvcRoot(mockedConfig)
     expect(repoRoot).toEqual(defaultProject)
   })
 })

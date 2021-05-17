@@ -18,7 +18,7 @@ export const showExperimentsTableThenRun = async (
   runner: Runner,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
-  const experimentsTable = await experiments.showExperiment()
+  const experimentsTable = await experiments.getExperimentsTableForCommand()
   if (!experimentsTable) {
     return
   }
@@ -90,7 +90,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      experiments.showExperiment()
+      experiments.showExperimentsTable()
     )
   )
 

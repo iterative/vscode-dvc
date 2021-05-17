@@ -3,11 +3,11 @@ import { mocked } from 'ts-jest/utils'
 import { ExperimentsTable, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
-import { getDvcRoot } from '../../fileSystem/workspace'
+import { getDefaultOrPickDvcRoot } from '../../fileSystem/workspace'
 import { showExperimentsTableThenRun } from './register'
 import { runQueued, runReset } from './runner'
 
-const mockedGetDvcRoot = mocked(getDvcRoot)
+const mockedGetDvcRoot = mocked(getDefaultOrPickDvcRoot)
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
 const mockedRun = jest.fn()

@@ -34,7 +34,10 @@ suite('Experiments Test Suite', () => {
 
   describe('showExperiment', () => {
     it('should return the active experiment if the webview is active', async () => {
-      const mockGetDvcRoot = stub(Workspace, 'getDvcRoot').resolves(dvcDemoPath)
+      const mockGetDvcRoot = stub(
+        Workspace,
+        'getDefaultOrPickDvcRoot'
+      ).resolves(dvcDemoPath)
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const config = disposable.track(new Config())
@@ -67,7 +70,7 @@ suite('Experiments Test Suite', () => {
 
       const active = onDidChangeActiveStatus()
 
-      await experiments.showExperiment()
+      await experiments.getExperimentsTableForCommand()
 
       expect(await active).to.equal(dvcDemoPath)
       expect(mockGetDvcRoot).to.be.calledOnce
@@ -75,7 +78,7 @@ suite('Experiments Test Suite', () => {
 
       mockGetDvcRoot.resetHistory()
 
-      const alreadyActiveExperiment = await experiments.showExperiment()
+      const alreadyActiveExperiment = await experiments.getExperimentsTableForCommand()
 
       expect(alreadyActiveExperiment).to.equal(experimentsTable)
       expect(mockGetDvcRoot).not.to.be.called
