@@ -32,8 +32,8 @@ suite('Experiments Test Suite', () => {
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
-  describe('showExperiment', () => {
-    it('should return the active experiment if the webview is active', async () => {
+  describe('getExperimentsTableForCommand', () => {
+    it('should return an experiments table if its webview is focused', async () => {
       const mockGetDefaultOrPickDvcRoot = stub(
         Workspace,
         'getDefaultOrPickDvcRoot'
