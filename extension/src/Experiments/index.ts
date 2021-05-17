@@ -18,12 +18,12 @@ export class ExperimentsTable {
 
   private readonly dvcRoot: string
   private readonly config: Config
-  protected readonly activeStatusChanged: EventEmitter<
+  protected readonly isWebviewFocusedChanged: EventEmitter<
     string | undefined
   > = this.dispose.track(new EventEmitter())
 
-  public readonly onDidChangeActiveStatus: Event<string | undefined> = this
-    .activeStatusChanged.event
+  public readonly onDidChangeIsWebviewFocused: Event<string | undefined> = this
+    .isWebviewFocusedChanged.event
 
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
@@ -91,7 +91,7 @@ export class ExperimentsTable {
     this.setWebview(webview)
     this.sendData()
 
-    this.activeStatusChanged.fire(this.dvcRoot)
+    this.isWebviewFocusedChanged.fire(this.dvcRoot)
 
     return webview
   }
@@ -112,14 +112,14 @@ export class ExperimentsTable {
       })
     )
     this.dispose.track(
-      view.onDidChangeActiveStatus(dvcRoot => {
-        this.activeStatusChanged.fire(dvcRoot)
+      view.onDidChangeIsFocused(dvcRoot => {
+        this.isWebviewFocusedChanged.fire(dvcRoot)
       })
     )
   }
 
   private resetWebview = () => {
-    this.activeStatusChanged.fire(undefined)
+    this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
     this.lastDataHash = ''
@@ -149,13 +149,13 @@ export class Experiments {
   }
 
   @observable
-  private activeDvcRoot: string | undefined
+  private focusedWebviewDvcRoot: string | undefined
 
-  public getActive(): ExperimentsTable | undefined {
-    if (!this.activeDvcRoot) {
+  public getFocused(): ExperimentsTable | undefined {
+    if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
-    return this.experiments[this.activeDvcRoot]
+    return this.experiments[this.focusedWebviewDvcRoot]
   }
 
   private experiments: Record<string, ExperimentsTable> = {}
@@ -171,7 +171,7 @@ export class Experiments {
   }
 
   private getFocusedOrDefaultOrPickProject() {
-    return this.activeDvcRoot || getDefaultOrPickDvcRoot(this.config)
+    return this.focusedWebviewDvcRoot || getDefaultOrPickDvcRoot(this.config)
   }
 
   public async getExperimentsTableForCommand(): Promise<
@@ -204,8 +204,8 @@ export class Experiments {
     this.experiments[dvcRoot] = experimentsTable
 
     this.dispose.track(
-      experimentsTable.onDidChangeActiveStatus(
-        dvcRoot => (this.activeDvcRoot = dvcRoot)
+      experimentsTable.onDidChangeIsWebviewFocused(
+        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
       )
     )
     return experimentsTable

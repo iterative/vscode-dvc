@@ -57,9 +57,9 @@ suite('Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      const onDidChangeActiveStatus = (): Promise<string | undefined> => {
+      const onDidChangeIsWebviewFocused = (): Promise<string | undefined> => {
         return new Promise(resolve => {
-          const listener: Disposable = experimentsTable.onDidChangeActiveStatus(
+          const listener: Disposable = experimentsTable.onDidChangeIsWebviewFocused(
             (event: string | undefined) => {
               listener.dispose()
               return resolve(event)
@@ -68,33 +68,33 @@ suite('Experiments Test Suite', () => {
         })
       }
 
-      const active = onDidChangeActiveStatus()
+      const focused = onDidChangeIsWebviewFocused()
 
       await experiments.getExperimentsTableForCommand()
 
-      expect(await active).to.equal(dvcDemoPath)
+      expect(await focused).to.equal(dvcDemoPath)
       expect(mockGetDefaultOrPickDvcRoot).to.be.calledOnce
-      expect(experiments.getActive()).to.equal(experimentsTable)
+      expect(experiments.getFocused()).to.equal(experimentsTable)
 
       mockGetDefaultOrPickDvcRoot.resetHistory()
 
-      const alreadyActiveExperiment = await experiments.getExperimentsTableForCommand()
+      const focusedExperimentsTable = await experiments.getExperimentsTableForCommand()
 
-      expect(alreadyActiveExperiment).to.equal(experimentsTable)
+      expect(focusedExperimentsTable).to.equal(experimentsTable)
       expect(mockGetDefaultOrPickDvcRoot).not.to.be.called
 
-      const inactive = onDidChangeActiveStatus()
+      const unfocused = onDidChangeIsWebviewFocused()
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
 
-      expect(await inactive).to.be.undefined
-      expect(experiments.getActive()).to.be.undefined
+      expect(await unfocused).to.be.undefined
+      expect(experiments.getFocused()).to.be.undefined
 
-      const activeAgain = onDidChangeActiveStatus()
+      const focusedAgain = onDidChangeIsWebviewFocused()
       await commands.executeCommand('workbench.action.previousEditor')
-      expect(await activeAgain).to.equal(dvcDemoPath)
+      expect(await focusedAgain).to.equal(dvcDemoPath)
     })
   })
 
