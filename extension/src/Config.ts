@@ -161,7 +161,7 @@ export class Config {
             label: 'Always prompt',
             description: 'Choose project each time a command is run',
             picked: true,
-            value: 'reset'
+            value: 'remove-default'
           },
           ...dvcRoots.map(dvcRoot => ({
             label: 'Project',
@@ -174,7 +174,7 @@ export class Config {
           placeHolder: 'Select a default project to run all commands against'
         }
       )
-      if (selected?.value === 'reset') {
+      if (selected?.value === 'remove-default') {
         this.deselectDefaultProject()
         return
       }
