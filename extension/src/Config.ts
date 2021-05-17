@@ -18,10 +18,7 @@ import {
 import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
 import { relative } from 'path'
-import {
-  QuickPickItemWithFollowup,
-  QuickPickItemWithValue
-} from './vscode/quickPick'
+import { QuickPickItemWithValue } from './vscode/quickPick'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -99,37 +96,34 @@ export class Config {
     return workspace.getConfiguration().update(this.dvcPathOption, path)
   }
 
-  private getDvcPathQuickPickItems(): QuickPickItemWithFollowup[] {
-    return [
-      {
-        label: 'Default',
-        description: 'Use Python Extension virtual environment if available',
-        picked: true,
-        value: undefined
-      },
-      {
-        label: 'Find',
-        description: 'Browse the filesystem for a DVC executable',
-        value: async () => {
-          const result = await window.showOpenDialog({
-            title: 'Select a DVC executable'
-          })
-          if (result) {
-            const [input] = result
-            const { fsPath } = input
-            this.setDvcPath(fsPath)
-            return fsPath
-          } else {
-            return undefined
-          }
+  private dvcPathQuickPickItems = [
+    {
+      label: 'Default',
+      description: 'Use Python Extension virtual environment if available',
+      picked: true,
+      value: undefined
+    },
+    {
+      label: 'Find',
+      description: 'Browse the filesystem for a DVC executable',
+      value: async () => {
+        const result = await window.showOpenDialog({
+          title: 'Select a DVC executable'
+        })
+        if (result) {
+          const [input] = result
+          const { fsPath } = input
+          this.setDvcPath(fsPath)
+          return fsPath
+        } else {
+          return undefined
         }
       }
-    ]
-  }
+    }
+  ]
 
   public selectDvcPath = async (): Promise<void> => {
-    const quickPickOptions = this.getDvcPathQuickPickItems()
-    const result = await window.showQuickPick(quickPickOptions, {
+    const result = await window.showQuickPick(this.dvcPathQuickPickItems, {
       placeHolder: 'Please choose...'
     })
     if (result) {

@@ -1,9 +1,5 @@
 import { QuickPickOptions, QuickPickItem, window } from 'vscode'
 
-export interface QuickPickItemWithFollowup<T = string> extends QuickPickItem {
-  value: T | undefined | (() => Promise<string | undefined>)
-}
-
 export interface QuickPickItemWithValue<T = string> extends QuickPickItem {
   value: T
 }
