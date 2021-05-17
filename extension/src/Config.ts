@@ -17,6 +17,9 @@ import {
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
+import { relative } from 'path'
+import { QuickPickItemWithValue } from './vscode/quickPick'
+import { getConfigValue, setConfigValue } from './vscode/config'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -61,10 +64,6 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private updateDvcPathStatusBarItem = (path = this.getCliPath()): void => {
-    this.dvcPathStatusBarItem.text = path
-  }
-
   private getWorkspaceRoot = (): string => {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0) {
@@ -77,7 +76,7 @@ export class Config {
   private dvcPathOption = 'dvc.dvcPath'
 
   public getCliPath(): string {
-    return workspace.getConfiguration().get(this.dvcPathOption, '')
+    return getConfigValue(this.dvcPathOption)
   }
 
   private notifyIfChanged(
@@ -91,40 +90,37 @@ export class Config {
 
   private setDvcPath(path?: string): Thenable<void> {
     this.notifyIfChanged(this.getCliPath(), path)
-    return workspace.getConfiguration().update(this.dvcPathOption, path)
+    return setConfigValue(this.dvcPathOption, path)
   }
 
-  private getDvcPathQuickPickOptions() {
-    return [
-      {
-        label: 'Default',
-        description: 'Use Python Extension virtual environment if available',
-        picked: true,
-        value: undefined
-      },
-      {
-        label: 'Find',
-        description: 'Browse the filesystem for a DVC executable',
-        value: async () => {
-          const result = await window.showOpenDialog({
-            title: 'Select a DVC executable'
-          })
-          if (result) {
-            const [input] = result
-            const { fsPath } = input
-            this.setDvcPath(fsPath)
-            return fsPath
-          } else {
-            return undefined
-          }
+  private dvcPathQuickPickItems = [
+    {
+      label: 'Default',
+      description: 'Use Python Extension virtual environment if available',
+      picked: true,
+      value: undefined
+    },
+    {
+      label: 'Find',
+      description: 'Browse the filesystem for a DVC executable',
+      value: async () => {
+        const result = await window.showOpenDialog({
+          title: 'Select a DVC executable'
+        })
+        if (result) {
+          const [input] = result
+          const { fsPath } = input
+          this.setDvcPath(fsPath)
+          return fsPath
+        } else {
+          return undefined
         }
       }
-    ]
-  }
+    }
+  ]
 
   public selectDvcPath = async (): Promise<void> => {
-    const quickPickOptions = this.getDvcPathQuickPickOptions()
-    const result = await window.showQuickPick(quickPickOptions, {
+    const result = await window.showQuickPick(this.dvcPathQuickPickItems, {
       placeHolder: 'Please choose...'
     })
     if (result) {
@@ -142,21 +138,51 @@ export class Config {
 
   private defaultProjectOption = 'dvc.defaultProject'
 
-  public getDefaultProject() {
-    return workspace.getConfiguration().get(this.defaultProjectOption, '')
+  public getDefaultProject(): string {
+    return getConfigValue(this.defaultProjectOption)
   }
 
   public deselectDefaultProject = (): Thenable<void> =>
     this.setDefaultProject(undefined)
 
+  private getDefaultProjectOptions(
+    dvcRoots: string[]
+  ): QuickPickItemWithValue[] {
+    return [
+      {
+        label: 'Always prompt',
+        description: 'Choose project each time a command is run',
+        picked: true,
+        value: 'remove-default'
+      },
+      ...dvcRoots.map(dvcRoot => ({
+        label: 'Project',
+        description: dvcRoot,
+        value: dvcRoot
+      }))
+    ]
+  }
+
   private async pickDefaultProject(): Promise<string | undefined> {
     const options = this.getExecutionOptions()
     const dvcRoots = await findDvcRootPaths(options)
 
-    return window.showQuickPick(dvcRoots, {
-      canPickMany: false,
-      placeHolder: 'Select a default project to run all commands against'
-    })
+    if (dvcRoots) {
+      const selected = await window.showQuickPick(
+        this.getDefaultProjectOptions(dvcRoots),
+        {
+          canPickMany: false,
+          placeHolder: 'Select a default project to run all commands against'
+        }
+      )
+
+      if (selected?.value === 'remove-default') {
+        this.deselectDefaultProject()
+        return
+      }
+
+      return selected?.value
+    }
   }
 
   public selectDefaultProject = async (): Promise<void> => {
@@ -167,11 +193,7 @@ export class Config {
   }
 
   private setDefaultProject(path?: string): Thenable<void> {
-    return workspace.getConfiguration().update(this.defaultProjectOption, path)
-  }
-
-  private updateDefaultProjectStatusBarItem = (): void => {
-    this.defaultProjectStatusBarItem.text = this.getDefaultProject()
+    return setConfigValue(this.defaultProjectOption, path)
   }
 
   private createStatusBarItem = (
@@ -187,6 +209,20 @@ export class Config {
     dvcPathStatusBarItem.show()
 
     return dvcPathStatusBarItem
+  }
+
+  private setStatusBarItemText(
+    statusBarItem: StatusBarItem,
+    path: string
+  ): void {
+    statusBarItem.text = this.getRelativePathText(path)
+  }
+
+  private getRelativePathText(path?: string): string {
+    if (!path) {
+      return ''
+    }
+    return relative(this.getWorkspaceRoot(), path) || '.'
   }
 
   constructor() {
@@ -237,10 +273,16 @@ export class Config {
     this.dispose.track(
       workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
-          this.updateDvcPathStatusBarItem()
+          this.setStatusBarItemText(
+            this.dvcPathStatusBarItem,
+            this.getCliPath()
+          )
         }
         if (e.affectsConfiguration(this.defaultProjectOption)) {
-          this.updateDefaultProjectStatusBarItem()
+          this.setStatusBarItemText(
+            this.defaultProjectStatusBarItem,
+            this.getDefaultProject()
+          )
         }
       })
     )
