@@ -20,7 +20,7 @@ export class Experiment {
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
   private data?: ExperimentsRepoJSONOutput
-  private lastExperimentsOutputHash = ''
+  private lastDataHash = ''
 
   public getDvcRoot() {
     return this.dvcRoot
@@ -53,15 +53,12 @@ export class Experiment {
 
   public refresh = async () => {
     const tableData = await this.updateData()
-    const outputHash = createHash('sha1')
+    const dataHash = createHash('sha1')
       .update(JSON.stringify(tableData))
       .digest('base64')
 
-    if (
-      outputHash !== this.lastExperimentsOutputHash &&
-      (await this.dataDelivered())
-    ) {
-      this.lastExperimentsOutputHash = outputHash
+    if (dataHash !== this.lastDataHash && (await this.dataDelivered())) {
+      this.lastDataHash = dataHash
     }
   }
 
@@ -105,7 +102,7 @@ export class Experiment {
   private resetWebview = () => {
     this.dispose.untrack(this.webview)
     this.webview = undefined
-    this.lastExperimentsOutputHash = ''
+    this.lastDataHash = ''
   }
 
   constructor(
