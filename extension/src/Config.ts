@@ -19,6 +19,7 @@ import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
 import { relative } from 'path'
 import { QuickPickItemWithValue } from './vscode/quickPick'
+import { getConfigValue, setConfigValue } from './vscode/config'
 
 export class Config {
   public readonly dispose = Disposable.fn()
@@ -75,7 +76,7 @@ export class Config {
   private dvcPathOption = 'dvc.dvcPath'
 
   public getCliPath(): string {
-    return this.getConfigValue(this.dvcPathOption)
+    return getConfigValue(this.dvcPathOption)
   }
 
   private notifyIfChanged(
@@ -89,7 +90,7 @@ export class Config {
 
   private setDvcPath(path?: string): Thenable<void> {
     this.notifyIfChanged(this.getCliPath(), path)
-    return workspace.getConfiguration().update(this.dvcPathOption, path)
+    return setConfigValue(this.dvcPathOption, path)
   }
 
   private dvcPathQuickPickItems = [
@@ -138,7 +139,7 @@ export class Config {
   private defaultProjectOption = 'dvc.defaultProject'
 
   public getDefaultProject(): string {
-    return this.getConfigValue(this.defaultProjectOption)
+    return getConfigValue(this.defaultProjectOption)
   }
 
   public deselectDefaultProject = (): Thenable<void> =>
@@ -192,7 +193,7 @@ export class Config {
   }
 
   private setDefaultProject(path?: string): Thenable<void> {
-    return workspace.getConfiguration().update(this.defaultProjectOption, path)
+    return setConfigValue(this.defaultProjectOption, path)
   }
 
   private createStatusBarItem = (
@@ -222,10 +223,6 @@ export class Config {
       return ''
     }
     return relative(this.getWorkspaceRoot(), path) || '.'
-  }
-
-  private getConfigValue(key: string): string {
-    return workspace.getConfiguration().get(key, '')
   }
 
   constructor() {
