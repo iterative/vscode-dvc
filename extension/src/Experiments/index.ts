@@ -46,6 +46,11 @@ export class Experiment {
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
+  public onDidChangeData(gitRoot: string): void {
+    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
+    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
+  }
+
   public refresh = async () => {
     const tableData = await this.updateData()
     const outputHash = createHash('sha1')
@@ -151,10 +156,9 @@ export class Experiments {
     this.experiments = {}
   }
 
-  public onDidChangeExperimentsData(dvcRoot: string, gitRoot: string): void {
-    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
+  public onDidChangeData(dvcRoot: string, gitRoot: string) {
     const experiment = this.experiments[dvcRoot]
-    this.dispose.track(onDidChangeFileSystem(refsPath, experiment.refresh))
+    experiment.onDidChangeData(gitRoot)
   }
 
   constructor(config: Config, experiments?: Record<string, Experiment>) {

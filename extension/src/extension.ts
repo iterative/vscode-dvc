@@ -174,7 +174,7 @@ export class Extension {
       dvcRoots.forEach(dvcRoot => {
         const repository = this.dvcRepositories[dvcRoot]
 
-        this.experiments.onDidChangeExperimentsData(dvcRoot, gitRoot)
+        this.experiments.onDidChangeData(dvcRoot, gitRoot)
 
         this.dispose.track(
           gitExtensionRepository.onDidChange(() => {
