@@ -47,13 +47,16 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsTable>
 
       const experiments = new Experiments(config, testExperiments)
-      const [experiment] = experiments.create([dvcDemoPath], resourceLocator)
+      const [experimentsTable] = experiments.create(
+        [dvcDemoPath],
+        resourceLocator
+      )
 
       await experiments.isReady()
 
       const onDidChangeActiveStatus = (): Promise<string | undefined> => {
         return new Promise(resolve => {
-          const listener: Disposable = experiment.onDidChangeActiveStatus(
+          const listener: Disposable = experimentsTable.onDidChangeActiveStatus(
             (event: string | undefined) => {
               listener.dispose()
               return resolve(event)
@@ -68,13 +71,13 @@ suite('Experiments Test Suite', () => {
 
       expect(await active).to.equal(dvcDemoPath)
       expect(mockGetDvcRoot).to.be.calledOnce
-      expect(experiments.getActive()).to.equal(experiment)
+      expect(experiments.getActive()).to.equal(experimentsTable)
 
       mockGetDvcRoot.resetHistory()
 
       const alreadyActiveExperiment = await experiments.showExperiment()
 
-      expect(alreadyActiveExperiment).to.equal(experiment)
+      expect(alreadyActiveExperiment).to.equal(experimentsTable)
       expect(mockGetDvcRoot).not.to.be.called
 
       const inactive = onDidChangeActiveStatus()
@@ -101,11 +104,11 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experiment = disposable.track(
+      const experimentsTable = disposable.track(
         new ExperimentsTable(dvcDemoPath, config, resourceLocator)
       )
 
-      const webview = await experiment.showWebview()
+      const webview = await experimentsTable.showWebview()
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true

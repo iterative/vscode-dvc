@@ -162,7 +162,7 @@ export class Experiments {
   private config: Config
 
   public async showExperiment() {
-    const dvcRoot = await getDvcRoot(this.config)
+    const dvcRoot = this.activeDvcRoot || (await getDvcRoot(this.config))
     if (!dvcRoot) {
       return
     }
