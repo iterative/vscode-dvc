@@ -11,6 +11,7 @@ import { ExperimentsTable, Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
 import { ResourceLocator } from '../../../ResourceLocator'
 import * as Workspace from '../../../fileSystem/workspace'
+import { setConfigValue } from '../../../vscode/config'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -25,11 +26,109 @@ suite('Experiments Test Suite', () => {
 
   beforeEach(() => {
     restore()
+    return setConfigValue('dvc.defaultProject', undefined)
   })
 
   afterEach(() => {
     disposable.dispose()
     return commands.executeCommand('workbench.action.closeAllEditors')
+  })
+
+  const onDidChangeIsWebviewFocused = (
+    experimentsTable: ExperimentsTable
+  ): Promise<string | undefined> =>
+    new Promise(resolve => {
+      const listener: Disposable = experimentsTable.onDidChangeIsWebviewFocused(
+        (event: string | undefined) => {
+          listener.dispose()
+          return resolve(event)
+        }
+      )
+    })
+
+  describe('showExperimentsTable', () => {
+    it("should take the config's default even if an experiments webview is focused", async () => {
+      const mockPickDvcRoot = stub(Workspace, 'pickDvcRoot')
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      await setConfigValue('dvc.defaultProject', dvcDemoPath)
+
+      const config = disposable.track(new Config())
+      const configSpy = spy(config, 'getDefaultProject')
+
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
+      )
+      const mockExperimentsTable = {
+        'other/dvc/root': {} as ExperimentsTable
+      } as Record<string, ExperimentsTable>
+
+      const experiments = new Experiments(config, mockExperimentsTable)
+      const [experimentsTable] = experiments.create(
+        [dvcDemoPath],
+        resourceLocator
+      )
+
+      await experiments.isReady()
+
+      const focused = onDidChangeIsWebviewFocused(experimentsTable)
+
+      await experiments.showExperimentsTable()
+
+      expect(await focused).to.equal(dvcDemoPath)
+      expect(configSpy).to.be.calledOnce
+      expect(mockPickDvcRoot).not.to.be.called
+      expect(experiments.getFocused()).to.equal(experimentsTable)
+
+      configSpy.resetHistory()
+      mockPickDvcRoot.resetHistory()
+
+      const focusedExperimentsTable = await experiments.showExperimentsTable()
+
+      expect(focusedExperimentsTable).to.equal(experimentsTable)
+      expect(mockPickDvcRoot).not.to.be.called
+      expect(configSpy).to.be.calledOnce
+    })
+
+    it('should prompt to pick a project even if a webview is focused', async () => {
+      const mockPickDvcRoot = stub(Workspace, 'pickDvcRoot').resolves(
+        dvcDemoPath
+      )
+
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const config = disposable.track(new Config())
+
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
+      )
+      const mockExperimentsTable = {
+        'other/dvc/root': {} as ExperimentsTable
+      } as Record<string, ExperimentsTable>
+
+      const experiments = new Experiments(config, mockExperimentsTable)
+      const [experimentsTable] = experiments.create(
+        [dvcDemoPath],
+        resourceLocator
+      )
+
+      await experiments.isReady()
+
+      const focused = onDidChangeIsWebviewFocused(experimentsTable)
+
+      await experiments.showExperimentsTable()
+
+      expect(await focused).to.equal(dvcDemoPath)
+      expect(mockPickDvcRoot).to.be.calledOnce
+      expect(experiments.getFocused()).to.equal(experimentsTable)
+
+      mockPickDvcRoot.resetHistory()
+
+      const focusedExperimentsTable = await experiments.showExperimentsTable()
+
+      expect(focusedExperimentsTable).to.equal(experimentsTable)
+      expect(mockPickDvcRoot).to.be.calledOnce
+    })
   })
 
   describe('getExperimentsTableForCommand', () => {
@@ -45,11 +144,11 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const testExperiments = {
+      const mockExperimentsTable = {
         'other/dvc/root': {} as ExperimentsTable
       } as Record<string, ExperimentsTable>
 
-      const experiments = new Experiments(config, testExperiments)
+      const experiments = new Experiments(config, mockExperimentsTable)
       const [experimentsTable] = experiments.create(
         [dvcDemoPath],
         resourceLocator
@@ -57,18 +156,7 @@ suite('Experiments Test Suite', () => {
 
       await experiments.isReady()
 
-      const onDidChangeIsWebviewFocused = (): Promise<string | undefined> => {
-        return new Promise(resolve => {
-          const listener: Disposable = experimentsTable.onDidChangeIsWebviewFocused(
-            (event: string | undefined) => {
-              listener.dispose()
-              return resolve(event)
-            }
-          )
-        })
-      }
-
-      const focused = onDidChangeIsWebviewFocused()
+      const focused = onDidChangeIsWebviewFocused(experimentsTable)
 
       await experiments.getExperimentsTableForCommand()
 
@@ -83,7 +171,7 @@ suite('Experiments Test Suite', () => {
       expect(focusedExperimentsTable).to.equal(experimentsTable)
       expect(mockGetDefaultOrPickDvcRoot).not.to.be.called
 
-      const unfocused = onDidChangeIsWebviewFocused()
+      const unfocused = onDidChangeIsWebviewFocused(experimentsTable)
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
 
       const document = await workspace.openTextDocument(uri)
@@ -92,7 +180,7 @@ suite('Experiments Test Suite', () => {
       expect(await unfocused).to.be.undefined
       expect(experiments.getFocused()).to.be.undefined
 
-      const focusedAgain = onDidChangeIsWebviewFocused()
+      const focusedAgain = onDidChangeIsWebviewFocused(experimentsTable)
       await commands.executeCommand('workbench.action.previousEditor')
       expect(await focusedAgain).to.equal(dvcDemoPath)
     })
