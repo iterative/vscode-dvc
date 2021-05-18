@@ -17,7 +17,7 @@
     "test:jest": "yarn workspaces run test",
     "test": "run-p test:*",
     "cover:unit": "yarn workspaces run cover",
-    "cover:integration": "node ./coverIntergrationTests.js",
+    "cover:integration": "node ./coverIntegrationTests.js",
     "cover:merge:dvc-vscode-webview": "nyc merge ./webview/coverage ./coverage/combined/dvc-vscode-webview-coverage-final.json",
     "cover:merge": "nyc merge ./coverage/combined coverage/coverage-final.json",
     "cover:report:integration": "nyc report --reporter=lcov --reporter=text --temp-dir=./extension/coverage/integration",
