@@ -235,7 +235,13 @@ export class Experiments {
   }
 
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    this.experiments[dvcRoot].setWebview(experimentsWebview)
+    const experimentsTable = this.experiments[dvcRoot]
+    if (!experimentsTable) {
+      experimentsWebview.dispose()
+    }
+
+    experimentsTable.setWebview(experimentsWebview)
+    experimentsTable.refresh()
   }
 
   constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
