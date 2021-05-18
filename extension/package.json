@@ -506,8 +506,7 @@
     "vsce": "^1.88.0",
     "vscode-test": "^1.5.2",
     "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11",
-    "yargs": "^17.0.1"
+    "webpack-cli": "^3.3.11"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
