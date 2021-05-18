@@ -1,4 +1,7 @@
+import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { Deferred } from '@hediet/std/synchronization'
+import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
@@ -7,14 +10,21 @@ import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
-import { getDvcRoot } from '../fileSystem/workspace'
+import { getDefaultOrPickDvcRoot } from '../fileSystem/workspace'
 import { onDidChangeFileSystem } from '../fileSystem'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
-  private readonly config: Config
   private readonly dvcRoot: string
+  private readonly config: Config
+  protected readonly isWebviewFocusedChanged: EventEmitter<
+    string | undefined
+  > = this.dispose.track(new EventEmitter())
+
+  public readonly onDidChangeIsWebviewFocused: Event<string | undefined> = this
+    .isWebviewFocusedChanged.event
+
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
@@ -74,10 +84,14 @@ export class ExperimentsTable {
 
     const webview = await ExperimentsWebview.create(
       this.config,
+      this.dvcRoot,
       this.resourceLocator
     )
+
     this.setWebview(webview)
     this.sendData()
+
+    this.isWebviewFocusedChanged.fire(this.dvcRoot)
 
     return webview
   }
@@ -97,9 +111,15 @@ export class ExperimentsTable {
         this.resetWebview()
       })
     )
+    this.dispose.track(
+      view.onDidChangeIsFocused(dvcRoot => {
+        this.isWebviewFocusedChanged.fire(dvcRoot)
+      })
+    )
   }
 
   private resetWebview = () => {
+    this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
     this.lastDataHash = ''
@@ -111,10 +131,6 @@ export class ExperimentsTable {
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
-
-    if (!config) {
-      throw new Error('The Experiments class requires a Config instance!')
-    }
     this.config = config
     this.resourceLocator = resourceLocator
 
@@ -125,18 +141,85 @@ export class ExperimentsTable {
 export class Experiments {
   public dispose = Disposable.fn()
 
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
+
+  public isReady() {
+    return this.initialized
+  }
+
+  @observable
+  private focusedWebviewDvcRoot: string | undefined
+
+  public getFocused(): ExperimentsTable | undefined {
+    if (!this.focusedWebviewDvcRoot) {
+      return undefined
+    }
+    return this.experiments[this.focusedWebviewDvcRoot]
+  }
+
   private experiments: Record<string, ExperimentsTable> = {}
   private config: Config
 
-  public async showExperiment() {
-    const dvcRoot = await getDvcRoot(this.config)
+  public async showExperimentsTable() {
+    const dvcRoot = await getDefaultOrPickDvcRoot(this.config)
     if (!dvcRoot) {
       return
     }
 
-    const experiment = this.experiments[dvcRoot]
-    await experiment?.showWebview()
-    return experiment
+    return this.showExperimentsWebview(dvcRoot)
+  }
+
+  private getFocusedOrDefaultOrPickProject() {
+    return this.focusedWebviewDvcRoot || getDefaultOrPickDvcRoot(this.config)
+  }
+
+  public async getExperimentsTableForCommand(): Promise<
+    ExperimentsTable | undefined
+  > {
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.showExperimentsWebview(dvcRoot)
+  }
+
+  private async showExperimentsWebview(
+    dvcRoot: string
+  ): Promise<ExperimentsTable> {
+    const experimentsTable = this.experiments[dvcRoot]
+    await experimentsTable.showWebview()
+    return experimentsTable
+  }
+
+  private createExperimentsTable(
+    dvcRoot: string,
+    resourceLocator: ResourceLocator
+  ) {
+    const experimentsTable = this.dispose.track(
+      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
+    )
+
+    this.experiments[dvcRoot] = experimentsTable
+
+    this.dispose.track(
+      experimentsTable.onDidChangeIsWebviewFocused(
+        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
+      )
+    )
+    return experimentsTable
+  }
+
+  public create(
+    dvcRoots: string[],
+    resourceLocator: ResourceLocator
+  ): ExperimentsTable[] {
+    const experiments = dvcRoots.map(dvcRoot =>
+      this.createExperimentsTable(dvcRoot, resourceLocator)
+    )
+    this.deferred.resolve()
+    return experiments
   }
 
   public createExperiment(
@@ -149,16 +232,20 @@ export class Experiments {
   }
 
   public reset(): void {
-    Object.values(this.experiments).forEach(experiment => experiment.dispose())
+    Object.values(this.experiments).forEach(experimentsTable =>
+      experimentsTable.dispose()
+    )
     this.experiments = {}
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experiment = this.experiments[dvcRoot]
-    experiment.onDidChangeData(gitRoot)
+    const experimentsTable = this.experiments[dvcRoot]
+    experimentsTable.onDidChangeData(gitRoot)
   }
 
   constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
+    makeObservable(this)
+
     this.config = config
     if (experiments) {
       this.experiments = experiments

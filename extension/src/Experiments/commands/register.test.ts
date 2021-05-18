@@ -3,11 +3,11 @@ import { mocked } from 'ts-jest/utils'
 import { ExperimentsTable, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
-import { getDvcRoot } from '../../fileSystem/workspace'
-import { showExperimentThenRun } from './register'
+import { getDefaultOrPickDvcRoot } from '../../fileSystem/workspace'
+import { showExperimentsTableThenRun } from './register'
 import { runQueued, runReset } from './runner'
 
-const mockedGetDvcRoot = mocked(getDvcRoot)
+const mockedGetDefaultOrPickDvcRoot = mocked(getDefaultOrPickDvcRoot)
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
 const mockedRun = jest.fn()
@@ -27,9 +27,9 @@ beforeEach(() => {
   } as unknown) as (() => void) & Disposer)
 })
 
-describe('showExperimentThenRun', () => {
+describe('showExperimentsTableThenRun', () => {
   it('should call the runner with the correct args when runQueued is provided', async () => {
-    mockedGetDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
+    mockedGetDefaultOrPickDvcRoot.mockResolvedValueOnce(mockedDvcRoot)
 
     const experiments = new Experiments(mockedConfig, {
       '/my/dvc/root': ({
@@ -38,7 +38,7 @@ describe('showExperimentThenRun', () => {
       } as unknown) as ExperimentsTable
     })
 
-    await showExperimentThenRun(
+    await showExperimentsTableThenRun(
       experiments,
       ({
         run: mockedRun,
@@ -47,11 +47,13 @@ describe('showExperimentThenRun', () => {
       runQueued
     )
 
+    expect(mockedGetDefaultOrPickDvcRoot).toBeCalledTimes(1)
     expect(mockedShowWebview).toBeCalledTimes(1)
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--run-all')
   })
+
   it('should call the runner with the correct args when runReset is provided', async () => {
-    mockedGetDvcRoot.mockResolvedValueOnce('/my/dvc/root')
+    mockedGetDefaultOrPickDvcRoot.mockResolvedValueOnce('/my/dvc/root')
 
     const experiments = new Experiments(mockedConfig, {
       '/my/dvc/root': ({
@@ -64,7 +66,7 @@ describe('showExperimentThenRun', () => {
       } as unknown) as ExperimentsTable
     })
 
-    await showExperimentThenRun(
+    await showExperimentsTableThenRun(
       experiments,
       ({
         run: mockedRun,
@@ -73,6 +75,7 @@ describe('showExperimentThenRun', () => {
       runReset
     )
 
+    expect(mockedGetDefaultOrPickDvcRoot).toBeCalledTimes(1)
     expect(mockedShowWebview).toBeCalledTimes(1)
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--reset')
   })

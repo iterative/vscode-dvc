@@ -13,20 +13,20 @@ import { getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 
-export const showExperimentThenRun = async (
+export const showExperimentsTableThenRun = async (
   experiments: Experiments,
   runner: Runner,
   func: typeof run | typeof runQueued | typeof runReset
 ) => {
-  const experiment = await experiments.showExperiment()
-  if (!experiment) {
+  const experimentsTable = await experiments.getExperimentsTableForCommand()
+  if (!experimentsTable) {
     return
   }
 
-  func(runner, experiment.getDvcRoot())
+  func(runner, experimentsTable.getDvcRoot())
   const listener = experiments.dispose.track(
     runner.onDidCompleteProcess(() => {
-      experiment.refresh()
+      experimentsTable.refresh()
       experiments.dispose.untrack(listener)
       listener.dispose()
     })
@@ -72,25 +72,25 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      showExperimentThenRun(experiments, runner, run)
+      showExperimentsTableThenRun(experiments, runner, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      showExperimentThenRun(experiments, runner, runReset)
+      showExperimentsTableThenRun(experiments, runner, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      showExperimentThenRun(experiments, runner, runQueued)
+      showExperimentsTableThenRun(experiments, runner, runQueued)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.showExperiments', () =>
-      experiments.showExperiment()
+      experiments.showExperimentsTable()
     )
   )
 
