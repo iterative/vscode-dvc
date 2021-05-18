@@ -10,6 +10,11 @@ const packageJsonPath = resolve(__dirname, 'extension', 'package.json')
 
 const cwd = join(__dirname, 'extension')
 
+const pipe = childProcess => {
+  childProcess.stdout.pipe(process.stdout)
+  childProcess.stderr.pipe(process.stderr)
+}
+
 const packageJson = require(packageJsonPath)
 activationEvents = packageJson.activationEvents
 packageJson.activationEvents = ['onStartupFinished']
@@ -19,15 +24,13 @@ const tsc = execa('tsc', ['-p', './'], {
   cwd
 })
 
-tsc.stdout.pipe(process.stdout)
-tsc.stderr.pipe(process.stderr)
+pipe(tsc)
 tsc.then(() => {
   const tests = execa('node', [join(cwd, 'dist', 'test', 'runTest.js')], {
     cwd
   })
 
-  tests.stdout.pipe(process.stdout)
-  tests.stderr.pipe(process.stderr)
+  pipe(tests)
   tests
     .then(() => {})
     .catch(() => {
@@ -38,8 +41,7 @@ tsc.then(() => {
       writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
       const prettier = execa('prettier', ['--write', 'package.json'], { cwd })
-      prettier.stdout.pipe(process.stdout)
-      prettier.stderr.pipe(process.stderr)
+      pipe(prettier)
       prettier.then(() => {
         if (failed) {
           process.exit(1)
