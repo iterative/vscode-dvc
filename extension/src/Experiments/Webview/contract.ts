@@ -74,3 +74,8 @@ export interface ExperimentsRepoJSONOutput
   extends Record<string, ExperimentsCommitJSONOutput> {
   workspace: ExperimentsCommitJSONOutput
 }
+
+export interface ExperimentsWebviewState {
+  dvcRoot: string
+  experiments?: ExperimentsRepoJSONOutput
+}

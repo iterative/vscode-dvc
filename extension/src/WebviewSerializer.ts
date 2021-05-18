@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './Experiments/Webview'
 import { Config } from './Config'
 import { Experiments } from './Experiments'
-import { ExperimentsRepoJSONOutput } from './Experiments/Webview/contract'
+import { ExperimentsWebviewState } from './Experiments/Webview/contract'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
@@ -17,7 +17,7 @@ export class WebviewSerializer {
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (
           panel: WebviewPanel,
-          state: { dvcRoot: string; experiments?: ExperimentsRepoJSONOutput }
+          state: ExperimentsWebviewState
         ) => {
           const dvcRoot = state?.dvcRoot
           const experimentsWebview = await ExperimentsWebview.restore(

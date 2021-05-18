@@ -18,7 +18,8 @@ import {
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
-  WindowWithWebviewData
+  WindowWithWebviewData,
+  ExperimentsWebviewState
 } from './contract'
 import { Logger } from '../../common/Logger'
 import { ResourceLocator } from '../../ResourceLocator'
@@ -56,10 +57,7 @@ export class ExperimentsWebview {
   public static restore(
     webviewPanel: WebviewPanel,
     config: Config,
-    state: {
-      dvcRoot: string
-      experiments?: ExperimentsRepoJSONOutput
-    }
+    state: ExperimentsWebviewState
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
@@ -72,10 +70,7 @@ export class ExperimentsWebview {
 
   public static async create(
     config: Config,
-    state: {
-      dvcRoot: string
-      experiments?: ExperimentsRepoJSONOutput
-    },
+    state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
@@ -111,10 +106,7 @@ export class ExperimentsWebview {
   private constructor(
     webviewPanel: WebviewPanel,
     config: Config,
-    state: {
-      dvcRoot: string
-      experiments?: ExperimentsRepoJSONOutput
-    }
+    state: ExperimentsWebviewState
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
