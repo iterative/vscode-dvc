@@ -24,6 +24,10 @@ export type MessageToWebview = {
   errors?: Error[]
 } & (
   | {
+      type: MessageToWebviewType.setDvcRoot
+      dvcRoot?: string
+    }
+  | {
       type: MessageToWebviewType.setTheme
       theme: WebviewColorTheme
     }
@@ -34,6 +38,7 @@ export type MessageToWebview = {
 )
 
 export enum MessageToWebviewType {
+  setDvcRoot = 'setDvcRoot',
   setTheme = 'setTheme',
   showExperiments = 'showExperiments'
 }

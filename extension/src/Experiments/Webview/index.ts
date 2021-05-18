@@ -138,6 +138,10 @@ export class ExperimentsWebview {
           type: MessageToWebviewType.setTheme,
           theme: config.getTheme()
         })
+        this.sendMessage({
+          type: MessageToWebviewType.setDvcRoot,
+          dvcRoot
+        })
       })
     })
   }

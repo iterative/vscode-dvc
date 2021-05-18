@@ -222,15 +222,6 @@ export class Experiments {
     return experiments
   }
 
-  public createExperiment(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ): void {
-    this.experiments[dvcRoot] = this.dispose.track(
-      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
-    )
-  }
-
   public reset(): void {
     Object.values(this.experiments).forEach(experimentsTable =>
       experimentsTable.dispose()
@@ -241,6 +232,10 @@ export class Experiments {
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
     const experimentsTable = this.experiments[dvcRoot]
     experimentsTable.onDidChangeData(gitRoot)
+  }
+
+  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
+    this.experiments[dvcRoot].setWebview(experimentsWebview)
   }
 
   constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
