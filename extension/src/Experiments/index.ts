@@ -84,28 +84,20 @@ export class ExperimentsTable {
 
     const webview = await ExperimentsWebview.create(
       this.config,
-      this.dvcRoot,
+      { dvcRoot: this.dvcRoot, experiments: this.data },
       this.resourceLocator
     )
 
     this.setWebview(webview)
-    this.sendData()
 
     this.isWebviewFocusedChanged.fire(this.dvcRoot)
 
     return webview
   }
 
-  private sendData() {
-    if (this.data && this.webview) {
-      return this.webview.showExperiments({
-        tableData: this.data
-      })
-    }
-  }
-
   public setWebview = (view: ExperimentsWebview) => {
     this.webview = this.dispose.track(view)
+    this.sendData()
     this.dispose.track(
       view.onDidDispose(() => {
         this.resetWebview()
@@ -116,6 +108,14 @@ export class ExperimentsTable {
         this.isWebviewFocusedChanged.fire(dvcRoot)
       })
     )
+  }
+
+  private sendData() {
+    if (this.data && this.webview) {
+      return this.webview.showExperiments({
+        tableData: this.data
+      })
+    }
   }
 
   private resetWebview = () => {
@@ -222,15 +222,6 @@ export class Experiments {
     return experiments
   }
 
-  public createExperiment(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ): void {
-    this.experiments[dvcRoot] = this.dispose.track(
-      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
-    )
-  }
-
   public reset(): void {
     Object.values(this.experiments).forEach(experimentsTable =>
       experimentsTable.dispose()
@@ -241,6 +232,15 @@ export class Experiments {
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
     const experimentsTable = this.experiments[dvcRoot]
     experimentsTable.onDidChangeData(gitRoot)
+  }
+
+  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
+    const experimentsTable = this.experiments[dvcRoot]
+    if (!experimentsTable) {
+      experimentsWebview.dispose()
+    }
+
+    experimentsTable.setWebview(experimentsWebview)
   }
 
   constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {

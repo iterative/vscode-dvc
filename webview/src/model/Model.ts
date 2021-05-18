@@ -25,6 +25,7 @@ declare let __webpack_public_path__: string
 
 interface PersistedModelState {
   experiments?: ExperimentsRepoJSONOutput | null
+  dvcRoot?: string
 }
 
 export class Model {
@@ -37,6 +38,9 @@ export class Model {
 
   @observable
   public experiments?: ExperimentsRepoJSONOutput | null = null
+
+  @observable
+  public dvcRoot?: string
 
   public readonly vsCodeApi = getVsCodeApi<
     PersistedModelState,
@@ -58,6 +62,7 @@ export class Model {
     )
 
     const state = this.vsCodeApi.getState()
+
     if (state) {
       this.setState(state)
     }
@@ -80,12 +85,14 @@ export class Model {
 
   private getState(): PersistedModelState {
     return {
-      experiments: this.experiments
+      experiments: this.experiments,
+      dvcRoot: this.dvcRoot
     }
   }
 
   private setState(state: PersistedModelState) {
     this.experiments = state.experiments
+    this.dvcRoot = state.dvcRoot
   }
 
   private sendMessage(message: MessageFromWebview): void {
@@ -103,6 +110,11 @@ export class Model {
       case MessageToWebviewType.showExperiments:
         runInAction(() => {
           this.experiments = message.tableData
+        })
+        return
+      case MessageToWebviewType.setDvcRoot:
+        runInAction(() => {
+          this.dvcRoot = message.dvcRoot
         })
 
         return

@@ -249,7 +249,10 @@ export class Extension {
       this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
     )
 
-    this.webviewSerializer = new WebviewSerializer(this.config)
+    this.webviewSerializer = new WebviewSerializer(
+      this.config,
+      this.experiments
+    )
     this.dispose.track(this.webviewSerializer)
 
     this.dispose.track(
