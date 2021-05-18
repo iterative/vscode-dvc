@@ -8,10 +8,12 @@ function setupNyc() {
   const NYC = require('nyc')
   const defaultExclude = require('@istanbuljs/schema/default-exclude')
 
-  // create an nyc instance, config here is the same as your package.json
+  const cwd = join(__dirname, '..', '..', '..')
+
   const nyc = new NYC({
-    cache: false,
-    cwd: join(__dirname, '..', '..', '..'),
+    cache: true,
+    cacheDir: join(cwd, '.cache', 'nyc'),
+    cwd,
     exclude: [...defaultExclude],
     hookRequire: true,
     hookRunInContext: true,
@@ -20,7 +22,7 @@ function setupNyc() {
     reporter: ['text', 'html'],
     sourceMap: true,
     extensions: ['ts'],
-    tempDirectory: './coverage/integration'
+    tempDirectory: join(cwd, 'coverage', 'integration')
   })
   nyc.reset()
   nyc.wrap()
