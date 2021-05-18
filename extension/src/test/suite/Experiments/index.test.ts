@@ -90,7 +90,7 @@ suite('Experiments Test Suite', () => {
       expect(configSpy).to.be.calledOnce
     })
 
-    it('should prompt to pick a project even if a webview is focused', async () => {
+    it('should prompt to pick a project even if a webview is focused (if no default)', async () => {
       const mockPickDvcRoot = stub(Workspace, 'pickDvcRoot').resolves(
         dvcDemoPath
       )
