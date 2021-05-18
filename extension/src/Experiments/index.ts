@@ -84,7 +84,7 @@ export class ExperimentsTable {
 
     const webview = await ExperimentsWebview.create(
       this.config,
-      this.dvcRoot,
+      { dvcRoot: this.dvcRoot, experiments: this.data },
       this.resourceLocator
     )
 

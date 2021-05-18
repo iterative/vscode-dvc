@@ -62,6 +62,7 @@ export class Model {
     )
 
     const state = this.vsCodeApi.getState()
+
     if (state) {
       this.setState(state)
     }

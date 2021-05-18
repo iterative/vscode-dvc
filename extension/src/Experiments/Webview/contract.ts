@@ -25,7 +25,7 @@ export type MessageToWebview = {
 } & (
   | {
       type: MessageToWebviewType.setDvcRoot
-      dvcRoot?: string
+      dvcRoot: string
     }
   | {
       type: MessageToWebviewType.setTheme

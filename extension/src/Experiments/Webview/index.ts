@@ -56,11 +56,14 @@ export class ExperimentsWebview {
   public static restore(
     webviewPanel: WebviewPanel,
     config: Config,
-    dvcRoot: string
+    state: {
+      dvcRoot: string
+      experiments?: ExperimentsRepoJSONOutput
+    }
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(webviewPanel, config, dvcRoot))
+        resolve(new ExperimentsWebview(webviewPanel, config, state))
       } catch (e) {
         reject(e)
       }
@@ -69,7 +72,10 @@ export class ExperimentsWebview {
 
   public static async create(
     config: Config,
-    dvcRoot: string,
+    state: {
+      dvcRoot: string
+      experiments?: ExperimentsRepoJSONOutput
+    },
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
@@ -85,7 +91,7 @@ export class ExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new ExperimentsWebview(webviewPanel, config, dvcRoot)
+    const view = new ExperimentsWebview(webviewPanel, config, state)
     await view.isReady()
     return view
   }
@@ -105,13 +111,16 @@ export class ExperimentsWebview {
   private constructor(
     webviewPanel: WebviewPanel,
     config: Config,
-    dvcRoot: string
+    state: {
+      dvcRoot: string
+      experiments?: ExperimentsRepoJSONOutput
+    }
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
 
     this.config = config
-    this.dvcRoot = dvcRoot
+    this.dvcRoot = state.dvcRoot
 
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
@@ -133,15 +142,22 @@ export class ExperimentsWebview {
 
     this.disposer.track({
       dispose: autorun(async () => {
-        await this.initialized // Read all mobx dependencies before await
+        await this.isReady() // Read all mobx dependencies before await
         this.sendMessage({
           type: MessageToWebviewType.setTheme,
           theme: config.getTheme()
         })
         this.sendMessage({
           type: MessageToWebviewType.setDvcRoot,
-          dvcRoot
+          dvcRoot: this.dvcRoot
         })
+        const experiments = state.experiments
+        if (experiments) {
+          this.sendMessage({
+            type: MessageToWebviewType.showExperiments,
+            tableData: experiments
+          })
+        }
       })
     })
   }
