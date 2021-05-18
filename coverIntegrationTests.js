@@ -5,7 +5,7 @@ const { writeFileSync } = require('fs-extra')
 const execa = require('execa')
 
 let activationEvents = []
-
+let failed
 const packageJsonPath = resolve(__dirname, 'extension', 'package.json')
 
 const cwd = join(__dirname, 'extension')
@@ -28,12 +28,22 @@ tsc.then(() => {
 
   tests.stdout.pipe(process.stdout)
   tests.stderr.pipe(process.stderr)
-  tests.then(() => {
-    packageJson.activationEvents = activationEvents
-    writeFileSync(packageJsonPath, JSON.stringify(packageJson))
+  tests
+    .then(() => {})
+    .catch(() => {
+      failed = true
+    })
+    .finally(() => {
+      packageJson.activationEvents = activationEvents
+      writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
-    const prettier = execa('prettier', ['--write', 'package.json'], { cwd })
-    prettier.stdout.pipe(process.stdout)
-    prettier.stderr.pipe(process.stderr)
-  })
+      const prettier = execa('prettier', ['--write', 'package.json'], { cwd })
+      prettier.stdout.pipe(process.stdout)
+      prettier.stderr.pipe(process.stderr)
+      prettier.then(() => {
+        if (failed) {
+          process.exit(1)
+        }
+      })
+    })
 })
