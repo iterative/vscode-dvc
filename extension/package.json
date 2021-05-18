@@ -448,12 +448,11 @@
     "test": "jest",
     "cover:unit": "jest --collect-coverage",
     "cover:integration": "yarn run test-vscode-run",
-    "ci:cover:integration": "yarn run test-vscode-run --ci --cover",
     "cover:merge:unit": "nyc merge ./coverage/unit coverage/unit-coverage-final.json",
     "cover:merge:integration": "nyc merge ./coverage/integration coverage/integration-coverage-final.json",
     "cover:report": "nyc report --reporter=lcov --reporter=text --temp-dir=./coverage",
     "cover:clean": "rm -rf ./coverage/combined",
-    "cover": "yarn run cover:unit && yarn run ci:cover:integration && yarn run-p cover:merge:* && yarn run cover:report && yarn run cover:clean",
+    "cover": "yarn run cover:unit",
     "vscode:prepublish": ""
   },
   "dependencies": {
