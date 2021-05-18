@@ -2,7 +2,12 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
-import { deleteTarget, pickDvcRoot, pickDvcRootThenRun } from './workspace'
+import {
+  deleteTarget,
+  getDefaultOrPickDvcRoot,
+  getDvcRootThenRun,
+  pickDvcRoot
+} from './workspace'
 import { findDvcRootPaths } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -20,12 +25,11 @@ const mockedShowRepoQuickPick = mocked<
 
 const mockedCwd = '/root'
 
+const mockedGetDefaultProject = jest.fn()
+const mockedGetExecutionOptions = jest.fn()
 const mockedConfig = ({
-  getExecutionOptions: () => ({
-    cliPath: undefined,
-    cwd: mockedCwd,
-    pythonBinPath: undefined
-  })
+  getDefaultProject: mockedGetDefaultProject,
+  getExecutionOptions: mockedGetExecutionOptions
 } as unknown) as Config
 
 jest.mock('vscode')
@@ -54,22 +58,14 @@ describe('deleteTarget', () => {
 })
 
 describe('pickDvcRoot', () => {
-  it('should return the optional repository if provided', async () => {
-    const optionallyProvidedRepo = `${mockedCwd}/repo/b`
-    const repoRoot = await pickDvcRoot(mockedConfig, optionallyProvidedRepo)
-    expect(repoRoot).toEqual(optionallyProvidedRepo)
-  })
-
   it('should return the single repository if only one is found', async () => {
     const singleRepo = '/some/other/path/to/repo/a'
 
-    const mockedConfig = ({
-      getExecutionOptions: () => ({
-        cliPath: undefined,
-        cwd: singleRepo,
-        pythonBinPath: undefined
-      })
-    } as unknown) as Config
+    mockedGetExecutionOptions.mockResolvedValueOnce({
+      cliPath: undefined,
+      cwd: singleRepo,
+      pythonBinPath: undefined
+    })
 
     mockedFindDvcRootPaths.mockResolvedValueOnce([singleRepo])
 
@@ -82,13 +78,11 @@ describe('pickDvcRoot', () => {
     const unselectedRepoB = '/path/to/repo/b'
     const unselectedRepoC = '/path/to/repo/c'
 
-    const mockedConfig = ({
-      getExecutionOptions: () => ({
-        cliPath: undefined,
-        cwd: '/path/to',
-        pythonBinPath: undefined
-      })
-    } as unknown) as Config
+    mockedGetExecutionOptions.mockResolvedValueOnce({
+      cliPath: undefined,
+      cwd: '/path/to',
+      pythonBinPath: undefined
+    })
 
     mockedShowRepoQuickPick.mockResolvedValueOnce(selectedRepo)
 
@@ -120,12 +114,27 @@ describe('pickDvcRoot', () => {
   })
 })
 
-describe('pickDvcRootThenRun', () => {
+describe('getDefaultOrPickDvcRoot', () => {
+  it('should return the default project if it is set', async () => {
+    const defaultProject = `${mockedCwd}/repo/b`
+    mockedGetExecutionOptions.mockResolvedValueOnce({
+      cliPath: undefined,
+      cwd: mockedCwd,
+      pythonBinPath: undefined
+    })
+    mockedGetDefaultProject.mockResolvedValueOnce(defaultProject)
+
+    const repoRoot = await getDefaultOrPickDvcRoot(mockedConfig)
+    expect(repoRoot).toEqual(defaultProject)
+  })
+})
+
+describe('getDvcRootThenRun', () => {
   it('should run the function if a DVC root is found or provided', async () => {
     mockedFindDvcRootPaths.mockResolvedValueOnce(['/root/nested/repo'])
 
     const mockedFunc = jest.fn()
-    await pickDvcRootThenRun(mockedConfig, mockedFunc)
+    await getDvcRootThenRun(mockedConfig, mockedFunc)
     expect(mockedFunc).toBeCalledTimes(1)
   })
 
@@ -135,7 +144,7 @@ describe('pickDvcRootThenRun', () => {
     mockedFindDvcRootPaths.mockResolvedValueOnce([])
 
     const mockedFunc = jest.fn()
-    await pickDvcRootThenRun(mockedConfig, mockedFunc)
+    await getDvcRootThenRun(mockedConfig, mockedFunc)
     expect(mockedFunc).toBeCalledTimes(0)
   })
 })

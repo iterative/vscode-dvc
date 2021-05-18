@@ -34,8 +34,7 @@
     "node": ">=10.2.0"
   },
   "activationEvents": [
-    "*",
-    "onWebviewPanel:dvc-experiments"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -105,6 +104,16 @@
       {
         "title": "%command.removeExperiment%",
         "command": "dvc.removeExperiment",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.deselectDefaultProject%",
+        "command": "dvc.deselectDefaultProject",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.selectDefaultProject%",
+        "command": "dvc.selectDefaultProject",
         "category": "DVC"
       },
       {
@@ -187,6 +196,12 @@
     "configuration": {
       "title": "DVC",
       "properties": {
+        "dvc.defaultProject": {
+          "title": "%config.defaultProject.title%",
+          "description": "%config.defaultProject.description%",
+          "type": "string",
+          "scope": "resource"
+        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",
@@ -430,6 +445,7 @@
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
+    "cover": "jest --collect-coverage",
     "vscode:prepublish": ""
   },
   "dependencies": {

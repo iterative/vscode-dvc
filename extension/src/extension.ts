@@ -27,7 +27,6 @@ import {
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
 import { GitExtension } from './extensions/Git'
-import { resolve } from 'path'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
@@ -52,12 +51,13 @@ export class Extension {
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
   private dvcRepositories: Record<string, Repository> = {}
-  private readonly experiments: Record<string, Experiments> = {}
+  private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly gitExtension: GitExtension
+
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter<void>()
+    new EventEmitter()
   )
 
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
@@ -154,15 +154,12 @@ export class Extension {
   }
 
   private initializeExperiments() {
-    this.dvcRoots.forEach(dvcRoot => {
-      this.experiments[dvcRoot] = this.dispose.track(
-        new Experiments(dvcRoot, this.config, this.runner, this.resourceLocator)
-      )
-    })
+    this.experiments.reset()
+    this.experiments.create(this.dvcRoots, this.resourceLocator)
   }
 
   private async initializeGitRepositories() {
-    await this.gitExtension.isReady()
+    await Promise.all([this.experiments.isReady(), this.gitExtension.isReady()])
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
@@ -175,7 +172,7 @@ export class Extension {
       dvcRoots.forEach(dvcRoot => {
         const repository = this.dvcRepositories[dvcRoot]
 
-        this.dispose.track(this.onDidChangeExperimentsData(dvcRoot, gitRoot))
+        this.experiments.onDidChangeData(dvcRoot, gitRoot)
 
         this.dispose.track(
           gitExtensionRepository.onDidChange(() => {
@@ -186,26 +183,32 @@ export class Extension {
     })
   }
 
-  private onDidChangeExperimentsData = (
-    dvcRoot: string,
-    gitRoot: string
-  ): Disposable => {
-    if (!gitRoot) {
-      throw new Error(
-        'Live updates for the experiment table are not possible as the Git repo root was not found!'
-      )
-    }
-    const experiments = this.experiments[dvcRoot]
-    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    return onDidChangeFileSystem(refsPath, experiments.refresh)
-  }
-
   private setCommandsAvailability(available: boolean) {
     setContextValue('dvc.commands.available', available)
   }
 
   private setProjectAvailability(available: boolean) {
     setContextValue('dvc.project.available', available)
+  }
+
+  private registerConfigCommands() {
+    this.dispose.track(
+      commands.registerCommand('dvc.deselectDefaultProject', () =>
+        this.config.deselectDefaultProject()
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDvcPath', () =>
+        this.config.selectDvcPath()
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand('dvc.selectDefaultProject', () =>
+        this.config.selectDefaultProject()
+      )
+    )
   }
 
   constructor(context: ExtensionContext) {
@@ -225,6 +228,8 @@ export class Extension {
     this.config = this.dispose.track(new Config())
 
     this.runner = this.dispose.track(new Runner(this.config))
+
+    this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.gitExtension = this.dispose.track(new GitExtension())
 
@@ -247,16 +252,13 @@ export class Extension {
     this.webviewSerializer = new WebviewSerializer(this.config)
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(this.experiments, this.config, this.dispose)
-
-    registerRepositoryCommands(this.config, this.dispose)
-
-    // When hot-reload is active, make sure that you dispose everything when the extension is disposed!
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', () =>
-        this.config.selectDvcPath()
-      )
+      registerExperimentCommands(this.config, this.experiments, this.runner)
     )
+
+    this.dispose.track(registerRepositoryCommands(this.config))
+
+    this.registerConfigCommands()
   }
 }
 

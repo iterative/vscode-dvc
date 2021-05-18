@@ -10,13 +10,8 @@ export const deleteTarget = (path: string) => {
 }
 
 export const pickDvcRoot = async (
-  config: Config,
-  providedRoot?: string
+  config: Config
 ): Promise<string | undefined> => {
-  if (providedRoot) {
-    return providedRoot
-  }
-
   const options = config.getExecutionOptions()
 
   const dvcRoots = await findDvcRootPaths(options)
@@ -30,13 +25,25 @@ export const pickDvcRoot = async (
   })
 }
 
-export const pickDvcRootThenRun = async (
+export const getDefaultOrPickDvcRoot = (
+  config: Config
+): Promise<string | undefined> => {
+  const defaultProject = config.getDefaultProject()
+  if (defaultProject) {
+    return Promise.resolve(defaultProject)
+  }
+  return pickDvcRoot(config)
+}
+
+export const getDvcRootThenRun = async (
   config: Config,
   func: (options: ExecutionOptions) => unknown
 ) => {
-  const dvcRoot = await pickDvcRoot(config)
-  if (dvcRoot) {
-    const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
-    return func(options)
+  const dvcRoot = await getDefaultOrPickDvcRoot(config)
+  if (!dvcRoot) {
+    return
   }
+
+  const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
+  return func(options)
 }

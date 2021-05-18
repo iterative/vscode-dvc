@@ -37,6 +37,13 @@ jobs:
           restore-keys: yarn
 
       - uses: actions/cache@v2
+        name: Restore NYC cache
+        id: nyc-cache
+        with:
+          path: extension/.cache/nyc
+          key: nyc
+
+      - uses: actions/cache@v2
         name: Restore ESLint cache
         id: eslint-cache
         with:
@@ -52,7 +59,14 @@ jobs:
 
       - run: yarn install
 
-      - run: xvfb-run -a yarn run-p lint test
+      - run: yarn run lint
+
+      - uses: paambaati/codeclimate-action@v2.7.5
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageCommand: xvfb-run -a yarn run cover
+          coverageLocations: ${{github.workspace}}/coverage/lcov.info:lcov
 
       - run: yarn run-p "build-extension -o ./vscode-dvc.vsix" build-storybook
 
