@@ -1,7 +1,10 @@
+import { writeFileSync } from 'fs-extra'
 import { resolve } from 'path'
-
 import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
 import { Logger } from '../common/Logger'
+import { definedAndNonEmpty } from '../util'
+
+const argv = require('yargs/yargs')(process.argv.slice(2)).argv
 
 async function main() {
   try {
@@ -25,4 +28,20 @@ async function main() {
   }
 }
 
+let activationEvents = []
+let packageJson
+const packageJsonPath = resolve(__dirname, '..', '..', 'package.json')
+
+if (argv.ci && argv.cover) {
+  packageJson = require(packageJsonPath)
+  activationEvents = packageJson.activationEvents
+  packageJson.activationEvents = ['onStartupFinished']
+  writeFileSync(packageJsonPath, JSON.stringify(packageJson))
+}
+
 main()
+
+if (argv.ci && argv.cover && definedAndNonEmpty(activationEvents)) {
+  packageJson.activationEvents = activationEvents
+  writeFileSync(packageJsonPath, JSON.stringify(packageJson))
+}
