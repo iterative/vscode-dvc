@@ -13,8 +13,11 @@ export class WebviewSerializer {
 
     this.dispose.track(
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
-        deserializeWebviewPanel: async (panel: WebviewPanel) => {
-          await ExperimentsWebview.restore(panel, this.config)
+        deserializeWebviewPanel: async (
+          panel: WebviewPanel,
+          state: { dvcRoot: string }
+        ) => {
+          await ExperimentsWebview.restore(panel, this.config, state?.dvcRoot)
         }
       })
     )
