@@ -1,5 +1,4 @@
 import { resolve } from 'path'
-
 import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
 import { Logger } from '../common/Logger'
 

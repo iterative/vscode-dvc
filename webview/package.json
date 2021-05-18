@@ -5,6 +5,7 @@
     "dev": "webpack-dev-server --hot",
     "build": "webpack --mode production",
     "test": "jest",
+    "cover": "jest --collect-coverage",
     "test-staged": "lint-staged",
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json}'",
     "lint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",

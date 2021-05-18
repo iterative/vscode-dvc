@@ -34,8 +34,7 @@
     "node": ">=10.2.0"
   },
   "activationEvents": [
-    "*",
-    "onWebviewPanel:dvc-experiments"
+    "*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -446,6 +445,7 @@
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
+    "cover": "jest --collect-coverage",
     "vscode:prepublish": ""
   },
   "dependencies": {
