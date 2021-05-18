@@ -89,23 +89,15 @@ export class ExperimentsTable {
     )
 
     this.setWebview(webview)
-    this.sendData()
 
     this.isWebviewFocusedChanged.fire(this.dvcRoot)
 
     return webview
   }
 
-  private sendData() {
-    if (this.data && this.webview) {
-      return this.webview.showExperiments({
-        tableData: this.data
-      })
-    }
-  }
-
   public setWebview = (view: ExperimentsWebview) => {
     this.webview = this.dispose.track(view)
+    this.sendData()
     this.dispose.track(
       view.onDidDispose(() => {
         this.resetWebview()
@@ -116,6 +108,14 @@ export class ExperimentsTable {
         this.isWebviewFocusedChanged.fire(dvcRoot)
       })
     )
+  }
+
+  private sendData() {
+    if (this.data && this.webview) {
+      return this.webview.showExperiments({
+        tableData: this.data
+      })
+    }
   }
 
   private resetWebview = () => {
@@ -241,7 +241,6 @@ export class Experiments {
     }
 
     experimentsTable.setWebview(experimentsWebview)
-    experimentsTable.refresh()
   }
 
   constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
