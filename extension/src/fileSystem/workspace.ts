@@ -1,6 +1,5 @@
 import { Uri, window, workspace, WorkspaceEdit } from 'vscode'
 import { findDvcRootPaths } from '.'
-import { ExecutionOptions } from '../cli/execution'
 import { Config } from '../Config'
 
 export const deleteTarget = (path: string) => {
@@ -33,17 +32,4 @@ export const getDefaultOrPickDvcRoot = (
     return Promise.resolve(defaultProject)
   }
   return pickDvcRoot(config)
-}
-
-export const getDvcRootThenRun = async (
-  config: Config,
-  func: (options: ExecutionOptions) => unknown
-) => {
-  const dvcRoot = await getDefaultOrPickDvcRoot(config)
-  if (!dvcRoot) {
-    return
-  }
-
-  const options = { ...config.getExecutionOptions(), cwd: dvcRoot }
-  return func(options)
 }

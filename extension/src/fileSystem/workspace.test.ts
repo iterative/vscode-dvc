@@ -2,12 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
-import {
-  deleteTarget,
-  getDefaultOrPickDvcRoot,
-  getDvcRootThenRun,
-  pickDvcRoot
-} from './workspace'
+import { deleteTarget, getDefaultOrPickDvcRoot, pickDvcRoot } from './workspace'
 import { findDvcRootPaths } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -126,25 +121,5 @@ describe('getDefaultOrPickDvcRoot', () => {
 
     const repoRoot = await getDefaultOrPickDvcRoot(mockedConfig)
     expect(repoRoot).toEqual(defaultProject)
-  })
-})
-
-describe('getDvcRootThenRun', () => {
-  it('should run the function if a DVC root is found or provided', async () => {
-    mockedFindDvcRootPaths.mockResolvedValueOnce(['/root/nested/repo'])
-
-    const mockedFunc = jest.fn()
-    await getDvcRootThenRun(mockedConfig, mockedFunc)
-    expect(mockedFunc).toBeCalledTimes(1)
-  })
-
-  it("should not run the function if a DVC root isn't found or provided", async () => {
-    mockedShowRepoQuickPick.mockResolvedValueOnce(undefined)
-
-    mockedFindDvcRootPaths.mockResolvedValueOnce([])
-
-    const mockedFunc = jest.fn()
-    await getDvcRootThenRun(mockedConfig, mockedFunc)
-    expect(mockedFunc).toBeCalledTimes(0)
   })
 })
