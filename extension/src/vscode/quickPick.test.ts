@@ -6,6 +6,10 @@ const mockedWindow = mocked(window)
 
 jest.mock('vscode')
 
+beforeEach(() => {
+  jest.resetAllMocks()
+})
+
 describe('quickPickSingle', () => {
   it('should call window.quickPick with the correct arguments', async () => {
     const placeHolder = 'my placeholder'
