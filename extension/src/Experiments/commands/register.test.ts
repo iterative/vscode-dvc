@@ -98,7 +98,7 @@ describe('showExperimentsTableThenRun', () => {
 })
 
 describe('getExecutionOptionsThenRun', () => {
-  it('should call the correct function with the correct parameters', async () => {
+  it('should call the correct function with the correct parameters if a project is picked', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
     mockedQuickPickSingle.mockResolvedValueOnce(mockedDvcRoot)
     const cliPath = join(mockedDvcRoot, '.env', 'bin', 'dvc')
@@ -130,5 +130,29 @@ describe('getExecutionOptionsThenRun', () => {
       pythonBinPath: undefined,
       cwd: mockedDvcRoot
     })
+  })
+
+  it('should not call the function if a project is not picked', async () => {
+    mockedGetDefaultProject.mockReturnValueOnce(undefined)
+    mockedQuickPickSingle.mockResolvedValueOnce(undefined)
+
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as ExperimentsTable,
+      '/my/mocked/dvc/root': ({
+        showWebview: jest.fn(),
+        getDvcRoot: () => '/my/mocked/dvc/root'
+      } as unknown) as ExperimentsTable
+    })
+
+    const mockedExpFunc = jest.fn()
+    await getExecutionOptionsThenRun(experiments, mockedExpFunc)
+
+    expect(mockedGetDefaultProject).toBeCalledTimes(1)
+    expect(mockedQuickPickSingle).toBeCalledTimes(1)
+    expect(mockedGetExecutionOptions).not.toBeCalled()
+    expect(mockedExpFunc).not.toBeCalled()
   })
 })
