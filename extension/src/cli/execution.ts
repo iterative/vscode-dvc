@@ -3,6 +3,7 @@ import { getProcessEnv } from '../env'
 import { Args } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, executeProcess } from '../processExecution'
+import { Config } from '../Config'
 
 export type BaseExecutionOptions = {
   cliPath: string | undefined
@@ -14,6 +15,15 @@ type CwdOption = {
 }
 
 export type ExecutionOptions = BaseExecutionOptions & CwdOption
+
+export const getExecutionOptions = (
+  config: Config,
+  path: string
+): ExecutionOptions => ({
+  cliPath: config.getCliPath(),
+  cwd: path,
+  pythonBinPath: config.pythonBinPath
+})
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
