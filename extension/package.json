@@ -226,7 +226,7 @@
         },
         {
           "command": "dvc.init",
-          "when": "dvc.commands.available == true"
+          "when": "false"
         },
         {
           "command": "dvc.queueExperiment",

@@ -33,6 +33,7 @@ import { GitExtension } from './extensions/Git'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
+import { getExecutionOptions } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { Runner } from './cli/Runner'
@@ -77,12 +78,9 @@ export class Extension {
   }
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
-    const workspaceRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await findDvcRootPaths({
-      cliPath: this.config.getCliPath(),
-      cwd: workspaceRoot,
-      pythonBinPath: this.config.pythonBinPath
-    })
+    const workspaceFolderRoot = workspaceFolder.uri.fsPath
+    const options = getExecutionOptions(this.config, workspaceFolderRoot)
+    const dvcRoots = await findDvcRootPaths(options)
 
     if (definedAndNonEmpty(dvcRoots)) {
       this.initializeDecorationProvidersEarly(dvcRoots)
@@ -102,11 +100,11 @@ export class Extension {
   }
 
   private initializeOrNotify() {
-    return canRunCli({
-      cliPath: this.config.getCliPath(),
-      pythonBinPath: this.config.pythonBinPath,
-      cwd: this.config.workspaceRoot
-    }).then(
+    const options = getExecutionOptions(
+      this.config,
+      this.config.firstWorkspaceFolderRoot
+    )
+    return canRunCli(options).then(
       () => {
         this.initialize()
       },
@@ -166,11 +164,8 @@ export class Extension {
     this.gitExtension.repositories.forEach(async gitExtensionRepository => {
       const gitRoot = gitExtensionRepository.getRepositoryRoot()
 
-      const dvcRoots = await findDvcRootPaths({
-        cliPath: this.config.getCliPath(),
-        cwd: gitRoot,
-        pythonBinPath: this.config.pythonBinPath
-      })
+      const options = getExecutionOptions(this.config, gitRoot)
+      const dvcRoots = await findDvcRootPaths(options)
 
       dvcRoots.forEach(dvcRoot => {
         const repository = this.dvcRepositories[dvcRoot]
