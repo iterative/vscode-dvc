@@ -23,13 +23,3 @@ export const pickDvcRoot = async (
     placeHolder: 'Select which repository to run command against'
   })
 }
-
-export const getDefaultOrPickDvcRoot = (
-  config: Config
-): Promise<string | undefined> => {
-  const defaultProject = config.getDefaultProject()
-  if (defaultProject) {
-    return Promise.resolve(defaultProject)
-  }
-  return pickDvcRoot(config)
-}

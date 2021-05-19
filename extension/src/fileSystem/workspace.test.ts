@@ -2,7 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { window, workspace, WorkspaceEdit } from 'vscode'
 import { Config } from '../Config'
-import { deleteTarget, getDefaultOrPickDvcRoot, pickDvcRoot } from './workspace'
+import { deleteTarget, pickDvcRoot } from './workspace'
 import { findDvcRootPaths } from '.'
 
 const mockedWorkspace = mocked(workspace)
@@ -17,8 +17,6 @@ const mockedShowRepoQuickPick = mocked<
     options: { canPickMany: false }
   ) => Thenable<string | undefined>
 >(window.showQuickPick)
-
-const mockedCwd = '/root'
 
 const mockedGetDefaultProject = jest.fn()
 const mockedGetExecutionOptions = jest.fn()
@@ -106,20 +104,5 @@ describe('pickDvcRoot', () => {
 
     const repoRoot = await pickDvcRoot(mockedConfig)
     expect(repoRoot).toBeUndefined()
-  })
-})
-
-describe('getDefaultOrPickDvcRoot', () => {
-  it('should return the default project if it is set', async () => {
-    const defaultProject = `${mockedCwd}/repo/b`
-    mockedGetExecutionOptions.mockResolvedValueOnce({
-      cliPath: undefined,
-      cwd: mockedCwd,
-      pythonBinPath: undefined
-    })
-    mockedGetDefaultProject.mockResolvedValueOnce(defaultProject)
-
-    const repoRoot = await getDefaultOrPickDvcRoot(mockedConfig)
-    expect(repoRoot).toEqual(defaultProject)
   })
 })
