@@ -1,13 +1,10 @@
 import { commands } from 'vscode'
-import { ExecutionOptions } from '../cli/execution'
-import { ExecutionOnTargetOptions } from '../cli/executor'
+import { ExecutionOptions, getExecutionOptions } from '../cli/execution'
+import {
+  ExecutionOnTargetOptions,
+  getExecutionOnTargetOptions
+} from '../cli/executor'
 import { Config } from '../Config'
-
-const getOptions = (config: Config, path: string) => ({
-  fsPath: path,
-  cliPath: config.getCliPath(),
-  pythonBinPath: config.pythonBinPath
-})
 
 export const registerPathCommand = (
   config: Config,
@@ -15,7 +12,7 @@ export const registerPathCommand = (
   func: (options: ExecutionOnTargetOptions) => Promise<string>
 ) =>
   commands.registerCommand(name, path => {
-    const options = getOptions(config, path)
+    const options = getExecutionOnTargetOptions(config, path)
     return func(options)
   })
 
@@ -24,13 +21,10 @@ export const registerRootUriCommand = (
   name: string,
   func: (options: ExecutionOptions) => Promise<string>
 ) =>
-  commands.registerCommand(name, ({ rootUri }) =>
-    func({
-      cwd: rootUri.fsPath,
-      cliPath: config.getCliPath(),
-      pythonBinPath: config.pythonBinPath
-    })
-  )
+  commands.registerCommand(name, ({ rootUri }) => {
+    const options = getExecutionOptions(config, rootUri.fsPath)
+    return func(options)
+  })
 
 export const registerResourceUriCommand = (
   config: Config,
@@ -38,6 +32,6 @@ export const registerResourceUriCommand = (
   func: (options: ExecutionOnTargetOptions) => Promise<string>
 ) =>
   commands.registerCommand(name, ({ resourceUri }) => {
-    const options = getOptions(config, resourceUri.fsPath)
+    const options = getExecutionOnTargetOptions(config, resourceUri.fsPath)
     return func(options)
   })
