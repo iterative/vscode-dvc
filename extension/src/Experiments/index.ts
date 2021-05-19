@@ -13,6 +13,7 @@ import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
+import { ExecutionOptions } from '../cli/execution'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -166,6 +167,15 @@ export class Experiments {
     }
 
     return this.showExperimentsWebview(dvcRoot)
+  }
+
+  public async getExecutionOptions(): Promise<ExecutionOptions | undefined> {
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    return { ...this.config.getExecutionOptions(), cwd: dvcRoot }
   }
 
   public async getExperimentsTableForCommand(): Promise<
