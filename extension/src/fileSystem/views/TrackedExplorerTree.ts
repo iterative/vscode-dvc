@@ -16,8 +16,15 @@ import { definedAndNonEmpty } from '../../util'
 import { reportStderrOrThrow } from '../../vscode/reporting'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { init, pullTarget, pushTarget, removeTarget } from '../../cli/executor'
+import {
+  getExecutionOnTargetOptions,
+  init,
+  pullTarget,
+  pushTarget,
+  removeTarget
+} from '../../cli/executor'
 import { registerPathCommand } from '../../vscode/commands'
+import { getExecutionOptions } from '../../cli/execution'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -137,14 +144,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return []
     }
 
-    const listOutput = await listDvcOnly(
-      {
-        pythonBinPath: this.config.pythonBinPath,
-        cliPath: this.config.getCliPath(),
-        cwd: path
-      },
-      relative(root, path)
-    )
+    const options = getExecutionOptions(this.config, path)
+    const listOutput = await listDvcOnly(options, relative(root, path))
 
     return listOutput.map(relative => {
       const absolutePath = join(path, relative.path)
@@ -158,11 +159,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
-        await init({
-          cwd: this.config.workspaceRoot,
-          cliPath: this.config.getCliPath(),
-          pythonBinPath: this.config.pythonBinPath
-        })
+        const options = getExecutionOptions(
+          this.config,
+          this.config.workspaceRoot
+        )
+        await init(options)
 
         workspaceChanged.fire()
       })
@@ -182,11 +183,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.removeTarget', path => {
         deleteTarget(path)
-        return removeTarget({
-          fsPath: this.getDataPlaceholder(path),
-          cliPath: this.config.getCliPath(),
-          pythonBinPath: this.config.pythonBinPath
-        })
+        const options = getExecutionOnTargetOptions(
+          this.config,
+          this.getDataPlaceholder(path)
+        )
+        return removeTarget(options)
       })
     )
 
