@@ -10,6 +10,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
+import { getExecutionOptions } from '../cli/execution'
 
 export enum Status {
   DELETED = 'deleted',
@@ -78,14 +79,6 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private sourceControlManagement: SourceControlManagement
 
-  private getCliExecutionOptions() {
-    return {
-      cliPath: this.config.getCliPath(),
-      pythonBinPath: this.config.pythonBinPath,
-      cwd: this.dvcRoot
-    }
-  }
-
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
   }
@@ -101,7 +94,7 @@ export class Repository {
   }
 
   public async updateList(): Promise<void> {
-    const options = this.getCliExecutionOptions()
+    const options = getExecutionOptions(this.config, this.dvcRoot)
     const listOutput = await listDvcOnlyRecursive(options)
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
@@ -152,7 +145,7 @@ export class Repository {
   }
 
   private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const options = this.getCliExecutionOptions()
+    const options = getExecutionOptions(this.config, this.dvcRoot)
     const statusOutput = (await status(options)) as StatusOutput
 
     return this.reduceToChangedOutsStatuses(statusOutput)
