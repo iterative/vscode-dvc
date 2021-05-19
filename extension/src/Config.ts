@@ -31,7 +31,7 @@ export class Config {
     return this.initialized
   }
 
-  public readonly workspaceRoot: string
+  public readonly firstWorkspaceFolderRoot: string
 
   private readonly executionDetailsChanged: EventEmitter<
     void
@@ -56,7 +56,7 @@ export class Config {
   public getExecutionOptions(): ExecutionOptions {
     return {
       cliPath: this.getCliPath(),
-      cwd: this.workspaceRoot,
+      cwd: this.firstWorkspaceFolderRoot,
       pythonBinPath: this.pythonBinPath
     }
   }
@@ -64,7 +64,7 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private getWorkspaceRoot = (): string => {
+  private getFirstWorkspaceFolderRoot = (): string => {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0) {
       throw new Error('There are no folders in the Workspace to operate on!')
@@ -222,7 +222,7 @@ export class Config {
     if (!path) {
       return ''
     }
-    return relative(this.getWorkspaceRoot(), path) || '.'
+    return relative(this.getFirstWorkspaceFolderRoot(), path) || '.'
   }
 
   constructor() {
@@ -244,7 +244,7 @@ export class Config {
         )
     )
 
-    this.workspaceRoot = this.getWorkspaceRoot()
+    this.firstWorkspaceFolderRoot = this.getFirstWorkspaceFolderRoot()
 
     this.vsCodeTheme = window.activeColorTheme
 

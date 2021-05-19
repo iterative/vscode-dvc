@@ -158,7 +158,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
         await init({
-          cwd: this.config.workspaceRoot,
+          cwd: this.config.firstWorkspaceFolderRoot,
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
         })
