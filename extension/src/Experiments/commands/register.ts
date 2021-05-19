@@ -1,6 +1,5 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Config } from '../../Config'
 import { queueExperiment } from './report'
 import {
   applyExperiment,
@@ -9,7 +8,6 @@ import {
   removeExperiment
 } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
-import { getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { ExecutionOptions } from '../../cli/execution'
@@ -45,7 +43,6 @@ export const getExecutionOptionsThenRun = async (
 }
 
 export const registerExperimentCommands = (
-  config: Config,
   experiments: Experiments,
   runner: Runner
 ) => {
@@ -53,31 +50,31 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      getDvcRootThenRun(config, queueExperiment)
+      getExecutionOptionsThenRun(experiments, queueExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      getDvcRootThenRun(config, garbageCollectExperiments)
+      getExecutionOptionsThenRun(experiments, garbageCollectExperiments)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getDvcRootThenRun(config, applyExperiment)
+      getExecutionOptionsThenRun(experiments, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      getDvcRootThenRun(config, branchExperiment)
+      getExecutionOptionsThenRun(experiments, branchExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      getDvcRootThenRun(config, removeExperiment)
+      getExecutionOptionsThenRun(experiments, removeExperiment)
     )
   )
 
