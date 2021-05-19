@@ -21,7 +21,7 @@ export const quickPickManyValues: <T = string>(
     })
   )?.map(item => item.value)
 
-export const quickPickSingle = (
+export const quickPickOne = (
   items: string[],
   placeHolder: string
 ): Thenable<string | undefined> =>

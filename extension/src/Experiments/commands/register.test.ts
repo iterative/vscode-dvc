@@ -5,14 +5,14 @@ import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
 import { showExperimentsTableThenRun } from './register'
 import { runQueued, runReset } from './runner'
-import { quickPickSingle } from '../../vscode/quickPick'
+import { quickPickOne } from '../../vscode/quickPick'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
 const mockedRun = jest.fn()
 const mockedDvcRoot = '/my/dvc/root'
 const mockedGetDefaultProject = jest.fn()
-const mockedQuickPickSingle = mocked(quickPickSingle)
+const mockedQuickPickOne = mocked(quickPickOne)
 const mockedConfig = ({
   getDefaultProject: mockedGetDefaultProject
 } as unknown) as Config
@@ -51,14 +51,14 @@ describe('showExperimentsTableThenRun', () => {
     )
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).not.toBeCalled()
+    expect(mockedQuickPickOne).not.toBeCalled()
     expect(mockedShowWebview).toBeCalledTimes(1)
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--run-all')
   })
 
   it('should call the runner with the correct args when runReset is provided', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickSingle.mockResolvedValueOnce('/my/dvc/root')
+    mockedQuickPickOne.mockResolvedValueOnce('/my/dvc/root')
 
     const experiments = new Experiments(mockedConfig, {
       '/my/dvc/root': ({
@@ -81,8 +81,8 @@ describe('showExperimentsTableThenRun', () => {
     )
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).toBeCalledWith(
+    expect(mockedQuickPickOne).toBeCalledTimes(1)
+    expect(mockedQuickPickOne).toBeCalledWith(
       [mockedDvcRoot, '/my/other/dvc/root'],
       'Select which project to run command against'
     )

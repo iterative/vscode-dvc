@@ -11,7 +11,7 @@ import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
-import { quickPickSingle } from '../vscode/quickPick'
+import { quickPickOne } from '../vscode/quickPick'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -190,7 +190,7 @@ export class Experiments {
   }
 
   private pickDvcRoot() {
-    return quickPickSingle(
+    return quickPickOne(
       Object.keys(this.experiments),
       'Select which project to run command against'
     )
