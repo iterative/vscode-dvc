@@ -20,3 +20,12 @@ export const quickPickManyValues: <T = string>(
       canPickMany: true
     })
   )?.map(item => item.value)
+
+export const quickPickSingle = (
+  items: string[],
+  placeHolder: string
+): Thenable<string | undefined> =>
+  window.showQuickPick(items, {
+    canPickMany: false,
+    placeHolder
+  })
