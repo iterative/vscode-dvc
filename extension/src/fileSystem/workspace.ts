@@ -1,25 +1,7 @@
-import { Uri, window, workspace, WorkspaceEdit } from 'vscode'
-import { findDvcRootPaths } from '.'
-import { Config } from '../Config'
+import { Uri, workspace, WorkspaceEdit } from 'vscode'
 
 export const deleteTarget = (path: string) => {
   const edit = new WorkspaceEdit()
   edit.deleteFile(Uri.file(path), { ignoreIfNotExists: true, recursive: true })
   return workspace.applyEdit(edit)
-}
-
-export const pickDvcRoot = async (
-  config: Config
-): Promise<string | undefined> => {
-  const options = config.getExecutionOptions()
-
-  const dvcRoots = await findDvcRootPaths(options)
-  if (dvcRoots.length === 1) {
-    return dvcRoots[0]
-  }
-
-  return window.showQuickPick(dvcRoots, {
-    canPickMany: false,
-    placeHolder: 'Select which repository to run command against'
-  })
 }
