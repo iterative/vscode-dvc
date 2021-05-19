@@ -75,8 +75,8 @@ export class Extension {
   }
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
-    const workspaceRoot = workspaceFolder.uri.fsPath
-    const options = getExecutionOptions(this.config, workspaceRoot)
+    const workspaceFolderRoot = workspaceFolder.uri.fsPath
+    const options = getExecutionOptions(this.config, workspaceFolderRoot)
     const dvcRoots = await findDvcRootPaths(options)
 
     if (definedAndNonEmpty(dvcRoots)) {
@@ -97,7 +97,10 @@ export class Extension {
   }
 
   private initializeOrNotify() {
-    const options = getExecutionOptions(this.config, this.config.workspaceRoot)
+    const options = getExecutionOptions(
+      this.config,
+      this.config.firstWorkspaceFolderRoot
+    )
     return canRunCli(options).then(
       () => {
         this.initialize()
