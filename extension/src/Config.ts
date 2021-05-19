@@ -17,7 +17,6 @@ import {
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
-import { relative } from 'path'
 import { QuickPickItemWithValue } from './vscode/quickPick'
 import { getConfigValue, setConfigValue } from './vscode/config'
 
@@ -31,7 +30,7 @@ export class Config {
     return this.initialized
   }
 
-  public readonly workspaceRoot: string
+  public readonly firstWorkspaceFolderRoot: string
 
   private readonly executionDetailsChanged: EventEmitter<
     void
@@ -56,7 +55,7 @@ export class Config {
   public getExecutionOptions(): ExecutionOptions {
     return {
       cliPath: this.getCliPath(),
-      cwd: this.workspaceRoot,
+      cwd: this.firstWorkspaceFolderRoot,
       pythonBinPath: this.pythonBinPath
     }
   }
@@ -64,7 +63,7 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private getWorkspaceRoot = (): string => {
+  private getFirstWorkspaceFolderRoot = (): string => {
     const { workspaceFolders } = workspace
     if (!workspaceFolders || workspaceFolders.length === 0) {
       throw new Error('There are no folders in the Workspace to operate on!')
@@ -215,14 +214,7 @@ export class Config {
     statusBarItem: StatusBarItem,
     path: string
   ): void {
-    statusBarItem.text = this.getRelativePathText(path)
-  }
-
-  private getRelativePathText(path?: string): string {
-    if (!path) {
-      return ''
-    }
-    return relative(this.getWorkspaceRoot(), path) || '.'
+    statusBarItem.text = path
   }
 
   constructor() {
@@ -244,7 +236,7 @@ export class Config {
         )
     )
 
-    this.workspaceRoot = this.getWorkspaceRoot()
+    this.firstWorkspaceFolderRoot = this.getFirstWorkspaceFolderRoot()
 
     this.vsCodeTheme = window.activeColorTheme
 

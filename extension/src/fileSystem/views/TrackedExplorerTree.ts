@@ -17,6 +17,7 @@ import { reportStderrOrThrow } from '../../vscode/reporting'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import { init, pullTarget, pushTarget, removeTarget } from '../../cli/executor'
+import { registerPathCommand } from '../../vscode/commands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -158,7 +159,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
         await init({
-          cwd: this.config.workspaceRoot,
+          cwd: this.config.firstWorkspaceFolderRoot,
           cliPath: this.config.getCliPath(),
           pythonBinPath: this.config.pythonBinPath
         })
@@ -190,23 +191,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.pullTarget', path =>
-        pullTarget({
-          fsPath: path,
-          cliPath: this.config.getCliPath(),
-          pythonBinPath: this.config.pythonBinPath
-        })
-      )
+      registerPathCommand(this.config, 'dvc.pullTarget', pullTarget)
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.pushTarget', path =>
-        pushTarget({
-          fsPath: path,
-          cliPath: this.config.getCliPath(),
-          pythonBinPath: this.config.pythonBinPath
-        })
-      )
+      registerPathCommand(this.config, 'dvc.pushTarget', pushTarget)
     )
   }
 
