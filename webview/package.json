@@ -1,6 +1,7 @@
 {
   "name": "dvc-vscode-webview",
   "version": "0.0.1",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "webpack-dev-server --hot",
     "build": "webpack --mode production",

@@ -3,6 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
+import { getExecutionOptions } from '../cli/execution'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
@@ -40,11 +41,8 @@ export class ExperimentsTable {
   private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
       try {
-        const experimentData = experimentShow({
-          pythonBinPath: this.config.pythonBinPath,
-          cliPath: this.config.getCliPath(),
-          cwd: this.dvcRoot
-        })
+        const options = getExecutionOptions(this.config, this.dvcRoot)
+        const experimentData = experimentShow(options)
         this.currentUpdatePromise = experimentData
         this.data = await experimentData
         return experimentData
