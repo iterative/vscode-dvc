@@ -10,8 +10,8 @@ import { ExperimentsWebview } from './Webview'
 import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
-import { getDefaultOrPickDvcRoot } from '../fileSystem/workspace'
 import { onDidChangeFileSystem } from '../fileSystem'
+import { quickPickSingle } from '../vscode/quickPick'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -162,16 +162,12 @@ export class Experiments {
   private config: Config
 
   public async showExperimentsTable() {
-    const dvcRoot = await getDefaultOrPickDvcRoot(this.config)
+    const dvcRoot = await this.getDefaultOrPickDvcRoot()
     if (!dvcRoot) {
       return
     }
 
     return this.showExperimentsWebview(dvcRoot)
-  }
-
-  private getFocusedOrDefaultOrPickProject() {
-    return this.focusedWebviewDvcRoot || getDefaultOrPickDvcRoot(this.config)
   }
 
   public async getExperimentsTableForCommand(): Promise<
@@ -183,6 +179,21 @@ export class Experiments {
     }
 
     return this.showExperimentsWebview(dvcRoot)
+  }
+
+  private getFocusedOrDefaultOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getDefaultOrPickDvcRoot()
+  }
+
+  private getDefaultOrPickDvcRoot() {
+    return this.config.getDefaultProject() || this.pickDvcRoot()
+  }
+
+  private pickDvcRoot() {
+    return quickPickSingle(
+      Object.keys(this.experiments),
+      'Select which project to run command against'
+    )
   }
 
   private async showExperimentsWebview(

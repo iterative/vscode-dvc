@@ -10,7 +10,7 @@ import complexExperimentsOutput from '../../../Experiments/Webview/complex-outpu
 import { ExperimentsTable, Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
 import { ResourceLocator } from '../../../ResourceLocator'
-import * as Workspace from '../../../fileSystem/workspace'
+import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 
 chai.use(sinonChai)
@@ -48,7 +48,7 @@ suite('Experiments Test Suite', () => {
 
   describe('showExperimentsTable', () => {
     it("should take the config's default even if an experiments webview is focused", async () => {
-      const mockPickDvcRoot = stub(Workspace, 'pickDvcRoot')
+      const mockQuickPickSingle = stub(QuickPick, 'quickPickSingle')
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       await setConfigValue('dvc.defaultProject', dvcDemoPath)
@@ -77,21 +77,21 @@ suite('Experiments Test Suite', () => {
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(configSpy).to.be.calledOnce
-      expect(mockPickDvcRoot).not.to.be.called
+      expect(mockQuickPickSingle).not.to.be.called
       expect(experiments.getFocused()).to.equal(experimentsTable)
 
       configSpy.resetHistory()
-      mockPickDvcRoot.resetHistory()
+      mockQuickPickSingle.resetHistory()
 
       const focusedExperimentsTable = await experiments.showExperimentsTable()
 
       expect(focusedExperimentsTable).to.equal(experimentsTable)
-      expect(mockPickDvcRoot).not.to.be.called
+      expect(mockQuickPickSingle).not.to.be.called
       expect(configSpy).to.be.calledOnce
     })
 
     it('should prompt to pick a project even if a webview is focused (if no default)', async () => {
-      const mockPickDvcRoot = stub(Workspace, 'pickDvcRoot').resolves(
+      const mockQuickPickSingle = stub(QuickPick, 'quickPickSingle').resolves(
         dvcDemoPath
       )
 
@@ -119,24 +119,23 @@ suite('Experiments Test Suite', () => {
       await experiments.showExperimentsTable()
 
       expect(await focused).to.equal(dvcDemoPath)
-      expect(mockPickDvcRoot).to.be.calledOnce
+      expect(mockQuickPickSingle).to.be.calledOnce
       expect(experiments.getFocused()).to.equal(experimentsTable)
 
-      mockPickDvcRoot.resetHistory()
+      mockQuickPickSingle.resetHistory()
 
       const focusedExperimentsTable = await experiments.showExperimentsTable()
 
       expect(focusedExperimentsTable).to.equal(experimentsTable)
-      expect(mockPickDvcRoot).to.be.calledOnce
+      expect(mockQuickPickSingle).to.be.calledOnce
     })
   })
 
   describe('getExperimentsTableForCommand', () => {
     it('should return an experiments table if its webview is focused', async () => {
-      const mockGetDefaultOrPickDvcRoot = stub(
-        Workspace,
-        'getDefaultOrPickDvcRoot'
-      ).resolves(dvcDemoPath)
+      const mockQuickPickSingle = stub(QuickPick, 'quickPickSingle').resolves(
+        dvcDemoPath
+      )
       stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const config = disposable.track(new Config())
@@ -161,15 +160,15 @@ suite('Experiments Test Suite', () => {
       await experiments.getExperimentsTableForCommand()
 
       expect(await focused).to.equal(dvcDemoPath)
-      expect(mockGetDefaultOrPickDvcRoot).to.be.calledOnce
+      expect(mockQuickPickSingle).to.be.calledOnce
       expect(experiments.getFocused()).to.equal(experimentsTable)
 
-      mockGetDefaultOrPickDvcRoot.resetHistory()
+      mockQuickPickSingle.resetHistory()
 
       const focusedExperimentsTable = await experiments.getExperimentsTableForCommand()
 
       expect(focusedExperimentsTable).to.equal(experimentsTable)
-      expect(mockGetDefaultOrPickDvcRoot).not.to.be.called
+      expect(mockQuickPickSingle).not.to.be.called
 
       const unfocused = onDidChangeIsWebviewFocused(experimentsTable)
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
