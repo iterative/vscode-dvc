@@ -1,9 +1,13 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
+import { join } from 'path'
 import { ExperimentsTable, Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { Config } from '../../Config'
-import { showExperimentsTableThenRun } from './register'
+import {
+  getExecutionOptionsThenRun,
+  showExperimentsTableThenRun
+} from './register'
 import { runQueued, runReset } from './runner'
 import { quickPickSingle } from '../../vscode/quickPick'
 
@@ -13,8 +17,10 @@ const mockedRun = jest.fn()
 const mockedDvcRoot = '/my/dvc/root'
 const mockedGetDefaultProject = jest.fn()
 const mockedQuickPickSingle = mocked(quickPickSingle)
+const mockedGetExecutionOptions = jest.fn()
 const mockedConfig = ({
-  getDefaultProject: mockedGetDefaultProject
+  getDefaultProject: mockedGetDefaultProject,
+  getExecutionOptions: mockedGetExecutionOptions
 } as unknown) as Config
 
 jest.mock('@hediet/std/disposable')
@@ -58,7 +64,7 @@ describe('showExperimentsTableThenRun', () => {
 
   it('should call the runner with the correct args when runReset is provided', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickSingle.mockResolvedValueOnce('/my/dvc/root')
+    mockedQuickPickSingle.mockResolvedValueOnce(mockedDvcRoot)
 
     const experiments = new Experiments(mockedConfig, {
       '/my/dvc/root': ({
@@ -88,5 +94,41 @@ describe('showExperimentsTableThenRun', () => {
     )
     expect(mockedShowWebview).toBeCalledTimes(1)
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--reset')
+  })
+})
+
+describe('getExecutionOptionsThenRun', () => {
+  it('should call the correct function with the correct parameters', async () => {
+    mockedGetDefaultProject.mockReturnValueOnce(undefined)
+    mockedQuickPickSingle.mockResolvedValueOnce(mockedDvcRoot)
+    const cliPath = join(mockedDvcRoot, '.env', 'bin', 'dvc')
+    mockedGetExecutionOptions.mockReturnValueOnce({
+      cliPath,
+      pythonBinPath: undefined,
+      cwd: '/my'
+    })
+
+    const experiments = new Experiments(mockedConfig, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as ExperimentsTable,
+      '/my/mocked/dvc/root': ({
+        showWebview: jest.fn(),
+        getDvcRoot: () => '/my/mocked/dvc/root'
+      } as unknown) as ExperimentsTable
+    })
+
+    const mockedExpFunc = jest.fn()
+    await getExecutionOptionsThenRun(experiments, mockedExpFunc)
+
+    expect(mockedGetDefaultProject).toBeCalledTimes(1)
+    expect(mockedQuickPickSingle).toBeCalledTimes(1)
+    expect(mockedExpFunc).toBeCalledTimes(1)
+    expect(mockedExpFunc).toBeCalledWith({
+      cliPath,
+      pythonBinPath: undefined,
+      cwd: mockedDvcRoot
+    })
   })
 })

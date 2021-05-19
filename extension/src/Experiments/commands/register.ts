@@ -12,6 +12,7 @@ import { run, runQueued, runReset, stop } from './runner'
 import { getDvcRootThenRun } from '../../fileSystem/workspace'
 import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
+import { ExecutionOptions } from '../../cli/execution'
 
 export const showExperimentsTableThenRun = async (
   experiments: Experiments,
@@ -31,6 +32,16 @@ export const showExperimentsTableThenRun = async (
       listener.dispose()
     })
   )
+}
+
+export const getExecutionOptionsThenRun = async (
+  experiments: Experiments,
+  func: (options: ExecutionOptions) => Promise<unknown>
+) => {
+  const options = await experiments.getExecutionOptions()
+  if (options) {
+    return func(options)
+  }
 }
 
 export const registerExperimentCommands = (
