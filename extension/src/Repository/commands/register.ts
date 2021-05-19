@@ -1,4 +1,3 @@
-import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import {
@@ -10,78 +9,33 @@ import {
   pull,
   push
 } from '../../cli/executor'
+import {
+  registerResourceUriCommand,
+  registerRootUriCommand
+} from '../../vscode/commands'
 
 export const registerRepositoryCommands = (config: Config) => {
   const disposer = Disposable.fn()
 
+  disposer.track(registerResourceUriCommand(config, 'dvc.addTarget', addTarget))
+
+  disposer.track(registerRootUriCommand(config, 'dvc.checkout', checkout))
+
   disposer.track(
-    commands.registerCommand('dvc.addTarget', ({ resourceUri }) =>
-      addTarget({
-        fsPath: resourceUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    )
+    registerResourceUriCommand(config, 'dvc.checkoutTarget', checkoutTarget)
+  )
+
+  disposer.track(registerRootUriCommand(config, 'dvc.commit', commit))
+
+  disposer.track(
+    registerResourceUriCommand(config, 'dvc.commitTarget', commitTarget)
   )
 
   disposer.track(
-    commands.registerCommand('dvc.checkout', ({ rootUri }) => {
-      checkout({
-        cwd: rootUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    })
+    disposer.track(registerRootUriCommand(config, 'dvc.pull', pull))
   )
 
-  disposer.track(
-    commands.registerCommand('dvc.checkoutTarget', ({ resourceUri }) =>
-      checkoutTarget({
-        fsPath: resourceUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    )
-  )
+  disposer.track(registerRootUriCommand(config, 'dvc.push', push))
 
-  disposer.track(
-    commands.registerCommand('dvc.commit', ({ rootUri }) => {
-      commit({
-        cwd: rootUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.commitTarget', ({ resourceUri }) =>
-      commitTarget({
-        fsPath: resourceUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.pull', ({ rootUri }) => {
-      pull({
-        cwd: rootUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.push', ({ rootUri }) => {
-      push({
-        cwd: rootUri.fsPath,
-        cliPath: config.getCliPath(),
-        pythonBinPath: config.pythonBinPath
-      })
-    })
-  )
   return disposer
 }
