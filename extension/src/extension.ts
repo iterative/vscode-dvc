@@ -17,7 +17,10 @@ import {
 import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
 import { Experiments } from './Experiments'
-import { registerExperimentCommands } from './Experiments/commands/register'
+import {
+  registerExperimentCommands,
+  registerExperimentRunnerCommands
+} from './Experiments/commands/register'
 import { registerRepositoryCommands } from './Repository/commands/register'
 import {
   findDvcRootPaths,
@@ -255,8 +258,9 @@ export class Extension {
     )
     this.dispose.track(this.webviewSerializer)
 
+    this.dispose.track(registerExperimentCommands(this.experiments))
     this.dispose.track(
-      registerExperimentCommands(this.experiments, this.runner)
+      registerExperimentRunnerCommands(this.experiments, this.runner)
     )
 
     this.dispose.track(registerRepositoryCommands(this.config))

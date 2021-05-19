@@ -12,26 +12,6 @@ import { Experiments } from '..'
 import { Runner } from '../../cli/Runner'
 import { ExecutionOptions } from '../../cli/execution'
 
-export const showExperimentsTableThenRun = async (
-  experiments: Experiments,
-  runner: Runner,
-  func: typeof run | typeof runQueued | typeof runReset
-) => {
-  const experimentsTable = await experiments.getExperimentsTableForCommand()
-  if (!experimentsTable) {
-    return
-  }
-
-  func(runner, experimentsTable.getDvcRoot())
-  const listener = experiments.dispose.track(
-    runner.onDidCompleteProcess(() => {
-      experimentsTable.refresh()
-      experiments.dispose.untrack(listener)
-      listener.dispose()
-    })
-  )
-}
-
 export const getExecutionOptionsThenRun = async (
   experiments: Experiments,
   func: (options: ExecutionOptions) => Promise<unknown>
@@ -43,10 +23,7 @@ export const getExecutionOptionsThenRun = async (
   return func(options)
 }
 
-export const registerExperimentCommands = (
-  experiments: Experiments,
-  runner: Runner
-) => {
+export const registerExperimentCommands = (experiments: Experiments) => {
   const disposer = Disposable.fn()
 
   disposer.track(
@@ -80,6 +57,41 @@ export const registerExperimentCommands = (
   )
 
   disposer.track(
+    commands.registerCommand('dvc.showExperiments', () =>
+      experiments.showExperimentsTable()
+    )
+  )
+
+  return disposer
+}
+
+export const showExperimentsTableThenRun = async (
+  experiments: Experiments,
+  runner: Runner,
+  func: (runner: Runner, dvcRoot: string) => Promise<void>
+) => {
+  const experimentsTable = await experiments.getExperimentsTableForCommand()
+  if (!experimentsTable) {
+    return
+  }
+
+  func(runner, experimentsTable.getDvcRoot())
+  const listener = experiments.dispose.track(
+    runner.onDidCompleteProcess(() => {
+      experimentsTable.refresh()
+      experiments.dispose.untrack(listener)
+      listener.dispose()
+    })
+  )
+}
+
+export const registerExperimentRunnerCommands = (
+  experiments: Experiments,
+  runner: Runner
+): Disposable => {
+  const disposer = Disposable.fn()
+
+  disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
       showExperimentsTableThenRun(experiments, runner, run)
     )
@@ -94,12 +106,6 @@ export const registerExperimentCommands = (
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
       showExperimentsTableThenRun(experiments, runner, runQueued)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.showExperiments', () =>
-      experiments.showExperimentsTable()
     )
   )
 
