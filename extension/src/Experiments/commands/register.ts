@@ -37,9 +37,10 @@ export const getExecutionOptionsThenRun = async (
   func: (options: ExecutionOptions) => Promise<unknown>
 ) => {
   const options = await experiments.getExecutionOptions()
-  if (options) {
-    return func(options)
+  if (!options) {
+    return
   }
+  return func(options)
 }
 
 export const registerExperimentCommands = (
