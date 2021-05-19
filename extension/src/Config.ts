@@ -17,7 +17,6 @@ import {
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
 import { findDvcRootPaths } from './fileSystem'
-import { relative } from 'path'
 import { QuickPickItemWithValue } from './vscode/quickPick'
 import { getConfigValue, setConfigValue } from './vscode/config'
 
@@ -215,14 +214,7 @@ export class Config {
     statusBarItem: StatusBarItem,
     path: string
   ): void {
-    statusBarItem.text = this.getRelativePathText(path)
-  }
-
-  private getRelativePathText(path?: string): string {
-    if (!path) {
-      return ''
-    }
-    return relative(this.getFirstWorkspaceFolderRoot(), path) || '.'
+    statusBarItem.text = path
   }
 
   constructor() {
