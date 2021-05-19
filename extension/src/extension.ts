@@ -74,10 +74,10 @@ export class Extension {
   }
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
-    const workspaceRoot = workspaceFolder.uri.fsPath
+    const workspaceFolderRoot = workspaceFolder.uri.fsPath
     const dvcRoots = await findDvcRootPaths({
       cliPath: this.config.getCliPath(),
-      cwd: workspaceRoot,
+      cwd: workspaceFolderRoot,
       pythonBinPath: this.config.pythonBinPath
     })
 
@@ -102,7 +102,7 @@ export class Extension {
     return canRunCli({
       cliPath: this.config.getCliPath(),
       pythonBinPath: this.config.pythonBinPath,
-      cwd: this.config.workspaceRoot
+      cwd: this.config.firstWorkspaceFolderRoot
     }).then(
       () => {
         this.initialize()
