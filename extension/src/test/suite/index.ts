@@ -14,7 +14,7 @@ function setupNyc() {
     cache: true,
     cacheDir: join(cwd, '.cache', 'nyc'),
     cwd,
-    exclude: [...defaultExclude],
+    exclude: [...defaultExclude, '**/.vscode-test/**'],
     hookRequire: true,
     hookRunInContext: true,
     hookRunInThisContext: true,

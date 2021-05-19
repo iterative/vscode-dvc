@@ -9,15 +9,15 @@ import {
   showExperimentsTableThenRun
 } from './register'
 import { runQueued, runReset } from './runner'
-import { quickPickSingle } from '../../vscode/quickPick'
+import { quickPickOne } from '../../vscode/quickPick'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
 const mockedRun = jest.fn()
 const mockedDvcRoot = '/my/dvc/root'
 const mockedGetDefaultProject = jest.fn()
-const mockedQuickPickSingle = mocked(quickPickSingle)
 const mockedGetExecutionOptions = jest.fn()
+const mockedQuickPickOne = mocked(quickPickOne)
 const mockedConfig = ({
   getDefaultProject: mockedGetDefaultProject,
   getExecutionOptions: mockedGetExecutionOptions
@@ -57,14 +57,14 @@ describe('showExperimentsTableThenRun', () => {
     )
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).not.toBeCalled()
+    expect(mockedQuickPickOne).not.toBeCalled()
     expect(mockedShowWebview).toBeCalledTimes(1)
     expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--run-all')
   })
 
   it('should call the runner with the correct args when runReset is provided', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickSingle.mockResolvedValueOnce(mockedDvcRoot)
+    mockedQuickPickOne.mockResolvedValueOnce('/my/dvc/root')
 
     const experiments = new Experiments(mockedConfig, {
       '/my/dvc/root': ({
@@ -87,8 +87,8 @@ describe('showExperimentsTableThenRun', () => {
     )
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).toBeCalledWith(
+    expect(mockedQuickPickOne).toBeCalledTimes(1)
+    expect(mockedQuickPickOne).toBeCalledWith(
       [mockedDvcRoot, '/my/other/dvc/root'],
       'Select which project to run command against'
     )
@@ -100,7 +100,7 @@ describe('showExperimentsTableThenRun', () => {
 describe('getExecutionOptionsThenRun', () => {
   it('should call the correct function with the correct parameters if a project is picked', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickSingle.mockResolvedValueOnce(mockedDvcRoot)
+    mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
     const cliPath = join(mockedDvcRoot, '.env', 'bin', 'dvc')
     mockedGetExecutionOptions.mockReturnValueOnce({
       cliPath,
@@ -123,7 +123,7 @@ describe('getExecutionOptionsThenRun', () => {
     await getExecutionOptionsThenRun(experiments, mockedExpFunc)
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).toBeCalledTimes(1)
+    expect(mockedQuickPickOne).toBeCalledTimes(1)
     expect(mockedExpFunc).toBeCalledTimes(1)
     expect(mockedExpFunc).toBeCalledWith({
       cliPath,
@@ -134,7 +134,7 @@ describe('getExecutionOptionsThenRun', () => {
 
   it('should not call the function if a project is not picked', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickSingle.mockResolvedValueOnce(undefined)
+    mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
     const experiments = new Experiments(mockedConfig, {
       '/my/dvc/root': ({
@@ -151,7 +151,7 @@ describe('getExecutionOptionsThenRun', () => {
     await getExecutionOptionsThenRun(experiments, mockedExpFunc)
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickSingle).toBeCalledTimes(1)
+    expect(mockedQuickPickOne).toBeCalledTimes(1)
     expect(mockedGetExecutionOptions).not.toBeCalled()
     expect(mockedExpFunc).not.toBeCalled()
   })
