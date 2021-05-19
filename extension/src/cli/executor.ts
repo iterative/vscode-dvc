@@ -90,7 +90,7 @@ export const pull = (options: ExecutionOptions): Promise<string> =>
 export const push = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.PUSH)
 
-type ExecutionOnTargetOptions = BaseExecutionOptions & {
+export type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string
 }
 
