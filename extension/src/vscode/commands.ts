@@ -3,6 +3,19 @@ import { ExecutionOptions } from '../cli/execution'
 import { ExecutionOnTargetOptions } from '../cli/executor'
 import { Config } from '../Config'
 
+export const registerPathCommand = (
+  config: Config,
+  name: string,
+  func: (options: ExecutionOnTargetOptions) => Promise<string>
+) =>
+  commands.registerCommand(name, path =>
+    func({
+      fsPath: path,
+      cliPath: config.getCliPath(),
+      pythonBinPath: config.pythonBinPath
+    })
+  )
+
 export const registerRootUriCommand = (
   config: Config,
   name: string,
