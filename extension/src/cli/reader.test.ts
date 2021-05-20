@@ -2,7 +2,7 @@ import { experimentShow, root, listDvcOnlyRecursive } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('fs')
@@ -22,7 +22,7 @@ beforeEach(() => {
 
 describe('experimentShow', () => {
   it('should match a snapshot when parsed', async () => {
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(
       JSON.stringify(complexExperimentsOutput)
     )
@@ -45,7 +45,7 @@ describe('experimentShow', () => {
 describe('root', () => {
   it('should return the root relative to the cwd', async () => {
     const stdout = join('..', '..')
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
     const relativeRoot = await root({
       cliPath: 'dvc',
@@ -117,7 +117,7 @@ describe('listDvcOnlyRecursive', () => {
       { isout: false, isdir: false, isexec: false, path: 'logs/loss.tsv' },
       { isout: true, isdir: false, isexec: false, path: 'model.pt' }
     ]
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
     const tracked = await listDvcOnlyRecursive({
       cliPath: undefined,
