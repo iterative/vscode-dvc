@@ -18,20 +18,6 @@ export enum Status {
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'not in cache'
 }
-
-enum ChangedType {
-  CHANGED_OUTS = 'changed outs',
-  CHANGED_DEPS = 'changed deps'
-}
-
-type PathStatus = Record<string, Status>
-
-type StageOrFileStatuses = Record<ChangedType, PathStatus>
-
-type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
-
-type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
-
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
@@ -106,50 +92,6 @@ export class Repository {
     ])
   }
 
-  private getChangedOutsStatuses(
-    fileOrStage: StatusesOrAlwaysChanged[]
-  ): PathStatus[] {
-    return fileOrStage
-      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
-      .filter(value => value)
-  }
-
-  private reduceStatuses(
-    reducedStatus: Partial<Record<Status, Set<string>>>,
-    statuses: PathStatus[]
-  ) {
-    return statuses.map(entry =>
-      Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = join(this.dvcRoot, relativePath)
-        const existingPaths = reducedStatus[status] || new Set<string>()
-        reducedStatus[status] = existingPaths.add(absolutePath)
-      })
-    )
-  }
-
-  private reduceToChangedOutsStatuses(
-    filteredStatusOutput: StatusOutput
-  ): Partial<Record<Status, Set<string>>> {
-    const statusReducer = (
-      reducedStatus: Partial<Record<Status, Set<string>>>,
-      entry: StatusesOrAlwaysChanged[]
-    ): Partial<Record<Status, Set<string>>> => {
-      const statuses = this.getChangedOutsStatuses(entry)
-
-      this.reduceStatuses(reducedStatus, statuses)
-
-      return reducedStatus
-    }
-
-    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
-  }
-
-  private getStatus(): Partial<Record<Status, Set<string>>> {
-    const statusOutput = {} as StatusOutput
-
-    return this.reduceToChangedOutsStatuses(statusOutput)
-  }
-
   private mapStatusToState(status: { path: string }[]): Set<string> {
     return new Set<string>(status.map(entry => join(this.dvcRoot, entry.path)))
   }
@@ -162,8 +104,6 @@ export class Repository {
   }
 
   public async updateStatus() {
-    this.getStatus()
-
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const diffOutput = await diff(options)
     return this.getStateFromDiff(diffOutput)
