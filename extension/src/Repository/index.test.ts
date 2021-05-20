@@ -151,7 +151,7 @@ describe('Repository', () => {
   })
 
   describe('resetState', () => {
-    it('will not exclude changed outs from stages that are always changed', async () => {
+    it('should map the output of diff to the correct statuses', async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedDiff.mockResolvedValueOnce(emptyDiff)
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
