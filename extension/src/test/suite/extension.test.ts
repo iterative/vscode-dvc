@@ -108,7 +108,7 @@ suite('Extension Test Suite', () => {
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
       ])
 
-      const mockStatus = stub(CliReader, 'status').resolves({
+      stub(CliReader, 'status').resolves({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -117,6 +117,36 @@ suite('Extension Test Suite', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
+      })
+      const mockDiff = stub(CliReader, 'diff').resolves({
+        added: [],
+        deleted: [
+          {
+            path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+          }
+        ],
+        modified: [
+          {
+            path: 'data/MNIST/raw/'
+          },
+          {
+            path: 'logs/'
+          },
+          {
+            path: 'logs/acc.tsv'
+          },
+          {
+            path: 'logs/loss.tsv'
+          },
+          {
+            path: 'model.pt'
+          },
+          {
+            path: 'predictions.json'
+          }
+        ],
+        renamed: [],
+        'not in cache': []
       })
 
       const configurationChangeEvent = () => {
@@ -137,7 +167,7 @@ suite('Extension Test Suite', () => {
       expect(mockOnDidChangeFileSystem).to.have.been.called
       expect(mockOnDidChangeFileType).to.have.been.called
       expect(mockListDvcOnlyRecursive).to.have.been.called
-      expect(mockStatus).to.have.been.called
+      expect(mockDiff).to.have.been.calledOnce
 
       await configurationChangeEvent()
 
