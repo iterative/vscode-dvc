@@ -2,6 +2,7 @@ export enum Command {
   ADD = 'add',
   CHECKOUT = 'checkout',
   COMMIT = 'commit',
+  DIFF = 'diff',
   EXPERIMENT = 'exp',
   INITIALIZE = 'init',
   LIST = 'list',
