@@ -44,6 +44,12 @@ beforeEach(() => {
 describe('TrackedTreeView', () => {
   const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
 
+  const demoRootList = [
+    { isout: false, isdir: true, isexec: false, path: 'data' },
+    { isout: true, isdir: true, isexec: false, path: 'logs' },
+    { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+  ]
+
   describe('initialize', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
@@ -67,11 +73,7 @@ describe('TrackedTreeView', () => {
       trackedTreeView.initialize([dvcDemoPath])
 
       const mockedListDvcOnly = mocked(listDvcOnly)
-      mockedListDvcOnly.mockResolvedValueOnce([
-        { isout: false, isdir: true, isexec: false, path: 'data' },
-        { isout: true, isdir: true, isexec: false, path: 'logs' },
-        { isout: true, isdir: false, isexec: false, path: 'model.pt' }
-      ])
+      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       const rootElements = await trackedTreeView.getChildren()
       expect(rootElements).toEqual([
@@ -105,11 +107,7 @@ describe('TrackedTreeView', () => {
       trackedTreeView.initialize([dvcDemoPath])
 
       const mockedListDvcOnly = mocked(listDvcOnly)
-      mockedListDvcOnly.mockResolvedValueOnce([
-        { isout: false, isdir: true, isexec: false, path: 'data' },
-        { isout: true, isdir: true, isexec: false, path: 'logs' },
-        { isout: true, isdir: false, isexec: false, path: 'model.pt' }
-      ])
+      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       await trackedTreeView.getChildren()
       const treeItem = trackedTreeView.getTreeItem(join(dvcDemoPath, 'data'))
