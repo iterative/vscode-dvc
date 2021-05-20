@@ -6,7 +6,11 @@ import {
   ListFlag
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
-import { ExecutionOptions, readCliProcess } from './execution'
+import {
+  ExecutionOptions,
+  readCliProcess,
+  readCliProcessJson
+} from './execution'
 import { trimAndSplit } from '../util/stdout'
 
 export const root = (options: ExecutionOptions): Promise<string> =>
@@ -23,17 +27,15 @@ export type DiffOutput = {
 }
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
-  readCliProcess<DiffOutput>(options, JSON.parse, Command.DIFF, Flag.SHOW_JSON)
+  readCliProcessJson<DiffOutput>(options, Command.DIFF)
 
 export const experimentShow = (
   options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  readCliProcess<ExperimentsRepoJSONOutput>(
+  readCliProcessJson<ExperimentsRepoJSONOutput>(
     options,
-    JSON.parse,
     Command.EXPERIMENT,
-    ExperimentSubCommands.SHOW,
-    Flag.SHOW_JSON
+    ExperimentSubCommands.SHOW
   )
 
 export type ListOutput = {
@@ -47,27 +49,23 @@ export const listDvcOnly = (
   options: ExecutionOptions,
   relativePath: string
 ): Promise<ListOutput[]> =>
-  readCliProcess<ListOutput[]>(
+  readCliProcessJson<ListOutput[]>(
     options,
-    JSON.parse,
     Command.LIST,
     ListFlag.LOCAL_REPO,
     relativePath,
-    ListFlag.DVC_ONLY,
-    Flag.SHOW_JSON
+    ListFlag.DVC_ONLY
   )
 
 export const listDvcOnlyRecursive = (
   options: ExecutionOptions
 ): Promise<ListOutput[]> =>
-  readCliProcess<ListOutput[]>(
+  readCliProcessJson<ListOutput[]>(
     options,
-    JSON.parse,
     Command.LIST,
     ListFlag.LOCAL_REPO,
     ListFlag.DVC_ONLY,
-    Flag.RECURSIVE,
-    Flag.SHOW_JSON
+    Flag.RECURSIVE
   )
 
 type Status = Record<
@@ -76,7 +74,7 @@ type Status = Record<
 >
 
 export const status = (options: ExecutionOptions): Promise<Status> =>
-  readCliProcess<Status>(options, JSON.parse, Command.STATUS, Flag.SHOW_JSON)
+  readCliProcessJson<Status>(options, Command.STATUS)
 
 export const experimentListCurrent = (
   options: ExecutionOptions
