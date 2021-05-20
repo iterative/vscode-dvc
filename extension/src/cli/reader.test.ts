@@ -1,8 +1,8 @@
-import { experimentShow, root, listDvcOnlyRecursive } from './reader'
+import { experimentShow, root, listDvcOnlyRecursive, diff } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 
 jest.mock('fs')
@@ -14,6 +14,7 @@ const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   PATH: '/all/of/the/goodies:/in/my/path'
 }
+const SHOW_JSON = '--show-json'
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -22,7 +23,7 @@ beforeEach(() => {
 
 describe('experimentShow', () => {
   it('should match a snapshot when parsed', async () => {
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(
       JSON.stringify(complexExperimentsOutput)
     )
@@ -35,7 +36,7 @@ describe('experimentShow', () => {
     expect(experiments).toMatchSnapshot()
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp', 'show', '--show-json'],
+      args: ['exp', 'show', SHOW_JSON],
       cwd,
       env: mockedEnv
     })
@@ -45,7 +46,7 @@ describe('experimentShow', () => {
 describe('root', () => {
   it('should return the root relative to the cwd', async () => {
     const stdout = join('..', '..')
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(stdout)
     const relativeRoot = await root({
       cliPath: 'dvc',
@@ -117,7 +118,7 @@ describe('listDvcOnlyRecursive', () => {
       { isout: false, isdir: false, isexec: false, path: 'logs/loss.tsv' },
       { isout: true, isdir: false, isexec: false, path: 'model.pt' }
     ]
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
     const tracked = await listDvcOnlyRecursive({
       cliPath: undefined,
@@ -129,7 +130,42 @@ describe('listDvcOnlyRecursive', () => {
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['list', '.', '--dvc-only', '-R', '--show-json'],
+      args: ['list', '.', '--dvc-only', '-R', SHOW_JSON],
+      cwd,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('diff', () => {
+  it('should call the cli with the correct parameters', async () => {
+    const cliOutput = {
+      added: [],
+      deleted: [{ path: 'data/MNIST/raw/t10k-images-idx3-ubyte' }],
+      modified: [
+        { path: 'data/MNIST/raw/' },
+        { path: 'logs/' },
+        { path: 'logs/acc.tsv' },
+        { path: 'logs/loss.tsv' },
+        { path: 'model.pt' },
+        { path: 'predictions.json' }
+      ],
+      renamed: [],
+      'not in cache': []
+    }
+    const cwd = __dirname
+    mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+    const diffOutput = await diff({
+      cliPath: undefined,
+      pythonBinPath: undefined,
+      cwd
+    })
+
+    expect(diffOutput).toEqual(cliOutput)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['diff', SHOW_JSON],
       cwd,
       env: mockedEnv
     })

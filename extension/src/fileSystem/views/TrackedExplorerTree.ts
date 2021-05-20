@@ -29,12 +29,8 @@ import { getExecutionOptions } from '../../cli/execution'
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
-  private readonly treeDataChanged: EventEmitter<
-    string | void
-  > = this.dispose.track(new EventEmitter())
-
-  public readonly onDidChangeTreeData: Event<string | void> = this
-    .treeDataChanged.event
+  private readonly treeDataChanged: EventEmitter<string | void>
+  public readonly onDidChangeTreeData: Event<string | void>
 
   private config: Config
   private dvcRoots: string[] = []
@@ -200,10 +196,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
   }
 
-  constructor(config: Config, workspaceChanged: EventEmitter<void>) {
+  constructor(
+    config: Config,
+    workspaceChanged: EventEmitter<void>,
+    treeDataChanged?: EventEmitter<string | void>
+  ) {
     this.config = config
 
     this.registerCommands(workspaceChanged)
+
+    this.treeDataChanged = this.dispose.track(
+      treeDataChanged || new EventEmitter()
+    )
+    this.onDidChangeTreeData = this.treeDataChanged.event
 
     this.dispose.track(
       window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)

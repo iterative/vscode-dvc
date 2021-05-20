@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
 import { getProcessEnv } from '../env'
-import { Args } from './args'
+import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, executeProcess } from '../processExecution'
 import { Config } from '../Config'
@@ -118,3 +118,9 @@ export const readCliProcess = async <T = string>(
   }
   return (formatter(output) as unknown) as T
 }
+
+export const readCliProcessJson = <T>(
+  options: ExecutionOptions,
+  command: Command,
+  ...args: Args
+) => readCliProcess<T>(options, JSON.parse, command, ...args, Flag.SHOW_JSON)
