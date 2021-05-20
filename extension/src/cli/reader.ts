@@ -23,7 +23,7 @@ export type DiffOutput = {
 }
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
-  readCliProcess<DiffOutput>(options, JSON.parse, 'diff', Flag.SHOW_JSON)
+  readCliProcess<DiffOutput>(options, JSON.parse, Command.DIFF, Flag.SHOW_JSON)
 
 export const experimentShow = (
   options: ExecutionOptions
