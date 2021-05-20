@@ -4,13 +4,12 @@ import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository, RepositoryState, Status } from '.'
+import { Repository, RepositoryState } from '.'
 import {
   diff,
   DiffOutput,
   listDvcOnlyRecursive,
-  ListOutput,
-  status
+  ListOutput
 } from '../cli/reader'
 import { getAllUntracked } from '../git'
 
@@ -23,7 +22,6 @@ jest.mock('../fileSystem')
 
 const mockedDiff = mocked(diff)
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
-const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
@@ -82,7 +80,7 @@ describe('Repository', () => {
         { path: rawDataDir }
       ] as ListOutput[])
 
-      mockedDiff.mockResolvedValueOnce(({
+      mockedDiff.mockResolvedValueOnce({
         added: [],
         deleted: [],
         modified: [
@@ -92,18 +90,9 @@ describe('Repository', () => {
           { path: logLoss },
           { path: MNISTDataDir }
         ],
-        'not in cache': []
-      } as unknown) as DiffOutput)
-      mockedStatus.mockResolvedValueOnce({
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-          'always changed'
-        ],
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+        'not in cache': [],
+        renamed: []
+      } as DiffOutput)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
@@ -165,7 +154,6 @@ describe('Repository', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedDiff.mockResolvedValueOnce(emptyDiff)
-      mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
       const config = ({
@@ -190,18 +178,6 @@ describe('Repository', () => {
         modified: [],
         'not in cache': []
       } as unknown) as DiffOutput)
-      mockedStatus.mockResolvedValueOnce({
-        train: [
-          {
-            'changed deps': { 'data/MNIST': 'modified', 'train.py': 'modified' }
-          },
-          { 'changed outs': { 'model.pt': 'deleted' } },
-          'always changed'
-        ],
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
-        ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
 
       const emptySet = new Set<string>()
 
@@ -257,7 +233,6 @@ describe('Repository', () => {
     it("should update the classes state and call it's dependents", async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedDiff.mockResolvedValueOnce(emptyDiff)
-      mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
       const config = ({
@@ -286,31 +261,6 @@ describe('Repository', () => {
         deleted: [{ path: model }],
         'not in cache': [{ path: 'data/data.xml' }, { path: 'data/prepared' }]
       } as unknown) as DiffOutput)
-      mockedStatus.mockResolvedValueOnce({
-        prepare: [
-          { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
-          { 'changed outs': { 'data/prepared': Status.NOT_IN_CACHE } }
-        ],
-        featurize: [
-          { 'changed deps': { 'data/prepared': Status.NOT_IN_CACHE } },
-          { 'changed outs': { 'data/features': 'modified' } }
-        ],
-        train: [
-          { 'changed deps': { 'data/features': 'modified' } },
-          { 'changed outs': { 'model.pkl': 'deleted' } }
-        ],
-        evaluate: [
-          {
-            'changed deps': {
-              'data/features': 'modified',
-              'model.pkl': 'deleted'
-            }
-          }
-        ],
-        'data/data.xml.dvc': [
-          { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
-        ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py'),
