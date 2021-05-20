@@ -84,7 +84,7 @@ describe('Repository', () => {
         added: [],
         deleted: [],
         modified: [
-          { path: 'model.pt' },
+          { path: model },
           { path: logDir },
           { path: logAcc },
           { path: logLoss },
