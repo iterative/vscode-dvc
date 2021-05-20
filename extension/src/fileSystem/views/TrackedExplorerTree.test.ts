@@ -1,4 +1,4 @@
-import { commands, EventEmitter, window } from 'vscode'
+import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { Config } from '../../Config'
@@ -16,6 +16,7 @@ const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
+const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
@@ -41,6 +42,8 @@ beforeEach(() => {
 })
 
 describe('TrackedTreeView', () => {
+  const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
+
   describe('initialize', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
@@ -48,7 +51,6 @@ describe('TrackedTreeView', () => {
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
-      const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
       trackedTreeView.initialize([dvcDemoPath])
 
       expect(mockedTreeDataChangedFire).toBeCalledTimes(1)
@@ -56,13 +58,12 @@ describe('TrackedTreeView', () => {
   })
 
   describe('getChildren', () => {
-    it('should get the root directory children when no element is provided', async () => {
+    it('should get the children for the provided element', async () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
-      const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
       trackedTreeView.initialize([dvcDemoPath])
 
       const mockedListDvcOnly = mocked(listDvcOnly)
@@ -85,6 +86,68 @@ describe('TrackedTreeView', () => {
 
       const child = await trackedTreeView.getChildren(join(dvcDemoPath, 'data'))
       expect(child).toEqual([join(dvcDemoPath, 'data', 'MNIST')])
+    })
+  })
+
+  describe('getTreeItem', () => {
+    it('should return the correct tree item for a directory', async () => {
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
+        mockedItem = { uri, collapsibleState }
+        return mockedItem
+      })
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedConfig,
+        mockedWorkspaceChanged,
+        mockedTreeDataChanged
+      )
+      trackedTreeView.initialize([dvcDemoPath])
+
+      const mockedListDvcOnly = mocked(listDvcOnly)
+      mockedListDvcOnly.mockResolvedValueOnce([
+        { isout: false, isdir: true, isexec: false, path: 'data' },
+        { isout: true, isdir: true, isexec: false, path: 'logs' },
+        { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+      ])
+
+      await trackedTreeView.getChildren()
+      const treeItem = trackedTreeView.getTreeItem(join(dvcDemoPath, 'data'))
+
+      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(treeItem).toEqual({
+        ...mockedItem,
+        contextValue: 'dvc'
+      })
+    })
+
+    it('should return the correct tree item for a file', () => {
+      let mockedItem = {}
+      const log = join(dvcDemoPath, 'logs', 'acc.tsv')
+      const mockedUri = Uri.file(log)
+      mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
+        mockedItem = { uri, collapsibleState }
+        return mockedItem
+      })
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedConfig,
+        mockedWorkspaceChanged,
+        mockedTreeDataChanged
+      )
+
+      const treeItem = trackedTreeView.getTreeItem(log)
+
+      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(treeItem).toEqual({
+        ...mockedItem,
+        command: {
+          arguments: [mockedUri],
+          command: 'dvc.views.trackedExplorerTree.openFile',
+          title: 'Open File'
+        },
+        contextValue: 'dvcHasRemote'
+      })
     })
   })
 })
