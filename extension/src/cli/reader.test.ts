@@ -153,7 +153,7 @@ describe('diff', () => {
       renamed: [],
       'not in cache': []
     }
-    const cwd = resolve()
+    const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
     const diffOutput = await diff({
       cliPath: undefined,
