@@ -7,7 +7,7 @@ import {
 } from './views/SourceControlManagement'
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { diff, status, listDvcOnlyRecursive } from '../cli/reader'
+import { diff, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
@@ -144,15 +144,14 @@ export class Repository {
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const options = getExecutionOptions(this.config, this.dvcRoot)
-    const statusOutput = (await status(options)) as StatusOutput
+  private getStatus(): Partial<Record<Status, Set<string>>> {
+    const statusOutput = {} as StatusOutput
 
     return this.reduceToChangedOutsStatuses(statusOutput)
   }
 
   public async updateStatus() {
-    const status = await this.getStatus()
+    this.getStatus()
 
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const diffOutput = await diff(options)
@@ -166,7 +165,9 @@ export class Repository {
     this.state.deleted = new Set<string>(
       diffOutput.deleted.map(entry => join(this.dvcRoot, entry.path))
     )
-    this.state.notInCache = status['not in cache'] || new Set<string>()
+    this.state.notInCache = new Set<string>(
+      diffOutput['not in cache'].map(entry => join(this.dvcRoot, entry.path))
+    )
   }
 
   public async updateUntracked() {

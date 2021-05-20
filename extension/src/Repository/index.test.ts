@@ -91,7 +91,8 @@ describe('Repository', () => {
           { path: logAcc },
           { path: logLoss },
           { path: MNISTDataDir }
-        ]
+        ],
+        'not in cache': []
       } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         train: [
@@ -140,7 +141,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
-      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
         expectedExecutionOptions
@@ -186,7 +187,8 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce(({
         added: [],
         deleted: [{ path: model }, { path: dataDir }],
-        modified: []
+        modified: [],
+        'not in cache': []
       } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         train: [
@@ -235,7 +237,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
-      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
         expectedExecutionOptions
@@ -281,7 +283,8 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce(({
         added: [],
         modified: [{ path: 'data/features' }],
-        deleted: [{ path: model }]
+        deleted: [{ path: model }],
+        'not in cache': [{ path: 'data/data.xml' }, { path: 'data/prepared' }]
       } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         prepare: [
@@ -340,7 +343,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
-      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
         expectedExecutionOptions
