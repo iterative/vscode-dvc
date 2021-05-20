@@ -59,6 +59,14 @@ beforeEach(() => {
 describe('Repository', () => {
   const dvcRoot = resolve(__dirname, '..', '..', 'demo')
 
+  const emptyDiff = {
+    added: [],
+    modified: [],
+    deleted: [],
+    renamed: [],
+    'not in cache': []
+  }
+
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
       const logDir = 'logs'
@@ -74,7 +82,8 @@ describe('Repository', () => {
         { path: rawDataDir }
       ] as ListOutput[])
 
-      mockedDiff.mockResolvedValueOnce({
+      mockedDiff.mockResolvedValueOnce(({
+        deleted: [],
         modified: [
           { path: 'model.pt' },
           { path: logDir },
@@ -82,7 +91,7 @@ describe('Repository', () => {
           { path: logLoss },
           { path: MNISTDataDir }
         ]
-      } as DiffOutput)
+      } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
@@ -153,9 +162,7 @@ describe('Repository', () => {
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
-      mockedDiff.mockResolvedValueOnce(({
-        modified: []
-      } as unknown) as DiffOutput)
+      mockedDiff.mockResolvedValueOnce(emptyDiff)
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
@@ -176,6 +183,7 @@ describe('Repository', () => {
       const model = 'model.pt'
 
       mockedDiff.mockResolvedValueOnce(({
+        deleted: [{ path: model }, { path: dataDir }],
         modified: []
       } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
@@ -244,9 +252,7 @@ describe('Repository', () => {
 
     it("should update the classes state and call it's dependents", async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
-      mockedDiff.mockResolvedValueOnce(({
-        modified: []
-      } as unknown) as DiffOutput)
+      mockedDiff.mockResolvedValueOnce(emptyDiff)
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
@@ -262,7 +268,7 @@ describe('Repository', () => {
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
       const dataDir = 'data'
-      const model = 'model.pt'
+      const model = 'model.pkl'
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: logAcc },
         { path: logLoss },
@@ -271,7 +277,8 @@ describe('Repository', () => {
       ] as ListOutput[])
 
       mockedDiff.mockResolvedValueOnce(({
-        modified: [{ path: 'data/features' }]
+        modified: [{ path: 'data/features' }],
+        deleted: [{ path: model }]
       } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         prepare: [
@@ -313,8 +320,8 @@ describe('Repository', () => {
       const deleted = new Set([join(dvcRoot, 'model.pkl')])
       const modified = new Set([join(dvcRoot, 'data/features')])
       const notInCache = new Set([
-        join(dvcRoot, 'data/data.xml'),
-        join(dvcRoot, 'data/prepared')
+        join(dvcRoot, 'data/prepared'),
+        join(dvcRoot, 'data/data.xml')
       ])
       const tracked = new Set([
         resolve(dvcRoot, logAcc),

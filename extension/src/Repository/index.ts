@@ -160,7 +160,9 @@ export class Repository {
     this.state.modified = new Set<string>(
       diffOutput.modified.map(entry => join(this.dvcRoot, entry.path))
     )
-    this.state.deleted = status.deleted || new Set<string>()
+    this.state.deleted = new Set<string>(
+      diffOutput.deleted.map(entry => join(this.dvcRoot, entry.path))
+    )
     this.state.new = status.new || new Set<string>()
     this.state.notInCache = status['not in cache'] || new Set<string>()
   }
