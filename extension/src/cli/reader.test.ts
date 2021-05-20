@@ -1,4 +1,4 @@
-import { experimentShow, root, listDvcOnlyRecursive } from './reader'
+import { experimentShow, root, listDvcOnlyRecursive, diff } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
@@ -14,6 +14,7 @@ const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   PATH: '/all/of/the/goodies:/in/my/path'
 }
+const SHOW_JSON = '--show-json'
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -35,7 +36,7 @@ describe('experimentShow', () => {
     expect(experiments).toMatchSnapshot()
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['exp', 'show', '--show-json'],
+      args: ['exp', 'show', SHOW_JSON],
       cwd,
       env: mockedEnv
     })
@@ -129,7 +130,42 @@ describe('listDvcOnlyRecursive', () => {
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['list', '.', '--dvc-only', '-R', '--show-json'],
+      args: ['list', '.', '--dvc-only', '-R', SHOW_JSON],
+      cwd,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('diff', () => {
+  it('should call the cli with the correct parameters', async () => {
+    const cliOutput = {
+      added: [],
+      deleted: [{ path: 'data/MNIST/raw/t10k-images-idx3-ubyte' }],
+      modified: [
+        { path: 'data/MNIST/raw/' },
+        { path: 'logs/' },
+        { path: 'logs/acc.tsv' },
+        { path: 'logs/loss.tsv' },
+        { path: 'model.pt' },
+        { path: 'predictions.json' }
+      ],
+      renamed: [],
+      'not in cache': []
+    }
+    const cwd = resolve()
+    mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+    const diffOutput = await diff({
+      cliPath: undefined,
+      pythonBinPath: undefined,
+      cwd
+    })
+
+    expect(diffOutput).toEqual(cliOutput)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['diff', SHOW_JSON],
       cwd,
       env: mockedEnv
     })
