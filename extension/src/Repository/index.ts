@@ -7,7 +7,7 @@ import {
 } from './views/SourceControlManagement'
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { status, listDvcOnlyRecursive } from '../cli/reader'
+import { diff, status, listDvcOnlyRecursive } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
@@ -154,7 +154,13 @@ export class Repository {
   public async updateStatus() {
     const status = await this.getStatus()
 
-    this.state.modified = status.modified || new Set<string>()
+    const options = getExecutionOptions(this.config, this.dvcRoot)
+    const diffOutput = await diff(options)
+
+    this.state.modified =
+      new Set<string>(
+        diffOutput.modified.map(entry => join(this.dvcRoot, entry.path))
+      ) || new Set<string>()
     this.state.deleted = status.deleted || new Set<string>()
     this.state.new = status.new || new Set<string>()
     this.state.notInCache = status['not in cache'] || new Set<string>()

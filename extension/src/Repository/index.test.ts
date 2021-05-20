@@ -5,7 +5,13 @@ import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
 import { Repository, RepositoryState, Status } from '.'
-import { listDvcOnlyRecursive, ListOutput, status } from '../cli/reader'
+import {
+  diff,
+  DiffOutput,
+  listDvcOnlyRecursive,
+  ListOutput,
+  status
+} from '../cli/reader'
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
@@ -15,6 +21,7 @@ jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
 
+const mockedDiff = mocked(diff)
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
@@ -67,6 +74,15 @@ describe('Repository', () => {
         { path: rawDataDir }
       ] as ListOutput[])
 
+      mockedDiff.mockResolvedValueOnce({
+        modified: [
+          { path: 'model.pt' },
+          { path: logDir },
+          { path: logAcc },
+          { path: logLoss },
+          { path: MNISTDataDir }
+        ]
+      } as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
@@ -91,7 +107,13 @@ describe('Repository', () => {
       const repository = new Repository(dvcRoot, config, decorationProvider)
       await repository.isReady()
 
-      const modified = new Set([resolve(dvcRoot, rawDataDir)])
+      const modified = new Set([
+        resolve(dvcRoot, rawDataDir),
+        resolve(dvcRoot, logDir),
+        resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logLoss),
+        resolve(dvcRoot, model)
+      ])
       const tracked = new Set([
         resolve(dvcRoot, logAcc),
         resolve(dvcRoot, logLoss),
@@ -131,6 +153,9 @@ describe('Repository', () => {
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedDiff.mockResolvedValueOnce(({
+        modified: []
+      } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
@@ -150,6 +175,9 @@ describe('Repository', () => {
       const logLoss = join(logDir, 'loss.tsv')
       const model = 'model.pt'
 
+      mockedDiff.mockResolvedValueOnce(({
+        modified: []
+      } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         train: [
           {
@@ -216,6 +244,9 @@ describe('Repository', () => {
 
     it("should update the classes state and call it's dependents", async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedDiff.mockResolvedValueOnce(({
+        modified: []
+      } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
@@ -239,6 +270,9 @@ describe('Repository', () => {
         { path: dataDir }
       ] as ListOutput[])
 
+      mockedDiff.mockResolvedValueOnce(({
+        modified: [{ path: 'data/features' }]
+      } as unknown) as DiffOutput)
       mockedStatus.mockResolvedValueOnce({
         prepare: [
           { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
