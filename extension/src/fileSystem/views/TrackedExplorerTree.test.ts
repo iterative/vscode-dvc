@@ -95,6 +95,7 @@ describe('TrackedTreeView', () => {
     it('should return the correct tree item for a directory', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
+        expect(collapsibleState).toEqual(1)
         mockedItem = { uri, collapsibleState }
         return mockedItem
       })
@@ -124,6 +125,8 @@ describe('TrackedTreeView', () => {
       const log = join(dvcDemoPath, 'logs', 'acc.tsv')
       const mockedUri = Uri.file(log)
       mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
+        expect(collapsibleState).toEqual(0)
+        expect(uri).toEqual(mockedUri)
         mockedItem = { uri, collapsibleState }
         return mockedItem
       })
