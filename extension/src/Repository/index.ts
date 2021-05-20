@@ -157,10 +157,9 @@ export class Repository {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const diffOutput = await diff(options)
 
-    this.state.modified =
-      new Set<string>(
-        diffOutput.modified.map(entry => join(this.dvcRoot, entry.path))
-      ) || new Set<string>()
+    this.state.modified = new Set<string>(
+      diffOutput.modified.map(entry => join(this.dvcRoot, entry.path))
+    )
     this.state.deleted = status.deleted || new Set<string>()
     this.state.new = status.new || new Set<string>()
     this.state.notInCache = status['not in cache'] || new Set<string>()
