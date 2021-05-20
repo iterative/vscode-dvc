@@ -108,16 +108,6 @@ suite('Extension Test Suite', () => {
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
       ])
 
-      stub(CliReader, 'status').resolves({
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-          'always changed'
-        ],
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ]
-      })
       const mockDiff = stub(CliReader, 'diff').resolves({
         added: [],
         deleted: [
