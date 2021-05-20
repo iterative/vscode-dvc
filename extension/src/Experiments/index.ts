@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
-import { getExecutionOptions } from '../cli/execution'
+import { getExecutionOptions, ExecutionOptions } from '../cli/execution'
 import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
@@ -13,7 +13,6 @@ import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
-import { ExecutionOptions } from '../cli/execution'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
