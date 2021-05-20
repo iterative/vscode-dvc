@@ -13,9 +13,9 @@ import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
 
 export enum Status {
+  ADDED = 'added',
   DELETED = 'deleted',
   MODIFIED = 'modified',
-  NEW = 'new',
   NOT_IN_CACHE = 'not in cache'
 }
 
@@ -36,18 +36,18 @@ export class RepositoryState
   implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
 
-  public tracked: Set<string>
+  public added: Set<string>
   public deleted: Set<string>
   public modified: Set<string>
-  public new: Set<string>
   public notInCache: Set<string>
+  public tracked: Set<string>
   public untracked: Set<string>
 
   constructor() {
     this.tracked = new Set<string>()
     this.deleted = new Set<string>()
     this.modified = new Set<string>()
-    this.new = new Set<string>()
+    this.added = new Set<string>()
     this.notInCache = new Set<string>()
     this.untracked = new Set<string>()
   }
@@ -157,13 +157,15 @@ export class Repository {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const diffOutput = await diff(options)
 
+    this.state.added = new Set<string>(
+      diffOutput.added.map(entry => join(this.dvcRoot, entry.path))
+    )
     this.state.modified = new Set<string>(
       diffOutput.modified.map(entry => join(this.dvcRoot, entry.path))
     )
     this.state.deleted = new Set<string>(
       diffOutput.deleted.map(entry => join(this.dvcRoot, entry.path))
     )
-    this.state.new = status.new || new Set<string>()
     this.state.notInCache = status['not in cache'] || new Set<string>()
   }
 

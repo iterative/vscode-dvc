@@ -14,14 +14,20 @@ import { isStringInEnum } from '../util'
 export type DecorationState = Record<Status, Set<string>>
 
 enum Status {
+  ADDED = 'added',
   DELETED = 'deleted',
   MODIFIED = 'modified',
-  NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
   TRACKED = 'tracked'
 }
 
 export class DecorationProvider implements FileDecorationProvider {
+  private static DecorationAdded: FileDecoration = {
+    badge: 'A',
+    color: new ThemeColor('gitDecoration.addedResourceForeground'),
+    tooltip: 'DVC added'
+  }
+
   private static DecorationDeleted: FileDecoration = {
     badge: 'D',
     color: new ThemeColor('gitDecoration.deletedResourceForeground'),
@@ -32,12 +38,6 @@ export class DecorationProvider implements FileDecorationProvider {
     badge: 'M',
     color: new ThemeColor('gitDecoration.modifiedResourceForeground'),
     tooltip: 'DVC modified'
-  }
-
-  private static DecorationNew: FileDecoration = {
-    badge: 'A',
-    color: new ThemeColor('gitDecoration.addedResourceForeground'),
-    tooltip: 'DVC added'
   }
 
   private static DecorationNotInCache: FileDecoration = {
@@ -102,8 +102,8 @@ export class DecorationProvider implements FileDecorationProvider {
     if (this.state.deleted?.has(uri.fsPath)) {
       return DecorationProvider.DecorationDeleted
     }
-    if (this.state.new?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationNew
+    if (this.state.added?.has(uri.fsPath)) {
+      return DecorationProvider.DecorationAdded
     }
     if (this.state.notInCache?.has(uri.fsPath)) {
       return DecorationProvider.DecorationNotInCache

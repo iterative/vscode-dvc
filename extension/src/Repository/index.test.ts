@@ -83,6 +83,7 @@ describe('Repository', () => {
       ] as ListOutput[])
 
       mockedDiff.mockResolvedValueOnce(({
+        added: [],
         deleted: [],
         modified: [
           { path: 'model.pt' },
@@ -147,10 +148,10 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(
         expect.objectContaining({
+          added: emptySet,
           dispose: Disposable.fn(),
           deleted: emptySet,
           notInCache: emptySet,
-          new: emptySet,
           modified,
           tracked,
           untracked
@@ -183,6 +184,7 @@ describe('Repository', () => {
       const model = 'model.pt'
 
       mockedDiff.mockResolvedValueOnce(({
+        added: [],
         deleted: [{ path: model }, { path: dataDir }],
         modified: []
       } as unknown) as DiffOutput)
@@ -240,8 +242,8 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
+        added: emptySet,
         dispose: Disposable.fn(),
-        new: emptySet,
         modified: emptySet,
         notInCache: emptySet,
         deleted,
@@ -277,6 +279,7 @@ describe('Repository', () => {
       ] as ListOutput[])
 
       mockedDiff.mockResolvedValueOnce(({
+        added: [],
         modified: [{ path: 'data/features' }],
         deleted: [{ path: model }]
       } as unknown) as DiffOutput)
@@ -344,8 +347,8 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
+        added: new Set(),
         dispose: Disposable.fn(),
-        new: new Set(),
         modified,
         notInCache,
         deleted,
