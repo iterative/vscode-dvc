@@ -30,7 +30,7 @@ const UndefinedCell = <>-</>
 
 // String
 const StringCell: React.FC<{ value: Value }> = ({ value }) =>
-  value === undefined ? UndefinedCell : <>{value}</>
+  value === undefined ? UndefinedCell : <>{String(value)}</>
 // Integer
 const IntegerCell: React.FC<{ value: Value }> = ({ value }) =>
   value === undefined ? UndefinedCell : <>{formatInteger(value as number)}</>
