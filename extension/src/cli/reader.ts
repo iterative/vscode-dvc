@@ -68,14 +68,6 @@ export const listDvcOnlyRecursive = (
     Flag.RECURSIVE
   )
 
-type Status = Record<
-  string,
-  (Record<string, Record<string, string>> | string)[]
->
-
-export const status = (options: ExecutionOptions): Promise<Status> =>
-  readCliProcessJson<Status>(options, Command.STATUS)
-
 export const experimentListCurrent = (
   options: ExecutionOptions
 ): Promise<string[]> =>
