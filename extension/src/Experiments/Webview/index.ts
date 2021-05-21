@@ -236,8 +236,8 @@ export class ExperimentsWebview {
 
   public showExperiments(
     payload: {
-      tableData?: ExperimentsRepoJSONOutput | null
-      errors?: Error[]
+      tableData?: ExperimentsRepoJSONOutput | undefined
+      error?: Error | string | undefined
     } = {}
   ): Thenable<boolean> {
     return this.sendMessage({

@@ -8,11 +8,11 @@ import { experimentShow } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
 import { ExperimentsWebview } from './Webview'
-import { createHash } from 'crypto'
 import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
+import { reportStderrOrThrow } from '../vscode/reporting'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -31,7 +31,7 @@ export class ExperimentsTable {
 
   private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
   private data?: ExperimentsRepoJSONOutput
-  private lastDataHash = ''
+  private error?: Error
 
   public getDvcRoot() {
     return this.dvcRoot
@@ -60,19 +60,16 @@ export class ExperimentsTable {
   }
 
   public refresh = async () => {
-    const tableData = await this.updateData()
-    const dataHash = createHash('sha1')
-      .update(JSON.stringify(tableData))
-      .digest('base64')
-
-    if (dataHash !== this.lastDataHash && (await this.dataDelivered())) {
-      this.lastDataHash = dataHash
+    try {
+      const tableData = await this.updateData()
+      this.data = tableData
+      this.error = undefined
+    } catch (e) {
+      this.error = e
+      reportStderrOrThrow(e)
+    } finally {
+      this.sendData()
     }
-  }
-
-  private async dataDelivered(): Promise<boolean> {
-    const sent = await this.sendData()
-    return !!sent
   }
 
   public showWebview = async () => {
@@ -111,7 +108,8 @@ export class ExperimentsTable {
   private sendData() {
     if (this.data && this.webview) {
       return this.webview.showExperiments({
-        tableData: this.data
+        tableData: this.data,
+        error: this.error
       })
     }
   }
@@ -120,7 +118,6 @@ export class ExperimentsTable {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
-    this.lastDataHash = ''
   }
 
   constructor(
