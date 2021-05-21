@@ -8,9 +8,10 @@ import {
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { diff, DiffOutput, listDvcOnlyRecursive, status } from '../cli/reader'
-import { dirname, join } from 'path'
+import { dirname, join, normalize } from 'path'
 import { observable, makeObservable } from 'mobx'
 import { ExecutionOptions, getExecutionOptions } from '../cli/execution'
+import { isDirectory } from '../fileSystem'
 
 export enum Status {
   ADDED = 'added',
@@ -54,7 +55,9 @@ export class RepositoryState
     filter: (path: string) => boolean
   ) {
     return new Set(
-      diff?.map(entry => join(this.dvcRoot, entry.path)).filter(filter)
+      diff
+        ?.map(entry => normalize(join(this.dvcRoot, entry.path)))
+        .filter(filter)
     )
   }
 
@@ -66,8 +69,12 @@ export class RepositoryState
     this.deleted = this.mapStatusToState(diff.deleted)
     this.notInCache = this.mapStatusToState(diff['not in cache'])
 
-    const pathMatchesDvc = (path: string): boolean =>
-      !status.modified?.has(path)
+    const pathMatchesDvc = (path: string): boolean => {
+      if (isDirectory(path)) {
+        return !status.modified?.has(path)
+      }
+      return !status.modified?.has(dirname(path))
+    }
 
     this.modified = this.getModified(
       diff.modified,
