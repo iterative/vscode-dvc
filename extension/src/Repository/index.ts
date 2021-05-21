@@ -10,7 +10,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { diff, DiffOutput, listDvcOnlyRecursive, status } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
-import { getExecutionOptions } from '../cli/execution'
+import { ExecutionOptions, getExecutionOptions } from '../cli/execution'
 
 export enum Status {
   ADDED = 'added',
@@ -35,20 +35,49 @@ export class RepositoryState
   implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
 
-  public added: Set<string>
-  public deleted: Set<string>
-  public modified: Set<string>
-  public notInCache: Set<string>
-  public tracked: Set<string>
-  public untracked: Set<string>
+  private dvcRoot: string
 
-  constructor() {
-    this.tracked = new Set<string>()
-    this.deleted = new Set<string>()
-    this.modified = new Set<string>()
-    this.added = new Set<string>()
-    this.notInCache = new Set<string>()
-    this.untracked = new Set<string>()
+  public added: Set<string> = new Set()
+  public deleted: Set<string> = new Set()
+  public modified: Set<string> = new Set()
+  public notInCache: Set<string> = new Set()
+  public stageModified: Set<string> = new Set()
+  public tracked: Set<string> = new Set()
+  public untracked: Set<string> = new Set()
+
+  private mapStatusToState(status?: { path: string }[]): Set<string> {
+    return new Set<string>(status?.map(entry => join(this.dvcRoot, entry.path)))
+  }
+
+  private getModified(
+    diff: { path: string }[] | undefined,
+    filter: (path: string) => boolean
+  ) {
+    return new Set(
+      diff?.map(entry => join(this.dvcRoot, entry.path)).filter(filter)
+    )
+  }
+
+  public update(
+    diff: DiffOutput,
+    status: Partial<Record<Status, Set<string>>>
+  ): void {
+    this.added = this.mapStatusToState(diff.added)
+    this.deleted = this.mapStatusToState(diff.deleted)
+    this.notInCache = this.mapStatusToState(diff['not in cache'])
+
+    const pathMatchesDvc = (path: string): boolean =>
+      !status.modified?.has(path)
+
+    this.modified = this.getModified(
+      diff.modified,
+      path => !pathMatchesDvc(path)
+    )
+    this.stageModified = this.getModified(diff.modified, pathMatchesDvc)
+  }
+
+  constructor(dvcRoot: string) {
+    this.dvcRoot = dvcRoot
   }
 }
 
@@ -118,11 +147,13 @@ export class Repository {
     statuses: PathStatus[]
   ) {
     return statuses.map(entry =>
-      Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = join(this.dvcRoot, relativePath)
-        const existingPaths = reducedStatus[status] || new Set<string>()
-        reducedStatus[status] = existingPaths.add(absolutePath)
-      })
+      Object.entries(entry)
+        .filter(([, status]) => status === 'modified')
+        .map(([relativePath, status]) => {
+          const absolutePath = join(this.dvcRoot, relativePath)
+          const existingPaths = reducedStatus[status] || new Set<string>()
+          reducedStatus[status] = existingPaths.add(absolutePath)
+        })
     )
   }
 
@@ -143,28 +174,21 @@ export class Repository {
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
-    const options = getExecutionOptions(this.config, this.dvcRoot)
+  private async getDiffFromDvc(
+    options: ExecutionOptions
+  ): Promise<Partial<Record<Status, Set<string>>>> {
     const statusOutput = (await status(options)) as StatusOutput
 
     return this.reduceToChangedOutsStatuses(statusOutput)
   }
 
-  private mapStatusToState(status?: { path: string }[]): Set<string> {
-    return new Set<string>(status?.map(entry => join(this.dvcRoot, entry.path)))
-  }
-
-  private getStateFromDiff(diff: DiffOutput) {
-    this.state.added = this.mapStatusToState(diff.added)
-    this.state.deleted = this.mapStatusToState(diff.deleted)
-    this.state.modified = this.mapStatusToState(diff.modified)
-    this.state.notInCache = this.mapStatusToState(diff['not in cache'])
-  }
-
   public async updateStatus() {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    const [diffOutput] = await Promise.all([diff(options), this.getStatus()])
-    return this.getStateFromDiff(diffOutput)
+    const [diffFromHead, diffFromDvc] = await Promise.all([
+      diff(options),
+      this.getDiffFromDvc(options)
+    ])
+    return this.state.update(diffFromHead, diffFromDvc)
   }
 
   public async updateUntracked() {
@@ -211,7 +235,7 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-    this.state = this.dispose.track(new RepositoryState())
+    this.state = this.dispose.track(new RepositoryState(this.dvcRoot))
 
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, this.state)

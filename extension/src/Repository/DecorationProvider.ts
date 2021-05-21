@@ -18,6 +18,7 @@ enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
+  STAGE_MODIFIED = 'stageModified',
   TRACKED = 'tracked'
 }
 
@@ -38,6 +39,12 @@ export class DecorationProvider implements FileDecorationProvider {
     badge: 'M',
     color: new ThemeColor('gitDecoration.modifiedResourceForeground'),
     tooltip: 'DVC modified'
+  }
+
+  private static DecorationStageModified: FileDecoration = {
+    badge: 'M',
+    color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
+    tooltip: 'DVC staged modified'
   }
 
   private static DecorationNotInCache: FileDecoration = {
@@ -98,6 +105,7 @@ export class DecorationProvider implements FileDecorationProvider {
     this.dispose.track(window.registerFileDecorationProvider(this))
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
     if (this.state.deleted?.has(uri.fsPath)) {
       return DecorationProvider.DecorationDeleted
@@ -110,6 +118,9 @@ export class DecorationProvider implements FileDecorationProvider {
     }
     if (this.state.modified?.has(uri.fsPath)) {
       return DecorationProvider.DecorationModified
+    }
+    if (this.state.stageModified?.has(uri.fsPath)) {
+      return DecorationProvider.DecorationStageModified
     }
     if (this.state.tracked?.has(uri.fsPath)) {
       return DecorationProvider.DecorationTracked

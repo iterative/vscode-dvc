@@ -143,6 +143,7 @@ describe('Repository', () => {
         expect.objectContaining({
           added: emptySet,
           dispose: Disposable.fn(),
+          dvcRoot,
           deleted: emptySet,
           notInCache: emptySet,
           modified,
@@ -194,7 +195,7 @@ describe('Repository', () => {
         { path: model }
       ] as ListOutput[])
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(new RepositoryState(dvcRoot))
 
       await repository.resetState()
 
@@ -224,10 +225,12 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual({
         added: emptySet,
+        deleted,
         dispose: Disposable.fn(),
+        dvcRoot,
         modified: emptySet,
         notInCache: emptySet,
-        deleted,
+        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -268,7 +271,7 @@ describe('Repository', () => {
         { path: model }
       ] as ListOutput[])
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(new RepositoryState(dvcRoot))
 
       await repository.resetState()
 
@@ -296,10 +299,12 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual({
         added: emptySet,
+        deleted: emptySet,
         dispose: Disposable.fn(),
+        dvcRoot,
         modified: emptySet,
         notInCache: emptySet,
-        deleted: emptySet,
+        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -344,12 +349,12 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(new RepositoryState(dvcRoot))
 
       await repository.resetState()
 
       const deleted = new Set([join(dvcRoot, 'model.pkl')])
-      const modified = new Set([join(dvcRoot, 'data/features')])
+      const stageModified = new Set([join(dvcRoot, 'data/features')])
       const notInCache = new Set([
         join(dvcRoot, 'data/prepared'),
         join(dvcRoot, 'data/data.xml')
@@ -374,12 +379,16 @@ describe('Repository', () => {
         expectedExecutionOptions
       )
 
+      const emptySet = new Set()
+
       expect(repository.getState()).toEqual({
-        added: new Set(),
-        dispose: Disposable.fn(),
-        modified,
-        notInCache,
+        added: emptySet,
         deleted,
+        dispose: Disposable.fn(),
+        dvcRoot,
+        modified: emptySet,
+        notInCache,
+        stageModified,
         tracked,
         untracked
       })
