@@ -161,13 +161,13 @@ describe('diff', () => {
     }
     const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
-    const diffOutput = await diff({
+    const statusOutput = await diff({
       cliPath: undefined,
       pythonBinPath: undefined,
       cwd
     })
 
-    expect(diffOutput).toEqual(cliOutput)
+    expect(statusOutput).toEqual(cliOutput)
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
