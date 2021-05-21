@@ -8,7 +8,7 @@ import {
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { diff, DiffOutput, listDvcOnlyRecursive, status } from '../cli/reader'
-import { dirname, join, normalize } from 'path'
+import { dirname, join, resolve } from 'path'
 import { observable, makeObservable } from 'mobx'
 import { ExecutionOptions, getExecutionOptions } from '../cli/execution'
 import { isDirectory } from '../fileSystem'
@@ -55,9 +55,7 @@ export class RepositoryState
     filter: (path: string) => boolean
   ) {
     return new Set(
-      diff
-        ?.map(entry => normalize(join(this.dvcRoot, entry.path)))
-        .filter(filter)
+      diff?.map(entry => resolve(this.dvcRoot, entry.path)).filter(filter)
     )
   }
 
@@ -71,9 +69,11 @@ export class RepositoryState
 
     const pathMatchesDvc = (path: string): boolean => {
       if (isDirectory(path)) {
-        return !status.modified?.has(path)
+        return !status.modified?.has(resolve(path))
       }
-      return !status.modified?.has(dirname(path))
+      return !(
+        status.modified?.has(path) || status.modified?.has(dirname(path))
+      )
     }
 
     this.modified = this.getModified(
