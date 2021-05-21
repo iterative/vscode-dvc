@@ -1,4 +1,10 @@
-import { experimentShow, root, listDvcOnlyRecursive, diff } from './reader'
+import {
+  diff,
+  experimentShow,
+  listDvcOnlyRecursive,
+  root,
+  status
+} from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
@@ -166,6 +172,37 @@ describe('diff', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['diff', SHOW_JSON],
+      cwd,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('status', () => {
+  it('should call the cli with the correct parameters', async () => {
+    const cliOutput = {
+      train: [
+        { 'changed deps': { 'data/MNIST': 'modified' } },
+        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+        'always changed'
+      ],
+      'data/MNIST/raw.dvc': [
+        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+      ]
+    }
+    const cwd = __dirname
+    mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+    const diffOutput = await status({
+      cliPath: undefined,
+      pythonBinPath: undefined,
+      cwd
+    })
+
+    expect(diffOutput).toEqual(cliOutput)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['status', SHOW_JSON],
       cwd,
       env: mockedEnv
     })
