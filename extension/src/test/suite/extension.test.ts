@@ -139,6 +139,17 @@ suite('Extension Test Suite', () => {
         'not in cache': []
       })
 
+      const mockStatus = stub(CliReader, 'status').resolves({
+        train: [
+          { 'changed deps': { 'data/MNIST': 'modified' } },
+          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+          'always changed'
+        ],
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ]
+      })
+
       const configurationChangeEvent = () => {
         return new Promise(resolve => {
           const listener: Disposable = workspace.onDidChangeConfiguration(
@@ -158,6 +169,7 @@ suite('Extension Test Suite', () => {
       expect(mockOnDidChangeFileType).to.have.been.called
       expect(mockListDvcOnlyRecursive).to.have.been.called
       expect(mockDiff).to.have.been.calledOnce
+      expect(mockStatus).to.have.been.calledOnce
 
       await configurationChangeEvent()
 

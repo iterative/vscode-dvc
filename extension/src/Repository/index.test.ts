@@ -9,7 +9,8 @@ import {
   diff,
   DiffOutput,
   listDvcOnlyRecursive,
-  ListOutput
+  ListOutput,
+  status
 } from '../cli/reader'
 import { getAllUntracked } from '../git'
 
@@ -22,6 +23,7 @@ jest.mock('../fileSystem')
 
 const mockedDiff = mocked(diff)
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
+const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
@@ -52,6 +54,7 @@ beforeEach(() => {
       return disposable
     }
   } as unknown) as (() => void) & Disposer)
+  mockedStatus.mockResolvedValue({})
 })
 
 describe('Repository', () => {
