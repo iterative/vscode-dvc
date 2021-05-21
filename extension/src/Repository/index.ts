@@ -147,13 +147,11 @@ export class Repository {
     statuses: PathStatus[]
   ) {
     return statuses.map(entry =>
-      Object.entries(entry)
-        .filter(([, status]) => status === 'modified')
-        .map(([relativePath, status]) => {
-          const absolutePath = join(this.dvcRoot, relativePath)
-          const existingPaths = reducedStatus[status] || new Set<string>()
-          reducedStatus[status] = existingPaths.add(absolutePath)
-        })
+      Object.entries(entry).map(([relativePath, status]) => {
+        const absolutePath = join(this.dvcRoot, relativePath)
+        const existingPaths = reducedStatus[status] || new Set<string>()
+        reducedStatus[status] = existingPaths.add(absolutePath)
+      })
     )
   }
 
