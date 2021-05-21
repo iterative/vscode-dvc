@@ -85,6 +85,28 @@ export class DecorationProvider implements FileDecorationProvider {
     return Object.entries(this.state).reduce(reduceState, [])
   }
 
+  private decorationMapping: Partial<Record<Status, FileDecoration>> = {
+    deleted: DecorationProvider.DecorationDeleted,
+    modified: DecorationProvider.DecorationModified,
+    new: DecorationProvider.DecorationNew,
+    notInCache: DecorationProvider.DecorationNotInCache
+  }
+
+  public provideFileDecoration(uri: Uri): FileDecoration | undefined {
+    const decoration = Object.keys(this.decorationMapping).find(status => {
+      if (this.state[status as Status]?.has(uri.fsPath)) {
+        return status
+      }
+    }) as Status
+
+    if (decoration) {
+      return this.decorationMapping[decoration]
+    }
+    if (this.state.tracked?.has(uri.fsPath)) {
+      return DecorationProvider.DecorationTracked
+    }
+  }
+
   public setState = (state: DecorationState) => {
     this.state = state
     this.decorationsChanged.fire(this.getUrisFromState())
@@ -96,23 +118,5 @@ export class DecorationProvider implements FileDecorationProvider {
     this.state = {} as DecorationState
 
     this.dispose.track(window.registerFileDecorationProvider(this))
-  }
-
-  public provideFileDecoration(uri: Uri): FileDecoration | undefined {
-    if (this.state.deleted?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationDeleted
-    }
-    if (this.state.new?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationNew
-    }
-    if (this.state.notInCache?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationNotInCache
-    }
-    if (this.state.modified?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationModified
-    }
-    if (this.state.tracked?.has(uri.fsPath)) {
-      return DecorationProvider.DecorationTracked
-    }
   }
 }
