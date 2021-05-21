@@ -19,11 +19,11 @@ export const root = (options: ExecutionOptions): Promise<string> =>
 type Path = { path: string }
 
 export type DiffOutput = {
-  added: Path[]
-  deleted: Path[]
-  modified: Path[]
-  renamed: Path[]
-  'not in cache': Path[]
+  added?: Path[]
+  deleted?: Path[]
+  modified?: Path[]
+  renamed?: Path[]
+  'not in cache'?: Path[]
 }
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>

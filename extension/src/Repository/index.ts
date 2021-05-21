@@ -92,8 +92,8 @@ export class Repository {
     ])
   }
 
-  private mapStatusToState(status: { path: string }[]): Set<string> {
-    return new Set<string>(status.map(entry => join(this.dvcRoot, entry.path)))
+  private mapStatusToState(status?: { path: string }[]): Set<string> {
+    return new Set<string>(status?.map(entry => join(this.dvcRoot, entry.path)))
   }
 
   private getStateFromDiff(diff: DiffOutput) {

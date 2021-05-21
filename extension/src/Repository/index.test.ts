@@ -230,6 +230,78 @@ describe('Repository', () => {
       })
     })
 
+    it('should handle an empty diff output', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedDiff.mockResolvedValueOnce(emptyDiff)
+      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+
+      const config = ({
+        getCliPath: () => undefined
+      } as unknown) as Config
+      const decorationProvider = new DecorationProvider()
+
+      const repository = new Repository(dvcRoot, config, decorationProvider)
+      await repository.isReady()
+
+      const dataDir = 'data/MNIST/raw'
+      const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
+      const dataset = join(dataDir, 't10k-images-idx3-ubyte')
+      const logDir = 'logs'
+      const logAcc = join(logDir, 'acc.tsv')
+      const logLoss = join(logDir, 'loss.tsv')
+      const model = 'model.pt'
+
+      mockedDiff.mockResolvedValueOnce({})
+
+      const emptySet = new Set<string>()
+
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
+
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([
+        { path: compressedDataset },
+        { path: dataset },
+        { path: logAcc },
+        { path: logLoss },
+        { path: model }
+      ] as ListOutput[])
+
+      expect(repository.getState()).toEqual(new RepositoryState())
+
+      await repository.resetState()
+
+      const tracked = new Set([
+        resolve(dvcRoot, compressedDataset),
+        resolve(dvcRoot, dataset),
+        resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logLoss),
+        resolve(dvcRoot, model),
+        resolve(dvcRoot, dataDir),
+        resolve(dvcRoot, logDir)
+      ])
+
+      const expectedExecutionOptions = {
+        cliPath: undefined,
+        cwd: dvcRoot,
+        pythonBinPath: undefined
+      }
+
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
+        expectedExecutionOptions
+      )
+
+      expect(repository.getState()).toEqual({
+        added: emptySet,
+        dispose: Disposable.fn(),
+        modified: emptySet,
+        notInCache: emptySet,
+        deleted: emptySet,
+        tracked,
+        untracked: emptySet
+      })
+    })
+
     it("should update the classes state and call it's dependents", async () => {
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedDiff.mockResolvedValueOnce(emptyDiff)
