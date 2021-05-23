@@ -9,7 +9,6 @@ import {
 } from '../../cli/executor'
 import { experimentListCurrent } from '../../cli/reader'
 import { quickPickManyValues } from '../../vscode/quickPick'
-import { reportStderrOrThrow } from '../../vscode/reporting'
 
 export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
@@ -39,12 +38,8 @@ export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   )
 
   if (quickPickResult) {
-    try {
-      const stdout = await experimentGarbageCollect(options, quickPickResult)
-      window.showInformationMessage(stdout)
-    } catch (e) {
-      reportStderrOrThrow(e)
-    }
+    const stdout = await experimentGarbageCollect(options, quickPickResult)
+    window.showInformationMessage(stdout)
   }
 }
 
@@ -65,13 +60,9 @@ const experimentsQuickPickCommand = async <T = void>(
     selectedExperiment: string
   ) => Promise<T>
 ) => {
-  try {
-    const selectedExperimentName = await experimentsQuickPick(options)
-    if (selectedExperimentName) {
-      return callback(options, selectedExperimentName)
-    }
-  } catch (e) {
-    reportStderrOrThrow(e)
+  const selectedExperimentName = await experimentsQuickPick(options)
+  if (selectedExperimentName) {
+    return callback(options, selectedExperimentName)
   }
 }
 

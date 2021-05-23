@@ -131,15 +131,20 @@ describe('garbageCollectExperiments', () => {
 
   it('reports stderr from the executed command via showInformationMessage', async () => {
     const stderr = 'example stderr that will be passed on'
+    const mockedError = { stderr }
+
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValueOnce(stderr)
-    await garbageCollectExperiments(exampleExecutionOptions)
+    mockedExecuteProcess.mockRejectedValueOnce(mockedError)
+
+    await expect(
+      garbageCollectExperiments(exampleExecutionOptions)
+    ).rejects.toEqual(mockedError)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 
   it('throws from a non-shell Exception', async () => {
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValueOnce('')
+    mockedExecuteProcess.mockRejectedValueOnce(new Error())
     await expect(
       garbageCollectExperiments(exampleExecutionOptions)
     ).rejects.toThrow()
@@ -191,7 +196,7 @@ describe('applyExperiment', () => {
 
   it('throws from a non-shell Exception', async () => {
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValueOnce('')
+    mockedExecuteProcess.mockRejectedValueOnce(new Error())
     await expect(applyExperiment(exampleExecutionOptions)).rejects.toThrow()
     expect(mockedShowErrorMessage).not.toBeCalled()
   })

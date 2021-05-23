@@ -40,10 +40,6 @@ export const createProcess = ({
 export const executeProcess = async (
   options: ProcessOptions
 ): Promise<string> => {
-  try {
-    const { stdout } = await createProcess(options)
-    return stdout
-  } catch (e) {
-    return Promise.reject(e.stderr)
-  }
+  const { stdout } = await createProcess(options)
+  return stdout
 }

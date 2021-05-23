@@ -4,6 +4,7 @@ import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, executeProcess } from '../processExecution'
 import { Config } from '../Config'
+import { reportStderrOrThrow } from '../vscode/reporting'
 
 export type BaseExecutionOptions = {
   cliPath: string | undefined
@@ -94,17 +95,24 @@ export const createCliProcess = ({
   return process
 }
 
-export const executeCliProcess = (
+export const executeCliProcess = async (
   options: ExecutionOptions,
   ...args: Args
 ): Promise<string> => {
   const { executable, cwd, env } = getExecutionDetails(options)
-  return executeProcess({
-    executable,
-    args,
-    cwd,
-    env
-  })
+  try {
+    // eslint-disable-next-line sonarjs/prefer-immediate-return
+    const stdout = await executeProcess({
+      executable,
+      args,
+      cwd,
+      env
+    })
+    return stdout
+  } catch (e) {
+    await reportStderrOrThrow(e)
+    return Promise.reject(e)
+  }
 }
 
 export const readCliProcess = async <T = string>(

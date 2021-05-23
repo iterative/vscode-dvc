@@ -1,8 +1,10 @@
 import { window } from 'vscode'
 
-export const reportStderrOrThrow = (error: string) => {
-  if (error) {
-    return window.showErrorMessage(error)
+export const reportStderrOrThrow = (
+  error: Error & { stdout?: string; stderr?: string }
+) => {
+  if (error.stderr) {
+    return window.showErrorMessage(error.stderr)
   }
-  throw new Error(error)
+  throw error
 }
