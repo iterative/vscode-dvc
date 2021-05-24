@@ -32,7 +32,6 @@ export const onDidChangeFileSystem = (
     ignored: ignoredDotDirectories
   })
 
-  pathWatcher.on('ready', debouncedWatcher)
   pathWatcher.on('add', debouncedWatcher)
   pathWatcher.on('addDir', debouncedWatcher)
   pathWatcher.on('change', debouncedWatcher)

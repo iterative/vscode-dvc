@@ -69,8 +69,7 @@ describe('onDidChangeFileSystem', () => {
     })
     expect(mockedWatch).toBeCalledTimes(1)
 
-    expect(mockedWatcher.on).toBeCalledTimes(6)
-    expect(mockedWatcher.on).toBeCalledWith('ready', func)
+    expect(mockedWatcher.on).toBeCalledTimes(5)
     expect(mockedWatcher.on).toBeCalledWith('add', func)
     expect(mockedWatcher.on).toBeCalledWith('addDir', func)
     expect(mockedWatcher.on).toBeCalledWith('change', func)
