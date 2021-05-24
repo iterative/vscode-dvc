@@ -24,11 +24,12 @@ describe('RepositoryState', () => {
 
   describe('updateStatus', () => {
     it('should correctly process the outputs of diff and status', () => {
-      const file = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
+      const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
+      const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
       const predictions = 'predictions.json'
       const diff = {
         added: [],
-        deleted: [{ path: file }],
+        deleted: [{ path: deleted }],
         modified: [
           { path: join('data', 'MNIST', 'raw') + sep },
           { path: 'logs' + sep },
@@ -37,7 +38,7 @@ describe('RepositoryState', () => {
           { path: 'model.pt' },
           { path: predictions }
         ],
-        renamed: [],
+        renamed: [{ path: renamed }],
         'not in cache': []
       }
 
@@ -59,7 +60,7 @@ describe('RepositoryState', () => {
 
       expect(repositoryState.getState()).toEqual({
         added: emptySet,
-        deleted: new Set([join(dvcRoot, file)]),
+        deleted: new Set([join(dvcRoot, deleted)]),
         modified: new Set([
           join(dvcRoot, 'data', 'MNIST', 'raw'),
           join(dvcRoot, 'logs'),
@@ -68,7 +69,7 @@ describe('RepositoryState', () => {
           join(dvcRoot, predictions)
         ]),
         notInCache: emptySet,
-        renamed: emptySet,
+        renamed: new Set([join(dvcRoot, renamed)]),
         stageModified: new Set([join(dvcRoot, 'model.pt')]),
         tracked: emptySet,
         untracked: emptySet
