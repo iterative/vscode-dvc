@@ -4,8 +4,17 @@ import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository, RepositoryState, Status } from '.'
-import { listDvcOnlyRecursive, ListOutput, status } from '../cli/reader'
+import { Repository } from '.'
+import { RepositoryState } from './State'
+import {
+  diff,
+  DiffOutput,
+  listDvcOnlyRecursive,
+  ListOutput,
+  status,
+  Status,
+  StatusOutput
+} from '../cli/reader'
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
@@ -15,6 +24,7 @@ jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
 
+const mockedDiff = mocked(diff)
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
@@ -51,6 +61,8 @@ beforeEach(() => {
 
 describe('Repository', () => {
   const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+  const emptyState = new RepositoryState(dvcRoot).getState()
+  const emptySet = new Set<string>()
 
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
@@ -67,7 +79,7 @@ describe('Repository', () => {
         { path: rawDataDir }
       ] as ListOutput[])
 
-      mockedStatus.mockResolvedValueOnce({
+      mockedStatus.mockResolvedValueOnce(({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -76,7 +88,21 @@ describe('Repository', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+      } as unknown) as StatusOutput)
+
+      mockedDiff.mockResolvedValueOnce({
+        added: [],
+        deleted: [],
+        modified: [
+          { path: model },
+          { path: logDir },
+          { path: logAcc },
+          { path: logLoss },
+          { path: MNISTDataDir }
+        ],
+        'not in cache': [],
+        renamed: []
+      } as DiffOutput)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
@@ -100,7 +126,6 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir),
         resolve(dvcRoot, MNISTDataDir)
       ])
-      const emptySet = new Set()
 
       const expectedExecutionOptions = {
         cliPath: undefined,
@@ -108,6 +133,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
@@ -116,11 +142,12 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(
         expect.objectContaining({
-          dispose: Disposable.fn(),
+          added: emptySet,
           deleted: emptySet,
           notInCache: emptySet,
-          new: emptySet,
           modified,
+          renamed: emptySet,
+          stageModified: emptySet,
           tracked,
           untracked
         })
@@ -130,6 +157,7 @@ describe('Repository', () => {
 
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
+      mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
@@ -150,7 +178,14 @@ describe('Repository', () => {
       const logLoss = join(logDir, 'loss.tsv')
       const model = 'model.pt'
 
-      mockedStatus.mockResolvedValueOnce({
+      mockedDiff.mockResolvedValueOnce(({
+        added: [],
+        deleted: [{ path: model }, { path: dataDir }],
+        modified: [],
+        'not in cache': []
+      } as unknown) as DiffOutput)
+
+      mockedStatus.mockResolvedValueOnce(({
         train: [
           {
             'changed deps': { 'data/MNIST': 'modified', 'train.py': 'modified' }
@@ -161,9 +196,7 @@ describe('Repository', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
-
-      const emptySet = new Set<string>()
+      } as unknown) as StatusOutput)
 
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
@@ -175,7 +208,7 @@ describe('Repository', () => {
         { path: model }
       ] as ListOutput[])
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(emptyState)
 
       await repository.resetState()
 
@@ -197,6 +230,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
@@ -204,17 +238,19 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        new: emptySet,
+        added: emptySet,
+        deleted,
         modified: emptySet,
         notInCache: emptySet,
-        deleted,
+        renamed: emptySet,
+        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
     })
 
     it("should update the classes state and call it's dependents", async () => {
+      mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
@@ -239,7 +275,14 @@ describe('Repository', () => {
         { path: dataDir }
       ] as ListOutput[])
 
-      mockedStatus.mockResolvedValueOnce({
+      mockedDiff.mockResolvedValueOnce(({
+        added: [],
+        modified: [{ path: 'data/features' }],
+        deleted: [{ path: model }],
+        'not in cache': [{ path: 'data/data.xml' }, { path: 'data/prepared' }]
+      } as unknown) as DiffOutput)
+
+      mockedStatus.mockResolvedValueOnce(({
         prepare: [
           { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
           { 'changed outs': { 'data/prepared': Status.NOT_IN_CACHE } }
@@ -250,7 +293,7 @@ describe('Repository', () => {
         ],
         train: [
           { 'changed deps': { 'data/features': 'modified' } },
-          { 'changed outs': { 'model.pkl': 'deleted' } }
+          { 'changed outs': { 'model.pt': 'deleted' } }
         ],
         evaluate: [
           {
@@ -263,7 +306,7 @@ describe('Repository', () => {
         'data/data.xml.dvc': [
           { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+      } as unknown) as StatusOutput)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py'),
@@ -272,11 +315,11 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(emptyState)
 
       await repository.resetState()
 
-      const deleted = new Set([join(dvcRoot, 'model.pkl')])
+      const deleted = new Set([join(dvcRoot, model)])
       const modified = new Set([join(dvcRoot, 'data/features')])
       const notInCache = new Set([
         join(dvcRoot, 'data/data.xml'),
@@ -303,11 +346,12 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        new: new Set(),
-        modified,
-        notInCache,
+        added: emptySet,
         deleted,
+        modified,
+        renamed: emptySet,
+        stageModified: emptySet,
+        notInCache,
         tracked,
         untracked
       })
