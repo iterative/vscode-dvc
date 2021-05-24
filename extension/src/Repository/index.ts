@@ -7,7 +7,7 @@ import {
 } from './views/SourceControlManagement'
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { status, listDvcOnlyRecursive } from '../cli/reader'
+import { status, listDvcOnlyRecursive, ListOutput } from '../cli/reader'
 import { dirname, join } from 'path'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
@@ -36,48 +36,14 @@ export class RepositoryState
   implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
 
-  public tracked: Set<string>
-  public deleted: Set<string>
-  public modified: Set<string>
-  public new: Set<string>
-  public notInCache: Set<string>
-  public untracked: Set<string>
-
-  constructor() {
-    this.tracked = new Set<string>()
-    this.deleted = new Set<string>()
-    this.modified = new Set<string>()
-    this.new = new Set<string>()
-    this.notInCache = new Set<string>()
-    this.untracked = new Set<string>()
-  }
-}
-
-export class Repository {
-  public readonly dispose = Disposable.fn()
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
-  public isReady() {
-    return this.initialized
-  }
-
-  public getState() {
-    return this.state
-  }
-
-  public getTracked() {
-    return this.state.tracked
-  }
-
-  @observable
-  private state: RepositoryState
-
-  private config: Config
   private dvcRoot: string
-  private decorationProvider?: DecorationProvider
-  private sourceControlManagement: SourceControlManagement
+
+  public deleted: Set<string> = new Set()
+  public modified: Set<string> = new Set()
+  public new: Set<string> = new Set()
+  public notInCache: Set<string> = new Set()
+  public tracked: Set<string> = new Set()
+  public untracked: Set<string> = new Set()
 
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
@@ -91,19 +57,6 @@ export class Repository {
     return this.filterRootDir(
       files.map(file => join(this.dvcRoot, dirname(file)))
     )
-  }
-
-  public async updateList(): Promise<void> {
-    const options = getExecutionOptions(this.config, this.dvcRoot)
-    const listOutput = await listDvcOnlyRecursive(options)
-    const trackedPaths = listOutput.map(tracked => tracked.path)
-
-    const absoluteTrackedPaths = this.getAbsolutePath(trackedPaths)
-
-    this.state.tracked = new Set([
-      ...absoluteTrackedPaths,
-      ...this.getAbsoluteParentPath(trackedPaths)
-    ])
   }
 
   private getChangedOutsStatuses(
@@ -144,24 +97,85 @@ export class Repository {
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
+  public updateStatus(statusOutput: StatusOutput) {
+    const status = this.reduceToChangedOutsStatuses(statusOutput)
+
+    this.modified = status.modified || new Set<string>()
+    this.deleted = status.deleted || new Set<string>()
+    this.new = status.new || new Set<string>()
+    this.notInCache = status['not in cache'] || new Set<string>()
+  }
+
+  public updateTracked(listOutput: ListOutput[]): void {
+    const trackedPaths = listOutput.map(tracked => tracked.path)
+
+    const absoluteTrackedPaths = this.getAbsolutePath(trackedPaths)
+
+    this.tracked = new Set([
+      ...absoluteTrackedPaths,
+      ...this.getAbsoluteParentPath(trackedPaths)
+    ])
+  }
+
+  public updateUntracked(untracked: Set<string>): void {
+    this.untracked = untracked
+  }
+
+  public getState() {
+    return {
+      deleted: this.deleted,
+      modified: this.modified,
+      new: this.new,
+      notInCache: this.notInCache,
+      tracked: this.tracked,
+      untracked: this.untracked
+    }
+  }
+
+  constructor(dvcRoot: string) {
+    this.dvcRoot = dvcRoot
+  }
+}
+
+export class Repository {
+  public readonly dispose = Disposable.fn()
+
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
+
+  public isReady() {
+    return this.initialized
+  }
+
+  public getState() {
+    return this.state.getState()
+  }
+
+  @observable
+  private state: RepositoryState
+
+  private config: Config
+  private dvcRoot: string
+  private decorationProvider?: DecorationProvider
+  private sourceControlManagement: SourceControlManagement
+
+  private async updateTracked(): Promise<void> {
+    const options = getExecutionOptions(this.config, this.dvcRoot)
+    const listOutput = await listDvcOnlyRecursive(options)
+
+    this.state.updateTracked(listOutput)
+  }
+
+  private async updateStatus() {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const statusOutput = (await status(options)) as StatusOutput
 
-    return this.reduceToChangedOutsStatuses(statusOutput)
+    this.state.updateStatus(statusOutput)
   }
 
-  public async updateStatus() {
-    const status = await this.getStatus()
-
-    this.state.modified = status.modified || new Set<string>()
-    this.state.deleted = status.deleted || new Set<string>()
-    this.state.new = status.new || new Set<string>()
-    this.state.notInCache = status['not in cache'] || new Set<string>()
-  }
-
-  public async updateUntracked() {
-    this.state.untracked = await getAllUntracked(this.dvcRoot)
+  private async updateUntracked() {
+    const untracked = await getAllUntracked(this.dvcRoot)
+    this.state.updateUntracked(untracked)
   }
 
   private updateStatuses() {
@@ -171,18 +185,18 @@ export class Repository {
   public async resetState() {
     const statusesUpdated = this.updateStatuses()
 
-    const slowerTrackedUpdated = this.updateList()
+    const slowerTrackedUpdated = this.updateTracked()
 
     await statusesUpdated
-    this.sourceControlManagement.setState(this.state)
+    this.sourceControlManagement.setState(this.state.getState())
 
     await slowerTrackedUpdated
-    this.decorationProvider?.setState(this.state)
+    this.decorationProvider?.setState(this.state.getState())
   }
 
   private setState() {
-    this.sourceControlManagement.setState(this.state)
-    this.decorationProvider?.setState(this.state)
+    this.sourceControlManagement.setState(this.state.getState())
+    this.decorationProvider?.setState(this.state.getState())
   }
 
   public async updateState() {
@@ -204,7 +218,7 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-    this.state = this.dispose.track(new RepositoryState())
+    this.state = this.dispose.track(new RepositoryState(dvcRoot))
 
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, this.state)
