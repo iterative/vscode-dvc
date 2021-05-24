@@ -1,5 +1,4 @@
 /model.pt
-/predictions.json
 /data/MNIST/processed
 /.vscode/settings.json
 /logs
