@@ -18,6 +18,7 @@ enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
+  RENAMED = 'renamed',
   STAGE_MODIFIED = 'stageModified',
   TRACKED = 'tracked'
 }
@@ -45,6 +46,12 @@ export class DecorationProvider implements FileDecorationProvider {
     badge: 'NC',
     color: new ThemeColor('gitDecoration.renamedResourceForeground'),
     tooltip: 'DVC not in cache'
+  }
+
+  private static DecorationRenamed: FileDecoration = {
+    badge: 'R',
+    color: new ThemeColor('gitDecoration.renamedResourceForeground'),
+    tooltip: 'DVC renamed'
   }
 
   private static DecorationStageModified: FileDecoration = {
@@ -96,6 +103,7 @@ export class DecorationProvider implements FileDecorationProvider {
     added: DecorationProvider.DecorationAdded,
     deleted: DecorationProvider.DecorationDeleted,
     modified: DecorationProvider.DecorationModified,
+    renamed: DecorationProvider.DecorationRenamed,
     stageModified: DecorationProvider.DecorationStageModified,
     notInCache: DecorationProvider.DecorationNotInCache
   }
