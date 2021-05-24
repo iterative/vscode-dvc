@@ -15,6 +15,14 @@ export class Repository {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
+  private config: Config
+  private dvcRoot: string
+  private decorationProvider?: DecorationProvider
+  private sourceControlManagement: SourceControlManagement
+
+  @observable
+  private state: RepositoryState
+
   public isReady() {
     return this.initialized
   }
@@ -22,14 +30,6 @@ export class Repository {
   public getState() {
     return this.state.getState()
   }
-
-  @observable
-  private state: RepositoryState
-
-  private config: Config
-  private dvcRoot: string
-  private decorationProvider?: DecorationProvider
-  private sourceControlManagement: SourceControlManagement
 
   private async updateTracked(): Promise<void> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
