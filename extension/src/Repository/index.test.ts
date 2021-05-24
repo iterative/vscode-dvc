@@ -5,7 +5,7 @@ import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
 import { Repository } from '.'
-import { RepositoryState } from './State'
+import { RepositoryState } from './Model'
 import {
   diff,
   DiffOutput,

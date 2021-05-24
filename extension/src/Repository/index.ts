@@ -7,7 +7,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { listDvcOnlyRecursive, status, diff } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
-import { RepositoryState } from './State'
+import { RepositoryState } from './Model'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
