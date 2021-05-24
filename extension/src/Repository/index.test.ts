@@ -4,8 +4,15 @@ import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository, RepositoryState, Status } from '.'
-import { listDvcOnlyRecursive, ListOutput, status } from '../cli/reader'
+import { Repository } from '.'
+import { RepositoryState } from './State'
+import {
+  listDvcOnlyRecursive,
+  ListOutput,
+  status,
+  Status,
+  StatusOutput
+} from '../cli/reader'
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
@@ -68,7 +75,7 @@ describe('Repository', () => {
         { path: rawDataDir }
       ] as ListOutput[])
 
-      mockedStatus.mockResolvedValueOnce({
+      mockedStatus.mockResolvedValueOnce(({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -77,7 +84,7 @@ describe('Repository', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+      } as unknown) as StatusOutput)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
@@ -150,7 +157,7 @@ describe('Repository', () => {
       const logLoss = join(logDir, 'loss.tsv')
       const model = 'model.pt'
 
-      mockedStatus.mockResolvedValueOnce({
+      mockedStatus.mockResolvedValueOnce(({
         train: [
           {
             'changed deps': { 'data/MNIST': 'modified', 'train.py': 'modified' }
@@ -161,7 +168,7 @@ describe('Repository', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+      } as unknown) as StatusOutput)
 
       const emptySet = new Set<string>()
 
@@ -238,7 +245,7 @@ describe('Repository', () => {
         { path: dataDir }
       ] as ListOutput[])
 
-      mockedStatus.mockResolvedValueOnce({
+      mockedStatus.mockResolvedValueOnce(({
         prepare: [
           { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
           { 'changed outs': { 'data/prepared': Status.NOT_IN_CACHE } }
@@ -262,7 +269,7 @@ describe('Repository', () => {
         'data/data.xml.dvc': [
           { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
         ]
-      } as Record<string, (Record<string, Record<string, string>> | string)[]>)
+      } as unknown) as StatusOutput)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py'),
