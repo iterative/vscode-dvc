@@ -42,9 +42,7 @@ describe('queueExperiment', () => {
     const stderr = 'Example stderr that will be resolved literally'
     const mockedError = { stderr }
     mockedExecuteProcess.mockRejectedValueOnce(mockedError)
-    await expect(queueExperiment(exampleExecutionOptions)).rejects.toEqual(
-      mockedError
-    )
+    await queueExperiment(exampleExecutionOptions)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 })

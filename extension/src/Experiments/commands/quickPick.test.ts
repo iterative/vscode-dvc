@@ -136,19 +136,16 @@ describe('garbageCollectExperiments', () => {
     mockedShowQuickPick.mockResolvedValueOnce([])
     mockedExecuteProcess.mockRejectedValueOnce(mockedError)
 
-    await expect(
-      garbageCollectExperiments(exampleExecutionOptions)
-    ).rejects.toEqual(mockedError)
+    await garbageCollectExperiments(exampleExecutionOptions)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 
-  it('throws from a non-shell Exception', async () => {
+  it('reports the message from a non-shell Exception', async () => {
+    const exampleMessage = 'example Error message that will be shown'
     mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValueOnce(new Error())
-    await expect(
-      garbageCollectExperiments(exampleExecutionOptions)
-    ).rejects.toThrow()
-    expect(mockedShowErrorMessage).not.toBeCalled()
+    mockedExecuteProcess.mockRejectedValueOnce(new Error(exampleMessage))
+    await garbageCollectExperiments(exampleExecutionOptions)
+    expect(mockedShowErrorMessage).toBeCalledWith(exampleMessage)
   })
 
   it('executes the proper default command given no selections', async () => {

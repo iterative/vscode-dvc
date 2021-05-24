@@ -1,10 +1,21 @@
-import { window } from 'vscode'
+import { ExecutionOptions } from '../cli/execution'
 
-export const reportStderrOrThrow = (
-  error: Error & { stdout?: string; stderr?: string }
-) => {
-  if (error.stderr) {
-    return window.showErrorMessage(error.stderr)
+interface CLIProcessErrorArgs {
+  args: string[]
+  options: ExecutionOptions
+  baseError: Error
+  message?: string
+}
+
+export class CliProcessError extends Error {
+  args: string[]
+  options: ExecutionOptions
+  baseError: Error
+
+  constructor({ message, args, options, baseError }: CLIProcessErrorArgs) {
+    super(message || baseError.message)
+    this.args = args
+    this.options = options
+    this.baseError = baseError
   }
-  throw error
 }

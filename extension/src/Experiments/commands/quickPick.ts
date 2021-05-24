@@ -38,8 +38,12 @@ export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   )
 
   if (quickPickResult) {
-    const stdout = await experimentGarbageCollect(options, quickPickResult)
-    window.showInformationMessage(stdout)
+    try {
+      const stdout = await experimentGarbageCollect(options, quickPickResult)
+      window.showInformationMessage(stdout)
+    } catch (e) {
+      window.showErrorMessage(e.baseError?.stderr || e.message)
+    }
   }
 }
 

@@ -4,11 +4,12 @@ import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, executeProcess } from '../processExecution'
 import { Config } from '../Config'
-import { reportStderrOrThrow } from '../vscode/reporting'
+import { CliProcessError } from '../vscode/reporting'
 
 export type BaseExecutionOptions = {
   cliPath: string | undefined
   pythonBinPath: string | undefined
+  reportOnFailure?: boolean
 }
 
 type CwdOption = {
@@ -101,17 +102,14 @@ export const executeCliProcess = async (
 ): Promise<string> => {
   const { executable, cwd, env } = getExecutionDetails(options)
   try {
-    // eslint-disable-next-line sonarjs/prefer-immediate-return
-    const stdout = await executeProcess({
+    return await executeProcess({
       executable,
       args,
       cwd,
       env
     })
-    return stdout
-  } catch (e) {
-    await reportStderrOrThrow(e)
-    return Promise.reject(e)
+  } catch (baseError) {
+    throw new CliProcessError({ options, args, baseError })
   }
 }
 
