@@ -80,12 +80,6 @@ export class RepositoryState
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  private getDiffFromDvc(
-    statusOutput: StatusOutput
-  ): Partial<Record<Status, Set<string>>> {
-    return this.reduceToChangedOutsStatuses(statusOutput)
-  }
-
   private mapDiffToState(status?: { path: string }[]): Set<string> {
     return new Set<string>(status?.map(entry => join(this.dvcRoot, entry.path)))
   }
@@ -107,7 +101,7 @@ export class RepositoryState
     this.deleted = this.mapDiffToState(diffOutput.deleted)
     this.notInCache = this.mapDiffToState(diffOutput['not in cache'])
 
-    const status = this.getDiffFromDvc(statusOutput)
+    const status = this.reduceToChangedOutsStatuses(statusOutput)
 
     const pathMatchesDvc = (path: string): boolean => {
       if (isDirectory(path)) {
