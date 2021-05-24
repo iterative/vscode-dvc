@@ -9,7 +9,6 @@ import { CliProcessError } from '../vscode/reporting'
 export type BaseExecutionOptions = {
   cliPath: string | undefined
   pythonBinPath: string | undefined
-  reportOnFailure?: boolean
 }
 
 type CwdOption = {
