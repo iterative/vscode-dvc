@@ -175,7 +175,7 @@ describe('Repository', () => {
         { path: model }
       ] as ListOutput[])
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(new RepositoryState(dvcRoot))
 
       await repository.resetState()
 
@@ -204,11 +204,12 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        new: emptySet,
-        modified: emptySet,
-        notInCache: emptySet,
+        dvcRoot,
         deleted,
+        dispose: Disposable.fn(),
+        modified: emptySet,
+        new: emptySet,
+        notInCache: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -272,7 +273,7 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(new RepositoryState(dvcRoot))
 
       await repository.resetState()
 
@@ -303,11 +304,12 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        new: new Set(),
-        modified,
-        notInCache,
         deleted,
+        dispose: Disposable.fn(),
+        dvcRoot,
+        modified,
+        new: new Set(),
+        notInCache,
         tracked,
         untracked
       })
