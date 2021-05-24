@@ -161,6 +161,10 @@ export class RepositoryState
     this.stageModified = this.getModified(diffOutput.modified, pathMatchesDvc)
   }
 
+  public updateUntracked(untracked: Set<string>): void {
+    this.untracked = untracked
+  }
+
   constructor(dvcRoot: string) {
     this.dvcRoot = dvcRoot
   }
@@ -207,8 +211,9 @@ export class Repository {
     return this.state.updateStatus(diffFromHead, diffFromDvc)
   }
 
-  public async updateUntracked() {
-    this.state.untracked = await getAllUntracked(this.dvcRoot)
+  private async updateUntracked() {
+    const untracked = await getAllUntracked(this.dvcRoot)
+    this.state.updateUntracked(untracked)
   }
 
   private updateStatuses() {
