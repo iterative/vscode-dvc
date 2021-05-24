@@ -36,21 +36,12 @@ export class RepositoryState
   implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
 
-  public tracked: Set<string>
-  public deleted: Set<string>
-  public modified: Set<string>
-  public new: Set<string>
-  public notInCache: Set<string>
-  public untracked: Set<string>
-
-  constructor() {
-    this.tracked = new Set<string>()
-    this.deleted = new Set<string>()
-    this.modified = new Set<string>()
-    this.new = new Set<string>()
-    this.notInCache = new Set<string>()
-    this.untracked = new Set<string>()
-  }
+  public tracked: Set<string> = new Set()
+  public deleted: Set<string> = new Set()
+  public modified: Set<string> = new Set()
+  public new: Set<string> = new Set()
+  public notInCache: Set<string> = new Set()
+  public untracked: Set<string> = new Set()
 }
 
 export class Repository {
