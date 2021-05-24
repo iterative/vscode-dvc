@@ -59,6 +59,53 @@ export class RepositoryState
     )
   }
 
+  private getChangedOutsStatuses(
+    fileOrStage: StatusesOrAlwaysChanged[]
+  ): PathStatus[] {
+    return fileOrStage
+      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
+      .filter(value => value)
+  }
+
+  private reduceStatuses(
+    reducedStatus: Partial<Record<Status, Set<string>>>,
+    statuses: PathStatus[]
+  ) {
+    return statuses.map(entry =>
+      Object.entries(entry).map(([relativePath, status]) => {
+        const absolutePath = join(this.dvcRoot, relativePath)
+        const existingPaths = reducedStatus[status] || new Set<string>()
+        reducedStatus[status] = existingPaths.add(absolutePath)
+      })
+    )
+  }
+
+  private reduceToChangedOutsStatuses(
+    filteredStatusOutput: StatusOutput
+  ): Partial<Record<Status, Set<string>>> {
+    const statusReducer = (
+      reducedStatus: Partial<Record<Status, Set<string>>>,
+      entry: StatusesOrAlwaysChanged[]
+    ): Partial<Record<Status, Set<string>>> => {
+      const statuses = this.getChangedOutsStatuses(entry)
+
+      this.reduceStatuses(reducedStatus, statuses)
+
+      return reducedStatus
+    }
+
+    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
+  }
+
+  public updateStatus(statusOutput: StatusOutput) {
+    const status = this.reduceToChangedOutsStatuses(statusOutput)
+
+    this.modified = status.modified || new Set<string>()
+    this.deleted = status.deleted || new Set<string>()
+    this.new = status.new || new Set<string>()
+    this.notInCache = status['not in cache'] || new Set<string>()
+  }
+
   public updateTracked(listOutput: ListOutput[]): void {
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
@@ -112,58 +159,11 @@ export class Repository {
     this.state.updateTracked(listOutput)
   }
 
-  private getChangedOutsStatuses(
-    fileOrStage: StatusesOrAlwaysChanged[]
-  ): PathStatus[] {
-    return fileOrStage
-      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
-      .filter(value => value)
-  }
-
-  private reduceStatuses(
-    reducedStatus: Partial<Record<Status, Set<string>>>,
-    statuses: PathStatus[]
-  ) {
-    return statuses.map(entry =>
-      Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = join(this.dvcRoot, relativePath)
-        const existingPaths = reducedStatus[status] || new Set<string>()
-        reducedStatus[status] = existingPaths.add(absolutePath)
-      })
-    )
-  }
-
-  private reduceToChangedOutsStatuses(
-    filteredStatusOutput: StatusOutput
-  ): Partial<Record<Status, Set<string>>> {
-    const statusReducer = (
-      reducedStatus: Partial<Record<Status, Set<string>>>,
-      entry: StatusesOrAlwaysChanged[]
-    ): Partial<Record<Status, Set<string>>> => {
-      const statuses = this.getChangedOutsStatuses(entry)
-
-      this.reduceStatuses(reducedStatus, statuses)
-
-      return reducedStatus
-    }
-
-    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
-  }
-
-  private async getStatus(): Promise<Partial<Record<Status, Set<string>>>> {
+  private async updateStatus() {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const statusOutput = (await status(options)) as StatusOutput
 
-    return this.reduceToChangedOutsStatuses(statusOutput)
-  }
-
-  public async updateStatus() {
-    const status = await this.getStatus()
-
-    this.state.modified = status.modified || new Set<string>()
-    this.state.deleted = status.deleted || new Set<string>()
-    this.state.new = status.new || new Set<string>()
-    this.state.notInCache = status['not in cache'] || new Set<string>()
+    this.state.updateStatus(statusOutput)
   }
 
   private async updateUntracked() {
