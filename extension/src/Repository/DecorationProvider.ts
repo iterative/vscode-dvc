@@ -14,14 +14,21 @@ import { isStringInEnum } from '../util'
 export type DecorationState = Record<Status, Set<string>>
 
 enum Status {
+  ADDED = 'added',
   DELETED = 'deleted',
   MODIFIED = 'modified',
-  NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
+  STAGE_MODIFIED = 'stageModified',
   TRACKED = 'tracked'
 }
 
 export class DecorationProvider implements FileDecorationProvider {
+  private static DecorationAdded: FileDecoration = {
+    badge: 'A',
+    color: new ThemeColor('gitDecoration.addedResourceForeground'),
+    tooltip: 'DVC added'
+  }
+
   private static DecorationDeleted: FileDecoration = {
     badge: 'D',
     color: new ThemeColor('gitDecoration.deletedResourceForeground'),
@@ -34,16 +41,16 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC modified'
   }
 
-  private static DecorationNew: FileDecoration = {
-    badge: 'A',
-    color: new ThemeColor('gitDecoration.addedResourceForeground'),
-    tooltip: 'DVC added'
-  }
-
   private static DecorationNotInCache: FileDecoration = {
     badge: 'NC',
     color: new ThemeColor('gitDecoration.renamedResourceForeground'),
     tooltip: 'DVC not in cache'
+  }
+
+  private static DecorationStageModified: FileDecoration = {
+    badge: 'M',
+    color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
+    tooltip: 'DVC staged modified'
   }
 
   private static DecorationTracked: FileDecoration = {
@@ -86,9 +93,10 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   private decorationMapping: Partial<Record<Status, FileDecoration>> = {
+    added: DecorationProvider.DecorationAdded,
     deleted: DecorationProvider.DecorationDeleted,
     modified: DecorationProvider.DecorationModified,
-    new: DecorationProvider.DecorationNew,
+    stageModified: DecorationProvider.DecorationStageModified,
     notInCache: DecorationProvider.DecorationNotInCache
   }
 

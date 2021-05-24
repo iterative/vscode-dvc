@@ -59,6 +59,7 @@ beforeEach(() => {
 describe('Repository', () => {
   const dvcRoot = resolve(__dirname, '..', '..', 'demo')
   const emptyState = new RepositoryState(dvcRoot).getState()
+  const emptySet = new Set<string>()
 
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
@@ -108,7 +109,6 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir),
         resolve(dvcRoot, MNISTDataDir)
       ])
-      const emptySet = new Set()
 
       const expectedExecutionOptions = {
         cliPath: undefined,
@@ -124,10 +124,11 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(
         expect.objectContaining({
+          added: emptySet,
           deleted: emptySet,
           notInCache: emptySet,
-          new: emptySet,
           modified,
+          stageModified: emptySet,
           tracked,
           untracked
         })
@@ -170,8 +171,6 @@ describe('Repository', () => {
         ]
       } as unknown) as StatusOutput)
 
-      const emptySet = new Set<string>()
-
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
@@ -211,10 +210,11 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
+        added: emptySet,
         deleted,
         modified: emptySet,
-        new: emptySet,
         notInCache: emptySet,
+        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -309,9 +309,10 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
+        added: emptySet,
         deleted,
         modified,
-        new: new Set(),
+        stageModified: emptySet,
         notInCache,
         tracked,
         untracked
