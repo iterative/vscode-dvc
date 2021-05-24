@@ -108,7 +108,7 @@ suite('Extension Test Suite', () => {
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
       ])
 
-      const mockStatus = stub(CliReader, 'status').resolves({
+      const mockStatus = stub(CliReader, 'status').resolves(({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -117,7 +117,7 @@ suite('Extension Test Suite', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      })
+      } as unknown) as CliReader.StatusOutput)
 
       const configurationChangeEvent = () => {
         return new Promise(resolve => {
