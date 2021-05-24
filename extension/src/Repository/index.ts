@@ -7,7 +7,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { listDvcOnlyRecursive, status, diff } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
-import { RepositoryState } from './Model'
+import { Model } from './Model'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
@@ -21,21 +21,21 @@ export class Repository {
   private sourceControlManagement: SourceControlManagement
 
   @observable
-  private state: RepositoryState
+  private model: Model
 
   public isReady() {
     return this.initialized
   }
 
   public getState() {
-    return this.state.getState()
+    return this.model.getState()
   }
 
   private async updateTracked(): Promise<void> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const listOutput = await listDvcOnlyRecursive(options)
 
-    this.state.updateTracked(listOutput)
+    this.model.updateTracked(listOutput)
   }
 
   private async updateStatus() {
@@ -44,12 +44,12 @@ export class Repository {
       diff(options),
       status(options)
     ])
-    return this.state.updateStatus(diffFromHead, diffFromDvc)
+    return this.model.updateStatus(diffFromHead, diffFromDvc)
   }
 
   private async updateUntracked() {
     const untracked = await getAllUntracked(this.dvcRoot)
-    this.state.updateUntracked(untracked)
+    this.model.updateUntracked(untracked)
   }
 
   private updateStatuses() {
@@ -62,15 +62,15 @@ export class Repository {
     const slowerTrackedUpdated = this.updateTracked()
 
     await statusesUpdated
-    this.sourceControlManagement.setState(this.state.getState())
+    this.sourceControlManagement.setState(this.model.getState())
 
     await slowerTrackedUpdated
-    this.decorationProvider?.setState(this.state.getState())
+    this.decorationProvider?.setState(this.model.getState())
   }
 
   private setState() {
-    this.sourceControlManagement.setState(this.state.getState())
-    this.decorationProvider?.setState(this.state.getState())
+    this.sourceControlManagement.setState(this.model.getState())
+    this.decorationProvider?.setState(this.model.getState())
   }
 
   public async updateState() {
@@ -92,10 +92,10 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-    this.state = this.dispose.track(new RepositoryState(dvcRoot))
+    this.model = this.dispose.track(new Model(dvcRoot))
 
     this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, this.state)
+      new SourceControlManagement(this.dvcRoot, this.model)
     )
 
     this.setup()

@@ -14,8 +14,7 @@ import {
 import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
-export class RepositoryState
-  implements DecorationState, SourceControlManagementState {
+export class Model implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
 
   private dvcRoot: string
