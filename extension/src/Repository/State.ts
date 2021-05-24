@@ -18,10 +18,12 @@ export class RepositoryState
 
   private dvcRoot: string
 
+  public added: Set<string> = new Set()
   public deleted: Set<string> = new Set()
   public modified: Set<string> = new Set()
-  public new: Set<string> = new Set()
   public notInCache: Set<string> = new Set()
+  public renamed: Set<string> = new Set()
+  public stageModified: Set<string> = new Set()
   public tracked: Set<string> = new Set()
   public untracked: Set<string> = new Set()
 
@@ -80,9 +82,9 @@ export class RepositoryState
   public updateStatus(statusOutput: StatusOutput) {
     const status = this.reduceToChangedOutsStatuses(statusOutput)
 
+    this.added = new Set<string>()
     this.modified = status.modified || new Set<string>()
     this.deleted = status.deleted || new Set<string>()
-    this.new = status.new || new Set<string>()
     this.notInCache = status['not in cache'] || new Set<string>()
   }
 
@@ -103,10 +105,12 @@ export class RepositoryState
 
   public getState() {
     return {
+      added: this.added,
       deleted: this.deleted,
       modified: this.modified,
-      new: this.new,
       notInCache: this.notInCache,
+      renamed: this.renamed,
+      stageModified: this.stageModified,
       tracked: this.tracked,
       untracked: this.untracked
     }

@@ -7,10 +7,12 @@ import { isStringInEnum } from '../../util'
 export type SourceControlManagementState = Record<Status, Set<string>>
 
 enum Status {
+  ADDED = 'added',
   DELETED = 'deleted',
   MODIFIED = 'modified',
-  NEW = 'new',
   NOT_IN_CACHE = 'notInCache',
+  RENAMED = 'renamed',
+  STAGE_MODIFIED = 'stageModified',
   UNTRACKED = 'untracked'
 }
 
