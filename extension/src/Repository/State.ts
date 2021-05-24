@@ -11,7 +11,7 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../cli/reader'
-import { dirname, join, resolve } from 'path'
+import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
 export class RepositoryState
@@ -32,13 +32,17 @@ export class RepositoryState
     return dirs.filter(dir => dir !== this.dvcRoot)
   }
 
-  private getAbsolutePath(files: string[] = []): string[] {
-    return files.map(file => join(this.dvcRoot, file))
+  private getAbsolutePath(path: string): string {
+    return resolve(this.dvcRoot, path)
+  }
+
+  private getAbsolutePaths(paths: string[] = []): string[] {
+    return paths.map(path => this.getAbsolutePath(path))
   }
 
   private getAbsoluteParentPath(files: string[] = []): string[] {
     return this.filterRootDir(
-      files.map(file => join(this.dvcRoot, dirname(file)))
+      files.map(file => this.getAbsolutePath(dirname(file)))
     )
   }
 
@@ -55,7 +59,7 @@ export class RepositoryState
       Object.entries(entry)
         .filter(([, status]) => status === 'modified')
         .map(([relativePath]) => {
-          const absolutePath = join(this.dvcRoot, relativePath)
+          const absolutePath = this.getAbsolutePath(relativePath)
           const existingPaths = reducedStatus || new Set<string>()
           reducedStatus = existingPaths.add(absolutePath)
         })
@@ -78,7 +82,7 @@ export class RepositoryState
   }
 
   private mapToAbsolutePaths(diff: PathOutput[] = []): string[] {
-    return diff.map(entry => resolve(this.dvcRoot, entry.path))
+    return diff.map(entry => this.getAbsolutePath(entry.path))
   }
 
   private getStateFromDiff(diff?: PathOutput[]): Set<string> {
@@ -95,7 +99,7 @@ export class RepositoryState
     return !(set?.has(path) || set?.has(dirname(path)))
   }
 
-  private getModified(
+  private splitModified(
     modifiedAgainstHead: string[],
     filter: (path: string) => boolean
   ): Set<string> {
@@ -109,11 +113,11 @@ export class RepositoryState
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToAbsolutePaths(diffOutput.modified)
 
-    this.modified = this.getModified(modifiedAgainstHead, path =>
+    this.modified = this.splitModified(modifiedAgainstHead, path =>
       this.pathInSet(path, modifiedAgainstCache)
     )
 
-    this.stageModified = this.getModified(modifiedAgainstHead, path =>
+    this.stageModified = this.splitModified(modifiedAgainstHead, path =>
       this.pathNotInSet(path, modifiedAgainstCache)
     )
   }
@@ -132,7 +136,7 @@ export class RepositoryState
   public updateTracked(listOutput: ListOutput[]): void {
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
-    const absoluteTrackedPaths = this.getAbsolutePath(trackedPaths)
+    const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
 
     this.tracked = new Set([
       ...absoluteTrackedPaths,
