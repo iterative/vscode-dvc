@@ -25,6 +25,7 @@ export class RepositoryState
   public deleted: Set<string> = new Set()
   public modified: Set<string> = new Set()
   public notInCache: Set<string> = new Set()
+  public renamed: Set<string> = new Set()
   public stageModified: Set<string> = new Set()
   public tracked: Set<string> = new Set()
   public untracked: Set<string> = new Set()
@@ -145,6 +146,7 @@ export class RepositoryState
       deleted: this.deleted,
       modified: this.modified,
       notInCache: this.notInCache,
+      renamed: this.renamed,
       stageModified: this.stageModified,
       tracked: this.tracked,
       untracked: this.untracked

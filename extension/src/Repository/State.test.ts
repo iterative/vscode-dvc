@@ -60,8 +60,6 @@ describe('RepositoryState', () => {
       expect(repositoryState.getState()).toEqual({
         added: emptySet,
         deleted: new Set([join(dvcRoot, file)]),
-        notInCache: emptySet,
-        stageModified: new Set([join(dvcRoot, 'model.pt')]),
         modified: new Set([
           join(dvcRoot, 'data', 'MNIST', 'raw'),
           join(dvcRoot, 'logs'),
@@ -69,6 +67,9 @@ describe('RepositoryState', () => {
           join(dvcRoot, 'logs', 'loss.tsv'),
           join(dvcRoot, predictions)
         ]),
+        notInCache: emptySet,
+        renamed: emptySet,
+        stageModified: new Set([join(dvcRoot, 'model.pt')]),
         tracked: emptySet,
         untracked: emptySet
       })
@@ -91,6 +92,7 @@ describe('RepositoryState', () => {
         deleted: emptySet,
         modified: emptySet,
         notInCache: emptySet,
+        renamed: emptySet,
         stageModified: emptySet,
         tracked: emptySet,
         untracked: emptySet
