@@ -8,6 +8,6 @@ export const queueExperiment = async (
   try {
     window.showInformationMessage(await experimentRunQueue(options))
   } catch (e) {
-    window.showErrorMessage(e.baseError.stderr)
+    window.showErrorMessage(e.stderr)
   }
 }

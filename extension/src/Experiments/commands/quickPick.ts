@@ -9,6 +9,78 @@ import {
 } from '../../cli/executor'
 import { experimentListCurrent } from '../../cli/reader'
 import { quickPickManyValues } from '../../vscode/quickPick'
+import { reportErrorMessage } from '../../vscode/reporting'
+
+const experimentsQuickPick = async (options: ExecutionOptions) => {
+  const experiments = await experimentListCurrent(options)
+
+  if (experiments.length === 0) {
+    window.showErrorMessage('There are no experiments to select!')
+  } else {
+    return window.showQuickPick(experiments)
+  }
+}
+
+const experimentsQuickPickCommand = async <T = void>(
+  options: ExecutionOptions,
+  callback: (
+    options: ExecutionOptions,
+    selectedExperiment: string
+  ) => Promise<T>
+) => {
+  const selectedExperimentName = await experimentsQuickPick(options)
+  if (selectedExperimentName) {
+    return callback(options, selectedExperimentName)
+  }
+}
+
+export const applyExperiment = (options: ExecutionOptions) =>
+  experimentsQuickPickCommand(
+    options,
+    async (options, selectedExperimentName) => {
+      try {
+        window.showInformationMessage(
+          await experimentApply(options, selectedExperimentName)
+        )
+      } catch (e) {
+        reportErrorMessage(e)
+      }
+    }
+  )
+
+export const removeExperiment = (options: ExecutionOptions) =>
+  experimentsQuickPickCommand(
+    options,
+    async (options, selectedExperimentName) => {
+      try {
+        await experimentRemove(options, selectedExperimentName)
+        window.showInformationMessage(
+          `Experiment ${selectedExperimentName} has been removed!`
+        )
+      } catch (e) {
+        reportErrorMessage(e)
+      }
+    }
+  )
+
+export const branchExperiment = (options: ExecutionOptions) =>
+  experimentsQuickPickCommand(
+    options,
+    async (options, selectedExperimentName) => {
+      const branchName = await window.showInputBox({
+        prompt: 'Name the new branch'
+      })
+      if (branchName) {
+        try {
+          window.showInformationMessage(
+            await experimentBranch(options, selectedExperimentName, branchName)
+          )
+        } catch (e) {
+          reportErrorMessage(e)
+        }
+      }
+    }
+  )
 
 export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
@@ -42,66 +114,7 @@ export const garbageCollectExperiments = async (options: ExecutionOptions) => {
       const stdout = await experimentGarbageCollect(options, quickPickResult)
       window.showInformationMessage(stdout)
     } catch (e) {
-      window.showErrorMessage(e.baseError?.stderr || e.message)
+      reportErrorMessage(e)
     }
   }
 }
-
-const experimentsQuickPick = async (options: ExecutionOptions) => {
-  const experiments = await experimentListCurrent(options)
-
-  if (experiments.length === 0) {
-    window.showErrorMessage('There are no experiments to select!')
-  } else {
-    return window.showQuickPick(experiments)
-  }
-}
-
-const experimentsQuickPickCommand = async <T = void>(
-  options: ExecutionOptions,
-  callback: (
-    options: ExecutionOptions,
-    selectedExperiment: string
-  ) => Promise<T>
-) => {
-  const selectedExperimentName = await experimentsQuickPick(options)
-  if (selectedExperimentName) {
-    return callback(options, selectedExperimentName)
-  }
-}
-
-export const applyExperiment = (options: ExecutionOptions) =>
-  experimentsQuickPickCommand(
-    options,
-    async (options, selectedExperimentName) => {
-      window.showInformationMessage(
-        await experimentApply(options, selectedExperimentName)
-      )
-    }
-  )
-
-export const removeExperiment = (options: ExecutionOptions) =>
-  experimentsQuickPickCommand(
-    options,
-    async (options, selectedExperimentName) => {
-      await experimentRemove(options, selectedExperimentName)
-      window.showInformationMessage(
-        `Experiment ${selectedExperimentName} has been removed!`
-      )
-    }
-  )
-
-export const branchExperiment = (options: ExecutionOptions) =>
-  experimentsQuickPickCommand(
-    options,
-    async (options, selectedExperimentName) => {
-      const branchName = await window.showInputBox({
-        prompt: 'Name the new branch'
-      })
-      if (branchName) {
-        window.showInformationMessage(
-          await experimentBranch(options, selectedExperimentName, branchName)
-        )
-      }
-    }
-  )
