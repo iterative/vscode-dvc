@@ -10,7 +10,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { diff, DiffOutput, listDvcOnlyRecursive, status } from '../cli/reader'
 import { dirname, join, resolve } from 'path'
 import { observable, makeObservable } from 'mobx'
-import { ExecutionOptions, getExecutionOptions } from '../cli/execution'
+import { getExecutionOptions } from '../cli/execution'
 import { isDirectory } from '../fileSystem'
 
 export enum Status {
@@ -31,7 +31,8 @@ type StageOrFileStatuses = Record<ChangedType, PathStatus>
 
 type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 
-type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
+export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
+
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
   public dispose = Disposable.fn()
@@ -46,6 +47,50 @@ export class RepositoryState
   public tracked: Set<string> = new Set()
   public untracked: Set<string> = new Set()
 
+  private getChangedOutsStatuses(
+    fileOrStage: StatusesOrAlwaysChanged[]
+  ): PathStatus[] {
+    return fileOrStage
+      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
+      .filter(value => value)
+  }
+
+  private reduceStatuses(
+    reducedStatus: Partial<Record<Status, Set<string>>>,
+    statuses: PathStatus[]
+  ) {
+    return statuses.map(entry =>
+      Object.entries(entry).map(([relativePath, status]) => {
+        const absolutePath = join(this.dvcRoot, relativePath)
+        const existingPaths = reducedStatus[status] || new Set<string>()
+        reducedStatus[status] = existingPaths.add(absolutePath)
+      })
+    )
+  }
+
+  private reduceToChangedOutsStatuses(
+    filteredStatusOutput: StatusOutput
+  ): Partial<Record<Status, Set<string>>> {
+    const statusReducer = (
+      reducedStatus: Partial<Record<Status, Set<string>>>,
+      entry: StatusesOrAlwaysChanged[]
+    ): Partial<Record<Status, Set<string>>> => {
+      const statuses = this.getChangedOutsStatuses(entry)
+
+      this.reduceStatuses(reducedStatus, statuses)
+
+      return reducedStatus
+    }
+
+    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
+  }
+
+  private getDiffFromDvc(
+    statusOutput: StatusOutput
+  ): Partial<Record<Status, Set<string>>> {
+    return this.reduceToChangedOutsStatuses(statusOutput)
+  }
+
   private mapStatusToState(status?: { path: string }[]): Set<string> {
     return new Set<string>(status?.map(entry => join(this.dvcRoot, entry.path)))
   }
@@ -59,17 +104,16 @@ export class RepositoryState
     )
   }
 
-  public update(
-    diff: DiffOutput,
-    status: Partial<Record<Status, Set<string>>>
-  ): void {
-    this.added = this.mapStatusToState(diff.added)
-    this.deleted = this.mapStatusToState(diff.deleted)
-    this.notInCache = this.mapStatusToState(diff['not in cache'])
+  public update(diffOutput: DiffOutput, statusOutput: StatusOutput): void {
+    this.added = this.mapStatusToState(diffOutput.added)
+    this.deleted = this.mapStatusToState(diffOutput.deleted)
+    this.notInCache = this.mapStatusToState(diffOutput['not in cache'])
+
+    const status = this.getDiffFromDvc(statusOutput)
 
     const pathMatchesDvc = (path: string): boolean => {
       if (isDirectory(path)) {
-        return !status.modified?.has(resolve(path))
+        return !status.modified?.has(path)
       }
       return !(
         status.modified?.has(path) || status.modified?.has(dirname(path))
@@ -77,10 +121,10 @@ export class RepositoryState
     }
 
     this.modified = this.getModified(
-      diff.modified,
+      diffOutput.modified,
       path => !pathMatchesDvc(path)
     )
-    this.stageModified = this.getModified(diff.modified, pathMatchesDvc)
+    this.stageModified = this.getModified(diffOutput.modified, pathMatchesDvc)
   }
 
   constructor(dvcRoot: string) {
@@ -141,57 +185,11 @@ export class Repository {
     ])
   }
 
-  private getChangedOutsStatuses(
-    fileOrStage: StatusesOrAlwaysChanged[]
-  ): PathStatus[] {
-    return fileOrStage
-      .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
-      .filter(value => value)
-  }
-
-  private reduceStatuses(
-    reducedStatus: Partial<Record<Status, Set<string>>>,
-    statuses: PathStatus[]
-  ) {
-    return statuses.map(entry =>
-      Object.entries(entry).map(([relativePath, status]) => {
-        const absolutePath = join(this.dvcRoot, relativePath)
-        const existingPaths = reducedStatus[status] || new Set<string>()
-        reducedStatus[status] = existingPaths.add(absolutePath)
-      })
-    )
-  }
-
-  private reduceToChangedOutsStatuses(
-    filteredStatusOutput: StatusOutput
-  ): Partial<Record<Status, Set<string>>> {
-    const statusReducer = (
-      reducedStatus: Partial<Record<Status, Set<string>>>,
-      entry: StatusesOrAlwaysChanged[]
-    ): Partial<Record<Status, Set<string>>> => {
-      const statuses = this.getChangedOutsStatuses(entry)
-
-      this.reduceStatuses(reducedStatus, statuses)
-
-      return reducedStatus
-    }
-
-    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
-  }
-
-  private async getDiffFromDvc(
-    options: ExecutionOptions
-  ): Promise<Partial<Record<Status, Set<string>>>> {
-    const statusOutput = (await status(options)) as StatusOutput
-
-    return this.reduceToChangedOutsStatuses(statusOutput)
-  }
-
   public async updateStatus() {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const [diffFromHead, diffFromDvc] = await Promise.all([
       diff(options),
-      this.getDiffFromDvc(options)
+      status(options) as Promise<StatusOutput>
     ])
     return this.state.update(diffFromHead, diffFromDvc)
   }

@@ -4,7 +4,7 @@ import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
-import { Repository, RepositoryState } from '.'
+import { Repository, RepositoryState, StatusOutput } from '.'
 import {
   diff,
   DiffOutput,
@@ -78,14 +78,22 @@ describe('RepositoryState', () => {
         renamed: [],
         'not in cache': []
       }
-      const status = new Set([
-        join(dvcRoot, predictions),
-        join(dvcRoot, 'logs'),
-        join(dvcRoot, 'data', 'MNIST', 'raw')
-      ])
+
+      const status = ({
+        train: [
+          { 'changed deps': { 'data/MNIST': 'modified' } },
+          {
+            'changed outs': { 'predictions.json': 'modified', logs: 'modified' }
+          },
+          'always changed'
+        ],
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ]
+      } as unknown) as StatusOutput
 
       const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.update(diff, { modified: status })
+      repositoryState.update(diff, status)
 
       const emptySet = new Set()
 
