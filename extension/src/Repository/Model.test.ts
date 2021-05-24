@@ -55,10 +55,10 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new Model(dvcRoot)
-      repositoryState.updateStatus(diff, status)
+      const model = new Model(dvcRoot)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: new Set([join(dvcRoot, deleted)]),
         modified: new Set([
@@ -85,10 +85,10 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new Model(dvcRoot)
-      repositoryState.updateStatus(diff, status)
+      const model = new Model(dvcRoot)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: emptySet,
         modified: emptySet,
