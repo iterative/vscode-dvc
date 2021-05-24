@@ -16,14 +16,14 @@ import { trimAndSplit } from '../util/stdout'
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
 
-type Path = { path: string }
+export type PathOutput = { path: string }
 
 export type DiffOutput = {
-  added?: Path[]
-  deleted?: Path[]
-  modified?: Path[]
-  renamed?: Path[]
-  'not in cache'?: Path[]
+  added?: PathOutput[]
+  deleted?: PathOutput[]
+  modified?: PathOutput[]
+  renamed?: PathOutput[]
+  'not in cache'?: PathOutput[]
 }
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
