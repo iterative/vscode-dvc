@@ -93,7 +93,7 @@ describe('RepositoryState', () => {
       } as unknown) as StatusOutput
 
       const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.update(diff, status)
+      repositoryState.updateStatus(diff, status)
 
       const emptySet = new Set()
 

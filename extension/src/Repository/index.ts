@@ -7,7 +7,13 @@ import {
 } from './views/SourceControlManagement'
 import { DecorationProvider, DecorationState } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { diff, DiffOutput, listDvcOnlyRecursive, status } from '../cli/reader'
+import {
+  diff,
+  DiffOutput,
+  listDvcOnlyRecursive,
+  ListOutput,
+  status
+} from '../cli/reader'
 import { dirname, join, resolve } from 'path'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
@@ -46,6 +52,31 @@ export class RepositoryState
   public stageModified: Set<string> = new Set()
   public tracked: Set<string> = new Set()
   public untracked: Set<string> = new Set()
+
+  private filterRootDir(dirs: string[] = []) {
+    return dirs.filter(dir => dir !== this.dvcRoot)
+  }
+
+  private getAbsolutePath(files: string[] = []): string[] {
+    return files.map(file => join(this.dvcRoot, file))
+  }
+
+  private getAbsoluteParentPath(files: string[] = []): string[] {
+    return this.filterRootDir(
+      files.map(file => join(this.dvcRoot, dirname(file)))
+    )
+  }
+
+  public updateTracked(listOutput: ListOutput[]): void {
+    const trackedPaths = listOutput.map(tracked => tracked.path)
+
+    const absoluteTrackedPaths = this.getAbsolutePath(trackedPaths)
+
+    this.tracked = new Set([
+      ...absoluteTrackedPaths,
+      ...this.getAbsoluteParentPath(trackedPaths)
+    ])
+  }
 
   private getChangedOutsStatuses(
     fileOrStage: StatusesOrAlwaysChanged[]
@@ -104,7 +135,10 @@ export class RepositoryState
     )
   }
 
-  public update(diffOutput: DiffOutput, statusOutput: StatusOutput): void {
+  public updateStatus(
+    diffOutput: DiffOutput,
+    statusOutput: StatusOutput
+  ): void {
     this.added = this.mapStatusToState(diffOutput.added)
     this.deleted = this.mapStatusToState(diffOutput.deleted)
     this.notInCache = this.mapStatusToState(diffOutput['not in cache'])
@@ -158,31 +192,10 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private sourceControlManagement: SourceControlManagement
 
-  private filterRootDir(dirs: string[] = []) {
-    return dirs.filter(dir => dir !== this.dvcRoot)
-  }
-
-  private getAbsolutePath(files: string[] = []): string[] {
-    return files.map(file => join(this.dvcRoot, file))
-  }
-
-  private getAbsoluteParentPath(files: string[] = []): string[] {
-    return this.filterRootDir(
-      files.map(file => join(this.dvcRoot, dirname(file)))
-    )
-  }
-
-  public async updateList(): Promise<void> {
+  private async updateTracked(): Promise<void> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     const listOutput = await listDvcOnlyRecursive(options)
-    const trackedPaths = listOutput.map(tracked => tracked.path)
-
-    const absoluteTrackedPaths = this.getAbsolutePath(trackedPaths)
-
-    this.state.tracked = new Set([
-      ...absoluteTrackedPaths,
-      ...this.getAbsoluteParentPath(trackedPaths)
-    ])
+    this.state.updateTracked(listOutput)
   }
 
   public async updateStatus() {
@@ -191,7 +204,7 @@ export class Repository {
       diff(options),
       status(options) as Promise<StatusOutput>
     ])
-    return this.state.update(diffFromHead, diffFromDvc)
+    return this.state.updateStatus(diffFromHead, diffFromDvc)
   }
 
   public async updateUntracked() {
@@ -205,7 +218,7 @@ export class Repository {
   public async resetState() {
     const statusesUpdated = this.updateStatuses()
 
-    const slowerTrackedUpdated = this.updateList()
+    const slowerTrackedUpdated = this.updateTracked()
 
     await statusesUpdated
     this.sourceControlManagement.setState(this.state)
