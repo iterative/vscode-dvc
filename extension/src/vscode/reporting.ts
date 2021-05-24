@@ -8,8 +8,7 @@ export const reportStderrOrThrow = (
       return
     }
 
-    const message = `${error.message}. Reason: ${error.stderr}`
-    return window.showErrorMessage(message)
+    return window.showErrorMessage(error.stderr)
   }
   throw error
 }
