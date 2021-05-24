@@ -62,15 +62,15 @@ export class Repository {
     const slowerTrackedUpdated = this.updateTracked()
 
     await statusesUpdated
-    this.sourceControlManagement.setState(this.model.getState())
+    this.sourceControlManagement.setState(this.getState())
 
     await slowerTrackedUpdated
-    this.decorationProvider?.setState(this.model.getState())
+    this.decorationProvider?.setState(this.getState())
   }
 
   private setState() {
-    this.sourceControlManagement.setState(this.model.getState())
-    this.decorationProvider?.setState(this.model.getState())
+    this.sourceControlManagement.setState(this.getState())
+    this.decorationProvider?.setState(this.getState())
   }
 
   public async updateState() {
@@ -95,7 +95,7 @@ export class Repository {
     this.model = this.dispose.track(new Model(dvcRoot))
 
     this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, this.model)
+      new SourceControlManagement(this.dvcRoot, this.getState())
     )
 
     this.setup()

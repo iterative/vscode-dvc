@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SourceControlManagementState } from './views/SourceControlManagement'
-import { DecorationState } from './DecorationProvider'
+import { SourceControlManagementModel } from './views/SourceControlManagement'
+import { DecorationModel } from './DecorationProvider'
 import {
   ChangedType,
   DiffOutput,
@@ -14,19 +14,21 @@ import {
 import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
-export class Model implements DecorationState, SourceControlManagementState {
+export class Model implements DecorationModel, SourceControlManagementModel {
   public dispose = Disposable.fn()
 
   private dvcRoot: string
 
-  public added: Set<string> = new Set()
-  public deleted: Set<string> = new Set()
-  public modified: Set<string> = new Set()
-  public notInCache: Set<string> = new Set()
-  public renamed: Set<string> = new Set()
-  public stageModified: Set<string> = new Set()
-  public tracked: Set<string> = new Set()
-  public untracked: Set<string> = new Set()
+  public state = {
+    added: new Set<string>(),
+    deleted: new Set<string>(),
+    modified: new Set<string>(),
+    notInCache: new Set<string>(),
+    renamed: new Set<string>(),
+    stageModified: new Set<string>(),
+    tracked: new Set<string>(),
+    untracked: new Set<string>()
+  }
 
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
@@ -113,11 +115,11 @@ export class Model implements DecorationState, SourceControlManagementState {
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToAbsolutePaths(diffOutput.modified)
 
-    this.modified = this.splitModified(modifiedAgainstHead, path =>
+    this.state.modified = this.splitModified(modifiedAgainstHead, path =>
       this.pathInSet(path, modifiedAgainstCache)
     )
 
-    this.stageModified = this.splitModified(modifiedAgainstHead, path =>
+    this.state.stageModified = this.splitModified(modifiedAgainstHead, path =>
       this.pathNotInSet(path, modifiedAgainstCache)
     )
   }
@@ -126,10 +128,10 @@ export class Model implements DecorationState, SourceControlManagementState {
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
-    this.added = this.getStateFromDiff(diffOutput.added)
-    this.deleted = this.getStateFromDiff(diffOutput.deleted)
-    this.renamed = this.getStateFromDiff(diffOutput.renamed)
-    this.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
+    this.state.added = this.getStateFromDiff(diffOutput.added)
+    this.state.deleted = this.getStateFromDiff(diffOutput.deleted)
+    this.state.renamed = this.getStateFromDiff(diffOutput.renamed)
+    this.state.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
 
     this.setModified(diffOutput, statusOutput)
   }
@@ -139,26 +141,26 @@ export class Model implements DecorationState, SourceControlManagementState {
 
     const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
 
-    this.tracked = new Set([
+    this.state.tracked = new Set([
       ...absoluteTrackedPaths,
       ...this.getAbsoluteParentPath(trackedPaths)
     ])
   }
 
   public updateUntracked(untracked: Set<string>): void {
-    this.untracked = untracked
+    this.state.untracked = untracked
   }
 
   public getState() {
     return {
-      added: this.added,
-      deleted: this.deleted,
-      modified: this.modified,
-      notInCache: this.notInCache,
-      renamed: this.renamed,
-      stageModified: this.stageModified,
-      tracked: this.tracked,
-      untracked: this.untracked
+      added: this.state.added,
+      deleted: this.state.deleted,
+      modified: this.state.modified,
+      notInCache: this.state.notInCache,
+      renamed: this.state.renamed,
+      stageModified: this.state.stageModified,
+      tracked: this.state.tracked,
+      untracked: this.state.untracked
     }
   }
 
