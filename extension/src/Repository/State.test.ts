@@ -20,6 +20,7 @@ beforeEach(() => {
 
 describe('RepositoryState', () => {
   const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+  const emptySet = new Set()
 
   describe('updateStatus', () => {
     it('should correctly process the outputs of diff and status', () => {
@@ -56,8 +57,6 @@ describe('RepositoryState', () => {
       const repositoryState = new RepositoryState(dvcRoot)
       repositoryState.updateStatus(diff, status)
 
-      const emptySet = new Set()
-
       expect(repositoryState.getState()).toEqual({
         added: emptySet,
         deleted: new Set([join(dvcRoot, file)]),
@@ -70,6 +69,29 @@ describe('RepositoryState', () => {
           join(dvcRoot, 'logs', 'loss.tsv'),
           join(dvcRoot, predictions)
         ]),
+        tracked: emptySet,
+        untracked: emptySet
+      })
+    })
+
+    it('should handle an empty diff output', () => {
+      const diff = {}
+
+      const status = ({
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ]
+      } as unknown) as StatusOutput
+
+      const repositoryState = new RepositoryState(dvcRoot)
+      repositoryState.updateStatus(diff, status)
+
+      expect(repositoryState.getState()).toEqual({
+        added: emptySet,
+        deleted: emptySet,
+        modified: emptySet,
+        notInCache: emptySet,
+        stageModified: emptySet,
         tracked: emptySet,
         untracked: emptySet
       })
