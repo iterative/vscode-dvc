@@ -4,7 +4,8 @@ export const reportStderrOrThrow = (
   error: Error & { stdout?: string; stderr?: string }
 ) => {
   if (error.stderr) {
-    return window.showErrorMessage(error.stderr)
+    const message = `${error.message}. Reason: ${error.stderr}`
+    return window.showErrorMessage(message)
   }
   throw error
 }
