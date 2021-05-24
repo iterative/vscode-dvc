@@ -128,6 +128,7 @@ describe('Repository', () => {
           deleted: emptySet,
           notInCache: emptySet,
           modified,
+          renamed: emptySet,
           stageModified: emptySet,
           tracked,
           untracked
@@ -214,6 +215,7 @@ describe('Repository', () => {
         deleted,
         modified: emptySet,
         notInCache: emptySet,
+        renamed: emptySet,
         stageModified: emptySet,
         tracked,
         untracked: emptySet
@@ -312,6 +314,7 @@ describe('Repository', () => {
         added: emptySet,
         deleted,
         modified,
+        renamed: emptySet,
         stageModified: emptySet,
         notInCache,
         tracked,
