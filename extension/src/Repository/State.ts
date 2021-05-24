@@ -85,27 +85,36 @@ export class RepositoryState
     return new Set<string>(this.mapToAbsolutePaths(diff))
   }
 
-  private notInStatus = (diffPath: string, status?: Set<string>): boolean => {
-    if (isDirectory(diffPath)) {
-      return !status?.has(diffPath)
+  private pathInSet = (path: string, set?: Set<string>): boolean =>
+    !this.pathNotInSet(path, set)
+
+  private pathNotInSet = (path: string, set?: Set<string>): boolean => {
+    if (isDirectory(path)) {
+      return !set?.has(path)
     }
-    return !(status?.has(diffPath) || status?.has(dirname(diffPath)))
+    return !(set?.has(path) || set?.has(dirname(path)))
+  }
+
+  private getModified(
+    modifiedAgainstHead: string[],
+    filter: (path: string) => boolean
+  ): Set<string> {
+    return new Set(modifiedAgainstHead?.filter(filter))
   }
 
   private setModified(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
-    const modified = this.reduceToModified(statusOutput)
+    const modifiedAgainstCache = this.reduceToModified(statusOutput)
+    const modifiedAgainstHead = this.mapToAbsolutePaths(diffOutput.modified)
 
-    const allModified = this.mapToAbsolutePaths(diffOutput.modified)
-
-    this.modified = new Set(
-      allModified?.filter(path => !this.notInStatus(path, modified))
+    this.modified = this.getModified(modifiedAgainstHead, path =>
+      this.pathInSet(path, modifiedAgainstCache)
     )
 
-    this.stageModified = new Set(
-      allModified?.filter(path => this.notInStatus(path, modified))
+    this.stageModified = this.getModified(modifiedAgainstHead, path =>
+      this.pathNotInSet(path, modifiedAgainstCache)
     )
   }
 
