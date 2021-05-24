@@ -8,7 +8,6 @@ import {
   PathOutput,
   PathStatus,
   StageOrFileStatuses,
-  Status,
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../cli/reader'
@@ -51,36 +50,31 @@ export class RepositoryState
       .filter(value => value)
   }
 
-  private reduceStatuses(
-    reducedStatus: Partial<Record<Status, Set<string>>>,
-    statuses: PathStatus[]
-  ) {
+  private reduceModified(reducedStatus: Set<string>, statuses: PathStatus[]) {
     return statuses.map(entry =>
       Object.entries(entry)
         .filter(([, status]) => status === 'modified')
-        .map(([relativePath, status]) => {
+        .map(([relativePath]) => {
           const absolutePath = join(this.dvcRoot, relativePath)
-          const existingPaths = reducedStatus[status] || new Set<string>()
-          reducedStatus[status] = existingPaths.add(absolutePath)
+          const existingPaths = reducedStatus || new Set<string>()
+          reducedStatus = existingPaths.add(absolutePath)
         })
     )
   }
 
-  private reduceToChangedOutsStatuses(
-    filteredStatusOutput: StatusOutput
-  ): Partial<Record<Status, Set<string>>> {
+  private reduceToModified(filteredStatusOutput: StatusOutput): Set<string> {
     const statusReducer = (
-      reducedStatus: Partial<Record<Status, Set<string>>>,
+      reducedStatus: Set<string>,
       entry: StatusesOrAlwaysChanged[]
-    ): Partial<Record<Status, Set<string>>> => {
+    ): Set<string> => {
       const statuses = this.getChangedOutsStatuses(entry)
 
-      this.reduceStatuses(reducedStatus, statuses)
+      this.reduceModified(reducedStatus, statuses)
 
       return reducedStatus
     }
 
-    return Object.values(filteredStatusOutput).reduce(statusReducer, {})
+    return Object.values(filteredStatusOutput).reduce(statusReducer, new Set())
   }
 
   private mapToAbsolutePaths(diff: PathOutput[] = []): string[] {
@@ -102,16 +96,16 @@ export class RepositoryState
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
-    const status = this.reduceToChangedOutsStatuses(statusOutput)
+    const modified = this.reduceToModified(statusOutput)
 
     const allModified = this.mapToAbsolutePaths(diffOutput.modified)
 
     this.modified = new Set(
-      allModified?.filter(path => !this.notInStatus(path, status.modified))
+      allModified?.filter(path => !this.notInStatus(path, modified))
     )
 
     this.stageModified = new Set(
-      allModified?.filter(path => this.notInStatus(path, status.modified))
+      allModified?.filter(path => this.notInStatus(path, modified))
     )
   }
 
