@@ -1,8 +1,8 @@
 import {
-  experimentShow,
-  root,
-  listDvcOnlyRecursive,
   diff,
+  experimentShow,
+  listDvcOnlyRecursive,
+  root,
   status
 } from './reader'
 import { executeProcess } from '../processExecution'
@@ -161,13 +161,13 @@ describe('diff', () => {
     }
     const cwd = __dirname
     mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
-    const diffOutput = await diff({
+    const statusOutput = await diff({
       cliPath: undefined,
       pythonBinPath: undefined,
       cwd
     })
 
-    expect(diffOutput).toEqual(cliOutput)
+    expect(statusOutput).toEqual(cliOutput)
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
