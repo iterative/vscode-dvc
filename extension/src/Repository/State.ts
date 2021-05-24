@@ -3,14 +3,17 @@ import { SourceControlManagementState } from './views/SourceControlManagement'
 import { DecorationState } from './DecorationProvider'
 import {
   ChangedType,
+  DiffOutput,
   ListOutput,
+  PathOutput,
   PathStatus,
   StageOrFileStatuses,
   Status,
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../cli/reader'
-import { dirname, join } from 'path'
+import { dirname, join, resolve } from 'path'
+import { isDirectory } from '../fileSystem'
 
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
@@ -79,13 +82,48 @@ export class RepositoryState
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  public updateStatus(statusOutput: StatusOutput) {
+  private mapToAbsolutePaths(diff: PathOutput[] = []): string[] {
+    return diff.map(entry => resolve(this.dvcRoot, entry.path))
+  }
+
+  private getStateFromDiff(diff?: PathOutput[]): Set<string> {
+    return new Set<string>(this.mapToAbsolutePaths(diff))
+  }
+
+  private notInStatus = (diffPath: string, status?: Set<string>): boolean => {
+    if (isDirectory(diffPath)) {
+      return !status?.has(diffPath)
+    }
+    return !(status?.has(diffPath) || status?.has(dirname(diffPath)))
+  }
+
+  private setModified(
+    diffOutput: DiffOutput,
+    statusOutput: StatusOutput
+  ): void {
     const status = this.reduceToChangedOutsStatuses(statusOutput)
 
-    this.added = new Set<string>()
-    this.modified = status.modified || new Set<string>()
-    this.deleted = status.deleted || new Set<string>()
-    this.notInCache = status['not in cache'] || new Set<string>()
+    const allModified = this.mapToAbsolutePaths(diffOutput.modified)
+
+    this.modified = new Set(
+      allModified?.filter(path => !this.notInStatus(path, status.modified))
+    )
+
+    this.stageModified = new Set(
+      allModified?.filter(path => this.notInStatus(path, status.modified))
+    )
+  }
+
+  public updateStatus(
+    diffOutput: DiffOutput,
+    statusOutput: StatusOutput
+  ): void {
+    this.added = this.getStateFromDiff(diffOutput.added)
+    this.deleted = this.getStateFromDiff(diffOutput.deleted)
+    this.renamed = this.getStateFromDiff(diffOutput.renamed)
+    this.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
+
+    this.setModified(diffOutput, statusOutput)
   }
 
   public updateTracked(listOutput: ListOutput[]): void {
