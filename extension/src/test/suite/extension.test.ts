@@ -108,6 +108,14 @@ suite('Extension Test Suite', () => {
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
       ])
 
+      const mockDiff = stub(CliReader, 'diff').resolves({
+        modified: [
+          { path: 'model.pt' },
+          { path: 'logs' },
+          { path: 'data/MNIST/raw' }
+        ]
+      })
+
       const mockStatus = stub(CliReader, 'status').resolves(({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
@@ -137,6 +145,7 @@ suite('Extension Test Suite', () => {
       expect(mockOnDidChangeFileSystem).to.have.been.called
       expect(mockOnDidChangeFileType).to.have.been.called
       expect(mockListDvcOnlyRecursive).to.have.been.called
+      expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
 
       await configurationChangeEvent()
