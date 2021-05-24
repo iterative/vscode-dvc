@@ -38,11 +38,11 @@ export class RepositoryState
 
   private dvcRoot: string
 
-  public tracked: Set<string> = new Set()
   public deleted: Set<string> = new Set()
   public modified: Set<string> = new Set()
   public new: Set<string> = new Set()
   public notInCache: Set<string> = new Set()
+  public tracked: Set<string> = new Set()
   public untracked: Set<string> = new Set()
 
   private filterRootDir(dirs: string[] = []) {
@@ -121,6 +121,17 @@ export class RepositoryState
     this.untracked = untracked
   }
 
+  public getState() {
+    return {
+      deleted: this.deleted,
+      modified: this.modified,
+      new: this.new,
+      notInCache: this.notInCache,
+      tracked: this.tracked,
+      untracked: this.untracked
+    }
+  }
+
   constructor(dvcRoot: string) {
     this.dvcRoot = dvcRoot
   }
@@ -137,11 +148,7 @@ export class Repository {
   }
 
   public getState() {
-    return this.state
-  }
-
-  public getTracked() {
-    return this.state.tracked
+    return this.state.getState()
   }
 
   @observable
@@ -181,15 +188,15 @@ export class Repository {
     const slowerTrackedUpdated = this.updateTracked()
 
     await statusesUpdated
-    this.sourceControlManagement.setState(this.state)
+    this.sourceControlManagement.setState(this.state.getState())
 
     await slowerTrackedUpdated
-    this.decorationProvider?.setState(this.state)
+    this.decorationProvider?.setState(this.state.getState())
   }
 
   private setState() {
-    this.sourceControlManagement.setState(this.state)
-    this.decorationProvider?.setState(this.state)
+    this.sourceControlManagement.setState(this.state.getState())
+    this.decorationProvider?.setState(this.state.getState())
   }
 
   public async updateState() {
