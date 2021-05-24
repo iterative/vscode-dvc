@@ -129,6 +129,7 @@ export class RepositoryState
   ): void {
     this.added = this.getStateFromDiff(diffOutput.added)
     this.deleted = this.getStateFromDiff(diffOutput.deleted)
+    this.renamed = this.getStateFromDiff(diffOutput.renamed)
     this.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
 
     this.setModified(diffOutput, statusOutput)
