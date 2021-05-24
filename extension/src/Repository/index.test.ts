@@ -51,6 +51,7 @@ beforeEach(() => {
 
 describe('Repository', () => {
   const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+  const emptyState = new RepositoryState(dvcRoot).getState()
 
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
@@ -116,7 +117,6 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(
         expect.objectContaining({
-          dispose: Disposable.fn(),
           deleted: emptySet,
           notInCache: emptySet,
           new: emptySet,
@@ -175,7 +175,7 @@ describe('Repository', () => {
         { path: model }
       ] as ListOutput[])
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(emptyState)
 
       await repository.resetState()
 
@@ -204,11 +204,10 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        new: emptySet,
-        modified: emptySet,
-        notInCache: emptySet,
         deleted,
+        modified: emptySet,
+        new: emptySet,
+        notInCache: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -272,7 +271,7 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      expect(repository.getState()).toEqual(new RepositoryState())
+      expect(repository.getState()).toEqual(emptyState)
 
       await repository.resetState()
 
@@ -303,11 +302,10 @@ describe('Repository', () => {
       )
 
       expect(repository.getState()).toEqual({
-        dispose: Disposable.fn(),
-        new: new Set(),
-        modified,
-        notInCache,
         deleted,
+        modified,
+        new: new Set(),
+        notInCache,
         tracked,
         untracked
       })
