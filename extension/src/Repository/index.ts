@@ -4,7 +4,7 @@ import { getAllUntracked } from '../git'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { DecorationProvider } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { status, listDvcOnlyRecursive } from '../cli/reader'
+import { listDvcOnlyRecursive, status, diff } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
 import { RepositoryState } from './State'
@@ -40,9 +40,11 @@ export class Repository {
 
   private async updateStatus() {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    const statusOutput = await status(options)
-
-    this.state.updateStatus(statusOutput)
+    const [diffFromHead, diffFromDvc] = await Promise.all([
+      diff(options),
+      status(options)
+    ])
+    return this.state.updateStatus(diffFromHead, diffFromDvc)
   }
 
   private async updateUntracked() {

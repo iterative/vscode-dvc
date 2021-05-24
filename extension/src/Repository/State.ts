@@ -3,6 +3,7 @@ import { SourceControlManagementState } from './views/SourceControlManagement'
 import { DecorationState } from './DecorationProvider'
 import {
   ChangedType,
+  DiffOutput,
   ListOutput,
   PathStatus,
   StageOrFileStatuses,
@@ -10,7 +11,8 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../cli/reader'
-import { dirname, join } from 'path'
+import { dirname, join, resolve } from 'path'
+import { isDirectory } from '../fileSystem'
 
 export class RepositoryState
   implements DecorationState, SourceControlManagementState {
@@ -78,13 +80,50 @@ export class RepositoryState
     return Object.values(filteredStatusOutput).reduce(statusReducer, {})
   }
 
-  public updateStatus(statusOutput: StatusOutput) {
-    const status = this.reduceToChangedOutsStatuses(statusOutput)
+  private getDiffFromDvc(
+    statusOutput: StatusOutput
+  ): Partial<Record<Status, Set<string>>> {
+    return this.reduceToChangedOutsStatuses(statusOutput)
+  }
 
-    this.added = new Set<string>()
-    this.modified = status.modified || new Set<string>()
-    this.deleted = status.deleted || new Set<string>()
-    this.notInCache = status['not in cache'] || new Set<string>()
+  private mapDiffToState(status?: { path: string }[]): Set<string> {
+    return new Set<string>(status?.map(entry => join(this.dvcRoot, entry.path)))
+  }
+
+  private getModified(
+    diff: { path: string }[] | undefined,
+    filter: (path: string) => boolean
+  ) {
+    return new Set(
+      diff?.map(entry => resolve(this.dvcRoot, entry.path)).filter(filter)
+    )
+  }
+
+  public updateStatus(
+    diffOutput: DiffOutput,
+    statusOutput: StatusOutput
+  ): void {
+    this.added = this.mapDiffToState(diffOutput.added)
+    this.deleted = this.mapDiffToState(diffOutput.deleted)
+    this.notInCache = this.mapDiffToState(diffOutput['not in cache'])
+
+    const status = this.getDiffFromDvc(statusOutput)
+
+    const pathMatchesDvc = (path: string): boolean => {
+      if (isDirectory(path)) {
+        return !status.modified?.has(path)
+      }
+      return !(
+        status.modified?.has(path) || status.modified?.has(dirname(path))
+      )
+    }
+
+    this.modified = this.getModified(
+      diffOutput.modified,
+      path => !pathMatchesDvc(path)
+    )
+
+    this.stageModified = this.getModified(diffOutput.modified, pathMatchesDvc)
   }
 
   public updateTracked(listOutput: ListOutput[]): void {

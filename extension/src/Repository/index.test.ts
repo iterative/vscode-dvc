@@ -7,6 +7,8 @@ import { DecorationProvider } from './DecorationProvider'
 import { Repository } from '.'
 import { RepositoryState } from './State'
 import {
+  diff,
+  DiffOutput,
   listDvcOnlyRecursive,
   ListOutput,
   status,
@@ -22,6 +24,7 @@ jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
 
+const mockedDiff = mocked(diff)
 const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
@@ -87,6 +90,20 @@ describe('Repository', () => {
         ]
       } as unknown) as StatusOutput)
 
+      mockedDiff.mockResolvedValueOnce({
+        added: [],
+        deleted: [],
+        modified: [
+          { path: model },
+          { path: logDir },
+          { path: logAcc },
+          { path: logLoss },
+          { path: MNISTDataDir }
+        ],
+        'not in cache': [],
+        renamed: []
+      } as DiffOutput)
+
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py')
       ])
@@ -116,6 +133,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
@@ -138,6 +156,7 @@ describe('Repository', () => {
 
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
+      mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
@@ -157,6 +176,13 @@ describe('Repository', () => {
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
       const model = 'model.pt'
+
+      mockedDiff.mockResolvedValueOnce(({
+        added: [],
+        deleted: [{ path: model }, { path: dataDir }],
+        modified: [],
+        'not in cache': []
+      } as unknown) as DiffOutput)
 
       mockedStatus.mockResolvedValueOnce(({
         train: [
@@ -203,6 +229,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
+      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(
@@ -221,6 +248,7 @@ describe('Repository', () => {
     })
 
     it("should update the classes state and call it's dependents", async () => {
+      mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
@@ -245,6 +273,13 @@ describe('Repository', () => {
         { path: dataDir }
       ] as ListOutput[])
 
+      mockedDiff.mockResolvedValueOnce(({
+        added: [],
+        modified: [{ path: 'data/features' }],
+        deleted: [{ path: model }],
+        'not in cache': [{ path: 'data/data.xml' }, { path: 'data/prepared' }]
+      } as unknown) as DiffOutput)
+
       mockedStatus.mockResolvedValueOnce(({
         prepare: [
           { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
@@ -256,7 +291,7 @@ describe('Repository', () => {
         ],
         train: [
           { 'changed deps': { 'data/features': 'modified' } },
-          { 'changed outs': { 'model.pkl': 'deleted' } }
+          { 'changed outs': { 'model.pt': 'deleted' } }
         ],
         evaluate: [
           {
@@ -282,7 +317,7 @@ describe('Repository', () => {
 
       await repository.resetState()
 
-      const deleted = new Set([join(dvcRoot, 'model.pkl')])
+      const deleted = new Set([join(dvcRoot, model)])
       const modified = new Set([join(dvcRoot, 'data/features')])
       const notInCache = new Set([
         join(dvcRoot, 'data/data.xml'),
