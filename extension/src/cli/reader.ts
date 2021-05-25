@@ -16,14 +16,14 @@ import { trimAndSplit } from '../util/stdout'
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
 
-type Path = { path: string }
+export type PathOutput = { path: string }
 
 export type DiffOutput = {
-  added: Path[]
-  deleted: Path[]
-  modified: Path[]
-  renamed: Path[]
-  'not in cache': Path[]
+  added?: PathOutput[]
+  deleted?: PathOutput[]
+  modified?: PathOutput[]
+  renamed?: PathOutput[]
+  'not in cache'?: PathOutput[]
 }
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
@@ -68,13 +68,28 @@ export const listDvcOnlyRecursive = (
     Flag.RECURSIVE
   )
 
-type Status = Record<
-  string,
-  (Record<string, Record<string, string>> | string)[]
->
+export enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'not in cache'
+}
 
-export const status = (options: ExecutionOptions): Promise<Status> =>
-  readCliProcessJson<Status>(options, Command.STATUS)
+export enum ChangedType {
+  CHANGED_OUTS = 'changed outs',
+  CHANGED_DEPS = 'changed deps'
+}
+
+export type PathStatus = Record<string, Status>
+
+export type StageOrFileStatuses = Record<ChangedType, PathStatus>
+
+export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
+
+export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
+
+export const status = (options: ExecutionOptions): Promise<StatusOutput> =>
+  readCliProcessJson<StatusOutput>(options, Command.STATUS)
 
 export const experimentListCurrent = (
   options: ExecutionOptions
