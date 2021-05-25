@@ -9,7 +9,7 @@ import {
 } from '../../cli/executor'
 import { experimentListCurrent } from '../../cli/reader'
 import { quickPickManyValues } from '../../vscode/quickPick'
-import { reportErrorMessage } from '../../vscode/reporting'
+import { showCliProcessError } from '../../vscode/reporting'
 
 export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
@@ -43,7 +43,7 @@ export const garbageCollectExperiments = async (options: ExecutionOptions) => {
       const stdout = await experimentGarbageCollect(options, quickPickResult)
       window.showInformationMessage(stdout)
     } catch (e) {
-      reportErrorMessage(e)
+      return showCliProcessError(e, 'Failed to garbage collect experiments')
     }
   }
 }
@@ -52,7 +52,7 @@ const experimentsQuickPick = async (options: ExecutionOptions) => {
   const experiments = await experimentListCurrent(options)
 
   if (experiments.length === 0) {
-    window.showErrorMessage('There are no experiments to select!')
+    window.showErrorMessage('There are no experiments to select')
   } else {
     return window.showQuickPick(experiments)
   }
@@ -80,10 +80,13 @@ export const applyExperiment = (options: ExecutionOptions) =>
           await experimentApply(options, selectedExperimentName)
         )
       } catch (e) {
-        reportErrorMessage(e)
+        return showCliProcessError(
+          e,
+          `Failed to apply experiment ${selectedExperimentName}`
+        )
       }
     }
-  )
+  ).catch(showCliProcessError)
 
 export const removeExperiment = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
@@ -91,11 +94,14 @@ export const removeExperiment = (options: ExecutionOptions) =>
     async (options, selectedExperimentName) => {
       try {
         await experimentRemove(options, selectedExperimentName)
-        window.showInformationMessage(
-          `Experiment ${selectedExperimentName} has been removed!`
+        return window.showInformationMessage(
+          `Experiment ${selectedExperimentName} has been removed`
         )
       } catch (e) {
-        reportErrorMessage(e)
+        return showCliProcessError(
+          e,
+          `Failed to remove experiment ${selectedExperimentName}`
+        )
       }
     }
   )
@@ -109,11 +115,14 @@ export const branchExperiment = (options: ExecutionOptions) =>
       })
       if (branchName) {
         try {
-          window.showInformationMessage(
+          return window.showInformationMessage(
             await experimentBranch(options, selectedExperimentName, branchName)
           )
         } catch (e) {
-          reportErrorMessage(e)
+          return showCliProcessError(
+            e,
+            `Failed to convert experiment ${selectedExperimentName} to branch ${branchName}`
+          )
         }
       }
     }

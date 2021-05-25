@@ -38,11 +38,13 @@ describe('queueExperiment', () => {
     expect(mockedShowInformationMessage).toBeCalledWith(stdout)
   })
 
-  it('displays an error message with the contents of stderr when the command fails', async () => {
+  it('displays an error message when the command fails', async () => {
     const stderr = 'Example stderr that will be resolved literally'
     const mockedError = { stderr }
     mockedExecuteProcess.mockRejectedValueOnce(mockedError)
     await queueExperiment(exampleExecutionOptions)
-    expect(mockedShowErrorMessage).toBeCalledWith(stderr)
+    expect(mockedShowErrorMessage).toBeCalledWith(
+      'Failed to queue an experiment'
+    )
   })
 })

@@ -137,15 +137,19 @@ describe('garbageCollectExperiments', () => {
     mockedExecuteProcess.mockRejectedValueOnce(mockedError)
 
     await garbageCollectExperiments(exampleExecutionOptions)
-    expect(mockedShowErrorMessage).toBeCalledWith(stderr)
+    expect(mockedShowErrorMessage).toBeCalledWith(
+      'Failed to garbage collect experiments'
+    )
   })
 
-  it('reports the message from a non-shell Exception', async () => {
+  it('Shows an error on a non-shell Exception', async () => {
     const exampleMessage = 'example Error message that will be shown'
     mockedShowQuickPick.mockResolvedValueOnce([])
     mockedExecuteProcess.mockRejectedValueOnce(new Error(exampleMessage))
     await garbageCollectExperiments(exampleExecutionOptions)
-    expect(mockedShowErrorMessage).toBeCalledWith(exampleMessage)
+    expect(mockedShowErrorMessage).toBeCalledWith(
+      'Failed to garbage collect experiments'
+    )
   })
 
   it('executes the proper default command given no selections', async () => {
@@ -191,11 +195,15 @@ describe('applyExperiment', () => {
     })
   })
 
-  it('throws from a non-shell Exception', async () => {
+  it('catches a non-shell Exception', async () => {
     mockedShowQuickPick.mockResolvedValueOnce([])
     mockedExecuteProcess.mockRejectedValueOnce(new Error())
-    await expect(applyExperiment(exampleExecutionOptions)).rejects.toThrow()
-    expect(mockedShowErrorMessage).not.toBeCalled()
+    await expect(applyExperiment(exampleExecutionOptions)).resolves.toBe(
+      undefined
+    )
+    expect(mockedShowErrorMessage).toBeCalledWith(
+      'Error running command "dvc exp list --names-only"!'
+    )
   })
 
   it('displays an error message when there are no experiments to select', async () => {
@@ -204,7 +212,7 @@ describe('applyExperiment', () => {
     await applyExperiment(exampleExecutionOptions)
     expect(mockedShowQuickPick).not.toBeCalled()
     expect(mockedShowErrorMessage).toBeCalledWith(
-      'There are no experiments to select!'
+      'There are no experiments to select'
     )
   })
 
@@ -224,7 +232,7 @@ describe('removeExperiment', () => {
     await removeExperiment(exampleExecutionOptions)
 
     expect(mockedShowInformationMessage).toBeCalledWith(
-      'Experiment exp-2021 has been removed!'
+      'Experiment exp-2021 has been removed'
     )
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',

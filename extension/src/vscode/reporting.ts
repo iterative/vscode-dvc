@@ -27,5 +27,12 @@ export class CliProcessError extends Error {
   }
 }
 
-export const reportErrorMessage = (error: MaybeConsoleError) =>
-  window.showErrorMessage(error.stderr || error.message)
+const inferErrorMessage = (error: CliProcessError | Error): string =>
+  error instanceof CliProcessError
+    ? `Error running command "dvc ${error.args.join(' ')}"!`
+    : error.message
+
+export const showCliProcessError = (
+  error: MaybeConsoleError,
+  message: string = inferErrorMessage(error)
+) => window.showErrorMessage(message)
