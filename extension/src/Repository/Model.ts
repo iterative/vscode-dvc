@@ -131,20 +131,7 @@ export class RepositoryModel
     )
   }
 
-  public setState(data: {
-    diffFromCache: StatusOutput
-    diffFromHead: DiffOutput
-    tracked?: ListOutput[]
-    untracked: Set<string>
-  }) {
-    if (data.tracked) {
-      this.updateTracked(data.tracked)
-    }
-    this.updateStatus(data.diffFromHead, data.diffFromCache)
-    this.updateUntracked(data.untracked)
-  }
-
-  public updateStatus(
+  private updateStatus(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
@@ -156,7 +143,7 @@ export class RepositoryModel
     this.setModified(diffOutput, statusOutput)
   }
 
-  public updateTracked(listOutput: ListOutput[]): void {
+  private updateTracked(listOutput: ListOutput[]): void {
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
     const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
@@ -167,8 +154,21 @@ export class RepositoryModel
     ])
   }
 
-  public updateUntracked(untracked: Set<string>): void {
+  private updateUntracked(untracked: Set<string>): void {
     this.state.untracked = untracked
+  }
+
+  public setState(data: {
+    diffFromCache: StatusOutput
+    diffFromHead: DiffOutput
+    tracked?: ListOutput[]
+    untracked: Set<string>
+  }) {
+    if (data.tracked) {
+      this.updateTracked(data.tracked)
+    }
+    this.updateStatus(data.diffFromHead, data.diffFromCache)
+    this.updateUntracked(data.untracked)
   }
 
   constructor(dvcRoot: string) {

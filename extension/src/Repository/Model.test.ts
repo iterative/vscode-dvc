@@ -70,8 +70,12 @@ describe('RepositoryState', () => {
       } as unknown) as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
-      model.updateTracked(tracked)
-      model.updateStatus(diff, status)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>(),
+        tracked
+      })
 
       expect(model.getState()).toEqual({
         added: emptySet,
@@ -104,7 +108,11 @@ describe('RepositoryState', () => {
       } as unknown) as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
-      model.updateStatus(diff, status)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>()
+      })
 
       expect(model.getState()).toEqual({
         added: emptySet,
@@ -130,7 +138,11 @@ describe('RepositoryState', () => {
       } as unknown) as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
-      model.updateStatus(diff, status)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>()
+      })
 
       expect(model.getState()).toEqual({
         added: emptySet,
