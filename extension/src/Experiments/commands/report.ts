@@ -1,6 +1,7 @@
 import { window } from 'vscode'
 import { experimentRunQueue } from '../../cli/executor'
 import { ExecutionOptions } from '../../cli/execution'
+import { reportErrorMessage } from '../../vscode/reporting'
 
 export const queueExperiment = async (
   options: ExecutionOptions
@@ -8,6 +9,6 @@ export const queueExperiment = async (
   try {
     window.showInformationMessage(await experimentRunQueue(options))
   } catch (e) {
-    window.showErrorMessage(e.stderr)
+    reportErrorMessage(e)
   }
 }
