@@ -17,6 +17,21 @@ export const getWatcher = (handler: (path: string) => void) => (
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
+export const onReady = (
+  debouncedWatcher: (path: string) => void,
+  path: string | string[],
+  pathWatcher: chokidar.FSWatcher
+) => {
+  pathWatcher.on('add', debouncedWatcher)
+  pathWatcher.on('addDir', debouncedWatcher)
+  pathWatcher.on('change', debouncedWatcher)
+  pathWatcher.on('unlink', debouncedWatcher)
+  pathWatcher.on('unlinkDir', debouncedWatcher)
+
+  const pathToFire = Array.isArray(path) ? path[0] : path
+  debouncedWatcher(pathToFire)
+}
+
 export const onDidChangeFileSystem = (
   path: string | string[],
   handler: (path: string) => void
@@ -32,12 +47,7 @@ export const onDidChangeFileSystem = (
     ignored: ignoredDotDirectories
   })
 
-  pathWatcher.on('ready', debouncedWatcher)
-  pathWatcher.on('add', debouncedWatcher)
-  pathWatcher.on('addDir', debouncedWatcher)
-  pathWatcher.on('change', debouncedWatcher)
-  pathWatcher.on('unlink', debouncedWatcher)
-  pathWatcher.on('unlinkDir', debouncedWatcher)
+  pathWatcher.on('ready', () => onReady(debouncedWatcher, path, pathWatcher))
 
   return {
     dispose: () => {
