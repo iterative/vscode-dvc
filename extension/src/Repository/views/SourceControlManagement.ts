@@ -6,6 +6,10 @@ import { isStringInEnum } from '../../util'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
+export interface SourceControlManagementModel {
+  getState: () => SourceControlManagementState
+}
+
 enum Status {
   ADDED = 'added',
   DELETED = 'deleted',

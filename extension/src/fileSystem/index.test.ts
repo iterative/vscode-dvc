@@ -14,7 +14,8 @@ const {
   ignoredDotDirectories,
   isDirectory,
   onDidChangeFileSystem,
-  onDidChangeFileType
+  onDidChangeFileType,
+  onReady
 } = FileSystem
 
 jest.mock('chokidar')
@@ -30,6 +31,35 @@ beforeEach(() => {
 })
 
 const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
+
+describe('onReady', () => {
+  it('should add the callbacks after the scan is complete', () => {
+    const mockedPath = join('some', 'path')
+    const mockedDebounce = jest.fn()
+    const mockedWatcher = mocked(new FSWatcher())
+    onReady(mockedDebounce, join('some', 'path'), mockedWatcher)
+
+    expect(mockedDebounce).toBeCalledWith(mockedPath)
+    expect(mockedWatcher.on).toBeCalledWith('addDir', mockedDebounce)
+    expect(mockedWatcher.on).toBeCalledWith('change', mockedDebounce)
+    expect(mockedWatcher.on).toBeCalledWith('unlink', mockedDebounce)
+    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', mockedDebounce)
+  })
+
+  it('should work with multiple paths', () => {
+    const mockedPath = join('some', 'path')
+    const mockedOtherPath = join('some', 'other', 'path')
+    const mockedDebounce = jest.fn()
+    const mockedWatcher = mocked(new FSWatcher())
+    onReady(mockedDebounce, [mockedPath, mockedOtherPath], mockedWatcher)
+
+    expect(mockedDebounce).toBeCalledWith(mockedPath)
+    expect(mockedWatcher.on).toBeCalledWith('addDir', mockedDebounce)
+    expect(mockedWatcher.on).toBeCalledWith('change', mockedDebounce)
+    expect(mockedWatcher.on).toBeCalledWith('unlink', mockedDebounce)
+    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', mockedDebounce)
+  })
+})
 
 describe('onDidChangeFileSystem', () => {
   it('should call fs.watch with the correct parameters', () => {
@@ -69,13 +99,7 @@ describe('onDidChangeFileSystem', () => {
     })
     expect(mockedWatch).toBeCalledTimes(1)
 
-    expect(mockedWatcher.on).toBeCalledTimes(6)
-    expect(mockedWatcher.on).toBeCalledWith('ready', func)
-    expect(mockedWatcher.on).toBeCalledWith('add', func)
-    expect(mockedWatcher.on).toBeCalledWith('addDir', func)
-    expect(mockedWatcher.on).toBeCalledWith('change', func)
-    expect(mockedWatcher.on).toBeCalledWith('unlink', func)
-    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', func)
+    expect(mockedWatcher.on).toBeCalledTimes(1)
   })
 })
 
