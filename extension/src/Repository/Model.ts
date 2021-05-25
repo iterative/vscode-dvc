@@ -19,7 +19,7 @@ export class Model implements DecorationModel, SourceControlManagementModel {
 
   private dvcRoot: string
 
-  public state = {
+  private state = {
     added: new Set<string>(),
     deleted: new Set<string>(),
     modified: new Set<string>(),
@@ -28,6 +28,10 @@ export class Model implements DecorationModel, SourceControlManagementModel {
     stageModified: new Set<string>(),
     tracked: new Set<string>(),
     untracked: new Set<string>()
+  }
+
+  public getState() {
+    return this.state
   }
 
   private filterRootDir(dirs: string[] = []) {
@@ -149,19 +153,6 @@ export class Model implements DecorationModel, SourceControlManagementModel {
 
   public updateUntracked(untracked: Set<string>): void {
     this.state.untracked = untracked
-  }
-
-  public getState() {
-    return {
-      added: this.state.added,
-      deleted: this.state.deleted,
-      modified: this.state.modified,
-      notInCache: this.state.notInCache,
-      renamed: this.state.renamed,
-      stageModified: this.state.stageModified,
-      tracked: this.state.tracked,
-      untracked: this.state.untracked
-    }
   }
 
   constructor(dvcRoot: string) {

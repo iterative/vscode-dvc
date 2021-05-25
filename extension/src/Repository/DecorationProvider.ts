@@ -14,7 +14,7 @@ import { isStringInEnum } from '../util'
 type DecorationState = Record<Status, Set<string>>
 
 export interface DecorationModel {
-  state: DecorationState
+  getState: () => DecorationState
 }
 
 enum Status {
