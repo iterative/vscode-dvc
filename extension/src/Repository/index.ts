@@ -14,7 +14,7 @@ import {
 } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
-import { RepositoryState } from './State'
+import { Model } from './Model'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
@@ -28,14 +28,14 @@ export class Repository {
   private sourceControlManagement: SourceControlManagement
 
   @observable
-  private state: RepositoryState
+  private model: Model
 
   public isReady() {
     return this.initialized
   }
 
   public getState() {
-    return this.state.getState()
+    return this.model.getState()
   }
 
   private getDiff(): Promise<[DiffOutput, StatusOutput]> {
@@ -62,14 +62,14 @@ export class Repository {
       [untracked, [diffFromHead, diffFromCache]]
     ] = await Promise.all([this.getTracked(), this.getStatusData()])
 
-    this.state.setState({ diffFromCache, diffFromHead, tracked, untracked })
+    this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
     this.setState()
   }
 
   private setState() {
-    this.sourceControlManagement.setState(this.state.getState())
-    this.decorationProvider?.setState(this.state.getState())
+    this.sourceControlManagement.setState(this.getState())
+    this.decorationProvider?.setState(this.getState())
   }
 
   public async updateState() {
@@ -78,7 +78,7 @@ export class Repository {
       [diffFromHead, diffFromCache]
     ] = await this.getStatusData()
 
-    this.state.setState({ diffFromCache, diffFromHead, untracked })
+    this.model.setState({ diffFromCache, diffFromHead, untracked })
 
     this.setState()
   }
@@ -97,10 +97,10 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-    this.state = this.dispose.track(new RepositoryState(dvcRoot))
+    this.model = this.dispose.track(new Model(dvcRoot))
 
     this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, this.state)
+      new SourceControlManagement(this.dvcRoot, this.getState())
     )
 
     this.setup()

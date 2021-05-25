@@ -2,7 +2,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve, sep } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { ListOutput, StatusOutput } from '../cli/reader'
-import { RepositoryState } from './State'
+import { Model } from './Model'
 
 jest.mock('@hediet/std/disposable')
 
@@ -28,7 +28,7 @@ describe('RepositoryState', () => {
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
-      const model = 'model.pt'
+      const output = 'model.pt'
       const predictions = 'predictions.json'
       const rawDataDir = join('data', 'MNIST', 'raw')
       const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
@@ -38,7 +38,7 @@ describe('RepositoryState', () => {
         { path: renamed },
         { path: logAcc },
         { path: logLoss },
-        { path: model }
+        { path: output }
       ] as ListOutput[]
 
       const diff = {
@@ -49,7 +49,7 @@ describe('RepositoryState', () => {
           { path: logDir + sep },
           { path: logAcc },
           { path: logLoss },
-          { path: model },
+          { path: output },
           { path: predictions }
         ],
         renamed: [{ path: renamed }],
@@ -69,11 +69,11 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.updateTracked(tracked)
-      repositoryState.updateStatus(diff, status)
+      const model = new Model(dvcRoot)
+      model.updateTracked(tracked)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: new Set([join(dvcRoot, deleted)]),
         modified: new Set([
@@ -84,7 +84,7 @@ describe('RepositoryState', () => {
         ]),
         notInCache: emptySet,
         renamed: new Set([join(dvcRoot, renamed)]),
-        stageModified: new Set([join(dvcRoot, model)]),
+        stageModified: new Set([join(dvcRoot, output)]),
         tracked: new Set([
           ...tracked.map(entry => join(dvcRoot, entry.path)),
           join(dvcRoot, rawDataDir),
@@ -103,10 +103,10 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.updateStatus(diff, status)
+      const model = new Model(dvcRoot)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: emptySet,
         modified: emptySet,
@@ -118,7 +118,7 @@ describe('RepositoryState', () => {
       })
     })
 
-    it('should filter the diff down to tracked path', () => {
+    it('should filter the diff down to tracked paths', () => {
       const diff = {
         modified: [{ path: 'data/MNIST/raw' }]
       }
@@ -129,10 +129,10 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.updateStatus(diff, status)
+      const model = new Model(dvcRoot)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: emptySet,
         modified: emptySet,
