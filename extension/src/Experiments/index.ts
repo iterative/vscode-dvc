@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
@@ -197,12 +197,17 @@ export class Experiments {
   }
 
   private pickDvcRoot() {
-    const experiments = Object.keys(this.experiments)
-    if (experiments.length === 1) {
-      return experiments[0]
+    const tableKeys = Object.keys(this.experiments)
+    if (tableKeys.length === 0) {
+      return window.showErrorMessage(
+        'There are no DVC projects in the current workspace'
+      )
+    }
+    if (tableKeys.length === 1) {
+      return tableKeys[0]
     }
     return quickPickOne(
-      experiments,
+      tableKeys,
       'Select which project to run command against'
     )
   }

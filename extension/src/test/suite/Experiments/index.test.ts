@@ -152,6 +152,27 @@ suite('Experiments Test Suite', () => {
 
       expect(mockQuickPickOne).to.not.be.called
     })
+
+    it('should show an error message if there are no projects', async () => {
+      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
+        dvcDemoPath
+      )
+
+      const mockShowErrorMessage = stub(window, 'showErrorMessage')
+
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const config = disposable.track(new Config())
+
+      const experiments = new Experiments(config)
+
+      await experiments.showExperimentsTable()
+
+      expect(mockQuickPickOne).to.not.be.called
+      expect(mockShowErrorMessage).to.be.calledWith(
+        'There are no DVC projects in the current workspace'
+      )
+    })
   })
 
   describe('getExperimentsTableForCommand', () => {
