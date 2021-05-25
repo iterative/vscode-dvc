@@ -125,6 +125,19 @@ export class RepositoryState
     )
   }
 
+  public setState(data: {
+    diffFromCache: StatusOutput
+    diffFromHead: DiffOutput
+    tracked?: ListOutput[]
+    untracked: Set<string>
+  }) {
+    if (data.tracked) {
+      this.updateTracked(data.tracked)
+    }
+    this.updateStatus(data.diffFromHead, data.diffFromCache)
+    this.updateUntracked(data.untracked)
+  }
+
   public updateStatus(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput

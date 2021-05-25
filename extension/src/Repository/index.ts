@@ -62,9 +62,7 @@ export class Repository {
       [untracked, [diffFromHead, diffFromCache]]
     ] = await Promise.all([this.getTracked(), this.getStatusData()])
 
-    this.state.updateTracked(tracked)
-    this.state.updateUntracked(untracked)
-    this.state.updateStatus(diffFromHead, diffFromCache)
+    this.state.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
     this.setState()
   }
@@ -80,8 +78,7 @@ export class Repository {
       [diffFromHead, diffFromCache]
     ] = await this.getStatusData()
 
-    this.state.updateStatus(diffFromHead, diffFromCache)
-    this.state.updateUntracked(untracked)
+    this.state.setState({ diffFromCache, diffFromHead, untracked })
 
     this.setState()
   }
