@@ -197,8 +197,12 @@ export class Experiments {
   }
 
   private pickDvcRoot() {
+    const experiments = Object.keys(this.experiments)
+    if (experiments.length === 1) {
+      return experiments[0]
+    }
     return quickPickOne(
-      Object.keys(this.experiments),
+      experiments,
       'Select which project to run command against'
     )
   }
