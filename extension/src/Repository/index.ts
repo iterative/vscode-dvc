@@ -40,11 +40,11 @@ export class Repository {
 
   private async updateStatus() {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    const [diffFromHead, diffFromDvc] = await Promise.all([
+    const [diffFromHead, diffFromCache] = await Promise.all([
       diff(options),
       status(options)
     ])
-    return this.model.updateStatus(diffFromHead, diffFromDvc)
+    return this.model.updateStatus(diffFromHead, diffFromCache)
   }
 
   private async updateUntracked() {
