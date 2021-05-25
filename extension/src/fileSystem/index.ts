@@ -22,14 +22,14 @@ export const onReady = (
   path: string | string[],
   pathWatcher: chokidar.FSWatcher
 ) => {
-  const pathToFire = Array.isArray(path) ? path[0] : path
-  debouncedWatcher(pathToFire)
-
   pathWatcher.on('add', debouncedWatcher)
   pathWatcher.on('addDir', debouncedWatcher)
   pathWatcher.on('change', debouncedWatcher)
   pathWatcher.on('unlink', debouncedWatcher)
   pathWatcher.on('unlinkDir', debouncedWatcher)
+
+  const pathToFire = Array.isArray(path) ? path[0] : path
+  debouncedWatcher(pathToFire)
 }
 
 export const onDidChangeFileSystem = (
