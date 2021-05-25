@@ -4,7 +4,14 @@ import { getAllUntracked } from '../git'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { DecorationProvider } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { listDvcOnlyRecursive, status, diff } from '../cli/reader'
+import {
+  listDvcOnlyRecursive,
+  status,
+  diff,
+  ListOutput,
+  DiffOutput,
+  StatusOutput
+} from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
 import { RepositoryModel } from './Model'
@@ -31,41 +38,38 @@ export class Repository {
     return this.model.getState()
   }
 
-  private async updateTracked(): Promise<void> {
+  private getUpdateData(): Promise<[DiffOutput, StatusOutput, Set<string>]> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    const listOutput = await listDvcOnlyRecursive(options)
-
-    this.model.updateTracked(listOutput)
-  }
-
-  private async updateStatus() {
-    const options = getExecutionOptions(this.config, this.dvcRoot)
-    const [diffFromHead, diffFromCache] = await Promise.all([
+    return Promise.all([
       diff(options),
-      status(options)
+      status(options),
+      getAllUntracked(this.dvcRoot)
     ])
-    return this.model.updateStatus(diffFromHead, diffFromCache)
   }
 
-  private async updateUntracked() {
-    const untracked = await getAllUntracked(this.dvcRoot)
-    this.model.updateUntracked(untracked)
-  }
-
-  private updateStatuses() {
-    return Promise.all([this.updateUntracked(), this.updateStatus()])
+  private getRefreshData(): Promise<
+    [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
+  > {
+    const options = getExecutionOptions(this.config, this.dvcRoot)
+    return Promise.all([
+      diff(options),
+      status(options),
+      getAllUntracked(this.dvcRoot),
+      listDvcOnlyRecursive(options)
+    ])
   }
 
   public async resetState() {
-    const statusesUpdated = this.updateStatuses()
+    const [
+      diffFromHead,
+      diffFromCache,
+      untracked,
+      tracked
+    ] = await this.getRefreshData()
 
-    const slowerTrackedUpdated = this.updateTracked()
+    this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
-    await statusesUpdated
-    this.sourceControlManagement.setState(this.getState())
-
-    await slowerTrackedUpdated
-    this.decorationProvider?.setState(this.getState())
+    this.setState()
   }
 
   private setState() {
@@ -74,7 +78,9 @@ export class Repository {
   }
 
   public async updateState() {
-    await this.updateStatuses()
+    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
+
+    this.model.setState({ diffFromCache, diffFromHead, untracked })
     this.setState()
   }
 

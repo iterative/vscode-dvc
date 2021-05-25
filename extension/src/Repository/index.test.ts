@@ -267,19 +267,25 @@ describe('Repository', () => {
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
       const dataDir = 'data'
+      const features = join(dataDir, 'features')
+      const dataXml = join(dataDir, 'data.xml')
+      const prepared = join(dataDir, 'prepared')
       const model = 'model.pt'
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: logAcc },
         { path: logLoss },
         { path: model },
-        { path: dataDir }
+        { path: dataDir },
+        { path: features },
+        { path: dataXml },
+        { path: prepared }
       ] as ListOutput[])
 
       mockedDiff.mockResolvedValueOnce(({
         added: [],
-        modified: [{ path: 'data/features' }],
+        modified: [{ path: features }],
         deleted: [{ path: model }],
-        'not in cache': [{ path: 'data/data.xml' }, { path: 'data/prepared' }]
+        'not in cache': [{ path: dataXml }, { path: prepared }]
       } as unknown) as DiffOutput)
 
       mockedStatus.mockResolvedValueOnce(({
@@ -326,11 +332,14 @@ describe('Repository', () => {
         join(dvcRoot, 'data/prepared')
       ])
       const tracked = new Set([
+        resolve(dvcRoot, dataDir),
+        resolve(dvcRoot, dataXml),
+        resolve(dvcRoot, features),
         resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logDir),
         resolve(dvcRoot, logLoss),
         resolve(dvcRoot, model),
-        resolve(dvcRoot, dataDir),
-        resolve(dvcRoot, logDir)
+        resolve(dvcRoot, prepared)
       ])
 
       const expectedExecutionOptions = {

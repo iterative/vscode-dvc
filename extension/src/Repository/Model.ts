@@ -14,6 +14,13 @@ import {
 import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
+type OutputData = {
+  diffFromCache: StatusOutput
+  diffFromHead: DiffOutput
+  tracked?: ListOutput[]
+  untracked: Set<string>
+}
+
 export class RepositoryModel
   implements DecorationModel, SourceControlManagementModel {
   public dispose = Disposable.fn()
@@ -88,12 +95,14 @@ export class RepositoryModel
     return Object.values(filteredStatusOutput).reduce(statusReducer, new Set())
   }
 
-  private mapToAbsolutePaths(diff: PathOutput[] = []): string[] {
-    return diff.map(entry => this.getAbsolutePath(entry.path))
+  private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
+    return diff
+      .map(entry => this.getAbsolutePath(entry.path))
+      .filter(path => this.state.tracked.has(path))
   }
 
   private getStateFromDiff(diff?: PathOutput[]): Set<string> {
-    return new Set<string>(this.mapToAbsolutePaths(diff))
+    return new Set<string>(this.mapToTrackedPaths(diff))
   }
 
   private pathInSet = (path: string, set?: Set<string>): boolean =>
@@ -118,7 +127,7 @@ export class RepositoryModel
     statusOutput: StatusOutput
   ): void {
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
-    const modifiedAgainstHead = this.mapToAbsolutePaths(diffOutput.modified)
+    const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
 
     this.state.modified = this.splitModified(modifiedAgainstHead, path =>
       this.pathInSet(path, modifiedAgainstCache)
@@ -129,7 +138,7 @@ export class RepositoryModel
     )
   }
 
-  public updateStatus(
+  private updateStatus(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
@@ -141,7 +150,7 @@ export class RepositoryModel
     this.setModified(diffOutput, statusOutput)
   }
 
-  public updateTracked(listOutput: ListOutput[]): void {
+  private updateTracked(listOutput: ListOutput[]): void {
     const trackedPaths = listOutput.map(tracked => tracked.path)
 
     const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
@@ -152,8 +161,21 @@ export class RepositoryModel
     ])
   }
 
-  public updateUntracked(untracked: Set<string>): void {
+  private updateUntracked(untracked: Set<string>): void {
     this.state.untracked = untracked
+  }
+
+  public setState({
+    diffFromCache,
+    diffFromHead,
+    tracked,
+    untracked
+  }: OutputData) {
+    if (tracked) {
+      this.updateTracked(tracked)
+    }
+    this.updateStatus(diffFromHead, diffFromCache)
+    this.updateUntracked(untracked)
   }
 
   constructor(dvcRoot: string) {

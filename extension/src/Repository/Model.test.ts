@@ -1,7 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve, sep } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { StatusOutput } from '../cli/reader'
+import { ListOutput, StatusOutput } from '../cli/reader'
 import { RepositoryModel } from './Model'
 
 jest.mock('@hediet/std/disposable')
@@ -23,19 +23,33 @@ describe('RepositoryState', () => {
   const emptySet = new Set()
 
   describe('updateStatus', () => {
-    it('should correctly process the outputs of diff and status', () => {
+    it('should correctly process the outputs of list, diff and status', () => {
       const deleted = join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte')
-      const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
+      const logDir = 'logs'
+      const logAcc = join(logDir, 'acc.tsv')
+      const logLoss = join(logDir, 'loss.tsv')
+      const output = 'model.pt'
       const predictions = 'predictions.json'
+      const rawDataDir = join('data', 'MNIST', 'raw')
+      const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
+
+      const tracked = [
+        { path: deleted },
+        { path: renamed },
+        { path: logAcc },
+        { path: logLoss },
+        { path: output }
+      ] as ListOutput[]
+
       const diff = {
         added: [],
         deleted: [{ path: deleted }],
         modified: [
-          { path: join('data', 'MNIST', 'raw') + sep },
-          { path: 'logs' + sep },
-          { path: join('logs', 'acc.tsv') },
-          { path: join('logs', 'loss.tsv') },
-          { path: 'model.pt' },
+          { path: rawDataDir + sep },
+          { path: logDir + sep },
+          { path: logAcc },
+          { path: logLoss },
+          { path: output },
           { path: predictions }
         ],
         renamed: [{ path: renamed }],
@@ -56,22 +70,30 @@ describe('RepositoryState', () => {
       } as unknown) as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
-      model.updateStatus(diff, status)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>(),
+        tracked
+      })
 
       expect(model.getState()).toEqual({
         added: emptySet,
         deleted: new Set([join(dvcRoot, deleted)]),
         modified: new Set([
-          join(dvcRoot, 'data', 'MNIST', 'raw'),
-          join(dvcRoot, 'logs'),
-          join(dvcRoot, 'logs', 'acc.tsv'),
-          join(dvcRoot, 'logs', 'loss.tsv'),
-          join(dvcRoot, predictions)
+          join(dvcRoot, rawDataDir),
+          join(dvcRoot, logDir),
+          join(dvcRoot, logAcc),
+          join(dvcRoot, logLoss)
         ]),
         notInCache: emptySet,
         renamed: new Set([join(dvcRoot, renamed)]),
-        stageModified: new Set([join(dvcRoot, 'model.pt')]),
-        tracked: emptySet,
+        stageModified: new Set([join(dvcRoot, output)]),
+        tracked: new Set([
+          ...tracked.map(entry => join(dvcRoot, entry.path)),
+          join(dvcRoot, rawDataDir),
+          join(dvcRoot, logDir)
+        ]),
         untracked: emptySet
       })
     })
@@ -86,7 +108,41 @@ describe('RepositoryState', () => {
       } as unknown) as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
-      model.updateStatus(diff, status)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>()
+      })
+
+      expect(model.getState()).toEqual({
+        added: emptySet,
+        deleted: emptySet,
+        modified: emptySet,
+        notInCache: emptySet,
+        renamed: emptySet,
+        stageModified: emptySet,
+        tracked: emptySet,
+        untracked: emptySet
+      })
+    })
+
+    it('should filter the diff down to tracked paths', () => {
+      const diff = {
+        modified: [{ path: 'data/MNIST/raw' }]
+      }
+
+      const status = ({
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ]
+      } as unknown) as StatusOutput
+
+      const model = new RepositoryModel(dvcRoot)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>()
+      })
 
       expect(model.getState()).toEqual({
         added: emptySet,
