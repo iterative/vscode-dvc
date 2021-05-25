@@ -57,15 +57,9 @@ export class Repository {
   }
 
   public async resetState() {
-    const statusesUpdated = this.updateStatuses()
+    await Promise.all([this.updateTracked(), this.updateStatuses()])
 
-    const slowerTrackedUpdated = this.updateTracked()
-
-    await statusesUpdated
-    this.sourceControlManagement.setState(this.state.getState())
-
-    await slowerTrackedUpdated
-    this.decorationProvider?.setState(this.state.getState())
+    this.setState()
   }
 
   private setState() {
