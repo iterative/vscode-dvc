@@ -38,29 +38,34 @@ export class Repository {
     return this.model.getState()
   }
 
-  private getDiff(): Promise<[DiffOutput, StatusOutput]> {
+  private getUpdateData(): Promise<[DiffOutput, StatusOutput, Set<string>]> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    return Promise.all([diff(options), status(options)])
+    return Promise.all([
+      diff(options),
+      status(options),
+      getAllUntracked(this.dvcRoot)
+    ])
   }
 
-  private getUntracked(): Promise<Set<string>> {
-    return getAllUntracked(this.dvcRoot)
-  }
-
-  private getStatusData() {
-    return Promise.all([this.getUntracked(), this.getDiff()])
-  }
-
-  private getTracked(): Promise<ListOutput[]> {
+  private getRefreshData(): Promise<
+    [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
+  > {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    return listDvcOnlyRecursive(options)
+    return Promise.all([
+      diff(options),
+      status(options),
+      getAllUntracked(this.dvcRoot),
+      listDvcOnlyRecursive(options)
+    ])
   }
 
   public async resetState() {
     const [
-      tracked,
-      [untracked, [diffFromHead, diffFromCache]]
-    ] = await Promise.all([this.getTracked(), this.getStatusData()])
+      diffFromHead,
+      diffFromCache,
+      untracked,
+      tracked
+    ] = await this.getRefreshData()
 
     this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
@@ -73,13 +78,9 @@ export class Repository {
   }
 
   public async updateState() {
-    const [
-      untracked,
-      [diffFromHead, diffFromCache]
-    ] = await this.getStatusData()
+    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
 
     this.model.setState({ diffFromCache, diffFromHead, untracked })
-
     this.setState()
   }
 
