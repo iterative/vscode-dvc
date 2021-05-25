@@ -83,7 +83,9 @@ export class RepositoryState
   }
 
   private mapToAbsolutePaths(diff: PathOutput[] = []): string[] {
-    return diff.map(entry => this.getAbsolutePath(entry.path))
+    return diff
+      .map(entry => this.getAbsolutePath(entry.path))
+      .filter(path => this.tracked.has(path))
   }
 
   private getStateFromDiff(diff?: PathOutput[]): Set<string> {
