@@ -54,7 +54,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   public openResource(resource: Uri) {
-    return window.showTextDocument(resource).then(textEditor => textEditor)
+    return window.showTextDocument(resource).then(
+      textEditor => textEditor,
+      error => window.showErrorMessage(error.message)
+    )
   }
 
   private async getRootElements() {
