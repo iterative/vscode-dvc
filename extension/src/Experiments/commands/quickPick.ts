@@ -11,6 +11,43 @@ import { experimentListCurrent } from '../../cli/reader'
 import { quickPickManyValues } from '../../vscode/quickPick'
 import { reportErrorMessage } from '../../vscode/reporting'
 
+export const garbageCollectExperiments = async (options: ExecutionOptions) => {
+  const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
+    [
+      {
+        label: 'All Branches',
+        detail: 'Preserve Experiments derived from all Git branches',
+        value: GcPreserveFlag.ALL_BRANCHES
+      },
+      {
+        label: 'All Tags',
+        detail: 'Preserve Experiments derived from all Git tags',
+        value: GcPreserveFlag.ALL_TAGS
+      },
+      {
+        label: 'All Commits',
+        detail: 'Preserve Experiments derived from all Git commits',
+        value: GcPreserveFlag.ALL_COMMITS
+      },
+      {
+        label: 'Queued Experiments',
+        detail: 'Preserve all queued Experiments',
+        value: GcPreserveFlag.QUEUED
+      }
+    ],
+    { placeHolder: 'Select which Experiments to preserve' }
+  )
+
+  if (quickPickResult) {
+    try {
+      const stdout = await experimentGarbageCollect(options, quickPickResult)
+      window.showInformationMessage(stdout)
+    } catch (e) {
+      reportErrorMessage(e)
+    }
+  }
+}
+
 const experimentsQuickPick = async (options: ExecutionOptions) => {
   const experiments = await experimentListCurrent(options)
 
@@ -81,40 +118,3 @@ export const branchExperiment = (options: ExecutionOptions) =>
       }
     }
   )
-
-export const garbageCollectExperiments = async (options: ExecutionOptions) => {
-  const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
-    [
-      {
-        label: 'All Branches',
-        detail: 'Preserve Experiments derived from all Git branches',
-        value: GcPreserveFlag.ALL_BRANCHES
-      },
-      {
-        label: 'All Tags',
-        detail: 'Preserve Experiments derived from all Git tags',
-        value: GcPreserveFlag.ALL_TAGS
-      },
-      {
-        label: 'All Commits',
-        detail: 'Preserve Experiments derived from all Git commits',
-        value: GcPreserveFlag.ALL_COMMITS
-      },
-      {
-        label: 'Queued Experiments',
-        detail: 'Preserve all queued Experiments',
-        value: GcPreserveFlag.QUEUED
-      }
-    ],
-    { placeHolder: 'Select which Experiments to preserve' }
-  )
-
-  if (quickPickResult) {
-    try {
-      const stdout = await experimentGarbageCollect(options, quickPickResult)
-      window.showInformationMessage(stdout)
-    } catch (e) {
-      reportErrorMessage(e)
-    }
-  }
-}
