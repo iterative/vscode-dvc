@@ -14,6 +14,13 @@ import {
 import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
+type OutputData = {
+  diffFromCache: StatusOutput
+  diffFromHead: DiffOutput
+  tracked?: ListOutput[]
+  untracked: Set<string>
+}
+
 export class RepositoryModel
   implements DecorationModel, SourceControlManagementModel {
   public dispose = Disposable.fn()
@@ -158,17 +165,17 @@ export class RepositoryModel
     this.state.untracked = untracked
   }
 
-  public setState(data: {
-    diffFromCache: StatusOutput
-    diffFromHead: DiffOutput
-    tracked?: ListOutput[]
-    untracked: Set<string>
-  }) {
-    if (data.tracked) {
-      this.updateTracked(data.tracked)
+  public setState({
+    diffFromCache,
+    diffFromHead,
+    tracked,
+    untracked
+  }: OutputData) {
+    if (tracked) {
+      this.updateTracked(tracked)
     }
-    this.updateStatus(data.diffFromHead, data.diffFromCache)
-    this.updateUntracked(data.untracked)
+    this.updateStatus(diffFromHead, diffFromCache)
+    this.updateUntracked(untracked)
   }
 
   constructor(dvcRoot: string) {
