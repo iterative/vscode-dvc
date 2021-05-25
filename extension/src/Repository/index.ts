@@ -4,7 +4,14 @@ import { getAllUntracked } from '../git'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { DecorationProvider } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import { listDvcOnlyRecursive, status, diff } from '../cli/reader'
+import {
+  listDvcOnlyRecursive,
+  status,
+  diff,
+  ListOutput,
+  DiffOutput,
+  StatusOutput
+} from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
 import { RepositoryState } from './State'
@@ -31,33 +38,33 @@ export class Repository {
     return this.state.getState()
   }
 
-  private async updateTracked(): Promise<void> {
+  private getDiff(): Promise<[DiffOutput, StatusOutput]> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    const listOutput = await listDvcOnlyRecursive(options)
-
-    this.state.updateTracked(listOutput)
+    return Promise.all([diff(options), status(options)])
   }
 
-  private async updateStatus() {
+  private getUntracked(): Promise<Set<string>> {
+    return getAllUntracked(this.dvcRoot)
+  }
+
+  private getStatusData() {
+    return Promise.all([this.getUntracked(), this.getDiff()])
+  }
+
+  private getTracked(): Promise<ListOutput[]> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
-    const [diffFromHead, diffFromDvc] = await Promise.all([
-      diff(options),
-      status(options)
-    ])
-    return this.state.updateStatus(diffFromHead, diffFromDvc)
-  }
-
-  private async updateUntracked() {
-    const untracked = await getAllUntracked(this.dvcRoot)
-    this.state.updateUntracked(untracked)
-  }
-
-  private updateStatuses() {
-    return Promise.all([this.updateUntracked(), this.updateStatus()])
+    return listDvcOnlyRecursive(options)
   }
 
   public async resetState() {
-    await Promise.all([this.updateTracked(), this.updateStatuses()])
+    const [
+      tracked,
+      [untracked, [diffFromHead, diffFromCache]]
+    ] = await Promise.all([this.getTracked(), this.getStatusData()])
+
+    this.state.updateTracked(tracked)
+    this.state.updateUntracked(untracked)
+    this.state.updateStatus(diffFromHead, diffFromCache)
 
     this.setState()
   }
@@ -68,7 +75,14 @@ export class Repository {
   }
 
   public async updateState() {
-    await this.updateStatuses()
+    const [
+      untracked,
+      [diffFromHead, diffFromCache]
+    ] = await this.getStatusData()
+
+    this.state.updateStatus(diffFromHead, diffFromCache)
+    this.state.updateUntracked(untracked)
+
     this.setState()
   }
 
