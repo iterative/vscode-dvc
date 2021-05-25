@@ -2,7 +2,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve, sep } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { StatusOutput } from '../cli/reader'
-import { RepositoryState } from './State'
+import { RepositoryModel } from './Model'
 
 jest.mock('@hediet/std/disposable')
 
@@ -55,10 +55,10 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.updateStatus(diff, status)
+      const model = new RepositoryModel(dvcRoot)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: new Set([join(dvcRoot, deleted)]),
         modified: new Set([
@@ -85,10 +85,10 @@ describe('RepositoryState', () => {
         ]
       } as unknown) as StatusOutput
 
-      const repositoryState = new RepositoryState(dvcRoot)
-      repositoryState.updateStatus(diff, status)
+      const model = new RepositoryModel(dvcRoot)
+      model.updateStatus(diff, status)
 
-      expect(repositoryState.getState()).toEqual({
+      expect(model.getState()).toEqual({
         added: emptySet,
         deleted: emptySet,
         modified: emptySet,

@@ -11,7 +11,11 @@ import {
 } from 'vscode'
 import { isStringInEnum } from '../util'
 
-export type DecorationState = Record<Status, Set<string>>
+type DecorationState = Record<Status, Set<string>>
+
+export interface DecorationModel {
+  getState: () => DecorationState
+}
 
 enum Status {
   ADDED = 'added',
