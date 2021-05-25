@@ -14,7 +14,8 @@ import {
 import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
-export class Model implements DecorationModel, SourceControlManagementModel {
+export class RepositoryModel
+  implements DecorationModel, SourceControlManagementModel {
   public dispose = Disposable.fn()
 
   private dvcRoot: string

@@ -7,7 +7,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { listDvcOnlyRecursive, status, diff } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
 import { getExecutionOptions } from '../cli/execution'
-import { Model } from './Model'
+import { RepositoryModel } from './Model'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
@@ -21,7 +21,7 @@ export class Repository {
   private sourceControlManagement: SourceControlManagement
 
   @observable
-  private model: Model
+  private model: RepositoryModel
 
   public isReady() {
     return this.initialized
@@ -92,7 +92,7 @@ export class Repository {
     this.config = config
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
-    this.model = this.dispose.track(new Model(dvcRoot))
+    this.model = this.dispose.track(new RepositoryModel(dvcRoot))
 
     this.sourceControlManagement = this.dispose.track(
       new SourceControlManagement(this.dvcRoot, this.getState())

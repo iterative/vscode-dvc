@@ -5,7 +5,7 @@ import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
 import { Repository } from '.'
-import { Model } from './Model'
+import { RepositoryModel } from './Model'
 import {
   diff,
   DiffOutput,
@@ -61,7 +61,7 @@ beforeEach(() => {
 
 describe('Repository', () => {
   const dvcRoot = resolve(__dirname, '..', '..', 'demo')
-  const emptyState = new Model(dvcRoot).getState()
+  const emptyState = new RepositoryModel(dvcRoot).getState()
   const emptySet = new Set<string>()
 
   describe('ready', () => {
