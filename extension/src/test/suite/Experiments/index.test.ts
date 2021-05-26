@@ -129,6 +129,29 @@ suite('Experiments Test Suite', () => {
       expect(focusedExperimentsTable).to.equal(experimentsTable)
       expect(mockQuickPickOne).to.be.calledOnce
     })
+
+    it('should not prompt to pick a project if there is only one project', async () => {
+      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
+        dvcDemoPath
+      )
+
+      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const config = disposable.track(new Config())
+
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
+      )
+
+      const experiments = new Experiments(config)
+      experiments.create([dvcDemoPath], resourceLocator)
+
+      await experiments.isReady()
+
+      await experiments.showExperimentsTable()
+
+      expect(mockQuickPickOne).to.not.be.called
+    })
   })
 
   describe('getExperimentsTableForCommand', () => {
