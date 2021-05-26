@@ -13,7 +13,6 @@ import { dirname, join, relative } from 'path'
 import { listDvcOnly } from '../../cli/reader'
 import { Config } from '../../Config'
 import { definedAndNonEmpty } from '../../util'
-import { reportStderrOrThrow } from '../../vscode/reporting'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import {
@@ -57,9 +56,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   public openResource(resource: Uri) {
     return window.showTextDocument(resource).then(
       textEditor => textEditor,
-      error => {
-        reportStderrOrThrow(error.message)
-      }
+      error => window.showErrorMessage(error.message)
     )
   }
 

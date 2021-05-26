@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/no-identical-functions */
 import { EventEmitter } from 'vscode'
 import { getEmitter } from '../vscode/EventEmitter'
 import { getProcessEnv } from '../env'
@@ -6,6 +5,7 @@ import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { createProcess, Process, executeProcess } from '../processExecution'
 import { Config } from '../Config'
+import { CliProcessError } from '../vscode/reporting'
 
 export type BaseExecutionOptions = {
   cliPath: string | undefined
@@ -113,9 +113,10 @@ export class CliExecution {
         cwd,
         env
       })
-    } catch (e) {
-      CliExecution.e?.fire(e)
-      throw e
+    } catch (error) {
+      CliExecution.e?.fire(error)
+      CliExecution.e?.fire('\n')
+      throw new CliProcessError({ options, args, baseError: error })
     }
   }
 

@@ -9,7 +9,7 @@ import {
 } from '../../cli/executor'
 import { experimentListCurrent } from '../../cli/reader'
 import { quickPickManyValues } from '../../vscode/quickPick'
-import { reportStderrOrThrow } from '../../vscode/reporting'
+import { reportErrorMessage } from '../../vscode/reporting'
 
 export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
@@ -43,7 +43,7 @@ export const garbageCollectExperiments = async (options: ExecutionOptions) => {
       const stdout = await experimentGarbageCollect(options, quickPickResult)
       window.showInformationMessage(stdout)
     } catch (e) {
-      reportStderrOrThrow(e)
+      reportErrorMessage(e)
     }
   }
 }
@@ -65,13 +65,9 @@ const experimentsQuickPickCommand = async <T = void>(
     selectedExperiment: string
   ) => Promise<T>
 ) => {
-  try {
-    const selectedExperimentName = await experimentsQuickPick(options)
-    if (selectedExperimentName) {
-      return callback(options, selectedExperimentName)
-    }
-  } catch (e) {
-    reportStderrOrThrow(e)
+  const selectedExperimentName = await experimentsQuickPick(options)
+  if (selectedExperimentName) {
+    return callback(options, selectedExperimentName)
   }
 }
 
@@ -79,9 +75,13 @@ export const applyExperiment = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
     options,
     async (options, selectedExperimentName) => {
-      window.showInformationMessage(
-        await experimentApply(options, selectedExperimentName)
-      )
+      try {
+        window.showInformationMessage(
+          await experimentApply(options, selectedExperimentName)
+        )
+      } catch (e) {
+        reportErrorMessage(e)
+      }
     }
   )
 
@@ -89,10 +89,14 @@ export const removeExperiment = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
     options,
     async (options, selectedExperimentName) => {
-      await experimentRemove(options, selectedExperimentName)
-      window.showInformationMessage(
-        `Experiment ${selectedExperimentName} has been removed!`
-      )
+      try {
+        await experimentRemove(options, selectedExperimentName)
+        window.showInformationMessage(
+          `Experiment ${selectedExperimentName} has been removed!`
+        )
+      } catch (e) {
+        reportErrorMessage(e)
+      }
     }
   )
 
@@ -104,9 +108,13 @@ export const branchExperiment = (options: ExecutionOptions) =>
         prompt: 'Name the new branch'
       })
       if (branchName) {
-        window.showInformationMessage(
-          await experimentBranch(options, selectedExperimentName, branchName)
-        )
+        try {
+          window.showInformationMessage(
+            await experimentBranch(options, selectedExperimentName, branchName)
+          )
+        } catch (e) {
+          reportErrorMessage(e)
+        }
       }
     }
   )

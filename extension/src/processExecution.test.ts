@@ -10,16 +10,6 @@ describe('executeProcess', () => {
     expect(output).toEqual('some text')
   })
 
-  it('should throw an empty error if the underlying process throws without stderr', async () => {
-    await expect(
-      executeProcess({
-        executable: 'echo1',
-        args: ['I', 'deed'],
-        cwd: __dirname
-      })
-    ).rejects.toBeFalsy()
-  })
-
   it('should return the stderr if the process throws with stderr', async () => {
     await expect(
       executeProcess({

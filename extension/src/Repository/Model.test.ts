@@ -33,7 +33,7 @@ describe('RepositoryState', () => {
       const rawDataDir = join('data', 'MNIST', 'raw')
       const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
 
-      const tracked = [
+      const list = [
         { path: deleted },
         { path: renamed },
         { path: logAcc },
@@ -74,7 +74,7 @@ describe('RepositoryState', () => {
         diffFromHead: diff,
         diffFromCache: status,
         untracked: new Set<string>(),
-        tracked
+        tracked: list
       })
 
       expect(model.getState()).toEqual({
@@ -90,7 +90,7 @@ describe('RepositoryState', () => {
         renamed: new Set([join(dvcRoot, renamed)]),
         stageModified: new Set([join(dvcRoot, output)]),
         tracked: new Set([
-          ...tracked.map(entry => join(dvcRoot, entry.path)),
+          ...list.map(entry => join(dvcRoot, entry.path)),
           join(dvcRoot, rawDataDir),
           join(dvcRoot, logDir)
         ]),
@@ -98,7 +98,47 @@ describe('RepositoryState', () => {
       })
     })
 
+    it('should handle an empty status output', () => {
+      const rawDataDir = join('data', 'MNIST', 'raw')
+      const data = join(rawDataDir, 'train-labels-idx2-ubyte')
+
+      const list = [{ path: data }] as ListOutput[]
+
+      const diff = {
+        modified: [{ path: rawDataDir }, { path: data }]
+      }
+
+      const status = {}
+
+      const model = new RepositoryModel(dvcRoot)
+      model.setState({
+        diffFromHead: diff,
+        diffFromCache: status,
+        untracked: new Set<string>(),
+        tracked: list
+      })
+
+      expect(model.getState()).toEqual({
+        added: emptySet,
+        deleted: emptySet,
+        modified: emptySet,
+        notInCache: emptySet,
+        renamed: emptySet,
+        stageModified: new Set([
+          join(dvcRoot, rawDataDir),
+          join(dvcRoot, data)
+        ]),
+        tracked: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
+        untracked: emptySet
+      })
+    })
+
     it('should handle an empty diff output', () => {
+      const rawDataDir = join('data', 'MNIST', 'raw')
+      const data = join(rawDataDir, 'train-labels-idx3-ubyte')
+
+      const list = [{ path: data }] as ListOutput[]
+
       const diff = {}
 
       const status = ({
@@ -111,22 +151,23 @@ describe('RepositoryState', () => {
       model.setState({
         diffFromHead: diff,
         diffFromCache: status,
-        untracked: new Set<string>()
+        untracked: new Set<string>(),
+        tracked: list
       })
 
       expect(model.getState()).toEqual({
         added: emptySet,
         deleted: emptySet,
-        modified: emptySet,
+        modified: new Set([join(dvcRoot, rawDataDir)]),
         notInCache: emptySet,
         renamed: emptySet,
         stageModified: emptySet,
-        tracked: emptySet,
+        tracked: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
         untracked: emptySet
       })
     })
 
-    it('should filter the diff down to tracked paths', () => {
+    it('should filter the diff and status down to tracked paths', () => {
       const diff = {
         modified: [{ path: 'data/MNIST/raw' }]
       }
