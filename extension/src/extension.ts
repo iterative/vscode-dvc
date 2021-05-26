@@ -3,6 +3,7 @@ import {
   Event,
   EventEmitter,
   ExtensionContext,
+  OutputChannel,
   window,
   workspace,
   WorkspaceFolder
@@ -33,7 +34,7 @@ import { GitExtension } from './extensions/Git'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
-import { getExecutionOptions } from './cli/execution'
+import { CliExecution, getExecutionOptions } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { Runner } from './cli/Runner'
@@ -59,6 +60,7 @@ export class Extension {
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly gitExtension: GitExtension
+  private readonly outputChannel: OutputChannel
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -230,6 +232,10 @@ export class Extension {
     this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.gitExtension = this.dispose.track(new GitExtension())
+
+    this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
+
+    this.dispose.track(CliExecution.onDidRun(e => this.outputChannel.append(e)))
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)

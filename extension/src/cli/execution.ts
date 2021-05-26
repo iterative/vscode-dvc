@@ -62,6 +62,7 @@ const getOutput = (data: string | Buffer): string =>
 
 export class CliExecution {
   private static e = getEmitter<string>()
+  public static onDidRun = CliExecution.e.event
 
   public static createCliProcess({
     options,
