@@ -115,7 +115,9 @@ export class CliExecution {
       })
     } catch (error) {
       const cliError = new CliProcessError({ options, args, baseError: error })
-      CliExecution.e?.fire(`> ${cliError.stderr}\n`)
+      CliExecution.e?.fire(
+        `> dvc ${args.join(' ')} failed. ${cliError.stderr}\n`
+      )
       throw cliError
     }
   }
