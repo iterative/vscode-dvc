@@ -161,22 +161,12 @@ export class Extension {
 
   private async initializeGitRepositories() {
     await Promise.all([this.experiments.isReady(), this.gitExtension.isReady()])
-    this.gitExtension.repositories.forEach(async gitExtensionRepository => {
-      const gitRoot = gitExtensionRepository.getRepositoryRoot()
-
+    this.gitExtension.gitRoots.forEach(async gitRoot => {
       const options = getExecutionOptions(this.config, gitRoot)
       const dvcRoots = await findDvcRootPaths(options)
 
       dvcRoots.forEach(dvcRoot => {
-        const repository = this.dvcRepositories[dvcRoot]
-
         this.experiments.onDidChangeData(dvcRoot, gitRoot)
-
-        this.dispose.track(
-          gitExtensionRepository.onDidChange(() => {
-            repository?.updateState()
-          })
-        )
       })
     })
   }

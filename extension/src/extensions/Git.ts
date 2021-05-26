@@ -1,4 +1,4 @@
-import { Event, EventEmitter, Extension, extensions, Uri } from 'vscode'
+import { Event, Extension, extensions, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 
@@ -63,32 +63,6 @@ interface VscodeGit {
   getAPI(version: number): Thenable<ExtensionAPI>
 }
 
-class GitExtensionRepository {
-  public dispose = Disposable.fn()
-
-  private readonly changed: EventEmitter<void> = this.dispose.track(
-    new EventEmitter()
-  )
-
-  public readonly onDidChange: Event<void> = this.changed.event
-
-  private repositoryRoot: string
-
-  public getRepositoryRoot() {
-    return this.repositoryRoot
-  }
-
-  constructor(repository: Repository) {
-    this.repositoryRoot = repository.rootUri.fsPath
-
-    this.dispose.track(
-      repository.state.onDidChange(() => {
-        this.changed.fire()
-      })
-    )
-  }
-}
-
 export class GitExtension {
   public dispose = Disposable.fn()
 
@@ -97,7 +71,7 @@ export class GitExtension {
 
   private gitExtensionAPI?: ExtensionAPI
 
-  public repositories: GitExtensionRepository[] = []
+  public gitRoots: string[] = []
 
   public isReady() {
     return this.initialized
@@ -114,8 +88,8 @@ export class GitExtension {
   private initializeClass(gitExtensionAPI: ExtensionAPI) {
     this.gitExtensionAPI = gitExtensionAPI
 
-    this.repositories = this.gitExtensionAPI.repositories.map(repository =>
-      this.dispose.track(new GitExtensionRepository(repository))
+    this.gitRoots = this.gitExtensionAPI.repositories.map(
+      repository => repository.rootUri.fsPath
     )
 
     this.deferred.resolve()
