@@ -1,6 +1,4 @@
 import { Event, Extension, extensions, Uri } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 
 const enum GitStatus {
   INDEX_MODIFIED,
@@ -63,52 +61,12 @@ interface VscodeGit {
   getAPI(version: number): Thenable<ExtensionAPI>
 }
 
-export class GitExtension {
-  public dispose = Disposable.fn()
+export const getGitRepositoryRoots = async () => {
+  const extension = extensions.getExtension('vscode.git') as Extension<
+    VscodeGit
+  >
+  const activatedExtension = await extension.activate()
+  const api = await activatedExtension.getAPI(1)
 
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
-  private gitExtensionAPI?: ExtensionAPI
-
-  public gitRoots: string[] = []
-
-  public isReady() {
-    return this.initialized
-  }
-
-  private getExtensionAPI = async (): Promise<ExtensionAPI> => {
-    const extension = extensions.getExtension('vscode.git') as Extension<
-      VscodeGit
-    >
-    const activatedExtension = await extension.activate()
-    return activatedExtension.getAPI(1)
-  }
-
-  private initializeClass(gitExtensionAPI: ExtensionAPI) {
-    this.gitExtensionAPI = gitExtensionAPI
-
-    this.gitRoots = this.gitExtensionAPI.repositories.map(
-      repository => repository.rootUri.fsPath
-    )
-
-    this.deferred.resolve()
-  }
-
-  private initialize(extensionAPI: ExtensionAPI) {
-    if (extensionAPI.state === 'initialized') {
-      return this.initializeClass(extensionAPI)
-    }
-    return extensionAPI.onDidChangeState(state => {
-      if (state === 'initialized') {
-        this.initializeClass(extensionAPI)
-      }
-    })
-  }
-
-  constructor() {
-    this.getExtensionAPI().then(gitExtensionAPI => {
-      this.initialize(gitExtensionAPI)
-    })
-  }
+  return api.repositories.map(repository => repository.rootUri.fsPath)
 }

@@ -29,7 +29,7 @@ import {
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
-import { GitExtension } from './extensions/Git'
+import { getGitRepositoryRoots } from './extensions/Git'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
@@ -58,7 +58,6 @@ export class Extension {
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
-  private readonly gitExtension: GitExtension
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -160,8 +159,11 @@ export class Extension {
   }
 
   private async initializeGitRepositories() {
-    await Promise.all([this.experiments.isReady(), this.gitExtension.isReady()])
-    this.gitExtension.gitRoots.forEach(async gitRoot => {
+    const [, gitRoots] = await Promise.all([
+      this.experiments.isReady(),
+      getGitRepositoryRoots()
+    ])
+    gitRoots.forEach(async gitRoot => {
       const options = getExecutionOptions(this.config, gitRoot)
       const dvcRoots = await findDvcRootPaths(options)
 
@@ -218,8 +220,6 @@ export class Extension {
     this.runner = this.dispose.track(new Runner(this.config))
 
     this.experiments = this.dispose.track(new Experiments(this.config))
-
-    this.gitExtension = this.dispose.track(new GitExtension())
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)

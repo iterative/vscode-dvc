@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { resolve } from 'path'
-import { GitExtension } from '../../../extensions/Git'
+import { getGitRepositoryRoots } from '../../../extensions/Git'
 import { restore } from 'sinon'
 
 chai.use(sinonChai)
@@ -25,11 +25,10 @@ suite('Git Extension Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('GitExtension', () => {
+  describe('getGitRepositoryRoots', () => {
     it('should be able to return the root path of each open repository', async () => {
-      const gitExtension = disposable.track(new GitExtension())
-      await gitExtension.isReady()
-      const [gitRoot] = gitExtension.gitRoots
+      const gitRoots = await getGitRepositoryRoots()
+      const [gitRoot] = gitRoots
       expect(gitRoot).to.equal(workspacePath)
     })
   })
