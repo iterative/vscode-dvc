@@ -75,7 +75,9 @@ export class RepositoryModel
         .map(([relativePath]) => {
           const absolutePath = this.getAbsolutePath(relativePath)
           const existingPaths = reducedStatus || new Set<string>()
-          reducedStatus = existingPaths.add(absolutePath)
+          if (this.state.tracked.has(absolutePath)) {
+            reducedStatus = existingPaths.add(absolutePath)
+          }
         })
     )
   }
@@ -108,18 +110,33 @@ export class RepositoryModel
   private pathInSet = (path: string, set?: Set<string>): boolean =>
     !this.pathNotInSet(path, set)
 
-  private pathNotInSet = (path: string, set?: Set<string>): boolean => {
+  private pathNotInSet = (
+    path: string,
+    set: Set<string> = new Set()
+  ): boolean => {
     if (isDirectory(path)) {
-      return !set?.has(path)
+      return !set.has(path)
     }
-    return !(set?.has(path) || set?.has(dirname(path)))
+    return !(set.has(path) || set.has(dirname(path)))
   }
 
-  private splitModified(
+  private splitModifiedAgainstHead(
     modifiedAgainstHead: string[],
     filter: (path: string) => boolean
   ): Set<string> {
-    return new Set(modifiedAgainstHead?.filter(filter))
+    return new Set(modifiedAgainstHead.filter(filter))
+  }
+
+  private getAllModifiedAgainstCache(
+    modifiedAgainstHead: string[],
+    modifiedAgainstCache: Set<string>
+  ): Set<string> {
+    return new Set<string>([
+      ...this.splitModifiedAgainstHead(modifiedAgainstHead, path =>
+        this.pathInSet(path, modifiedAgainstCache)
+      ),
+      ...modifiedAgainstCache
+    ])
   }
 
   private setModified(
@@ -129,12 +146,14 @@ export class RepositoryModel
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
 
-    this.state.modified = this.splitModified(modifiedAgainstHead, path =>
-      this.pathInSet(path, modifiedAgainstCache)
+    this.state.stageModified = this.splitModifiedAgainstHead(
+      modifiedAgainstHead,
+      path => this.pathNotInSet(path, modifiedAgainstCache)
     )
 
-    this.state.stageModified = this.splitModified(modifiedAgainstHead, path =>
-      this.pathNotInSet(path, modifiedAgainstCache)
+    this.state.modified = this.getAllModifiedAgainstCache(
+      modifiedAgainstHead,
+      modifiedAgainstCache
     )
   }
 
