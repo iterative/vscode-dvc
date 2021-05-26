@@ -105,19 +105,19 @@ export class CliExecution {
     ...args: Args
   ): Promise<string> {
     const { executable, cwd, env } = getExecutionDetails(options)
+    const command = `dvc ${args.join(' ')}`
     try {
-      CliExecution.e?.fire(`> dvc ${args.join(' ')}\n`)
-      return await executeProcess({
+      const stdout = await executeProcess({
         executable,
         args,
         cwd,
         env
       })
+      CliExecution.e?.fire(`> ${command}\n`)
+      return stdout
     } catch (error) {
       const cliError = new CliProcessError({ options, args, baseError: error })
-      CliExecution.e?.fire(
-        `> dvc ${args.join(' ')} failed. ${cliError.stderr}\n`
-      )
+      CliExecution.e?.fire(`> ${command} failed. ${cliError.stderr}\n`)
       throw cliError
     }
   }
