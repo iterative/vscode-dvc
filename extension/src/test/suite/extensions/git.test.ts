@@ -4,7 +4,7 @@ import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { resolve } from 'path'
-import { getGitRepositoryRoots } from '../../../extensions/Git'
+import { getGitRepositoryRoots } from '../../../extensions/git'
 import { restore } from 'sinon'
 
 chai.use(sinonChai)

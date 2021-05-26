@@ -29,7 +29,7 @@ import {
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
 import { DecorationProvider } from './Repository/DecorationProvider'
-import { getGitRepositoryRoots } from './extensions/Git'
+import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { canRunCli } from './cli/executor'
