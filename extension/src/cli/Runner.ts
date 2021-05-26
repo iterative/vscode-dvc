@@ -7,6 +7,7 @@ import { CliExecution } from './execution'
 import { Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 
+const { createCliProcess } = CliExecution
 export class Runner {
   public readonly dispose = Disposable.fn()
 
@@ -40,7 +41,7 @@ export class Runner {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    this.currentProcess = CliExecution.createCliProcess({
+    this.currentProcess = createCliProcess({
       options: {
         cliPath: this.getOverrideOrCliPath(),
         cwd,

@@ -15,6 +15,8 @@ import {
   CliExecution
 } from './execution'
 
+const { executeCliProcess } = CliExecution
+
 export const getExecutionOnTargetOptions = (
   config: Config,
   path: string
@@ -25,19 +27,19 @@ export const getExecutionOnTargetOptions = (
 })
 
 export const canRunCli = (options: ExecutionOptions): Promise<string> =>
-  CliExecution.executeCliProcess(options, Flag.HELP)
+  executeCliProcess(options, Flag.HELP)
 
 export const checkout = (options: ExecutionOptions): Promise<string> =>
-  CliExecution.executeCliProcess(options, Command.CHECKOUT)
+  executeCliProcess(options, Command.CHECKOUT)
 
 export const commit = (options: ExecutionOptions): Promise<string> =>
-  CliExecution.executeCliProcess(options, Command.COMMIT, Flag.FORCE)
+  executeCliProcess(options, Command.COMMIT, Flag.FORCE)
 
 export const experimentApply = (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
-  CliExecution.executeCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.APPLY,
@@ -49,7 +51,7 @@ export const experimentBranch = (
   experiment: string,
   branchName: string
 ): Promise<string> =>
-  CliExecution.executeCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.BRANCH,
@@ -61,7 +63,7 @@ export const experimentGarbageCollect = (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]
 ): Promise<string> =>
-  CliExecution.executeCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.GARBAGE_COLLECT,
@@ -74,7 +76,7 @@ export const experimentRemove = (
   options: ExecutionOptions,
   experiment: string
 ): Promise<string> =>
-  CliExecution.executeCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.REMOVE,
@@ -82,12 +84,12 @@ export const experimentRemove = (
   )
 
 export const init = (options: ExecutionOptions): Promise<string> =>
-  CliExecution.executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
+  executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
 export const experimentRunQueue = (
   options: ExecutionOptions
 ): Promise<string> =>
-  CliExecution.executeCliProcess(
+  executeCliProcess(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.RUN,
@@ -95,10 +97,10 @@ export const experimentRunQueue = (
   )
 
 export const pull = (options: ExecutionOptions): Promise<string> =>
-  CliExecution.executeCliProcess(options, Command.PULL)
+  executeCliProcess(options, Command.PULL)
 
 export const push = (options: ExecutionOptions): Promise<string> =>
-  CliExecution.executeCliProcess(options, Command.PUSH)
+  executeCliProcess(options, Command.PUSH)
 
 export type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string
@@ -115,11 +117,7 @@ const runCliProcessOnTarget = async (
   const target = basename(fsPath)
   await ensureDir(cwd)
 
-  return CliExecution.executeCliProcess(
-    { cwd, cliPath, pythonBinPath },
-    ...args,
-    target
-  )
+  return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
 
 export const addTarget = (options: ExecutionOnTargetOptions): Promise<string> =>
