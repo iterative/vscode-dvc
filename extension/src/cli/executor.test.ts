@@ -209,31 +209,6 @@ describe('push', () => {
   })
 })
 
-describe('removeTarget', () => {
-  it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
-    const file = 'data.dvc'
-    const fsPath = join(__dirname, 'data.dvc')
-
-    const stdout = ''
-
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await removeTarget({
-      cliPath: 'dvc',
-      fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['remove', file],
-      cwd: __dirname,
-      env: mockedEnv
-    })
-  })
-})
-
 describe('checkoutTarget', () => {
   it('should call executeProcess with the correct parameters to checkout a file', async () => {
     const file = 'acc.tsv'
@@ -255,6 +230,31 @@ describe('checkoutTarget', () => {
       executable: 'dvc',
       args: ['checkout', '-f', file],
       cwd: dir,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('removeTarget', () => {
+  it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+    const file = 'data.dvc'
+    const fsPath = join(__dirname, 'data.dvc')
+
+    const stdout = ''
+
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+    const output = await removeTarget({
+      cliPath: 'dvc',
+      fsPath,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['remove', file],
+      cwd: __dirname,
       env: mockedEnv
     })
   })
