@@ -44,7 +44,8 @@ describe('showExperimentsTableThenRun', () => {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot
-      } as unknown) as ExperimentsTable
+      } as unknown) as ExperimentsTable,
+      '/other/dvc/root': ({} as unknown) as ExperimentsTable
     })
 
     await showExperimentsTableThenRun(
