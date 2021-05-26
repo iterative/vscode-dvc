@@ -1,6 +1,6 @@
 import { createProcess, Process } from '../processExecution'
 import { Command } from './args'
-import { createCliProcess } from './execution'
+import { CliExecution } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
 
@@ -18,7 +18,7 @@ beforeEach(() => {
   } as unknown) as Process)
 })
 
-describe('createCliProcess', () => {
+describe('CliExecution.createCliProcess', () => {
   it('should pass the correct details to the underlying process given no path to the cli or python binary path', async () => {
     const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
@@ -26,7 +26,7 @@ describe('createCliProcess', () => {
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await createCliProcess({
+    await CliExecution.createCliProcess({
       options: {
         cliPath: '',
         cwd,
@@ -51,7 +51,7 @@ describe('createCliProcess', () => {
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
 
-    await createCliProcess({
+    await CliExecution.createCliProcess({
       options: {
         cliPath,
         cwd,
@@ -81,7 +81,7 @@ describe('createCliProcess', () => {
     const cwd = __dirname
     const args = [Command.PUSH]
 
-    await createCliProcess({
+    await CliExecution.createCliProcess({
       options: {
         cliPath,
         cwd,
@@ -107,7 +107,7 @@ describe('createCliProcess', () => {
     const cwd = __dirname
     const args = [Command.PULL]
 
-    await createCliProcess({
+    await CliExecution.createCliProcess({
       options: {
         cliPath: undefined,
         cwd,

@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
-import { createCliProcess } from './execution'
+import { CliExecution } from './execution'
 import { Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 
@@ -40,7 +40,7 @@ export class Runner {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    this.currentProcess = createCliProcess({
+    this.currentProcess = CliExecution.createCliProcess({
       options: {
         cliPath: this.getOverrideOrCliPath(),
         cwd,

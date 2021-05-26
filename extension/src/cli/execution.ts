@@ -1,4 +1,6 @@
-import { EventEmitter, OutputChannel, window } from 'vscode'
+/* eslint-disable sonarjs/no-identical-functions */
+import { EventEmitter } from 'vscode'
+import { getEmitter } from '../vscode/EventEmitter'
 import { getProcessEnv } from '../env'
 import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
@@ -58,72 +60,6 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const createCliProcess = ({
-  options,
-  emitters,
-  args
-}: {
-  options: ExecutionOptions
-  args: Args
-  emitters?: {
-    processCompleted?: EventEmitter<void>
-    processOutput?: EventEmitter<string>
-    processStarted?: EventEmitter<void>
-  }
-}): Process => {
-  const { executable, cwd, env } = getExecutionDetails(options)
-
-  const process = createProcess({
-    executable,
-    args,
-    cwd,
-    env
-  })
-
-  emitters?.processStarted?.fire()
-
-  process.all?.on('data', chunk => {
-    const output = getOutput(chunk)
-    emitters?.processOutput?.fire(output)
-  })
-
-  process.on('close', () => {
-    emitters?.processCompleted?.fire()
-  })
-
-  return process
-}
-
-class CliExecutor {
-  e = new EventEmitter<string>()
-  private outputChannel: OutputChannel
-
-  public async executeCliProcess(
-    options: ExecutionOptions,
-    ...args: Args
-  ): Promise<string> {
-    const { executable, cwd, env } = getExecutionDetails(options)
-    try {
-      this.outputChannel?.append(`> dvc ${args.join(' ')}\n`)
-      return await executeProcess({
-        executable,
-        args,
-        cwd,
-        env
-      })
-    } catch (e) {
-      this.outputChannel?.append(e)
-      throw e
-    }
-  }
-
-  constructor() {
-    this.outputChannel = window.createOutputChannel('DVC')
-  }
-}
-
-const x = new CliExecutor()
-
 export const executeCliProcess = (
   options: ExecutionOptions,
   ...args: Args
@@ -142,7 +78,7 @@ export const readCliProcess = async <T = string>(
   formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
   ...args: Args
 ): Promise<T> => {
-  const output = await x.executeCliProcess(options, ...args)
+  const output = await executeCliProcess(options, ...args)
   if (!formatter) {
     return (output as unknown) as T
   }
@@ -154,3 +90,87 @@ export const readCliProcessJson = <T>(
   command: Command,
   ...args: Args
 ) => readCliProcess<T>(options, JSON.parse, command, ...args, Flag.SHOW_JSON)
+
+export class CliExecution {
+  private static e = getEmitter<string>()
+
+  public static createCliProcess({
+    options,
+    emitters,
+    args
+  }: {
+    options: ExecutionOptions
+    args: Args
+    emitters?: {
+      processCompleted?: EventEmitter<void>
+      processOutput?: EventEmitter<string>
+      processStarted?: EventEmitter<void>
+    }
+  }): Process {
+    const { executable, cwd, env } = getExecutionDetails(options)
+
+    const process = createProcess({
+      executable,
+      args,
+      cwd,
+      env
+    })
+
+    emitters?.processStarted?.fire()
+
+    process.all?.on('data', chunk => {
+      const output = getOutput(chunk)
+      emitters?.processOutput?.fire(output)
+    })
+
+    process.on('close', () => {
+      emitters?.processCompleted?.fire()
+    })
+
+    return process
+  }
+
+  public static async executeCliProcess(
+    options: ExecutionOptions,
+    ...args: Args
+  ): Promise<string> {
+    const { executable, cwd, env } = getExecutionDetails(options)
+    try {
+      CliExecution.e?.fire(`> dvc ${args.join(' ')}\n`)
+      return await executeProcess({
+        executable,
+        args,
+        cwd,
+        env
+      })
+    } catch (e) {
+      CliExecution.e?.fire(e)
+      throw e
+    }
+  }
+
+  public static readCliProcess = async <T = string>(
+    options: ExecutionOptions,
+    formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
+    ...args: Args
+  ): Promise<T> => {
+    const output = await CliExecution.executeCliProcess(options, ...args)
+    if (!formatter) {
+      return (output as unknown) as T
+    }
+    return (formatter(output) as unknown) as T
+  }
+
+  public static readCliProcessJson = <T>(
+    options: ExecutionOptions,
+    command: Command,
+    ...args: Args
+  ) =>
+    CliExecution.readCliProcess<T>(
+      options,
+      JSON.parse,
+      command,
+      ...args,
+      Flag.SHOW_JSON
+    )
+}
