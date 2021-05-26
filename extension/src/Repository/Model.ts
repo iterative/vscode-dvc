@@ -74,7 +74,7 @@ export class RepositoryModel
         .filter(([, status]) => status === 'modified')
         .map(([relativePath]) => {
           const absolutePath = this.getAbsolutePath(relativePath)
-          const existingPaths = reducedStatus || new Set<string>()
+          const existingPaths = reducedStatus
           if (this.state.tracked.has(absolutePath)) {
             reducedStatus = existingPaths.add(absolutePath)
           }
