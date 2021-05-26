@@ -132,7 +132,7 @@ describe('RepositoryState', () => {
       })
     })
 
-    it('should filter the diff down to tracked paths', () => {
+    it('should filter the diff and status down to tracked paths', () => {
       const diff = {
         modified: [{ path: 'data/MNIST/raw' }]
       }
