@@ -28,7 +28,7 @@ export const canRunCli = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Flag.HELP)
 
 export const checkout = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.CHECKOUT)
+  executeCliProcess(options, Command.CHECKOUT, Flag.FORCE)
 
 export const commit = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.COMMIT, Flag.FORCE)
@@ -123,7 +123,8 @@ export const addTarget = (options: ExecutionOnTargetOptions): Promise<string> =>
 
 export const checkoutTarget = (
   options: ExecutionOnTargetOptions
-): Promise<string> => runCliProcessOnTarget(options, Command.CHECKOUT)
+): Promise<string> =>
+  runCliProcessOnTarget(options, Command.CHECKOUT, Flag.FORCE)
 
 export const commitTarget = (
   options: ExecutionOnTargetOptions
