@@ -33,7 +33,7 @@ describe('RepositoryState', () => {
       const rawDataDir = join('data', 'MNIST', 'raw')
       const renamed = join('data', 'MNIST', 'raw', 'train-lulbels-idx9-ubyte')
 
-      const tracked = [
+      const list = [
         { path: deleted },
         { path: renamed },
         { path: logAcc },
@@ -74,7 +74,7 @@ describe('RepositoryState', () => {
         diffFromHead: diff,
         diffFromCache: status,
         untracked: new Set<string>(),
-        tracked
+        tracked: list
       })
 
       expect(model.getState()).toEqual({
@@ -90,7 +90,7 @@ describe('RepositoryState', () => {
         renamed: new Set([join(dvcRoot, renamed)]),
         stageModified: new Set([join(dvcRoot, output)]),
         tracked: new Set([
-          ...tracked.map(entry => join(dvcRoot, entry.path)),
+          ...list.map(entry => join(dvcRoot, entry.path)),
           join(dvcRoot, rawDataDir),
           join(dvcRoot, logDir)
         ]),
