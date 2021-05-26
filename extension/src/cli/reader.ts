@@ -6,15 +6,11 @@ import {
   ListFlag
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
-import {
-  ExecutionOptions,
-  readCliProcess,
-  readCliProcessJson
-} from './execution'
+import { ExecutionOptions, CliExecution } from './execution'
 import { trimAndSplit } from '../util/stdout'
 
 export const root = (options: ExecutionOptions): Promise<string> =>
-  readCliProcess(options, undefined, Command.ROOT)
+  CliExecution.readCliProcess(options, undefined, Command.ROOT)
 
 export type PathOutput = { path: string }
 
@@ -27,12 +23,12 @@ export type DiffOutput = {
 }
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
-  readCliProcessJson<DiffOutput>(options, Command.DIFF)
+  CliExecution.readCliProcessJson<DiffOutput>(options, Command.DIFF)
 
 export const experimentShow = (
   options: ExecutionOptions
 ): Promise<ExperimentsRepoJSONOutput> =>
-  readCliProcessJson<ExperimentsRepoJSONOutput>(
+  CliExecution.readCliProcessJson<ExperimentsRepoJSONOutput>(
     options,
     Command.EXPERIMENT,
     ExperimentSubCommands.SHOW
@@ -49,7 +45,7 @@ export const listDvcOnly = (
   options: ExecutionOptions,
   relativePath: string
 ): Promise<ListOutput[]> =>
-  readCliProcessJson<ListOutput[]>(
+  CliExecution.readCliProcessJson<ListOutput[]>(
     options,
     Command.LIST,
     ListFlag.LOCAL_REPO,
@@ -60,7 +56,7 @@ export const listDvcOnly = (
 export const listDvcOnlyRecursive = (
   options: ExecutionOptions
 ): Promise<ListOutput[]> =>
-  readCliProcessJson<ListOutput[]>(
+  CliExecution.readCliProcessJson<ListOutput[]>(
     options,
     Command.LIST,
     ListFlag.LOCAL_REPO,
@@ -89,12 +85,12 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export const status = (options: ExecutionOptions): Promise<StatusOutput> =>
-  readCliProcessJson<StatusOutput>(options, Command.STATUS)
+  CliExecution.readCliProcessJson<StatusOutput>(options, Command.STATUS)
 
 export const experimentListCurrent = (
   options: ExecutionOptions
 ): Promise<string[]> =>
-  readCliProcess<string[]>(
+  CliExecution.readCliProcess<string[]>(
     options,
     trimAndSplit,
     Command.EXPERIMENT,

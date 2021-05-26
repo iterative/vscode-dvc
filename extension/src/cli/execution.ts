@@ -60,37 +60,6 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const executeCliProcess = (
-  options: ExecutionOptions,
-  ...args: Args
-): Promise<string> => {
-  const { executable, cwd, env } = getExecutionDetails(options)
-  return executeProcess({
-    executable,
-    args,
-    cwd,
-    env
-  })
-}
-
-export const readCliProcess = async <T = string>(
-  options: ExecutionOptions,
-  formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
-  ...args: Args
-): Promise<T> => {
-  const output = await executeCliProcess(options, ...args)
-  if (!formatter) {
-    return (output as unknown) as T
-  }
-  return (formatter(output) as unknown) as T
-}
-
-export const readCliProcessJson = <T>(
-  options: ExecutionOptions,
-  command: Command,
-  ...args: Args
-) => readCliProcess<T>(options, JSON.parse, command, ...args, Flag.SHOW_JSON)
-
 export class CliExecution {
   private static e = getEmitter<string>()
 
