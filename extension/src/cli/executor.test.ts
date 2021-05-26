@@ -5,6 +5,7 @@ import { executeProcess } from '../processExecution'
 import {
   addTarget,
   checkout,
+  checkoutTarget,
   commit,
   experimentApply,
   init,
@@ -74,7 +75,7 @@ describe('checkout', () => {
 
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
-      args: ['checkout'],
+      args: ['checkout', '-f'],
       cwd: fsPath,
       env: mockedEnv
     })
@@ -203,6 +204,32 @@ describe('push', () => {
       executable: 'dvc',
       args: ['push'],
       cwd: __dirname,
+      env: mockedEnv
+    })
+  })
+})
+
+describe('checkoutTarget', () => {
+  it('should call executeProcess with the correct parameters to checkout a file', async () => {
+    const file = 'acc.tsv'
+    const dir = join(__dirname, 'logs')
+    const fsPath = join(dir, 'acc.tsv')
+
+    const stdout = 'M       ./'
+
+    mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+    const output = await checkoutTarget({
+      cliPath: 'dvc',
+      fsPath,
+      pythonBinPath: undefined
+    })
+    expect(output).toEqual(stdout)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['checkout', '-f', file],
+      cwd: dir,
       env: mockedEnv
     })
   })
