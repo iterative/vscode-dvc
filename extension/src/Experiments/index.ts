@@ -188,23 +188,31 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  private getFocusedOrDefaultOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getDefaultOrPickDvcRoot()
-  }
-
-  private getDefaultOrPickDvcRoot() {
-    return this.config.getDefaultProject() || this.pickDvcRoot()
-  }
-
-  private pickDvcRoot() {
-    const experiments = Object.keys(this.experiments)
-    if (experiments.length === 1) {
-      return experiments[0]
+  private async getDvcRoot(
+    chooserFn: (keys: string[]) => string | Thenable<string | undefined>
+  ) {
+    const keys = Object.keys(this.experiments)
+    if (keys.length === 1) {
+      return keys[0]
     }
-    return quickPickOne(
-      experiments,
-      'Select which project to run command against'
+    return await chooserFn(keys)
+  }
+
+  private getFocusedOrDefaultOrPickProject = () =>
+    this.getDvcRoot(
+      keys =>
+        this.focusedWebviewDvcRoot ||
+        this.config.getDefaultProject() ||
+        this.showDvcRootQuickPick(keys)
     )
+
+  private getDefaultOrPickDvcRoot = () =>
+    this.getDvcRoot(
+      keys => this.config.getDefaultProject() || this.showDvcRootQuickPick(keys)
+    )
+
+  private showDvcRootQuickPick(keys: string[]) {
+    return quickPickOne(keys, 'Select which project to run command against')
   }
 
   private async showExperimentsWebview(
