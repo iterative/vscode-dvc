@@ -19,6 +19,7 @@ export const Uri = {
   joinPath: Utils.joinPath
 }
 export const window = {
+  createOutputChannel: jest.fn(),
   showInputBox: jest.fn(),
   showInformationMessage: jest.fn(),
   showErrorMessage: jest.fn(),

@@ -1,4 +1,4 @@
-import { EventEmitter } from 'vscode'
+import { EventEmitter, OutputChannel, window } from 'vscode'
 import { getProcessEnv } from '../env'
 import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
@@ -94,6 +94,36 @@ export const createCliProcess = ({
   return process
 }
 
+class CliExecutor {
+  e = new EventEmitter<string>()
+  private outputChannel: OutputChannel
+
+  public async executeCliProcess(
+    options: ExecutionOptions,
+    ...args: Args
+  ): Promise<string> {
+    const { executable, cwd, env } = getExecutionDetails(options)
+    try {
+      this.outputChannel?.append(`> dvc ${args.join(' ')}\n`)
+      return await executeProcess({
+        executable,
+        args,
+        cwd,
+        env
+      })
+    } catch (e) {
+      this.outputChannel?.append(e)
+      throw e
+    }
+  }
+
+  constructor() {
+    this.outputChannel = window.createOutputChannel('DVC')
+  }
+}
+
+const x = new CliExecutor()
+
 export const executeCliProcess = (
   options: ExecutionOptions,
   ...args: Args
@@ -112,7 +142,7 @@ export const readCliProcess = async <T = string>(
   formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
   ...args: Args
 ): Promise<T> => {
-  const output = await executeCliProcess(options, ...args)
+  const output = await x.executeCliProcess(options, ...args)
   if (!formatter) {
     return (output as unknown) as T
   }
