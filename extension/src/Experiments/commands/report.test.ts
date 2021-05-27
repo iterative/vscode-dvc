@@ -7,6 +7,7 @@ import { window } from 'vscode'
 jest.mock('../../processExecution')
 jest.mock('../../env')
 jest.mock('vscode')
+jest.mock('../../vscode/EventEmitter')
 
 const mockedExecuteProcess = mocked(executeProcess)
 const mockedShowErrorMessage = mocked(window.showErrorMessage)

@@ -12,8 +12,10 @@ import {
 import {
   BaseExecutionOptions,
   ExecutionOptions,
-  executeCliProcess
+  CliExecution
 } from './execution'
+
+const { executeCliProcess } = CliExecution
 
 export const getExecutionOnTargetOptions = (
   config: Config,

@@ -14,6 +14,7 @@ import { mocked } from 'ts-jest/utils'
 jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
+jest.mock('../vscode/EventEmitter')
 
 const mockedExecuteProcess = mocked(executeProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)

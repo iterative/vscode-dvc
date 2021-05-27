@@ -3,10 +3,11 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
-import { createCliProcess } from './execution'
+import { CliExecution } from './execution'
 import { Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 
+const { createCliProcess } = CliExecution
 export class Runner {
   public readonly dispose = Disposable.fn()
 

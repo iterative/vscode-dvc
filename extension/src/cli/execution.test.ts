@@ -1,8 +1,10 @@
 import { createProcess, Process } from '../processExecution'
 import { Command } from './args'
-import { createCliProcess } from './execution'
+import { CliExecution } from './execution'
 import { mocked } from 'ts-jest/utils'
 import { getProcessEnv } from '../env'
+
+const { createCliProcess } = CliExecution
 
 jest.mock('../env')
 jest.mock('../processExecution')

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'vscode'
+import { getEmitter } from '../vscode/EventEmitter'
 import { getProcessEnv } from '../env'
 import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
@@ -59,73 +60,90 @@ const getOutput = (data: string | Buffer): string =>
     .split(/(\r?\n)/g)
     .join('\r')
 
-export const createCliProcess = ({
-  options,
-  emitters,
-  args
-}: {
-  options: ExecutionOptions
-  args: Args
-  emitters?: {
-    processCompleted?: EventEmitter<void>
-    processOutput?: EventEmitter<string>
-    processStarted?: EventEmitter<void>
-  }
-}): Process => {
-  const { executable, cwd, env } = getExecutionDetails(options)
+export class CliExecution {
+  private static e = getEmitter<string>()
+  public static onDidRun = CliExecution.e.event
 
-  const process = createProcess({
-    executable,
-    args,
-    cwd,
-    env
-  })
+  public static createCliProcess({
+    options,
+    emitters,
+    args
+  }: {
+    options: ExecutionOptions
+    args: Args
+    emitters?: {
+      processCompleted?: EventEmitter<void>
+      processOutput?: EventEmitter<string>
+      processStarted?: EventEmitter<void>
+    }
+  }): Process {
+    const { executable, cwd, env } = getExecutionDetails(options)
 
-  emitters?.processStarted?.fire()
-
-  process.all?.on('data', chunk => {
-    const output = getOutput(chunk)
-    emitters?.processOutput?.fire(output)
-  })
-
-  process.on('close', () => {
-    emitters?.processCompleted?.fire()
-  })
-
-  return process
-}
-
-export const executeCliProcess = async (
-  options: ExecutionOptions,
-  ...args: Args
-): Promise<string> => {
-  const { executable, cwd, env } = getExecutionDetails(options)
-  try {
-    return await executeProcess({
+    const process = createProcess({
       executable,
       args,
       cwd,
       env
     })
-  } catch (baseError) {
-    throw new CliProcessError({ options, args, baseError })
-  }
-}
 
-export const readCliProcess = async <T = string>(
-  options: ExecutionOptions,
-  formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
-  ...args: Args
-): Promise<T> => {
-  const output = await executeCliProcess(options, ...args)
-  if (!formatter) {
-    return (output as unknown) as T
-  }
-  return (formatter(output) as unknown) as T
-}
+    emitters?.processStarted?.fire()
 
-export const readCliProcessJson = <T>(
-  options: ExecutionOptions,
-  command: Command,
-  ...args: Args
-) => readCliProcess<T>(options, JSON.parse, command, ...args, Flag.SHOW_JSON)
+    process.all?.on('data', chunk => {
+      const output = getOutput(chunk)
+      emitters?.processOutput?.fire(output)
+    })
+
+    process.on('close', () => {
+      emitters?.processCompleted?.fire()
+    })
+
+    return process
+  }
+
+  public static async executeCliProcess(
+    options: ExecutionOptions,
+    ...args: Args
+  ): Promise<string> {
+    const { executable, cwd, env } = getExecutionDetails(options)
+    const command = `dvc ${args.join(' ')}`
+    try {
+      const stdout = await executeProcess({
+        executable,
+        args,
+        cwd,
+        env
+      })
+      CliExecution.e?.fire(`> ${command}\n`)
+      return stdout
+    } catch (error) {
+      const cliError = new CliProcessError({ options, args, baseError: error })
+      CliExecution.e?.fire(`> ${command} failed. ${cliError.stderr}\n`)
+      throw cliError
+    }
+  }
+
+  public static readCliProcess = async <T = string>(
+    options: ExecutionOptions,
+    formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
+    ...args: Args
+  ): Promise<T> => {
+    const output = await CliExecution.executeCliProcess(options, ...args)
+    if (!formatter) {
+      return (output as unknown) as T
+    }
+    return (formatter(output) as unknown) as T
+  }
+
+  public static readCliProcessJson = <T>(
+    options: ExecutionOptions,
+    command: Command,
+    ...args: Args
+  ) =>
+    CliExecution.readCliProcess<T>(
+      options,
+      JSON.parse,
+      command,
+      ...args,
+      Flag.SHOW_JSON
+    )
+}

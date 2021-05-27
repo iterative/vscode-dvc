@@ -6,12 +6,10 @@ import {
   ListFlag
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
-import {
-  ExecutionOptions,
-  readCliProcess,
-  readCliProcessJson
-} from './execution'
+import { ExecutionOptions, CliExecution } from './execution'
 import { trimAndSplit } from '../util/stdout'
+
+const { readCliProcess, readCliProcessJson } = CliExecution
 
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
