@@ -7,14 +7,14 @@ interface MaybeConsoleError extends Error {
 
 interface CLIProcessErrorArgs {
   args: string[]
-  options: ExecutionOptions
+  options?: ExecutionOptions
   baseError: MaybeConsoleError
   message?: string
 }
 
 export class CliProcessError extends Error {
   public readonly args: string[]
-  public readonly options: ExecutionOptions
+  public readonly options?: ExecutionOptions
   public readonly baseError: Error
   public readonly stderr?: string
 
