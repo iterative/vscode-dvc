@@ -10,7 +10,6 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
-import { listDvcOnly } from '../../cli/reader'
 import { Config } from '../../Config'
 import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
@@ -24,10 +23,12 @@ import {
 } from '../../cli/executor'
 import { registerPathCommand } from '../../vscode/commands'
 import { getExecutionOptions } from '../../cli/execution'
+import { CliReader } from '../../cli/reader'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
+  private readonly cliReader: CliReader
   private readonly treeDataChanged: EventEmitter<string | void>
   public readonly onDidChangeTreeData: Event<string | void>
 
@@ -137,8 +138,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return []
     }
 
-    const options = getExecutionOptions(this.config, path)
-    const listOutput = await listDvcOnly(options, relative(root, path))
+    const listOutput = await this.cliReader.listDvcOnly(
+      root,
+      relative(root, path)
+    )
 
     return listOutput.map(relative => {
       const absolutePath = join(path, relative.path)
@@ -195,10 +198,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   constructor(
     config: Config,
+    cliReader: CliReader,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
+    this.cliReader = cliReader
 
     this.registerCommands(workspaceChanged)
 

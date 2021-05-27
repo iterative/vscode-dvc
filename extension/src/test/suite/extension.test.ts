@@ -11,12 +11,10 @@ import {
   ConfigurationChangeEvent
 } from 'vscode'
 import { Disposable } from '../../extension'
-import * as Reader from '../../cli/reader'
+import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as CliExecutor from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../Experiments/Webview/complex-output-example.json'
-
-const { CliReader } = Reader
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -104,9 +102,9 @@ suite('Extension Test Suite', () => {
         { path: join('logs', 'acc.tsv') },
         { path: join('logs', 'loss.tsv') },
         { path: 'model.pt' }
-      ] as Reader.ListOutput[])
+      ] as ListOutput[])
 
-      stub(Reader, 'listDvcOnly').resolves([
+      stub(CliReader.prototype, 'listDvcOnly').resolves([
         { isout: false, isdir: true, isexec: false, path: 'data' },
         { isout: true, isdir: true, isexec: false, path: 'logs' },
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
@@ -129,7 +127,7 @@ suite('Extension Test Suite', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as unknown) as Reader.StatusOutput)
+      } as unknown) as StatusOutput)
 
       const configurationChangeEvent = () => {
         return new Promise(resolve => {

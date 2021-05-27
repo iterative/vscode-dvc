@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { Config } from '../../Config'
 import { TrackedExplorerTree } from './TrackedExplorerTree'
 import { join } from 'path'
-import { listDvcOnly } from '../../cli/reader'
+import { CliReader } from '../../cli/reader'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
@@ -54,6 +54,7 @@ describe('TrackedTreeView', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
+        {} as CliReader,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -65,15 +66,16 @@ describe('TrackedTreeView', () => {
 
   describe('getChildren', () => {
     it('should get the children for the provided element', async () => {
+      const mockedListDvcOnly = jest.fn()
+      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
+
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
+        ({ listDvcOnly: mockedListDvcOnly } as unknown) as CliReader,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
       trackedTreeView.initialize([dvcDemoPath])
-
-      const mockedListDvcOnly = mocked(listDvcOnly)
-      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       const rootElements = await trackedTreeView.getChildren()
       expect(rootElements).toEqual([
@@ -100,15 +102,16 @@ describe('TrackedTreeView', () => {
         return mockedItem
       })
 
+      const mockedListDvcOnly = jest.fn()
+      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
+
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
+        ({ listDvcOnly: mockedListDvcOnly } as unknown) as CliReader,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
       trackedTreeView.initialize([dvcDemoPath])
-
-      const mockedListDvcOnly = mocked(listDvcOnly)
-      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       await trackedTreeView.getChildren()
       const treeItem = trackedTreeView.getTreeItem(join(dvcDemoPath, 'data'))
@@ -133,6 +136,7 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
+        {} as CliReader,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
