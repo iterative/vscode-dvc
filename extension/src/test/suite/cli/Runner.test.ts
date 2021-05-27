@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { restore, spy } from 'sinon'
+import { restore, spy, stub } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
 import { Runner } from '../../../cli/Runner'
+import * as ProcessExecution from '../../../processExecution'
+import { Command } from '../../../cli/args'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -128,5 +130,26 @@ suite('Runner Test Suite', () => {
       expect((await eventStream).includes(text)).to.be.true
       return completed
     }).timeout(12000)
+
+    it('should call createProcess with the correct arguments when no executable is provided', async () => {
+      const mockCreateProcess = stub(
+        ProcessExecution,
+        'createProcess'
+      ).returns(({ on: spy() } as unknown) as ProcessExecution.Process)
+      const cwd = __dirname
+
+      const runner = disposable.track(
+        new Runner(({ getCliPath: () => undefined } as unknown) as Config)
+      )
+
+      await runner.run(cwd, Command.ADD)
+      expect(mockCreateProcess).to.have.been.calledOnce
+      expect(mockCreateProcess).to.have.been.calledWith({
+        executable: 'dvc',
+        args: [Command.ADD],
+        cwd,
+        env: process.env
+      })
+    })
   })
 })

@@ -1,9 +1,8 @@
-import { EventEmitter } from 'vscode'
 import { getEmitter } from '../vscode/EventEmitter'
 import { getProcessEnv } from '../env'
 import { Args, Command, Flag } from './args'
 import { trimAndSplit } from '../util/stdout'
-import { createProcess, Process, executeProcess } from '../processExecution'
+import { executeProcess } from '../processExecution'
 import { Config } from '../Config'
 import { CliProcessError } from '../vscode/reporting'
 
@@ -30,7 +29,7 @@ export const getExecutionOptions = (
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
 
-const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
+export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
   const PATH = getPATH(env?.PATH as string, pythonBinPath)
   return {
@@ -39,7 +38,7 @@ const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   }
 }
 
-export const getExecutionDetails = (
+const getExecutionDetails = (
   options: ExecutionOptions
 ): {
   cwd: string
@@ -54,51 +53,9 @@ export const getExecutionDetails = (
   }
 }
 
-const getOutput = (data: string | Buffer): string =>
-  data
-    .toString()
-    .split(/(\r?\n)/g)
-    .join('\r')
-
 export class CliExecution {
   private static e = getEmitter<string>()
   public static onDidRun = CliExecution.e.event
-
-  public static createCliProcess({
-    options,
-    emitters,
-    args
-  }: {
-    options: ExecutionOptions
-    args: Args
-    emitters?: {
-      processCompleted?: EventEmitter<void>
-      processOutput?: EventEmitter<string>
-      processStarted?: EventEmitter<void>
-    }
-  }): Process {
-    const { executable, cwd, env } = getExecutionDetails(options)
-
-    const process = createProcess({
-      executable,
-      args,
-      cwd,
-      env
-    })
-
-    emitters?.processStarted?.fire()
-
-    process.all?.on('data', chunk => {
-      const output = getOutput(chunk)
-      emitters?.processOutput?.fire(output)
-    })
-
-    process.on('close', () => {
-      emitters?.processCompleted?.fire()
-    })
-
-    return process
-  }
 
   public static async executeCliProcess(
     options: ExecutionOptions,

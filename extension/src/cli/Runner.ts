@@ -3,11 +3,10 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
-import { CliExecution } from './execution'
-import { Process } from '../processExecution'
+import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
+import { getEnv } from './execution'
 
-const { createCliProcess } = CliExecution
 export class Runner {
   public readonly dispose = Disposable.fn()
 
@@ -34,24 +33,49 @@ export class Runner {
     if (this.executable) {
       return this.executable
     }
-    return this.config.getCliPath()
+    return this.config.getCliPath() || 'dvc'
+  }
+
+  private createCliProcess({
+    cwd,
+    args
+  }: {
+    cwd: string
+    args: Args
+  }): Process {
+    const env = getEnv(this.config.pythonBinPath)
+
+    const process = createProcess({
+      executable: this.getOverrideOrCliPath(),
+      args,
+      cwd,
+      env
+    })
+
+    this.processStarted.fire()
+
+    process.all?.on('data', chunk => {
+      this.processOutput.fire(
+        chunk
+          .toString()
+          .split(/(\r?\n)/g)
+          .join('\r')
+      )
+    })
+
+    process.on('close', () => {
+      this.processCompleted.fire()
+    })
+
+    return process
   }
 
   private startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    this.currentProcess = createCliProcess({
-      options: {
-        cliPath: this.getOverrideOrCliPath(),
-        cwd,
-        pythonBinPath: this.config.pythonBinPath
-      },
-      emitters: {
-        processCompleted: this.processCompleted,
-        processStarted: this.processStarted,
-        processOutput: this.processOutput
-      },
+    this.currentProcess = this.createCliProcess({
+      cwd,
       args
     })
   }
@@ -64,7 +88,7 @@ export class Runner {
     window.showErrorMessage(
       `Cannot start dvc ${args.join(
         ' '
-      )} as the output terminal is already occupied`
+      )} as the output terminal is already occupied.`
     )
   }
 
