@@ -45,16 +45,10 @@ export class Runner {
 
   private createCliProcess({
     cwd,
-    emitters,
     args
   }: {
     cwd: string
     args: Args
-    emitters: {
-      processCompleted: EventEmitter<void>
-      processOutput: EventEmitter<string>
-      processStarted: EventEmitter<void>
-    }
   }): Process {
     const env = getEnv(this.config.pythonBinPath)
 
@@ -65,15 +59,15 @@ export class Runner {
       env
     })
 
-    emitters.processStarted.fire()
+    this.processStarted.fire()
 
     process.all?.on('data', chunk => {
       const output = this.getOutput(chunk)
-      emitters.processOutput.fire(output)
+      this.processOutput.fire(output)
     })
 
     process.on('close', () => {
-      emitters.processCompleted.fire()
+      this.processCompleted.fire()
     })
 
     return process
@@ -85,11 +79,6 @@ export class Runner {
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     this.currentProcess = this.createCliProcess({
       cwd,
-      emitters: {
-        processCompleted: this.processCompleted,
-        processStarted: this.processStarted,
-        processOutput: this.processOutput
-      },
       args
     })
   }
@@ -102,7 +91,7 @@ export class Runner {
     window.showErrorMessage(
       `Cannot start dvc ${args.join(
         ' '
-      )} as the output terminal is already occupied`
+      )} as the output terminal is already occupied.`
     )
   }
 
