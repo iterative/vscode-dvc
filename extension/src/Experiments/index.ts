@@ -3,8 +3,8 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
-import { getExecutionOptions, ExecutionOptions } from '../cli/execution'
-import { experimentShow } from '../cli/reader'
+import { ExecutionOptions } from '../cli/execution'
+import { CliReader } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
 import { ExperimentsWebview } from './Webview'
@@ -19,6 +19,8 @@ export class ExperimentsTable {
 
   private readonly dvcRoot: string
   private readonly config: Config
+  private readonly cliReader: CliReader
+
   protected readonly isWebviewFocusedChanged: EventEmitter<
     string | undefined
   > = this.dispose.track(new EventEmitter())
@@ -40,8 +42,7 @@ export class ExperimentsTable {
   private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
       try {
-        const options = getExecutionOptions(this.config, this.dvcRoot)
-        const experimentData = experimentShow(options)
+        const experimentData = this.cliReader.experimentShow(this.dvcRoot)
         this.currentUpdatePromise = experimentData
         this.data = await experimentData
         return experimentData
@@ -126,10 +127,12 @@ export class ExperimentsTable {
   constructor(
     dvcRoot: string,
     config: Config,
+    cliReader: CliReader,
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
     this.config = config
+    this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
     this.updateData()
@@ -141,6 +144,7 @@ export class Experiments {
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
+  private readonly cliReader: CliReader
 
   public isReady() {
     return this.initialized
@@ -228,7 +232,12 @@ export class Experiments {
     resourceLocator: ResourceLocator
   ) {
     const experimentsTable = this.dispose.track(
-      new ExperimentsTable(dvcRoot, this.config, resourceLocator)
+      new ExperimentsTable(
+        dvcRoot,
+        this.config,
+        this.cliReader,
+        resourceLocator
+      )
     )
 
     this.experiments[dvcRoot] = experimentsTable
@@ -273,10 +282,15 @@ export class Experiments {
     experimentsTable.setWebview(experimentsWebview)
   }
 
-  constructor(config: Config, experiments?: Record<string, ExperimentsTable>) {
+  constructor(
+    config: Config,
+    cliReader: CliReader,
+    experiments?: Record<string, ExperimentsTable>
+  ) {
     makeObservable(this)
 
     this.config = config
+    this.cliReader = cliReader
     if (experiments) {
       this.experiments = experiments
     }

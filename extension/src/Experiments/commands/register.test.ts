@@ -10,6 +10,7 @@ import {
 } from './register'
 import { runQueued, runReset } from './runner'
 import { quickPickOne } from '../../vscode/quickPick'
+import { CliReader } from '../../cli/reader'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -40,7 +41,7 @@ describe('showExperimentsTableThenRun', () => {
   it('should call the runner with the correct args when runQueued is provided', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
 
-    const experiments = new Experiments(mockedConfig, {
+    const experiments = new Experiments(mockedConfig, {} as CliReader, {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot
@@ -67,7 +68,7 @@ describe('showExperimentsTableThenRun', () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
     mockedQuickPickOne.mockResolvedValueOnce('/my/dvc/root')
 
-    const experiments = new Experiments(mockedConfig, {
+    const experiments = new Experiments(mockedConfig, {} as CliReader, {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot
@@ -109,7 +110,7 @@ describe('getExecutionOptionsThenRun', () => {
       cwd: '/my'
     })
 
-    const experiments = new Experiments(mockedConfig, {
+    const experiments = new Experiments(mockedConfig, {} as CliReader, {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot
@@ -137,7 +138,7 @@ describe('getExecutionOptionsThenRun', () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
     mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-    const experiments = new Experiments(mockedConfig, {
+    const experiments = new Experiments(mockedConfig, {} as CliReader, {
       '/my/dvc/root': ({
         showWebview: mockedShowWebview,
         getDvcRoot: () => mockedDvcRoot

@@ -55,7 +55,9 @@ suite('Extension Test Suite', () => {
       const mockShowInputBox = stub(window, 'showInputBox')
       const mockCanRunCli = stub(CliExecutor, 'canRunCli').rejects('ERROR')
       await selectDvcPathItem(0)
-      stub(Reader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
 

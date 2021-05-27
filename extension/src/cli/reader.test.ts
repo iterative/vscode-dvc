@@ -1,4 +1,4 @@
-import { CliReader, experimentShow, root } from './reader'
+import { CliReader, root } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
@@ -36,6 +36,24 @@ describe('CliReader', () => {
       event: jest.fn()
     } as unknown) as EventEmitter<string>
   )
+
+  describe('experimentShow', () => {
+    it('should match a snapshot when parsed', async () => {
+      const cwd = __dirname
+      mockedExecuteProcess.mockResolvedValueOnce(
+        JSON.stringify(complexExperimentsOutput)
+      )
+
+      const experiments = await cliReader.experimentShow(cwd)
+      expect(experiments).toMatchSnapshot()
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'show', SHOW_JSON],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
 
   describe('diff', () => {
     it('should call the cli with the correct parameters', async () => {
@@ -165,28 +183,6 @@ describe('CliReader', () => {
           env: mockedEnv
         })
       })
-    })
-  })
-})
-
-describe('experimentShow', () => {
-  it('should match a snapshot when parsed', async () => {
-    const cwd = __dirname
-    mockedExecuteProcess.mockResolvedValueOnce(
-      JSON.stringify(complexExperimentsOutput)
-    )
-
-    const experiments = await experimentShow({
-      cliPath: undefined,
-      pythonBinPath: undefined,
-      cwd
-    })
-    expect(experiments).toMatchSnapshot()
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'show', SHOW_JSON],
-      cwd,
-      env: mockedEnv
     })
   })
 })
