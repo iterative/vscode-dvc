@@ -31,7 +31,7 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
+  private currentUpdatePromise?: Promise<void>
   private data?: ExperimentsRepoJSONOutput
   private lastDataHash = ''
 
@@ -39,13 +39,12 @@ export class ExperimentsTable {
     return this.dvcRoot
   }
 
-  private async performUpdate(): Promise<ExperimentsRepoJSONOutput> {
+  private async performUpdate(): Promise<void> {
     try {
       const experimentUpdatePromise = this.cliReader.experimentShow(
         this.dvcRoot
       )
-      this.currentUpdatePromise = experimentUpdatePromise
-      return await experimentUpdatePromise
+      await experimentUpdatePromise
     } catch (e) {
       Logger.error(e)
       throw e
@@ -54,11 +53,11 @@ export class ExperimentsTable {
     }
   }
 
-  private updateData(): Promise<ExperimentsRepoJSONOutput> {
+  private updateData(): Promise<void> {
     if (!this.currentUpdatePromise) {
       this.currentUpdatePromise = this.performUpdate()
     }
-    return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
+    return this.currentUpdatePromise as Promise<void>
   }
 
   public onDidChangeData(gitRoot: string): void {
