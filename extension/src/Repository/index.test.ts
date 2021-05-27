@@ -1,17 +1,14 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
-import { Config } from '../Config'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { mocked } from 'ts-jest/utils'
 import { DecorationProvider } from './DecorationProvider'
 import { Repository } from '.'
 import { RepositoryModel } from './Model'
 import {
-  diff,
+  CliReader,
   DiffOutput,
-  listDvcOnlyRecursive,
   ListOutput,
-  status,
   Status,
   StatusOutput
 } from '../cli/reader'
@@ -24,9 +21,9 @@ jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
 
-const mockedDiff = mocked(diff)
-const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
-const mockedStatus = mocked(status)
+const mockedListDvcOnlyRecursive = jest.fn()
+const mockedDiff = jest.fn()
+const mockedStatus = jest.fn()
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
@@ -109,12 +106,18 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      const config = ({
-        getCliPath: () => undefined
-      } as unknown) as Config
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
-      const repository = new Repository(dvcRoot, config, decorationProvider)
+      const repository = new Repository(
+        dvcRoot,
+        mockedCliReader,
+        decorationProvider
+      )
       await repository.isReady()
 
       const modified = new Set([resolve(dvcRoot, rawDataDir)])
@@ -127,18 +130,10 @@ describe('Repository', () => {
         resolve(dvcRoot, MNISTDataDir)
       ])
 
-      const expectedExecutionOptions = {
-        cliPath: undefined,
-        cwd: dvcRoot,
-        pythonBinPath: undefined
-      }
-
-      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
-      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(dvcRoot)
+      expect(mockedStatus).toBeCalledWith(dvcRoot)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
-        expectedExecutionOptions
-      )
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
 
       expect(repository.getState()).toEqual(
         expect.objectContaining({
@@ -162,12 +157,18 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
-      const config = ({
-        getCliPath: () => undefined
-      } as unknown) as Config
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
-      const repository = new Repository(dvcRoot, config, decorationProvider)
+      const repository = new Repository(
+        dvcRoot,
+        mockedCliReader,
+        decorationProvider
+      )
       await repository.isReady()
 
       const dataDir = 'data/MNIST/raw'
@@ -224,18 +225,10 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir)
       ])
 
-      const expectedExecutionOptions = {
-        cliPath: undefined,
-        cwd: dvcRoot,
-        pythonBinPath: undefined
-      }
-
-      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
-      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(dvcRoot)
+      expect(mockedStatus).toBeCalledWith(dvcRoot)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
-        expectedExecutionOptions
-      )
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
 
       expect(repository.getState()).toEqual({
         added: emptySet,
@@ -255,12 +248,18 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
-      const config = ({
-        getCliPath: () => undefined
-      } as unknown) as Config
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
-      const repository = new Repository(dvcRoot, config, decorationProvider)
+      const repository = new Repository(
+        dvcRoot,
+        mockedCliReader,
+        decorationProvider
+      )
       await repository.isReady()
 
       const logDir = 'logs'
@@ -342,17 +341,9 @@ describe('Repository', () => {
         resolve(dvcRoot, prepared)
       ])
 
-      const expectedExecutionOptions = {
-        cliPath: undefined,
-        cwd: dvcRoot,
-        pythonBinPath: undefined
-      }
-
-      expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedStatus).toBeCalledWith(dvcRoot)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
-        expectedExecutionOptions
-      )
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
 
       expect(repository.getState()).toEqual({
         added: emptySet,

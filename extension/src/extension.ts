@@ -38,6 +38,7 @@ import { CliExecution, getExecutionOptions } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { Runner } from './cli/Runner'
+import { CliReader } from './cli/reader'
 
 export { Disposable, Disposer }
 
@@ -60,6 +61,7 @@ export class Extension {
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly runner: Runner
   private readonly outputChannel: OutputChannel
+  private readonly cliReader: CliReader
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -134,7 +136,11 @@ export class Extension {
   private initializeDvcRepositories() {
     this.dvcRoots.forEach(dvcRoot => {
       const repository = this.dispose.track(
-        new Repository(dvcRoot, this.config, this.decorationProviders[dvcRoot])
+        new Repository(
+          dvcRoot,
+          this.cliReader,
+          this.decorationProviders[dvcRoot]
+        )
       )
 
       this.dispose.track(
@@ -220,12 +226,16 @@ export class Extension {
     this.config = this.dispose.track(new Config())
 
     this.runner = this.dispose.track(new Runner(this.config))
+    this.cliReader = this.dispose.track(new CliReader(this.config))
 
     this.experiments = this.dispose.track(new Experiments(this.config))
 
     this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
 
     this.dispose.track(CliExecution.onDidRun(e => this.outputChannel.append(e)))
+    this.dispose.track(
+      this.cliReader.onDidRun(e => this.outputChannel.append(e))
+    )
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.config, this.workspaceChanged)

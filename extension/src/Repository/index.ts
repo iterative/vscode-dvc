@@ -1,19 +1,10 @@
-import { Config } from '../Config'
 import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from '../git'
 import { SourceControlManagement } from './views/SourceControlManagement'
 import { DecorationProvider } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
-import {
-  listDvcOnlyRecursive,
-  status,
-  diff,
-  ListOutput,
-  DiffOutput,
-  StatusOutput
-} from '../cli/reader'
+import { ListOutput, DiffOutput, StatusOutput, CliReader } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
-import { getExecutionOptions } from '../cli/execution'
 import { RepositoryModel } from './Model'
 
 export class Repository {
@@ -22,10 +13,10 @@ export class Repository {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private config: Config
-  private dvcRoot: string
+  private readonly dvcRoot: string
+  private readonly cliReader: CliReader
   private decorationProvider?: DecorationProvider
-  private sourceControlManagement: SourceControlManagement
+  private readonly sourceControlManagement: SourceControlManagement
 
   @observable
   private model: RepositoryModel
@@ -39,10 +30,9 @@ export class Repository {
   }
 
   private getUpdateData(): Promise<[DiffOutput, StatusOutput, Set<string>]> {
-    const options = getExecutionOptions(this.config, this.dvcRoot)
     return Promise.all([
-      diff(options),
-      status(options),
+      this.cliReader.diff(this.dvcRoot),
+      this.cliReader.status(this.dvcRoot),
       getAllUntracked(this.dvcRoot)
     ])
   }
@@ -50,12 +40,11 @@ export class Repository {
   private getRefreshData(): Promise<
     [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
   > {
-    const options = getExecutionOptions(this.config, this.dvcRoot)
     return Promise.all([
-      diff(options),
-      status(options),
+      this.cliReader.diff(this.dvcRoot),
+      this.cliReader.status(this.dvcRoot),
       getAllUntracked(this.dvcRoot),
-      listDvcOnlyRecursive(options)
+      this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
     ])
   }
 
@@ -91,11 +80,11 @@ export class Repository {
 
   constructor(
     dvcRoot: string,
-    config: Config,
+    cliReader: CliReader,
     decorationProvider?: DecorationProvider
   ) {
     makeObservable(this)
-    this.config = config
+    this.cliReader = cliReader
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
