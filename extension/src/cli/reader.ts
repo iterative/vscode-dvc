@@ -11,7 +11,7 @@ import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
 import { ExecutionOptions, CliExecution } from './execution'
 import { trimAndSplit } from '../util/stdout'
 
-const { readCliProcess, readCliProcessJson } = CliExecution
+const { readCliProcess } = CliExecution
 
 export type PathOutput = { path: string }
 
@@ -85,6 +85,16 @@ export class CliReader extends Cli {
     return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
   }
 
+  public listDvcOnly(cwd: string, relativePath: string): Promise<ListOutput[]> {
+    return this.readProcessJson<ListOutput[]>(
+      cwd,
+      Command.LIST,
+      ListFlag.LOCAL_REPO,
+      relativePath,
+      ListFlag.DVC_ONLY
+    )
+  }
+
   public listDvcOnlyRecursive(cwd: string): Promise<ListOutput[]> {
     return this.readProcessJson<ListOutput[]>(
       cwd,
@@ -102,18 +112,6 @@ export class CliReader extends Cli {
 
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
-
-export const listDvcOnly = (
-  options: ExecutionOptions,
-  relativePath: string
-): Promise<ListOutput[]> =>
-  readCliProcessJson<ListOutput[]>(
-    options,
-    Command.LIST,
-    ListFlag.LOCAL_REPO,
-    relativePath,
-    ListFlag.DVC_ONLY
-  )
 
 export const experimentListCurrent = (
   options: ExecutionOptions

@@ -237,7 +237,11 @@ export class Extension {
     this.dispose.track(CliExecution.onDidRun(e => this.outputChannel.append(e)))
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.config, this.workspaceChanged)
+      new TrackedExplorerTree(
+        this.config,
+        this.cliReader,
+        this.workspaceChanged
+      )
     )
 
     this.setup()

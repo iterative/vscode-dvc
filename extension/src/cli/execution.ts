@@ -1,6 +1,6 @@
 import { getEmitter } from '../vscode/EventEmitter'
 import { getProcessEnv } from '../env'
-import { Args, Command, Flag } from './args'
+import { Args } from './args'
 import { trimAndSplit } from '../util/stdout'
 import { executeProcess } from '../processExecution'
 import { Config } from '../Config'
@@ -90,17 +90,4 @@ export class CliExecution {
     }
     return (formatter(output) as unknown) as T
   }
-
-  public static readCliProcessJson = <T>(
-    options: ExecutionOptions,
-    command: Command,
-    ...args: Args
-  ) =>
-    CliExecution.readCliProcess<T>(
-      options,
-      JSON.parse,
-      command,
-      ...args,
-      Flag.SHOW_JSON
-    )
 }
