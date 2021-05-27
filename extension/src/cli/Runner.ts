@@ -36,13 +36,6 @@ export class Runner {
     return this.config.getCliPath() || 'dvc'
   }
 
-  private getOutput(data: string | Buffer): string {
-    return data
-      .toString()
-      .split(/(\r?\n)/g)
-      .join('\r')
-  }
-
   private createCliProcess({
     cwd,
     args
@@ -62,8 +55,12 @@ export class Runner {
     this.processStarted.fire()
 
     process.all?.on('data', chunk => {
-      const output = this.getOutput(chunk)
-      this.processOutput.fire(output)
+      this.processOutput.fire(
+        chunk
+          .toString()
+          .split(/(\r?\n)/g)
+          .join('\r')
+      )
     })
 
     process.on('close', () => {
