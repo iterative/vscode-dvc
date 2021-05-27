@@ -240,6 +240,9 @@ export class Extension {
     this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
 
     this.dispose.track(CliExecution.onDidRun(e => this.outputChannel.append(e)))
+    this.dispose.track(
+      this.cliReader.onDidRun(e => this.outputChannel.append(e))
+    )
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(

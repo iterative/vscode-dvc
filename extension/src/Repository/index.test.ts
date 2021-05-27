@@ -63,12 +63,6 @@ describe('Repository', () => {
 
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
-
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
@@ -112,6 +106,11 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -153,16 +152,16 @@ describe('Repository', () => {
 
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -244,16 +243,16 @@ describe('Repository', () => {
     })
 
     it("should update the classes state and call it's dependents", async () => {
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(new Set())
 
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
