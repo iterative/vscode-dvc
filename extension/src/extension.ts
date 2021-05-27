@@ -77,13 +77,16 @@ export class Extension {
       ),
       this.config.isReady()
     ])
+    this.config.setDvcRoots(this.dvcRoots)
     return this.initializeOrNotify()
   }
 
   private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
     const workspaceFolderRoot = workspaceFolder.uri.fsPath
-    const options = getExecutionOptions(this.config, workspaceFolderRoot)
-    const dvcRoots = await findDvcRootPaths(options)
+    const dvcRoots = await findDvcRootPaths(
+      workspaceFolderRoot,
+      this.cliReader.root(workspaceFolderRoot)
+    )
 
     if (definedAndNonEmpty(dvcRoots)) {
       this.initializeDecorationProvidersEarly(dvcRoots)
@@ -172,8 +175,10 @@ export class Extension {
       getGitRepositoryRoots()
     ])
     gitRoots.forEach(async gitRoot => {
-      const options = getExecutionOptions(this.config, gitRoot)
-      const dvcRoots = await findDvcRootPaths(options)
+      const dvcRoots = await findDvcRootPaths(
+        gitRoot,
+        this.cliReader.root(gitRoot)
+      )
 
       dvcRoots.forEach(dvcRoot => {
         this.experiments.onDidChangeData(dvcRoot, gitRoot)

@@ -1,4 +1,4 @@
-import { CliReader, root } from './reader'
+import { CliReader } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
@@ -176,51 +176,63 @@ describe('CliReader', () => {
         })
       })
 
-      describe('status', () => {
-        it('should call the cli with the correct parameters', async () => {
-          const cliOutput = {
-            train: [
-              { 'changed deps': { 'data/MNIST': 'modified' } },
-              { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-              'always changed'
-            ],
-            'data/MNIST/raw.dvc': [
-              { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-            ]
-          }
+      describe('root', () => {
+        it('should return the root relative to the cwd', async () => {
+          const stdout = join('..', '..')
           const cwd = __dirname
-          mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
-          const diffOutput = await cliReader.status(cwd)
-
-          expect(diffOutput).toEqual(cliOutput)
-
+          mockedExecuteProcess.mockResolvedValueOnce(stdout)
+          const relativeRoot = await cliReader.root(cwd)
+          expect(relativeRoot).toEqual(stdout)
           expect(mockedExecuteProcess).toBeCalledWith({
             executable: 'dvc',
-            args: ['status', SHOW_JSON],
+            args: ['root'],
+            cwd,
+            env: mockedEnv
+          })
+        })
+
+        it('should return undefined when run outside of a project', async () => {
+          const cwd = __dirname
+          mockedExecuteProcess.mockRejectedValueOnce({
+            stderr:
+              "ERROR: you are not inside of a DVC repository (checked up to mount point '/' )"
+          })
+          const relativeRoot = await cliReader.root(cwd)
+          expect(relativeRoot).toBeUndefined()
+          expect(mockedExecuteProcess).toBeCalledWith({
+            executable: 'dvc',
+            args: ['root'],
             cwd,
             env: mockedEnv
           })
         })
       })
     })
-  })
 
-  describe('root', () => {
-    it('should return the root relative to the cwd', async () => {
-      const stdout = join('..', '..')
-      const cwd = __dirname
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-      const relativeRoot = await root({
-        cliPath: 'dvc',
-        cwd,
-        pythonBinPath: undefined
-      })
-      expect(relativeRoot).toEqual(stdout)
-      expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
-        args: ['root'],
-        cwd,
-        env: mockedEnv
+    describe('status', () => {
+      it('should call the cli with the correct parameters', async () => {
+        const cliOutput = {
+          train: [
+            { 'changed deps': { 'data/MNIST': 'modified' } },
+            { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+            'always changed'
+          ],
+          'data/MNIST/raw.dvc': [
+            { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+          ]
+        }
+        const cwd = __dirname
+        mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+        const diffOutput = await cliReader.status(cwd)
+
+        expect(diffOutput).toEqual(cliOutput)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['status', SHOW_JSON],
+          cwd,
+          env: mockedEnv
+        })
       })
     })
   })

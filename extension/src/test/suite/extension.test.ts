@@ -110,6 +110,8 @@ suite('Extension Test Suite', () => {
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
       ])
 
+      stub(CliReader.prototype, 'root').resolves('.')
+
       const mockDiff = stub(CliReader.prototype, 'diff').resolves({
         modified: [
           { path: 'model.pt' },

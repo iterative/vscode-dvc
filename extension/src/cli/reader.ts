@@ -53,7 +53,7 @@ export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 export class CliReader extends Cli {
   private async readProcess<T = string>(
     cwd: string,
-    formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
+    formatter: typeof trimAndSplit | typeof JSON.parse,
     ...args: Args
   ): Promise<T> {
     const output = await this.executeProcess(cwd, ...args)
@@ -105,13 +105,16 @@ export class CliReader extends Cli {
     )
   }
 
+  public async root(cwd: string): Promise<string | undefined> {
+    try {
+      return await this.executeProcess(cwd, Command.ROOT)
+    } catch (error) {}
+  }
+
   public status(cwd: string): Promise<StatusOutput> {
     return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
   }
 }
-
-export const root = (options: ExecutionOptions): Promise<string> =>
-  readCliProcess(options, undefined, Command.ROOT)
 
 export const experimentListCurrent = (
   options: ExecutionOptions

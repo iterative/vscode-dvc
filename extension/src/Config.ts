@@ -16,15 +16,20 @@ import {
   getPythonBinPath
 } from './extensions/python'
 import { ExecutionOptions } from './cli/execution'
-import { findDvcRootPaths } from './fileSystem'
 import { QuickPickItemWithValue } from './vscode/quickPick'
 import { getConfigValue, setConfigValue } from './vscode/config'
+import { definedAndNonEmpty } from './util'
 
 export class Config {
   public readonly dispose = Disposable.fn()
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
+  private dvcRoots: string[] = []
+
+  public setDvcRoots(dvcRoots: string[]): void {
+    this.dvcRoots = dvcRoots
+  }
 
   public isReady() {
     return this.initialized
@@ -163,12 +168,9 @@ export class Config {
   }
 
   private async pickDefaultProject(): Promise<string | undefined> {
-    const options = this.getExecutionOptions()
-    const dvcRoots = await findDvcRootPaths(options)
-
-    if (dvcRoots) {
+    if (definedAndNonEmpty(this.dvcRoots)) {
       const selected = await window.showQuickPick(
-        this.getDefaultProjectOptions(dvcRoots),
+        this.getDefaultProjectOptions(this.dvcRoots),
         {
           canPickMany: false,
           placeHolder: 'Select a default project to run all commands against'
