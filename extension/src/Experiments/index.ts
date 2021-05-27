@@ -39,18 +39,24 @@ export class ExperimentsTable {
     return this.dvcRoot
   }
 
-  private async updateData(): Promise<ExperimentsRepoJSONOutput> {
+  private async performUpdate(): Promise<ExperimentsRepoJSONOutput> {
+    try {
+      const experimentUpdatePromise = this.cliReader.experimentShow(
+        this.dvcRoot
+      )
+      this.currentUpdatePromise = experimentUpdatePromise
+      return await experimentUpdatePromise
+    } catch (e) {
+      Logger.error(e)
+      throw e
+    } finally {
+      this.currentUpdatePromise = undefined
+    }
+  }
+
+  private updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
-      try {
-        const experimentData = this.cliReader.experimentShow(this.dvcRoot)
-        this.currentUpdatePromise = experimentData
-        this.data = await experimentData
-        return experimentData
-      } catch (e) {
-        Logger.error(e)
-      } finally {
-        this.currentUpdatePromise = undefined
-      }
+      this.currentUpdatePromise = this.performUpdate()
     }
     return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
