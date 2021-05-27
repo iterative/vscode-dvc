@@ -1,4 +1,6 @@
+import { Cli } from '.'
 import {
+  Args,
   Command,
   ExperimentFlag,
   ExperimentSubCommands,
@@ -11,9 +13,6 @@ import { trimAndSplit } from '../util/stdout'
 
 const { readCliProcess, readCliProcessJson } = CliExecution
 
-export const root = (options: ExecutionOptions): Promise<string> =>
-  readCliProcess(options, undefined, Command.ROOT)
-
 export type PathOutput = { path: string }
 
 export type DiffOutput = {
@@ -23,6 +22,51 @@ export type DiffOutput = {
   renamed?: PathOutput[]
   'not in cache'?: PathOutput[]
 }
+
+export type PathStatus = Record<string, Status>
+
+export type StageOrFileStatuses = Record<ChangedType, PathStatus>
+
+export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
+
+export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
+
+export class CliReader extends Cli {
+  public async readProcess<T = string>(
+    cwd: string,
+    formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
+    ...args: Args
+  ): Promise<T> {
+    const output = await this.executeProcess(cwd, ...args)
+    if (!formatter) {
+      return (output as unknown) as T
+    }
+    return (formatter(output) as unknown) as T
+  }
+
+  public readProcessJson<T>(cwd: string, command: Command, ...args: Args) {
+    return this.readProcess<T>(
+      cwd,
+      JSON.parse,
+      command,
+      ...args,
+      Flag.SHOW_JSON
+    )
+  }
+
+  public listDvcOnlyRecursive(cwd: string): Promise<ListOutput[]> {
+    return this.readProcessJson<ListOutput[]>(
+      cwd,
+      Command.LIST,
+      ListFlag.LOCAL_REPO,
+      ListFlag.DVC_ONLY,
+      Flag.RECURSIVE
+    )
+  }
+}
+
+export const root = (options: ExecutionOptions): Promise<string> =>
+  readCliProcess(options, undefined, Command.ROOT)
 
 export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
   readCliProcessJson<DiffOutput>(options, Command.DIFF)
@@ -55,17 +99,6 @@ export const listDvcOnly = (
     ListFlag.DVC_ONLY
   )
 
-export const listDvcOnlyRecursive = (
-  options: ExecutionOptions
-): Promise<ListOutput[]> =>
-  readCliProcessJson<ListOutput[]>(
-    options,
-    Command.LIST,
-    ListFlag.LOCAL_REPO,
-    ListFlag.DVC_ONLY,
-    Flag.RECURSIVE
-  )
-
 export enum Status {
   DELETED = 'deleted',
   MODIFIED = 'modified',
@@ -77,14 +110,6 @@ export enum ChangedType {
   CHANGED_OUTS = 'changed outs',
   CHANGED_DEPS = 'changed deps'
 }
-
-export type PathStatus = Record<string, Status>
-
-export type StageOrFileStatuses = Record<ChangedType, PathStatus>
-
-export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
-
-export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export const status = (options: ExecutionOptions): Promise<StatusOutput> =>
   readCliProcessJson<StatusOutput>(options, Command.STATUS)

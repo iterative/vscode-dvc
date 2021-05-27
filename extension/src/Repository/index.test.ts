@@ -7,9 +7,9 @@ import { DecorationProvider } from './DecorationProvider'
 import { Repository } from '.'
 import { RepositoryModel } from './Model'
 import {
+  CliReader,
   diff,
   DiffOutput,
-  listDvcOnlyRecursive,
   ListOutput,
   status,
   Status,
@@ -24,8 +24,8 @@ jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
 
+const mockedListDvcOnlyRecursive = jest.fn()
 const mockedDiff = mocked(diff)
-const mockedListDvcOnlyRecursive = mocked(listDvcOnlyRecursive)
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
@@ -66,6 +66,10 @@ describe('Repository', () => {
 
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
+      const mockedCliReader = ({
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive
+      } as unknown) as CliReader
+
       const logDir = 'logs'
       const logAcc = join(logDir, 'acc.tsv')
       const logLoss = join(logDir, 'loss.tsv')
@@ -114,7 +118,12 @@ describe('Repository', () => {
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
-      const repository = new Repository(dvcRoot, config, decorationProvider)
+      const repository = new Repository(
+        dvcRoot,
+        config,
+        mockedCliReader,
+        decorationProvider
+      )
       await repository.isReady()
 
       const modified = new Set([resolve(dvcRoot, rawDataDir)])
@@ -136,9 +145,7 @@ describe('Repository', () => {
       expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
-        expectedExecutionOptions
-      )
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
 
       expect(repository.getState()).toEqual(
         expect.objectContaining({
@@ -157,6 +164,9 @@ describe('Repository', () => {
 
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
+      const mockedCliReader = ({
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive
+      } as unknown) as CliReader
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
@@ -167,7 +177,12 @@ describe('Repository', () => {
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
-      const repository = new Repository(dvcRoot, config, decorationProvider)
+      const repository = new Repository(
+        dvcRoot,
+        config,
+        mockedCliReader,
+        decorationProvider
+      )
       await repository.isReady()
 
       const dataDir = 'data/MNIST/raw'
@@ -233,9 +248,7 @@ describe('Repository', () => {
       expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
-        expectedExecutionOptions
-      )
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
 
       expect(repository.getState()).toEqual({
         added: emptySet,
@@ -250,6 +263,10 @@ describe('Repository', () => {
     })
 
     it("should update the classes state and call it's dependents", async () => {
+      const mockedCliReader = ({
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive
+      } as unknown) as CliReader
+
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
@@ -260,7 +277,12 @@ describe('Repository', () => {
       } as unknown) as Config
       const decorationProvider = new DecorationProvider()
 
-      const repository = new Repository(dvcRoot, config, decorationProvider)
+      const repository = new Repository(
+        dvcRoot,
+        config,
+        mockedCliReader,
+        decorationProvider
+      )
       await repository.isReady()
 
       const logDir = 'logs'
@@ -350,9 +372,7 @@ describe('Repository', () => {
 
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
-      expect(mockedListDvcOnlyRecursive).toBeCalledWith(
-        expectedExecutionOptions
-      )
+      expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
 
       expect(repository.getState()).toEqual({
         added: emptySet,

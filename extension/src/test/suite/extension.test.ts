@@ -11,10 +11,12 @@ import {
   ConfigurationChangeEvent
 } from 'vscode'
 import { Disposable } from '../../extension'
-import * as CliReader from '../../cli/reader'
+import * as Reader from '../../cli/reader'
 import * as CliExecutor from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../Experiments/Webview/complex-output-example.json'
+
+const { CliReader } = Reader
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -53,7 +55,7 @@ suite('Extension Test Suite', () => {
       const mockShowInputBox = stub(window, 'showInputBox')
       const mockCanRunCli = stub(CliExecutor, 'canRunCli').rejects('ERROR')
       await selectDvcPathItem(0)
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(Reader, 'experimentShow').resolves(complexExperimentsOutput)
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
 
@@ -86,7 +88,7 @@ suite('Extension Test Suite', () => {
       } as Disposable)
 
       const mockListDvcOnlyRecursive = stub(
-        CliReader,
+        CliReader.prototype,
         'listDvcOnlyRecursive'
       ).resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -100,15 +102,15 @@ suite('Extension Test Suite', () => {
         { path: join('logs', 'acc.tsv') },
         { path: join('logs', 'loss.tsv') },
         { path: 'model.pt' }
-      ] as CliReader.ListOutput[])
+      ] as Reader.ListOutput[])
 
-      stub(CliReader, 'listDvcOnly').resolves([
+      stub(Reader, 'listDvcOnly').resolves([
         { isout: false, isdir: true, isexec: false, path: 'data' },
         { isout: true, isdir: true, isexec: false, path: 'logs' },
         { isout: true, isdir: false, isexec: false, path: 'model.pt' }
       ])
 
-      const mockDiff = stub(CliReader, 'diff').resolves({
+      const mockDiff = stub(Reader, 'diff').resolves({
         modified: [
           { path: 'model.pt' },
           { path: 'logs' },
@@ -116,7 +118,7 @@ suite('Extension Test Suite', () => {
         ]
       })
 
-      const mockStatus = stub(CliReader, 'status').resolves(({
+      const mockStatus = stub(Reader, 'status').resolves(({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
@@ -125,7 +127,7 @@ suite('Extension Test Suite', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as unknown) as CliReader.StatusOutput)
+      } as unknown) as Reader.StatusOutput)
 
       const configurationChangeEvent = () => {
         return new Promise(resolve => {
