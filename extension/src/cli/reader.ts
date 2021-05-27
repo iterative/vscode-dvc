@@ -51,7 +51,7 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class CliReader extends Cli {
-  public async readProcess<T = string>(
+  private async readProcess<T = string>(
     cwd: string,
     formatter: typeof trimAndSplit | typeof JSON.parse | undefined,
     ...args: Args
@@ -63,13 +63,21 @@ export class CliReader extends Cli {
     return (formatter(output) as unknown) as T
   }
 
-  public readProcessJson<T>(cwd: string, command: Command, ...args: Args) {
+  private readProcessJson<T>(cwd: string, command: Command, ...args: Args) {
     return this.readProcess<T>(
       cwd,
       JSON.parse,
       command,
       ...args,
       Flag.SHOW_JSON
+    )
+  }
+
+  public experimentShow(cwd: string): Promise<ExperimentsRepoJSONOutput> {
+    return this.readProcessJson<ExperimentsRepoJSONOutput>(
+      cwd,
+      Command.EXPERIMENT,
+      ExperimentSubCommands.SHOW
     )
   }
 
@@ -94,15 +102,6 @@ export class CliReader extends Cli {
 
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
-
-export const experimentShow = (
-  options: ExecutionOptions
-): Promise<ExperimentsRepoJSONOutput> =>
-  readCliProcessJson<ExperimentsRepoJSONOutput>(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.SHOW
-  )
 
 export const listDvcOnly = (
   options: ExecutionOptions,

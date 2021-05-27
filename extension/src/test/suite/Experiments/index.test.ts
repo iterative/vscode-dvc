@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai'
 import { resolve } from 'path'
 import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
-import * as CliReader from '../../../cli/reader'
+import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
 import { ExperimentsTable, Experiments } from '../../../Experiments'
 import { Config } from '../../../Config'
@@ -49,7 +49,9 @@ suite('Experiments Test Suite', () => {
   describe('showExperimentsTable', () => {
     it("should take the config's default even if an experiments webview is focused", async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne')
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
 
       await setConfigValue('dvc.defaultProject', dvcDemoPath)
 
@@ -63,7 +65,11 @@ suite('Experiments Test Suite', () => {
         'other/dvc/root': {} as ExperimentsTable
       } as Record<string, ExperimentsTable>
 
-      const experiments = new Experiments(config, mockExperimentsTable)
+      const experiments = new Experiments(
+        config,
+        {} as CliReader,
+        mockExperimentsTable
+      )
       const [experimentsTable] = experiments.create(
         [dvcDemoPath],
         resourceLocator
@@ -95,7 +101,9 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
 
       const config = disposable.track(new Config())
 
@@ -106,7 +114,11 @@ suite('Experiments Test Suite', () => {
         'other/dvc/root': {} as ExperimentsTable
       } as Record<string, ExperimentsTable>
 
-      const experiments = new Experiments(config, mockExperimentsTable)
+      const experiments = new Experiments(
+        config,
+        {} as CliReader,
+        mockExperimentsTable
+      )
       const [experimentsTable] = experiments.create(
         [dvcDemoPath],
         resourceLocator
@@ -135,15 +147,18 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
 
       const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = new Experiments(config)
+      const experiments = new Experiments(config, cliReader)
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -159,9 +174,12 @@ suite('Experiments Test Suite', () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
 
       const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -170,7 +188,11 @@ suite('Experiments Test Suite', () => {
         'other/dvc/root': {} as ExperimentsTable
       } as Record<string, ExperimentsTable>
 
-      const experiments = new Experiments(config, mockExperimentsTable)
+      const experiments = new Experiments(
+        config,
+        cliReader,
+        mockExperimentsTable
+      )
       const [experimentsTable] = experiments.create(
         [dvcDemoPath],
         resourceLocator
@@ -210,15 +232,18 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      stub(CliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
 
       const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, config, resourceLocator)
+        new ExperimentsTable(dvcDemoPath, config, cliReader, resourceLocator)
       )
 
       const webview = await experimentsTable.showWebview()
@@ -228,16 +253,17 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should only be able to open a single experiments webview', async () => {
-      const mockReader = stub(CliReader, 'experimentShow').resolves(
+      const mockReader = stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
       const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, config, resourceLocator)
+        new ExperimentsTable(dvcDemoPath, config, cliReader, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

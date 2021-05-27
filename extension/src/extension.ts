@@ -228,7 +228,9 @@ export class Extension {
     this.runner = this.dispose.track(new Runner(this.config))
     this.cliReader = this.dispose.track(new CliReader(this.config))
 
-    this.experiments = this.dispose.track(new Experiments(this.config))
+    this.experiments = this.dispose.track(
+      new Experiments(this.config, this.cliReader)
+    )
 
     this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
 
