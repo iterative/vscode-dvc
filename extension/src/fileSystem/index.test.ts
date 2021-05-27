@@ -4,7 +4,6 @@ import debounce from 'lodash.debounce'
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
-import { root } from '../cli/reader'
 import { Disposable } from '../extension'
 
 const {
@@ -24,7 +23,6 @@ jest.mock('../cli/reader')
 
 const mockedWatch = mocked(watch)
 const mockedDebounce = mocked(debounce)
-const mockedRoot = mocked(root)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -205,16 +203,10 @@ describe('ignoredDotDirectories', () => {
 
 describe('findDvcRootPaths', () => {
   const dataRoot = resolve(dvcDemoPath, 'data')
-  const mockCliPath = 'dvc'
 
   it('should find the dvc root if it exists in the given folder', async () => {
-    const dvcRoots = await findDvcRootPaths({
-      cliPath: mockCliPath,
-      cwd: dvcDemoPath,
-      pythonBinPath: undefined
-    })
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath, Promise.resolve('.'))
 
-    expect(mockedRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
@@ -223,35 +215,27 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(parentDir, 'mockDvc')
     ensureDirSync(join(mockDvcRoot, '.dvc'))
 
-    const dvcRoots = await findDvcRootPaths({
-      cliPath: mockCliPath,
-      cwd: parentDir,
-      pythonBinPath: undefined
-    })
+    const dvcRoots = await findDvcRootPaths(
+      parentDir,
+      Promise.resolve(undefined)
+    )
 
     remove(mockDvcRoot)
 
-    expect(mockedRoot).not.toBeCalled()
     expect(dvcRoots).toEqual([dvcDemoPath, mockDvcRoot].sort())
   })
 
   it('should find the dvc root if it exists above the given folder', async () => {
-    mockedRoot.mockResolvedValueOnce('..')
-    const dvcRoots = await findDvcRootPaths({
-      cliPath: mockCliPath,
-      cwd: dataRoot,
-      pythonBinPath: undefined
-    })
-    expect(mockedRoot).toBeCalledTimes(1)
+    const dvcRoots = await findDvcRootPaths(dataRoot, Promise.resolve('..'))
+
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
-    const dvcRoots = await findDvcRootPaths({
-      cliPath: mockCliPath,
-      cwd: __dirname,
-      pythonBinPath: undefined
-    })
+    const dvcRoots = await findDvcRootPaths(
+      __dirname,
+      Promise.resolve(undefined)
+    )
     expect(dvcRoots).toEqual([])
   })
 })

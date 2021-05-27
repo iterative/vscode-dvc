@@ -3,8 +3,6 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { join, resolve } from 'path'
-import { ExecutionOptions } from '../cli/execution'
-import { root } from '../cli/reader'
 import { definedAndNonEmpty } from '../util'
 
 export const getWatcher = (handler: (path: string) => void) => (
@@ -65,15 +63,6 @@ export const onDidChangeFileType = (
   return onDidChangeFileSystem(globs, handler)
 }
 
-const findDvcAbsoluteRootPath = async (
-  options: ExecutionOptions
-): Promise<string | undefined> => {
-  try {
-    const dvcRoot = await root(options)
-    return resolve(options?.cwd, dvcRoot)
-  } catch (e) {}
-}
-
 export const exists = (path: string): boolean => existsSync(path)
 
 export const isDirectory = (path: string): boolean => {
@@ -98,19 +87,21 @@ export const findDvcSubRootPaths = async (
 }
 
 export const findDvcRootPaths = async (
-  options: ExecutionOptions
+  cwd: string,
+  relativePathPromise: Promise<string | undefined>
 ): Promise<string[]> => {
-  const subRoots = await findDvcSubRootPaths(options.cwd)
+  const subRoots = await findDvcSubRootPaths(cwd)
 
   if (definedAndNonEmpty(subRoots)) {
     return subRoots
   }
 
-  const absoluteRoot = await findDvcAbsoluteRootPath(options)
-
-  if (!absoluteRoot) {
+  const relativePath = await relativePathPromise
+  if (!relativePath) {
     return []
   }
+
+  const absoluteRoot = resolve(cwd, relativePath)
 
   return [absoluteRoot]
 }
