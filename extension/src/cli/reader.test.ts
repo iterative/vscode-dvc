@@ -1,4 +1,4 @@
-import { CliReader, diff, experimentShow, root, status } from './reader'
+import { CliReader, experimentShow, root, status } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
@@ -36,6 +36,37 @@ describe('CliReader', () => {
       event: jest.fn()
     } as unknown) as EventEmitter<string>
   )
+
+  describe('diff', () => {
+    it('should call the cli with the correct parameters', async () => {
+      const cliOutput = {
+        added: [],
+        deleted: [{ path: 'data/MNIST/raw/t10k-images-idx3-ubyte' }],
+        modified: [
+          { path: 'data/MNIST/raw/' },
+          { path: 'logs/' },
+          { path: 'logs/acc.tsv' },
+          { path: 'logs/loss.tsv' },
+          { path: 'model.pt' },
+          { path: 'predictions.json' }
+        ],
+        renamed: [],
+        'not in cache': []
+      }
+      const cwd = __dirname
+      mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+      const statusOutput = await cliReader.diff(cwd)
+
+      expect(statusOutput).toEqual(cliOutput)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['diff', SHOW_JSON],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
 
   describe('listDvcOnlyRecursive', () => {
     it('should return all relative tracked paths', async () => {
@@ -147,41 +178,6 @@ describe('root', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['root'],
-      cwd,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('diff', () => {
-  it('should call the cli with the correct parameters', async () => {
-    const cliOutput = {
-      added: [],
-      deleted: [{ path: 'data/MNIST/raw/t10k-images-idx3-ubyte' }],
-      modified: [
-        { path: 'data/MNIST/raw/' },
-        { path: 'logs/' },
-        { path: 'logs/acc.tsv' },
-        { path: 'logs/loss.tsv' },
-        { path: 'model.pt' },
-        { path: 'predictions.json' }
-      ],
-      renamed: [],
-      'not in cache': []
-    }
-    const cwd = __dirname
-    mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
-    const statusOutput = await diff({
-      cliPath: undefined,
-      pythonBinPath: undefined,
-      cwd
-    })
-
-    expect(statusOutput).toEqual(cliOutput)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['diff', SHOW_JSON],
       cwd,
       env: mockedEnv
     })

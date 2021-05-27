@@ -54,6 +54,10 @@ export class CliReader extends Cli {
     )
   }
 
+  public diff(cwd: string): Promise<DiffOutput> {
+    return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
+  }
+
   public listDvcOnlyRecursive(cwd: string): Promise<ListOutput[]> {
     return this.readProcessJson<ListOutput[]>(
       cwd,
@@ -67,9 +71,6 @@ export class CliReader extends Cli {
 
 export const root = (options: ExecutionOptions): Promise<string> =>
   readCliProcess(options, undefined, Command.ROOT)
-
-export const diff = (options: ExecutionOptions): Promise<DiffOutput> =>
-  readCliProcessJson<DiffOutput>(options, Command.DIFF)
 
 export const experimentShow = (
   options: ExecutionOptions

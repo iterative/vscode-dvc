@@ -8,7 +8,6 @@ import { Repository } from '.'
 import { RepositoryModel } from './Model'
 import {
   CliReader,
-  diff,
   DiffOutput,
   ListOutput,
   status,
@@ -25,7 +24,7 @@ jest.mock('../git')
 jest.mock('../fileSystem')
 
 const mockedListDvcOnlyRecursive = jest.fn()
-const mockedDiff = mocked(diff)
+const mockedDiff = jest.fn()
 const mockedStatus = mocked(status)
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
@@ -67,6 +66,7 @@ describe('Repository', () => {
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
       const mockedCliReader = ({
+        diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive
       } as unknown) as CliReader
 
@@ -142,7 +142,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
-      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(dvcRoot)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
@@ -165,6 +165,7 @@ describe('Repository', () => {
   describe('resetState', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       const mockedCliReader = ({
+        diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive
       } as unknown) as CliReader
       mockedDiff.mockResolvedValueOnce({})
@@ -245,7 +246,7 @@ describe('Repository', () => {
         pythonBinPath: undefined
       }
 
-      expect(mockedDiff).toBeCalledWith(expectedExecutionOptions)
+      expect(mockedDiff).toBeCalledWith(dvcRoot)
       expect(mockedStatus).toBeCalledWith(expectedExecutionOptions)
       expect(mockedGetAllUntracked).toBeCalledWith(dvcRoot)
       expect(mockedListDvcOnlyRecursive).toBeCalledWith(dvcRoot)
@@ -264,9 +265,9 @@ describe('Repository', () => {
 
     it("should update the classes state and call it's dependents", async () => {
       const mockedCliReader = ({
+        diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive
       } as unknown) as CliReader
-
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})

@@ -6,7 +6,6 @@ import { DecorationProvider } from './DecorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import {
   status,
-  diff,
   ListOutput,
   DiffOutput,
   StatusOutput,
@@ -42,7 +41,7 @@ export class Repository {
   private getUpdateData(): Promise<[DiffOutput, StatusOutput, Set<string>]> {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     return Promise.all([
-      diff(options),
+      this.cliReader.diff(this.dvcRoot),
       status(options),
       getAllUntracked(this.dvcRoot)
     ])
@@ -53,7 +52,7 @@ export class Repository {
   > {
     const options = getExecutionOptions(this.config, this.dvcRoot)
     return Promise.all([
-      diff(options),
+      this.cliReader.diff(this.dvcRoot),
       status(options),
       getAllUntracked(this.dvcRoot),
       this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
