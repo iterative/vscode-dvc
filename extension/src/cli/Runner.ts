@@ -3,11 +3,10 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../Config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
-import { CliExecution } from './execution'
-import { Process } from '../processExecution'
+import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
+import { getEnv } from './execution'
 
-const { createCliProcess } = CliExecution
 export class Runner {
   public readonly dispose = Disposable.fn()
 
@@ -37,16 +36,55 @@ export class Runner {
     return this.config.getCliPath()
   }
 
+  private getOutput(data: string | Buffer): string {
+    return data
+      .toString()
+      .split(/(\r?\n)/g)
+      .join('\r')
+  }
+
+  private createCliProcess({
+    cwd,
+    emitters,
+    args
+  }: {
+    cwd: string
+    args: Args
+    emitters: {
+      processCompleted: EventEmitter<void>
+      processOutput: EventEmitter<string>
+      processStarted: EventEmitter<void>
+    }
+  }): Process {
+    const env = getEnv(this.config.pythonBinPath)
+
+    const process = createProcess({
+      executable: this.getOverrideOrCliPath(),
+      args,
+      cwd,
+      env
+    })
+
+    emitters.processStarted.fire()
+
+    process.all?.on('data', chunk => {
+      const output = this.getOutput(chunk)
+      emitters.processOutput.fire(output)
+    })
+
+    process.on('close', () => {
+      emitters.processCompleted.fire()
+    })
+
+    return process
+  }
+
   private startProcess(cwd: string, args: Args) {
     Runner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    this.currentProcess = createCliProcess({
-      options: {
-        cliPath: this.getOverrideOrCliPath(),
-        cwd,
-        pythonBinPath: this.config.pythonBinPath
-      },
+    this.currentProcess = this.createCliProcess({
+      cwd,
       emitters: {
         processCompleted: this.processCompleted,
         processStarted: this.processStarted,
