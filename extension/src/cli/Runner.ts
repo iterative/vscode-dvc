@@ -33,7 +33,7 @@ export class Runner {
     if (this.executable) {
       return this.executable
     }
-    return this.config.getCliPath()
+    return this.config.getCliPath() || 'dvc'
   }
 
   private getOutput(data: string | Buffer): string {
