@@ -43,39 +43,38 @@ export enum MessageToWebviewType {
   showExperiments = 'showExperiments'
 }
 
-interface DataDict {
-  [name: string]: string | number | DataDict
+export interface ExperimentsWebviewState {
+  dvcRoot: string
+  experiments?: ExperimentsRepoJSONOutput
 }
+
+interface DataDict {
+  [name: string]: string | number | boolean | DataDict
+}
+
 export interface DataDictRoot {
   [filename: string]: DataDict
 }
 
 export interface ExperimentJSONOutput {
   name?: string
-  timestamp?: string | Date | null
+  timestamp?: string | null
+  queued?: boolean
   params?: DataDictRoot
   metrics?: DataDictRoot
-  queued?: boolean
   checkpoint_tip?: string
   checkpoint_parent?: string
 }
 
-interface ExperimentsCommitJSONOutput
-  extends Record<string, ExperimentJSONOutput> {
+interface ExperimentsWorkspaceJSONOutput {
   baseline: ExperimentJSONOutput
 }
 
-interface ExperimentsCommitJSONOutput
-  extends Record<string, ExperimentJSONOutput> {
-  baseline: ExperimentJSONOutput
+interface ExperimentsBranchJSONOutput extends ExperimentsWorkspaceJSONOutput {
+  [sha: string]: ExperimentJSONOutput
 }
 
-export interface ExperimentsRepoJSONOutput
-  extends Record<string, ExperimentsCommitJSONOutput> {
-  workspace: ExperimentsCommitJSONOutput
-}
-
-export interface ExperimentsWebviewState {
-  dvcRoot: string
-  experiments?: ExperimentsRepoJSONOutput
+export interface ExperimentsRepoJSONOutput {
+  workspace: ExperimentsWorkspaceJSONOutput
+  [name: string]: ExperimentsWorkspaceJSONOutput | ExperimentsBranchJSONOutput
 }
