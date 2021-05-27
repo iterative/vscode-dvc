@@ -23,6 +23,25 @@ export type DiffOutput = {
   'not in cache'?: PathOutput[]
 }
 
+export type ListOutput = {
+  isdir: boolean
+  isexec: boolean
+  isout: boolean
+  path: string
+}
+
+export enum Status {
+  DELETED = 'deleted',
+  MODIFIED = 'modified',
+  NEW = 'new',
+  NOT_IN_CACHE = 'not in cache'
+}
+
+export enum ChangedType {
+  CHANGED_OUTS = 'changed outs',
+  CHANGED_DEPS = 'changed deps'
+}
+
 export type PathStatus = Record<string, Status>
 
 export type StageOrFileStatuses = Record<ChangedType, PathStatus>
@@ -67,6 +86,10 @@ export class CliReader extends Cli {
       Flag.RECURSIVE
     )
   }
+
+  public status(cwd: string): Promise<StatusOutput> {
+    return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
+  }
 }
 
 export const root = (options: ExecutionOptions): Promise<string> =>
@@ -81,13 +104,6 @@ export const experimentShow = (
     ExperimentSubCommands.SHOW
   )
 
-export type ListOutput = {
-  isdir: boolean
-  isexec: boolean
-  isout: boolean
-  path: string
-}
-
 export const listDvcOnly = (
   options: ExecutionOptions,
   relativePath: string
@@ -99,21 +115,6 @@ export const listDvcOnly = (
     relativePath,
     ListFlag.DVC_ONLY
   )
-
-export enum Status {
-  DELETED = 'deleted',
-  MODIFIED = 'modified',
-  NEW = 'new',
-  NOT_IN_CACHE = 'not in cache'
-}
-
-export enum ChangedType {
-  CHANGED_OUTS = 'changed outs',
-  CHANGED_DEPS = 'changed deps'
-}
-
-export const status = (options: ExecutionOptions): Promise<StatusOutput> =>
-  readCliProcessJson<StatusOutput>(options, Command.STATUS)
 
 export const experimentListCurrent = (
   options: ExecutionOptions

@@ -118,7 +118,7 @@ suite('Extension Test Suite', () => {
         ]
       })
 
-      const mockStatus = stub(Reader, 'status').resolves(({
+      const mockStatus = stub(CliReader.prototype, 'status').resolves(({
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },

@@ -138,7 +138,6 @@ export class Extension {
       const repository = this.dispose.track(
         new Repository(
           dvcRoot,
-          this.config,
           this.cliReader,
           this.decorationProviders[dvcRoot]
         )

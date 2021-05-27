@@ -1,4 +1,4 @@
-import { CliReader, experimentShow, root, status } from './reader'
+import { CliReader, experimentShow, root } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../Experiments/Webview/complex-output-example.json'
@@ -139,6 +139,33 @@ describe('CliReader', () => {
         env: mockedEnv
       })
     })
+
+    describe('status', () => {
+      it('should call the cli with the correct parameters', async () => {
+        const cliOutput = {
+          train: [
+            { 'changed deps': { 'data/MNIST': 'modified' } },
+            { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
+            'always changed'
+          ],
+          'data/MNIST/raw.dvc': [
+            { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+          ]
+        }
+        const cwd = __dirname
+        mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+        const diffOutput = await cliReader.status(cwd)
+
+        expect(diffOutput).toEqual(cliOutput)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['status', SHOW_JSON],
+          cwd,
+          env: mockedEnv
+        })
+      })
+    })
   })
 })
 
@@ -178,37 +205,6 @@ describe('root', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['root'],
-      cwd,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('status', () => {
-  it('should call the cli with the correct parameters', async () => {
-    const cliOutput = {
-      train: [
-        { 'changed deps': { 'data/MNIST': 'modified' } },
-        { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-        'always changed'
-      ],
-      'data/MNIST/raw.dvc': [
-        { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-      ]
-    }
-    const cwd = __dirname
-    mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
-    const diffOutput = await status({
-      cliPath: undefined,
-      pythonBinPath: undefined,
-      cwd
-    })
-
-    expect(diffOutput).toEqual(cliOutput)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['status', SHOW_JSON],
       cwd,
       env: mockedEnv
     })
