@@ -44,7 +44,17 @@ export class ExperimentsTable {
       const experimentUpdatePromise = this.cliReader.experimentShow(
         this.dvcRoot
       )
-      await experimentUpdatePromise
+      const tableData = await experimentUpdatePromise
+      const dataHash = createHash('sha1')
+        .update(JSON.stringify(tableData))
+        .digest('base64')
+
+      if (dataHash === this.lastDataHash) {
+        return
+      }
+      this.lastDataHash = dataHash
+      this.data = tableData
+      this.sendData()
     } catch (e) {
       Logger.error(e)
       throw e
@@ -53,32 +63,16 @@ export class ExperimentsTable {
     }
   }
 
-  private updateData(): Promise<void> {
+  public refresh(): Promise<void> {
     if (!this.currentUpdatePromise) {
       this.currentUpdatePromise = this.performUpdate()
     }
-    return this.currentUpdatePromise as Promise<void>
+    return this.currentUpdatePromise
   }
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
-  }
-
-  public refresh = async () => {
-    const tableData = await this.updateData()
-    const dataHash = createHash('sha1')
-      .update(JSON.stringify(tableData))
-      .digest('base64')
-
-    if (dataHash !== this.lastDataHash && (await this.dataDelivered())) {
-      this.lastDataHash = dataHash
-    }
-  }
-
-  private async dataDelivered(): Promise<boolean> {
-    const sent = await this.sendData()
-    return !!sent
+    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh))
   }
 
   public showWebview = async () => {
@@ -140,7 +134,7 @@ export class ExperimentsTable {
     this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
-    this.updateData()
+    this.refresh()
   }
 }
 
