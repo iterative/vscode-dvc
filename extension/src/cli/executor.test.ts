@@ -42,6 +42,33 @@ describe('CliExecutor', () => {
     } as unknown) as EventEmitter<string>
   )
 
+  describe('addTarget', () => {
+    it('should call executeProcess with the correct parameters to add a file', async () => {
+      const fsPath = __filename
+      const dir = resolve(fsPath, '..')
+      const file = basename(__filename)
+      const stdout =
+        `100% Add|████████████████████████████████████████████████` +
+        `█████████████████████████████████████████████████████████` +
+        `█████████████████████████████████████████████████████████` +
+        `██████████████████████████████████████████|1/1 [00:00,  2` +
+        `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
+        `\n\rgit add ${file} .gitignore`
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.addTarget(fsPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['add', file],
+        cwd: dir,
+        env: mockedEnv
+      })
+    })
+  })
+
   describe('checkout', () => {
     it('should call executeProcess with the correct parameters to checkout a repo', async () => {
       const fsPath = __dirname

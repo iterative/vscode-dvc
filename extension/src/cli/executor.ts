@@ -28,6 +28,22 @@ export const getExecutionOnTargetOptions = (
 })
 
 export class CliExecutor extends Cli {
+  private async executeProcessOnTarget(
+    fsPath: string,
+    ...args: Args
+  ): Promise<string> {
+    const cwd = dirname(fsPath)
+
+    const target = basename(fsPath)
+    await ensureDir(cwd)
+
+    return this.executeProcess(cwd, ...args, target)
+  }
+
+  public addTarget(fsPath: string): Promise<string> {
+    return this.executeProcessOnTarget(fsPath, Command.ADD)
+  }
+
   public checkout(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
   }
