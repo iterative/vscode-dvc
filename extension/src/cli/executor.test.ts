@@ -10,7 +10,6 @@ import {
   CliExecutor,
   experimentApply,
   init,
-  pull,
   removeTarget
 } from './executor'
 
@@ -137,6 +136,25 @@ describe('CliExecutor', () => {
       })
     })
 
+    describe('pull', () => {
+      it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
+        const cwd = __dirname
+        const stdout = 'M       data/MNIST/raw/\n1 file modified'
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.pull(cwd)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['pull'],
+          cwd: __dirname,
+          env: mockedEnv
+        })
+      })
+    })
+
     describe('push', () => {
       it('should call executeProcess with the correct parameters to push the entire repository', async () => {
         const cwd = __dirname
@@ -243,29 +261,6 @@ describe('init', () => {
       executable: 'dvc',
       args: ['init', '--subdir'],
       cwd: fsPath,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('pull', () => {
-  it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
-    const cwd = __dirname
-    const stdout = 'M       data/MNIST/raw/\n1 file modified'
-
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await pull({
-      cliPath: 'dvc',
-      cwd,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['pull'],
-      cwd: __dirname,
       env: mockedEnv
     })
   })

@@ -40,6 +40,10 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Flag.HELP)
   }
 
+  public pull(cwd: string): Promise<string> {
+    return this.executeProcess(cwd, Command.PULL)
+  }
+
   public push(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Command.PUSH)
   }
@@ -105,9 +109,6 @@ export const experimentRunQueue = (
     ExperimentSubCommands.RUN,
     ExperimentFlag.QUEUE
   )
-
-export const pull = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.PULL)
 
 export type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string

@@ -4,13 +4,11 @@ import {
   addTarget,
   checkoutTarget,
   CliExecutor,
-  commitTarget,
-  pull
+  commitTarget
 } from '../../cli/executor'
 import {
   registerResourceUriCommand,
-  registerRootUriCommand,
-  registerRootUriCommand_
+  registerRootUriCommand
 } from '../../vscode/commands'
 
 export const registerRepositoryCommands = (
@@ -21,23 +19,23 @@ export const registerRepositoryCommands = (
 
   disposer.track(registerResourceUriCommand(config, 'dvc.addTarget', addTarget))
 
-  disposer.track(registerRootUriCommand_('dvc.checkout', cliExecutor.checkout))
+  disposer.track(registerRootUriCommand('dvc.checkout', cliExecutor.checkout))
 
   disposer.track(
     registerResourceUriCommand(config, 'dvc.checkoutTarget', checkoutTarget)
   )
 
-  disposer.track(registerRootUriCommand_('dvc.commit', cliExecutor.commit))
+  disposer.track(registerRootUriCommand('dvc.commit', cliExecutor.commit))
 
   disposer.track(
     registerResourceUriCommand(config, 'dvc.commitTarget', commitTarget)
   )
 
   disposer.track(
-    disposer.track(registerRootUriCommand(config, 'dvc.pull', pull))
+    disposer.track(registerRootUriCommand('dvc.pull', cliExecutor.pull))
   )
 
-  disposer.track(registerRootUriCommand_('dvc.push', cliExecutor.push))
+  disposer.track(registerRootUriCommand('dvc.push', cliExecutor.push))
 
   return disposer
 }
