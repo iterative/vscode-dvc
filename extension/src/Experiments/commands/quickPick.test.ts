@@ -5,9 +5,9 @@ import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from '../../cli/args'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import {
-  applyExperiment,
   branchExperiment,
   garbageCollectExperiments,
+  pickExperimentName,
   removeExperiment
 } from './quickPick'
 
@@ -170,53 +170,6 @@ describe('garbageCollectExperiments', () => {
   })
 })
 
-describe('applyExperiment', () => {
-  it('invokes a quick pick with a list of names from stdout and executes a constructed command', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
-    mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
-    await applyExperiment(exampleExecutionOptions)
-    expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'list', '--names-only'],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'apply', 'exp-2021'],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
-  })
-
-  it('throws from a non-shell Exception', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce([])
-    mockedExecuteProcess.mockRejectedValueOnce(new Error())
-    await expect(applyExperiment(exampleExecutionOptions)).rejects.toThrow()
-    expect(mockedShowErrorMessage).not.toBeCalled()
-  })
-
-  it('displays an error message when there are no experiments to select', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce('')
-    mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
-    await applyExperiment(exampleExecutionOptions)
-    expect(mockedShowQuickPick).not.toBeCalled()
-    expect(mockedShowErrorMessage).toBeCalledWith(
-      'There are no experiments to select!'
-    )
-  })
-
-  it('does not execute a command if the QuickPick is dismissed', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
-    await applyExperiment(exampleExecutionOptions)
-    expect(mockedExecuteProcess).toBeCalledTimes(1)
-  })
-})
-
 describe('removeExperiment', () => {
   it('executes a constructed command', async () => {
     mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
@@ -240,14 +193,11 @@ describe('branchExperiment', () => {
   const testBranchName = 'test-branch-name'
 
   it('gets a name from showInputBox and executes a constructed command', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
     mockedExecuteProcess.mockResolvedValueOnce('output from branch')
-    mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
     mockedShowInputBox.mockResolvedValueOnce(testBranchName)
 
-    await branchExperiment(exampleExecutionOptions)
+    await branchExperiment(exampleExecutionOptions, exampleExpName)
 
-    expect(mockedShowQuickPick).toBeCalledWith(exampleExperimentsList)
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
@@ -255,15 +205,23 @@ describe('branchExperiment', () => {
       env: mockedEnv
     })
   })
+})
 
-  it('does not execute a command if the InputBox is dismissed', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
+describe('pickExperimentName', () => {
+  it('should return the name of the chosen experiment if one is selected by the user', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
-    mockedShowInputBox.mockResolvedValueOnce(undefined)
-    mockedExecuteProcess.mockResolvedValueOnce('output from branch')
+    const name = await pickExperimentName(exampleExperimentsList)
+    expect(name).toEqual(exampleExpName)
+  })
 
-    await branchExperiment(exampleExecutionOptions)
-    expect(mockedExecuteProcess).toBeCalledTimes(1)
+  it('should return undefined if the user cancels the popup dialog', async () => {
+    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    const undef = await pickExperimentName(exampleExperimentsList)
+    expect(undef).toBeUndefined()
+  })
+
+  it('should call showErrorMessage when no experiment names are provided', async () => {
+    await pickExperimentName([])
+    expect(mockedShowErrorMessage).toHaveBeenCalledTimes(1)
   })
 })

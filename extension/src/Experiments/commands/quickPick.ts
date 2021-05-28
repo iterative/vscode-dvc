@@ -71,19 +71,28 @@ const experimentsQuickPickCommand = async <T = void>(
   }
 }
 
-export const applyExperiment = (options: ExecutionOptions) =>
-  experimentsQuickPickCommand(
-    options,
-    async (options, selectedExperimentName) => {
-      try {
-        window.showInformationMessage(
-          await experimentApply(options, selectedExperimentName)
-        )
-      } catch (e) {
-        reportErrorMessage(e)
-      }
-    }
-  )
+export const pickExperimentName = (
+  experimentNames: string[]
+): Thenable<string | undefined> | undefined => {
+  if (experimentNames.length === 0) {
+    window.showErrorMessage('There are no experiments to select!')
+  } else {
+    return window.showQuickPick(experimentNames)
+  }
+}
+
+export const applyExperiment_ = async (
+  options: ExecutionOptions,
+  selectedExperimentName: string
+) => {
+  try {
+    return window.showInformationMessage(
+      await experimentApply(options, selectedExperimentName)
+    )
+  } catch (e) {
+    return reportErrorMessage(e)
+  }
+}
 
 export const removeExperiment = (options: ExecutionOptions) =>
   experimentsQuickPickCommand(
@@ -100,21 +109,20 @@ export const removeExperiment = (options: ExecutionOptions) =>
     }
   )
 
-export const branchExperiment = (options: ExecutionOptions) =>
-  experimentsQuickPickCommand(
-    options,
-    async (options, selectedExperimentName) => {
-      const branchName = await window.showInputBox({
-        prompt: 'Name the new branch'
-      })
-      if (branchName) {
-        try {
-          window.showInformationMessage(
-            await experimentBranch(options, selectedExperimentName, branchName)
-          )
-        } catch (e) {
-          reportErrorMessage(e)
-        }
-      }
+export const branchExperiment = async (
+  options: ExecutionOptions,
+  selectedExperimentName: string
+) => {
+  const branchName = await window.showInputBox({
+    prompt: 'Name the new branch'
+  })
+  if (branchName) {
+    try {
+      window.showInformationMessage(
+        await experimentBranch(options, selectedExperimentName, branchName)
+      )
+    } catch (e) {
+      reportErrorMessage(e)
     }
-  )
+  }
+}

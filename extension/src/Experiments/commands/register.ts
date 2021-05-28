@@ -1,8 +1,7 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { queueExperiment } from './report'
+import { applyExperiment, queueExperiment } from './report'
 import {
-  applyExperiment,
   branchExperiment,
   garbageCollectExperiments,
   removeExperiment
@@ -23,6 +22,19 @@ export const getExecutionOptionsThenRun = async (
   return func(options)
 }
 
+export const getExperimentListThenRun = async (
+  experiments: Experiments,
+  func: (options: ExecutionOptions, experimentName: string) => Promise<unknown>
+) => {
+  const obj = await experiments.getExperimentName()
+  const options = obj?.options
+  const name = await obj?.name
+  if (!(name && options)) {
+    return
+  }
+  return func(options, name)
+}
+
 export const registerExperimentCommands = (experiments: Experiments) => {
   const disposer = Disposable.fn()
 
@@ -40,13 +52,13 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getExecutionOptionsThenRun(experiments, applyExperiment)
+      getExperimentListThenRun(experiments, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      getExecutionOptionsThenRun(experiments, branchExperiment)
+      getExperimentListThenRun(experiments, branchExperiment)
     )
   )
 
