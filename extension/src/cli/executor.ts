@@ -28,25 +28,21 @@ export const getExecutionOnTargetOptions = (
 })
 
 export class CliExecutor extends Cli {
-  public checkout(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
-  }
+  public checkout = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
 
-  public commit(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
-  }
+  public commit = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
 
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
 
-  public pull(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.PULL)
-  }
+  public pull = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PULL)
 
-  public push(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.PUSH)
-  }
+  public push = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PUSH)
 }
 
 export const experimentApply = (
