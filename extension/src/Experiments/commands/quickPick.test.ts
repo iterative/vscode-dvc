@@ -61,6 +61,24 @@ const exampleExperimentsList = [
 
 const exampleExpName = 'exp-2021'
 
+describe('branchExperiment', () => {
+  const testBranchName = 'test-branch-name'
+
+  it('gets a name from showInputBox and executes a constructed command', async () => {
+    mockedExecuteProcess.mockResolvedValueOnce('output from branch')
+    mockedShowInputBox.mockResolvedValueOnce(testBranchName)
+
+    await branchExperiment(exampleExecutionOptions, exampleExpName)
+
+    expect(mockedExecuteProcess).toBeCalledWith({
+      executable: 'dvc',
+      args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
+      cwd: defaultPath,
+      env: mockedEnv
+    })
+  })
+})
+
 describe('garbageCollectExperiments', () => {
   it('invokes a QuickPick with the correct options', async () => {
     await garbageCollectExperiments(exampleExecutionOptions)
@@ -164,24 +182,6 @@ describe('garbageCollectExperiments', () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
     await garbageCollectExperiments(exampleExecutionOptions)
     expect(mockedExecuteProcess).not.toBeCalled()
-  })
-})
-
-describe('branchExperiment', () => {
-  const testBranchName = 'test-branch-name'
-
-  it('gets a name from showInputBox and executes a constructed command', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce('output from branch')
-    mockedShowInputBox.mockResolvedValueOnce(testBranchName)
-
-    await branchExperiment(exampleExecutionOptions, exampleExpName)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
   })
 })
 
