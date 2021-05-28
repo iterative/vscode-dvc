@@ -16,6 +16,14 @@ export const registerPathCommand = (
     return func(options)
   })
 
+export const registerRootUriCommand_ = (
+  name: string,
+  func: (cwd: string) => Promise<string>
+) =>
+  commands.registerCommand(name, ({ rootUri }) => {
+    return func(rootUri)
+  })
+
 export const registerRootUriCommand = (
   config: Config,
   name: string,

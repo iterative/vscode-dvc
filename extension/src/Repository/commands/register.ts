@@ -2,8 +2,8 @@ import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../../Config'
 import {
   addTarget,
-  checkout,
   checkoutTarget,
+  CliExecutor,
   commit,
   commitTarget,
   pull,
@@ -11,15 +11,19 @@ import {
 } from '../../cli/executor'
 import {
   registerResourceUriCommand,
-  registerRootUriCommand
+  registerRootUriCommand,
+  registerRootUriCommand_
 } from '../../vscode/commands'
 
-export const registerRepositoryCommands = (config: Config) => {
+export const registerRepositoryCommands = (
+  config: Config,
+  cliExecutor: CliExecutor
+) => {
   const disposer = Disposable.fn()
 
   disposer.track(registerResourceUriCommand(config, 'dvc.addTarget', addTarget))
 
-  disposer.track(registerRootUriCommand(config, 'dvc.checkout', checkout))
+  disposer.track(registerRootUriCommand_('dvc.checkout', cliExecutor.checkout))
 
   disposer.track(
     registerResourceUriCommand(config, 'dvc.checkoutTarget', checkoutTarget)
