@@ -2,7 +2,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { join } from 'path'
 import { ExperimentsTable, Experiments } from '..'
-import { Runner } from '../../cli/Runner'
+import { CliRunner } from '../../cli/runner'
 import { Config } from '../../Config'
 import {
   getExecutionOptionsThenRun,
@@ -54,7 +54,7 @@ describe('showExperimentsTableThenRun', () => {
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
-      } as unknown) as Runner,
+      } as unknown) as CliRunner,
       runQueued
     )
 
@@ -84,7 +84,7 @@ describe('showExperimentsTableThenRun', () => {
       ({
         run: mockedRun,
         onDidCompleteProcess: jest.fn()
-      } as unknown) as Runner,
+      } as unknown) as CliRunner,
       runReset
     )
 

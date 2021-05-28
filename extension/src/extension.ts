@@ -37,7 +37,7 @@ import { canRunCli } from './cli/executor'
 import { CliExecution, getExecutionOptions } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
-import { Runner } from './cli/Runner'
+import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 
 export { Disposable, Disposer }
@@ -59,7 +59,7 @@ export class Extension {
   private dvcRepositories: Record<string, Repository> = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
-  private readonly runner: Runner
+  private readonly cliRunner: CliRunner
   private readonly outputChannel: OutputChannel
   private readonly cliReader: CliReader
 
@@ -230,7 +230,7 @@ export class Extension {
 
     this.config = this.dispose.track(new Config())
 
-    this.runner = this.dispose.track(new Runner(this.config))
+    this.cliRunner = this.dispose.track(new CliRunner(this.config))
     this.cliReader = this.dispose.track(new CliReader(this.config))
 
     this.experiments = this.dispose.track(
@@ -272,7 +272,7 @@ export class Extension {
 
     this.dispose.track(registerExperimentCommands(this.experiments))
     this.dispose.track(
-      registerExperimentRunnerCommands(this.experiments, this.runner)
+      registerExperimentRunnerCommands(this.experiments, this.cliRunner)
     )
 
     this.dispose.track(registerRepositoryCommands(this.config))

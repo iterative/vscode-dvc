@@ -4,18 +4,18 @@ import {
   ExperimentFlag,
   ExperimentSubCommands
 } from '../../cli/args'
-import { Runner } from '../../cli/Runner'
+import { CliRunner } from '../../cli/runner'
 
-const runExperiment = (runner: Runner, dvcRoot: string, ...args: Args) =>
-  runner.run(dvcRoot, Command.EXPERIMENT, ExperimentSubCommands.RUN, ...args)
+const runExperiment = (cliRunner: CliRunner, dvcRoot: string, ...args: Args) =>
+  cliRunner.run(dvcRoot, Command.EXPERIMENT, ExperimentSubCommands.RUN, ...args)
 
-export const run = (runner: Runner, dvcRoot: string) =>
-  runExperiment(runner, dvcRoot)
+export const run = (cliRunner: CliRunner, dvcRoot: string) =>
+  runExperiment(cliRunner, dvcRoot)
 
-export const runReset = (runner: Runner, dvcRoot: string) =>
-  runExperiment(runner, dvcRoot, ExperimentFlag.RESET)
+export const runReset = (cliRunner: CliRunner, dvcRoot: string) =>
+  runExperiment(cliRunner, dvcRoot, ExperimentFlag.RESET)
 
-export const runQueued = (runner: Runner, dvcRoot: string) =>
-  runExperiment(runner, dvcRoot, ExperimentFlag.RUN_ALL)
+export const runQueued = (cliRunner: CliRunner, dvcRoot: string) =>
+  runExperiment(cliRunner, dvcRoot, ExperimentFlag.RUN_ALL)
 
-export const stop = (runner: Runner) => runner.stop()
+export const stop = (cliRunner: CliRunner) => cliRunner.stop()

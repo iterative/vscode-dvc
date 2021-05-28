@@ -7,7 +7,7 @@ import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 import { getEnv } from './execution'
 
-export class Runner {
+export class CliRunner {
   public readonly dispose = Disposable.fn()
 
   private static setRunningContext = (isRunning: boolean) =>
@@ -71,7 +71,7 @@ export class Runner {
   }
 
   private startProcess(cwd: string, args: Args) {
-    Runner.setRunningContext(true)
+    CliRunner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     this.currentProcess = this.createCliProcess({
@@ -134,7 +134,7 @@ export class Runner {
     this.dispose.track(
       this.onDidCompleteProcess(() => {
         this.pseudoTerminal.setBlocked(false)
-        Runner.setRunningContext(false)
+        CliRunner.setRunningContext(false)
         this.processOutput.fire(
           '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
         )
