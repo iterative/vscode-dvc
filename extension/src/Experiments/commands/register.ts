@@ -18,7 +18,7 @@ export const getExecutionOptionsThenRun = async (
   return func(options)
 }
 
-export const getExperimentListThenRun = async (
+export const getExperimentNameThenRun = async (
   experiments: Experiments,
   func: (options: ExecutionOptions, experimentName: string) => Promise<unknown>
 ) => {
@@ -48,19 +48,19 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getExperimentListThenRun(experiments, applyExperiment)
+      getExperimentNameThenRun(experiments, applyExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      getExperimentListThenRun(experiments, branchExperiment)
+      getExperimentNameThenRun(experiments, branchExperiment)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      getExperimentListThenRun(experiments, removeExperiment)
+      getExperimentNameThenRun(experiments, removeExperiment)
     )
   )
 
