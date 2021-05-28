@@ -23,6 +23,14 @@ export const registerRootUriCommand = (
     return func(rootUri)
   })
 
+export const registerResourceUriCommand_ = (
+  name: string,
+  func: (fsPath: string) => Promise<string>
+) =>
+  commands.registerCommand(name, ({ resourceUri }) => {
+    return func(resourceUri.fsPath)
+  })
+
 export const registerResourceUriCommand = (
   config: Config,
   name: string,
