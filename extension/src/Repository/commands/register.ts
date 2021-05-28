@@ -4,7 +4,6 @@ import {
   addTarget,
   checkoutTarget,
   CliExecutor,
-  commit,
   commitTarget,
   pull,
   push
@@ -29,7 +28,7 @@ export const registerRepositoryCommands = (
     registerResourceUriCommand(config, 'dvc.checkoutTarget', checkoutTarget)
   )
 
-  disposer.track(registerRootUriCommand(config, 'dvc.commit', commit))
+  disposer.track(registerRootUriCommand_('dvc.commit', cliExecutor.commit))
 
   disposer.track(
     registerResourceUriCommand(config, 'dvc.commitTarget', commitTarget)

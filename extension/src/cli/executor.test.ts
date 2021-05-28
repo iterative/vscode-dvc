@@ -8,7 +8,6 @@ import {
   addTarget,
   checkoutTarget,
   CliExecutor,
-  commit,
   experimentApply,
   init,
   pull,
@@ -58,6 +57,24 @@ describe('CliExecutor', () => {
         executable: 'dvc',
         args: ['checkout', '-f'],
         cwd: fsPath,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('commit', () => {
+    it('should call execPromise with the correct parameters to commit a repo', async () => {
+      const cwd = __dirname
+      const stdout = "Updating lock file 'dvc.lock'"
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.commit(cwd)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['commit', '-f'],
+        cwd,
         env: mockedEnv
       })
     })
@@ -149,28 +166,6 @@ describe('addTarget', () => {
       executable: 'dvc',
       args: ['add', file],
       cwd: dir,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('commit', () => {
-  it('should call execPromise with the correct parameters to commit a repo', async () => {
-    const cwd = __dirname
-    const stdout = "Updating lock file 'dvc.lock'"
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await commit({
-      cliPath: 'dvc',
-      cwd,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['commit', '-f'],
-      cwd,
       env: mockedEnv
     })
   })

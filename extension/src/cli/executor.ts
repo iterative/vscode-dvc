@@ -32,13 +32,14 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
   }
 
+  public commit(cwd: string): Promise<string> {
+    return this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
+  }
+
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
 }
-
-export const commit = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.COMMIT, Flag.FORCE)
 
 export const experimentApply = (
   options: ExecutionOptions,
