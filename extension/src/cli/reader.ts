@@ -8,10 +8,7 @@ import {
   ListFlag
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
-import { ExecutionOptions, CliExecution } from './execution'
 import { trimAndSplit } from '../util/stdout'
-
-const { readCliProcess } = CliExecution
 
 export type PathOutput = { path: string }
 
@@ -125,14 +122,3 @@ export class CliReader extends Cli {
     return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
   }
 }
-
-export const experimentListCurrent = (
-  options: ExecutionOptions
-): Promise<string[]> =>
-  readCliProcess<string[]>(
-    options,
-    trimAndSplit,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.LIST,
-    ExperimentFlag.NAMES_ONLY
-  )
