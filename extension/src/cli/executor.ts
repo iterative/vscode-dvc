@@ -1,5 +1,6 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
+import { Cli } from '.'
 import { Config } from '../Config'
 import {
   Args,
@@ -25,6 +26,12 @@ export const getExecutionOnTargetOptions = (
   cliPath: config.getCliPath(),
   pythonBinPath: config.pythonBinPath
 })
+
+export class CliExecutor extends Cli {
+  public help(cwd: string): Promise<string> {
+    return this.executeProcess(cwd, Flag.HELP)
+  }
+}
 
 export const canRunCli = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Flag.HELP)
