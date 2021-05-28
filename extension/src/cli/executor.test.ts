@@ -11,7 +11,6 @@ import {
   experimentApply,
   init,
   pull,
-  push,
   removeTarget
 } from './executor'
 
@@ -137,6 +136,25 @@ describe('CliExecutor', () => {
         env: mockedEnv
       })
     })
+
+    describe('push', () => {
+      it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+        const cwd = __dirname
+        const stdout = 'Everything is up to date.'
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.push(cwd)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['push'],
+          cwd: __dirname,
+          env: mockedEnv
+        })
+      })
+    })
   })
 })
 
@@ -247,29 +265,6 @@ describe('pull', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       executable: 'dvc',
       args: ['pull'],
-      cwd: __dirname,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('push', () => {
-  it('should call executeProcess with the correct parameters to push the entire repository', async () => {
-    const cwd = __dirname
-    const stdout = 'Everything is up to date.'
-
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await push({
-      cliPath: 'dvc',
-      cwd,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['push'],
       cwd: __dirname,
       env: mockedEnv
     })

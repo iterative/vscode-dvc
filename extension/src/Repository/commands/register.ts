@@ -5,8 +5,7 @@ import {
   checkoutTarget,
   CliExecutor,
   commitTarget,
-  pull,
-  push
+  pull
 } from '../../cli/executor'
 import {
   registerResourceUriCommand,
@@ -38,7 +37,7 @@ export const registerRepositoryCommands = (
     disposer.track(registerRootUriCommand(config, 'dvc.pull', pull))
   )
 
-  disposer.track(registerRootUriCommand(config, 'dvc.push', push))
+  disposer.track(registerRootUriCommand_('dvc.push', cliExecutor.push))
 
   return disposer
 }
