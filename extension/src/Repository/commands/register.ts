@@ -1,41 +1,43 @@
 import { Disposable } from '@hediet/std/disposable'
-import { Config } from '../../Config'
-import {
-  addTarget,
-  checkoutTarget,
-  CliExecutor,
-  commitTarget
-} from '../../cli/executor'
-import {
-  registerResourceUriCommand,
-  registerRootUriCommand
-} from '../../vscode/commands'
+import { CliExecutor } from '../../cli/executor'
+import { registerUriCommand } from '../../vscode/commands'
 
-export const registerRepositoryCommands = (
-  config: Config,
-  cliExecutor: CliExecutor
-) => {
+export const registerRepositoryCommands = (cliExecutor: CliExecutor) => {
   const disposer = Disposable.fn()
 
-  disposer.track(registerResourceUriCommand(config, 'dvc.addTarget', addTarget))
-
-  disposer.track(registerRootUriCommand('dvc.checkout', cliExecutor.checkout))
-
   disposer.track(
-    registerResourceUriCommand(config, 'dvc.checkoutTarget', checkoutTarget)
-  )
-
-  disposer.track(registerRootUriCommand('dvc.commit', cliExecutor.commit))
-
-  disposer.track(
-    registerResourceUriCommand(config, 'dvc.commitTarget', commitTarget)
+    registerUriCommand('dvc.addTarget', 'resourceUri', cliExecutor.addTarget)
   )
 
   disposer.track(
-    disposer.track(registerRootUriCommand('dvc.pull', cliExecutor.pull))
+    registerUriCommand('dvc.checkout', 'rootUri', cliExecutor.checkout)
   )
 
-  disposer.track(registerRootUriCommand('dvc.push', cliExecutor.push))
+  disposer.track(
+    registerUriCommand(
+      'dvc.checkoutTarget',
+      'resourceUri',
+      cliExecutor.checkoutTarget
+    )
+  )
+
+  disposer.track(
+    registerUriCommand('dvc.commit', 'rootUri', cliExecutor.commit)
+  )
+
+  disposer.track(
+    registerUriCommand(
+      'dvc.commitTarget',
+      'resourceUri',
+      cliExecutor.commitTarget
+    )
+  )
+
+  disposer.track(
+    disposer.track(registerUriCommand('dvc.pull', 'rootUri', cliExecutor.pull))
+  )
+
+  disposer.track(registerUriCommand('dvc.push', 'rootUri', cliExecutor.push))
 
   return disposer
 }

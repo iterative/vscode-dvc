@@ -28,11 +28,32 @@ export const getExecutionOnTargetOptions = (
 })
 
 export class CliExecutor extends Cli {
+  private async executeProcessOnTarget(
+    fsPath: string,
+    ...args: Args
+  ): Promise<string> {
+    const cwd = dirname(fsPath)
+
+    const target = basename(fsPath)
+    await ensureDir(cwd)
+
+    return this.executeProcess(cwd, ...args, target)
+  }
+
+  public addTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.ADD)
+
   public checkout = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
 
+  public checkoutTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.CHECKOUT, Flag.FORCE)
+
   public commit = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
+
+  public commitTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.COMMIT, Flag.FORCE)
 
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
@@ -123,18 +144,6 @@ const runCliProcessOnTarget = async (
 
   return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
-
-export const addTarget = (options: ExecutionOnTargetOptions): Promise<string> =>
-  runCliProcessOnTarget(options, Command.ADD)
-
-export const checkoutTarget = (
-  options: ExecutionOnTargetOptions
-): Promise<string> =>
-  runCliProcessOnTarget(options, Command.CHECKOUT, Flag.FORCE)
-
-export const commitTarget = (
-  options: ExecutionOnTargetOptions
-): Promise<string> => runCliProcessOnTarget(options, Command.COMMIT, Flag.FORCE)
 
 export const pullTarget = (
   options: ExecutionOnTargetOptions

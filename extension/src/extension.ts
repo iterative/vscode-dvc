@@ -280,9 +280,7 @@ export class Extension {
       registerExperimentRunnerCommands(this.experiments, this.cliRunner)
     )
 
-    this.dispose.track(
-      registerRepositoryCommands(this.config, this.cliExecutor)
-    )
+    this.dispose.track(registerRepositoryCommands(this.cliExecutor))
 
     this.registerConfigCommands()
   }
