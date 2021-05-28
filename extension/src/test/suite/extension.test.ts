@@ -12,7 +12,7 @@ import {
 } from 'vscode'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
-import * as CliExecutor from '../../cli/executor'
+import { CliExecutor } from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
 import complexExperimentsOutput from '../../Experiments/Webview/complex-output-example.json'
 
@@ -51,7 +51,7 @@ suite('Extension Test Suite', () => {
 
     it('should set dvc.dvcPath to blank on the first option', async () => {
       const mockShowInputBox = stub(window, 'showInputBox')
-      const mockCanRunCli = stub(CliExecutor, 'canRunCli').rejects('ERROR')
+      const mockCanRunCli = stub(CliExecutor.prototype, 'help').rejects('ERROR')
       await selectDvcPathItem(0)
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
@@ -69,7 +69,7 @@ suite('Extension Test Suite', () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         fileResolve
       )
-      const mockCanRunCli = stub(CliExecutor, 'canRunCli').resolves(
+      const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
         'I WORK NOW'
       )
 

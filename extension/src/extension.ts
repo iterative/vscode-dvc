@@ -33,8 +33,8 @@ import { DecorationProvider } from './Repository/DecorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
-import { canRunCli } from './cli/executor'
-import { CliExecution, getExecutionOptions } from './cli/execution'
+import { CliExecutor } from './cli/executor'
+import { CliExecution } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { CliRunner } from './cli/runner'
@@ -59,9 +59,10 @@ export class Extension {
   private dvcRepositories: Record<string, Repository> = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
+  private readonly cliExecutor: CliExecutor
+  private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
   private readonly outputChannel: OutputChannel
-  private readonly cliReader: CliReader
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -105,12 +106,12 @@ export class Extension {
     )
   }
 
+  private canRunCli() {
+    return this.cliExecutor.help(this.config.firstWorkspaceFolderRoot)
+  }
+
   private initializeOrNotify() {
-    const options = getExecutionOptions(
-      this.config,
-      this.config.firstWorkspaceFolderRoot
-    )
-    return canRunCli(options).then(
+    return this.canRunCli().then(
       () => {
         this.initialize()
       },
@@ -230,8 +231,9 @@ export class Extension {
 
     this.config = this.dispose.track(new Config())
 
-    this.cliRunner = this.dispose.track(new CliRunner(this.config))
+    this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
     this.cliReader = this.dispose.track(new CliReader(this.config))
+    this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
     this.experiments = this.dispose.track(
       new Experiments(this.config, this.cliReader)
@@ -240,6 +242,9 @@ export class Extension {
     this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
 
     this.dispose.track(CliExecution.onDidRun(e => this.outputChannel.append(e)))
+    this.dispose.track(
+      this.cliExecutor.onDidRun(e => this.outputChannel.append(e))
+    )
     this.dispose.track(
       this.cliReader.onDidRun(e => this.outputChannel.append(e))
     )
