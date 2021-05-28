@@ -17,6 +17,6 @@ export const registerPathCommand = (
 
 export const registerUriCommand = (
   name: string,
-  uriName: string,
+  uriName: 'rootUri' | 'resourceUri',
   func: (fsPath: string) => Promise<string>
 ) => commands.registerCommand(name, context => func(context[uriName].fsPath))
