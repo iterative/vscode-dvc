@@ -7,8 +7,7 @@ import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import {
   branchExperiment,
   garbageCollectExperiments,
-  pickExperimentName,
-  removeExperiment
+  pickExperimentName
 } from './quickPick'
 
 jest.mock('../../processExecution')
@@ -61,8 +60,6 @@ const exampleExperimentsList = [
 ]
 
 const exampleExpName = 'exp-2021'
-
-const exampleListStdout = exampleExperimentsList.join('\n') + '\n'
 
 describe('garbageCollectExperiments', () => {
   it('invokes a QuickPick with the correct options', async () => {
@@ -167,25 +164,6 @@ describe('garbageCollectExperiments', () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
     await garbageCollectExperiments(exampleExecutionOptions)
     expect(mockedExecuteProcess).not.toBeCalled()
-  })
-})
-
-describe('removeExperiment', () => {
-  it('executes a constructed command', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce(exampleListStdout)
-    mockedExecuteProcess.mockResolvedValueOnce('output from remove')
-    mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
-    await removeExperiment(exampleExecutionOptions)
-
-    expect(mockedShowInformationMessage).toBeCalledWith(
-      'Experiment exp-2021 has been removed!'
-    )
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'remove', 'exp-2021'],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
   })
 })
 

@@ -1,11 +1,7 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { applyExperiment, queueExperiment } from './report'
-import {
-  branchExperiment,
-  garbageCollectExperiments,
-  removeExperiment
-} from './quickPick'
+import { applyExperiment, queueExperiment, removeExperiment } from './report'
+import { branchExperiment, garbageCollectExperiments } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
@@ -64,7 +60,7 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      getExecutionOptionsThenRun(experiments, removeExperiment)
+      getExperimentListThenRun(experiments, removeExperiment)
     )
   )
 
