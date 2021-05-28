@@ -4,7 +4,7 @@ import {
   ExperimentFlag,
   ExperimentSubCommands
 } from '../../cli/args'
-import { CliRunner } from '../../cli/Runner'
+import { CliRunner } from '../../cli/runner'
 
 const runExperiment = (runner: CliRunner, dvcRoot: string, ...args: Args) =>
   runner.run(dvcRoot, Command.EXPERIMENT, ExperimentSubCommands.RUN, ...args)

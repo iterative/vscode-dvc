@@ -9,7 +9,7 @@ import {
 } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
-import { CliRunner } from '../../cli/Runner'
+import { CliRunner } from '../../cli/runner'
 import { ExecutionOptions } from '../../cli/execution'
 
 export const getExecutionOptionsThenRun = async (

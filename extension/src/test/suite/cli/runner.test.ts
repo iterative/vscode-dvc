@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
-import { CliRunner } from '../../../cli/Runner'
+import { CliRunner } from '../../../cli/runner'
 import * as ProcessExecution from '../../../processExecution'
 import { Command } from '../../../cli/args'
 

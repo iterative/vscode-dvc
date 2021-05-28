@@ -37,7 +37,7 @@ import { canRunCli } from './cli/executor'
 import { CliExecution, getExecutionOptions } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
-import { CliRunner } from './cli/Runner'
+import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 
 export { Disposable, Disposer }
