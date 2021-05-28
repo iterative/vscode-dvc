@@ -120,6 +120,26 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('commitTarget', () => {
+    it('should call execPromise with the correct parameters to commit a target', async () => {
+      const fsPath = __filename
+      const dir = resolve(fsPath, '..')
+      const file = basename(__filename)
+      const stdout = "Updating lock file 'dvc.lock'"
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.commitTarget(fsPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['commit', '-f', file],
+        cwd: dir,
+        env: mockedEnv
+      })
+    })
+  })
+
   describe('help', () => {
     it('should call execute process with the correct parameters', async () => {
       const cwd = __dirname

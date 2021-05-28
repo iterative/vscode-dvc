@@ -56,6 +56,10 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
   }
 
+  public commitTarget(fsPath: string): Promise<string> {
+    return this.executeProcessOnTarget(fsPath, Command.COMMIT, Flag.FORCE)
+  }
+
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
@@ -147,10 +151,6 @@ const runCliProcessOnTarget = async (
 
   return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
-
-export const commitTarget = (
-  options: ExecutionOnTargetOptions
-): Promise<string> => runCliProcessOnTarget(options, Command.COMMIT, Flag.FORCE)
 
 export const pullTarget = (
   options: ExecutionOnTargetOptions

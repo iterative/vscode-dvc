@@ -23,20 +23,10 @@ export const registerRootUriCommand = (
     return func(rootUri.fsPath)
   })
 
-export const registerResourceUriCommand_ = (
+export const registerResourceUriCommand = (
   name: string,
   func: (fsPath: string) => Promise<string>
 ) =>
   commands.registerCommand(name, ({ resourceUri }) => {
     return func(resourceUri.fsPath)
-  })
-
-export const registerResourceUriCommand = (
-  config: Config,
-  name: string,
-  func: (options: ExecutionOnTargetOptions) => Promise<string>
-) =>
-  commands.registerCommand(name, ({ resourceUri }) => {
-    const options = getExecutionOnTargetOptions(config, resourceUri.fsPath)
-    return func(options)
   })
