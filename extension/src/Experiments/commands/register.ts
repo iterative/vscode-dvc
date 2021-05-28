@@ -9,7 +9,7 @@ import {
 } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
-import { Runner } from '../../cli/Runner'
+import { CliRunner } from '../../cli/Runner'
 import { ExecutionOptions } from '../../cli/execution'
 
 export const getExecutionOptionsThenRun = async (
@@ -67,8 +67,8 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 
 export const showExperimentsTableThenRun = async (
   experiments: Experiments,
-  runner: Runner,
-  func: (runner: Runner, dvcRoot: string) => Promise<void>
+  runner: CliRunner,
+  func: (runner: CliRunner, dvcRoot: string) => Promise<void>
 ) => {
   const experimentsTable = await experiments.getExperimentsTableForCommand()
   if (!experimentsTable) {
@@ -87,7 +87,7 @@ export const showExperimentsTableThenRun = async (
 
 export const registerExperimentRunnerCommands = (
   experiments: Experiments,
-  runner: Runner
+  runner: CliRunner
 ): Disposable => {
   const disposer = Disposable.fn()
 

@@ -5,7 +5,7 @@ import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../Config'
-import { Runner } from '../../../cli/Runner'
+import { CliRunner } from '../../../cli/Runner'
 import * as ProcessExecution from '../../../processExecution'
 import { Command } from '../../../cli/args'
 
@@ -27,7 +27,7 @@ suite('Runner Test Suite', () => {
 
   describe('Runner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const runner = disposable.track(new Runner({} as Config, 'sleep'))
+      const runner = disposable.track(new CliRunner({} as Config, 'sleep'))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
@@ -39,7 +39,7 @@ suite('Runner Test Suite', () => {
     }).timeout(6000)
 
     it('should be able to stop a started command', async () => {
-      const runner = disposable.track(new Runner({} as Config, 'sleep'))
+      const runner = disposable.track(new CliRunner({} as Config, 'sleep'))
       const cwd = __dirname
 
       const executeCommandSpy = spy(commands, 'executeCommand')
@@ -117,7 +117,7 @@ suite('Runner Test Suite', () => {
       const cwd = __dirname
 
       const runner = disposable.track(
-        new Runner({} as Config, 'echo', {
+        new CliRunner({} as Config, 'echo', {
           processCompleted: processCompleted,
           processOutput: processOutput,
           processStarted: processStarted
@@ -139,7 +139,7 @@ suite('Runner Test Suite', () => {
       const cwd = __dirname
 
       const runner = disposable.track(
-        new Runner(({ getCliPath: () => undefined } as unknown) as Config)
+        new CliRunner(({ getCliPath: () => undefined } as unknown) as Config)
       )
 
       await runner.run(cwd, Command.ADD)
