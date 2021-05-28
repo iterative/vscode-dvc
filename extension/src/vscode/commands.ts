@@ -1,5 +1,4 @@
 import { commands } from 'vscode'
-import { ExecutionOptions, getExecutionOptions } from '../cli/execution'
 import {
   ExecutionOnTargetOptions,
   getExecutionOnTargetOptions
@@ -17,13 +16,11 @@ export const registerPathCommand = (
   })
 
 export const registerRootUriCommand = (
-  config: Config,
   name: string,
-  func: (options: ExecutionOptions) => Promise<string>
+  func: (cwd: string) => Promise<string>
 ) =>
   commands.registerCommand(name, ({ rootUri }) => {
-    const options = getExecutionOptions(config, rootUri.fsPath)
-    return func(options)
+    return func(rootUri.fsPath)
   })
 
 export const registerResourceUriCommand = (

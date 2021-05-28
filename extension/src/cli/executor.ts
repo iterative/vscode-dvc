@@ -28,16 +28,22 @@ export const getExecutionOnTargetOptions = (
 })
 
 export class CliExecutor extends Cli {
+  public checkout = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
+
+  public commit = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
+
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
+
+  public pull = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PULL)
+
+  public push = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PUSH)
 }
-
-export const checkout = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.CHECKOUT, Flag.FORCE)
-
-export const commit = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.COMMIT, Flag.FORCE)
 
 export const experimentApply = (
   options: ExecutionOptions,
@@ -99,12 +105,6 @@ export const experimentRunQueue = (
     ExperimentSubCommands.RUN,
     ExperimentFlag.QUEUE
   )
-
-export const pull = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.PULL)
-
-export const push = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.PUSH)
 
 export type ExecutionOnTargetOptions = BaseExecutionOptions & {
   fsPath: string
