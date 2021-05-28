@@ -67,7 +67,7 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 
 export const showExperimentsTableThenRun = async (
   experiments: Experiments,
-  runner: CliRunner,
+  cliRunner: CliRunner,
   func: (runner: CliRunner, dvcRoot: string) => Promise<void>
 ) => {
   const experimentsTable = await experiments.getExperimentsTableForCommand()
@@ -75,9 +75,9 @@ export const showExperimentsTableThenRun = async (
     return
   }
 
-  func(runner, experimentsTable.getDvcRoot())
+  func(cliRunner, experimentsTable.getDvcRoot())
   const listener = experiments.dispose.track(
-    runner.onDidCompleteProcess(() => {
+    cliRunner.onDidCompleteProcess(() => {
       experimentsTable.refresh()
       experiments.dispose.untrack(listener)
       listener.dispose()
@@ -87,30 +87,30 @@ export const showExperimentsTableThenRun = async (
 
 export const registerExperimentRunnerCommands = (
   experiments: Experiments,
-  runner: CliRunner
+  cliRunner: CliRunner
 ): Disposable => {
   const disposer = Disposable.fn()
 
   disposer.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      showExperimentsTableThenRun(experiments, runner, run)
+      showExperimentsTableThenRun(experiments, cliRunner, run)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      showExperimentsTableThenRun(experiments, runner, runReset)
+      showExperimentsTableThenRun(experiments, cliRunner, runReset)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      showExperimentsTableThenRun(experiments, runner, runQueued)
+      showExperimentsTableThenRun(experiments, cliRunner, runQueued)
     )
   )
 
   disposer.track(
-    commands.registerCommand('dvc.stopRunningExperiment', () => stop(runner))
+    commands.registerCommand('dvc.stopRunningExperiment', () => stop(cliRunner))
   )
 
   return disposer

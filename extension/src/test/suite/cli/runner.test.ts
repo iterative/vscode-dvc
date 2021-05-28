@@ -13,7 +13,7 @@ chai.use(sinonChai)
 const { expect } = chai
 
 suite('Runner Test Suite', () => {
-  window.showInformationMessage('Start all runner tests.')
+  window.showInformationMessage('Start all cli runner tests.')
 
   const disposable = Disposable.fn()
 
@@ -25,47 +25,47 @@ suite('Runner Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('Runner', () => {
+  describe('CliRunner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const runner = disposable.track(new CliRunner({} as Config, 'sleep'))
+      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
 
-      await runner.run(cwd, '3')
-      await runner.run(cwd, '1000')
+      await cliRunner.run(cwd, '3')
+      await cliRunner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
     }).timeout(6000)
 
     it('should be able to stop a started command', async () => {
-      const runner = disposable.track(new CliRunner({} as Config, 'sleep'))
+      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
       const cwd = __dirname
 
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       const onDidCompleteProcess = (): Promise<void> =>
         new Promise(resolve =>
-          disposable.track(runner.onDidCompleteProcess(() => resolve()))
+          disposable.track(cliRunner.onDidCompleteProcess(() => resolve()))
         )
 
-      await runner.run(cwd, '100000000000000000000000')
+      await cliRunner.run(cwd, '100000000000000000000000')
 
       const completed = onDidCompleteProcess()
 
-      expect(runner.isRunning()).to.be.true
+      expect(cliRunner.isRunning()).to.be.true
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.runner.running',
         true
       )
 
-      const stopped = await runner.stop()
+      const stopped = await cliRunner.stop()
       expect(stopped).to.be.true
 
       await completed
 
-      expect(runner.isRunning()).to.be.false
+      expect(cliRunner.isRunning()).to.be.false
       expect(executeCommandSpy).to.be.calledWith(
         'setContext',
         'dvc.runner.running',
@@ -116,7 +116,7 @@ suite('Runner Test Suite', () => {
 
       const cwd = __dirname
 
-      const runner = disposable.track(
+      const cliRunner = disposable.track(
         new CliRunner({} as Config, 'echo', {
           processCompleted: processCompleted,
           processOutput: processOutput,
@@ -124,7 +124,7 @@ suite('Runner Test Suite', () => {
         })
       )
 
-      runner.run(cwd, text)
+      cliRunner.run(cwd, text)
 
       await started
       expect((await eventStream).includes(text)).to.be.true
@@ -138,11 +138,11 @@ suite('Runner Test Suite', () => {
       ).returns(({ on: spy() } as unknown) as ProcessExecution.Process)
       const cwd = __dirname
 
-      const runner = disposable.track(
+      const cliRunner = disposable.track(
         new CliRunner(({ getCliPath: () => undefined } as unknown) as Config)
       )
 
-      await runner.run(cwd, Command.ADD)
+      await cliRunner.run(cwd, Command.ADD)
       expect(mockCreateProcess).to.have.been.calledOnce
       expect(mockCreateProcess).to.have.been.calledWith({
         executable: 'dvc',
