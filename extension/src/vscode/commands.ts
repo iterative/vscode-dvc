@@ -15,18 +15,11 @@ export const registerPathCommand = (
     return func(options)
   })
 
-export const registerRootUriCommand = (
+export const registerUriCommand = (
   name: string,
-  func: (cwd: string) => Promise<string>
-) =>
-  commands.registerCommand(name, ({ rootUri }) => {
-    return func(rootUri.fsPath)
-  })
-
-export const registerResourceUriCommand = (
-  name: string,
+  uriName: string,
   func: (fsPath: string) => Promise<string>
 ) =>
-  commands.registerCommand(name, ({ resourceUri }) => {
-    return func(resourceUri.fsPath)
+  commands.registerCommand(name, context => {
+    return func(context[uriName].fsPath)
   })
