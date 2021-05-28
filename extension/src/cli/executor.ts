@@ -37,9 +37,6 @@ export class CliExecutor extends Cli {
   }
 }
 
-export const checkout = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.CHECKOUT, Flag.FORCE)
-
 export const commit = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.COMMIT, Flag.FORCE)
 

@@ -6,7 +6,6 @@ import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
 import {
   addTarget,
-  checkout,
   checkoutTarget,
   CliExecutor,
   commit,
@@ -150,28 +149,6 @@ describe('addTarget', () => {
       executable: 'dvc',
       args: ['add', file],
       cwd: dir,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('checkout', () => {
-  it('should call executeProcess with the correct parameters to checkout a repo', async () => {
-    const fsPath = __dirname
-    const stdout = `M       model.pt\nM       logs/\n`
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await checkout({
-      cliPath: 'dvc',
-      cwd: fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['checkout', '-f'],
-      cwd: fsPath,
       env: mockedEnv
     })
   })
