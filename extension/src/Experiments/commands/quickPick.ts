@@ -5,6 +5,24 @@ import { experimentBranch, experimentGarbageCollect } from '../../cli/executor'
 import { quickPickManyValues } from '../../vscode/quickPick'
 import { reportErrorMessage } from '../../vscode/reporting'
 
+export const branchExperiment = async (
+  options: ExecutionOptions,
+  selectedExperimentName: string
+) => {
+  const branchName = await window.showInputBox({
+    prompt: 'Name the new branch'
+  })
+  if (branchName) {
+    try {
+      window.showInformationMessage(
+        await experimentBranch(options, selectedExperimentName, branchName)
+      )
+    } catch (e) {
+      reportErrorMessage(e)
+    }
+  }
+}
+
 export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
     [
@@ -49,23 +67,5 @@ export const pickExperimentName = (
     window.showErrorMessage('There are no experiments to select!')
   } else {
     return window.showQuickPick(experimentNames)
-  }
-}
-
-export const branchExperiment = async (
-  options: ExecutionOptions,
-  selectedExperimentName: string
-) => {
-  const branchName = await window.showInputBox({
-    prompt: 'Name the new branch'
-  })
-  if (branchName) {
-    try {
-      window.showInformationMessage(
-        await experimentBranch(options, selectedExperimentName, branchName)
-      )
-    } catch (e) {
-      reportErrorMessage(e)
-    }
   }
 }
