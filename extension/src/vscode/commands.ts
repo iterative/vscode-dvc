@@ -20,7 +20,7 @@ export const registerRootUriCommand = (
   func: (cwd: string) => Promise<string>
 ) =>
   commands.registerCommand(name, ({ rootUri }) => {
-    return func(rootUri)
+    return func(rootUri.fsPath)
   })
 
 export const registerResourceUriCommand_ = (
