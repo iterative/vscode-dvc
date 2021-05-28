@@ -68,7 +68,7 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 export const showExperimentsTableThenRun = async (
   experiments: Experiments,
   cliRunner: CliRunner,
-  func: (runner: CliRunner, dvcRoot: string) => Promise<void>
+  func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
 ) => {
   const experimentsTable = await experiments.getExperimentsTableForCommand()
   if (!experimentsTable) {
