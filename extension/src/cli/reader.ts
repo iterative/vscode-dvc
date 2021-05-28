@@ -73,6 +73,16 @@ export class CliReader extends Cli {
     )
   }
 
+  public experimentListCurrent(cwd: string): Promise<string[]> {
+    return this.readProcess<string[]>(
+      cwd,
+      trimAndSplit,
+      Command.EXPERIMENT,
+      ExperimentSubCommands.LIST,
+      ExperimentFlag.NAMES_ONLY
+    )
+  }
+
   public experimentShow(cwd: string): Promise<ExperimentsRepoJSONOutput> {
     return this.readProcessJson<ExperimentsRepoJSONOutput>(
       cwd,
