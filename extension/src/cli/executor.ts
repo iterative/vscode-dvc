@@ -33,9 +33,6 @@ export class CliExecutor extends Cli {
   }
 }
 
-export const canRunCli = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Flag.HELP)
-
 export const checkout = (options: ExecutionOptions): Promise<string> =>
   executeCliProcess(options, Command.CHECKOUT, Flag.FORCE)
 
