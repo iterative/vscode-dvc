@@ -9,7 +9,7 @@ import { CliProcessError } from '../vscode/reporting'
 export class Cli {
   public dispose = Disposable.fn()
 
-  private config: Config
+  protected config: Config
 
   private ran: EventEmitter<string>
   public onDidRun: Event<string>

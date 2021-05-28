@@ -40,37 +40,30 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, ...args, target)
   }
 
-  public addTarget(fsPath: string): Promise<string> {
-    return this.executeProcessOnTarget(fsPath, Command.ADD)
-  }
+  public addTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.ADD)
 
-  public checkout(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
-  }
+  public checkout = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
 
-  public checkoutTarget(fsPath: string): Promise<string> {
-    return this.executeProcessOnTarget(fsPath, Command.CHECKOUT, Flag.FORCE)
-  }
+  public checkoutTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.CHECKOUT, Flag.FORCE)
 
-  public commit(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
-  }
+  public commit = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
 
-  public commitTarget(fsPath: string): Promise<string> {
-    return this.executeProcessOnTarget(fsPath, Command.COMMIT, Flag.FORCE)
-  }
+  public commitTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.COMMIT, Flag.FORCE)
 
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
 
-  public pull(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.PULL)
-  }
+  public pull = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PULL)
 
-  public push(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Command.PUSH)
-  }
+  public push = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PUSH)
 }
 
 export const experimentApply = (
