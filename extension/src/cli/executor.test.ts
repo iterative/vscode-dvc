@@ -46,6 +46,24 @@ describe('CliExecutor', () => {
     } as unknown) as EventEmitter<string>
   )
 
+  describe('checkout', () => {
+    it('should call executeProcess with the correct parameters to checkout a repo', async () => {
+      const fsPath = __dirname
+      const stdout = `M       model.pt\nM       logs/\n`
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.checkout(fsPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['checkout', '-f'],
+        cwd: fsPath,
+        env: mockedEnv
+      })
+    })
+  })
+
   describe('help', () => {
     it('should call execute process with the correct parameters', async () => {
       const cwd = __dirname

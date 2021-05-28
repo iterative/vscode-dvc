@@ -28,6 +28,10 @@ export const getExecutionOnTargetOptions = (
 })
 
 export class CliExecutor extends Cli {
+  public checkout(cwd: string): Promise<string> {
+    return this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
+  }
+
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
