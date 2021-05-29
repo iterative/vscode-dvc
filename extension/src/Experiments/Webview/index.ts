@@ -11,9 +11,9 @@ import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
 import { Config } from '../../Config'
+import { ExperimentsRepoJSONOutput } from '../contract'
 import {
   WebviewType as Experiments,
-  ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
