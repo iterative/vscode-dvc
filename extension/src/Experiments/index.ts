@@ -13,6 +13,7 @@ import { ResourceLocator } from '../ResourceLocator'
 import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
+import { buildColumns, SerializedColumn } from './build-columns'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -35,8 +36,14 @@ export class ExperimentsTable {
   private data?: ExperimentsRepoJSONOutput
   private lastDataHash = ''
 
+  private columns?: SerializedColumn[]
+
   public getDvcRoot() {
     return this.dvcRoot
+  }
+
+  public getColumns() {
+    return this.columns
   }
 
   private async performUpdate(): Promise<void> {
@@ -54,6 +61,9 @@ export class ExperimentsTable {
       }
       this.lastDataHash = dataHash
       this.data = tableData
+
+      this.columns = buildColumns(tableData)
+
       this.sendData()
     } catch (e) {
       Logger.error(e)
