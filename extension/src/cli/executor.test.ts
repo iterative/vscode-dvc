@@ -217,6 +217,27 @@ describe('CliExecutor', () => {
       })
     })
 
+    describe('pullTarget', () => {
+      it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+        const fsPath = __filename
+        const dir = resolve(fsPath, '..')
+        const file = basename(__filename)
+        const stdout = 'Everything is up to date.'
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.pullTarget(fsPath)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['pull', file],
+          cwd: dir,
+          env: mockedEnv
+        })
+      })
+    })
+
     describe('push', () => {
       it('should call executeProcess with the correct parameters to push the entire repository', async () => {
         const cwd = __dirname

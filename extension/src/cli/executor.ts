@@ -62,6 +62,9 @@ export class CliExecutor extends Cli {
   public pull = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PULL)
 
+  public pullTarget = (cwd: string): Promise<string> =>
+    this.executeProcessOnTarget(cwd, Command.PULL)
+
   public push = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PUSH)
 }
