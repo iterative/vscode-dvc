@@ -14,12 +14,7 @@ import { Config } from '../../Config'
 import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import {
-  CliExecutor,
-  getExecutionOnTargetOptions,
-  init,
-  removeTarget
-} from '../../cli/executor'
+import { CliExecutor, init } from '../../cli/executor'
 import { registerPathCommand } from '../../vscode/commands'
 import { getExecutionOptions } from '../../cli/execution'
 import { CliReader } from '../../cli/reader'
@@ -179,11 +174,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.removeTarget', path => {
         deleteTarget(path)
-        const options = getExecutionOnTargetOptions(
-          this.config,
-          this.getDataPlaceholder(path)
-        )
-        return removeTarget(options)
+        return this.cliExecutor.removeTarget(path)
       })
     )
 

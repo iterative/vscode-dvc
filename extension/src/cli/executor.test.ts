@@ -4,7 +4,7 @@ import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
-import { CliExecutor, experimentApply, init, removeTarget } from './executor'
+import { CliExecutor, experimentApply, init } from './executor'
 
 jest.mock('vscode')
 jest.mock('fs-extra')
@@ -277,6 +277,27 @@ describe('CliExecutor', () => {
         })
       })
     })
+
+    describe('removeTarget', () => {
+      it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+        const file = 'data.dvc'
+        const fsPath = join(__dirname, 'data.dvc')
+
+        const stdout = ''
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.removeTarget(fsPath)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['remove', file],
+          cwd: __dirname,
+          env: mockedEnv
+        })
+      })
+    })
   })
 })
 
@@ -334,31 +355,6 @@ describe('init', () => {
       executable: 'dvc',
       args: ['init', '--subdir'],
       cwd: fsPath,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('removeTarget', () => {
-  it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
-    const file = 'data.dvc'
-    const fsPath = join(__dirname, 'data.dvc')
-
-    const stdout = ''
-
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await removeTarget({
-      cliPath: 'dvc',
-      fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['remove', file],
-      cwd: __dirname,
       env: mockedEnv
     })
   })

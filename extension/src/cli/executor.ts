@@ -1,7 +1,6 @@
 import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
 import { Cli } from '.'
-import { Config } from '../Config'
 import {
   Args,
   Command,
@@ -10,22 +9,9 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
-import {
-  BaseExecutionOptions,
-  ExecutionOptions,
-  CliExecution
-} from './execution'
+import { ExecutionOptions, CliExecution } from './execution'
 
 const { executeCliProcess } = CliExecution
-
-export const getExecutionOnTargetOptions = (
-  config: Config,
-  path: string
-): ExecutionOnTargetOptions => ({
-  fsPath: path,
-  cliPath: config.getCliPath(),
-  pythonBinPath: config.pythonBinPath
-})
 
 export class CliExecutor extends Cli {
   private async executeProcessOnTarget(
@@ -70,6 +56,9 @@ export class CliExecutor extends Cli {
 
   public pushTarget = (fsPath: string): Promise<string> =>
     this.executeProcessOnTarget(fsPath, Command.PUSH)
+
+  public removeTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.REMOVE)
 }
 
 export const experimentApply = (
@@ -132,25 +121,3 @@ export const experimentRunQueue = (
     ExperimentSubCommands.RUN,
     ExperimentFlag.QUEUE
   )
-
-export type ExecutionOnTargetOptions = BaseExecutionOptions & {
-  fsPath: string
-}
-
-const runCliProcessOnTarget = async (
-  options: ExecutionOnTargetOptions,
-  ...args: Args
-): Promise<string> => {
-  const { fsPath, cliPath, pythonBinPath } = options
-
-  const cwd = dirname(fsPath)
-
-  const target = basename(fsPath)
-  await ensureDir(cwd)
-
-  return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
-}
-
-export const removeTarget = (
-  options: ExecutionOnTargetOptions
-): Promise<string> => runCliProcessOnTarget(options, Command.REMOVE)
