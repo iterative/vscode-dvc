@@ -15,13 +15,16 @@ import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import {
+  CliExecutor,
   getExecutionOnTargetOptions,
   init,
-  pullTarget,
   pushTarget,
   removeTarget
 } from '../../cli/executor'
-import { registerPathCommand } from '../../vscode/commands'
+import {
+  registerPathCommand,
+  registerPathCommand_
+} from '../../vscode/commands'
 import { getExecutionOptions } from '../../cli/execution'
 import { CliReader } from '../../cli/reader'
 
@@ -29,6 +32,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   private readonly cliReader: CliReader
+  private readonly cliExecutor: CliExecutor
   private readonly treeDataChanged: EventEmitter<string | void>
   public readonly onDidChangeTreeData: Event<string | void>
 
@@ -188,7 +192,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      registerPathCommand(this.config, 'dvc.pullTarget', pullTarget)
+      registerPathCommand_('dvc.pullTarget', this.cliExecutor.pullTarget)
     )
 
     this.dispose.track(
@@ -199,11 +203,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   constructor(
     config: Config,
     cliReader: CliReader,
+    cliExecutor: CliExecutor,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
     this.cliReader = cliReader
+    this.cliExecutor = cliExecutor
 
     this.registerCommands(workspaceChanged)
 

@@ -5,6 +5,14 @@ import {
 } from '../cli/executor'
 import { Config } from '../Config'
 
+export const registerPathCommand_ = (
+  name: string,
+  func: (cwd: string) => Promise<string>
+) =>
+  commands.registerCommand(name, path => {
+    return func(path)
+  })
+
 export const registerPathCommand = (
   config: Config,
   name: string,

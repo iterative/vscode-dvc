@@ -253,6 +253,7 @@ export class Extension {
       new TrackedExplorerTree(
         this.config,
         this.cliReader,
+        this.cliExecutor,
         this.workspaceChanged
       )
     )
