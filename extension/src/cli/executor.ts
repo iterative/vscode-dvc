@@ -41,6 +41,17 @@ export class CliExecutor extends Cli {
   public commitTarget = (fsPath: string): Promise<string> =>
     this.executeProcessOnTarget(fsPath, Command.COMMIT, Flag.FORCE)
 
+  public experimentApply = (
+    cwd: string,
+    experimentName: string
+  ): Promise<string> =>
+    this.executeProcess(
+      cwd,
+      Command.EXPERIMENT,
+      ExperimentSubCommands.APPLY,
+      experimentName
+    )
+
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }

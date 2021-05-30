@@ -1,11 +1,12 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { applyExperiment, queueExperiment, removeExperiment } from './report'
+import { queueExperiment, removeExperiment, report } from './report'
 import { branchExperiment, garbageCollectExperiments } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { ExecutionOptions } from '../../cli/execution'
+import { CliExecutor } from '../../cli/executor'
 
 export const getExecutionOptionsThenRun = async (
   experiments: Experiments,
@@ -31,7 +32,24 @@ export const getExperimentNameThenRun = async (
   return func(options, name)
 }
 
-export const registerExperimentCommands = (experiments: Experiments) => {
+export const getExperimentNameThenRun_ = async (
+  experiments: Experiments,
+  func: (cwd: string, experimentName: string) => Promise<string>
+) => {
+  const obj = await experiments.getExperimentName()
+  const options = obj?.options
+  const cwd = options?.cwd
+  const name = await obj?.name
+  if (!(name && cwd)) {
+    return
+  }
+  return report(func, cwd, name)
+}
+
+export const registerExperimentCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+) => {
   const disposer = Disposable.fn()
 
   disposer.track(
@@ -48,7 +66,7 @@ export const registerExperimentCommands = (experiments: Experiments) => {
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getExperimentNameThenRun(experiments, applyExperiment)
+      getExperimentNameThenRun_(experiments, cliExecutor.experimentApply)
     )
   )
 

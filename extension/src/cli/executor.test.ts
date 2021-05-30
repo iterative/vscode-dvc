@@ -4,7 +4,7 @@ import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
-import { CliExecutor, experimentApply } from './executor'
+import { CliExecutor } from './executor'
 
 jest.mock('vscode')
 jest.mock('fs-extra')
@@ -135,6 +135,21 @@ describe('CliExecutor', () => {
         executable: 'dvc',
         args: ['commit', '-f', file],
         cwd: dir,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentApply', () => {
+    it('builds the correct command and returns stdout', async () => {
+      const cwd = ''
+      const stdout = 'Test output that will be passed along'
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      expect(await cliExecutor.experimentApply(cwd, 'exp-test')).toEqual(stdout)
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'apply', 'exp-test'],
+        cwd,
         env: mockedEnv
       })
     })
@@ -332,26 +347,6 @@ describe('CliExecutor', () => {
           env: mockedEnv
         })
       })
-    })
-  })
-})
-
-describe('experimentApply', () => {
-  it('builds the correct command and returns stdout', async () => {
-    const cwd = ''
-    const stdout = 'Test output that will be passed along'
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-    expect(
-      await experimentApply(
-        { cwd, cliPath: 'dvc', pythonBinPath: undefined },
-        'exp-test'
-      )
-    ).toEqual(stdout)
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'apply', 'exp-test'],
-      cwd,
-      env: mockedEnv
     })
   })
 })

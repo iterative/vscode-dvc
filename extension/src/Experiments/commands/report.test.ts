@@ -1,4 +1,4 @@
-import { applyExperiment, queueExperiment, removeExperiment } from './report'
+import { queueExperiment, removeExperiment, report } from './report'
 import { mocked } from 'ts-jest/utils'
 import { executeProcess } from '../../processExecution'
 import { getProcessEnv } from '../../env'
@@ -32,25 +32,27 @@ const exampleExecutionOptions = {
   pythonBinPath: undefined
 }
 
-describe('applyExperiment', () => {
-  it('invokes a quick pick with a list of names from stdout and executes a constructed command', async () => {
-    await applyExperiment(exampleExecutionOptions, exampleExpName)
+describe('report', () => {
+  it('reports the output of the given command', async () => {
+    const mockedExperimentApply = jest.fn()
+    const mockedStdOut = 'I applied your experiment boss'
+    mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
 
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'apply', exampleExpName],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
+    await report(mockedExperimentApply, defaultPath, exampleExpName)
+
+    expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
 
     expect(mockedShowInformationMessage).toBeCalledTimes(1)
+    expect(mockedShowInformationMessage).toBeCalledWith(mockedStdOut)
   })
 
   it('reports the error when execute process throws with stderr', async () => {
-    mockedExecuteProcess.mockRejectedValueOnce({
+    const mockedExperimentApply = jest.fn()
+    mockedExperimentApply.mockRejectedValueOnce({
       stderr: 'something went very wrong'
     })
-    await applyExperiment(exampleExecutionOptions, exampleExpName)
+
+    await report(mockedExperimentApply, defaultPath, exampleExpName)
 
     expect(mockedShowErrorMessage).toBeCalledTimes(1)
   })

@@ -276,7 +276,9 @@ export class Extension {
     )
     this.dispose.track(this.webviewSerializer)
 
-    this.dispose.track(registerExperimentCommands(this.experiments))
+    this.dispose.track(
+      registerExperimentCommands(this.experiments, this.cliExecutor)
+    )
     this.dispose.track(
       registerExperimentRunnerCommands(this.experiments, this.cliRunner)
     )

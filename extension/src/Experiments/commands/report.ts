@@ -1,20 +1,15 @@
 import { window } from 'vscode'
-import {
-  experimentApply,
-  experimentRemove,
-  experimentRunQueue
-} from '../../cli/executor'
+import { experimentRemove, experimentRunQueue } from '../../cli/executor'
 import { ExecutionOptions } from '../../cli/execution'
 import { reportErrorMessage } from '../../vscode/reporting'
 
-export const applyExperiment = async (
-  options: ExecutionOptions,
+export const report = async (
+  func: (cwd: string, selectedExperimentName: string) => Promise<string>,
+  cwd: string,
   selectedExperimentName: string
 ) => {
   try {
-    window.showInformationMessage(
-      await experimentApply(options, selectedExperimentName)
-    )
+    window.showInformationMessage(await func(cwd, selectedExperimentName))
   } catch (e) {
     reportErrorMessage(e)
   }
