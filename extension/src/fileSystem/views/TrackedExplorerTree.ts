@@ -14,9 +14,8 @@ import { Config } from '../../Config'
 import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { CliExecutor, init } from '../../cli/executor'
+import { CliExecutor } from '../../cli/executor'
 import { registerPathCommand } from '../../vscode/commands'
-import { getExecutionOptions } from '../../cli/execution'
 import { CliReader } from '../../cli/reader'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
@@ -150,11 +149,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
-        const options = getExecutionOptions(
-          this.config,
-          this.config.firstWorkspaceFolderRoot
-        )
-        await init(options)
+        await this.cliExecutor.init(this.config.firstWorkspaceFolderRoot)
 
         workspaceChanged.fire()
       })

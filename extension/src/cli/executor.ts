@@ -45,6 +45,9 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Flag.HELP)
   }
 
+  public init = (cwd: string): Promise<string> =>
+    this.executeProcess(cwd, Command.INITIALIZE, Flag.SUBDIRECTORY)
+
   public pull = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PULL)
 
@@ -108,9 +111,6 @@ export const experimentRemove = (
     ExperimentSubCommands.REMOVE,
     experiment
   )
-
-export const init = (options: ExecutionOptions): Promise<string> =>
-  executeCliProcess(options, Command.INITIALIZE, Flag.SUBDIRECTORY)
 
 export const experimentRunQueue = (
   options: ExecutionOptions
