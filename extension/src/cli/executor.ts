@@ -62,11 +62,14 @@ export class CliExecutor extends Cli {
   public pull = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PULL)
 
-  public pullTarget = (cwd: string): Promise<string> =>
-    this.executeProcessOnTarget(cwd, Command.PULL)
+  public pullTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.PULL)
 
   public push = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PUSH)
+
+  public pushTarget = (fsPath: string): Promise<string> =>
+    this.executeProcessOnTarget(fsPath, Command.PUSH)
 }
 
 export const experimentApply = (
@@ -147,10 +150,6 @@ const runCliProcessOnTarget = async (
 
   return executeCliProcess({ cwd, cliPath, pythonBinPath }, ...args, target)
 }
-
-export const pushTarget = (
-  options: ExecutionOnTargetOptions
-): Promise<string> => runCliProcessOnTarget(options, Command.PUSH)
 
 export const removeTarget = (
   options: ExecutionOnTargetOptions

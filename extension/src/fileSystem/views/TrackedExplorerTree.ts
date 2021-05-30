@@ -18,13 +18,9 @@ import {
   CliExecutor,
   getExecutionOnTargetOptions,
   init,
-  pushTarget,
   removeTarget
 } from '../../cli/executor'
-import {
-  registerPathCommand,
-  registerPathCommand_
-} from '../../vscode/commands'
+import { registerPathCommand } from '../../vscode/commands'
 import { getExecutionOptions } from '../../cli/execution'
 import { CliReader } from '../../cli/reader'
 
@@ -192,11 +188,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      registerPathCommand_('dvc.pullTarget', this.cliExecutor.pullTarget)
+      registerPathCommand('dvc.pullTarget', this.cliExecutor.pullTarget)
     )
 
     this.dispose.track(
-      registerPathCommand(this.config, 'dvc.pushTarget', pushTarget)
+      registerPathCommand('dvc.pushTarget', this.cliExecutor.pushTarget)
     )
   }
 
