@@ -1,7 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
-import { getGarbageCollectionFlags, pickExperimentName } from './quickPick'
+import { pickGarbageCollectionFlags, pickExperimentName } from './quickPick'
 
 jest.mock('vscode')
 
@@ -35,9 +35,28 @@ const mockedExpList = [
 
 const mockedExpName = 'exp-2021'
 
-describe('getGarbageCollectionFlags', () => {
+describe('pickExperimentName', () => {
+  it('should return the name of the chosen experiment if one is selected by the user', async () => {
+    mockedShowQuickPick.mockResolvedValueOnce(mockedExpName)
+    const name = await pickExperimentName(Promise.resolve(mockedExpList))
+    expect(name).toEqual(mockedExpName)
+  })
+
+  it('should return undefined if the user cancels the popup dialog', async () => {
+    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    const undef = await pickExperimentName(Promise.resolve(mockedExpList))
+    expect(undef).toBeUndefined()
+  })
+
+  it('should call showErrorMessage when no experiment names are provided', async () => {
+    await pickExperimentName(Promise.resolve([]))
+    expect(mockedShowErrorMessage).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('pickGarbageCollectionFlags', () => {
   it('invokes a QuickPick with the correct options', async () => {
-    await getGarbageCollectionFlags()
+    await pickGarbageCollectionFlags()
     expect(mockedShowQuickPick).toBeCalledWith(
       [
         {
@@ -66,24 +85,5 @@ describe('getGarbageCollectionFlags', () => {
         placeHolder: 'Select which Experiments to preserve'
       }
     )
-  })
-})
-
-describe('pickExperimentName', () => {
-  it('should return the name of the chosen experiment if one is selected by the user', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(mockedExpName)
-    const name = await pickExperimentName(Promise.resolve(mockedExpList))
-    expect(name).toEqual(mockedExpName)
-  })
-
-  it('should return undefined if the user cancels the popup dialog', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    const undef = await pickExperimentName(Promise.resolve(mockedExpList))
-    expect(undef).toBeUndefined()
-  })
-
-  it('should call showErrorMessage when no experiment names are provided', async () => {
-    await pickExperimentName(Promise.resolve([]))
-    expect(mockedShowErrorMessage).toHaveBeenCalledTimes(1)
   })
 })
