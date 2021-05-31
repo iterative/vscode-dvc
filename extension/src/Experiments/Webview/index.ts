@@ -21,7 +21,7 @@ import {
   WindowWithWebviewData,
   ExperimentsWebviewState
 } from './contract'
-import { Logger } from '../../common/Logger'
+import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../ResourceLocator'
 import { setContextValue } from '../../vscode/context'
 

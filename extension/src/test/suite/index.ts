@@ -2,7 +2,7 @@
 import { join, resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
-import { Logger } from '../../common/Logger'
+import { Logger } from '../../common/logger'
 
 function setupNyc() {
   const NYC = require('nyc')
