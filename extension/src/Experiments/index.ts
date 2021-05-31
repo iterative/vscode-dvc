@@ -13,6 +13,7 @@ import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickExperimentName } from './commands/quickPick'
+import { report } from './commands/report'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -191,6 +192,16 @@ export class Experiments {
       name,
       cwd: dvcRoot
     }
+  }
+
+  public getExpNameThenRun = async (
+    func: (cwd: string, experimentName: string) => Promise<string>
+  ) => {
+    const { cwd, name } = await this.getExperimentName()
+    if (!(name && cwd)) {
+      return
+    }
+    return report(func(cwd, name))
   }
 
   public async getExperimentsTableForCommand(): Promise<

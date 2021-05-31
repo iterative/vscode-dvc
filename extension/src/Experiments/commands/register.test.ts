@@ -4,7 +4,6 @@ import { ExperimentsTable, Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { Config } from '../../Config'
 import {
-  getExpNameThenRun,
   getCwdThenRun,
   showExperimentsTableThenRun,
   getExpNameAndInputThenRun,
@@ -147,61 +146,6 @@ describe('getCwdThenRun', () => {
 
     const mockedExpFunc = jest.fn()
     await getCwdThenRun(experiments, mockedExpFunc)
-
-    expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickOne).toBeCalledTimes(1)
-    expect(mockedExpFunc).not.toBeCalled()
-  })
-})
-
-describe('getExpNameThenRun', () => {
-  it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
-    mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-    mockedPickExperimentName.mockResolvedValueOnce('exp-123')
-
-    const experiments = new Experiments(
-      mockedConfig,
-      ({ experimentListCurrent: jest.fn() } as unknown) as CliReader,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as ExperimentsTable,
-        '/my/fun/dvc/root': ({
-          showWebview: jest.fn(),
-          getDvcRoot: () => '/my/fun/dvc/root'
-        } as unknown) as ExperimentsTable
-      }
-    )
-
-    const mockedExpFunc = jest.fn()
-    await getExpNameThenRun(experiments, mockedExpFunc)
-
-    expect(mockedGetDefaultProject).toBeCalledTimes(1)
-    expect(mockedQuickPickOne).toBeCalledTimes(1)
-    expect(mockedPickExperimentName).toBeCalledTimes(1)
-    expect(mockedExpFunc).toBeCalledTimes(1)
-    expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123')
-  })
-
-  it('should not call the function if a project is not picked', async () => {
-    mockedGetDefaultProject.mockReturnValueOnce(undefined)
-    mockedQuickPickOne.mockResolvedValueOnce(undefined)
-
-    const experiments = new Experiments(mockedConfig, {} as CliReader, {
-      '/my/dvc/root': ({
-        showWebview: mockedShowWebview,
-        getDvcRoot: () => mockedDvcRoot
-      } as unknown) as ExperimentsTable,
-      '/my/mono/dvc/root': ({
-        showWebview: jest.fn(),
-        getDvcRoot: () => '/my/mono/dvc/root'
-      } as unknown) as ExperimentsTable
-    })
-
-    const mockedExpFunc = jest.fn()
-    await getExpNameThenRun(experiments, mockedExpFunc)
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
     expect(mockedQuickPickOne).toBeCalledTimes(1)

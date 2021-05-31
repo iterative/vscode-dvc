@@ -30,30 +30,19 @@ const registerExperimentCwdCommands = (
   )
 }
 
-export const getExpNameThenRun = async (
-  experiments: Experiments,
-  func: (cwd: string, experimentName: string) => Promise<string>
-) => {
-  const { cwd, name } = await experiments.getExperimentName()
-  if (!(name && cwd)) {
-    return
-  }
-  return report(func(cwd, name))
-}
-
 const registerExperimentNameCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getExpNameThenRun(experiments, cliExecutor.experimentApply)
+      experiments.getExpNameThenRun(cliExecutor.experimentApply)
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      getExpNameThenRun(experiments, cliExecutor.experimentRemove)
+      experiments.getExpNameThenRun(cliExecutor.experimentRemove)
     )
   )
 }
