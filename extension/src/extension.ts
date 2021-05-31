@@ -25,7 +25,7 @@ import {
   onDidChangeFileType
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
-import { DecorationProvider } from './repository/DecorationProvider'
+import { DecorationProvider } from './repository/decorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './repository'
 import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'

@@ -2,7 +2,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
 import { SourceControlManagement } from './views/sourceControlManagement'
 import { mocked } from 'ts-jest/utils'
-import { DecorationProvider } from './DecorationProvider'
+import { DecorationProvider } from './decorationProvider'
 import { Repository } from '.'
 import { RepositoryModel } from './Model'
 import {
