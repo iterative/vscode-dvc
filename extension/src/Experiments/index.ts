@@ -204,6 +204,21 @@ export class Experiments {
     return report(func(cwd, name))
   }
 
+  public getCwdAndQuickPickThenRun = async <T>(
+    func: (cwd: string, result: T) => Promise<string>,
+    quickPick: () => Thenable<T | undefined>
+  ) => {
+    const cwd = await this.getCwd()
+    if (!cwd) {
+      return
+    }
+    const result = await quickPick()
+
+    if (result) {
+      report(func(cwd, result))
+    }
+  }
+
   public async getExperimentsTableForCommand(): Promise<
     ExperimentsTable | undefined
   > {

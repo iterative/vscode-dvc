@@ -78,30 +78,13 @@ const registerExperimentInputCommands = (
   )
 }
 
-export const getCwdAndQuickPickThenRun = async <T>(
-  experiments: Experiments,
-  func: (cwd: string, result: T) => Promise<string>,
-  quickPick: () => Thenable<T | undefined>
-) => {
-  const cwd = await experiments.getCwd()
-  if (!cwd) {
-    return
-  }
-  const result = await quickPick()
-
-  if (result) {
-    report(func(cwd, result))
-  }
-}
-
 const registerExperimentQuickPickCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      getCwdAndQuickPickThenRun(
-        experiments,
+      experiments.getCwdAndQuickPickThenRun(
         cliExecutor.experimentGarbageCollect,
         getGarbageCollectionFlags
       )
