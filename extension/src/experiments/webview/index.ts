@@ -22,7 +22,7 @@ import {
   ExperimentsWebviewState
 } from './contract'
 import { Logger } from '../../common/logger'
-import { ResourceLocator } from '../../ResourceLocator'
+import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
 
 export class ExperimentsWebview {

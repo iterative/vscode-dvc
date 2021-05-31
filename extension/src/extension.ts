@@ -24,7 +24,7 @@ import {
   onDidChangeFileSystem,
   onDidChangeFileType
 } from './fileSystem'
-import { ResourceLocator } from './ResourceLocator'
+import { ResourceLocator } from './resourceLocator'
 import { DecorationProvider } from './repository/decorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './repository'
