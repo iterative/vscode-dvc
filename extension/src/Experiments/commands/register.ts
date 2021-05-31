@@ -1,6 +1,5 @@
 import { commands } from 'vscode'
 import { report } from './report'
-import { getInput } from '../../vscode/inputBox'
 import { getGarbageCollectionFlags } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
@@ -47,30 +46,13 @@ const registerExperimentNameCommands = (
   )
 }
 
-export const getExpNameAndInputThenRun = async (
-  experiments: Experiments,
-  func: (cwd: string, experiment: string, input: string) => Promise<string>,
-  prompt: string
-) => {
-  const { cwd, name } = await experiments.getExperimentName()
-  if (!(name && cwd)) {
-    return
-  }
-
-  const input = await getInput(prompt)
-  if (input) {
-    report(func(cwd, name, input))
-  }
-}
-
 const registerExperimentInputCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      getExpNameAndInputThenRun(
-        experiments,
+      experiments.getExpNameAndInputThenRun(
         cliExecutor.experimentBranch,
         'Name the new branch'
       )

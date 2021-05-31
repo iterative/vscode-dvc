@@ -14,6 +14,7 @@ import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickExperimentName } from './commands/quickPick'
 import { report } from './commands/report'
+import { getInput } from '../vscode/inputBox'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -177,7 +178,7 @@ export class Experiments {
     return this.getFocusedOrDefaultOrPickProject()
   }
 
-  public async getExperimentName(): Promise<{
+  private async getExperimentName(): Promise<{
     name: string | undefined
     cwd: string | undefined
   }> {
@@ -228,6 +229,21 @@ export class Experiments {
     }
 
     return this.showExperimentsWebview(dvcRoot)
+  }
+
+  public getExpNameAndInputThenRun = async (
+    func: (cwd: string, experiment: string, input: string) => Promise<string>,
+    prompt: string
+  ) => {
+    const { cwd, name } = await this.getExperimentName()
+    if (!(name && cwd)) {
+      return
+    }
+
+    const input = await getInput(prompt)
+    if (input) {
+      report(func(cwd, name, input))
+    }
   }
 
   private async getDvcRoot(
