@@ -181,11 +181,11 @@ suite('Experiments Test Suite', () => {
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
-      const mockRun = stub(CliRunner.prototype, 'run').resolves()
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const cliRunner = disposable.track(new CliRunner(config))
+      const mockRun = stub(cliRunner, 'run').resolves()
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))

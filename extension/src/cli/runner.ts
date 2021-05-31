@@ -29,14 +29,20 @@ export class CliRunner {
   private currentProcess: Process | undefined
   private config: Config
 
-  private getOverrideOrCliPath() {
+  private getOverrideOrCliPath = () => {
     if (this.executable) {
       return this.executable
     }
     return this.config.getCliPath() || 'dvc'
   }
 
-  private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
+  private createProcess = ({
+    cwd,
+    args
+  }: {
+    cwd: string
+    args: Args
+  }): Process => {
     const env = getEnv(this.config.pythonBinPath)
 
     const process = createProcess({
@@ -64,7 +70,7 @@ export class CliRunner {
     return process
   }
 
-  private startProcess(cwd: string, args: Args) {
+  private startProcess = (cwd: string, args: Args) => {
     CliRunner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
@@ -74,7 +80,7 @@ export class CliRunner {
     })
   }
 
-  public async run(cwd: string, ...args: Args) {
+  public run = async (cwd: string, ...args: Args) => {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
@@ -86,7 +92,7 @@ export class CliRunner {
     )
   }
 
-  public async stop() {
+  public stop = async () => {
     try {
       this.currentProcess?.kill('SIGINT')
       await this.currentProcess
@@ -100,11 +106,11 @@ export class CliRunner {
     }
   }
 
-  public isRunning() {
+  public isRunning = () => {
     return !!this.currentProcess
   }
 
-  public getRunningProcess() {
+  public getRunningProcess = () => {
     return this.currentProcess
   }
 
