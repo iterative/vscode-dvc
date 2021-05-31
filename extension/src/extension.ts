@@ -18,16 +18,16 @@ import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
-import { registerRepositoryCommands } from './Repository/commands/register'
+import { registerRepositoryCommands } from './repository/commands/register'
 import {
   findDvcRootPaths,
   onDidChangeFileSystem,
   onDidChangeFileType
 } from './fileSystem'
 import { ResourceLocator } from './ResourceLocator'
-import { DecorationProvider } from './Repository/DecorationProvider'
+import { DecorationProvider } from './repository/DecorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
-import { Repository } from './Repository'
+import { Repository } from './repository'
 import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import { CliExecutor } from './cli/executor'
 import { setContextValue } from './vscode/context'
