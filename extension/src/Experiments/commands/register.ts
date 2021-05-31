@@ -1,13 +1,12 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { report, report_ } from './report'
+import { report } from './report'
 import { garbageCollectExperiments, getBranchName } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { ExecutionOptions } from '../../cli/execution'
 import { CliExecutor } from '../../cli/executor'
-import { reportErrorMessage } from '../../vscode/reporting'
 
 export const getExecutionOptionsThenRun = async (
   experiments: Experiments,
@@ -22,66 +21,40 @@ export const getExecutionOptionsThenRun = async (
 
 export const getCwdThenRun = async (
   experiments: Experiments,
-  func: (cwd: string) => Promise<string | undefined>
+  func: (cwd: string) => Promise<string>
 ) => {
   const options = await experiments.getExecutionOptions()
   const cwd = options?.cwd
   if (!cwd) {
     return
   }
-  try {
-    report_(await func(cwd))
-  } catch (e) {
-    reportErrorMessage(e)
-  }
+
+  report(func(cwd))
 }
 
 export const getExperimentNameThenRun = async (
   experiments: Experiments,
-  func: (options: ExecutionOptions, experimentName: string) => Promise<unknown>
-) => {
-  const obj = await experiments.getExperimentName()
-  const options = obj?.options
-  const name = await obj?.name
-  if (!(name && options)) {
-    return
-  }
-  return func(options, name)
-}
-
-export const getExperimentNameThenRun_ = async (
-  experiments: Experiments,
   func: (cwd: string, experimentName: string) => Promise<string>
 ) => {
-  const obj = await experiments.getExperimentName()
-  const options = obj?.options
-  const cwd = options?.cwd
-  const name = await obj?.name
+  const { cwd, name } = await experiments.getExperimentName()
   if (!(name && cwd)) {
     return
   }
-  return report(func, cwd, name)
+  return report(func(cwd, name))
 }
 
 const branchExperiment = async (
   experiments: Experiments,
   cliExecutor: CliExecutor
 ) => {
-  const obj = await experiments.getExperimentName()
-  const options = obj?.options
-  const cwd = options?.cwd
-  const name = await obj?.name
+  const { cwd, name } = await experiments.getExperimentName()
   if (!(name && cwd)) {
     return
   }
 
   const branchName = await getBranchName()
   if (branchName) {
-    try {
-      report_(await cliExecutor.experimentBranch(cwd, name, branchName))
-    } catch (e) {
-      reportErrorMessage(e)
-    }
+    report(cliExecutor.experimentBranch(cwd, name, branchName))
   }
 }
 
@@ -105,7 +78,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getExperimentNameThenRun_(experiments, cliExecutor.experimentApply)
+      getExperimentNameThenRun(experiments, cliExecutor.experimentApply)
     )
   )
 
@@ -117,7 +90,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      getExperimentNameThenRun_(experiments, cliExecutor.experimentRemove)
+      getExperimentNameThenRun(experiments, cliExecutor.experimentRemove)
     )
   )
 

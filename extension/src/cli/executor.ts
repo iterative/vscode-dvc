@@ -107,17 +107,6 @@ export class CliExecutor extends Cli {
     this.executeProcessOnTarget(fsPath, Command.REMOVE)
 }
 
-export const experimentApply = (
-  options: ExecutionOptions,
-  experiment: string
-): Promise<string> =>
-  executeCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.APPLY,
-    experiment
-  )
-
 export const experimentGarbageCollect = (
   options: ExecutionOptions,
   preserveFlags: GcPreserveFlag[]

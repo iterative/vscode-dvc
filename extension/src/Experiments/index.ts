@@ -182,22 +182,20 @@ export class Experiments {
     return { ...this.config.getExecutionOptions(), cwd: dvcRoot }
   }
 
-  public async getExperimentName(): Promise<
-    | {
-        name: Thenable<string | undefined> | undefined
-        options: ExecutionOptions | undefined
-      }
-    | undefined
-  > {
+  public async getExperimentName(): Promise<{
+    name: string | undefined
+    cwd: string | undefined
+  }> {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
-      return
+      return { name: undefined, cwd: dvcRoot }
     }
     const experimentNames = await this.cliReader.experimentListCurrent(dvcRoot)
+    const name = await pickExperimentName(experimentNames)
 
     return {
-      name: pickExperimentName(experimentNames),
-      options: { ...this.config.getExecutionOptions(), cwd: dvcRoot }
+      name,
+      cwd: dvcRoot
     }
   }
 

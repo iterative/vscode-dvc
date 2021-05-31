@@ -197,14 +197,7 @@ describe('getExperimentNameThenRun', () => {
     expect(mockedQuickPickOne).toBeCalledTimes(1)
     expect(mockedPickExperimentName).toBeCalledTimes(1)
     expect(mockedExpFunc).toBeCalledTimes(1)
-    expect(mockedExpFunc).toBeCalledWith(
-      {
-        cliPath,
-        pythonBinPath: undefined,
-        cwd: mockedDvcRoot
-      },
-      'exp-123'
-    )
+    expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123')
   })
 
   it('should not call the function if a project is not picked', async () => {

@@ -20,7 +20,7 @@ describe('report', () => {
     const mockedStdOut = 'I applied your experiment boss'
     mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
 
-    await report(mockedExperimentApply, defaultPath, exampleExpName)
+    await report(mockedExperimentApply(defaultPath, exampleExpName))
 
     expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
 
@@ -33,7 +33,7 @@ describe('report', () => {
     const mockedStdOut = ''
     mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
 
-    await report(mockedExperimentApply, defaultPath, exampleExpName)
+    await report(mockedExperimentApply(defaultPath, exampleExpName))
 
     expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
 
@@ -47,7 +47,7 @@ describe('report', () => {
       stderr: 'something went very wrong'
     })
 
-    await report(mockedExperimentApply, defaultPath, exampleExpName)
+    await report(mockedExperimentApply(defaultPath, exampleExpName))
 
     expect(mockedShowErrorMessage).toBeCalledTimes(1)
   })
