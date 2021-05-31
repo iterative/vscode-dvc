@@ -71,45 +71,25 @@ const registerExperimentExecutorCommands = (
   registerExperimentQuickPickCommands(experiments, cliExecutor)
 }
 
-export const showExperimentsTableThenRun = async (
-  experiments: Experiments,
-  cliRunner: CliRunner,
-  func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
-) => {
-  const experimentsTable = await experiments.getExperimentsTableForCommand()
-  if (!experimentsTable) {
-    return
-  }
-
-  func(cliRunner, experimentsTable.getDvcRoot())
-  const listener = experiments.dispose.track(
-    cliRunner.onDidCompleteProcess(() => {
-      experimentsTable.refresh()
-      experiments.dispose.untrack(listener)
-      listener.dispose()
-    })
-  )
-}
-
 const registerExperimentRunnerCommands = (
   experiments: Experiments,
   cliRunner: CliRunner
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      showExperimentsTableThenRun(experiments, cliRunner, run)
+      experiments.showExperimentsTableThenRun(cliRunner, run)
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      showExperimentsTableThenRun(experiments, cliRunner, runReset)
+      experiments.showExperimentsTableThenRun(cliRunner, runReset)
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      showExperimentsTableThenRun(experiments, cliRunner, runQueued)
+      experiments.showExperimentsTableThenRun(cliRunner, runQueued)
     )
   )
 

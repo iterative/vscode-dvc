@@ -15,6 +15,7 @@ import { quickPickOne } from '../vscode/quickPick'
 import { pickExperimentName } from './commands/quickPick'
 import { report } from './commands/report'
 import { getInput } from '../vscode/inputBox'
+import { CliRunner } from '../cli/runner'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -165,6 +166,33 @@ export class Experiments {
   private experiments: Record<string, ExperimentsTable> = {}
   private config: Config
 
+  private async getDvcRoot(
+    chooserFn: (keys: string[]) => string | Thenable<string | undefined>
+  ) {
+    const keys = Object.keys(this.experiments)
+    if (keys.length === 1) {
+      return keys[0]
+    }
+    return await chooserFn(keys)
+  }
+
+  private getFocusedOrDefaultOrPickProject = () =>
+    this.getDvcRoot(
+      keys =>
+        this.focusedWebviewDvcRoot ||
+        this.config.getDefaultProject() ||
+        this.showDvcRootQuickPick(keys)
+    )
+
+  private getDefaultOrPickDvcRoot = () =>
+    this.getDvcRoot(
+      keys => this.config.getDefaultProject() || this.showDvcRootQuickPick(keys)
+    )
+
+  private showDvcRootQuickPick(keys: string[]) {
+    return quickPickOne(keys, 'Select which project to run command against')
+  }
+
   public async showExperimentsTable() {
     const dvcRoot = await this.getDefaultOrPickDvcRoot()
     if (!dvcRoot) {
@@ -225,17 +253,6 @@ export class Experiments {
     }
   }
 
-  public async getExperimentsTableForCommand(): Promise<
-    ExperimentsTable | undefined
-  > {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
   public getExpNameAndInputThenRun = async (
     func: (cwd: string, experiment: string, input: string) => Promise<string>,
     prompt: string
@@ -251,31 +268,34 @@ export class Experiments {
     }
   }
 
-  private async getDvcRoot(
-    chooserFn: (keys: string[]) => string | Thenable<string | undefined>
-  ) {
-    const keys = Object.keys(this.experiments)
-    if (keys.length === 1) {
-      return keys[0]
+  public async getExperimentsTableForCommand(): Promise<
+    ExperimentsTable | undefined
+  > {
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
     }
-    return await chooserFn(keys)
+
+    return this.showExperimentsWebview(dvcRoot)
   }
 
-  private getFocusedOrDefaultOrPickProject = () =>
-    this.getDvcRoot(
-      keys =>
-        this.focusedWebviewDvcRoot ||
-        this.config.getDefaultProject() ||
-        this.showDvcRootQuickPick(keys)
-    )
+  public showExperimentsTableThenRun = async (
+    cliRunner: CliRunner,
+    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
+  ) => {
+    const experimentsTable = await this.getExperimentsTableForCommand()
+    if (!experimentsTable) {
+      return
+    }
 
-  private getDefaultOrPickDvcRoot = () =>
-    this.getDvcRoot(
-      keys => this.config.getDefaultProject() || this.showDvcRootQuickPick(keys)
+    func(cliRunner, experimentsTable.getDvcRoot())
+    const listener = cliRunner.dispose.track(
+      cliRunner.onDidCompleteProcess(() => {
+        experimentsTable.refresh()
+        cliRunner.dispose.untrack(listener)
+        listener.dispose()
+      })
     )
-
-  private showDvcRootQuickPick(keys: string[]) {
-    return quickPickOne(keys, 'Select which project to run command against')
   }
 
   private async showExperimentsWebview(
