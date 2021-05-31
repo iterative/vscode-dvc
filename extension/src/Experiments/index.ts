@@ -174,8 +174,13 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  public getCwd(): Promise<string | undefined> {
-    return this.getFocusedOrDefaultOrPickProject()
+  public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    report(func(cwd))
   }
 
   private async getExperimentName(): Promise<{
@@ -209,7 +214,7 @@ export class Experiments {
     func: (cwd: string, result: T) => Promise<string>,
     quickPick: () => Thenable<T | undefined>
   ) => {
-    const cwd = await this.getCwd()
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }

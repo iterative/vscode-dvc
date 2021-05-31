@@ -1,22 +1,9 @@
 import { commands } from 'vscode'
-import { report } from './report'
 import { getGarbageCollectionFlags } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { CliExecutor } from '../../cli/executor'
-
-export const getCwdThenRun = async (
-  experiments: Experiments,
-  func: (cwd: string) => Promise<string>
-) => {
-  const cwd = await experiments.getCwd()
-  if (!cwd) {
-    return
-  }
-
-  report(func(cwd))
-}
 
 const registerExperimentCwdCommands = (
   experiments: Experiments,
@@ -24,7 +11,7 @@ const registerExperimentCwdCommands = (
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      getCwdThenRun(experiments, cliExecutor.experimentRunQueue)
+      experiments.getCwdThenRun(cliExecutor.experimentRunQueue)
     )
   )
 }

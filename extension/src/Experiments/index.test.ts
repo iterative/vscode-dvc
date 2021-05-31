@@ -274,4 +274,53 @@ describe('Experiments', () => {
       expect(mockedExpFunc).not.toBeCalled()
     })
   })
+
+  describe('getCwdThenRun', () => {
+    it('should call the correct function with the correct parameters if a project is picked', async () => {
+      mockedGetDefaultProject.mockReturnValueOnce(undefined)
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      const experiments = new Experiments(mockedConfig, {} as CliReader, {
+        '/my/dvc/root': ({
+          showWebview: mockedShowWebview,
+          getDvcRoot: () => mockedDvcRoot
+        } as unknown) as ExperimentsTable,
+        '/my/other/dvc/root': ({
+          showWebview: jest.fn(),
+          getDvcRoot: () => '/my/other/dvc/root'
+        } as unknown) as ExperimentsTable
+      })
+
+      const mockedExpFunc = jest.fn()
+      await experiments.getCwdThenRun(mockedExpFunc)
+
+      expect(mockedGetDefaultProject).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).toBeCalledTimes(1)
+      expect(mockedExpFunc).toBeCalledTimes(1)
+      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot)
+    })
+
+    it('should not call the function if a project is not picked', async () => {
+      mockedGetDefaultProject.mockReturnValueOnce(undefined)
+      mockedQuickPickOne.mockResolvedValueOnce(undefined)
+
+      const experiments = new Experiments(mockedConfig, {} as CliReader, {
+        '/my/dvc/root': ({
+          showWebview: mockedShowWebview,
+          getDvcRoot: () => mockedDvcRoot
+        } as unknown) as ExperimentsTable,
+        '/my/test/dvc/root': ({
+          showWebview: jest.fn(),
+          getDvcRoot: () => '/my/test/dvc/root'
+        } as unknown) as ExperimentsTable
+      })
+
+      const mockedExpFunc = jest.fn()
+      await experiments.getCwdThenRun(mockedExpFunc)
+
+      expect(mockedGetDefaultProject).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).toBeCalledTimes(1)
+      expect(mockedExpFunc).not.toBeCalled()
+    })
+  })
 })
