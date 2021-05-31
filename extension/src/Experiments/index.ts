@@ -13,7 +13,7 @@ import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickExperimentName } from './quickPick'
-import { report } from './commands/report'
+import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { CliRunner } from '../cli/runner'
 
