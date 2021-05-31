@@ -10,7 +10,7 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
-import { WebviewColorTheme } from './experiments/Webview/contract'
+import { WebviewColorTheme } from './experiments/webview/contract'
 import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath

@@ -1,9 +1,9 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { ExperimentsWebview } from './experiments/Webview'
+import { ExperimentsWebview } from './experiments/webview'
 import { Config } from './Config'
 import { Experiments } from './experiments'
-import { ExperimentsWebviewState } from './experiments/Webview/contract'
+import { ExperimentsWebviewState } from './experiments/webview/contract'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()

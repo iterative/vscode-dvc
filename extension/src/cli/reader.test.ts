@@ -1,7 +1,7 @@
 import { CliReader } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
-import complexExperimentsOutput from '../experiments/Webview/complex-output-example.json'
+import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { Config } from '../Config'

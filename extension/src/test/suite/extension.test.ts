@@ -14,7 +14,7 @@ import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
-import complexExperimentsOutput from '../../experiments/Webview/complex-output-example.json'
+import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 
 chai.use(sinonChai)
 const { expect } = chai
