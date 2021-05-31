@@ -3,7 +3,6 @@ import {
   Event,
   EventEmitter,
   ExtensionContext,
-  OutputChannel,
   window,
   workspace,
   WorkspaceFolder
@@ -35,6 +34,7 @@ import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
+import { OutputChannel } from './outputChannel'
 
 export { Disposable, Disposer }
 
@@ -58,7 +58,6 @@ export class Extension {
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
-  private readonly outputChannel: OutputChannel
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -235,14 +234,7 @@ export class Extension {
       new Experiments(this.config, this.cliReader)
     )
 
-    this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
-
-    this.dispose.track(
-      this.cliExecutor.onDidRun(e => this.outputChannel.append(e))
-    )
-    this.dispose.track(
-      this.cliReader.onDidRun(e => this.outputChannel.append(e))
-    )
+    this.dispose.track(new OutputChannel([this.cliExecutor, this.cliReader]))
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(
