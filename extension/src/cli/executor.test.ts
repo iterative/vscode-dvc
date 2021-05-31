@@ -11,7 +11,6 @@ jest.mock('vscode')
 jest.mock('fs-extra')
 jest.mock('../processExecution')
 jest.mock('../env')
-jest.mock('../vscode/EventEmitter')
 
 const mockedExecuteProcess = mocked(executeProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
