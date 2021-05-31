@@ -274,27 +274,21 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  public async getExperimentsTableForCommand(): Promise<
-    ExperimentsTable | undefined
-  > {
+  public showExperimentsTableThenRun = async (
+    cliRunner: CliRunner,
+    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
+  ) => {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
       return
     }
 
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
-  public showExperimentsTableThenRun = async (
-    cliRunner: CliRunner,
-    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
-  ) => {
-    const experimentsTable = await this.getExperimentsTableForCommand()
+    const experimentsTable = await this.showExperimentsWebview(dvcRoot)
     if (!experimentsTable) {
       return
     }
 
-    func(cliRunner, experimentsTable.getDvcRoot())
+    func(cliRunner, dvcRoot)
     const listener = cliRunner.dispose.track(
       cliRunner.onDidCompleteProcess(() => {
         experimentsTable.refresh()
@@ -302,6 +296,7 @@ export class Experiments {
         listener.dispose()
       })
     )
+    return experimentsTable
   }
 
   private createExperimentsTable(
