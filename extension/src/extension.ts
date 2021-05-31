@@ -16,8 +16,8 @@ import {
 } from '@hediet/node-reload'
 import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
-import { Experiments } from './Experiments'
-import { registerExperimentCommands } from './Experiments/commands/register'
+import { Experiments } from './experiments'
+import { registerExperimentCommands } from './experiments/commands/register'
 import { registerRepositoryCommands } from './Repository/commands/register'
 import {
   findDvcRootPaths,

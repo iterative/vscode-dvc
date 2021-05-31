@@ -6,14 +6,14 @@ import { resolve } from 'path'
 import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
-import complexExperimentsOutput from '../../../Experiments/Webview/complex-output-example.json'
-import { ExperimentsTable, Experiments } from '../../../Experiments'
+import complexExperimentsOutput from '../../../experiments/Webview/complex-output-example.json'
+import { ExperimentsTable, Experiments } from '../../../experiments'
 import { Config } from '../../../Config'
 import { ResourceLocator } from '../../../ResourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
-import { runQueued } from '../../../Experiments/runner'
+import { runQueued } from '../../../experiments/runner'
 
 chai.use(sinonChai)
 const { expect } = chai
