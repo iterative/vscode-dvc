@@ -240,7 +240,7 @@ describe('Experiments', () => {
 
     it('should call the runner with the correct args when runReset is provided', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
-      mockedQuickPickOne.mockResolvedValueOnce('/my/dvc/root')
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
       await experiments.showExperimentsTableThenRun(
         ({
