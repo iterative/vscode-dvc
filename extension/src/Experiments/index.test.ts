@@ -52,6 +52,33 @@ describe('Experiments', () => {
     }
   )
 
+  describe('getCwdThenRun', () => {
+    it('should call the correct function with the correct parameters if a project is picked', async () => {
+      mockedGetDefaultProject.mockReturnValueOnce(undefined)
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      const mockedExpFunc = jest.fn()
+      await experiments.getCwdThenRun(mockedExpFunc)
+
+      expect(mockedGetDefaultProject).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).toBeCalledTimes(1)
+      expect(mockedExpFunc).toBeCalledTimes(1)
+      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot)
+    })
+
+    it('should not call the function if a project is not picked', async () => {
+      mockedGetDefaultProject.mockReturnValueOnce(undefined)
+      mockedQuickPickOne.mockResolvedValueOnce(undefined)
+
+      const mockedExpFunc = jest.fn()
+      await experiments.getCwdThenRun(mockedExpFunc)
+
+      expect(mockedGetDefaultProject).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).toBeCalledTimes(1)
+      expect(mockedExpFunc).not.toBeCalled()
+    })
+  })
+
   describe('getExpNameThenRun', () => {
     it('should call the correct function with the correct parameters if a project and experiment are picked', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
@@ -188,33 +215,6 @@ describe('Experiments', () => {
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).not.toBeCalled()
       expect(mockedGetInput).toBeCalledTimes(1)
-      expect(mockedExpFunc).not.toBeCalled()
-    })
-  })
-
-  describe('getCwdThenRun', () => {
-    it('should call the correct function with the correct parameters if a project is picked', async () => {
-      mockedGetDefaultProject.mockReturnValueOnce(undefined)
-      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-
-      const mockedExpFunc = jest.fn()
-      await experiments.getCwdThenRun(mockedExpFunc)
-
-      expect(mockedGetDefaultProject).toBeCalledTimes(1)
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot)
-    })
-
-    it('should not call the function if a project is not picked', async () => {
-      mockedGetDefaultProject.mockReturnValueOnce(undefined)
-      mockedQuickPickOne.mockResolvedValueOnce(undefined)
-
-      const mockedExpFunc = jest.fn()
-      await experiments.getCwdThenRun(mockedExpFunc)
-
-      expect(mockedGetDefaultProject).toBeCalledTimes(1)
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).not.toBeCalled()
     })
   })
