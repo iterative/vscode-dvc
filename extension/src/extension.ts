@@ -34,7 +34,7 @@ import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
-import { OutputChannel } from './outputChannel'
+import { OutputChannel } from './vscode/outputChannel'
 
 export { Disposable, Disposer }
 

@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { EventEmitter, window, OutputChannel as VSOutputChannel } from 'vscode'
-import { OutputChannel } from '../../outputChannel'
-import { Disposable } from '../../extension'
+import { OutputChannel } from '../../../vscode/outputChannel'
+import { Disposable } from '../../../extension'
 import { restore, stub, fake } from 'sinon'
-import { Cli } from '../../cli'
-import { Config } from '../../Config'
+import { Cli } from '../../../cli'
+import { Config } from '../../../Config'
 
 chai.use(sinonChai)
 const { expect } = chai

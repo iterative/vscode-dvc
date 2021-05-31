@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { OutputChannel as VSOutputChannel, window } from 'vscode'
-import { Cli } from './cli'
+import { Cli } from '../cli'
 
 export class OutputChannel {
   public dispose = Disposable.fn()
