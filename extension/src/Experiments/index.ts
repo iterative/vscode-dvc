@@ -193,15 +193,6 @@ export class Experiments {
     return quickPickOne(keys, 'Select which project to run command against')
   }
 
-  public async showExperimentsTable() {
-    const dvcRoot = await this.getDefaultOrPickDvcRoot()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
   public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
@@ -211,28 +202,19 @@ export class Experiments {
     report(func(cwd))
   }
 
-  private async getExperimentName(): Promise<{
-    name: string | undefined
-    cwd: string | undefined
-  }> {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return { name: undefined, cwd: dvcRoot }
-    }
-    const experimentNames = await this.cliReader.experimentListCurrent(dvcRoot)
-    const name = await pickExperimentName(experimentNames)
-
-    return {
-      name,
-      cwd: dvcRoot
-    }
-  }
-
   public getExpNameThenRun = async (
     func: (cwd: string, experimentName: string) => Promise<string>
   ) => {
-    const { cwd, name } = await this.getExperimentName()
-    if (!(name && cwd)) {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const name = await pickExperimentName(
+      this.cliReader.experimentListCurrent(cwd)
+    )
+
+    if (!name) {
       return
     }
     return report(func(cwd, name))
@@ -257,15 +239,39 @@ export class Experiments {
     func: (cwd: string, experiment: string, input: string) => Promise<string>,
     prompt: string
   ) => {
-    const { cwd, name } = await this.getExperimentName()
-    if (!(name && cwd)) {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
       return
     }
 
+    const name = await pickExperimentName(
+      this.cliReader.experimentListCurrent(cwd)
+    )
+
+    if (!name) {
+      return
+    }
     const input = await getInput(prompt)
     if (input) {
       report(func(cwd, name, input))
     }
+  }
+
+  private async showExperimentsWebview(
+    dvcRoot: string
+  ): Promise<ExperimentsTable> {
+    const experimentsTable = this.experiments[dvcRoot]
+    await experimentsTable.showWebview()
+    return experimentsTable
+  }
+
+  public async showExperimentsTable() {
+    const dvcRoot = await this.getDefaultOrPickDvcRoot()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.showExperimentsWebview(dvcRoot)
   }
 
   public async getExperimentsTableForCommand(): Promise<
@@ -296,14 +302,6 @@ export class Experiments {
         listener.dispose()
       })
     )
-  }
-
-  private async showExperimentsWebview(
-    dvcRoot: string
-  ): Promise<ExperimentsTable> {
-    const experimentsTable = this.experiments[dvcRoot]
-    await experimentsTable.showWebview()
-    return experimentsTable
   }
 
   private createExperimentsTable(

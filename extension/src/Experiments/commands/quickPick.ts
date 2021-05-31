@@ -29,9 +29,10 @@ export const getGarbageCollectionFlags = () =>
     { placeHolder: 'Select which Experiments to preserve' }
   )
 
-export const pickExperimentName = (
-  experimentNames: string[]
-): Thenable<string | undefined> | undefined => {
+export const pickExperimentName = async (
+  experimentNamesPromise: Promise<string[]>
+): Promise<string | undefined> => {
+  const experimentNames = await experimentNamesPromise
   if (experimentNames.length === 0) {
     window.showErrorMessage('There are no experiments to select.')
   } else {

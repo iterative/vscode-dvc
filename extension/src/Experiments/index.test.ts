@@ -4,9 +4,9 @@ import { ExperimentsTable, Experiments } from '.'
 import { Config } from '../Config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliReader } from '../cli/reader'
+import { CliRunner } from '../cli/runner'
 import { pickExperimentName } from './commands/quickPick'
 import { getInput } from '../vscode/inputBox'
-import { CliRunner } from '../cli/runner'
 import { runQueued, runReset } from './commands/runner'
 
 const mockedShowWebview = jest.fn()

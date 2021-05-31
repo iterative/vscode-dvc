@@ -72,18 +72,18 @@ describe('getGarbageCollectionFlags', () => {
 describe('pickExperimentName', () => {
   it('should return the name of the chosen experiment if one is selected by the user', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(mockedExpName)
-    const name = await pickExperimentName(mockedExpList)
+    const name = await pickExperimentName(Promise.resolve(mockedExpList))
     expect(name).toEqual(mockedExpName)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    const undef = await pickExperimentName(mockedExpList)
+    const undef = await pickExperimentName(Promise.resolve(mockedExpList))
     expect(undef).toBeUndefined()
   })
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
-    await pickExperimentName([])
+    await pickExperimentName(Promise.resolve([]))
     expect(mockedShowErrorMessage).toHaveBeenCalledTimes(1)
   })
 })
