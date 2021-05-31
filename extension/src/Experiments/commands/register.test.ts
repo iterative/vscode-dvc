@@ -8,7 +8,7 @@ import {
   getCwdThenRun,
   showExperimentsTableThenRun,
   getExpNameAndInputThenRun,
-  getExpNameAndQuickPickThenRun
+  getCwdAndQuickPickThenRun
 } from './register'
 import { runQueued, runReset } from './runner'
 import { quickPickOne } from '../../vscode/quickPick'
@@ -308,7 +308,7 @@ describe('getExpNameAndInputThenRun', () => {
   })
 })
 
-describe('getExpNameAndQuickPickThenRun', () => {
+describe('getCwdAndQuickPickThenRun', () => {
   it('should call the correct function with the correct parameters if a project and experiment are picked and the quick pick returns a list', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
     mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
@@ -327,7 +327,7 @@ describe('getExpNameAndQuickPickThenRun', () => {
     const mockedExpFunc = jest.fn()
     const mockedPickedOptions = ['a', 'b', 'c']
     const mockedQuickPick = jest.fn().mockResolvedValueOnce(mockedPickedOptions)
-    await getExpNameAndQuickPickThenRun<string[]>(
+    await getCwdAndQuickPickThenRun<string[]>(
       experiments,
       mockedExpFunc,
       mockedQuickPick
@@ -357,11 +357,7 @@ describe('getExpNameAndQuickPickThenRun', () => {
 
     const mockedExpFunc = jest.fn()
     const mockedQuickPick = jest.fn()
-    await getExpNameAndQuickPickThenRun(
-      experiments,
-      mockedExpFunc,
-      mockedQuickPick
-    )
+    await getCwdAndQuickPickThenRun(experiments, mockedExpFunc, mockedQuickPick)
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
     expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -386,11 +382,7 @@ describe('getExpNameAndQuickPickThenRun', () => {
 
     const mockedExpFunc = jest.fn()
     const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)
-    await getExpNameAndQuickPickThenRun(
-      experiments,
-      mockedExpFunc,
-      mockedQuickPick
-    )
+    await getCwdAndQuickPickThenRun(experiments, mockedExpFunc, mockedQuickPick)
 
     expect(mockedGetDefaultProject).toBeCalledTimes(1)
     expect(mockedQuickPickOne).not.toBeCalled()

@@ -47,7 +47,7 @@ export const getExpNameAndInputThenRun = async (
   }
 }
 
-export const getExpNameAndQuickPickThenRun = async <T>(
+export const getCwdAndQuickPickThenRun = async <T>(
   experiments: Experiments,
   func: (cwd: string, result: T) => Promise<string>,
   quickPick: () => Thenable<T | undefined>
@@ -77,7 +77,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      getExpNameAndQuickPickThenRun(
+      getCwdAndQuickPickThenRun(
         experiments,
         cliExecutor.experimentGarbageCollect,
         getGarbageCollectionFlags
