@@ -5,7 +5,7 @@ import {
   Args,
   Command,
   ExperimentFlag,
-  ExperimentSubCommands,
+  ExperimentSubCommand,
   Flag,
   GcPreserveFlag
 } from './args'
@@ -22,6 +22,9 @@ export class CliExecutor extends Cli {
 
     return this.executeProcess(cwd, ...args, target)
   }
+
+  private executeExperimentProcess = (cwd: string, ...args: Args) =>
+    this.executeProcess(cwd, Command.EXPERIMENT, ...args)
 
   public addTarget = (fsPath: string): Promise<string> =>
     this.executeProcessOnTarget(fsPath, Command.ADD)
@@ -42,10 +45,9 @@ export class CliExecutor extends Cli {
     cwd: string,
     experimentName: string
   ): Promise<string> =>
-    this.executeProcess(
+    this.executeExperimentProcess(
       cwd,
-      Command.EXPERIMENT,
-      ExperimentSubCommands.APPLY,
+      ExperimentSubCommand.APPLY,
       experimentName
     )
 
@@ -54,10 +56,9 @@ export class CliExecutor extends Cli {
     experimentName: string,
     branchName: string
   ): Promise<string> =>
-    this.executeProcess(
+    this.executeExperimentProcess(
       cwd,
-      Command.EXPERIMENT,
-      ExperimentSubCommands.BRANCH,
+      ExperimentSubCommand.BRANCH,
       experimentName,
       branchName
     )
@@ -66,10 +67,9 @@ export class CliExecutor extends Cli {
     cwd: string,
     preserveFlags: GcPreserveFlag[]
   ): Promise<string> =>
-    this.executeProcess(
+    this.executeExperimentProcess(
       cwd,
-      Command.EXPERIMENT,
-      ExperimentSubCommands.GARBAGE_COLLECT,
+      ExperimentSubCommand.GARBAGE_COLLECT,
       Flag.FORCE,
       ExperimentFlag.WORKSPACE,
       ...preserveFlags
@@ -79,18 +79,16 @@ export class CliExecutor extends Cli {
     cwd: string,
     experimentName: string
   ): Promise<string> =>
-    this.executeProcess(
+    this.executeExperimentProcess(
       cwd,
-      Command.EXPERIMENT,
-      ExperimentSubCommands.REMOVE,
+      ExperimentSubCommand.REMOVE,
       experimentName
     )
 
   public experimentRunQueue = (cwd: string): Promise<string> =>
-    this.executeProcess(
+    this.executeExperimentProcess(
       cwd,
-      Command.EXPERIMENT,
-      ExperimentSubCommands.RUN,
+      ExperimentSubCommand.RUN,
       ExperimentFlag.QUEUE
     )
 
