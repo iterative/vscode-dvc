@@ -2,9 +2,9 @@ import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { getProcessEnv } from '../env'
 import { Args } from './args'
+import { CliError } from './error'
 import { executeProcess } from '../processExecution'
 import { Config } from '../Config'
-import { CliProcessError } from '../vscode/reporting'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
@@ -43,7 +43,7 @@ export class Cli {
       this.ran?.fire(`> ${command}\n`)
       return stdout
     } catch (error) {
-      const cliError = new CliProcessError({ options, baseError: error })
+      const cliError = new CliError({ options, baseError: error })
       this.ran?.fire(`> ${command} failed. ${cliError.stderr}\n`)
       throw cliError
     }
