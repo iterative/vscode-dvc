@@ -1,11 +1,11 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { ExperimentsTable, Experiments } from '..'
-import { Config } from '../../Config'
-import { quickPickOne } from '../../vscode/quickPick'
-import { CliReader } from '../../cli/reader'
-import { pickExperimentName } from './quickPick'
-import { getInput } from '../../vscode/inputBox'
+import { ExperimentsTable, Experiments } from '.'
+import { Config } from '../Config'
+import { quickPickOne } from '../vscode/quickPick'
+import { CliReader } from '../cli/reader'
+import { pickExperimentName } from './commands/quickPick'
+import { getInput } from '../vscode/inputBox'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -19,9 +19,9 @@ const mockedConfig = ({
 } as unknown) as Config
 
 jest.mock('@hediet/std/disposable')
-jest.mock('../../vscode/quickPick')
-jest.mock('../../vscode/inputBox')
-jest.mock('./quickPick')
+jest.mock('../vscode/quickPick')
+jest.mock('../vscode/inputBox')
+jest.mock('./commands/quickPick')
 
 beforeEach(() => {
   jest.resetAllMocks()
