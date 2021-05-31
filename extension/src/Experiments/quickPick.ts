@@ -1,6 +1,6 @@
 import { window } from 'vscode'
-import { GcPreserveFlag } from '../../cli/args'
-import { quickPickManyValues } from '../../vscode/quickPick'
+import { GcPreserveFlag } from '../cli/args'
+import { quickPickManyValues } from '../vscode/quickPick'
 
 export const getGarbageCollectionFlags = () =>
   quickPickManyValues<GcPreserveFlag>(

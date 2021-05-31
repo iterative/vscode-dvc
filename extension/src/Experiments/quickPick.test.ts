@@ -1,6 +1,6 @@
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
-import { QuickPickItemWithValue } from '../../vscode/quickPick'
+import { QuickPickItemWithValue } from '../vscode/quickPick'
 import { getGarbageCollectionFlags, pickExperimentName } from './quickPick'
 
 jest.mock('vscode')
