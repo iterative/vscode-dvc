@@ -1,5 +1,5 @@
 import { window } from 'vscode'
-import { experimentRemove, experimentRunQueue } from '../../cli/executor'
+import { experimentRunQueue } from '../../cli/executor'
 import { ExecutionOptions } from '../../cli/execution'
 import { reportErrorMessage } from '../../vscode/reporting'
 
@@ -9,7 +9,9 @@ export const report = async (
   selectedExperimentName: string
 ) => {
   try {
-    window.showInformationMessage(await func(cwd, selectedExperimentName))
+    window.showInformationMessage(
+      (await func(cwd, selectedExperimentName)) || 'Operation successful.'
+    )
   } catch (e) {
     reportErrorMessage(e)
   }
@@ -20,20 +22,6 @@ export const queueExperiment = async (
 ): Promise<void> => {
   try {
     window.showInformationMessage(await experimentRunQueue(options))
-  } catch (e) {
-    reportErrorMessage(e)
-  }
-}
-
-export const removeExperiment = async (
-  options: ExecutionOptions,
-  selectedExperimentName: string
-) => {
-  try {
-    await experimentRemove(options, selectedExperimentName)
-    window.showInformationMessage(
-      `Experiment ${selectedExperimentName} has been removed!`
-    )
   } catch (e) {
     reportErrorMessage(e)
   }

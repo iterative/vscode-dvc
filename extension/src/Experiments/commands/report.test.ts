@@ -1,4 +1,4 @@
-import { queueExperiment, removeExperiment, report } from './report'
+import { queueExperiment, report } from './report'
 import { mocked } from 'ts-jest/utils'
 import { executeProcess } from '../../processExecution'
 import { getProcessEnv } from '../../env'
@@ -46,6 +46,19 @@ describe('report', () => {
     expect(mockedShowInformationMessage).toBeCalledWith(mockedStdOut)
   })
 
+  it('reports operation successful when no output is returned for the given command', async () => {
+    const mockedExperimentApply = jest.fn()
+    const mockedStdOut = ''
+    mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
+
+    await report(mockedExperimentApply, defaultPath, exampleExpName)
+
+    expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
+
+    expect(mockedShowInformationMessage).toBeCalledTimes(1)
+    expect(mockedShowInformationMessage).toBeCalledWith('Operation successful.')
+  })
+
   it('reports the error when execute process throws with stderr', async () => {
     const mockedExperimentApply = jest.fn()
     mockedExperimentApply.mockRejectedValueOnce({
@@ -71,32 +84,6 @@ describe('queueExperiment', () => {
     const mockedError = { stderr }
     mockedExecuteProcess.mockRejectedValueOnce(mockedError)
     await queueExperiment(exampleExecutionOptions)
-    expect(mockedShowErrorMessage).toBeCalledWith(stderr)
-  })
-})
-
-describe('removeExperiment', () => {
-  it('displays an info message with the contents of stdout when the command succeeds', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce('output from remove')
-
-    await removeExperiment(exampleExecutionOptions, exampleExpName)
-
-    expect(mockedShowInformationMessage).toBeCalledWith(
-      'Experiment exp-2021 has been removed!'
-    )
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'remove', 'exp-2021'],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
-  })
-
-  it('displays an error message with the contents of stderr when the command fails', async () => {
-    const stderr = 'Example stderr that will be resolved literally'
-    const mockedError = { stderr }
-    mockedExecuteProcess.mockRejectedValueOnce(mockedError)
-    await removeExperiment(exampleExecutionOptions, exampleExpName)
     expect(mockedShowErrorMessage).toBeCalledWith(stderr)
   })
 })

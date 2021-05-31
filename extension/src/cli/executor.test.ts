@@ -145,10 +145,31 @@ describe('CliExecutor', () => {
       const cwd = ''
       const stdout = 'Test output that will be passed along'
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
-      expect(await cliExecutor.experimentApply(cwd, 'exp-test')).toEqual(stdout)
+
+      const output = await cliExecutor.experimentApply(cwd, 'exp-test')
+      expect(output).toEqual(stdout)
+
       expect(mockedExecuteProcess).toBeCalledWith({
         executable: 'dvc',
         args: ['exp', 'apply', 'exp-test'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentRemove', () => {
+    it('builds the correct command and returns stdout', async () => {
+      const cwd = __dirname
+      const stdout = ''
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentRemove(cwd, 'exp-dfd12')
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'remove', 'exp-dfd12'],
         cwd,
         env: mockedEnv
       })
