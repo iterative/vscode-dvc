@@ -6,7 +6,7 @@ import {
   MessageToWebviewType,
   WebviewColorTheme,
   WindowWithWebviewData
-} from 'dvc/src/Experiments/Webview/contract'
+} from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/Logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'

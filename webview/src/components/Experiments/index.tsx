@@ -22,7 +22,7 @@ import styles from '../Table/styles.module.scss'
 
 import buildDynamicColumns from '../../util/build-dynamic-columns'
 
-import { VsCodeApi } from '../../model/Model'
+import { VsCodeApi } from '../../model'
 import SortIndicator from '../SortIndicator'
 import ManageColumns from '../ManageColumns'
 
