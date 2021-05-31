@@ -24,7 +24,7 @@ export const getExpNameThenRun = async (
   experiments: Experiments,
   func: (cwd: string, experimentName: string) => Promise<string>
 ) => {
-  const { cwd, name } = await experiments.getExpName()
+  const { cwd, name } = await experiments.getExperimentName()
   if (!(name && cwd)) {
     return
   }
@@ -36,7 +36,7 @@ export const getExpNameAndInputThenRun = async (
   func: (cwd: string, experiment: string, input: string) => Promise<string>,
   prompt: string
 ) => {
-  const { cwd, name } = await experiments.getExpName()
+  const { cwd, name } = await experiments.getExperimentName()
   if (!(name && cwd)) {
     return
   }

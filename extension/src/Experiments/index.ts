@@ -176,7 +176,7 @@ export class Experiments {
     return this.getFocusedOrDefaultOrPickProject()
   }
 
-  public async getExpName(): Promise<{
+  public async getExperimentName(): Promise<{
     name: string | undefined
     cwd: string | undefined
   }> {
