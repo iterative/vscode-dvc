@@ -1,26 +1,30 @@
 import { window } from 'vscode'
-import { ExecutionOptions } from '../cli/execution'
+import { Args } from '../cli/args'
 
 interface MaybeConsoleError extends Error {
   stderr?: string
 }
 
+export interface ExecutionOptions {
+  executable: string
+  args: Args
+  cwd: string
+  env: NodeJS.ProcessEnv
+}
+
 interface CLIProcessErrorArgs {
-  args: string[]
-  options?: ExecutionOptions
+  options: ExecutionOptions
   baseError: MaybeConsoleError
   message?: string
 }
 
 export class CliProcessError extends Error {
-  public readonly args: string[]
   public readonly options?: ExecutionOptions
   public readonly baseError: Error
   public readonly stderr?: string
 
-  constructor({ message, args, options, baseError }: CLIProcessErrorArgs) {
+  constructor({ message, options, baseError }: CLIProcessErrorArgs) {
     super(message || baseError.message)
-    this.args = args
     this.options = options
     this.baseError = baseError
     this.stderr = baseError.stderr

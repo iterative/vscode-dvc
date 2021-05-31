@@ -15,7 +15,6 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
-import { ExecutionOptions } from './cli/execution'
 import { QuickPickItemWithValue } from './vscode/quickPick'
 import { getConfigValue, setConfigValue } from './vscode/config'
 import { definedAndNonEmpty } from './util'
@@ -55,14 +54,6 @@ export class Config {
       return WebviewColorTheme.dark
     }
     return WebviewColorTheme.light
-  }
-
-  public getExecutionOptions(): ExecutionOptions {
-    return {
-      cliPath: this.getCliPath(),
-      cwd: this.firstWorkspaceFolderRoot,
-      pythonBinPath: this.pythonBinPath
-    }
   }
 
   @observable
