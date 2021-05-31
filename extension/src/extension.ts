@@ -15,7 +15,7 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { Config } from './config'
-import { WebviewSerializer } from './WebviewSerializer'
+import { WebviewSerializer } from './webviewSerializer'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerRepositoryCommands } from './repository/commands/register'
