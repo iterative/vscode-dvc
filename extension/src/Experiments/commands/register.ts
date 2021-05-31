@@ -63,7 +63,7 @@ export const getCwdAndQuickPickThenRun = async <T>(
   }
 }
 
-export const registerExperimentCommands = (
+export const registerExperimentExecutorCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
 ) => {
