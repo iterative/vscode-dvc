@@ -11,7 +11,13 @@ export class OutputChannel {
 
     cliInteractors.forEach(cli => {
       this.dispose.track(
-        cli.onDidRun(event => this.outputChannel.append(event))
+        cli.onDidRun(result => {
+          const { command, stderr } = result
+          if (stderr) {
+            return this.outputChannel.append(`> ${command} failed. ${stderr}\n`)
+          }
+          return this.outputChannel.append(`> ${command} \n`)
+        })
       )
     })
   }

@@ -1,6 +1,7 @@
 import { basename, join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
+import { CliResult } from '.'
 import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
@@ -32,7 +33,7 @@ describe('CliExecutor', () => {
     ({
       fire: jest.fn(),
       event: jest.fn()
-    } as unknown) as EventEmitter<string>
+    } as unknown) as EventEmitter<CliResult>
   )
 
   describe('addTarget', () => {
