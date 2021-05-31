@@ -13,7 +13,7 @@ import { ResourceLocator } from '../../../ResourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
-import { runQueued } from '../../../Experiments/commands/runner'
+import { runQueued } from '../../../Experiments/runner'
 
 chai.use(sinonChai)
 const { expect } = chai
