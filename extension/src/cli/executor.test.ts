@@ -4,6 +4,7 @@ import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
+import { GcPreserveFlag } from './args'
 import { CliExecutor } from './executor'
 
 jest.mock('vscode')
@@ -177,6 +178,29 @@ describe('CliExecutor', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         executable: 'dvc',
         args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentGarbageCollect', () => {
+    it('should call executeProcess with the correct parameters to garbage collect experiments', async () => {
+      const cwd = __dirname
+      const stdout =
+        `WARNING: This will remove all experiments except those derived from the workspace of the current repo. ` +
+        `Run queued experiments will be preserved. Run queued experiments will be removed.\n` +
+        `Removed 45 experiments. To remove unused cache files use 'dvc gc'. `
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentGarbageCollect(cwd, [
+        GcPreserveFlag.QUEUED
+      ])
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'gc', '-f', '-w', '--queued'],
         cwd,
         env: mockedEnv
       })

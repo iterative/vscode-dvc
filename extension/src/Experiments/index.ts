@@ -3,7 +3,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
-import { ExecutionOptions } from '../cli/execution'
 import { CliReader } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
@@ -173,16 +172,11 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  public async getExecutionOptions(): Promise<ExecutionOptions | undefined> {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return { ...this.config.getExecutionOptions(), cwd: dvcRoot }
+  public getCwd(): Promise<string | undefined> {
+    return this.getFocusedOrDefaultOrPickProject()
   }
 
-  public async getExperimentName(): Promise<{
+  public async getExpName(): Promise<{
     name: string | undefined
     cwd: string | undefined
   }> {

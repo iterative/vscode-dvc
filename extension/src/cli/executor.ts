@@ -9,9 +9,6 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
-import { ExecutionOptions, CliExecution } from './execution'
-
-const { executeCliProcess } = CliExecution
 
 export class CliExecutor extends Cli {
   private async executeProcessOnTarget(
@@ -54,15 +51,28 @@ export class CliExecutor extends Cli {
 
   public experimentBranch = (
     cwd: string,
-    experiment: string,
+    experimentName: string,
     branchName: string
   ): Promise<string> =>
     this.executeProcess(
       cwd,
       Command.EXPERIMENT,
       ExperimentSubCommands.BRANCH,
-      experiment,
+      experimentName,
       branchName
+    )
+
+  public experimentGarbageCollect = (
+    cwd: string,
+    preserveFlags: GcPreserveFlag[]
+  ): Promise<string> =>
+    this.executeProcess(
+      cwd,
+      Command.EXPERIMENT,
+      ExperimentSubCommands.GARBAGE_COLLECT,
+      Flag.FORCE,
+      ExperimentFlag.WORKSPACE,
+      ...preserveFlags
     )
 
   public experimentRemove = (
@@ -106,16 +116,3 @@ export class CliExecutor extends Cli {
   public removeTarget = (fsPath: string): Promise<string> =>
     this.executeProcessOnTarget(fsPath, Command.REMOVE)
 }
-
-export const experimentGarbageCollect = (
-  options: ExecutionOptions,
-  preserveFlags: GcPreserveFlag[]
-): Promise<string> =>
-  executeCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.GARBAGE_COLLECT,
-    Flag.FORCE,
-    ExperimentFlag.WORKSPACE,
-    ...preserveFlags
-  )
