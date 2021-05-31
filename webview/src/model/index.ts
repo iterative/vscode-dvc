@@ -11,7 +11,7 @@ import { Logger } from 'dvc/src/common/Logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
-import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './VsCodeApi'
+import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './vsCodeApi'
 
 export type VsCodeApi = BaseVsCodeApi<
   PersistedModelState,
