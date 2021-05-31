@@ -1,5 +1,4 @@
 import { commands } from 'vscode'
-import { Disposable } from '@hediet/std/disposable'
 import { report } from './report'
 import { getInput } from '../../vscode/inputBox'
 import { getGarbageCollectionFlags } from './quickPick'
@@ -20,6 +19,17 @@ export const getCwdThenRun = async (
   report(func(cwd))
 }
 
+const registerExperimentCwdCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+): void => {
+  experiments.dispose.track(
+    commands.registerCommand('dvc.queueExperiment', () =>
+      getCwdThenRun(experiments, cliExecutor.experimentRunQueue)
+    )
+  )
+}
+
 export const getExpNameThenRun = async (
   experiments: Experiments,
   func: (cwd: string, experimentName: string) => Promise<string>
@@ -29,6 +39,23 @@ export const getExpNameThenRun = async (
     return
   }
   return report(func(cwd, name))
+}
+
+const registerExperimentNameCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+): void => {
+  experiments.dispose.track(
+    commands.registerCommand('dvc.applyExperiment', () =>
+      getExpNameThenRun(experiments, cliExecutor.experimentApply)
+    )
+  )
+
+  experiments.dispose.track(
+    commands.registerCommand('dvc.removeExperiment', () =>
+      getExpNameThenRun(experiments, cliExecutor.experimentRemove)
+    )
+  )
 }
 
 export const getExpNameAndInputThenRun = async (
@@ -47,6 +74,21 @@ export const getExpNameAndInputThenRun = async (
   }
 }
 
+const registerExperimentInputCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+): void => {
+  experiments.dispose.track(
+    commands.registerCommand('dvc.branchExperiment', () =>
+      getExpNameAndInputThenRun(
+        experiments,
+        cliExecutor.experimentBranch,
+        'Name the new branch'
+      )
+    )
+  )
+}
+
 export const getCwdAndQuickPickThenRun = async <T>(
   experiments: Experiments,
   func: (cwd: string, result: T) => Promise<string>,
@@ -63,19 +105,11 @@ export const getCwdAndQuickPickThenRun = async <T>(
   }
 }
 
-export const registerExperimentExecutorCommands = (
+const registerExperimentQuickPickCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
-) => {
-  const disposer = Disposable.fn()
-
-  disposer.track(
-    commands.registerCommand('dvc.queueExperiment', () =>
-      getCwdThenRun(experiments, cliExecutor.experimentRunQueue)
-    )
-  )
-
-  disposer.track(
+): void => {
+  experiments.dispose.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
       getCwdAndQuickPickThenRun(
         experiments,
@@ -84,36 +118,16 @@ export const registerExperimentExecutorCommands = (
       )
     )
   )
+}
 
-  disposer.track(
-    commands.registerCommand('dvc.applyExperiment', () =>
-      getExpNameThenRun(experiments, cliExecutor.experimentApply)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.branchExperiment', () =>
-      getExpNameAndInputThenRun(
-        experiments,
-        cliExecutor.experimentBranch,
-        'Name the new branch'
-      )
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.removeExperiment', () =>
-      getExpNameThenRun(experiments, cliExecutor.experimentRemove)
-    )
-  )
-
-  disposer.track(
-    commands.registerCommand('dvc.showExperiments', () =>
-      experiments.showExperimentsTable()
-    )
-  )
-
-  return disposer
+const registerExperimentExecutorCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+): void => {
+  registerExperimentCwdCommands(experiments, cliExecutor)
+  registerExperimentNameCommands(experiments, cliExecutor)
+  registerExperimentInputCommands(experiments, cliExecutor)
+  registerExperimentQuickPickCommands(experiments, cliExecutor)
 }
 
 export const showExperimentsTableThenRun = async (
@@ -136,33 +150,44 @@ export const showExperimentsTableThenRun = async (
   )
 }
 
-export const registerExperimentRunnerCommands = (
+const registerExperimentRunnerCommands = (
   experiments: Experiments,
   cliRunner: CliRunner
-): Disposable => {
-  const disposer = Disposable.fn()
-
-  disposer.track(
+): void => {
+  experiments.dispose.track(
     commands.registerCommand('dvc.runExperiment', () =>
       showExperimentsTableThenRun(experiments, cliRunner, run)
     )
   )
 
-  disposer.track(
+  experiments.dispose.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
       showExperimentsTableThenRun(experiments, cliRunner, runReset)
     )
   )
 
-  disposer.track(
+  experiments.dispose.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
       showExperimentsTableThenRun(experiments, cliRunner, runQueued)
     )
   )
 
-  disposer.track(
+  experiments.dispose.track(
     commands.registerCommand('dvc.stopRunningExperiment', () => stop(cliRunner))
   )
 
-  return disposer
+  experiments.dispose.track(
+    commands.registerCommand('dvc.showExperiments', () =>
+      experiments.showExperimentsTable()
+    )
+  )
+}
+
+export const registerExperimentCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor,
+  cliRunner: CliRunner
+) => {
+  registerExperimentExecutorCommands(experiments, cliExecutor)
+  registerExperimentRunnerCommands(experiments, cliRunner)
 }
