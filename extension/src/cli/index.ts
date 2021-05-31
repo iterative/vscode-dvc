@@ -4,7 +4,7 @@ import { getProcessEnv } from '../env'
 import { Args } from './args'
 import { executeProcess } from '../processExecution'
 import { Config } from '../Config'
-import { CliProcessError, ExecutionOptions } from '../vscode/reporting'
+import { CliProcessError } from '../vscode/reporting'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')
@@ -26,7 +26,7 @@ export class Cli {
   private ran: EventEmitter<string>
   public onDidRun: Event<string>
 
-  private getExecutionOptions(cwd: string, args: Args): ExecutionOptions {
+  private getExecutionOptions(cwd: string, args: Args) {
     return {
       executable: this.config.getCliPath() || 'dvc',
       args,

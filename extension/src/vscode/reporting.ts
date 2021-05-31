@@ -5,7 +5,7 @@ interface MaybeConsoleError extends Error {
   stderr?: string
 }
 
-export interface ExecutionOptions {
+interface ExecutionOptions {
   executable: string
   args: Args
   cwd: string
