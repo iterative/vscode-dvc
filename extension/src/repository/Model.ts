@@ -1,5 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SourceControlManagementModel } from './views/SourceControlManagement'
+import { SourceControlManagementModel } from './views/sourceControlManagement'
 import { DecorationModel } from './DecorationProvider'
 import {
   ChangedType,
