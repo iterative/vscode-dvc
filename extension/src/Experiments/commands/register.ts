@@ -1,12 +1,13 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { queueExperiment, report } from './report'
-import { branchExperiment, garbageCollectExperiments } from './quickPick'
+import { queueExperiment, report, report_ } from './report'
+import { garbageCollectExperiments, getBranchName } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { ExecutionOptions } from '../../cli/execution'
 import { CliExecutor } from '../../cli/executor'
+import { reportErrorMessage } from '../../vscode/reporting'
 
 export const getExecutionOptionsThenRun = async (
   experiments: Experiments,
@@ -46,6 +47,28 @@ export const getExperimentNameThenRun_ = async (
   return report(func, cwd, name)
 }
 
+const branchExperiment = async (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+) => {
+  const obj = await experiments.getExperimentName()
+  const options = obj?.options
+  const cwd = options?.cwd
+  const name = await obj?.name
+  if (!(name && cwd)) {
+    return
+  }
+
+  const branchName = await getBranchName()
+  if (branchName) {
+    try {
+      report_(await cliExecutor.experimentBranch(cwd, name, branchName))
+    } catch (e) {
+      reportErrorMessage(e)
+    }
+  }
+}
+
 export const registerExperimentCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
@@ -72,7 +95,7 @@ export const registerExperimentCommands = (
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      getExperimentNameThenRun(experiments, branchExperiment)
+      branchExperiment(experiments, cliExecutor)
     )
   )
 

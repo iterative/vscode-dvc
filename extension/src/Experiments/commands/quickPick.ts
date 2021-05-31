@@ -1,27 +1,14 @@
 import { window } from 'vscode'
 import { GcPreserveFlag } from '../../cli/args'
 import { ExecutionOptions } from '../../cli/execution'
-import { experimentBranch, experimentGarbageCollect } from '../../cli/executor'
+import { experimentGarbageCollect } from '../../cli/executor'
 import { quickPickManyValues } from '../../vscode/quickPick'
 import { reportErrorMessage } from '../../vscode/reporting'
 
-export const branchExperiment = async (
-  options: ExecutionOptions,
-  selectedExperimentName: string
-) => {
-  const branchName = await window.showInputBox({
+export const getBranchName = () =>
+  window.showInputBox({
     prompt: 'Name the new branch'
   })
-  if (branchName) {
-    try {
-      window.showInformationMessage(
-        await experimentBranch(options, selectedExperimentName, branchName)
-      )
-    } catch (e) {
-      reportErrorMessage(e)
-    }
-  }
-}
 
 export const garbageCollectExperiments = async (options: ExecutionOptions) => {
   const quickPickResult = await quickPickManyValues<GcPreserveFlag>(

@@ -52,6 +52,19 @@ export class CliExecutor extends Cli {
       experimentName
     )
 
+  public experimentBranch = (
+    cwd: string,
+    experiment: string,
+    branchName: string
+  ): Promise<string> =>
+    this.executeProcess(
+      cwd,
+      Command.EXPERIMENT,
+      ExperimentSubCommands.BRANCH,
+      experiment,
+      branchName
+    )
+
   public experimentRemove = (
     cwd: string,
     experimentName: string
@@ -95,19 +108,6 @@ export const experimentApply = (
     Command.EXPERIMENT,
     ExperimentSubCommands.APPLY,
     experiment
-  )
-
-export const experimentBranch = (
-  options: ExecutionOptions,
-  experiment: string,
-  branchName: string
-): Promise<string> =>
-  executeCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.BRANCH,
-    experiment,
-    branchName
   )
 
 export const experimentGarbageCollect = (

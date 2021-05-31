@@ -4,7 +4,7 @@ import { ExecutionOptions } from '../../cli/execution'
 import { reportErrorMessage } from '../../vscode/reporting'
 
 export const report = async (
-  func: (cwd: string, selectedExperimentName: string) => Promise<string>,
+  func: (cwd: string, experimentName: string) => Promise<string>,
   cwd: string,
   selectedExperimentName: string
 ) => {
@@ -16,6 +16,9 @@ export const report = async (
     reportErrorMessage(e)
   }
 }
+
+export const report_ = (stdout = 'Operation successful.') =>
+  window.showInformationMessage(stdout)
 
 export const queueExperiment = async (
   options: ExecutionOptions

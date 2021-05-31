@@ -103,7 +103,7 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call execPromise with the correct parameters to commit a repo', async () => {
+    it('should call executeProcess with the correct parameters to commit a repo', async () => {
       const cwd = __dirname
       const stdout = "Updating lock file 'dvc.lock'"
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -121,7 +121,7 @@ describe('CliExecutor', () => {
   })
 
   describe('commitTarget', () => {
-    it('should call execPromise with the correct parameters to commit a target', async () => {
+    it('should call executeProcess with the correct parameters to commit a target', async () => {
       const fsPath = __filename
       const dir = resolve(fsPath, '..')
       const file = basename(__filename)
@@ -141,7 +141,7 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentApply', () => {
-    it('builds the correct command and returns stdout', async () => {
+    it('should call executeProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
       const cwd = ''
       const stdout = 'Test output that will be passed along'
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -158,8 +158,33 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('experimentBranch', () => {
+    it('should call executeProcess with the correct parameters to create a new branch from an existing experiment', async () => {
+      const cwd = __dirname
+      const stdout =
+        `Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n` +
+        `To switch to the new branch run:\n\n` +
+        `\t\tgit checkout some-branch`
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentBranch(
+        cwd,
+        'exp-0898f',
+        'some-branch'
+      )
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
   describe('experimentRemove', () => {
-    it('builds the correct command and returns stdout', async () => {
+    it('should call executeProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
       const cwd = __dirname
       const stdout = ''
       mockedExecuteProcess.mockResolvedValueOnce(stdout)

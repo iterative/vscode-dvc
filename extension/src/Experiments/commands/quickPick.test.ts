@@ -4,11 +4,7 @@ import { getProcessEnv } from '../../env'
 import { QuickPickOptions, window } from 'vscode'
 import { GcPreserveFlag } from '../../cli/args'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
-import {
-  branchExperiment,
-  garbageCollectExperiments,
-  pickExperimentName
-} from './quickPick'
+import { garbageCollectExperiments, pickExperimentName } from './quickPick'
 
 jest.mock('../../processExecution')
 jest.mock('../../env')
@@ -26,7 +22,7 @@ const mockedShowQuickPick = mocked<
     QuickPickItemWithValue[] | QuickPickItemWithValue | string | undefined
   >
 >(window.showQuickPick)
-const mockedShowInputBox = mocked(window.showInputBox)
+// const mockedShowInputBox = mocked(window.showInputBox)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   PATH: '/all/of/the/goodies:/in/my/path'
@@ -61,23 +57,23 @@ const exampleExperimentsList = [
 
 const exampleExpName = 'exp-2021'
 
-describe('branchExperiment', () => {
-  const testBranchName = 'test-branch-name'
+// describe('branchExperiment', () => {
+//   const testBranchName = 'test-branch-name'
 
-  it('gets a name from showInputBox and executes a constructed command', async () => {
-    mockedExecuteProcess.mockResolvedValueOnce('output from branch')
-    mockedShowInputBox.mockResolvedValueOnce(testBranchName)
+//   it('gets a name from showInputBox and executes a constructed command', async () => {
+//     mockedExecuteProcess.mockResolvedValueOnce('output from branch')
+//     mockedShowInputBox.mockResolvedValueOnce(testBranchName)
 
-    await branchExperiment(exampleExecutionOptions, exampleExpName)
+//     await branchExperiment(exampleExecutionOptions, exampleExpName)
 
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
-      cwd: defaultPath,
-      env: mockedEnv
-    })
-  })
-})
+//     expect(mockedExecuteProcess).toBeCalledWith({
+//       executable: 'dvc',
+//       args: ['exp', 'branch', 'exp-2021', 'test-branch-name'],
+//       cwd: defaultPath,
+//       env: mockedEnv
+//     })
+//   })
+// })
 
 describe('garbageCollectExperiments', () => {
   it('invokes a QuickPick with the correct options', async () => {
