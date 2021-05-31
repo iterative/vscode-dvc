@@ -4,7 +4,7 @@ import { getProcessEnv } from '../env'
 import { Args } from './args'
 import { CliError } from './error'
 import { executeProcess } from '../processExecution'
-import { Config } from '../Config'
+import { Config } from '../config'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
   [pythonBinPath, existingPath].filter(Boolean).join(':')

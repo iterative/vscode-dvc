@@ -14,7 +14,7 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { Config } from './Config'
+import { Config } from './config'
 import { WebviewSerializer } from './WebviewSerializer'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'

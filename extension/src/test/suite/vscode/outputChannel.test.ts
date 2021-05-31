@@ -6,7 +6,7 @@ import { OutputChannel } from '../../../vscode/outputChannel'
 import { Disposable } from '../../../extension'
 import { restore, stub, fake } from 'sinon'
 import { Cli, CliResult } from '../../../cli'
-import { Config } from '../../../Config'
+import { Config } from '../../../config'
 
 chai.use(sinonChai)
 const { expect } = chai

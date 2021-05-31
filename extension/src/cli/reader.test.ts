@@ -4,7 +4,7 @@ import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { Config } from '../Config'
+import { Config } from '../config'
 import { EventEmitter } from 'vscode'
 import { CliResult } from '.'
 

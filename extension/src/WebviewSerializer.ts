@@ -1,7 +1,7 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './experiments/webview'
-import { Config } from './Config'
+import { Config } from './config'
 import { Experiments } from './experiments'
 import { ExperimentsWebviewState } from './experiments/webview/contract'
 

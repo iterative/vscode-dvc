@@ -1,7 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { ExperimentsTable, Experiments } from '.'
-import { Config } from '../Config'
+import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'

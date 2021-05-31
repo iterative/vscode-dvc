@@ -10,7 +10,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
-import { Config } from '../../Config'
+import { Config } from '../../config'
 import {
   WebviewType as Experiments,
   ExperimentsRepoJSONOutput,
