@@ -201,6 +201,24 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('experimentRunQueue', () => {
+    it('should call executeProcess with the correct parameters to queue an experiment for later execution', async () => {
+      const cwd = __dirname
+      const stdout = "Queued experiment 'bbf5c01' for future execution."
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentRunQueue(cwd)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'run', '--queue'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
   describe('help', () => {
     it('should call execute process with the correct parameters', async () => {
       const cwd = __dirname

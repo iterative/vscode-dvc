@@ -76,6 +76,14 @@ export class CliExecutor extends Cli {
       experimentName
     )
 
+  public experimentRunQueue = (cwd: string): Promise<string> =>
+    this.executeProcess(
+      cwd,
+      Command.EXPERIMENT,
+      ExperimentSubCommands.RUN,
+      ExperimentFlag.QUEUE
+    )
+
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
   }
@@ -121,14 +129,4 @@ export const experimentGarbageCollect = (
     Flag.FORCE,
     ExperimentFlag.WORKSPACE,
     ...preserveFlags
-  )
-
-export const experimentRunQueue = (
-  options: ExecutionOptions
-): Promise<string> =>
-  executeCliProcess(
-    options,
-    Command.EXPERIMENT,
-    ExperimentSubCommands.RUN,
-    ExperimentFlag.QUEUE
   )
