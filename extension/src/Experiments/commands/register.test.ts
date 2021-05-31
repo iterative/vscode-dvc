@@ -214,7 +214,7 @@ describe('getExpNameAndInputThenRun', () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
     mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
     mockedPickExperimentName.mockResolvedValueOnce('exp-123')
-    mockedGetInput.mockResolvedValueOnce('some-branch')
+    mockedGetInput.mockResolvedValueOnce('abc123')
 
     const experiments = new Experiments(
       mockedConfig,
@@ -242,11 +242,7 @@ describe('getExpNameAndInputThenRun', () => {
     expect(mockedQuickPickOne).toBeCalledTimes(1)
     expect(mockedPickExperimentName).toBeCalledTimes(1)
     expect(mockedExpFunc).toBeCalledTimes(1)
-    expect(mockedExpFunc).toBeCalledWith(
-      mockedDvcRoot,
-      'exp-123',
-      'some-branch'
-    )
+    expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, 'exp-123', 'abc123')
   })
 
   it('should not call the function or ask for input if a project is not picked', async () => {
@@ -317,20 +313,16 @@ describe('getExpNameAndQuickPickThenRun', () => {
     mockedGetDefaultProject.mockReturnValueOnce(undefined)
     mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-    const experiments = new Experiments(
-      mockedConfig,
-      ({ experimentListCurrent: jest.fn() } as unknown) as CliReader,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as ExperimentsTable,
-        '/my/fun/dvc/root': ({
-          showWebview: jest.fn(),
-          getDvcRoot: () => '/my/fun/dvc/root'
-        } as unknown) as ExperimentsTable
-      }
-    )
+    const experiments = new Experiments(mockedConfig, {} as CliReader, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as ExperimentsTable,
+      '/my/fun/dvc/root': ({
+        showWebview: jest.fn(),
+        getDvcRoot: () => '/my/fun/dvc/root'
+      } as unknown) as ExperimentsTable
+    })
 
     const mockedExpFunc = jest.fn()
     const mockedPickedOptions = ['a', 'b', 'c']
@@ -379,24 +371,18 @@ describe('getExpNameAndQuickPickThenRun', () => {
 
   it('should not call the function if quick picks are not provided', async () => {
     mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
-    mockedPickExperimentName.mockResolvedValueOnce('exp-456')
-    mockedQuickPickOne.mockResolvedValueOnce(undefined)
-    mockedGetInput.mockResolvedValueOnce(undefined)
+    mockedPickExperimentName.mockResolvedValueOnce('exp-789')
 
-    const experiments = new Experiments(
-      mockedConfig,
-      ({ experimentListCurrent: jest.fn() } as unknown) as CliReader,
-      {
-        '/my/dvc/root': ({
-          showWebview: mockedShowWebview,
-          getDvcRoot: () => mockedDvcRoot
-        } as unknown) as ExperimentsTable,
-        '/my/mocked/dvc/root': ({
-          showWebview: jest.fn(),
-          getDvcRoot: () => '/my/mocked/dvc/root'
-        } as unknown) as ExperimentsTable
-      }
-    )
+    const experiments = new Experiments(mockedConfig, {} as CliReader, {
+      '/my/dvc/root': ({
+        showWebview: mockedShowWebview,
+        getDvcRoot: () => mockedDvcRoot
+      } as unknown) as ExperimentsTable,
+      '/my/mocked/dvc/root': ({
+        showWebview: jest.fn(),
+        getDvcRoot: () => '/my/mocked/dvc/root'
+      } as unknown) as ExperimentsTable
+    })
 
     const mockedExpFunc = jest.fn()
     const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)

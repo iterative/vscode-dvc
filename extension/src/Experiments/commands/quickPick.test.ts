@@ -3,8 +3,6 @@ import { QuickPickOptions, window } from 'vscode'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
 import { getGarbageCollectionFlags, pickExperimentName } from './quickPick'
 
-jest.mock('../../processExecution')
-jest.mock('../../env')
 jest.mock('vscode')
 
 const mockedShowErrorMessage = mocked(window.showErrorMessage)
@@ -21,7 +19,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const exampleExperimentsList = [
+const mockedExpList = [
   'exp-0580a',
   'exp-c54c4',
   'exp-054f1',
@@ -35,7 +33,7 @@ const exampleExperimentsList = [
   'exp-59807'
 ]
 
-const exampleExpName = 'exp-2021'
+const mockedExpName = 'exp-2021'
 
 describe('getGarbageCollectionFlags', () => {
   it('invokes a QuickPick with the correct options', async () => {
@@ -73,14 +71,14 @@ describe('getGarbageCollectionFlags', () => {
 
 describe('pickExperimentName', () => {
   it('should return the name of the chosen experiment if one is selected by the user', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(exampleExpName)
-    const name = await pickExperimentName(exampleExperimentsList)
-    expect(name).toEqual(exampleExpName)
+    mockedShowQuickPick.mockResolvedValueOnce(mockedExpName)
+    const name = await pickExperimentName(mockedExpList)
+    expect(name).toEqual(mockedExpName)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    const undef = await pickExperimentName(exampleExperimentsList)
+    const undef = await pickExperimentName(mockedExpList)
     expect(undef).toBeUndefined()
   })
 
