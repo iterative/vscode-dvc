@@ -1,43 +1,43 @@
-import { Disposable } from '@hediet/std/disposable'
 import { CliExecutor } from '../../cli/executor'
 import { registerUriCommand } from '../../vscode/commands'
 
-export const registerRepositoryCommands = (cliExecutor: CliExecutor) => {
-  const disposer = Disposable.fn()
+const registerResourceCommands = (cliExecutor: CliExecutor): void => {
+  const type = 'resourceUri'
 
-  disposer.track(
-    registerUriCommand('dvc.addTarget', 'resourceUri', cliExecutor.addTarget)
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.addTarget', type, cliExecutor.addTarget)
   )
 
-  disposer.track(
-    registerUriCommand('dvc.checkout', 'rootUri', cliExecutor.checkout)
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.checkoutTarget', type, cliExecutor.checkoutTarget)
   )
 
-  disposer.track(
-    registerUriCommand(
-      'dvc.checkoutTarget',
-      'resourceUri',
-      cliExecutor.checkoutTarget
-    )
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.commitTarget', type, cliExecutor.commitTarget)
+  )
+}
+
+const registerRootCommands = (cliExecutor: CliExecutor) => {
+  const type = 'rootUri'
+
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.checkout', type, cliExecutor.checkout)
   )
 
-  disposer.track(
-    registerUriCommand('dvc.commit', 'rootUri', cliExecutor.commit)
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.commit', type, cliExecutor.commit)
   )
 
-  disposer.track(
-    registerUriCommand(
-      'dvc.commitTarget',
-      'resourceUri',
-      cliExecutor.commitTarget
-    )
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.pull', type, cliExecutor.pull)
   )
 
-  disposer.track(
-    disposer.track(registerUriCommand('dvc.pull', 'rootUri', cliExecutor.pull))
+  cliExecutor.dispose.track(
+    registerUriCommand('dvc.push', type, cliExecutor.push)
   )
+}
 
-  disposer.track(registerUriCommand('dvc.push', 'rootUri', cliExecutor.push))
-
-  return disposer
+export const registerRepositoryCommands = (cliExecutor: CliExecutor): void => {
+  registerResourceCommands(cliExecutor)
+  registerRootCommands(cliExecutor)
 }
