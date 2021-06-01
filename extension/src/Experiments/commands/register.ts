@@ -1,66 +1,109 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { applyExperiment, queueExperiment, removeExperiment } from './report'
-import { branchExperiment, garbageCollectExperiments } from './quickPick'
+import { report } from './report'
+import { getInput } from '../../vscode/inputBox'
+import { getGarbageCollectionFlags } from './quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
-import { ExecutionOptions } from '../../cli/execution'
+import { CliExecutor } from '../../cli/executor'
 
-export const getExecutionOptionsThenRun = async (
+export const getCwdThenRun = async (
   experiments: Experiments,
-  func: (options: ExecutionOptions) => Promise<unknown>
+  func: (cwd: string) => Promise<string>
 ) => {
-  const options = await experiments.getExecutionOptions()
-  if (!options) {
+  const cwd = await experiments.getCwd()
+  if (!cwd) {
     return
   }
-  return func(options)
+
+  report(func(cwd))
 }
 
-export const getExperimentNameThenRun = async (
+export const getExpNameThenRun = async (
   experiments: Experiments,
-  func: (options: ExecutionOptions, experimentName: string) => Promise<unknown>
+  func: (cwd: string, experimentName: string) => Promise<string>
 ) => {
-  const obj = await experiments.getExperimentName()
-  const options = obj?.options
-  const name = await obj?.name
-  if (!(name && options)) {
+  const { cwd, name } = await experiments.getExperimentName()
+  if (!(name && cwd)) {
     return
   }
-  return func(options, name)
+  return report(func(cwd, name))
 }
 
-export const registerExperimentCommands = (experiments: Experiments) => {
+export const getExpNameAndInputThenRun = async (
+  experiments: Experiments,
+  func: (cwd: string, experiment: string, input: string) => Promise<string>,
+  prompt: string
+) => {
+  const { cwd, name } = await experiments.getExperimentName()
+  if (!(name && cwd)) {
+    return
+  }
+
+  const input = await getInput(prompt)
+  if (input) {
+    report(func(cwd, name, input))
+  }
+}
+
+export const getCwdAndQuickPickThenRun = async <T>(
+  experiments: Experiments,
+  func: (cwd: string, result: T) => Promise<string>,
+  quickPick: () => Thenable<T | undefined>
+) => {
+  const cwd = await experiments.getCwd()
+  if (!cwd) {
+    return
+  }
+  const result = await quickPick()
+
+  if (result) {
+    report(func(cwd, result))
+  }
+}
+
+export const registerExperimentExecutorCommands = (
+  experiments: Experiments,
+  cliExecutor: CliExecutor
+) => {
   const disposer = Disposable.fn()
 
   disposer.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      getExecutionOptionsThenRun(experiments, queueExperiment)
+      getCwdThenRun(experiments, cliExecutor.experimentRunQueue)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
-      getExecutionOptionsThenRun(experiments, garbageCollectExperiments)
+      getCwdAndQuickPickThenRun(
+        experiments,
+        cliExecutor.experimentGarbageCollect,
+        getGarbageCollectionFlags
+      )
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      getExperimentNameThenRun(experiments, applyExperiment)
+      getExpNameThenRun(experiments, cliExecutor.experimentApply)
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.branchExperiment', () =>
-      getExperimentNameThenRun(experiments, branchExperiment)
+      getExpNameAndInputThenRun(
+        experiments,
+        cliExecutor.experimentBranch,
+        'Name the new branch'
+      )
     )
   )
 
   disposer.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      getExperimentNameThenRun(experiments, removeExperiment)
+      getExpNameThenRun(experiments, cliExecutor.experimentRemove)
     )
   )
 

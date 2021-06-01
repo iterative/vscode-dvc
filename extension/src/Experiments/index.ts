@@ -3,7 +3,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { resolve } from 'path'
-import { ExecutionOptions } from '../cli/execution'
 import { CliReader } from '../cli/reader'
 import { Config } from '../Config'
 import { ExperimentsRepoJSONOutput } from '../Experiments/Webview/contract'
@@ -173,31 +172,24 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  public async getExecutionOptions(): Promise<ExecutionOptions | undefined> {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return { ...this.config.getExecutionOptions(), cwd: dvcRoot }
+  public getCwd(): Promise<string | undefined> {
+    return this.getFocusedOrDefaultOrPickProject()
   }
 
-  public async getExperimentName(): Promise<
-    | {
-        name: Thenable<string | undefined> | undefined
-        options: ExecutionOptions | undefined
-      }
-    | undefined
-  > {
+  public async getExperimentName(): Promise<{
+    name: string | undefined
+    cwd: string | undefined
+  }> {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
-      return
+      return { name: undefined, cwd: dvcRoot }
     }
     const experimentNames = await this.cliReader.experimentListCurrent(dvcRoot)
+    const name = await pickExperimentName(experimentNames)
 
     return {
-      name: pickExperimentName(experimentNames),
-      options: { ...this.config.getExecutionOptions(), cwd: dvcRoot }
+      name,
+      cwd: dvcRoot
     }
   }
 

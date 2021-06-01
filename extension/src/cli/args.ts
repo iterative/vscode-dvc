@@ -21,7 +21,7 @@ export enum Flag {
   SUBDIRECTORY = '--subdir'
 }
 
-export enum ExperimentSubCommands {
+export enum ExperimentSubCommand {
   APPLY = 'apply',
   BRANCH = 'branch',
   GARBAGE_COLLECT = 'gc',
@@ -55,4 +55,4 @@ type Target = string
 
 type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag
 
-export type Args = (Command | Target | ExperimentSubCommands | Flags)[]
+export type Args = (Command | Target | ExperimentSubCommand | Flags)[]

@@ -1,30 +1,9 @@
 import { window } from 'vscode'
 import { GcPreserveFlag } from '../../cli/args'
-import { ExecutionOptions } from '../../cli/execution'
-import { experimentBranch, experimentGarbageCollect } from '../../cli/executor'
 import { quickPickManyValues } from '../../vscode/quickPick'
-import { reportErrorMessage } from '../../vscode/reporting'
 
-export const branchExperiment = async (
-  options: ExecutionOptions,
-  selectedExperimentName: string
-) => {
-  const branchName = await window.showInputBox({
-    prompt: 'Name the new branch'
-  })
-  if (branchName) {
-    try {
-      window.showInformationMessage(
-        await experimentBranch(options, selectedExperimentName, branchName)
-      )
-    } catch (e) {
-      reportErrorMessage(e)
-    }
-  }
-}
-
-export const garbageCollectExperiments = async (options: ExecutionOptions) => {
-  const quickPickResult = await quickPickManyValues<GcPreserveFlag>(
+export const getGarbageCollectionFlags = () =>
+  quickPickManyValues<GcPreserveFlag>(
     [
       {
         label: 'All Branches',
@@ -50,21 +29,11 @@ export const garbageCollectExperiments = async (options: ExecutionOptions) => {
     { placeHolder: 'Select which Experiments to preserve' }
   )
 
-  if (quickPickResult) {
-    try {
-      const stdout = await experimentGarbageCollect(options, quickPickResult)
-      window.showInformationMessage(stdout)
-    } catch (e) {
-      reportErrorMessage(e)
-    }
-  }
-}
-
 export const pickExperimentName = (
   experimentNames: string[]
 ): Thenable<string | undefined> | undefined => {
   if (experimentNames.length === 0) {
-    window.showErrorMessage('There are no experiments to select!')
+    window.showErrorMessage('There are no experiments to select.')
   } else {
     return window.showQuickPick(experimentNames)
   }

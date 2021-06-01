@@ -3,7 +3,7 @@ import {
   Args,
   Command,
   ExperimentFlag,
-  ExperimentSubCommands,
+  ExperimentSubCommand,
   Flag,
   ListFlag
 } from './args'
@@ -75,7 +75,7 @@ export class CliReader extends Cli {
       cwd,
       trimAndSplit,
       Command.EXPERIMENT,
-      ExperimentSubCommands.LIST,
+      ExperimentSubCommand.LIST,
       ExperimentFlag.NAMES_ONLY
     )
   }
@@ -84,7 +84,7 @@ export class CliReader extends Cli {
     return this.readProcessJson<ExperimentsRepoJSONOutput>(
       cwd,
       Command.EXPERIMENT,
-      ExperimentSubCommands.SHOW
+      ExperimentSubCommand.SHOW
     )
   }
 

@@ -19,7 +19,7 @@ import { Config } from './Config'
 import { WebviewSerializer } from './WebviewSerializer'
 import { Experiments } from './Experiments'
 import {
-  registerExperimentCommands,
+  registerExperimentExecutorCommands,
   registerExperimentRunnerCommands
 } from './Experiments/commands/register'
 import { registerRepositoryCommands } from './Repository/commands/register'
@@ -276,7 +276,9 @@ export class Extension {
     )
     this.dispose.track(this.webviewSerializer)
 
-    this.dispose.track(registerExperimentCommands(this.experiments))
+    this.dispose.track(
+      registerExperimentExecutorCommands(this.experiments, this.cliExecutor)
+    )
     this.dispose.track(
       registerExperimentRunnerCommands(this.experiments, this.cliRunner)
     )

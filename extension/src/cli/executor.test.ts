@@ -4,7 +4,8 @@ import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
-import { CliExecutor, experimentApply } from './executor'
+import { GcPreserveFlag } from './args'
+import { CliExecutor } from './executor'
 
 jest.mock('vscode')
 jest.mock('fs-extra')
@@ -103,7 +104,7 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call execPromise with the correct parameters to commit a repo', async () => {
+    it('should call executeProcess with the correct parameters to commit a repo', async () => {
       const cwd = __dirname
       const stdout = "Updating lock file 'dvc.lock'"
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -121,7 +122,7 @@ describe('CliExecutor', () => {
   })
 
   describe('commitTarget', () => {
-    it('should call execPromise with the correct parameters to commit a target', async () => {
+    it('should call executeProcess with the correct parameters to commit a target', async () => {
       const fsPath = __filename
       const dir = resolve(fsPath, '..')
       const file = basename(__filename)
@@ -135,6 +136,108 @@ describe('CliExecutor', () => {
         executable: 'dvc',
         args: ['commit', '-f', file],
         cwd: dir,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentApply', () => {
+    it('should call executeProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
+      const cwd = ''
+      const stdout = 'Test output that will be passed along'
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentApply(cwd, 'exp-test')
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'apply', 'exp-test'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentBranch', () => {
+    it('should call executeProcess with the correct parameters to create a new branch from an existing experiment', async () => {
+      const cwd = __dirname
+      const stdout =
+        `Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n` +
+        `To switch to the new branch run:\n\n` +
+        `\t\tgit checkout some-branch`
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentBranch(
+        cwd,
+        'exp-0898f',
+        'some-branch'
+      )
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentGarbageCollect', () => {
+    it('should call executeProcess with the correct parameters to garbage collect experiments', async () => {
+      const cwd = __dirname
+      const stdout =
+        `WARNING: This will remove all experiments except those derived from the workspace of the current repo. ` +
+        `Run queued experiments will be preserved. Run queued experiments will be removed.\n` +
+        `Removed 45 experiments. To remove unused cache files use 'dvc gc'. `
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentGarbageCollect(cwd, [
+        GcPreserveFlag.QUEUED
+      ])
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'gc', '-f', '-w', '--queued'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentRemove', () => {
+    it('should call executeProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
+      const cwd = __dirname
+      const stdout = ''
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentRemove(cwd, 'exp-dfd12')
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'remove', 'exp-dfd12'],
+        cwd,
+        env: mockedEnv
+      })
+    })
+  })
+
+  describe('experimentRunQueue', () => {
+    it('should call executeProcess with the correct parameters to queue an experiment for later execution', async () => {
+      const cwd = __dirname
+      const stdout = "Queued experiment 'bbf5c01' for future execution."
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.experimentRunQueue(cwd)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        executable: 'dvc',
+        args: ['exp', 'run', '--queue'],
+        cwd,
         env: mockedEnv
       })
     })
@@ -332,26 +435,6 @@ describe('CliExecutor', () => {
           env: mockedEnv
         })
       })
-    })
-  })
-})
-
-describe('experimentApply', () => {
-  it('builds the correct command and returns stdout', async () => {
-    const cwd = ''
-    const stdout = 'Test output that will be passed along'
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-    expect(
-      await experimentApply(
-        { cwd, cliPath: 'dvc', pythonBinPath: undefined },
-        'exp-test'
-      )
-    ).toEqual(stdout)
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['exp', 'apply', 'exp-test'],
-      cwd,
-      env: mockedEnv
     })
   })
 })
