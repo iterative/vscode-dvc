@@ -1,11 +1,11 @@
+import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
-import { Disposable } from '../../../extension'
-import { resolve } from 'path'
-import { getGitRepositoryRoots } from '../../../extensions/git'
 import { restore } from 'sinon'
+import { Disposable } from '../../../extension'
+import { getGitRepositoryRoots } from '../../../extensions/git'
 
 chai.use(sinonChai)
 const { expect } = chai

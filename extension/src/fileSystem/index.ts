@@ -1,8 +1,8 @@
+import { join, resolve } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
-import { join, resolve } from 'path'
 import { definedAndNonEmpty } from '../util'
 
 export const getWatcher = (handler: (path: string) => void) => (

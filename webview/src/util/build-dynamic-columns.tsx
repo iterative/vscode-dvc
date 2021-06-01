@@ -3,6 +3,7 @@ import React from 'react'
 import get from 'lodash/get'
 
 import { DataDictRoot } from 'dvc/src/experiments/webview/contract'
+import { Column, Accessor } from 'react-table'
 import { Experiment } from './parse-experiments'
 
 import {
@@ -10,7 +11,6 @@ import {
   formatInteger,
   formatSignedFloat
 } from './number-formatting'
-import { Column, Accessor } from 'react-table'
 
 type SchemaType = string | string[]
 

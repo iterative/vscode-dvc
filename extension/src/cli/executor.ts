@@ -1,5 +1,5 @@
-import { ensureDir } from 'fs-extra'
 import { basename, dirname } from 'path'
+import { ensureDir } from 'fs-extra'
 import { Cli } from '.'
 import {
   Args,

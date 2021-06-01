@@ -1,9 +1,9 @@
+import { join } from 'path'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { Config } from '../../config'
 import { TrackedExplorerTree } from './trackedExplorerTree'
-import { join } from 'path'
+import { Config } from '../../config'
 import { CliReader } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
 

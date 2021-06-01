@@ -1,6 +1,6 @@
 import { ChildProcess } from 'child_process'
-import execa from 'execa'
 import { Readable } from 'stream'
+import execa from 'execa'
 
 interface RunningProcess extends ChildProcess {
   all?: Readable

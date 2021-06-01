@@ -1,13 +1,13 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { ExperimentsTable, Experiments } from '.'
+import { pickExperimentName } from './quickPick'
+import { runQueued, runReset } from './runner'
 import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'
-import { pickExperimentName } from './quickPick'
 import { getInput } from '../vscode/inputBox'
-import { runQueued, runReset } from './runner'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)

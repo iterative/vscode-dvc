@@ -1,7 +1,7 @@
+import { resolve } from 'path'
 import { WebviewType } from 'dvc/src/experiments/webview/contract'
 import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import { resolve } from 'path'
 import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 

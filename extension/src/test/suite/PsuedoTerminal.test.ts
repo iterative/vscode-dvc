@@ -2,9 +2,9 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import sinonChai from 'sinon-chai'
 import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
+import { restore } from 'sinon'
 import { PseudoTerminal } from '../../PseudoTerminal'
 import { Disposable, Disposer } from '../../extension'
-import { restore } from 'sinon'
 
 chai.use(sinonChai)
 const { expect } = chai

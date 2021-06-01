@@ -1,7 +1,7 @@
+import Module = require('module')
 import { observer } from 'mobx-react'
 import * as React from 'react'
 import { observable, runInAction } from 'mobx'
-import Module = require('module')
 
 type ReactComponent<P = Record<string, unknown>> =
   | React.ComponentClass<P>

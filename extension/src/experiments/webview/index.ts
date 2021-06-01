@@ -10,7 +10,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
-import { Config } from '../../config'
 import {
   WebviewType as Experiments,
   ExperimentsRepoJSONOutput,
@@ -21,6 +20,7 @@ import {
   WindowWithWebviewData,
   ExperimentsWebviewState
 } from './contract'
+import { Config } from '../../config'
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'

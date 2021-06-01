@@ -1,7 +1,7 @@
 import { EventEmitter } from 'vscode'
 import { mocked } from 'ts-jest/utils'
-import { Command } from './args'
 import { Cli, CliResult } from '.'
+import { Command } from './args'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'

@@ -1,11 +1,11 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { getEnv } from '.'
+import { Args } from './args'
 import { Config } from '../config'
 import { PseudoTerminal } from '../PseudoTerminal'
-import { Args } from './args'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
-import { getEnv } from '.'
 
 export class CliRunner {
   public readonly dispose = Disposable.fn()
