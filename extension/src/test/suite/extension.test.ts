@@ -105,9 +105,9 @@ suite('Extension Test Suite', () => {
       ] as ListOutput[])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([
-        { isout: false, isdir: true, isexec: false, path: 'data' },
-        { isout: true, isdir: true, isexec: false, path: 'logs' },
-        { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+        { isdir: true, isexec: false, isout: false, path: 'data' },
+        { isdir: true, isexec: false, isout: true, path: 'logs' },
+        { isdir: false, isexec: false, isout: true, path: 'model.pt' }
       ])
 
       stub(CliReader.prototype, 'root').resolves('.')
@@ -121,13 +121,13 @@ suite('Extension Test Suite', () => {
       })
 
       const mockStatus = stub(CliReader.prototype, 'status').resolves(({
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-          'always changed'
-        ],
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ],
+        train: [
+          { 'changed deps': { 'data/MNIST': 'modified' } },
+          { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
+          'always changed'
         ]
       } as unknown) as StatusOutput)
 

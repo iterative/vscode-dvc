@@ -42,12 +42,12 @@ describe('Experiments', () => {
     ({ experimentListCurrent: jest.fn() } as unknown) as CliReader,
     {
       '/my/dvc/root': ({
-        showWebview: mockedShowWebview,
-        getDvcRoot: () => mockedDvcRoot
+        getDvcRoot: () => mockedDvcRoot,
+        showWebview: mockedShowWebview
       } as unknown) as ExperimentsTable,
       '/my/fun/dvc/root': ({
-        showWebview: jest.fn(),
-        getDvcRoot: () => mockedOtherDvcRoot
+        getDvcRoot: () => mockedOtherDvcRoot,
+        showWebview: jest.fn()
       } as unknown) as ExperimentsTable
     }
   )

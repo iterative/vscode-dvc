@@ -54,8 +54,8 @@ suite('Output Channel Test Suite', () => {
         'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
       disposable.track(new OutputChannel([cli], 'The Success Channel'))
       ran.fire({
-        stderr: usefulMessage,
-        command: 'some command'
+        command: 'some command',
+        stderr: usefulMessage
       })
 
       expect(mockOutputChannel).to.be.called

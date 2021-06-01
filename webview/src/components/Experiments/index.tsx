@@ -88,7 +88,6 @@ const getColumns = (
   [
     {
       Header: 'Experiment',
-      id: 'id',
       accessor: ({ name, id }: { name: string | undefined; id: string }) => {
         if (name) {
           return name
@@ -98,18 +97,19 @@ const getColumns = (
         }
         return id.slice(0, 7)
       },
+      id: 'id',
       width: 150
     },
     {
-      Header: 'Timestamp',
-      accessor: 'timestamp',
       Cell: ({ value }: { value: string }) => {
         if (!value || value === '') {
           return null
         }
         const time = dayjs(value)
         return time.format(time.isToday() ? 'HH:mm:ss' : 'YYYY/MM/DD')
-      }
+      },
+      Header: 'Timestamp',
+      accessor: 'timestamp'
     },
     ...buildDynamicColumns(flatExperiments)
   ] as Column<Experiment>[]
@@ -133,13 +133,13 @@ export const ExperimentsTable: React.FC<{
 
   const instance = useTable<Experiment>(
     {
+      autoResetExpanded: false,
       columns,
       data,
-      initialState,
       defaultColumn,
-      orderByFn,
       expandSubRows: false,
-      autoResetExpanded: false
+      initialState,
+      orderByFn
     },
     useFlexLayout,
     hooks => {
@@ -164,8 +164,8 @@ export const ExperimentsTable: React.FC<{
         )
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
-          sortedColumns,
-          expandedRowCount
+          expandedRowCount,
+          sortedColumns
         })
       })
     }

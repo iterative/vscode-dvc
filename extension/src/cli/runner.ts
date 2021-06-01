@@ -46,10 +46,10 @@ export class CliRunner {
     const env = getEnv(this.config.pythonBinPath)
 
     const process = createProcess({
-      executable: this.getOverrideOrCliPath(),
       args,
       cwd,
-      env
+      env,
+      executable: this.getOverrideOrCliPath()
     })
 
     this.processStarted.fire()
@@ -75,8 +75,8 @@ export class CliRunner {
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
     this.currentProcess = this.createProcess({
-      cwd,
-      args
+      args,
+      cwd
     })
   }
 

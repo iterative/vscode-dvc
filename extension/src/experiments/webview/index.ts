@@ -79,8 +79,8 @@ export class ExperimentsWebview {
       ViewColumn.Active,
       {
         enableScripts: true,
-        retainContextWhenHidden: true,
-        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)]
+        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)],
+        retainContextWhenHidden: true
       }
     )
 
@@ -136,18 +136,18 @@ export class ExperimentsWebview {
       dispose: autorun(async () => {
         await this.isReady() // Read all mobx dependencies before await
         this.sendMessage({
-          type: MessageToWebviewType.setTheme,
-          theme: config.getTheme()
+          theme: config.getTheme(),
+          type: MessageToWebviewType.setTheme
         })
         this.sendMessage({
-          type: MessageToWebviewType.setDvcRoot,
-          dvcRoot: this.dvcRoot
+          dvcRoot: this.dvcRoot,
+          type: MessageToWebviewType.setDvcRoot
         })
         const experiments = state.experiments
         if (experiments) {
           this.sendMessage({
-            type: MessageToWebviewType.showExperiments,
-            tableData: experiments
+            tableData: experiments,
+            type: MessageToWebviewType.showExperiments
           })
         }
       })
@@ -187,8 +187,8 @@ export class ExperimentsWebview {
 
     const data: WindowWithWebviewData = {
       webviewData: {
-        theme: this.config.getTheme(),
-        publicPath: urls.publicPath
+        publicPath: urls.publicPath,
+        theme: this.config.getTheme()
       }
     }
 

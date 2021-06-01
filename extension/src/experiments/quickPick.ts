@@ -17,23 +17,23 @@ export const pickGarbageCollectionFlags = () =>
   quickPickManyValues<GcPreserveFlag>(
     [
       {
-        label: 'All Branches',
         detail: 'Preserve Experiments derived from all Git branches',
+        label: 'All Branches',
         value: GcPreserveFlag.ALL_BRANCHES
       },
       {
-        label: 'All Tags',
         detail: 'Preserve Experiments derived from all Git tags',
+        label: 'All Tags',
         value: GcPreserveFlag.ALL_TAGS
       },
       {
-        label: 'All Commits',
         detail: 'Preserve Experiments derived from all Git commits',
+        label: 'All Commits',
         value: GcPreserveFlag.ALL_COMMITS
       },
       {
-        label: 'Queued Experiments',
         detail: 'Preserve all queued Experiments',
+        label: 'Queued Experiments',
         value: GcPreserveFlag.QUEUED
       }
     ],

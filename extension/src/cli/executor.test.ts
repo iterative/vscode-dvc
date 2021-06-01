@@ -31,8 +31,8 @@ describe('CliExecutor', () => {
       pythonBinPath: undefined
     } as unknown) as Config,
     ({
-      fire: jest.fn(),
-      event: jest.fn()
+      event: jest.fn(),
+      fire: jest.fn()
     } as unknown) as EventEmitter<CliResult>
   )
 
@@ -55,10 +55,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['add', file],
         cwd: dir,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -73,10 +73,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['checkout', '-f'],
         cwd: fsPath,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -95,10 +95,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['checkout', '-f', file],
         cwd: dir,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -113,10 +113,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['commit', '-f'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -133,10 +133,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['commit', '-f', file],
         cwd: dir,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -151,10 +151,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'apply', 'exp-test'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -176,10 +176,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -199,10 +199,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'gc', '-f', '-w', '--queued'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -217,10 +217,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'remove', 'exp-dfd12'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -235,10 +235,10 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'run', '--queue'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -294,10 +294,10 @@ describe('CliExecutor', () => {
 
       expect(output).toEqual(stdout)
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['-h'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
 
@@ -328,10 +328,10 @@ describe('CliExecutor', () => {
         expect(output).toEqual(stdout)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['init', '--subdir'],
           cwd: fsPath,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })
@@ -347,10 +347,10 @@ describe('CliExecutor', () => {
         expect(output).toEqual(stdout)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['pull'],
           cwd: __dirname,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })
@@ -368,10 +368,10 @@ describe('CliExecutor', () => {
         expect(output).toEqual(stdout)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['pull', file],
           cwd: dir,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })
@@ -387,10 +387,10 @@ describe('CliExecutor', () => {
         expect(output).toEqual(stdout)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['push'],
           cwd: __dirname,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })
@@ -408,10 +408,10 @@ describe('CliExecutor', () => {
         expect(output).toEqual(stdout)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['push', file],
           cwd: dir,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })
@@ -429,10 +429,10 @@ describe('CliExecutor', () => {
         expect(output).toEqual(stdout)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['remove', file],
           cwd: __dirname,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })

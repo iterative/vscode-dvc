@@ -6308,6 +6308,13 @@ eslint-plugin-sonarjs@^0.7.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-sonarjs/-/eslint-plugin-sonarjs-0.7.0.tgz#2dbad45e03a6a4de687756b659e88bf3f977383f"
   integrity sha512-vi6zGkd5Eznc32AQlleWUOMrMeDiUih9wR7nPPfrDCyVRmwYNHIBRPZGv1EgXwELwaPghCSvoAoHoR7uSbBF/Q==
 
+eslint-plugin-sort-keys-fix@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-sort-keys-fix/-/eslint-plugin-sort-keys-fix-1.1.1.tgz#2ed201b53fd4a89552c6e2abd38933f330a4b62e"
+  integrity sha512-x02SLBg+8OEaoT9vvMbsgeInw17wjHLsa9cOieIVQY+xMNRiXBbyMWw+NiBoxYyJIR4QKDOPDofCjQdoSvltQg==
+  dependencies:
+    requireindex "~1.2.0"
+
 eslint-scope@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/eslint-scope/-/eslint-scope-4.0.3.tgz#ca03833310f6889a3264781aa82e63eb9cfe7848"
@@ -12199,6 +12206,11 @@ require-main-filename@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/require-main-filename/-/require-main-filename-2.0.0.tgz#d0b329ecc7cc0f61649f62215be69af54aa8989b"
   integrity sha512-NKN5kMDylKuldxYLSUfrbo5Tuzh4hd+2E8NPPX02mZtn1VuREQToYe/ZdlJy+J3uCpfaiGF05e7B8W0iXbQHmg==
+
+requireindex@~1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.2.0.tgz#3463cdb22ee151902635aa6c9535d4de9c2ef1ef"
+  integrity sha512-L9jEkOi3ASd9PYit2cwRfyppc9NoABujTP8/5gFcbERmo5jUoAKovIC3fsF17pkTnGsrByysqX+Kxd2OTNI1ww==
 
 requires-port@^1.0.0:
   version "1.0.0"

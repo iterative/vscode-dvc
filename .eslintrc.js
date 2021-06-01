@@ -1,9 +1,9 @@
 /* global module */
 
 module.exports = {
-  root: true,
-  parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jest', 'react-hooks', 'jsx-a11y', 'sonarjs'],
+  env: {
+    'jest/globals': true
+  },
   extends: [
     'prettier-standard/prettier-file',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -13,77 +13,31 @@ module.exports = {
     'plugin:jsx-a11y/recommended',
     'plugin:sonarjs/recommended'
   ],
-  rules: {
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/ban-types': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/member-delimiter-style': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
-    '@typescript-eslint/no-extra-semi': 'off',
-    camelcase: 'off',
-    'security/detect-object-injection': 'off',
-    'no-restricted-globals': ['error', 'name', 'length', 'event'],
-    'react/react-in-jsx-scope': 'off',
-    'no-console': 'error',
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'error',
-    // Trust TS on this one -- Useful for functions that need to exhaust an enum.
-    'array-callback-return': 'off',
-    // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
-    'no-use-before-define': 'off',
-    '@typescript-eslint/no-use-before-define': 'error',
-    '@typescript-eslint/no-explicit-any': 'error',
-
-    // Let us wrap Radio components in labels.
-    'jsx-a11y/label-has-associated-control': [
-      2,
-      {
-        controlComponents: ['Radio']
-      }
-    ],
-
-    // vscode-dvc specific
-
-    // This project doesn't use prop types
-    'react/prop-types': 'off',
-    curly: ['error', 'all'],
-    '@typescript-eslint/prefer-optional-chain': 'error',
-    'require-await': 'error',
-    'sonarjs/cognitive-complexity': ['error', 5]
-  },
-  env: {
-    'jest/globals': true
-  },
-  settings: {
-    react: {
-      version: 'detect'
-    },
-    linkComponents: [{ name: 'Link', linkAttribute: 'to' }]
-  },
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true
-    }
-  },
+  ignorePatterns: [
+    '**/dist/**',
+    'webview/storybook-static/**',
+    'extension/vscode-test/**',
+    'extension/src/vscode.proposed.d.ts'
+  ],
   overrides: [
-    // Jest tests rely on a lot of undefined globals
     {
+      // Jest tests rely on a lot of undefined globals
       files: ['**/*.test.*'],
       rules: {
-        'no-undef': 'off',
-        '@typescript-eslint/no-unsafe-return': 'off',
-        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-floating-promises': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
-        '@typescript-eslint/no-floating-promises': 'off'
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/no-unsafe-return': 'off',
+        'no-undef': 'off'
       }
     },
-    // Webpack dependencies are meant to be devDependencies
+
     {
+      // Webpack dependencies are meant to be devDependencies
       files: ['**/*/webpack.config.[tj]s'],
       rules: {
-        'import/no-extraneous-dependencies': 'off',
-        '@typescript-eslint/no-unsafe-return': 'off'
+        '@typescript-eslint/no-unsafe-return': 'off',
+        'import/no-extraneous-dependencies': 'off'
       }
     },
     {
@@ -95,10 +49,64 @@ module.exports = {
       }
     }
   ],
-  ignorePatterns: [
-    '**/dist/**',
-    'webview/storybook-static/**',
-    'extension/vscode-test/**',
-    'extension/src/vscode.proposed.d.ts'
-  ]
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true
+    }
+  },
+  plugins: [
+    '@typescript-eslint',
+    'jest',
+    'react-hooks',
+    'jsx-a11y',
+    'sonarjs',
+    'sort-keys-fix'
+  ],
+  root: true,
+  rules: {
+    '@typescript-eslint/ban-types': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/member-delimiter-style': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/no-extra-semi': 'off',
+    '@typescript-eslint/no-use-before-define': 'error',
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/prefer-optional-chain': 'error',
+    // Trust TS on this one -- Useful for functions that need to exhaust an enum.
+    'array-callback-return': 'off',
+
+    camelcase: 'off',
+
+    curly: ['error', 'all'],
+
+    // Let us wrap Radio components in labels.
+    'jsx-a11y/label-has-associated-control': [
+      2,
+      {
+        controlComponents: ['Radio']
+      }
+    ],
+    'no-console': 'error',
+    'no-restricted-globals': ['error', 'name', 'length', 'event'],
+    // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
+    'no-use-before-define': 'off',
+    'react-hooks/exhaustive-deps': 'error',
+    'react-hooks/rules-of-hooks': 'error',
+    // This project doesn't use prop types
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'require-await': 'error',
+    'security/detect-object-injection': 'off',
+    'sonarjs/cognitive-complexity': ['error', 5],
+    'sort-keys-fix/sort-keys-fix': 'warn'
+  },
+  settings: {
+    linkComponents: [{ linkAttribute: 'to', name: 'Link' }],
+    react: {
+      version: 'detect'
+    }
+  }
 }

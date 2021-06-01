@@ -33,9 +33,9 @@ export function getVsCodeApi<
   const api = w.vscodeApi
 
   return {
+    addMessageHandler,
     getState: () => api.getState(),
-    setState: state => api.setState(state),
     postMessage: api.postMessage,
-    addMessageHandler
+    setState: state => api.setState(state)
   }
 }

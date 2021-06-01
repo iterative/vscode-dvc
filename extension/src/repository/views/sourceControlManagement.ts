@@ -64,8 +64,8 @@ export class SourceControlManagement {
         path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
       )
       .map(path => ({
-        resourceUri: Uri.file(path),
-        contextValue
+        contextValue,
+        resourceUri: Uri.file(path)
       }))
   }
 

@@ -30,10 +30,10 @@ export class Cli {
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
-      executable: this.config.getCliPath() || 'dvc',
       args,
       cwd,
-      env: getEnv(this.config.pythonBinPath)
+      env: getEnv(this.config.pythonBinPath),
+      executable: this.config.getCliPath() || 'dvc'
     }
   }
 
@@ -45,8 +45,8 @@ export class Cli {
       this.ran?.fire({ command })
       return stdout
     } catch (error) {
-      const cliError = new CliError({ options, baseError: error })
-      this.ran?.fire({ stderr: cliError.stderr, command })
+      const cliError = new CliError({ baseError: error, options })
+      this.ran?.fire({ command, stderr: cliError.stderr })
       throw cliError
     }
   }

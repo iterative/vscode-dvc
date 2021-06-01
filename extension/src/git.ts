@@ -10,7 +10,6 @@ const getUntrackedDirectories = async (
   repositoryRoot: string
 ): Promise<string[]> => {
   const output = await executeProcess({
-    executable: 'git',
     args: [
       'ls-files',
       '--others',
@@ -18,7 +17,8 @@ const getUntrackedDirectories = async (
       '--directory',
       '--no-empty-directory'
     ],
-    cwd: repositoryRoot
+    cwd: repositoryRoot,
+    executable: 'git'
   })
   return getUris(repositoryRoot, trimAndSplit(output)).filter(path =>
     isDirectory(path)
@@ -27,9 +27,9 @@ const getUntrackedDirectories = async (
 
 const getUntrackedFiles = async (repositoryRoot: string): Promise<string[]> => {
   const output = await executeProcess({
-    executable: 'git',
     args: ['ls-files', '--others', '--exclude-standard'],
-    cwd: repositoryRoot
+    cwd: repositoryRoot,
+    executable: 'git'
   })
   return getUris(repositoryRoot, trimAndSplit(output))
 }

@@ -77,13 +77,13 @@ describe('Repository', () => {
       ] as ListOutput[])
 
       mockedStatus.mockResolvedValueOnce(({
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-          'always changed'
-        ],
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ],
+        train: [
+          { 'changed deps': { 'data/MNIST': 'modified' } },
+          { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
+          'always changed'
         ]
       } as unknown) as StatusOutput)
 
@@ -139,8 +139,8 @@ describe('Repository', () => {
         expect.objectContaining({
           added: emptySet,
           deleted: emptySet,
-          notInCache: emptySet,
           modified,
+          notInCache: emptySet,
           renamed: emptySet,
           stageModified: emptySet,
           tracked,
@@ -187,15 +187,15 @@ describe('Repository', () => {
       } as unknown) as DiffOutput)
 
       mockedStatus.mockResolvedValueOnce(({
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
+        ],
         train: [
           {
             'changed deps': { 'data/MNIST': 'modified', 'train.py': 'modified' }
           },
           { 'changed outs': { 'model.pt': 'deleted' } },
           'always changed'
-        ],
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
         ]
       } as unknown) as StatusOutput)
 
@@ -282,23 +282,14 @@ describe('Repository', () => {
 
       mockedDiff.mockResolvedValueOnce(({
         added: [],
-        modified: [{ path: features }],
         deleted: [{ path: model }],
+        modified: [{ path: features }],
         'not in cache': [{ path: dataXml }, { path: prepared }]
       } as unknown) as DiffOutput)
 
       mockedStatus.mockResolvedValueOnce(({
-        prepare: [
-          { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
-          { 'changed outs': { 'data/prepared': Status.NOT_IN_CACHE } }
-        ],
-        featurize: [
-          { 'changed deps': { 'data/prepared': Status.NOT_IN_CACHE } },
-          { 'changed outs': { 'data/features': 'modified' } }
-        ],
-        train: [
-          { 'changed deps': { 'data/features': 'modified' } },
-          { 'changed outs': { 'model.pt': 'deleted' } }
+        'data/data.xml.dvc': [
+          { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
         ],
         evaluate: [
           {
@@ -308,8 +299,17 @@ describe('Repository', () => {
             }
           }
         ],
-        'data/data.xml.dvc': [
-          { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
+        featurize: [
+          { 'changed deps': { 'data/prepared': Status.NOT_IN_CACHE } },
+          { 'changed outs': { 'data/features': 'modified' } }
+        ],
+        prepare: [
+          { 'changed deps': { 'data/data.xml': Status.NOT_IN_CACHE } },
+          { 'changed outs': { 'data/prepared': Status.NOT_IN_CACHE } }
+        ],
+        train: [
+          { 'changed deps': { 'data/features': 'modified' } },
+          { 'changed outs': { 'model.pt': 'deleted' } }
         ]
       } as unknown) as StatusOutput)
 
@@ -349,9 +349,9 @@ describe('Repository', () => {
         added: emptySet,
         deleted,
         modified,
+        notInCache,
         renamed: emptySet,
         stageModified: emptySet,
-        notInCache,
         tracked,
         untracked
       })

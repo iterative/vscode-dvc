@@ -15,35 +15,25 @@ function includeDependency(location: string) {
   return new CopyPlugin([
     {
       from: location,
-      to: r(`./dist/node_modules/${pkgName}`),
-      ignore: ['**/node_modules/**/*']
+      ignore: ['**/node_modules/**/*'],
+      to: r(`./dist/node_modules/${pkgName}`)
     }
   ])
 }
 
 module.exports = {
-  target: 'node',
-  entry: r('./src/extension'),
-  output: {
-    path: r('./dist'),
-    filename: 'extension.js',
-    libraryTarget: 'commonjs2',
-    devtoolModuleFilenameTemplate: '../[resource-path]'
-  },
   devtool: 'source-map',
+  entry: r('./src/extension'),
   externals: {
-    vscode: 'commonjs vscode',
     'dvc-vscode-webview': 'dvc-vscode-webview',
-    fsevents: "require('fsevents')"
-  },
-  resolve: {
-    extensions: ['.ts', '.js']
+    fsevents: "require('fsevents')",
+    vscode: 'commonjs vscode'
   },
   module: {
     rules: [
       {
-        test: /\.ts$/,
         exclude: /node_modules/,
+        test: /\.ts$/,
         use: [
           {
             loader: 'ts-loader'
@@ -55,5 +45,15 @@ module.exports = {
   node: {
     __dirname: false
   },
-  plugins: [new CleanWebpackPlugin(), includeDependency(r('../webview/'))]
+  output: {
+    devtoolModuleFilenameTemplate: '../[resource-path]',
+    filename: 'extension.js',
+    libraryTarget: 'commonjs2',
+    path: r('./dist')
+  },
+  plugins: [new CleanWebpackPlugin(), includeDependency(r('../webview/'))],
+  resolve: {
+    extensions: ['.ts', '.js']
+  },
+  target: 'node'
 } as webpack.Configuration

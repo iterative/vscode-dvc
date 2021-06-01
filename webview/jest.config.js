@@ -1,12 +1,12 @@
 /* global module */
 
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
+  globals: {
+    __webpack_public_path__: true
+  },
   moduleNameMapper: {
     '\\.(scss|css|less)$': 'identity-obj-proxy'
   },
-  globals: {
-    __webpack_public_path__: true
-  }
+  preset: 'ts-jest',
+  testEnvironment: 'node'
 }
