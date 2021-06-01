@@ -1,8 +1,8 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { getProcessEnv } from '../env'
 import { Args } from './args'
 import { CliError } from './error'
+import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
 

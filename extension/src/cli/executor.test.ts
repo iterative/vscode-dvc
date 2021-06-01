@@ -2,11 +2,11 @@ import { basename, join, resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { CliResult } from '.'
-import { Config } from '../config'
-import { getProcessEnv } from '../env'
-import { executeProcess } from '../processExecution'
 import { GcPreserveFlag } from './args'
 import { CliExecutor } from './executor'
+import { getProcessEnv } from '../env'
+import { Config } from '../config'
+import { executeProcess } from '../processExecution'
 
 jest.mock('vscode')
 jest.mock('fs-extra')

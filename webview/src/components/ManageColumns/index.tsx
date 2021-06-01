@@ -1,4 +1,6 @@
 import React from 'react'
+import { ColumnInstance } from 'react-table'
+import styles from './styles.module.scss'
 import { InstanceProp } from '../Table'
 import {
   MenuToggle,
@@ -7,8 +9,6 @@ import {
   MenuItem,
   MenuSeparator
 } from '../Menu/index'
-import styles from './styles.module.scss'
-import { ColumnInstance } from 'react-table'
 import { Experiment } from '../../util/parse-experiments'
 
 const ManageColumns: React.FC<InstanceProp> = ({ instance }) => {

@@ -1,8 +1,8 @@
-import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve, sep } from 'path'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { ListOutput, StatusOutput } from '../cli/reader'
 import { RepositoryModel } from './model'
+import { ListOutput, StatusOutput } from '../cli/reader'
 
 jest.mock('@hediet/std/disposable')
 

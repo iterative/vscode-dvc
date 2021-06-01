@@ -1,9 +1,9 @@
-import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
-import { SourceControlManagement } from './views/sourceControlManagement'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { DecorationProvider } from './decorationProvider'
 import { Repository } from '.'
+import { SourceControlManagement } from './views/sourceControlManagement'
+import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import {
   CliReader,

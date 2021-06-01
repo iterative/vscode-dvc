@@ -1,3 +1,4 @@
+import { dirname, resolve } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import { SourceControlManagementModel } from './views/sourceControlManagement'
 import { DecorationModel } from './decorationProvider'
@@ -11,7 +12,6 @@ import {
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../cli/reader'
-import { dirname, resolve } from 'path'
 import { isDirectory } from '../fileSystem'
 
 type OutputData = {

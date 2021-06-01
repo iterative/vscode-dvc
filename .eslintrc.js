@@ -11,7 +11,9 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:jest/recommended',
     'plugin:jsx-a11y/recommended',
-    'plugin:sonarjs/recommended'
+    'plugin:sonarjs/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript'
   ],
   ignorePatterns: [
     '**/dist/**',
@@ -81,7 +83,21 @@ module.exports = {
     camelcase: 'off',
 
     curly: ['error', 'all'],
-
+    'import/no-unresolved': 'off',
+    'import/order': [
+      'error',
+      {
+        groups: [
+          'builtin',
+          'external',
+          'index',
+          'sibling',
+          'parent',
+          'internal',
+          'object'
+        ]
+      }
+    ],
     // Let us wrap Radio components in labels.
     'jsx-a11y/label-has-associated-control': [
       2,

@@ -1,7 +1,7 @@
-import * as webpack from 'webpack'
-import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { readFileSync } from 'fs'
 import { join, resolve } from 'path'
+import * as webpack from 'webpack'
+import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import CopyPlugin = require('copy-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
