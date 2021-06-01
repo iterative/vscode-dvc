@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExperimentsRepoJSONOutput } from 'dvc/src/Experiments/Webview/contract'
+import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
