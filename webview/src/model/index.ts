@@ -6,12 +6,12 @@ import {
   MessageToWebviewType,
   WebviewColorTheme,
   WindowWithWebviewData
-} from 'dvc/src/Experiments/Webview/contract'
-import { Logger } from 'dvc/src/common/Logger'
+} from 'dvc/src/experiments/webview/contract'
+import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
-import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './VsCodeApi'
+import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './vsCodeApi'
 
 export type VsCodeApi = BaseVsCodeApi<
   PersistedModelState,

@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { dirname, join, relative } from 'path'
-import { Config } from '../../Config'
+import { Config } from '../../config'
 import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'

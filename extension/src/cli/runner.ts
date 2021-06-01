@@ -1,6 +1,6 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Config } from '../Config'
+import { Config } from '../config'
 import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
 import { createProcess, Process } from '../processExecution'

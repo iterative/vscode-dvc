@@ -14,21 +14,21 @@ import {
   registerUpdateReconciler,
   getReloadCount
 } from '@hediet/node-reload'
-import { Config } from './Config'
-import { WebviewSerializer } from './WebviewSerializer'
-import { Experiments } from './Experiments'
-import { registerExperimentCommands } from './Experiments/commands/register'
-import { registerRepositoryCommands } from './Repository/commands/register'
+import { Config } from './config'
+import { WebviewSerializer } from './webviewSerializer'
+import { Experiments } from './experiments'
+import { registerExperimentCommands } from './experiments/commands/register'
+import { registerRepositoryCommands } from './repository/commands/register'
 import {
   findDvcRootPaths,
   onDidChangeFileSystem,
   onDidChangeFileType
 } from './fileSystem'
-import { ResourceLocator } from './ResourceLocator'
-import { DecorationProvider } from './Repository/DecorationProvider'
+import { ResourceLocator } from './resourceLocator'
+import { DecorationProvider } from './repository/decorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
-import { Repository } from './Repository'
-import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
+import { Repository } from './repository'
+import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import { CliExecutor } from './cli/executor'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'

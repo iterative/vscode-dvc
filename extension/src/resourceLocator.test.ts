@@ -1,5 +1,5 @@
 import { Uri } from 'vscode'
-import { ResourceLocator } from './ResourceLocator'
+import { ResourceLocator } from './resourceLocator'
 
 jest.mock('vscode')
 

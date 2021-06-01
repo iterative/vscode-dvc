@@ -1,4 +1,4 @@
-import { WebviewType } from 'dvc/src/Experiments/Webview/contract'
+import { WebviewType } from 'dvc/src/experiments/webview/contract'
 import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { resolve } from 'path'

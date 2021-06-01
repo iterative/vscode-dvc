@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SourceControlManagementModel } from './views/SourceControlManagement'
-import { DecorationModel } from './DecorationProvider'
+import { SourceControlManagementModel } from './views/sourceControlManagement'
+import { DecorationModel } from './decorationProvider'
 import {
   ChangedType,
   DiffOutput,

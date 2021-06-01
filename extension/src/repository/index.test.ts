@@ -1,10 +1,10 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { join, resolve } from 'path'
-import { SourceControlManagement } from './views/SourceControlManagement'
+import { SourceControlManagement } from './views/sourceControlManagement'
 import { mocked } from 'ts-jest/utils'
-import { DecorationProvider } from './DecorationProvider'
+import { DecorationProvider } from './decorationProvider'
 import { Repository } from '.'
-import { RepositoryModel } from './Model'
+import { RepositoryModel } from './model'
 import {
   CliReader,
   DiffOutput,
@@ -15,8 +15,8 @@ import {
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
-jest.mock('./views/SourceControlManagement')
-jest.mock('./DecorationProvider')
+jest.mock('./views/sourceControlManagement')
+jest.mock('./decorationProvider')
 jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')

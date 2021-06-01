@@ -4,7 +4,7 @@ import { Command } from './args'
 import { Cli, CliResult } from '.'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
-import { Config } from '../Config'
+import { Config } from '../config'
 
 jest.mock('vscode')
 jest.mock('../env')

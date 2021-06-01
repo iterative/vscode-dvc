@@ -4,7 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   SourceControlManagement,
   SourceControlManagementState
-} from './SourceControlManagement'
+} from './sourceControlManagement'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')

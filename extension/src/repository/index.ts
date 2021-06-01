@@ -1,11 +1,11 @@
 import { Disposable } from '@hediet/std/disposable'
 import { getAllUntracked } from '../git'
-import { SourceControlManagement } from './views/SourceControlManagement'
-import { DecorationProvider } from './DecorationProvider'
+import { SourceControlManagement } from './views/sourceControlManagement'
+import { DecorationProvider } from './decorationProvider'
 import { Deferred } from '@hediet/std/synchronization'
 import { ListOutput, DiffOutput, StatusOutput, CliReader } from '../cli/reader'
 import { observable, makeObservable } from 'mobx'
-import { RepositoryModel } from './Model'
+import { RepositoryModel } from './model'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
