@@ -1,7 +1,7 @@
 import { EventEmitter } from 'vscode'
 import { mocked } from 'ts-jest/utils'
 import { Command } from './args'
-import { Cli } from '.'
+import { Cli, CliResult } from '.'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
 import { Config } from '../Config'
@@ -30,7 +30,10 @@ describe('executeProcess', () => {
         getCliPath: () => undefined,
         pythonBinPath: undefined
       } as unknown) as Config,
-      ({ fire: jest.fn(), event: jest.fn() } as unknown) as EventEmitter<string>
+      ({
+        fire: jest.fn(),
+        event: jest.fn()
+      } as unknown) as EventEmitter<CliResult>
     )
 
     await cli.executeProcess(cwd, ...args)
@@ -57,7 +60,10 @@ describe('executeProcess', () => {
         getCliPath: () => '/some/path/to/dvc',
         pythonBinPath
       } as unknown) as Config,
-      ({ fire: jest.fn(), event: jest.fn() } as unknown) as EventEmitter<string>
+      ({
+        fire: jest.fn(),
+        event: jest.fn()
+      } as unknown) as EventEmitter<CliResult>
     )
 
     await expect(cli.executeProcess(cwd, ...args)).rejects.toThrow()

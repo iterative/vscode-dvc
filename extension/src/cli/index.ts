@@ -18,13 +18,15 @@ export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   }
 }
 
+export type CliResult = { stderr?: string; command: string }
+
 export class Cli {
   public dispose = Disposable.fn()
 
   protected config: Config
 
-  private ran: EventEmitter<string>
-  public onDidRun: Event<string>
+  private ran: EventEmitter<CliResult>
+  public onDidRun: Event<CliResult>
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
@@ -40,19 +42,19 @@ export class Cli {
     const options = this.getExecutionOptions(cwd, args)
     try {
       const stdout = await executeProcess(options)
-      this.ran?.fire(`> ${command}\n`)
+      this.ran?.fire({ command })
       return stdout
     } catch (error) {
       const cliError = new CliError({ options, baseError: error })
-      this.ran?.fire(`> ${command} failed. ${cliError.stderr}\n`)
+      this.ran?.fire({ stderr: cliError.stderr, command })
       throw cliError
     }
   }
 
-  constructor(config: Config, ran?: EventEmitter<string>) {
+  constructor(config: Config, ran?: EventEmitter<CliResult>) {
     this.config = config
 
-    this.ran = ran || this.dispose.track(new EventEmitter<string>())
+    this.ran = ran || this.dispose.track(new EventEmitter<CliResult>())
     this.onDidRun = this.ran.event
   }
 }

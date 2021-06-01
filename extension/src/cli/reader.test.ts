@@ -6,6 +6,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { Config } from '../Config'
 import { EventEmitter } from 'vscode'
+import { CliResult } from '.'
 
 jest.mock('vscode')
 jest.mock('fs')
@@ -33,7 +34,7 @@ describe('CliReader', () => {
     ({
       fire: jest.fn(),
       event: jest.fn()
-    } as unknown) as EventEmitter<string>
+    } as unknown) as EventEmitter<CliResult>
   )
 
   describe('experimentListCurrent', () => {
