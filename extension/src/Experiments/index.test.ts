@@ -5,7 +5,7 @@ import { Config } from '../Config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'
-import { pickExperimentName } from './commands/quickPick'
+import { pickExperimentName } from './quickPick'
 import { getInput } from '../vscode/inputBox'
 import { runQueued, runReset } from './commands/runner'
 
@@ -25,7 +25,7 @@ const mockedConfig = ({
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
 jest.mock('../vscode/inputBox')
-jest.mock('./commands/quickPick')
+jest.mock('./quickPick')
 
 beforeEach(() => {
   jest.resetAllMocks()

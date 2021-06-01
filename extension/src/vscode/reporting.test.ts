@@ -1,6 +1,6 @@
-import { report } from './report'
 import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
+import { report } from './reporting'
 
 jest.mock('vscode')
 

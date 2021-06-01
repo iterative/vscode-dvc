@@ -1,5 +1,5 @@
 import { commands } from 'vscode'
-import { getGarbageCollectionFlags } from './quickPick'
+import { pickGarbageCollectionFlags } from '../quickPick'
 import { run, runQueued, runReset, stop } from './runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
@@ -55,7 +55,7 @@ const registerExperimentQuickPickCommands = (
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
       experiments.getCwdAndQuickPickThenRun(
         cliExecutor.experimentGarbageCollect,
-        getGarbageCollectionFlags
+        pickGarbageCollectionFlags
       )
     )
   )
