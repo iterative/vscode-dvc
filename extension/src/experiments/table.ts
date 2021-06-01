@@ -7,7 +7,7 @@ import { ExperimentsRepoJSONOutput } from './webview/contract'
 import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
-import { onDidChangeFileSystem } from '../fileSystem'
+import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { Logger } from '../common/logger'
 
 export class ExperimentsTable {
