@@ -55,11 +55,6 @@ export class PseudoTerminal {
   private createInstance = (): Promise<void> =>
     new Promise<void>(resolve => {
       const pty: Pseudoterminal = {
-        onDidWrite: this.processOutput.event,
-        open: () => {
-          this.processOutput.fire('>>>> DVC Terminal >>>>\r\n\n')
-          resolve()
-        },
         close: () => {
           this.processTerminated.fire()
           this.setBlocked(false)
@@ -68,6 +63,11 @@ export class PseudoTerminal {
           if (!this.isBlocked() && data) {
             this.close()
           }
+        },
+        onDidWrite: this.processOutput.event,
+        open: () => {
+          this.processOutput.fire('>>>> DVC Terminal >>>>\r\n\n')
+          resolve()
         }
       }
 

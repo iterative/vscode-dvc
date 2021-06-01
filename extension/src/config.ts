@@ -90,14 +90,14 @@ export class Config {
 
   private dvcPathQuickPickItems = [
     {
-      label: 'Default',
       description: 'Use Python Extension virtual environment if available',
+      label: 'Default',
       picked: true,
       value: undefined
     },
     {
-      label: 'Find',
       description: 'Browse the filesystem for a DVC executable',
+      label: 'Find',
       value: async () => {
         const result = await window.showOpenDialog({
           title: 'Select a DVC executable'
@@ -145,14 +145,14 @@ export class Config {
   ): QuickPickItemWithValue[] {
     return [
       {
-        label: 'Always prompt',
         description: 'Choose project each time a command is run',
+        label: 'Always prompt',
         picked: true,
         value: 'remove-default'
       },
       ...dvcRoots.map(dvcRoot => ({
-        label: 'Project',
         description: dvcRoot,
+        label: 'Project',
         value: dvcRoot
       }))
     ]

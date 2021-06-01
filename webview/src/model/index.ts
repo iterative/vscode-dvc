@@ -85,8 +85,8 @@ export class Model {
 
   private getState(): PersistedModelState {
     return {
-      experiments: this.experiments,
-      dvcRoot: this.dvcRoot
+      dvcRoot: this.dvcRoot,
+      experiments: this.experiments
     }
   }
 

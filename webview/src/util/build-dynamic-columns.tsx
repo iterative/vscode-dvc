@@ -179,11 +179,11 @@ const buildColumnsFromSchemaProperties: (
       sortType?: string
       type?: SchemaType
     } = {
+      Cell,
       Header: key,
-      id: buildColumnIdFromPath(currentPath),
       accessor: buildAccessor(currentPath),
-      type: propertyType,
-      Cell
+      id: buildColumnIdFromPath(currentPath),
+      type: propertyType
     }
     switch (propertyType) {
       case 'object':
@@ -208,10 +208,10 @@ const dataReducer = (data: Experiment[]) =>
     metrics: DataDictRoot[]
   }>(
     ({ params, metrics }, cur) => ({
-      params: cur.params ? [...params, cur.params] : params,
-      metrics: cur.metrics ? [...metrics, cur.metrics] : metrics
+      metrics: cur.metrics ? [...metrics, cur.metrics] : metrics,
+      params: cur.params ? [...params, cur.params] : params
     }),
-    { params: [], metrics: [] }
+    { metrics: [], params: [] }
   )
 
 const buildDynamicColumnsFromExperiments = (

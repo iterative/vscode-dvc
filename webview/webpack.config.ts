@@ -11,32 +11,24 @@ const styleLoader = 'style-loader'
 const cssLoader = 'css-loader'
 
 module.exports = {
-  entry: [r('src/index.tsx')],
-  output: {
-    path: r('dist'),
-    filename: '[name].js',
-    chunkFilename: '[name]-[hash].js',
-    devtoolModuleFilenameTemplate: info => {
-      let result = info.absoluteResourcePath.replace(/\\/g, '/')
-      if (!result.startsWith('file:')) {
-        // Some paths already start with the file scheme.
-        result = `file:///${result}`
-      }
-      return result
+  devServer: {
+    disableHostCheck: true,
+    headers: {
+      'Access-Control-Allow-Headers':
+        'X-Requested-With, content-type, Authorization',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Origin': '*'
     }
   },
-  resolve: {
-    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
-  },
   devtool: 'source-map',
+  entry: [r('src/index.tsx')],
   module: {
     rules: [
       {
-        test: /\.less$/,
-        loaders: [styleLoader, cssLoader, 'less-loader']
+        loaders: [styleLoader, cssLoader, 'less-loader'],
+        test: /\.less$/
       },
       {
-        test: /\.css$/,
         loaders: [
           styleLoader,
           {
@@ -45,10 +37,10 @@ module.exports = {
               modules: { auto: true }
             }
           }
-        ]
+        ],
+        test: /\.css$/
       },
       {
-        test: /\.scss$/,
         loaders: [
           styleLoader,
           {
@@ -58,21 +50,35 @@ module.exports = {
             }
           },
           'sass-loader'
-        ]
+        ],
+        test: /\.scss$/
       },
       {
-        test: /\.(jpe?g|png|gif|eot|svg|woff|woff2|md)$/i,
-        loader: 'file-loader'
+        loader: 'file-loader',
+        test: /\.(jpe?g|png|gif|eot|svg|woff|woff2|md)$/i
       },
       {
-        test: /\.tsx?$/,
         loader: 'ts-loader',
-        options: { transpileOnly: true }
+        options: { transpileOnly: true },
+        test: /\.tsx?$/
       }
     ]
   },
   node: {
     fs: 'empty'
+  },
+  output: {
+    chunkFilename: '[name]-[hash].js',
+    devtoolModuleFilenameTemplate: info => {
+      let result = info.absoluteResourcePath.replace(/\\/g, '/')
+      if (!result.startsWith('file:')) {
+        // Some paths already start with the file scheme.
+        result = `file:///${result}`
+      }
+      return result
+    },
+    filename: '[name].js',
+    path: r('dist')
   },
   plugins: (() => {
     return [
@@ -83,13 +89,7 @@ module.exports = {
       new CleanWebpackPlugin()
     ]
   })(),
-  devServer: {
-    disableHostCheck: true,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers':
-        'X-Requested-With, content-type, Authorization'
-    }
+  resolve: {
+    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
   }
 } as webpack.Configuration

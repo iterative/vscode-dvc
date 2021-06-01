@@ -145,10 +145,10 @@ suite('Runner Test Suite', () => {
       await cliRunner.run(cwd, Command.ADD)
       expect(mockCreateProcess).to.have.been.calledOnce
       expect(mockCreateProcess).to.have.been.calledWith({
-        executable: 'dvc',
         args: [Command.ADD],
         cwd,
-        env: process.env
+        env: process.env,
+        executable: 'dvc'
       })
     })
   })

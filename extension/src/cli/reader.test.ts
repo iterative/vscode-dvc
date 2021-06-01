@@ -32,8 +32,8 @@ describe('CliReader', () => {
       pythonBinPath: undefined
     } as unknown) as Config,
     ({
-      fire: jest.fn(),
-      event: jest.fn()
+      event: jest.fn(),
+      fire: jest.fn()
     } as unknown) as EventEmitter<CliResult>
   )
 
@@ -46,10 +46,10 @@ describe('CliReader', () => {
       const experimentList = await cliReader.experimentListCurrent(cwd)
       expect(experimentList).toEqual(experimentNames)
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'list', '--names-only'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -64,10 +64,10 @@ describe('CliReader', () => {
       const experiments = await cliReader.experimentShow(cwd)
       expect(experiments).toMatchSnapshot()
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['exp', 'show', SHOW_JSON],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -85,8 +85,8 @@ describe('CliReader', () => {
           { path: 'model.pt' },
           { path: 'predictions.json' }
         ],
-        renamed: [],
-        'not in cache': []
+        'not in cache': [],
+        renamed: []
       }
       const cwd = __dirname
       mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
@@ -95,10 +95,10 @@ describe('CliReader', () => {
       expect(statusOutput).toEqual(cliOutput)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['diff', SHOW_JSON],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
@@ -108,8 +108,8 @@ describe('CliReader', () => {
       const cwd = __dirname
       const path = 'logs'
       const listOutput = [
-        { isout: false, isdir: false, isexec: false, path: 'acc.tsv' },
-        { isout: false, isdir: false, isexec: false, path: 'loss.tsv' }
+        { isdir: false, isexec: false, isout: false, path: 'acc.tsv' },
+        { isdir: false, isexec: false, isout: false, path: 'loss.tsv' }
       ]
       mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
       const tracked = await cliReader.listDvcOnly(cwd, path)
@@ -117,10 +117,10 @@ describe('CliReader', () => {
       expect(tracked).toEqual(listOutput)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        executable: 'dvc',
         args: ['list', '.', path, '--dvc-only', '--show-json'],
         cwd,
-        env: mockedEnv
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
 
@@ -129,56 +129,56 @@ describe('CliReader', () => {
         const cwd = __dirname
         const listOutput = [
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/train-images-idx3-ubyte'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/train-labels-idx1-ubyte'
           },
           {
-            isout: false,
             isdir: false,
             isexec: false,
+            isout: false,
             path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
           },
-          { isout: false, isdir: false, isexec: false, path: 'logs/acc.tsv' },
-          { isout: false, isdir: false, isexec: false, path: 'logs/loss.tsv' },
-          { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+          { isdir: false, isexec: false, isout: false, path: 'logs/acc.tsv' },
+          { isdir: false, isexec: false, isout: false, path: 'logs/loss.tsv' },
+          { isdir: false, isexec: false, isout: true, path: 'model.pt' }
         ]
         mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
         const tracked = await cliReader.listDvcOnlyRecursive(cwd)
@@ -186,10 +186,10 @@ describe('CliReader', () => {
         expect(tracked).toEqual(listOutput)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['list', '.', '--dvc-only', '-R', SHOW_JSON],
           cwd,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
 
@@ -201,10 +201,10 @@ describe('CliReader', () => {
           const relativeRoot = await cliReader.root(cwd)
           expect(relativeRoot).toEqual(stdout)
           expect(mockedExecuteProcess).toBeCalledWith({
-            executable: 'dvc',
             args: ['root'],
             cwd,
-            env: mockedEnv
+            env: mockedEnv,
+            executable: 'dvc'
           })
         })
 
@@ -217,10 +217,10 @@ describe('CliReader', () => {
           const relativeRoot = await cliReader.root(cwd)
           expect(relativeRoot).toBeUndefined()
           expect(mockedExecuteProcess).toBeCalledWith({
-            executable: 'dvc',
             args: ['root'],
             cwd,
-            env: mockedEnv
+            env: mockedEnv,
+            executable: 'dvc'
           })
         })
       })
@@ -229,13 +229,13 @@ describe('CliReader', () => {
     describe('status', () => {
       it('should call the cli with the correct parameters', async () => {
         const cliOutput = {
-          train: [
-            { 'changed deps': { 'data/MNIST': 'modified' } },
-            { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-            'always changed'
-          ],
           'data/MNIST/raw.dvc': [
             { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+          ],
+          train: [
+            { 'changed deps': { 'data/MNIST': 'modified' } },
+            { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
+            'always changed'
           ]
         }
         const cwd = __dirname
@@ -245,10 +245,10 @@ describe('CliReader', () => {
         expect(diffOutput).toEqual(cliOutput)
 
         expect(mockedExecuteProcess).toBeCalledWith({
-          executable: 'dvc',
           args: ['status', SHOW_JSON],
           cwd,
-          env: mockedEnv
+          env: mockedEnv,
+          executable: 'dvc'
         })
       })
     })

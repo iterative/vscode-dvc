@@ -116,9 +116,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     if (!elementIsDirectory) {
       treeItem.command = {
+        arguments: [resourceUri],
         command: 'dvc.views.trackedExplorerTree.openFile',
-        title: 'Open File',
-        arguments: [resourceUri]
+        title: 'Open File'
       }
     }
 

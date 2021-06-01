@@ -107,9 +107,9 @@ export class DecorationProvider implements FileDecorationProvider {
     added: DecorationProvider.DecorationAdded,
     deleted: DecorationProvider.DecorationDeleted,
     modified: DecorationProvider.DecorationModified,
+    notInCache: DecorationProvider.DecorationNotInCache,
     renamed: DecorationProvider.DecorationRenamed,
-    stageModified: DecorationProvider.DecorationStageModified,
-    notInCache: DecorationProvider.DecorationNotInCache
+    stageModified: DecorationProvider.DecorationStageModified
   }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {

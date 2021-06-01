@@ -14,19 +14,19 @@ const dummyVsCodeApi = {
 }
 
 export default {
-  title: 'Experiments/Table',
-  component: Experiments,
-  args: {
-    experiments: complexExperimentsData,
-    vsCodeApi: dummyVsCodeApi
-  },
   argTypes: {
     vsCodeApi: {
       table: {
         disable: true
       }
     }
-  }
+  },
+  args: {
+    experiments: complexExperimentsData,
+    vsCodeApi: dummyVsCodeApi
+  },
+  component: Experiments,
+  title: 'Experiments/Table'
 } as Meta
 
 export const ComplexTable: Story = ({ experiments, vsCodeApi }) => {

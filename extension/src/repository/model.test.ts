@@ -52,29 +52,29 @@ describe('RepositoryState', () => {
           { path: output },
           { path: predictions }
         ],
-        renamed: [{ path: renamed }],
-        'not in cache': []
+        'not in cache': [],
+        renamed: [{ path: renamed }]
       }
 
       const status = ({
+        'data/MNIST/raw.dvc': [
+          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ],
         train: [
           { 'changed deps': { 'data/MNIST': 'modified' } },
           {
-            'changed outs': { 'predictions.json': 'modified', logs: 'modified' }
+            'changed outs': { logs: 'modified', 'predictions.json': 'modified' }
           },
           'always changed'
-        ],
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
       } as unknown) as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
-        diffFromHead: diff,
         diffFromCache: status,
-        untracked: new Set<string>(),
-        tracked: list
+        diffFromHead: diff,
+        tracked: list,
+        untracked: new Set<string>()
       })
 
       expect(model.getState()).toEqual({
@@ -112,10 +112,10 @@ describe('RepositoryState', () => {
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
-        diffFromHead: diff,
         diffFromCache: status,
-        untracked: new Set<string>(),
-        tracked: list
+        diffFromHead: diff,
+        tracked: list,
+        untracked: new Set<string>()
       })
 
       expect(model.getState()).toEqual({
@@ -149,10 +149,10 @@ describe('RepositoryState', () => {
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
-        diffFromHead: diff,
         diffFromCache: status,
-        untracked: new Set<string>(),
-        tracked: list
+        diffFromHead: diff,
+        tracked: list,
+        untracked: new Set<string>()
       })
 
       expect(model.getState()).toEqual({
@@ -180,8 +180,8 @@ describe('RepositoryState', () => {
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
-        diffFromHead: diff,
         diffFromCache: status,
+        diffFromHead: diff,
         untracked: new Set<string>()
       })
 

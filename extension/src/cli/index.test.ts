@@ -31,18 +31,18 @@ describe('executeProcess', () => {
         pythonBinPath: undefined
       } as unknown) as Config,
       ({
-        fire: jest.fn(),
-        event: jest.fn()
+        event: jest.fn(),
+        fire: jest.fn()
       } as unknown) as EventEmitter<CliResult>
     )
 
     await cli.executeProcess(cwd, ...args)
 
     expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
       args,
       cwd,
-      env: processEnv
+      env: processEnv,
+      executable: 'dvc'
     })
   })
 
@@ -61,18 +61,18 @@ describe('executeProcess', () => {
         pythonBinPath
       } as unknown) as Config,
       ({
-        fire: jest.fn(),
-        event: jest.fn()
+        event: jest.fn(),
+        fire: jest.fn()
       } as unknown) as EventEmitter<CliResult>
     )
 
     await expect(cli.executeProcess(cwd, ...args)).rejects.toThrow()
 
     expect(mockedExecuteProcess).toBeCalledWith({
-      executable: '/some/path/to/dvc',
       args,
       cwd,
-      env: { PATH: `${pythonBinPath}:${existingPath}`, SECRET_KEY }
+      env: { PATH: `${pythonBinPath}:${existingPath}`, SECRET_KEY },
+      executable: '/some/path/to/dvc'
     })
   })
 })

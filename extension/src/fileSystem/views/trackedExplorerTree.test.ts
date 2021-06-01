@@ -24,8 +24,8 @@ const mockedDisposable = mocked(Disposable)
 const mockedGetDefaultProject = jest.fn()
 const mockedGetCliPath = jest.fn()
 const mockedConfig = ({
-  getDefaultProject: mockedGetDefaultProject,
-  getCliPath: mockedGetCliPath
+  getCliPath: mockedGetCliPath,
+  getDefaultProject: mockedGetDefaultProject
 } as unknown) as Config
 
 jest.mock('vscode')
@@ -46,9 +46,9 @@ describe('TrackedTreeView', () => {
   const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
 
   const demoRootList = [
-    { isout: false, isdir: true, isexec: false, path: 'data' },
-    { isout: true, isdir: true, isexec: false, path: 'logs' },
-    { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+    { isdir: true, isexec: false, isout: false, path: 'data' },
+    { isdir: true, isexec: false, isout: true, path: 'logs' },
+    { isdir: false, isexec: false, isout: true, path: 'model.pt' }
   ]
 
   describe('initialize', () => {
@@ -88,7 +88,7 @@ describe('TrackedTreeView', () => {
       ])
 
       mockedListDvcOnly.mockResolvedValueOnce([
-        { isout: false, isdir: true, isexec: false, path: 'MNIST' }
+        { isdir: true, isexec: false, isout: false, path: 'MNIST' }
       ])
 
       const child = await trackedTreeView.getChildren(join(dvcDemoPath, 'data'))
@@ -101,7 +101,7 @@ describe('TrackedTreeView', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
         expect(collapsibleState).toEqual(1)
-        mockedItem = { uri, collapsibleState }
+        mockedItem = { collapsibleState, uri }
         return mockedItem
       })
 
@@ -134,7 +134,7 @@ describe('TrackedTreeView', () => {
       mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
         expect(collapsibleState).toEqual(0)
         expect(uri).toEqual(mockedUri)
-        mockedItem = { uri, collapsibleState }
+        mockedItem = { collapsibleState, uri }
         return mockedItem
       })
 

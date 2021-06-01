@@ -25,8 +25,8 @@ describe('SourceControlManagement', () => {
   describe('setState', () => {
     it('should be able to set the state', () => {
       const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
-        inputBox: { visible: true },
-        createResourceGroup: jest.fn().mockReturnValueOnce({})
+        createResourceGroup: jest.fn().mockReturnValueOnce({}),
+        inputBox: { visible: true }
       })
       mockedScm.createSourceControl = mockedCreateSourceControl
 
@@ -48,14 +48,14 @@ describe('SourceControlManagement', () => {
       sourceControlManagement.setState(updatedState)
 
       expect(sourceControlManagement.getState()).toEqual([
-        { resourceUri: Uri.file('/some/new/path'), contextValue: 'added' },
+        { contextValue: 'added', resourceUri: Uri.file('/some/new/path') },
         {
-          resourceUri: Uri.file('/some/deleted/path'),
-          contextValue: 'deleted'
+          contextValue: 'deleted',
+          resourceUri: Uri.file('/some/deleted/path')
         },
         {
-          resourceUri: Uri.file('/some/other/deleted/path'),
-          contextValue: 'deleted'
+          contextValue: 'deleted',
+          resourceUri: Uri.file('/some/other/deleted/path')
         }
       ])
 
