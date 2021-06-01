@@ -15,8 +15,8 @@ import {
 import { getAllUntracked } from '../git'
 
 jest.mock('@hediet/std/disposable')
-jest.mock('./views/SourceControlManagement')
-jest.mock('./DecorationProvider')
+jest.mock('./views/sourceControlManagement')
+jest.mock('./decorationProvider')
 jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
