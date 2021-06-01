@@ -1,6 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { ExperimentsTable, Experiments } from '.'
+import { Experiments } from '.'
+import { ExperimentsTable } from './table'
 import { pickExperimentName } from './quickPick'
 import { runQueued, runReset } from './runner'
 import { Config } from '../config'
