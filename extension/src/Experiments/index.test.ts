@@ -7,7 +7,7 @@ import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'
 import { pickExperimentName } from './quickPick'
 import { getInput } from '../vscode/inputBox'
-import { runQueued, runReset } from './commands/runner'
+import { runQueued, runReset } from './runner'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)

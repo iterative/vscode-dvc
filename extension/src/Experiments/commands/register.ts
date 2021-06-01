@@ -1,6 +1,6 @@
 import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
-import { run, runQueued, runReset, stop } from './runner'
+import { run, runQueued, runReset, stop } from '../runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { CliExecutor } from '../../cli/executor'
