@@ -2,9 +2,21 @@ import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { getProcessEnv } from '../env'
 import { Args } from './args'
+import { CliError } from './error'
 import { executeProcess } from '../processExecution'
 import { Config } from '../Config'
-import { CliProcessError } from '../vscode/reporting'
+
+const getPATH = (existingPath: string, pythonBinPath?: string): string =>
+  [pythonBinPath, existingPath].filter(Boolean).join(':')
+
+export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
+  const env = getProcessEnv()
+  const PATH = getPATH(env?.PATH as string, pythonBinPath)
+  return {
+    ...env,
+    PATH
+  }
+}
 
 export class Cli {
   public dispose = Disposable.fn()
@@ -14,25 +26,12 @@ export class Cli {
   private ran: EventEmitter<string>
   public onDidRun: Event<string>
 
-  private getPATH(existingPath: string, pythonBinPath?: string): string {
-    return [pythonBinPath, existingPath].filter(Boolean).join(':')
-  }
-
-  private getEnv(pythonBinPath?: string): NodeJS.ProcessEnv {
-    const env = getProcessEnv()
-    const PATH = this.getPATH(env?.PATH as string, pythonBinPath)
-    return {
-      ...env,
-      PATH
-    }
-  }
-
   private getExecutionOptions(cwd: string, args: Args) {
     return {
       executable: this.config.getCliPath() || 'dvc',
       args,
       cwd,
-      env: this.getEnv(this.config.pythonBinPath)
+      env: getEnv(this.config.pythonBinPath)
     }
   }
 
@@ -44,7 +43,7 @@ export class Cli {
       this.ran?.fire(`> ${command}\n`)
       return stdout
     } catch (error) {
-      const cliError = new CliProcessError({ args, baseError: error })
+      const cliError = new CliError({ options, baseError: error })
       this.ran?.fire(`> ${command} failed. ${cliError.stderr}\n`)
       throw cliError
     }

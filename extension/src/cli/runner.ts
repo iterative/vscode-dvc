@@ -5,7 +5,7 @@ import { PseudoTerminal } from '../PseudoTerminal'
 import { Args } from './args'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
-import { getEnv } from './execution'
+import { getEnv } from '.'
 
 export class CliRunner {
   public readonly dispose = Disposable.fn()
@@ -36,13 +36,7 @@ export class CliRunner {
     return this.config.getCliPath() || 'dvc'
   }
 
-  private createCliProcess({
-    cwd,
-    args
-  }: {
-    cwd: string
-    args: Args
-  }): Process {
+  private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
     const env = getEnv(this.config.pythonBinPath)
 
     const process = createProcess({
@@ -74,7 +68,7 @@ export class CliRunner {
     CliRunner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    this.currentProcess = this.createCliProcess({
+    this.currentProcess = this.createProcess({
       cwd,
       args
     })

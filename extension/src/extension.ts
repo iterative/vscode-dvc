@@ -34,7 +34,6 @@ import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './Repository'
 import { TrackedExplorerTree } from './fileSystem/views/TrackedExplorerTree'
 import { CliExecutor } from './cli/executor'
-import { CliExecution } from './cli/execution'
 import { setContextValue } from './vscode/context'
 import { definedAndNonEmpty } from './util'
 import { CliRunner } from './cli/runner'
@@ -241,7 +240,6 @@ export class Extension {
 
     this.outputChannel = this.dispose.track(window.createOutputChannel('DVC'))
 
-    this.dispose.track(CliExecution.onDidRun(e => this.outputChannel.append(e)))
     this.dispose.track(
       this.cliExecutor.onDidRun(e => this.outputChannel.append(e))
     )
