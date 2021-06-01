@@ -43,7 +43,7 @@ export const onReady = (
 }
 
 export const onDidChangeFileSystem = (
-  path: string | string[],
+  path: string,
   watcher: (path: string) => void
 ): Disposable => {
   const debouncedWatcher = debounce(watcher, 500, {
