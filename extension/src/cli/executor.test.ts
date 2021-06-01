@@ -4,7 +4,7 @@ import { EventEmitter } from 'vscode'
 import { Config } from '../Config'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
-import { CliExecutor, experimentApply, init, removeTarget } from './executor'
+import { CliExecutor, experimentApply } from './executor'
 
 jest.mock('vscode')
 jest.mock('fs-extra')
@@ -198,6 +198,41 @@ describe('CliExecutor', () => {
       })
     })
 
+    describe('init', () => {
+      it('should call executeProcess with the correct parameters to initialize a project', async () => {
+        const fsPath = __dirname
+        const stdout = `
+			Initialized DVC repository.
+			You can now commit the changes to git.
+			
+			+---------------------------------------------------------------------+
+			|                                                                     |
+			|        DVC has enabled anonymous aggregate usage analytics.         |
+			|     Read the analytics documentation (and how to opt-out) here:     |
+			|             <https://dvc.org/doc/user-guide/analytics>              |
+			|                                                                     |
+			+---------------------------------------------------------------------+
+			
+			What's next?
+			------------
+			- Check out the documentation: <https://dvc.org/doc>
+			- Get help and share ideas: <https://dvc.org/chat>
+			- Star us on GitHub: <https://github.com/iterative/dvc>`
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.init(fsPath)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['init', '--subdir'],
+          cwd: fsPath,
+          env: mockedEnv
+        })
+      })
+    })
+
     describe('pull', () => {
       it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
         const cwd = __dirname
@@ -212,6 +247,27 @@ describe('CliExecutor', () => {
           executable: 'dvc',
           args: ['pull'],
           cwd: __dirname,
+          env: mockedEnv
+        })
+      })
+    })
+
+    describe('pullTarget', () => {
+      it('should call executeProcess with the correct parameters to pull the target', async () => {
+        const fsPath = __filename
+        const dir = resolve(fsPath, '..')
+        const file = basename(__filename)
+        const stdout = 'M       logs/\n1 file modified'
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.pullTarget(fsPath)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['pull', file],
+          cwd: dir,
           env: mockedEnv
         })
       })
@@ -235,6 +291,48 @@ describe('CliExecutor', () => {
         })
       })
     })
+
+    describe('pushTarget', () => {
+      it('should call executeProcess with the correct parameters to push the target', async () => {
+        const fsPath = __filename
+        const dir = resolve(fsPath, '..')
+        const file = basename(__filename)
+        const stdout = 'Everything is up to date.'
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.pushTarget(fsPath)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['push', file],
+          cwd: dir,
+          env: mockedEnv
+        })
+      })
+    })
+
+    describe('removeTarget', () => {
+      it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+        const file = 'data.dvc'
+        const fsPath = join(__dirname, 'data.dvc')
+
+        const stdout = ''
+
+        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+        const output = await cliExecutor.removeTarget(fsPath)
+        expect(output).toEqual(stdout)
+
+        expect(mockedExecuteProcess).toBeCalledWith({
+          executable: 'dvc',
+          args: ['remove', file],
+          cwd: __dirname,
+          env: mockedEnv
+        })
+      })
+    })
   })
 })
 
@@ -253,70 +351,6 @@ describe('experimentApply', () => {
       executable: 'dvc',
       args: ['exp', 'apply', 'exp-test'],
       cwd,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('init', () => {
-  it('should call executeProcess with the correct parameters to initialize a project', async () => {
-    const fsPath = __dirname
-    const stdout = `
-	  Initialized DVC repository.
-	  You can now commit the changes to git.
-	  
-	  +---------------------------------------------------------------------+
-	  |                                                                     |
-	  |        DVC has enabled anonymous aggregate usage analytics.         |
-	  |     Read the analytics documentation (and how to opt-out) here:     |
-	  |             <https://dvc.org/doc/user-guide/analytics>              |
-	  |                                                                     |
-	  +---------------------------------------------------------------------+
-	  
-	  What's next?
-	  ------------
-	  - Check out the documentation: <https://dvc.org/doc>
-	  - Get help and share ideas: <https://dvc.org/chat>
-	  - Star us on GitHub: <https://github.com/iterative/dvc>`
-
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await init({
-      cliPath: 'dvc',
-      cwd: fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['init', '--subdir'],
-      cwd: fsPath,
-      env: mockedEnv
-    })
-  })
-})
-
-describe('removeTarget', () => {
-  it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
-    const file = 'data.dvc'
-    const fsPath = join(__dirname, 'data.dvc')
-
-    const stdout = ''
-
-    mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-    const output = await removeTarget({
-      cliPath: 'dvc',
-      fsPath,
-      pythonBinPath: undefined
-    })
-    expect(output).toEqual(stdout)
-
-    expect(mockedExecuteProcess).toBeCalledWith({
-      executable: 'dvc',
-      args: ['remove', file],
-      cwd: __dirname,
       env: mockedEnv
     })
   })

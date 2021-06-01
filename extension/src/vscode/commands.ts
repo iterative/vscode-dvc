@@ -1,18 +1,11 @@
 import { commands } from 'vscode'
-import {
-  ExecutionOnTargetOptions,
-  getExecutionOnTargetOptions
-} from '../cli/executor'
-import { Config } from '../Config'
 
 export const registerPathCommand = (
-  config: Config,
   name: string,
-  func: (options: ExecutionOnTargetOptions) => Promise<string>
+  func: (cwd: string) => Promise<string>
 ) =>
   commands.registerCommand(name, path => {
-    const options = getExecutionOnTargetOptions(config, path)
-    return func(options)
+    return func(path)
   })
 
 export const registerUriCommand = (

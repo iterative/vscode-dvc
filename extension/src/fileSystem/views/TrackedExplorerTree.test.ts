@@ -5,6 +5,7 @@ import { Config } from '../../Config'
 import { TrackedExplorerTree } from './TrackedExplorerTree'
 import { join } from 'path'
 import { CliReader } from '../../cli/reader'
+import { CliExecutor } from '../../cli/executor'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
@@ -55,6 +56,7 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         {} as CliReader,
+        {} as CliExecutor,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -72,6 +74,7 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         ({ listDvcOnly: mockedListDvcOnly } as unknown) as CliReader,
+        {} as CliExecutor,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -108,6 +111,7 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         ({ listDvcOnly: mockedListDvcOnly } as unknown) as CliReader,
+        {} as CliExecutor,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -137,6 +141,7 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         {} as CliReader,
+        {} as CliExecutor,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )

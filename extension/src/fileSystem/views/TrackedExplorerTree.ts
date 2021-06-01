@@ -14,21 +14,15 @@ import { Config } from '../../Config'
 import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import {
-  getExecutionOnTargetOptions,
-  init,
-  pullTarget,
-  pushTarget,
-  removeTarget
-} from '../../cli/executor'
+import { CliExecutor } from '../../cli/executor'
 import { registerPathCommand } from '../../vscode/commands'
-import { getExecutionOptions } from '../../cli/execution'
 import { CliReader } from '../../cli/reader'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   private readonly cliReader: CliReader
+  private readonly cliExecutor: CliExecutor
   private readonly treeDataChanged: EventEmitter<string | void>
   public readonly onDidChangeTreeData: Event<string | void>
 
@@ -155,11 +149,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
-        const options = getExecutionOptions(
-          this.config,
-          this.config.firstWorkspaceFolderRoot
-        )
-        await init(options)
+        await this.cliExecutor.init(this.config.firstWorkspaceFolderRoot)
 
         workspaceChanged.fire()
       })
@@ -179,31 +169,29 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.removeTarget', path => {
         deleteTarget(path)
-        const options = getExecutionOnTargetOptions(
-          this.config,
-          this.getDataPlaceholder(path)
-        )
-        return removeTarget(options)
+        return this.cliExecutor.removeTarget(path)
       })
     )
 
     this.dispose.track(
-      registerPathCommand(this.config, 'dvc.pullTarget', pullTarget)
+      registerPathCommand('dvc.pullTarget', this.cliExecutor.pullTarget)
     )
 
     this.dispose.track(
-      registerPathCommand(this.config, 'dvc.pushTarget', pushTarget)
+      registerPathCommand('dvc.pushTarget', this.cliExecutor.pushTarget)
     )
   }
 
   constructor(
     config: Config,
     cliReader: CliReader,
+    cliExecutor: CliExecutor,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
     this.cliReader = cliReader
+    this.cliExecutor = cliExecutor
 
     this.registerCommands(workspaceChanged)
 
