@@ -5,7 +5,7 @@ import debounce from 'lodash.debounce'
 import { TrackedExplorerTree } from './views/trackedExplorerTree'
 import { Repository } from '../repository'
 
-export const getWatcher = (
+export const getRepositoryWatcher = (
   repository: Repository,
   trackedExplorerTree: TrackedExplorerTree
 ): ((path: string) => void) => (path: string) => {

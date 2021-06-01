@@ -20,7 +20,10 @@ import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { findDvcRootPaths } from './fileSystem'
-import { getWatcher, onDidChangeFileSystem } from './fileSystem/watcher'
+import {
+  getRepositoryWatcher,
+  onDidChangeFileSystem
+} from './fileSystem/watcher'
 import { ResourceLocator } from './resourceLocator'
 import { DecorationProvider } from './repository/decorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
@@ -142,7 +145,7 @@ export class Extension {
       this.dispose.track(
         onDidChangeFileSystem(
           dvcRoot,
-          getWatcher(repository, this.trackedExplorerTree)
+          getRepositoryWatcher(repository, this.trackedExplorerTree)
         )
       )
 

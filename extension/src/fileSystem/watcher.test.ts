@@ -4,7 +4,7 @@ import debounce from 'lodash.debounce'
 import { FSWatcher, watch } from 'chokidar'
 import { TrackedExplorerTree } from './views/trackedExplorerTree'
 import {
-  getWatcher,
+  getRepositoryWatcher,
   ignoredDotDirectories,
   onDidChangeFileSystem,
   onReady
@@ -21,7 +21,7 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('getWatcher', () => {
+describe('getRepositoryWatcher', () => {
   const mockedResetState = jest.fn()
   const mockedUpdateState = jest.fn()
   const repository = ({
@@ -37,7 +37,7 @@ describe('getWatcher', () => {
   } as unknown) as TrackedExplorerTree
 
   it('should return a function that does nothing if an empty path is provided', () => {
-    const watcher = getWatcher(repository, trackedExplorerTree)
+    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher('')
 
@@ -48,7 +48,7 @@ describe('getWatcher', () => {
   })
 
   it('should return a function that calls reset if it called with a .dvc data placeholder', () => {
-    const watcher = getWatcher(repository, trackedExplorerTree)
+    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(join('some', 'dvc', 'repo', 'data', 'placeholder.dvc'))
 
@@ -60,7 +60,7 @@ describe('getWatcher', () => {
   })
 
   it('should return a function that calls reset if it called with a dvc.yml', () => {
-    const watcher = getWatcher(repository, trackedExplorerTree)
+    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(join('some', 'dvc', 'repo', 'data', 'dvc.yaml'))
 
@@ -72,7 +72,7 @@ describe('getWatcher', () => {
   })
 
   it('should return a function that calls reset if it called with a dvc.lock', () => {
-    const watcher = getWatcher(repository, trackedExplorerTree)
+    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(join('some', 'dvc', 'repo', 'data', 'dvc.lock'))
 
@@ -84,7 +84,7 @@ describe('getWatcher', () => {
   })
 
   it('should return a function that calls update if it called with anything else', () => {
-    const watcher = getWatcher(repository, trackedExplorerTree)
+    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(__filename)
 
