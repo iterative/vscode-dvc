@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { getEnv } from '.'
 import { Args } from './args'
 import { Config } from '../config'
-import { PseudoTerminal } from '../PseudoTerminal'
+import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 
