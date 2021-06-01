@@ -12,6 +12,8 @@ import { Config } from '../../../Config'
 import { ResourceLocator } from '../../../ResourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
+import { CliRunner } from '../../../cli/runner'
+import { runQueued } from '../../../Experiments/commands/runner'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -171,17 +173,19 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('getExperimentsTableForCommand', () => {
-    it('should return an experiments table if its webview is focused', async () => {
+  describe('showExperimentsTableThenRun', () => {
+    it('should run against an experiments table if webview is focused', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
+      const mockRun = stub(CliRunner.prototype, 'run').resolves()
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
+      const cliRunner = disposable.track(new CliRunner(config))
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -204,15 +208,19 @@ suite('Experiments Test Suite', () => {
 
       const focused = onDidChangeIsWebviewFocused(experimentsTable)
 
-      await experiments.getExperimentsTableForCommand()
+      await experiments.showExperimentsTableThenRun(cliRunner, runQueued)
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
+      expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
       expect(experiments.getFocused()).to.equal(experimentsTable)
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsTable = await experiments.getExperimentsTableForCommand()
+      const focusedExperimentsTable = await experiments.showExperimentsTableThenRun(
+        cliRunner,
+        runQueued
+      )
 
       expect(focusedExperimentsTable).to.equal(experimentsTable)
       expect(mockQuickPickOne).not.to.be.called

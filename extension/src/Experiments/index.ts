@@ -13,6 +13,9 @@ import { Logger } from '../common/Logger'
 import { onDidChangeFileSystem } from '../fileSystem'
 import { quickPickOne } from '../vscode/quickPick'
 import { pickExperimentName } from './commands/quickPick'
+import { report } from './commands/report'
+import { getInput } from '../vscode/inputBox'
+import { CliRunner } from '../cli/runner'
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -163,47 +166,6 @@ export class Experiments {
   private experiments: Record<string, ExperimentsTable> = {}
   private config: Config
 
-  public async showExperimentsTable() {
-    const dvcRoot = await this.getDefaultOrPickDvcRoot()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
-  public getCwd(): Promise<string | undefined> {
-    return this.getFocusedOrDefaultOrPickProject()
-  }
-
-  public async getExperimentName(): Promise<{
-    name: string | undefined
-    cwd: string | undefined
-  }> {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return { name: undefined, cwd: dvcRoot }
-    }
-    const experimentNames = await this.cliReader.experimentListCurrent(dvcRoot)
-    const name = await pickExperimentName(experimentNames)
-
-    return {
-      name,
-      cwd: dvcRoot
-    }
-  }
-
-  public async getExperimentsTableForCommand(): Promise<
-    ExperimentsTable | undefined
-  > {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
   private async getDvcRoot(
     chooserFn: (keys: string[]) => string | Thenable<string | undefined>
   ) {
@@ -231,11 +193,109 @@ export class Experiments {
     return quickPickOne(keys, 'Select which project to run command against')
   }
 
+  public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    report(func(cwd))
+  }
+
+  public getExpNameThenRun = async (
+    func: (cwd: string, experimentName: string) => Promise<string>
+  ) => {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const name = await pickExperimentName(
+      this.cliReader.experimentListCurrent(cwd)
+    )
+
+    if (!name) {
+      return
+    }
+    return report(func(cwd, name))
+  }
+
+  public getCwdAndQuickPickThenRun = async <T>(
+    func: (cwd: string, result: T) => Promise<string>,
+    quickPick: () => Thenable<T | undefined>
+  ) => {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
+      return
+    }
+    const result = await quickPick()
+
+    if (result) {
+      report(func(cwd, result))
+    }
+  }
+
+  public getExpNameAndInputThenRun = async (
+    func: (cwd: string, experiment: string, input: string) => Promise<string>,
+    prompt: string
+  ) => {
+    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    if (!cwd) {
+      return
+    }
+
+    const name = await pickExperimentName(
+      this.cliReader.experimentListCurrent(cwd)
+    )
+
+    if (!name) {
+      return
+    }
+    const input = await getInput(prompt)
+    if (input) {
+      report(func(cwd, name, input))
+    }
+  }
+
   private async showExperimentsWebview(
     dvcRoot: string
   ): Promise<ExperimentsTable> {
     const experimentsTable = this.experiments[dvcRoot]
     await experimentsTable.showWebview()
+    return experimentsTable
+  }
+
+  public async showExperimentsTable() {
+    const dvcRoot = await this.getDefaultOrPickDvcRoot()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.showExperimentsWebview(dvcRoot)
+  }
+
+  public showExperimentsTableThenRun = async (
+    cliRunner: CliRunner,
+    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
+  ) => {
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    const experimentsTable = await this.showExperimentsWebview(dvcRoot)
+    if (!experimentsTable) {
+      return
+    }
+
+    func(cliRunner, dvcRoot)
+    const listener = cliRunner.dispose.track(
+      cliRunner.onDidCompleteProcess(() => {
+        experimentsTable.refresh()
+        cliRunner.dispose.untrack(listener)
+        listener.dispose()
+      })
+    )
     return experimentsTable
   }
 
