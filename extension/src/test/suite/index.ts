@@ -2,7 +2,7 @@
 import { join, resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
-import { Logger } from '../../common/Logger'
+import { Logger } from '../../common/logger'
 
 function setupNyc() {
   const NYC = require('nyc')
@@ -15,13 +15,13 @@ function setupNyc() {
     cacheDir: join(cwd, '.cache', 'nyc'),
     cwd,
     exclude: [...defaultExclude, '**/.vscode-test/**'],
+    extensions: ['ts'],
     hookRequire: true,
     hookRunInContext: true,
     hookRunInThisContext: true,
     instrument: true,
     reporter: ['text', 'html'],
     sourceMap: true,
-    extensions: ['ts'],
     tempDirectory: join(cwd, 'coverage', 'integration')
   })
   nyc.reset()
@@ -33,8 +33,8 @@ export async function run() {
   const nyc = setupNyc()
   // Create the mocha test
   const mocha = new Mocha({
-    ui: 'tdd',
-    color: true
+    color: true,
+    ui: 'tdd'
   })
 
   const testsRoot = resolvePath(__dirname, '..')

@@ -42,9 +42,9 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonBin = pythonExecutionDetails?.join(' ')
   if (pythonBin) {
     const output = await executeProcess({
-      executable: pythonBin,
       args: ['-c', 'import sys; print(sys.prefix)'],
-      cwd: process.cwd()
+      cwd: process.cwd(),
+      executable: pythonBin
     })
     return join(output, 'bin')
   }

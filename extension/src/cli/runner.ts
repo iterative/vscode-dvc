@@ -1,11 +1,11 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Config } from '../Config'
-import { PseudoTerminal } from '../PseudoTerminal'
+import { getEnv } from '.'
 import { Args } from './args'
+import { Config } from '../config'
+import { PseudoTerminal } from '../PseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
-import { getEnv } from './execution'
 
 export class CliRunner {
   public readonly dispose = Disposable.fn()
@@ -29,27 +29,27 @@ export class CliRunner {
   private currentProcess: Process | undefined
   private config: Config
 
-  private getOverrideOrCliPath() {
+  private getOverrideOrCliPath = () => {
     if (this.executable) {
       return this.executable
     }
     return this.config.getCliPath() || 'dvc'
   }
 
-  private createCliProcess({
+  private createProcess = ({
     cwd,
     args
   }: {
     cwd: string
     args: Args
-  }): Process {
+  }): Process => {
     const env = getEnv(this.config.pythonBinPath)
 
     const process = createProcess({
-      executable: this.getOverrideOrCliPath(),
       args,
       cwd,
-      env
+      env,
+      executable: this.getOverrideOrCliPath()
     })
 
     this.processStarted.fire()
@@ -70,17 +70,17 @@ export class CliRunner {
     return process
   }
 
-  private startProcess(cwd: string, args: Args) {
+  private startProcess = (cwd: string, args: Args) => {
     CliRunner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)
-    this.currentProcess = this.createCliProcess({
-      cwd,
-      args
+    this.currentProcess = this.createProcess({
+      args,
+      cwd
     })
   }
 
-  public async run(cwd: string, ...args: Args) {
+  public run = async (cwd: string, ...args: Args) => {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
@@ -92,7 +92,7 @@ export class CliRunner {
     )
   }
 
-  public async stop() {
+  public stop = async () => {
     try {
       this.currentProcess?.kill('SIGINT')
       await this.currentProcess
@@ -106,11 +106,11 @@ export class CliRunner {
     }
   }
 
-  public isRunning() {
+  public isRunning = () => {
     return !!this.currentProcess
   }
 
-  public getRunningProcess() {
+  public getRunningProcess = () => {
     return this.currentProcess
   }
 

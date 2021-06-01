@@ -11,16 +11,16 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
-import { App } from './App'
-import complexExperimentsOutput from 'dvc/src/Experiments/Webview/complex-output-example.json'
-import { getVsCodeApi } from '../model/VsCodeApi'
+import complexExperimentsOutput from 'dvc/src/experiments/webview/complex-output-example.json'
 import {
   MessageFromWebviewType,
   MessageToWebviewType,
   WebviewColorTheme
-} from 'dvc/src/Experiments/Webview/contract'
+} from 'dvc/src/experiments/webview/contract'
+import { App } from './App'
+import { getVsCodeApi } from '../model/vsCodeApi'
 
-jest.mock('../model/VsCodeApi')
+jest.mock('../model/vsCodeApi')
 
 const { postMessage, getState } = getVsCodeApi()
 const mockGetVsCodeApi = mocked(getVsCodeApi)
@@ -74,8 +74,8 @@ describe('App', () => {
   describe('Given a message to add experiments to the state', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
-        type: MessageToWebviewType.showExperiments,
-        tableData: complexExperimentsOutput
+        tableData: complexExperimentsOutput,
+        type: MessageToWebviewType.showExperiments
       }
     })
 

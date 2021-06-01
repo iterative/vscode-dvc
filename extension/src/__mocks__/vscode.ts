@@ -20,9 +20,9 @@ export const Uri = {
 }
 export const window = {
   createOutputChannel: jest.fn(),
-  showInputBox: jest.fn(),
-  showInformationMessage: jest.fn(),
   showErrorMessage: jest.fn(),
+  showInformationMessage: jest.fn(),
+  showInputBox: jest.fn(),
   showQuickPick: jest.fn()
 }
 export const workspace = {

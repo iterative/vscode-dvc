@@ -1,8 +1,8 @@
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
-import { join } from 'path'
 import {
   window,
   commands,
@@ -14,7 +14,7 @@ import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
 import * as FileSystem from '../../fileSystem'
-import complexExperimentsOutput from '../../Experiments/Webview/complex-output-example.json'
+import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -105,9 +105,9 @@ suite('Extension Test Suite', () => {
       ] as ListOutput[])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([
-        { isout: false, isdir: true, isexec: false, path: 'data' },
-        { isout: true, isdir: true, isexec: false, path: 'logs' },
-        { isout: true, isdir: false, isexec: false, path: 'model.pt' }
+        { isdir: true, isexec: false, isout: false, path: 'data' },
+        { isdir: true, isexec: false, isout: true, path: 'logs' },
+        { isdir: false, isexec: false, isout: true, path: 'model.pt' }
       ])
 
       stub(CliReader.prototype, 'root').resolves('.')
@@ -121,13 +121,13 @@ suite('Extension Test Suite', () => {
       })
 
       const mockStatus = stub(CliReader.prototype, 'status').resolves(({
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { 'model.pt': 'modified', logs: 'modified' } },
-          'always changed'
-        ],
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
+        ],
+        train: [
+          { 'changed deps': { 'data/MNIST': 'modified' } },
+          { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
+          'always changed'
         ]
       } as unknown) as StatusOutput)
 

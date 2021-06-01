@@ -2,9 +2,8 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 
+import complexExperimentsData from 'dvc/src/experiments/webview/complex-output-example.json'
 import Experiments from '../components/Experiments'
-
-import complexExperimentsData from 'dvc/src/Experiments/Webview/complex-output-example.json'
 
 import './test-vscode-styles.scss'
 import '../style.scss'
@@ -14,19 +13,19 @@ const dummyVsCodeApi = {
 }
 
 export default {
-  title: 'Experiments/Table',
-  component: Experiments,
-  args: {
-    experiments: complexExperimentsData,
-    vsCodeApi: dummyVsCodeApi
-  },
   argTypes: {
     vsCodeApi: {
       table: {
         disable: true
       }
     }
-  }
+  },
+  args: {
+    experiments: complexExperimentsData,
+    vsCodeApi: dummyVsCodeApi
+  },
+  component: Experiments,
+  title: 'Experiments/Table'
 } as Meta
 
 export const ComplexTable: Story = ({ experiments, vsCodeApi }) => {

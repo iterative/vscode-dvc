@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { downloadAndUnzipVSCode, runTests } from 'vscode-test'
-import { Logger } from '../common/Logger'
+import { Logger } from '../common/logger'
 
 async function main() {
   try {

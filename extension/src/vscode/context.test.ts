@@ -1,6 +1,6 @@
-import { setContextValue } from './context'
 import { commands } from 'vscode'
 import { mocked } from 'ts-jest/utils'
+import { setContextValue } from './context'
 
 jest.mock('vscode')
 

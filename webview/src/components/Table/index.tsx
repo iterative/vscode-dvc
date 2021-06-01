@@ -1,8 +1,8 @@
 import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
-import { Experiment } from '../../util/parse-experiments'
 import styles from './styles.module.scss'
+import { Experiment } from '../../util/parse-experiments'
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 import SortIconToggle from '../SortIconToggle'
 

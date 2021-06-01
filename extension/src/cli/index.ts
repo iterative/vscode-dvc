@@ -1,38 +1,39 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { getProcessEnv } from '../env'
 import { Args } from './args'
+import { CliError } from './error'
+import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
-import { Config } from '../Config'
-import { CliProcessError } from '../vscode/reporting'
+import { Config } from '../config'
+
+const getPATH = (existingPath: string, pythonBinPath?: string): string =>
+  [pythonBinPath, existingPath].filter(Boolean).join(':')
+
+export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
+  const env = getProcessEnv()
+  const PATH = getPATH(env?.PATH as string, pythonBinPath)
+  return {
+    ...env,
+    PATH
+  }
+}
+
+export type CliResult = { stderr?: string; command: string }
 
 export class Cli {
   public dispose = Disposable.fn()
 
   protected config: Config
 
-  private ran: EventEmitter<string>
-  public onDidRun: Event<string>
-
-  private getPATH(existingPath: string, pythonBinPath?: string): string {
-    return [pythonBinPath, existingPath].filter(Boolean).join(':')
-  }
-
-  private getEnv(pythonBinPath?: string): NodeJS.ProcessEnv {
-    const env = getProcessEnv()
-    const PATH = this.getPATH(env?.PATH as string, pythonBinPath)
-    return {
-      ...env,
-      PATH
-    }
-  }
+  private ran: EventEmitter<CliResult>
+  public onDidRun: Event<CliResult>
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
-      executable: this.config.getCliPath() || 'dvc',
       args,
       cwd,
-      env: this.getEnv(this.config.pythonBinPath)
+      env: getEnv(this.config.pythonBinPath),
+      executable: this.config.getCliPath() || 'dvc'
     }
   }
 
@@ -41,19 +42,19 @@ export class Cli {
     const options = this.getExecutionOptions(cwd, args)
     try {
       const stdout = await executeProcess(options)
-      this.ran?.fire(`> ${command}\n`)
+      this.ran?.fire({ command })
       return stdout
     } catch (error) {
-      const cliError = new CliProcessError({ args, baseError: error })
-      this.ran?.fire(`> ${command} failed. ${cliError.stderr}\n`)
+      const cliError = new CliError({ baseError: error, options })
+      this.ran?.fire({ command, stderr: cliError.stderr })
       throw cliError
     }
   }
 
-  constructor(config: Config, ran?: EventEmitter<string>) {
+  constructor(config: Config, ran?: EventEmitter<CliResult>) {
     this.config = config
 
-    this.ran = ran || this.dispose.track(new EventEmitter<string>())
+    this.ran = ran || this.dispose.track(new EventEmitter<CliResult>())
     this.onDidRun = this.ran.event
   }
 }

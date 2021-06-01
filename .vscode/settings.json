@@ -13,6 +13,7 @@
   "editor.formatOnSave": true,
   "cSpell.words": [
     "DVCPATH",
+    "Interactors",
     "MNIST",
     "bufferutil",
     "conda",

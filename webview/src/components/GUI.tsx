@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { observer } from 'mobx-react'
+import ExperimentsGUI from './Experiments'
 import { hotComponent } from '../hotComponent'
 
-import ExperimentsGUI from './Experiments'
-import { Model } from '../model/Model'
+import { Model } from '../model'
 
 export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
