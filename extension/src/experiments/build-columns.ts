@@ -14,7 +14,7 @@ export interface SerializedColumn {
   childColumns?: SerializedColumn[]
 }
 
-export const mergeOrCreateColumnsMap = (
+const mergeOrCreateColumnsMap = (
   originalColumnsMap: ColumnsMap = new Map(),
   valueTree: ValueTree
 ): ColumnsMap => {
@@ -53,7 +53,7 @@ const getValueType = (value: Value | ValueTree) => {
   return typeof value
 }
 
-export const mergeOrCreateColumnDescriptor = (
+const mergeOrCreateColumnDescriptor = (
   columnDescriptor: IncompleteColumnDescriptor = {},
   newValue: Value | ValueTree
 ): IncompleteColumnDescriptor => {
@@ -75,7 +75,7 @@ export const mergeOrCreateColumnDescriptor = (
   }
 }
 
-export const serializeColumnMap = (columns: ColumnsMap): SerializedColumn[] =>
+const serializeColumnMap = (columns: ColumnsMap): SerializedColumn[] =>
   [...columns].map(([name, { types, childColumns, ...rest }]) => {
     const column: SerializedColumn = {
       name,
