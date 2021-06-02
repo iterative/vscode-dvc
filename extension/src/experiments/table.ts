@@ -26,38 +26,37 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private currentUpdatePromise?: Promise<void>
+  private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
   private data?: ExperimentsRepoJSONOutput
 
   public getDvcRoot() {
     return this.dvcRoot
   }
 
-  private async performUpdate(): Promise<void> {
-    try {
-      const experimentUpdatePromise = this.cliReader.experimentShow(
-        this.dvcRoot
-      )
-      this.data = await experimentUpdatePromise
-    } catch (e) {
-      Logger.error(e)
-      throw e
-    } finally {
-      this.sendData()
-      this.currentUpdatePromise = undefined
-    }
-  }
-
-  public refresh(): Promise<void> {
+  private async updateData(): Promise<ExperimentsRepoJSONOutput> {
     if (!this.currentUpdatePromise) {
-      this.currentUpdatePromise = this.performUpdate()
+      try {
+        const experimentData = this.cliReader.experimentShow(this.dvcRoot)
+        this.currentUpdatePromise = experimentData
+        this.data = await experimentData
+        return experimentData
+      } catch (e) {
+        Logger.error(e)
+      } finally {
+        this.currentUpdatePromise = undefined
+      }
     }
-    return this.currentUpdatePromise
+    return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
   }
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh))
+    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
+  }
+
+  public refresh = async () => {
+    await this.updateData()
+    return this.sendData()
   }
 
   public showWebview = async () => {
@@ -118,6 +117,6 @@ export class ExperimentsTable {
     this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
-    this.refresh()
+    this.updateData()
   }
 }
