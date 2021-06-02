@@ -62,6 +62,7 @@ suite('Experiments Table Test Suite', () => {
       expect(secondUpdate === thirdUpdate).to.equal(false)
 
       deferred.resolve()
+      await thirdUpdate
     })
   })
 

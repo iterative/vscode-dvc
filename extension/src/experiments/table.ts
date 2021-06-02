@@ -42,6 +42,7 @@ export class ExperimentsTable {
       throw e
     } finally {
       this.currentUpdatePromise = undefined
+      this.sendData()
     }
   }
 
