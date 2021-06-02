@@ -35,7 +35,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('Status', () => {
-    it('should show the (running) status of the cli', () => {
+    it('should show a spinner if the cli is running', () => {
       const processCompleted = new EventEmitter<CliResult>()
       const processStarted = new EventEmitter<void>()
 
@@ -72,6 +72,37 @@ suite('Extension Test Suite', () => {
       processCompleted.fire({} as CliResult)
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
+    })
+
+    it('should floor the number of workers at 0', () => {
+      const processCompleted = new EventEmitter<CliResult>()
+      const processStarted = new EventEmitter<void>()
+
+      const loadingText = '$(loading~spin) DVC'
+      const waitingText = 'DVC'
+
+      const cli = new Cli({} as Config, { processCompleted, processStarted })
+      const mockStatusBarItem = ({
+        dispose: fake(),
+        text: ''
+      } as unknown) as StatusBarItem
+      stub(window, 'createStatusBarItem').returns(mockStatusBarItem)
+
+      disposable.track(new Status([cli]))
+
+      const mockCliResult = {} as CliResult
+
+      processCompleted.fire(mockCliResult)
+      processCompleted.fire(mockCliResult)
+      processCompleted.fire(mockCliResult)
+      processCompleted.fire(mockCliResult)
+      processCompleted.fire(mockCliResult)
+      processCompleted.fire(mockCliResult)
+
+      expect(mockStatusBarItem.text).to.equal(waitingText)
+
+      processStarted.fire()
+      expect(mockStatusBarItem.text).to.equal(loadingText)
     })
   })
 })
