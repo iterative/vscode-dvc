@@ -65,11 +65,11 @@ suite('Extension Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({} as CliResult)
+      processCompleted.fire({ command: 'one is still running' })
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({} as CliResult)
+      processCompleted.fire({ command: 'all stopped' })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
     })
@@ -90,7 +90,7 @@ suite('Extension Test Suite', () => {
 
       disposable.track(new Status([cli]))
 
-      const mockCliResult = {} as CliResult
+      const mockCliResult = { command: 'there is nothing currently running' }
 
       processCompleted.fire(mockCliResult)
       processCompleted.fire(mockCliResult)
