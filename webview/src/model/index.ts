@@ -1,5 +1,5 @@
+import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
 import {
-  ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,

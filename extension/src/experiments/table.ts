@@ -1,8 +1,9 @@
+import { createHash } from 'crypto'
 import { resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import { ExperimentsRepoJSONOutput } from './webview/contract'
+import { ExperimentsRepoJSONOutput } from './contract'
 import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
@@ -26,37 +27,48 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private currentUpdatePromise?: Thenable<ExperimentsRepoJSONOutput>
+  private currentUpdatePromise?: Promise<void>
   private data?: ExperimentsRepoJSONOutput
+  private lastDataHash = ''
 
   public getDvcRoot() {
     return this.dvcRoot
   }
 
-  private async updateData(): Promise<ExperimentsRepoJSONOutput> {
-    if (!this.currentUpdatePromise) {
-      try {
-        const experimentData = this.cliReader.experimentShow(this.dvcRoot)
-        this.currentUpdatePromise = experimentData
-        this.data = await experimentData
-        return experimentData
-      } catch (e) {
-        Logger.error(e)
-      } finally {
-        this.currentUpdatePromise = undefined
+  private async performUpdate(): Promise<void> {
+    try {
+      const experimentUpdatePromise = this.cliReader.experimentShow(
+        this.dvcRoot
+      )
+      const tableData = await experimentUpdatePromise
+      const dataHash = createHash('sha1')
+        .update(JSON.stringify(tableData))
+        .digest('base64')
+
+      if (dataHash === this.lastDataHash) {
+        return
       }
+      this.lastDataHash = dataHash
+      this.data = tableData
+      this.sendData()
+    } catch (e) {
+      Logger.error(e)
+      throw e
+    } finally {
+      this.currentUpdatePromise = undefined
     }
-    return this.currentUpdatePromise as Promise<ExperimentsRepoJSONOutput>
+  }
+
+  public refresh(): Promise<void> {
+    if (!this.currentUpdatePromise) {
+      this.currentUpdatePromise = this.performUpdate()
+    }
+    return this.currentUpdatePromise
   }
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
-    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
-  }
-
-  public refresh = async () => {
-    await this.updateData()
-    return this.sendData()
+    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh))
   }
 
   public showWebview = async () => {
@@ -104,6 +116,7 @@ export class ExperimentsTable {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
+    this.lastDataHash = ''
   }
 
   constructor(
@@ -117,6 +130,6 @@ export class ExperimentsTable {
     this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
-    this.updateData()
+    this.refresh()
   }
 }

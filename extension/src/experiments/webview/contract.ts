@@ -1,3 +1,4 @@
+import { ExperimentsRepoJSONOutput } from '../contract'
 export const WebviewType = 'Experiments'
 
 export interface WindowWithWebviewData {
@@ -46,35 +47,4 @@ export enum MessageToWebviewType {
 export interface ExperimentsWebviewState {
   dvcRoot: string
   experiments?: ExperimentsRepoJSONOutput
-}
-
-interface DataDict {
-  [name: string]: string | number | boolean | DataDict
-}
-
-export interface DataDictRoot {
-  [filename: string]: DataDict
-}
-
-export interface ExperimentJSONOutput {
-  name?: string
-  timestamp?: string | null
-  queued?: boolean
-  params?: DataDictRoot
-  metrics?: DataDictRoot
-  checkpoint_tip?: string
-  checkpoint_parent?: string
-}
-
-interface ExperimentsWorkspaceJSONOutput {
-  baseline: ExperimentJSONOutput
-}
-
-interface ExperimentsBranchJSONOutput extends ExperimentsWorkspaceJSONOutput {
-  [sha: string]: ExperimentJSONOutput
-}
-
-export interface ExperimentsRepoJSONOutput {
-  workspace: ExperimentsWorkspaceJSONOutput
-  [name: string]: ExperimentsWorkspaceJSONOutput | ExperimentsBranchJSONOutput
 }
