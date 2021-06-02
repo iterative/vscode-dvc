@@ -12,7 +12,6 @@ import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
 import {
   WebviewType as Experiments,
-  ExperimentsRepoJSONOutput,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
@@ -20,6 +19,7 @@ import {
   WindowWithWebviewData,
   ExperimentsWebviewState
 } from './contract'
+import { ExperimentsRepoJSONOutput } from '../contract'
 import { Config } from '../../config'
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
