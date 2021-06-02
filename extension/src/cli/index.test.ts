@@ -30,10 +30,16 @@ describe('executeProcess', () => {
         getCliPath: () => undefined,
         pythonBinPath: undefined
       } as unknown) as Config,
-      ({
-        event: jest.fn(),
-        fire: jest.fn()
-      } as unknown) as EventEmitter<CliResult>
+      {
+        processCompleted: ({
+          event: jest.fn(),
+          fire: jest.fn()
+        } as unknown) as EventEmitter<CliResult>,
+        processStarted: ({
+          event: jest.fn(),
+          fire: jest.fn()
+        } as unknown) as EventEmitter<void>
+      }
     )
 
     await cli.executeProcess(cwd, ...args)
@@ -60,10 +66,16 @@ describe('executeProcess', () => {
         getCliPath: () => '/some/path/to/dvc',
         pythonBinPath
       } as unknown) as Config,
-      ({
-        event: jest.fn(),
-        fire: jest.fn()
-      } as unknown) as EventEmitter<CliResult>
+      {
+        processCompleted: ({
+          event: jest.fn(),
+          fire: jest.fn()
+        } as unknown) as EventEmitter<CliResult>,
+        processStarted: ({
+          event: jest.fn(),
+          fire: jest.fn()
+        } as unknown) as EventEmitter<void>
+      }
     )
 
     await expect(cli.executeProcess(cwd, ...args)).rejects.toThrow()

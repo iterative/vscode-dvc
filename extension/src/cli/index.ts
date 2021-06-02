@@ -25,8 +25,11 @@ export class Cli {
 
   protected config: Config
 
-  private ran: EventEmitter<CliResult>
-  public onDidRun: Event<CliResult>
+  private processCompleted: EventEmitter<CliResult>
+  public onDidCompleteProcess: Event<CliResult>
+
+  private readonly processStarted: EventEmitter<void>
+  public readonly onDidStartProcess: Event<void>
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
@@ -41,20 +44,33 @@ export class Cli {
     const command = `dvc ${args.join(' ')}`
     const options = this.getExecutionOptions(cwd, args)
     try {
+      this.processStarted.fire()
       const stdout = await executeProcess(options)
-      this.ran?.fire({ command })
+      this.processCompleted.fire({ command })
       return stdout
     } catch (error) {
       const cliError = new CliError({ baseError: error, options })
-      this.ran?.fire({ command, stderr: cliError.stderr })
+      this.processCompleted.fire({ command, stderr: cliError.stderr })
       throw cliError
     }
   }
 
-  constructor(config: Config, ran?: EventEmitter<CliResult>) {
+  constructor(
+    config: Config,
+    emitters?: {
+      processStarted: EventEmitter<void>
+      processCompleted: EventEmitter<CliResult>
+    }
+  ) {
     this.config = config
 
-    this.ran = ran || this.dispose.track(new EventEmitter<CliResult>())
-    this.onDidRun = this.ran.event
+    this.processCompleted =
+      emitters?.processCompleted ||
+      this.dispose.track(new EventEmitter<CliResult>())
+    this.onDidCompleteProcess = this.processCompleted.event
+
+    this.processStarted =
+      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+    this.onDidStartProcess = this.processStarted.event
   }
 }
