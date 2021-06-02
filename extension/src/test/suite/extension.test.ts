@@ -13,7 +13,7 @@ import {
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
-import * as FileSystem from '../../fileSystem'
+import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 
 chai.use(sinonChai)
@@ -74,15 +74,8 @@ suite('Extension Test Suite', () => {
       )
 
       const mockOnDidChangeFileSystem = stub(
-        FileSystem,
+        Watcher,
         'onDidChangeFileSystem'
-      ).returns({
-        dispose: () => undefined
-      } as Disposable)
-
-      const mockOnDidChangeFileType = stub(
-        FileSystem,
-        'onDidChangeFileType'
       ).returns({
         dispose: () => undefined
       } as Disposable)
@@ -147,7 +140,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockOnDidChangeFileSystem).to.have.been.called
-      expect(mockOnDidChangeFileType).to.have.been.called
       expect(mockListDvcOnlyRecursive).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called

@@ -19,11 +19,11 @@ import { WebviewSerializer } from './webviewSerializer'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerRepositoryCommands } from './repository/commands/register'
+import { findDvcRootPaths } from './fileSystem'
 import {
-  findDvcRootPaths,
-  onDidChangeFileSystem,
-  onDidChangeFileType
-} from './fileSystem'
+  getRepositoryWatcher,
+  onDidChangeFileSystem
+} from './fileSystem/watcher'
 import { ResourceLocator } from './resourceLocator'
 import { DecorationProvider } from './repository/decorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
@@ -143,17 +143,10 @@ export class Extension {
       )
 
       this.dispose.track(
-        onDidChangeFileType(dvcRoot, ['*.dvc', 'dvc.lock', 'dvc.yaml'], () => {
-          repository.resetState()
-          this.trackedExplorerTree.reset()
-        })
-      )
-
-      this.dispose.track(
-        onDidChangeFileSystem(dvcRoot, (path: string) => {
-          repository.updateState()
-          this.trackedExplorerTree.refresh(path)
-        })
+        onDidChangeFileSystem(
+          dvcRoot,
+          getRepositoryWatcher(repository, this.trackedExplorerTree)
+        )
       )
 
       this.dvcRepositories[dvcRoot] = repository
