@@ -20,23 +20,26 @@ export class Status {
     }
   }
 
-  private setWorking = (working: boolean) => {
-    if (working) {
-      this.statusBarItem.text = '$(loading~spin) DVC'
-    } else {
-      this.statusBarItem.text = 'DVC'
+  private getText = (isWorking: boolean) => {
+    if (isWorking) {
+      return '$(loading~spin) DVC'
     }
+    return 'DVC'
+  }
+
+  private setStatusText = (isWorking: boolean) => {
+    this.statusBarItem.text = this.getText(isWorking)
   }
 
   private addWorker = () => {
     this.workers = this.workers + 1
-    this.setWorking(true)
+    this.setStatusText(true)
   }
 
   private removeWorker = () => {
     this.workers = Math.max(this.workers - 1, 0)
     if (!this.workers) {
-      this.setWorking(false)
+      this.setStatusText(false)
     }
   }
 
