@@ -20,15 +20,23 @@ export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
 
 export type CliResult = { stderr?: string; command: string }
 
-export class Cli {
+export interface ICli {
+  processCompleted: EventEmitter<CliResult>
+  onDidCompleteProcess: Event<CliResult>
+
+  processStarted: EventEmitter<void>
+  onDidStartProcess: Event<void>
+}
+
+export class Cli implements ICli {
   public dispose = Disposable.fn()
 
   protected config: Config
 
-  private processCompleted: EventEmitter<CliResult>
-  public onDidCompleteProcess: Event<CliResult>
+  public readonly processCompleted: EventEmitter<CliResult>
+  public readonly onDidCompleteProcess: Event<CliResult>
 
-  private readonly processStarted: EventEmitter<void>
+  public readonly processStarted: EventEmitter<void>
   public readonly onDidStartProcess: Event<void>
 
   private getExecutionOptions(cwd: string, args: Args) {

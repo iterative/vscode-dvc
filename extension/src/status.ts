@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window } from 'vscode'
-import { Cli } from './cli'
-import { CliRunner } from './cli/runner'
+import { ICli } from './cli'
 
 export class Status {
   public dispose = Disposable.fn()
@@ -43,7 +42,7 @@ export class Status {
     }
   }
 
-  constructor(cliInteractors: (Cli | CliRunner)[]) {
+  constructor(cliInteractors: ICli[]) {
     this.statusBarItem.text = 'DVC'
     this.statusBarItem.tooltip = 'DVC Extension Status'
 
