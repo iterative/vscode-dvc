@@ -29,7 +29,7 @@ export class Cli {
   public onDidCompleteProcess: Event<CliResult>
 
   private readonly processStarted: EventEmitter<void>
-  public readonly onDidProcessStart: Event<void>
+  public readonly onDidStartProcess: Event<void>
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
@@ -71,6 +71,6 @@ export class Cli {
 
     this.processStarted =
       emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
-    this.onDidProcessStart = this.processStarted.event
+    this.onDidStartProcess = this.processStarted.event
   }
 }

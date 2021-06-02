@@ -19,6 +19,7 @@ export class CliRunner {
   private readonly processOutput: EventEmitter<string>
 
   private readonly processStarted: EventEmitter<void>
+  public readonly onDidStartProcess: Event<void>
 
   private readonly processTerminated: EventEmitter<void>
   private readonly onDidTerminateProcess: Event<void>
@@ -147,6 +148,7 @@ export class CliRunner {
 
     this.processStarted =
       emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+    this.onDidStartProcess = this.processStarted.event
 
     this.processTerminated =
       emitters?.processTerminated ||
