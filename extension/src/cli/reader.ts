@@ -7,7 +7,7 @@ import {
   Flag,
   ListFlag
 } from './args'
-import { ExperimentsRepoJSONOutput } from '../experiments/webview/contract'
+import { ExperimentsRepoJSONOutput } from '../experiments/contract'
 import { trimAndSplit } from '../util/stdout'
 
 export type PathOutput = { path: string }
