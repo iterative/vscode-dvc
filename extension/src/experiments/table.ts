@@ -1,4 +1,3 @@
-import { createHash } from 'crypto'
 import { resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
@@ -29,7 +28,6 @@ export class ExperimentsTable {
 
   private currentUpdatePromise?: Promise<void>
   private data?: ExperimentsRepoJSONOutput
-  private lastDataHash = ''
 
   public getDvcRoot() {
     return this.dvcRoot
@@ -40,21 +38,12 @@ export class ExperimentsTable {
       const experimentUpdatePromise = this.cliReader.experimentShow(
         this.dvcRoot
       )
-      const tableData = await experimentUpdatePromise
-      const dataHash = createHash('sha1')
-        .update(JSON.stringify(tableData))
-        .digest('base64')
-
-      if (dataHash === this.lastDataHash) {
-        return
-      }
-      this.lastDataHash = dataHash
-      this.data = tableData
-      this.sendData()
+      this.data = await experimentUpdatePromise
     } catch (e) {
       Logger.error(e)
       throw e
     } finally {
+      this.sendData()
       this.currentUpdatePromise = undefined
     }
   }
@@ -116,7 +105,6 @@ export class ExperimentsTable {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
-    this.lastDataHash = ''
   }
 
   constructor(
