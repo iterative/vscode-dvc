@@ -44,13 +44,13 @@ export class Cli {
     const command = `dvc ${args.join(' ')}`
     const options = this.getExecutionOptions(cwd, args)
     try {
-      this.processStarted?.fire()
+      this.processStarted.fire()
       const stdout = await executeProcess(options)
-      this.processCompleted?.fire({ command })
+      this.processCompleted.fire({ command })
       return stdout
     } catch (error) {
       const cliError = new CliError({ baseError: error, options })
-      this.processCompleted?.fire({ command, stderr: cliError.stderr })
+      this.processCompleted.fire({ command, stderr: cliError.stderr })
       throw cliError
     }
   }
