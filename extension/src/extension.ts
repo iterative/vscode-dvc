@@ -25,6 +25,7 @@ import {
   onDidChangeFileSystem
 } from './fileSystem/watcher'
 import { ResourceLocator } from './resourceLocator'
+import { Status } from './status'
 import { DecorationProvider } from './repository/decorationProvider'
 import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './repository'
@@ -58,6 +59,7 @@ export class Extension {
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
+  private readonly status: Status
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -115,6 +117,7 @@ export class Extension {
           'DVC extension is unable to initialize as the cli is not available.\n' +
             'Update your config options to try again.'
         )
+        this.status.setAvailability(false)
         return this.setCommandsAvailability(false)
       }
     )
@@ -129,6 +132,7 @@ export class Extension {
 
     this.initializeGitRepositories()
 
+    this.status.setAvailability(true)
     return this.setCommandsAvailability(true)
   }
 
@@ -222,6 +226,10 @@ export class Extension {
     this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
+
+    this.status = this.dispose.track(
+      new Status([this.cliExecutor, this.cliReader, this.cliRunner])
+    )
 
     this.experiments = this.dispose.track(
       new Experiments(this.config, this.cliReader)

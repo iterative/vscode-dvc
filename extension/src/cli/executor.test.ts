@@ -30,10 +30,16 @@ describe('CliExecutor', () => {
       getCliPath: () => undefined,
       pythonBinPath: undefined
     } as unknown) as Config,
-    ({
-      event: jest.fn(),
-      fire: jest.fn()
-    } as unknown) as EventEmitter<CliResult>
+    {
+      processCompleted: ({
+        event: jest.fn(),
+        fire: jest.fn()
+      } as unknown) as EventEmitter<CliResult>,
+      processStarted: ({
+        event: jest.fn(),
+        fire: jest.fn()
+      } as unknown) as EventEmitter<void>
+    }
   )
 
   describe('addTarget', () => {

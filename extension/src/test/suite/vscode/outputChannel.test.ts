@@ -26,8 +26,10 @@ suite('Output Channel Test Suite', () => {
 
   describe('OutputChannel', () => {
     it('should handle a process completing without error', () => {
-      const ran = new EventEmitter<CliResult>()
-      const cli = new Cli({} as Config, ran)
+      const processCompleted = new EventEmitter<CliResult>()
+      const processStarted = new EventEmitter<void>()
+
+      const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockAppend = fake()
       const mockOutputChannel = stub(window, 'createOutputChannel').returns(({
         append: mockAppend,
@@ -35,15 +37,17 @@ suite('Output Channel Test Suite', () => {
       } as unknown) as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], 'The Success Channel'))
-      ran.fire({ command: 'some command' })
+      processCompleted.fire({ command: 'some command' })
 
       expect(mockOutputChannel).to.be.called
       expect(mockAppend).to.be.calledWith('> some command \n')
     })
 
     it('should handle a process throwing an error', () => {
-      const ran = new EventEmitter<CliResult>()
-      const cli = new Cli({} as Config, ran)
+      const processCompleted = new EventEmitter<CliResult>()
+      const processStarted = new EventEmitter<void>()
+
+      const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockAppend = fake()
       const mockOutputChannel = stub(window, 'createOutputChannel').returns(({
         append: mockAppend,
@@ -53,7 +57,7 @@ suite('Output Channel Test Suite', () => {
       const usefulMessage =
         'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
       disposable.track(new OutputChannel([cli], 'The Success Channel'))
-      ran.fire({
+      processCompleted.fire({
         command: 'some command',
         stderr: usefulMessage
       })
