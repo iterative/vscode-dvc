@@ -56,7 +56,7 @@ export class ExperimentsTable {
 
   public refresh = async () => {
     await this.updateData()
-    this.sendData()
+    return this.sendData()
   }
 
   public showWebview = async () => {
