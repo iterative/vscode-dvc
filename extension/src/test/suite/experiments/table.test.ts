@@ -58,11 +58,10 @@ suite('Experiments Table Test Suite', () => {
       await secondUpdate
 
       const thirdUpdate = testTable.refresh()
-      expect(firstUpdate === secondUpdate).to.equal(true)
-      expect(secondUpdate === thirdUpdate).to.equal(false)
+      expect(firstUpdate).to.equal(secondUpdate)
+      expect(secondUpdate).to.not.equal(thirdUpdate)
 
       deferred.resolve()
-      await thirdUpdate
     })
   })
 
