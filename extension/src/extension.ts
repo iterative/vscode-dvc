@@ -235,7 +235,9 @@ export class Extension {
       new Experiments(this.config, this.cliReader)
     )
 
-    this.dispose.track(new OutputChannel([this.cliExecutor, this.cliReader]))
+    this.dispose.track(
+      new OutputChannel([this.cliExecutor, this.cliReader, this.cliRunner])
+    )
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(

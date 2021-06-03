@@ -8,6 +8,7 @@ import { Config } from '../../../config'
 import { CliRunner } from '../../../cli/runner'
 import * as ProcessExecution from '../../../processExecution'
 import { Command } from '../../../cli/args'
+import { CliResult } from '../../../cli'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -76,7 +77,7 @@ suite('Runner Test Suite', () => {
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const text = ':weeeee:'
 
-      const processCompleted = disposable.track(new EventEmitter<void>())
+      const processCompleted = disposable.track(new EventEmitter<CliResult>())
       const processOutput = disposable.track(new EventEmitter<string>())
       const processStarted = disposable.track(new EventEmitter<void>())
 
@@ -97,7 +98,7 @@ suite('Runner Test Suite', () => {
         })
       }
       const onDidStartOrCompleteProcess = (
-        event: Event<void>
+        event: Event<CliResult | void>
       ): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = event(() => {

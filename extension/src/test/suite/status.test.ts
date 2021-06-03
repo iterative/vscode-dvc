@@ -35,16 +35,18 @@ suite('Extension Test Suite', () => {
   })
 
   describe('Status', () => {
-    it('should show a spinner if the cli is running', () => {
+    const disabledText = '$(circle-slash) DVC'
+    const loadingText = '$(loading~spin) DVC'
+    const waitingText = '$(circle-large-outline) DVC'
+
+    it('should show the correct status of the cli', () => {
       const processCompleted = new EventEmitter<CliResult>()
       const processStarted = new EventEmitter<void>()
-
-      const loadingText = '$(loading~spin) DVC'
-      const waitingText = 'DVC'
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockStatusBarItem = ({
         dispose: fake(),
+        show: fake(),
         text: ''
       } as unknown) as StatusBarItem
       const mockCreateStatusBarItem = stub(
@@ -52,9 +54,13 @@ suite('Extension Test Suite', () => {
         'createStatusBarItem'
       ).returns(mockStatusBarItem)
 
-      disposable.track(new Status([cli]))
+      const status = disposable.track(new Status([cli]))
 
       expect(mockCreateStatusBarItem).to.be.calledOnce
+      expect(mockStatusBarItem.text).to.equal(disabledText)
+
+      status.setAvailability(true)
+
       expect(mockStatusBarItem.text).to.equal(waitingText)
 
       processStarted.fire()
@@ -72,25 +78,29 @@ suite('Extension Test Suite', () => {
       processCompleted.fire({ command: 'all stopped' })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
+
+      status.setAvailability(false)
+
+      expect(mockStatusBarItem.text).to.equal(disabledText)
     })
 
     it('should floor the number of workers at 0', () => {
       const processCompleted = new EventEmitter<CliResult>()
       const processStarted = new EventEmitter<void>()
 
-      const loadingText = '$(loading~spin) DVC'
-      const waitingText = 'DVC'
-
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockStatusBarItem = ({
         dispose: fake(),
+        show: fake(),
         text: ''
       } as unknown) as StatusBarItem
       stub(window, 'createStatusBarItem').returns(mockStatusBarItem)
 
-      disposable.track(new Status([cli]))
+      const status = disposable.track(new Status([cli]))
 
       const mockCliResult = { command: 'there is nothing currently running' }
+
+      status.setAvailability(true)
 
       processCompleted.fire(mockCliResult)
       processCompleted.fire(mockCliResult)

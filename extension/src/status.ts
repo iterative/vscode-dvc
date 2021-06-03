@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window } from 'vscode'
-import { Cli } from './cli'
-import { CliRunner } from './cli/runner'
+import { ICli } from './cli'
 
 export class Status {
   public dispose = Disposable.fn()
@@ -11,20 +10,16 @@ export class Status {
   )
 
   private workers = 0
-
-  public setAvailability = (available: boolean) => {
-    if (available) {
-      this.statusBarItem.show()
-    } else {
-      this.statusBarItem.hide()
-    }
-  }
+  private available = false
 
   private getText = (isWorking: boolean) => {
+    if (!this.available) {
+      return '$(circle-slash) DVC'
+    }
     if (isWorking) {
       return '$(loading~spin) DVC'
     }
-    return 'DVC'
+    return '$(circle-large-outline) DVC'
   }
 
   private setStatusText = (isWorking: boolean) => {
@@ -43,8 +38,14 @@ export class Status {
     }
   }
 
-  constructor(cliInteractors: (Cli | CliRunner)[]) {
-    this.statusBarItem.text = 'DVC'
+  public setAvailability = (available: boolean) => {
+    this.available = available
+    this.setStatusText(!!this.workers)
+  }
+
+  constructor(cliInteractors: ICli[]) {
+    this.statusBarItem.text = this.getText(false)
+    this.statusBarItem.show()
     this.statusBarItem.tooltip = 'DVC Extension Status'
 
     cliInteractors.forEach(cli => {
