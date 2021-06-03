@@ -1,24 +1,24 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { getEnv } from '.'
+import { CliResult, getEnv, ICli } from '.'
 import { Args } from './args'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 
-export class CliRunner {
+export class CliRunner implements ICli {
   public readonly dispose = Disposable.fn()
 
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
-  private readonly processCompleted: EventEmitter<void>
-  public readonly onDidCompleteProcess: Event<void>
+  public readonly processCompleted: EventEmitter<CliResult>
+  public readonly onDidCompleteProcess: Event<CliResult>
 
   private readonly processOutput: EventEmitter<string>
 
-  private readonly processStarted: EventEmitter<void>
+  public readonly processStarted: EventEmitter<void>
   public readonly onDidStartProcess: Event<void>
 
   private readonly processTerminated: EventEmitter<void>
@@ -65,7 +65,9 @@ export class CliRunner {
     })
 
     process.on('close', () => {
-      this.processCompleted.fire()
+      this.processCompleted.fire({
+        command: `dvc ${args.join(' ')}`
+      })
     })
 
     return process
@@ -119,7 +121,7 @@ export class CliRunner {
     config: Config,
     executable?: string,
     emitters?: {
-      processCompleted: EventEmitter<void>
+      processCompleted: EventEmitter<CliResult>
       processOutput: EventEmitter<string>
       processStarted: EventEmitter<void>
       processTerminated?: EventEmitter<void>
@@ -130,7 +132,8 @@ export class CliRunner {
     this.executable = executable
 
     this.processCompleted =
-      emitters?.processCompleted || this.dispose.track(new EventEmitter<void>())
+      emitters?.processCompleted ||
+      this.dispose.track(new EventEmitter<CliResult>())
     this.onDidCompleteProcess = this.processCompleted.event
     this.dispose.track(
       this.onDidCompleteProcess(() => {
