@@ -30,8 +30,11 @@ export class ExperimentsTable {
   private currentUpdatePromise?: Promise<void>
   private data?: ExperimentsRepoJSONOutput
 
-  private columns?: Column[]
-  public getColumns = () => this.columns
+  private nestedColumns?: Column[]
+  public getNestedColumns = () => this.nestedColumns
+
+  private flatColumns?: Column[]
+  public getFlatColumns = () => this.flatColumns
 
   public getDvcRoot = () => this.dvcRoot
 
@@ -40,7 +43,9 @@ export class ExperimentsTable {
       const experimentData = await this.cliReader.experimentShow(this.dvcRoot)
       this.data = experimentData
 
-      this.columns = buildColumns(experimentData)
+      const [nestedColumns, flatColumns] = buildColumns(experimentData)
+      this.nestedColumns = nestedColumns
+      this.flatColumns = flatColumns
     } catch (e) {
       Logger.error(e)
       throw e

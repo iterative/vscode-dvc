@@ -13,6 +13,7 @@ export interface Column {
   types?: string[]
   maxStringLength?: number
   childColumns?: Column[]
+  ancestors?: string[]
 }
 
 const mergeOrCreateColumnsMap = (
@@ -76,24 +77,58 @@ const mergeOrCreateColumnDescriptor = (
   }
 }
 
-const serializeColumnMap = (columns: PartialColumnsMap): Column[] =>
-  [...columns].map(([name, { types, childColumns, ...rest }]) => {
-    const column: Column = {
-      name,
-      ...rest
-    }
-    if (types) {
-      column.types = [...types]
-    }
-    if (childColumns) {
-      column.childColumns = serializeColumnMap(childColumns)
-    }
-    return column
-  })
+const buildColumn = (
+  entry: [string, PartialColumnDescriptor],
+  flatColumns: Column[],
+  ancestors: string[]
+): Column => {
+  const [name, { types, childColumns: childColumnsMap, ...rest }] = entry
+  const column: Column = {
+    name,
+    ...rest,
+    ancestors
+  }
+  if (types) {
+    column.types = [...types]
+  }
+  if (childColumnsMap) {
+    column.childColumns = transformAndCollectFromColumns(
+      childColumnsMap,
+      flatColumns,
+      [...ancestors, name]
+    )
+  } else {
+    flatColumns.push(column)
+  }
+  return column
+}
+
+const transformAndCollectFromColumns = (
+  columnsMap: PartialColumnsMap,
+  flatColumns: Column[] = [],
+  ancestors: string[] = []
+): Column[] => {
+  const currentLevelColumns = []
+  for (const entry of columnsMap) {
+    currentLevelColumns.push(buildColumn(entry, flatColumns, ancestors))
+  }
+  return currentLevelColumns
+}
+
+const transformColumnsMap = (
+  columnsMap: PartialColumnsMap
+): [Column[], Column[]] => {
+  const flatColumns: Column[] = []
+  const topLevelColumns = transformAndCollectFromColumns(
+    columnsMap,
+    flatColumns
+  )
+  return [topLevelColumns, flatColumns]
+}
 
 export const buildColumns = (
   tableData: ExperimentsRepoJSONOutput
-): Column[] => {
+): [Column[], Column[]] => {
   let paramsColumn: PartialColumnDescriptor | undefined
   let metricsColumn: PartialColumnDescriptor | undefined
 
@@ -112,5 +147,5 @@ export const buildColumns = (
   if (metricsColumn) {
     columns.set('metrics', metricsColumn)
   }
-  return serializeColumnMap(columns)
+  return transformColumnsMap(columns)
 }

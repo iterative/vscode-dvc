@@ -50,90 +50,238 @@ describe('buildColumns', () => {
       })
     ).toMatchInlineSnapshot(`
       Array [
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "mixedparam",
-                  "types": Array [
-                    "number",
-                    "string",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 5,
-                  "name": "boolparam",
-                  "types": Array [
-                    "boolean",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 6,
-                  "name": "stringparam",
-                  "types": Array [
-                    "string",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 9,
-                  "name": "undefparam",
-                  "types": Array [
-                    "undefined",
-                  ],
-                },
-              ],
-              "name": "params.yaml",
-            },
-          ],
-          "name": "params",
-        },
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "acc",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 18,
-                  "name": "loss",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 1,
-                  "name": "step",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 4,
-                  "name": "boolparam",
-                  "types": Array [
-                    "boolean",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 4,
-                  "name": "nullparam",
-                  "types": Array [
-                    "null",
-                  ],
-                },
-              ],
-              "name": "logs.json",
-            },
-          ],
-          "name": "metrics",
-        },
+        Array [
+          Object {
+            "ancestors": Array [],
+            "childColumns": Array [
+              Object {
+                "ancestors": Array [
+                  "params",
+                ],
+                "childColumns": Array [
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 6,
+                    "name": "mixedparam",
+                    "types": Array [
+                      "number",
+                      "string",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 5,
+                    "name": "boolparam",
+                    "types": Array [
+                      "boolean",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 6,
+                    "name": "stringparam",
+                    "types": Array [
+                      "string",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 9,
+                    "name": "undefparam",
+                    "types": Array [
+                      "undefined",
+                    ],
+                  },
+                ],
+                "name": "params.yaml",
+              },
+            ],
+            "name": "params",
+          },
+          Object {
+            "ancestors": Array [],
+            "childColumns": Array [
+              Object {
+                "ancestors": Array [
+                  "metrics",
+                ],
+                "childColumns": Array [
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 6,
+                    "name": "acc",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 18,
+                    "name": "loss",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 1,
+                    "name": "step",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 4,
+                    "name": "boolparam",
+                    "types": Array [
+                      "boolean",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 4,
+                    "name": "nullparam",
+                    "types": Array [
+                      "null",
+                    ],
+                  },
+                ],
+                "name": "logs.json",
+              },
+            ],
+            "name": "metrics",
+          },
+        ],
+        Array [
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 6,
+            "name": "mixedparam",
+            "types": Array [
+              "number",
+              "string",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 5,
+            "name": "boolparam",
+            "types": Array [
+              "boolean",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 6,
+            "name": "stringparam",
+            "types": Array [
+              "string",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 9,
+            "name": "undefparam",
+            "types": Array [
+              "undefined",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 6,
+            "name": "acc",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 18,
+            "name": "loss",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 1,
+            "name": "step",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 4,
+            "name": "boolparam",
+            "types": Array [
+              "boolean",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 4,
+            "name": "nullparam",
+            "types": Array [
+              "null",
+            ],
+          },
+        ],
       ]
     `)
   })
@@ -278,68 +426,170 @@ describe('buildColumns', () => {
       })
     ).toMatchInlineSnapshot(`
       Array [
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "lr",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 6,
-                  "name": "seed",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 1,
-                  "name": "weight_decay",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-              ],
-              "name": "params.yaml",
-            },
-          ],
-          "name": "params",
-        },
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "acc",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 18,
-                  "name": "loss",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 1,
-                  "name": "step",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-              ],
-              "name": "logs.json",
-            },
-          ],
-          "name": "metrics",
-        },
+        Array [
+          Object {
+            "ancestors": Array [],
+            "childColumns": Array [
+              Object {
+                "ancestors": Array [
+                  "params",
+                ],
+                "childColumns": Array [
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 6,
+                    "name": "lr",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 6,
+                    "name": "seed",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "params",
+                      "params.yaml",
+                    ],
+                    "maxStringLength": 1,
+                    "name": "weight_decay",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                ],
+                "name": "params.yaml",
+              },
+            ],
+            "name": "params",
+          },
+          Object {
+            "ancestors": Array [],
+            "childColumns": Array [
+              Object {
+                "ancestors": Array [
+                  "metrics",
+                ],
+                "childColumns": Array [
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 6,
+                    "name": "acc",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 18,
+                    "name": "loss",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                  Object {
+                    "ancestors": Array [
+                      "metrics",
+                      "logs.json",
+                    ],
+                    "maxStringLength": 1,
+                    "name": "step",
+                    "types": Array [
+                      "number",
+                    ],
+                  },
+                ],
+                "name": "logs.json",
+              },
+            ],
+            "name": "metrics",
+          },
+        ],
+        Array [
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 6,
+            "name": "lr",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 6,
+            "name": "seed",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "params",
+              "params.yaml",
+            ],
+            "maxStringLength": 1,
+            "name": "weight_decay",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 6,
+            "name": "acc",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 18,
+            "name": "loss",
+            "types": Array [
+              "number",
+            ],
+          },
+          Object {
+            "ancestors": Array [
+              "metrics",
+              "logs.json",
+            ],
+            "maxStringLength": 1,
+            "name": "step",
+            "types": Array [
+              "number",
+            ],
+          },
+        ],
       ]
     `)
   })
