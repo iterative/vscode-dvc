@@ -10,16 +10,12 @@ export class Status {
   )
 
   private workers = 0
-
-  public setAvailability = (available: boolean) => {
-    if (available) {
-      this.statusBarItem.text = this.getText(!!this.workers)
-    } else {
-      this.statusBarItem.text = '$(circle-slash) DVC'
-    }
-  }
+  private available = false
 
   private getText = (isWorking: boolean) => {
+    if (!this.available) {
+      return '$(circle-slash) DVC'
+    }
     if (isWorking) {
       return '$(loading~spin) DVC'
     }
@@ -42,8 +38,13 @@ export class Status {
     }
   }
 
+  public setAvailability = (available: boolean) => {
+    this.available = available
+    this.setStatusText(!!this.workers)
+  }
+
   constructor(cliInteractors: ICli[]) {
-    this.statusBarItem.text = '$(circle-slash) DVC'
+    this.statusBarItem.text = this.getText(false)
     this.statusBarItem.show()
     this.statusBarItem.tooltip = 'DVC Extension Status'
 
