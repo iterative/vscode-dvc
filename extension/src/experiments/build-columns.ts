@@ -77,36 +77,53 @@ const mergeOrCreateColumnDescriptor = (
   }
 }
 
-const buildColumn = (
-  entry: [string, PartialColumnDescriptor],
-  flatColumns: Column[],
-  ancestors: string[]
+const columnFromMapEntry = (
+  entry: [string, PartialColumnDescriptor]
 ): Column => {
-  const [name, { types, childColumns: childColumnsMap, ...rest }] = entry
+  const [name, partialColumnDescriptor] = entry
+  const { types, maxStringLength } = partialColumnDescriptor
   const column: Column = {
-    name,
-    ...rest,
-    ancestors
+    name
+  }
+  if (maxStringLength) {
+    column.maxStringLength = maxStringLength
   }
   if (types) {
     column.types = [...types]
   }
-  if (childColumnsMap) {
-    column.childColumns = transformAndCollectFromColumns(
-      childColumnsMap,
+  return column
+}
+
+const buildColumn = (
+  entry: [string, PartialColumnDescriptor],
+  flatColumns: Column[],
+  ancestors?: string[]
+): Column => {
+  const finalColumn = columnFromMapEntry(entry)
+
+  const [name, { childColumns }] = entry
+
+  if (ancestors) {
+    finalColumn.ancestors = ancestors
+  }
+
+  if (childColumns) {
+    finalColumn.childColumns = transformAndCollectFromColumns(
+      childColumns,
       flatColumns,
-      [...ancestors, name]
+      ancestors ? [...ancestors, name] : [name]
     )
   } else {
-    flatColumns.push(column)
+    flatColumns.push(finalColumn)
   }
-  return column
+
+  return finalColumn
 }
 
 const transformAndCollectFromColumns = (
   columnsMap: PartialColumnsMap,
   flatColumns: Column[] = [],
-  ancestors: string[] = []
+  ancestors?: string[]
 ): Column[] => {
   const currentLevelColumns = []
   for (const entry of columnsMap) {

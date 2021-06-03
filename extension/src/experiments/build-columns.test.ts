@@ -52,7 +52,6 @@ describe('buildColumns', () => {
       Array [
         Array [
           Object {
-            "ancestors": Array [],
             "childColumns": Array [
               Object {
                 "ancestors": Array [
@@ -111,7 +110,6 @@ describe('buildColumns', () => {
             "name": "params",
           },
           Object {
-            "ancestors": Array [],
             "childColumns": Array [
               Object {
                 "ancestors": Array [
@@ -428,7 +426,6 @@ describe('buildColumns', () => {
       Array [
         Array [
           Object {
-            "ancestors": Array [],
             "childColumns": Array [
               Object {
                 "ancestors": Array [
@@ -475,7 +472,6 @@ describe('buildColumns', () => {
             "name": "params",
           },
           Object {
-            "ancestors": Array [],
             "childColumns": Array [
               Object {
                 "ancestors": Array [
