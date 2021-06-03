@@ -169,7 +169,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.removeTarget', path => {
         deleteTarget(path)
-        return this.cliExecutor.removeTarget(path)
+        this.treeDataChanged.fire()
+        const dvcRoot = this.pathRoots[path]
+        const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
+        return this.cliExecutor.removeTarget(dvcRoot, relPath)
       })
     )
 

@@ -111,6 +111,6 @@ export class CliExecutor extends Cli {
   public pushTarget = (fsPath: string): Promise<string> =>
     this.executeProcessOnTarget(fsPath, Command.PUSH)
 
-  public removeTarget = (fsPath: string): Promise<string> =>
-    this.executeProcessOnTarget(fsPath, Command.REMOVE)
+  public removeTarget = (cwd: string, target: string): Promise<string> =>
+    this.executeProcess(cwd, Command.REMOVE, target)
 }
