@@ -1,5 +1,3 @@
-import { basename, dirname } from 'path'
-import { ensureDir } from 'fs-extra'
 import { Cli } from '.'
 import {
   Args,
@@ -11,18 +9,6 @@ import {
 } from './args'
 
 export class CliExecutor extends Cli {
-  private async executeProcessOnTarget(
-    fsPath: string,
-    ...args: Args
-  ): Promise<string> {
-    const cwd = dirname(fsPath)
-
-    const target = basename(fsPath)
-    await ensureDir(cwd)
-
-    return this.executeProcess(cwd, ...args, target)
-  }
-
   private executeExperimentProcess = (cwd: string, ...args: Args) =>
     this.executeProcess(cwd, Command.EXPERIMENT, ...args)
 
@@ -102,14 +88,14 @@ export class CliExecutor extends Cli {
   public pull = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PULL)
 
-  public pullTarget = (fsPath: string): Promise<string> =>
-    this.executeProcessOnTarget(fsPath, Command.PULL)
+  public pullTarget = (cwd: string, target: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PULL, target)
 
   public push = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.PUSH)
 
-  public pushTarget = (fsPath: string): Promise<string> =>
-    this.executeProcessOnTarget(fsPath, Command.PUSH)
+  public pushTarget = (cwd: string, target: string): Promise<string> =>
+    this.executeProcess(cwd, Command.PUSH, target)
 
   public removeTarget = (cwd: string, target: string): Promise<string> =>
     this.executeProcess(cwd, Command.REMOVE, target)

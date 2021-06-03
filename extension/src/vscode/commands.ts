@@ -3,10 +3,13 @@ import { commands } from 'vscode'
 
 export const registerPathCommand = (
   name: string,
-  func: (cwd: string) => Promise<string>
+  func: (cwd: string, relPath: string) => Promise<string>,
+  pathRoots: Record<string, string>
 ) =>
   commands.registerCommand(name, path => {
-    return func(path)
+    const dvcRoot = pathRoots[path]
+    const relPath = relative(dvcRoot, path)
+    return func(dvcRoot, relPath)
   })
 
 export const registerResourceUriCommand = (

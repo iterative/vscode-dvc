@@ -177,11 +177,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      registerPathCommand('dvc.pullTarget', this.cliExecutor.pullTarget)
+      registerPathCommand(
+        'dvc.pullTarget',
+        this.cliExecutor.pullTarget,
+        this.pathRoots
+      )
     )
 
     this.dispose.track(
-      registerPathCommand('dvc.pushTarget', this.cliExecutor.pushTarget)
+      registerPathCommand(
+        'dvc.pushTarget',
+        this.cliExecutor.pushTarget,
+        this.pathRoots
+      )
     )
   }
 

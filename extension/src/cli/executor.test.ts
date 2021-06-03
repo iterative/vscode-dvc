@@ -1,4 +1,4 @@
-import { basename, join, resolve } from 'path'
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { CliResult } from '.'
@@ -9,7 +9,6 @@ import { Config } from '../config'
 import { executeProcess } from '../processExecution'
 
 jest.mock('vscode')
-jest.mock('fs-extra')
 jest.mock('../processExecution')
 jest.mock('../env')
 
@@ -366,19 +365,18 @@ describe('CliExecutor', () => {
 
   describe('pullTarget', () => {
     it('should call executeProcess with the correct parameters to pull the target', async () => {
-      const fsPath = __filename
-      const dir = resolve(fsPath, '..')
-      const file = basename(__filename)
+      const cwd = __dirname
+      const relPath = join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
       const stdout = 'M       logs/\n1 file modified'
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pullTarget(fsPath)
+      const output = await cliExecutor.pullTarget(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['pull', file],
-        cwd: dir,
+        args: ['pull', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -406,19 +404,18 @@ describe('CliExecutor', () => {
 
   describe('pushTarget', () => {
     it('should call executeProcess with the correct parameters to push the target', async () => {
-      const fsPath = __filename
-      const dir = resolve(fsPath, '..')
-      const file = basename(__filename)
+      const cwd = __dirname
+      const relPath = join('data', 'MNIST')
       const stdout = 'Everything is up to date.'
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pushTarget(fsPath)
+      const output = await cliExecutor.pushTarget(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['push', file],
-        cwd: dir,
+        args: ['push', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
