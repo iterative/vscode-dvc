@@ -1,17 +1,6 @@
 import { relative } from 'path'
 import { commands } from 'vscode'
 
-export const registerPathCommand = (
-  name: string,
-  func: (cwd: string, relPath: string) => Promise<string>,
-  pathRoots: Record<string, string>
-) =>
-  commands.registerCommand(name, path => {
-    const dvcRoot = pathRoots[path]
-    const relPath = relative(dvcRoot, path)
-    return func(dvcRoot, relPath)
-  })
-
 export const registerResourceUriCommand = (
   name: string,
   func: (cwd: string, relPath: string) => Promise<string>
