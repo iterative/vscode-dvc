@@ -12,20 +12,26 @@ export class CliExecutor extends Cli {
   private executeExperimentProcess = (cwd: string, ...args: Args) =>
     this.executeProcess(cwd, Command.EXPERIMENT, ...args)
 
+  private executeForcedProcess = (
+    cwd: string,
+    command: Command,
+    ...args: Args
+  ) => this.executeProcess(cwd, command, Flag.FORCE, ...args)
+
   public addTarget = (cwd: string, target: string): Promise<string> =>
     this.executeProcess(cwd, Command.ADD, target)
 
   public checkout = (cwd: string): Promise<string> =>
-    this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE)
+    this.executeForcedProcess(cwd, Command.CHECKOUT)
 
   public checkoutTarget = (cwd: string, target: string): Promise<string> =>
-    this.executeProcess(cwd, Command.CHECKOUT, Flag.FORCE, target)
+    this.executeForcedProcess(cwd, Command.CHECKOUT, target)
 
   public commit = (cwd: string): Promise<string> =>
-    this.executeProcess(cwd, Command.COMMIT, Flag.FORCE)
+    this.executeForcedProcess(cwd, Command.COMMIT)
 
   public commitTarget = (cwd: string, target: string): Promise<string> =>
-    this.executeProcess(cwd, Command.COMMIT, Flag.FORCE, target)
+    this.executeForcedProcess(cwd, Command.COMMIT, target)
 
   public experimentApply = (
     cwd: string,
