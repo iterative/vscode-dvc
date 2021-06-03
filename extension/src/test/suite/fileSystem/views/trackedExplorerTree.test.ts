@@ -4,7 +4,7 @@ import chai from 'chai'
 import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { ensureFileSync } from 'fs-extra'
-import { window, commands, Uri } from 'vscode'
+import { window, commands, Uri, TextEditor } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { exists } from '../../../../fileSystem'
 import * as Process from '../../../../processExecution'
@@ -53,12 +53,12 @@ suite('Extension Test Suite', () => {
       const path = join(dvcDemoPath, 'logs', 'acc.tsv')
       const uri = Uri.file(path)
 
-      await commands.executeCommand(
+      const textEditor = (await commands.executeCommand(
         'dvc.views.trackedExplorerTree.openFile',
         uri
-      )
+      )) as TextEditor
 
-      expect(window.activeTextEditor?.document.fileName).to.equal(path)
+      expect(textEditor.document.fileName).to.equal(path)
     })
 
     it('should call the showErrorMessage when dvc.views.trackedExplorerTree.openFile tries to open a binary file', async () => {
