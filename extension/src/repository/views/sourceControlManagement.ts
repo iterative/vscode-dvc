@@ -20,9 +20,11 @@ enum Status {
   UNTRACKED = 'untracked'
 }
 
-type ResourceState = { resourceUri: Uri; contextValue: Status }
+type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
+
 export class SourceControlManagement {
   public readonly dispose = Disposable.fn()
+  private readonly dvcRoot: string
 
   @observable
   private changedResourceGroup: SourceControlResourceGroup
@@ -65,15 +67,18 @@ export class SourceControlManagement {
       )
       .map(path => ({
         contextValue,
+        dvcRoot: this.dvcRoot,
         resourceUri: Uri.file(path)
       }))
   }
 
-  constructor(repositoryRoot: string, state: SourceControlManagementState) {
+  constructor(dvcRoot: string, state: SourceControlManagementState) {
     makeObservable(this)
 
+    this.dvcRoot = dvcRoot
+
     const scmView = this.dispose.track(
-      scm.createSourceControl('dvc', 'DVC', Uri.file(repositoryRoot))
+      scm.createSourceControl('dvc', 'DVC', Uri.file(dvcRoot))
     )
 
     scmView.inputBox.visible = false

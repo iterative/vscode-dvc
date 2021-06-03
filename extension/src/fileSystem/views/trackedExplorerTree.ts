@@ -15,7 +15,6 @@ import { definedAndNonEmpty } from '../../util'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
-import { registerPathCommand } from '../../vscode/commands'
 import { CliReader } from '../../cli/reader'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
@@ -146,6 +145,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     })
   }
 
+  private registerPathCommand = (
+    name: string,
+    func: (cwd: string, relPath: string) => Promise<string>
+  ) =>
+    commands.registerCommand(name, path => {
+      const dvcRoot = this.pathRoots[path]
+      const relPath = relative(dvcRoot, path)
+      return func(dvcRoot, relPath)
+    })
+
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
@@ -169,16 +178,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.removeTarget', path => {
         deleteTarget(path)
-        return this.cliExecutor.removeTarget(path)
+        this.treeDataChanged.fire()
+        const dvcRoot = this.pathRoots[path]
+        const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
+        return this.cliExecutor.removeTarget(dvcRoot, relPath)
       })
     )
 
     this.dispose.track(
-      registerPathCommand('dvc.pullTarget', this.cliExecutor.pullTarget)
+      this.registerPathCommand('dvc.pullTarget', this.cliExecutor.pullTarget)
     )
 
     this.dispose.track(
-      registerPathCommand('dvc.pushTarget', this.cliExecutor.pushTarget)
+      this.registerPathCommand('dvc.pushTarget', this.cliExecutor.pushTarget)
     )
   }
 
