@@ -306,140 +306,140 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
+  })
 
-    describe('init', () => {
-      it('should call executeProcess with the correct parameters to initialize a project', async () => {
-        const fsPath = __dirname
-        const stdout = `
-			Initialized DVC repository.
-			You can now commit the changes to git.
-			
-			+---------------------------------------------------------------------+
-			|                                                                     |
-			|        DVC has enabled anonymous aggregate usage analytics.         |
-			|     Read the analytics documentation (and how to opt-out) here:     |
-			|             <https://dvc.org/doc/user-guide/analytics>              |
-			|                                                                     |
-			+---------------------------------------------------------------------+
-			
-			What's next?
-			------------
-			- Check out the documentation: <https://dvc.org/doc>
-			- Get help and share ideas: <https://dvc.org/chat>
-			- Star us on GitHub: <https://github.com/iterative/dvc>`
+  describe('init', () => {
+    it('should call executeProcess with the correct parameters to initialize a project', async () => {
+      const fsPath = __dirname
+      const stdout = `
+		Initialized DVC repository.
+		You can now commit the changes to git.
+		
+		+---------------------------------------------------------------------+
+		|                                                                     |
+		|        DVC has enabled anonymous aggregate usage analytics.         |
+		|     Read the analytics documentation (and how to opt-out) here:     |
+		|             <https://dvc.org/doc/user-guide/analytics>              |
+		|                                                                     |
+		+---------------------------------------------------------------------+
+		
+		What's next?
+		------------
+		- Check out the documentation: <https://dvc.org/doc>
+		- Get help and share ideas: <https://dvc.org/chat>
+		- Star us on GitHub: <https://github.com/iterative/dvc>`
 
-        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-        const output = await cliExecutor.init(fsPath)
-        expect(output).toEqual(stdout)
+      const output = await cliExecutor.init(fsPath)
+      expect(output).toEqual(stdout)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
-          args: ['init', '--subdir'],
-          cwd: fsPath,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['init', '--subdir'],
+        cwd: fsPath,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
+  })
 
-    describe('pull', () => {
-      it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
-        const cwd = __dirname
-        const stdout = 'M       data/MNIST/raw/\n1 file modified'
+  describe('pull', () => {
+    it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
+      const cwd = __dirname
+      const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
-        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-        const output = await cliExecutor.pull(cwd)
-        expect(output).toEqual(stdout)
+      const output = await cliExecutor.pull(cwd)
+      expect(output).toEqual(stdout)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
-          args: ['pull'],
-          cwd: __dirname,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['pull'],
+        cwd: __dirname,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
+  })
 
-    describe('pullTarget', () => {
-      it('should call executeProcess with the correct parameters to pull the target', async () => {
-        const fsPath = __filename
-        const dir = resolve(fsPath, '..')
-        const file = basename(__filename)
-        const stdout = 'M       logs/\n1 file modified'
+  describe('pullTarget', () => {
+    it('should call executeProcess with the correct parameters to pull the target', async () => {
+      const fsPath = __filename
+      const dir = resolve(fsPath, '..')
+      const file = basename(__filename)
+      const stdout = 'M       logs/\n1 file modified'
 
-        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-        const output = await cliExecutor.pullTarget(fsPath)
-        expect(output).toEqual(stdout)
+      const output = await cliExecutor.pullTarget(fsPath)
+      expect(output).toEqual(stdout)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
-          args: ['pull', file],
-          cwd: dir,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['pull', file],
+        cwd: dir,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
+  })
 
-    describe('push', () => {
-      it('should call executeProcess with the correct parameters to push the entire repository', async () => {
-        const cwd = __dirname
-        const stdout = 'Everything is up to date.'
+  describe('push', () => {
+    it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+      const cwd = __dirname
+      const stdout = 'Everything is up to date.'
 
-        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-        const output = await cliExecutor.push(cwd)
-        expect(output).toEqual(stdout)
+      const output = await cliExecutor.push(cwd)
+      expect(output).toEqual(stdout)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
-          args: ['push'],
-          cwd: __dirname,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['push'],
+        cwd: __dirname,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
+  })
 
-    describe('pushTarget', () => {
-      it('should call executeProcess with the correct parameters to push the target', async () => {
-        const fsPath = __filename
-        const dir = resolve(fsPath, '..')
-        const file = basename(__filename)
-        const stdout = 'Everything is up to date.'
+  describe('pushTarget', () => {
+    it('should call executeProcess with the correct parameters to push the target', async () => {
+      const fsPath = __filename
+      const dir = resolve(fsPath, '..')
+      const file = basename(__filename)
+      const stdout = 'Everything is up to date.'
 
-        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-        const output = await cliExecutor.pushTarget(fsPath)
-        expect(output).toEqual(stdout)
+      const output = await cliExecutor.pushTarget(fsPath)
+      expect(output).toEqual(stdout)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
-          args: ['push', file],
-          cwd: dir,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['push', file],
+        cwd: dir,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
+  })
 
-    describe('removeTarget', () => {
-      it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
-        const file = 'data.dvc'
-        const fsPath = join(__dirname, 'data.dvc')
+  describe('removeTarget', () => {
+    it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+      const file = 'data.dvc'
+      const fsPath = join(__dirname, 'data.dvc')
 
-        const stdout = ''
+      const stdout = ''
 
-        mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-        const output = await cliExecutor.removeTarget(fsPath)
-        expect(output).toEqual(stdout)
+      const output = await cliExecutor.removeTarget(fsPath)
+      expect(output).toEqual(stdout)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
-          args: ['remove', file],
-          cwd: __dirname,
-          env: mockedEnv,
-          executable: 'dvc'
-        })
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['remove', file],
+        cwd: __dirname,
+        env: mockedEnv,
+        executable: 'dvc'
       })
     })
   })
