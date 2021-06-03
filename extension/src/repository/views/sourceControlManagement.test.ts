@@ -24,6 +24,7 @@ beforeEach(() => {
 describe('SourceControlManagement', () => {
   describe('setState', () => {
     it('should be able to set the state', () => {
+      const dvcRoot = __dirname
       const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
         createResourceGroup: jest.fn().mockReturnValueOnce({}),
         inputBox: { visible: true }
@@ -32,7 +33,7 @@ describe('SourceControlManagement', () => {
 
       const initialState = {} as SourceControlManagementState
       const sourceControlManagement = new SourceControlManagement(
-        __dirname,
+        dvcRoot,
         initialState
       )
       expect(mockedCreateSourceControl).toBeCalledTimes(1)
@@ -48,13 +49,19 @@ describe('SourceControlManagement', () => {
       sourceControlManagement.setState(updatedState)
 
       expect(sourceControlManagement.getState()).toEqual([
-        { contextValue: 'added', resourceUri: Uri.file('/some/new/path') },
+        {
+          contextValue: 'added',
+          dvcRoot,
+          resourceUri: Uri.file('/some/new/path')
+        },
         {
           contextValue: 'deleted',
+          dvcRoot,
           resourceUri: Uri.file('/some/deleted/path')
         },
         {
           contextValue: 'deleted',
+          dvcRoot,
           resourceUri: Uri.file('/some/other/deleted/path')
         }
       ])
