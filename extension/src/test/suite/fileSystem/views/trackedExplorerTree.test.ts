@@ -79,16 +79,52 @@ suite('Extension Test Suite', () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-      stub(Workspace, 'deleteTarget').resolves(true)
+      const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
       const mockProcess = stub(Process, 'executeProcess').resolves('fun')
 
       await commands.executeCommand('dvc.removeTarget', absPath)
+      expect(mockDeleteTarget).to.be.calledOnce
+      expect(mockProcess).to.be.calledOnce
       expect(mockProcess).to.be.calledWith({
-        args: ['remove', 'mock/data/MNIST/raw.dvc'],
+        args: ['remove', join('mock', 'data', 'MNIST', 'raw.dvc')],
         cwd: undefined,
         env: process.env,
         executable: 'dvc'
       })
+    })
+
+    it('should be able to run pullTarget without error', async () => {
+      const relPath = 'data'
+      const absPath = join(dvcDemoPath, relPath)
+      stub(path, 'relative').returns(relPath)
+      const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+
+      await commands.executeCommand('dvc.pullTarget', absPath)
+
+      expect(mockProcess).to.be.calledOnce
+      expect(mockProcess).to.be.calledWith({
+        args: ['pull', relPath],
+        cwd: undefined,
+        env: process.env,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  it('should be able to run pushTarget without error', async () => {
+    const relPath = join('data', 'MNIST')
+    const absPath = join(dvcDemoPath, relPath)
+    stub(path, 'relative').returns(relPath)
+    const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+
+    await commands.executeCommand('dvc.pushTarget', absPath)
+
+    expect(mockProcess).to.be.calledOnce
+    expect(mockProcess).to.be.calledWith({
+      args: ['push', relPath],
+      cwd: undefined,
+      env: process.env,
+      executable: 'dvc'
     })
   })
 })
