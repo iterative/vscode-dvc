@@ -312,22 +312,22 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to initialize a project', async () => {
       const fsPath = __dirname
       const stdout = `
-			Initialized DVC repository.
-			You can now commit the changes to git.
-			
-			+---------------------------------------------------------------------+
-			|                                                                     |
-			|        DVC has enabled anonymous aggregate usage analytics.         |
-			|     Read the analytics documentation (and how to opt-out) here:     |
-			|             <https://dvc.org/doc/user-guide/analytics>              |
-			|                                                                     |
-			+---------------------------------------------------------------------+
-			
-			What's next?
-			------------
-			- Check out the documentation: <https://dvc.org/doc>
-			- Get help and share ideas: <https://dvc.org/chat>
-			- Star us on GitHub: <https://github.com/iterative/dvc>`
+		Initialized DVC repository.
+		You can now commit the changes to git.
+		
+		+---------------------------------------------------------------------+
+		|                                                                     |
+		|        DVC has enabled anonymous aggregate usage analytics.         |
+		|     Read the analytics documentation (and how to opt-out) here:     |
+		|             <https://dvc.org/doc/user-guide/analytics>              |
+		|                                                                     |
+		+---------------------------------------------------------------------+
+		
+		What's next?
+		------------
+		- Check out the documentation: <https://dvc.org/doc>
+		- Get help and share ideas: <https://dvc.org/chat>
+		- Star us on GitHub: <https://github.com/iterative/dvc>`
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
