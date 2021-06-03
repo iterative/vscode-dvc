@@ -3,6 +3,7 @@ import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
+import { buildColumns, Column } from './build-columns'
 import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
@@ -29,14 +30,17 @@ export class ExperimentsTable {
   private currentUpdatePromise?: Promise<void>
   private data?: ExperimentsRepoJSONOutput
 
-  public getDvcRoot() {
-    return this.dvcRoot
-  }
+  private columns?: Column[]
+  public getColumns = () => this.columns
+
+  public getDvcRoot = () => this.dvcRoot
 
   private async updateData(): Promise<void> {
     try {
-      const experimentData = this.cliReader.experimentShow(this.dvcRoot)
-      this.data = await experimentData
+      const experimentData = await this.cliReader.experimentShow(this.dvcRoot)
+      this.data = experimentData
+
+      this.columns = buildColumns(experimentData)
     } catch (e) {
       Logger.error(e)
       throw e

@@ -1,23 +1,24 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { ExperimentsRepoJSONOutput, ValueTree, Value } from './contract'
 
-export interface IncompleteColumnDescriptor {
+interface PartialColumnDescriptor {
   types?: Set<string>
   maxStringLength?: number
-  childColumns?: ColumnsMap
+  childColumns?: PartialColumnsMap
 }
-export type ColumnsMap = Map<string, IncompleteColumnDescriptor>
+type PartialColumnsMap = Map<string, PartialColumnDescriptor>
 
-export interface SerializedColumn {
+export interface Column {
   name: string
   types?: string[]
-  childColumns?: SerializedColumn[]
+  maxStringLength?: number
+  childColumns?: Column[]
 }
 
 const mergeOrCreateColumnsMap = (
-  originalColumnsMap: ColumnsMap = new Map(),
+  originalColumnsMap: PartialColumnsMap = new Map(),
   valueTree: ValueTree
-): ColumnsMap => {
+): PartialColumnsMap => {
   if (!valueTree) {
     return originalColumnsMap
   }
@@ -35,15 +36,15 @@ const mergeOrCreateColumnsMap = (
 }
 
 const mergePrimitiveColumn = (
-  columnDescriptor: IncompleteColumnDescriptor,
+  columnDescriptor: PartialColumnDescriptor,
   newValue: Value
-): IncompleteColumnDescriptor => {
+): PartialColumnDescriptor => {
   const { maxStringLength } = columnDescriptor
   const additionStringLength = String(newValue).length
   if (maxStringLength === undefined || maxStringLength < additionStringLength) {
     columnDescriptor.maxStringLength = additionStringLength
   }
-  return columnDescriptor as IncompleteColumnDescriptor
+  return columnDescriptor as PartialColumnDescriptor
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -54,9 +55,9 @@ const getValueType = (value: Value | ValueTree) => {
 }
 
 const mergeOrCreateColumnDescriptor = (
-  columnDescriptor: IncompleteColumnDescriptor = {},
+  columnDescriptor: PartialColumnDescriptor = {},
   newValue: Value | ValueTree
-): IncompleteColumnDescriptor => {
+): PartialColumnDescriptor => {
   const newValueType = getValueType(newValue)
 
   if (newValueType === 'object') {
@@ -64,7 +65,7 @@ const mergeOrCreateColumnDescriptor = (
       columnDescriptor.childColumns,
       newValue as ValueTree
     )
-    return columnDescriptor as IncompleteColumnDescriptor
+    return columnDescriptor as PartialColumnDescriptor
   } else {
     if (!columnDescriptor.types) {
       columnDescriptor.types = new Set()
@@ -75,9 +76,9 @@ const mergeOrCreateColumnDescriptor = (
   }
 }
 
-const serializeColumnMap = (columns: ColumnsMap): SerializedColumn[] =>
+const serializeColumnMap = (columns: PartialColumnsMap): Column[] =>
   [...columns].map(([name, { types, childColumns, ...rest }]) => {
-    const column: SerializedColumn = {
+    const column: Column = {
       name,
       ...rest
     }
@@ -92,9 +93,9 @@ const serializeColumnMap = (columns: ColumnsMap): SerializedColumn[] =>
 
 export const buildColumns = (
   tableData: ExperimentsRepoJSONOutput
-): SerializedColumn[] => {
-  let paramsColumn: IncompleteColumnDescriptor | undefined
-  let metricsColumn: IncompleteColumnDescriptor | undefined
+): Column[] => {
+  let paramsColumn: PartialColumnDescriptor | undefined
+  let metricsColumn: PartialColumnDescriptor | undefined
 
   for (const branch of Object.values(tableData)) {
     for (const commit of Object.values(branch)) {
@@ -104,7 +105,7 @@ export const buildColumns = (
     }
   }
 
-  const columns: ColumnsMap = new Map()
+  const columns: PartialColumnsMap = new Map()
   if (paramsColumn) {
     columns.set('params', paramsColumn)
   }
