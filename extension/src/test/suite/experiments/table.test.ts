@@ -4,6 +4,7 @@ import chai from 'chai'
 import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
+import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
@@ -29,6 +30,39 @@ suite('Experiments Table Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     return commands.executeCommand('workbench.action.closeAllEditors')
+  })
+
+  describe('refresh', () => {
+    it('should return the currently unresolved promise if one exists', async () => {
+      let deferred = new Deferred()
+      const stubbedExperimentShow = stub(async () => {
+        await deferred.promise
+        deferred = new Deferred()
+        return complexExperimentsOutput
+      })
+      const testCliReader = ({
+        experimentShow: stubbedExperimentShow
+      } as unknown) as CliReader
+
+      const testTable = new ExperimentsTable(
+        'demo',
+        {} as Config,
+        testCliReader,
+        {} as ResourceLocator
+      )
+
+      const firstUpdate = testTable.refresh()
+      const secondUpdate = testTable.refresh()
+      deferred.resolve()
+
+      expect(firstUpdate).to.equal(secondUpdate)
+      await secondUpdate
+
+      const thirdUpdate = testTable.refresh()
+      deferred.resolve()
+
+      expect(secondUpdate).to.not.equal(thirdUpdate)
+    })
   })
 
   describe('showWebview', () => {
