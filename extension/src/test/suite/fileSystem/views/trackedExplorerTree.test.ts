@@ -66,7 +66,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowTextDocument).to.be.calledWith(uri)
     })
 
-    it('should call the showErrorMessage when dvc.views.trackedExplorerTree.openFile tries to open a binary file', async () => {
+    it('should call showErrorMessage when dvc.views.trackedExplorerTree.openFile tries to open a binary file', async () => {
       const path = join(dvcDemoPath, 'model.pt')
       const uri = Uri.file(path)
 
