@@ -53,12 +53,17 @@ suite('Extension Test Suite', () => {
       const path = join(dvcDemoPath, 'logs', 'acc.tsv')
       const uri = Uri.file(path)
 
+      const mockShowTextDocument = stub(window, 'showTextDocument').resolves(({
+        document: { fileName: path }
+      } as unknown) as TextEditor)
+
       const textEditor = (await commands.executeCommand(
         'dvc.views.trackedExplorerTree.openFile',
         uri
       )) as TextEditor
 
       expect(textEditor.document.fileName).to.equal(path)
+      expect(mockShowTextDocument).to.be.calledWith(uri)
     })
 
     it('should call the showErrorMessage when dvc.views.trackedExplorerTree.openFile tries to open a binary file', async () => {
