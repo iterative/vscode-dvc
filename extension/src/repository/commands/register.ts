@@ -1,8 +1,15 @@
+import { relative } from 'path'
+import { commands } from 'vscode'
 import { CliExecutor } from '../../cli/executor'
-import {
-  registerRootUriCommand,
-  registerResourceUriCommand
-} from '../../vscode/commands'
+
+const registerResourceUriCommand = (
+  name: string,
+  func: (cwd: string, relPath: string) => Promise<string>
+) =>
+  commands.registerCommand(name, ({ dvcRoot, resourceUri }) => {
+    const relPath = relative(dvcRoot, resourceUri.fsPath)
+    return func(dvcRoot, relPath)
+  })
 
 const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
@@ -17,6 +24,11 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
     registerResourceUriCommand('dvc.commitTarget', cliExecutor.commitTarget)
   )
 }
+
+const registerRootUriCommand = (
+  name: string,
+  func: (fsPath: string) => Promise<string>
+) => commands.registerCommand(name, ({ rootUri }) => func(rootUri.fsPath))
 
 const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(

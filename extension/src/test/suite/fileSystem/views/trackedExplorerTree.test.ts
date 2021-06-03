@@ -40,7 +40,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('TrackedExplorerTree', () => {
-    it('should be able to run deleteTarget without error', async () => {
+    it('should be able to run dvc.deleteTarget without error', async () => {
       const path = join(dvcDemoPath, 'deletable.txt')
       ensureFileSync(path)
       expect(exists(path)).to.be.true
@@ -75,7 +75,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowErrorMessage).to.be.calledOnce
     })
 
-    it('should be able to run removeTarget without error', async () => {
+    it('should be able to run dvc.removeTarget without error', async () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
@@ -93,7 +93,7 @@ suite('Extension Test Suite', () => {
       })
     })
 
-    it('should be able to run pullTarget without error', async () => {
+    it('should be able to run dvc.pullTarget without error', async () => {
       const relPath = 'data'
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
@@ -111,7 +111,7 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  it('should be able to run pushTarget without error', async () => {
+  it('should be able to run dvc.pushTarget without error', async () => {
     const relPath = join('data', 'MNIST')
     const absPath = join(dvcDemoPath, relPath)
     stub(path, 'relative').returns(relPath)
