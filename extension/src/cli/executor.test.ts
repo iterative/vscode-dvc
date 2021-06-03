@@ -44,25 +44,24 @@ describe('CliExecutor', () => {
 
   describe('addTarget', () => {
     it('should call executeProcess with the correct parameters to add a file', async () => {
-      const fsPath = __filename
-      const dir = resolve(fsPath, '..')
-      const file = basename(__filename)
+      const cwd = __dirname
+      const relPath = join('data', 'MNIST', 'raw')
       const stdout =
         `100% Add|████████████████████████████████████████████████` +
         `█████████████████████████████████████████████████████████` +
         `█████████████████████████████████████████████████████████` +
         `██████████████████████████████████████████|1/1 [00:00,  2` +
         `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
-        `\n\rgit add ${file} .gitignore`
+        `\n\rgit add ${relPath} .gitignore`
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.addTarget(fsPath)
+      const output = await cliExecutor.addTarget(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['add', file],
-        cwd: dir,
+        args: ['add', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -89,20 +88,19 @@ describe('CliExecutor', () => {
 
   describe('checkoutTarget', () => {
     it('should call executeProcess with the correct parameters to checkout a file', async () => {
-      const file = 'acc.tsv'
-      const dir = join(__dirname, 'logs')
-      const fsPath = join(dir, 'acc.tsv')
+      const cwd = __dirname
+      const relPath = join('logs', 'acc.tsv')
 
       const stdout = 'M       ./'
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.checkoutTarget(fsPath)
+      const output = await cliExecutor.checkoutTarget(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['checkout', '-f', file],
-        cwd: dir,
+        args: ['checkout', '-f', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -129,18 +127,22 @@ describe('CliExecutor', () => {
 
   describe('commitTarget', () => {
     it('should call executeProcess with the correct parameters to commit a target', async () => {
-      const fsPath = __filename
-      const dir = resolve(fsPath, '..')
-      const file = basename(__filename)
+      const cwd = __dirname
+      const relPath = join(
+        'data',
+        'fashion-mnist',
+        'raw',
+        't10k-images-idx3-ubyte.gz'
+      )
       const stdout = "Updating lock file 'dvc.lock'"
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.commitTarget(fsPath)
+      const output = await cliExecutor.commitTarget(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['commit', '-f', file],
-        cwd: dir,
+        args: ['commit', '-f', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })

@@ -1,39 +1,38 @@
 import { CliExecutor } from '../../cli/executor'
-import { registerUriCommand } from '../../vscode/commands'
+import {
+  registerRootUriCommand,
+  registerResourceUriCommand
+} from '../../vscode/commands'
 
 const registerResourceCommands = (cliExecutor: CliExecutor): void => {
-  const type = 'resourceUri'
-
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.addTarget', type, cliExecutor.addTarget)
+    registerResourceUriCommand('dvc.addTarget', cliExecutor.addTarget)
   )
 
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.checkoutTarget', type, cliExecutor.checkoutTarget)
+    registerResourceUriCommand('dvc.checkoutTarget', cliExecutor.checkoutTarget)
   )
 
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.commitTarget', type, cliExecutor.commitTarget)
+    registerResourceUriCommand('dvc.commitTarget', cliExecutor.commitTarget)
   )
 }
 
 const registerRootCommands = (cliExecutor: CliExecutor) => {
-  const type = 'rootUri'
-
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.checkout', type, cliExecutor.checkout)
+    registerRootUriCommand('dvc.checkout', cliExecutor.checkout)
   )
 
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.commit', type, cliExecutor.commit)
+    registerRootUriCommand('dvc.commit', cliExecutor.commit)
   )
 
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.pull', type, cliExecutor.pull)
+    registerRootUriCommand('dvc.pull', cliExecutor.pull)
   )
 
   cliExecutor.dispose.track(
-    registerUriCommand('dvc.push', type, cliExecutor.push)
+    registerRootUriCommand('dvc.push', cliExecutor.push)
   )
 }
 

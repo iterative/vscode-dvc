@@ -1,3 +1,4 @@
+import { relative } from 'path'
 import { commands } from 'vscode'
 
 export const registerPathCommand = (
@@ -8,8 +9,16 @@ export const registerPathCommand = (
     return func(path)
   })
 
-export const registerUriCommand = (
+export const registerResourceUriCommand = (
   name: string,
-  uriName: 'rootUri' | 'resourceUri',
+  func: (cwd: string, relPath: string) => Promise<string>
+) =>
+  commands.registerCommand(name, ({ dvcRoot, resourceUri }) => {
+    const relPath = relative(dvcRoot, resourceUri.fsPath)
+    return func(dvcRoot, relPath)
+  })
+
+export const registerRootUriCommand = (
+  name: string,
   func: (fsPath: string) => Promise<string>
-) => commands.registerCommand(name, context => func(context[uriName].fsPath))
+) => commands.registerCommand(name, ({ rootUri }) => func(rootUri.fsPath))
