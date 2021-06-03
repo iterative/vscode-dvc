@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { stub, restore } from 'sinon'
@@ -7,12 +7,16 @@ import { ensureFileSync } from 'fs-extra'
 import { window, commands, Uri } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { exists } from '../../../../fileSystem'
+import * as Process from '../../../../processExecution'
+import * as Workspace from '../../../../fileSystem/workspace'
 
 chai.use(sinonChai)
 const { expect } = chai
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
+
+  const { join, resolve } = path
 
   const dvcDemoPath = resolve(
     __dirname,
@@ -69,6 +73,22 @@ suite('Extension Test Suite', () => {
       )
 
       expect(mockShowErrorMessage).to.be.calledOnce
+    })
+
+    it('should be able to run removeTarget without error', async () => {
+      const relPath = join('mock', 'data', 'MNIST', 'raw')
+      const absPath = join(dvcDemoPath, relPath)
+      stub(path, 'relative').returns(relPath)
+      stub(Workspace, 'deleteTarget').resolves(true)
+      const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+
+      await commands.executeCommand('dvc.removeTarget', absPath)
+      expect(mockProcess).to.be.calledWith({
+        args: ['remove', 'mock/data/MNIST/raw.dvc'],
+        cwd: undefined,
+        env: process.env,
+        executable: 'dvc'
+      })
     })
   })
 })
