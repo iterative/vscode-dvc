@@ -50,20 +50,20 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private doNotShowAgainText = "Don't Show Again"
 
-  private noOpenBinaryErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
+  private noOpenUnsupportedOption =
+    'dvc.views.trackedExplorerTree.noOpenUnsupported'
 
-  private handleOpenBinaryError = async (relPath: string) => {
-    if (getConfigValue(this.noOpenBinaryErrorsOption)) {
+  private handleOpenUnsupportedError = async (relPath: string) => {
+    if (getConfigValue(this.noOpenUnsupportedOption)) {
       return
     }
     const response = await window.showInformationMessage(
-      `Cannot open ${relPath}. File seems to be binary and cannot be opened as text.`,
+      `Cannot open ${relPath}. File is unsupported and cannot be opened as text.`,
       this.doNotShowAgainText
     )
 
     if (response) {
-      return setConfigValue(this.noOpenBinaryErrorsOption, true)
+      return setConfigValue(this.noOpenUnsupportedOption, true)
     }
   }
 
@@ -75,7 +75,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return
     }
     const response = await window.showInformationMessage(
-      `Cannot open ${relPath} as it does not exist at the specified path.`,
+      `${relPath} does not exist at the specified path.`,
       'Pull File',
       this.doNotShowAgainText
     )
@@ -106,7 +106,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
             'File seems to be binary and cannot be opened as text'
           )
         ) {
-          return this.handleOpenBinaryError(relPath)
+          return this.handleOpenUnsupportedError(relPath)
         }
         return window.showInformationMessage(error.message)
       }

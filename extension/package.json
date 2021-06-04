@@ -208,9 +208,9 @@
           "type": "string",
           "scope": "resource"
         },
-        "dvc.views.trackedExplorerTree.noOpenBinaryErrors": {
-          "title": "%config.noOpenBinaryErrors.title%",
-          "description": "%config.noOpenBinaryErrors.description%",
+        "dvc.views.trackedExplorerTree.noOpenUnsupported": {
+          "title": "%config.noOpenUnsupported.title%",
+          "description": "%config.noOpenUnsupported.description%",
           "type": "boolean",
           "scope": "resource"
         },

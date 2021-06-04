@@ -31,8 +31,8 @@ suite('Extension Test Suite', () => {
   )
   const disposable = Disposable.fn()
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
-  const noOpenBinaryErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
+  const noOpenUnsupportedOption =
+    'dvc.views.trackedExplorerTree.noOpenUnsupported'
   const noPromptPullMissingOption =
     'dvc.views.trackedExplorerTree.noPromptPullMissing'
 
@@ -42,7 +42,7 @@ suite('Extension Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    setConfigValue(noOpenBinaryErrorsOption, undefined)
+    setConfigValue(noOpenUnsupportedOption, undefined)
     setConfigValue(noPromptPullMissingOption, undefined)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
@@ -88,13 +88,13 @@ suite('Extension Test Suite', () => {
 
       const mockShowInformationMessage = stub(window, 'showInformationMessage')
 
-      expect(!!getConfigValue(noOpenBinaryErrorsOption)).to.be.false
+      expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
       mockShowInformationMessage.resolves(undefined)
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(!!getConfigValue(noOpenBinaryErrorsOption)).to.be.false
+      expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
         ("Don't Show Again" as unknown) as MessageItem
@@ -103,13 +103,13 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(getConfigValue(noOpenBinaryErrorsOption)).to.be.true
+      expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
       mockShowInformationMessage.resetHistory()
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).not.to.be.called
-      expect(getConfigValue(noOpenBinaryErrorsOption)).to.be.true
+      expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
     })
 
     it('should be able to pull a file after trying to open it and it does not exist on disk and the no missing errors option is unset', async () => {
