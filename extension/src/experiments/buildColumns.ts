@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import { ExperimentsRepoJSONOutput, ValueTree, Value } from './contract'
 
 interface PartialColumnDescriptor {
@@ -16,24 +15,11 @@ export interface Column {
   ancestors?: string[]
 }
 
-const mergeOrCreateColumnsMap = (
-  originalColumnsMap: PartialColumnsMap = new Map(),
-  valueTree: ValueTree
-): PartialColumnsMap => {
-  if (!valueTree) {
-    return originalColumnsMap
+const getValueType = (value: Value | ValueTree) => {
+  if (value === null) {
+    return 'null'
   }
-  const sampleEntries = Object.entries(valueTree)
-  for (const [propertyKey, propertyValue] of sampleEntries) {
-    originalColumnsMap.set(
-      propertyKey,
-      mergeOrCreateColumnDescriptor(
-        originalColumnsMap.get(propertyKey),
-        propertyValue
-      )
-    )
-  }
-  return originalColumnsMap
+  return typeof value
 }
 
 const mergePrimitiveColumn = (
@@ -48,11 +34,25 @@ const mergePrimitiveColumn = (
   return columnDescriptor as PartialColumnDescriptor
 }
 
-const getValueType = (value: Value | ValueTree) => {
-  if (value === null) {
-    return 'null'
+const mergeOrCreateColumnsMap = (
+  originalColumnsMap: PartialColumnsMap = new Map(),
+  valueTree: ValueTree
+): PartialColumnsMap => {
+  if (!valueTree) {
+    return originalColumnsMap
   }
-  return typeof value
+  const sampleEntries = Object.entries(valueTree)
+  for (const [propertyKey, propertyValue] of sampleEntries) {
+    originalColumnsMap.set(
+      propertyKey,
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      mergeOrCreateColumnDescriptor(
+        originalColumnsMap.get(propertyKey),
+        propertyValue
+      )
+    )
+  }
+  return originalColumnsMap
 }
 
 const mergeOrCreateColumnDescriptor = (
@@ -94,6 +94,30 @@ const columnFromMapEntry = (
   return column
 }
 
+const transformAndCollectFromColumns = (
+  columnsMap: PartialColumnsMap,
+  flatColumns: Column[] = [],
+  ancestors?: string[]
+): Column[] => {
+  const currentLevelColumns = []
+  for (const entry of columnsMap) {
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    currentLevelColumns.push(buildColumn(entry, flatColumns, ancestors))
+  }
+  return currentLevelColumns
+}
+
+const transformColumnsMap = (
+  columnsMap: PartialColumnsMap
+): [Column[], Column[]] => {
+  const flatColumns: Column[] = []
+  const topLevelColumns = transformAndCollectFromColumns(
+    columnsMap,
+    flatColumns
+  )
+  return [topLevelColumns, flatColumns]
+}
+
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
   flatColumns: Column[],
@@ -118,29 +142,6 @@ const buildColumn = (
   }
 
   return finalColumn
-}
-
-const transformAndCollectFromColumns = (
-  columnsMap: PartialColumnsMap,
-  flatColumns: Column[] = [],
-  ancestors?: string[]
-): Column[] => {
-  const currentLevelColumns = []
-  for (const entry of columnsMap) {
-    currentLevelColumns.push(buildColumn(entry, flatColumns, ancestors))
-  }
-  return currentLevelColumns
-}
-
-const transformColumnsMap = (
-  columnsMap: PartialColumnsMap
-): [Column[], Column[]] => {
-  const flatColumns: Column[] = []
-  const topLevelColumns = transformAndCollectFromColumns(
-    columnsMap,
-    flatColumns
-  )
-  return [topLevelColumns, flatColumns]
 }
 
 export const buildColumns = (
