@@ -50,7 +50,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   public openResource(resource: Uri) {
     return window.showTextDocument(resource).then(
       textEditor => textEditor,
-      error => window.showErrorMessage(error.message)
+      async error => {
+        if (this.config.getNoOpenFileErrors()) {
+          return
+        }
+        const response = await window.showInformationMessage(
+          error.message,
+          'Do not show this message again.'
+        )
+
+        if (response) {
+          return this.config.setNoOpenFileErrors(true)
+        }
+      }
     )
   }
 

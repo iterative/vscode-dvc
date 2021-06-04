@@ -4,11 +4,12 @@ import chai from 'chai'
 import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { ensureFileSync } from 'fs-extra'
-import { window, commands, Uri, TextEditor } from 'vscode'
+import { window, commands, Uri, TextEditor, MessageItem } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { exists } from '../../../../fileSystem'
 import * as Process from '../../../../processExecution'
 import * as Workspace from '../../../../fileSystem/workspace'
+import { getConfigValue, setConfigValue } from '../../../../vscode/config'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -29,6 +30,9 @@ suite('Extension Test Suite', () => {
     'demo'
   )
   const disposable = Disposable.fn()
+  const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
+  const noOpenFileErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenFileErrors'
 
   beforeEach(() => {
     restore()
@@ -36,6 +40,7 @@ suite('Extension Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
+    setConfigValue(noOpenFileErrorsOption, undefined)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -49,7 +54,7 @@ suite('Extension Test Suite', () => {
       expect(exists(path)).to.be.false
     })
 
-    it('should be able to run dvc.views.trackedExplorerTree.openFile when opening a non-binary file', async () => {
+    it('should be able to open a non-binary file', async () => {
       const path = join(dvcDemoPath, 'logs', 'acc.tsv')
       const uri = Uri.file(path)
 
@@ -58,7 +63,7 @@ suite('Extension Test Suite', () => {
       } as unknown) as TextEditor)
 
       const textEditor = (await commands.executeCommand(
-        'dvc.views.trackedExplorerTree.openFile',
+        openFileCommand,
         uri
       )) as TextEditor
 
@@ -66,18 +71,34 @@ suite('Extension Test Suite', () => {
       expect(mockShowTextDocument).to.be.calledWith(uri)
     })
 
-    it('should call showErrorMessage when dvc.views.trackedExplorerTree.openFile tries to open a binary file', async () => {
+    it('should only call showInformationMessage when trying to open a binary file without the no errors option set', async () => {
       const path = join(dvcDemoPath, 'model.pt')
       const uri = Uri.file(path)
 
-      const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves()
+      const mockShowInformationMessage = stub(window, 'showInformationMessage')
 
-      await commands.executeCommand(
-        'dvc.views.trackedExplorerTree.openFile',
-        uri
+      expect(!!getConfigValue(noOpenFileErrorsOption)).to.be.false
+      mockShowInformationMessage.resolves(undefined)
+
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(!!getConfigValue(noOpenFileErrorsOption)).to.be.false
+      mockShowInformationMessage.resetHistory()
+      mockShowInformationMessage.resolves(
+        ('Do not show this message again.' as unknown) as MessageItem
       )
 
-      expect(mockShowErrorMessage).to.be.calledOnce
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(getConfigValue(noOpenFileErrorsOption)).to.be.true
+      mockShowInformationMessage.resetHistory()
+
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).not.to.be.called
+      expect(getConfigValue(noOpenFileErrorsOption)).to.be.true
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
