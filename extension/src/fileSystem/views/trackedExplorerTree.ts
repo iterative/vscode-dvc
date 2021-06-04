@@ -48,7 +48,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.reset()
   }
 
-  private doNotShowAgainText = 'Do not show messages like this again.'
+  private doNotShowAgainText = "Don't Show Again"
 
   private noOpenBinaryErrorsOption =
     'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
@@ -76,11 +76,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
     const response = await window.showInformationMessage(
       `Cannot open ${relPath}. The file does not exist at the specified path.`,
-      'Pull file',
+      'Pull File',
       this.doNotShowAgainText
     )
 
-    if (response === 'Pull file') {
+    if (response === 'Pull File') {
       return this.cliExecutor.pullTarget(dvcRoot, relPath)
     }
 

@@ -94,7 +94,7 @@ suite('Extension Test Suite', () => {
       expect(!!getConfigValue(noOpenBinaryErrorsOption)).to.be.false
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
-        ('Do not show this message again.' as unknown) as MessageItem
+        ("Don't Show Again" as unknown) as MessageItem
       )
 
       await commands.executeCommand(openFileCommand, uri)
@@ -129,7 +129,7 @@ suite('Extension Test Suite', () => {
 
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
-        ('Pull file' as unknown) as MessageItem
+        ('Pull File' as unknown) as MessageItem
       )
 
       await commands.executeCommand(openFileCommand, uri)
@@ -146,7 +146,7 @@ suite('Extension Test Suite', () => {
       mockProcess.resetHistory()
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
-        ('Do not show messages like this again.' as unknown) as MessageItem
+        ("Don't Show Again" as unknown) as MessageItem
       )
 
       await commands.executeCommand(openFileCommand, uri)
