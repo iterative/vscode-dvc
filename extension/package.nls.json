@@ -33,6 +33,6 @@
   "config.defaultProject.title": "DVC Default Project",
   "config.noOpenBinaryErrors.description": "Silence errors relating to attempting to open unsupported dvc tracked files.",
   "config.noOpenBinaryErrors.title": "DVC Tracked - No Binary Opening Errors",
-  "config.noOpenMissingErrors.description": "Silence errors relating to attempting to open dvc tracked files that do not exist.",
-  "config.noOpenMissingErrors.title": "DVC Tracked - No Missing File Opening Errors"
+  "config.noPromptPullMissing.description": "Disable prompts which are displayed when attempting to open dvc tracked files that do not exist.",
+  "config.noPromptPullMissing.title": "DVC Tracked - Do Not Prompt To Pull Missing"
 }

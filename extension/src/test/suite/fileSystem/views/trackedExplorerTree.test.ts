@@ -33,8 +33,8 @@ suite('Extension Test Suite', () => {
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
   const noOpenBinaryErrorsOption =
     'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
-  const noOpenMissingErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenMissingErrors'
+  const noPromptPullMissingOption =
+    'dvc.views.trackedExplorerTree.noPromptPullMissing'
 
   beforeEach(() => {
     restore()
@@ -43,7 +43,7 @@ suite('Extension Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     setConfigValue(noOpenBinaryErrorsOption, undefined)
-    setConfigValue(noOpenMissingErrorsOption, undefined)
+    setConfigValue(noPromptPullMissingOption, undefined)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -58,11 +58,14 @@ suite('Extension Test Suite', () => {
     })
 
     it('should be able to open a non-binary file', async () => {
-      const path = join(dvcDemoPath, 'logs', 'acc.tsv')
-      const uri = Uri.file(path)
+      const relPath = join('logs', 'acc.tsv')
+      stub(path, 'relative').returns(relPath)
+      const absPath = join(dvcDemoPath, relPath)
+
+      const uri = Uri.file(absPath)
 
       const mockShowTextDocument = stub(window, 'showTextDocument').resolves(({
-        document: { fileName: path }
+        document: { fileName: absPath }
       } as unknown) as TextEditor)
 
       const textEditor = (await commands.executeCommand(
@@ -70,7 +73,7 @@ suite('Extension Test Suite', () => {
         uri
       )) as TextEditor
 
-      expect(textEditor.document.fileName).to.equal(path)
+      expect(textEditor.document.fileName).to.equal(absPath)
       expect(mockShowTextDocument).to.be.calledWith(uri)
     })
 

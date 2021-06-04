@@ -67,15 +67,15 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
   }
 
-  private noOpenMissingErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenMissingErrors'
+  private noPromptPullMissingOption =
+    'dvc.views.trackedExplorerTree.noPromptPullMissing'
 
-  private handleOpenMissingError = async (dvcRoot: string, relPath: string) => {
-    if (getConfigValue(this.noOpenMissingErrorsOption)) {
+  private openPullPrompt = async (dvcRoot: string, relPath: string) => {
+    if (getConfigValue(this.noPromptPullMissingOption)) {
       return
     }
     const response = await window.showInformationMessage(
-      `Cannot open ${relPath}. The file does not exist at the specified path.`,
+      `Cannot open ${relPath} as it does not exist at the specified path.`,
       'Pull File',
       this.doNotShowAgainText
     )
@@ -85,18 +85,22 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
 
     if (response === this.doNotShowAgainText) {
-      return setConfigValue(this.noOpenMissingErrorsOption, true)
+      return setConfigValue(this.noPromptPullMissingOption, true)
     }
   }
 
   public openResource = (resource: Uri) => {
+    const path = resource.fsPath
+    const dvcRoot = this.pathRoots[path]
+    const relPath = relative(dvcRoot, path)
+
+    if (!exists(path)) {
+      return this.openPullPrompt(dvcRoot, relPath)
+    }
+
     return window.showTextDocument(resource).then(
       textEditor => textEditor,
       error => {
-        const path = resource.fsPath
-        const dvcRoot = this.pathRoots[path]
-        const relPath = relative(dvcRoot, path)
-
         if (
           error.message.includes(
             'File seems to be binary and cannot be opened as text'
@@ -104,10 +108,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         ) {
           return this.handleOpenBinaryError(relPath)
         }
-        if (error.message.includes('Unable to resolve non-existing file')) {
-          return this.handleOpenMissingError(dvcRoot, relPath)
-        }
-
         return window.showInformationMessage(error.message)
       }
     )

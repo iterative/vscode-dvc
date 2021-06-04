@@ -214,9 +214,9 @@
           "type": "boolean",
           "scope": "resource"
         },
-        "dvc.views.trackedExplorerTree.noOpenMissingErrors": {
-          "title": "%config.noOpenMissingErrors.title%",
-          "description": "%config.noOpenMissingErrors.description%",
+        "dvc.views.trackedExplorerTree.noPromptPullMissing": {
+          "title": "%config.noPromptPullMissing.title%",
+          "description": "%config.noPromptPullMissing.description%",
           "type": "boolean",
           "scope": "resource"
         }
