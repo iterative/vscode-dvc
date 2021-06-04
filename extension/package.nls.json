@@ -31,6 +31,6 @@
   "config.dvcPath.title": "DVC CLI Path",
   "config.defaultProject.description": "When enabled all generic commands will be run against this project.",
   "config.defaultProject.title": "DVC Default Project",
-  "config.noOpenFileErrors.description": "Suppress information regarding being unable to open files from the dvc tracked tree.",
-  "config.noOpenFileErrors.title": "DVC Tracked Tree - No File Opening Errors"
+  "config.noOpenBinaryErrors.description": "Suppress information regarding being unable to open binary files from the dvc tracked tree.",
+  "config.noOpenBinaryErrors.title": "DVC Tracked Tree - No Binary Opening Errors"
 }

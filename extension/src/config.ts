@@ -210,13 +210,14 @@ export class Config {
     statusBarItem.text = path
   }
 
-  private noOpenFileErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenFileErrors'
+  private noOpenBinaryErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
 
-  public getNoOpenFileErrors = () => getConfigValue(this.noOpenFileErrorsOption)
+  public getNoOpenBinaryErrors = () =>
+    getConfigValue(this.noOpenBinaryErrorsOption)
 
-  public setNoOpenFileErrors = (value: boolean): Thenable<void> =>
-    setConfigValue(this.noOpenFileErrorsOption, value)
+  public setNoOpenBinaryErrors = (value: boolean): Thenable<void> =>
+    setConfigValue(this.noOpenBinaryErrorsOption, value)
 
   constructor() {
     makeObservable(this)

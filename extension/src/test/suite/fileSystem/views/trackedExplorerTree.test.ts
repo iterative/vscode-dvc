@@ -31,8 +31,8 @@ suite('Extension Test Suite', () => {
   )
   const disposable = Disposable.fn()
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
-  const noOpenFileErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenFileErrors'
+  const noOpenBinaryErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
 
   beforeEach(() => {
     restore()
@@ -40,7 +40,7 @@ suite('Extension Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    setConfigValue(noOpenFileErrorsOption, undefined)
+    setConfigValue(noOpenBinaryErrorsOption, undefined)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -72,18 +72,20 @@ suite('Extension Test Suite', () => {
     })
 
     it('should only call showInformationMessage when trying to open a binary file without the no errors option set', async () => {
-      const path = join(dvcDemoPath, 'model.pt')
-      const uri = Uri.file(path)
+      const relPath = 'model.pt'
+      const absPath = join(dvcDemoPath, relPath)
+      const uri = Uri.file(absPath)
+      stub(path, 'relative').returns(relPath)
 
       const mockShowInformationMessage = stub(window, 'showInformationMessage')
 
-      expect(!!getConfigValue(noOpenFileErrorsOption)).to.be.false
+      expect(!!getConfigValue(noOpenBinaryErrorsOption)).to.be.false
       mockShowInformationMessage.resolves(undefined)
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(!!getConfigValue(noOpenFileErrorsOption)).to.be.false
+      expect(!!getConfigValue(noOpenBinaryErrorsOption)).to.be.false
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
         ('Do not show this message again.' as unknown) as MessageItem
@@ -92,13 +94,48 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(getConfigValue(noOpenFileErrorsOption)).to.be.true
+      expect(getConfigValue(noOpenBinaryErrorsOption)).to.be.true
       mockShowInformationMessage.resetHistory()
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).not.to.be.called
-      expect(getConfigValue(noOpenFileErrorsOption)).to.be.true
+      expect(getConfigValue(noOpenBinaryErrorsOption)).to.be.true
+    })
+
+    it('should be able to pull a file when trying to open it but it does not exist on disk', async () => {
+      const missingFile = 'non-existent.txt'
+      const absPath = join(dvcDemoPath, missingFile)
+      const uri = Uri.file(absPath)
+      stub(path, 'relative').returns(missingFile)
+
+      const mockShowInformationMessage = stub(window, 'showInformationMessage')
+
+      mockShowInformationMessage.resolves(undefined)
+      const mockProcess = stub(Process, 'executeProcess').resolves(
+        'M       non-existent.txt\n1 file modified'
+      )
+
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockProcess).not.to.be.called
+
+      mockShowInformationMessage.resetHistory()
+      mockShowInformationMessage.resolves(
+        ('Pull file' as unknown) as MessageItem
+      )
+
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockProcess).to.be.calledOnce
+      expect(mockProcess).to.be.calledWith({
+        args: ['pull', missingFile],
+        cwd: undefined,
+        env: process.env,
+        executable: 'dvc'
+      })
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {

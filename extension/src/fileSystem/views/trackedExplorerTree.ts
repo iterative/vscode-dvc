@@ -47,20 +47,48 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.reset()
   }
 
-  public openResource(resource: Uri) {
+  private handleOpenBinaryError = async (relPath: string) => {
+    if (this.config.getNoOpenBinaryErrors()) {
+      return
+    }
+    const response = await window.showInformationMessage(
+      `Cannot open ${relPath}. File seems to be binary and cannot be opened as text.`,
+      'Do not show messages like this again.'
+    )
+
+    if (response) {
+      return this.config.setNoOpenBinaryErrors(true)
+    }
+  }
+
+  private handleOpenMissingError = async (dvcRoot: string, relPath: string) => {
+    const response = await window.showInformationMessage(
+      `Cannot open ${relPath}. The file does not exist at the specified path`,
+      'Pull file'
+    )
+
+    if (response) {
+      return this.cliExecutor.pullTarget(dvcRoot, relPath)
+    }
+  }
+
+  public openResource = (resource: Uri) => {
     return window.showTextDocument(resource).then(
       textEditor => textEditor,
-      async error => {
-        if (this.config.getNoOpenFileErrors()) {
-          return
-        }
-        const response = await window.showInformationMessage(
-          error.message,
-          'Do not show this message again.'
-        )
+      error => {
+        const path = resource.fsPath
+        const dvcRoot = this.pathRoots[path]
+        const relPath = relative(dvcRoot, path)
 
-        if (response) {
-          return this.config.setNoOpenFileErrors(true)
+        if (
+          error.message.includes(
+            'File seems to be binary and cannot be opened as text'
+          )
+        ) {
+          return this.handleOpenBinaryError(relPath)
+        }
+        if (error.message.includes('Unable to resolve non-existing file')) {
+          return this.handleOpenMissingError(dvcRoot, relPath)
         }
       }
     )
