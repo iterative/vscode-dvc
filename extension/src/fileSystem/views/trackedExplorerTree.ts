@@ -90,6 +90,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         if (error.message.includes('Unable to resolve non-existing file')) {
           return this.handleOpenMissingError(dvcRoot, relPath)
         }
+
+        return window.showInformationMessage(error.message)
       }
     )
   }
