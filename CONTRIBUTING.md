@@ -18,22 +18,26 @@ See something that should be changed? Want to request a new feature? Open
 - Run `Tasks: Run Build Task` (Ctrl+Shift+b) to start the extension and webview
   development servers (alternatively run `yarn dev-server` from the terminal).
 
-- Open the test instance of VS Code with `Start Debugging` (f5). Note: selecting
-  the `Run Extension (Hot Reload + Dev UI for dev-server)` option when running
-  the debugger will prevent all other extensions from being loaded into the VS
-  code instance. This will improve the performance of VS code but cause certain
-  DVC commands to fail.
+- Open the Extension Development Host, a special VS Code instance with the
+  current source loaded as an extension, with `Start Debugging` (f5). Note:
+  selecting the `Run Extension (Hot Reload + Dev UI for dev-server)` option when
+  running the debugger will prevent all other extensions from being loaded into
+  the VS code instance. This will improve the performance of VS code but cause
+  certain DVC commands to fail.
 
 - To enable formatting on save install the `esbenp.prettier-vscode` extension
 
 ### Editor-agnostic Extension Development
 
-- run the `dev-server` script to start the extension and webview dev servers
-  (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
-  them individually).
+- run the `dev-server` script to start the extension and webview development
+  servers (alternatively, use `extension-dev-server` and `webview-dev-server` to
+  launch each server individually).
 
-- run the `dev-ui` script (or `dev-ui-win` on Windows) to launch VS code with
-  our extension installed.
+- run the `dev-ui` script to directly launch the Extension Development Host - a
+  special VS Code Insiders instance with the current repo loaded as an
+  extension. A directory can be appended to the dev UI to open it directly (e.g.
+  `yarn dev-ui ~/Projects/myDvcProject`). Without a project, the standard VSCode
+  behavior of re-opening the previously open project will happen.
 
 ### The demo project
 
