@@ -76,6 +76,9 @@ suite('Extension Test Suite', () => {
       const absPath = join(dvcDemoPath, relPath)
       const uri = Uri.file(absPath)
       stub(path, 'relative').returns(relPath)
+      stub(window, 'showTextDocument').rejects(
+        new Error('File seems to be binary and cannot be opened as text')
+      )
 
       const mockShowInformationMessage = stub(window, 'showInformationMessage')
 
