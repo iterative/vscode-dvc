@@ -213,6 +213,12 @@
           "description": "%config.noOpenBinaryErrors.description%",
           "type": "boolean",
           "scope": "resource"
+        },
+        "dvc.views.trackedExplorerTree.noOpenMissingErrors": {
+          "title": "%config.noOpenMissingErrors.title%",
+          "description": "%config.noOpenMissingErrors.description%",
+          "type": "boolean",
+          "scope": "resource"
         }
       }
     },

@@ -32,5 +32,7 @@
   "config.defaultProject.description": "When enabled all generic commands will be run against this project.",
   "config.defaultProject.title": "DVC Default Project",
   "config.noOpenBinaryErrors.description": "Silence errors relating to attempting to open unsupported dvc tracked files.",
-  "config.noOpenBinaryErrors.title": "DVC Tracked - No Binary Opening Errors"
+  "config.noOpenBinaryErrors.title": "DVC Tracked - No Binary Opening Errors",
+  "config.noOpenMissingErrors.description": "Silence errors relating to attempting to open dvc tracked files that do not exist.",
+  "config.noOpenMissingErrors.title": "DVC Tracked - No Missing File Opening Errors"
 }

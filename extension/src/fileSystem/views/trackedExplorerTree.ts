@@ -16,6 +16,7 @@ import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
+import { getConfigValue, setConfigValue } from '../../vscode/config'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -47,28 +48,44 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.reset()
   }
 
+  private doNotShowAgainText = 'Do not show messages like this again.'
+
+  private noOpenBinaryErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
+
   private handleOpenBinaryError = async (relPath: string) => {
-    if (this.config.getNoOpenBinaryErrors()) {
+    if (getConfigValue(this.noOpenBinaryErrorsOption)) {
       return
     }
     const response = await window.showInformationMessage(
       `Cannot open ${relPath}. File seems to be binary and cannot be opened as text.`,
-      'Do not show messages like this again.'
+      this.doNotShowAgainText
     )
 
     if (response) {
-      return this.config.setNoOpenBinaryErrors(true)
+      return setConfigValue(this.noOpenBinaryErrorsOption, true)
     }
   }
 
+  private noOpenMissingErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenMissingErrors'
+
   private handleOpenMissingError = async (dvcRoot: string, relPath: string) => {
+    if (getConfigValue(this.noOpenMissingErrorsOption)) {
+      return
+    }
     const response = await window.showInformationMessage(
       `Cannot open ${relPath}. The file does not exist at the specified path.`,
-      'Pull file'
+      'Pull file',
+      this.doNotShowAgainText
     )
 
-    if (response) {
+    if (response === 'Pull file') {
       return this.cliExecutor.pullTarget(dvcRoot, relPath)
+    }
+
+    if (response === this.doNotShowAgainText) {
+      return setConfigValue(this.noOpenMissingErrorsOption, true)
     }
   }
 

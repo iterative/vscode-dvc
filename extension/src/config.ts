@@ -210,15 +210,6 @@ export class Config {
     statusBarItem.text = path
   }
 
-  private noOpenBinaryErrorsOption =
-    'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
-
-  public getNoOpenBinaryErrors = () =>
-    getConfigValue(this.noOpenBinaryErrorsOption)
-
-  public setNoOpenBinaryErrors = (value: boolean): Thenable<void> =>
-    setConfigValue(this.noOpenBinaryErrorsOption, value)
-
   constructor() {
     makeObservable(this)
 

@@ -33,6 +33,8 @@ suite('Extension Test Suite', () => {
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
   const noOpenBinaryErrorsOption =
     'dvc.views.trackedExplorerTree.noOpenBinaryErrors'
+  const noOpenMissingErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenMissingErrors'
 
   beforeEach(() => {
     restore()
@@ -41,6 +43,7 @@ suite('Extension Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     setConfigValue(noOpenBinaryErrorsOption, undefined)
+    setConfigValue(noOpenMissingErrorsOption, undefined)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -71,7 +74,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowTextDocument).to.be.calledWith(uri)
     })
 
-    it('should only call showInformationMessage when trying to open a binary file without the no errors option set', async () => {
+    it('should only call showInformationMessage when trying to open a binary file without the no binary errors option set', async () => {
       const relPath = 'model.pt'
       const absPath = join(dvcDemoPath, relPath)
       const uri = Uri.file(absPath)
@@ -106,7 +109,7 @@ suite('Extension Test Suite', () => {
       expect(getConfigValue(noOpenBinaryErrorsOption)).to.be.true
     })
 
-    it('should be able to pull a file when trying to open it but it does not exist on disk', async () => {
+    it('should be able to pull a file after trying to open it and it does not exist on disk and the no missing errors option is unset', async () => {
       const missingFile = 'non-existent.txt'
       const absPath = join(dvcDemoPath, missingFile)
       const uri = Uri.file(absPath)
@@ -139,6 +142,24 @@ suite('Extension Test Suite', () => {
         env: process.env,
         executable: 'dvc'
       })
+
+      mockProcess.resetHistory()
+      mockShowInformationMessage.resetHistory()
+      mockShowInformationMessage.resolves(
+        ('Do not show messages like this again.' as unknown) as MessageItem
+      )
+
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockProcess).not.to.be.called
+
+      mockShowInformationMessage.resetHistory()
+
+      await commands.executeCommand(openFileCommand, uri)
+
+      expect(mockShowInformationMessage).not.to.be.called
+      expect(mockProcess).not.to.be.called
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
