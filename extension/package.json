@@ -207,6 +207,12 @@
           "description": "%config.dvcPath.description%",
           "type": "string",
           "scope": "resource"
+        },
+        "dvc.views.trackedExplorerTree.noOpenFileErrors": {
+          "title": "%config.noOpenFileErrors.title%",
+          "description": "%config.noOpenFileErrors.description%",
+          "type": "boolean",
+          "scope": "resource"
         }
       }
     },

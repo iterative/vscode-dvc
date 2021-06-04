@@ -210,6 +210,14 @@ export class Config {
     statusBarItem.text = path
   }
 
+  private noOpenFileErrorsOption =
+    'dvc.views.trackedExplorerTree.noOpenFileErrors'
+
+  public getNoOpenFileErrors = () => getConfigValue(this.noOpenFileErrorsOption)
+
+  public setNoOpenFileErrors = (value: boolean): Thenable<void> =>
+    setConfigValue(this.noOpenFileErrorsOption, value)
+
   constructor() {
     makeObservable(this)
 
