@@ -9,6 +9,7 @@ import { Disposable } from '../../../../extension'
 import { exists } from '../../../../fileSystem'
 import * as Process from '../../../../processExecution'
 import * as Workspace from '../../../../fileSystem/workspace'
+import * as FileSystem from '../../../../fileSystem'
 import { getConfigValue, setConfigValue } from '../../../../vscode/config'
 
 chai.use(sinonChai)
@@ -59,8 +60,9 @@ suite('Extension Test Suite', () => {
 
     it('should be able to open a non-binary file', async () => {
       const relPath = join('logs', 'acc.tsv')
-      stub(path, 'relative').returns(relPath)
       const absPath = join(dvcDemoPath, relPath)
+      stub(path, 'relative').returns(relPath)
+      stub(FileSystem, 'exists').returns(true)
 
       const uri = Uri.file(absPath)
 
@@ -82,6 +84,7 @@ suite('Extension Test Suite', () => {
       const absPath = join(dvcDemoPath, relPath)
       const uri = Uri.file(absPath)
       stub(path, 'relative').returns(relPath)
+      stub(FileSystem, 'exists').returns(true)
       stub(window, 'showTextDocument').rejects(
         new Error('File seems to be binary and cannot be opened as text')
       )
