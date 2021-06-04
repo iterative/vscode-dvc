@@ -63,7 +63,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private handleOpenMissingError = async (dvcRoot: string, relPath: string) => {
     const response = await window.showInformationMessage(
-      `Cannot open ${relPath}. The file does not exist at the specified path`,
+      `Cannot open ${relPath}. The file does not exist at the specified path.`,
       'Pull file'
     )
 
