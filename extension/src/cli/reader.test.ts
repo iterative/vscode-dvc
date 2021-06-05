@@ -1,11 +1,11 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
+import complexExperimentsOutput from 'fixtures/expShow/complex.json'
 import { CliResult } from '.'
 import { CliReader } from './reader'
 import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
-import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
 import { Config } from '../config'
 
 jest.mock('vscode')
