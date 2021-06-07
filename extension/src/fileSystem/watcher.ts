@@ -6,19 +6,23 @@ import { TrackedExplorerTree } from './views/trackedExplorerTree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/table'
 
+const isExcluded = (path: string) =>
+  !path || path.includes(EXPERIMENTS_GIT_REFS)
+
+const requiresReset = (path: string) =>
+  extname(path) === '.dvc' ||
+  basename(path) === 'dvc.lock' ||
+  basename(path) === 'dvc.yaml'
+
 export const getRepositoryWatcher = (
   repository: Repository,
   trackedExplorerTree: TrackedExplorerTree
 ): ((path: string) => void) => (path: string) => {
-  if (!path || path.includes(EXPERIMENTS_GIT_REFS)) {
+  if (isExcluded(path)) {
     return
   }
 
-  if (
-    extname(path) === '.dvc' ||
-    basename(path) === 'dvc.lock' ||
-    basename(path) === 'dvc.yaml'
-  ) {
+  if (requiresReset(path)) {
     repository.resetState()
     trackedExplorerTree.reset()
     return
