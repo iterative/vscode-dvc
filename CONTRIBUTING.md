@@ -6,11 +6,7 @@ See something that should be changed? Want to request a new feature? Open
 # Development Setup
 
 Ensure [Yarn](https://yarnpkg.com/), [DVC](https://dvc.org/doc/install), and
-[Visual Studio Code Insiders Edition](https://code.visualstudio.com/insiders/)
-are installed.
-
-Stable Visual Studio Code can also be used, but it could break for features of
-this Extension that depend on proposed API features that haven't hit stable yet.
+[Visual Studio Code](https://code.visualstudio.com) are installed.
 
 ## Development Environment
 
@@ -55,7 +51,8 @@ the ability to run the extension with VS Code Stable edition.
 
 This option lacks access to the debugger, but uses less resources if using an
 editor other then VS Code to work on this project. These scripts also assume
-`code-insiders` is installed and accessible.
+`code` is installed and accessible on `$PATH` (i.e. it can be run on the command
+line).
 
 - run `yarn dev-server` to start the extension and webview dev servers
   (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
