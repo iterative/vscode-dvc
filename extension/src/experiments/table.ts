@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
@@ -8,6 +8,8 @@ import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { Logger } from '../common/logger'
+
+export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -47,7 +49,7 @@ export class ExperimentsTable {
   }
 
   public onDidChangeData(gitRoot: string): void {
-    const refsPath = resolve(gitRoot, '.git', 'refs', 'exps')
+    const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
     this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
   }
 

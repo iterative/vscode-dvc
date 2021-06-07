@@ -47,7 +47,18 @@ describe('getRepositoryWatcher', () => {
     expect(mockedReset).not.toBeCalled()
   })
 
-  it('should return a function that calls reset if it called with a .dvc data placeholder', () => {
+  it('should return a function that does nothing if an experiments git refs path is provided', () => {
+    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+
+    watcher(join(__dirname, '.git', 'refs', 'exps', '0F'))
+
+    expect(mockedResetState).not.toBeCalled()
+    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedRefresh).not.toBeCalled()
+    expect(mockedReset).not.toBeCalled()
+  })
+
+  it('should return a function that calls reset if it is called with a .dvc data placeholder', () => {
     const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(join('some', 'dvc', 'repo', 'data', 'placeholder.dvc'))
@@ -59,7 +70,7 @@ describe('getRepositoryWatcher', () => {
     expect(mockedRefresh).not.toBeCalled()
   })
 
-  it('should return a function that calls reset if it called with a dvc.yml', () => {
+  it('should return a function that calls reset if it is called with a dvc.yml', () => {
     const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(join('some', 'dvc', 'repo', 'data', 'dvc.yaml'))
@@ -71,7 +82,7 @@ describe('getRepositoryWatcher', () => {
     expect(mockedRefresh).not.toBeCalled()
   })
 
-  it('should return a function that calls reset if it called with a dvc.lock', () => {
+  it('should return a function that calls reset if it is called with a dvc.lock', () => {
     const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(join('some', 'dvc', 'repo', 'data', 'dvc.lock'))
@@ -83,7 +94,7 @@ describe('getRepositoryWatcher', () => {
     expect(mockedRefresh).not.toBeCalled()
   })
 
-  it('should return a function that calls update if it called with anything else', () => {
+  it('should return a function that calls update if it is called with anything else', () => {
     const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
 
     watcher(__filename)
