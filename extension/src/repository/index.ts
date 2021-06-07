@@ -31,15 +31,21 @@ export class Repository {
     return this.model.getState()
   }
 
+  private getBaseData = (): [
+    Promise<DiffOutput>,
+    Promise<StatusOutput>,
+    Promise<Set<string>>
+  ] => [
+    this.cliReader.diff(this.dvcRoot),
+    this.cliReader.status(this.dvcRoot),
+    getAllUntracked(this.dvcRoot)
+  ]
+
   private getUpdateData = async (
     waitBeforeRetry = 500
   ): Promise<[DiffOutput, StatusOutput, Set<string>]> => {
     try {
-      return await Promise.all([
-        this.cliReader.diff(this.dvcRoot),
-        this.cliReader.status(this.dvcRoot),
-        getAllUntracked(this.dvcRoot)
-      ])
+      return await Promise.all(this.getBaseData())
     } catch (e) {
       Logger.error(`Repository update failed with ${e} retrying...`)
       await delay(waitBeforeRetry)
@@ -52,9 +58,7 @@ export class Repository {
   ): Promise<[DiffOutput, StatusOutput, Set<string>, ListOutput[]]> => {
     try {
       return await Promise.all([
-        this.cliReader.diff(this.dvcRoot),
-        this.cliReader.status(this.dvcRoot),
-        getAllUntracked(this.dvcRoot),
+        ...this.getBaseData(),
         this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
       ])
     } catch (e) {
