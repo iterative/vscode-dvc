@@ -15,13 +15,15 @@ this Extension API the depend on proposed features that haven't hit stable yet.
 ## Development Options
 
 There are two different ways to spin up a development environment: using an
-instance of Visual Studio Code or using the shell. Both options are equally
-capable, other than the full-featured debugger only being accessible in VS Code.
+instance of Visual Studio Code or using the shell. Which one a contributor uses
+is up to individual preference, though the VS Code method has some extra
+features that the shell method can't replicate.
 
 ### VS Code development environment
 
 This option is generally best for developers using VS Code as an editor to
-develop this extension. It also uniquely has access to the VS Code debugger.
+develop this extension. It also uniquely has access to the VS Code debugger and
+the ability to run the extension with VS Code Stable edition.
 
 - Open the monorepo root as a project in VS Code
 
@@ -47,7 +49,8 @@ develop this extension. It also uniquely has access to the VS Code debugger.
 ### Shell-based development environment
 
 This option lacks access to the debugger, but uses less resources if using an
-editor other then VS Code to work on this project.
+editor other then VS Code to work on this project. These scripts also assume
+`code-insiders` is installed and accessible.
 
 - run `yarn dev-server` to start the extension and webview dev servers
   (alternatively, use `extension-dev-server` and `webview-dev-server` to launch
