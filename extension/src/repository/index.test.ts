@@ -66,19 +66,22 @@ describe('Repository', () => {
   const emptyState = new RepositoryModel(dvcRoot).getState()
   const emptySet = new Set<string>()
 
+  const logDir = 'logs'
+  const logAcc = join(logDir, 'acc.tsv')
+  const logLoss = join(logDir, 'loss.tsv')
+  const MNISTDir = join('data', 'MNIST')
+  const dataDir = join(MNISTDir, 'raw')
+  const model = 'model.pt'
+  const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
+  const dataset = join(dataDir, 't10k-images-idx3-ubyte')
+
   describe('ready', () => {
     it('should wait for the state to be ready before resolving', async () => {
-      const logDir = 'logs'
-      const logAcc = join(logDir, 'acc.tsv')
-      const logLoss = join(logDir, 'loss.tsv')
-      const MNISTDataDir = join('data', 'MNIST')
-      const rawDataDir = join(MNISTDataDir, 'raw')
-      const model = 'model.pt'
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: logAcc },
         { path: logLoss },
         { path: model },
-        { path: rawDataDir }
+        { path: dataDir }
       ] as ListOutput[])
 
       mockedStatus.mockResolvedValueOnce(({
@@ -100,7 +103,7 @@ describe('Repository', () => {
           { path: logDir },
           { path: logAcc },
           { path: logLoss },
-          { path: MNISTDataDir }
+          { path: MNISTDir }
         ],
         'not in cache': [],
         renamed: []
@@ -125,14 +128,14 @@ describe('Repository', () => {
       )
       await repository.isReady()
 
-      const modified = new Set([resolve(dvcRoot, rawDataDir)])
+      const modified = new Set([resolve(dvcRoot, dataDir)])
       const tracked = new Set([
         resolve(dvcRoot, logAcc),
         resolve(dvcRoot, logLoss),
         resolve(dvcRoot, model),
-        resolve(dvcRoot, rawDataDir),
+        resolve(dvcRoot, dataDir),
         resolve(dvcRoot, logDir),
-        resolve(dvcRoot, MNISTDataDir)
+        resolve(dvcRoot, MNISTDir)
       ])
 
       expect(mockedDiff).toBeCalledWith(dvcRoot)
@@ -175,14 +178,6 @@ describe('Repository', () => {
         decorationProvider
       )
       await repository.isReady()
-
-      const dataDir = 'data/MNIST/raw'
-      const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
-      const dataset = join(dataDir, 't10k-images-idx3-ubyte')
-      const logDir = 'logs'
-      const logAcc = join(logDir, 'acc.tsv')
-      const logLoss = join(logDir, 'loss.tsv')
-      const model = 'model.pt'
 
       mockedDiff.mockResolvedValueOnce(({
         added: [],
@@ -267,14 +262,11 @@ describe('Repository', () => {
       )
       await repository.isReady()
 
-      const logDir = 'logs'
-      const logAcc = join(logDir, 'acc.tsv')
-      const logLoss = join(logDir, 'loss.tsv')
       const dataDir = 'data'
       const features = join(dataDir, 'features')
       const dataXml = join(dataDir, 'data.xml')
       const prepared = join(dataDir, 'prepared')
-      const model = 'model.pt'
+
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: logAcc },
         { path: logLoss },
@@ -387,14 +379,6 @@ describe('Repository', () => {
       )
       await repository.isReady()
 
-      const dataDir = 'data/MNIST/raw'
-      const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
-      const dataset = join(dataDir, 't10k-images-idx3-ubyte')
-      const logDir = 'logs'
-      const logAcc = join(logDir, 'acc.tsv')
-      const logLoss = join(logDir, 'loss.tsv')
-      const model = 'model.pt'
-
       mockedDiff
         .mockRejectedValueOnce("I tried but I just couldn't do it")
         .mockResolvedValueOnce({})
@@ -505,10 +489,7 @@ describe('Repository', () => {
 
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([] as ListOutput[])
 
-      const firstReset = repository.resetState()
-      const secondReset = repository.resetState()
-
-      await Promise.all([firstReset, secondReset])
+      await Promise.all([repository.resetState(), repository.resetState()])
 
       expect(mockedDiff).toBeCalledTimes(2)
       expect(mockedStatus).toBeCalledTimes(2)
@@ -519,11 +500,6 @@ describe('Repository', () => {
 
   describe('updateState', () => {
     it('should retry if one of the underlying commands fails', async () => {
-      const MNISTDir = join('data', 'MNIST')
-      const dataDir = join(MNISTDir, 'raw')
-      const logDir = 'logs'
-      const model = 'model.pt'
-
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: dataDir },
