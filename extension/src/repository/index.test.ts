@@ -13,6 +13,7 @@ import {
   StatusOutput
 } from '../cli/reader'
 import { getAllUntracked } from '../git'
+import { delay } from '../util'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/sourceControlManagement')
@@ -20,6 +21,8 @@ jest.mock('./decorationProvider')
 jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
+jest.mock('../util')
+jest.mock('../common/logger')
 
 const mockedListDvcOnlyRecursive = jest.fn()
 const mockedDiff = jest.fn()
@@ -33,6 +36,8 @@ const mockedDecorationProvider = mocked(DecorationProvider)
 const mockedSetDecorationState = jest.fn()
 
 const mockedDisposable = mocked(Disposable)
+
+const mockedDelay = mocked(delay)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -360,6 +365,241 @@ describe('Repository', () => {
         repository.getState()
       )
       expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
+    })
+
+    it('should retry if one of the underlying commands fails', async () => {
+      mockedDiff.mockResolvedValueOnce({})
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedStatus.mockResolvedValueOnce({})
+      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
+      const decorationProvider = new DecorationProvider()
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedCliReader,
+        decorationProvider
+      )
+      await repository.isReady()
+
+      const dataDir = 'data/MNIST/raw'
+      const compressedDataset = join(dataDir, 't10k-images-idx3-ubyte.gz')
+      const dataset = join(dataDir, 't10k-images-idx3-ubyte')
+      const logDir = 'logs'
+      const logAcc = join(logDir, 'acc.tsv')
+      const logLoss = join(logDir, 'loss.tsv')
+      const model = 'model.pt'
+
+      mockedDiff
+        .mockRejectedValueOnce("I tried but I just couldn't do it")
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce(({
+          added: [],
+          deleted: [{ path: model }, { path: dataDir }],
+          modified: [],
+          'not in cache': []
+        } as unknown) as DiffOutput)
+
+      mockedStatus
+        .mockResolvedValueOnce({})
+        .mockRejectedValueOnce('I failed on the second attempt')
+        .mockResolvedValueOnce(({
+          'data/MNIST/raw.dvc': [
+            { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
+          ],
+          train: [
+            {
+              'changed deps': {
+                'data/MNIST': 'modified',
+                'train.py': 'modified'
+              }
+            },
+            { 'changed outs': { 'model.pt': 'deleted' } }
+          ]
+        } as unknown) as StatusOutput)
+
+      mockedGetAllUntracked
+        .mockResolvedValueOnce(emptySet)
+        .mockResolvedValueOnce(emptySet)
+        .mockResolvedValueOnce(emptySet)
+
+      mockedListDvcOnlyRecursive
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([
+          { path: compressedDataset },
+          { path: dataset },
+          { path: logAcc },
+          { path: logLoss },
+          { path: model }
+        ] as ListOutput[])
+
+      expect(repository.getState()).toEqual(emptyState)
+      mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
+
+      await repository.resetState()
+
+      expect(mockedDelay).toBeCalledTimes(2)
+      expect(mockedDelay).toBeCalledWith(500)
+      expect(mockedDelay).toBeCalledWith(1000)
+
+      const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
+
+      const tracked = new Set([
+        resolve(dvcRoot, compressedDataset),
+        resolve(dvcRoot, dataset),
+        resolve(dvcRoot, logAcc),
+        resolve(dvcRoot, logLoss),
+        resolve(dvcRoot, model),
+        resolve(dvcRoot, dataDir),
+        resolve(dvcRoot, logDir)
+      ])
+
+      expect(mockedDiff).toBeCalledTimes(4)
+      expect(mockedStatus).toBeCalledTimes(4)
+      expect(mockedGetAllUntracked).toBeCalledTimes(4)
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(4)
+
+      expect(repository.getState()).toEqual({
+        added: emptySet,
+        deleted,
+        modified: emptySet,
+        notInCache: emptySet,
+        renamed: emptySet,
+        stageModified: emptySet,
+        tracked,
+        untracked: emptySet
+      })
+    })
+
+    it('should only try to reset the data once if called in quick succession', async () => {
+      mockedDiff.mockResolvedValueOnce({})
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
+      mockedStatus.mockResolvedValueOnce({})
+      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
+      const decorationProvider = new DecorationProvider()
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedCliReader,
+        decorationProvider
+      )
+      await repository.isReady()
+
+      mockedDiff.mockResolvedValueOnce({} as DiffOutput)
+
+      mockedStatus.mockResolvedValueOnce({} as StatusOutput)
+
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
+
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([] as ListOutput[])
+
+      const firstReset = repository.resetState()
+      const secondReset = repository.resetState()
+
+      await Promise.all([firstReset, secondReset])
+
+      expect(mockedDiff).toBeCalledTimes(2)
+      expect(mockedStatus).toBeCalledTimes(2)
+      expect(mockedGetAllUntracked).toBeCalledTimes(2)
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(2)
+    })
+  })
+
+  describe('updateState', () => {
+    it('should retry if one of the underlying commands fails', async () => {
+      const MNISTDir = join('data', 'MNIST')
+      const dataDir = join(MNISTDir, 'raw')
+      const logDir = 'logs'
+      const model = 'model.pt'
+
+      mockedDiff.mockResolvedValueOnce({})
+      mockedListDvcOnlyRecursive.mockResolvedValueOnce([
+        { path: dataDir },
+        { path: logDir },
+        { path: model }
+      ] as ListOutput[])
+      mockedStatus.mockResolvedValueOnce({})
+      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+
+      const mockedCliReader = ({
+        diff: mockedDiff,
+        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
+        status: mockedStatus
+      } as unknown) as CliReader
+      const decorationProvider = new DecorationProvider()
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedCliReader,
+        decorationProvider
+      )
+      await repository.isReady()
+
+      mockedDiff
+        .mockRejectedValueOnce("I also tried but I just couldn't do it")
+        .mockResolvedValueOnce({})
+        .mockResolvedValueOnce(({
+          added: [],
+          deleted: [{ path: model }],
+          modified: [{ path: dataDir }],
+          'not in cache': []
+        } as unknown) as DiffOutput)
+
+      mockedStatus
+        .mockResolvedValueOnce({})
+        .mockRejectedValueOnce('I also failed on the second attempt')
+        .mockResolvedValueOnce({})
+
+      mockedGetAllUntracked
+        .mockResolvedValueOnce(emptySet)
+        .mockResolvedValueOnce(emptySet)
+        .mockResolvedValueOnce(emptySet)
+
+      mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
+
+      await repository.updateState()
+
+      expect(mockedDelay).toBeCalledTimes(2)
+      expect(mockedDelay).toBeCalledWith(500)
+      expect(mockedDelay).toBeCalledWith(1000)
+
+      const deleted = new Set([join(dvcRoot, model)])
+      const stageModified = new Set([join(dvcRoot, dataDir)])
+
+      const tracked = new Set([
+        resolve(dvcRoot, model),
+        resolve(dvcRoot, MNISTDir),
+        resolve(dvcRoot, dataDir),
+        resolve(dvcRoot, logDir)
+      ])
+
+      expect(mockedDiff).toBeCalledTimes(4)
+      expect(mockedStatus).toBeCalledTimes(4)
+      expect(mockedGetAllUntracked).toBeCalledTimes(4)
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
+
+      expect(repository.getState()).toEqual({
+        added: emptySet,
+        deleted,
+        modified: emptySet,
+        notInCache: emptySet,
+        renamed: emptySet,
+        stageModified,
+        tracked,
+        untracked: emptySet
+      })
     })
   })
 })
