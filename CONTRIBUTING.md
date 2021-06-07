@@ -10,7 +10,7 @@ Ensure [Yarn](https://yarnpkg.com/), [DVC](https://dvc.org/doc/install), and
 are installed.
 
 Stable Visual Studio Code can also be used, but it could break for features of
-this Extension API the depend on proposed features that haven't hit stable yet.
+this Extension that depend on proposed API features that haven't hit stable yet.
 
 ## Development Options
 
@@ -19,7 +19,7 @@ instance of Visual Studio Code or using the shell. Which one a contributor uses
 is up to individual preference, though the VS Code method has some extra
 features that the shell method can't replicate.
 
-### VS Code development environment
+### VS Code Development Environment
 
 This option is generally best for developers using VS Code as an editor to
 develop this extension. It also uniquely has access to the VS Code debugger and
@@ -46,7 +46,7 @@ the ability to run the extension with VS Code Stable edition.
   Optional, but highly recommended as PRs with improper format will be blocked
   from merge until the issue is fixed.
 
-### Shell-based development environment
+### Shell-based Development Environment
 
 This option lacks access to the debugger, but uses less resources if using an
 editor other then VS Code to work on this project. These scripts also assume
