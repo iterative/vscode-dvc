@@ -46,7 +46,9 @@ export class Repository {
     waitBeforeRetry = 500
   ): Promise<T> => {
     try {
-      return ((await Promise.all(getNewPromises())) as unknown) as T
+      const promises = getNewPromises()
+      const data = await Promise.all(promises)
+      return (data as unknown) as T
     } catch (e) {
       Logger.error(`Repository data update failed with ${e} retrying...`)
       await delay(waitBeforeRetry)
