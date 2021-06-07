@@ -41,7 +41,7 @@ export class Repository {
     getAllUntracked(this.dvcRoot)
   ]
 
-  private retryPromises = async <T>(
+  private retryUntilAllResolved = async <T>(
     getNewPromises: () => Promise<unknown>[],
     waitBeforeRetry = 500
   ): Promise<T> => {
@@ -52,14 +52,14 @@ export class Repository {
     } catch (e) {
       Logger.error(`Repository data update failed with ${e} retrying...`)
       await delay(waitBeforeRetry)
-      return this.retryPromises(getNewPromises, waitBeforeRetry * 2)
+      return this.retryUntilAllResolved(getNewPromises, waitBeforeRetry * 2)
     }
   }
 
   private getUpdateData = (): Promise<
     [DiffOutput, StatusOutput, Set<string>]
   > =>
-    this.retryPromises<[DiffOutput, StatusOutput, Set<string>]>(
+    this.retryUntilAllResolved<[DiffOutput, StatusOutput, Set<string>]>(
       this.getBaseData
     )
 
@@ -70,7 +70,7 @@ export class Repository {
       ...this.getBaseData(),
       this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
     ]
-    return this.retryPromises<
+    return this.retryUntilAllResolved<
       [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
     >(getNewPromises)
   }
