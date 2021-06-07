@@ -6,6 +6,8 @@ import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput, CliReader } from '../cli/reader'
 import { getAllUntracked } from '../git'
+import { Logger } from '../common/logger'
+import { delay } from '../util'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
@@ -29,36 +31,67 @@ export class Repository {
     return this.model.getState()
   }
 
-  private getUpdateData(): Promise<[DiffOutput, StatusOutput, Set<string>]> {
-    return Promise.all([
-      this.cliReader.diff(this.dvcRoot),
-      this.cliReader.status(this.dvcRoot),
-      getAllUntracked(this.dvcRoot)
-    ])
+  private getBaseData = (): [
+    Promise<DiffOutput>,
+    Promise<StatusOutput>,
+    Promise<Set<string>>
+  ] => [
+    this.cliReader.diff(this.dvcRoot),
+    this.cliReader.status(this.dvcRoot),
+    getAllUntracked(this.dvcRoot)
+  ]
+
+  private retryUntilAllResolved = async <T>(
+    getNewPromises: () => Promise<unknown>[],
+    waitBeforeRetry = 500
+  ): Promise<T> => {
+    try {
+      const promises = getNewPromises()
+      const data = await Promise.all(promises)
+      return (data as unknown) as T
+    } catch (e) {
+      Logger.error(`Repository data update failed with ${e} retrying...`)
+      await delay(waitBeforeRetry)
+      return this.retryUntilAllResolved(getNewPromises, waitBeforeRetry * 2)
+    }
   }
 
-  private getRefreshData(): Promise<
+  private getUpdateData = (): Promise<
+    [DiffOutput, StatusOutput, Set<string>]
+  > =>
+    this.retryUntilAllResolved<[DiffOutput, StatusOutput, Set<string>]>(
+      this.getBaseData
+    )
+
+  private getResetData = (): Promise<
     [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
-  > {
-    return Promise.all([
-      this.cliReader.diff(this.dvcRoot),
-      this.cliReader.status(this.dvcRoot),
-      getAllUntracked(this.dvcRoot),
+  > => {
+    const getNewPromises = () => [
+      ...this.getBaseData(),
       this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
-    ])
+    ]
+    return this.retryUntilAllResolved<
+      [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
+    >(getNewPromises)
   }
+
+  private resetInProgress = false
 
   public async resetState() {
-    const [
-      diffFromHead,
-      diffFromCache,
-      untracked,
-      tracked
-    ] = await this.getRefreshData()
+    if (!this.resetInProgress) {
+      this.resetInProgress = true
+      const [
+        diffFromHead,
+        diffFromCache,
+        untracked,
+        tracked
+      ] = await this.getResetData()
 
-    this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
+      this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
-    this.setState()
+      this.setState()
+      this.resetInProgress = false
+    }
   }
 
   private setState() {
@@ -66,11 +99,21 @@ export class Repository {
     this.decorationProvider?.setState(this.getState())
   }
 
-  public async updateState() {
-    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
+  private updateInProgress = false
 
-    this.model.setState({ diffFromCache, diffFromHead, untracked })
-    this.setState()
+  public async updateState() {
+    if (!this.updateInProgress && !this.resetInProgress) {
+      this.updateInProgress = true
+      const [
+        diffFromHead,
+        diffFromCache,
+        untracked
+      ] = await this.getUpdateData()
+
+      this.model.setState({ diffFromCache, diffFromHead, untracked })
+      this.setState()
+      this.updateInProgress = false
+    }
   }
 
   private async setup() {
