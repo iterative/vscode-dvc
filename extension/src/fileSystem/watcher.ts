@@ -4,14 +4,16 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { TrackedExplorerTree } from './views/trackedExplorerTree'
 import { Repository } from '../repository'
+import { EXPERIMENTS_GIT_REFS } from '../experiments/table'
 
 export const getRepositoryWatcher = (
   repository: Repository,
   trackedExplorerTree: TrackedExplorerTree
 ): ((path: string) => void) => (path: string) => {
-  if (!path) {
+  if (!path || path.includes(EXPERIMENTS_GIT_REFS)) {
     return
   }
+
   if (
     extname(path) === '.dvc' ||
     basename(path) === 'dvc.lock' ||
