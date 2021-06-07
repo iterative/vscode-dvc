@@ -41,31 +41,36 @@ export class Repository {
     getAllUntracked(this.dvcRoot)
   ]
 
-  private getUpdateData = async (
+  private retryPromises = async <T>(
+    getNewPromises: () => Promise<unknown>[],
     waitBeforeRetry = 500
-  ): Promise<[DiffOutput, StatusOutput, Set<string>]> => {
+  ): Promise<T> => {
     try {
-      return await Promise.all(this.getBaseData())
+      return ((await Promise.all(getNewPromises())) as unknown) as T
     } catch (e) {
-      Logger.error(`Repository update failed with ${e} retrying...`)
+      Logger.error(`Repository data update failed with ${e} retrying...`)
       await delay(waitBeforeRetry)
-      return this.getUpdateData(waitBeforeRetry * 2)
+      return this.retryPromises(getNewPromises, waitBeforeRetry * 2)
     }
   }
 
-  private getResetData = async (
-    waitBeforeRetry = 500
-  ): Promise<[DiffOutput, StatusOutput, Set<string>, ListOutput[]]> => {
-    try {
-      return await Promise.all([
-        ...this.getBaseData(),
-        this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
-      ])
-    } catch (e) {
-      Logger.error(`Repository refresh failed with ${e} retrying...`)
-      await delay(waitBeforeRetry)
-      return this.getResetData(waitBeforeRetry * 2)
-    }
+  private getUpdateData = (): Promise<
+    [DiffOutput, StatusOutput, Set<string>]
+  > =>
+    this.retryPromises<[DiffOutput, StatusOutput, Set<string>]>(
+      this.getBaseData
+    )
+
+  private getResetData = (): Promise<
+    [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
+  > => {
+    const getNewPromises = () => [
+      ...this.getBaseData(),
+      this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
+    ]
+    return this.retryPromises<
+      [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
+    >(getNewPromises)
   }
 
   private resetInProgress = false
