@@ -16,6 +16,7 @@ import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
+import { getConfigValue, setConfigValue } from '../../vscode/config'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -47,10 +48,68 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.reset()
   }
 
-  public openResource(resource: Uri) {
+  private doNotShowAgainText = "Don't Show Again"
+
+  private noOpenUnsupportedOption =
+    'dvc.views.trackedExplorerTree.noOpenUnsupported'
+
+  private handleOpenUnsupportedError = async (relPath: string) => {
+    if (getConfigValue(this.noOpenUnsupportedOption)) {
+      return
+    }
+    const response = await window.showInformationMessage(
+      `Cannot open ${relPath}. File is unsupported and cannot be opened as text.`,
+      this.doNotShowAgainText
+    )
+
+    if (response) {
+      return setConfigValue(this.noOpenUnsupportedOption, true)
+    }
+  }
+
+  private noPromptPullMissingOption =
+    'dvc.views.trackedExplorerTree.noPromptPullMissing'
+
+  private openPullPrompt = async (dvcRoot: string, relPath: string) => {
+    if (getConfigValue(this.noPromptPullMissingOption)) {
+      return
+    }
+    const response = await window.showInformationMessage(
+      `${relPath} does not exist at the specified path.`,
+      'Pull File',
+      this.doNotShowAgainText
+    )
+
+    if (response === 'Pull File') {
+      return this.cliExecutor.pullTarget(dvcRoot, relPath)
+    }
+
+    if (response === this.doNotShowAgainText) {
+      return setConfigValue(this.noPromptPullMissingOption, true)
+    }
+  }
+
+  public openResource = (resource: Uri) => {
+    const path = resource.fsPath
+    const dvcRoot = this.pathRoots[path]
+    const relPath = relative(dvcRoot, path)
+
+    if (!exists(path)) {
+      return this.openPullPrompt(dvcRoot, relPath)
+    }
+
     return window.showTextDocument(resource).then(
       textEditor => textEditor,
-      error => window.showErrorMessage(error.message)
+      error => {
+        if (
+          error.message.includes(
+            'File seems to be binary and cannot be opened as text'
+          )
+        ) {
+          return this.handleOpenUnsupportedError(relPath)
+        }
+        return window.showInformationMessage(error.message)
+      }
     )
   }
 

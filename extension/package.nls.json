@@ -30,5 +30,9 @@
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
   "config.dvcPath.title": "DVC CLI Path",
   "config.defaultProject.description": "When enabled all generic commands will be run against this project.",
-  "config.defaultProject.title": "DVC Default Project"
+  "config.defaultProject.title": "DVC Default Project",
+  "config.noOpenUnsupported.description": "Do not attempt to open dvc tracked files that are not supported by the text editor.",
+  "config.noOpenUnsupported.title": "DVC Tracked - No Open Unsupported Files",
+  "config.noPromptPullMissing.description": "Do not prompt to pull dvc tracked files that do not exist.",
+  "config.noPromptPullMissing.title": "DVC Tracked - No Prompt On Missing"
 }
