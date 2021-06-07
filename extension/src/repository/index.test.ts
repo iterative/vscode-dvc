@@ -163,7 +163,7 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const mockedCliReader = ({
         diff: mockedDiff,
@@ -246,7 +246,7 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const mockedCliReader = ({
         diff: mockedDiff,
@@ -363,7 +363,7 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const mockedCliReader = ({
         diff: mockedDiff,
@@ -380,6 +380,7 @@ describe('Repository', () => {
       await repository.isReady()
 
       mockedDiff
+        .mockReset()
         .mockRejectedValueOnce("I tried but I just couldn't do it")
         .mockResolvedValueOnce({})
         .mockResolvedValueOnce(({
@@ -390,6 +391,7 @@ describe('Repository', () => {
         } as unknown) as DiffOutput)
 
       mockedStatus
+        .mockReset()
         .mockResolvedValueOnce({})
         .mockRejectedValueOnce('I failed on the second attempt')
         .mockResolvedValueOnce(({
@@ -408,11 +410,13 @@ describe('Repository', () => {
         } as unknown) as StatusOutput)
 
       mockedGetAllUntracked
+        .mockReset()
         .mockResolvedValueOnce(emptySet)
         .mockResolvedValueOnce(emptySet)
         .mockResolvedValueOnce(emptySet)
 
       mockedListDvcOnlyRecursive
+        .mockReset()
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
@@ -444,10 +448,10 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir)
       ])
 
-      expect(mockedDiff).toBeCalledTimes(4)
-      expect(mockedStatus).toBeCalledTimes(4)
-      expect(mockedGetAllUntracked).toBeCalledTimes(4)
-      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(4)
+      expect(mockedDiff).toBeCalledTimes(3)
+      expect(mockedStatus).toBeCalledTimes(3)
+      expect(mockedGetAllUntracked).toBeCalledTimes(3)
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(3)
 
       expect(repository.getState()).toEqual({
         added: emptySet,
@@ -465,7 +469,7 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const mockedCliReader = ({
         diff: mockedDiff,
@@ -481,20 +485,20 @@ describe('Repository', () => {
       )
       await repository.isReady()
 
-      mockedDiff.mockResolvedValueOnce({} as DiffOutput)
+      mockedDiff.mockReset().mockResolvedValueOnce({})
 
-      mockedStatus.mockResolvedValueOnce({} as StatusOutput)
+      mockedStatus.mockReset().mockResolvedValueOnce({})
 
-      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
+      mockedGetAllUntracked.mockReset().mockResolvedValueOnce(emptySet)
 
-      mockedListDvcOnlyRecursive.mockResolvedValueOnce([] as ListOutput[])
+      mockedListDvcOnlyRecursive.mockReset().mockResolvedValueOnce([])
 
       await Promise.all([repository.resetState(), repository.resetState()])
 
-      expect(mockedDiff).toBeCalledTimes(2)
-      expect(mockedStatus).toBeCalledTimes(2)
-      expect(mockedGetAllUntracked).toBeCalledTimes(2)
-      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(2)
+      expect(mockedDiff).toBeCalledTimes(1)
+      expect(mockedStatus).toBeCalledTimes(1)
+      expect(mockedGetAllUntracked).toBeCalledTimes(1)
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
     })
   })
 
@@ -507,7 +511,7 @@ describe('Repository', () => {
         { path: model }
       ] as ListOutput[])
       mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(new Set())
+      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const mockedCliReader = ({
         diff: mockedDiff,
@@ -524,6 +528,7 @@ describe('Repository', () => {
       await repository.isReady()
 
       mockedDiff
+        .mockReset()
         .mockRejectedValueOnce("I also tried but I just couldn't do it")
         .mockResolvedValueOnce({})
         .mockResolvedValueOnce(({
@@ -534,11 +539,13 @@ describe('Repository', () => {
         } as unknown) as DiffOutput)
 
       mockedStatus
+        .mockReset()
         .mockResolvedValueOnce({})
         .mockRejectedValueOnce('I also failed on the second attempt')
         .mockResolvedValueOnce({})
 
       mockedGetAllUntracked
+        .mockReset()
         .mockResolvedValueOnce(emptySet)
         .mockResolvedValueOnce(emptySet)
         .mockResolvedValueOnce(emptySet)
@@ -561,9 +568,9 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir)
       ])
 
-      expect(mockedDiff).toBeCalledTimes(4)
-      expect(mockedStatus).toBeCalledTimes(4)
-      expect(mockedGetAllUntracked).toBeCalledTimes(4)
+      expect(mockedDiff).toBeCalledTimes(3)
+      expect(mockedStatus).toBeCalledTimes(3)
+      expect(mockedGetAllUntracked).toBeCalledTimes(3)
       expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
 
       expect(repository.getState()).toEqual({
