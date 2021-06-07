@@ -12,7 +12,12 @@ are installed.
 Stable Visual Studio Code can also be used, but it could break for features of
 this Extension that depend on proposed API features that haven't hit stable yet.
 
-## Development Options
+## Development Environment
+
+The development environment allows contributors to test out the extension that
+the current repository source will build into by using the Extension Development
+Host to load the source as an Extension. Using this, it isn't necessary to build
+and install a `.vsix` to test any particular branch or commit of this project.
 
 There are two different ways to spin up a development environment: using an
 instance of Visual Studio Code or using the shell. Which one a contributor uses
