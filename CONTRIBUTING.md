@@ -12,7 +12,7 @@ are installed.
 Stable Visual Studio Code can also be used, but it could break for features of
 this Extension API the depend on proposed features that haven't hit stable yet.
 
-### Development Options
+## Development Options
 
 There are two different ways to spin up a development environment: using an
 instance of Visual Studio Code or using the shell. Both options are equally
