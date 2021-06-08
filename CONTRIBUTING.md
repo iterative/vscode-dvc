@@ -8,9 +8,17 @@ See something that should be changed? Want to request a new feature? Open
 Ensure [Yarn](https://yarnpkg.com/) and
 [Visual Studio Code](https://code.visualstudio.com) are installed.
 
-Visual Studio Code needs to have the
-[ms-python.python](https://github.com/Microsoft/vscode-python) extension
-installed.
+It is recommended that you have a DVC project available to test the extension
+against. We have provided [the demo project](#the-demo-project) as part of this
+repo but feel free to use any DVC project that you have available.
+
+<a id='note'></a>
+
+Note: When using any project that relies on an isolated python environment
+(conda, venv, etc) the
+[ms-python.python](https://github.com/Microsoft/vscode-python) extension needs
+to be installed into VS Code. It is used by this extension to locate and utilize
+the required environment.
 
 ## Development Environment
 
@@ -41,9 +49,8 @@ the ability to run the extension with VS Code Stable edition.
   Note: selecting the `Run Extension (Hot Reload + Dev UI for dev-server)`
   option when running the debugger will prevent all other extensions from being
   loaded into the VS code instance. This will improve the performance of VS code
-  but cause certain DVC commands to fail. This is because the extension has a
-  dependency on the `ms-python.python` extension when DVC has been installed
-  into a virtual environment.
+  but can cause certain DVC commands to fail if the project uses an isolated
+  python environment (see [this note](#note)).
 
 - Open the demo or another DVC project in the Extension Development Host; VS
   Code will remember the last project opened, so this step only has to be done
@@ -96,7 +103,7 @@ encouraged to try other DVC repositories- especially real-world cases!
   environment to be loaded.
 
 - This will happen automatically IF the `ms-python.python` extension is
-  installed within the VS code instance that you are developing against.
+  installed within the VS code instance that you are developing against. </a>
 
 ## React Component Development with Storybook
 
