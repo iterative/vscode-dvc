@@ -103,7 +103,7 @@ encouraged to try other DVC repositories- especially real-world cases!
   environment to be loaded.
 
 - This will happen automatically IF the `ms-python.python` extension is
-  installed within the VS code instance that you are developing against. </a>
+  installed within the VS code instance that you are developing against.
 
 ## React Component Development with Storybook
 
