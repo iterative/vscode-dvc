@@ -1,12 +1,135 @@
-import { buildColumns } from './buildColumns'
-import schemaExample from './webview/experimentsShowSchemaExample.json'
-import complexExample from './webview/complex-output-example.json'
+import { buildColumns, Column } from './buildColumns'
 
 describe('buildColumns', () => {
-  it('parses minimal exp show output with all schema types', () => {
-    expect(buildColumns(schemaExample)).toMatchSnapshot()
+  const exampleMixedColumn = buildColumns({
+    brancha: {
+      baseline: {
+        params: {
+          'params.yaml': {
+            mixedparam: 'string'
+          }
+        }
+      },
+      otherexp: {
+        params: {
+          'params.yaml': {
+            mixedparam: true
+          }
+        }
+      }
+    },
+    branchb: {
+      baseline: {
+        params: {
+          'params.yaml': {
+            mixedparam: null
+          }
+        }
+      }
+    },
+    workspace: {
+      baseline: {
+        params: {
+          'params.yaml': {
+            mixedparam: 3000000000
+          }
+        }
+      }
+    }
+  })[1][0]
+
+  test('captures mixed type params across branches and experiments', () =>
+    expect(exampleMixedColumn.types).toEqual([
+      'string',
+      'boolean',
+      'null',
+      'number'
+    ]))
+
+  test('correctly identifies a number the highest string length of a mixed column', () =>
+    expect(exampleMixedColumn.maxStringLength).toEqual(10))
+
+  test('aggregates multiple different field names', () => {
+    const [nestedColumns, flatColumns] = buildColumns({
+      brancha: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              one: 1
+            }
+          }
+        },
+        otherexp: {
+          params: {
+            'params.yaml': {
+              two: 2
+            }
+          }
+        }
+      },
+      branchb: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              three: 3
+            }
+          }
+        }
+      },
+      workspace: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              four: 4
+            }
+          }
+        }
+      }
+    })
+
+    const [paramsFilesColumn] = nestedColumns
+    const paramsYamlColumn = (paramsFilesColumn.childColumns as Column[])[0]
+    const paramsColumns = paramsYamlColumn.childColumns as Column[]
+
+    expect(paramsColumns?.map(({ name }) => name)).toEqual([
+      'one',
+      'two',
+      'three',
+      'four'
+    ])
+
+    expect(flatColumns?.map(({ name }) => name)).toEqual([
+      'one',
+      'two',
+      'three',
+      'four',
+      'metrics'
+    ])
   })
-  it('parses the complex exp show properly', () => {
-    expect(buildColumns(complexExample)).toMatchSnapshot()
+
+  test('does not report types for columns without primitives or children for columns without objects', () => {
+    const objectColumn: Column = ((buildColumns({
+      workspace: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              onlyHasChild: {
+                onlyHasPrimitive: 1
+              }
+            }
+          }
+        }
+      }
+    })[0][0].childColumns as Column[])[0].childColumns as Column[])[0] as Column
+
+    expect(objectColumn.name).toEqual('onlyHasChild')
+    expect(objectColumn.childColumns).toBeDefined()
+    expect(objectColumn.types).toBeUndefined()
+
+    const primitiveColumn = (objectColumn.childColumns as Column[])[0]
+
+    expect(primitiveColumn.name).toEqual('onlyHasPrimitive')
+    expect(primitiveColumn.types).toBeDefined()
+    expect(primitiveColumn.childColumns).toBeUndefined()
   })
 })

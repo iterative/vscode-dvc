@@ -19,7 +19,7 @@
       },
       "name": "parse-experiments-in-extension",
       "params": {
-        "params.yaml": { "mixedparam": "string" }
+        "params.yaml": { "mixedparam": "string", "stringparam": "string" }
       },
       "queued": false,
       "timestamp": "2021-05-27T17:57:43"
@@ -33,8 +33,7 @@
       "params": {
         "params.yaml": {
           "boolparam": false,
-          "mixedparam": 1.2,
-          "stringparam": "string"
+          "mixedparam": 1.2
         }
       },
       "queued": false,
