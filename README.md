@@ -9,10 +9,6 @@ backgrounds to effectively use [DVC](https://dvc.org/), particularly the new
 [Experiments](https://dvc.org/doc/start/experiments) feature.
 
 This project is in a very early state, and will definitely change in the future.
-With this in mind, the extension is built against the Insiders version of VS
-Code and the latest master of DVC installed from Git. Once we are feature
-complete and all Insider features we depend on move into stable, we'll end up
-building against stable VS Code.
 
 ## Setup
 
@@ -26,7 +22,7 @@ SHA appended to the extension version.
 You can find the download link in the Artifacts list of any run of the
 Continuous Integration workflow.
 
-![Screenshot_2021-05-12 iterative vscode-dvc](https://user-images.githubusercontent.com/9111807/118053924-64d0e000-b353-11eb-8d3d-7e202d741f54.png)
+![Screenshot of artifacts menu](https://user-images.githubusercontent.com/9111807/118053924-64d0e000-b353-11eb-8d3d-7e202d741f54.png)
 
 The easiest way to get to the build for any particular branch is to use the
 GitHub Checks UI to get to the details of the "Continuous Integration" run: next
@@ -81,7 +77,7 @@ available when the table is visible.
 The extension also provides a view in the SCM view container, next to the Git
 view, to manage file actions like checkout, pull, push, and add.
 
-![image](https://user-images.githubusercontent.com/9111807/118057076-19b9cb80-b359-11eb-91bc-9c73a85a83a8.png)
+![SCM view screenshot](https://user-images.githubusercontent.com/9111807/118057076-19b9cb80-b359-11eb-91bc-9c73a85a83a8.png)
 
 ## Contributing
 

@@ -8,7 +8,6 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo",
         "--disable-extensions"
       ],
       "env": {
@@ -30,10 +29,7 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/extension",
-        "${workspaceFolder}/demo"
-      ],
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}/extension"],
       "env": {
         "HOT_RELOAD": "true",
         "PYTHONPATH": ".env/bin/python3",
