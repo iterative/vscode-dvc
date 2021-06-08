@@ -1,0 +1,44 @@
+{
+  "8ff3baa3be877b406cd52517567f292334736453": {
+    "2ebc5eeb887c28adfdd019fa2112bc2a3b37e092": {
+      "checkpoint_parent": "4990dd057c58b2a5aaa9bb67ebf7f01b456ef328",
+      "checkpoint_tip": "2ebc5eeb887c28adfdd019fa2112bc2a3b37e092",
+      "metrics": {
+        "logs.json": { "acc": 0.7703, "loss": 1.0390191078186035, "step": 5 }
+      },
+      "name": "exp-0abff",
+      "params": {
+        "params.yaml": { "mixedparam": 3 }
+      },
+      "queued": false,
+      "timestamp": "2021-05-27T18:41:37"
+    },
+    "baseline": {
+      "metrics": {
+        "logs.json": { "acc": 0.752, "loss": 1.1647908687591553, "step": 9 }
+      },
+      "name": "parse-experiments-in-extension",
+      "params": {
+        "params.yaml": { "mixedparam": "string" }
+      },
+      "queued": false,
+      "timestamp": "2021-05-27T17:57:43"
+    }
+  },
+  "workspace": {
+    "baseline": {
+      "metrics": {
+        "logs.json": { "boolparam": true, "nullparam": null }
+      },
+      "params": {
+        "params.yaml": {
+          "boolparam": false,
+          "mixedparam": 1.2,
+          "stringparam": "string"
+        }
+      },
+      "queued": false,
+      "timestamp": null
+    }
+  }
+}
