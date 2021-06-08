@@ -13,7 +13,7 @@ import {
   StatusOutput
 } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { delay } from '../util'
+import { delay } from '../util/time'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/sourceControlManagement')
@@ -21,7 +21,7 @@ jest.mock('./decorationProvider')
 jest.mock('../cli/reader')
 jest.mock('../git')
 jest.mock('../fileSystem')
-jest.mock('../util')
+jest.mock('../util/time')
 jest.mock('../common/logger')
 
 const mockedListDvcOnlyRecursive = jest.fn()

@@ -6,9 +6,7 @@ import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput, CliReader } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { Logger } from '../common/logger'
-import { delay } from '../util'
-
+import { retryUntilAllResolved } from '../util/promise'
 export class Repository {
   public readonly dispose = Disposable.fn()
 
@@ -41,26 +39,12 @@ export class Repository {
     getAllUntracked(this.dvcRoot)
   ]
 
-  private retryUntilAllResolved = async <T>(
-    getNewPromises: () => Promise<unknown>[],
-    waitBeforeRetry = 500
-  ): Promise<T> => {
-    try {
-      const promises = getNewPromises()
-      const data = await Promise.all(promises)
-      return (data as unknown) as T
-    } catch (e) {
-      Logger.error(`Repository data update failed with ${e} retrying...`)
-      await delay(waitBeforeRetry)
-      return this.retryUntilAllResolved(getNewPromises, waitBeforeRetry * 2)
-    }
-  }
-
   private getUpdateData = (): Promise<
     [DiffOutput, StatusOutput, Set<string>]
   > =>
-    this.retryUntilAllResolved<[DiffOutput, StatusOutput, Set<string>]>(
-      this.getBaseData
+    retryUntilAllResolved<[DiffOutput, StatusOutput, Set<string>]>(
+      this.getBaseData,
+      'Repository data update'
     )
 
   private getResetData = (): Promise<
@@ -70,9 +54,9 @@ export class Repository {
       ...this.getBaseData(),
       this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
     ]
-    return this.retryUntilAllResolved<
+    return retryUntilAllResolved<
       [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
-    >(getNewPromises)
+    >(getNewPromises, 'Repository data update')
   }
 
   private resetInProgress = false
