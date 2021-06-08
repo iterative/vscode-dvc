@@ -40,8 +40,8 @@ export class ExperimentsTable {
   }
 
   private async updateData(): Promise<void> {
-    const getNewPromise = () => [this.cliReader.experimentShow(this.dvcRoot)]
-    const [data] = await retryUntilAllResolved<[ExperimentsRepoJSONOutput]>(
+    const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
+    const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
       getNewPromise,
       'Experiments table update'
     )

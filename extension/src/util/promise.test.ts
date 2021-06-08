@@ -12,6 +12,23 @@ beforeEach(() => {
 })
 
 describe('retryUntilAllResolved', () => {
+  it('should resolve a single promise and return the output', async () => {
+    const returnValue = 'I DID IT! WEEEEE'
+    const promise = jest.fn().mockResolvedValueOnce(returnValue)
+
+    const promiseRefresher = jest.fn().mockImplementation(() => promise())
+
+    const output = await retryUntilAllResolved<string>(
+      promiseRefresher,
+      'Definitely did not'
+    )
+
+    expect(output).toEqual(returnValue)
+
+    expect(promiseRefresher).toBeCalledTimes(1)
+    expect(mockedDelay).not.toBeCalled()
+  })
+
   it('should not retry if all of the promises that it is passed resolve', async () => {
     const p1 = jest.fn().mockResolvedValueOnce(1)
     const p2 = jest.fn().mockResolvedValueOnce(2)
@@ -60,7 +77,7 @@ describe('retryUntilAllResolved', () => {
       .fn()
       .mockImplementation(() => [unreliablePromise()])
 
-    await retryUntilAllResolved<string[]>(promiseRefresher, 'Data update')
+    await retryUntilAllResolved<string>(promiseRefresher, 'Data update')
 
     expect(promiseRefresher).toBeCalledTimes(4)
     expect(mockedDelay).toBeCalledTimes(3)
@@ -88,7 +105,10 @@ describe('retryUntilAllResolved', () => {
       .fn()
       .mockImplementation(() => [rejectsFirstPromise(), rejectsSecondPromise()])
 
-    await retryUntilAllResolved<string[]>(promiseRefresher, 'Data update')
+    await retryUntilAllResolved<[string, string]>(
+      promiseRefresher,
+      'Data update'
+    )
 
     expect(promiseRefresher).toBeCalledTimes(3)
     expect(mockedDelay).toBeCalledTimes(2)
