@@ -103,12 +103,13 @@ export class Extension {
     )
   }
 
-  private canRunCli() {
-    return this.cliExecutor.help(this.config.firstWorkspaceFolderRoot)
+  private async canRunCli() {
+    const root = this.config.firstWorkspaceFolderRoot
+    return !!(root && (await this.cliExecutor.help(root)))
   }
 
   private initializeOrNotify() {
-    return this.canRunCli().then(
+    return this.canRunCli()?.then(
       () => {
         this.initialize()
       },

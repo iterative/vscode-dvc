@@ -34,7 +34,7 @@ export class Config {
     return this.initialized
   }
 
-  public readonly firstWorkspaceFolderRoot: string
+  public readonly firstWorkspaceFolderRoot?: string
 
   private readonly executionDetailsChanged: EventEmitter<
     void
@@ -59,13 +59,11 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private getFirstWorkspaceFolderRoot = (): string => {
+  private getFirstWorkspaceFolderRoot = (): string | undefined => {
     const { workspaceFolders } = workspace
-    if (!workspaceFolders || workspaceFolders.length === 0) {
-      throw new Error('There are no folders in the Workspace to operate on!')
-    }
-
-    return workspaceFolders[0].uri.fsPath
+    return workspaceFolders && workspaceFolders.length > 0
+      ? workspaceFolders[0].uri.fsPath
+      : undefined
   }
 
   private dvcPathOption = 'dvc.dvcPath'
