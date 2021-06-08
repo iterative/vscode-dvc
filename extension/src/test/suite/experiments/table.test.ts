@@ -4,7 +4,6 @@ import chai from 'chai'
 import { stub, spy, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
@@ -33,13 +32,8 @@ suite('Experiments Table Test Suite', () => {
   })
 
   describe('refresh', () => {
-    it('should return the currently unresolved promise if one exists', async () => {
-      let deferred = new Deferred()
-      const stubbedExperimentShow = stub(async () => {
-        await deferred.promise
-        deferred = new Deferred()
-        return complexExperimentsOutput
-      })
+    it('should return early if an update is in progress', async () => {
+      const stubbedExperimentShow = stub().resolves(complexExperimentsOutput)
       const testCliReader = ({
         experimentShow: stubbedExperimentShow
       } as unknown) as CliReader
@@ -50,18 +44,16 @@ suite('Experiments Table Test Suite', () => {
         testCliReader,
         {} as ResourceLocator
       )
+      await testTable.isReady()
+      stubbedExperimentShow.resetHistory()
 
-      const firstUpdate = testTable.refresh()
-      const secondUpdate = testTable.refresh()
-      deferred.resolve()
+      await Promise.all([
+        testTable.refresh(),
+        testTable.refresh(),
+        testTable.refresh()
+      ])
 
-      expect(firstUpdate).to.equal(secondUpdate)
-      await secondUpdate
-
-      const thirdUpdate = testTable.refresh()
-      deferred.resolve()
-
-      expect(secondUpdate).to.not.equal(thirdUpdate)
+      expect(stubbedExperimentShow).to.be.calledOnce
     })
   })
 

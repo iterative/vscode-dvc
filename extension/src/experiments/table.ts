@@ -1,5 +1,6 @@
 import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
+import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
@@ -7,7 +8,7 @@ import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
-import { Logger } from '../common/logger'
+import { retryUntilAllResolved } from '../util/promise'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -17,6 +18,10 @@ export class ExperimentsTable {
   private readonly dvcRoot: string
   private readonly config: Config
   private readonly cliReader: CliReader
+
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
+  public isReady = () => this.initialized
 
   protected readonly isWebviewFocusedChanged: EventEmitter<
     string | undefined
@@ -28,7 +33,6 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private currentUpdatePromise?: Promise<void>
   private data?: ExperimentsRepoJSONOutput
 
   public getDvcRoot() {
@@ -36,16 +40,13 @@ export class ExperimentsTable {
   }
 
   private async updateData(): Promise<void> {
-    try {
-      const experimentData = this.cliReader.experimentShow(this.dvcRoot)
-      this.data = await experimentData
-    } catch (e) {
-      Logger.error(e)
-      throw e
-    } finally {
-      this.currentUpdatePromise = undefined
-      this.sendData()
-    }
+    const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
+    const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
+      getNewPromise,
+      'Experiments table update'
+    )
+    this.data = data
+    this.sendData()
   }
 
   public onDidChangeData(gitRoot: string): void {
@@ -53,11 +54,14 @@ export class ExperimentsTable {
     this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
   }
 
-  public refresh = () => {
-    if (!this.currentUpdatePromise) {
-      this.currentUpdatePromise = this.updateData()
+  private updateInProgress = false
+
+  public refresh = async () => {
+    if (!this.updateInProgress) {
+      this.updateInProgress = true
+      await this.updateData()
+      this.updateInProgress = false
     }
-    return this.currentUpdatePromise
   }
 
   public showWebview = async () => {
@@ -118,6 +122,6 @@ export class ExperimentsTable {
     this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
-    this.updateData()
+    this.refresh().then(() => this.deferred.resolve())
   }
 }
