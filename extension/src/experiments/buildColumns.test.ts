@@ -38,7 +38,7 @@ describe('buildColumns', () => {
     }
   })[1][0]
 
-  test('captures mixed type params across branches and experiments', () =>
+  test('correctly identifies mixed type params', () =>
     expect(exampleMixedColumn.types).toEqual([
       'string',
       'boolean',
@@ -46,7 +46,7 @@ describe('buildColumns', () => {
       'number'
     ]))
 
-  test('correctly identifies a number the highest string length of a mixed column', () =>
+  test('correctly identifies a number as the highest string length of a mixed column', () =>
     expect(exampleMixedColumn.maxStringLength).toEqual(10))
 
   test('aggregates multiple different field names', () => {
