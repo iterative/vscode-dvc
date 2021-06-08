@@ -1,4 +1,4 @@
-import { buildColumns } from './build-columns'
+import { buildColumns } from './buildColumns'
 
 describe('buildColumns', () => {
   it('parses minimal exp show data artificially stuffed with corner cases', () => {
@@ -48,94 +48,7 @@ describe('buildColumns', () => {
           }
         }
       })
-    ).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "mixedparam",
-                  "types": Array [
-                    "number",
-                    "string",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 5,
-                  "name": "boolparam",
-                  "types": Array [
-                    "boolean",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 6,
-                  "name": "stringparam",
-                  "types": Array [
-                    "string",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 9,
-                  "name": "undefparam",
-                  "types": Array [
-                    "undefined",
-                  ],
-                },
-              ],
-              "name": "params.yaml",
-            },
-          ],
-          "name": "params",
-        },
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "acc",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 18,
-                  "name": "loss",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 1,
-                  "name": "step",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 4,
-                  "name": "boolparam",
-                  "types": Array [
-                    "boolean",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 4,
-                  "name": "nullparam",
-                  "types": Array [
-                    "null",
-                  ],
-                },
-              ],
-              "name": "logs.json",
-            },
-          ],
-          "name": "metrics",
-        },
-      ]
-    `)
+    ).toMatchSnapshot()
   })
   it('parses real exp show data', () => {
     expect(
@@ -276,71 +189,6 @@ describe('buildColumns', () => {
           }
         }
       })
-    ).toMatchInlineSnapshot(`
-      Array [
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "lr",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 6,
-                  "name": "seed",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 1,
-                  "name": "weight_decay",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-              ],
-              "name": "params.yaml",
-            },
-          ],
-          "name": "params",
-        },
-        Object {
-          "childColumns": Array [
-            Object {
-              "childColumns": Array [
-                Object {
-                  "maxStringLength": 6,
-                  "name": "acc",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 18,
-                  "name": "loss",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-                Object {
-                  "maxStringLength": 1,
-                  "name": "step",
-                  "types": Array [
-                    "number",
-                  ],
-                },
-              ],
-              "name": "logs.json",
-            },
-          ],
-          "name": "metrics",
-        },
-      ]
-    `)
+    ).toMatchSnapshot()
   })
 })
