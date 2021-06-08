@@ -117,6 +117,6 @@ export class ExperimentsTable {
     this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
-    this.updateData()
+    this.refresh()
   }
 }
