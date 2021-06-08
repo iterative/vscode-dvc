@@ -5,8 +5,12 @@ See something that should be changed? Want to request a new feature? Open
 
 # Development Setup
 
-Ensure [Yarn](https://yarnpkg.com/), [DVC](https://dvc.org/doc/install), and
+Ensure [Yarn](https://yarnpkg.com/) and
 [Visual Studio Code](https://code.visualstudio.com) are installed.
+
+Visual Studio Code needs to have the
+[ms-python.python](https://github.com/Microsoft/vscode-python) extension
+installed.
 
 ## Development Environment
 
@@ -37,7 +41,9 @@ the ability to run the extension with VS Code Stable edition.
   Note: selecting the `Run Extension (Hot Reload + Dev UI for dev-server)`
   option when running the debugger will prevent all other extensions from being
   loaded into the VS code instance. This will improve the performance of VS code
-  but cause certain DVC commands to fail.
+  but cause certain DVC commands to fail. This is because the extension has a
+  dependency on the `ms-python.python` extension when DVC has been installed
+  into a virtual environment.
 
 - Open the demo or another DVC project in the Extension Development Host; VS
   Code will remember the last project opened, so this step only has to be done
