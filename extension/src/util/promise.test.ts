@@ -75,7 +75,7 @@ describe('retryUntilAllResolved', () => {
 
     const promiseRefresher = jest
       .fn()
-      .mockImplementation(() => [unreliablePromise()])
+      .mockImplementation(() => unreliablePromise())
 
     await retryUntilAllResolved<string>(promiseRefresher, 'Data update')
 
