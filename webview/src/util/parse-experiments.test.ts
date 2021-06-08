@@ -1,8 +1,8 @@
-import complexExperimentsOutput from 'fixtures/expShow/complex.json'
+import exampleData from 'dvc/src/experiments/webview/complex-output-example.json'
 import parseExperiments from './parse-experiments'
 
 test('Running parseExperiments on sampleData matches a Snapshot', () => {
-  expect(parseExperiments(complexExperimentsOutput)).toMatchInlineSnapshot(`
+  expect(parseExperiments(exampleData)).toMatchInlineSnapshot(`
     Object {
       "experiments": Array [
         Object {

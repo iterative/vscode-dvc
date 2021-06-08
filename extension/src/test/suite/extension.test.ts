@@ -10,11 +10,11 @@ import {
   Uri,
   ConfigurationChangeEvent
 } from 'vscode'
-import complexExperimentsOutput from 'fixtures/expShow/complex.json'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
 import * as Watcher from '../../fileSystem/watcher'
+import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 
 chai.use(sinonChai)
 const { expect } = chai
