@@ -1,5 +1,6 @@
 import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
+import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
@@ -17,6 +18,10 @@ export class ExperimentsTable {
   private readonly dvcRoot: string
   private readonly config: Config
   private readonly cliReader: CliReader
+
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
+  public isReady = () => this.initialized
 
   protected readonly isWebviewFocusedChanged: EventEmitter<
     string | undefined
@@ -117,6 +122,6 @@ export class ExperimentsTable {
     this.cliReader = cliReader
     this.resourceLocator = resourceLocator
 
-    this.refresh()
+    this.refresh().then(() => this.deferred.resolve())
   }
 }

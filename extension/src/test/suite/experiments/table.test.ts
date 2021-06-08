@@ -44,6 +44,7 @@ suite('Experiments Table Test Suite', () => {
         testCliReader,
         {} as ResourceLocator
       )
+      await testTable.isReady()
       stubbedExperimentShow.resetHistory()
 
       await Promise.all([
