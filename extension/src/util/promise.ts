@@ -1,4 +1,4 @@
-import { delay } from '.'
+import { delay } from './time'
 import { Logger } from '../common/logger'
 
 export const retryUntilAllResolved = async <T>(
