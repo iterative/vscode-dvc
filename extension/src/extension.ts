@@ -104,16 +104,18 @@ export class Extension {
   }
 
   private async canRunCli() {
-    const root = this.config.firstWorkspaceFolderRoot
-    return !!(root && (await this.cliExecutor.help(root)))
+    try {
+      const root = this.config.firstWorkspaceFolderRoot
+      return !!(root && (await this.cliExecutor.help(root)))
+    } catch (e) {
+      return false
+    }
   }
 
-  private async initializeOrNotify() {
-    try {
-      if (await this.canRunCli()) {
-        this.initialize()
-      }
-    } catch (e) {
+  private initializeOrNotify = async () => {
+    if (await this.canRunCli()) {
+      this.initialize()
+    } else {
       window.showInformationMessage(
         'DVC extension is unable to initialize as the cli is not available.\n' +
           'Update your config options to try again.'
