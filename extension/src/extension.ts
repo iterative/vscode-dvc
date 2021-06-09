@@ -120,24 +120,25 @@ export class Extension {
     }
   }
 
+  private setUnavailable() {
+    this.resetRepositories()
+
+    this.status.setAvailability(false)
+    return this.setCommandsAvailability(false)
+  }
+
   private async initializeOrNotify() {
     const root = this.config.firstWorkspaceFolderRoot
     if (!root) {
-      return
-    }
-
-    if (await this.canRunCli(root)) {
+      this.setUnavailable()
+    } else if (await this.canRunCli(root)) {
       this.initialize()
     } else {
       window.showInformationMessage(
         'DVC extension is unable to initialize as the cli is not available.\n' +
           'Update your config options to try again.'
       )
-
-      this.resetRepositories()
-
-      this.status.setAvailability(false)
-      return this.setCommandsAvailability(false)
+      this.setUnavailable()
     }
   }
 
