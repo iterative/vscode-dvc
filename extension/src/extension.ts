@@ -112,17 +112,21 @@ export class Extension {
     this.dvcRepositories = {}
   }
 
-  private async canRunCli() {
+  private async canRunCli(root: string) {
     try {
-      const root = this.config.firstWorkspaceFolderRoot
-      return !!(root && (await this.cliExecutor.help(root)))
+      return !!(await this.cliExecutor.help(root))
     } catch (e) {
       return false
     }
   }
 
   private async initializeOrNotify() {
-    if (await this.canRunCli()) {
+    const root = this.config.firstWorkspaceFolderRoot
+    if (!root) {
+      return
+    }
+
+    if (await this.canRunCli(root)) {
       this.initialize()
     } else {
       window.showInformationMessage(
