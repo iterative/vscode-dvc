@@ -1,13 +1,15 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
+import { getCommandString } from './command'
 import { CliError } from './error'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
+import { joinTruthyItems } from '../util/array'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
-  [pythonBinPath, existingPath].filter(Boolean).join(':')
+  joinTruthyItems([pythonBinPath, existingPath], ':')
 
 export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
@@ -49,8 +51,12 @@ export class Cli implements ICli {
   }
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
-    const command = `dvc ${args.join(' ')}`
     const options = this.getExecutionOptions(cwd, args)
+    const command = getCommandString(
+      this.config.pythonBinPath,
+      options.executable,
+      ...args
+    )
     try {
       this.processStarted.fire()
       const stdout = await executeProcess(options)

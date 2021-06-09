@@ -2,6 +2,7 @@ import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { CliResult, getEnv, ICli } from '.'
 import { Args } from './args'
+import { getCommandString } from './command'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
@@ -66,7 +67,11 @@ export class CliRunner implements ICli {
 
     process.on('close', () => {
       this.processCompleted.fire({
-        command: `dvc ${args.join(' ')}`
+        command: getCommandString(
+          this.config.pythonBinPath,
+          this.getOverrideOrCliPath(),
+          ...args
+        )
       })
     })
 

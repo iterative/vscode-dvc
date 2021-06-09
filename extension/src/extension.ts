@@ -32,7 +32,7 @@ import { Repository } from './repository'
 import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import { CliExecutor } from './cli/executor'
 import { setContextValue } from './vscode/context'
-import { definedAndNonEmpty } from './util'
+import { definedAndNonEmpty } from './util/array'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { OutputChannel } from './vscode/outputChannel'
@@ -103,6 +103,15 @@ export class Extension {
     )
   }
 
+  private resetRepositories = () => {
+    this.dvcRoots.forEach(dvcRoot => {
+      const repository = this.dvcRepositories[dvcRoot]
+      this.dispose.untrack(repository)
+      repository.dispose()
+    })
+    this.dvcRepositories = {}
+  }
+
   private async canRunCli() {
     try {
       const root = this.config.firstWorkspaceFolderRoot
@@ -112,7 +121,7 @@ export class Extension {
     }
   }
 
-  private initializeOrNotify = async () => {
+  private async initializeOrNotify() {
     if (await this.canRunCli()) {
       this.initialize()
     } else {
@@ -120,6 +129,9 @@ export class Extension {
         'DVC extension is unable to initialize as the cli is not available.\n' +
           'Update your config options to try again.'
       )
+
+      this.resetRepositories()
+
       this.status.setAvailability(false)
       return this.setCommandsAvailability(false)
     }
@@ -140,22 +152,24 @@ export class Extension {
 
   private initializeDvcRepositories() {
     this.dvcRoots.forEach(dvcRoot => {
-      const repository = this.dispose.track(
-        new Repository(
-          dvcRoot,
-          this.cliReader,
-          this.decorationProviders[dvcRoot]
+      if (!this.dvcRepositories[dvcRoot]) {
+        const repository = this.dispose.track(
+          new Repository(
+            dvcRoot,
+            this.cliReader,
+            this.decorationProviders[dvcRoot]
+          )
         )
-      )
 
-      this.dispose.track(
-        onDidChangeFileSystem(
-          dvcRoot,
-          getRepositoryWatcher(repository, this.trackedExplorerTree)
+        repository.dispose.track(
+          onDidChangeFileSystem(
+            dvcRoot,
+            getRepositoryWatcher(repository, this.trackedExplorerTree)
+          )
         )
-      )
 
-      this.dvcRepositories[dvcRoot] = repository
+        this.dvcRepositories[dvcRoot] = repository
+      }
     })
   }
 
@@ -238,7 +252,10 @@ export class Extension {
     )
 
     this.dispose.track(
-      new OutputChannel([this.cliExecutor, this.cliReader, this.cliRunner])
+      new OutputChannel(
+        [this.cliExecutor, this.cliReader, this.cliRunner],
+        context.extension.packageJSON.version
+      )
     )
 
     this.trackedExplorerTree = this.dispose.track(

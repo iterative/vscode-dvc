@@ -11,7 +11,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Config } from '../../config'
-import { definedAndNonEmpty } from '../../util'
+import { definedAndNonEmpty } from '../../util/array'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'

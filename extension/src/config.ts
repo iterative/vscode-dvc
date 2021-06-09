@@ -17,7 +17,7 @@ import {
 } from './extensions/python'
 import { QuickPickItemWithValue } from './vscode/quickPick'
 import { getConfigValue, setConfigValue } from './vscode/config'
-import { definedAndNonEmpty } from './util'
+import { definedAndNonEmpty } from './util/array'
 
 export class Config {
   public readonly dispose = Disposable.fn()
