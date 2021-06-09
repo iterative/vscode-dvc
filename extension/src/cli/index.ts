@@ -6,9 +6,10 @@ import { CliError } from './error'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
+import { joinTruthyItems } from '../util/array'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string =>
-  [pythonBinPath, existingPath].filter(Boolean).join(':')
+  joinTruthyItems([pythonBinPath, existingPath], ':')
 
 export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
