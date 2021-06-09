@@ -103,6 +103,15 @@ export class Extension {
     )
   }
 
+  private resetRepositories = () => {
+    this.dvcRoots.forEach(dvcRoot => {
+      const repository = this.dvcRepositories[dvcRoot]
+      this.dispose.untrack(repository)
+      repository.dispose()
+    })
+    this.dvcRepositories = {}
+  }
+
   private canRunCli() {
     return this.cliExecutor.help(this.config.firstWorkspaceFolderRoot)
   }
@@ -117,6 +126,9 @@ export class Extension {
           'DVC extension is unable to initialize as the cli is not available.\n' +
             'Update your config options to try again.'
         )
+
+        this.resetRepositories()
+
         this.status.setAvailability(false)
         return this.setCommandsAvailability(false)
       }
@@ -138,22 +150,24 @@ export class Extension {
 
   private initializeDvcRepositories() {
     this.dvcRoots.forEach(dvcRoot => {
-      const repository = this.dispose.track(
-        new Repository(
-          dvcRoot,
-          this.cliReader,
-          this.decorationProviders[dvcRoot]
+      if (!this.dvcRepositories[dvcRoot]) {
+        const repository = this.dispose.track(
+          new Repository(
+            dvcRoot,
+            this.cliReader,
+            this.decorationProviders[dvcRoot]
+          )
         )
-      )
 
-      this.dispose.track(
-        onDidChangeFileSystem(
-          dvcRoot,
-          getRepositoryWatcher(repository, this.trackedExplorerTree)
+        repository.dispose.track(
+          onDidChangeFileSystem(
+            dvcRoot,
+            getRepositoryWatcher(repository, this.trackedExplorerTree)
+          )
         )
-      )
 
-      this.dvcRepositories[dvcRoot] = repository
+        this.dvcRepositories[dvcRoot] = repository
+      }
     })
   }
 
