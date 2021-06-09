@@ -236,7 +236,10 @@ export class Extension {
     )
 
     this.dispose.track(
-      new OutputChannel([this.cliExecutor, this.cliReader, this.cliRunner])
+      new OutputChannel(
+        [this.cliExecutor, this.cliReader, this.cliRunner],
+        context.extension.packageJSON.version
+      )
     )
 
     this.trackedExplorerTree = this.dispose.track(

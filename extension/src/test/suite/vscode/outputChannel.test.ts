@@ -25,6 +25,8 @@ suite('Output Channel Test Suite', () => {
   })
 
   describe('OutputChannel', () => {
+    const version = '1.0.0'
+
     it('should handle a process completing without error', () => {
       const processCompleted = new EventEmitter<CliResult>()
       const processStarted = new EventEmitter<void>()
@@ -36,11 +38,11 @@ suite('Output Channel Test Suite', () => {
         dispose: fake()
       } as unknown) as VSOutputChannel)
 
-      disposable.track(new OutputChannel([cli], 'The Success Channel'))
+      disposable.track(new OutputChannel([cli], version, 'The Success Channel'))
       processCompleted.fire({ command: 'some command' })
 
       expect(mockOutputChannel).to.be.called
-      expect(mockAppend).to.be.calledWith('> some command \n')
+      expect(mockAppend).to.be.calledWithMatch(/\[.*?\] > some command \n/)
     })
 
     it('should handle a process throwing an error', () => {
@@ -54,17 +56,16 @@ suite('Output Channel Test Suite', () => {
         dispose: fake()
       } as unknown) as VSOutputChannel)
 
-      const usefulMessage =
-        'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
-      disposable.track(new OutputChannel([cli], 'The Success Channel'))
+      disposable.track(new OutputChannel([cli], version, 'The Test Channel'))
       processCompleted.fire({
         command: 'some command',
-        stderr: usefulMessage
+        stderr:
+          'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
       })
 
       expect(mockOutputChannel).to.be.called
-      expect(mockAppend).to.be.calledWith(
-        `> some command failed. ${usefulMessage}\n`
+      expect(mockAppend).to.be.calledWithMatch(
+        /\[.*?\] > some command failed..*?\n/
       )
     })
   })
