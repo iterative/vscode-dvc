@@ -1,5 +1,10 @@
 import { ExperimentsRepoJSONOutput, ValueTree, Value } from './contract'
 
+interface BuildColumnsOutput {
+  flatColumns: Column[]
+  nestedColumns: Column[]
+}
+
 interface PartialColumnDescriptor {
   types?: Set<string>
   maxStringLength?: number
@@ -109,13 +114,10 @@ const transformAndCollectFromColumns = (
 
 const transformColumnsMap = (
   columnsMap: PartialColumnsMap
-): [Column[], Column[]] => {
+): BuildColumnsOutput => {
   const flatColumns: Column[] = []
-  const topLevelColumns = transformAndCollectFromColumns(
-    columnsMap,
-    flatColumns
-  )
-  return [topLevelColumns, flatColumns]
+  const nestedColumns = transformAndCollectFromColumns(columnsMap, flatColumns)
+  return { flatColumns, nestedColumns }
 }
 
 const buildColumn = (
@@ -146,7 +148,7 @@ const buildColumn = (
 
 export const buildColumns = (
   tableData: ExperimentsRepoJSONOutput
-): [Column[], Column[]] => {
+): BuildColumnsOutput => {
   let paramsColumn: PartialColumnDescriptor | undefined
   let metricsColumn: PartialColumnDescriptor | undefined
 

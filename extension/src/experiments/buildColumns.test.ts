@@ -1,7 +1,9 @@
 import { buildColumns, Column } from './buildColumns'
 
 describe('buildColumns', () => {
-  const exampleMixedColumn = buildColumns({
+  const {
+    flatColumns: [exampleMixedColumn]
+  } = buildColumns({
     brancha: {
       baseline: {
         params: {
@@ -36,7 +38,7 @@ describe('buildColumns', () => {
         }
       }
     }
-  })[1][0]
+  })
 
   test('correctly identifies mixed type params', () =>
     expect(exampleMixedColumn.types).toEqual([
@@ -50,7 +52,7 @@ describe('buildColumns', () => {
     expect(exampleMixedColumn.maxStringLength).toEqual(10))
 
   test('aggregates multiple different field names', () => {
-    const [nestedColumns, flatColumns] = buildColumns({
+    const { nestedColumns, flatColumns } = buildColumns({
       brancha: {
         baseline: {
           params: {
@@ -108,7 +110,9 @@ describe('buildColumns', () => {
   })
 
   test('does not report types for columns without primitives or children for columns without objects', () => {
-    const objectColumn: Column = ((buildColumns({
+    const {
+      nestedColumns: [paramsColumn]
+    } = buildColumns({
       workspace: {
         baseline: {
           params: {
@@ -120,7 +124,9 @@ describe('buildColumns', () => {
           }
         }
       }
-    })[0][0].childColumns as Column[])[0].childColumns as Column[])[0] as Column
+    })
+    const objectColumn: Column = ((paramsColumn.childColumns as Column[])[0]
+      .childColumns as Column[])[0] as Column
 
     expect(objectColumn.name).toEqual('onlyHasChild')
     expect(objectColumn.childColumns).toBeDefined()

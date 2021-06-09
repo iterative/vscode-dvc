@@ -51,7 +51,7 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
-    const [nestedColumns, flatColumns] = buildColumns(data)
+    const { nestedColumns, flatColumns } = buildColumns(data)
     this.nestedColumns = nestedColumns
     this.flatColumns = flatColumns
     this.sendData()
