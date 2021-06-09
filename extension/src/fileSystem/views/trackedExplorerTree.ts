@@ -218,10 +218,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
         const root = this.config.firstWorkspaceFolderRoot
-        if (!root) {
-          return undefined
+
+        if (root) {
+          await this.cliExecutor.init(root)
         }
-        await this.cliExecutor.init(root)
 
         workspaceChanged.fire()
       })
