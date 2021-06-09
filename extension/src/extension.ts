@@ -108,20 +108,19 @@ export class Extension {
     return !!(root && (await this.cliExecutor.help(root)))
   }
 
-  private initializeOrNotify() {
-    return this.canRunCli()?.then(
-      () => {
+  private async initializeOrNotify() {
+    try {
+      if (await this.canRunCli()) {
         this.initialize()
-      },
-      () => {
-        window.showInformationMessage(
-          'DVC extension is unable to initialize as the cli is not available.\n' +
-            'Update your config options to try again.'
-        )
-        this.status.setAvailability(false)
-        return this.setCommandsAvailability(false)
       }
-    )
+    } catch (e) {
+      window.showInformationMessage(
+        'DVC extension is unable to initialize as the cli is not available.\n' +
+          'Update your config options to try again.'
+      )
+      this.status.setAvailability(false)
+      return this.setCommandsAvailability(false)
+    }
   }
 
   private initialize() {
