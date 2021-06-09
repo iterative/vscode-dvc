@@ -5,17 +5,21 @@ interface BuildColumnsOutput {
   nestedColumns: Column[]
 }
 
-interface PartialColumnDescriptor {
-  types?: Set<string>
+interface ColumnCommon {
   maxStringLength?: number
+  maxNumber?: number
+  minNumber?: number
+}
+
+interface PartialColumnDescriptor extends ColumnCommon {
+  types?: Set<string>
   childColumns?: PartialColumnsMap
 }
 type PartialColumnsMap = Map<string, PartialColumnDescriptor>
 
-export interface Column {
+export interface Column extends ColumnCommon {
   name: string
   types?: string[]
-  maxStringLength?: number
   childColumns?: Column[]
   ancestors?: string[]
 }
@@ -27,15 +31,36 @@ const getValueType = (value: Value | ValueTree) => {
   return typeof value
 }
 
+const mergeNumberColumn = (
+  columnDescriptor: PartialColumnDescriptor,
+  newNumber: number
+): void => {
+  const { maxNumber, minNumber } = columnDescriptor
+  if (maxNumber === undefined || maxNumber < newNumber) {
+    columnDescriptor.maxNumber = newNumber
+  }
+  if (minNumber === undefined || minNumber > newNumber) {
+    columnDescriptor.minNumber = newNumber
+  }
+}
+
 const mergePrimitiveColumn = (
   columnDescriptor: PartialColumnDescriptor,
-  newValue: Value
+  newValue: Value,
+  newValueType: string
 ): PartialColumnDescriptor => {
   const { maxStringLength } = columnDescriptor
-  const additionStringLength = String(newValue).length
+
+  const stringifiedAddition = String(newValue)
+  const additionStringLength = stringifiedAddition.length
   if (maxStringLength === undefined || maxStringLength < additionStringLength) {
     columnDescriptor.maxStringLength = additionStringLength
   }
+
+  if (newValueType === 'number') {
+    mergeNumberColumn(columnDescriptor, newValue as number)
+  }
+
   return columnDescriptor as PartialColumnDescriptor
 }
 
@@ -78,7 +103,11 @@ const mergeOrCreateColumnDescriptor = (
     }
     const { types } = columnDescriptor
     types.add(newValueType)
-    return mergePrimitiveColumn(columnDescriptor, newValue as Value)
+    return mergePrimitiveColumn(
+      columnDescriptor,
+      newValue as Value,
+      newValueType
+    )
   }
 }
 
@@ -86,12 +115,21 @@ const columnFromMapEntry = (
   entry: [string, PartialColumnDescriptor]
 ): Column => {
   const [name, partialColumnDescriptor] = entry
-  const { types, maxStringLength } = partialColumnDescriptor
+  const {
+    types,
+    maxStringLength,
+    minNumber,
+    maxNumber
+  } = partialColumnDescriptor
   const column: Column = {
     name
   }
   if (maxStringLength) {
     column.maxStringLength = maxStringLength
+  }
+  if (minNumber) {
+    column.minNumber = minNumber
+    column.maxNumber = maxNumber
   }
   if (types) {
     column.types = [...types]

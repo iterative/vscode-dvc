@@ -1,55 +1,107 @@
 import { buildColumns, Column } from './buildColumns'
 
 describe('buildColumns', () => {
-  const {
-    flatColumns: [exampleMixedColumn]
-  } = buildColumns({
-    brancha: {
-      baseline: {
-        params: {
-          'params.yaml': {
-            mixedparam: 'string'
+  describe('minimal mixed column example', () => {
+    const exampleBigNumber = 3000000000
+    const {
+      flatColumns: [exampleMixedColumn]
+    } = buildColumns({
+      brancha: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: 'string'
+            }
+          }
+        },
+        otherexp: {
+          params: {
+            'params.yaml': {
+              mixedparam: true
+            }
           }
         }
       },
-      otherexp: {
-        params: {
-          'params.yaml': {
-            mixedparam: true
+      branchb: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: null
+            }
+          }
+        }
+      },
+      workspace: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: exampleBigNumber
+            }
           }
         }
       }
-    },
-    branchb: {
-      baseline: {
-        params: {
-          'params.yaml': {
-            mixedparam: null
-          }
-        }
-      }
-    },
-    workspace: {
-      baseline: {
-        params: {
-          'params.yaml': {
-            mixedparam: 3000000000
-          }
-        }
-      }
-    }
+    })
+
+    it('correctly identifies mixed type params', () =>
+      expect(exampleMixedColumn.types).toEqual([
+        'string',
+        'boolean',
+        'null',
+        'number'
+      ]))
+
+    it('correctly identifies a number as the highest string length of a mixed column', () =>
+      expect(exampleMixedColumn.maxStringLength).toEqual(10))
+
+    it('adds a highest and lowest number from the one present', () => {
+      expect(exampleMixedColumn.maxNumber).toEqual(exampleBigNumber)
+      expect(exampleMixedColumn.minNumber).toEqual(exampleBigNumber)
+    })
   })
 
-  it('correctly identifies mixed type params', () =>
-    expect(exampleMixedColumn.types).toEqual([
-      'string',
-      'boolean',
-      'null',
-      'number'
-    ]))
+  describe('Number features', () => {
+    const {
+      flatColumns: [columnWithNumbers, columnWithoutNumbers]
+    } = buildColumns({
+      workspace: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              withNumbers: -1,
+              withoutNumbers: 'a'
+            }
+          }
+        },
+        exp1: {
+          params: {
+            'params.yaml': {
+              withNumbers: 2,
+              withoutNumbers: 'b'
+            }
+          }
+        },
+        exp2: {
+          params: {
+            'params.yaml': {
+              withNumbers: 'c',
+              withoutNumbers: 'b'
+            }
+          }
+        }
+      }
+    })
 
-  it('correctly identifies a number as the highest string length of a mixed column', () =>
-    expect(exampleMixedColumn.maxStringLength).toEqual(10))
+    it('does not add maxNumber or minNumber on a column with no numbers', () => {
+      expect(columnWithoutNumbers.minNumber).toBeUndefined()
+      expect(columnWithoutNumbers.maxNumber).toBeUndefined()
+    })
+    it('finds the min number of -1', () =>
+      expect(columnWithNumbers.minNumber).toEqual(-1))
+    it('finds the max number of 2', () =>
+      expect(columnWithNumbers.maxNumber).toEqual(2))
+    it('finds a max string length of two from -1', () =>
+      expect(columnWithNumbers.maxStringLength).toEqual(2))
+  })
 
   it('aggregates multiple different field names', () => {
     const { nestedColumns, flatColumns } = buildColumns({
