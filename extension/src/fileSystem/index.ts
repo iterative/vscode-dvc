@@ -1,6 +1,6 @@
 import { join, resolve } from 'path'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
-import { definedAndNonEmpty } from '../util'
+import { definedAndNonEmpty } from '../util/array'
 
 export const exists = (path: string): boolean => existsSync(path)
 
