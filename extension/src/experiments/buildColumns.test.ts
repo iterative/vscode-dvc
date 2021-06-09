@@ -40,7 +40,7 @@ describe('buildColumns', () => {
     }
   })
 
-  test('correctly identifies mixed type params', () =>
+  it('correctly identifies mixed type params', () =>
     expect(exampleMixedColumn.types).toEqual([
       'string',
       'boolean',
@@ -48,10 +48,10 @@ describe('buildColumns', () => {
       'number'
     ]))
 
-  test('correctly identifies a number as the highest string length of a mixed column', () =>
+  it('correctly identifies a number as the highest string length of a mixed column', () =>
     expect(exampleMixedColumn.maxStringLength).toEqual(10))
 
-  test('aggregates multiple different field names', () => {
+  it('aggregates multiple different field names', () => {
     const { nestedColumns, flatColumns } = buildColumns({
       brancha: {
         baseline: {
@@ -109,7 +109,7 @@ describe('buildColumns', () => {
     ])
   })
 
-  test('does not report types for columns without primitives or children for columns without objects', () => {
+  it('does not report types for columns without primitives or children for columns without objects', () => {
     const {
       nestedColumns: [paramsColumn]
     } = buildColumns({
