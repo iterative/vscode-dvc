@@ -42,8 +42,6 @@ export class ExperimentsTable {
   private flatColumns?: Column[]
   public getFlatColumns = () => this.flatColumns
 
-  public getDvcRoot = () => this.dvcRoot
-
   private async updateData(): Promise<void> {
     const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
     const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
