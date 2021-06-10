@@ -70,7 +70,7 @@ describe('CliExecutor', () => {
   })
 
   describe('checkout', () => {
-    it('should call executeProcess with the correct parameters to checkout a repo', async () => {
+    it('should call executeProcess with the correct parameters to checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -109,7 +109,7 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call executeProcess with the correct parameters to commit a repo', async () => {
+    it('should call executeProcess with the correct parameters to commit a repository', async () => {
       const cwd = __dirname
       const stdout = "Updating lock file 'dvc.lock'"
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -253,7 +253,7 @@ describe('CliExecutor', () => {
   })
 
   describe('forceCheckout', () => {
-    it('should call executeProcess with the correct parameters to force checkout a repo', async () => {
+    it('should call executeProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -271,7 +271,7 @@ describe('CliExecutor', () => {
   })
 
   describe('forceCommit', () => {
-    it('should call executeProcess with the correct parameters to force commit a repo', async () => {
+    it('should call executeProcess with the correct parameters to force commit a repository', async () => {
       const cwd = __dirname
       const stdout = 'Updating lock file'
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -289,7 +289,7 @@ describe('CliExecutor', () => {
   })
 
   describe('forcePull', () => {
-    it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
+    it('should call executeProcess with the correct parameters to force pull the entire repository', async () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
@@ -308,7 +308,7 @@ describe('CliExecutor', () => {
   })
 
   describe('forcePush', () => {
-    it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+    it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
