@@ -1,28 +1,41 @@
-import { relative } from 'path'
 import { commands } from 'vscode'
-import { getRootCommand, RootCommand } from '.'
+import {
+  getResourceCommand,
+  getRootCommand,
+  ResourceCommand,
+  RootCommand
+} from '.'
 import { CliExecutor } from '../../cli/executor'
 
-const registerResourceUriCommand = (
-  name: string,
-  func: (cwd: string, relPath: string) => Promise<string>
-) =>
-  commands.registerCommand(name, ({ dvcRoot, resourceUri }) => {
-    const relPath = relative(dvcRoot, resourceUri.fsPath)
-    return func(dvcRoot, relPath)
-  })
+const registerResourceUriCommand = (name: string, func: ResourceCommand) =>
+  commands.registerCommand(name, func)
 
 const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
-    registerResourceUriCommand('dvc.addTarget', cliExecutor.addTarget)
+    registerResourceUriCommand(
+      'dvc.addTarget',
+      getResourceCommand(cliExecutor.addTarget, cliExecutor.forceAddTarget)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerResourceUriCommand('dvc.checkoutTarget', cliExecutor.checkoutTarget)
+    registerResourceUriCommand(
+      'dvc.checkoutTarget',
+      getResourceCommand(
+        cliExecutor.checkoutTarget,
+        cliExecutor.forceCheckoutTarget
+      )
+    )
   )
 
   cliExecutor.dispose.track(
-    registerResourceUriCommand('dvc.commitTarget', cliExecutor.commitTarget)
+    registerResourceUriCommand(
+      'dvc.commitTarget',
+      getResourceCommand(
+        cliExecutor.commitTarget,
+        cliExecutor.forceCommitTarget
+      )
+    )
   )
 }
 
