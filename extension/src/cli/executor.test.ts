@@ -254,7 +254,7 @@ describe('CliExecutor', () => {
   })
 
   describe('forceAddTarget', () => {
-    it('should call executeProcess with the correct parameters to add a file', async () => {
+    it('should call executeProcess with the correct parameters to force add a file', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw')
       const stdout =
