@@ -18,7 +18,7 @@ beforeEach(() => {
 })
 
 describe('getRootCommand', () => {
-  it('should return a function that calls only calls the first function if it succeeds', async () => {
+  it('should return a function that only calls the first function if it succeeds', async () => {
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)
     const commandToRegister = getRootCommand(mockedFunc, mockedForceFunc)
