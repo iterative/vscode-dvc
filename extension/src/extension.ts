@@ -112,27 +112,34 @@ export class Extension {
     this.dvcRepositories = {}
   }
 
-  private canRunCli() {
-    return this.cliExecutor.help(this.config.firstWorkspaceFolderRoot)
+  private async canRunCli(root: string) {
+    try {
+      return !!(await this.cliExecutor.help(root))
+    } catch (e) {
+      return false
+    }
   }
 
-  private initializeOrNotify() {
-    return this.canRunCli().then(
-      () => {
-        this.initialize()
-      },
-      () => {
-        window.showInformationMessage(
-          'DVC extension is unable to initialize as the cli is not available.\n' +
-            'Update your config options to try again.'
-        )
+  private setUnavailable() {
+    this.resetRepositories()
 
-        this.resetRepositories()
+    this.status.setAvailability(false)
+    return this.setCommandsAvailability(false)
+  }
 
-        this.status.setAvailability(false)
-        return this.setCommandsAvailability(false)
-      }
-    )
+  private async initializeOrNotify() {
+    const root = this.config.firstWorkspaceFolderRoot
+    if (!root) {
+      this.setUnavailable()
+    } else if (await this.canRunCli(root)) {
+      this.initialize()
+    } else {
+      window.showInformationMessage(
+        'DVC extension is unable to initialize as the cli is not available.\n' +
+          'Update your config options to try again.'
+      )
+      this.setUnavailable()
+    }
   }
 
   private initialize() {
