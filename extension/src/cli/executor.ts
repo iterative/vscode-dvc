@@ -25,13 +25,13 @@ export class CliExecutor extends Cli {
     this.executeProcess(cwd, Command.CHECKOUT)
 
   public checkoutTarget = (cwd: string, target: string): Promise<string> =>
-    this.executeForcedProcess(cwd, Command.CHECKOUT, target)
+    this.executeProcess(cwd, Command.CHECKOUT, target)
 
   public commit = (cwd: string): Promise<string> =>
     this.executeProcess(cwd, Command.COMMIT)
 
   public commitTarget = (cwd: string, target: string): Promise<string> =>
-    this.executeForcedProcess(cwd, Command.COMMIT, target)
+    this.executeProcess(cwd, Command.COMMIT, target)
 
   public experimentApply = (
     cwd: string,
@@ -84,11 +84,20 @@ export class CliExecutor extends Cli {
       ExperimentFlag.QUEUE
     )
 
+  public forceAddTarget = (cwd: string, target: string): Promise<string> =>
+    this.executeForcedProcess(cwd, Command.ADD, target)
+
   public forceCheckout = (cwd: string): Promise<string> =>
     this.executeForcedProcess(cwd, Command.CHECKOUT)
 
+  public forceCheckoutTarget = (cwd: string, target: string): Promise<string> =>
+    this.executeForcedProcess(cwd, Command.CHECKOUT, target)
+
   public forceCommit = (cwd: string): Promise<string> =>
     this.executeForcedProcess(cwd, Command.COMMIT)
+
+  public forceCommitTarget = (cwd: string, target: string): Promise<string> =>
+    this.executeForcedProcess(cwd, Command.COMMIT, target)
 
   public forcePull = (cwd: string): Promise<string> =>
     this.executeForcedProcess(cwd, Command.PULL)
