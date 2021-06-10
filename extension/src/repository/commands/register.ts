@@ -1,6 +1,6 @@
 import { relative } from 'path'
-import { commands, Uri } from 'vscode'
-import { getRootCommand } from '.'
+import { commands } from 'vscode'
+import { getRootCommand, RootCommand } from '.'
 import { CliExecutor } from '../../cli/executor'
 
 const registerResourceUriCommand = (
@@ -26,10 +26,8 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   )
 }
 
-const registerRootUriCommand = (
-  name: string,
-  func: ({ rootUri }: { rootUri: Uri }) => Promise<string | undefined>
-) => commands.registerCommand(name, func)
+const registerRootUriCommand = (name: string, func: RootCommand) =>
+  commands.registerCommand(name, func)
 
 const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
