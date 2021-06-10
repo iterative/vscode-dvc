@@ -116,6 +116,10 @@ describe('getResourceCommand', () => {
     })
 
     expect(output).toEqual(forcedStdout)
+    expect(mockedForceFunc).toHaveBeenCalledWith(
+      mockedDvcRoot,
+      join('with', 'a', 'target')
+    )
     expect(mockedForceFunc).toHaveBeenCalledTimes(1)
   })
 })
