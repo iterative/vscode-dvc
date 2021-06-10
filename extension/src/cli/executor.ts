@@ -84,9 +84,6 @@ export class CliExecutor extends Cli {
       ExperimentFlag.QUEUE
     )
 
-  public forceAddTarget = (cwd: string, target: string): Promise<string> =>
-    this.executeForcedProcess(cwd, Command.ADD, target)
-
   public forceCheckout = (cwd: string): Promise<string> =>
     this.executeForcedProcess(cwd, Command.CHECKOUT)
 

@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
-import { getResourceCommand, getRootCommand } from '.'
+import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse, showGenericError } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
 
@@ -10,7 +10,8 @@ const mockedForceFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
 const mockedShowGenericError = mocked(showGenericError)
 const mockedDvcRoot = join('some', 'path')
-const mockedTarget = join(mockedDvcRoot, 'with', 'a', 'target')
+const mockedRelPath = join('with', 'a', 'target')
+const mockedTarget = join(mockedDvcRoot, mockedRelPath)
 
 jest.mock('vscode')
 jest.mock('../../vscode/modal')
@@ -31,10 +32,7 @@ describe('getResourceCommand', () => {
     })
 
     expect(output).toEqual(stdout)
-    expect(mockedFunc).toBeCalledWith(
-      mockedDvcRoot,
-      join('with', 'a', 'target')
-    )
+    expect(mockedFunc).toBeCalledWith(mockedDvcRoot, mockedRelPath)
     expect(mockedForceFunc).not.toHaveBeenCalled()
   })
 
@@ -116,11 +114,39 @@ describe('getResourceCommand', () => {
     })
 
     expect(output).toEqual(forcedStdout)
-    expect(mockedForceFunc).toHaveBeenCalledWith(
-      mockedDvcRoot,
-      join('with', 'a', 'target')
-    )
+    expect(mockedForceFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath)
     expect(mockedForceFunc).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('getSimpleResourceCommand', () => {
+  it('should return a simple function that only calls the first function if it succeeds', async () => {
+    const stdout = "I'm simple, that's easy"
+    mockedFunc.mockResolvedValueOnce(stdout)
+    const commandToRegister = getSimpleResourceCommand(mockedFunc)
+
+    const output = await commandToRegister({
+      dvcRoot: mockedDvcRoot,
+      resourceUri: { fsPath: mockedTarget } as Uri
+    })
+
+    expect(output).toEqual(stdout)
+    expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath)
+  })
+
+  it('should return a function that calls showGenericError if the provided function fails', async () => {
+    const stderr = 'I deed'
+    const noResponsePossible = undefined
+    mockedFunc.mockRejectedValueOnce({ stderr })
+    mockedShowGenericError.mockResolvedValueOnce(noResponsePossible)
+    const commandToRegister = getSimpleResourceCommand(mockedFunc)
+
+    const undef = await commandToRegister({
+      dvcRoot: mockedDvcRoot,
+      resourceUri: { fsPath: mockedDvcRoot } as Uri
+    })
+
+    expect(undef).toEqual(noResponsePossible)
   })
 })
 

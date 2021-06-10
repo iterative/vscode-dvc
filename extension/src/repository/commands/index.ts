@@ -54,6 +54,17 @@ export const getResourceCommand = (
   return getCommand(func, forceFunc, dvcRoot, relPath)
 }
 
+export const getSimpleResourceCommand = (
+  func: (cwd: string, target: string) => Promise<string>
+): ResourceCommand => async ({ dvcRoot, resourceUri }) => {
+  const relPath = relative(dvcRoot, resourceUri.fsPath)
+  try {
+    return await func(dvcRoot, relPath)
+  } catch {
+    return showGenericError()
+  }
+}
+
 export type RootCommand = ({
   rootUri
 }: {

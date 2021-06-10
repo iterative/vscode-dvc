@@ -2,6 +2,7 @@ import { commands } from 'vscode'
 import {
   getResourceCommand,
   getRootCommand,
+  getSimpleResourceCommand,
   ResourceCommand,
   RootCommand
 } from '.'
@@ -14,7 +15,7 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.addTarget',
-      getResourceCommand(cliExecutor.addTarget, cliExecutor.forceAddTarget)
+      getSimpleResourceCommand(cliExecutor.addTarget)
     )
   )
 

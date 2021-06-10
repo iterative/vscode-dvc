@@ -253,32 +253,6 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('forceAddTarget', () => {
-    it('should call executeProcess with the correct parameters to force add a file', async () => {
-      const cwd = __dirname
-      const relPath = join('data', 'MNIST', 'raw')
-      const stdout =
-        `100% Add|████████████████████████████████████████████████` +
-        `█████████████████████████████████████████████████████████` +
-        `█████████████████████████████████████████████████████████` +
-        `██████████████████████████████████████████|1/1 [00:00,  2` +
-        `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
-        `\n\rgit add ${relPath} .gitignore`
-
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forceAddTarget(cwd, relPath)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['add', '-f', relPath],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('forceCheckout', () => {
     it('should call executeProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
