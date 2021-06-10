@@ -76,6 +76,20 @@ describe('getRootCommand', () => {
     expect(mockedForceFunc).not.toHaveBeenCalled()
   })
 
+  it('should return a function that does not call the force func if no stderr is return in the underlying error', async () => {
+    const userCancelled = 'Cancel'
+    mockedFunc.mockRejectedValueOnce({})
+    mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
+    const commandToRegister = getRootCommand(mockedFunc, mockedForceFunc)
+
+    const undef = await commandToRegister({
+      rootUri: { fsPath: mockedPath } as Uri
+    })
+
+    expect(undef).toEqual(undefined)
+    expect(mockedForceFunc).not.toHaveBeenCalled()
+  })
+
   it('should return a function that calls the force function if the first function fails with a force prompt and the user responds with force', async () => {
     const stderr = `I can fix this... maybe, but ${Prompt.TRY_FORCE}`
     const forcedStdout = 'ok, nw I forced it'

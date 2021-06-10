@@ -29,7 +29,7 @@ export const getRootCommand = (
   } catch (e) {
     const stderr = e.stderr
 
-    if (stderr.includes(Prompt.TRY_FORCE)) {
+    if (stderr?.includes(Prompt.TRY_FORCE)) {
       return offerToForce(stderr, forceFunc, cwd)
     }
 
