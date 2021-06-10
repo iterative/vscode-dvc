@@ -11901,9 +11901,9 @@ react-syntax-highlighter@^13.5.3:
     prismjs "^1.21.0"
     refractor "^3.1.0"
 
-"react-table@https://github.com/rogermparent/react-table.git#orderby-provide-parent":
+"react-table@https://github.com/rogermparent/react-table.git":
   version "1.0.0-semantic-release"
-  resolved "https://github.com/rogermparent/react-table.git#a6881b3aa33794e961d256741fb562852efa37e5"
+  resolved "https://github.com/rogermparent/react-table.git#a01f95ff3d2f952a2915505006c9960f3f497a33"
 
 react-textarea-autosize@^8.3.0:
   version "8.3.3"
