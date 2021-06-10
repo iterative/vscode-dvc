@@ -37,15 +37,13 @@ const getCommand = async (
   }
 }
 
-type ResourceInput = {
-  dvcRoot: string
-  resourceUri: Uri
-}
-
 export type ResourceCommand = ({
   dvcRoot,
   resourceUri
-}: ResourceInput) => Promise<string | undefined>
+}: {
+  dvcRoot: string
+  resourceUri: Uri
+}) => Promise<string | undefined>
 
 export const getResourceCommand = (
   func: (cwd: string, target: string) => Promise<string>,
@@ -56,11 +54,11 @@ export const getResourceCommand = (
   return getCommand(func, forceFunc, dvcRoot, relPath)
 }
 
-type RootInput = { rootUri: Uri }
-
 export type RootCommand = ({
   rootUri
-}: RootInput) => Promise<string | undefined>
+}: {
+  rootUri: Uri
+}) => Promise<string | undefined>
 
 export const getRootCommand = (
   func: (fsPath: string) => Promise<string>,
