@@ -1,6 +1,6 @@
 import { relative } from 'path'
 import { commands, Uri } from 'vscode'
-import { getRootCommand } from './root'
+import { getRootCommand } from '.'
 import { CliExecutor } from '../../cli/executor'
 
 const registerResourceUriCommand = (

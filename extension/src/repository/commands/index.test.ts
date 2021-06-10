@@ -1,6 +1,6 @@
 import { Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
-import { getRootCommand } from './root'
+import { getRootCommand } from '.'
 import { getWarningResponse, showGenericError } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
 
