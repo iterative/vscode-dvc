@@ -1,5 +1,6 @@
 import { relative } from 'path'
-import { commands } from 'vscode'
+import { commands, Uri } from 'vscode'
+import { getRootCommand } from '.'
 import { CliExecutor } from '../../cli/executor'
 
 const registerResourceUriCommand = (
@@ -27,24 +28,36 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
 
 const registerRootUriCommand = (
   name: string,
-  func: (fsPath: string) => Promise<string>
-) => commands.registerCommand(name, ({ rootUri }) => func(rootUri.fsPath))
+  func: ({ rootUri }: { rootUri: Uri }) => Promise<string | undefined>
+) => commands.registerCommand(name, func)
 
 const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.checkout', cliExecutor.checkout)
+    registerRootUriCommand(
+      'dvc.checkout',
+      getRootCommand(cliExecutor.checkout, cliExecutor.forceCheckout)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.commit', cliExecutor.commit)
+    registerRootUriCommand(
+      'dvc.commit',
+      getRootCommand(cliExecutor.commit, cliExecutor.forceCommit)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.pull', cliExecutor.pull)
+    registerRootUriCommand(
+      'dvc.pull',
+      getRootCommand(cliExecutor.pull, cliExecutor.forcePull)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.push', cliExecutor.push)
+    registerRootUriCommand(
+      'dvc.push',
+      getRootCommand(cliExecutor.push, cliExecutor.forcePush)
+    )
   )
 }
 

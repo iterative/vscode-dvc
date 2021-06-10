@@ -44,7 +44,7 @@ suite('Extension Test Suite', () => {
 
       expect(mockProcess).to.be.calledOnce
       expect(mockProcess).to.be.calledWith({
-        args: ['commit', '-f'],
+        args: ['commit'],
         cwd: dvcDemoPath,
         env: process.env,
         executable: 'dvc'
