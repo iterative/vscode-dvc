@@ -7,19 +7,19 @@ import {
 } from '.'
 import { CliExecutor } from '../../cli/executor'
 
-const registerResourceUriCommand = (name: string, func: ResourceCommand) =>
+const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
   commands.registerCommand(name, func)
 
 const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
-    registerResourceUriCommand(
+    registerCommand(
       'dvc.addTarget',
       getResourceCommand(cliExecutor.addTarget, cliExecutor.forceAddTarget)
     )
   )
 
   cliExecutor.dispose.track(
-    registerResourceUriCommand(
+    registerCommand(
       'dvc.checkoutTarget',
       getResourceCommand(
         cliExecutor.checkoutTarget,
@@ -29,7 +29,7 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   )
 
   cliExecutor.dispose.track(
-    registerResourceUriCommand(
+    registerCommand(
       'dvc.commitTarget',
       getResourceCommand(
         cliExecutor.commitTarget,
@@ -39,33 +39,30 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   )
 }
 
-const registerRootUriCommand = (name: string, func: RootCommand) =>
-  commands.registerCommand(name, func)
-
 const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
-    registerRootUriCommand(
+    registerCommand(
       'dvc.checkout',
       getRootCommand(cliExecutor.checkout, cliExecutor.forceCheckout)
     )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand(
+    registerCommand(
       'dvc.commit',
       getRootCommand(cliExecutor.commit, cliExecutor.forceCommit)
     )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand(
+    registerCommand(
       'dvc.pull',
       getRootCommand(cliExecutor.pull, cliExecutor.forcePull)
     )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand(
+    registerCommand(
       'dvc.push',
       getRootCommand(cliExecutor.push, cliExecutor.forcePush)
     )
