@@ -41,6 +41,9 @@ describe('CliExecutor', () => {
     }
   )
 
+  const everythingUpToDate = 'Everything is up to date.'
+  const updatingLockFile = "Updating lock file 'dvc.lock'"
+
   describe('addTarget', () => {
     it('should call executeProcess with the correct parameters to add a file', async () => {
       const cwd = __dirname
@@ -68,7 +71,7 @@ describe('CliExecutor', () => {
   })
 
   describe('checkout', () => {
-    it('should call executeProcess with the correct parameters to checkout a repo', async () => {
+    it('should call executeProcess with the correct parameters to checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -77,7 +80,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['checkout', '-f'],
+        args: ['checkout'],
         cwd: fsPath,
         env: mockedEnv,
         executable: 'dvc'
@@ -98,7 +101,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['checkout', '-f', relPath],
+        args: ['checkout', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -107,16 +110,16 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call executeProcess with the correct parameters to commit a repo', async () => {
+    it('should call executeProcess with the correct parameters to commit a repository', async () => {
       const cwd = __dirname
-      const stdout = "Updating lock file 'dvc.lock'"
+      const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
       const output = await cliExecutor.commit(cwd)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['commit', '-f'],
+        args: ['commit'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -133,14 +136,14 @@ describe('CliExecutor', () => {
         'raw',
         't10k-images-idx3-ubyte.gz'
       )
-      const stdout = "Updating lock file 'dvc.lock'"
+      const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
       const output = await cliExecutor.commitTarget(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['commit', '-f', relPath],
+        args: ['commit', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -244,6 +247,124 @@ describe('CliExecutor', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['exp', 'run', '--queue'],
         cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forceCheckout', () => {
+    it('should call executeProcess with the correct parameters to force checkout a repository', async () => {
+      const fsPath = __dirname
+      const stdout = `M       model.pt\nM       logs/\n`
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forceCheckout(fsPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['checkout', '-f'],
+        cwd: fsPath,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forceCheckoutTarget', () => {
+    it('should call executeProcess with the correct parameters to force checkout a file', async () => {
+      const cwd = __dirname
+      const relPath = join('logs', 'acc.tsv')
+
+      const stdout = 'M       ./'
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forceCheckoutTarget(cwd, relPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['checkout', '-f', relPath],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forceCommit', () => {
+    it('should call executeProcess with the correct parameters to force commit a repository', async () => {
+      const cwd = __dirname
+      const stdout = updatingLockFile
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forceCommit(cwd)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['commit', '-f'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forceCommitTarget', () => {
+    it('should call executeProcess with the correct parameters to force commit a target', async () => {
+      const cwd = __dirname
+      const relPath = join(
+        'data',
+        'fashion-mnist',
+        'raw',
+        't10k-images-idx3-ubyte.gz'
+      )
+      const stdout = updatingLockFile
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forceCommitTarget(cwd, relPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['commit', '-f', relPath],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forcePull', () => {
+    it('should call executeProcess with the correct parameters to force pull the entire repository', async () => {
+      const cwd = __dirname
+      const stdout = 'M       data/MNIST/raw/\n1 file modified'
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forcePull(cwd)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['pull', '-f'],
+        cwd: __dirname,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forcePush', () => {
+    it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
+      const cwd = __dirname
+      const stdout = everythingUpToDate
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forcePush(cwd)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['push', '-f'],
+        cwd: __dirname,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -386,7 +507,7 @@ describe('CliExecutor', () => {
   describe('push', () => {
     it('should call executeProcess with the correct parameters to push the entire repository', async () => {
       const cwd = __dirname
-      const stdout = 'Everything is up to date.'
+      const stdout = everythingUpToDate
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
@@ -406,7 +527,7 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to push the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST')
-      const stdout = 'Everything is up to date.'
+      const stdout = everythingUpToDate
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 

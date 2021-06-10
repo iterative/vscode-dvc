@@ -1,50 +1,72 @@
-import { relative } from 'path'
 import { commands } from 'vscode'
+import {
+  getResourceCommand,
+  getRootCommand,
+  getSimpleResourceCommand,
+  ResourceCommand,
+  RootCommand
+} from '.'
 import { CliExecutor } from '../../cli/executor'
 
-const registerResourceUriCommand = (
-  name: string,
-  func: (cwd: string, relPath: string) => Promise<string>
-) =>
-  commands.registerCommand(name, ({ dvcRoot, resourceUri }) => {
-    const relPath = relative(dvcRoot, resourceUri.fsPath)
-    return func(dvcRoot, relPath)
-  })
+const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
+  commands.registerCommand(name, func)
 
 const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
-    registerResourceUriCommand('dvc.addTarget', cliExecutor.addTarget)
+    registerCommand(
+      'dvc.addTarget',
+      getSimpleResourceCommand(cliExecutor.addTarget)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerResourceUriCommand('dvc.checkoutTarget', cliExecutor.checkoutTarget)
+    registerCommand(
+      'dvc.checkoutTarget',
+      getResourceCommand(
+        cliExecutor.checkoutTarget,
+        cliExecutor.forceCheckoutTarget
+      )
+    )
   )
 
   cliExecutor.dispose.track(
-    registerResourceUriCommand('dvc.commitTarget', cliExecutor.commitTarget)
+    registerCommand(
+      'dvc.commitTarget',
+      getResourceCommand(
+        cliExecutor.commitTarget,
+        cliExecutor.forceCommitTarget
+      )
+    )
   )
 }
 
-const registerRootUriCommand = (
-  name: string,
-  func: (fsPath: string) => Promise<string>
-) => commands.registerCommand(name, ({ rootUri }) => func(rootUri.fsPath))
-
 const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.checkout', cliExecutor.checkout)
+    registerCommand(
+      'dvc.checkout',
+      getRootCommand(cliExecutor.checkout, cliExecutor.forceCheckout)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.commit', cliExecutor.commit)
+    registerCommand(
+      'dvc.commit',
+      getRootCommand(cliExecutor.commit, cliExecutor.forceCommit)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.pull', cliExecutor.pull)
+    registerCommand(
+      'dvc.pull',
+      getRootCommand(cliExecutor.pull, cliExecutor.forcePull)
+    )
   )
 
   cliExecutor.dispose.track(
-    registerRootUriCommand('dvc.push', cliExecutor.push)
+    registerCommand(
+      'dvc.push',
+      getRootCommand(cliExecutor.push, cliExecutor.forcePush)
+    )
   )
 }
 
