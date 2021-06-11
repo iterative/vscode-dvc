@@ -19,7 +19,7 @@ import { WebviewSerializer } from './webviewSerializer'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerRepositoryCommands } from './repository/commands/register'
-import { findDvcRootPaths } from './fileSystem'
+import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
 import { ResourceLocator } from './resourceLocator'
 import { Status } from './status'
 import { DecorationProvider } from './repository/decorationProvider'
@@ -32,6 +32,7 @@ import { CliReader } from './cli/reader'
 import { OutputChannel } from './vscode/outputChannel'
 import { IExtension, initializeOrNotify } from './setup'
 import { definedAndNonEmpty } from './util/array'
+import { reset } from './util/disposable'
 
 export { Disposable, Disposer }
 
@@ -77,15 +78,6 @@ export class Extension implements IExtension {
   public setRepository = (dvcRoot: string, repository: Repository) =>
     (this.dvcRepositories[dvcRoot] = this.dispose.track(repository))
 
-  public resetRepositories = () => {
-    this.dvcRoots.forEach(dvcRoot => {
-      const repository = this.dvcRepositories[dvcRoot]
-      this.dispose.untrack(repository)
-      repository.dispose()
-    })
-    this.dvcRepositories = {}
-  }
-
   public getExperiments = () => this.experiments
   public getTrackedExplorerTree = () => this.trackedExplorerTree
 
@@ -108,8 +100,9 @@ export class Extension implements IExtension {
   }
 
   public setUnavailable = () => {
-    this.resetRepositories()
-
+    this.dvcRepositories = reset(this.dvcRepositories, this.dispose)
+    this.experiments.reset()
+    this.trackedExplorerTree.initialize([])
     this.status.setAvailability(false)
     return this.setCommandsAvailability(false)
   }
@@ -152,12 +145,19 @@ export class Extension implements IExtension {
       this.setDecorationProvider(dvcRoot, new DecorationProvider())
     )
 
+  private findDvcRoots = async (cwd: string): Promise<string[]> => {
+    const dvcRoots = await findDvcRootPaths(cwd)
+    if (definedAndNonEmpty(dvcRoots)) {
+      return dvcRoots
+    }
+
+    await this.config.isReady()
+    return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
+  }
+
   private setupWorkspaceFolder = async (workspaceFolder: WorkspaceFolder) => {
     const workspaceFolderRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await findDvcRootPaths(
-      workspaceFolderRoot,
-      this.cliReader.root(workspaceFolderRoot)
-    )
+    const dvcRoots = await this.findDvcRoots(workspaceFolderRoot)
 
     this.setDvcRoots(dvcRoots)
     this.config.setDvcRoots(dvcRoots)

@@ -11,6 +11,7 @@ import { quickPickOne } from '../vscode/quickPick'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { CliRunner } from '../cli/runner'
+import { reset } from '../util/disposable'
 
 export class Experiments {
   public dispose = Disposable.fn()
@@ -204,10 +205,10 @@ export class Experiments {
   }
 
   public reset(): void {
-    Object.values(this.experiments).forEach(experimentsTable =>
-      experimentsTable.dispose()
+    this.experiments = reset<Record<string, ExperimentsTable>>(
+      this.experiments,
+      this.dispose
     )
-    this.experiments = {}
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {

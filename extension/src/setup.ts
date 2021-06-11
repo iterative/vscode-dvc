@@ -36,7 +36,6 @@ const initializeDvcRepositories = (extension: IExtension) => {
 
 const initializeExperiments = (extension: IExtension) => {
   const experiments = extension.getExperiments()
-  experiments.reset()
   experiments.create(extension.getDvcRoots(), extension.getResourceLocator())
 }
 
@@ -47,10 +46,7 @@ const initializeGitRepositories = async (extension: IExtension) => {
     getGitRepositoryRoots()
   ])
   gitRoots.forEach(async gitRoot => {
-    const dvcRoots = await findDvcRootPaths(
-      gitRoot,
-      extension.getCliReader().root(gitRoot)
-    )
+    const dvcRoots = await findDvcRootPaths(gitRoot)
 
     dvcRoots.forEach(dvcRoot => {
       experiments.onDidChangeData(dvcRoot, gitRoot)
@@ -89,7 +85,6 @@ export interface IExtension {
 
   getRepository: (dvcRoot: string) => Repository
   setRepository: (dvcRoot: string, repository: Repository) => void
-  resetRepositories: () => void
 
   getResourceLocator: () => ResourceLocator
 

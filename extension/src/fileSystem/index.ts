@@ -25,16 +25,19 @@ export const findDvcSubRootPaths = async (
     .map(child => join(cwd, child))
 }
 
-export const findDvcRootPaths = async (
-  cwd: string,
-  relativePathPromise: Promise<string | undefined>
-): Promise<string[]> => {
+export const findDvcRootPaths = async (cwd: string): Promise<string[]> => {
   const subRoots = await findDvcSubRootPaths(cwd)
 
   if (definedAndNonEmpty(subRoots)) {
     return subRoots
   }
+  return []
+}
 
+export const findAbsoluteDvcRootPath = async (
+  cwd: string,
+  relativePathPromise: Promise<string | undefined>
+): Promise<string[]> => {
   const relativePath = await relativePathPromise
   if (!relativePath) {
     return []
