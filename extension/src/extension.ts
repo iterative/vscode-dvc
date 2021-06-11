@@ -128,7 +128,7 @@ export class Extension implements IExtension {
     )
   }
 
-  private initializeDvcRepositories = () => {
+  private initializeRepositories = () => {
     reset(this.repositories, this.dispose)
 
     this.dvcRoots.forEach(dvcRoot => {
@@ -167,7 +167,7 @@ export class Extension implements IExtension {
   }
 
   public initialize = () => {
-    this.initializeDvcRepositories()
+    this.initializeRepositories()
 
     this.trackedExplorerTree.initialize(this.dvcRoots)
 
