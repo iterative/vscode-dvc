@@ -74,11 +74,13 @@ export class Extension implements IExtension {
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
     .event
 
+  public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
+
   public canRunCli = async () => {
     try {
       await this.config.isReady()
-      const root = this.dvcRoots?.[0]
-      return !!(root && (await this.cliExecutor.help(root)))
+      const [root] = this.dvcRoots
+      return !!(await this.cliExecutor.help(root))
     } catch (e) {
       return false
     }
