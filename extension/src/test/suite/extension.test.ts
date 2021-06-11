@@ -192,20 +192,7 @@ suite('Extension Test Suite', () => {
         'GONE AGAIN'
       )
 
-      stub(Watcher, 'onDidChangeFileSystem').returns({} as Disposable)
-
       const mockDisposer = spy(Disposer, 'reset')
-
-      const mockListDvcOnlyRecursive = stub(
-        CliReader.prototype,
-        'listDvcOnlyRecursive'
-      ).resolves([])
-
-      stub(CliReader.prototype, 'listDvcOnly').resolves([])
-
-      const mockDiff = stub(CliReader.prototype, 'diff').resolves({})
-
-      const mockStatus = stub(CliReader.prototype, 'status').resolves({})
 
       await selectDvcPathItem(1)
 
@@ -214,9 +201,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
-      expect(mockListDvcOnlyRecursive).not.to.have.been.called
-      expect(mockDiff).not.to.have.been.called
-      expect(mockStatus).not.to.have.been.called
     })
   })
 })

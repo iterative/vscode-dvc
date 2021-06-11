@@ -17,7 +17,7 @@ beforeEach(() => {
 })
 
 describe('setup', () => {
-  it('should always run the pre check initialization', async () => {
+  it('should do nothing if there is no workspace folder', async () => {
     const extension = {
       canRunCli: mockedCanRunCli,
       hasWorkspaceFolder: mockedHasWorkspaceFolder,
@@ -26,10 +26,29 @@ describe('setup', () => {
       reset: mockedReset
     }
 
-    mockedCanRunCli.mockResolvedValueOnce(false)
-    mockedHasWorkspaceFolder.mockResolvedValueOnce(true)
+    mockedHasWorkspaceFolder.mockReturnValueOnce(false)
 
     await setup(extension)
+
+    expect(mockedInitializePreCheck).not.toBeCalled()
+    expect(mockedCanRunCli).not.toBeCalled()
+    expect(mockedInitialize).not.toBeCalled()
+  })
+
+  it('should run the pre check initialization even if the cli cannot be used', async () => {
+    const extension = {
+      canRunCli: mockedCanRunCli,
+      hasWorkspaceFolder: mockedHasWorkspaceFolder,
+      initialize: mockedInitialize,
+      initializePreCheck: mockedInitializePreCheck,
+      reset: mockedReset
+    }
+
+    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
+    mockedCanRunCli.mockResolvedValueOnce(false)
+
+    await setup(extension)
+
     expect(mockedInitializePreCheck).toBeCalledTimes(1)
   })
 
@@ -42,6 +61,7 @@ describe('setup', () => {
       reset: mockedReset
     }
 
+    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
@@ -60,32 +80,13 @@ describe('setup', () => {
       reset: mockedReset
     }
 
-    mockedCanRunCli.mockResolvedValueOnce(false)
     mockedHasWorkspaceFolder.mockReturnValueOnce(true)
+    mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
     expect(mockedInitializePreCheck).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
     expect(mockedShowInformationMessage).toBeCalledTimes(1)
-  })
-
-  it('should run reset but not alert the user if the cli cannot be run but there is no workspace folder open', async () => {
-    const extension = {
-      canRunCli: mockedCanRunCli,
-      hasWorkspaceFolder: mockedHasWorkspaceFolder,
-      initialize: mockedInitialize,
-      initializePreCheck: mockedInitializePreCheck,
-      reset: mockedReset
-    }
-
-    mockedCanRunCli.mockResolvedValueOnce(false)
-    mockedHasWorkspaceFolder.mockReturnValueOnce(false)
-
-    await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
-    expect(mockedReset).toBeCalledTimes(1)
-    expect(mockedInitialize).not.toBeCalled()
-    expect(mockedShowInformationMessage).not.toBeCalled()
   })
 })

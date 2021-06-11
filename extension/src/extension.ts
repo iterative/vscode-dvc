@@ -76,14 +76,14 @@ export class Extension implements IExtension {
   public canRunCli = async () => {
     try {
       await this.config.isReady()
-      const root = this.config.firstWorkspaceFolderRoot
+      const root = this.dvcRoots?.[0]
       return !!(root && (await this.cliExecutor.help(root)))
     } catch (e) {
       return false
     }
   }
 
-  public hasWorkspaceFolder = () => !!this.config.firstWorkspaceFolderRoot
+  public hasWorkspaceFolder = () => !!this.config.getFirstWorkspaceFolderRoot()
 
   public reset = () => {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)

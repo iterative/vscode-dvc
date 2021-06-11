@@ -10,6 +10,11 @@ export interface IExtension {
 }
 
 export const setup = async (extension: IExtension) => {
+  const hasWorkspaceFolder = extension.hasWorkspaceFolder()
+  if (!hasWorkspaceFolder) {
+    return
+  }
+
   await extension.initializePreCheck()
 
   if (await extension.canRunCli()) {
@@ -18,10 +23,6 @@ export const setup = async (extension: IExtension) => {
 
   extension.reset()
 
-  const hasWorkspaceFolder = extension.hasWorkspaceFolder()
-  if (!hasWorkspaceFolder) {
-    return
-  }
   window.showInformationMessage(
     'DVC extension is unable to initialize as the cli is not available.\n' +
       'Update your config options to try again.'
