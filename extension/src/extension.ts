@@ -167,13 +167,12 @@ export class Extension implements IExtension {
   }
 
   public initialize = () => {
-    this.initializeRepositories()
-
-    this.trackedExplorerTree.initialize(this.dvcRoots)
-
-    this.initializeExperiments()
-
-    return this.setAvailable(true)
+    Promise.all([
+      this.initializeRepositories(),
+      this.trackedExplorerTree.initialize(this.dvcRoots),
+      this.initializeExperiments(),
+      this.setAvailable(true)
+    ])
   }
 
   private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>
