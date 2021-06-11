@@ -47,6 +47,7 @@ if (process.env.HOT_RELOAD) {
 
 registerUpdateReconciler(module)
 
+type Repositories = Record<string, Repository>
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
 
@@ -55,7 +56,7 @@ export class Extension implements IExtension {
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
-  private dvcRepositories: Record<string, Repository> = {}
+  private repositories: Repositories = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
@@ -83,7 +84,7 @@ export class Extension implements IExtension {
   public hasWorkspaceFolder = () => !!this.config.firstWorkspaceFolderRoot
 
   public reset = () => {
-    this.dvcRepositories = reset(this.dvcRepositories, this.dispose)
+    this.repositories = reset<Repositories>(this.repositories, this.dispose)
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
     return this.setAvailable(false)
@@ -123,7 +124,7 @@ export class Extension implements IExtension {
   }
 
   private initializeDvcRepositories = () => {
-    reset(this.dvcRepositories, this.dispose)
+    reset(this.repositories, this.dispose)
 
     this.dvcRoots.forEach(dvcRoot => {
       const repository = new Repository(
@@ -139,7 +140,7 @@ export class Extension implements IExtension {
         )
       )
 
-      this.dvcRepositories[dvcRoot] = repository
+      this.repositories[dvcRoot] = repository
     })
   }
 
