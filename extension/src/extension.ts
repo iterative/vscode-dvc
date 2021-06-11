@@ -1,12 +1,4 @@
-import {
-  commands,
-  Event,
-  EventEmitter,
-  ExtensionContext,
-  window,
-  workspace,
-  WorkspaceFolder
-} from 'vscode'
+import { commands, Event, EventEmitter, ExtensionContext, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -32,10 +24,10 @@ import { Repository } from './repository'
 import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import { CliExecutor } from './cli/executor'
 import { setContextValue } from './vscode/context'
-import { definedAndNonEmpty } from './util/array'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { OutputChannel } from './vscode/outputChannel'
+import { IExtension, setup } from './setup'
 
 export { Disposable, Disposer }
 
@@ -45,11 +37,11 @@ if (process.env.HOT_RELOAD) {
 
 registerUpdateReconciler(module)
 
-export class Extension {
+export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
 
   private readonly resourceLocator: ResourceLocator
-  private readonly config: Config
+  readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private decorationProviders: Record<string, DecorationProvider> = {}
@@ -61,49 +53,27 @@ export class Extension {
   private readonly cliRunner: CliRunner
   private readonly status: Status
 
-  private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
-    new EventEmitter()
-  )
+  public getCliReader = () => this.cliReader
 
-  private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
-    .event
+  public getDvcRoots = () => this.dvcRoots
+  public setDvcRoots = (dvcRoots: string[]) => (this.dvcRoots = dvcRoots)
 
-  private async setup() {
-    await Promise.all([
-      (workspace.workspaceFolders || []).map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
-      ),
-      this.config.isReady()
-    ])
-    this.config.setDvcRoots(this.dvcRoots)
-    return this.initializeOrNotify()
-  }
+  public getDecorationProvider = (dvcRoot: string) =>
+    this.decorationProviders[dvcRoot]
 
-  private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
-    const workspaceFolderRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await findDvcRootPaths(
-      workspaceFolderRoot,
-      this.cliReader.root(workspaceFolderRoot)
-    )
+  public setDecorationProvider = (
+    dvcRoot: string,
+    decorationProvider: DecorationProvider
+  ) =>
+    (this.decorationProviders[dvcRoot] = this.dispose.track(decorationProvider))
 
-    if (definedAndNonEmpty(dvcRoots)) {
-      this.initializeDecorationProvidersEarly(dvcRoots)
-      this.setProjectAvailability(true)
-    }
+  public getRepository = (dvcRoot: string): Repository =>
+    this.dvcRepositories[dvcRoot]
 
-    return this.dvcRoots.push(...dvcRoots)
-  }
+  public setRepository = (dvcRoot: string, repository: Repository) =>
+    (this.dvcRepositories[dvcRoot] = this.dispose.track(repository))
 
-  private initializeDecorationProvidersEarly(dvcRoots: string[]) {
-    dvcRoots.forEach(
-      dvcRoot =>
-        (this.decorationProviders[dvcRoot] = this.dispose.track(
-          new DecorationProvider()
-        ))
-    )
-  }
-
-  private resetRepositories = () => {
+  public resetRepositories = () => {
     this.dvcRoots.forEach(dvcRoot => {
       const repository = this.dvcRepositories[dvcRoot]
       this.dispose.untrack(repository)
@@ -112,26 +82,44 @@ export class Extension {
     this.dvcRepositories = {}
   }
 
-  private async canRunCli(root: string) {
+  public getExperiments = () => this.experiments
+  public getTrackedExplorerTree = () => this.trackedExplorerTree
+
+  public getResourceLocator = () => this.resourceLocator
+
+  private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
+    new EventEmitter()
+  )
+
+  private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
+    .event
+
+  public canRunCli = async () => {
     try {
-      return !!(await this.cliExecutor.help(root))
+      const root = this.config.firstWorkspaceFolderRoot
+      return !!(root && (await this.cliExecutor.help(root)))
     } catch (e) {
       return false
     }
   }
 
-  private setUnavailable() {
+  public setUnavailable = () => {
     this.resetRepositories()
 
     this.status.setAvailability(false)
     return this.setCommandsAvailability(false)
   }
 
+  public setAvailable = () => {
+    this.status.setAvailability(true)
+    return this.setCommandsAvailability(true)
+  }
+
   private async initializeOrNotify() {
     const root = this.config.firstWorkspaceFolderRoot
     if (!root) {
       this.setUnavailable()
-    } else if (await this.canRunCli(root)) {
+    } else if (await this.canRunCli()) {
       this.initialize()
     } else {
       window.showInformationMessage(
@@ -272,11 +260,11 @@ export class Extension {
       )
     )
 
-    this.setup()
+    setup(this)
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
-        this.setup()
+        setup(this)
       })
     )
 
