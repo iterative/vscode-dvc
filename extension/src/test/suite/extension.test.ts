@@ -38,6 +38,9 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
+    const testUri = Uri.file('/file/picked/path/to/dvc')
+    const mockFilePickerResolve = [testUri]
+
     const selectDvcPathItem = async (selection: number) => {
       const selectionPromise = commands.executeCommand('dvc.selectDvcPath')
 
@@ -76,10 +79,8 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
-      const testUri = Uri.file('/file/picked/path/to/dvc')
-      const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        fileResolve
+        mockFilePickerResolve
       )
       const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
         'I WORK NOW'
@@ -148,11 +149,9 @@ suite('Extension Test Suite', () => {
       expect(mockStatus).to.have.been.called
     })
 
-    it('should dispose of the current repositories before creating new ones', async () => {
-      const testUri = Uri.file('/file/picked/path/to/dvc')
-      const fileResolve = [testUri]
+    it('should dispose of the current repositories and experiments before creating new ones', async () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        fileResolve
+        mockFilePickerResolve
       )
       const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
         'I STILL WORK'
@@ -183,6 +182,41 @@ suite('Extension Test Suite', () => {
       expect(mockListDvcOnlyRecursive).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
+    })
+
+    it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
+        mockFilePickerResolve
+      )
+      const mockCanRunCli = stub(CliExecutor.prototype, 'help').rejects(
+        'GONE AGAIN'
+      )
+
+      stub(Watcher, 'onDidChangeFileSystem').returns({} as Disposable)
+
+      const mockDisposer = spy(Disposer, 'reset')
+
+      const mockListDvcOnlyRecursive = stub(
+        CliReader.prototype,
+        'listDvcOnlyRecursive'
+      ).resolves([])
+
+      stub(CliReader.prototype, 'listDvcOnly').resolves([])
+
+      const mockDiff = stub(CliReader.prototype, 'diff').resolves({})
+
+      const mockStatus = stub(CliReader.prototype, 'status').resolves({})
+
+      await selectDvcPathItem(1)
+
+      await configurationChangeEvent()
+
+      expect(mockShowOpenDialog).to.have.been.called
+      expect(mockCanRunCli).to.have.been.called
+      expect(mockDisposer).to.have.been.called
+      expect(mockListDvcOnlyRecursive).not.to.have.been.called
+      expect(mockDiff).not.to.have.been.called
+      expect(mockStatus).not.to.have.been.called
     })
   })
 })
