@@ -13,6 +13,8 @@ import { getInput } from '../vscode/inputBox'
 import { CliRunner } from '../cli/runner'
 import { reset } from '../util/disposable'
 
+type ExperimentsTables = Record<string, ExperimentsTable>
+
 export class Experiments {
   public dispose = Disposable.fn()
 
@@ -34,7 +36,7 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  private experiments: Record<string, ExperimentsTable> = {}
+  private experiments: ExperimentsTables = {}
   private config: Config
 
   private async getDvcRoot(
@@ -205,10 +207,7 @@ export class Experiments {
   }
 
   public reset(): void {
-    this.experiments = reset<Record<string, ExperimentsTable>>(
-      this.experiments,
-      this.dispose
-    )
+    this.experiments = reset<ExperimentsTables>(this.experiments, this.dispose)
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
