@@ -48,6 +48,8 @@ if (process.env.HOT_RELOAD) {
 registerUpdateReconciler(module)
 
 type Repositories = Record<string, Repository>
+type DecorationProviders = Record<string, DecorationProvider>
+
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
 
@@ -55,7 +57,7 @@ export class Extension implements IExtension {
   readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
-  private decorationProviders: Record<string, DecorationProvider> = {}
+  private decorationProviders: DecorationProviders = {}
   private repositories: Repositories = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
