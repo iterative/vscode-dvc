@@ -34,8 +34,6 @@ export class Config {
     return this.initialized
   }
 
-  public readonly firstWorkspaceFolderRoot?: string
-
   private readonly executionDetailsChanged: EventEmitter<
     void
   > = this.dispose.track(new EventEmitter())
@@ -59,7 +57,7 @@ export class Config {
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  private getFirstWorkspaceFolderRoot = (): string | undefined => {
+  public getFirstWorkspaceFolderRoot = (): string | undefined => {
     const { workspaceFolders } = workspace
     return workspaceFolders && workspaceFolders.length > 0
       ? workspaceFolders[0].uri.fsPath
@@ -226,8 +224,6 @@ export class Config {
           })
         )
     )
-
-    this.firstWorkspaceFolderRoot = this.getFirstWorkspaceFolderRoot()
 
     this.vsCodeTheme = window.activeColorTheme
 

@@ -15,27 +15,30 @@ import {
   getReloadCount
 } from '@hediet/node-reload'
 import { Config } from './config'
-import { WebviewSerializer } from './webviewSerializer'
+import { CliExecutor } from './cli/executor'
+import { CliRunner } from './cli/runner'
+import { CliReader } from './cli/reader'
+import { getGitRepositoryRoots } from './extensions/git'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
-import { registerRepositoryCommands } from './repository/commands/register'
-import { findDvcRootPaths } from './fileSystem'
+import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
+import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import {
   getRepositoryWatcher,
   onDidChangeFileSystem
 } from './fileSystem/watcher'
-import { ResourceLocator } from './resourceLocator'
-import { Status } from './status'
-import { DecorationProvider } from './repository/decorationProvider'
-import { getGitRepositoryRoots } from './extensions/git'
+import { IExtension } from './interfaces'
 import { Repository } from './repository'
-import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
-import { CliExecutor } from './cli/executor'
-import { setContextValue } from './vscode/context'
+import { registerRepositoryCommands } from './repository/commands/register'
+import { DecorationProvider } from './repository/decorationProvider'
+import { ResourceLocator } from './resourceLocator'
+import { reset } from './util/disposable'
+import { setup } from './setup'
+import { Status } from './status'
 import { definedAndNonEmpty } from './util/array'
-import { CliRunner } from './cli/runner'
-import { CliReader } from './cli/reader'
+import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
+import { WebviewSerializer } from './webviewSerializer'
 
 export { Disposable, Disposer }
 
@@ -45,15 +48,18 @@ if (process.env.HOT_RELOAD) {
 
 registerUpdateReconciler(module)
 
-export class Extension {
+type Repositories = Record<string, Repository>
+type DecorationProviders = Record<string, DecorationProvider>
+
+export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
-  private decorationProviders: Record<string, DecorationProvider> = {}
-  private dvcRepositories: Record<string, Repository> = {}
+  private decorationProviders: DecorationProviders = {}
+  private repositories: Repositories = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
@@ -68,136 +74,30 @@ export class Extension {
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
     .event
 
-  private async setup() {
-    await Promise.all([
-      (workspace.workspaceFolders || []).map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
-      ),
-      this.config.isReady()
-    ])
-    this.config.setDvcRoots(this.dvcRoots)
-    return this.initializeOrNotify()
-  }
+  public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
 
-  private async setupWorkspaceFolder(workspaceFolder: WorkspaceFolder) {
-    const workspaceFolderRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await findDvcRootPaths(
-      workspaceFolderRoot,
-      this.cliReader.root(workspaceFolderRoot)
-    )
-
-    if (definedAndNonEmpty(dvcRoots)) {
-      this.initializeDecorationProvidersEarly(dvcRoots)
-      this.setProjectAvailability(true)
-    }
-
-    return this.dvcRoots.push(...dvcRoots)
-  }
-
-  private initializeDecorationProvidersEarly(dvcRoots: string[]) {
-    dvcRoots.forEach(
-      dvcRoot =>
-        (this.decorationProviders[dvcRoot] = this.dispose.track(
-          new DecorationProvider()
-        ))
-    )
-  }
-
-  private resetRepositories = () => {
-    this.dvcRoots.forEach(dvcRoot => {
-      const repository = this.dvcRepositories[dvcRoot]
-      this.dispose.untrack(repository)
-      repository.dispose()
-    })
-    this.dvcRepositories = {}
-  }
-
-  private async canRunCli(root: string) {
+  public canRunCli = async () => {
     try {
+      await this.config.isReady()
+      const [root] = this.dvcRoots
       return !!(await this.cliExecutor.help(root))
     } catch (e) {
       return false
     }
   }
 
-  private setUnavailable() {
-    this.resetRepositories()
+  public hasWorkspaceFolder = () => !!this.config.getFirstWorkspaceFolderRoot()
 
-    this.status.setAvailability(false)
-    return this.setCommandsAvailability(false)
-  }
-
-  private async initializeOrNotify() {
-    const root = this.config.firstWorkspaceFolderRoot
-    if (!root) {
-      this.setUnavailable()
-    } else if (await this.canRunCli(root)) {
-      this.initialize()
-    } else {
-      window.showInformationMessage(
-        'DVC extension is unable to initialize as the cli is not available.\n' +
-          'Update your config options to try again.'
-      )
-      this.setUnavailable()
-    }
-  }
-
-  private initialize() {
-    this.initializeDvcRepositories()
-
-    this.trackedExplorerTree.initialize(this.dvcRoots)
-
-    this.initializeExperiments()
-
-    this.initializeGitRepositories()
-
-    this.status.setAvailability(true)
-    return this.setCommandsAvailability(true)
-  }
-
-  private initializeDvcRepositories() {
-    this.dvcRoots.forEach(dvcRoot => {
-      if (!this.dvcRepositories[dvcRoot]) {
-        const repository = this.dispose.track(
-          new Repository(
-            dvcRoot,
-            this.cliReader,
-            this.decorationProviders[dvcRoot]
-          )
-        )
-
-        repository.dispose.track(
-          onDidChangeFileSystem(
-            dvcRoot,
-            getRepositoryWatcher(repository, this.trackedExplorerTree)
-          )
-        )
-
-        this.dvcRepositories[dvcRoot] = repository
-      }
-    })
-  }
-
-  private initializeExperiments() {
+  public reset = () => {
+    this.repositories = reset<Repositories>(this.repositories, this.dispose)
+    this.trackedExplorerTree.initialize([])
     this.experiments.reset()
-    this.experiments.create(this.dvcRoots, this.resourceLocator)
+    return this.setAvailable(false)
   }
 
-  private async initializeGitRepositories() {
-    const [, gitRoots] = await Promise.all([
-      this.experiments.isReady(),
-      getGitRepositoryRoots()
-    ])
-    gitRoots.forEach(async gitRoot => {
-      const dvcRoots = await findDvcRootPaths(
-        gitRoot,
-        this.cliReader.root(gitRoot)
-      )
-
-      dvcRoots.forEach(dvcRoot => {
-        this.experiments.onDidChangeData(dvcRoot, gitRoot)
-      })
-    })
+  private setAvailable = (available: boolean) => {
+    this.status.setAvailability(available)
+    return this.setCommandsAvailability(available)
   }
 
   private setCommandsAvailability(available: boolean) {
@@ -226,6 +126,96 @@ export class Extension {
         this.config.selectDefaultProject()
       )
     )
+  }
+
+  private initializeRepositories = () => {
+    reset(this.repositories, this.dispose)
+
+    this.dvcRoots.forEach(dvcRoot => {
+      const repository = new Repository(
+        dvcRoot,
+        this.cliReader,
+        this.decorationProviders[dvcRoot]
+      )
+
+      repository.dispose.track(
+        onDidChangeFileSystem(
+          dvcRoot,
+          getRepositoryWatcher(repository, this.trackedExplorerTree)
+        )
+      )
+
+      this.repositories[dvcRoot] = repository
+    })
+  }
+
+  private initializeExperiments = async () => {
+    this.experiments.reset()
+
+    this.experiments.create(this.dvcRoots, this.resourceLocator)
+    const [, gitRoots] = await Promise.all([
+      this.experiments.isReady(),
+      getGitRepositoryRoots()
+    ])
+    gitRoots.forEach(async gitRoot => {
+      const dvcRoots = await findDvcRootPaths(gitRoot)
+
+      dvcRoots.forEach(dvcRoot => {
+        this.experiments.onDidChangeData(dvcRoot, gitRoot)
+      })
+    })
+  }
+
+  public initialize = () => {
+    Promise.all([
+      this.initializeRepositories(),
+      this.trackedExplorerTree.initialize(this.dvcRoots),
+      this.initializeExperiments(),
+      this.setAvailable(true)
+    ])
+  }
+
+  private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>
+    dvcRoots
+      .filter(dvcRoot => !this.dvcRoots.includes(dvcRoot))
+      .forEach(
+        dvcRoot =>
+          (this.decorationProviders[dvcRoot] = this.dispose.track(
+            new DecorationProvider()
+          ))
+      )
+
+  private findDvcRoots = async (cwd: string): Promise<string[]> => {
+    const dvcRoots = await findDvcRootPaths(cwd)
+    if (definedAndNonEmpty(dvcRoots)) {
+      return dvcRoots
+    }
+
+    await this.config.isReady()
+    return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
+  }
+
+  private setupWorkspaceFolder = async (workspaceFolder: WorkspaceFolder) => {
+    const workspaceFolderRoot = workspaceFolder.uri.fsPath
+    const dvcRoots = await this.findDvcRoots(workspaceFolderRoot)
+
+    if (definedAndNonEmpty(dvcRoots)) {
+      this.initializeDecorationProvidersEarly(dvcRoots)
+      this.setProjectAvailability(true)
+    }
+
+    return dvcRoots
+  }
+
+  public initializePreCheck = async () => {
+    const dvcRoots = await Promise.all(
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      )
+    )
+
+    this.dvcRoots = ([] as string[]).concat(...dvcRoots)
+    this.config.setDvcRoots(this.dvcRoots)
   }
 
   constructor(context: ExtensionContext) {
@@ -272,16 +262,18 @@ export class Extension {
       )
     )
 
-    this.setup()
+    setup(this)
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
-        this.setup()
+        setup(this)
       })
     )
 
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
+      this.config.onDidChangeExecutionDetails(() => {
+        setup(this)
+      })
     )
 
     this.webviewSerializer = new WebviewSerializer(

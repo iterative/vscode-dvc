@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import {
   window,
@@ -15,6 +15,7 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
+import * as Disposer from '../../util/disposable'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -37,6 +38,9 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.selectDvcPath', () => {
+    const testUri = Uri.file('/file/picked/path/to/dvc')
+    const mockFilePickerResolve = [testUri]
+
     const selectDvcPathItem = async (selection: number) => {
       const selectionPromise = commands.executeCommand('dvc.selectDvcPath')
 
@@ -49,20 +53,6 @@ suite('Extension Test Suite', () => {
       await selectionPromise
     }
 
-    it('should set dvc.dvcPath to blank on the first option', async () => {
-      const mockShowInputBox = stub(window, 'showInputBox')
-      const mockCanRunCli = stub(CliExecutor.prototype, 'help').rejects('ERROR')
-      await selectDvcPathItem(0)
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
-      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
-
-      expect(mockShowInputBox).not.to.have.been.called
-      expect(mockCanRunCli).to.have.been.called
-    })
-
     const configurationChangeEvent = () => {
       return new Promise(resolve => {
         const listener: Disposable = workspace.onDidChangeConfiguration(
@@ -74,11 +64,23 @@ suite('Extension Test Suite', () => {
       })
     }
 
+    it('should set dvc.dvcPath to blank on the first option', async () => {
+      const mockShowInputBox = stub(window, 'showInputBox')
+
+      await selectDvcPathItem(0)
+
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
+      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
+
+      expect(mockShowInputBox).not.to.have.been.called
+    })
+
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
-      const testUri = Uri.file('/file/picked/path/to/dvc')
-      const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        fileResolve
+        mockFilePickerResolve
       )
       const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
         'I WORK NOW'
@@ -91,10 +93,7 @@ suite('Extension Test Suite', () => {
         dispose: () => undefined
       } as Disposable)
 
-      const mockListDvcOnlyRecursive = stub(
-        CliReader.prototype,
-        'listDvcOnlyRecursive'
-      ).resolves([
+      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
         { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
@@ -146,16 +145,13 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockOnDidChangeFileSystem).to.have.been.called
-      expect(mockListDvcOnlyRecursive).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
     })
 
-    it('should not create a second set of repositories if they have already been created', async () => {
-      const testUri = Uri.file('/file/picked/path/to/dvc')
-      const fileResolve = [testUri]
+    it('should dispose of the current repositories and experiments before creating new ones', async () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        fileResolve
+        mockFilePickerResolve
       )
       const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
         'I STILL WORK'
@@ -163,14 +159,14 @@ suite('Extension Test Suite', () => {
 
       stub(Watcher, 'onDidChangeFileSystem').returns({} as Disposable)
 
+      const mockDisposer = spy(Disposer, 'reset')
+
       const mockListDvcOnlyRecursive = stub(
         CliReader.prototype,
         'listDvcOnlyRecursive'
       ).resolves([])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([])
-
-      stub(CliReader.prototype, 'root').resolves('.')
 
       const mockDiff = stub(CliReader.prototype, 'diff').resolves({})
 
@@ -182,9 +178,29 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
-      expect(mockListDvcOnlyRecursive).not.to.have.been.called
-      expect(mockDiff).not.to.have.been.called
-      expect(mockStatus).not.to.have.been.called
+      expect(mockDisposer).to.have.been.called
+      expect(mockListDvcOnlyRecursive).to.have.been.called
+      expect(mockDiff).to.have.been.called
+      expect(mockStatus).to.have.been.called
+    })
+
+    it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
+        mockFilePickerResolve
+      )
+      const mockCanRunCli = stub(CliExecutor.prototype, 'help').rejects(
+        'GONE AGAIN'
+      )
+
+      const mockDisposer = spy(Disposer, 'reset')
+
+      await selectDvcPathItem(1)
+
+      await configurationChangeEvent()
+
+      expect(mockShowOpenDialog).to.have.been.called
+      expect(mockCanRunCli).to.have.been.called
+      expect(mockDisposer).to.have.been.called
     })
   })
 })
