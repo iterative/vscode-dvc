@@ -55,7 +55,7 @@ export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
 
   private readonly resourceLocator: ResourceLocator
-  readonly config: Config
+  private readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private decorationProviders: DecorationProviders = {}
