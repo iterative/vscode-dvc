@@ -85,13 +85,13 @@ export class Extension implements IExtension {
   public reset = () => {
     this.dvcRepositories = reset(this.dvcRepositories, this.dispose)
     this.trackedExplorerTree.initialize([])
-    this.status.setAvailability(false)
-    return this.setCommandsAvailability(false)
+    this.experiments.reset()
+    return this.setAvailable(false)
   }
 
-  public setAvailable = () => {
-    this.status.setAvailability(true)
-    return this.setCommandsAvailability(true)
+  private setAvailable = (available: boolean) => {
+    this.status.setAvailability(available)
+    return this.setCommandsAvailability(available)
   }
 
   private setCommandsAvailability(available: boolean) {
@@ -123,31 +123,30 @@ export class Extension implements IExtension {
   }
 
   private initializeDvcRepositories = () => {
+    reset(this.dvcRepositories, this.dispose)
+
     this.dvcRoots.forEach(dvcRoot => {
-      if (!this.dvcRepositories[dvcRoot]) {
-        const repository = new Repository(
+      const repository = new Repository(
+        dvcRoot,
+        this.cliReader,
+        this.decorationProviders[dvcRoot]
+      )
+
+      repository.dispose.track(
+        onDidChangeFileSystem(
           dvcRoot,
-          this.cliReader,
-          this.decorationProviders[dvcRoot]
+          getRepositoryWatcher(repository, this.trackedExplorerTree)
         )
+      )
 
-        repository.dispose.track(
-          onDidChangeFileSystem(
-            dvcRoot,
-            getRepositoryWatcher(repository, this.trackedExplorerTree)
-          )
-        )
-
-        this.dvcRepositories[dvcRoot] = repository
-      }
+      this.dvcRepositories[dvcRoot] = repository
     })
   }
 
-  private initializeExperiments = () => {
-    this.experiments.create(this.dvcRoots, this.resourceLocator)
-  }
+  private initializeExperiments = async () => {
+    this.experiments.reset()
 
-  private initializeGitRepositories = async () => {
+    this.experiments.create(this.dvcRoots, this.resourceLocator)
     const [, gitRoots] = await Promise.all([
       this.experiments.isReady(),
       getGitRepositoryRoots()
@@ -168,9 +167,7 @@ export class Extension implements IExtension {
 
     this.initializeExperiments()
 
-    this.initializeGitRepositories()
-
-    return this.setAvailable()
+    return this.setAvailable(true)
   }
 
   private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>

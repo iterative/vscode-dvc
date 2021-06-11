@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import sinonChai from 'sinon-chai'
 import {
   window,
@@ -15,6 +15,7 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import { CliExecutor } from '../../cli/executor'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
+import * as Disposer from '../../util/disposable'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -147,7 +148,7 @@ suite('Extension Test Suite', () => {
       expect(mockStatus).to.have.been.called
     })
 
-    it('should not create a second set of repositories if they have already been created', async () => {
+    it('should dispose of the current repositories before creating new ones', async () => {
       const testUri = Uri.file('/file/picked/path/to/dvc')
       const fileResolve = [testUri]
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
@@ -158,6 +159,8 @@ suite('Extension Test Suite', () => {
       )
 
       stub(Watcher, 'onDidChangeFileSystem').returns({} as Disposable)
+
+      const mockDisposer = spy(Disposer, 'reset')
 
       const mockListDvcOnlyRecursive = stub(
         CliReader.prototype,
@@ -176,9 +179,10 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
-      expect(mockListDvcOnlyRecursive).not.to.have.been.called
-      expect(mockDiff).not.to.have.been.called
-      expect(mockStatus).not.to.have.been.called
+      expect(mockDisposer).to.have.been.called
+      expect(mockListDvcOnlyRecursive).to.have.been.called
+      expect(mockDiff).to.have.been.called
+      expect(mockStatus).to.have.been.called
     })
   })
 })
