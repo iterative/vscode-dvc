@@ -2,7 +2,12 @@ import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
 
-const { exists, findDvcRootPaths, isDirectory } = FileSystem
+const {
+  exists,
+  findAbsoluteDvcRootPath,
+  findDvcRootPaths,
+  isDirectory
+} = FileSystem
 
 jest.mock('../cli/reader')
 
@@ -13,10 +18,8 @@ beforeEach(() => {
 const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
 
 describe('findDvcRootPaths', () => {
-  const dataRoot = resolve(dvcDemoPath, 'data')
-
   it('should find the dvc root if it exists in the given folder', async () => {
-    const dvcRoots = await findDvcRootPaths(dvcDemoPath, Promise.resolve('.'))
+    const dvcRoots = await findDvcRootPaths(dvcDemoPath)
 
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
@@ -26,24 +29,28 @@ describe('findDvcRootPaths', () => {
     const mockDvcRoot = join(parentDir, 'mockDvc')
     ensureDirSync(join(mockDvcRoot, '.dvc'))
 
-    const dvcRoots = await findDvcRootPaths(
-      parentDir,
-      Promise.resolve(undefined)
-    )
+    const dvcRoots = await findDvcRootPaths(parentDir)
 
     remove(mockDvcRoot)
 
     expect(dvcRoots).toEqual([dvcDemoPath, mockDvcRoot].sort())
   })
+})
+
+describe('findAbsoluteDvcRootPath', () => {
+  const dataRoot = resolve(dvcDemoPath, 'data')
 
   it('should find the dvc root if it exists above the given folder', async () => {
-    const dvcRoots = await findDvcRootPaths(dataRoot, Promise.resolve('..'))
+    const dvcRoots = await findAbsoluteDvcRootPath(
+      dataRoot,
+      Promise.resolve('..')
+    )
 
     expect(dvcRoots).toEqual([dvcDemoPath])
   })
 
   it('should return an empty array given no dvc root in or above the given directory', async () => {
-    const dvcRoots = await findDvcRootPaths(
+    const dvcRoots = await findAbsoluteDvcRootPath(
       __dirname,
       Promise.resolve(undefined)
     )

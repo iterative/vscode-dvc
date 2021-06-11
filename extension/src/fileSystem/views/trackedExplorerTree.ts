@@ -217,7 +217,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
-        const root = this.config.firstWorkspaceFolderRoot
+        const root = this.config.getFirstWorkspaceFolderRoot()
         if (root) {
           await this.cliExecutor.init(root)
         }
