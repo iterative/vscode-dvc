@@ -43,7 +43,7 @@ describe('reset', () => {
     expect(mockedDispose).toBeCalledTimes(3)
   })
 
-  it('should stop tracking the disposables with the disposer', () => {
+  it('should stop the disposer tracking the disposables', () => {
     const disposer = Disposable.fn()
 
     const disposable = disposer.track(Disposable.fn())
