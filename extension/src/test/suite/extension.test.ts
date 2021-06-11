@@ -49,20 +49,6 @@ suite('Extension Test Suite', () => {
       await selectionPromise
     }
 
-    it('should set dvc.dvcPath to blank on the first option', async () => {
-      const mockShowInputBox = stub(window, 'showInputBox')
-      const mockCanRunCli = stub(CliExecutor.prototype, 'help').rejects('ERROR')
-      await selectDvcPathItem(0)
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
-      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
-
-      expect(mockShowInputBox).not.to.have.been.called
-      expect(mockCanRunCli).to.have.been.called
-    })
-
     const configurationChangeEvent = () => {
       return new Promise(resolve => {
         const listener: Disposable = workspace.onDidChangeConfiguration(
@@ -73,6 +59,20 @@ suite('Extension Test Suite', () => {
         disposable.track(listener)
       })
     }
+
+    it('should set dvc.dvcPath to blank on the first option', async () => {
+      const mockShowInputBox = stub(window, 'showInputBox')
+
+      await selectDvcPathItem(0)
+
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
+      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
+
+      expect(mockShowInputBox).not.to.have.been.called
+    })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
       const testUri = Uri.file('/file/picked/path/to/dvc')
@@ -91,10 +91,7 @@ suite('Extension Test Suite', () => {
         dispose: () => undefined
       } as Disposable)
 
-      const mockListDvcOnlyRecursive = stub(
-        CliReader.prototype,
-        'listDvcOnlyRecursive'
-      ).resolves([
+      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
         { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
@@ -146,7 +143,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockOnDidChangeFileSystem).to.have.been.called
-      expect(mockListDvcOnlyRecursive).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
     })
@@ -169,8 +165,6 @@ suite('Extension Test Suite', () => {
       ).resolves([])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([])
-
-      stub(CliReader.prototype, 'root').resolves('.')
 
       const mockDiff = stub(CliReader.prototype, 'diff').resolves({})
 

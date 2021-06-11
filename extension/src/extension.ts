@@ -30,9 +30,14 @@ import { setContextValue } from './vscode/context'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { OutputChannel } from './vscode/outputChannel'
-import { IExtension, initializeOrNotify } from './setup'
+import { IExtension, setup } from './setup'
 import { definedAndNonEmpty } from './util/array'
 import { reset } from './util/disposable'
+import { getGitRepositoryRoots } from './extensions/git'
+import {
+  getRepositoryWatcher,
+  onDidChangeFileSystem
+} from './fileSystem/watcher'
 
 export { Disposable, Disposer }
 
@@ -58,31 +63,6 @@ export class Extension implements IExtension {
   private readonly cliRunner: CliRunner
   private readonly status: Status
 
-  public getCliReader = () => this.cliReader
-
-  public getDvcRoots = () => this.dvcRoots
-  public setDvcRoots = (dvcRoots: string[]) => (this.dvcRoots = dvcRoots)
-
-  public getDecorationProvider = (dvcRoot: string) =>
-    this.decorationProviders[dvcRoot]
-
-  public setDecorationProvider = (
-    dvcRoot: string,
-    decorationProvider: DecorationProvider
-  ) =>
-    (this.decorationProviders[dvcRoot] = this.dispose.track(decorationProvider))
-
-  public getRepository = (dvcRoot: string): Repository =>
-    this.dvcRepositories[dvcRoot]
-
-  public setRepository = (dvcRoot: string, repository: Repository) =>
-    (this.dvcRepositories[dvcRoot] = this.dispose.track(repository))
-
-  public getExperiments = () => this.experiments
-  public getTrackedExplorerTree = () => this.trackedExplorerTree
-
-  public getResourceLocator = () => this.resourceLocator
-
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
   )
@@ -92,6 +72,7 @@ export class Extension implements IExtension {
 
   public canRunCli = async () => {
     try {
+      await this.config.isReady()
       const root = this.config.firstWorkspaceFolderRoot
       return !!(root && (await this.cliExecutor.help(root)))
     } catch (e) {
@@ -99,9 +80,10 @@ export class Extension implements IExtension {
     }
   }
 
-  public setUnavailable = () => {
+  public hasWorkspaceFolder = () => !!this.config.firstWorkspaceFolderRoot
+
+  public reset = () => {
     this.dvcRepositories = reset(this.dvcRepositories, this.dispose)
-    this.experiments.reset()
     this.trackedExplorerTree.initialize([])
     this.status.setAvailability(false)
     return this.setCommandsAvailability(false)
@@ -140,10 +122,66 @@ export class Extension implements IExtension {
     )
   }
 
-  private initializeDecorationProvidersEarly = () =>
-    this.dvcRoots.forEach(dvcRoot =>
-      this.setDecorationProvider(dvcRoot, new DecorationProvider())
-    )
+  private initializeDvcRepositories = () => {
+    this.dvcRoots.forEach(dvcRoot => {
+      if (!this.dvcRepositories[dvcRoot]) {
+        const repository = new Repository(
+          dvcRoot,
+          this.cliReader,
+          this.decorationProviders[dvcRoot]
+        )
+
+        repository.dispose.track(
+          onDidChangeFileSystem(
+            dvcRoot,
+            getRepositoryWatcher(repository, this.trackedExplorerTree)
+          )
+        )
+
+        this.dvcRepositories[dvcRoot] = repository
+      }
+    })
+  }
+
+  private initializeExperiments = () => {
+    this.experiments.create(this.dvcRoots, this.resourceLocator)
+  }
+
+  private initializeGitRepositories = async () => {
+    const [, gitRoots] = await Promise.all([
+      this.experiments.isReady(),
+      getGitRepositoryRoots()
+    ])
+    gitRoots.forEach(async gitRoot => {
+      const dvcRoots = await findDvcRootPaths(gitRoot)
+
+      dvcRoots.forEach(dvcRoot => {
+        this.experiments.onDidChangeData(dvcRoot, gitRoot)
+      })
+    })
+  }
+
+  public initialize = () => {
+    this.initializeDvcRepositories()
+
+    this.trackedExplorerTree.initialize(this.dvcRoots)
+
+    this.initializeExperiments()
+
+    this.initializeGitRepositories()
+
+    return this.setAvailable()
+  }
+
+  private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>
+    dvcRoots
+      .filter(dvcRoot => !this.dvcRoots.includes(dvcRoot))
+      .forEach(
+        dvcRoot =>
+          (this.decorationProviders[dvcRoot] = this.dispose.track(
+            new DecorationProvider()
+          ))
+      )
 
   private findDvcRoots = async (cwd: string): Promise<string[]> => {
     const dvcRoots = await findDvcRootPaths(cwd)
@@ -159,24 +197,23 @@ export class Extension implements IExtension {
     const workspaceFolderRoot = workspaceFolder.uri.fsPath
     const dvcRoots = await this.findDvcRoots(workspaceFolderRoot)
 
-    this.setDvcRoots(dvcRoots)
-    this.config.setDvcRoots(dvcRoots)
-
     if (definedAndNonEmpty(dvcRoots)) {
-      this.initializeDecorationProvidersEarly()
+      this.initializeDecorationProvidersEarly(dvcRoots)
       this.setProjectAvailability(true)
     }
+
+    return dvcRoots
   }
 
-  private setup = async () => {
-    await Promise.all([
+  public initializePreCheck = async () => {
+    const dvcRoots = await Promise.all(
       (workspace.workspaceFolders || []).map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
-      ),
-      this.config.isReady()
-    ])
+      )
+    )
 
-    return initializeOrNotify(this)
+    this.dvcRoots = ([] as string[]).concat(...dvcRoots)
+    this.config.setDvcRoots(this.dvcRoots)
   }
 
   constructor(context: ExtensionContext) {
@@ -223,16 +260,18 @@ export class Extension implements IExtension {
       )
     )
 
-    this.setup()
+    setup(this)
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
-        this.setup()
+        setup(this)
       })
     )
 
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(() => initializeOrNotify(this))
+      this.config.onDidChangeExecutionDetails(() => {
+        setup(this)
+      })
     )
 
     this.webviewSerializer = new WebviewSerializer(
