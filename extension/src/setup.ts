@@ -1,8 +1,7 @@
-import { window, workspace, WorkspaceFolder } from 'vscode'
+import { window } from 'vscode'
 import { Config } from './config'
 import { findDvcRootPaths } from './fileSystem'
 import { DecorationProvider } from './repository/decorationProvider'
-import { definedAndNonEmpty } from './util/array'
 import { Repository } from './repository'
 import {
   getRepositoryWatcher,
@@ -12,11 +11,7 @@ import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import { CliReader } from './cli/reader'
 import { Experiments } from './experiments'
 import { ResourceLocator } from './resourceLocator'
-import { setContextValue } from './vscode/context'
 import { getGitRepositoryRoots } from './extensions/git'
-
-const setProjectAvailability = (available: boolean) =>
-  setContextValue('dvc.project.available', available)
 
 const initializeDvcRepositories = (extension: IExtension) => {
   extension.getDvcRoots().forEach(dvcRoot => {
@@ -75,32 +70,6 @@ const initialize = (extension: IExtension) => {
   return extension.setAvailable()
 }
 
-const initializeDecorationProvidersEarly = (extension: IExtension) =>
-  extension
-    .getDvcRoots()
-    .forEach(dvcRoot =>
-      extension.setDecorationProvider(dvcRoot, new DecorationProvider())
-    )
-
-const setupWorkspaceFolder = async (
-  extension: IExtension,
-  workspaceFolder: WorkspaceFolder
-) => {
-  const workspaceFolderRoot = workspaceFolder.uri.fsPath
-  const dvcRoots = await findDvcRootPaths(
-    workspaceFolderRoot,
-    extension.getCliReader().root(workspaceFolderRoot)
-  )
-
-  extension.setDvcRoots(dvcRoots)
-  extension.config.setDvcRoots(dvcRoots)
-
-  if (definedAndNonEmpty(dvcRoots)) {
-    initializeDecorationProvidersEarly(extension)
-    setProjectAvailability(true)
-  }
-}
-
 export interface IExtension {
   config: Config
   canRunCli: () => Promise<boolean>
@@ -130,7 +99,7 @@ export interface IExtension {
   setUnavailable: () => void
 }
 
-const initializeOrNotify = async (extension: IExtension) => {
+export const initializeOrNotify = async (extension: IExtension) => {
   const root = extension.config.firstWorkspaceFolderRoot
   if (!root) {
     extension.setUnavailable()
@@ -143,15 +112,4 @@ const initializeOrNotify = async (extension: IExtension) => {
     )
     extension.setUnavailable()
   }
-}
-
-export const setup = async (extension: IExtension) => {
-  await Promise.all([
-    (workspace.workspaceFolders || []).map(workspaceFolder =>
-      setupWorkspaceFolder(extension, workspaceFolder)
-    ),
-    extension.config.isReady()
-  ])
-
-  return initializeOrNotify(extension)
 }

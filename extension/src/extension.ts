@@ -1,4 +1,12 @@
-import { commands, Event, EventEmitter, ExtensionContext, window } from 'vscode'
+import {
+  commands,
+  Event,
+  EventEmitter,
+  ExtensionContext,
+  window,
+  workspace,
+  WorkspaceFolder
+} from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -12,14 +20,9 @@ import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { findDvcRootPaths } from './fileSystem'
-import {
-  getRepositoryWatcher,
-  onDidChangeFileSystem
-} from './fileSystem/watcher'
 import { ResourceLocator } from './resourceLocator'
 import { Status } from './status'
 import { DecorationProvider } from './repository/decorationProvider'
-import { getGitRepositoryRoots } from './extensions/git'
 import { Repository } from './repository'
 import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
 import { CliExecutor } from './cli/executor'
@@ -27,7 +30,8 @@ import { setContextValue } from './vscode/context'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { OutputChannel } from './vscode/outputChannel'
-import { IExtension, setup } from './setup'
+import { IExtension, initializeOrNotify } from './setup'
+import { definedAndNonEmpty } from './util/array'
 
 export { Disposable, Disposer }
 
@@ -115,79 +119,6 @@ export class Extension implements IExtension {
     return this.setCommandsAvailability(true)
   }
 
-  private async initializeOrNotify() {
-    const root = this.config.firstWorkspaceFolderRoot
-    if (!root) {
-      this.setUnavailable()
-    } else if (await this.canRunCli()) {
-      this.initialize()
-    } else {
-      window.showInformationMessage(
-        'DVC extension is unable to initialize as the cli is not available.\n' +
-          'Update your config options to try again.'
-      )
-      this.setUnavailable()
-    }
-  }
-
-  private initialize() {
-    this.initializeDvcRepositories()
-
-    this.trackedExplorerTree.initialize(this.dvcRoots)
-
-    this.initializeExperiments()
-
-    this.initializeGitRepositories()
-
-    this.status.setAvailability(true)
-    return this.setCommandsAvailability(true)
-  }
-
-  private initializeDvcRepositories() {
-    this.dvcRoots.forEach(dvcRoot => {
-      if (!this.dvcRepositories[dvcRoot]) {
-        const repository = this.dispose.track(
-          new Repository(
-            dvcRoot,
-            this.cliReader,
-            this.decorationProviders[dvcRoot]
-          )
-        )
-
-        repository.dispose.track(
-          onDidChangeFileSystem(
-            dvcRoot,
-            getRepositoryWatcher(repository, this.trackedExplorerTree)
-          )
-        )
-
-        this.dvcRepositories[dvcRoot] = repository
-      }
-    })
-  }
-
-  private initializeExperiments() {
-    this.experiments.reset()
-    this.experiments.create(this.dvcRoots, this.resourceLocator)
-  }
-
-  private async initializeGitRepositories() {
-    const [, gitRoots] = await Promise.all([
-      this.experiments.isReady(),
-      getGitRepositoryRoots()
-    ])
-    gitRoots.forEach(async gitRoot => {
-      const dvcRoots = await findDvcRootPaths(
-        gitRoot,
-        this.cliReader.root(gitRoot)
-      )
-
-      dvcRoots.forEach(dvcRoot => {
-        this.experiments.onDidChangeData(dvcRoot, gitRoot)
-      })
-    })
-  }
-
   private setCommandsAvailability(available: boolean) {
     setContextValue('dvc.commands.available', available)
   }
@@ -214,6 +145,38 @@ export class Extension implements IExtension {
         this.config.selectDefaultProject()
       )
     )
+  }
+
+  private initializeDecorationProvidersEarly = () =>
+    this.dvcRoots.forEach(dvcRoot =>
+      this.setDecorationProvider(dvcRoot, new DecorationProvider())
+    )
+
+  private setupWorkspaceFolder = async (workspaceFolder: WorkspaceFolder) => {
+    const workspaceFolderRoot = workspaceFolder.uri.fsPath
+    const dvcRoots = await findDvcRootPaths(
+      workspaceFolderRoot,
+      this.cliReader.root(workspaceFolderRoot)
+    )
+
+    this.setDvcRoots(dvcRoots)
+    this.config.setDvcRoots(dvcRoots)
+
+    if (definedAndNonEmpty(dvcRoots)) {
+      this.initializeDecorationProvidersEarly()
+      this.setProjectAvailability(true)
+    }
+  }
+
+  private setup = async () => {
+    await Promise.all([
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      ),
+      this.config.isReady()
+    ])
+
+    return initializeOrNotify(this)
   }
 
   constructor(context: ExtensionContext) {
@@ -260,16 +223,16 @@ export class Extension implements IExtension {
       )
     )
 
-    setup(this)
+    this.setup()
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
-        setup(this)
+        this.setup()
       })
     )
 
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(() => this.initializeOrNotify())
+      this.config.onDidChangeExecutionDetails(() => initializeOrNotify(this))
     )
 
     this.webviewSerializer = new WebviewSerializer(
