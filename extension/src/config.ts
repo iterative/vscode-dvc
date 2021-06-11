@@ -34,8 +34,6 @@ export class Config {
     return this.initialized
   }
 
-  public readonly firstWorkspaceFolderRoot?: string
-
   private readonly executionDetailsChanged: EventEmitter<
     void
   > = this.dispose.track(new EventEmitter())
