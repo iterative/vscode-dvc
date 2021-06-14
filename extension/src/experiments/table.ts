@@ -36,11 +36,17 @@ export class ExperimentsTable {
 
   private data?: ExperimentsRepoJSONOutput
 
-  private nestedColumns?: Column[]
-  public getNestedColumns = () => this.nestedColumns
+  private params?: Column[]
+  public getParams = () => this.params
 
-  private flatColumns?: Column[]
-  public getFlatColumns = () => this.flatColumns
+  private metrics?: Column[]
+  public getMetrics = () => this.metrics
+
+  private leafParams?: Column[]
+  public getLeafParams = () => this.leafParams
+
+  private leafMetrics?: Column[]
+  public getLeafMetrics = () => this.leafMetrics
 
   private async updateData(): Promise<void> {
     const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
@@ -49,9 +55,11 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
-    const { nestedColumns, flatColumns } = buildColumns(data)
-    this.nestedColumns = nestedColumns
-    this.flatColumns = flatColumns
+    const { params, metrics, leafParams, leafMetrics } = buildColumns(data)
+    this.params = params
+    this.leafParams = leafParams
+    this.metrics = metrics
+    this.leafMetrics = leafMetrics
     this.sendData()
   }
 

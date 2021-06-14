@@ -3,9 +3,7 @@ import { buildColumns, Column } from './buildColumns'
 describe('buildColumns', () => {
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
-    const {
-      flatColumns: [exampleMixedColumn]
-    } = buildColumns({
+    const { leafParams } = buildColumns({
       brancha: {
         baseline: {
           params: {
@@ -41,6 +39,7 @@ describe('buildColumns', () => {
         }
       }
     })
+    const exampleMixedColumn = (leafParams as Column[])[0]
 
     it('correctly identifies mixed type params', () =>
       expect(exampleMixedColumn.types).toEqual([
@@ -60,9 +59,7 @@ describe('buildColumns', () => {
   })
 
   describe('Number features', () => {
-    const {
-      flatColumns: [columnWithNumbers, columnWithoutNumbers]
-    } = buildColumns({
+    const { leafParams } = buildColumns({
       workspace: {
         baseline: {
           params: {
@@ -90,6 +87,7 @@ describe('buildColumns', () => {
         }
       }
     })
+    const [columnWithNumbers, columnWithoutNumbers] = leafParams as Column[]
 
     it('does not add maxNumber or minNumber on a column with no numbers', () => {
       expect(columnWithoutNumbers.minNumber).toBeUndefined()
@@ -104,7 +102,7 @@ describe('buildColumns', () => {
   })
 
   it('aggregates multiple different field names', () => {
-    const { nestedColumns, flatColumns } = buildColumns({
+    const { params, leafParams } = buildColumns({
       brancha: {
         baseline: {
           params: {
@@ -141,8 +139,7 @@ describe('buildColumns', () => {
       }
     })
 
-    const [paramsFilesColumn] = nestedColumns
-    const paramsYamlColumn = (paramsFilesColumn.childColumns as Column[])[0]
+    const [paramsYamlColumn] = params as Column[]
     const paramsColumns = paramsYamlColumn.childColumns as Column[]
 
     expect(paramsColumns?.map(({ name }) => name)).toEqual([
@@ -152,19 +149,16 @@ describe('buildColumns', () => {
       'four'
     ])
 
-    expect(flatColumns?.map(({ name }) => name)).toEqual([
+    expect(leafParams?.map(({ name }) => name)).toEqual([
       'one',
       'two',
       'three',
-      'four',
-      'metrics'
+      'four'
     ])
   })
 
   it('does not report types for columns without primitives or children for columns without objects', () => {
-    const {
-      nestedColumns: [paramsColumn]
-    } = buildColumns({
+    const { params } = buildColumns({
       workspace: {
         baseline: {
           params: {
@@ -177,8 +171,9 @@ describe('buildColumns', () => {
         }
       }
     })
-    const objectColumn: Column = ((paramsColumn.childColumns as Column[])[0]
-      .childColumns as Column[])[0] as Column
+
+    const [paramsYamlColumn] = params as Column[]
+    const [objectColumn] = paramsYamlColumn.childColumns as Column[]
 
     expect(objectColumn.name).toEqual('onlyHasChild')
     expect(objectColumn.childColumns).toBeDefined()
