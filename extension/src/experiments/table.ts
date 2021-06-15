@@ -4,6 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
+import { buildColumns, Column } from './buildColumns'
 import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
@@ -35,9 +36,11 @@ export class ExperimentsTable {
 
   private data?: ExperimentsRepoJSONOutput
 
-  public getDvcRoot() {
-    return this.dvcRoot
-  }
+  private nestedColumns?: Column[]
+  public getNestedColumns = () => this.nestedColumns
+
+  private flatColumns?: Column[]
+  public getFlatColumns = () => this.flatColumns
 
   private async updateData(): Promise<void> {
     const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
@@ -46,6 +49,9 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
+    const { nestedColumns, flatColumns } = buildColumns(data)
+    this.nestedColumns = nestedColumns
+    this.flatColumns = flatColumns
     this.sendData()
   }
 
