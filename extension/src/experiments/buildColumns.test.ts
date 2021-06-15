@@ -1,6 +1,121 @@
 import { buildColumns, Column } from './buildColumns'
 
 describe('buildColumns', () => {
+  test('Outputs both params and metrics when both are present', () => {
+    const { params, metrics, leafParams, leafMetrics } = buildColumns({
+      workspace: {
+        baseline: {
+          metrics: {
+            1: {
+              2: 3
+            }
+          },
+          params: {
+            a: {
+              b: 'c'
+            }
+          }
+        }
+      }
+    })
+    expect(params).toBeDefined()
+    expect(leafParams).toBeDefined()
+    expect(metrics).toBeDefined()
+    expect(leafMetrics).toBeDefined()
+  })
+
+  test('Omits params when none exist in the source data', () => {
+    const { params, metrics, leafParams, leafMetrics } = buildColumns({
+      workspace: {
+        baseline: {
+          metrics: {
+            1: {
+              2: 3
+            }
+          }
+        }
+      }
+    })
+    expect(params).toBeUndefined()
+    expect(leafParams).toBeUndefined()
+    expect(metrics).toBeDefined()
+    expect(leafMetrics).toBeDefined()
+  })
+
+  test('returns an empty object if input data is empty', () => {
+    const output = buildColumns({
+      workspace: {
+        baseline: {}
+      }
+    })
+    expect(output).toEqual({})
+  })
+
+  describe('Primitive-based leaf columns', () => {
+    const { leafParams } = buildColumns({
+      brancha: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: 'string'
+            }
+          }
+        },
+        otherexp: {
+          params: {
+            'params.yaml': {
+              mixedparam: true
+            }
+          }
+        }
+      },
+      branchb: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: null
+            }
+          }
+        }
+      },
+      branchc: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: {
+                nestedvalue: 'x'
+              }
+            }
+          }
+        }
+      },
+      workspace: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixedparam: {
+                nestedvalue: 22.5
+              }
+            }
+          }
+        }
+      }
+    }) as {
+      leafParams: Column[]
+    }
+
+    test('finds two leaf columns', () => expect(leafParams.length).toEqual(2))
+    const [parentColumn, nestedColumn] = leafParams as Column[]
+    test('lists parent leaves before nested child leaves', () => {
+      expect(parentColumn.name).toEqual('mixedparam')
+      expect(nestedColumn.name).toEqual('nestedvalue')
+    })
+    test('records ancestors of each item', () => {
+      expect(parentColumn.ancestors).toEqual(['params.yaml'])
+      expect(nestedColumn.ancestors).toEqual(['params.yaml', 'mixedparam'])
+    })
+  })
+
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
     const { leafParams } = buildColumns({
@@ -56,6 +171,45 @@ describe('buildColumns', () => {
       expect(exampleMixedColumn.maxNumber).toEqual(exampleBigNumber)
       expect(exampleMixedColumn.minNumber).toEqual(exampleBigNumber)
     })
+  })
+
+  test('finds different minNumber and maxNumber on a mixed column', () => {
+    const { leafParams } = buildColumns({
+      workspace: {
+        baseline: {
+          params: {
+            'params.yaml': {
+              mixednumber: null
+            }
+          }
+        },
+        exp1: {
+          params: {
+            'params.yaml': {
+              mixednumber: 0
+            }
+          }
+        },
+        exp2: {
+          params: {
+            'params.yaml': {
+              mixednumber: -1
+            }
+          }
+        },
+        exp3: {
+          params: {
+            'params.yaml': {
+              mixednumber: 1
+            }
+          }
+        }
+      }
+    })
+    const [mixedColumn] = leafParams as Column[]
+
+    expect(mixedColumn.minNumber).toEqual(-1)
+    expect(mixedColumn.maxNumber).toEqual(1)
   })
 
   describe('Number features', () => {
