@@ -81,9 +81,6 @@ const mergeOrCreateColumnsMap = (
   originalColumnsMap: PartialColumnsMap = new Map(),
   valueTree: ValueTree | DataDictRoot
 ): PartialColumnsMap => {
-  if (!valueTree) {
-    return originalColumnsMap
-  }
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
     originalColumnsMap.set(
@@ -152,7 +149,7 @@ const columnFromMapEntry = (
 
 const transformAndCollectFromColumns = (
   columnsMap: PartialColumnsMap,
-  leafColumns: Column[] = [],
+  leafColumns: Column[],
   ancestors?: string[]
 ): Column[] => {
   const currentLevelColumns = []
@@ -178,20 +175,21 @@ const buildColumn = (
 ): Column => {
   const finalColumn = columnFromMapEntry(entry)
 
-  const [name, { childColumns }] = entry
+  const [name, { childColumns, types }] = entry
 
   if (ancestors) {
     finalColumn.ancestors = ancestors
   }
 
+  if (types) {
+    leafColumns.push(finalColumn)
+  }
   if (childColumns) {
     finalColumn.childColumns = transformAndCollectFromColumns(
       childColumns,
       leafColumns,
       ancestors ? [...ancestors, name] : [name]
     )
-  } else {
-    leafColumns.push(finalColumn)
   }
 
   return finalColumn
