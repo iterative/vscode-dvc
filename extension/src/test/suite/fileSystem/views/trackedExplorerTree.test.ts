@@ -127,11 +127,17 @@ suite('Extension Test Suite', () => {
       const mockProcess = stub(Process, 'executeProcess').resolves(
         'M       non-existent.txt\n1 file modified'
       )
+      const pullAgs = {
+        args: ['pull', missingFile],
+        cwd: undefined,
+        env: process.env,
+        executable: 'dvc'
+      }
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockProcess).not.to.be.called
+      expect(mockProcess).not.to.be.calledWith(pullAgs)
 
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
@@ -142,12 +148,7 @@ suite('Extension Test Suite', () => {
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith({
-        args: ['pull', missingFile],
-        cwd: undefined,
-        env: process.env,
-        executable: 'dvc'
-      })
+      expect(mockProcess).to.be.calledWith(pullAgs)
 
       mockProcess.resetHistory()
       mockShowInformationMessage.resetHistory()
@@ -158,14 +159,14 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockProcess).not.to.be.called
+      expect(mockProcess).not.to.be.calledWith(pullAgs)
 
       mockShowInformationMessage.resetHistory()
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).not.to.be.called
-      expect(mockProcess).not.to.be.called
+      expect(mockProcess).not.to.be.calledWith(pullAgs)
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
