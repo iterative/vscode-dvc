@@ -37,6 +37,11 @@ export interface Column extends ColumnCommon {
   ancestors?: string[]
 }
 
+interface AggregatedColumns {
+  paramsMap: PartialColumnsMap | undefined
+  metricsMap: PartialColumnsMap | undefined
+}
+
 const getValueType = (value: Value | ValueTree) => {
   if (value === null) {
     return 'null'
@@ -193,11 +198,6 @@ const buildColumn = (
   }
 
   return finalColumn
-}
-
-interface AggregatedColumns {
-  paramsMap: PartialColumnsMap | undefined
-  metricsMap: PartialColumnsMap | undefined
 }
 
 const walkExperiments = (
