@@ -3,6 +3,8 @@
     "extension/out": true
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "plantuml.diagramsRoot": "docs",
   "plantuml.exportFormat": "png",
   "plantuml.exportOutDir": "docs/exported",
@@ -10,7 +12,6 @@
   "mochaExplorer.files": "./data-extraction/test/**/*.test.ts",
   "mochaExplorer.require": ["ts-node/register", "source-map-support/register"],
   "tasksStatusbar.taskLabelFilter": "dev",
-  "editor.formatOnSave": true,
   "cSpell.words": [
     "DVCPATH",
     "Interactors",
