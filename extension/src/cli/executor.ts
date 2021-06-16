@@ -147,7 +147,7 @@ export class CliExecutor extends Cli {
   ) {
     super(config, emitters)
 
-    bindMethods<CliExecutor>(
+    bindMethods(
       this,
       'addTarget',
       'checkout',
