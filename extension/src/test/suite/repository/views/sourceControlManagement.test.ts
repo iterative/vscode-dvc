@@ -25,6 +25,9 @@ suite('Extension Test Suite', () => {
     'demo'
   )
   const disposable = Disposable.fn()
+  const rootUri = Uri.file(dvcDemoPath)
+  const relPath = join('data', 'MNIST')
+  const resourceUri = Uri.file(join(dvcDemoPath, relPath))
 
   beforeEach(() => {
     restore()
@@ -37,34 +40,82 @@ suite('Extension Test Suite', () => {
 
   describe('SourceControlManagement', () => {
     it('should be able to run dvc.addTarget without error', async () => {
-      const relPath = join('data', 'MNIST')
-      const uri = Uri.file(join(dvcDemoPath, relPath))
-
       const mockAddTarget = stub(CliExecutor.prototype, 'addTarget').resolves(
         ''
       )
 
       await commands.executeCommand('dvc.addTarget', {
         dvcRoot: dvcDemoPath,
-        resourceUri: uri
+        resourceUri
       })
 
       expect(mockAddTarget).to.be.calledOnce
     })
 
-    it('should be able to run dvc.commit without error', async () => {
-      const uri = Uri.file(dvcDemoPath)
+    it('should not prompt to force if dvc.checkout fails without a prompt error', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').rejects(
+        'This is not a error that we would ask the user if they want to try and force'
+      )
+      const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
+        ('' as unknown) as MessageItem
+      )
+      const mockForceCheckout = stub(
+        CliExecutor.prototype,
+        'forceCheckout'
+      ).resolves('')
 
+      await commands.executeCommand('dvc.checkout', { rootUri })
+
+      expect(mockCheckout).to.be.calledOnce
+      expect(mockShowErrorMessage).to.be.calledOnce
+      expect(mockForceCheckout).not.to.be.called
+    })
+
+    it('should be able to run dvc.checkoutTarget without error', async () => {
+      const mockCheckout = stub(
+        CliExecutor.prototype,
+        'checkoutTarget'
+      ).resolves('')
+
+      await commands.executeCommand('dvc.checkoutTarget', {
+        dvcRoot: dvcDemoPath,
+        resourceUri
+      })
+
+      expect(mockCheckout).to.be.calledOnce
+    })
+
+    it('should prompt to force if dvc.checkoutTarget fails', async () => {
+      stub(CliExecutor.prototype, 'checkoutTarget').rejects({
+        stderr: Prompt.TRY_FORCE
+      })
+      const mockShowInformationMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(('Force' as unknown) as MessageItem)
+      const mockForceCheckout = stub(
+        CliExecutor.prototype,
+        'forceCheckoutTarget'
+      ).resolves('')
+
+      await commands.executeCommand('dvc.checkoutTarget', {
+        dvcRoot: dvcDemoPath,
+        resourceUri
+      })
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockForceCheckout).to.be.calledOnce
+    })
+
+    it('should be able to run dvc.commit without error', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
 
-      await commands.executeCommand('dvc.commit', { rootUri: uri })
+      await commands.executeCommand('dvc.commit', { rootUri })
 
       expect(mockCommit).to.be.calledOnce
     })
 
     it('should prompt to force if dvc.commit fails', async () => {
-      const uri = Uri.file(dvcDemoPath)
-
       stub(CliExecutor.prototype, 'commit').rejects({
         stderr: Prompt.TRY_FORCE
       })
@@ -77,16 +128,13 @@ suite('Extension Test Suite', () => {
         'forceCommit'
       ).resolves('')
 
-      await commands.executeCommand('dvc.commit', { rootUri: uri })
+      await commands.executeCommand('dvc.commit', { rootUri })
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockForceCommit).to.be.calledOnce
     })
 
     it('should be able to run dvc.commitTarget without error', async () => {
-      const relPath = join('data', 'MNIST')
-      const uri = Uri.file(join(dvcDemoPath, relPath))
-
       const mockCommitTarget = stub(
         CliExecutor.prototype,
         'commitTarget'
@@ -94,27 +142,68 @@ suite('Extension Test Suite', () => {
 
       await commands.executeCommand('dvc.commitTarget', {
         dvcRoot: dvcDemoPath,
-        resourceUri: uri
+        resourceUri
       })
 
       expect(mockCommitTarget).to.be.calledOnce
     })
 
-    it('should be able to run dvc.checkoutTarget without error', async () => {
-      const relPath = join('data', 'MNIST')
-      const uri = Uri.file(join(dvcDemoPath, relPath))
-
-      const mockCheckout = stub(
+    it('should prompt to force if dvc.commitTarget fails', async () => {
+      stub(CliExecutor.prototype, 'commitTarget').rejects({
+        stderr: Prompt.TRY_FORCE
+      })
+      const mockShowInformationMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(('Force' as unknown) as MessageItem)
+      const mockForceCommit = stub(
         CliExecutor.prototype,
-        'checkoutTarget'
+        'forceCommitTarget'
       ).resolves('')
 
-      await commands.executeCommand('dvc.checkoutTarget', {
+      await commands.executeCommand('dvc.commitTarget', {
         dvcRoot: dvcDemoPath,
-        resourceUri: uri
+        resourceUri
       })
 
-      expect(mockCheckout).to.be.calledOnce
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockForceCommit).to.be.calledOnce
+    })
+
+    it('should not prompt to force if dvc.pull fails without a prompt error', async () => {
+      const mockPull = stub(CliExecutor.prototype, 'pull').rejects(
+        'The remote has gone away'
+      )
+      const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
+        ('' as unknown) as MessageItem
+      )
+      const mockForcePull = stub(CliExecutor.prototype, 'forcePull').resolves(
+        ''
+      )
+
+      await commands.executeCommand('dvc.pull', { rootUri })
+
+      expect(mockPull).to.be.calledOnce
+      expect(mockShowErrorMessage).to.be.calledOnce
+      expect(mockForcePull).not.to.be.called
+    })
+
+    it('should not prompt to force if dvc.push fails without a prompt error', async () => {
+      const mockPush = stub(CliExecutor.prototype, 'push').rejects(
+        'The remote has gone away'
+      )
+      const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
+        ('' as unknown) as MessageItem
+      )
+      const mockForcePush = stub(CliExecutor.prototype, 'forcePush').resolves(
+        ''
+      )
+
+      await commands.executeCommand('dvc.push', { rootUri })
+
+      expect(mockPush).to.be.calledOnce
+      expect(mockShowErrorMessage).to.be.calledOnce
+      expect(mockForcePush).not.to.be.called
     })
   })
 })
