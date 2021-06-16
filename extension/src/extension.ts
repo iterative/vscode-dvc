@@ -80,7 +80,7 @@ export class Extension implements IExtension {
     try {
       await this.config.isReady()
       const [root] = this.dvcRoots
-      return !!(await this.cliExecutor.help(root))
+      return !!(await this.cliReader.help(root))
     } catch (e) {
       return false
     }

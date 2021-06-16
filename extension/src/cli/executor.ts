@@ -113,10 +113,6 @@ export class CliExecutor extends Cli {
     return this.executeForcedProcess(cwd, Command.PUSH)
   }
 
-  public help(cwd: string): Promise<string> {
-    return this.executeProcess(cwd, Flag.HELP)
-  }
-
   public init(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Command.INITIALIZE, Flag.SUBDIRECTORY)
   }

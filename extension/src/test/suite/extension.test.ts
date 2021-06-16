@@ -12,7 +12,6 @@ import {
 } from 'vscode'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
-import { CliExecutor } from '../../cli/executor'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
@@ -82,7 +81,7 @@ suite('Extension Test Suite', () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         mockFilePickerResolve
       )
-      const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
+      const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I WORK NOW'
       )
 
@@ -153,7 +152,7 @@ suite('Extension Test Suite', () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         mockFilePickerResolve
       )
-      const mockCanRunCli = stub(CliExecutor.prototype, 'help').resolves(
+      const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I STILL WORK'
       )
 
@@ -188,7 +187,7 @@ suite('Extension Test Suite', () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
         mockFilePickerResolve
       )
-      const mockCanRunCli = stub(CliExecutor.prototype, 'help').rejects(
+      const mockCanRunCli = stub(CliReader.prototype, 'help').rejects(
         'GONE AGAIN'
       )
 
