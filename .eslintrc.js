@@ -98,6 +98,13 @@ module.exports = {
         ]
       }
     ],
+    'jest/consistent-test-it': [
+      'error',
+      {
+        fn: 'it',
+        withinDescribe: 'it'
+      }
+    ],
     // Let us wrap Radio components in labels.
     'jsx-a11y/label-has-associated-control': [
       2,
