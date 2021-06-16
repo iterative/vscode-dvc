@@ -5,7 +5,6 @@ import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window, commands, Uri } from 'vscode'
 import { Disposable } from '../../../../extension'
-import * as Process from '../../../../processExecution'
 import { CliExecutor } from '../../../../cli/executor'
 
 chai.use(sinonChai)
@@ -50,20 +49,17 @@ suite('Extension Test Suite', () => {
       const relPath = join('data', 'MNIST')
       const uri = Uri.file(join(dvcDemoPath, relPath))
 
-      const mockProcess = stub(Process, 'executeProcess').resolves('')
+      const mockCheckout = stub(
+        CliExecutor.prototype,
+        'checkoutTarget'
+      ).resolves('')
 
       await commands.executeCommand('dvc.checkoutTarget', {
         dvcRoot: dvcDemoPath,
         resourceUri: uri
       })
 
-      expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith({
-        args: ['checkout', relPath],
-        cwd: dvcDemoPath,
-        env: process.env,
-        executable: 'dvc'
-      })
+      expect(mockCheckout).to.be.calledOnce
     })
   })
 })
