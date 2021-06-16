@@ -202,7 +202,13 @@ export class Experiments {
     const experiments = dvcRoots.map(dvcRoot =>
       this.createExperimentsTable(dvcRoot, resourceLocator)
     )
-    this.deferred.resolve()
+
+    Promise.all(
+      experiments.map(experimentsTable => experimentsTable.isReady())
+    ).then(() => {
+      this.deferred.resolve()
+    })
+
     return experiments
   }
 
