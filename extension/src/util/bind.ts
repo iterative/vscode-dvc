@@ -1,8 +1,6 @@
-export const bindMethods = <T>(self: T, ...methodNames: string[]) =>
+export const bindMethods = <T>(self: T, ...methodNames: (keyof T)[]) =>
   methodNames.forEach(method => {
-    if (typeof self[method as keyof T] === 'function') {
-      self[method as keyof T] = ((self[
-        method as keyof T
-      ] as unknown) as Function).bind(self)
+    if (typeof self[method] === 'function') {
+      self[method] = ((self[method] as unknown) as Function).bind(self)
     }
   })
