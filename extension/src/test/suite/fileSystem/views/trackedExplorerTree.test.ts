@@ -203,22 +203,22 @@ suite('Extension Test Suite', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  it('should be able to run dvc.pushTarget without error', async () => {
-    const relPath = join('data', 'MNIST')
-    const absPath = join(dvcDemoPath, relPath)
-    stub(path, 'relative').returns(relPath)
-    const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+    it('should be able to run dvc.pushTarget without error', async () => {
+      const relPath = join('data', 'MNIST')
+      const absPath = join(dvcDemoPath, relPath)
+      stub(path, 'relative').returns(relPath)
+      const mockProcess = stub(Process, 'executeProcess').resolves('fun')
 
-    await commands.executeCommand('dvc.pushTarget', absPath)
+      await commands.executeCommand('dvc.pushTarget', absPath)
 
-    expect(mockProcess).to.be.calledOnce
-    expect(mockProcess).to.be.calledWith({
-      args: ['push', relPath],
-      cwd: undefined,
-      env: process.env,
-      executable: 'dvc'
+      expect(mockProcess).to.be.calledOnce
+      expect(mockProcess).to.be.calledWith({
+        args: ['push', relPath],
+        cwd: undefined,
+        env: process.env,
+        executable: 'dvc'
+      })
     })
   })
 })

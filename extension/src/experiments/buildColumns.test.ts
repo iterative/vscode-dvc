@@ -1,7 +1,7 @@
 import { buildColumns, Column } from './buildColumns'
 
 describe('buildColumns', () => {
-  test('Outputs both params and metrics when both are present', () => {
+  it('Outputs both params and metrics when both are present', () => {
     const { params, metrics, leafParams, leafMetrics } = buildColumns({
       workspace: {
         baseline: {
@@ -24,7 +24,7 @@ describe('buildColumns', () => {
     expect(leafMetrics).toBeDefined()
   })
 
-  test('Omits params when none exist in the source data', () => {
+  it('Omits params when none exist in the source data', () => {
     const { params, metrics, leafParams, leafMetrics } = buildColumns({
       workspace: {
         baseline: {
@@ -42,7 +42,7 @@ describe('buildColumns', () => {
     expect(leafMetrics).toBeDefined()
   })
 
-  test('returns an empty object if input data is empty', () => {
+  it('returns an empty object if input data is empty', () => {
     const output = buildColumns({
       workspace: {
         baseline: {}
@@ -104,13 +104,13 @@ describe('buildColumns', () => {
       leafParams: Column[]
     }
 
-    test('finds two leaf columns', () => expect(leafParams.length).toEqual(2))
+    it('finds two leaf columns', () => expect(leafParams.length).toEqual(2))
     const [parentColumn, nestedColumn] = leafParams as Column[]
-    test('lists parent leaves before nested child leaves', () => {
+    it('lists parent leaves before nested child leaves', () => {
       expect(parentColumn.name).toEqual('mixedparam')
       expect(nestedColumn.name).toEqual('nestedvalue')
     })
-    test('records ancestors of each item', () => {
+    it('records ancestors of each item', () => {
       expect(parentColumn.ancestors).toEqual(['params.yaml'])
       expect(nestedColumn.ancestors).toEqual(['params.yaml', 'mixedparam'])
     })
@@ -173,7 +173,7 @@ describe('buildColumns', () => {
     })
   })
 
-  test('finds different minNumber and maxNumber on a mixed column', () => {
+  it('finds different minNumber and maxNumber on a mixed column', () => {
     const { leafParams } = buildColumns({
       workspace: {
         baseline: {
