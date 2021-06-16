@@ -7,10 +7,10 @@ import { ensureFileSync } from 'fs-extra'
 import { window, commands, Uri, TextEditor, MessageItem } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { exists } from '../../../../fileSystem'
-import * as Process from '../../../../processExecution'
 import * as Workspace from '../../../../fileSystem/workspace'
 import * as FileSystem from '../../../../fileSystem'
 import { getConfigValue, setConfigValue } from '../../../../vscode/config'
+import { CliExecutor } from '../../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -124,20 +124,14 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(window, 'showInformationMessage')
 
       mockShowInformationMessage.resolves(undefined)
-      const mockProcess = stub(Process, 'executeProcess').resolves(
+      const mockPullTarget = stub(CliExecutor.prototype, 'pullTarget').resolves(
         'M       non-existent.txt\n1 file modified'
       )
-      const pullAgs = {
-        args: ['pull', missingFile],
-        cwd: undefined,
-        env: process.env,
-        executable: 'dvc'
-      }
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockProcess).not.to.be.calledWith(pullAgs)
+      expect(mockPullTarget).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
@@ -147,10 +141,9 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith(pullAgs)
+      expect(mockPullTarget).to.be.calledOnce
 
-      mockProcess.resetHistory()
+      mockPullTarget.resetHistory()
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
         ("Don't Show Again" as unknown) as MessageItem
@@ -159,14 +152,14 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockProcess).not.to.be.calledWith(pullAgs)
+      expect(mockPullTarget).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).not.to.be.called
-      expect(mockProcess).not.to.be.calledWith(pullAgs)
+      expect(mockPullTarget).not.to.be.called
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
@@ -174,51 +167,40 @@ suite('Extension Test Suite', () => {
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
       const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
-      const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+      const mockRemoveTarget = stub(
+        CliExecutor.prototype,
+        'removeTarget'
+      ).resolves('target destroyed!')
 
       await commands.executeCommand('dvc.removeTarget', absPath)
       expect(mockDeleteTarget).to.be.calledOnce
-      expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith({
-        args: ['remove', join('mock', 'data', 'MNIST', 'raw.dvc')],
-        cwd: undefined,
-        env: process.env,
-        executable: 'dvc'
-      })
+      expect(mockRemoveTarget).to.be.calledOnce
     })
 
     it('should be able to run dvc.pullTarget without error', async () => {
       const relPath = 'data'
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-      const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+      const mockPullTarget = stub(CliExecutor.prototype, 'pullTarget').resolves(
+        'target pulled'
+      )
 
       await commands.executeCommand('dvc.pullTarget', absPath)
 
-      expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith({
-        args: ['pull', relPath],
-        cwd: undefined,
-        env: process.env,
-        executable: 'dvc'
-      })
+      expect(mockPullTarget).to.be.calledOnce
     })
 
     it('should be able to run dvc.pushTarget without error', async () => {
       const relPath = join('data', 'MNIST')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-      const mockProcess = stub(Process, 'executeProcess').resolves('fun')
+      const mockPush = stub(CliExecutor.prototype, 'pushTarget').resolves(
+        'target pushed'
+      )
 
       await commands.executeCommand('dvc.pushTarget', absPath)
 
-      expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith({
-        args: ['push', relPath],
-        cwd: undefined,
-        env: process.env,
-        executable: 'dvc'
-      })
+      expect(mockPush).to.be.calledOnce
     })
   })
 })
