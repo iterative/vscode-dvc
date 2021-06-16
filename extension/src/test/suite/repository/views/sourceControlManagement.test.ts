@@ -6,6 +6,7 @@ import sinonChai from 'sinon-chai'
 import { window, commands, Uri } from 'vscode'
 import { Disposable } from '../../../../extension'
 import * as Process from '../../../../processExecution'
+import { CliExecutor } from '../../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -38,17 +39,11 @@ suite('Extension Test Suite', () => {
     it('should be able to run dvc.commit without error', async () => {
       const uri = Uri.file(join(dvcDemoPath))
 
-      const mockProcess = stub(Process, 'executeProcess').resolves('')
+      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
 
       await commands.executeCommand('dvc.commit', { rootUri: uri })
 
-      expect(mockProcess).to.be.calledOnce
-      expect(mockProcess).to.be.calledWith({
-        args: ['commit'],
-        cwd: dvcDemoPath,
-        env: process.env,
-        executable: 'dvc'
-      })
+      expect(mockCommit).to.be.calledOnce
     })
 
     it('should be able to run dvc.checkoutTarget without error', async () => {

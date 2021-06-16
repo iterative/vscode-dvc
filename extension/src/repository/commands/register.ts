@@ -15,7 +15,9 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.addTarget',
-      getSimpleResourceCommand(cliExecutor.addTarget)
+      getSimpleResourceCommand((cwd: string, target: string) =>
+        cliExecutor.addTarget(cwd, target)
+      )
     )
   )
 
@@ -23,8 +25,10 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.checkoutTarget',
       getResourceCommand(
-        cliExecutor.checkoutTarget,
-        cliExecutor.forceCheckoutTarget
+        (cwd: string, target: string) =>
+          cliExecutor.checkoutTarget(cwd, target),
+        (cwd: string, target: string) =>
+          cliExecutor.forceCheckoutTarget(cwd, target)
       )
     )
   )
@@ -33,8 +37,9 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.commitTarget',
       getResourceCommand(
-        cliExecutor.commitTarget,
-        cliExecutor.forceCommitTarget
+        (cwd: string, target: string) => cliExecutor.commitTarget(cwd, target),
+        (cwd: string, target: string) =>
+          cliExecutor.forceCommitTarget(cwd, target)
       )
     )
   )
@@ -44,28 +49,40 @@ const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.checkout',
-      getRootCommand(cliExecutor.checkout, cliExecutor.forceCheckout)
+      getRootCommand(
+        (cwd: string) => cliExecutor.checkout(cwd),
+        (cwd: string) => cliExecutor.forceCheckout(cwd)
+      )
     )
   )
 
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.commit',
-      getRootCommand(cliExecutor.commit, cliExecutor.forceCommit)
+      getRootCommand(
+        (cwd: string) => cliExecutor.commit(cwd),
+        (cwd: string) => cliExecutor.forceCommit(cwd)
+      )
     )
   )
 
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.pull',
-      getRootCommand(cliExecutor.pull, cliExecutor.forcePull)
+      getRootCommand(
+        (cwd: string) => cliExecutor.pull(cwd),
+        (cwd: string) => cliExecutor.forcePull(cwd)
+      )
     )
   )
 
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.push',
-      getRootCommand(cliExecutor.push, cliExecutor.forcePush)
+      getRootCommand(
+        (cwd: string) => cliExecutor.push(cwd),
+        (cwd: string) => cliExecutor.forcePush(cwd)
+      )
     )
   )
 }
