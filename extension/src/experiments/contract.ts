@@ -3,7 +3,7 @@ export interface ValueTree {
   [key: string]: Value | ValueTree
 }
 
-export interface DataDictRoot {
+export interface DataDictRoot extends ValueTree {
   [filename: string]: ValueTree
 }
 

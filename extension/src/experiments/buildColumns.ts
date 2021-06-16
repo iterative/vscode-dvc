@@ -1,7 +1,17 @@
-import { ExperimentsRepoJSONOutput, ValueTree, Value } from './contract'
+import {
+  ExperimentsRepoJSONOutput,
+  ValueTree,
+  Value,
+  DataDictRoot,
+  ExperimentJSONOutput
+} from './contract'
 
 interface BuildColumnsOutput {
-  flatColumns: Column[]
+  params?: Column[]
+  metrics?: Column[]
+}
+
+interface InferredColumns {
   nestedColumns: Column[]
 }
 
@@ -22,6 +32,11 @@ export interface Column extends ColumnCommon {
   types?: string[]
   childColumns?: Column[]
   ancestors?: string[]
+}
+
+interface AggregatedColumns {
+  paramsMap: PartialColumnsMap | undefined
+  metricsMap: PartialColumnsMap | undefined
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -66,11 +81,8 @@ const mergePrimitiveColumn = (
 
 const mergeOrCreateColumnsMap = (
   originalColumnsMap: PartialColumnsMap = new Map(),
-  valueTree: ValueTree
+  valueTree: ValueTree | DataDictRoot
 ): PartialColumnsMap => {
-  if (!valueTree) {
-    return originalColumnsMap
-  }
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
     originalColumnsMap.set(
@@ -139,28 +151,25 @@ const columnFromMapEntry = (
 
 const transformAndCollectFromColumns = (
   columnsMap: PartialColumnsMap,
-  flatColumns: Column[] = [],
   ancestors?: string[]
 ): Column[] => {
   const currentLevelColumns = []
   for (const entry of columnsMap) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    currentLevelColumns.push(buildColumn(entry, flatColumns, ancestors))
+    currentLevelColumns.push(buildColumn(entry, ancestors))
   }
   return currentLevelColumns
 }
 
 const transformColumnsMap = (
   columnsMap: PartialColumnsMap
-): BuildColumnsOutput => {
-  const flatColumns: Column[] = []
-  const nestedColumns = transformAndCollectFromColumns(columnsMap, flatColumns)
-  return { flatColumns, nestedColumns }
+): InferredColumns => {
+  const nestedColumns = transformAndCollectFromColumns(columnsMap)
+  return { nestedColumns }
 }
 
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
-  flatColumns: Column[],
   ancestors?: string[]
 ): Column => {
   const finalColumn = columnFromMapEntry(entry)
@@ -174,36 +183,64 @@ const buildColumn = (
   if (childColumns) {
     finalColumn.childColumns = transformAndCollectFromColumns(
       childColumns,
-      flatColumns,
       ancestors ? [...ancestors, name] : [name]
     )
-  } else {
-    flatColumns.push(finalColumn)
   }
 
   return finalColumn
 }
 
+const walkExperiments = (
+  tableData: ExperimentsRepoJSONOutput,
+  onExperiment: (commit: ExperimentJSONOutput) => void
+) => {
+  for (const branch of Object.values(tableData)) {
+    for (const commit of Object.values(branch)) {
+      onExperiment(commit)
+    }
+  }
+}
+
+const aggregateColumns = (
+  tableData: ExperimentsRepoJSONOutput
+): AggregatedColumns => {
+  let paramsMap: PartialColumnsMap | undefined
+  let metricsMap: PartialColumnsMap | undefined
+
+  walkExperiments(tableData, (commit: ExperimentJSONOutput) => {
+    const { params, metrics } = commit
+    if (params) {
+      paramsMap = mergeOrCreateColumnsMap(paramsMap, params)
+    }
+    if (metrics) {
+      metricsMap = mergeOrCreateColumnsMap(metricsMap, metrics)
+    }
+  })
+
+  return { metricsMap, paramsMap }
+}
+
+const buildColumnsOutput = ({
+  paramsMap,
+  metricsMap
+}: AggregatedColumns): BuildColumnsOutput => {
+  const output: BuildColumnsOutput = {}
+
+  if (paramsMap) {
+    const { nestedColumns } = transformColumnsMap(paramsMap)
+    output.params = nestedColumns
+  }
+
+  if (metricsMap) {
+    const { nestedColumns } = transformColumnsMap(metricsMap)
+    output.metrics = nestedColumns
+  }
+
+  return output
+}
+
 export const buildColumns = (
   tableData: ExperimentsRepoJSONOutput
 ): BuildColumnsOutput => {
-  let paramsColumn: PartialColumnDescriptor | undefined
-  let metricsColumn: PartialColumnDescriptor | undefined
-
-  for (const branch of Object.values(tableData)) {
-    for (const commit of Object.values(branch)) {
-      const { params, metrics } = commit
-      paramsColumn = mergeOrCreateColumnDescriptor(paramsColumn, params)
-      metricsColumn = mergeOrCreateColumnDescriptor(metricsColumn, metrics)
-    }
-  }
-
-  const columns: PartialColumnsMap = new Map()
-  if (paramsColumn) {
-    columns.set('params', paramsColumn)
-  }
-  if (metricsColumn) {
-    columns.set('metrics', metricsColumn)
-  }
-  return transformColumnsMap(columns)
+  return buildColumnsOutput(aggregateColumns(tableData))
 }
