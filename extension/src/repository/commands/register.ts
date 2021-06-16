@@ -15,7 +15,7 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.addTarget',
-      getSimpleResourceCommand(cliExecutor.addTarget.bind(cliExecutor))
+      getSimpleResourceCommand(cliExecutor.addTarget)
     )
   )
 
@@ -23,8 +23,8 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.checkoutTarget',
       getResourceCommand(
-        cliExecutor.checkoutTarget.bind(cliExecutor),
-        cliExecutor.forceCheckoutTarget.bind(cliExecutor)
+        cliExecutor.checkoutTarget,
+        cliExecutor.forceCheckoutTarget
       )
     )
   )
@@ -33,8 +33,8 @@ const registerResourceCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.commitTarget',
       getResourceCommand(
-        cliExecutor.commitTarget.bind(cliExecutor),
-        cliExecutor.forceCommitTarget.bind(cliExecutor)
+        cliExecutor.commitTarget,
+        cliExecutor.forceCommitTarget
       )
     )
   )
@@ -44,40 +44,28 @@ const registerRootCommands = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.checkout',
-      getRootCommand(
-        cliExecutor.checkout.bind(cliExecutor),
-        cliExecutor.forceCheckout.bind(cliExecutor)
-      )
+      getRootCommand(cliExecutor.checkout, cliExecutor.forceCheckout)
     )
   )
 
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.commit',
-      getRootCommand(
-        cliExecutor.commit.bind(cliExecutor),
-        cliExecutor.forceCommit.bind(cliExecutor)
-      )
+      getRootCommand(cliExecutor.commit, cliExecutor.forceCommit)
     )
   )
 
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.pull',
-      getRootCommand(
-        cliExecutor.pull.bind(cliExecutor),
-        cliExecutor.forcePull.bind(cliExecutor)
-      )
+      getRootCommand(cliExecutor.pull, cliExecutor.forcePull)
     )
   )
 
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.push',
-      getRootCommand(
-        cliExecutor.push.bind(cliExecutor),
-        cliExecutor.forcePush.bind(cliExecutor)
-      )
+      getRootCommand(cliExecutor.push, cliExecutor.forcePush)
     )
   )
 }

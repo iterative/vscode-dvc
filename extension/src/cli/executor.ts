@@ -1,4 +1,5 @@
-import { Cli } from '.'
+import { EventEmitter } from 'vscode'
+import { Cli, CliResult } from '.'
 import {
   Args,
   Command,
@@ -7,6 +8,8 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
+import { Config } from '../config'
+import { bindMethods } from '../util/bind'
 
 export class CliExecutor extends Cli {
   private executeExperimentProcess(cwd: string, ...args: Args) {
@@ -133,5 +136,32 @@ export class CliExecutor extends Cli {
 
   public removeTarget(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.REMOVE, target)
+  }
+
+  constructor(
+    config: Config,
+    emitters?: {
+      processStarted: EventEmitter<void>
+      processCompleted: EventEmitter<CliResult>
+    }
+  ) {
+    super(config, emitters)
+
+    bindMethods<CliExecutor>(
+      this,
+      'addTarget',
+      'checkout',
+      'checkoutTarget',
+      'commit',
+      'commitTarget',
+      'forceCheckout',
+      'forceCheckoutTarget',
+      'forceCommit',
+      'forceCommitTarget',
+      'forcePull',
+      'forcePush',
+      'pull',
+      'push'
+    )
   }
 }
