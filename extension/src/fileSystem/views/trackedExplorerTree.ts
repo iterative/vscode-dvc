@@ -204,11 +204,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     })
   }
 
-  private getTargetExecutionDetails(path: string) {
-    const dvcRoot = this.pathRoots[path]
-    return [dvcRoot, relative(dvcRoot, path)]
-  }
-
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
@@ -243,14 +238,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path => {
-        const [dvcRoot, relPath] = this.getTargetExecutionDetails(path)
+        const dvcRoot = this.pathRoots[path]
+        const relPath = relative(dvcRoot, path)
         return this.cliExecutor.pullTarget(dvcRoot, relPath)
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path => {
-        const [dvcRoot, relPath] = this.getTargetExecutionDetails(path)
+        const dvcRoot = this.pathRoots[path]
+        const relPath = relative(dvcRoot, path)
         return this.cliExecutor.pushTarget(dvcRoot, relPath)
       })
     )
