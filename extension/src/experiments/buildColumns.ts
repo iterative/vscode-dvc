@@ -8,13 +8,10 @@ import {
 
 interface BuildColumnsOutput {
   params?: Column[]
-  leafParams?: Column[]
   metrics?: Column[]
-  leafMetrics?: Column[]
 }
 
 interface InferredColumns {
-  leafColumns: Column[]
   nestedColumns: Column[]
 }
 
@@ -154,13 +151,12 @@ const columnFromMapEntry = (
 
 const transformAndCollectFromColumns = (
   columnsMap: PartialColumnsMap,
-  leafColumns: Column[],
   ancestors?: string[]
 ): Column[] => {
   const currentLevelColumns = []
   for (const entry of columnsMap) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    currentLevelColumns.push(buildColumn(entry, leafColumns, ancestors))
+    currentLevelColumns.push(buildColumn(entry, ancestors))
   }
   return currentLevelColumns
 }
@@ -168,31 +164,25 @@ const transformAndCollectFromColumns = (
 const transformColumnsMap = (
   columnsMap: PartialColumnsMap
 ): InferredColumns => {
-  const leafColumns: Column[] = []
-  const nestedColumns = transformAndCollectFromColumns(columnsMap, leafColumns)
-  return { leafColumns, nestedColumns }
+  const nestedColumns = transformAndCollectFromColumns(columnsMap)
+  return { nestedColumns }
 }
 
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
-  leafColumns: Column[],
   ancestors?: string[]
 ): Column => {
   const finalColumn = columnFromMapEntry(entry)
 
-  const [name, { childColumns, types }] = entry
+  const [name, { childColumns }] = entry
 
   if (ancestors) {
     finalColumn.ancestors = ancestors
   }
 
-  if (types) {
-    leafColumns.push(finalColumn)
-  }
   if (childColumns) {
     finalColumn.childColumns = transformAndCollectFromColumns(
       childColumns,
-      leafColumns,
       ancestors ? [...ancestors, name] : [name]
     )
   }
@@ -237,15 +227,13 @@ const buildColumnsOutput = ({
   const output: BuildColumnsOutput = {}
 
   if (paramsMap) {
-    const { nestedColumns, leafColumns } = transformColumnsMap(paramsMap)
+    const { nestedColumns } = transformColumnsMap(paramsMap)
     output.params = nestedColumns
-    output.leafParams = leafColumns
   }
 
   if (metricsMap) {
-    const { nestedColumns, leafColumns } = transformColumnsMap(metricsMap)
+    const { nestedColumns } = transformColumnsMap(metricsMap)
     output.metrics = nestedColumns
-    output.leafMetrics = leafColumns
   }
 
   return output

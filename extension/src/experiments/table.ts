@@ -42,12 +42,6 @@ export class ExperimentsTable {
   private metrics?: Column[]
   public getMetrics = () => this.metrics
 
-  private leafParams?: Column[]
-  public getLeafParams = () => this.leafParams
-
-  private leafMetrics?: Column[]
-  public getLeafMetrics = () => this.leafMetrics
-
   private async updateData(): Promise<void> {
     const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
     const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
@@ -55,11 +49,9 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
-    const { params, metrics, leafParams, leafMetrics } = buildColumns(data)
+    const { params, metrics } = buildColumns(data)
     this.params = params
-    this.leafParams = leafParams
     this.metrics = metrics
-    this.leafMetrics = leafMetrics
     this.sendData()
   }
 
