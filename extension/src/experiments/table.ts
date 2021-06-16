@@ -42,7 +42,7 @@ export class ExperimentsTable {
   private flatColumns?: Column[]
   public getFlatColumns = () => this.flatColumns
 
-  private async updateData(): Promise<void> {
+  private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
     const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
       getNewPromise,
@@ -52,7 +52,7 @@ export class ExperimentsTable {
     const { nestedColumns, flatColumns } = buildColumns(data)
     this.nestedColumns = nestedColumns
     this.flatColumns = flatColumns
-    this.sendData()
+    return this.sendData()
   }
 
   public onDidChangeData(gitRoot: string): void {
@@ -103,8 +103,9 @@ export class ExperimentsTable {
     )
   }
 
-  private sendData() {
+  private async sendData() {
     if (this.data && this.webview) {
+      await this.webview.isReady()
       return this.webview.showExperiments({
         tableData: this.data
       })
