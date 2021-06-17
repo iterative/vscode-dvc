@@ -80,9 +80,7 @@ module.exports = {
     '@typescript-eslint/prefer-optional-chain': 'error',
     // Trust TS on this one -- Useful for functions that need to exhaust an enum.
     'array-callback-return': 'off',
-
     camelcase: 'off',
-
     curly: ['error', 'all'],
     'import/no-unresolved': 'off',
     'import/order': [
