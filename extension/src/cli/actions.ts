@@ -38,7 +38,7 @@ export const tryThenMaybeForce = async (
 
 const offerToForce_ = async (
   stderr: string,
-  forceFunc: (...args: string[]) => Promise<string>,
+  func: (...args: string[]) => Promise<string>,
   ...args: string[]
 ): Promise<string | undefined> => {
   const text = stderr.replace(
@@ -49,7 +49,7 @@ const offerToForce_ = async (
   if (response !== 'Force') {
     return
   }
-  return forceFunc(...args, Flag.FORCE)
+  return func(...args, Flag.FORCE)
 }
 
 export const tryThenMaybeForce_ = async (

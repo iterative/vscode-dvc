@@ -353,26 +353,6 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('forcePullTarget', () => {
-    it('should call executeProcess with the correct parameters to force pull a target', async () => {
-      const cwd = __dirname
-      const stdout = everythingUpToDate
-      const relPath = join('logs', 'acc.tsv')
-
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forcePullTarget(cwd, relPath)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['pull', '-f', relPath],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('forcePush', () => {
     it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
@@ -458,6 +438,24 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['pull', relPath],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should call executeProcess with the correct parameters to force pull a target', async () => {
+      const cwd = __dirname
+      const stdout = everythingUpToDate
+      const relPath = join('logs', 'acc.tsv')
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.pullTarget(cwd, relPath, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['pull', relPath, '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

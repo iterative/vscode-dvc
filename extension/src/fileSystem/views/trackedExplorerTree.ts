@@ -17,7 +17,7 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
-import { tryThenMaybeForce, tryThenMaybeForce_ } from '../../cli/actions'
+import { tryThenMaybeForce_ } from '../../cli/actions'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -141,10 +141,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     if (response === 'Pull File') {
-      return tryThenMaybeForce(
-        (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
-        (dvcRoot, relPath) =>
-          this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+      return tryThenMaybeForce_(
+        (dvcRoot, relPath, ...args) =>
+          this.cliExecutor.pullTarget(dvcRoot, relPath, ...args),
         dvcRoot,
         relPath
       )
@@ -270,10 +269,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
-          (dvcRoot, relPath) =>
-            this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+        return tryThenMaybeForce_(
+          (dvcRoot, relPath, ...args) =>
+            this.cliExecutor.pullTarget(dvcRoot, relPath, ...args),
           dvcRoot,
           relative(dvcRoot, path)
         )
