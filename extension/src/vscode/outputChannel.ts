@@ -7,9 +7,6 @@ export class OutputChannel {
   private readonly outputChannel: VSOutputChannel
   private readonly version: string
 
-  private getVersionAndISOString = () =>
-    `[version: ${this.version}, ${new Date().toISOString()}]`
-
   constructor(cliInteractors: ICli[], version: string, name = 'DVC') {
     this.outputChannel = this.dispose.track(window.createOutputChannel(name))
     this.version = version
@@ -29,5 +26,9 @@ export class OutputChannel {
         })
       )
     })
+  }
+
+  private getVersionAndISOString() {
+    return `[version: ${this.version}, ${new Date().toISOString()}]`
   }
 }
