@@ -48,28 +48,6 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class CliReader extends Cli {
-  private async readProcess<T = string>(
-    cwd: string,
-    formatter: typeof trimAndSplit | typeof JSON.parse,
-    ...args: Args
-  ): Promise<T> {
-    const output = await this.executeProcess(cwd, ...args)
-    if (!formatter) {
-      return (output as unknown) as T
-    }
-    return (formatter(output) as unknown) as T
-  }
-
-  private readProcessJson<T>(cwd: string, command: Command, ...args: Args) {
-    return this.readProcess<T>(
-      cwd,
-      JSON.parse,
-      command,
-      ...args,
-      Flag.SHOW_JSON
-    )
-  }
-
   public experimentListCurrent(cwd: string): Promise<string[]> {
     return this.readProcess<string[]>(
       cwd,
@@ -124,5 +102,27 @@ export class CliReader extends Cli {
 
   public status(cwd: string): Promise<StatusOutput> {
     return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
+  }
+
+  private async readProcess<T = string>(
+    cwd: string,
+    formatter: typeof trimAndSplit | typeof JSON.parse,
+    ...args: Args
+  ): Promise<T> {
+    const output = await this.executeProcess(cwd, ...args)
+    if (!formatter) {
+      return (output as unknown) as T
+    }
+    return (formatter(output) as unknown) as T
+  }
+
+  private readProcessJson<T>(cwd: string, command: Command, ...args: Args) {
+    return this.readProcess<T>(
+      cwd,
+      JSON.parse,
+      command,
+      ...args,
+      Flag.SHOW_JSON
+    )
   }
 }

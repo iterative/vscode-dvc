@@ -9,6 +9,20 @@ export class PseudoTerminal {
 
   private blocked: boolean
 
+  private readonly processOutput: EventEmitter<string>
+  private readonly processTerminated: EventEmitter<void>
+
+  constructor(
+    processOutput: EventEmitter<string>,
+    processTerminated: EventEmitter<void>,
+    termName = 'DVC'
+  ) {
+    this.termName = termName
+    this.processOutput = processOutput
+    this.processTerminated = processTerminated
+    this.blocked = false
+  }
+
   public isBlocked() {
     return this.blocked
   }
@@ -16,9 +30,6 @@ export class PseudoTerminal {
   public setBlocked(blocked: boolean) {
     this.blocked = blocked
   }
-
-  private readonly processOutput: EventEmitter<string>
-  private readonly processTerminated: EventEmitter<void>
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
     if (!this.instance) {
@@ -78,15 +89,4 @@ export class PseudoTerminal {
         })
       )
     })
-
-  constructor(
-    processOutput: EventEmitter<string>,
-    processTerminated: EventEmitter<void>,
-    termName = 'DVC'
-  ) {
-    this.termName = termName
-    this.processOutput = processOutput
-    this.processTerminated = processTerminated
-    this.blocked = false
-  }
 }

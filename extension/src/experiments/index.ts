@@ -16,54 +16,41 @@ import { reset } from '../util/disposable'
 type ExperimentsTables = Record<string, ExperimentsTable>
 
 export class Experiments {
+  @observable
+  private focusedWebviewDvcRoot: string | undefined
+
   public dispose = Disposable.fn()
+
+  private experiments: ExperimentsTables = {}
+  private config: Config
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
   private readonly cliReader: CliReader
 
+  constructor(
+    config: Config,
+    cliReader: CliReader,
+    experiments?: Record<string, ExperimentsTable>
+  ) {
+    makeObservable(this)
+
+    this.config = config
+    this.cliReader = cliReader
+    if (experiments) {
+      this.experiments = experiments
+    }
+  }
+
   public isReady() {
     return this.initialized
   }
-
-  @observable
-  private focusedWebviewDvcRoot: string | undefined
 
   public getFocused(): ExperimentsTable | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
     return this.experiments[this.focusedWebviewDvcRoot]
-  }
-
-  private experiments: ExperimentsTables = {}
-  private config: Config
-
-  private async getDvcRoot(
-    chooserFn: (keys: string[]) => string | Thenable<string | undefined>
-  ) {
-    const keys = Object.keys(this.experiments)
-    if (keys.length === 1) {
-      return keys[0]
-    }
-    return await chooserFn(keys)
-  }
-
-  private getFocusedOrDefaultOrPickProject = () =>
-    this.getDvcRoot(
-      keys =>
-        this.focusedWebviewDvcRoot ||
-        this.config.getDefaultProject() ||
-        this.showDvcRootQuickPick(keys)
-    )
-
-  private getDefaultOrPickDvcRoot = () =>
-    this.getDvcRoot(
-      keys => this.config.getDefaultProject() || this.showDvcRootQuickPick(keys)
-    )
-
-  private showDvcRootQuickPick(keys: string[]) {
-    return quickPickOne(keys, 'Select which project to run command against')
   }
 
   public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
@@ -130,14 +117,6 @@ export class Experiments {
     }
   }
 
-  private async showExperimentsWebview(
-    dvcRoot: string
-  ): Promise<ExperimentsTable> {
-    const experimentsTable = this.experiments[dvcRoot]
-    await experimentsTable.showWebview()
-    return experimentsTable
-  }
-
   public async showExperimentsTable() {
     const dvcRoot = await this.getDefaultOrPickDvcRoot()
     if (!dvcRoot) {
@@ -168,29 +147,6 @@ export class Experiments {
         cliRunner.dispose.untrack(listener)
         listener.dispose()
       })
-    )
-    return experimentsTable
-  }
-
-  private createExperimentsTable(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ) {
-    const experimentsTable = this.dispose.track(
-      new ExperimentsTable(
-        dvcRoot,
-        this.config,
-        this.cliReader,
-        resourceLocator
-      )
-    )
-
-    this.experiments[dvcRoot] = experimentsTable
-
-    this.dispose.track(
-      experimentsTable.onDidChangeIsWebviewFocused(
-        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
-      )
     )
     return experimentsTable
   }
@@ -230,17 +186,61 @@ export class Experiments {
     experimentsTable.setWebview(experimentsWebview)
   }
 
-  constructor(
-    config: Config,
-    cliReader: CliReader,
-    experiments?: Record<string, ExperimentsTable>
+  private async getDvcRoot(
+    chooserFn: (keys: string[]) => string | Thenable<string | undefined>
   ) {
-    makeObservable(this)
-
-    this.config = config
-    this.cliReader = cliReader
-    if (experiments) {
-      this.experiments = experiments
+    const keys = Object.keys(this.experiments)
+    if (keys.length === 1) {
+      return keys[0]
     }
+    return await chooserFn(keys)
+  }
+
+  private getFocusedOrDefaultOrPickProject = () =>
+    this.getDvcRoot(
+      keys =>
+        this.focusedWebviewDvcRoot ||
+        this.config.getDefaultProject() ||
+        this.showDvcRootQuickPick(keys)
+    )
+
+  private getDefaultOrPickDvcRoot = () =>
+    this.getDvcRoot(
+      keys => this.config.getDefaultProject() || this.showDvcRootQuickPick(keys)
+    )
+
+  private showDvcRootQuickPick(keys: string[]) {
+    return quickPickOne(keys, 'Select which project to run command against')
+  }
+
+  private async showExperimentsWebview(
+    dvcRoot: string
+  ): Promise<ExperimentsTable> {
+    const experimentsTable = this.experiments[dvcRoot]
+    await experimentsTable.showWebview()
+    return experimentsTable
+  }
+
+  private createExperimentsTable(
+    dvcRoot: string,
+    resourceLocator: ResourceLocator
+  ) {
+    const experimentsTable = this.dispose.track(
+      new ExperimentsTable(
+        dvcRoot,
+        this.config,
+        this.cliReader,
+        resourceLocator
+      )
+    )
+
+    this.experiments[dvcRoot] = experimentsTable
+
+    this.dispose.track(
+      experimentsTable.onDidChangeIsWebviewFocused(
+        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
+      )
+    )
+    return experimentsTable
   }
 }

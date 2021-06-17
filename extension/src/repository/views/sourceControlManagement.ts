@@ -23,20 +23,29 @@ enum Status {
 type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
 
 export class SourceControlManagement {
-  public readonly dispose = Disposable.fn()
-  private readonly dvcRoot: string
-
   @observable
   private changedResourceGroup: SourceControlResourceGroup
 
-  private getResourceStatesReducer() {
-    return (
-      resourceStates: ResourceState[],
-      entry: [string, Set<string>]
-    ): ResourceState[] => {
-      const [status, resources] = entry as [Status, Set<string>]
-      return [...resourceStates, ...this.getResourceStates(status, resources)]
-    }
+  public readonly dispose = Disposable.fn()
+
+  private readonly dvcRoot: string
+
+  constructor(dvcRoot: string, state: SourceControlManagementState) {
+    makeObservable(this)
+
+    this.dvcRoot = dvcRoot
+
+    const scmView = this.dispose.track(
+      scm.createSourceControl('dvc', 'DVC', Uri.file(dvcRoot))
+    )
+
+    scmView.inputBox.visible = false
+
+    this.changedResourceGroup = this.dispose.track(
+      scmView.createResourceGroup('group1', 'Changes')
+    )
+
+    this.setState(state)
   }
 
   public setState(state: SourceControlManagementState) {
@@ -48,6 +57,16 @@ export class SourceControlManagement {
 
   public getState() {
     return this.changedResourceGroup.resourceStates
+  }
+
+  private getResourceStatesReducer() {
+    return (
+      resourceStates: ResourceState[],
+      entry: [string, Set<string>]
+    ): ResourceState[] => {
+      const [status, resources] = entry as [Status, Set<string>]
+      return [...resourceStates, ...this.getResourceStates(status, resources)]
+    }
   }
 
   private isValidStatus(status: string): boolean {
@@ -70,23 +89,5 @@ export class SourceControlManagement {
         dvcRoot: this.dvcRoot,
         resourceUri: Uri.file(path)
       }))
-  }
-
-  constructor(dvcRoot: string, state: SourceControlManagementState) {
-    makeObservable(this)
-
-    this.dvcRoot = dvcRoot
-
-    const scmView = this.dispose.track(
-      scm.createSourceControl('dvc', 'DVC', Uri.file(dvcRoot))
-    )
-
-    scmView.inputBox.visible = false
-
-    this.changedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('group1', 'Changes')
-    )
-
-    this.setState(state)
   }
 }

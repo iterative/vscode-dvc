@@ -11,16 +11,13 @@ import { setContextValue } from '../vscode/context'
 export class CliRunner implements ICli {
   public readonly dispose = Disposable.fn()
 
-  private static setRunningContext = (isRunning: boolean) =>
-    setContextValue('dvc.runner.running', isRunning)
-
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
 
-  private readonly processOutput: EventEmitter<string>
-
   public readonly processStarted: EventEmitter<void>
   public readonly onDidStartProcess: Event<void>
+
+  private readonly processOutput: EventEmitter<string>
 
   private readonly processTerminated: EventEmitter<void>
   private readonly onDidTerminateProcess: Event<void>
@@ -30,6 +27,94 @@ export class CliRunner implements ICli {
   private pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
   private config: Config
+
+  constructor(
+    config: Config,
+    executable?: string,
+    emitters?: {
+      processCompleted: EventEmitter<CliResult>
+      processOutput: EventEmitter<string>
+      processStarted: EventEmitter<void>
+      processTerminated?: EventEmitter<void>
+    }
+  ) {
+    this.config = config
+
+    this.executable = executable
+
+    this.processCompleted =
+      emitters?.processCompleted ||
+      this.dispose.track(new EventEmitter<CliResult>())
+    this.onDidCompleteProcess = this.processCompleted.event
+    this.dispose.track(
+      this.onDidCompleteProcess(() => {
+        this.pseudoTerminal.setBlocked(false)
+        CliRunner.setRunningContext(false)
+        this.processOutput.fire(
+          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
+        )
+        this.currentProcess = undefined
+      })
+    )
+
+    this.processOutput =
+      emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
+
+    this.processStarted =
+      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+    this.onDidStartProcess = this.processStarted.event
+
+    this.processTerminated =
+      emitters?.processTerminated ||
+      this.dispose.track(new EventEmitter<void>())
+    this.onDidTerminateProcess = this.processTerminated.event
+    this.dispose.track(
+      this.onDidTerminateProcess(() => {
+        this.stop()
+      })
+    )
+
+    this.pseudoTerminal = this.dispose.track(
+      new PseudoTerminal(this.processOutput, this.processTerminated)
+    )
+  }
+
+  private static setRunningContext = (isRunning: boolean) =>
+    setContextValue('dvc.runner.running', isRunning)
+
+  public run = async (cwd: string, ...args: Args) => {
+    await this.pseudoTerminal.openCurrentInstance()
+    if (!this.pseudoTerminal.isBlocked()) {
+      return this.startProcess(cwd, args)
+    }
+    window.showErrorMessage(
+      `Cannot start dvc ${args.join(
+        ' '
+      )} as the output terminal is already occupied.`
+    )
+  }
+
+  public stop = async () => {
+    try {
+      this.currentProcess?.kill('SIGINT')
+      await this.currentProcess
+      return false
+    } catch (e) {
+      const stopped = this.currentProcess?.killed || !this.currentProcess
+      if (stopped) {
+        this.pseudoTerminal.close()
+      }
+      return stopped
+    }
+  }
+
+  public isRunning = () => {
+    return !!this.currentProcess
+  }
+
+  public getRunningProcess = () => {
+    return this.currentProcess
+  }
 
   private getOverrideOrCliPath = () => {
     if (this.executable) {
@@ -86,90 +171,5 @@ export class CliRunner implements ICli {
       args,
       cwd
     })
-  }
-
-  public run = async (cwd: string, ...args: Args) => {
-    await this.pseudoTerminal.openCurrentInstance()
-    if (!this.pseudoTerminal.isBlocked()) {
-      return this.startProcess(cwd, args)
-    }
-    window.showErrorMessage(
-      `Cannot start dvc ${args.join(
-        ' '
-      )} as the output terminal is already occupied.`
-    )
-  }
-
-  public stop = async () => {
-    try {
-      this.currentProcess?.kill('SIGINT')
-      await this.currentProcess
-      return false
-    } catch (e) {
-      const stopped = this.currentProcess?.killed || !this.currentProcess
-      if (stopped) {
-        this.pseudoTerminal.close()
-      }
-      return stopped
-    }
-  }
-
-  public isRunning = () => {
-    return !!this.currentProcess
-  }
-
-  public getRunningProcess = () => {
-    return this.currentProcess
-  }
-
-  constructor(
-    config: Config,
-    executable?: string,
-    emitters?: {
-      processCompleted: EventEmitter<CliResult>
-      processOutput: EventEmitter<string>
-      processStarted: EventEmitter<void>
-      processTerminated?: EventEmitter<void>
-    }
-  ) {
-    this.config = config
-
-    this.executable = executable
-
-    this.processCompleted =
-      emitters?.processCompleted ||
-      this.dispose.track(new EventEmitter<CliResult>())
-    this.onDidCompleteProcess = this.processCompleted.event
-    this.dispose.track(
-      this.onDidCompleteProcess(() => {
-        this.pseudoTerminal.setBlocked(false)
-        CliRunner.setRunningContext(false)
-        this.processOutput.fire(
-          '\r\nTerminal will be reused by DVC, press any key to close it\r\n\n'
-        )
-        this.currentProcess = undefined
-      })
-    )
-
-    this.processOutput =
-      emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
-
-    this.processStarted =
-      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
-    this.onDidStartProcess = this.processStarted.event
-
-    this.processTerminated =
-      emitters?.processTerminated ||
-      this.dispose.track(new EventEmitter<void>())
-    this.onDidTerminateProcess = this.processTerminated.event
-    this.dispose.track(
-      this.onDidTerminateProcess(() => {
-        this.stop()
-      })
-    )
-
-    this.pseudoTerminal = this.dispose.track(
-      new PseudoTerminal(this.processOutput, this.processTerminated)
-    )
   }
 }

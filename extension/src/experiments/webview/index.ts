@@ -28,80 +28,24 @@ import { setContextValue } from '../../vscode/context'
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
 
+  public readonly onDidDispose: Event<void>
+
+  public readonly onDidChangeIsFocused: Event<string | undefined>
+
+  protected readonly initialized: Promise<void>
+
   private readonly disposer = Disposable.fn()
 
   private readonly deferred = new Deferred()
-  protected readonly initialized = this.deferred.promise
-
-  public isReady() {
-    return this.initialized
-  }
-
-  public isActive = () => this.webviewPanel.active
-
-  public isVisible = () => this.webviewPanel.visible
 
   private dvcRoot: string
+
   private readonly isFocusedChanged: EventEmitter<
     string | undefined
   > = this.disposer.track(new EventEmitter())
 
-  public readonly onDidChangeIsFocused: Event<string | undefined> = this
-    .isFocusedChanged.event
-
   private readonly webviewPanel: WebviewPanel
   private readonly config: Config
-
-  public readonly onDidDispose: Event<void>
-
-  public static restore(
-    webviewPanel: WebviewPanel,
-    config: Config,
-    state: ExperimentsWebviewState
-  ): Promise<ExperimentsWebview> {
-    return new Promise((resolve, reject) => {
-      try {
-        resolve(new ExperimentsWebview(webviewPanel, config, state))
-      } catch (e) {
-        reject(e)
-      }
-    })
-  }
-
-  public static async create(
-    config: Config,
-    state: ExperimentsWebviewState,
-    resourceLocator: ResourceLocator
-  ): Promise<ExperimentsWebview> {
-    const webviewPanel = window.createWebviewPanel(
-      ExperimentsWebview.viewKey,
-      Experiments,
-      ViewColumn.Active,
-      {
-        enableScripts: true,
-        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)],
-        retainContextWhenHidden: true
-      }
-    )
-
-    webviewPanel.iconPath = resourceLocator.dvcIconPath
-
-    const view = new ExperimentsWebview(webviewPanel, config, state)
-    await view.isReady()
-    return view
-  }
-
-  public reveal = () => {
-    this.webviewPanel.reveal()
-    return this
-  }
-
-  private notifyActiveStatus(webviewPanel: WebviewPanel) {
-    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
-
-    const active = webviewPanel.active ? this.dvcRoot : undefined
-    this.isFocusedChanged.fire(active)
-  }
 
   private constructor(
     webviewPanel: WebviewPanel,
@@ -110,6 +54,10 @@ export class ExperimentsWebview {
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
+
+    this.initialized = this.deferred.promise
+
+    this.onDidChangeIsFocused = this.isFocusedChanged.event
 
     this.config = config
     this.dvcRoot = state.dvcRoot
@@ -154,12 +102,81 @@ export class ExperimentsWebview {
     })
   }
 
+  public static restore(
+    webviewPanel: WebviewPanel,
+    config: Config,
+    state: ExperimentsWebviewState
+  ): Promise<ExperimentsWebview> {
+    return new Promise((resolve, reject) => {
+      try {
+        resolve(new ExperimentsWebview(webviewPanel, config, state))
+      } catch (e) {
+        reject(e)
+      }
+    })
+  }
+
+  public static async create(
+    config: Config,
+    state: ExperimentsWebviewState,
+    resourceLocator: ResourceLocator
+  ): Promise<ExperimentsWebview> {
+    const webviewPanel = window.createWebviewPanel(
+      ExperimentsWebview.viewKey,
+      Experiments,
+      ViewColumn.Active,
+      {
+        enableScripts: true,
+        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)],
+        retainContextWhenHidden: true
+      }
+    )
+
+    webviewPanel.iconPath = resourceLocator.dvcIconPath
+
+    const view = new ExperimentsWebview(webviewPanel, config, state)
+    await view.isReady()
+    return view
+  }
+
   private static setPanelActiveContext(state: boolean) {
     setContextValue('dvc.experiments.webviewActive', state)
   }
 
   public dispose(): void {
     this.webviewPanel.dispose()
+  }
+
+  public isReady() {
+    return this.initialized
+  }
+
+  public isActive = () => this.webviewPanel.active
+
+  public isVisible = () => this.webviewPanel.visible
+
+  public reveal = () => {
+    this.webviewPanel.reveal()
+    return this
+  }
+
+  public showExperiments(
+    payload: {
+      tableData?: ExperimentsRepoJSONOutput | null
+      errors?: Error[]
+    } = {}
+  ): Thenable<boolean> {
+    return this.sendMessage({
+      type: MessageToWebviewType.showExperiments,
+      ...payload
+    })
+  }
+
+  private notifyActiveStatus(webviewPanel: WebviewPanel) {
+    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
+
+    const active = webviewPanel.active ? this.dvcRoot : undefined
+    this.isFocusedChanged.fire(active)
   }
 
   private getHtml(): string {
@@ -232,17 +249,5 @@ export class ExperimentsWebview {
     } else {
       Logger.error(`Unexpected message: ${message}`)
     }
-  }
-
-  public showExperiments(
-    payload: {
-      tableData?: ExperimentsRepoJSONOutput | null
-      errors?: Error[]
-    } = {}
-  ): Thenable<boolean> {
-    return this.sendMessage({
-      type: MessageToWebviewType.showExperiments,
-      ...payload
-    })
   }
 }
