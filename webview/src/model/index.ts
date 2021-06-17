@@ -31,8 +31,6 @@ interface PersistedModelState {
 export class Model {
   private static instance: Model
 
-  public readonly dispose = Disposable.fn()
-
   @observable
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
@@ -41,6 +39,8 @@ export class Model {
 
   @observable
   public dvcRoot?: string
+
+  public readonly dispose = Disposable.fn()
 
   public readonly vsCodeApi = getVsCodeApi<
     PersistedModelState,
