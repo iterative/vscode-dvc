@@ -1,7 +1,6 @@
 import { commands } from 'vscode'
 import {
   getResourceCommand,
-  getRootCommand,
   getRootCommand_,
   getSimpleResourceCommand,
   ResourceCommand,
@@ -79,9 +78,8 @@ const registerPushCommand = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.push',
-      getRootCommand(
-        (cwd: string) => cliExecutor.push(cwd),
-        (cwd: string) => cliExecutor.forcePush(cwd)
+      getRootCommand_((cwd: string, ...args: Args) =>
+        cliExecutor.push(cwd, ...args)
       )
     )
   )

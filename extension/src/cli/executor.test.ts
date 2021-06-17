@@ -326,24 +326,6 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('forcePush', () => {
-    it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
-      const cwd = __dirname
-      const stdout = everythingUpToDate
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forcePush(cwd)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['push', '-f'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('init', () => {
     it('should call executeProcess with the correct parameters to initialize a project', async () => {
       const fsPath = __dirname
@@ -465,6 +447,22 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['push'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
+      const cwd = __dirname
+      const stdout = everythingUpToDate
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.push(cwd, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['push', '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

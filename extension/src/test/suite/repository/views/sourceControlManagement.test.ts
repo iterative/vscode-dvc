@@ -193,15 +193,11 @@ suite('Extension Test Suite', () => {
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
         ('' as unknown) as MessageItem
       )
-      const mockForcePush = stub(CliExecutor.prototype, 'forcePush').resolves(
-        ''
-      )
 
       await commands.executeCommand('dvc.push', { rootUri })
 
       expect(mockPush).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
-      expect(mockForcePush).not.to.be.called
     })
   })
 })
