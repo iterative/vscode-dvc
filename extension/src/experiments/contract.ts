@@ -27,6 +27,6 @@ export interface ExperimentsBranchJSONOutput {
 }
 
 export interface ExperimentsRepoJSONOutput {
-  workspace: ExperimentsWorkspaceJSONOutput
   [name: string]: ExperimentsWorkspaceJSONOutput | ExperimentsBranchJSONOutput
+  workspace: ExperimentsWorkspaceJSONOutput
 }
