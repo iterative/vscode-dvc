@@ -20,69 +20,30 @@ import { getConfigValue, setConfigValue } from './vscode/config'
 import { definedAndNonEmpty } from './util/array'
 
 export class Config {
-  public readonly dispose = Disposable.fn()
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-  private dvcRoots: string[] = []
-
-  public setDvcRoots(dvcRoots: string[]): void {
-    this.dvcRoots = dvcRoots
-  }
-
-  public isReady() {
-    return this.initialized
-  }
-
-  private readonly executionDetailsChanged: EventEmitter<
-    void
-  > = this.dispose.track(new EventEmitter())
-
-  public readonly onDidChangeExecutionDetails: Event<void> = this
-    .executionDetailsChanged.event
-
   @observable
   public pythonBinPath: string | undefined
 
   @observable
   private vsCodeTheme: ColorTheme
 
-  public getTheme(): WebviewColorTheme {
-    if (this.vsCodeTheme.kind === ColorThemeKind.Dark) {
-      return WebviewColorTheme.dark
-    }
-    return WebviewColorTheme.light
-  }
-
   @observable
   private dvcPathStatusBarItem: StatusBarItem
 
-  public getFirstWorkspaceFolderRoot = (): string | undefined => {
-    const { workspaceFolders } = workspace
-    return workspaceFolders && workspaceFolders.length > 0
-      ? workspaceFolders[0].uri.fsPath
-      : undefined
-  }
+  @observable
+  private defaultProjectStatusBarItem: StatusBarItem
+
+  public readonly dispose = Disposable.fn()
+
+  public readonly onDidChangeExecutionDetails: Event<void>
+  private readonly executionDetailsChanged: EventEmitter<void>
+
+  private dvcRoots: string[] = []
+
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
   private dvcPathOption = 'dvc.dvcPath'
-
-  public getCliPath(): string {
-    return getConfigValue(this.dvcPathOption)
-  }
-
-  private notifyIfChanged(
-    oldPath: string | undefined,
-    newPath: string | undefined
-  ) {
-    if (oldPath !== newPath) {
-      this.executionDetailsChanged.fire()
-    }
-  }
-
-  private setDvcPath(path?: string): Thenable<void> {
-    this.notifyIfChanged(this.getCliPath(), path)
-    return setConfigValue(this.dvcPathOption, path)
-  }
+  private defaultProjectOption = 'dvc.defaultProject'
 
   private dvcPathQuickPickItems = [
     {
@@ -110,104 +71,11 @@ export class Config {
     }
   ]
 
-  public selectDvcPath = async (): Promise<void> => {
-    const result = await window.showQuickPick(this.dvcPathQuickPickItems, {
-      placeHolder: 'Please choose...'
-    })
-    if (result) {
-      const { value } = result
-      if (typeof value === 'function') {
-        await value()
-      } else {
-        this.setDvcPath(value)
-      }
-    }
-  }
-
-  @observable
-  private defaultProjectStatusBarItem: StatusBarItem
-
-  private defaultProjectOption = 'dvc.defaultProject'
-
-  public getDefaultProject(): string {
-    return getConfigValue(this.defaultProjectOption)
-  }
-
-  public deselectDefaultProject = (): Thenable<void> =>
-    this.setDefaultProject(undefined)
-
-  private getDefaultProjectOptions(
-    dvcRoots: string[]
-  ): QuickPickItemWithValue[] {
-    return [
-      {
-        description: 'Choose project each time a command is run',
-        label: 'Always prompt',
-        picked: true,
-        value: 'remove-default'
-      },
-      ...dvcRoots.map(dvcRoot => ({
-        description: dvcRoot,
-        label: 'Project',
-        value: dvcRoot
-      }))
-    ]
-  }
-
-  private async pickDefaultProject(): Promise<string | undefined> {
-    if (definedAndNonEmpty(this.dvcRoots)) {
-      const selected = await window.showQuickPick(
-        this.getDefaultProjectOptions(this.dvcRoots),
-        {
-          canPickMany: false,
-          placeHolder: 'Select a default project to run all commands against'
-        }
-      )
-
-      if (selected?.value === 'remove-default') {
-        this.deselectDefaultProject()
-        return
-      }
-
-      return selected?.value
-    }
-  }
-
-  public selectDefaultProject = async (): Promise<void> => {
-    const dvcRoot = await this.pickDefaultProject()
-    if (dvcRoot) {
-      this.setDefaultProject(dvcRoot)
-    }
-  }
-
-  private setDefaultProject(path?: string): Thenable<void> {
-    return setConfigValue(this.defaultProjectOption, path)
-  }
-
-  private createStatusBarItem = (
-    command: string,
-    tooltip: string,
-    text: string
-  ) => {
-    const dvcPathStatusBarItem = window.createStatusBarItem()
-
-    dvcPathStatusBarItem.tooltip = tooltip
-    dvcPathStatusBarItem.command = command
-    dvcPathStatusBarItem.text = text
-    dvcPathStatusBarItem.show()
-
-    return dvcPathStatusBarItem
-  }
-
-  private setStatusBarItemText(
-    statusBarItem: StatusBarItem,
-    path: string
-  ): void {
-    statusBarItem.text = path
-  }
-
   constructor() {
     makeObservable(this)
+
+    this.executionDetailsChanged = this.dispose.track(new EventEmitter())
+    this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
     getPythonBinPath().then(path => {
       this.pythonBinPath = path
@@ -265,5 +133,136 @@ export class Config {
         }
       })
     )
+  }
+
+  public setDvcRoots(dvcRoots: string[]): void {
+    this.dvcRoots = dvcRoots
+  }
+
+  public isReady() {
+    return this.initialized
+  }
+
+  public getTheme(): WebviewColorTheme {
+    if (this.vsCodeTheme.kind === ColorThemeKind.Dark) {
+      return WebviewColorTheme.dark
+    }
+    return WebviewColorTheme.light
+  }
+
+  public getFirstWorkspaceFolderRoot = (): string | undefined => {
+    const { workspaceFolders } = workspace
+    return workspaceFolders && workspaceFolders.length > 0
+      ? workspaceFolders[0].uri.fsPath
+      : undefined
+  }
+
+  public getCliPath(): string {
+    return getConfigValue(this.dvcPathOption)
+  }
+
+  public selectDvcPath = async (): Promise<void> => {
+    const result = await window.showQuickPick(this.dvcPathQuickPickItems, {
+      placeHolder: 'Please choose...'
+    })
+    if (result) {
+      const { value } = result
+      if (typeof value === 'function') {
+        await value()
+      } else {
+        this.setDvcPath(value)
+      }
+    }
+  }
+
+  public getDefaultProject(): string {
+    return getConfigValue(this.defaultProjectOption)
+  }
+
+  public deselectDefaultProject = (): Thenable<void> =>
+    this.setDefaultProject(undefined)
+
+  public selectDefaultProject = async (): Promise<void> => {
+    const dvcRoot = await this.pickDefaultProject()
+    if (dvcRoot) {
+      this.setDefaultProject(dvcRoot)
+    }
+  }
+
+  private notifyIfChanged(
+    oldPath: string | undefined,
+    newPath: string | undefined
+  ) {
+    if (oldPath !== newPath) {
+      this.executionDetailsChanged.fire()
+    }
+  }
+
+  private setDvcPath(path?: string): Thenable<void> {
+    this.notifyIfChanged(this.getCliPath(), path)
+    return setConfigValue(this.dvcPathOption, path)
+  }
+
+  private getDefaultProjectOptions(
+    dvcRoots: string[]
+  ): QuickPickItemWithValue[] {
+    return [
+      {
+        description: 'Choose project each time a command is run',
+        label: 'Always prompt',
+        picked: true,
+        value: 'remove-default'
+      },
+      ...dvcRoots.map(dvcRoot => ({
+        description: dvcRoot,
+        label: 'Project',
+        value: dvcRoot
+      }))
+    ]
+  }
+
+  private async pickDefaultProject(): Promise<string | undefined> {
+    if (definedAndNonEmpty(this.dvcRoots)) {
+      const selected = await window.showQuickPick(
+        this.getDefaultProjectOptions(this.dvcRoots),
+        {
+          canPickMany: false,
+          placeHolder: 'Select a default project to run all commands against'
+        }
+      )
+
+      if (selected?.value === 'remove-default') {
+        this.deselectDefaultProject()
+        return
+      }
+
+      return selected?.value
+    }
+  }
+
+  private setDefaultProject(path?: string): Thenable<void> {
+    return setConfigValue(this.defaultProjectOption, path)
+  }
+
+  private createStatusBarItem = (
+    command: string,
+    tooltip: string,
+    text: string
+  ) => {
+    const dvcPathStatusBarItem = window.createStatusBarItem()
+
+    dvcPathStatusBarItem.tooltip = tooltip
+    dvcPathStatusBarItem.command = command
+    dvcPathStatusBarItem.text = text
+    dvcPathStatusBarItem.show()
+
+    return dvcPathStatusBarItem
+  }
+
+  private setStatusBarItemText(
+    statusBarItem: StatusBarItem,
+    path: string
+  ): void {
+    statusBarItem.text = path
   }
 }
