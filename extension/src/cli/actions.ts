@@ -17,7 +17,7 @@ const offerToForce = async (
   return forceFunc(...args)
 }
 
-export const chainCommands = async (
+export const tryThenMaybeForce = async (
   func: (...args: string[]) => Promise<string>,
   forceFunc: (...args: string[]) => Promise<string>,
   ...args: string[]
