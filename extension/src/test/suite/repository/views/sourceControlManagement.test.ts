@@ -82,25 +82,27 @@ suite('Extension Test Suite', () => {
     })
 
     it('should prompt to force if dvc.checkoutTarget fails', async () => {
-      stub(CliExecutor.prototype, 'checkoutTarget').rejects({
-        stderr: Prompt.TRY_FORCE
-      })
+      const mockCheckoutTarget = stub(CliExecutor.prototype, 'checkoutTarget')
+        .onFirstCall()
+        .rejects({
+          stderr: Prompt.TRY_FORCE
+        })
+        .onSecondCall()
+        .resolves('')
       const mockShowInformationMessage = stub(
         window,
         'showWarningMessage'
       ).resolves(('Force' as unknown) as MessageItem)
-      const mockForceCheckout = stub(
-        CliExecutor.prototype,
-        'forceCheckoutTarget'
-      ).resolves('')
 
       await commands.executeCommand('dvc.checkoutTarget', {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
 
+      expect(mockCheckoutTarget).to.be.calledTwice
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockForceCheckout).to.be.calledOnce
+      expect(mockCheckoutTarget).to.be.calledWith(dvcDemoPath, relPath)
+      expect(mockCheckoutTarget).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
     it('should be able to run dvc.commit without error', async () => {

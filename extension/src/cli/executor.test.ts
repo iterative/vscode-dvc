@@ -123,6 +123,25 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
+
+    it('should call executeProcess with the correct parameters to force checkout a file', async () => {
+      const cwd = __dirname
+      const relPath = join('logs', 'acc.tsv')
+
+      const stdout = 'M       ./'
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.checkoutTarget(cwd, relPath, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['checkout', relPath, '-f'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
   })
 
   describe('commit', () => {
@@ -262,27 +281,6 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['exp', 'run', '--queue'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
-  describe('forceCheckoutTarget', () => {
-    it('should call executeProcess with the correct parameters to force checkout a file', async () => {
-      const cwd = __dirname
-      const relPath = join('logs', 'acc.tsv')
-
-      const stdout = 'M       ./'
-
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forceCheckoutTarget(cwd, relPath)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['checkout', '-f', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

@@ -20,6 +20,14 @@ export const getResourceCommand = (
   return tryThenMaybeForce(func, forceFunc, dvcRoot, relPath)
 }
 
+export const getResourceCommand_ = (
+  func: (cwd: string, target: string) => Promise<string>
+): ResourceCommand => ({ dvcRoot, resourceUri }) => {
+  const relPath = relative(dvcRoot, resourceUri.fsPath)
+
+  return tryThenMaybeForce_(func, dvcRoot, relPath)
+}
+
 export const getSimpleResourceCommand = (
   func: (cwd: string, target: string) => Promise<string>
 ): ResourceCommand => async ({ dvcRoot, resourceUri }) => {

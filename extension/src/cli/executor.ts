@@ -17,8 +17,8 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.CHECKOUT, ...args)
   }
 
-  public checkoutTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.CHECKOUT, target)
+  public checkoutTarget(cwd: string, target: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.CHECKOUT, target, ...args)
   }
 
   public commit(cwd: string) {
@@ -77,10 +77,6 @@ export class CliExecutor extends Cli {
       ExperimentSubCommand.RUN,
       ExperimentFlag.QUEUE
     )
-  }
-
-  public forceCheckoutTarget(cwd: string, target: string) {
-    return this.executeForcedProcess(cwd, Command.CHECKOUT, target)
   }
 
   public forceCommit(cwd: string) {
