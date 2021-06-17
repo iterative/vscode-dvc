@@ -12,6 +12,31 @@ export class Status {
   private workers = 0
   private available = false
 
+  constructor(cliInteractors: ICli[]) {
+    this.statusBarItem.text = this.getText(false)
+    this.statusBarItem.show()
+    this.statusBarItem.tooltip = 'DVC Extension Status'
+
+    cliInteractors.forEach(cli => {
+      this.dispose.track(
+        cli.onDidStartProcess(() => {
+          this.addWorker()
+        })
+      )
+
+      this.dispose.track(
+        cli.onDidCompleteProcess(() => {
+          this.removeWorker()
+        })
+      )
+    })
+  }
+
+  public setAvailability = (available: boolean) => {
+    this.available = available
+    this.setStatusText(!!this.workers)
+  }
+
   private getText = (isWorking: boolean) => {
     if (!this.available) {
       return '$(circle-slash) DVC'
@@ -36,30 +61,5 @@ export class Status {
     if (!this.workers) {
       this.setStatusText(false)
     }
-  }
-
-  public setAvailability = (available: boolean) => {
-    this.available = available
-    this.setStatusText(!!this.workers)
-  }
-
-  constructor(cliInteractors: ICli[]) {
-    this.statusBarItem.text = this.getText(false)
-    this.statusBarItem.show()
-    this.statusBarItem.tooltip = 'DVC Extension Status'
-
-    cliInteractors.forEach(cli => {
-      this.dispose.track(
-        cli.onDidStartProcess(() => {
-          this.addWorker()
-        })
-      )
-
-      this.dispose.track(
-        cli.onDidCompleteProcess(() => {
-          this.removeWorker()
-        })
-      )
-    })
   }
 }
