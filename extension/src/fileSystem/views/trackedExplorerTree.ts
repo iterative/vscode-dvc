@@ -17,6 +17,7 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
+import { tryThenMaybeForce } from '../../cli/actions'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -140,7 +141,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     if (response === 'Pull File') {
-      return this.cliExecutor.pullTarget(dvcRoot, relPath)
+      return tryThenMaybeForce(
+        (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
+        (dvcRoot, relPath) =>
+          this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+        dvcRoot,
+        relPath
+      )
     }
 
     if (response === this.doNotShowAgainText) {
@@ -263,16 +270,26 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        const relPath = relative(dvcRoot, path)
-        return this.cliExecutor.pullTarget(dvcRoot, relPath)
+        return tryThenMaybeForce(
+          (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
+          (dvcRoot, relPath) =>
+            this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+          dvcRoot,
+          relative(dvcRoot, path)
+        )
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        const relPath = relative(dvcRoot, path)
-        return this.cliExecutor.pushTarget(dvcRoot, relPath)
+        return tryThenMaybeForce(
+          (dvcRoot, relPath) => this.cliExecutor.pushTarget(dvcRoot, relPath),
+          (dvcRoot, relPath) =>
+            this.cliExecutor.forcePushTarget(dvcRoot, relPath),
+          dvcRoot,
+          relative(dvcRoot, path)
+        )
       })
     )
   }

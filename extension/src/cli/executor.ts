@@ -99,8 +99,16 @@ export class CliExecutor extends Cli {
     return this.executeForcedProcess(cwd, Command.PULL)
   }
 
+  public forcePullTarget(cwd: string, target: string) {
+    return this.executeForcedProcess(cwd, Command.PULL, target)
+  }
+
   public forcePush(cwd: string) {
     return this.executeForcedProcess(cwd, Command.PUSH)
+  }
+
+  public forcePushTarget(cwd: string, target: string) {
+    return this.executeForcedProcess(cwd, Command.PUSH, target)
   }
 
   public init(cwd: string) {
