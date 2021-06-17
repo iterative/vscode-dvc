@@ -17,6 +17,7 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
+import { chainCommands } from '../../cli/actions'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -140,7 +141,13 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     if (response === 'Pull File') {
-      return this.cliExecutor.pullTarget(dvcRoot, relPath)
+      return chainCommands(
+        (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
+        (dvcRoot, relPath) =>
+          this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+        dvcRoot,
+        relPath
+      )
     }
 
     if (response === this.doNotShowAgainText) {
