@@ -2,8 +2,7 @@ import {
   ExperimentsRepoJSONOutput,
   ValueTree,
   Value,
-  DataDictRoot,
-  ExperimentJSONOutput
+  DataDictRoot
 } from './contract'
 
 interface BuildColumnsOutput {
@@ -34,7 +33,7 @@ export interface Column extends ColumnCommon {
   ancestors?: string[]
 }
 
-interface AggregatedColumns {
+interface ExperimentsAggregate {
   paramsMap: PartialColumnsMap | undefined
   metricsMap: PartialColumnsMap | undefined
 }
@@ -190,40 +189,29 @@ const buildColumn = (
   return finalColumn
 }
 
-const walkExperiments = (
-  tableData: ExperimentsRepoJSONOutput,
-  onExperiment: (commit: ExperimentJSONOutput) => void
-) => {
-  for (const branch of Object.values(tableData)) {
-    for (const commit of Object.values(branch)) {
-      onExperiment(commit)
-    }
-  }
-}
-
-const aggregateColumns = (
+const aggregateExperiments = (
   tableData: ExperimentsRepoJSONOutput
-): AggregatedColumns => {
-  let paramsMap: PartialColumnsMap | undefined
-  let metricsMap: PartialColumnsMap | undefined
-
-  walkExperiments(tableData, (commit: ExperimentJSONOutput) => {
-    const { params, metrics } = commit
-    if (params) {
-      paramsMap = mergeOrCreateColumnsMap(paramsMap, params)
-    }
-    if (metrics) {
-      metricsMap = mergeOrCreateColumnsMap(metricsMap, metrics)
-    }
-  })
-
-  return { metricsMap, paramsMap }
-}
+): ExperimentsAggregate =>
+  Object.values(tableData).reduce(
+    (acc, branch) =>
+      Object.values(branch).reduce(
+        ({ paramsMap, metricsMap }, { params, metrics }) => ({
+          metricsMap: metrics
+            ? mergeOrCreateColumnsMap(metricsMap, metrics)
+            : metricsMap,
+          paramsMap: params
+            ? mergeOrCreateColumnsMap(paramsMap, params)
+            : paramsMap
+        }),
+        acc
+      ),
+    {} as ExperimentsAggregate
+  )
 
 const buildColumnsOutput = ({
   paramsMap,
   metricsMap
-}: AggregatedColumns): BuildColumnsOutput => {
+}: ExperimentsAggregate) => {
   const output: BuildColumnsOutput = {}
 
   if (paramsMap) {
@@ -239,8 +227,7 @@ const buildColumnsOutput = ({
   return output
 }
 
-export const buildColumns = (
-  tableData: ExperimentsRepoJSONOutput
-): BuildColumnsOutput => {
-  return buildColumnsOutput(aggregateColumns(tableData))
+export const buildColumns = (tableData: ExperimentsRepoJSONOutput) => {
+  const aggregate = aggregateExperiments(tableData)
+  return buildColumnsOutput(aggregate)
 }
