@@ -2,7 +2,7 @@ import { buildColumns, Column } from './buildColumns'
 
 describe('buildColumns', () => {
   it('Outputs both params and metrics when both are present', () => {
-    const { params, metrics, leafParams, leafMetrics } = buildColumns({
+    const { params, metrics } = buildColumns({
       workspace: {
         baseline: {
           metrics: {
@@ -19,13 +19,11 @@ describe('buildColumns', () => {
       }
     })
     expect(params).toBeDefined()
-    expect(leafParams).toBeDefined()
     expect(metrics).toBeDefined()
-    expect(leafMetrics).toBeDefined()
   })
 
   it('Omits params when none exist in the source data', () => {
-    const { params, metrics, leafParams, leafMetrics } = buildColumns({
+    const { params, metrics } = buildColumns({
       workspace: {
         baseline: {
           metrics: {
@@ -37,9 +35,7 @@ describe('buildColumns', () => {
       }
     })
     expect(params).toBeUndefined()
-    expect(leafParams).toBeUndefined()
     expect(metrics).toBeDefined()
-    expect(leafMetrics).toBeDefined()
   })
 
   it('returns an empty object if input data is empty', () => {
@@ -51,74 +47,9 @@ describe('buildColumns', () => {
     expect(output).toEqual({})
   })
 
-  describe('Primitive-based leaf columns', () => {
-    const { leafParams } = buildColumns({
-      brancha: {
-        baseline: {
-          params: {
-            'params.yaml': {
-              mixedparam: 'string'
-            }
-          }
-        },
-        otherexp: {
-          params: {
-            'params.yaml': {
-              mixedparam: true
-            }
-          }
-        }
-      },
-      branchb: {
-        baseline: {
-          params: {
-            'params.yaml': {
-              mixedparam: null
-            }
-          }
-        }
-      },
-      branchc: {
-        baseline: {
-          params: {
-            'params.yaml': {
-              mixedparam: {
-                nestedvalue: 'x'
-              }
-            }
-          }
-        }
-      },
-      workspace: {
-        baseline: {
-          params: {
-            'params.yaml': {
-              mixedparam: {
-                nestedvalue: 22.5
-              }
-            }
-          }
-        }
-      }
-    }) as {
-      leafParams: Column[]
-    }
-
-    it('finds two leaf columns', () => expect(leafParams.length).toEqual(2))
-    const [parentColumn, nestedColumn] = leafParams as Column[]
-    it('lists parent leaves before nested child leaves', () => {
-      expect(parentColumn.name).toEqual('mixedparam')
-      expect(nestedColumn.name).toEqual('nestedvalue')
-    })
-    it('records ancestors of each item', () => {
-      expect(parentColumn.ancestors).toEqual(['params.yaml'])
-      expect(nestedColumn.ancestors).toEqual(['params.yaml', 'mixedparam'])
-    })
-  })
-
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
-    const { leafParams } = buildColumns({
+    const { params } = buildColumns({
       brancha: {
         baseline: {
           params: {
@@ -153,8 +84,11 @@ describe('buildColumns', () => {
           }
         }
       }
-    })
-    const exampleMixedColumn = (leafParams as Column[])[0]
+    }) as {
+      params: Column[]
+    }
+    const [paramsFileColumn] = params
+    const [exampleMixedColumn] = paramsFileColumn.childColumns as Column[]
 
     it('correctly identifies mixed type params', () =>
       expect(exampleMixedColumn.types).toEqual([
@@ -174,7 +108,7 @@ describe('buildColumns', () => {
   })
 
   it('finds different minNumber and maxNumber on a mixed column', () => {
-    const { leafParams } = buildColumns({
+    const { params } = buildColumns({
       workspace: {
         baseline: {
           params: {
@@ -205,15 +139,16 @@ describe('buildColumns', () => {
           }
         }
       }
-    })
-    const [mixedColumn] = leafParams as Column[]
+    }) as { params: Column[] }
+    const [paramsFileColumn] = params
+    const [mixedColumn] = paramsFileColumn.childColumns as Column[]
 
     expect(mixedColumn.minNumber).toEqual(-1)
     expect(mixedColumn.maxNumber).toEqual(1)
   })
 
   describe('Number features', () => {
-    const { leafParams } = buildColumns({
+    const { params } = buildColumns({
       workspace: {
         baseline: {
           params: {
@@ -240,8 +175,14 @@ describe('buildColumns', () => {
           }
         }
       }
-    })
-    const [columnWithNumbers, columnWithoutNumbers] = leafParams as Column[]
+    }) as {
+      params: Column[]
+    }
+    const [paramsFileColumn] = params
+    const [
+      columnWithNumbers,
+      columnWithoutNumbers
+    ] = paramsFileColumn.childColumns as Column[]
 
     it('does not add maxNumber or minNumber on a column with no numbers', () => {
       expect(columnWithoutNumbers.minNumber).toBeUndefined()
@@ -256,7 +197,7 @@ describe('buildColumns', () => {
   })
 
   it('aggregates multiple different field names', () => {
-    const { params, leafParams } = buildColumns({
+    const { params } = buildColumns({
       brancha: {
         baseline: {
           params: {
@@ -297,13 +238,6 @@ describe('buildColumns', () => {
     const paramsColumns = paramsYamlColumn.childColumns as Column[]
 
     expect(paramsColumns?.map(({ name }) => name)).toEqual([
-      'one',
-      'two',
-      'three',
-      'four'
-    ])
-
-    expect(leafParams?.map(({ name }) => name)).toEqual([
       'one',
       'two',
       'three',

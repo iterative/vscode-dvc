@@ -17,6 +17,7 @@
     "Interactors",
     "MNIST",
     "bufferutil",
+    "camelcase",
     "conda",
     "dvcignore",
     "execa",

@@ -68,48 +68,34 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC tracked'
   }
 
-  public readonly dispose = Disposable.fn()
-
   @observable
   private state: DecorationState
 
-  private readonly decorationsChanged: EventEmitter<Uri[]> = new EventEmitter<
-    Uri[]
-  >()
+  public readonly dispose = Disposable.fn()
 
-  public readonly onDidChangeFileDecorations: Event<Uri[]> = this
-    .decorationsChanged.event
+  public readonly onDidChangeFileDecorations: Event<Uri[]>
+  private readonly decorationsChanged: EventEmitter<Uri[]>
 
-  private isValidStatus(status: string): boolean {
-    return isStringInEnum(status, Status)
-  }
-
-  private getUrisFromSet(paths: Set<string>): Uri[] {
-    return [...paths].map(path => Uri.file(path))
-  }
-
-  private getUrisFromState() {
-    const reduceState = (
-      toDecorate: Uri[],
-      entry: [string, Set<string>]
-    ): Uri[] => {
-      const [status, paths] = entry as [Status, Set<string>]
-      if (!this.isValidStatus(status)) {
-        return toDecorate
-      }
-      return [...toDecorate, ...this.getUrisFromSet(paths)]
-    }
-
-    return Object.entries(this.state).reduce(reduceState, [])
-  }
-
-  private decorationMapping: Partial<Record<Status, FileDecoration>> = {
+  private readonly decorationMapping: Partial<
+    Record<Status, FileDecoration>
+  > = {
     added: DecorationProvider.DecorationAdded,
     deleted: DecorationProvider.DecorationDeleted,
     modified: DecorationProvider.DecorationModified,
     notInCache: DecorationProvider.DecorationNotInCache,
     renamed: DecorationProvider.DecorationRenamed,
     stageModified: DecorationProvider.DecorationStageModified
+  }
+
+  constructor() {
+    makeObservable(this)
+
+    this.state = {} as DecorationState
+
+    this.decorationsChanged = this.dispose.track(new EventEmitter())
+    this.onDidChangeFileDecorations = this.decorationsChanged.event
+
+    this.dispose.track(window.registerFileDecorationProvider(this))
   }
 
   public provideFileDecoration(uri: Uri): FileDecoration | undefined {
@@ -132,11 +118,26 @@ export class DecorationProvider implements FileDecorationProvider {
     this.decorationsChanged.fire(this.getUrisFromState())
   }
 
-  constructor() {
-    makeObservable(this)
+  private isValidStatus(status: string): boolean {
+    return isStringInEnum(status, Status)
+  }
 
-    this.state = {} as DecorationState
+  private getUrisFromSet(paths: Set<string>): Uri[] {
+    return [...paths].map(path => Uri.file(path))
+  }
 
-    this.dispose.track(window.registerFileDecorationProvider(this))
+  private getUrisFromState() {
+    const reduceState = (
+      toDecorate: Uri[],
+      entry: [string, Set<string>]
+    ): Uri[] => {
+      const [status, paths] = entry as [Status, Set<string>]
+      if (!this.isValidStatus(status)) {
+        return toDecorate
+      }
+      return [...toDecorate, ...this.getUrisFromSet(paths)]
+    }
+
+    return Object.entries(this.state).reduce(reduceState, [])
   }
 }

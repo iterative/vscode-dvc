@@ -38,8 +38,25 @@ export class RepositoryModel
     untracked: new Set<string>()
   }
 
+  constructor(dvcRoot: string) {
+    this.dvcRoot = dvcRoot
+  }
+
   public getState() {
     return this.state
+  }
+
+  public setState({
+    diffFromCache,
+    diffFromHead,
+    tracked,
+    untracked
+  }: OutputData) {
+    if (tracked) {
+      this.updateTracked(tracked)
+    }
+    this.updateStatus(diffFromHead, diffFromCache)
+    this.updateUntracked(untracked)
   }
 
   private filterRootDir(dirs: string[] = []) {
@@ -182,22 +199,5 @@ export class RepositoryModel
 
   private updateUntracked(untracked: Set<string>): void {
     this.state.untracked = untracked
-  }
-
-  public setState({
-    diffFromCache,
-    diffFromHead,
-    tracked,
-    untracked
-  }: OutputData) {
-    if (tracked) {
-      this.updateTracked(tracked)
-    }
-    this.updateStatus(diffFromHead, diffFromCache)
-    this.updateUntracked(untracked)
-  }
-
-  constructor(dvcRoot: string) {
-    this.dvcRoot = dvcRoot
   }
 }

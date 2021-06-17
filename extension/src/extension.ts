@@ -74,16 +74,111 @@ export class Extension implements IExtension {
   private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
     .event
 
+  constructor(context: ExtensionContext) {
+    if (getReloadCount(module) > 0) {
+      const i = this.dispose.track(window.createStatusBarItem())
+      i.text = `reload${getReloadCount(module)}`
+      i.show()
+    }
+
+    this.setCommandsAvailability(false)
+    this.setProjectAvailability(false)
+
+    this.resourceLocator = this.dispose.track(
+      new ResourceLocator(context.extensionUri)
+    )
+
+    this.config = this.dispose.track(new Config())
+
+    this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
+    this.cliReader = this.dispose.track(new CliReader(this.config))
+    this.cliRunner = this.dispose.track(new CliRunner(this.config))
+
+    this.status = this.dispose.track(
+      new Status([this.cliExecutor, this.cliReader, this.cliRunner])
+    )
+
+    this.experiments = this.dispose.track(
+      new Experiments(this.config, this.cliReader)
+    )
+
+    this.dispose.track(
+      new OutputChannel(
+        [this.cliExecutor, this.cliReader, this.cliRunner],
+        context.extension.packageJSON.version
+      )
+    )
+
+    this.trackedExplorerTree = this.dispose.track(
+      new TrackedExplorerTree(
+        this.config,
+        this.cliReader,
+        this.cliExecutor,
+        this.workspaceChanged
+      )
+    )
+
+    setup(this)
+
+    this.dispose.track(
+      this.onDidChangeWorkspace(() => {
+        setup(this)
+      })
+    )
+
+    this.dispose.track(
+      this.config.onDidChangeExecutionDetails(() => {
+        setup(this)
+      })
+    )
+
+    this.webviewSerializer = new WebviewSerializer(
+      this.config,
+      this.experiments
+    )
+    this.dispose.track(this.webviewSerializer)
+
+    registerExperimentCommands(
+      this.experiments,
+      this.cliExecutor,
+      this.cliRunner
+    )
+
+    registerRepositoryCommands(this.cliExecutor)
+
+    this.registerConfigCommands()
+  }
+
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
 
   public canRunCli = async () => {
     try {
       await this.config.isReady()
       const [root] = this.dvcRoots
-      return !!(await this.cliExecutor.help(root))
+      return !!(await this.cliReader.help(root))
     } catch (e) {
       return false
     }
+  }
+
+  public initializePreCheck = async () => {
+    const dvcRoots = await Promise.all(
+      (workspace.workspaceFolders || []).map(workspaceFolder =>
+        this.setupWorkspaceFolder(workspaceFolder)
+      )
+    )
+
+    this.dvcRoots = ([] as string[]).concat(...dvcRoots)
+    this.config.setDvcRoots(this.dvcRoots)
+  }
+
+  public initialize = () => {
+    Promise.all([
+      this.initializeRepositories(),
+      this.trackedExplorerTree.initialize(this.dvcRoots),
+      this.initializeExperiments(),
+      this.setAvailable(true)
+    ])
   }
 
   public hasWorkspaceFolder = () => !!this.config.getFirstWorkspaceFolderRoot()
@@ -166,15 +261,6 @@ export class Extension implements IExtension {
     })
   }
 
-  public initialize = () => {
-    Promise.all([
-      this.initializeRepositories(),
-      this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.initializeExperiments(),
-      this.setAvailable(true)
-    ])
-  }
-
   private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>
     dvcRoots
       .filter(dvcRoot => !this.dvcRoots.includes(dvcRoot))
@@ -205,92 +291,6 @@ export class Extension implements IExtension {
     }
 
     return dvcRoots
-  }
-
-  public initializePreCheck = async () => {
-    const dvcRoots = await Promise.all(
-      (workspace.workspaceFolders || []).map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
-      )
-    )
-
-    this.dvcRoots = ([] as string[]).concat(...dvcRoots)
-    this.config.setDvcRoots(this.dvcRoots)
-  }
-
-  constructor(context: ExtensionContext) {
-    if (getReloadCount(module) > 0) {
-      const i = this.dispose.track(window.createStatusBarItem())
-      i.text = `reload${getReloadCount(module)}`
-      i.show()
-    }
-
-    this.setCommandsAvailability(false)
-    this.setProjectAvailability(false)
-
-    this.resourceLocator = this.dispose.track(
-      new ResourceLocator(context.extensionUri)
-    )
-
-    this.config = this.dispose.track(new Config())
-
-    this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
-    this.cliReader = this.dispose.track(new CliReader(this.config))
-    this.cliRunner = this.dispose.track(new CliRunner(this.config))
-
-    this.status = this.dispose.track(
-      new Status([this.cliExecutor, this.cliReader, this.cliRunner])
-    )
-
-    this.experiments = this.dispose.track(
-      new Experiments(this.config, this.cliReader)
-    )
-
-    this.dispose.track(
-      new OutputChannel(
-        [this.cliExecutor, this.cliReader, this.cliRunner],
-        context.extension.packageJSON.version
-      )
-    )
-
-    this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(
-        this.config,
-        this.cliReader,
-        this.cliExecutor,
-        this.workspaceChanged
-      )
-    )
-
-    setup(this)
-
-    this.dispose.track(
-      this.onDidChangeWorkspace(() => {
-        setup(this)
-      })
-    )
-
-    this.dispose.track(
-      this.config.onDidChangeExecutionDetails(() => {
-        setup(this)
-      })
-    )
-
-    this.webviewSerializer = new WebviewSerializer(
-      this.config,
-      this.experiments
-    )
-    this.dispose.track(this.webviewSerializer)
-
-    registerExperimentCommands(
-      this.experiments,
-      this.cliExecutor,
-      this.cliRunner
-    )
-
-    registerRepositoryCommands(this.cliExecutor)
-
-    this.registerConfigCommands()
   }
 }
 

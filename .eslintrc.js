@@ -71,6 +71,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/member-delimiter-style': 'off',
+    '@typescript-eslint/member-ordering': 'error',
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/no-extra-semi': 'off',
@@ -79,9 +80,7 @@ module.exports = {
     '@typescript-eslint/prefer-optional-chain': 'error',
     // Trust TS on this one -- Useful for functions that need to exhaust an enum.
     'array-callback-return': 'off',
-
     camelcase: 'off',
-
     curly: ['error', 'all'],
     'import/no-unresolved': 'off',
     'import/order': [

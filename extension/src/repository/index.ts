@@ -8,6 +8,9 @@ import { ListOutput, DiffOutput, StatusOutput, CliReader } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { retryUntilAllResolved } from '../util/promise'
 export class Repository {
+  @observable
+  private model: RepositoryModel
+
   public readonly dispose = Disposable.fn()
 
   private readonly deferred = new Deferred()
@@ -18,8 +21,26 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
 
-  @observable
-  private model: RepositoryModel
+  private resetInProgress = false
+  private updateInProgress = false
+
+  constructor(
+    dvcRoot: string,
+    cliReader: CliReader,
+    decorationProvider?: DecorationProvider
+  ) {
+    makeObservable(this)
+    this.cliReader = cliReader
+    this.decorationProvider = decorationProvider
+    this.dvcRoot = dvcRoot
+    this.model = this.dispose.track(new RepositoryModel(dvcRoot))
+
+    this.sourceControlManagement = this.dispose.track(
+      new SourceControlManagement(this.dvcRoot, this.getState())
+    )
+
+    this.setup()
+  }
 
   public isReady() {
     return this.initialized
@@ -27,6 +48,38 @@ export class Repository {
 
   public getState() {
     return this.model.getState()
+  }
+
+  public async resetState() {
+    if (!this.resetInProgress) {
+      this.resetInProgress = true
+      const [
+        diffFromHead,
+        diffFromCache,
+        untracked,
+        tracked
+      ] = await this.getResetData()
+
+      this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
+
+      this.setState()
+      this.resetInProgress = false
+    }
+  }
+
+  public async updateState() {
+    if (!this.updateInProgress && !this.resetInProgress) {
+      this.updateInProgress = true
+      const [
+        diffFromHead,
+        diffFromCache,
+        untracked
+      ] = await this.getUpdateData()
+
+      this.model.setState({ diffFromCache, diffFromHead, untracked })
+      this.setState()
+      this.updateInProgress = false
+    }
   }
 
   private getBaseData = (): [
@@ -59,67 +112,13 @@ export class Repository {
     >(getNewPromises, 'Repository data update')
   }
 
-  private resetInProgress = false
-
-  public async resetState() {
-    if (!this.resetInProgress) {
-      this.resetInProgress = true
-      const [
-        diffFromHead,
-        diffFromCache,
-        untracked,
-        tracked
-      ] = await this.getResetData()
-
-      this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
-
-      this.setState()
-      this.resetInProgress = false
-    }
-  }
-
   private setState() {
     this.sourceControlManagement.setState(this.getState())
     this.decorationProvider?.setState(this.getState())
   }
 
-  private updateInProgress = false
-
-  public async updateState() {
-    if (!this.updateInProgress && !this.resetInProgress) {
-      this.updateInProgress = true
-      const [
-        diffFromHead,
-        diffFromCache,
-        untracked
-      ] = await this.getUpdateData()
-
-      this.model.setState({ diffFromCache, diffFromHead, untracked })
-      this.setState()
-      this.updateInProgress = false
-    }
-  }
-
   private async setup() {
     await this.resetState()
     return this.deferred.resolve()
-  }
-
-  constructor(
-    dvcRoot: string,
-    cliReader: CliReader,
-    decorationProvider?: DecorationProvider
-  ) {
-    makeObservable(this)
-    this.cliReader = cliReader
-    this.decorationProvider = decorationProvider
-    this.dvcRoot = dvcRoot
-    this.model = this.dispose.track(new RepositoryModel(dvcRoot))
-
-    this.sourceControlManagement = this.dispose.track(
-      new SourceControlManagement(this.dvcRoot, this.getState())
-    )
-
-    this.setup()
   }
 }
