@@ -204,16 +204,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     })
   }
 
-  private registerPathCommand = (
-    name: string,
-    func: (cwd: string, relPath: string) => Promise<string>
-  ) =>
-    commands.registerCommand(name, path => {
-      const dvcRoot = this.pathRoots[path]
-      const relPath = relative(dvcRoot, path)
-      return func(dvcRoot, relPath)
-    })
-
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
@@ -247,11 +237,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      this.registerPathCommand('dvc.pullTarget', this.cliExecutor.pullTarget)
+      commands.registerCommand('dvc.pullTarget', path => {
+        const dvcRoot = this.pathRoots[path]
+        const relPath = relative(dvcRoot, path)
+        return this.cliExecutor.pullTarget(dvcRoot, relPath)
+      })
     )
 
     this.dispose.track(
-      this.registerPathCommand('dvc.pushTarget', this.cliExecutor.pushTarget)
+      commands.registerCommand('dvc.pushTarget', path => {
+        const dvcRoot = this.pathRoots[path]
+        const relPath = relative(dvcRoot, path)
+        return this.cliExecutor.pushTarget(dvcRoot, relPath)
+      })
     )
   }
 

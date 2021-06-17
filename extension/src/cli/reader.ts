@@ -92,6 +92,10 @@ export class CliReader extends Cli {
     return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
   }
 
+  public help(cwd: string): Promise<string> {
+    return this.executeProcess(cwd, Flag.HELP)
+  }
+
   public listDvcOnly(cwd: string, relativePath: string): Promise<ListOutput[]> {
     return this.readProcessJson<ListOutput[]>(
       cwd,
