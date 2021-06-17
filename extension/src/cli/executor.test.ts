@@ -184,6 +184,27 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
+    it('should call executeProcess with the correct parameters to force commit a target', async () => {
+      const cwd = __dirname
+      const relPath = join(
+        'data',
+        'fashion-mnist',
+        'raw',
+        't10k-images-idx3-ubyte.gz'
+      )
+      const stdout = updatingLockFile
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.commitTarget(cwd, relPath, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['commit', relPath, '-f'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
   })
 
   describe('experimentApply', () => {
@@ -299,30 +320,6 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['commit', '-f'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
-  describe('forceCommitTarget', () => {
-    it('should call executeProcess with the correct parameters to force commit a target', async () => {
-      const cwd = __dirname
-      const relPath = join(
-        'data',
-        'fashion-mnist',
-        'raw',
-        't10k-images-idx3-ubyte.gz'
-      )
-      const stdout = updatingLockFile
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forceCommitTarget(cwd, relPath)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['commit', '-f', relPath],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

@@ -1,7 +1,6 @@
 import { commands } from 'vscode'
 import {
   getResourceCommand,
-  getResourceCommand_,
   getRootCommand,
   getRootCommand_,
   getSimpleResourceCommand,
@@ -38,7 +37,7 @@ const registerCheckoutCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.checkoutTarget',
-      getResourceCommand_((cwd: string, target: string, ...args: Args) =>
+      getResourceCommand((cwd: string, target: string, ...args: Args) =>
         cliExecutor.checkoutTarget(cwd, target, ...args)
       )
     )
@@ -49,10 +48,8 @@ const registerCommitCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.commitTarget',
-      getResourceCommand(
-        (cwd: string, target: string) => cliExecutor.commitTarget(cwd, target),
-        (cwd: string, target: string) =>
-          cliExecutor.forceCommitTarget(cwd, target)
+      getResourceCommand((cwd: string, target: string, ...args: Args) =>
+        cliExecutor.commitTarget(cwd, target, ...args)
       )
     )
   )

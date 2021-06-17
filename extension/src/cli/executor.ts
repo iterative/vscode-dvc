@@ -25,8 +25,8 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.COMMIT)
   }
 
-  public commitTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.COMMIT, target)
+  public commitTarget(cwd: string, target: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.COMMIT, target, ...args)
   }
 
   public experimentApply(cwd: string, experimentName: string) {
@@ -81,10 +81,6 @@ export class CliExecutor extends Cli {
 
   public forceCommit(cwd: string) {
     return this.executeForcedProcess(cwd, Command.COMMIT)
-  }
-
-  public forceCommitTarget(cwd: string, target: string) {
-    return this.executeForcedProcess(cwd, Command.COMMIT, target)
   }
 
   public forcePull(cwd: string) {
