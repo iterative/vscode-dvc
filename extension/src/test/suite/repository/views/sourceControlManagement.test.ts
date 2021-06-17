@@ -173,21 +173,17 @@ suite('Extension Test Suite', () => {
     })
 
     it('should not prompt to force if dvc.pull fails without a prompt error', async () => {
-      const mockPull = stub(CliExecutor.prototype, 'pull').rejects(
-        'The remote has gone away'
-      )
+      const mockPull = stub(CliExecutor.prototype, 'pull')
+        .onFirstCall()
+        .rejects('The remote has gone away')
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
         ('' as unknown) as MessageItem
-      )
-      const mockForcePull = stub(CliExecutor.prototype, 'forcePull').resolves(
-        ''
       )
 
       await commands.executeCommand('dvc.pull', { rootUri })
 
       expect(mockPull).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
-      expect(mockForcePull).not.to.be.called
     })
 
     it('should not prompt to force if dvc.push fails without a prompt error', async () => {

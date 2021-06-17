@@ -68,9 +68,8 @@ const registerPullCommand = (cliExecutor: CliExecutor) => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.pull',
-      getRootCommand(
-        (cwd: string) => cliExecutor.pull(cwd),
-        (cwd: string) => cliExecutor.forcePull(cwd)
+      getRootCommand_((cwd: string, ...args: Args) =>
+        cliExecutor.pull(cwd, ...args)
       )
     )
   )

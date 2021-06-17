@@ -79,10 +79,6 @@ export class CliExecutor extends Cli {
     )
   }
 
-  public forcePull(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.PULL)
-  }
-
   public forcePush(cwd: string) {
     return this.executeForcedProcess(cwd, Command.PUSH)
   }
@@ -91,8 +87,8 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.INITIALIZE, Flag.SUBDIRECTORY)
   }
 
-  public pull(cwd: string) {
-    return this.executeProcess(cwd, Command.PULL)
+  public pull(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.PULL, ...args)
   }
 
   public pullTarget(cwd: string, target: string, ...args: Args) {

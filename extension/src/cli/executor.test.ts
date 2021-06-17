@@ -326,25 +326,6 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('forcePull', () => {
-    it('should call executeProcess with the correct parameters to force pull the entire repository', async () => {
-      const cwd = __dirname
-      const stdout = 'M       data/MNIST/raw/\n1 file modified'
-
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forcePull(cwd)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['pull', '-f'],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('forcePush', () => {
     it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
@@ -410,6 +391,23 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['pull'],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should call executeProcess with the correct parameters to force pull the entire repository', async () => {
+      const cwd = __dirname
+      const stdout = 'M       data/MNIST/raw/\n1 file modified'
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.pull(cwd, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['pull', '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
