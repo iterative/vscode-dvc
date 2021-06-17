@@ -2,7 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { CliResult } from '.'
-import { GcPreserveFlag } from './args'
+import { Flag, GcPreserveFlag } from './args'
 import { CliExecutor } from './executor'
 import { getProcessEnv } from '../env'
 import { Config } from '../config'
@@ -391,26 +391,6 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('forcePushTarget', () => {
-    it('should call executeProcess with the correct parameters to force push a target', async () => {
-      const cwd = __dirname
-      const stdout = everythingUpToDate
-      const relPath = join('logs', 'loss.tsv')
-
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forcePushTarget(cwd, relPath)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['push', '-f', relPath],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
   describe('init', () => {
     it('should call executeProcess with the correct parameters to initialize a project', async () => {
       const fsPath = __dirname
@@ -517,6 +497,24 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['push', relPath],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should call executeProcess with the correct parameters to force push a target', async () => {
+      const cwd = __dirname
+      const stdout = everythingUpToDate
+      const relPath = join('logs', 'loss.tsv')
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.pushTarget(cwd, relPath, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['push', relPath, '-f'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

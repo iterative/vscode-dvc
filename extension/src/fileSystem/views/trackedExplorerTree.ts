@@ -17,7 +17,7 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
-import { tryThenMaybeForce } from '../../cli/actions'
+import { tryThenMaybeForce, tryThenMaybeForce_ } from '../../cli/actions'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -283,10 +283,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          (dvcRoot, relPath) => this.cliExecutor.pushTarget(dvcRoot, relPath),
-          (dvcRoot, relPath) =>
-            this.cliExecutor.forcePushTarget(dvcRoot, relPath),
+        return tryThenMaybeForce_(
+          (dvcRoot, relPath, ...args) =>
+            this.cliExecutor.pushTarget(dvcRoot, relPath, ...args),
           dvcRoot,
           relative(dvcRoot, path)
         )

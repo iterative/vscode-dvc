@@ -11,6 +11,7 @@ import * as Workspace from '../../../../fileSystem/workspace'
 import * as FileSystem from '../../../../fileSystem'
 import { getConfigValue, setConfigValue } from '../../../../vscode/config'
 import { CliExecutor } from '../../../../cli/executor'
+import { Prompt } from '../../../../cli/output'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -201,6 +202,31 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand('dvc.pushTarget', absPath)
 
       expect(mockPush).to.be.calledOnce
+    })
+
+    it('should prompt to force if dvc.pushTarget fails', async () => {
+      const relPath = join('data', 'MNIST')
+      const absPath = join(dvcDemoPath, relPath)
+
+      stub(path, 'relative').returns(relPath)
+      const mockPushTarget = stub(CliExecutor.prototype, 'pushTarget')
+        .onFirstCall()
+        .rejects({
+          stderr: Prompt.TRY_FORCE
+        })
+        .onSecondCall()
+        .resolves('')
+      const mockShowInformationMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(('Force' as unknown) as MessageItem)
+
+      await commands.executeCommand('dvc.pushTarget', absPath)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockPushTarget).to.be.calledTwice
+      expect(mockPushTarget).to.be.calledWith(undefined, relPath)
+      expect(mockPushTarget).to.be.calledWith(undefined, relPath, '-f')
     })
   })
 })
