@@ -9,14 +9,6 @@ import {
 } from './args'
 
 export class CliExecutor extends Cli {
-  private executeExperimentProcess(cwd: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.EXPERIMENT, ...args)
-  }
-
-  private executeForcedProcess(cwd: string, command: Command, ...args: Args) {
-    return this.executeProcess(cwd, command, Flag.FORCE, ...args)
-  }
-
   public addTarget(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }
@@ -133,5 +125,13 @@ export class CliExecutor extends Cli {
 
   public removeTarget(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.REMOVE, target)
+  }
+
+  private executeExperimentProcess(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.EXPERIMENT, ...args)
+  }
+
+  private executeForcedProcess(cwd: string, command: Command, ...args: Args) {
+    return this.executeProcess(cwd, command, Flag.FORCE, ...args)
   }
 }
