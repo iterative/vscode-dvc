@@ -346,7 +346,27 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['pull', '-f'],
-        cwd: __dirname,
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forcePullTarget', () => {
+    it('should call executeProcess with the correct parameters to force pull a target', async () => {
+      const cwd = __dirname
+      const stdout = everythingUpToDate
+      const relPath = join('logs', 'acc.tsv')
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forcePullTarget(cwd, relPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['pull', '-f', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -364,7 +384,27 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['push', '-f'],
-        cwd: __dirname,
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('forcePushTarget', () => {
+    it('should call executeProcess with the correct parameters to force push a target', async () => {
+      const cwd = __dirname
+      const stdout = everythingUpToDate
+      const relPath = join('logs', 'loss.tsv')
+
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.forcePushTarget(cwd, relPath)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['push', '-f', relPath],
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -418,7 +458,7 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['pull'],
-        cwd: __dirname,
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
@@ -457,7 +497,7 @@ describe('CliExecutor', () => {
 
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['push'],
-        cwd: __dirname,
+        cwd,
         env: mockedEnv,
         executable: 'dvc'
       })
