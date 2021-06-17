@@ -21,8 +21,8 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.CHECKOUT, target, ...args)
   }
 
-  public commit(cwd: string) {
-    return this.executeProcess(cwd, Command.COMMIT)
+  public commit(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.COMMIT, ...args)
   }
 
   public commitTarget(cwd: string, target: string, ...args: Args) {
@@ -77,10 +77,6 @@ export class CliExecutor extends Cli {
       ExperimentSubCommand.RUN,
       ExperimentFlag.QUEUE
     )
-  }
-
-  public forceCommit(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.COMMIT)
   }
 
   public forcePull(cwd: string) {

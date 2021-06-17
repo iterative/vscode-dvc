@@ -57,9 +57,8 @@ const registerCommitCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.commit',
-      getRootCommand(
-        (cwd: string) => cliExecutor.commit(cwd),
-        (cwd: string) => cliExecutor.forceCommit(cwd)
+      getRootCommand_((cwd: string, ...args: Args) =>
+        cliExecutor.commit(cwd, ...args)
       )
     )
   )
