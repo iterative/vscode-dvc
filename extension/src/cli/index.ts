@@ -33,21 +33,31 @@ export interface ICli {
 export class Cli implements ICli {
   public dispose = Disposable.fn()
 
-  protected config: Config
-
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
 
   public readonly processStarted: EventEmitter<void>
   public readonly onDidStartProcess: Event<void>
 
-  private getExecutionOptions(cwd: string, args: Args) {
-    return {
-      args,
-      cwd,
-      env: getEnv(this.config.pythonBinPath),
-      executable: this.config.getCliPath() || 'dvc'
+  protected config: Config
+
+  constructor(
+    config: Config,
+    emitters?: {
+      processStarted: EventEmitter<void>
+      processCompleted: EventEmitter<CliResult>
     }
+  ) {
+    this.config = config
+
+    this.processCompleted =
+      emitters?.processCompleted ||
+      this.dispose.track(new EventEmitter<CliResult>())
+    this.onDidCompleteProcess = this.processCompleted.event
+
+    this.processStarted =
+      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+    this.onDidStartProcess = this.processStarted.event
   }
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
@@ -69,22 +79,12 @@ export class Cli implements ICli {
     }
   }
 
-  constructor(
-    config: Config,
-    emitters?: {
-      processStarted: EventEmitter<void>
-      processCompleted: EventEmitter<CliResult>
+  private getExecutionOptions(cwd: string, args: Args) {
+    return {
+      args,
+      cwd,
+      env: getEnv(this.config.pythonBinPath),
+      executable: this.config.getCliPath() || 'dvc'
     }
-  ) {
-    this.config = config
-
-    this.processCompleted =
-      emitters?.processCompleted ||
-      this.dispose.track(new EventEmitter<CliResult>())
-    this.onDidCompleteProcess = this.processCompleted.event
-
-    this.processStarted =
-      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
-    this.onDidStartProcess = this.processStarted.event
   }
 }
