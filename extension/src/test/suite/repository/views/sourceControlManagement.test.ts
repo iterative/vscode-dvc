@@ -59,16 +59,12 @@ suite('Extension Test Suite', () => {
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
         ('' as unknown) as MessageItem
       )
-      const mockForceCheckout = stub(
-        CliExecutor.prototype,
-        'forceCheckout'
-      ).resolves('')
 
       await commands.executeCommand('dvc.checkout', { rootUri })
 
       expect(mockCheckout).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
-      expect(mockForceCheckout).not.to.be.called
+      expect(mockCheckout).to.be.calledWith(rootUri.fsPath)
     })
 
     it('should be able to run dvc.checkoutTarget without error', async () => {

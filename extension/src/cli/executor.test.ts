@@ -86,6 +86,22 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
+
+    it('should call executeProcess with the correct parameters to force checkout a repository', async () => {
+      const fsPath = __dirname
+      const stdout = `M       model.pt\nM       logs/\n`
+      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+
+      const output = await cliExecutor.checkout(fsPath, Flag.FORCE)
+      expect(output).toEqual(stdout)
+
+      expect(mockedExecuteProcess).toBeCalledWith({
+        args: ['checkout', '-f'],
+        cwd: fsPath,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
   })
 
   describe('checkoutTarget', () => {
@@ -247,24 +263,6 @@ describe('CliExecutor', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['exp', 'run', '--queue'],
         cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
-  describe('forceCheckout', () => {
-    it('should call executeProcess with the correct parameters to force checkout a repository', async () => {
-      const fsPath = __dirname
-      const stdout = `M       model.pt\nM       logs/\n`
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
-
-      const output = await cliExecutor.forceCheckout(fsPath)
-      expect(output).toEqual(stdout)
-
-      expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['checkout', '-f'],
-        cwd: fsPath,
         env: mockedEnv,
         executable: 'dvc'
       })

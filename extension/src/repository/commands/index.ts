@@ -1,6 +1,6 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
-import { tryThenMaybeForce } from '../../cli/actions'
+import { tryThenMaybeForce, tryThenMaybeForce_ } from '../../cli/actions'
 import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({
@@ -44,4 +44,12 @@ export const getRootCommand = (
   const cwd = rootUri.fsPath
 
   return tryThenMaybeForce(func, forceFunc, cwd)
+}
+
+export const getRootCommand_ = (
+  func: (fsPath: string) => Promise<string>
+): RootCommand => ({ rootUri }) => {
+  const cwd = rootUri.fsPath
+
+  return tryThenMaybeForce_(func, cwd)
 }

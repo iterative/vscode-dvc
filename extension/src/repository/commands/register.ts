@@ -2,6 +2,7 @@ import { commands } from 'vscode'
 import {
   getResourceCommand,
   getRootCommand,
+  getRootCommand_,
   getSimpleResourceCommand,
   ResourceCommand,
   RootCommand
@@ -26,10 +27,7 @@ const registerCheckoutCommands = (cliExecutor: CliExecutor): void => {
   cliExecutor.dispose.track(
     registerCommand(
       'dvc.checkout',
-      getRootCommand(
-        (cwd: string) => cliExecutor.checkout(cwd),
-        (cwd: string) => cliExecutor.forceCheckout(cwd)
-      )
+      getRootCommand_((cwd: string) => cliExecutor.checkout(cwd))
     )
   )
 

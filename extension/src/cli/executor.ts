@@ -13,8 +13,8 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.ADD, target)
   }
 
-  public checkout(cwd: string) {
-    return this.executeProcess(cwd, Command.CHECKOUT)
+  public checkout(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.CHECKOUT, ...args)
   }
 
   public checkoutTarget(cwd: string, target: string) {
@@ -77,10 +77,6 @@ export class CliExecutor extends Cli {
       ExperimentSubCommand.RUN,
       ExperimentFlag.QUEUE
     )
-  }
-
-  public forceCheckout(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.CHECKOUT)
   }
 
   public forceCheckoutTarget(cwd: string, target: string) {
