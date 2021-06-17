@@ -2,7 +2,9 @@ import {
   ExperimentsRepoJSONOutput,
   ValueTree,
   Value,
-  DataDictRoot
+  DataDictRoot,
+  ExperimentJSONOutput,
+  ExperimentsBranchJSONOutput
 } from './contract'
 
 interface BuildColumnsOutput {
@@ -189,24 +191,25 @@ const buildColumn = (
   return finalColumn
 }
 
+const aggregateExperiment = (
+  { paramsMap, metricsMap }: ExperimentsAggregate,
+  { params, metrics }: ExperimentJSONOutput
+) => ({
+  metricsMap: metrics
+    ? mergeOrCreateColumnsMap(metricsMap, metrics)
+    : metricsMap,
+  paramsMap: params ? mergeOrCreateColumnsMap(paramsMap, params) : paramsMap
+})
+
+const aggregateBranch = (
+  acc: ExperimentsAggregate,
+  branch: ExperimentsBranchJSONOutput
+) => Object.values(branch).reduce(aggregateExperiment, acc)
+
 const aggregateExperiments = (
   tableData: ExperimentsRepoJSONOutput
 ): ExperimentsAggregate =>
-  Object.values(tableData).reduce(
-    (acc, branch) =>
-      Object.values(branch).reduce(
-        ({ paramsMap, metricsMap }, { params, metrics }) => ({
-          metricsMap: metrics
-            ? mergeOrCreateColumnsMap(metricsMap, metrics)
-            : metricsMap,
-          paramsMap: params
-            ? mergeOrCreateColumnsMap(paramsMap, params)
-            : paramsMap
-        }),
-        acc
-      ),
-    {} as ExperimentsAggregate
-  )
+  Object.values(tableData).reduce(aggregateBranch, {} as ExperimentsAggregate)
 
 const buildColumnsOutput = ({
   paramsMap,
