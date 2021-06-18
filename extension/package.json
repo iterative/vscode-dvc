@@ -191,6 +191,11 @@
         "command": "dvc.removeTarget",
         "category": "DVC",
         "icon": "$(trash)"
+      },
+      {
+        "title": "%command.copyFilePath%",
+        "command": "dvc.copyFilePath",
+        "category": "DVC"
       }
     ],
     "configuration": {
@@ -200,25 +205,25 @@
           "title": "%config.defaultProject.title%",
           "description": "%config.defaultProject.description%",
           "type": "string",
-          "scope": "resource"
+          "default": null
         },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",
           "type": "string",
-          "scope": "resource"
+          "default": null
         },
         "dvc.views.trackedExplorerTree.noOpenUnsupported": {
           "title": "%config.noOpenUnsupported.title%",
           "description": "%config.noOpenUnsupported.description%",
           "type": "boolean",
-          "scope": "resource"
+          "default": false
         },
         "dvc.views.trackedExplorerTree.noPromptPullMissing": {
           "title": "%config.noPromptPullMissing.title%",
           "description": "%config.noPromptPullMissing.description%",
           "type": "boolean",
-          "scope": "resource"
+          "default": false
         }
       }
     },
@@ -310,6 +315,10 @@
         },
         {
           "command": "dvc.removeTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.copyFilePath",
           "when": "false"
         }
       ],
@@ -420,6 +429,10 @@
           "command": "dvc.pullTarget",
           "group": "DVC",
           "when": "viewItem != dvc"
+        },
+        {
+          "command": "dvc.copyFilePath",
+          "group": "1_cutcopypaste"
         }
       ]
     },
