@@ -72,7 +72,9 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal('')
+      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
+        null
+      )
 
       expect(mockShowInputBox).not.to.have.been.called
     })
