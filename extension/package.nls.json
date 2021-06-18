@@ -4,6 +4,7 @@
   "command.addTarget": "Add Target",
   "command.checkout": "Checkout",
   "command.checkoutTarget": "Checkout Target",
+  "command.copyFilePath": "Copy Path",
   "command.commit": "Commit",
   "command.commitTarget": "Commit Target",
   "command.deleteTarget": "Delete",

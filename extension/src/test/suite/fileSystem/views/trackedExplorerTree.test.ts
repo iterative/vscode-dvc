@@ -50,6 +50,15 @@ suite('Extension Test Suite', () => {
   })
 
   describe('TrackedExplorerTree', () => {
+    it('should be able to run dvc.copyFilePath and copy a path to the clipboard', async () => {
+      await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)
+
+      await commands.executeCommand('workbench.action.files.newUntitledFile')
+      await commands.executeCommand('editor.action.clipboardPasteAction')
+
+      expect(window.activeTextEditor?.document.getText()).to.equal(dvcDemoPath)
+    })
+
     it('should be able to run dvc.deleteTarget without error', async () => {
       const path = join(dvcDemoPath, 'deletable.txt')
       ensureFileSync(path)
