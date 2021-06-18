@@ -283,7 +283,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         const dvcRoot = this.pathRoots[path]
         return tryThenMaybeForce(
           (dvcRoot, relPath, ...args) =>
-            this.cliExecutor.pushTarget(dvcRoot, relPath, ...args),
+            this.cliExecutor.push(dvcRoot, relPath, ...args),
           dvcRoot,
           relative(dvcRoot, path)
         )

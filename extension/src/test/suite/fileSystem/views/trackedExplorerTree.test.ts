@@ -220,7 +220,7 @@ suite('Extension Test Suite', () => {
       const relPath = join('data', 'MNIST')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-      const mockPush = stub(CliExecutor.prototype, 'pushTarget').resolves(
+      const mockPush = stub(CliExecutor.prototype, 'push').resolves(
         'target pushed'
       )
 
@@ -234,7 +234,7 @@ suite('Extension Test Suite', () => {
       const absPath = join(dvcDemoPath, relPath)
 
       stub(path, 'relative').returns(relPath)
-      const mockPushTarget = stub(CliExecutor.prototype, 'pushTarget')
+      const mockPush = stub(CliExecutor.prototype, 'push')
         .onFirstCall()
         .rejects({
           stderr: Prompt.TRY_FORCE
@@ -249,9 +249,9 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand('dvc.pushTarget', absPath)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPushTarget).to.be.calledTwice
-      expect(mockPushTarget).to.be.calledWith(undefined, relPath)
-      expect(mockPushTarget).to.be.calledWith(undefined, relPath, '-f')
+      expect(mockPush).to.be.calledTwice
+      expect(mockPush).to.be.calledWith(undefined, relPath)
+      expect(mockPush).to.be.calledWith(undefined, relPath, '-f')
     })
   })
 })
