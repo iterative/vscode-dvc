@@ -18,18 +18,28 @@ export interface Experiment {
   metrics?: ValueTreeRoot
   checkpoint_tip?: string
   checkpoint_parent?: string
+  sha?: string
 }
 
-export interface ExperimentsWorkspaceJSONOutput
-  extends ExperimentsBranchJSONOutput {
+export interface CheckpointTip extends Experiment {
+  checkpoints?: Experiment[]
+}
+
+export interface ExperimentsWorkspace {
   baseline: Experiment
+}
+
+export interface Branch {
+  baseline: Experiment
+  experiments: CheckpointTip[]
 }
 
 export interface ExperimentsBranchJSONOutput {
   [sha: string]: Experiment
+  baseline: Experiment
 }
 
 export interface ExperimentsRepoJSONOutput {
-  [name: string]: ExperimentsWorkspaceJSONOutput | ExperimentsBranchJSONOutput
-  workspace: ExperimentsWorkspaceJSONOutput
+  [name: string]: ExperimentsBranchJSONOutput
+  workspace: ExperimentsBranchJSONOutput
 }

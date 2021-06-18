@@ -6,10 +6,6 @@ import {
   ExperimentsBranchJSONOutput
 } from './contract'
 
-interface InferredColumns {
-  nestedColumns: Column[]
-}
-
 interface ColumnCommon {
   maxStringLength?: number
   maxNumber?: number
@@ -161,13 +157,6 @@ const transformAndCollectFromColumns = (
   return currentLevelColumns
 }
 
-const transformColumnsMap = (
-  columnsMap: PartialColumnsMap
-): InferredColumns => {
-  const nestedColumns = transformAndCollectFromColumns(columnsMap)
-  return { nestedColumns }
-}
-
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
   ancestors?: string[]
@@ -216,8 +205,8 @@ export const transformExperimentsRepo = (
   const { metricsMap, paramsMap } = aggregateExperimentsRepo(tableData)
   return {
     metrics: metricsMap
-      ? transformColumnsMap(metricsMap).nestedColumns
+      ? transformAndCollectFromColumns(metricsMap)
       : undefined,
-    params: paramsMap ? transformColumnsMap(paramsMap).nestedColumns : undefined
+    params: paramsMap ? transformAndCollectFromColumns(paramsMap) : undefined
   }
 }
