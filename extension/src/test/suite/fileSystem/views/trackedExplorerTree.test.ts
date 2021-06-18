@@ -50,6 +50,11 @@ suite('Extension Test Suite', () => {
   })
 
   describe('TrackedExplorerTree', () => {
+    it('should be able to run dvc.copyFilePath without error', async () => {
+      expect(await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)).not
+        .to.Throw
+    })
+
     it('should be able to run dvc.deleteTarget without error', async () => {
       const path = join(dvcDemoPath, 'deletable.txt')
       ensureFileSync(path)
