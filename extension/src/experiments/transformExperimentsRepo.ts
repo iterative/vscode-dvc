@@ -210,20 +210,14 @@ const aggregateExperimentsRepo = (
 ): ExperimentsAggregate =>
   Object.values(tableData).reduce(aggregateBranch, {} as ExperimentsAggregate)
 
-const buildColumnArrays = ({
-  paramsMap,
-  metricsMap
-}: ExperimentsAggregate) => ({
-  metrics: metricsMap
-    ? transformColumnsMap(metricsMap).nestedColumns
-    : undefined,
-  params: paramsMap ? transformColumnsMap(paramsMap).nestedColumns : undefined
-})
-
 export const transformExperimentsRepo = (
   tableData: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const aggregate = aggregateExperimentsRepo(tableData)
-  const { metrics, params } = buildColumnArrays(aggregate)
-  return { metrics, params }
+  const { metricsMap, paramsMap } = aggregateExperimentsRepo(tableData)
+  return {
+    metrics: metricsMap
+      ? transformColumnsMap(metricsMap).nestedColumns
+      : undefined,
+    params: paramsMap ? transformColumnsMap(paramsMap).nestedColumns : undefined
+  }
 }
