@@ -17,10 +17,6 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.CHECKOUT, ...args)
   }
 
-  public checkoutTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.CHECKOUT, target, ...args)
-  }
-
   public commit(cwd: string, ...args: Args) {
     return this.executeProcess(cwd, Command.COMMIT, ...args)
   }

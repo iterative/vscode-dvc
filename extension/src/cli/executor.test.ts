@@ -102,10 +102,8 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('checkoutTarget', () => {
-    it('should call executeProcess with the correct parameters to checkout a file', async () => {
+    it('should be able to call executeProcess with the correct parameters to checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
@@ -113,7 +111,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.checkoutTarget(cwd, relPath)
+      const output = await cliExecutor.checkout(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -132,7 +130,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.checkoutTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.checkout(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({

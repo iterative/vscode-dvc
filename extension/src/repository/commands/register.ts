@@ -37,7 +37,7 @@ const registerCheckoutCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.checkoutTarget',
       getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.checkoutTarget(cwd, target, ...args)
+        cliExecutor.checkout(cwd, target, ...args)
       )
     )
   )
