@@ -1,8 +1,7 @@
 import {
   ExperimentsRepoJSONOutput,
-  ValueTree,
   Value,
-  ValueTreeRoot,
+  ValueTree,
   ExperimentJSONOutput,
   ExperimentsBranchJSONOutput
 } from './contract'
@@ -82,7 +81,7 @@ const mergePrimitiveColumn = (
 
 const mergeOrCreateColumnsMap = (
   originalColumnsMap: PartialColumnsMap = new Map(),
-  valueTree: ValueTree | ValueTreeRoot
+  valueTree: ValueTree
 ): PartialColumnsMap => {
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
