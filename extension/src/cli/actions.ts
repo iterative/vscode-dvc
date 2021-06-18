@@ -1,10 +1,11 @@
+import { Args, Flag } from './args'
 import { Prompt } from './output'
 import { getWarningResponse, showGenericError } from '../vscode/modal'
 
 const offerToForce = async (
   stderr: string,
-  forceFunc: (...args: string[]) => Promise<string>,
-  ...args: string[]
+  func: (...args: Args) => Promise<string>,
+  ...args: Args
 ): Promise<string | undefined> => {
   const text = stderr.replace(
     Prompt.TRY_FORCE,
@@ -14,13 +15,12 @@ const offerToForce = async (
   if (response !== 'Force') {
     return
   }
-  return forceFunc(...args)
+  return func(...args, Flag.FORCE)
 }
 
 export const tryThenMaybeForce = async (
-  func: (...args: string[]) => Promise<string>,
-  forceFunc: (...args: string[]) => Promise<string>,
-  ...args: string[]
+  func: (...args: Args) => Promise<string>,
+  ...args: Args
 ): Promise<string | undefined> => {
   try {
     return await func(...args)
@@ -28,7 +28,7 @@ export const tryThenMaybeForce = async (
     const stderr = e.stderr
 
     if (stderr?.includes(Prompt.TRY_FORCE)) {
-      return offerToForce(stderr, forceFunc, ...args)
+      return offerToForce(stderr, func, ...args)
     }
 
     return showGenericError()

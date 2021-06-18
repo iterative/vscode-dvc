@@ -1,6 +1,7 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
+import { Args } from '../../cli/args'
 import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({
@@ -12,12 +13,11 @@ export type ResourceCommand = ({
 }) => Promise<string | undefined>
 
 export const getResourceCommand = (
-  func: (cwd: string, target: string) => Promise<string>,
-  forceFunc: (cwd: string, target: string) => Promise<string>
+  func: (cwd: string, target: string, ...args: Args) => Promise<string>
 ): ResourceCommand => ({ dvcRoot, resourceUri }) => {
   const relPath = relative(dvcRoot, resourceUri.fsPath)
 
-  return tryThenMaybeForce(func, forceFunc, dvcRoot, relPath)
+  return tryThenMaybeForce(func, dvcRoot, relPath)
 }
 
 export const getSimpleResourceCommand = (
@@ -38,10 +38,9 @@ export type RootCommand = ({
 }) => Promise<string | undefined>
 
 export const getRootCommand = (
-  func: (fsPath: string) => Promise<string>,
-  forceFunc: (fsPath: string) => Promise<string>
+  func: (fsPath: string, ...args: Args) => Promise<string>
 ): RootCommand => ({ rootUri }) => {
   const cwd = rootUri.fsPath
 
-  return tryThenMaybeForce(func, forceFunc, cwd)
+  return tryThenMaybeForce(func, cwd)
 }

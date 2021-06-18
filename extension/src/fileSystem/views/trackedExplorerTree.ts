@@ -142,9 +142,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     if (response === 'Pull File') {
       return tryThenMaybeForce(
-        (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
-        (dvcRoot, relPath) =>
-          this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+        (dvcRoot, relPath, ...args) =>
+          this.cliExecutor.pullTarget(dvcRoot, relPath, ...args),
         dvcRoot,
         relPath
       )
@@ -271,9 +270,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       commands.registerCommand('dvc.pullTarget', path => {
         const dvcRoot = this.pathRoots[path]
         return tryThenMaybeForce(
-          (dvcRoot, relPath) => this.cliExecutor.pullTarget(dvcRoot, relPath),
-          (dvcRoot, relPath) =>
-            this.cliExecutor.forcePullTarget(dvcRoot, relPath),
+          (dvcRoot, relPath, ...args) =>
+            this.cliExecutor.pullTarget(dvcRoot, relPath, ...args),
           dvcRoot,
           relative(dvcRoot, path)
         )
@@ -284,9 +282,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       commands.registerCommand('dvc.pushTarget', path => {
         const dvcRoot = this.pathRoots[path]
         return tryThenMaybeForce(
-          (dvcRoot, relPath) => this.cliExecutor.pushTarget(dvcRoot, relPath),
-          (dvcRoot, relPath) =>
-            this.cliExecutor.forcePushTarget(dvcRoot, relPath),
+          (dvcRoot, relPath, ...args) =>
+            this.cliExecutor.pushTarget(dvcRoot, relPath, ...args),
           dvcRoot,
           relative(dvcRoot, path)
         )

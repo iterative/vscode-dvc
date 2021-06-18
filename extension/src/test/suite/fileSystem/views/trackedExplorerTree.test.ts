@@ -11,6 +11,7 @@ import * as Workspace from '../../../../fileSystem/workspace'
 import * as FileSystem from '../../../../fileSystem'
 import { getConfigValue, setConfigValue } from '../../../../vscode/config'
 import { CliExecutor } from '../../../../cli/executor'
+import { Prompt } from '../../../../cli/output'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -190,6 +191,31 @@ suite('Extension Test Suite', () => {
       expect(mockPullTarget).to.be.calledOnce
     })
 
+    it('should prompt to force if dvc.pullTarget fails', async () => {
+      const relPath = join('data', 'MNIST')
+      const absPath = join(dvcDemoPath, relPath)
+
+      stub(path, 'relative').returns(relPath)
+      const mockPullTarget = stub(CliExecutor.prototype, 'pullTarget')
+        .onFirstCall()
+        .rejects({
+          stderr: Prompt.TRY_FORCE
+        })
+        .onSecondCall()
+        .resolves('')
+      const mockShowInformationMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(('Force' as unknown) as MessageItem)
+
+      await commands.executeCommand('dvc.pullTarget', absPath)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockPullTarget).to.be.calledTwice
+      expect(mockPullTarget).to.be.calledWith(undefined, relPath)
+      expect(mockPullTarget).to.be.calledWith(undefined, relPath, '-f')
+    })
+
     it('should be able to run dvc.pushTarget without error', async () => {
       const relPath = join('data', 'MNIST')
       const absPath = join(dvcDemoPath, relPath)
@@ -201,6 +227,31 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand('dvc.pushTarget', absPath)
 
       expect(mockPush).to.be.calledOnce
+    })
+
+    it('should prompt to force if dvc.pushTarget fails', async () => {
+      const relPath = join('data', 'MNIST')
+      const absPath = join(dvcDemoPath, relPath)
+
+      stub(path, 'relative').returns(relPath)
+      const mockPushTarget = stub(CliExecutor.prototype, 'pushTarget')
+        .onFirstCall()
+        .rejects({
+          stderr: Prompt.TRY_FORCE
+        })
+        .onSecondCall()
+        .resolves('')
+      const mockShowInformationMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves(('Force' as unknown) as MessageItem)
+
+      await commands.executeCommand('dvc.pushTarget', absPath)
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockPushTarget).to.be.calledTwice
+      expect(mockPushTarget).to.be.calledWith(undefined, relPath)
+      expect(mockPushTarget).to.be.calledWith(undefined, relPath, '-f')
     })
   })
 })
