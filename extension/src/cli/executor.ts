@@ -25,10 +25,6 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.COMMIT, ...args)
   }
 
-  public commitTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.COMMIT, target, ...args)
-  }
-
   public experimentApply(cwd: string, experimentName: string) {
     return this.executeExperimentProcess(
       cwd,

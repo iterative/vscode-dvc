@@ -135,21 +135,18 @@ suite('Extension Test Suite', () => {
     })
 
     it('should be able to run dvc.commitTarget without error', async () => {
-      const mockCommitTarget = stub(
-        CliExecutor.prototype,
-        'commitTarget'
-      ).resolves('')
+      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
 
       await commands.executeCommand('dvc.commitTarget', {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
 
-      expect(mockCommitTarget).to.be.calledOnce
+      expect(mockCommit).to.be.calledOnce
     })
 
     it('should prompt to force if dvc.commitTarget fails', async () => {
-      const mockCommit = stub(CliExecutor.prototype, 'commitTarget')
+      const mockCommit = stub(CliExecutor.prototype, 'commit')
         .onFirstCall()
         .rejects({
           stderr: Prompt.TRY_FORCE

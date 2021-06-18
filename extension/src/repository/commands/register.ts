@@ -48,7 +48,7 @@ const registerCommitCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.commitTarget',
       getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.commitTarget(cwd, target, ...args)
+        cliExecutor.commit(cwd, target, ...args)
       )
     )
   )

@@ -176,10 +176,8 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('commitTarget', () => {
-    it('should call executeProcess with the correct parameters to commit a target', async () => {
+    it('should be able to call executeProcess with the correct parameters to commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -190,7 +188,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.commitTarget(cwd, relPath)
+      const output = await cliExecutor.commit(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -212,7 +210,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.commitTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
