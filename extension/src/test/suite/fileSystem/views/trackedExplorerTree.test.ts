@@ -168,14 +168,13 @@ suite('Extension Test Suite', () => {
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
       const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
-      const mockRemoveTarget = stub(
-        CliExecutor.prototype,
-        'removeTarget'
-      ).resolves('target destroyed!')
+      const mockRemove = stub(CliExecutor.prototype, 'remove').resolves(
+        'target destroyed!'
+      )
 
       await commands.executeCommand('dvc.removeTarget', absPath)
       expect(mockDeleteTarget).to.be.calledOnce
-      expect(mockRemoveTarget).to.be.calledOnce
+      expect(mockRemove).to.be.calledOnce
     })
 
     it('should be able to run dvc.pullTarget without error', async () => {

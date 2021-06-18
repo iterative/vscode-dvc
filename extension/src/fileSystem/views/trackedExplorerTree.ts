@@ -262,7 +262,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         this.treeDataChanged.fire()
         const dvcRoot = this.pathRoots[path]
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-        return this.cliExecutor.removeTarget(dvcRoot, relPath)
+        return this.cliExecutor.remove(dvcRoot, relPath)
       })
     )
 

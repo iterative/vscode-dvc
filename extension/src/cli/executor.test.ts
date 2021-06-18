@@ -500,8 +500,8 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('removeTarget', () => {
-    it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+  describe('remove', () => {
+    it('should be able to call executeProcess with the correct parameters to remove a .dvc file', async () => {
       const cwd = __dirname
       const relPath = 'data.dvc'
 
@@ -509,7 +509,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.removeTarget(cwd, relPath)
+      const output = await cliExecutor.remove(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
