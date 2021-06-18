@@ -7,11 +7,6 @@ import {
   ExperimentsBranchJSONOutput
 } from './contract'
 
-interface BuildColumnsOutput {
-  params?: Column[]
-  metrics?: Column[]
-}
-
 interface InferredColumns {
   nestedColumns: Column[]
 }
@@ -214,21 +209,12 @@ const aggregateExperimentsRepo = (
 const buildColumnsOutput = ({
   paramsMap,
   metricsMap
-}: ExperimentsAggregate) => {
-  const output: BuildColumnsOutput = {}
-
-  if (paramsMap) {
-    const { nestedColumns } = transformColumnsMap(paramsMap)
-    output.params = nestedColumns
-  }
-
-  if (metricsMap) {
-    const { nestedColumns } = transformColumnsMap(metricsMap)
-    output.metrics = nestedColumns
-  }
-
-  return output
-}
+}: ExperimentsAggregate) => ({
+  metrics: metricsMap
+    ? transformColumnsMap(metricsMap).nestedColumns
+    : undefined,
+  params: paramsMap ? transformColumnsMap(paramsMap).nestedColumns : undefined
+})
 
 export const buildColumns = (tableData: ExperimentsRepoJSONOutput) => {
   const aggregate = aggregateExperimentsRepo(tableData)
