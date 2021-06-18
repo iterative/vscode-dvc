@@ -87,7 +87,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force checkout a repository', async () => {
+    it('should be able to call executeProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -124,7 +124,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force checkout a file', async () => {
+    it('should be able to call executeProcess with the correct parameters to force checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
@@ -161,7 +161,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force commit a repository', async () => {
+    it('should be able to call executeProcess with the correct parameters to force commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -201,7 +201,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force commit a target', async () => {
+    it('should be able to call executeProcess with the correct parameters to force commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -379,7 +379,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force pull the entire repository', async () => {
+    it('should be able to call executeProcess with the correct parameters to force pull the entire repository', async () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
@@ -416,7 +416,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force pull a target', async () => {
+    it('should be able to call executeProcess with the correct parameters to force pull a target', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       const relPath = join('logs', 'acc.tsv')
@@ -453,7 +453,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force push the entire repository', async () => {
+    it('should be able to call executeProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
@@ -489,7 +489,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should call executeProcess with the correct parameters to force push a target', async () => {
+    it('should be able to call executeProcess with the correct parameters to force push a target', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       const relPath = join('logs', 'loss.tsv')
