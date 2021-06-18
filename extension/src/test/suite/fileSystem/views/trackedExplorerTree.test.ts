@@ -50,7 +50,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('TrackedExplorerTree', () => {
-    it('should be able to run dvc.copyFilePath without error', async () => {
+    it('should be able to run dvc.copyFilePath and copy a path to the clipboard', async () => {
       await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
