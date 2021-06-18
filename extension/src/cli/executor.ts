@@ -87,10 +87,6 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.PULL, ...args)
   }
 
-  public pullTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PULL, target, ...args)
-  }
-
   public push(cwd: string, ...args: Args) {
     return this.executeProcess(cwd, Command.PUSH, ...args)
   }

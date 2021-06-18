@@ -395,17 +395,15 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('pullTarget', () => {
-    it('should call executeProcess with the correct parameters to pull the target', async () => {
+    it('should be able to call executeProcess with the correct parameters to pull the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
       const stdout = 'M       logs/\n1 file modified'
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pullTarget(cwd, relPath)
+      const output = await cliExecutor.pull(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -423,7 +421,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pullTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({

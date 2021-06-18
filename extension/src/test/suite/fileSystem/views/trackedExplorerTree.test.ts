@@ -125,14 +125,14 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(window, 'showInformationMessage')
 
       mockShowInformationMessage.resolves(undefined)
-      const mockPullTarget = stub(CliExecutor.prototype, 'pullTarget').resolves(
+      const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'M       non-existent.txt\n1 file modified'
       )
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPullTarget).not.to.be.called
+      expect(mockPull).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
@@ -142,9 +142,9 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPullTarget).to.be.calledOnce
+      expect(mockPull).to.be.calledOnce
 
-      mockPullTarget.resetHistory()
+      mockPull.resetHistory()
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
         ("Don't Show Again" as unknown) as MessageItem
@@ -153,14 +153,14 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPullTarget).not.to.be.called
+      expect(mockPull).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
 
       await commands.executeCommand(openFileCommand, uri)
 
       expect(mockShowInformationMessage).not.to.be.called
-      expect(mockPullTarget).not.to.be.called
+      expect(mockPull).not.to.be.called
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
@@ -182,13 +182,13 @@ suite('Extension Test Suite', () => {
       const relPath = 'data'
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-      const mockPullTarget = stub(CliExecutor.prototype, 'pullTarget').resolves(
+      const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
 
       await commands.executeCommand('dvc.pullTarget', absPath)
 
-      expect(mockPullTarget).to.be.calledOnce
+      expect(mockPull).to.be.calledOnce
     })
 
     it('should prompt to force if dvc.pullTarget fails', async () => {
@@ -196,7 +196,7 @@ suite('Extension Test Suite', () => {
       const absPath = join(dvcDemoPath, relPath)
 
       stub(path, 'relative').returns(relPath)
-      const mockPullTarget = stub(CliExecutor.prototype, 'pullTarget')
+      const mockPull = stub(CliExecutor.prototype, 'pull')
         .onFirstCall()
         .rejects({
           stderr: Prompt.TRY_FORCE
@@ -211,9 +211,9 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand('dvc.pullTarget', absPath)
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPullTarget).to.be.calledTwice
-      expect(mockPullTarget).to.be.calledWith(undefined, relPath)
-      expect(mockPullTarget).to.be.calledWith(undefined, relPath, '-f')
+      expect(mockPull).to.be.calledTwice
+      expect(mockPull).to.be.calledWith(undefined, relPath)
+      expect(mockPull).to.be.calledWith(undefined, relPath, '-f')
     })
 
     it('should be able to run dvc.pushTarget without error', async () => {
