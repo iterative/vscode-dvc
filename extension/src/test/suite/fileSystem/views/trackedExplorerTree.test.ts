@@ -51,8 +51,12 @@ suite('Extension Test Suite', () => {
 
   describe('TrackedExplorerTree', () => {
     it('should be able to run dvc.copyFilePath without error', async () => {
-      expect(await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)).not
-        .to.Throw
+      await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)
+
+      await commands.executeCommand('workbench.action.files.newUntitledFile')
+      await commands.executeCommand('editor.action.clipboardPasteAction')
+
+      expect(window.activeTextEditor?.document.getText()).to.equal(dvcDemoPath)
     })
 
     it('should be able to run dvc.deleteTarget without error', async () => {
