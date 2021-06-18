@@ -1,18 +1,21 @@
-export type Value = string | number | boolean | null | undefined
-export interface ValueTree {
+export type Value = string | number | boolean | null
+
+export interface ValueTreeRoot {
+  [filename: string]: ValueTree
+}
+
+export interface ValueTreeNode {
   [key: string]: Value | ValueTree
 }
 
-export interface DataDictRoot extends ValueTree {
-  [filename: string]: ValueTree
-}
+export type ValueTree = ValueTreeRoot | ValueTreeNode
 
 export interface ExperimentJSONOutput {
   name?: string
   timestamp?: string | null
   queued?: boolean
-  params?: DataDictRoot
-  metrics?: DataDictRoot
+  params?: ValueTreeRoot
+  metrics?: ValueTreeRoot
   checkpoint_tip?: string
   checkpoint_parent?: string
 }

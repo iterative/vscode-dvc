@@ -2,7 +2,7 @@
 import React from 'react'
 import get from 'lodash/get'
 
-import { DataDictRoot } from 'dvc/src/experiments/contract'
+import { ValueTreeRoot } from 'dvc/src/experiments/contract'
 import { Column, Accessor } from 'react-table'
 import { Experiment } from './parse-experiments'
 
@@ -204,8 +204,8 @@ const buildColumnsFromSchemaProperties: (
 
 const dataReducer = (data: Experiment[]) =>
   data.reduce<{
-    params: DataDictRoot[]
-    metrics: DataDictRoot[]
+    params: ValueTreeRoot[]
+    metrics: ValueTreeRoot[]
   }>(
     ({ params, metrics }, cur) => ({
       metrics: cur.metrics ? [...metrics, cur.metrics] : metrics,

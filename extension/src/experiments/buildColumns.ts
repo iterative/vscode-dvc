@@ -2,7 +2,7 @@ import {
   ExperimentsRepoJSONOutput,
   ValueTree,
   Value,
-  DataDictRoot,
+  ValueTreeRoot,
   ExperimentJSONOutput,
   ExperimentsBranchJSONOutput
 } from './contract'
@@ -82,7 +82,7 @@ const mergePrimitiveColumn = (
 
 const mergeOrCreateColumnsMap = (
   originalColumnsMap: PartialColumnsMap = new Map(),
-  valueTree: ValueTree | DataDictRoot
+  valueTree: ValueTree | ValueTreeRoot
 ): PartialColumnsMap => {
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
@@ -206,7 +206,7 @@ const aggregateBranch = (
   branch: ExperimentsBranchJSONOutput
 ) => Object.values(branch).reduce(aggregateExperiment, acc)
 
-const aggregateExperiments = (
+const aggregateExperimentsRepo = (
   tableData: ExperimentsRepoJSONOutput
 ): ExperimentsAggregate =>
   Object.values(tableData).reduce(aggregateBranch, {} as ExperimentsAggregate)
@@ -231,6 +231,6 @@ const buildColumnsOutput = ({
 }
 
 export const buildColumns = (tableData: ExperimentsRepoJSONOutput) => {
-  const aggregate = aggregateExperiments(tableData)
+  const aggregate = aggregateExperimentsRepo(tableData)
   return buildColumnsOutput(aggregate)
 }
