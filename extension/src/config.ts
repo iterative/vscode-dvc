@@ -3,7 +3,6 @@ import {
   ColorThemeKind,
   EventEmitter,
   Event,
-  StatusBarItem,
   window,
   workspace
 } from 'vscode'
@@ -25,12 +24,6 @@ export class Config {
 
   @observable
   private vsCodeTheme: ColorTheme
-
-  @observable
-  private dvcPathStatusBarItem: StatusBarItem
-
-  @observable
-  private defaultProjectStatusBarItem: StatusBarItem
 
   public readonly dispose = Disposable.fn()
 
@@ -98,39 +91,6 @@ export class Config {
     this.dispose.track(
       window.onDidChangeActiveColorTheme(() => {
         this.vsCodeTheme = window.activeColorTheme
-      })
-    )
-
-    this.dvcPathStatusBarItem = this.dispose.track(
-      this.createStatusBarItem(
-        'dvc.selectDvcPath',
-        'Current DVC path.',
-        this.getCliPath()
-      )
-    )
-
-    this.defaultProjectStatusBarItem = this.dispose.track(
-      this.createStatusBarItem(
-        'dvc.selectDefaultProject',
-        'Current default project.',
-        this.getDefaultProject()
-      )
-    )
-
-    this.dispose.track(
-      workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration(this.dvcPathOption)) {
-          this.setStatusBarItemText(
-            this.dvcPathStatusBarItem,
-            this.getCliPath()
-          )
-        }
-        if (e.affectsConfiguration(this.defaultProjectOption)) {
-          this.setStatusBarItemText(
-            this.defaultProjectStatusBarItem,
-            this.getDefaultProject()
-          )
-        }
       })
     )
   }
@@ -242,27 +202,5 @@ export class Config {
 
   private setDefaultProject(path?: string): Thenable<void> {
     return setConfigValue(this.defaultProjectOption, path)
-  }
-
-  private createStatusBarItem = (
-    command: string,
-    tooltip: string,
-    text: string
-  ) => {
-    const dvcPathStatusBarItem = window.createStatusBarItem()
-
-    dvcPathStatusBarItem.tooltip = tooltip
-    dvcPathStatusBarItem.command = command
-    dvcPathStatusBarItem.text = text
-    dvcPathStatusBarItem.show()
-
-    return dvcPathStatusBarItem
-  }
-
-  private setStatusBarItemText(
-    statusBarItem: StatusBarItem,
-    path: string
-  ): void {
-    statusBarItem.text = path
   }
 }
