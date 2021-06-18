@@ -124,12 +124,10 @@ export class CliRunner implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const env = getEnv(this.config.pythonBinPath)
-
     const process = createProcess({
       args,
       cwd,
-      env,
+      env: getEnv(this.config.pythonBinPath),
       executable: this.getOverrideOrCliPath()
     })
 
