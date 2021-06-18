@@ -44,8 +44,8 @@ describe('CliExecutor', () => {
   const everythingUpToDate = 'Everything is up to date.'
   const updatingLockFile = "Updating lock file 'dvc.lock'"
 
-  describe('addTarget', () => {
-    it('should call executeProcess with the correct parameters to add a file', async () => {
+  describe('add', () => {
+    it('should be able to call executeProcess with the correct parameters to add a file', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw')
       const stdout =
@@ -58,7 +58,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.addTarget(cwd, relPath)
+      const output = await cliExecutor.add(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({

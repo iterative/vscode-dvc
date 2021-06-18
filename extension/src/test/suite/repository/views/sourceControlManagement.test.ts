@@ -40,16 +40,14 @@ suite('Extension Test Suite', () => {
 
   describe('SourceControlManagement', () => {
     it('should be able to run dvc.addTarget without error', async () => {
-      const mockAddTarget = stub(CliExecutor.prototype, 'addTarget').resolves(
-        ''
-      )
+      const mockAdd = stub(CliExecutor.prototype, 'add').resolves('')
 
       await commands.executeCommand('dvc.addTarget', {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
 
-      expect(mockAddTarget).to.be.calledOnce
+      expect(mockAdd).to.be.calledOnce
     })
 
     it('should not prompt to force if dvc.checkout fails without a prompt error', async () => {

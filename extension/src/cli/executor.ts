@@ -9,7 +9,7 @@ import {
 } from './args'
 
 export class CliExecutor extends Cli {
-  public addTarget(cwd: string, target: string) {
+  public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }
 

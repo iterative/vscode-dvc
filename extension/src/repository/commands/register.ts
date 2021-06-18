@@ -17,7 +17,7 @@ const registerAddCommand = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.addTarget',
       getSimpleResourceCommand((cwd: string, target: string) =>
-        cliExecutor.addTarget(cwd, target)
+        cliExecutor.add(cwd, target)
       )
     )
   )
