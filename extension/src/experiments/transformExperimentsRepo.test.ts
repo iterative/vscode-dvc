@@ -1,8 +1,8 @@
-import { buildColumns, Column } from './buildColumns'
+import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
 
-describe('buildColumns', () => {
+describe('transformExperimentsRepo', () => {
   it('Outputs both params and metrics when both are present', () => {
-    const { params, metrics } = buildColumns({
+    const { params, metrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           metrics: {
@@ -23,7 +23,7 @@ describe('buildColumns', () => {
   })
 
   it('Omits params when none exist in the source data', () => {
-    const { params, metrics } = buildColumns({
+    const { params, metrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           metrics: {
@@ -39,7 +39,7 @@ describe('buildColumns', () => {
   })
 
   it('returns an empty object if input data is empty', () => {
-    const output = buildColumns({
+    const output = transformExperimentsRepo({
       workspace: {
         baseline: {}
       }
@@ -49,7 +49,7 @@ describe('buildColumns', () => {
 
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       brancha: {
         baseline: {
           params: {
@@ -108,7 +108,7 @@ describe('buildColumns', () => {
   })
 
   it('finds different minNumber and maxNumber on a mixed column', () => {
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       workspace: {
         baseline: {
           params: {
@@ -148,7 +148,7 @@ describe('buildColumns', () => {
   })
 
   describe('Number features', () => {
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       workspace: {
         baseline: {
           params: {
@@ -197,7 +197,7 @@ describe('buildColumns', () => {
   })
 
   it('aggregates multiple different field names', () => {
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       brancha: {
         baseline: {
           params: {
@@ -246,7 +246,7 @@ describe('buildColumns', () => {
   })
 
   it('does not report types for columns without primitives or children for columns without objects', () => {
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       workspace: {
         baseline: {
           params: {

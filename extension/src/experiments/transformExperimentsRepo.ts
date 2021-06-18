@@ -35,6 +35,11 @@ interface ExperimentsAggregate {
   metricsMap: PartialColumnsMap | undefined
 }
 
+export interface TransformedExperiments {
+  metrics?: Column[]
+  params?: Column[]
+}
+
 const getValueType = (value: Value | ValueTree) => {
   if (value === null) {
     return 'null'
@@ -206,7 +211,7 @@ const aggregateExperimentsRepo = (
 ): ExperimentsAggregate =>
   Object.values(tableData).reduce(aggregateBranch, {} as ExperimentsAggregate)
 
-const buildColumnsOutput = ({
+const buildColumnArrays = ({
   paramsMap,
   metricsMap
 }: ExperimentsAggregate) => ({
@@ -216,7 +221,10 @@ const buildColumnsOutput = ({
   params: paramsMap ? transformColumnsMap(paramsMap).nestedColumns : undefined
 })
 
-export const buildColumns = (tableData: ExperimentsRepoJSONOutput) => {
+export const transformExperimentsRepo = (
+  tableData: ExperimentsRepoJSONOutput
+): TransformedExperiments => {
   const aggregate = aggregateExperimentsRepo(tableData)
-  return buildColumnsOutput(aggregate)
+  const { metrics, params } = buildColumnArrays(aggregate)
+  return { metrics, params }
 }

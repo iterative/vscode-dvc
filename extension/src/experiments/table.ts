@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
-import { buildColumns, Column } from './buildColumns'
+import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
 import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
@@ -113,7 +113,7 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
-    const { params, metrics } = buildColumns(data)
+    const { params, metrics } = transformExperimentsRepo(data)
     this.params = params
     this.metrics = metrics
     return this.sendData()
