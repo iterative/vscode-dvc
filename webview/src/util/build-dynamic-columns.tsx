@@ -4,7 +4,7 @@ import get from 'lodash/get'
 
 import { ValueTreeRoot } from 'dvc/src/experiments/contract'
 import { Column, Accessor } from 'react-table'
-import { Experiment } from './parse-experiments'
+import { ExperimentWithSubRows } from './parse-experiments'
 
 import {
   formatFloat,
@@ -162,20 +162,20 @@ const addToProperty: (
 
 const buildAccessor: (
   valuePath: string[]
-) => Accessor<Experiment> = pathArray => originalRow =>
+) => Accessor<ExperimentWithSubRows> = pathArray => originalRow =>
   get(originalRow, pathArray)
 
 const buildColumnsFromSchemaProperties: (
   properties: SchemaProperties,
   objectPath?: string[]
-) => Column<Experiment>[] = (properties, objectPath = []) => {
+) => Column<ExperimentWithSubRows>[] = (properties, objectPath = []) => {
   const entries = Object.entries(properties)
   return entries.map(([key, property]) => {
     const currentPath = [...objectPath, key]
     const { type: propertyType } = property
     const Cell = getCellComponent(property)
-    const column: Column<Experiment> & {
-      columns?: Column<Experiment>[]
+    const column: Column<ExperimentWithSubRows> & {
+      columns?: Column<ExperimentWithSubRows>[]
       sortType?: string
       type?: SchemaType
     } = {
@@ -202,7 +202,7 @@ const buildColumnsFromSchemaProperties: (
   })
 }
 
-const dataReducer = (data: Experiment[]) =>
+const dataReducer = (data: ExperimentWithSubRows[]) =>
   data.reduce<{
     params: ValueTreeRoot[]
     metrics: ValueTreeRoot[]
@@ -215,8 +215,8 @@ const dataReducer = (data: Experiment[]) =>
   )
 
 const buildDynamicColumnsFromExperiments = (
-  data: Experiment[]
-): Column<Experiment>[] => {
+  data: ExperimentWithSubRows[]
+): Column<ExperimentWithSubRows>[] => {
   if (!data || data?.length === 0) {
     return []
   }

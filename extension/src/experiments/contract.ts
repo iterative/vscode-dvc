@@ -10,7 +10,7 @@ export interface ValueTreeNode {
 
 export type ValueTree = ValueTreeRoot | ValueTreeNode
 
-export interface ExperimentJSONOutput {
+export interface Experiment {
   name?: string
   timestamp?: string | null
   queued?: boolean
@@ -22,11 +22,11 @@ export interface ExperimentJSONOutput {
 
 export interface ExperimentsWorkspaceJSONOutput
   extends ExperimentsBranchJSONOutput {
-  baseline: ExperimentJSONOutput
+  baseline: Experiment
 }
 
 export interface ExperimentsBranchJSONOutput {
-  [sha: string]: ExperimentJSONOutput
+  [sha: string]: Experiment
 }
 
 export interface ExperimentsRepoJSONOutput {

@@ -2,20 +2,20 @@ import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { Experiment } from '../../util/parse-experiments'
+import { ExperimentWithSubRows } from '../../util/parse-experiments'
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 import SortIconToggle from '../SortIconToggle'
 
 export interface InstanceProp {
-  instance: TableInstance<Experiment>
+  instance: TableInstance<ExperimentWithSubRows>
 }
 
 export interface RowProp {
-  row: Row<Experiment>
+  row: Row<ExperimentWithSubRows>
 }
 
 export const ParentHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<Experiment>
+  headerGroup: HeaderGroup<ExperimentWithSubRows>
 }> = ({ headerGroup }) => {
   return (
     <div
@@ -44,8 +44,8 @@ export const ParentHeaderGroup: React.FC<{
 }
 
 const getFirstCellProps = (
-  cell: Cell<Experiment, unknown>,
-  row: Row<Experiment>
+  cell: Cell<ExperimentWithSubRows, unknown>,
+  row: Row<ExperimentWithSubRows>
 ) => {
   const baseFirstCellProps = cell.getCellProps({
     className: cx(
@@ -74,9 +74,9 @@ const getFirstCellProps = (
   })
 }
 
-export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
-  cell
-}) => {
+export const FirstCell: React.FC<{
+  cell: Cell<ExperimentWithSubRows, unknown>
+}> = ({ cell }) => {
   const { row } = cell
 
   const firstCellProps = getFirstCellProps(cell, row)
@@ -101,7 +101,7 @@ export const FirstCell: React.FC<{ cell: Cell<Experiment, unknown> }> = ({
 }
 
 export const PrimaryHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<Experiment>
+  headerGroup: HeaderGroup<ExperimentWithSubRows>
 }> = ({ headerGroup }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -164,7 +164,7 @@ export const PrimaryHeaderGroup: React.FC<{
   )
 }
 
-const getCells = (cells: Cell<Experiment, unknown>[]) =>
+const getCells = (cells: Cell<ExperimentWithSubRows, unknown>[]) =>
   cells.map(cell => {
     return (
       <div

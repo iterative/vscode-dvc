@@ -1,45 +1,43 @@
 import {
   ExperimentsRepoJSONOutput,
-  ExperimentJSONOutput
+  Experiment
 } from 'dvc/src/experiments/contract'
 
-export interface ExperimentWithId extends ExperimentJSONOutput {
+export interface ExperimentWithSubRows extends Experiment {
   id: string
+  subRows?: ExperimentWithSubRows[]
 }
 
-export interface Experiment extends ExperimentWithId {
-  subRows?: Experiment[]
-}
-
-export type RepoExperiments = Array<ExperimentWithId>
+export type RepoExperiments = Array<ExperimentWithSubRows>
 
 interface ParseExperimentsOutput {
-  experiments: ExperimentWithId[]
-  flatExperiments: ExperimentWithId[]
+  experiments: ExperimentWithSubRows[]
+  flatExperiments: ExperimentWithSubRows[]
 }
 
 const addIdToExperiment: (
   id: string,
-  experiment: ExperimentJSONOutput
-) => Experiment = (id, experiment) => ({
+  experiment: Experiment
+) => ExperimentWithSubRows = (id, experiment) => ({
   ...experiment,
   id
 })
 
 const buildExperimentFromEntry: (
-  entry: [string, ExperimentJSONOutput]
-) => Experiment = ([id, experiment]) => addIdToExperiment(id, experiment)
+  entry: [string, Experiment]
+) => ExperimentWithSubRows = ([id, experiment]) =>
+  addIdToExperiment(id, experiment)
 
-const isTopLevelExperiment: (row: ExperimentWithId) => boolean = ({
+const isTopLevelExperiment: (row: ExperimentWithSubRows) => boolean = ({
   queued,
   id,
   checkpoint_tip
 }) => queued || (checkpoint_tip ? id === checkpoint_tip : true)
 
 const pushResult = (
-  currentTip: Experiment | undefined,
-  currentEpochs: Experiment[],
-  result: Experiment[]
+  currentTip: ExperimentWithSubRows | undefined,
+  currentEpochs: ExperimentWithSubRows[],
+  result: ExperimentWithSubRows[]
 ): void => {
   if (currentTip) {
     const resultToPush = {
@@ -52,10 +50,12 @@ const pushResult = (
   }
 }
 
-const groupCheckpoints = (rows: Experiment[]): Experiment[] => {
-  let currentTip: Experiment | undefined
-  let currentEpochs: Experiment[] = []
-  const result: Experiment[] = []
+const groupCheckpoints = (
+  rows: ExperimentWithSubRows[]
+): ExperimentWithSubRows[] => {
+  let currentTip: ExperimentWithSubRows | undefined
+  let currentEpochs: ExperimentWithSubRows[] = []
+  const result: ExperimentWithSubRows[] = []
 
   for (const row of rows) {
     if (isTopLevelExperiment(row)) {
@@ -78,9 +78,9 @@ const parseExperiments: (
       { experiments, flatExperiments },
       [commitId, { baseline, ...childExperiments }]
     ) => {
-      const parsedChildExperiments: Experiment[] = Object.entries(
+      const parsedChildExperiments: ExperimentWithSubRows[] = Object.entries(
         childExperiments
-      ).map<Experiment>(buildExperimentFromEntry)
+      ).map<ExperimentWithSubRows>(buildExperimentFromEntry)
       const baselineEntry = addIdToExperiment(commitId, baseline)
       return {
         experiments: [

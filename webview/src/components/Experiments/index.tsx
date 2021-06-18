@@ -14,8 +14,7 @@ import {
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import parseExperiments, {
-  Experiment,
-  ExperimentWithId
+  ExperimentWithSubRows
 } from '../../util/parse-experiments'
 
 import styles from '../Table/styles.module.scss'
@@ -25,7 +24,7 @@ import buildDynamicColumns from '../../util/build-dynamic-columns'
 import { VsCodeApi } from '../../model'
 
 const countRowsAndAddIndexes: (
-  rows: Row<Experiment>[],
+  rows: Row<ExperimentWithSubRows>[],
   index?: number
 ) => number = (rows, index = 0) => {
   for (const row of rows) {
@@ -46,15 +45,15 @@ const sortByDirection = (desc: boolean, sortInt: number) =>
 
 const sortByFirstDirection = (
   direction: boolean | 'desc',
-  rowA: Row<Experiment>,
-  rowB: Row<Experiment>
+  rowA: Row<ExperimentWithSubRows>,
+  rowB: Row<ExperimentWithSubRows>
 ) => (isDesc(direction) ? rowA.index - rowB.index : rowB.index - rowA.index)
 
 const getSortedRows = (
-  rows: Row<Experiment>[],
-  sortFns: SortByFn<Experiment>[],
+  rows: Row<ExperimentWithSubRows>[],
+  sortFns: SortByFn<ExperimentWithSubRows>[],
   directions: (boolean | 'desc')[]
-): Row<Experiment>[] =>
+): Row<ExperimentWithSubRows>[] =>
   [...rows].sort((rowA, rowB) => {
     for (let i = 0; i < sortFns.length; i += 1) {
       const sortFn = sortFns[i]
@@ -68,11 +67,11 @@ const getSortedRows = (
   })
 
 const orderByFn = (
-  rows: Row<Experiment>[],
-  sortFns: SortByFn<Experiment>[],
+  rows: Row<ExperimentWithSubRows>[],
+  sortFns: SortByFn<ExperimentWithSubRows>[],
   directions: (boolean | 'desc')[],
-  parentRow: Row<Experiment>
-): Row<Experiment>[] => {
+  parentRow: Row<ExperimentWithSubRows>
+): Row<ExperimentWithSubRows>[] => {
   if (parentRow && parentRow.depth === 0) {
     return getSortedRows(rows, sortFns, directions)
   } else {
@@ -81,8 +80,8 @@ const orderByFn = (
 }
 
 const getColumns = (
-  flatExperiments: ExperimentWithId[]
-): Column<Experiment>[] =>
+  flatExperiments: ExperimentWithSubRows[]
+): Column<ExperimentWithSubRows>[] =>
   [
     {
       Header: 'Experiment',
@@ -110,14 +109,14 @@ const getColumns = (
       accessor: 'timestamp'
     },
     ...buildDynamicColumns(flatExperiments)
-  ] as Column<Experiment>[]
+  ] as Column<ExperimentWithSubRows>[]
 
 export const ExperimentsTable: React.FC<{
   experiments: ExperimentsRepoJSONOutput
 }> = ({ experiments: rawExperiments }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<Experiment>> = {
+    const defaultColumn: Partial<Column<ExperimentWithSubRows>> = {
       width: 110
     }
     return [initialState, defaultColumn]
@@ -129,7 +128,7 @@ export const ExperimentsTable: React.FC<{
     return [experiments, columns]
   }, [rawExperiments])
 
-  const instance = useTable<Experiment>(
+  const instance = useTable<ExperimentWithSubRows>(
     {
       autoResetExpanded: false,
       columns,
@@ -157,9 +156,9 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns, rows } = instance
-        const sortedColumns: ColumnInstance<Experiment>[] = allColumns.filter(
-          column => column.isSorted
-        )
+        const sortedColumns: ColumnInstance<
+          ExperimentWithSubRows
+        >[] = allColumns.filter(column => column.isSorted)
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
           expandedRowCount,

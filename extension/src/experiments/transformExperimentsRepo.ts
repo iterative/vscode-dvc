@@ -2,7 +2,7 @@ import {
   ExperimentsRepoJSONOutput,
   Value,
   ValueTree,
-  ExperimentJSONOutput,
+  Experiment,
   ExperimentsBranchJSONOutput
 } from './contract'
 
@@ -192,7 +192,7 @@ const buildColumn = (
 
 const aggregateExperiment = (
   { paramsMap, metricsMap }: ExperimentsAggregate,
-  { params, metrics }: ExperimentJSONOutput
+  { params, metrics }: Experiment
 ) => ({
   metricsMap: metrics
     ? mergeOrCreateColumnsMap(metricsMap, metrics)
