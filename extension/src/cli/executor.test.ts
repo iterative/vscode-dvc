@@ -44,8 +44,8 @@ describe('CliExecutor', () => {
   const everythingUpToDate = 'Everything is up to date.'
   const updatingLockFile = "Updating lock file 'dvc.lock'"
 
-  describe('addTarget', () => {
-    it('should call executeProcess with the correct parameters to add a file', async () => {
+  describe('add', () => {
+    it('should be able to call executeProcess with the correct parameters to add a file', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw')
       const stdout =
@@ -58,7 +58,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.addTarget(cwd, relPath)
+      const output = await cliExecutor.add(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -102,10 +102,8 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('checkoutTarget', () => {
-    it('should call executeProcess with the correct parameters to checkout a file', async () => {
+    it('should be able to call executeProcess with the correct parameters to checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
@@ -113,7 +111,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.checkoutTarget(cwd, relPath)
+      const output = await cliExecutor.checkout(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -132,7 +130,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.checkoutTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.checkout(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -176,10 +174,8 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('commitTarget', () => {
-    it('should call executeProcess with the correct parameters to commit a target', async () => {
+    it('should be able to call executeProcess with the correct parameters to commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -190,7 +186,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.commitTarget(cwd, relPath)
+      const output = await cliExecutor.commit(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -212,7 +208,7 @@ describe('CliExecutor', () => {
       const stdout = updatingLockFile
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.commitTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -395,17 +391,15 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('pullTarget', () => {
-    it('should call executeProcess with the correct parameters to pull the target', async () => {
+    it('should be able to call executeProcess with the correct parameters to pull the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
       const stdout = 'M       logs/\n1 file modified'
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pullTarget(cwd, relPath)
+      const output = await cliExecutor.pull(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -423,7 +417,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pullTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -468,17 +462,15 @@ describe('CliExecutor', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('pushTarget', () => {
-    it('should call executeProcess with the correct parameters to push the target', async () => {
+    it('should be able to call executeProcess with the correct parameters to push the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST')
       const stdout = everythingUpToDate
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pushTarget(cwd, relPath)
+      const output = await cliExecutor.push(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -496,7 +488,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.pushTarget(cwd, relPath, Flag.FORCE)
+      const output = await cliExecutor.push(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
@@ -508,8 +500,8 @@ describe('CliExecutor', () => {
     })
   })
 
-  describe('removeTarget', () => {
-    it('should call executeProcess with the correct parameters to remove a .dvc file', async () => {
+  describe('remove', () => {
+    it('should be able to call executeProcess with the correct parameters to remove a .dvc file', async () => {
       const cwd = __dirname
       const relPath = 'data.dvc'
 
@@ -517,7 +509,7 @@ describe('CliExecutor', () => {
 
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.removeTarget(cwd, relPath)
+      const output = await cliExecutor.remove(cwd, relPath)
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({

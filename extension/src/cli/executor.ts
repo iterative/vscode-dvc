@@ -9,7 +9,7 @@ import {
 } from './args'
 
 export class CliExecutor extends Cli {
-  public addTarget(cwd: string, target: string) {
+  public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }
 
@@ -17,16 +17,8 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.CHECKOUT, ...args)
   }
 
-  public checkoutTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.CHECKOUT, target, ...args)
-  }
-
   public commit(cwd: string, ...args: Args) {
     return this.executeProcess(cwd, Command.COMMIT, ...args)
-  }
-
-  public commitTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.COMMIT, target, ...args)
   }
 
   public experimentApply(cwd: string, experimentName: string) {
@@ -87,20 +79,12 @@ export class CliExecutor extends Cli {
     return this.executeProcess(cwd, Command.PULL, ...args)
   }
 
-  public pullTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PULL, target, ...args)
-  }
-
   public push(cwd: string, ...args: Args) {
     return this.executeProcess(cwd, Command.PUSH, ...args)
   }
 
-  public pushTarget(cwd: string, target: string, ...args: Args) {
-    return this.executeProcess(cwd, Command.PUSH, target, ...args)
-  }
-
-  public removeTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.REMOVE, target)
+  public remove(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.REMOVE, ...args)
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {

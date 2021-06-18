@@ -17,7 +17,7 @@ const registerAddCommand = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.addTarget',
       getSimpleResourceCommand((cwd: string, target: string) =>
-        cliExecutor.addTarget(cwd, target)
+        cliExecutor.add(cwd, target)
       )
     )
   )
@@ -37,7 +37,7 @@ const registerCheckoutCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.checkoutTarget',
       getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.checkoutTarget(cwd, target, ...args)
+        cliExecutor.checkout(cwd, target, ...args)
       )
     )
   )
@@ -48,7 +48,7 @@ const registerCommitCommands = (cliExecutor: CliExecutor): void => {
     registerCommand(
       'dvc.commitTarget',
       getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.commitTarget(cwd, target, ...args)
+        cliExecutor.commit(cwd, target, ...args)
       )
     )
   )
