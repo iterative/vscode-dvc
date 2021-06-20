@@ -7,4 +7,10 @@ export const reRegisterVsCodeCommands = (disposer: Disposer) => {
       commands.executeCommand('copyFilePath', Uri.file(path))
     )
   )
+
+  disposer.track(
+    commands.registerCommand('dvc.copyRelativeFilePath', path =>
+      commands.executeCommand('copyRelativeFilePath', Uri.file(path))
+    )
+  )
 }
