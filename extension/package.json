@@ -441,11 +441,11 @@
         },
         {
           "command": "dvc.copyFilePath",
-          "group": "1_cutcopypaste@1"
+          "group": "6_copypath@1"
         },
         {
           "command": "dvc.copyRelativeFilePath",
-          "group": "1_cutcopypaste@2"
+          "group": "6_copypath@2"
         }
       ]
     },
