@@ -82,7 +82,7 @@ export class CliRunner implements ICli {
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
-  public run = async (cwd: string, ...args: Args) => {
+  public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
@@ -94,7 +94,7 @@ export class CliRunner implements ICli {
     )
   }
 
-  public stop = async () => {
+  public async stop() {
     try {
       this.currentProcess?.kill('SIGINT')
       await this.currentProcess
@@ -108,34 +108,26 @@ export class CliRunner implements ICli {
     }
   }
 
-  public isRunning = () => {
+  public isRunning() {
     return !!this.currentProcess
   }
 
-  public getRunningProcess = () => {
+  public getRunningProcess() {
     return this.currentProcess
   }
 
-  private getOverrideOrCliPath = () => {
+  private getOverrideOrCliPath() {
     if (this.executable) {
       return this.executable
     }
     return this.config.getCliPath() || 'dvc'
   }
 
-  private createProcess = ({
-    cwd,
-    args
-  }: {
-    cwd: string
-    args: Args
-  }): Process => {
-    const env = getEnv(this.config.pythonBinPath)
-
+  private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
     const process = createProcess({
       args,
       cwd,
-      env,
+      env: getEnv(this.config.pythonBinPath),
       executable: this.getOverrideOrCliPath()
     })
 
@@ -163,7 +155,7 @@ export class CliRunner implements ICli {
     return process
   }
 
-  private startProcess = (cwd: string, args: Args) => {
+  private startProcess(cwd: string, args: Args) {
     CliRunner.setRunningContext(true)
     this.pseudoTerminal.setBlocked(true)
     this.processOutput.fire(`Running: dvc ${args.join(' ')}\r\n\n`)

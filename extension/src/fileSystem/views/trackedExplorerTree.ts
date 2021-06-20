@@ -17,6 +17,7 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
+import { tryThenMaybeForce } from '../../cli/actions'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -140,7 +141,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     if (response === 'Pull File') {
-      return this.cliExecutor.pullTarget(dvcRoot, relPath)
+      return tryThenMaybeForce(
+        (dvcRoot, relPath, ...args) =>
+          this.cliExecutor.pull(dvcRoot, relPath, ...args),
+        dvcRoot,
+        relPath
+      )
     }
 
     if (response === this.doNotShowAgainText) {
@@ -256,23 +262,31 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         this.treeDataChanged.fire()
         const dvcRoot = this.pathRoots[path]
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-        return this.cliExecutor.removeTarget(dvcRoot, relPath)
+        return this.cliExecutor.remove(dvcRoot, relPath)
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        const relPath = relative(dvcRoot, path)
-        return this.cliExecutor.pullTarget(dvcRoot, relPath)
+        return tryThenMaybeForce(
+          (dvcRoot, relPath, ...args) =>
+            this.cliExecutor.pull(dvcRoot, relPath, ...args),
+          dvcRoot,
+          relative(dvcRoot, path)
+        )
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        const relPath = relative(dvcRoot, path)
-        return this.cliExecutor.pushTarget(dvcRoot, relPath)
+        return tryThenMaybeForce(
+          (dvcRoot, relPath, ...args) =>
+            this.cliExecutor.push(dvcRoot, relPath, ...args),
+          dvcRoot,
+          relative(dvcRoot, path)
+        )
       })
     )
   }

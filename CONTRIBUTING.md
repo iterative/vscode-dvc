@@ -22,10 +22,12 @@ the required environment.
 
 ## Development Environment
 
-The development environment allows contributors to test out the extension that
-the current repository source will build into by using the Extension Development
-Host to load the source as an Extension. Using this, it isn't necessary to build
-and install a `.vsix` to test any particular branch or commit of this project.
+The development environment allows contributors to test out the extension. The
+current repository source is built and loaded into the Extension Development
+Host as an Extension.
+
+Please be aware that having a separate (`.vsix`) version of the extension
+installed will cause all kinds of chaos in your development environment.
 
 There are two different ways to spin up a development environment: using an
 instance of Visual Studio Code or using the shell. Which one a contributor uses

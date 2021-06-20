@@ -39,6 +39,7 @@ import { definedAndNonEmpty } from './util/array'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './webviewSerializer'
+import { reRegisterVsCodeCommands } from './vscode/commands'
 
 export { Disposable, Disposer }
 
@@ -147,6 +148,8 @@ export class Extension implements IExtension {
     registerRepositoryCommands(this.cliExecutor)
 
     this.registerConfigCommands()
+
+    reRegisterVsCodeCommands(this.dispose)
   }
 
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)

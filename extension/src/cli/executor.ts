@@ -9,24 +9,16 @@ import {
 } from './args'
 
 export class CliExecutor extends Cli {
-  public addTarget(cwd: string, target: string) {
+  public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }
 
-  public checkout(cwd: string) {
-    return this.executeProcess(cwd, Command.CHECKOUT)
+  public checkout(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.CHECKOUT, ...args)
   }
 
-  public checkoutTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.CHECKOUT, target)
-  }
-
-  public commit(cwd: string) {
-    return this.executeProcess(cwd, Command.COMMIT)
-  }
-
-  public commitTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.COMMIT, target)
+  public commit(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.COMMIT, ...args)
   }
 
   public experimentApply(cwd: string, experimentName: string) {
@@ -79,59 +71,23 @@ export class CliExecutor extends Cli {
     )
   }
 
-  public forceCheckout(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.CHECKOUT)
-  }
-
-  public forceCheckoutTarget(cwd: string, target: string) {
-    return this.executeForcedProcess(cwd, Command.CHECKOUT, target)
-  }
-
-  public forceCommit(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.COMMIT)
-  }
-
-  public forceCommitTarget(cwd: string, target: string) {
-    return this.executeForcedProcess(cwd, Command.COMMIT, target)
-  }
-
-  public forcePull(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.PULL)
-  }
-
-  public forcePush(cwd: string) {
-    return this.executeForcedProcess(cwd, Command.PUSH)
-  }
-
   public init(cwd: string) {
     return this.executeProcess(cwd, Command.INITIALIZE, Flag.SUBDIRECTORY)
   }
 
-  public pull(cwd: string) {
-    return this.executeProcess(cwd, Command.PULL)
+  public pull(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.PULL, ...args)
   }
 
-  public pullTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.PULL, target)
+  public push(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.PUSH, ...args)
   }
 
-  public push(cwd: string) {
-    return this.executeProcess(cwd, Command.PUSH)
-  }
-
-  public pushTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.PUSH, target)
-  }
-
-  public removeTarget(cwd: string, target: string) {
-    return this.executeProcess(cwd, Command.REMOVE, target)
+  public remove(cwd: string, ...args: Args) {
+    return this.executeProcess(cwd, Command.REMOVE, ...args)
   }
 
   private executeExperimentProcess(cwd: string, ...args: Args) {
     return this.executeProcess(cwd, Command.EXPERIMENT, ...args)
-  }
-
-  private executeForcedProcess(cwd: string, command: Command, ...args: Args) {
-    return this.executeProcess(cwd, command, Flag.FORCE, ...args)
   }
 }

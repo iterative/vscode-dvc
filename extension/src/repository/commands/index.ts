@@ -1,41 +1,8 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
-import { Prompt } from '../../cli/output'
-import { getWarningResponse, showGenericError } from '../../vscode/modal'
-
-const offerToForce = async (
-  stderr: string,
-  forceFunc: (...args: string[]) => Promise<string>,
-  ...args: string[]
-): Promise<string | undefined> => {
-  const text = stderr.replace(
-    Prompt.TRY_FORCE,
-    '\n\nWould you like to force this action?'
-  )
-  const response = await getWarningResponse(text, 'Force')
-  if (response !== 'Force') {
-    return
-  }
-  return forceFunc(...args)
-}
-
-const getCommand = async (
-  func: (...args: string[]) => Promise<string>,
-  forceFunc: (...args: string[]) => Promise<string>,
-  ...args: string[]
-): Promise<string | undefined> => {
-  try {
-    return await func(...args)
-  } catch (e) {
-    const stderr = e.stderr
-
-    if (stderr?.includes(Prompt.TRY_FORCE)) {
-      return offerToForce(stderr, forceFunc, ...args)
-    }
-
-    return showGenericError()
-  }
-}
+import { tryThenMaybeForce } from '../../cli/actions'
+import { Args } from '../../cli/args'
+import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({
   dvcRoot,
@@ -46,12 +13,11 @@ export type ResourceCommand = ({
 }) => Promise<string | undefined>
 
 export const getResourceCommand = (
-  func: (cwd: string, target: string) => Promise<string>,
-  forceFunc: (cwd: string, target: string) => Promise<string>
+  func: (cwd: string, target: string, ...args: Args) => Promise<string>
 ): ResourceCommand => ({ dvcRoot, resourceUri }) => {
   const relPath = relative(dvcRoot, resourceUri.fsPath)
 
-  return getCommand(func, forceFunc, dvcRoot, relPath)
+  return tryThenMaybeForce(func, dvcRoot, relPath)
 }
 
 export const getSimpleResourceCommand = (
@@ -72,10 +38,9 @@ export type RootCommand = ({
 }) => Promise<string | undefined>
 
 export const getRootCommand = (
-  func: (fsPath: string) => Promise<string>,
-  forceFunc: (fsPath: string) => Promise<string>
+  func: (fsPath: string, ...args: Args) => Promise<string>
 ): RootCommand => ({ rootUri }) => {
   const cwd = rootUri.fsPath
 
-  return getCommand(func, forceFunc, cwd)
+  return tryThenMaybeForce(func, cwd)
 }
