@@ -126,23 +126,18 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
   }
 
-  private openPullPrompt = async (dvcRoot: string, relPath: string) => {
+  private openPullPrompt = async (path: string) => {
     if (getConfigValue(this.noPromptPullMissingOption)) {
       return
     }
     const response = await window.showInformationMessage(
-      `${relPath} does not exist at the specified path.`,
+      `${path} does not exist at the specified path.`,
       'Pull File',
       this.doNotShowAgainText
     )
 
     if (response === 'Pull File') {
-      return tryThenMaybeForce(
-        this.internalCommands,
-        AvailableCommands.PULL,
-        dvcRoot,
-        relPath
-      )
+      return this.tryThenMaybeForce(AvailableCommands.PULL, path)
     }
 
     if (response === this.doNotShowAgainText) {
@@ -171,7 +166,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     const relPath = relative(dvcRoot, path)
 
     if (!exists(path)) {
-      return this.openPullPrompt(dvcRoot, relPath)
+      return this.openPullPrompt(path)
     }
 
     return window.showTextDocument(resource).then(
