@@ -42,7 +42,7 @@ export class CliExecutor extends Cli {
 
     internalCommands.registerCommand(
       'init',
-      (cwd: string): Promise<string> => this.init(cwd)
+      (dvcRoot: string): Promise<string> => this.init(dvcRoot)
     )
 
     internalCommands.registerCommand(
@@ -55,6 +55,12 @@ export class CliExecutor extends Cli {
       'push',
       (dvcRoot: string, ...args: Args): Promise<string> =>
         this.push(dvcRoot, ...args)
+    )
+
+    internalCommands.registerCommand(
+      'remove',
+      (dvcRoot: string, relPath: string): Promise<string> =>
+        this.remove(dvcRoot, relPath)
     )
   }
 

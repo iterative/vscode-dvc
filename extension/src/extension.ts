@@ -119,7 +119,6 @@ export class Extension implements IExtension {
       new TrackedExplorerTree(
         this.config,
         this.cliReader,
-        this.cliExecutor,
         this.internalCommands,
         this.workspaceChanged
       )
