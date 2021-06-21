@@ -151,7 +151,7 @@ export class Extension implements IExtension {
       this.cliRunner
     )
 
-    registerRepositoryCommands(this.cliExecutor, this.internalCommands)
+    registerRepositoryCommands(this.internalCommands)
 
     this.registerConfigCommands()
 
