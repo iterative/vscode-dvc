@@ -1,7 +1,9 @@
 import { commands } from 'vscode'
 import {
   getResourceCommand,
+  getResourceCommand_,
   getRootCommand,
+  getRootCommand_,
   getSimpleResourceCommand,
   ResourceCommand,
   RootCommand
@@ -22,22 +24,18 @@ const registerAddCommand = (internalCommands: InternalCommands): void => {
   )
 }
 
-const registerCheckoutCommands = (cliExecutor: CliExecutor): void => {
-  cliExecutor.dispose.track(
+const registerCheckoutCommands = (internalCommands: InternalCommands): void => {
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.checkout',
-      getRootCommand((cwd: string, ...args: Args) =>
-        cliExecutor.checkout(cwd, ...args)
-      )
+      getRootCommand_(internalCommands, 'checkout')
     )
   )
 
-  cliExecutor.dispose.track(
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.checkoutTarget',
-      getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.checkout(cwd, target, ...args)
-      )
+      getResourceCommand_(internalCommands, 'checkout')
     )
   )
 }
@@ -89,7 +87,7 @@ export const registerRepositoryCommands = (
   internalCommands: InternalCommands
 ): void => {
   registerAddCommand(internalCommands)
-  registerCheckoutCommands(cliExecutor)
+  registerCheckoutCommands(internalCommands)
   registerCommitCommands(cliExecutor)
   registerPullCommand(cliExecutor)
   registerPushCommand(cliExecutor)

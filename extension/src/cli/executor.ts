@@ -29,6 +29,12 @@ export class CliExecutor extends Cli {
     )
 
     internalCommands.registerCommand(
+      'checkout',
+      (dvcRoot: string, ...args: Args): Promise<string> =>
+        this.checkout(dvcRoot, ...args)
+    )
+
+    internalCommands.registerCommand(
       'pull',
       (dvcRoot: string, ...args: Args): Promise<string> =>
         this.pull(dvcRoot, ...args)
