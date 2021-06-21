@@ -76,9 +76,9 @@ suite('Extension Test Suite', () => {
 
       const uri = Uri.file(absPath)
 
-      const mockShowTextDocument = stub(window, 'showTextDocument').resolves(({
+      const mockShowTextDocument = stub(window, 'showTextDocument').resolves({
         document: { fileName: absPath }
-      } as unknown) as TextEditor)
+      } as unknown as TextEditor)
 
       const textEditor = (await commands.executeCommand(
         openFileCommand,
@@ -110,7 +110,7 @@ suite('Extension Test Suite', () => {
       expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
-        ("Don't Show Again" as unknown) as MessageItem
+        "Don't Show Again" as unknown as MessageItem
       )
 
       await commands.executeCommand(openFileCommand, uri)
@@ -144,9 +144,7 @@ suite('Extension Test Suite', () => {
       expect(mockPull).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
-      mockShowInformationMessage.resolves(
-        ('Pull File' as unknown) as MessageItem
-      )
+      mockShowInformationMessage.resolves('Pull File' as unknown as MessageItem)
 
       await commands.executeCommand(openFileCommand, uri)
 
@@ -156,7 +154,7 @@ suite('Extension Test Suite', () => {
       mockPull.resetHistory()
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves(
-        ("Don't Show Again" as unknown) as MessageItem
+        "Don't Show Again" as unknown as MessageItem
       )
 
       await commands.executeCommand(openFileCommand, uri)
@@ -214,7 +212,7 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(
         window,
         'showWarningMessage'
-      ).resolves(('Force' as unknown) as MessageItem)
+      ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand('dvc.pullTarget', absPath)
 
@@ -252,7 +250,7 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(
         window,
         'showWarningMessage'
-      ).resolves(('Force' as unknown) as MessageItem)
+      ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand('dvc.pushTarget', absPath)
 

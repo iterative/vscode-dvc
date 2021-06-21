@@ -33,10 +33,10 @@ suite('Output Channel Test Suite', () => {
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockAppend = fake()
-      const mockOutputChannel = stub(window, 'createOutputChannel').returns(({
+      const mockOutputChannel = stub(window, 'createOutputChannel').returns({
         append: mockAppend,
         dispose: fake()
-      } as unknown) as VSOutputChannel)
+      } as unknown as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], version, 'The Success Channel'))
       processCompleted.fire({ command: 'some command' })
@@ -51,10 +51,10 @@ suite('Output Channel Test Suite', () => {
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockAppend = fake()
-      const mockOutputChannel = stub(window, 'createOutputChannel').returns(({
+      const mockOutputChannel = stub(window, 'createOutputChannel').returns({
         append: mockAppend,
         dispose: fake()
-      } as unknown) as VSOutputChannel)
+      } as unknown as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], version, 'The Test Channel'))
       processCompleted.fire({

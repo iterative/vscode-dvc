@@ -46,9 +46,7 @@ describe('showGenericError', () => {
 
     await showGenericError()
 
-    expect(
-      mockedShowErrorMessage
-    ).toBeCalledWith(
+    expect(mockedShowErrorMessage).toBeCalledWith(
       'Something went wrong, please see the DVC output channel for more details.',
       { modal: true }
     )

@@ -44,11 +44,11 @@ suite('Extension Test Suite', () => {
       const processStarted = new EventEmitter<void>()
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
-      const mockStatusBarItem = ({
+      const mockStatusBarItem = {
         dispose: fake(),
         show: fake(),
         text: ''
-      } as unknown) as StatusBarItem
+      } as unknown as StatusBarItem
       const mockCreateStatusBarItem = stub(
         window,
         'createStatusBarItem'
@@ -89,11 +89,11 @@ suite('Extension Test Suite', () => {
       const processStarted = new EventEmitter<void>()
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
-      const mockStatusBarItem = ({
+      const mockStatusBarItem = {
         dispose: fake(),
         show: fake(),
         text: ''
-      } as unknown) as StatusBarItem
+      } as unknown as StatusBarItem
       stub(window, 'createStatusBarItem').returns(mockStatusBarItem)
 
       const status = disposable.track(new Status([cli]))

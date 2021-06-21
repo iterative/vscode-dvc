@@ -31,11 +31,10 @@ export const getReadyPythonExtension: () => Thenable<
   return extension
 }
 
-export const getPythonExecutionDetails: () => Thenable<
-  string[] | undefined
-> = async () =>
-  (await getReadyPythonExtension())?.exports.settings.getExecutionDetails()
-    .execCommand
+export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
+  async () =>
+    (await getReadyPythonExtension())?.exports.settings.getExecutionDetails()
+      .execCommand
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
