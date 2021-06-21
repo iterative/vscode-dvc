@@ -1,7 +1,6 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
-import { tryThenMaybeForce, tryThenMaybeForce_ } from '../../cli/actions'
-import { Args } from '../../cli/args'
+import { tryThenMaybeForce_ } from '../../cli/actions'
 import { InternalCommands } from '../../internalCommands'
 import { showGenericError } from '../../vscode/modal'
 
@@ -41,14 +40,6 @@ export type RootCommand = ({
 }) => Promise<string | undefined>
 
 export const getRootCommand = (
-  func: (fsPath: string, ...args: Args) => Promise<string>
-): RootCommand => ({ rootUri }) => {
-  const cwd = rootUri.fsPath
-
-  return tryThenMaybeForce(func, cwd)
-}
-
-export const getRootCommand_ = (
   internalCommands: InternalCommands,
   name: string
 ): RootCommand => ({ rootUri }) => {
