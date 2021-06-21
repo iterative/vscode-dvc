@@ -15,6 +15,8 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { runQueued } from '../../../experiments/runner'
+import { InternalCommands } from '../../../internalCommands'
+import { CliExecutor } from '../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -59,7 +61,11 @@ suite('Experiments Test Suite', () => {
       await setConfigValue('dvc.defaultProject', dvcDemoPath)
 
       const config = disposable.track(new Config())
+      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(
+        new InternalCommands(cliExecutor, cliReader)
+      )
       const configSpy = spy(config, 'getDefaultProject')
 
       const resourceLocator = disposable.track(
@@ -72,6 +78,7 @@ suite('Experiments Test Suite', () => {
       const experiments = new Experiments(
         config,
         cliReader,
+        internalCommands,
         mockExperimentsTable
       )
       const [experimentsTable] = experiments.create(
@@ -110,7 +117,11 @@ suite('Experiments Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
+      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(
+        new InternalCommands(cliExecutor, cliReader)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -122,6 +133,7 @@ suite('Experiments Test Suite', () => {
       const experiments = new Experiments(
         config,
         cliReader,
+        internalCommands,
         mockExperimentsTable
       )
       const [experimentsTable] = experiments.create(
@@ -157,13 +169,17 @@ suite('Experiments Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
+      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(
+        new InternalCommands(cliExecutor, cliReader)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = new Experiments(config, cliReader)
+      const experiments = new Experiments(config, cliReader, internalCommands)
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -184,7 +200,11 @@ suite('Experiments Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
+      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(
+        new InternalCommands(cliExecutor, cliReader)
+      )
       const cliRunner = disposable.track(new CliRunner(config))
       const mockRun = stub(cliRunner, 'run').resolves()
 
@@ -198,6 +218,7 @@ suite('Experiments Test Suite', () => {
       const experiments = new Experiments(
         config,
         cliReader,
+        internalCommands,
         mockExperimentsTable
       )
       const [experimentsTable] = experiments.create(

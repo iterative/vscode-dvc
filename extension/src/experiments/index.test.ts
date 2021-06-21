@@ -9,6 +9,7 @@ import { quickPickOne } from '../vscode/quickPick'
 import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
+import { InternalCommands } from '../internalCommands'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -40,7 +41,14 @@ beforeEach(() => {
 describe('Experiments', () => {
   const experiments = new Experiments(
     mockedConfig,
-    { experimentListCurrent: jest.fn() } as unknown as CliReader,
+    {} as CliReader,
+    {
+      executeCommand: (name: string) => {
+        if (name === 'experimentListCurrent') {
+          return jest.fn()
+        }
+      }
+    } as unknown as InternalCommands,
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,

@@ -108,7 +108,7 @@ export class Extension implements IExtension {
     )
 
     this.experiments = this.dispose.track(
-      new Experiments(this.config, this.cliReader)
+      new Experiments(this.config, this.cliReader, this.internalCommands)
     )
 
     this.dispose.track(

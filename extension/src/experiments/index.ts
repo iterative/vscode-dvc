@@ -12,6 +12,7 @@ import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { CliRunner } from '../cli/runner'
 import { reset } from '../util/disposable'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 
 type ExperimentsTables = Record<string, ExperimentsTable>
 
@@ -27,16 +28,19 @@ export class Experiments {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
   private readonly cliReader: CliReader
+  private readonly internalCommands: InternalCommands
 
   constructor(
     config: Config,
     cliReader: CliReader,
+    internalCommands: InternalCommands,
     experiments?: Record<string, ExperimentsTable>
   ) {
     makeObservable(this)
 
     this.config = config
     this.cliReader = cliReader
+    this.internalCommands = internalCommands
     if (experiments) {
       this.experiments = experiments
     }
@@ -71,7 +75,10 @@ export class Experiments {
     }
 
     const name = await pickExperimentName(
-      this.cliReader.experimentListCurrent(cwd)
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_LIST_CURRENT,
+        cwd
+      )
     )
 
     if (!name) {
@@ -105,7 +112,10 @@ export class Experiments {
     }
 
     const name = await pickExperimentName(
-      this.cliReader.experimentListCurrent(cwd)
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_LIST_CURRENT,
+        cwd
+      )
     )
 
     if (!name) {
