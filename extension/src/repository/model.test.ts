@@ -11,11 +11,11 @@ const mockedDisposable = mocked(Disposable)
 beforeEach(() => {
   jest.resetAllMocks()
 
-  mockedDisposable.fn.mockReturnValueOnce(({
-    track: function<T>(disposable: T): T {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
       return disposable
     }
-  } as unknown) as (() => void) & Disposer)
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('RepositoryState', () => {
@@ -56,7 +56,7 @@ describe('RepositoryState', () => {
         renamed: [{ path: renamed }]
       }
 
-      const status = ({
+      const status = {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ],
@@ -67,7 +67,7 @@ describe('RepositoryState', () => {
           },
           'always changed'
         ]
-      } as unknown) as StatusOutput
+      } as unknown as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
@@ -141,11 +141,11 @@ describe('RepositoryState', () => {
 
       const diff = {}
 
-      const status = ({
+      const status = {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as unknown) as StatusOutput
+      } as unknown as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
@@ -172,11 +172,11 @@ describe('RepositoryState', () => {
         modified: [{ path: 'data/MNIST/raw' }]
       }
 
-      const status = ({
+      const status = {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as unknown) as StatusOutput
+      } as unknown as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({

@@ -25,19 +25,19 @@ beforeEach(() => {
 
 describe('CliExecutor', () => {
   const cliExecutor = new CliExecutor(
-    ({
+    {
       getCliPath: () => undefined,
       pythonBinPath: undefined
-    } as unknown) as Config,
+    } as unknown as Config,
     {
-      processCompleted: ({
+      processCompleted: {
         event: jest.fn(),
         fire: jest.fn()
-      } as unknown) as EventEmitter<CliResult>,
-      processStarted: ({
+      } as unknown as EventEmitter<CliResult>,
+      processStarted: {
         event: jest.fn(),
         fire: jest.fn()
-      } as unknown) as EventEmitter<void>
+      } as unknown as EventEmitter<void>
     }
   )
 

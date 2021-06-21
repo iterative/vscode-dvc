@@ -2,12 +2,8 @@ import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
 
-const {
-  exists,
-  findAbsoluteDvcRootPath,
-  findDvcRootPaths,
-  isDirectory
-} = FileSystem
+const { exists, findAbsoluteDvcRootPath, findDvcRootPaths, isDirectory } =
+  FileSystem
 
 jest.mock('../cli/reader')
 

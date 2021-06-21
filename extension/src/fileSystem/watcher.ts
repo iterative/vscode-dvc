@@ -14,22 +14,24 @@ const requiresReset = (path: string) =>
   basename(path) === 'dvc.lock' ||
   basename(path) === 'dvc.yaml'
 
-export const getRepositoryWatcher = (
-  repository: Repository,
-  trackedExplorerTree: TrackedExplorerTree
-): ((path: string) => void) => (path: string) => {
-  if (isExcluded(path)) {
-    return
-  }
+export const getRepositoryWatcher =
+  (
+    repository: Repository,
+    trackedExplorerTree: TrackedExplorerTree
+  ): ((path: string) => void) =>
+  (path: string) => {
+    if (isExcluded(path)) {
+      return
+    }
 
-  if (requiresReset(path)) {
-    repository.resetState()
-    trackedExplorerTree.reset()
-    return
+    if (requiresReset(path)) {
+      repository.resetState()
+      trackedExplorerTree.reset()
+      return
+    }
+    repository.updateState()
+    trackedExplorerTree.refresh(path)
   }
-  repository.updateState()
-  trackedExplorerTree.refresh(path)
-}
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 

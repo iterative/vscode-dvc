@@ -18,9 +18,8 @@ export class ExperimentsTable {
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
 
-  protected readonly isWebviewFocusedChanged: EventEmitter<
-    string | undefined
-  > = this.dispose.track(new EventEmitter())
+  protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
+    this.dispose.track(new EventEmitter())
 
   private readonly dvcRoot: string
   private readonly config: Config
