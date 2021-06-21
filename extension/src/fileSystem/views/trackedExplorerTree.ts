@@ -17,7 +17,7 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
-import { tryThenMaybeForce, tryThenMaybeForce_ } from '../../cli/actions'
+import { tryThenMaybeForce_ } from '../../cli/actions'
 import { InternalCommands } from '../../internalCommands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
@@ -145,12 +145,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     if (response === 'Pull File') {
-      return tryThenMaybeForce(
-        (dvcRoot, relPath, ...args) =>
-          this.cliExecutor.pull(dvcRoot, relPath, ...args),
-        dvcRoot,
-        relPath
-      )
+      return tryThenMaybeForce_(this.internalCommands, 'pull', dvcRoot, relPath)
     }
 
     if (response === this.doNotShowAgainText) {
@@ -285,9 +280,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          (dvcRoot, relPath, ...args) =>
-            this.cliExecutor.push(dvcRoot, relPath, ...args),
+        return tryThenMaybeForce_(
+          this.internalCommands,
+          'push',
           dvcRoot,
           relative(dvcRoot, path)
         )
