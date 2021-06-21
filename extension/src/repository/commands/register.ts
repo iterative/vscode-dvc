@@ -60,14 +60,9 @@ const registerCommitCommands = (cliExecutor: CliExecutor): void => {
   )
 }
 
-const registerPullCommand = (cliExecutor: CliExecutor) => {
-  cliExecutor.dispose.track(
-    registerCommand(
-      'dvc.pull',
-      getRootCommand((cwd: string, ...args: Args) =>
-        cliExecutor.pull(cwd, ...args)
-      )
-    )
+const registerPullCommand = (internalCommands: InternalCommands) => {
+  internalCommands.dispose.track(
+    registerCommand('dvc.pull', getRootCommand_(internalCommands, 'pull'))
   )
 }
 
@@ -89,6 +84,6 @@ export const registerRepositoryCommands = (
   registerAddCommand(internalCommands)
   registerCheckoutCommands(internalCommands)
   registerCommitCommands(cliExecutor)
-  registerPullCommand(cliExecutor)
+  registerPullCommand(internalCommands)
   registerPushCommand(cliExecutor)
 }
