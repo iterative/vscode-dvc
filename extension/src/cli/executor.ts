@@ -22,46 +22,23 @@ export class CliExecutor extends Cli {
   ) {
     super(config, emitters)
 
-    internalCommands.registerCommand(
+    const commandsToRegister = [
       'add',
-      (dvcRoot: string, relPath: string): Promise<string> =>
-        this.add(dvcRoot, relPath)
-    )
-
-    internalCommands.registerCommand(
       'checkout',
-      (dvcRoot: string, ...args: Args): Promise<string> =>
-        this.checkout(dvcRoot, ...args)
-    )
-
-    internalCommands.registerCommand(
       'commit',
-      (dvcRoot: string, ...args: Args): Promise<string> =>
-        this.commit(dvcRoot, ...args)
-    )
-
-    internalCommands.registerCommand(
       'init',
-      (dvcRoot: string): Promise<string> => this.init(dvcRoot)
-    )
-
-    internalCommands.registerCommand(
       'pull',
-      (dvcRoot: string, ...args: Args): Promise<string> =>
-        this.pull(dvcRoot, ...args)
-    )
-
-    internalCommands.registerCommand(
       'push',
-      (dvcRoot: string, ...args: Args): Promise<string> =>
-        this.push(dvcRoot, ...args)
-    )
+      'remove'
+    ]
 
-    internalCommands.registerCommand(
-      'remove',
-      (dvcRoot: string, relPath: string): Promise<string> =>
-        this.remove(dvcRoot, relPath)
-    )
+    commandsToRegister.forEach(name => {
+      internalCommands.registerCommand(
+        name,
+        (dvcRoot: string, ...args: Args): Promise<string> =>
+          (this[name as keyof CliExecutor] as Function)(dvcRoot, ...args)
+      )
+    })
   }
 
   public add(cwd: string, target: string) {
