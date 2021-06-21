@@ -124,7 +124,7 @@ suite('Extension Test Suite', () => {
         ]
       })
 
-      const mockStatus = stub(CliReader.prototype, 'status').resolves(({
+      const mockStatus = stub(CliReader.prototype, 'status').resolves({
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ],
@@ -133,7 +133,7 @@ suite('Extension Test Suite', () => {
           { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
           'always changed'
         ]
-      } as unknown) as StatusOutput)
+      } as unknown as StatusOutput)
 
       await selectDvcPathItem(1)
 

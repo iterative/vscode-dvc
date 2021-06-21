@@ -40,9 +40,8 @@ export class ExperimentsWebview {
 
   private dvcRoot: string
 
-  private readonly isFocusedChanged: EventEmitter<
-    string | undefined
-  > = this.disposer.track(new EventEmitter())
+  private readonly isFocusedChanged: EventEmitter<string | undefined> =
+    this.disposer.track(new EventEmitter())
 
   private readonly webviewPanel: WebviewPanel
   private readonly config: Config

@@ -42,23 +42,23 @@ const mockedDelay = mocked(delay)
 beforeEach(() => {
   jest.resetAllMocks()
 
-  mockedSourceControlManagement.mockImplementationOnce(function() {
-    return ({
+  mockedSourceControlManagement.mockImplementationOnce(function () {
+    return {
       setState: mockedSetScmState
-    } as unknown) as SourceControlManagement
+    } as unknown as SourceControlManagement
   })
 
-  mockedDecorationProvider.mockImplementationOnce(function() {
-    return ({
+  mockedDecorationProvider.mockImplementationOnce(function () {
+    return {
       setState: mockedSetDecorationState
-    } as unknown) as DecorationProvider
+    } as unknown as DecorationProvider
   })
 
-  mockedDisposable.fn.mockReturnValueOnce(({
-    track: function<T>(disposable: T): T {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
       return disposable
     }
-  } as unknown) as (() => void) & Disposer)
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('Repository', () => {
@@ -84,7 +84,7 @@ describe('Repository', () => {
         { path: dataDir }
       ] as ListOutput[])
 
-      mockedStatus.mockResolvedValueOnce(({
+      mockedStatus.mockResolvedValueOnce({
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ],
@@ -93,7 +93,7 @@ describe('Repository', () => {
           { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
           'always changed'
         ]
-      } as unknown) as StatusOutput)
+      } as unknown as StatusOutput)
 
       mockedDiff.mockResolvedValueOnce({
         added: [],
@@ -114,11 +114,11 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      const mockedCliReader = ({
+      const mockedCliReader = {
         diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
         status: mockedStatus
-      } as unknown) as CliReader
+      } as unknown as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -165,11 +165,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
+      const mockedCliReader = {
         diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
         status: mockedStatus
-      } as unknown) as CliReader
+      } as unknown as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -179,14 +179,14 @@ describe('Repository', () => {
       )
       await repository.isReady()
 
-      mockedDiff.mockResolvedValueOnce(({
+      mockedDiff.mockResolvedValueOnce({
         added: [],
         deleted: [{ path: model }, { path: dataDir }],
         modified: [],
         'not in cache': []
-      } as unknown) as DiffOutput)
+      } as unknown as DiffOutput)
 
-      mockedStatus.mockResolvedValueOnce(({
+      mockedStatus.mockResolvedValueOnce({
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
         ],
@@ -197,7 +197,7 @@ describe('Repository', () => {
           { 'changed outs': { 'model.pt': 'deleted' } },
           'always changed'
         ]
-      } as unknown) as StatusOutput)
+      } as unknown as StatusOutput)
 
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
@@ -248,11 +248,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
+      const mockedCliReader = {
         diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
         status: mockedStatus
-      } as unknown) as CliReader
+      } as unknown as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -277,14 +277,14 @@ describe('Repository', () => {
         { path: prepared }
       ] as ListOutput[])
 
-      mockedDiff.mockResolvedValueOnce(({
+      mockedDiff.mockResolvedValueOnce({
         added: [],
         deleted: [{ path: model }],
         modified: [{ path: features }],
         'not in cache': [{ path: dataXml }, { path: prepared }]
-      } as unknown) as DiffOutput)
+      } as unknown as DiffOutput)
 
-      mockedStatus.mockResolvedValueOnce(({
+      mockedStatus.mockResolvedValueOnce({
         'data/data.xml.dvc': [
           { 'changed outs': { 'data/data.xml': Status.NOT_IN_CACHE } }
         ],
@@ -308,7 +308,7 @@ describe('Repository', () => {
           { 'changed deps': { 'data/features': 'modified' } },
           { 'changed outs': { 'model.pt': 'deleted' } }
         ]
-      } as unknown) as StatusOutput)
+      } as unknown as StatusOutput)
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py'),
@@ -365,11 +365,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
+      const mockedCliReader = {
         diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
         status: mockedStatus
-      } as unknown) as CliReader
+      } as unknown as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -383,18 +383,18 @@ describe('Repository', () => {
         .mockReset()
         .mockRejectedValueOnce("I tried but I just couldn't do it")
         .mockResolvedValueOnce({})
-        .mockResolvedValueOnce(({
+        .mockResolvedValueOnce({
           added: [],
           deleted: [{ path: model }, { path: dataDir }],
           modified: [],
           'not in cache': []
-        } as unknown) as DiffOutput)
+        } as unknown as DiffOutput)
 
       mockedStatus
         .mockReset()
         .mockResolvedValueOnce({})
         .mockRejectedValueOnce('I failed on the second attempt')
-        .mockResolvedValueOnce(({
+        .mockResolvedValueOnce({
           'data/MNIST/raw.dvc': [
             { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
           ],
@@ -407,7 +407,7 @@ describe('Repository', () => {
             },
             { 'changed outs': { 'model.pt': 'deleted' } }
           ]
-        } as unknown) as StatusOutput)
+        } as unknown as StatusOutput)
 
       mockedGetAllUntracked
         .mockReset()
@@ -471,11 +471,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
+      const mockedCliReader = {
         diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
         status: mockedStatus
-      } as unknown) as CliReader
+      } as unknown as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -513,11 +513,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
+      const mockedCliReader = {
         diff: mockedDiff,
         listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
         status: mockedStatus
-      } as unknown) as CliReader
+      } as unknown as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
@@ -531,12 +531,12 @@ describe('Repository', () => {
         .mockReset()
         .mockRejectedValueOnce("I also tried but I just couldn't do it")
         .mockResolvedValueOnce({})
-        .mockResolvedValueOnce(({
+        .mockResolvedValueOnce({
           added: [],
           deleted: [{ path: model }],
           modified: [{ path: dataDir }],
           'not in cache': []
-        } as unknown) as DiffOutput)
+        } as unknown as DiffOutput)
 
       mockedStatus
         .mockReset()

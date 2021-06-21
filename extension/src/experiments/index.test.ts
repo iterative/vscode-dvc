@@ -19,9 +19,9 @@ const mockedQuickPickOne = mocked(quickPickOne)
 const mockedPickExperimentName = mocked(pickExperimentName)
 const mockedGetInput = mocked(getInput)
 const mockedRun = jest.fn()
-const mockedConfig = ({
+const mockedConfig = {
   getDefaultProject: mockedGetDefaultProject
-} as unknown) as Config
+} as unknown as Config
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
@@ -30,26 +30,26 @@ jest.mock('./quickPick')
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedDisposable.fn.mockReturnValueOnce(({
-    track: function<T>(disposable: T): T {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
       return disposable
     }
-  } as unknown) as (() => void) & Disposer)
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('Experiments', () => {
   const experiments = new Experiments(
     mockedConfig,
-    ({ experimentListCurrent: jest.fn() } as unknown) as CliReader,
+    { experimentListCurrent: jest.fn() } as unknown as CliReader,
     {
-      '/my/dvc/root': ({
+      '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
         showWebview: mockedShowWebview
-      } as unknown) as ExperimentsTable,
-      '/my/fun/dvc/root': ({
+      } as unknown as ExperimentsTable,
+      '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
         showWebview: jest.fn()
-      } as unknown) as ExperimentsTable
+      } as unknown as ExperimentsTable
     }
   )
 
@@ -225,11 +225,11 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
 
       await experiments.showExperimentsTableThenRun(
-        ({
+        {
           dispose: { track: jest.fn() },
           onDidCompleteProcess: jest.fn(),
           run: mockedRun
-        } as unknown) as CliRunner,
+        } as unknown as CliRunner,
         runQueued
       )
 
@@ -244,11 +244,11 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
       await experiments.showExperimentsTableThenRun(
-        ({
+        {
           dispose: { track: jest.fn() },
           onDidCompleteProcess: jest.fn(),
           run: mockedRun
-        } as unknown) as CliRunner,
+        } as unknown as CliRunner,
         runReset
       )
 
