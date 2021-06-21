@@ -81,8 +81,11 @@ export class Repository {
     Promise<StatusOutput>,
     Promise<Set<string>>
   ] => [
-    this.internalCommands.executeCommand(AvailableCommands.DIFF, this.dvcRoot),
-    this.internalCommands.executeCommand(
+    this.internalCommands.executeCommand<DiffOutput>(
+      AvailableCommands.DIFF,
+      this.dvcRoot
+    ),
+    this.internalCommands.executeCommand<StatusOutput>(
       AvailableCommands.STATUS,
       this.dvcRoot
     ),
@@ -102,7 +105,7 @@ export class Repository {
   > => {
     const getNewPromises = () => [
       ...this.getBaseData(),
-      this.internalCommands.executeCommand(
+      this.internalCommands.executeCommand<ListOutput[]>(
         AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
         this.dvcRoot
       )
