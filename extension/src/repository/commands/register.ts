@@ -11,20 +11,11 @@ import { AvailableCommands, InternalCommands } from '../../internalCommands'
 const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
   commands.registerCommand(name, func)
 
-const registerAddCommand = (internalCommands: InternalCommands): void => {
+const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.dispose.track(
     registerCommand(
       'dvc.addTarget',
       getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
-    )
-  )
-}
-
-const registerCheckoutCommands = (internalCommands: InternalCommands): void => {
-  internalCommands.dispose.track(
-    registerCommand(
-      'dvc.checkout',
-      getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
     )
   )
 
@@ -32,15 +23,6 @@ const registerCheckoutCommands = (internalCommands: InternalCommands): void => {
     registerCommand(
       'dvc.checkoutTarget',
       getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
-    )
-  )
-}
-
-const registerCommitCommands = (internalCommands: InternalCommands): void => {
-  internalCommands.dispose.track(
-    registerCommand(
-      'dvc.commit',
-      getRootCommand(internalCommands, AvailableCommands.COMMIT)
     )
   )
 
@@ -52,16 +34,28 @@ const registerCommitCommands = (internalCommands: InternalCommands): void => {
   )
 }
 
-const registerPullCommand = (internalCommands: InternalCommands) => {
+const registerRootCommands = (internalCommands: InternalCommands) => {
+  internalCommands.dispose.track(
+    registerCommand(
+      'dvc.checkout',
+      getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
+    )
+  )
+
+  internalCommands.dispose.track(
+    registerCommand(
+      'dvc.commit',
+      getRootCommand(internalCommands, AvailableCommands.COMMIT)
+    )
+  )
+
   internalCommands.dispose.track(
     registerCommand(
       'dvc.pull',
       getRootCommand(internalCommands, AvailableCommands.PULL)
     )
   )
-}
 
-const registerPushCommand = (internalCommands: InternalCommands) => {
   internalCommands.dispose.track(
     registerCommand(
       'dvc.push',
@@ -73,9 +67,6 @@ const registerPushCommand = (internalCommands: InternalCommands) => {
 export const registerRepositoryCommands = (
   internalCommands: InternalCommands
 ): void => {
-  registerAddCommand(internalCommands)
-  registerCheckoutCommands(internalCommands)
-  registerCommitCommands(internalCommands)
-  registerPullCommand(internalCommands)
-  registerPushCommand(internalCommands)
+  registerResourceCommands(internalCommands)
+  registerRootCommands(internalCommands)
 }
