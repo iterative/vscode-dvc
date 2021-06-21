@@ -13,18 +13,17 @@ const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
 const mockedExecuteCommand = jest.fn()
-const mockedInternalCommands = ({
+const mockedInternalCommands = {
   executeCommand: mockedExecuteCommand
-} as unknown) as InternalCommands
+} as unknown as InternalCommands
 
-const getMockedExecuteCommand = (expectedName: string) => (
-  name: string,
-  ...args: string[]
-) => {
-  if (name === expectedName) {
-    return mockedFunc(...args)
+const getMockedExecuteCommand =
+  (expectedName: string) =>
+  (name: string, ...args: string[]) => {
+    if (name === expectedName) {
+      return mockedFunc(...args)
+    }
   }
-}
 
 jest.mock('vscode')
 jest.mock('../../vscode/modal')
