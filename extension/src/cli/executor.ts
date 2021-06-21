@@ -41,6 +41,11 @@ export class CliExecutor extends Cli {
     )
 
     internalCommands.registerCommand(
+      'init',
+      (cwd: string): Promise<string> => this.init(cwd)
+    )
+
+    internalCommands.registerCommand(
       'pull',
       (dvcRoot: string, ...args: Args): Promise<string> =>
         this.pull(dvcRoot, ...args)

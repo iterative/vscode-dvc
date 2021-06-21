@@ -238,7 +238,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       commands.registerCommand('dvc.init', async () => {
         const root = this.config.getFirstWorkspaceFolderRoot()
         if (root) {
-          await this.cliExecutor.init(root)
+          await this.internalCommands.executeCommand('init', root)
         }
         workspaceChanged.fire()
       })
