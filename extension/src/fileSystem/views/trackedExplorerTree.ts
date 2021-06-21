@@ -17,7 +17,8 @@ import { exists } from '..'
 import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
-import { tryThenMaybeForce } from '../../cli/actions'
+import { tryThenMaybeForce, tryThenMaybeForce_ } from '../../cli/actions'
+import { InternalCommands } from '../../internalCommands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -26,6 +27,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private readonly cliReader: CliReader
   private readonly cliExecutor: CliExecutor
+  private readonly internalCommands: InternalCommands
   private readonly treeDataChanged: EventEmitter<string | void>
 
   private config: Config
@@ -47,12 +49,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     config: Config,
     cliReader: CliReader,
     cliExecutor: CliExecutor,
+    internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
     this.cliReader = cliReader
     this.cliExecutor = cliExecutor
+    this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)
 
@@ -269,9 +273,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path => {
         const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          (dvcRoot, relPath, ...args) =>
-            this.cliExecutor.pull(dvcRoot, relPath, ...args),
+        return tryThenMaybeForce_(
+          this.internalCommands,
+          '_pullTarget',
           dvcRoot,
           relative(dvcRoot, path)
         )

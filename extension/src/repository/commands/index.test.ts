@@ -4,6 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse, showGenericError } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
+import { InternalCommands } from '../../internalCommands'
 
 const mockedFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
@@ -11,6 +12,10 @@ const mockedShowGenericError = mocked(showGenericError)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
+const mockedExecuteCommand = jest.fn()
+const mockedInternalCommands = ({
+  executeCommand: mockedExecuteCommand
+} as unknown) as InternalCommands
 
 jest.mock('vscode')
 jest.mock('../../vscode/modal')
@@ -124,7 +129,17 @@ describe('getSimpleResourceCommand', () => {
   it('should return a simple function that only calls the first function if it succeeds', async () => {
     const stdout = "I'm simple, that's easy"
     mockedFunc.mockResolvedValueOnce(stdout)
-    const commandToRegister = getSimpleResourceCommand(mockedFunc)
+
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'addTarget') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getSimpleResourceCommand(
+      mockedInternalCommands,
+      'addTarget'
+    )
 
     const output = await commandToRegister({
       dvcRoot: mockedDvcRoot,
@@ -140,7 +155,17 @@ describe('getSimpleResourceCommand', () => {
     const noResponsePossible = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedShowGenericError.mockResolvedValueOnce(noResponsePossible)
-    const commandToRegister = getSimpleResourceCommand(mockedFunc)
+
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'add') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getSimpleResourceCommand(
+      mockedInternalCommands,
+      'add'
+    )
 
     const undef = await commandToRegister({
       dvcRoot: mockedDvcRoot,

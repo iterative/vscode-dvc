@@ -2,6 +2,7 @@ import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
 import { Args } from '../../cli/args'
+import { InternalCommands } from '../../internalCommands'
 import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({
@@ -21,11 +22,12 @@ export const getResourceCommand = (
 }
 
 export const getSimpleResourceCommand = (
-  func: (cwd: string, target: string) => Promise<string>
+  internalCommands: InternalCommands,
+  name: string
 ): ResourceCommand => async ({ dvcRoot, resourceUri }) => {
   const relPath = relative(dvcRoot, resourceUri.fsPath)
   try {
-    return await func(dvcRoot, relPath)
+    return await internalCommands.executeCommand(name, dvcRoot, relPath)
   } catch {
     return showGenericError()
   }

@@ -8,17 +8,16 @@ import {
 } from '.'
 import { Args } from '../../cli/args'
 import { CliExecutor } from '../../cli/executor'
+import { InternalCommands } from '../../internalCommands'
 
 const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
   commands.registerCommand(name, func)
 
-const registerAddCommand = (cliExecutor: CliExecutor): void => {
-  cliExecutor.dispose.track(
+const registerAddCommand = (internalCommands: InternalCommands): void => {
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.addTarget',
-      getSimpleResourceCommand((cwd: string, target: string) =>
-        cliExecutor.add(cwd, target)
-      )
+      getSimpleResourceCommand(internalCommands, '_addTarget')
     )
   )
 }
@@ -85,8 +84,11 @@ const registerPushCommand = (cliExecutor: CliExecutor) => {
   )
 }
 
-export const registerRepositoryCommands = (cliExecutor: CliExecutor): void => {
-  registerAddCommand(cliExecutor)
+export const registerRepositoryCommands = (
+  cliExecutor: CliExecutor,
+  internalCommands: InternalCommands
+): void => {
+  registerAddCommand(internalCommands)
   registerCheckoutCommands(cliExecutor)
   registerCommitCommands(cliExecutor)
   registerPullCommand(cliExecutor)

@@ -1,4 +1,5 @@
-import { Cli } from '.'
+import { EventEmitter } from 'vscode'
+import { Cli, CliResult } from '.'
 import {
   Args,
   Command,
@@ -7,8 +8,33 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
+import { Config } from '../config'
+import { InternalCommands } from '../internalCommands'
 
 export class CliExecutor extends Cli {
+  constructor(
+    config: Config,
+    internalCommands: InternalCommands,
+    emitters?: {
+      processStarted: EventEmitter<void>
+      processCompleted: EventEmitter<CliResult>
+    }
+  ) {
+    super(config, emitters)
+
+    internalCommands.registerCommand(
+      '_pullTarget',
+      (dvcRoot: string, relPath: string, ...args: Args): Promise<string> =>
+        this.pull(dvcRoot, relPath, ...args)
+    )
+
+    internalCommands.registerCommand(
+      '_addTarget',
+      (dvcRoot: string, relPath: string): Promise<string> =>
+        this.add(dvcRoot, relPath)
+    )
+  }
+
   public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }
