@@ -17,7 +17,7 @@ const registerAddCommand = (internalCommands: InternalCommands): void => {
   internalCommands.dispose.track(
     registerCommand(
       'dvc.addTarget',
-      getSimpleResourceCommand(internalCommands, '_addTarget')
+      getSimpleResourceCommand(internalCommands, 'add')
     )
   )
 }

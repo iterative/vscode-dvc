@@ -275,7 +275,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         const dvcRoot = this.pathRoots[path]
         return tryThenMaybeForce_(
           this.internalCommands,
-          '_pullTarget',
+          'pull',
           dvcRoot,
           relative(dvcRoot, path)
         )

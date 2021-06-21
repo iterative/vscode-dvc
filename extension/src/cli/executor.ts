@@ -23,15 +23,15 @@ export class CliExecutor extends Cli {
     super(config, emitters)
 
     internalCommands.registerCommand(
-      '_pullTarget',
-      (dvcRoot: string, relPath: string, ...args: Args): Promise<string> =>
-        this.pull(dvcRoot, relPath, ...args)
+      'add',
+      (dvcRoot: string, relPath: string): Promise<string> =>
+        this.add(dvcRoot, relPath)
     )
 
     internalCommands.registerCommand(
-      '_addTarget',
-      (dvcRoot: string, relPath: string): Promise<string> =>
-        this.add(dvcRoot, relPath)
+      'pull',
+      (dvcRoot: string, ...args: Args): Promise<string> =>
+        this.pull(dvcRoot, ...args)
     )
   }
 
