@@ -109,7 +109,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
 
     treeItem.contextValue = this.getContextValue(element)
-
     return treeItem
   }
 
