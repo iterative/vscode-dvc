@@ -14,7 +14,7 @@ import { Config } from '../../config'
 import { definedAndNonEmpty } from '../../util/array'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { CliReader } from '../../cli/reader'
+import { ListOutput } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
 import { tryThenMaybeForce } from '../../cli/actions'
 import { InternalCommands } from '../../internalCommands'
@@ -24,7 +24,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public readonly onDidChangeTreeData: Event<string | void>
 
-  private readonly cliReader: CliReader
   private readonly internalCommands: InternalCommands
   private readonly treeDataChanged: EventEmitter<string | void>
 
@@ -45,13 +44,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   constructor(
     config: Config,
-    cliReader: CliReader,
     internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
-    this.cliReader = cliReader
     this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)
@@ -215,7 +212,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return []
     }
 
-    const listOutput = await this.cliReader.listDvcOnly(
+    const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
+      'listDvcOnly',
       root,
       relative(root, path)
     )

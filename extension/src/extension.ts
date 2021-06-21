@@ -97,7 +97,9 @@ export class Extension implements IExtension {
     this.cliExecutor = this.dispose.track(
       new CliExecutor(this.config, this.internalCommands)
     )
-    this.cliReader = this.dispose.track(new CliReader(this.config))
+    this.cliReader = this.dispose.track(
+      new CliReader(this.config, this.internalCommands)
+    )
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
     this.status = this.dispose.track(
@@ -118,7 +120,6 @@ export class Extension implements IExtension {
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(
         this.config,
-        this.cliReader,
         this.internalCommands,
         this.workspaceChanged
       )
