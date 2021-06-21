@@ -5,6 +5,20 @@ import { CliReader } from './cli/reader'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
+export enum AvailableCommands {
+  ADD = 'add',
+  CHECKOUT = 'checkout',
+  COMMIT = 'commit',
+  DIFF = 'diff',
+  INIT = 'init',
+  LIST_DVC_ONLY = 'listDvcOnly',
+  LIST_DVC_ONLY_RECURSIVE = 'listDvcOnlyRecursive',
+  PULL = 'pull',
+  PUSH = 'push',
+  REMOVE = 'remove',
+  STATUS = 'status'
+}
+
 export class InternalCommands {
   public dispose = Disposable.fn()
 
@@ -15,7 +29,10 @@ export class InternalCommands {
     this.registerCommands(cliReader)
   }
 
-  public executeCommand<T = string>(id: string, ...args: Args): Promise<T> {
+  public executeCommand<T = string>(
+    id: AvailableCommands,
+    ...args: Args
+  ): Promise<T> {
     const command = this.commands.get(id)
     if (!command) {
       throw new Error('Unknown command')

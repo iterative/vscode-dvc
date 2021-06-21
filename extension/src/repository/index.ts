@@ -7,7 +7,7 @@ import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { retryUntilAllResolved } from '../util/promise'
-import { InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 export class Repository {
   @observable
   private model: RepositoryModel
@@ -88,8 +88,11 @@ export class Repository {
     Promise<StatusOutput>,
     Promise<Set<string>>
   ] => [
-    this.internalCommands.executeCommand('diff', this.dvcRoot),
-    this.internalCommands.executeCommand('status', this.dvcRoot),
+    this.internalCommands.executeCommand(AvailableCommands.DIFF, this.dvcRoot),
+    this.internalCommands.executeCommand(
+      AvailableCommands.STATUS,
+      this.dvcRoot
+    ),
     getAllUntracked(this.dvcRoot)
   ]
 
@@ -106,7 +109,10 @@ export class Repository {
   > => {
     const getNewPromises = () => [
       ...this.getBaseData(),
-      this.internalCommands.executeCommand('listDvcOnlyRecursive', this.dvcRoot)
+      this.internalCommands.executeCommand(
+        AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
+        this.dvcRoot
+      )
     ]
     return retryUntilAllResolved<
       [DiffOutput, StatusOutput, Set<string>, ListOutput[]]

@@ -1,7 +1,7 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { InternalCommands } from '../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../internalCommands'
 import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({
@@ -14,7 +14,7 @@ export type ResourceCommand = ({
 
 export const getResourceCommand = (
   internalCommands: InternalCommands,
-  name: string
+  name: AvailableCommands
 ): ResourceCommand => ({ dvcRoot, resourceUri }) => {
   const relPath = relative(dvcRoot, resourceUri.fsPath)
 
@@ -23,7 +23,7 @@ export const getResourceCommand = (
 
 export const getSimpleResourceCommand = (
   internalCommands: InternalCommands,
-  name: string
+  name: AvailableCommands
 ): ResourceCommand => async ({ dvcRoot, resourceUri }) => {
   const relPath = relative(dvcRoot, resourceUri.fsPath)
   try {
@@ -41,7 +41,7 @@ export type RootCommand = ({
 
 export const getRootCommand = (
   internalCommands: InternalCommands,
-  name: string
+  name: AvailableCommands
 ): RootCommand => ({ rootUri }) => {
   const cwd = rootUri.fsPath
 
