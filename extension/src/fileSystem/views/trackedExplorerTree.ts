@@ -263,26 +263,24 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path => {
-        const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          this.internalCommands,
-          'pull',
-          dvcRoot,
-          relative(dvcRoot, path)
-        )
+        return this.tryThenMaybeForce('pull', path)
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path => {
-        const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          this.internalCommands,
-          'push',
-          dvcRoot,
-          relative(dvcRoot, path)
-        )
+        return this.tryThenMaybeForce('push', path)
       })
+    )
+  }
+
+  private tryThenMaybeForce(name: string, path: string) {
+    const dvcRoot = this.pathRoots[path]
+    return tryThenMaybeForce(
+      this.internalCommands,
+      name,
+      dvcRoot,
+      relative(dvcRoot, path)
     )
   }
 }
