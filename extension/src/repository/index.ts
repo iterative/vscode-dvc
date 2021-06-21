@@ -4,9 +4,10 @@ import { observable, makeObservable } from 'mobx'
 import { SourceControlManagement } from './views/sourceControlManagement'
 import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
-import { ListOutput, DiffOutput, StatusOutput, CliReader } from '../cli/reader'
+import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { retryUntilAllResolved } from '../util/promise'
+import { InternalCommands } from '../internalCommands'
 export class Repository {
   @observable
   private model: RepositoryModel
@@ -17,7 +18,7 @@ export class Repository {
   private readonly initialized = this.deferred.promise
 
   private readonly dvcRoot: string
-  private readonly cliReader: CliReader
+  private readonly internalCommands: InternalCommands
   private decorationProvider?: DecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
 
@@ -26,11 +27,11 @@ export class Repository {
 
   constructor(
     dvcRoot: string,
-    cliReader: CliReader,
+    internalCommands: InternalCommands,
     decorationProvider?: DecorationProvider
   ) {
     makeObservable(this)
-    this.cliReader = cliReader
+    this.internalCommands = internalCommands
     this.decorationProvider = decorationProvider
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
@@ -87,8 +88,8 @@ export class Repository {
     Promise<StatusOutput>,
     Promise<Set<string>>
   ] => [
-    this.cliReader.diff(this.dvcRoot),
-    this.cliReader.status(this.dvcRoot),
+    this.internalCommands.executeCommand('diff', this.dvcRoot),
+    this.internalCommands.executeCommand('status', this.dvcRoot),
     getAllUntracked(this.dvcRoot)
   ]
 
@@ -105,7 +106,7 @@ export class Repository {
   > => {
     const getNewPromises = () => [
       ...this.getBaseData(),
-      this.cliReader.listDvcOnlyRecursive(this.dvcRoot)
+      this.internalCommands.executeCommand('listDvcOnlyRecursive', this.dvcRoot)
     ]
     return retryUntilAllResolved<
       [DiffOutput, StatusOutput, Set<string>, ListOutput[]]

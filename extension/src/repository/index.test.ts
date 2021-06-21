@@ -5,15 +5,10 @@ import { Repository } from '.'
 import { SourceControlManagement } from './views/sourceControlManagement'
 import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
-import {
-  CliReader,
-  DiffOutput,
-  ListOutput,
-  Status,
-  StatusOutput
-} from '../cli/reader'
+import { DiffOutput, ListOutput, Status, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { delay } from '../util/time'
+import { InternalCommands } from '../internalCommands'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/sourceControlManagement')
@@ -38,6 +33,20 @@ const mockedSetDecorationState = jest.fn()
 const mockedDisposable = mocked(Disposable)
 
 const mockedDelay = mocked(delay)
+
+const mockedInternalCommands = ({
+  executeCommand: (name: string, ...args: string[]) => {
+    if (name === 'diff') {
+      return mockedDiff(...args)
+    }
+    if (name === 'listDvcOnlyRecursive') {
+      return mockedListDvcOnlyRecursive(...args)
+    }
+    if (name === 'status') {
+      return mockedStatus(...args)
+    }
+  }
+} as unknown) as InternalCommands
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -114,16 +123,11 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
         dvcRoot,
-        mockedCliReader,
+        mockedInternalCommands,
         decorationProvider
       )
       await repository.isReady()
@@ -165,16 +169,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
         dvcRoot,
-        mockedCliReader,
+        mockedInternalCommands,
         decorationProvider
       )
       await repository.isReady()
@@ -248,16 +247,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
         dvcRoot,
-        mockedCliReader,
+        mockedInternalCommands,
         decorationProvider
       )
       await repository.isReady()
@@ -365,16 +359,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
         dvcRoot,
-        mockedCliReader,
+        mockedInternalCommands,
         decorationProvider
       )
       await repository.isReady()
@@ -471,16 +460,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
         dvcRoot,
-        mockedCliReader,
+        mockedInternalCommands,
         decorationProvider
       )
       await repository.isReady()
@@ -513,16 +497,11 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const mockedCliReader = ({
-        diff: mockedDiff,
-        listDvcOnlyRecursive: mockedListDvcOnlyRecursive,
-        status: mockedStatus
-      } as unknown) as CliReader
       const decorationProvider = new DecorationProvider()
 
       const repository = new Repository(
         dvcRoot,
-        mockedCliReader,
+        mockedInternalCommands,
         decorationProvider
       )
       await repository.isReady()
