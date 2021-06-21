@@ -118,9 +118,9 @@ export class CliReader extends Cli {
   ): Promise<T> {
     const output = await this.executeProcess(cwd, ...args)
     if (!formatter) {
-      return (output as unknown) as T
+      return output as unknown as T
     }
-    return (formatter(output) as unknown) as T
+    return formatter(output) as unknown as T
   }
 
   private readProcessJson<T>(cwd: string, command: Command, ...args: Args) {

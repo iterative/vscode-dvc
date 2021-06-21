@@ -22,7 +22,8 @@ type OutputData = {
 }
 
 export class RepositoryModel
-  implements DecorationModel, SourceControlManagementModel {
+  implements DecorationModel, SourceControlManagementModel
+{
   public dispose = Disposable.fn()
 
   private dvcRoot: string

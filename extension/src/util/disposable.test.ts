@@ -10,13 +10,13 @@ jest.mock('@hediet/std/disposable')
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedDisposable.fn.mockReturnValue(({
+  mockedDisposable.fn.mockReturnValue({
     dispose: mockedDispose,
-    track: function<T>(disposable: T): T {
+    track: function <T>(disposable: T): T {
       return disposable
     },
     untrack: mockedUntrack
-  } as unknown) as (() => void) & Disposer)
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('reset', () => {

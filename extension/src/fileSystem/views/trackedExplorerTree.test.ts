@@ -22,10 +22,10 @@ const mockedDisposable = mocked(Disposable)
 
 const mockedGetDefaultProject = jest.fn()
 const mockedGetCliPath = jest.fn()
-const mockedConfig = ({
+const mockedConfig = {
   getCliPath: mockedGetCliPath,
   getDefaultProject: mockedGetDefaultProject
-} as unknown) as Config
+} as unknown as Config
 
 const mockedListDvcOnly = jest.fn()
 const mockedExecuteCommand = (name: string, ...args: string[]) => {
@@ -41,11 +41,11 @@ jest.mock('../../cli/reader')
 beforeEach(() => {
   jest.resetAllMocks()
 
-  mockedDisposable.fn.mockReturnValueOnce(({
-    track: function<T>(disposable: T): T {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
       return disposable
     }
-  } as unknown) as (() => void) & Disposer)
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('TrackedTreeView', () => {
@@ -104,7 +104,7 @@ describe('TrackedTreeView', () => {
   describe('getTreeItem', () => {
     it('should return the correct tree item for a directory', async () => {
       let mockedItem = {}
-      mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(1)
         mockedItem = { collapsibleState, uri }
         return mockedItem
@@ -114,9 +114,9 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        ({
+        {
           executeCommand: mockedExecuteCommand
-        } as unknown) as InternalCommands,
+        } as unknown as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -136,7 +136,7 @@ describe('TrackedTreeView', () => {
       let mockedItem = {}
       const log = join(dvcDemoPath, 'logs', 'acc.tsv')
       const mockedUri = Uri.file(log)
-      mockedTreeItem.mockImplementationOnce(function(uri, collapsibleState) {
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(0)
         expect(uri).toEqual(mockedUri)
         mockedItem = { collapsibleState, uri }

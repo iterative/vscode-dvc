@@ -54,12 +54,8 @@ export class Repository {
   public async resetState() {
     if (!this.resetInProgress) {
       this.resetInProgress = true
-      const [
-        diffFromHead,
-        diffFromCache,
-        untracked,
-        tracked
-      ] = await this.getResetData()
+      const [diffFromHead, diffFromCache, untracked, tracked] =
+        await this.getResetData()
 
       this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
@@ -71,11 +67,8 @@ export class Repository {
   public async updateState() {
     if (!this.updateInProgress && !this.resetInProgress) {
       this.updateInProgress = true
-      const [
-        diffFromHead,
-        diffFromCache,
-        untracked
-      ] = await this.getUpdateData()
+      const [diffFromHead, diffFromCache, untracked] =
+        await this.getUpdateData()
 
       this.model.setState({ diffFromCache, diffFromHead, untracked })
       this.setState()
