@@ -14,7 +14,6 @@ import { Config } from '../../config'
 import { definedAndNonEmpty } from '../../util/array'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { CliExecutor } from '../../cli/executor'
 import { CliReader } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
 import { tryThenMaybeForce } from '../../cli/actions'
@@ -26,7 +25,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly cliReader: CliReader
-  private readonly cliExecutor: CliExecutor
   private readonly internalCommands: InternalCommands
   private readonly treeDataChanged: EventEmitter<string | void>
 
@@ -48,14 +46,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   constructor(
     config: Config,
     cliReader: CliReader,
-    cliExecutor: CliExecutor,
     internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
     this.cliReader = cliReader
-    this.cliExecutor = cliExecutor
     this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)
@@ -261,7 +257,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         this.treeDataChanged.fire()
         const dvcRoot = this.pathRoots[path]
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-        return this.cliExecutor.remove(dvcRoot, relPath)
+        return this.internalCommands.executeCommand('remove', dvcRoot, relPath)
       })
     )
 

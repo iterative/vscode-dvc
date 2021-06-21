@@ -5,7 +5,6 @@ import { mocked } from 'ts-jest/utils'
 import { TrackedExplorerTree } from './trackedExplorerTree'
 import { Config } from '../../config'
 import { CliReader } from '../../cli/reader'
-import { CliExecutor } from '../../cli/executor'
 import { InternalCommands } from '../../internalCommands'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
@@ -57,7 +56,6 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         {} as CliReader,
-        {} as CliExecutor,
         {} as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
@@ -76,7 +74,6 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         ({ listDvcOnly: mockedListDvcOnly } as unknown) as CliReader,
-        {} as CliExecutor,
         {} as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
@@ -114,7 +111,6 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         ({ listDvcOnly: mockedListDvcOnly } as unknown) as CliReader,
-        {} as CliExecutor,
         {} as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
@@ -145,7 +141,6 @@ describe('TrackedTreeView', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
         {} as CliReader,
-        {} as CliExecutor,
         {} as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
