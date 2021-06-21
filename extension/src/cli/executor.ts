@@ -1,5 +1,4 @@
-import { EventEmitter } from 'vscode'
-import { Cli, CliResult } from '.'
+import { Cli } from '.'
 import {
   Args,
   Command,
@@ -8,38 +7,16 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
-import { Config } from '../config'
-import { InternalCommands } from '../internalCommands'
-
 export class CliExecutor extends Cli {
-  constructor(
-    config: Config,
-    internalCommands: InternalCommands,
-    emitters?: {
-      processStarted: EventEmitter<void>
-      processCompleted: EventEmitter<CliResult>
-    }
-  ) {
-    super(config, emitters)
-
-    const commandsToRegister = [
-      'add',
-      'checkout',
-      'commit',
-      'init',
-      'pull',
-      'push',
-      'remove'
-    ]
-
-    commandsToRegister.forEach(name => {
-      internalCommands.registerCommand(
-        name,
-        (dvcRoot: string, ...args: Args): Promise<string> =>
-          (this[name as keyof CliExecutor] as Function)(dvcRoot, ...args)
-      )
-    })
-  }
+  public commandsToRegister = [
+    'add',
+    'checkout',
+    'commit',
+    'init',
+    'pull',
+    'push',
+    'remove'
+  ]
 
   public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
