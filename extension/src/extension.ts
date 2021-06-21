@@ -56,7 +56,7 @@ type DecorationProviders = Record<string, DecorationProvider>
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
 
-  protected readonly internalCommands = new InternalCommands()
+  protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
@@ -94,13 +94,14 @@ export class Extension implements IExtension {
 
     this.config = this.dispose.track(new Config())
 
-    this.cliExecutor = this.dispose.track(
-      new CliExecutor(this.config, this.internalCommands)
-    )
-    this.cliReader = this.dispose.track(
-      new CliReader(this.config, this.internalCommands)
-    )
+    this.cliExecutor = this.dispose.track(new CliExecutor(this.config))
+    this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
+
+    this.internalCommands = new InternalCommands(
+      this.cliExecutor,
+      this.cliReader
+    )
 
     this.status = this.dispose.track(
       new Status([this.cliExecutor, this.cliReader, this.cliRunner])

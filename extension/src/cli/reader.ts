@@ -1,5 +1,4 @@
-import { EventEmitter } from 'vscode'
-import { Cli, CliResult } from '.'
+import { Cli } from '.'
 import {
   Args,
   Command,
@@ -10,8 +9,6 @@ import {
 } from './args'
 import { ExperimentsRepoJSONOutput } from '../experiments/contract'
 import { trimAndSplit } from '../util/stdout'
-import { Config } from '../config'
-import { InternalCommands } from '../internalCommands'
 
 export type PathOutput = { path: string }
 
@@ -51,26 +48,7 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class CliReader extends Cli {
-  constructor(
-    config: Config,
-    internalCommands: InternalCommands,
-    emitters?: {
-      processStarted: EventEmitter<void>
-      processCompleted: EventEmitter<CliResult>
-    }
-  ) {
-    super(config, emitters)
-
-    const commandsToRegister = ['listDvcOnly']
-
-    commandsToRegister.forEach(name => {
-      internalCommands.registerCommand(
-        name,
-        (dvcRoot: string, ...args: Args): Promise<string> =>
-          (this[name as keyof CliReader] as Function)(dvcRoot, ...args)
-      )
-    })
-  }
+  public commandsToRegister = ['listDvcOnly']
 
   public experimentListCurrent(cwd: string): Promise<string[]> {
     return this.readProcess<string[]>(

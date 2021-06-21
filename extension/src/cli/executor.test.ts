@@ -7,7 +7,6 @@ import { CliExecutor } from './executor'
 import { getProcessEnv } from '../env'
 import { Config } from '../config'
 import { executeProcess } from '../processExecution'
-import { InternalCommands } from '../internalCommands'
 
 jest.mock('vscode')
 jest.mock('../processExecution')
@@ -30,7 +29,6 @@ describe('CliExecutor', () => {
       getCliPath: () => undefined,
       pythonBinPath: undefined
     } as unknown as Config,
-    { registerCommand: jest.fn() } as unknown as InternalCommands,
     {
       processCompleted: {
         event: jest.fn(),

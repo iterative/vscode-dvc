@@ -10,7 +10,6 @@ import complexExperimentsOutput from '../../../experiments/webview/complex-outpu
 import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import { InternalCommands } from '../../../internalCommands'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -65,10 +64,7 @@ suite('Experiments Table Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const internalCommands = disposable.track(new InternalCommands())
-      const cliReader = disposable.track(
-        new CliReader(config, internalCommands)
-      )
+      const cliReader = disposable.track(new CliReader(config))
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -89,10 +85,7 @@ suite('Experiments Table Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const internalCommands = disposable.track(new InternalCommands())
-      const cliReader = disposable.track(
-        new CliReader(config, internalCommands)
-      )
+      const cliReader = disposable.track(new CliReader(config))
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
