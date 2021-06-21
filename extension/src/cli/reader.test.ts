@@ -7,6 +7,7 @@ import { executeProcess } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
 import { Config } from '../config'
+import { InternalCommands } from '../internalCommands'
 
 jest.mock('vscode')
 jest.mock('fs')
@@ -31,6 +32,7 @@ describe('CliReader', () => {
       getCliPath: () => undefined,
       pythonBinPath: undefined
     } as unknown as Config,
+    { registerCommand: jest.fn() } as unknown as InternalCommands,
     {
       processCompleted: {
         event: jest.fn(),

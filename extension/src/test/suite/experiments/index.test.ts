@@ -15,6 +15,7 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { runQueued } from '../../../experiments/runner'
+import { InternalCommands } from '../../../internalCommands'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -59,7 +60,10 @@ suite('Experiments Test Suite', () => {
       await setConfigValue('dvc.defaultProject', dvcDemoPath)
 
       const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(new InternalCommands())
+      const cliReader = disposable.track(
+        new CliReader(config, internalCommands)
+      )
       const configSpy = spy(config, 'getDefaultProject')
 
       const resourceLocator = disposable.track(
@@ -110,7 +114,10 @@ suite('Experiments Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(new InternalCommands())
+      const cliReader = disposable.track(
+        new CliReader(config, internalCommands)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -157,7 +164,10 @@ suite('Experiments Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(new InternalCommands())
+      const cliReader = disposable.track(
+        new CliReader(config, internalCommands)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -184,7 +194,10 @@ suite('Experiments Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = disposable.track(new InternalCommands())
+      const cliReader = disposable.track(
+        new CliReader(config, internalCommands)
+      )
       const cliRunner = disposable.track(new CliRunner(config))
       const mockRun = stub(cliRunner, 'run').resolves()
 
