@@ -28,7 +28,17 @@ describe('getResourceCommand', () => {
   it('should return a function that only calls the first function if it succeeds', async () => {
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)
-    const commandToRegister = getResourceCommand(mockedFunc)
+
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'commit') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getResourceCommand(
+      mockedInternalCommands,
+      'commit'
+    )
 
     const output = await commandToRegister({
       dvcRoot: mockedDvcRoot,
@@ -45,7 +55,16 @@ describe('getResourceCommand', () => {
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedShowGenericError.mockResolvedValueOnce(userCancelled)
-    const commandToRegister = getResourceCommand(mockedFunc)
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'checkout') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getResourceCommand(
+      mockedInternalCommands,
+      'checkout'
+    )
 
     const undef = await commandToRegister({
       dvcRoot: mockedDvcRoot,
@@ -61,7 +80,16 @@ describe('getResourceCommand', () => {
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
-    const commandToRegister = getResourceCommand(mockedFunc)
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'remove') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getResourceCommand(
+      mockedInternalCommands,
+      'remove'
+    )
 
     const undef = await commandToRegister({
       dvcRoot: mockedDvcRoot,
@@ -77,7 +105,13 @@ describe('getResourceCommand', () => {
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
-    const commandToRegister = getResourceCommand(mockedFunc)
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'pull') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getResourceCommand(mockedInternalCommands, 'pull')
 
     const undef = await commandToRegister({
       dvcRoot: mockedDvcRoot,
@@ -92,7 +126,16 @@ describe('getResourceCommand', () => {
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({})
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
-    const commandToRegister = getResourceCommand(mockedFunc)
+    mockedExecuteCommand.mockImplementationOnce((name, ...args) => {
+      if (name === 'not-a-function') {
+        return mockedFunc(...args)
+      }
+    })
+
+    const commandToRegister = getResourceCommand(
+      mockedInternalCommands,
+      'not-a-function'
+    )
 
     const undef = await commandToRegister({
       dvcRoot: mockedDvcRoot,
@@ -111,7 +154,16 @@ describe('getResourceCommand', () => {
       .mockRejectedValueOnce({ stderr })
       .mockResolvedValueOnce(forcedStdout)
     mockedGetWarningResponse.mockResolvedValueOnce(userApproves)
-    const commandToRegister = getResourceCommand(mockedFunc)
+    const mockPush = (name: string, ...args: string[]) => {
+      if (name === 'push') {
+        return mockedFunc(...args)
+      }
+    }
+    mockedExecuteCommand
+      .mockImplementationOnce(mockPush)
+      .mockImplementationOnce(mockPush)
+
+    const commandToRegister = getResourceCommand(mockedInternalCommands, 'push')
 
     const output = await commandToRegister({
       dvcRoot: mockedDvcRoot,

@@ -14,16 +14,6 @@ export type ResourceCommand = ({
 }) => Promise<string | undefined>
 
 export const getResourceCommand =
-  (
-    func: (cwd: string, target: string, ...args: Args) => Promise<string>
-  ): ResourceCommand =>
-  ({ dvcRoot, resourceUri }) => {
-    const relPath = relative(dvcRoot, resourceUri.fsPath)
-
-    return tryThenMaybeForce(func, dvcRoot, relPath)
-  }
-
-export const getResourceCommand_ =
   (internalCommands: InternalCommands, name: string): ResourceCommand =>
   ({ dvcRoot, resourceUri }) => {
     const relPath = relative(dvcRoot, resourceUri.fsPath)
