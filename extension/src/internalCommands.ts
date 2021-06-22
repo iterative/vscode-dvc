@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
+import { ICli } from './cli'
 import { Args } from './cli/args'
-import { CliExecutor } from './cli/executor'
-import { CliReader } from './cli/reader'
 import { Config } from './config'
 import { quickPickOne } from './vscode/quickPick'
 
@@ -30,7 +29,11 @@ export enum AvailableCommands {
   GET_DEFAULT_OR_PICK_PROJECT = 'getDefaultOrPickProject', // experiments
   GET_DEFAULT_PROJECT = 'getDefaultProject', // experiments
   GET_THEME = 'getTheme', // experiments
-  QUICK_PICK_ONE_PROJECT = 'quickPickOneProject' // experiments
+  QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
+
+  EXPERIMENT_RUN = 'runExperiment', // experiments
+  EXPERIMENT_RUN_RESET = 'runExperimentReset', // experiments
+  EXPERIMENT_RUN_QUEUED = 'runExperimentQueue' // experiments
 }
 
 export class InternalCommands {
@@ -38,9 +41,8 @@ export class InternalCommands {
 
   private readonly commands = new Map<string, Command>()
 
-  constructor(config: Config, cliExecutor: CliExecutor, cliReader: CliReader) {
-    this.registerCommands(cliExecutor)
-    this.registerCommands(cliReader)
+  constructor(config: Config, ...cliInteractors: ICli[]) {
+    cliInteractors.forEach(cli => this.registerCommands(cli))
 
     this.registerCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
@@ -83,7 +85,7 @@ export class InternalCommands {
     this.commands.set(id, command)
   }
 
-  private registerCommands(cli: CliExecutor | CliReader) {
+  private registerCommands(cli: ICli) {
     cli.commandsToRegister.forEach((name: string) => {
       this.registerCommand(
         name,

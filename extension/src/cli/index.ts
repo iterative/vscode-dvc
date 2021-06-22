@@ -20,9 +20,11 @@ export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   }
 }
 
-export type CliResult = { stderr?: string; command: string }
+export type CliResult = { stderr?: string; command: string; cwd: string }
 
 export interface ICli {
+  commandsToRegister: string[]
+
   processCompleted: EventEmitter<CliResult>
   onDidCompleteProcess: Event<CliResult>
 
@@ -32,6 +34,8 @@ export interface ICli {
 
 export class Cli implements ICli {
   public dispose = Disposable.fn()
+
+  public commandsToRegister: string[] = []
 
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
@@ -70,11 +74,11 @@ export class Cli implements ICli {
     try {
       this.processStarted.fire()
       const stdout = await executeProcess(options)
-      this.processCompleted.fire({ command })
+      this.processCompleted.fire({ command, cwd })
       return stdout
     } catch (error) {
       const cliError = new CliError({ baseError: error, options })
-      this.processCompleted.fire({ command, stderr: cliError.stderr })
+      this.processCompleted.fire({ command, cwd, stderr: cliError.stderr })
       throw cliError
     }
   }

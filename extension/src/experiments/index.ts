@@ -7,7 +7,6 @@ import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
-import { CliRunner } from '../cli/runner'
 import { reset } from '../util/disposable'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 
@@ -125,8 +124,7 @@ export class Experiments {
   }
 
   public showExperimentsTableThenRun = async (
-    cliRunner: CliRunner,
-    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
+    commandName: AvailableCommands
   ) => {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
@@ -138,14 +136,7 @@ export class Experiments {
       return
     }
 
-    func(cliRunner, dvcRoot)
-    const listener = cliRunner.dispose.track(
-      cliRunner.onDidCompleteProcess(() => {
-        experimentsTable.refresh()
-        cliRunner.dispose.untrack(listener)
-        listener.dispose()
-      })
-    )
+    this.internalCommands.executeCommand(commandName, dvcRoot)
     return experimentsTable
   }
 
@@ -173,6 +164,11 @@ export class Experiments {
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
     const experimentsTable = this.experiments[dvcRoot]
     experimentsTable.onDidChangeData(gitRoot)
+  }
+
+  public refreshData(dvcRoot: string) {
+    const experimentsTable = this.experiments[dvcRoot]
+    experimentsTable?.refresh()
   }
 
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {

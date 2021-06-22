@@ -1,8 +1,6 @@
 import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
-import { run, runQueued, runReset, stop } from '../runner'
 import { Experiments } from '..'
-import { CliRunner } from '../../cli/runner'
 import { AvailableCommands } from '../../internalCommands'
 
 const registerExperimentCwdCommands = (experiments: Experiments): void => {
@@ -51,37 +49,27 @@ const registerExperimentQuickPickCommands = (
   )
 }
 
-const registerExperimentExecutorCommands = (experiments: Experiments): void => {
-  registerExperimentCwdCommands(experiments)
-  registerExperimentNameCommands(experiments)
-  registerExperimentInputCommands(experiments)
-  registerExperimentQuickPickCommands(experiments)
-}
-
-const registerExperimentRunnerCommands = (
-  experiments: Experiments,
-  cliRunner: CliRunner
-): void => {
+const registerExperimentRunCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      experiments.showExperimentsTableThenRun(cliRunner, run)
+      experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      experiments.showExperimentsTableThenRun(cliRunner, runReset)
+      experiments.showExperimentsTableThenRun(
+        AvailableCommands.EXPERIMENT_RUN_RESET
+      )
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      experiments.showExperimentsTableThenRun(cliRunner, runQueued)
+      experiments.showExperimentsTableThenRun(
+        AvailableCommands.EXPERIMENT_RUN_QUEUED
+      )
     )
-  )
-
-  experiments.dispose.track(
-    commands.registerCommand('dvc.stopRunningExperiment', () => stop(cliRunner))
   )
 
   experiments.dispose.track(
@@ -91,10 +79,10 @@ const registerExperimentRunnerCommands = (
   )
 }
 
-export const registerExperimentCommands = (
-  experiments: Experiments,
-  cliRunner: CliRunner
-) => {
-  registerExperimentExecutorCommands(experiments)
-  registerExperimentRunnerCommands(experiments, cliRunner)
+export const registerExperimentCommands = (experiments: Experiments) => {
+  registerExperimentCwdCommands(experiments)
+  registerExperimentNameCommands(experiments)
+  registerExperimentInputCommands(experiments)
+  registerExperimentQuickPickCommands(experiments)
+  registerExperimentRunCommands(experiments)
 }
