@@ -1,6 +1,6 @@
 import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
-import { runQueued, stop } from '../runner'
+import { stop } from '../runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { AvailableCommands } from '../../internalCommands'
@@ -64,13 +64,13 @@ const registerExperimentRunnerCommands = (
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.runExperiment', () =>
-      experiments.showExperimentsTableThenRun_(AvailableCommands.EXPERIMENT_RUN)
+      experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.runResetExperiment', () =>
-      experiments.showExperimentsTableThenRun_(
+      experiments.showExperimentsTableThenRun(
         AvailableCommands.EXPERIMENT_RUN_RESET
       )
     )
@@ -78,7 +78,9 @@ const registerExperimentRunnerCommands = (
 
   experiments.dispose.track(
     commands.registerCommand('dvc.runQueuedExperiments', () =>
-      experiments.showExperimentsTableThenRun(cliRunner, runQueued)
+      experiments.showExperimentsTableThenRun(
+        AvailableCommands.EXPERIMENT_RUN_QUEUED
+      )
     )
   )
 

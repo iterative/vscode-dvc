@@ -7,7 +7,6 @@ import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
-import { CliRunner } from '../cli/runner'
 import { reset } from '../util/disposable'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 
@@ -124,7 +123,7 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  public showExperimentsTableThenRun_ = async (
+  public showExperimentsTableThenRun = async (
     commandName: AvailableCommands
   ) => {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
@@ -138,31 +137,6 @@ export class Experiments {
     }
 
     this.internalCommands.executeCommand(commandName, dvcRoot)
-    return experimentsTable
-  }
-
-  public showExperimentsTableThenRun = async (
-    cliRunner: CliRunner,
-    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
-  ) => {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    const experimentsTable = await this.showExperimentsWebview(dvcRoot)
-    if (!experimentsTable) {
-      return
-    }
-
-    func(cliRunner, dvcRoot)
-    const listener = cliRunner.dispose.track(
-      cliRunner.onDidCompleteProcess(() => {
-        experimentsTable.refresh()
-        cliRunner.dispose.untrack(listener)
-        listener.dispose()
-      })
-    )
     return experimentsTable
   }
 

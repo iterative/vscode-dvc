@@ -14,8 +14,7 @@ import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
-import { runQueued } from '../../../experiments/runner'
-import { InternalCommands } from '../../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { CliExecutor } from '../../../cli/executor'
 
 chai.use(sinonChai)
@@ -198,10 +197,10 @@ suite('Experiments Test Suite', () => {
       const config = disposable.track(new Config())
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliExecutor, cliReader)
-      )
       const cliRunner = disposable.track(new CliRunner(config))
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliExecutor, cliReader, cliRunner)
+      )
       const mockRun = stub(cliRunner, 'run').resolves()
 
       const resourceLocator = disposable.track(
@@ -224,7 +223,9 @@ suite('Experiments Test Suite', () => {
 
       const focused = onDidChangeIsWebviewFocused(experimentsTable)
 
-      await experiments.showExperimentsTableThenRun(cliRunner, runQueued)
+      await experiments.showExperimentsTableThenRun(
+        AvailableCommands.EXPERIMENT_RUN_QUEUED
+      )
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
@@ -234,7 +235,9 @@ suite('Experiments Test Suite', () => {
       mockQuickPickOne.resetHistory()
 
       const focusedExperimentsTable =
-        await experiments.showExperimentsTableThenRun(cliRunner, runQueued)
+        await experiments.showExperimentsTableThenRun(
+          AvailableCommands.EXPERIMENT_RUN_QUEUED
+        )
 
       expect(focusedExperimentsTable).to.equal(experimentsTable)
       expect(mockQuickPickOne).not.to.be.called

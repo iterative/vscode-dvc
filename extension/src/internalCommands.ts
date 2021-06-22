@@ -32,7 +32,8 @@ export enum AvailableCommands {
   QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
 
   EXPERIMENT_RUN = 'runExperiment', // experiments
-  EXPERIMENT_RUN_RESET = 'runExperimentReset' // experiments
+  EXPERIMENT_RUN_RESET = 'runExperimentReset', // experiments
+  EXPERIMENT_RUN_QUEUED = 'runExperimentQueue' // experiments
 }
 
 export class InternalCommands {

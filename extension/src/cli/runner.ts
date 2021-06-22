@@ -11,7 +11,11 @@ import { setContextValue } from '../vscode/context'
 export class CliRunner implements ICli {
   public readonly dispose = Disposable.fn()
 
-  public readonly commandsToRegister = ['runExperiment', 'runExperimentReset']
+  public readonly commandsToRegister = [
+    'runExperiment',
+    'runExperimentReset',
+    'runExperimentQueue'
+  ]
 
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
@@ -97,7 +101,7 @@ export class CliRunner implements ICli {
     return this.runExperiment(dvcRoot, ExperimentFlag.RESET)
   }
 
-  public runExperimentsQueued(dvcRoot: string) {
+  public runExperimentQueue(dvcRoot: string) {
     return this.runExperiment(dvcRoot, ExperimentFlag.RUN_ALL)
   }
 
