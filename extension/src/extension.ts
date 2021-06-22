@@ -40,6 +40,7 @@ import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
+import { InternalCommands } from './internalCommands'
 
 export { Disposable, Disposer }
 
@@ -54,6 +55,8 @@ type DecorationProviders = Record<string, DecorationProvider>
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
+
+  protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
@@ -95,6 +98,11 @@ export class Extension implements IExtension {
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
+    this.internalCommands = new InternalCommands(
+      this.cliExecutor,
+      this.cliReader
+    )
+
     this.status = this.dispose.track(
       new Status([this.cliExecutor, this.cliReader, this.cliRunner])
     )
@@ -113,8 +121,7 @@ export class Extension implements IExtension {
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(
         this.config,
-        this.cliReader,
-        this.cliExecutor,
+        this.internalCommands,
         this.workspaceChanged
       )
     )
@@ -145,7 +152,7 @@ export class Extension implements IExtension {
       this.cliRunner
     )
 
-    registerRepositoryCommands(this.cliExecutor)
+    registerRepositoryCommands(this.internalCommands)
 
     this.registerConfigCommands()
 

@@ -14,18 +14,17 @@ import { Config } from '../../config'
 import { definedAndNonEmpty } from '../../util/array'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
-import { CliExecutor } from '../../cli/executor'
-import { CliReader } from '../../cli/reader'
+import { ListOutput } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
 import { tryThenMaybeForce } from '../../cli/actions'
+import { InternalCommands } from '../../internalCommands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
 
-  private readonly cliReader: CliReader
-  private readonly cliExecutor: CliExecutor
+  private readonly internalCommands: InternalCommands
   private readonly treeDataChanged: EventEmitter<string | void>
 
   private config: Config
@@ -45,14 +44,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   constructor(
     config: Config,
-    cliReader: CliReader,
-    cliExecutor: CliExecutor,
+    internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
     this.config = config
-    this.cliReader = cliReader
-    this.cliExecutor = cliExecutor
+    this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)
 
@@ -141,12 +138,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     if (response === 'Pull File') {
-      return tryThenMaybeForce(
-        (dvcRoot, relPath, ...args) =>
-          this.cliExecutor.pull(dvcRoot, relPath, ...args),
-        dvcRoot,
-        relPath
-      )
+      return tryThenMaybeForce(this.internalCommands, 'pull', dvcRoot, relPath)
     }
 
     if (response === this.doNotShowAgainText) {
@@ -220,7 +212,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return []
     }
 
-    const listOutput = await this.cliReader.listDvcOnly(
+    const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
+      'listDvcOnly',
       root,
       relative(root, path)
     )
@@ -239,7 +232,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       commands.registerCommand('dvc.init', async () => {
         const root = this.config.getFirstWorkspaceFolderRoot()
         if (root) {
-          await this.cliExecutor.init(root)
+          await this.internalCommands.executeCommand('init', root)
         }
         workspaceChanged.fire()
       })
@@ -262,32 +255,30 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         this.treeDataChanged.fire()
         const dvcRoot = this.pathRoots[path]
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-        return this.cliExecutor.remove(dvcRoot, relPath)
+        return this.internalCommands.executeCommand('remove', dvcRoot, relPath)
       })
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.pullTarget', path => {
-        const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          (dvcRoot, relPath, ...args) =>
-            this.cliExecutor.pull(dvcRoot, relPath, ...args),
-          dvcRoot,
-          relative(dvcRoot, path)
-        )
-      })
+      commands.registerCommand('dvc.pullTarget', path =>
+        this.tryThenMaybeForce('pull', path)
+      )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.pushTarget', path => {
-        const dvcRoot = this.pathRoots[path]
-        return tryThenMaybeForce(
-          (dvcRoot, relPath, ...args) =>
-            this.cliExecutor.push(dvcRoot, relPath, ...args),
-          dvcRoot,
-          relative(dvcRoot, path)
-        )
-      })
+      commands.registerCommand('dvc.pushTarget', path =>
+        this.tryThenMaybeForce('push', path)
+      )
+    )
+  }
+
+  private tryThenMaybeForce(name: string, path: string) {
+    const dvcRoot = this.pathRoots[path]
+    return tryThenMaybeForce(
+      this.internalCommands,
+      name,
+      dvcRoot,
+      relative(dvcRoot, path)
     )
   }
 }

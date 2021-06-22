@@ -7,8 +7,17 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
-
 export class CliExecutor extends Cli {
+  public commandsToRegister = [
+    'add',
+    'checkout',
+    'commit',
+    'init',
+    'pull',
+    'push',
+    'remove'
+  ]
+
   public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }

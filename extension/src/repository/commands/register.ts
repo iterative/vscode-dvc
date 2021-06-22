@@ -6,89 +6,67 @@ import {
   ResourceCommand,
   RootCommand
 } from '.'
-import { Args } from '../../cli/args'
-import { CliExecutor } from '../../cli/executor'
+import { InternalCommands } from '../../internalCommands'
 
 const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
   commands.registerCommand(name, func)
 
-const registerAddCommand = (cliExecutor: CliExecutor): void => {
-  cliExecutor.dispose.track(
+const registerAddCommand = (internalCommands: InternalCommands): void => {
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.addTarget',
-      getSimpleResourceCommand((cwd: string, target: string) =>
-        cliExecutor.add(cwd, target)
-      )
+      getSimpleResourceCommand(internalCommands, 'add')
     )
   )
 }
 
-const registerCheckoutCommands = (cliExecutor: CliExecutor): void => {
-  cliExecutor.dispose.track(
+const registerCheckoutCommands = (internalCommands: InternalCommands): void => {
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.checkout',
-      getRootCommand((cwd: string, ...args: Args) =>
-        cliExecutor.checkout(cwd, ...args)
-      )
+      getRootCommand(internalCommands, 'checkout')
     )
   )
 
-  cliExecutor.dispose.track(
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.checkoutTarget',
-      getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.checkout(cwd, target, ...args)
-      )
+      getResourceCommand(internalCommands, 'checkout')
     )
   )
 }
 
-const registerCommitCommands = (cliExecutor: CliExecutor): void => {
-  cliExecutor.dispose.track(
+const registerCommitCommands = (internalCommands: InternalCommands): void => {
+  internalCommands.dispose.track(
     registerCommand(
       'dvc.commitTarget',
-      getResourceCommand((cwd: string, target: string, ...args: Args) =>
-        cliExecutor.commit(cwd, target, ...args)
-      )
+      getResourceCommand(internalCommands, 'commit')
     )
   )
 
-  cliExecutor.dispose.track(
-    registerCommand(
-      'dvc.commit',
-      getRootCommand((cwd: string, ...args: Args) =>
-        cliExecutor.commit(cwd, ...args)
-      )
-    )
+  internalCommands.dispose.track(
+    registerCommand('dvc.commit', getRootCommand(internalCommands, 'commit'))
   )
 }
 
-const registerPullCommand = (cliExecutor: CliExecutor) => {
-  cliExecutor.dispose.track(
-    registerCommand(
-      'dvc.pull',
-      getRootCommand((cwd: string, ...args: Args) =>
-        cliExecutor.pull(cwd, ...args)
-      )
-    )
+const registerPullCommand = (internalCommands: InternalCommands) => {
+  internalCommands.dispose.track(
+    registerCommand('dvc.pull', getRootCommand(internalCommands, 'pull'))
   )
 }
 
-const registerPushCommand = (cliExecutor: CliExecutor) => {
-  cliExecutor.dispose.track(
-    registerCommand(
-      'dvc.push',
-      getRootCommand((cwd: string, ...args: Args) =>
-        cliExecutor.push(cwd, ...args)
-      )
-    )
+const registerPushCommand = (internalCommands: InternalCommands) => {
+  internalCommands.dispose.track(
+    registerCommand('dvc.push', getRootCommand(internalCommands, 'push'))
   )
 }
 
-export const registerRepositoryCommands = (cliExecutor: CliExecutor): void => {
-  registerAddCommand(cliExecutor)
-  registerCheckoutCommands(cliExecutor)
-  registerCommitCommands(cliExecutor)
-  registerPullCommand(cliExecutor)
-  registerPushCommand(cliExecutor)
+export const registerRepositoryCommands = (
+  internalCommands: InternalCommands
+): void => {
+  registerAddCommand(internalCommands)
+  registerCheckoutCommands(internalCommands)
+  registerCommitCommands(internalCommands)
+  registerPullCommand(internalCommands)
+  registerPushCommand(internalCommands)
 }
