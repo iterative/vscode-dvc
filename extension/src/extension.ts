@@ -40,6 +40,7 @@ import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
+import { InternalCommands } from './internalCommands'
 
 export { Disposable, Disposer }
 
@@ -54,6 +55,8 @@ type DecorationProviders = Record<string, DecorationProvider>
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
+
+  protected readonly internalCommands: InternalCommands
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
@@ -95,12 +98,25 @@ export class Extension implements IExtension {
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
+    this.internalCommands = new InternalCommands(
+      this.config,
+      this.cliExecutor,
+      this.cliReader,
+      this.cliRunner
+    )
+
     this.status = this.dispose.track(
       new Status([this.cliExecutor, this.cliReader, this.cliRunner])
     )
 
     this.experiments = this.dispose.track(
-      new Experiments(this.config, this.cliReader)
+      new Experiments(this.internalCommands)
+    )
+
+    this.dispose.track(
+      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+        this.experiments.refreshData(cwd)
+      })
     )
 
     this.dispose.track(
@@ -113,8 +129,7 @@ export class Extension implements IExtension {
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(
         this.config,
-        this.cliReader,
-        this.cliExecutor,
+        this.internalCommands,
         this.workspaceChanged
       )
     )
@@ -134,18 +149,19 @@ export class Extension implements IExtension {
     )
 
     this.webviewSerializer = new WebviewSerializer(
-      this.config,
+      this.internalCommands,
       this.experiments
     )
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(
-      this.experiments,
-      this.cliExecutor,
-      this.cliRunner
+    registerExperimentCommands(this.experiments)
+    this.dispose.track(
+      commands.registerCommand('dvc.stopRunningExperiment', () =>
+        this.cliRunner.stop()
+      )
     )
 
-    registerRepositoryCommands(this.cliExecutor)
+    registerRepositoryCommands(this.internalCommands)
 
     this.registerConfigCommands()
 
@@ -232,7 +248,7 @@ export class Extension implements IExtension {
     this.dvcRoots.forEach(dvcRoot => {
       const repository = new Repository(
         dvcRoot,
-        this.cliReader,
+        this.internalCommands,
         this.decorationProviders[dvcRoot]
       )
 

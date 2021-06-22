@@ -10,6 +10,8 @@ import complexExperimentsOutput from '../../../experiments/webview/complex-outpu
 import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
+import { InternalCommands } from '../../../internalCommands'
+import { CliExecutor } from '../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -34,14 +36,17 @@ suite('Experiments Table Test Suite', () => {
   describe('refresh', () => {
     it('should return early if an update is in progress', async () => {
       const stubbedExperimentShow = stub().resolves(complexExperimentsOutput)
-      const testCliReader = {
-        experimentShow: stubbedExperimentShow
-      } as unknown as CliReader
+      const internalCommands = {
+        executeCommand: (name: string) => {
+          if (name === 'experimentShow') {
+            return stubbedExperimentShow()
+          }
+        }
+      } as unknown as InternalCommands
 
       const testTable = new ExperimentsTable(
         'demo',
-        {} as Config,
-        testCliReader,
+        internalCommands,
         {} as ResourceLocator
       )
       await testTable.isReady()
@@ -64,13 +69,19 @@ suite('Experiments Table Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
+      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = new InternalCommands(
+        config,
+        cliExecutor,
+        cliReader
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, config, cliReader, resourceLocator)
+        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
       )
 
       const webview = await experimentsTable.showWebview()
@@ -85,12 +96,18 @@ suite('Experiments Table Test Suite', () => {
       )
 
       const config = disposable.track(new Config())
+      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      const internalCommands = new InternalCommands(
+        config,
+        cliExecutor,
+        cliReader
+      )
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, config, cliReader, resourceLocator)
+        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

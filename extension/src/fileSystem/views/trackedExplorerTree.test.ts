@@ -4,8 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { TrackedExplorerTree } from './trackedExplorerTree'
 import { Config } from '../../config'
-import { CliReader } from '../../cli/reader'
-import { CliExecutor } from '../../cli/executor'
+import { InternalCommands } from '../../internalCommands'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
@@ -27,6 +26,13 @@ const mockedConfig = {
   getCliPath: mockedGetCliPath,
   getDefaultProject: mockedGetDefaultProject
 } as unknown as Config
+
+const mockedListDvcOnly = jest.fn()
+const mockedExecuteCommand = (name: string, ...args: string[]) => {
+  if (name === 'listDvcOnly') {
+    return mockedListDvcOnly(...args)
+  }
+}
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -55,8 +61,7 @@ describe('TrackedTreeView', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        {} as CliReader,
-        {} as CliExecutor,
+        {} as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -68,13 +73,13 @@ describe('TrackedTreeView', () => {
 
   describe('getChildren', () => {
     it('should get the children for the provided element', async () => {
-      const mockedListDvcOnly = jest.fn()
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        { listDvcOnly: mockedListDvcOnly } as unknown as CliReader,
-        {} as CliExecutor,
+        {
+          executeCommand: mockedExecuteCommand
+        } as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -105,13 +110,13 @@ describe('TrackedTreeView', () => {
         return mockedItem
       })
 
-      const mockedListDvcOnly = jest.fn()
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        { listDvcOnly: mockedListDvcOnly } as unknown as CliReader,
-        {} as CliExecutor,
+        {
+          executeCommand: mockedExecuteCommand
+        } as unknown as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -140,8 +145,7 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        {} as CliReader,
-        {} as CliExecutor,
+        {} as InternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )

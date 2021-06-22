@@ -7,8 +7,21 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
-
 export class CliExecutor extends Cli {
+  public commandsToRegister = [
+    'add',
+    'checkout',
+    'commit',
+    'experimentApply',
+    'experimentBranch',
+    'experimentRemove',
+    'experimentRunQueue',
+    'init',
+    'pull',
+    'push',
+    'remove'
+  ]
+
   public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)
   }
@@ -44,7 +57,7 @@ export class CliExecutor extends Cli {
 
   public experimentGarbageCollect(
     cwd: string,
-    preserveFlags: GcPreserveFlag[]
+    ...preserveFlags: GcPreserveFlag[]
   ) {
     return this.executeExperimentProcess(
       cwd,

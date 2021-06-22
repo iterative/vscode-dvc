@@ -48,6 +48,15 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export class CliReader extends Cli {
+  public commandsToRegister = [
+    'experimentListCurrent',
+    'experimentShow',
+    'diff',
+    'listDvcOnly',
+    'listDvcOnlyRecursive',
+    'status'
+  ]
+
   public experimentListCurrent(cwd: string): Promise<string[]> {
     return this.readProcess<string[]>(
       cwd,

@@ -2,16 +2,13 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
-import { pickExperimentName } from './quickPick'
 import { ExperimentsTable } from './table'
-import { CliReader } from '../cli/reader'
-import { Config } from '../config'
+import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
-import { quickPickOne } from '../vscode/quickPick'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
-import { CliRunner } from '../cli/runner'
 import { reset } from '../util/disposable'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 
 type ExperimentsTables = Record<string, ExperimentsTable>
 
@@ -22,21 +19,18 @@ export class Experiments {
   public dispose = Disposable.fn()
 
   private experiments: ExperimentsTables = {}
-  private config: Config
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
-  private readonly cliReader: CliReader
+  private readonly internalCommands: InternalCommands
 
   constructor(
-    config: Config,
-    cliReader: CliReader,
+    internalCommands: InternalCommands,
     experiments?: Record<string, ExperimentsTable>
   ) {
     makeObservable(this)
 
-    this.config = config
-    this.cliReader = cliReader
+    this.internalCommands = internalCommands
     if (experiments) {
       this.experiments = experiments
     }
@@ -53,36 +47,34 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
+  public getCwdThenRun = async (commandName: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    report(func(cwd))
+    report(this.internalCommands.executeCommand(commandName, cwd))
   }
 
-  public getExpNameThenRun = async (
-    func: (cwd: string, experimentName: string) => Promise<string>
-  ) => {
+  public getExpNameThenRun = async (commandName: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    const name = await pickExperimentName(
-      this.cliReader.experimentListCurrent(cwd)
+    const experimentName = await this.pickExperimentName(cwd)
+
+    if (!experimentName) {
+      return
+    }
+    return report(
+      this.internalCommands.executeCommand(commandName, cwd, experimentName)
     )
-
-    if (!name) {
-      return
-    }
-    return report(func(cwd, name))
   }
 
-  public getCwdAndQuickPickThenRun = async <T>(
-    func: (cwd: string, result: T) => Promise<string>,
-    quickPick: () => Thenable<T | undefined>
+  public getCwdAndQuickPickThenRun = async (
+    commandName: AvailableCommands,
+    quickPick: () => Thenable<string[] | undefined>
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
@@ -91,12 +83,12 @@ export class Experiments {
     const result = await quickPick()
 
     if (result) {
-      report(func(cwd, result))
+      report(this.internalCommands.executeCommand(commandName, cwd, ...result))
     }
   }
 
   public getExpNameAndInputThenRun = async (
-    func: (cwd: string, experiment: string, input: string) => Promise<string>,
+    commandName: AvailableCommands,
     prompt: string
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
@@ -104,21 +96,26 @@ export class Experiments {
       return
     }
 
-    const name = await pickExperimentName(
-      this.cliReader.experimentListCurrent(cwd)
-    )
+    const experimentName = await this.pickExperimentName(cwd)
 
-    if (!name) {
+    if (!experimentName) {
       return
     }
     const input = await getInput(prompt)
     if (input) {
-      report(func(cwd, name, input))
+      report(
+        this.internalCommands.executeCommand(
+          commandName,
+          cwd,
+          experimentName,
+          input
+        )
+      )
     }
   }
 
   public async showExperimentsTable() {
-    const dvcRoot = await this.getDefaultOrPickDvcRoot()
+    const dvcRoot = await this.getDefaultOrPickProject()
     if (!dvcRoot) {
       return
     }
@@ -127,8 +124,7 @@ export class Experiments {
   }
 
   public showExperimentsTableThenRun = async (
-    cliRunner: CliRunner,
-    func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
+    commandName: AvailableCommands
   ) => {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
@@ -140,14 +136,7 @@ export class Experiments {
       return
     }
 
-    func(cliRunner, dvcRoot)
-    const listener = cliRunner.dispose.track(
-      cliRunner.onDidCompleteProcess(() => {
-        experimentsTable.refresh()
-        cliRunner.dispose.untrack(listener)
-        listener.dispose()
-      })
-    )
+    this.internalCommands.executeCommand(commandName, dvcRoot)
     return experimentsTable
   }
 
@@ -177,6 +166,11 @@ export class Experiments {
     experimentsTable.onDidChangeData(gitRoot)
   }
 
+  public refreshData(dvcRoot: string) {
+    const experimentsTable = this.experiments[dvcRoot]
+    experimentsTable?.refresh()
+  }
+
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
     const experimentsTable = this.experiments[dvcRoot]
     if (!experimentsTable) {
@@ -186,31 +180,24 @@ export class Experiments {
     experimentsTable.setWebview(experimentsWebview)
   }
 
-  private async getDvcRoot(
-    chooserFn: (keys: string[]) => string | Thenable<string | undefined>
-  ) {
-    const keys = Object.keys(this.experiments)
-    if (keys.length === 1) {
-      return keys[0]
-    }
-    return await chooserFn(keys)
+  private getFocusedOrDefaultOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getDefaultOrPickProject()
   }
 
-  private getFocusedOrDefaultOrPickProject = () =>
-    this.getDvcRoot(
-      keys =>
-        this.focusedWebviewDvcRoot ||
-        this.config.getDefaultProject() ||
-        this.showDvcRootQuickPick(keys)
+  private getDefaultOrPickProject() {
+    return this.internalCommands.executeCommand(
+      AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
+      ...Object.keys(this.experiments)
     )
+  }
 
-  private getDefaultOrPickDvcRoot = () =>
-    this.getDvcRoot(
-      keys => this.config.getDefaultProject() || this.showDvcRootQuickPick(keys)
+  private pickExperimentName(cwd: string) {
+    return pickExperimentName(
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_LIST_CURRENT,
+        cwd
+      )
     )
-
-  private showDvcRootQuickPick(keys: string[]) {
-    return quickPickOne(keys, 'Select which project to run command against')
   }
 
   private async showExperimentsWebview(
@@ -226,12 +213,7 @@ export class Experiments {
     resourceLocator: ResourceLocator
   ) {
     const experimentsTable = this.dispose.track(
-      new ExperimentsTable(
-        dvcRoot,
-        this.config,
-        this.cliReader,
-        resourceLocator
-      )
+      new ExperimentsTable(dvcRoot, this.internalCommands, resourceLocator)
     )
 
     this.experiments[dvcRoot] = experimentsTable
