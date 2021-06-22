@@ -454,7 +454,7 @@
       ],
       "dvc-container": [
         {
-          "id": "dvc-columns",
+          "id": "dvc.views.columnsTree",
           "name": "Columns",
           "when": "true"
         }

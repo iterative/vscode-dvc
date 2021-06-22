@@ -40,7 +40,7 @@ import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
-
+import { ColumnsTree } from './experiments/columnsTree' // temp
 export { Disposable, Disposer }
 
 if (process.env.HOT_RELOAD) {
@@ -63,6 +63,7 @@ export class Extension implements IExtension {
   private repositories: Repositories = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
+  private readonly columnsTree: ColumnsTree // temp
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
@@ -118,6 +119,8 @@ export class Extension implements IExtension {
         this.workspaceChanged
       )
     )
+
+    this.columnsTree = new ColumnsTree() // temp
 
     setup(this)
 
@@ -179,6 +182,7 @@ export class Extension implements IExtension {
     Promise.all([
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
+      this.columnsTree.initialize(),
       this.initializeExperiments(),
       this.setAvailable(true)
     ])
