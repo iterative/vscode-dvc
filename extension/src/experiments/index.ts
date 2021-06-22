@@ -118,10 +118,7 @@ export class Experiments {
   }
 
   public async showExperimentsTable() {
-    const dvcRoot = await this.internalCommands.executeCommand(
-      AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
-      ...Object.keys(this.experiments)
-    )
+    const dvcRoot = await this.getDefaultOrPickProject()
     if (!dvcRoot) {
       return
     }
@@ -190,12 +187,13 @@ export class Experiments {
   }
 
   private getFocusedOrDefaultOrPickProject() {
-    return (
-      this.focusedWebviewDvcRoot ||
-      this.internalCommands.executeCommand(
-        AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
-        ...Object.keys(this.experiments)
-      )
+    return this.focusedWebviewDvcRoot || this.getDefaultOrPickProject()
+  }
+
+  private getDefaultOrPickProject() {
+    return this.internalCommands.executeCommand(
+      AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
+      ...Object.keys(this.experiments)
     )
   }
 
