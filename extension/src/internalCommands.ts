@@ -31,7 +31,8 @@ export enum AvailableCommands {
   GET_THEME = 'getTheme', // experiments
   QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
 
-  RUN_EXPERIMENT = 'runExperiment' // experiments
+  EXPERIMENT_RUN = 'runExperiment', // experiments
+  EXPERIMENT_RUN_RESET = 'runExperimentReset' // experiments
 }
 
 export class InternalCommands {

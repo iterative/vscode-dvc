@@ -3,7 +3,7 @@ import { mocked } from 'ts-jest/utils'
 import { Experiments } from '.'
 import { ExperimentsTable } from './table'
 import { pickExperimentName } from './quickPick'
-import { runQueued, runReset } from './runner'
+import { runQueued } from './runner'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
@@ -61,7 +61,7 @@ describe('Experiments', () => {
           return mockedGetDefaultOrPickProject(args)
         }
 
-        if (name === 'runExperiment') {
+        if (['runExperiment', 'runExperimentReset'].includes(name)) {
           return mockedRun(...args)
         }
       },
@@ -240,15 +240,33 @@ describe('Experiments', () => {
   })
 
   describe('showExperimentsTableThenRun_', () => {
-    it('should call the runner with the correct args when runQueued is provided', async () => {
+    it('should call the runner with the correct args when run experiment is provided', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
 
       await experiments.showExperimentsTableThenRun_(
-        AvailableCommands.RUN_EXPERIMENT
+        AvailableCommands.EXPERIMENT_RUN
       )
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).not.toBeCalled()
+      expect(mockedShowWebview).toBeCalledTimes(1)
+      expect(mockedRun).toBeCalledWith(mockedDvcRoot)
+    })
+
+    it('should call the runner with the correct args when run experiment reset is provided', async () => {
+      mockedGetDefaultProject.mockReturnValueOnce(undefined)
+      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
+
+      await experiments.showExperimentsTableThenRun_(
+        AvailableCommands.EXPERIMENT_RUN_RESET
+      )
+
+      expect(mockedGetDefaultProject).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).toBeCalledWith(
+        [mockedDvcRoot, mockedOtherDvcRoot],
+        mockedPrompt
+      )
       expect(mockedShowWebview).toBeCalledTimes(1)
       expect(mockedRun).toBeCalledWith(mockedDvcRoot)
     })
@@ -271,29 +289,6 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).not.toBeCalled()
       expect(mockedShowWebview).toBeCalledTimes(1)
       expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--run-all')
-    })
-
-    it('should call the runner with the correct args when runReset is provided', async () => {
-      mockedGetDefaultProject.mockReturnValueOnce(undefined)
-      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-
-      await experiments.showExperimentsTableThenRun(
-        {
-          dispose: { track: jest.fn() },
-          onDidCompleteProcess: jest.fn(),
-          run: mockedRun
-        } as unknown as CliRunner,
-        runReset
-      )
-
-      expect(mockedGetDefaultProject).toBeCalledTimes(1)
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedQuickPickOne).toBeCalledWith(
-        [mockedDvcRoot, mockedOtherDvcRoot],
-        mockedPrompt
-      )
-      expect(mockedShowWebview).toBeCalledTimes(1)
-      expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--reset')
     })
   })
 })
