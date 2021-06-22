@@ -6,19 +6,19 @@ import { CliReader } from './cli/reader'
 type Command = (...args: Args) => unknown | Promise<unknown>
 
 export enum AvailableCommands {
-  ADD = 'add',
-  CHECKOUT = 'checkout',
-  COMMIT = 'commit',
-  DIFF = 'diff',
-  INIT = 'init',
-  LIST_DVC_ONLY = 'listDvcOnly',
-  LIST_DVC_ONLY_RECURSIVE = 'listDvcOnlyRecursive',
-  PULL = 'pull',
-  PUSH = 'push',
-  REMOVE = 'remove',
-  STATUS = 'status',
-  EXPERIMENT_LIST_CURRENT = 'experimentListCurrent',
-  EXPERIMENT_SHOW = 'experimentShow'
+  ADD = 'add', // scm
+  CHECKOUT = 'checkout', // scm & explorer
+  COMMIT = 'commit', // scm & explorer
+  DIFF = 'diff', // scm & decoration
+  EXPERIMENT_LIST_CURRENT = 'experimentListCurrent', // experiments
+  EXPERIMENT_SHOW = 'experimentShow', // experiments
+  INIT = 'init', // explorer welcome
+  LIST_DVC_ONLY = 'listDvcOnly', // explorer
+  LIST_DVC_ONLY_RECURSIVE = 'listDvcOnlyRecursive', // scm & decoration
+  PULL = 'pull', // scm & explorer
+  PUSH = 'push', // scm & explorer
+  REMOVE = 'remove', // explorer
+  STATUS = 'status' // scm & decoration
 }
 
 export class InternalCommands {
