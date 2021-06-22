@@ -99,6 +99,7 @@ export class Extension implements IExtension {
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
     this.internalCommands = new InternalCommands(
+      this.config,
       this.cliExecutor,
       this.cliReader
     )
@@ -108,7 +109,7 @@ export class Extension implements IExtension {
     )
 
     this.experiments = this.dispose.track(
-      new Experiments(this.config, this.cliReader)
+      new Experiments(this.config, this.internalCommands)
     )
 
     this.dispose.track(

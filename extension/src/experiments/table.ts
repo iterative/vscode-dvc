@@ -5,11 +5,11 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
 import { buildColumns, Column } from './buildColumns'
-import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -23,7 +23,7 @@ export class ExperimentsTable {
 
   private readonly dvcRoot: string
   private readonly config: Config
-  private readonly cliReader: CliReader
+  private readonly internalCommands: InternalCommands
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -42,12 +42,12 @@ export class ExperimentsTable {
   constructor(
     dvcRoot: string,
     config: Config,
-    cliReader: CliReader,
+    internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
     this.config = config
-    this.cliReader = cliReader
+    this.internalCommands = internalCommands
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
@@ -106,7 +106,11 @@ export class ExperimentsTable {
   }
 
   private async updateData(): Promise<boolean | undefined> {
-    const getNewPromise = () => this.cliReader.experimentShow(this.dvcRoot)
+    const getNewPromise = () =>
+      this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
+        AvailableCommands.EXPERIMENT_SHOW,
+        this.dvcRoot
+      )
     const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
       getNewPromise,
       'Experiments table update'

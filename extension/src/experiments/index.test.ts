@@ -6,9 +6,9 @@ import { pickExperimentName } from './quickPick'
 import { runQueued, runReset } from './runner'
 import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
-import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
+import { InternalCommands } from '../internalCommands'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -22,6 +22,15 @@ const mockedRun = jest.fn()
 const mockedConfig = {
   getDefaultProject: mockedGetDefaultProject
 } as unknown as Config
+const mockedGetDefaultOrPickProject = (args: string[]) => {
+  if (args.length === 1) {
+    return args[0]
+  }
+  return (
+    mockedGetDefaultProject() ||
+    mockedQuickPickOne(args, 'Select which project to run command against')
+  )
+}
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
@@ -40,7 +49,22 @@ beforeEach(() => {
 describe('Experiments', () => {
   const experiments = new Experiments(
     mockedConfig,
-    { experimentListCurrent: jest.fn() } as unknown as CliReader,
+    {
+      executeCommand: (name: string, ...args: string[]) => {
+        if (name === 'experimentListCurrent') {
+          return jest.fn()
+        }
+
+        if (name === 'pickExperimentName') {
+          return mockedPickExperimentName(Promise.resolve(args))
+        }
+
+        if (name === 'getDefaultOrPickProject') {
+          return mockedGetDefaultOrPickProject(args)
+        }
+      },
+      registerCommand: jest.fn()
+    } as unknown as InternalCommands,
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
