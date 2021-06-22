@@ -113,8 +113,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getExpNameThenRun(mockedExpFunc)
+      await experiments.getExpNameThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -127,8 +126,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getExpNameThenRun(mockedExpFunc)
+      await experiments.getExpNameThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)

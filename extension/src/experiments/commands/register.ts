@@ -9,24 +9,21 @@ import { AvailableCommands } from '../../internalCommands'
 const registerExperimentCwdCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENTS_RUN_QUEUE)
+      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_QUEUE)
     )
   )
 }
 
-const registerExperimentNameCommands = (
-  experiments: Experiments,
-  cliExecutor: CliExecutor
-): void => {
+const registerExperimentNameCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.applyExperiment', () =>
-      experiments.getExpNameThenRun(cliExecutor.experimentApply)
+      experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
     )
   )
 
   experiments.dispose.track(
     commands.registerCommand('dvc.removeExperiment', () =>
-      experiments.getExpNameThenRun(cliExecutor.experimentRemove)
+      experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
     )
   )
 }
@@ -64,7 +61,7 @@ const registerExperimentExecutorCommands = (
   cliExecutor: CliExecutor
 ): void => {
   registerExperimentCwdCommands(experiments)
-  registerExperimentNameCommands(experiments, cliExecutor)
+  registerExperimentNameCommands(experiments)
   registerExperimentInputCommands(experiments, cliExecutor)
   registerExperimentQuickPickCommands(experiments, cliExecutor)
 }

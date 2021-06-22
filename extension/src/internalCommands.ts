@@ -23,7 +23,9 @@ export enum AvailableCommands {
   REMOVE = 'remove', // explorer
   STATUS = 'status', // scm & decoration
 
-  EXPERIMENTS_RUN_QUEUE = 'experimentRunQueue', // experiments
+  EXPERIMENT_APPLY = 'experimentApply', // experiments
+  EXPERIMENT_RUN_QUEUE = 'experimentRunQueue', // experiments
+  EXPERIMENT_REMOVE = 'experimentRemove', // experiments
   PICK_EXPERIMENT_NAME = 'pickExperimentName', // experiments
   QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
   GET_DEFAULT_PROJECT = 'getDefaultProject', // experiments

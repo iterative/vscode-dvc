@@ -51,18 +51,16 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public getCwdThenRun = async (name: AvailableCommands) => {
+  public getCwdThenRun = async (commandName: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    report(this.internalCommands.executeCommand(name, cwd))
+    report(this.internalCommands.executeCommand(commandName, cwd))
   }
 
-  public getExpNameThenRun = async (
-    func: (cwd: string, experimentName: string) => Promise<string>
-  ) => {
+  public getExpNameThenRun = async (commandName: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
@@ -76,7 +74,7 @@ export class Experiments {
     if (!name) {
       return
     }
-    return report(func(cwd, name))
+    return report(this.internalCommands.executeCommand(commandName, cwd, name))
   }
 
   public getCwdAndQuickPickThenRun = async <T>(
