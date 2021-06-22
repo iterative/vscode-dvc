@@ -50,6 +50,7 @@ export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 export class CliReader extends Cli {
   public commandsToRegister = [
     'experimentListCurrent',
+    'experimentShow',
     'diff',
     'listDvcOnly',
     'listDvcOnlyRecursive',

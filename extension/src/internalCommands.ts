@@ -17,7 +17,8 @@ export enum AvailableCommands {
   PUSH = 'push',
   REMOVE = 'remove',
   STATUS = 'status',
-  EXPERIMENT_LIST_CURRENT = 'experimentListCurrent'
+  EXPERIMENT_LIST_CURRENT = 'experimentListCurrent',
+  EXPERIMENT_SHOW = 'experimentShow'
 }
 
 export class InternalCommands {

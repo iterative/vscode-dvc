@@ -6,7 +6,6 @@ import { pickExperimentName } from './quickPick'
 import { runQueued, runReset } from './runner'
 import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
-import { CliReader } from '../cli/reader'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
 import { InternalCommands } from '../internalCommands'
@@ -41,7 +40,6 @@ beforeEach(() => {
 describe('Experiments', () => {
   const experiments = new Experiments(
     mockedConfig,
-    {} as CliReader,
     {
       executeCommand: (name: string) => {
         if (name === 'experimentListCurrent') {

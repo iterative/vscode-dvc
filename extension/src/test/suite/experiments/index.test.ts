@@ -77,7 +77,6 @@ suite('Experiments Test Suite', () => {
 
       const experiments = new Experiments(
         config,
-        cliReader,
         internalCommands,
         mockExperimentsTable
       )
@@ -132,7 +131,6 @@ suite('Experiments Test Suite', () => {
 
       const experiments = new Experiments(
         config,
-        cliReader,
         internalCommands,
         mockExperimentsTable
       )
@@ -179,7 +177,7 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = new Experiments(config, cliReader, internalCommands)
+      const experiments = new Experiments(config, internalCommands)
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -217,7 +215,6 @@ suite('Experiments Test Suite', () => {
 
       const experiments = new Experiments(
         config,
-        cliReader,
         internalCommands,
         mockExperimentsTable
       )

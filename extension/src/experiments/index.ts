@@ -4,7 +4,6 @@ import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { pickExperimentName } from './quickPick'
 import { ExperimentsTable } from './table'
-import { CliReader } from '../cli/reader'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { quickPickOne } from '../vscode/quickPick'
@@ -27,19 +26,16 @@ export class Experiments {
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
-  private readonly cliReader: CliReader
   private readonly internalCommands: InternalCommands
 
   constructor(
     config: Config,
-    cliReader: CliReader,
     internalCommands: InternalCommands,
     experiments?: Record<string, ExperimentsTable>
   ) {
     makeObservable(this)
 
     this.config = config
-    this.cliReader = cliReader
     this.internalCommands = internalCommands
     if (experiments) {
       this.experiments = experiments
@@ -239,7 +235,7 @@ export class Experiments {
       new ExperimentsTable(
         dvcRoot,
         this.config,
-        this.cliReader,
+        this.internalCommands,
         resourceLocator
       )
     )
