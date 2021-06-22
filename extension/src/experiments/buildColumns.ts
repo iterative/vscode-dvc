@@ -127,12 +127,8 @@ const columnFromMapEntry = (
   entry: [string, PartialColumnDescriptor]
 ): Column => {
   const [name, partialColumnDescriptor] = entry
-  const {
-    types,
-    maxStringLength,
-    minNumber,
-    maxNumber
-  } = partialColumnDescriptor
+  const { types, maxStringLength, minNumber, maxNumber } =
+    partialColumnDescriptor
   const column: Column = {
     name
   }

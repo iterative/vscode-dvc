@@ -55,7 +55,7 @@ suite('Extension Test Suite', () => {
         'This is not a error that we would ask the user if they want to try and force'
       )
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
-        ('' as unknown) as MessageItem
+        '' as unknown as MessageItem
       )
 
       await commands.executeCommand('dvc.checkout', { rootUri })
@@ -87,7 +87,7 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(
         window,
         'showWarningMessage'
-      ).resolves(('Force' as unknown) as MessageItem)
+      ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand('dvc.checkoutTarget', {
         dvcRoot: dvcDemoPath,
@@ -119,7 +119,7 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(
         window,
         'showWarningMessage'
-      ).resolves(('Force' as unknown) as MessageItem)
+      ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand('dvc.commit', { rootUri })
 
@@ -151,7 +151,7 @@ suite('Extension Test Suite', () => {
       const mockShowInformationMessage = stub(
         window,
         'showWarningMessage'
-      ).resolves(('Force' as unknown) as MessageItem)
+      ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand('dvc.commitTarget', {
         dvcRoot: dvcDemoPath,
@@ -169,7 +169,7 @@ suite('Extension Test Suite', () => {
         .onFirstCall()
         .rejects('The remote has gone away')
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
-        ('' as unknown) as MessageItem
+        '' as unknown as MessageItem
       )
 
       await commands.executeCommand('dvc.pull', { rootUri })
@@ -183,7 +183,7 @@ suite('Extension Test Suite', () => {
         'The remote has gone away'
       )
       const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
-        ('' as unknown) as MessageItem
+        '' as unknown as MessageItem
       )
 
       await commands.executeCommand('dvc.push', { rootUri })

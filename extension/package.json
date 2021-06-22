@@ -196,6 +196,11 @@
         "title": "%command.copyFilePath%",
         "command": "dvc.copyFilePath",
         "category": "DVC"
+      },
+      {
+        "title": "%command.copyRelativeFilePath%",
+        "command": "dvc.copyRelativeFilePath",
+        "category": "DVC"
       }
     ],
     "configuration": {
@@ -320,6 +325,10 @@
         {
           "command": "dvc.copyFilePath",
           "when": "false"
+        },
+        {
+          "command": "dvc.copyRelativeFilePath",
+          "when": "false"
         }
       ],
       "scm/title": [
@@ -432,7 +441,11 @@
         },
         {
           "command": "dvc.copyFilePath",
-          "group": "1_cutcopypaste"
+          "group": "6_copypath@1"
+        },
+        {
+          "command": "dvc.copyRelativeFilePath",
+          "group": "6_copypath@2"
         }
       ]
     },

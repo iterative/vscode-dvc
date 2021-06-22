@@ -34,9 +34,9 @@ suite('Experiments Table Test Suite', () => {
   describe('refresh', () => {
     it('should return early if an update is in progress', async () => {
       const stubbedExperimentShow = stub().resolves(complexExperimentsOutput)
-      const testCliReader = ({
+      const testCliReader = {
         experimentShow: stubbedExperimentShow
-      } as unknown) as CliReader
+      } as unknown as CliReader
 
       const testTable = new ExperimentsTable(
         'demo',

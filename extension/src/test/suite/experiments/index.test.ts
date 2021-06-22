@@ -192,7 +192,7 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const mockExperimentsTable = {
-        'other/dvc/root': ({ cliReader } as unknown) as ExperimentsTable
+        'other/dvc/root': { cliReader } as unknown as ExperimentsTable
       } as Record<string, ExperimentsTable>
 
       const experiments = new Experiments(
@@ -218,10 +218,8 @@ suite('Experiments Test Suite', () => {
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsTable = await experiments.showExperimentsTableThenRun(
-        cliRunner,
-        runQueued
-      )
+      const focusedExperimentsTable =
+        await experiments.showExperimentsTableThenRun(cliRunner, runQueued)
 
       expect(focusedExperimentsTable).to.equal(experimentsTable)
       expect(mockQuickPickOne).not.to.be.called

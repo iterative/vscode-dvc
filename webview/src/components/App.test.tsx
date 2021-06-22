@@ -38,7 +38,7 @@ let customWindow: CustomWindow
 beforeEach(() => {
   jest.clearAllMocks()
   mockGetState.mockReturnValueOnce({})
-  customWindow = (window as unknown) as CustomWindow
+  customWindow = window as unknown as CustomWindow
   customWindow.webviewData = {
     publicPath: '/some/path',
     theme: WebviewColorTheme.dark

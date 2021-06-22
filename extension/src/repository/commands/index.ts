@@ -13,25 +13,26 @@ export type ResourceCommand = ({
   resourceUri: Uri
 }) => Promise<string | undefined>
 
-export const getResourceCommand = (
-  func: (cwd: string, target: string, ...args: Args) => Promise<string>
-): ResourceCommand => ({ dvcRoot, resourceUri }) => {
-  const relPath = relative(dvcRoot, resourceUri.fsPath)
+export const getResourceCommand =
+  (
+    func: (cwd: string, target: string, ...args: Args) => Promise<string>
+  ): ResourceCommand =>
+  ({ dvcRoot, resourceUri }) => {
+    const relPath = relative(dvcRoot, resourceUri.fsPath)
 
-  return tryThenMaybeForce(func, dvcRoot, relPath)
-}
-
-export const getSimpleResourceCommand = (
-  internalCommands: InternalCommands,
-  name: string
-): ResourceCommand => async ({ dvcRoot, resourceUri }) => {
-  const relPath = relative(dvcRoot, resourceUri.fsPath)
-  try {
-    return await internalCommands.executeCommand(name, dvcRoot, relPath)
-  } catch {
-    return showGenericError()
+    return tryThenMaybeForce(func, dvcRoot, relPath)
   }
-}
+
+export const getSimpleResourceCommand =
+  (internalCommands: InternalCommands, name: string): ResourceCommand =>
+  async ({ dvcRoot, resourceUri }) => {
+    const relPath = relative(dvcRoot, resourceUri.fsPath)
+    try {
+      return await internalCommands.executeCommand(name, dvcRoot, relPath)
+    } catch {
+      return showGenericError()
+    }
+  }
 
 export type RootCommand = ({
   rootUri
@@ -39,10 +40,10 @@ export type RootCommand = ({
   rootUri: Uri
 }) => Promise<string | undefined>
 
-export const getRootCommand = (
-  func: (fsPath: string, ...args: Args) => Promise<string>
-): RootCommand => ({ rootUri }) => {
-  const cwd = rootUri.fsPath
+export const getRootCommand =
+  (func: (fsPath: string, ...args: Args) => Promise<string>): RootCommand =>
+  ({ rootUri }) => {
+    const cwd = rootUri.fsPath
 
-  return tryThenMaybeForce(func, cwd)
-}
+    return tryThenMaybeForce(func, cwd)
+  }
