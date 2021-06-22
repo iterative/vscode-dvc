@@ -72,8 +72,8 @@ export class Extension implements IExtension {
     new EventEmitter()
   )
 
-  private readonly onDidChangeWorkspace: Event<void> = this.workspaceChanged
-    .event
+  private readonly onDidChangeWorkspace: Event<void> =
+    this.workspaceChanged.event
 
   constructor(context: ExtensionContext) {
     if (getReloadCount(module) > 0) {

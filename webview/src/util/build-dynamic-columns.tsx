@@ -160,10 +160,9 @@ const addToProperty: (
   return newProperty
 }
 
-const buildAccessor: (
-  valuePath: string[]
-) => Accessor<ExperimentWithSubRows> = pathArray => originalRow =>
-  get(originalRow, pathArray)
+const buildAccessor: (valuePath: string[]) => Accessor<ExperimentWithSubRows> =
+  pathArray => originalRow =>
+    get(originalRow, pathArray)
 
 const buildColumnsFromSchemaProperties: (
   properties: SchemaProperties,

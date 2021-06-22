@@ -179,10 +179,8 @@ describe('transformExperimentsRepo', () => {
       params: Column[]
     }
     const [paramsFileColumn] = params
-    const [
-      columnWithNumbers,
-      columnWithoutNumbers
-    ] = paramsFileColumn.childColumns as Column[]
+    const [columnWithNumbers, columnWithoutNumbers] =
+      paramsFileColumn.childColumns as Column[]
 
     it('does not add maxNumber or minNumber on a column with no numbers', () => {
       expect(columnWithoutNumbers.minNumber).toBeUndefined()

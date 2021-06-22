@@ -133,14 +133,13 @@ suite('Runner Test Suite', () => {
     }).timeout(12000)
 
     it('should call createProcess with the correct arguments when no executable is provided', async () => {
-      const mockCreateProcess = stub(
-        ProcessExecution,
-        'createProcess'
-      ).returns(({ on: spy() } as unknown) as ProcessExecution.Process)
+      const mockCreateProcess = stub(ProcessExecution, 'createProcess').returns(
+        { on: spy() } as unknown as ProcessExecution.Process
+      )
       const cwd = __dirname
 
       const cliRunner = disposable.track(
-        new CliRunner(({ getCliPath: () => undefined } as unknown) as Config)
+        new CliRunner({ getCliPath: () => undefined } as unknown as Config)
       )
 
       await cliRunner.run(cwd, Command.ADD)

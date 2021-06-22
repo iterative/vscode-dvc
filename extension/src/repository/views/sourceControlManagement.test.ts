@@ -14,11 +14,11 @@ const mockedDisposable = mocked(Disposable)
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedDisposable.fn.mockReturnValueOnce(({
-    track: function<T>(disposable: T): T {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
       return disposable
     }
-  } as unknown) as (() => void) & Disposer)
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('SourceControlManagement', () => {
@@ -39,12 +39,12 @@ describe('SourceControlManagement', () => {
       expect(mockedCreateSourceControl).toBeCalledTimes(1)
       expect(sourceControlManagement.getState()).toEqual([])
 
-      const updatedState = ({
+      const updatedState = {
         added: new Set(['/some/new/path']),
         deleted: new Set(['/some/deleted/path', '/some/other/deleted/path']),
         dispose: () => undefined,
         tracked: new Set(['/some/excluded/tracked/path'])
-      } as unknown) as SourceControlManagementState
+      } as unknown as SourceControlManagementState
 
       sourceControlManagement.setState(updatedState)
 

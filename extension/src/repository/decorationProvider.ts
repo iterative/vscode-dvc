@@ -76,16 +76,15 @@ export class DecorationProvider implements FileDecorationProvider {
   public readonly onDidChangeFileDecorations: Event<Uri[]>
   private readonly decorationsChanged: EventEmitter<Uri[]>
 
-  private readonly decorationMapping: Partial<
-    Record<Status, FileDecoration>
-  > = {
-    added: DecorationProvider.DecorationAdded,
-    deleted: DecorationProvider.DecorationDeleted,
-    modified: DecorationProvider.DecorationModified,
-    notInCache: DecorationProvider.DecorationNotInCache,
-    renamed: DecorationProvider.DecorationRenamed,
-    stageModified: DecorationProvider.DecorationStageModified
-  }
+  private readonly decorationMapping: Partial<Record<Status, FileDecoration>> =
+    {
+      added: DecorationProvider.DecorationAdded,
+      deleted: DecorationProvider.DecorationDeleted,
+      modified: DecorationProvider.DecorationModified,
+      notInCache: DecorationProvider.DecorationNotInCache,
+      renamed: DecorationProvider.DecorationRenamed,
+      stageModified: DecorationProvider.DecorationStageModified
+    }
 
   constructor() {
     makeObservable(this)
