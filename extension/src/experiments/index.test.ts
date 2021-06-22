@@ -4,7 +4,6 @@ import { Experiments } from '.'
 import { ExperimentsTable } from './table'
 import { pickExperimentName } from './quickPick'
 import { runQueued, runReset } from './runner'
-import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
@@ -19,9 +18,6 @@ const mockedQuickPickOne = mocked(quickPickOne)
 const mockedPickExperimentName = mocked(pickExperimentName)
 const mockedGetInput = mocked(getInput)
 const mockedRun = jest.fn()
-const mockedConfig = {
-  getDefaultProject: mockedGetDefaultProject
-} as unknown as Config
 const mockedGetDefaultOrPickProject = (args: string[]) => {
   if (args.length === 1) {
     return args[0]
@@ -49,7 +45,6 @@ beforeEach(() => {
 
 describe('Experiments', () => {
   const experiments = new Experiments(
-    mockedConfig,
     {
       executeCommand: (name: string, ...args: string[]) => {
         if (name === 'mockedExpFunc') {

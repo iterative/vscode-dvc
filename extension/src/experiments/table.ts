@@ -5,7 +5,6 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsRepoJSONOutput } from './contract'
 import { buildColumns, Column } from './buildColumns'
-import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -22,7 +21,6 @@ export class ExperimentsTable {
     this.dispose.track(new EventEmitter())
 
   private readonly dvcRoot: string
-  private readonly config: Config
   private readonly internalCommands: InternalCommands
 
   private readonly deferred = new Deferred()
@@ -41,12 +39,10 @@ export class ExperimentsTable {
 
   constructor(
     dvcRoot: string,
-    config: Config,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
     this.dvcRoot = dvcRoot
-    this.config = config
     this.internalCommands = internalCommands
     this.resourceLocator = resourceLocator
 
@@ -78,7 +74,7 @@ export class ExperimentsTable {
     }
 
     const webview = await ExperimentsWebview.create(
-      this.config,
+      this.internalCommands,
       { dvcRoot: this.dvcRoot, experiments: this.data },
       this.resourceLocator
     )

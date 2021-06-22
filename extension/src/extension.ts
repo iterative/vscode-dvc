@@ -109,7 +109,7 @@ export class Extension implements IExtension {
     )
 
     this.experiments = this.dispose.track(
-      new Experiments(this.config, this.internalCommands)
+      new Experiments(this.internalCommands)
     )
 
     this.dispose.track(
@@ -142,7 +142,7 @@ export class Extension implements IExtension {
     )
 
     this.webviewSerializer = new WebviewSerializer(
-      this.config,
+      this.internalCommands,
       this.experiments
     )
     this.dispose.track(this.webviewSerializer)

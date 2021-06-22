@@ -24,12 +24,13 @@ export enum AvailableCommands {
 
   EXPERIMENT_APPLY = 'experimentApply', // experiments
   EXPERIMENT_BRANCH = 'experimentBranch', // experiments
-  EXPERIMENT_RUN_QUEUE = 'experimentRunQueue', // experiments
-  EXPERIMENT_REMOVE = 'experimentRemove', // experiments
   EXPERIMENT_GARBAGE_COLLECT = 'experimentGarbageCollect', // experiments
-  QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
+  EXPERIMENT_REMOVE = 'experimentRemove', // experiments
+  EXPERIMENT_RUN_QUEUE = 'experimentRunQueue', // experiments
+  GET_DEFAULT_OR_PICK_PROJECT = 'getDefaultOrPickProject', // experiments
   GET_DEFAULT_PROJECT = 'getDefaultProject', // experiments
-  GET_DEFAULT_OR_PICK_PROJECT = 'getDefaultOrPickProject' // experiments
+  GET_THEME = 'getTheme', // experiments
+  QUICK_PICK_ONE_PROJECT = 'quickPickOneProject' // experiments
 }
 
 export class InternalCommands {
@@ -54,6 +55,8 @@ export class InternalCommands {
         )
       }
     )
+
+    this.registerCommand(AvailableCommands.GET_THEME, () => config.getTheme())
   }
 
   public executeCommand<T = string>(
