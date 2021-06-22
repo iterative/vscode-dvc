@@ -49,14 +49,7 @@ const registerExperimentQuickPickCommands = (
   )
 }
 
-const registerExperimentExecutorCommands = (experiments: Experiments): void => {
-  registerExperimentCwdCommands(experiments)
-  registerExperimentNameCommands(experiments)
-  registerExperimentInputCommands(experiments)
-  registerExperimentQuickPickCommands(experiments)
-}
-
-const registerExperimentRunnerCommands = (experiments: Experiments): void => {
+const registerExperimentRunCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.runExperiment', () =>
       experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
@@ -87,6 +80,9 @@ const registerExperimentRunnerCommands = (experiments: Experiments): void => {
 }
 
 export const registerExperimentCommands = (experiments: Experiments) => {
-  registerExperimentExecutorCommands(experiments)
-  registerExperimentRunnerCommands(experiments)
+  registerExperimentCwdCommands(experiments)
+  registerExperimentNameCommands(experiments)
+  registerExperimentInputCommands(experiments)
+  registerExperimentQuickPickCommands(experiments)
+  registerExperimentRunCommands(experiments)
 }
