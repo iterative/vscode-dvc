@@ -124,6 +124,23 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
+  public showExperimentsTableThenRun_ = async (
+    commandName: AvailableCommands
+  ) => {
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    const experimentsTable = await this.showExperimentsWebview(dvcRoot)
+    if (!experimentsTable) {
+      return
+    }
+
+    this.internalCommands.executeCommand(commandName, dvcRoot)
+    return experimentsTable
+  }
+
   public showExperimentsTableThenRun = async (
     cliRunner: CliRunner,
     func: (cliRunner: CliRunner, dvcRoot: string) => Promise<void>
@@ -173,6 +190,11 @@ export class Experiments {
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
     const experimentsTable = this.experiments[dvcRoot]
     experimentsTable.onDidChangeData(gitRoot)
+  }
+
+  public refreshData(dvcRoot: string) {
+    const experimentsTable = this.experiments[dvcRoot]
+    experimentsTable?.refresh()
   }
 
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {

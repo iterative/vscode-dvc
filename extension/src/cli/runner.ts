@@ -1,7 +1,7 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { CliResult, getEnv, ICli } from '.'
-import { Args } from './args'
+import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
 import { getCommandString } from './command'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
@@ -10,6 +10,8 @@ import { setContextValue } from '../vscode/context'
 
 export class CliRunner implements ICli {
   public readonly dispose = Disposable.fn()
+
+  public readonly commandsToRegister = ['runExperiment']
 
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
@@ -82,6 +84,23 @@ export class CliRunner implements ICli {
   private static setRunningContext = (isRunning: boolean) =>
     setContextValue('dvc.runner.running', isRunning)
 
+  public runExperiment(dvcRoot: string, ...args: Args) {
+    return this.run(
+      dvcRoot,
+      Command.EXPERIMENT,
+      ExperimentSubCommand.RUN,
+      ...args
+    )
+  }
+
+  public runReset(dvcRoot: string) {
+    return this.runExperiment(dvcRoot, ExperimentFlag.RESET)
+  }
+
+  public runQueued(dvcRoot: string) {
+    return this.runExperiment(dvcRoot, ExperimentFlag.RUN_ALL)
+  }
+
   public async run(cwd: string, ...args: Args) {
     await this.pseudoTerminal.openCurrentInstance()
     if (!this.pseudoTerminal.isBlocked()) {
@@ -148,7 +167,8 @@ export class CliRunner implements ICli {
           this.config.pythonBinPath,
           this.getOverrideOrCliPath(),
           ...args
-        )
+        ),
+        cwd
       })
     })
 

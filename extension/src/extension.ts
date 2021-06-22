@@ -101,7 +101,8 @@ export class Extension implements IExtension {
     this.internalCommands = new InternalCommands(
       this.config,
       this.cliExecutor,
-      this.cliReader
+      this.cliReader,
+      this.cliRunner
     )
 
     this.status = this.dispose.track(
@@ -110,6 +111,12 @@ export class Extension implements IExtension {
 
     this.experiments = this.dispose.track(
       new Experiments(this.internalCommands)
+    )
+
+    this.dispose.track(
+      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+        this.experiments.refreshData(cwd)
+      })
     )
 
     this.dispose.track(

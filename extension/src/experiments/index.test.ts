@@ -18,14 +18,12 @@ const mockedQuickPickOne = mocked(quickPickOne)
 const mockedPickExperimentName = mocked(pickExperimentName)
 const mockedGetInput = mocked(getInput)
 const mockedRun = jest.fn()
+const mockedPrompt = 'Select which project to run command against'
 const mockedGetDefaultOrPickProject = (args: string[]) => {
   if (args.length === 1) {
     return args[0]
   }
-  return (
-    mockedGetDefaultProject() ||
-    mockedQuickPickOne(args, 'Select which project to run command against')
-  )
+  return mockedGetDefaultProject() || mockedQuickPickOne(args, mockedPrompt)
 }
 const mockedExpFunc = jest.fn()
 
@@ -61,6 +59,10 @@ describe('Experiments', () => {
 
         if (name === 'getDefaultOrPickProject') {
           return mockedGetDefaultOrPickProject(args)
+        }
+
+        if (name === 'runExperiment') {
+          return mockedRun(...args)
         }
       },
       registerCommand: jest.fn()
@@ -237,6 +239,21 @@ describe('Experiments', () => {
     })
   })
 
+  describe('showExperimentsTableThenRun_', () => {
+    it('should call the runner with the correct args when runQueued is provided', async () => {
+      mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
+
+      await experiments.showExperimentsTableThenRun_(
+        AvailableCommands.RUN_EXPERIMENT
+      )
+
+      expect(mockedGetDefaultProject).toBeCalledTimes(1)
+      expect(mockedQuickPickOne).not.toBeCalled()
+      expect(mockedShowWebview).toBeCalledTimes(1)
+      expect(mockedRun).toBeCalledWith(mockedDvcRoot)
+    })
+  })
+
   describe('showExperimentsTableThenRun', () => {
     it('should call the runner with the correct args when runQueued is provided', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
@@ -273,7 +290,7 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledWith(
         [mockedDvcRoot, mockedOtherDvcRoot],
-        'Select which project to run command against'
+        mockedPrompt
       )
       expect(mockedShowWebview).toBeCalledTimes(1)
       expect(mockedRun).toBeCalledWith(mockedDvcRoot, 'exp', 'run', '--reset')

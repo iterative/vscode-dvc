@@ -25,6 +25,7 @@ suite('Output Channel Test Suite', () => {
   })
 
   describe('OutputChannel', () => {
+    const cwd = __dirname
     const version = '1.0.0'
 
     it('should handle a process completing without error', () => {
@@ -39,7 +40,7 @@ suite('Output Channel Test Suite', () => {
       } as unknown as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], version, 'The Success Channel'))
-      processCompleted.fire({ command: 'some command' })
+      processCompleted.fire({ command: 'some command', cwd })
 
       expect(mockOutputChannel).to.be.called
       expect(mockAppend).to.be.calledWithMatch(/\[.*?\] > some command \n/)
@@ -59,6 +60,7 @@ suite('Output Channel Test Suite', () => {
       disposable.track(new OutputChannel([cli], version, 'The Test Channel'))
       processCompleted.fire({
         command: 'some command',
+        cwd,
         stderr:
           'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
       })

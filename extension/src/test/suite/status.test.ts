@@ -40,6 +40,7 @@ suite('Extension Test Suite', () => {
     const waitingText = '$(circle-large-outline) DVC'
 
     it('should show the correct status of the cli', () => {
+      const cwd = __dirname
       const processCompleted = new EventEmitter<CliResult>()
       const processStarted = new EventEmitter<void>()
 
@@ -71,11 +72,11 @@ suite('Extension Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({ command: 'one is still running' })
+      processCompleted.fire({ command: 'one is still running', cwd })
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({ command: 'all stopped' })
+      processCompleted.fire({ command: 'all stopped', cwd })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
 
@@ -98,7 +99,10 @@ suite('Extension Test Suite', () => {
 
       const status = disposable.track(new Status([cli]))
 
-      const mockCliResult = { command: 'there is nothing currently running' }
+      const mockCliResult = {
+        command: 'there is nothing currently running',
+        cwd: __dirname
+      }
 
       status.setAvailability(true)
 
