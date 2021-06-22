@@ -139,13 +139,12 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      const mockedExpFunc = jest.fn()
       const mockedPickedOptions = ['a', 'b', 'c']
       const mockedQuickPick = jest
         .fn()
         .mockResolvedValueOnce(mockedPickedOptions)
-      await experiments.getCwdAndQuickPickThenRun<string[]>(
-        mockedExpFunc,
+      await experiments.getCwdAndQuickPickThenRun(
+        'mockedExpFunc' as AvailableCommands,
         mockedQuickPick
       )
 
@@ -153,16 +152,18 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedQuickPick).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, mockedPickedOptions)
+      expect(mockedExpFunc).toBeCalledWith(
+        mockedDvcRoot,
+        ...mockedPickedOptions
+      )
     })
 
     it('should not call the function or ask for quick picks if a project is not picked', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
-      const mockedExpFunc = jest.fn()
       const mockedQuickPick = jest.fn()
       await experiments.getCwdAndQuickPickThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         mockedQuickPick
       )
 
@@ -176,10 +177,9 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
       mockedPickExperimentName.mockResolvedValueOnce('exp-789')
 
-      const mockedExpFunc = jest.fn()
       const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)
       await experiments.getCwdAndQuickPickThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         mockedQuickPick
       )
 
@@ -230,7 +230,6 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
       mockedGetInput.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
         'mockedExpFunc' as AvailableCommands,
         'please enter your bank account number and sort code'

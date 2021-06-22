@@ -79,9 +79,9 @@ export class Experiments {
     )
   }
 
-  public getCwdAndQuickPickThenRun = async <T>(
-    func: (cwd: string, result: T) => Promise<string>,
-    quickPick: () => Thenable<T | undefined>
+  public getCwdAndQuickPickThenRun = async (
+    commandName: AvailableCommands,
+    quickPick: () => Thenable<string[] | undefined>
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
@@ -90,7 +90,7 @@ export class Experiments {
     const result = await quickPick()
 
     if (result) {
-      report(func(cwd, result))
+      report(this.internalCommands.executeCommand(commandName, cwd, ...result))
     }
   }
 

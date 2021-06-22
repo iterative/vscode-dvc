@@ -3,7 +3,6 @@ import { pickGarbageCollectionFlags } from '../quickPick'
 import { run, runQueued, runReset, stop } from '../runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
-import { CliExecutor } from '../../cli/executor'
 import { AvailableCommands } from '../../internalCommands'
 
 const registerExperimentCwdCommands = (experiments: Experiments): void => {
@@ -40,27 +39,23 @@ const registerExperimentInputCommands = (experiments: Experiments): void => {
 }
 
 const registerExperimentQuickPickCommands = (
-  experiments: Experiments,
-  cliExecutor: CliExecutor
+  experiments: Experiments
 ): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.experimentGarbageCollect', () =>
       experiments.getCwdAndQuickPickThenRun(
-        cliExecutor.experimentGarbageCollect,
+        AvailableCommands.EXPERIMENT_GARBAGE_COLLECT,
         pickGarbageCollectionFlags
       )
     )
   )
 }
 
-const registerExperimentExecutorCommands = (
-  experiments: Experiments,
-  cliExecutor: CliExecutor
-): void => {
+const registerExperimentExecutorCommands = (experiments: Experiments): void => {
   registerExperimentCwdCommands(experiments)
   registerExperimentNameCommands(experiments)
   registerExperimentInputCommands(experiments)
-  registerExperimentQuickPickCommands(experiments, cliExecutor)
+  registerExperimentQuickPickCommands(experiments)
 }
 
 const registerExperimentRunnerCommands = (
@@ -98,9 +93,8 @@ const registerExperimentRunnerCommands = (
 
 export const registerExperimentCommands = (
   experiments: Experiments,
-  cliExecutor: CliExecutor,
   cliRunner: CliRunner
 ) => {
-  registerExperimentExecutorCommands(experiments, cliExecutor)
+  registerExperimentExecutorCommands(experiments)
   registerExperimentRunnerCommands(experiments, cliRunner)
 }
