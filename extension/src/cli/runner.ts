@@ -156,27 +156,29 @@ export class CliRunner implements ICli {
 
     this.processStarted.fire()
 
-    process.all?.on('data', chunk => {
+    process.all?.on('data', chunk =>
       this.processOutput.fire(
         chunk
           .toString()
           .split(/(\r?\n)/g)
           .join('\r')
       )
-    })
+    )
 
-    process.on('close', () => {
-      this.processCompleted.fire({
-        command: getCommandString(
-          this.config.pythonBinPath,
-          this.getOverrideOrCliPath(),
-          ...args
-        ),
-        cwd
-      })
-    })
+    process.on('close', () => this.fireCompleted(cwd, args))
 
     return process
+  }
+
+  private fireCompleted(cwd: string, args: Args) {
+    return this.processCompleted.fire({
+      command: getCommandString(
+        this.config.pythonBinPath,
+        this.getOverrideOrCliPath(),
+        ...args
+      ),
+      cwd
+    })
   }
 
   private startProcess(cwd: string, args: Args) {
