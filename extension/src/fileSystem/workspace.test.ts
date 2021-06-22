@@ -17,10 +17,10 @@ beforeEach(() => {
 
 describe('deleteTarget', () => {
   it('should call WorkspaceEdit deleteFile with the provided uri', async () => {
-    mockedWorkspaceEdit.mockImplementationOnce(function() {
-      return ({
+    mockedWorkspaceEdit.mockImplementationOnce(function () {
+      return {
         deleteFile: mockedDeleteFile
-      } as unknown) as WorkspaceEdit
+      } as unknown as WorkspaceEdit
     })
     mockedWorkspace.applyEdit = mockedApplyEdit.mockResolvedValueOnce(true)
 

@@ -13,9 +13,9 @@ interface VscodeGit {
 }
 
 export const getGitRepositoryRoots = async () => {
-  const extension = extensions.getExtension('vscode.git') as Extension<
-    VscodeGit
-  >
+  const extension = extensions.getExtension(
+    'vscode.git'
+  ) as Extension<VscodeGit>
   const activatedExtension = await extension.activate()
   const api = await activatedExtension.getAPI(1)
 

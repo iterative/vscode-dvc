@@ -24,17 +24,17 @@ beforeEach(() => {
 describe('getRepositoryWatcher', () => {
   const mockedResetState = jest.fn()
   const mockedUpdateState = jest.fn()
-  const repository = ({
+  const repository = {
     resetState: mockedResetState,
     updateState: mockedUpdateState
-  } as unknown) as Repository
+  } as unknown as Repository
 
   const mockedRefresh = jest.fn()
   const mockedReset = jest.fn()
-  const trackedExplorerTree = ({
+  const trackedExplorerTree = {
     refresh: mockedRefresh,
     reset: mockedReset
-  } as unknown) as TrackedExplorerTree
+  } as unknown as TrackedExplorerTree
 
   it('should return a function that does nothing if an empty path is provided', () => {
     const watcher = getRepositoryWatcher(repository, trackedExplorerTree)

@@ -18,7 +18,7 @@ export const retryUntilAllResolved = async <T>(
   try {
     const promiseOrPromises = getNewPromiseOrPromises()
     const data = await promiseOrPromiseAll(promiseOrPromises)
-    return (data as unknown) as T
+    return data as unknown as T
   } catch (e) {
     Logger.error(`${type} failed with ${e} retrying...`)
     await delay(waitBeforeRetry)
