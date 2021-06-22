@@ -4,14 +4,12 @@ import { run, runQueued, runReset, stop } from '../runner'
 import { Experiments } from '..'
 import { CliRunner } from '../../cli/runner'
 import { CliExecutor } from '../../cli/executor'
+import { AvailableCommands } from '../../internalCommands'
 
-const registerExperimentCwdCommands = (
-  experiments: Experiments,
-  cliExecutor: CliExecutor
-): void => {
+const registerExperimentCwdCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      experiments.getCwdThenRun(cliExecutor.experimentRunQueue)
+      experiments.getCwdThenRun(AvailableCommands.EXPERIMENTS_RUN_QUEUE)
     )
   )
 }
@@ -65,7 +63,7 @@ const registerExperimentExecutorCommands = (
   experiments: Experiments,
   cliExecutor: CliExecutor
 ): void => {
-  registerExperimentCwdCommands(experiments, cliExecutor)
+  registerExperimentCwdCommands(experiments)
   registerExperimentNameCommands(experiments, cliExecutor)
   registerExperimentInputCommands(experiments, cliExecutor)
   registerExperimentQuickPickCommands(experiments, cliExecutor)

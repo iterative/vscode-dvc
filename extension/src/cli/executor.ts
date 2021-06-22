@@ -12,6 +12,7 @@ export class CliExecutor extends Cli {
     'add',
     'checkout',
     'commit',
+    'experimentRunQueue',
     'init',
     'pull',
     'push',

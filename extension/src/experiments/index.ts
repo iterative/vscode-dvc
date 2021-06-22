@@ -51,13 +51,13 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
+  public getCwdThenRun = async (name: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    report(func(cwd))
+    report(this.internalCommands.executeCommand(name, cwd))
   }
 
   public getExpNameThenRun = async (

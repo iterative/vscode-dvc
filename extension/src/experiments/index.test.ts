@@ -8,7 +8,7 @@ import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
-import { InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -31,6 +31,7 @@ const mockedGetDefaultOrPickProject = (args: string[]) => {
     mockedQuickPickOne(args, 'Select which project to run command against')
   )
 }
+const mockedExpFunc = jest.fn()
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
@@ -51,6 +52,10 @@ describe('Experiments', () => {
     mockedConfig,
     {
       executeCommand: (name: string, ...args: string[]) => {
+        if (name === 'mockedExpFunc') {
+          return mockedExpFunc(...args)
+        }
+
         if (name === 'experimentListCurrent') {
           return jest.fn()
         }
@@ -82,8 +87,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getCwdThenRun(mockedExpFunc)
+      await experiments.getCwdThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -95,8 +99,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getCwdThenRun(mockedExpFunc)
+      await experiments.getCwdThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)

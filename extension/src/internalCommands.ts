@@ -23,6 +23,7 @@ export enum AvailableCommands {
   REMOVE = 'remove', // explorer
   STATUS = 'status', // scm & decoration
 
+  EXPERIMENTS_RUN_QUEUE = 'experimentRunQueue', // experiments
   PICK_EXPERIMENT_NAME = 'pickExperimentName', // experiments
   QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
   GET_DEFAULT_PROJECT = 'getDefaultProject', // experiments
