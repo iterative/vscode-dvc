@@ -64,7 +64,7 @@ suite('Experiments Test Suite', () => {
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
       const internalCommands = disposable.track(
-        new InternalCommands(cliExecutor, cliReader)
+        new InternalCommands(config, cliExecutor, cliReader)
       )
       const configSpy = spy(config, 'getDefaultProject')
 
@@ -119,7 +119,7 @@ suite('Experiments Test Suite', () => {
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
       const internalCommands = disposable.track(
-        new InternalCommands(cliExecutor, cliReader)
+        new InternalCommands(config, cliExecutor, cliReader)
       )
 
       const resourceLocator = disposable.track(
@@ -170,7 +170,7 @@ suite('Experiments Test Suite', () => {
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
       const internalCommands = disposable.track(
-        new InternalCommands(cliExecutor, cliReader)
+        new InternalCommands(config, cliExecutor, cliReader)
       )
 
       const resourceLocator = disposable.track(
@@ -201,7 +201,7 @@ suite('Experiments Test Suite', () => {
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
       const internalCommands = disposable.track(
-        new InternalCommands(cliExecutor, cliReader)
+        new InternalCommands(config, cliExecutor, cliReader)
       )
       const cliRunner = disposable.track(new CliRunner(config))
       const mockRun = stub(cliRunner, 'run').resolves()

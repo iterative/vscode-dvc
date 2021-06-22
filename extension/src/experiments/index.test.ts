@@ -22,6 +22,15 @@ const mockedRun = jest.fn()
 const mockedConfig = {
   getDefaultProject: mockedGetDefaultProject
 } as unknown as Config
+const mockedGetDefaultOrPickProject = (args: string[]) => {
+  if (args.length === 1) {
+    return args[0]
+  }
+  return (
+    mockedGetDefaultProject() ||
+    mockedQuickPickOne(args, 'Select which project to run command against')
+  )
+}
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
@@ -41,11 +50,20 @@ describe('Experiments', () => {
   const experiments = new Experiments(
     mockedConfig,
     {
-      executeCommand: (name: string) => {
+      executeCommand: (name: string, ...args: string[]) => {
         if (name === 'experimentListCurrent') {
           return jest.fn()
         }
-      }
+
+        if (name === 'pickExperimentName') {
+          return mockedPickExperimentName(Promise.resolve(args))
+        }
+
+        if (name === 'getDefaultOrPickProject') {
+          return mockedGetDefaultOrPickProject(args)
+        }
+      },
+      registerCommand: jest.fn()
     } as unknown as InternalCommands,
     {
       '/my/dvc/root': {

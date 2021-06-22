@@ -72,7 +72,11 @@ suite('Experiments Table Test Suite', () => {
       const config = disposable.track(new Config())
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = new InternalCommands(cliExecutor, cliReader)
+      const internalCommands = new InternalCommands(
+        config,
+        cliExecutor,
+        cliReader
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -100,7 +104,11 @@ suite('Experiments Table Test Suite', () => {
       const config = disposable.track(new Config())
       const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = new InternalCommands(cliExecutor, cliReader)
+      const internalCommands = new InternalCommands(
+        config,
+        cliExecutor,
+        cliReader
+      )
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )

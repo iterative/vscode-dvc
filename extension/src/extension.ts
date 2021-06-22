@@ -99,6 +99,7 @@ export class Extension implements IExtension {
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
     this.internalCommands = new InternalCommands(
+      this.config,
       this.cliExecutor,
       this.cliReader
     )
