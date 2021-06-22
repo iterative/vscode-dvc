@@ -3,6 +3,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
+import { pickExperimentName } from './quickPick'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
@@ -66,10 +67,7 @@ export class Experiments {
       return
     }
 
-    const experimentName = await this.internalCommands.executeCommand(
-      AvailableCommands.PICK_EXPERIMENT_NAME,
-      cwd
-    )
+    const experimentName = await this.pickExperimentName(cwd)
 
     if (!experimentName) {
       return
@@ -103,10 +101,7 @@ export class Experiments {
       return
     }
 
-    const experimentName = await this.internalCommands.executeCommand(
-      AvailableCommands.PICK_EXPERIMENT_NAME,
-      cwd
-    )
+    const experimentName = await this.pickExperimentName(cwd)
 
     if (!experimentName) {
       return
@@ -201,6 +196,15 @@ export class Experiments {
     return this.internalCommands.executeCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
       ...Object.keys(this.experiments)
+    )
+  }
+
+  private pickExperimentName(cwd: string) {
+    return pickExperimentName(
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_LIST_CURRENT,
+        cwd
+      )
     )
   }
 

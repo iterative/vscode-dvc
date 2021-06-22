@@ -3,7 +3,6 @@ import { Args } from './cli/args'
 import { CliExecutor } from './cli/executor'
 import { CliReader } from './cli/reader'
 import { Config } from './config'
-import { pickExperimentName } from './experiments/quickPick'
 import { quickPickOne } from './vscode/quickPick'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
@@ -28,7 +27,6 @@ export enum AvailableCommands {
   EXPERIMENT_RUN_QUEUE = 'experimentRunQueue', // experiments
   EXPERIMENT_REMOVE = 'experimentRemove', // experiments
   EXPERIMENT_GARBAGE_COLLECT = 'experimentGarbageCollect', // experiments
-  PICK_EXPERIMENT_NAME = 'pickExperimentName', // experiments
   QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
   GET_DEFAULT_PROJECT = 'getDefaultProject', // experiments
   GET_DEFAULT_OR_PICK_PROJECT = 'getDefaultOrPickProject' // experiments
@@ -42,14 +40,6 @@ export class InternalCommands {
   constructor(config: Config, cliExecutor: CliExecutor, cliReader: CliReader) {
     this.registerCommands(cliExecutor)
     this.registerCommands(cliReader)
-
-    this.registerCommand(
-      AvailableCommands.PICK_EXPERIMENT_NAME,
-      (cwd: string) =>
-        pickExperimentName(
-          this.executeCommand(AvailableCommands.EXPERIMENT_LIST_CURRENT, cwd)
-        )
-    )
 
     this.registerCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
