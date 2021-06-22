@@ -272,9 +272,10 @@ describe('CliExecutor', () => {
         `Removed 45 experiments. To remove unused cache files use 'dvc gc'. `
       mockedExecuteProcess.mockResolvedValueOnce(stdout)
 
-      const output = await cliExecutor.experimentGarbageCollect(cwd, [
+      const output = await cliExecutor.experimentGarbageCollect(
+        cwd,
         GcPreserveFlag.QUEUED
-      ])
+      )
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({

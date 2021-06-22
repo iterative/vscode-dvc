@@ -147,11 +147,7 @@ export class Extension implements IExtension {
     )
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(
-      this.experiments,
-      this.cliExecutor,
-      this.cliRunner
-    )
+    registerExperimentCommands(this.experiments, this.cliRunner)
 
     registerRepositoryCommands(this.internalCommands)
 

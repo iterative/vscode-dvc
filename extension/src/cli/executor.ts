@@ -12,6 +12,10 @@ export class CliExecutor extends Cli {
     'add',
     'checkout',
     'commit',
+    'experimentApply',
+    'experimentBranch',
+    'experimentRemove',
+    'experimentRunQueue',
     'init',
     'pull',
     'push',
@@ -53,7 +57,7 @@ export class CliExecutor extends Cli {
 
   public experimentGarbageCollect(
     cwd: string,
-    preserveFlags: GcPreserveFlag[]
+    ...preserveFlags: GcPreserveFlag[]
   ) {
     return this.executeExperimentProcess(
       cwd,

@@ -8,7 +8,7 @@ import { Config } from '../config'
 import { quickPickOne } from '../vscode/quickPick'
 import { CliRunner } from '../cli/runner'
 import { getInput } from '../vscode/inputBox'
-import { InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -31,6 +31,7 @@ const mockedGetDefaultOrPickProject = (args: string[]) => {
     mockedQuickPickOne(args, 'Select which project to run command against')
   )
 }
+const mockedExpFunc = jest.fn()
 
 jest.mock('@hediet/std/disposable')
 jest.mock('../vscode/quickPick')
@@ -51,6 +52,10 @@ describe('Experiments', () => {
     mockedConfig,
     {
       executeCommand: (name: string, ...args: string[]) => {
+        if (name === 'mockedExpFunc') {
+          return mockedExpFunc(...args)
+        }
+
         if (name === 'experimentListCurrent') {
           return jest.fn()
         }
@@ -82,8 +87,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getCwdThenRun(mockedExpFunc)
+      await experiments.getCwdThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -95,8 +99,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getCwdThenRun(mockedExpFunc)
+      await experiments.getCwdThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -110,8 +113,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getExpNameThenRun(mockedExpFunc)
+      await experiments.getExpNameThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -124,8 +126,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
-      await experiments.getExpNameThenRun(mockedExpFunc)
+      await experiments.getExpNameThenRun('mockedExpFunc' as AvailableCommands)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -138,13 +139,12 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      const mockedExpFunc = jest.fn()
       const mockedPickedOptions = ['a', 'b', 'c']
       const mockedQuickPick = jest
         .fn()
         .mockResolvedValueOnce(mockedPickedOptions)
-      await experiments.getCwdAndQuickPickThenRun<string[]>(
-        mockedExpFunc,
+      await experiments.getCwdAndQuickPickThenRun(
+        'mockedExpFunc' as AvailableCommands,
         mockedQuickPick
       )
 
@@ -152,16 +152,18 @@ describe('Experiments', () => {
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedQuickPick).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
-      expect(mockedExpFunc).toBeCalledWith(mockedDvcRoot, mockedPickedOptions)
+      expect(mockedExpFunc).toBeCalledWith(
+        mockedDvcRoot,
+        ...mockedPickedOptions
+      )
     })
 
     it('should not call the function or ask for quick picks if a project is not picked', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
-      const mockedExpFunc = jest.fn()
       const mockedQuickPick = jest.fn()
       await experiments.getCwdAndQuickPickThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         mockedQuickPick
       )
 
@@ -175,10 +177,9 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(mockedDvcRoot)
       mockedPickExperimentName.mockResolvedValueOnce('exp-789')
 
-      const mockedExpFunc = jest.fn()
       const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)
       await experiments.getCwdAndQuickPickThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         mockedQuickPick
       )
 
@@ -196,9 +197,8 @@ describe('Experiments', () => {
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
-      const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         'enter your password please'
       )
 
@@ -213,9 +213,8 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         'please name the branch'
       )
 
@@ -231,9 +230,8 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
       mockedGetInput.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         'please enter your bank account number and sort code'
       )
 

@@ -3,6 +3,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
+import { pickExperimentName } from './quickPick'
 import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
@@ -51,37 +52,34 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public getCwdThenRun = async (func: (cwd: string) => Promise<string>) => {
+  public getCwdThenRun = async (commandName: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    report(func(cwd))
+    report(this.internalCommands.executeCommand(commandName, cwd))
   }
 
-  public getExpNameThenRun = async (
-    func: (cwd: string, experimentName: string) => Promise<string>
-  ) => {
+  public getExpNameThenRun = async (commandName: AvailableCommands) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    const name = await this.internalCommands.executeCommand(
-      AvailableCommands.PICK_EXPERIMENT_NAME,
-      cwd
+    const experimentName = await this.pickExperimentName(cwd)
+
+    if (!experimentName) {
+      return
+    }
+    return report(
+      this.internalCommands.executeCommand(commandName, cwd, experimentName)
     )
-
-    if (!name) {
-      return
-    }
-    return report(func(cwd, name))
   }
 
-  public getCwdAndQuickPickThenRun = async <T>(
-    func: (cwd: string, result: T) => Promise<string>,
-    quickPick: () => Thenable<T | undefined>
+  public getCwdAndQuickPickThenRun = async (
+    commandName: AvailableCommands,
+    quickPick: () => Thenable<string[] | undefined>
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
@@ -90,12 +88,12 @@ export class Experiments {
     const result = await quickPick()
 
     if (result) {
-      report(func(cwd, result))
+      report(this.internalCommands.executeCommand(commandName, cwd, ...result))
     }
   }
 
   public getExpNameAndInputThenRun = async (
-    func: (cwd: string, experiment: string, input: string) => Promise<string>,
+    commandName: AvailableCommands,
     prompt: string
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
@@ -103,17 +101,21 @@ export class Experiments {
       return
     }
 
-    const name = await this.internalCommands.executeCommand(
-      AvailableCommands.PICK_EXPERIMENT_NAME,
-      cwd
-    )
+    const experimentName = await this.pickExperimentName(cwd)
 
-    if (!name) {
+    if (!experimentName) {
       return
     }
     const input = await getInput(prompt)
     if (input) {
-      report(func(cwd, name, input))
+      report(
+        this.internalCommands.executeCommand(
+          commandName,
+          cwd,
+          experimentName,
+          input
+        )
+      )
     }
   }
 
@@ -194,6 +196,15 @@ export class Experiments {
     return this.internalCommands.executeCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
       ...Object.keys(this.experiments)
+    )
+  }
+
+  private pickExperimentName(cwd: string) {
+    return pickExperimentName(
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_LIST_CURRENT,
+        cwd
+      )
     )
   }
 
