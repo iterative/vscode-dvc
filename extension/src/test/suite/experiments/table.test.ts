@@ -46,7 +46,6 @@ suite('Experiments Table Test Suite', () => {
 
       const testTable = new ExperimentsTable(
         'demo',
-        {} as Config,
         internalCommands,
         {} as ResourceLocator
       )
@@ -82,12 +81,7 @@ suite('Experiments Table Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experimentsTable = disposable.track(
-        new ExperimentsTable(
-          dvcDemoPath,
-          config,
-          internalCommands,
-          resourceLocator
-        )
+        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
       )
 
       const webview = await experimentsTable.showWebview()
@@ -113,12 +107,7 @@ suite('Experiments Table Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const experimentsTable = disposable.track(
-        new ExperimentsTable(
-          dvcDemoPath,
-          config,
-          internalCommands,
-          resourceLocator
-        )
+        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')

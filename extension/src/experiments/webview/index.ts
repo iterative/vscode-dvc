@@ -17,13 +17,14 @@ import {
   MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData,
-  ExperimentsWebviewState
+  ExperimentsWebviewState,
+  WebviewColorTheme
 } from './contract'
 import { ExperimentsRepoJSONOutput } from '../contract'
-import { Config } from '../../config'
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
+import { AvailableCommands, InternalCommands } from '../../internalCommands'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
@@ -44,11 +45,11 @@ export class ExperimentsWebview {
     this.disposer.track(new EventEmitter())
 
   private readonly webviewPanel: WebviewPanel
-  private readonly config: Config
+  private readonly internalCommands: InternalCommands
 
   private constructor(
     webviewPanel: WebviewPanel,
-    config: Config,
+    internalCommands: InternalCommands,
     state: ExperimentsWebviewState
   ) {
     this.webviewPanel = webviewPanel
@@ -58,7 +59,7 @@ export class ExperimentsWebview {
 
     this.onDidChangeIsFocused = this.isFocusedChanged.event
 
-    this.config = config
+    this.internalCommands = internalCommands
     this.dvcRoot = state.dvcRoot
 
     webviewPanel.onDidDispose(() => {
@@ -69,7 +70,7 @@ export class ExperimentsWebview {
       this.handleMessage(arg as MessageFromWebview)
     })
 
-    webviewPanel.webview.html = this.getHtml()
+    this.getHtml().then(html => (webviewPanel.webview.html = html))
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
@@ -82,8 +83,12 @@ export class ExperimentsWebview {
     this.disposer.track({
       dispose: autorun(async () => {
         await this.isReady() // Read all mobx dependencies before await
+        const theme =
+          await this.internalCommands.executeCommand<WebviewColorTheme>(
+            AvailableCommands.GET_THEME
+          )
         this.sendMessage({
-          theme: config.getTheme(),
+          theme,
           type: MessageToWebviewType.setTheme
         })
         this.sendMessage({
@@ -103,12 +108,12 @@ export class ExperimentsWebview {
 
   public static restore(
     webviewPanel: WebviewPanel,
-    config: Config,
+    internalCommands: InternalCommands,
     state: ExperimentsWebviewState
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(webviewPanel, config, state))
+        resolve(new ExperimentsWebview(webviewPanel, internalCommands, state))
       } catch (e) {
         reject(e)
       }
@@ -116,7 +121,7 @@ export class ExperimentsWebview {
   }
 
   public static async create(
-    config: Config,
+    internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator
   ): Promise<ExperimentsWebview> {
@@ -133,7 +138,7 @@ export class ExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIconPath
 
-    const view = new ExperimentsWebview(webviewPanel, config, state)
+    const view = new ExperimentsWebview(webviewPanel, internalCommands, state)
     await view.isReady()
     return view
   }
@@ -178,7 +183,7 @@ export class ExperimentsWebview {
     this.isFocusedChanged.fire(active)
   }
 
-  private getHtml(): string {
+  private async getHtml(): Promise<string> {
     let urls: {
       publicPath: string
       mainJsUrl: string
@@ -201,10 +206,13 @@ export class ExperimentsWebview {
       }
     }
 
+    const theme = await this.internalCommands.executeCommand<WebviewColorTheme>(
+      AvailableCommands.GET_THEME
+    )
     const data: WindowWithWebviewData = {
       webviewData: {
         publicPath: urls.publicPath,
-        theme: this.config.getTheme()
+        theme
       }
     }
 

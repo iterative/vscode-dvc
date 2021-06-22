@@ -4,7 +4,6 @@ import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
 import { pickExperimentName } from './quickPick'
-import { Config } from '../config'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -21,20 +20,17 @@ export class Experiments {
   public dispose = Disposable.fn()
 
   private experiments: ExperimentsTables = {}
-  private config: Config
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
   private readonly internalCommands: InternalCommands
 
   constructor(
-    config: Config,
     internalCommands: InternalCommands,
     experiments?: Record<string, ExperimentsTable>
   ) {
     makeObservable(this)
 
-    this.config = config
     this.internalCommands = internalCommands
     if (experiments) {
       this.experiments = experiments
@@ -221,12 +217,7 @@ export class Experiments {
     resourceLocator: ResourceLocator
   ) {
     const experimentsTable = this.dispose.track(
-      new ExperimentsTable(
-        dvcRoot,
-        this.config,
-        this.internalCommands,
-        resourceLocator
-      )
+      new ExperimentsTable(dvcRoot, this.internalCommands, resourceLocator)
     )
 
     this.experiments[dvcRoot] = experimentsTable

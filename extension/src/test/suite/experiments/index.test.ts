@@ -76,7 +76,6 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsTable>
 
       const experiments = new Experiments(
-        config,
         internalCommands,
         mockExperimentsTable
       )
@@ -130,7 +129,6 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsTable>
 
       const experiments = new Experiments(
-        config,
         internalCommands,
         mockExperimentsTable
       )
@@ -177,7 +175,7 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = new Experiments(config, internalCommands)
+      const experiments = new Experiments(internalCommands)
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -214,7 +212,6 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsTable>
 
       const experiments = new Experiments(
-        config,
         internalCommands,
         mockExperimentsTable
       )
