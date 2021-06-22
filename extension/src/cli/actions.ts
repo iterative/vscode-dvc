@@ -1,12 +1,12 @@
 import { Args, Flag } from './args'
 import { Prompt } from './output'
 import { getWarningResponse, showGenericError } from '../vscode/modal'
-import { InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
 
 const offerToForce = async (
   stderr: string,
   internalCommands: InternalCommands,
-  name: string,
+  name: AvailableCommands,
   ...args: Args
 ): Promise<string | undefined> => {
   const text = stderr.replace(
@@ -22,7 +22,7 @@ const offerToForce = async (
 
 export const tryThenMaybeForce = async (
   internalCommands: InternalCommands,
-  name: string,
+  name: AvailableCommands,
   ...args: Args
 ): Promise<string | undefined> => {
   try {

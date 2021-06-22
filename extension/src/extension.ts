@@ -239,7 +239,7 @@ export class Extension implements IExtension {
     this.dvcRoots.forEach(dvcRoot => {
       const repository = new Repository(
         dvcRoot,
-        this.cliReader,
+        this.internalCommands,
         this.decorationProviders[dvcRoot]
       )
 

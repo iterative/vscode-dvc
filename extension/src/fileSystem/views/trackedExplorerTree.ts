@@ -17,7 +17,7 @@ import { exists } from '..'
 import { ListOutput } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { InternalCommands } from '../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../internalCommands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -109,7 +109,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
 
     treeItem.contextValue = this.getContextValue(element)
-
     return treeItem
   }
 
@@ -127,18 +126,18 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
   }
 
-  private openPullPrompt = async (dvcRoot: string, relPath: string) => {
+  private openPullPrompt = async (path: string) => {
     if (getConfigValue(this.noPromptPullMissingOption)) {
       return
     }
     const response = await window.showInformationMessage(
-      `${relPath} does not exist at the specified path.`,
+      `${path} does not exist at the specified path.`,
       'Pull File',
       this.doNotShowAgainText
     )
 
     if (response === 'Pull File') {
-      return tryThenMaybeForce(this.internalCommands, 'pull', dvcRoot, relPath)
+      return this.tryThenMaybeForce(AvailableCommands.PULL, path)
     }
 
     if (response === this.doNotShowAgainText) {
@@ -167,7 +166,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     const relPath = relative(dvcRoot, path)
 
     if (!exists(path)) {
-      return this.openPullPrompt(dvcRoot, relPath)
+      return this.openPullPrompt(path)
     }
 
     return window.showTextDocument(resource).then(
@@ -213,7 +212,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     }
 
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
-      'listDvcOnly',
+      AvailableCommands.LIST_DVC_ONLY,
       root,
       relative(root, path)
     )
@@ -232,7 +231,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       commands.registerCommand('dvc.init', async () => {
         const root = this.config.getFirstWorkspaceFolderRoot()
         if (root) {
-          await this.internalCommands.executeCommand('init', root)
+          await this.internalCommands.executeCommand(
+            AvailableCommands.INIT,
+            root
+          )
         }
         workspaceChanged.fire()
       })
@@ -255,24 +257,28 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         this.treeDataChanged.fire()
         const dvcRoot = this.pathRoots[path]
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-        return this.internalCommands.executeCommand('remove', dvcRoot, relPath)
+        return this.internalCommands.executeCommand(
+          AvailableCommands.REMOVE,
+          dvcRoot,
+          relPath
+        )
       })
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pullTarget', path =>
-        this.tryThenMaybeForce('pull', path)
+        this.tryThenMaybeForce(AvailableCommands.PULL, path)
       )
     )
 
     this.dispose.track(
       commands.registerCommand('dvc.pushTarget', path =>
-        this.tryThenMaybeForce('push', path)
+        this.tryThenMaybeForce(AvailableCommands.PUSH, path)
       )
     )
   }
 
-  private tryThenMaybeForce(name: string, path: string) {
+  private tryThenMaybeForce(name: AvailableCommands, path: string) {
     const dvcRoot = this.pathRoots[path]
     return tryThenMaybeForce(
       this.internalCommands,
