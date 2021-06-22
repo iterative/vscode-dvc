@@ -1,8 +1,6 @@
 import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
-import { stop } from '../runner'
 import { Experiments } from '..'
-import { CliRunner } from '../../cli/runner'
 import { AvailableCommands } from '../../internalCommands'
 
 const registerExperimentCwdCommands = (experiments: Experiments): void => {
@@ -58,10 +56,7 @@ const registerExperimentExecutorCommands = (experiments: Experiments): void => {
   registerExperimentQuickPickCommands(experiments)
 }
 
-const registerExperimentRunnerCommands = (
-  experiments: Experiments,
-  cliRunner: CliRunner
-): void => {
+const registerExperimentRunnerCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.runExperiment', () =>
       experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
@@ -85,20 +80,13 @@ const registerExperimentRunnerCommands = (
   )
 
   experiments.dispose.track(
-    commands.registerCommand('dvc.stopRunningExperiment', () => stop(cliRunner))
-  )
-
-  experiments.dispose.track(
     commands.registerCommand('dvc.showExperiments', () =>
       experiments.showExperimentsTable()
     )
   )
 }
 
-export const registerExperimentCommands = (
-  experiments: Experiments,
-  cliRunner: CliRunner
-) => {
+export const registerExperimentCommands = (experiments: Experiments) => {
   registerExperimentExecutorCommands(experiments)
-  registerExperimentRunnerCommands(experiments, cliRunner)
+  registerExperimentRunnerCommands(experiments)
 }

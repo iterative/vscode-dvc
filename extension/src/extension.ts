@@ -154,7 +154,12 @@ export class Extension implements IExtension {
     )
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(this.experiments, this.cliRunner)
+    registerExperimentCommands(this.experiments)
+    this.dispose.track(
+      commands.registerCommand('dvc.stopRunningExperiment', () =>
+        this.cliRunner.stop()
+      )
+    )
 
     registerRepositoryCommands(this.internalCommands)
 
