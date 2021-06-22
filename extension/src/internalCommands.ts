@@ -24,6 +24,7 @@ export enum AvailableCommands {
   STATUS = 'status', // scm & decoration
 
   EXPERIMENT_APPLY = 'experimentApply', // experiments
+  EXPERIMENT_BRANCH = 'experimentBranch', // experiments
   EXPERIMENT_RUN_QUEUE = 'experimentRunQueue', // experiments
   EXPERIMENT_REMOVE = 'experimentRemove', // experiments
   PICK_EXPERIMENT_NAME = 'pickExperimentName', // experiments

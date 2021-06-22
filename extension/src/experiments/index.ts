@@ -66,15 +66,17 @@ export class Experiments {
       return
     }
 
-    const name = await this.internalCommands.executeCommand(
+    const experimentName = await this.internalCommands.executeCommand(
       AvailableCommands.PICK_EXPERIMENT_NAME,
       cwd
     )
 
-    if (!name) {
+    if (!experimentName) {
       return
     }
-    return report(this.internalCommands.executeCommand(commandName, cwd, name))
+    return report(
+      this.internalCommands.executeCommand(commandName, cwd, experimentName)
+    )
   }
 
   public getCwdAndQuickPickThenRun = async <T>(
@@ -93,7 +95,7 @@ export class Experiments {
   }
 
   public getExpNameAndInputThenRun = async (
-    func: (cwd: string, experiment: string, input: string) => Promise<string>,
+    commandName: AvailableCommands,
     prompt: string
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
@@ -101,17 +103,24 @@ export class Experiments {
       return
     }
 
-    const name = await this.internalCommands.executeCommand(
+    const experimentName = await this.internalCommands.executeCommand(
       AvailableCommands.PICK_EXPERIMENT_NAME,
       cwd
     )
 
-    if (!name) {
+    if (!experimentName) {
       return
     }
     const input = await getInput(prompt)
     if (input) {
-      report(func(cwd, name, input))
+      report(
+        this.internalCommands.executeCommand(
+          commandName,
+          cwd,
+          experimentName,
+          input
+        )
+      )
     }
   }
 

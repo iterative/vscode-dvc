@@ -28,14 +28,11 @@ const registerExperimentNameCommands = (experiments: Experiments): void => {
   )
 }
 
-const registerExperimentInputCommands = (
-  experiments: Experiments,
-  cliExecutor: CliExecutor
-): void => {
+const registerExperimentInputCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.branchExperiment', () =>
       experiments.getExpNameAndInputThenRun(
-        cliExecutor.experimentBranch,
+        AvailableCommands.EXPERIMENT_BRANCH,
         'Name the new branch'
       )
     )
@@ -62,7 +59,7 @@ const registerExperimentExecutorCommands = (
 ): void => {
   registerExperimentCwdCommands(experiments)
   registerExperimentNameCommands(experiments)
-  registerExperimentInputCommands(experiments, cliExecutor)
+  registerExperimentInputCommands(experiments)
   registerExperimentQuickPickCommands(experiments, cliExecutor)
 }
 

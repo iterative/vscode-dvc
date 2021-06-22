@@ -13,6 +13,7 @@ export class CliExecutor extends Cli {
     'checkout',
     'commit',
     'experimentApply',
+    'experimentBranch',
     'experimentRemove',
     'experimentRunQueue',
     'init',

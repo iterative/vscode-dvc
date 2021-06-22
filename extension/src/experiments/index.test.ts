@@ -197,9 +197,8 @@ describe('Experiments', () => {
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
-      const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         'enter your password please'
       )
 
@@ -214,9 +213,8 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         'please name the branch'
       )
 
@@ -234,7 +232,7 @@ describe('Experiments', () => {
 
       const mockedExpFunc = jest.fn()
       await experiments.getExpNameAndInputThenRun(
-        mockedExpFunc,
+        'mockedExpFunc' as AvailableCommands,
         'please enter your bank account number and sort code'
       )
 
