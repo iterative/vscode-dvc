@@ -135,6 +135,10 @@ suite('Extension Test Suite', () => {
         ]
       } as unknown as StatusOutput)
 
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
       await selectDvcPathItem(1)
 
       await configurationChangeEvent()

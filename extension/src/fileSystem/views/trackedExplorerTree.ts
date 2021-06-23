@@ -237,8 +237,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
             AvailableCommands.INIT,
             root
           )
+          workspaceChanged.fire()
         }
-        workspaceChanged.fire()
       })
     )
 

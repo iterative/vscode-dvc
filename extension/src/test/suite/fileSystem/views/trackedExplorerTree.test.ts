@@ -12,6 +12,8 @@ import * as FileSystem from '../../../../fileSystem'
 import { getConfigValue, setConfigValue } from '../../../../vscode/config'
 import { CliExecutor } from '../../../../cli/executor'
 import { Prompt } from '../../../../cli/output'
+import { Config } from '../../../../config'
+import * as Setup from '../../../../setup'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -79,6 +81,24 @@ suite('Extension Test Suite', () => {
 
       await commands.executeCommand('dvc.deleteTarget', path)
       expect(exists(path)).to.be.false
+    })
+
+    it('should be able to run dvc.init without error', async () => {
+      const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
+      const mockSetup = stub(Setup, 'setup').resolves()
+
+      await commands.executeCommand('dvc.init')
+      expect(mockInit).to.be.calledOnce
+      expect(mockSetup).to.be.calledOnce
+
+      mockInit.resetHistory()
+      mockSetup.resetHistory()
+      stub(Config.prototype, 'getFirstWorkspaceFolderRoot').resolves(undefined)
+
+      await commands.executeCommand('dvc.init')
+
+      expect(mockInit).not.to.be.called
+      expect(mockSetup).not.to.be.called
     })
 
     it('should be able to open a non-binary file', async () => {
