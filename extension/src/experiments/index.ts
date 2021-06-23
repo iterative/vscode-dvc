@@ -8,7 +8,11 @@ import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { reset } from '../util/disposable'
-import { AvailableCommands, InternalCommands } from '../internalCommands'
+import {
+  CommandId,
+  AvailableCommands,
+  InternalCommands
+} from '../internalCommands'
 
 type ExperimentsTables = Record<string, ExperimentsTable>
 
@@ -47,16 +51,16 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public getCwdThenRun = async (commandName: AvailableCommands) => {
+  public getCwdThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
     }
 
-    report(this.internalCommands.executeCommand(commandName, cwd))
+    report(this.internalCommands.executeCommand(commandId, cwd))
   }
 
-  public getExpNameThenRun = async (commandName: AvailableCommands) => {
+  public getExpNameThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
       return
@@ -68,12 +72,12 @@ export class Experiments {
       return
     }
     return report(
-      this.internalCommands.executeCommand(commandName, cwd, experimentName)
+      this.internalCommands.executeCommand(commandId, cwd, experimentName)
     )
   }
 
   public getCwdAndQuickPickThenRun = async (
-    commandName: AvailableCommands,
+    commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
@@ -83,12 +87,12 @@ export class Experiments {
     const result = await quickPick()
 
     if (result) {
-      report(this.internalCommands.executeCommand(commandName, cwd, ...result))
+      report(this.internalCommands.executeCommand(commandId, cwd, ...result))
     }
   }
 
   public getExpNameAndInputThenRun = async (
-    commandName: AvailableCommands,
+    commandId: CommandId,
     prompt: string
   ) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
@@ -105,7 +109,7 @@ export class Experiments {
     if (input) {
       report(
         this.internalCommands.executeCommand(
-          commandName,
+          commandId,
           cwd,
           experimentName,
           input
@@ -123,9 +127,7 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
-  public showExperimentsTableThenRun = async (
-    commandName: AvailableCommands
-  ) => {
+  public showExperimentsTableThenRun = async (commandId: CommandId) => {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
       return
@@ -136,7 +138,7 @@ export class Experiments {
       return
     }
 
-    this.internalCommands.executeCommand(commandName, dvcRoot)
+    this.internalCommands.executeCommand(commandId, dvcRoot)
     return experimentsTable
   }
 

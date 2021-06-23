@@ -23,7 +23,7 @@ export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
 export type CliResult = { stderr?: string; command: string; cwd: string }
 
 export interface ICli {
-  commandsToRegister: string[]
+  autoRegisteredCommands: string[]
 
   processCompleted: EventEmitter<CliResult>
   onDidCompleteProcess: Event<CliResult>
@@ -32,10 +32,24 @@ export interface ICli {
   onDidStartProcess: Event<void>
 }
 
+export const typeCheckCommands = (
+  autoRegisteredCommands: Record<string, string>,
+  against: ICli
+) =>
+  Object.values(autoRegisteredCommands).map(value => {
+    if (typeof against[value as keyof typeof against] !== 'function') {
+      throw new Error(
+        `${against.constructor.name} tried to register an internal command that does not exist. ` +
+          'If you are a user and see this message then something has gone very wrong.'
+      )
+    }
+    return value
+  })
+
 export class Cli implements ICli {
   public dispose = Disposable.fn()
 
-  public commandsToRegister: string[] = []
+  public autoRegisteredCommands: string[] = []
 
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>

@@ -17,7 +17,11 @@ import { exists } from '..'
 import { ListOutput } from '../../cli/reader'
 import { getConfigValue, setConfigValue } from '../../vscode/config'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { AvailableCommands, InternalCommands } from '../../internalCommands'
+import {
+  CommandId,
+  AvailableCommands,
+  InternalCommands
+} from '../../internalCommands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -278,11 +282,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
   }
 
-  private tryThenMaybeForce(name: AvailableCommands, path: string) {
+  private tryThenMaybeForce(commandId: CommandId, path: string) {
     const dvcRoot = this.pathRoots[path]
     return tryThenMaybeForce(
       this.internalCommands,
-      name,
+      commandId,
       dvcRoot,
       relative(dvcRoot, path)
     )

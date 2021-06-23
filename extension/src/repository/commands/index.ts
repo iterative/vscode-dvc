@@ -1,7 +1,7 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { AvailableCommands, InternalCommands } from '../../internalCommands'
+import { CommandId, InternalCommands } from '../../internalCommands'
 import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({
@@ -13,25 +13,19 @@ export type ResourceCommand = ({
 }) => Promise<string | undefined>
 
 export const getResourceCommand =
-  (
-    internalCommands: InternalCommands,
-    name: AvailableCommands
-  ): ResourceCommand =>
+  (internalCommands: InternalCommands, commandId: CommandId): ResourceCommand =>
   ({ dvcRoot, resourceUri }) => {
     const relPath = relative(dvcRoot, resourceUri.fsPath)
 
-    return tryThenMaybeForce(internalCommands, name, dvcRoot, relPath)
+    return tryThenMaybeForce(internalCommands, commandId, dvcRoot, relPath)
   }
 
 export const getSimpleResourceCommand =
-  (
-    internalCommands: InternalCommands,
-    name: AvailableCommands
-  ): ResourceCommand =>
+  (internalCommands: InternalCommands, commandId: CommandId): ResourceCommand =>
   async ({ dvcRoot, resourceUri }) => {
     const relPath = relative(dvcRoot, resourceUri.fsPath)
     try {
-      return await internalCommands.executeCommand(name, dvcRoot, relPath)
+      return await internalCommands.executeCommand(commandId, dvcRoot, relPath)
     } catch {
       return showGenericError()
     }
@@ -44,9 +38,9 @@ export type RootCommand = ({
 }) => Promise<string | undefined>
 
 export const getRootCommand =
-  (internalCommands: InternalCommands, name: AvailableCommands): RootCommand =>
+  (internalCommands: InternalCommands, commandId: CommandId): RootCommand =>
   ({ rootUri }) => {
     const cwd = rootUri.fsPath
 
-    return tryThenMaybeForce(internalCommands, name, cwd)
+    return tryThenMaybeForce(internalCommands, commandId, cwd)
   }
