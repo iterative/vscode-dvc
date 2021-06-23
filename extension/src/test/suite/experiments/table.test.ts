@@ -86,7 +86,7 @@ suite('Experiments Table Test Suite', () => {
     it('should only be able to open a single experiments webview', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
-      const mockReader = stub(cliReader, 'experimentShow').resolves(
+      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
@@ -109,10 +109,10 @@ suite('Experiments Table Test Suite', () => {
       const webview = await experimentsTable.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
-      expect(mockReader).to.have.been.calledOnce
+      expect(mockExperimentShow).to.have.been.calledOnce
 
       windowSpy.resetHistory()
-      mockReader.resetHistory()
+      mockExperimentShow.resetHistory()
 
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
@@ -122,7 +122,7 @@ suite('Experiments Table Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-      expect(mockReader).not.to.have.been.called
+      expect(mockExperimentShow).not.to.have.been.called
     })
   })
 })
