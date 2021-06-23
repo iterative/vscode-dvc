@@ -18,8 +18,7 @@ export const AvailableCommands = Object.assign(
   CliReaderCommands,
   CliRunnerCommands
 )
-export type AvailableCommands =
-  typeof AvailableCommands[keyof typeof AvailableCommands]
+export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
 export class InternalCommands {
   public dispose = Disposable.fn()
@@ -47,10 +46,10 @@ export class InternalCommands {
   }
 
   public executeCommand<T = string>(
-    id: AvailableCommands,
+    commandId: CommandId,
     ...args: Args
   ): Promise<T> {
-    const command = this.commands.get(id)
+    const command = this.commands.get(commandId)
     if (!command) {
       throw new Error('Unknown command')
     }
@@ -58,16 +57,16 @@ export class InternalCommands {
     return command(...args) as Promise<T>
   }
 
-  private registerCommand(id: string, command: Command): void {
-    if (!id.trim().length) {
+  private registerCommand(commandId: string, command: Command): void {
+    if (!commandId.trim().length) {
       throw new Error('invalid id')
     }
 
-    if (this.commands.has(id)) {
-      throw new Error(`command '${id}' already exists`)
+    if (this.commands.has(commandId)) {
+      throw new Error(`command '${commandId}' already exists`)
     }
 
-    this.commands.set(id, command)
+    this.commands.set(commandId, command)
   }
 
   private registerCommands(cli: ICli) {
