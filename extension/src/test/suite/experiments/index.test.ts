@@ -114,8 +114,6 @@ suite('Experiments Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
