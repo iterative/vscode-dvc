@@ -108,11 +108,11 @@ suite('Experiments Test Suite', () => {
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
       const internalCommands = disposable.track(
         new InternalCommands(config, cliReader)
       )
-
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
