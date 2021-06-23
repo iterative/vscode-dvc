@@ -9,13 +9,13 @@ import {
   ValueTree
 } from './contract'
 
-export interface ColumnCommon {
+export interface ColumnAggregateData {
   maxStringLength?: number
   maxNumber?: number
   minNumber?: number
 }
 
-export interface PartialColumnDescriptor extends ColumnCommon {
+export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
   childColumns?: PartialColumnsMap
 }
