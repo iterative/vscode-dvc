@@ -127,11 +127,7 @@ export class Extension implements IExtension {
     )
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(
-        this.config,
-        this.internalCommands,
-        this.workspaceChanged
-      )
+      new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
     )
 
     setup(this)

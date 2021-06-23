@@ -19,13 +19,7 @@ mockedWindow.registerTreeDataProvider = jest.fn()
 const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
-
 const mockedGetDefaultProject = jest.fn()
-const mockedGetCliPath = jest.fn()
-const mockedConfig = {
-  getCliPath: mockedGetCliPath,
-  getDefaultProject: mockedGetDefaultProject
-} as unknown as Config
 
 const mockedListDvcOnly = jest.fn()
 const mockedInternalCommands = new InternalCommands({
@@ -62,7 +56,6 @@ describe('TrackedTreeView', () => {
   describe('initialize', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
-        mockedConfig,
         mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
@@ -78,7 +71,6 @@ describe('TrackedTreeView', () => {
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       const trackedTreeView = new TrackedExplorerTree(
-        mockedConfig,
         mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
@@ -113,7 +105,6 @@ describe('TrackedTreeView', () => {
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
       const trackedTreeView = new TrackedExplorerTree(
-        mockedConfig,
         mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
@@ -142,7 +133,6 @@ describe('TrackedTreeView', () => {
       })
 
       const trackedTreeView = new TrackedExplorerTree(
-        mockedConfig,
         mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged

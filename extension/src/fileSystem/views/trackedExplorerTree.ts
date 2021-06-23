@@ -10,7 +10,6 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Config } from '../../config'
 import { definedAndNonEmpty } from '../../util/array'
 import { deleteTarget } from '../workspace'
 import { exists } from '..'
@@ -31,7 +30,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private readonly internalCommands: InternalCommands
   private readonly treeDataChanged: EventEmitter<string | void>
 
-  private config: Config
   private dvcRoots: string[] = []
 
   private pathRoots: Record<string, string> = {}
@@ -47,12 +45,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     'dvc.views.trackedExplorerTree.noPromptPullMissing'
 
   constructor(
-    config: Config,
     internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
     treeDataChanged?: EventEmitter<string | void>
   ) {
-    this.config = config
     this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)
@@ -233,7 +229,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
-        const root = this.config.getFirstWorkspaceFolderRoot()
+        const root = await this.internalCommands.executeCommand(
+          AvailableCommands.GET_FIRST_WORKSPACE_FOLDER_ROOT
+        )
         if (root) {
           await this.internalCommands.executeCommand(
             AvailableCommands.INIT,
