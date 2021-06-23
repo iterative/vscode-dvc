@@ -34,14 +34,15 @@ suite('Experiments Table Test Suite', () => {
 
   describe('refresh', () => {
     it('should return early if an update is in progress', async () => {
-      const stubbedExperimentShow = stub().resolves(complexExperimentsOutput)
-      const internalCommands = {
-        executeCommand: (name: string) => {
-          if (name === 'experimentShow') {
-            return stubbedExperimentShow()
-          }
-        }
-      } as unknown as InternalCommands
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
 
       const testTable = new ExperimentsTable(
         'demo',
@@ -49,7 +50,7 @@ suite('Experiments Table Test Suite', () => {
         {} as ResourceLocator
       )
       await testTable.isReady()
-      stubbedExperimentShow.resetHistory()
+      mockExperimentShow.resetHistory()
 
       await Promise.all([
         testTable.refresh(),
@@ -57,7 +58,7 @@ suite('Experiments Table Test Suite', () => {
         testTable.refresh()
       ])
 
-      expect(stubbedExperimentShow).to.be.calledOnce
+      expect(mockExperimentShow).to.be.calledOnce
     })
   })
 
