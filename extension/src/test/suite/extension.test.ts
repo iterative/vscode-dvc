@@ -166,7 +166,9 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      stub(Watcher, 'onDidChangeFileSystem').returns({} as Disposable)
+      stub(Watcher, 'onDidChangeFileSystem').returns({
+        dispose: () => undefined
+      } as Disposable)
 
       const mockDisposer = spy(Disposer, 'reset')
 
