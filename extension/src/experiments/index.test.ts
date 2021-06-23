@@ -38,26 +38,26 @@ beforeEach(() => {
 })
 
 describe('Experiments', () => {
-  const internalCommands = new InternalCommands({
+  const mockedInternalCommands = new InternalCommands({
     getDefaultProject: mockedGetDefaultProject
   } as unknown as Config)
 
   const mockedCommandId = 'mockedExpFunc' as CommandId
-  internalCommands.registerCommand(mockedCommandId, (...args) =>
+  mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
     mockedExpFunc(...args)
   )
 
-  internalCommands.registerCommand(
+  mockedInternalCommands.registerCommand(
     AvailableCommands.EXPERIMENT_LIST_CURRENT,
     jest.fn()
   )
 
-  internalCommands.registerCommand(
+  mockedInternalCommands.registerCommand(
     AvailableCommands.EXPERIMENT_RUN,
     (...args) => mockedRun(...args)
   )
 
-  const experiments = new Experiments(internalCommands, {
+  const experiments = new Experiments(mockedInternalCommands, {
     '/my/dvc/root': {
       getDvcRoot: () => mockedDvcRoot,
       showWebview: mockedShowWebview

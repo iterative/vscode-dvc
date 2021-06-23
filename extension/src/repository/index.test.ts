@@ -9,6 +9,7 @@ import { DiffOutput, ListOutput, Status, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { delay } from '../util/time'
 import { InternalCommands } from '../internalCommands'
+import { Config } from '../config'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./views/sourceControlManagement')
@@ -34,19 +35,16 @@ const mockedDisposable = mocked(Disposable)
 
 const mockedDelay = mocked(delay)
 
-const mockedInternalCommands = {
-  executeCommand: (name: string, ...args: string[]) => {
-    if (name === 'diff') {
-      return mockedDiff(...args)
-    }
-    if (name === 'listDvcOnlyRecursive') {
-      return mockedListDvcOnlyRecursive(...args)
-    }
-    if (name === 'status') {
-      return mockedStatus(...args)
-    }
-  }
-} as unknown as InternalCommands
+const mockedInternalCommands = new InternalCommands({
+  getDefaultProject: jest.fn()
+} as unknown as Config)
+mockedInternalCommands.registerCommand('diff', (...args) => mockedDiff(...args))
+mockedInternalCommands.registerCommand('listDvcOnlyRecursive', (...args) =>
+  mockedListDvcOnlyRecursive(...args)
+)
+mockedInternalCommands.registerCommand('status', (...args) =>
+  mockedStatus(...args)
+)
 
 beforeEach(() => {
   jest.resetAllMocks()
