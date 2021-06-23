@@ -10,7 +10,7 @@ export interface ValueTreeNode {
 
 export type ValueTree = ValueTreeRoot | ValueTreeNode
 
-export interface Experiment {
+interface ExperimentCommon {
   name?: string
   timestamp?: string | null
   queued?: boolean
@@ -18,10 +18,19 @@ export interface Experiment {
   metrics?: ValueTreeRoot
   checkpoint_tip?: string
   checkpoint_parent?: string
-  sha?: string
 }
 
-export interface CheckpointTip extends Experiment {
+type ExperimentJSONOutput = ExperimentCommon
+
+export interface Experiment {
+  sha?: string
+  name?: string
+  timestamp?: string | null
+  queued?: boolean
+  params?: ValueTreeRoot
+  metrics?: ValueTreeRoot
+  checkpoint_tip?: string
+  checkpoint_parent?: string
   checkpoints?: Experiment[]
 }
 
@@ -31,12 +40,12 @@ export interface ExperimentsWorkspace {
 
 export interface Branch {
   baseline: Experiment
-  experiments: CheckpointTip[]
+  experiments: Experiment[]
 }
 
 export interface ExperimentsBranchJSONOutput {
-  [sha: string]: Experiment
-  baseline: Experiment
+  [sha: string]: ExperimentJSONOutput
+  baseline: ExperimentJSONOutput
 }
 
 export interface ExperimentsRepoJSONOutput {

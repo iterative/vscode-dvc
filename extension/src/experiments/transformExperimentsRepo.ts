@@ -25,14 +25,17 @@ export interface Column extends ColumnCommon {
   ancestors?: string[]
 }
 
-interface ExperimentsAggregate {
-  paramsMap: PartialColumnsMap | undefined
-  metricsMap: PartialColumnsMap | undefined
+interface ExperimentsAccumulator {
+  paramsMap: PartialColumnsMap
+  metricsMap: PartialColumnsMap
+  checkpointsByTip: Map<string, Experiment[]>
+  checkpointTips: Experiment[]
 }
 
 export interface TransformedExperiments {
   metrics?: Column[]
   params?: Column[]
+  checkpointTips: Experiment[]
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -75,8 +78,8 @@ const mergePrimitiveColumn = (
   return columnDescriptor as PartialColumnDescriptor
 }
 
-const mergeOrCreateColumnsMap = (
-  originalColumnsMap: PartialColumnsMap = new Map(),
+const mergeColumnsMap = (
+  originalColumnsMap: PartialColumnsMap,
   valueTree: ValueTree
 ): PartialColumnsMap => {
   const sampleEntries = Object.entries(valueTree)
@@ -100,8 +103,8 @@ const mergeOrCreateColumnDescriptor = (
   const newValueType = getValueType(newValue)
 
   if (newValueType === 'object') {
-    columnDescriptor.childColumns = mergeOrCreateColumnsMap(
-      columnDescriptor.childColumns,
+    columnDescriptor.childColumns = mergeColumnsMap(
+      columnDescriptor.childColumns || new Map(),
       newValue as ValueTree
     )
     return columnDescriptor as PartialColumnDescriptor
@@ -153,6 +156,11 @@ const transformAndCollectFromColumns = (
   return currentLevelColumns
 }
 
+const transformAndCollectFromColumnsIfAny = (
+  columnsMap: PartialColumnsMap
+): Column[] | undefined =>
+  columnsMap.size === 0 ? undefined : transformAndCollectFromColumns(columnsMap)
+
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
   ancestors?: string[]
@@ -175,34 +183,75 @@ const buildColumn = (
   return finalColumn
 }
 
+const addToMapArray = <K = string, V = unknown>(
+  map: Map<K, V[]>,
+  key: K,
+  value: V
+): void => {
+  const existingArray = map.get(key)
+  if (existingArray) {
+    existingArray.push(value)
+  } else {
+    const newArray = [value]
+    map.set(key, newArray)
+  }
+}
+
 const aggregateExperiment = (
-  { paramsMap, metricsMap }: ExperimentsAggregate,
-  { params, metrics }: Experiment
-) => ({
-  metricsMap: metrics
-    ? mergeOrCreateColumnsMap(metricsMap, metrics)
-    : metricsMap,
-  paramsMap: params ? mergeOrCreateColumnsMap(paramsMap, params) : paramsMap
-})
+  acc: ExperimentsAccumulator,
+  experiment: Experiment
+) => {
+  const { params, metrics, checkpoint_tip, sha } = experiment
+  const { paramsMap, metricsMap, checkpointsByTip, checkpointTips } = acc
+  if (params) {
+    mergeColumnsMap(paramsMap, params)
+  }
+  if (metrics) {
+    mergeColumnsMap(metricsMap, metrics)
+  }
+  if (checkpoint_tip && checkpoint_tip !== sha) {
+    addToMapArray(checkpointsByTip, checkpoint_tip, experiment)
+  } else {
+    checkpointTips.push(experiment)
+  }
+
+  return acc
+}
 
 const aggregateBranch = (
-  acc: ExperimentsAggregate,
+  acc: ExperimentsAccumulator,
   branch: ExperimentsBranchJSONOutput
-) => Object.values(branch).reduce(aggregateExperiment, acc)
+) =>
+  Object.entries(branch).reduce(
+    (acc, [sha, experiment]) =>
+      aggregateExperiment(acc, { sha, ...experiment }),
+    acc
+  )
 
 const aggregateExperimentsRepo = (
   tableData: ExperimentsRepoJSONOutput
-): ExperimentsAggregate =>
-  Object.values(tableData).reduce(aggregateBranch, {} as ExperimentsAggregate)
+): ExperimentsAccumulator =>
+  Object.values(tableData).reduce(aggregateBranch, {
+    checkpointTips: [],
+    checkpointsByTip: new Map(),
+    metricsMap: new Map(),
+    paramsMap: new Map()
+  } as ExperimentsAccumulator)
 
 export const transformExperimentsRepo = (
   tableData: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const { metricsMap, paramsMap } = aggregateExperimentsRepo(tableData)
+  const { metricsMap, paramsMap, checkpointsByTip, checkpointTips } =
+    aggregateExperimentsRepo(tableData)
+  for (const tip of checkpointTips) {
+    const checkpoints = checkpointsByTip.get(tip.sha as string)
+    if (checkpoints) {
+      tip.checkpoints = checkpoints
+    }
+  }
   return {
-    metrics: metricsMap
-      ? transformAndCollectFromColumns(metricsMap)
-      : undefined,
-    params: paramsMap ? transformAndCollectFromColumns(paramsMap) : undefined
+    checkpointTips,
+    metrics: transformAndCollectFromColumnsIfAny(metricsMap),
+    params: transformAndCollectFromColumnsIfAny(paramsMap)
   }
 }

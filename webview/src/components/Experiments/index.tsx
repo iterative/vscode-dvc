@@ -156,9 +156,8 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns, rows } = instance
-        const sortedColumns: ColumnInstance<
-          ExperimentWithSubRows
-        >[] = allColumns.filter(column => column.isSorted)
+        const sortedColumns: ColumnInstance<ExperimentWithSubRows>[] =
+          allColumns.filter(column => column.isSorted)
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
           expandedRowCount,

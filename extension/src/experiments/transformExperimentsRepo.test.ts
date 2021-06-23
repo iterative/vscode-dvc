@@ -38,13 +38,14 @@ describe('transformExperimentsRepo', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('returns an empty object if input data is empty', () => {
-    const output = transformExperimentsRepo({
+  it('returns undefined params and metrics if none are provided', () => {
+    const { params, metrics } = transformExperimentsRepo({
       workspace: {
         baseline: {}
       }
     })
-    expect(output).toEqual({})
+    expect(metrics).toBeUndefined()
+    expect(params).toBeUndefined()
   })
 
   describe('minimal mixed column example', () => {
