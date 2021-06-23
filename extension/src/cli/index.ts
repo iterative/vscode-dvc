@@ -38,7 +38,10 @@ export const typeCheckCommands = (
 ) =>
   Object.values(autoRegisteredCommands).map(value => {
     if (typeof against[value as keyof typeof against] !== 'function') {
-      throw new Error(`${against.constructor.name} did something stupid`)
+      throw new Error(
+        `${against.constructor.name} tried to register an internal command that does not exist. ` +
+          'If you are a user and see this message then something has gone very wrong.'
+      )
     }
     return value
   })
