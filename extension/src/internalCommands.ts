@@ -57,7 +57,7 @@ export class InternalCommands {
     return command(...args) as Promise<T>
   }
 
-  private registerCommand(commandId: string, command: Command): void {
+  public registerCommand(commandId: string, command: Command): void {
     if (!commandId.trim().length) {
       throw new Error('invalid id')
     }

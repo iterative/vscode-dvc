@@ -4,12 +4,13 @@ import { Experiments } from '.'
 import { ExperimentsTable } from './table'
 import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
-import { getInput } from '../vscode/inputBox'
+import { Config } from '../config'
 import {
   CommandId,
   AvailableCommands,
   InternalCommands
 } from '../internalCommands'
+import { getInput } from '../vscode/inputBox'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -20,13 +21,6 @@ const mockedQuickPickOne = mocked(quickPickOne)
 const mockedPickExperimentName = mocked(pickExperimentName)
 const mockedGetInput = mocked(getInput)
 const mockedRun = jest.fn()
-const mockedPrompt = 'Select which project to run command against'
-const mockedGetDefaultOrPickProject = (args: string[]) => {
-  if (args.length === 1) {
-    return args[0]
-  }
-  return mockedGetDefaultProject() || mockedQuickPickOne(args, mockedPrompt)
-}
 const mockedExpFunc = jest.fn()
 
 jest.mock('@hediet/std/disposable')
@@ -44,49 +38,42 @@ beforeEach(() => {
 })
 
 describe('Experiments', () => {
-  const experiments = new Experiments(
-    {
-      executeCommand: (name: string, ...args: string[]) => {
-        if (name === 'mockedExpFunc') {
-          return mockedExpFunc(...args)
-        }
+  const internalCommands = new InternalCommands({
+    getDefaultProject: mockedGetDefaultProject
+  } as unknown as Config)
 
-        if (name === 'experimentListCurrent') {
-          return jest.fn()
-        }
-
-        if (name === 'pickExperimentName') {
-          return mockedPickExperimentName(Promise.resolve(args))
-        }
-
-        if (name === 'getDefaultOrPickProject') {
-          return mockedGetDefaultOrPickProject(args)
-        }
-
-        if (['runExperiment', 'runExperimentReset'].includes(name)) {
-          return mockedRun(...args)
-        }
-      },
-      registerCommand: jest.fn()
-    } as unknown as InternalCommands,
-    {
-      '/my/dvc/root': {
-        getDvcRoot: () => mockedDvcRoot,
-        showWebview: mockedShowWebview
-      } as unknown as ExperimentsTable,
-      '/my/fun/dvc/root': {
-        getDvcRoot: () => mockedOtherDvcRoot,
-        showWebview: jest.fn()
-      } as unknown as ExperimentsTable
-    }
+  const mockedCommandId = 'mockedExpFunc' as CommandId
+  internalCommands.registerCommand(mockedCommandId, (...args) =>
+    mockedExpFunc(...args)
   )
+
+  internalCommands.registerCommand(
+    AvailableCommands.EXPERIMENT_LIST_CURRENT,
+    jest.fn()
+  )
+
+  internalCommands.registerCommand(
+    AvailableCommands.EXPERIMENT_RUN,
+    (...args) => mockedRun(...args)
+  )
+
+  const experiments = new Experiments(internalCommands, {
+    '/my/dvc/root': {
+      getDvcRoot: () => mockedDvcRoot,
+      showWebview: mockedShowWebview
+    } as unknown as ExperimentsTable,
+    '/my/fun/dvc/root': {
+      getDvcRoot: () => mockedOtherDvcRoot,
+      showWebview: jest.fn()
+    } as unknown as ExperimentsTable
+  })
 
   describe('getCwdThenRun', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await experiments.getCwdThenRun('mockedExpFunc' as CommandId)
+      await experiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -98,7 +85,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await experiments.getCwdThenRun('mockedExpFunc' as CommandId)
+      await experiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -112,7 +99,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
 
-      await experiments.getExpNameThenRun('mockedExpFunc' as CommandId)
+      await experiments.getExpNameThenRun(mockedCommandId)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -125,7 +112,7 @@ describe('Experiments', () => {
       mockedGetDefaultProject.mockReturnValueOnce(undefined)
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await experiments.getExpNameThenRun('mockedExpFunc' as CommandId)
+      await experiments.getExpNameThenRun(mockedCommandId)
 
       expect(mockedGetDefaultProject).toBeCalledTimes(1)
       expect(mockedQuickPickOne).toBeCalledTimes(1)
@@ -143,7 +130,7 @@ describe('Experiments', () => {
         .fn()
         .mockResolvedValueOnce(mockedPickedOptions)
       await experiments.getCwdAndQuickPickThenRun(
-        'mockedExpFunc' as CommandId,
+        mockedCommandId,
         mockedQuickPick
       )
 
@@ -162,7 +149,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
       const mockedQuickPick = jest.fn()
       await experiments.getCwdAndQuickPickThenRun(
-        'mockedExpFunc' as CommandId,
+        mockedCommandId,
         mockedQuickPick
       )
 
@@ -178,7 +165,7 @@ describe('Experiments', () => {
 
       const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)
       await experiments.getCwdAndQuickPickThenRun(
-        'mockedExpFunc' as CommandId,
+        mockedCommandId,
         mockedQuickPick
       )
 
@@ -197,7 +184,7 @@ describe('Experiments', () => {
       mockedGetInput.mockResolvedValueOnce('abc123')
 
       await experiments.getExpNameAndInputThenRun(
-        'mockedExpFunc' as CommandId,
+        mockedCommandId,
         'enter your password please'
       )
 
@@ -213,7 +200,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
       await experiments.getExpNameAndInputThenRun(
-        'mockedExpFunc' as CommandId,
+        mockedCommandId,
         'please name the branch'
       )
 
@@ -230,7 +217,7 @@ describe('Experiments', () => {
       mockedGetInput.mockResolvedValueOnce(undefined)
 
       await experiments.getExpNameAndInputThenRun(
-        'mockedExpFunc' as CommandId,
+        mockedCommandId,
         'please enter your bank account number and sort code'
       )
 
