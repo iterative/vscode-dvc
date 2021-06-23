@@ -3,7 +3,9 @@ import {
   Value,
   ValueTree,
   Experiment,
-  ExperimentsBranchJSONOutput
+  ExperimentsBranchJSONOutput,
+  ExperimentsBranch,
+  ExperimentsWorkspace
 } from './contract'
 
 interface ColumnCommon {
@@ -29,13 +31,15 @@ interface ExperimentsAccumulator {
   paramsMap: PartialColumnsMap
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
-  checkpointTips: Experiment[]
+  branches: ExperimentsBranch[]
+  workspace: ExperimentsWorkspace
 }
 
 export interface TransformedExperiments {
   metrics?: Column[]
   params?: Column[]
-  checkpointTips: Experiment[]
+  branches: ExperimentsBranch[]
+  workspace: ExperimentsWorkspace
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -197,61 +201,102 @@ const addToMapArray = <K = string, V = unknown>(
   }
 }
 
-const aggregateExperiment = (
+const collectColumnsFromExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
-  const { params, metrics, checkpoint_tip, sha } = experiment
-  const { paramsMap, metricsMap, checkpointsByTip, checkpointTips } = acc
+  const { paramsMap, metricsMap } = acc
+  const { params, metrics } = experiment
   if (params) {
     mergeColumnsMap(paramsMap, params)
   }
   if (metrics) {
     mergeColumnsMap(metricsMap, metrics)
   }
+}
+
+const collectExperimentIntoCheckpoints = (
+  experiments: Experiment[],
+  checkpointsByTip: Map<string, Experiment[]>,
+  experiment: Experiment
+) => {
+  const { checkpoint_tip, sha } = experiment
   if (checkpoint_tip && checkpoint_tip !== sha) {
     addToMapArray(checkpointsByTip, checkpoint_tip, experiment)
   } else {
-    checkpointTips.push(experiment)
+    experiments.push(experiment)
   }
-
-  return acc
 }
 
-const aggregateBranch = (
-  acc: ExperimentsAccumulator,
-  branch: ExperimentsBranchJSONOutput
-) =>
-  Object.entries(branch).reduce(
-    (acc, [sha, experiment]) =>
-      aggregateExperiment(acc, { sha, ...experiment }),
-    acc
-  )
+const addCheckpointsToTips = (
+  experiments: Experiment[],
+  checkpointsByTip: Map<string, Experiment[]>
+) => {
+  for (const checkpointTip of experiments) {
+    const checkpoints = checkpointsByTip.get(checkpointTip.sha as string)
+    if (checkpoints) {
+      checkpointTip.checkpoints = checkpoints
+    }
+  }
+}
 
-const aggregateExperimentsRepo = (
+const collectFromBranchEntry = (
+  acc: ExperimentsAccumulator,
+  [name, { baseline, ...experimentsObject }]: [
+    string,
+    ExperimentsBranchJSONOutput
+  ]
+) => {
+  collectColumnsFromExperiment(acc, baseline)
+  const experiments: Experiment[] = []
+  const checkpointsByTip = new Map<string, Experiment[]>()
+
+  for (const [sha, experimentData] of Object.entries(experimentsObject)) {
+    const experiment: Experiment = { ...experimentData, sha }
+    collectColumnsFromExperiment(acc, experiment)
+    collectExperimentIntoCheckpoints(experiments, checkpointsByTip, experiment)
+  }
+  addCheckpointsToTips(experiments, checkpointsByTip)
+
+  const branch = { baseline, experiments, name }
+  acc.branches.push(branch)
+}
+
+const collectFromBranchesObject = (
+  acc: ExperimentsAccumulator,
+  branchesObject: { [name: string]: ExperimentsBranchJSONOutput }
+) => {
+  for (const branchEntry of Object.entries(branchesObject)) {
+    collectFromBranchEntry(acc, branchEntry)
+  }
+}
+
+const collectFromRepo = (
   tableData: ExperimentsRepoJSONOutput
-): ExperimentsAccumulator =>
-  Object.values(tableData).reduce(aggregateBranch, {
-    checkpointTips: [],
+): ExperimentsAccumulator => {
+  const { workspace, ...branchesObject } = tableData
+  const acc: ExperimentsAccumulator = {
+    branches: [] as ExperimentsBranch[],
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
-    paramsMap: new Map()
-  } as ExperimentsAccumulator)
+    paramsMap: new Map(),
+    workspace
+  }
+  collectColumnsFromExperiment(acc, workspace.baseline)
+  collectFromBranchesObject(acc, branchesObject)
+  return acc
+}
 
 export const transformExperimentsRepo = (
   tableData: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const { metricsMap, paramsMap, checkpointsByTip, checkpointTips } =
-    aggregateExperimentsRepo(tableData)
-  for (const tip of checkpointTips) {
-    const checkpoints = checkpointsByTip.get(tip.sha as string)
-    if (checkpoints) {
-      tip.checkpoints = checkpoints
-    }
-  }
+  const { metricsMap, paramsMap, branches, workspace } =
+    collectFromRepo(tableData)
+
   return {
-    checkpointTips,
+    branches,
     metrics: transformAndCollectFromColumnsIfAny(metricsMap),
-    params: transformAndCollectFromColumnsIfAny(paramsMap)
-  }
+    params: transformAndCollectFromColumnsIfAny(paramsMap),
+    workspace
+  } as TransformedExperiments
 }

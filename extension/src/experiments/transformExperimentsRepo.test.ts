@@ -93,10 +93,10 @@ describe('transformExperimentsRepo', () => {
 
     it('correctly identifies mixed type params', () =>
       expect(exampleMixedColumn.types).toEqual([
+        'number',
         'string',
         'boolean',
-        'null',
-        'number'
+        'null'
       ]))
 
     it('correctly identifies a number as the highest string length of a mixed column', () =>
@@ -110,7 +110,7 @@ describe('transformExperimentsRepo', () => {
 
   it('finds different minNumber and maxNumber on a mixed column', () => {
     const { params } = transformExperimentsRepo({
-      workspace: {
+      branch1: {
         baseline: {
           params: {
             'params.yaml': {
@@ -139,6 +139,9 @@ describe('transformExperimentsRepo', () => {
             }
           }
         }
+      },
+      workspace: {
+        baseline: {}
       }
     }) as { params: Column[] }
     const [paramsFileColumn] = params
@@ -150,7 +153,7 @@ describe('transformExperimentsRepo', () => {
 
   describe('Number features', () => {
     const { params } = transformExperimentsRepo({
-      workspace: {
+      branch1: {
         baseline: {
           params: {
             'params.yaml': {
@@ -175,6 +178,9 @@ describe('transformExperimentsRepo', () => {
             }
           }
         }
+      },
+      workspace: {
+        baseline: {}
       }
     }) as {
       params: Column[]
@@ -201,14 +207,14 @@ describe('transformExperimentsRepo', () => {
         baseline: {
           params: {
             'params.yaml': {
-              one: 1
+              two: 2
             }
           }
         },
         otherexp: {
           params: {
             'params.yaml': {
-              two: 2
+              three: 3
             }
           }
         }
@@ -217,7 +223,7 @@ describe('transformExperimentsRepo', () => {
         baseline: {
           params: {
             'params.yaml': {
-              three: 3
+              four: 4
             }
           }
         }
@@ -226,7 +232,7 @@ describe('transformExperimentsRepo', () => {
         baseline: {
           params: {
             'params.yaml': {
-              four: 4
+              one: 1
             }
           }
         }

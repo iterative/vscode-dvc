@@ -38,9 +38,15 @@ export interface ExperimentsWorkspace {
   baseline: Experiment
 }
 
-export interface Branch {
+export interface ExperimentsBranch {
+  name: string
   baseline: Experiment
-  experiments: Experiment[]
+  experiments?: Experiment[]
+}
+
+export interface ExperimentsRepo {
+  workspace: ExperimentsBranch
+  branches: ExperimentsBranch[]
 }
 
 export interface ExperimentsBranchJSONOutput {
