@@ -21,7 +21,7 @@ export const autoRegisteredCommands = {
   PULL: 'pull',
   PUSH: 'push',
   REMOVE: 'remove'
-}
+} as const
 
 export class CliExecutor extends Cli {
   public readonly autoRegisteredCommands = typeCheckCommands(

@@ -54,7 +54,7 @@ export const autoRegisteredCommands = {
   LIST_DVC_ONLY: 'listDvcOnly',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
   STATUS: 'status'
-}
+} as const
 
 export class CliReader extends Cli {
   public readonly autoRegisteredCommands = typeCheckCommands(

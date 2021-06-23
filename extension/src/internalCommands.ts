@@ -13,7 +13,7 @@ export const AvailableCommands = Object.assign(
   {
     GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
     GET_THEME: 'getTheme'
-  },
+  } as const,
   CliExecutorCommands,
   CliReaderCommands,
   CliRunnerCommands

@@ -12,7 +12,7 @@ export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
   EXPERIMENT_RUN_QUEUED: 'runExperimentQueue',
   EXPERIMENT_RUN_RESET: 'runExperimentReset'
-}
+} as const
 
 export class CliRunner implements ICli {
   public readonly dispose = Disposable.fn()
