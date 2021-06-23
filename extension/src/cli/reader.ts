@@ -1,4 +1,4 @@
-import { Cli } from '.'
+import { Cli, typeCheckCommands } from '.'
 import {
   Args,
   Command,
@@ -47,15 +47,20 @@ export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
+export const autoRegisteredCommands = {
+  DIFF: 'diff',
+  EXPERIMENT_LIST_CURRENT: 'experimentListCurrent',
+  EXPERIMENT_SHOW: 'experimentShow',
+  LIST_DVC_ONLY: 'listDvcOnly',
+  LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
+  STATUS: 'status'
+} as const
+
 export class CliReader extends Cli {
-  public commandsToRegister = [
-    'experimentListCurrent',
-    'experimentShow',
-    'diff',
-    'listDvcOnly',
-    'listDvcOnlyRecursive',
-    'status'
-  ]
+  public readonly autoRegisteredCommands = typeCheckCommands(
+    autoRegisteredCommands,
+    this
+  )
 
   public experimentListCurrent(cwd: string): Promise<string[]> {
     return this.readProcess<string[]>(

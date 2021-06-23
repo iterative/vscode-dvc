@@ -1,4 +1,4 @@
-import { Cli } from '.'
+import { Cli, typeCheckCommands } from '.'
 import {
   Args,
   Command,
@@ -7,20 +7,27 @@ import {
   Flag,
   GcPreserveFlag
 } from './args'
+
+export const autoRegisteredCommands = {
+  ADD: 'add',
+  CHECKOUT: 'checkout',
+  COMMIT: 'commit',
+  EXPERIMENT_APPLY: 'experimentApply',
+  EXPERIMENT_BRANCH: 'experimentBranch',
+  EXPERIMENT_GARBAGE_COLLECT: 'experimentGarbageCollect',
+  EXPERIMENT_QUEUE: 'experimentRunQueue',
+  EXPERIMENT_REMOVE: 'experimentRemove',
+  INIT: 'init',
+  PULL: 'pull',
+  PUSH: 'push',
+  REMOVE: 'remove'
+} as const
+
 export class CliExecutor extends Cli {
-  public commandsToRegister = [
-    'add',
-    'checkout',
-    'commit',
-    'experimentApply',
-    'experimentBranch',
-    'experimentRemove',
-    'experimentRunQueue',
-    'init',
-    'pull',
-    'push',
-    'remove'
-  ]
+  public readonly autoRegisteredCommands = typeCheckCommands(
+    autoRegisteredCommands,
+    this
+  )
 
   public add(cwd: string, target: string) {
     return this.executeProcess(cwd, Command.ADD, target)

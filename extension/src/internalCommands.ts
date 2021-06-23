@@ -3,38 +3,22 @@ import { ICli } from './cli'
 import { Args } from './cli/args'
 import { Config } from './config'
 import { quickPickOne } from './vscode/quickPick'
+import { autoRegisteredCommands as CliExecutorCommands } from './cli/executor'
+import { autoRegisteredCommands as CliReaderCommands } from './cli/reader'
+import { autoRegisteredCommands as CliRunnerCommands } from './cli/runner'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
-export enum AvailableCommands {
-  ADD = 'add', // scm
-  CHECKOUT = 'checkout', // scm & explorer
-  COMMIT = 'commit', // scm & explorer
-  DIFF = 'diff', // scm & decoration
-  EXPERIMENT_LIST_CURRENT = 'experimentListCurrent', // experiments
-  EXPERIMENT_SHOW = 'experimentShow', // experiments
-  INIT = 'init', // explorer welcome
-  LIST_DVC_ONLY = 'listDvcOnly', // explorer
-  LIST_DVC_ONLY_RECURSIVE = 'listDvcOnlyRecursive', // scm & decoration
-  PULL = 'pull', // scm & explorer
-  PUSH = 'push', // scm & explorer
-  REMOVE = 'remove', // explorer
-  STATUS = 'status', // scm & decoration
-
-  EXPERIMENT_APPLY = 'experimentApply', // experiments
-  EXPERIMENT_BRANCH = 'experimentBranch', // experiments
-  EXPERIMENT_GARBAGE_COLLECT = 'experimentGarbageCollect', // experiments
-  EXPERIMENT_REMOVE = 'experimentRemove', // experiments
-  EXPERIMENT_RUN_QUEUE = 'experimentRunQueue', // experiments
-  GET_DEFAULT_OR_PICK_PROJECT = 'getDefaultOrPickProject', // experiments
-  GET_DEFAULT_PROJECT = 'getDefaultProject', // experiments
-  GET_THEME = 'getTheme', // experiments
-  QUICK_PICK_ONE_PROJECT = 'quickPickOneProject', // experiments
-
-  EXPERIMENT_RUN = 'runExperiment', // experiments
-  EXPERIMENT_RUN_RESET = 'runExperimentReset', // experiments
-  EXPERIMENT_RUN_QUEUED = 'runExperimentQueue' // experiments
-}
+export const AvailableCommands = Object.assign(
+  {
+    GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
+    GET_THEME: 'getTheme'
+  } as const,
+  CliExecutorCommands,
+  CliReaderCommands,
+  CliRunnerCommands
+)
+export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
 export class InternalCommands {
   public dispose = Disposable.fn()
@@ -42,7 +26,7 @@ export class InternalCommands {
   private readonly commands = new Map<string, Command>()
 
   constructor(config: Config, ...cliInteractors: ICli[]) {
-    cliInteractors.forEach(cli => this.registerCommands(cli))
+    cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
 
     this.registerCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
@@ -62,10 +46,10 @@ export class InternalCommands {
   }
 
   public executeCommand<T = string>(
-    id: AvailableCommands,
+    commandId: CommandId,
     ...args: Args
   ): Promise<T> {
-    const command = this.commands.get(id)
+    const command = this.commands.get(commandId)
     if (!command) {
       throw new Error('Unknown command')
     }
@@ -73,25 +57,31 @@ export class InternalCommands {
     return command(...args) as Promise<T>
   }
 
-  private registerCommand(id: string, command: Command): void {
-    if (!id.trim().length) {
-      throw new Error('invalid id')
+  public registerCommand(commandId: CommandId, command: Command): void {
+    if (this.commands.has(commandId)) {
+      throw new Error(`command '${commandId}' already exists`)
     }
 
-    if (this.commands.has(id)) {
-      throw new Error(`command '${id}' already exists`)
-    }
-
-    this.commands.set(id, command)
+    this.commands.set(commandId, command)
   }
 
-  private registerCommands(cli: ICli) {
-    cli.commandsToRegister.forEach((name: string) => {
+  private autoRegisterCommands(cli: ICli) {
+    cli.autoRegisteredCommands.forEach((commandId: string) => {
+      if (!this.confirmedId(commandId)) {
+        throw new Error(
+          `This should be an impossible error. ` +
+            'If you are a user and see this message then you win a prize.'
+        )
+      }
       this.registerCommand(
-        name,
+        commandId,
         (dvcRoot: string, ...args: Args): Promise<string> =>
-          (cli[name as keyof typeof cli] as Function)(dvcRoot, ...args)
+          (cli[commandId as keyof typeof cli] as Function)(dvcRoot, ...args)
       )
     })
+  }
+
+  private confirmedId(commandId: string): commandId is CommandId {
+    return Object.values(AvailableCommands).includes(commandId as CommandId)
   }
 }

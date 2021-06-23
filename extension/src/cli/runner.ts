@@ -1,6 +1,6 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { CliResult, getEnv, ICli } from '.'
+import { CliResult, getEnv, ICli, typeCheckCommands } from '.'
 import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
 import { getCommandString } from './command'
 import { Config } from '../config'
@@ -8,14 +8,19 @@ import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 
+export const autoRegisteredCommands = {
+  EXPERIMENT_RUN: 'runExperiment',
+  EXPERIMENT_RUN_QUEUED: 'runExperimentQueue',
+  EXPERIMENT_RUN_RESET: 'runExperimentReset'
+} as const
+
 export class CliRunner implements ICli {
   public readonly dispose = Disposable.fn()
 
-  public readonly commandsToRegister = [
-    'runExperiment',
-    'runExperimentReset',
-    'runExperimentQueue'
-  ]
+  public readonly autoRegisteredCommands = typeCheckCommands(
+    autoRegisteredCommands,
+    this
+  )
 
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>

@@ -11,7 +11,6 @@ import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
-import { CliExecutor } from '../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -35,14 +34,15 @@ suite('Experiments Table Test Suite', () => {
 
   describe('refresh', () => {
     it('should return early if an update is in progress', async () => {
-      const stubbedExperimentShow = stub().resolves(complexExperimentsOutput)
-      const internalCommands = {
-        executeCommand: (name: string) => {
-          if (name === 'experimentShow') {
-            return stubbedExperimentShow()
-          }
-        }
-      } as unknown as InternalCommands
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
 
       const testTable = new ExperimentsTable(
         'demo',
@@ -50,7 +50,7 @@ suite('Experiments Table Test Suite', () => {
         {} as ResourceLocator
       )
       await testTable.isReady()
-      stubbedExperimentShow.resetHistory()
+      mockExperimentShow.resetHistory()
 
       await Promise.all([
         testTable.refresh(),
@@ -58,24 +58,17 @@ suite('Experiments Table Test Suite', () => {
         testTable.refresh()
       ])
 
-      expect(stubbedExperimentShow).to.be.calledOnce
+      expect(mockExperimentShow).to.be.calledOnce
     })
   })
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
       const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = new InternalCommands(
-        config,
-        cliExecutor,
-        cliReader
-      )
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = new InternalCommands(config, cliReader)
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -91,18 +84,13 @@ suite('Experiments Table Test Suite', () => {
     })
 
     it('should only be able to open a single experiments webview', async () => {
-      const mockReader = stub(CliReader.prototype, 'experimentShow').resolves(
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
-      const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
-      const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = new InternalCommands(
-        config,
-        cliExecutor,
-        cliReader
-      )
+      const internalCommands = new InternalCommands(config, cliReader)
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
@@ -121,10 +109,10 @@ suite('Experiments Table Test Suite', () => {
       const webview = await experimentsTable.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
-      expect(mockReader).to.have.been.calledOnce
+      expect(mockExperimentShow).to.have.been.calledOnce
 
       windowSpy.resetHistory()
-      mockReader.resetHistory()
+      mockExperimentShow.resetHistory()
 
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
@@ -134,7 +122,7 @@ suite('Experiments Table Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-      expect(mockReader).not.to.have.been.called
+      expect(mockExperimentShow).not.to.have.been.called
     })
   })
 })

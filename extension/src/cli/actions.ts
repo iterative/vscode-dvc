@@ -1,12 +1,12 @@
 import { Args, Flag } from './args'
 import { Prompt } from './output'
 import { getWarningResponse, showGenericError } from '../vscode/modal'
-import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { CommandId, InternalCommands } from '../internalCommands'
 
 const offerToForce = async (
   stderr: string,
   internalCommands: InternalCommands,
-  name: AvailableCommands,
+  commandId: CommandId,
   ...args: Args
 ): Promise<string | undefined> => {
   const text = stderr.replace(
@@ -17,21 +17,21 @@ const offerToForce = async (
   if (response !== 'Force') {
     return
   }
-  return internalCommands.executeCommand(name, ...args, Flag.FORCE)
+  return internalCommands.executeCommand(commandId, ...args, Flag.FORCE)
 }
 
 export const tryThenMaybeForce = async (
   internalCommands: InternalCommands,
-  name: AvailableCommands,
+  commandId: CommandId,
   ...args: Args
 ): Promise<string | undefined> => {
   try {
-    return await internalCommands.executeCommand(name, ...args)
+    return await internalCommands.executeCommand(commandId, ...args)
   } catch (e) {
     const stderr = e.stderr
 
     if (stderr?.includes(Prompt.TRY_FORCE)) {
-      return offerToForce(stderr, internalCommands, name, ...args)
+      return offerToForce(stderr, internalCommands, commandId, ...args)
     }
 
     return showGenericError()

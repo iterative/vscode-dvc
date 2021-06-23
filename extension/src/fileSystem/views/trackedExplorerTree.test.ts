@@ -28,11 +28,13 @@ const mockedConfig = {
 } as unknown as Config
 
 const mockedListDvcOnly = jest.fn()
-const mockedExecuteCommand = (name: string, ...args: string[]) => {
-  if (name === 'listDvcOnly') {
-    return mockedListDvcOnly(...args)
-  }
-}
+const mockedInternalCommands = new InternalCommands({
+  getDefaultProject: mockedGetDefaultProject
+} as unknown as Config)
+
+mockedInternalCommands.registerCommand('listDvcOnly', (...args) =>
+  mockedListDvcOnly(...args)
+)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -61,7 +63,7 @@ describe('TrackedTreeView', () => {
     it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        {} as InternalCommands,
+        mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -77,9 +79,7 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        {
-          executeCommand: mockedExecuteCommand
-        } as InternalCommands,
+        mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -114,9 +114,7 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        {
-          executeCommand: mockedExecuteCommand
-        } as unknown as InternalCommands,
+        mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
@@ -145,7 +143,7 @@ describe('TrackedTreeView', () => {
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedConfig,
-        {} as InternalCommands,
+        mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
