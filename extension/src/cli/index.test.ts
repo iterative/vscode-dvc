@@ -1,6 +1,6 @@
 import { EventEmitter } from 'vscode'
 import { mocked } from 'ts-jest/utils'
-import { Cli, CliResult } from '.'
+import { Cli, CliResult, typeCheckCommands } from '.'
 import { Command } from './args'
 import { getProcessEnv } from '../env'
 import { executeProcess } from '../processExecution'
@@ -15,6 +15,27 @@ const mockedExecuteProcess = mocked(executeProcess)
 
 beforeEach(() => {
   jest.resetAllMocks()
+})
+
+describe('typeCheckCommands', () => {
+  const cli = { func: jest.fn() } as unknown as Cli
+  it('should throw an error when the command is not on the class', () => {
+    expect(() =>
+      typeCheckCommands(
+        { FUNC: 'func', NOT_A_COMMAND: 'could not be a command' },
+        cli
+      )
+    ).toThrow()
+  })
+
+  it('should not throw an error when the command is on the class', () => {
+    expect(() => typeCheckCommands({ FUNC: 'func' }, cli)).not.toThrow()
+  })
+
+  it('should return the list of commands that are on the class', () => {
+    const commandsToAutoRegister = typeCheckCommands({ FUNC: 'func' }, cli)
+    expect(commandsToAutoRegister).toEqual(['func'])
+  })
 })
 
 describe('executeProcess', () => {

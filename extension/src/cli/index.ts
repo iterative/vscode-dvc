@@ -33,7 +33,7 @@ export interface ICli {
 }
 
 export const typeCheckCommands = (
-  autoRegisteredCommands: object,
+  autoRegisteredCommands: Record<string, string>,
   against: ICli
 ) =>
   Object.values(autoRegisteredCommands).map(value => {
