@@ -1,9 +1,9 @@
 import {
   ExperimentsRepoJSONOutput,
-  Experiment
+  ExperimentFields
 } from 'dvc/src/experiments/contract'
 
-export interface ExperimentWithSubRows extends Experiment {
+export interface ExperimentWithSubRows extends ExperimentFields {
   id: string
   subRows?: ExperimentWithSubRows[]
 }
@@ -17,14 +17,14 @@ interface ParseExperimentsOutput {
 
 const addIdToExperiment: (
   id: string,
-  experiment: Experiment
+  experiment: ExperimentFields
 ) => ExperimentWithSubRows = (id, experiment) => ({
   ...experiment,
   id
 })
 
 const buildExperimentFromEntry: (
-  entry: [string, Experiment]
+  entry: [string, ExperimentFields]
 ) => ExperimentWithSubRows = ([id, experiment]) =>
   addIdToExperiment(id, experiment)
 

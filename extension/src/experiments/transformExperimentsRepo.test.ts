@@ -1,6 +1,88 @@
+import { Experiment } from './contract'
 import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
 
-describe('transformExperimentsRepo', () => {
+describe('branch and checkpoint nesting', () => {
+  it('returns an empty array if no branches are present', () => {
+    const { branches } = transformExperimentsRepo({
+      workspace: {
+        baseline: {}
+      }
+    })
+    expect(branches).toEqual([])
+  })
+
+  describe('a repo with two branches', () => {
+    const { branches, workspace } = transformExperimentsRepo({
+      brancha: {
+        baseline: {},
+        otherexp1: {},
+        otherexp2: {
+          checkpoint_tip: 'otherexp2'
+        },
+        otherexp2_1: {
+          checkpoint_tip: 'otherexp2'
+        }
+      },
+      branchb: {
+        baseline: {}
+      },
+      workspace: {
+        baseline: {}
+      }
+    })
+
+    it('defines workspace', () => expect(workspace).toBeDefined())
+    it('finds two branches', () => expect(branches.length).toEqual(2))
+    const [brancha, branchb] = branches
+    it('lists branches in the same order as the map', () => {
+      expect(brancha.baseline?.sha).toEqual('brancha')
+      expect(branchb.baseline?.sha).toEqual('branchb')
+    })
+    it('finds two experiments on brancha', () => {
+      expect(brancha.experiments?.length).toEqual(2)
+    })
+    it('finds no experiments on branchb', () => {
+      expect(branchb.experiments).toBeUndefined()
+    })
+  })
+
+  describe('a repo with one branch that has nested checkpoints', () => {
+    const {
+      branches: [brancha]
+    } = transformExperimentsRepo({
+      brancha: {
+        baseline: {},
+        tip1: {
+          checkpoint_tip: 'tip1'
+        },
+        tip1cp1: {
+          checkpoint_tip: 'tip1'
+        },
+        tip1cp2: {
+          checkpoint_tip: 'tip1'
+        },
+        tip1cp3: {
+          checkpoint_tip: 'tip1'
+        }
+      },
+      workspace: { baseline: {} }
+    })
+
+    it('only lists the tip as a top-level experiment', () =>
+      expect(brancha.experiments?.length).toEqual(1))
+    const [tip1] = brancha.experiments as Experiment[]
+    it('finds three checkpoints on the tip', () =>
+      expect(tip1.checkpoints?.length).toEqual(3))
+    const [tip1cp1, tip1cp2, tip1cp3] = tip1.checkpoints as Experiment[]
+    it('finds checkpoints in order', () => {
+      expect(tip1cp1.sha).toEqual('tip1cp1')
+      expect(tip1cp2.sha).toEqual('tip1cp2')
+      expect(tip1cp3.sha).toEqual('tip1cp3')
+    })
+  })
+})
+
+describe('metrics/params column schema builder', () => {
   it('Outputs both params and metrics when both are present', () => {
     const { params, metrics } = transformExperimentsRepo({
       workspace: {

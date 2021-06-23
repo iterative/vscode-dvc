@@ -5,7 +5,8 @@ import {
   Experiment,
   ExperimentsBranchJSONOutput,
   ExperimentsBranch,
-  ExperimentsWorkspace
+  ExperimentsWorkspace,
+  ExperimentFields
 } from './contract'
 
 interface ColumnCommon {
@@ -203,7 +204,7 @@ const addToMapArray = <K = string, V = unknown>(
 
 const collectColumnsFromExperiment = (
   acc: ExperimentsAccumulator,
-  experiment: Experiment
+  experiment: Experiment | ExperimentFields
 ) => {
   const { paramsMap, metricsMap } = acc
   const { params, metrics } = experiment
@@ -215,8 +216,8 @@ const collectColumnsFromExperiment = (
   }
 }
 
-const collectExperimentIntoCheckpoints = (
-  experiments: Experiment[],
+const nestExperiment = (
+  checkpointTips: Experiment[],
   checkpointsByTip: Map<string, Experiment[]>,
   experiment: Experiment
 ) => {
@@ -224,7 +225,7 @@ const collectExperimentIntoCheckpoints = (
   if (checkpoint_tip && checkpoint_tip !== sha) {
     addToMapArray(checkpointsByTip, checkpoint_tip, experiment)
   } else {
-    experiments.push(experiment)
+    checkpointTips.push(experiment)
   }
 }
 
@@ -242,23 +243,27 @@ const addCheckpointsToTips = (
 
 const collectFromBranchEntry = (
   acc: ExperimentsAccumulator,
-  [name, { baseline, ...experimentsObject }]: [
+  [branchSha, { baseline, ...experimentsObject }]: [
     string,
     ExperimentsBranchJSONOutput
   ]
 ) => {
-  collectColumnsFromExperiment(acc, baseline)
+  const baselineExperiment: Experiment = { sha: branchSha, ...baseline }
+  collectColumnsFromExperiment(acc, baselineExperiment)
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const experiment: Experiment = { ...experimentData, sha }
     collectColumnsFromExperiment(acc, experiment)
-    collectExperimentIntoCheckpoints(experiments, checkpointsByTip, experiment)
+    nestExperiment(experiments, checkpointsByTip, experiment)
   }
   addCheckpointsToTips(experiments, checkpointsByTip)
 
-  const branch = { baseline, experiments, name }
+  const branch: ExperimentsBranch = { baseline: baselineExperiment }
+  if (experiments.length > 0) {
+    branch.experiments = experiments
+  }
   acc.branches.push(branch)
 }
 
