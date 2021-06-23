@@ -3,7 +3,11 @@ import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import { ExperimentsRepoJSONOutput } from './contract'
+import {
+  ExperimentsBranch,
+  ExperimentsRepoJSONOutput,
+  ExperimentsWorkspace
+} from './contract'
 import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
@@ -37,6 +41,9 @@ export class ExperimentsTable {
 
   private updateInProgress = false
 
+  private workspace?: ExperimentsWorkspace
+  private branches?: ExperimentsBranch[]
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -54,6 +61,8 @@ export class ExperimentsTable {
   public isReady = () => this.initialized
   public getParams = () => this.params
   public getMetrics = () => this.metrics
+  public getWorkspace = () => this.workspace
+  public getBranches = () => this.branches
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
@@ -112,9 +121,12 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
-    const { params, metrics } = transformExperimentsRepo(data)
+    const { params, metrics, branches, workspace } =
+      transformExperimentsRepo(data)
     this.params = params
     this.metrics = metrics
+    this.branches = branches
+    this.workspace = workspace
     return this.sendData()
   }
 
