@@ -15,7 +15,6 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../internalCommands'
-import { CliExecutor } from '../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -53,19 +52,17 @@ suite('Experiments Test Suite', () => {
   describe('showExperimentsTable', () => {
     it("should take the config's default even if an experiments webview is focused", async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne')
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
 
       await setConfigValue('dvc.defaultProject', dvcDemoPath)
 
       const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
-      const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliExecutor, cliReader)
-      )
       const configSpy = spy(config, 'getDefaultProject')
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -109,15 +106,12 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
       const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
       const internalCommands = disposable.track(
-        new InternalCommands(config, cliExecutor, cliReader)
+        new InternalCommands(config, cliReader)
       )
 
       const resourceLocator = disposable.track(
@@ -159,15 +153,12 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
       const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
       const internalCommands = disposable.track(
-        new InternalCommands(config, cliExecutor, cliReader)
+        new InternalCommands(config, cliReader)
       )
 
       const resourceLocator = disposable.track(
@@ -190,18 +181,16 @@ suite('Experiments Test Suite', () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
 
       const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
       const cliRunner = disposable.track(new CliRunner(config))
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliExecutor, cliReader, cliRunner)
-      )
       const mockRun = stub(cliRunner, 'run').resolves()
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader, cliRunner)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))

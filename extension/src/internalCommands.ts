@@ -26,7 +26,7 @@ export class InternalCommands {
   private readonly commands = new Map<string, Command>()
 
   constructor(config: Config, ...cliInteractors: ICli[]) {
-    cliInteractors.forEach(cli => this.registerCommands(cli))
+    cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
 
     this.registerCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
@@ -57,11 +57,7 @@ export class InternalCommands {
     return command(...args) as Promise<T>
   }
 
-  private registerCommand(commandId: string, command: Command): void {
-    if (!commandId.trim().length) {
-      throw new Error('invalid id')
-    }
-
+  public registerCommand(commandId: CommandId, command: Command): void {
     if (this.commands.has(commandId)) {
       throw new Error(`command '${commandId}' already exists`)
     }
@@ -69,13 +65,23 @@ export class InternalCommands {
     this.commands.set(commandId, command)
   }
 
-  private registerCommands(cli: ICli) {
-    cli.autoRegisteredCommands.forEach((name: string) => {
+  private autoRegisterCommands(cli: ICli) {
+    cli.autoRegisteredCommands.forEach((commandId: string) => {
+      if (!this.confirmedId(commandId)) {
+        throw new Error(
+          `This should be an impossible error. ` +
+            'If you are a user and see this message then you win a prize.'
+        )
+      }
       this.registerCommand(
-        name,
+        commandId,
         (dvcRoot: string, ...args: Args): Promise<string> =>
-          (cli[name as keyof typeof cli] as Function)(dvcRoot, ...args)
+          (cli[commandId as keyof typeof cli] as Function)(dvcRoot, ...args)
       )
     })
+  }
+
+  private confirmedId(commandId: string): commandId is CommandId {
+    return Object.values(AvailableCommands).includes(commandId as CommandId)
   }
 }

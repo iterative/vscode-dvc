@@ -4,7 +4,8 @@ import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse, showGenericError } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
-import { AvailableCommands, InternalCommands } from '../../internalCommands'
+import { CommandId, InternalCommands } from '../../internalCommands'
+import { Config } from '../../config'
 
 const mockedFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
@@ -12,18 +13,15 @@ const mockedShowGenericError = mocked(showGenericError)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
-const mockedExecuteCommand = jest.fn()
-const mockedInternalCommands = {
-  executeCommand: mockedExecuteCommand
-} as unknown as InternalCommands
+const mockedGetDefaultProject = jest.fn()
+const mockedInternalCommands = new InternalCommands({
+  getDefaultProject: mockedGetDefaultProject
+} as unknown as Config)
 
-const getMockedExecuteCommand =
-  (expectedName: string) =>
-  (name: string, ...args: string[]) => {
-    if (name === expectedName) {
-      return mockedFunc(...args)
-    }
-  }
+const mockedCommandId = 'mockedFunc' as CommandId
+mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
+  mockedFunc(...args)
+)
 
 jest.mock('vscode')
 jest.mock('../../vscode/modal')
@@ -37,14 +35,9 @@ describe('getResourceCommand', () => {
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)
 
-    const mockedName = AvailableCommands.COMMIT
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const output = await commandToRegister({
@@ -63,14 +56,9 @@ describe('getResourceCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedShowGenericError.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.CHECKOUT
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const undef = await commandToRegister({
@@ -88,14 +76,9 @@ describe('getResourceCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.REMOVE
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const undef = await commandToRegister({
@@ -113,14 +96,9 @@ describe('getResourceCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.PULL
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const undef = await commandToRegister({
@@ -137,14 +115,9 @@ describe('getResourceCommand', () => {
     mockedFunc.mockRejectedValueOnce({})
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.LIST_DVC_ONLY
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const undef = await commandToRegister({
@@ -165,15 +138,9 @@ describe('getResourceCommand', () => {
       .mockResolvedValueOnce(forcedStdout)
     mockedGetWarningResponse.mockResolvedValueOnce(userApproves)
 
-    const mockedName = AvailableCommands.PUSH
-    const mockedPush = getMockedExecuteCommand(mockedName)
-    mockedExecuteCommand
-      .mockImplementationOnce(mockedPush)
-      .mockImplementationOnce(mockedPush)
-
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const output = await commandToRegister({
@@ -193,14 +160,9 @@ describe('getSimpleResourceCommand', () => {
     const stdout = "I'm simple, that's easy"
     mockedFunc.mockResolvedValueOnce(stdout)
 
-    const mockedName = AvailableCommands.ADD
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getSimpleResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const output = await commandToRegister({
@@ -218,14 +180,9 @@ describe('getSimpleResourceCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedShowGenericError.mockResolvedValueOnce(noResponsePossible)
 
-    const mockedName = AvailableCommands.ADD
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
-    )
-
     const commandToRegister = getSimpleResourceCommand(
       mockedInternalCommands,
-      mockedName
+      mockedCommandId
     )
 
     const undef = await commandToRegister({
@@ -242,12 +199,10 @@ describe('getRootCommand', () => {
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)
 
-    const mockedName = AvailableCommands.PULL
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
+    const commandToRegister = getRootCommand(
+      mockedInternalCommands,
+      mockedCommandId
     )
-
-    const commandToRegister = getRootCommand(mockedInternalCommands, mockedName)
 
     const output = await commandToRegister({
       rootUri: { fsPath: mockedDvcRoot } as Uri
@@ -264,12 +219,10 @@ describe('getRootCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedShowGenericError.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.PUSH
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
+    const commandToRegister = getRootCommand(
+      mockedInternalCommands,
+      mockedCommandId
     )
-
-    const commandToRegister = getRootCommand(mockedInternalCommands, mockedName)
 
     const undef = await commandToRegister({
       rootUri: { fsPath: mockedDvcRoot } as Uri
@@ -285,12 +238,10 @@ describe('getRootCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.PULL
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
+    const commandToRegister = getRootCommand(
+      mockedInternalCommands,
+      mockedCommandId
     )
-
-    const commandToRegister = getRootCommand(mockedInternalCommands, mockedName)
 
     const undef = await commandToRegister({
       rootUri: { fsPath: mockedDvcRoot } as Uri
@@ -306,12 +257,10 @@ describe('getRootCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.REMOVE
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
+    const commandToRegister = getRootCommand(
+      mockedInternalCommands,
+      mockedCommandId
     )
-
-    const commandToRegister = getRootCommand(mockedInternalCommands, mockedName)
 
     const undef = await commandToRegister({
       rootUri: { fsPath: mockedDvcRoot } as Uri
@@ -326,12 +275,10 @@ describe('getRootCommand', () => {
     mockedFunc.mockRejectedValueOnce({})
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
-    const mockedName = AvailableCommands.CHECKOUT
-    mockedExecuteCommand.mockImplementationOnce(
-      getMockedExecuteCommand(mockedName)
+    const commandToRegister = getRootCommand(
+      mockedInternalCommands,
+      mockedCommandId
     )
-
-    const commandToRegister = getRootCommand(mockedInternalCommands, mockedName)
 
     const undef = await commandToRegister({
       rootUri: { fsPath: mockedDvcRoot } as Uri
@@ -350,13 +297,10 @@ describe('getRootCommand', () => {
       .mockResolvedValueOnce(forcedStdout)
     mockedGetWarningResponse.mockResolvedValueOnce(userApproves)
 
-    const mockedName = AvailableCommands.CHECKOUT
-    const mockedCheckout = getMockedExecuteCommand(mockedName)
-    mockedExecuteCommand
-      .mockImplementationOnce(mockedCheckout)
-      .mockImplementationOnce(mockedCheckout)
-
-    const commandToRegister = getRootCommand(mockedInternalCommands, mockedName)
+    const commandToRegister = getRootCommand(
+      mockedInternalCommands,
+      mockedCommandId
+    )
 
     const output = await commandToRegister({
       rootUri: { fsPath: mockedDvcRoot } as Uri
