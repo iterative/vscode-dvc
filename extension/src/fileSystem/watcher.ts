@@ -65,9 +65,5 @@ export const onDidChangeFileSystem = (
 
   pathWatcher.on('ready', () => onReady(debouncedWatcher, path, pathWatcher))
 
-  return {
-    dispose: () => {
-      pathWatcher.close()
-    }
-  }
+  return { dispose: () => pathWatcher.close() }
 }
