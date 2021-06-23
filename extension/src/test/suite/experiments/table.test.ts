@@ -11,7 +11,6 @@ import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
-import { CliExecutor } from '../../../cli/executor'
 
 chai.use(sinonChai)
 const { expect } = chai
@@ -64,18 +63,11 @@ suite('Experiments Table Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
       const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
       const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = new InternalCommands(
-        config,
-        cliExecutor,
-        cliReader
-      )
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = new InternalCommands(config, cliReader)
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -91,18 +83,13 @@ suite('Experiments Table Test Suite', () => {
     })
 
     it('should only be able to open a single experiments webview', async () => {
-      const mockReader = stub(CliReader.prototype, 'experimentShow').resolves(
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      const mockReader = stub(cliReader, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
-      const config = disposable.track(new Config())
-      const cliExecutor = disposable.track(new CliExecutor(config))
-      const cliReader = disposable.track(new CliReader(config))
-      const internalCommands = new InternalCommands(
-        config,
-        cliExecutor,
-        cliReader
-      )
+      const internalCommands = new InternalCommands(config, cliReader)
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
