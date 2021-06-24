@@ -515,8 +515,6 @@
     "copy-webpack-plugin": "^5.1.1",
     "lint-staged": "^11.0.0",
     "mocha": "^9.0.0",
-    "npm-run-all": "^4.1.5",
-    "prettier": "^2.2.1",
     "shx": "^0.3.3",
     "sinon": "^11.1.1",
     "sinon-chai": "^3.5.0",
