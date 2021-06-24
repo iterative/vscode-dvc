@@ -12,13 +12,17 @@ function includeDependency(location: string) {
   })
   const pkgName = JSON.parse(content).name
 
-  return new CopyPlugin([
-    {
-      from: location,
-      ignore: ['**/node_modules/**/*'],
-      to: r(`./dist/node_modules/${pkgName}`)
-    }
-  ])
+  return new CopyPlugin({
+    patterns: [
+      {
+        from: location,
+        globOptions: {
+          ignore: ['**/node_modules/**/*']
+        },
+        to: r(`./dist/node_modules/${pkgName}`)
+      }
+    ]
+  })
 }
 
 module.exports = {
