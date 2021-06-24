@@ -514,7 +514,6 @@
     "@types/vscode": "^1.56.0",
     "chai": "^4.2.0",
     "copy-webpack-plugin": "^5.1.1",
-    "glob": "^7.1.6",
     "jest": "^27.0.4",
     "lint-staged": "^11.0.0",
     "mocha": "^9.0.0",
