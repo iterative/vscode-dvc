@@ -38,7 +38,7 @@ import { Status } from './status'
 import { definedAndNonEmpty } from './util/array'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
-import { WebviewSerializer } from './webviewSerializer'
+import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
 
