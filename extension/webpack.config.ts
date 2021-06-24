@@ -7,7 +7,8 @@ import CopyPlugin = require('copy-webpack-plugin')
 const r = (file: string) => resolve(__dirname, file)
 
 function includeDependency(location: string) {
-  const content = readFileSync(join(location, 'package.json'), {
+  const pJson = join(location, 'package.json')
+  const content = readFileSync(pJson, {
     encoding: 'utf8'
   })
   const pkgName = JSON.parse(content).name
@@ -15,8 +16,20 @@ function includeDependency(location: string) {
   return new CopyPlugin({
     patterns: [
       {
-        from: location,
-        to: r(`./dist/node_modules/${pkgName}`)
+        from: pJson,
+        to: r(`./dist/node_modules/${pkgName}/package.json`)
+      },
+      {
+        from: join(location, 'index.d.ts'),
+        to: r(`./dist/node_modules/${pkgName}/index.d.ts`)
+      },
+      {
+        from: join(location, 'index.js'),
+        to: r(`./dist/node_modules/${pkgName}/index.js`)
+      },
+      {
+        from: join(location, 'dist'),
+        to: r(`./dist/node_modules/${pkgName}/dist`)
       }
     ]
   })
