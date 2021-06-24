@@ -38,7 +38,7 @@ import { Status } from './status'
 import { definedAndNonEmpty } from './util/array'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
-import { WebviewSerializer } from './webviewSerializer'
+import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
 
@@ -127,11 +127,7 @@ export class Extension implements IExtension {
     )
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(
-        this.config,
-        this.internalCommands,
-        this.workspaceChanged
-      )
+      new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
     )
 
     setup(this)

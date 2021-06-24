@@ -110,7 +110,7 @@ export class Config {
     return WebviewColorTheme.light
   }
 
-  public getFirstWorkspaceFolderRoot = (): string | undefined => {
+  public getFirstWorkspaceFolderRoot(): string | undefined {
     const { workspaceFolders } = workspace
     return workspaceFolders && workspaceFolders.length > 0
       ? workspaceFolders[0].uri.fsPath
