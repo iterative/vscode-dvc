@@ -19,7 +19,7 @@ function includeDependency(location: string) {
         globOptions: {
           ignore: ['**/node_modules/**/*']
         },
-        to: r(`./dist/node_modules/${pkgName}`)
+        to: r(`./node_modules/${pkgName}`)
       }
     ]
   })
@@ -29,7 +29,6 @@ module.exports = {
   devtool: 'source-map',
   entry: r('./src/extension'),
   externals: {
-    'dvc-vscode-webview': 'dvc-vscode-webview',
     fsevents: "require('fsevents')",
     vscode: 'commonjs vscode'
   },
