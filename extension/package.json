@@ -531,7 +531,6 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^8.0.13",
-    "tslint": "^6.1.3",
     "typescript": "^4.1.3",
     "vsce": "^1.94.0",
     "vscode-test": "^1.5.2",
