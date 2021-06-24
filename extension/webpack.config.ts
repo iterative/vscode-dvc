@@ -39,7 +39,12 @@ module.exports = {
   devtool: 'source-map',
   entry: r('./src/extension'),
   externals: {
-    'dvc-vscode-webview': 'dvc-vscode-webview',
+    'dvc-vscode-webview': resolve(
+      __dirname,
+      'dist',
+      'node_modules',
+      'dvc-vscode-webview'
+    ),
     fsevents: "require('fsevents')",
     vscode: 'commonjs vscode'
   },
