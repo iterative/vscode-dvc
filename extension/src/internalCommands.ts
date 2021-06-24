@@ -12,6 +12,7 @@ type Command = (...args: Args) => unknown | Promise<unknown>
 export const AvailableCommands = Object.assign(
   {
     GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
+    GET_FIRST_WORKSPACE_FOLDER_ROOT: 'getFirstWorkspaceFolderRoot',
     GET_THEME: 'getTheme'
   } as const,
   CliExecutorCommands,
@@ -43,6 +44,10 @@ export class InternalCommands {
     )
 
     this.registerCommand(AvailableCommands.GET_THEME, () => config.getTheme())
+    this.registerCommand(
+      AvailableCommands.GET_FIRST_WORKSPACE_FOLDER_ROOT,
+      () => config.getFirstWorkspaceFolderRoot()
+    )
   }
 
   public executeCommand<T = string>(
