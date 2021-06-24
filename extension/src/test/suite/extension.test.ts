@@ -94,6 +94,10 @@ suite('Extension Test Suite', () => {
         dispose: () => undefined
       } as Disposable)
 
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
@@ -162,7 +166,13 @@ suite('Extension Test Suite', () => {
         'I STILL WORK'
       )
 
-      stub(Watcher, 'onDidChangeFileSystem').returns({} as Disposable)
+      stub(CliReader.prototype, 'experimentShow').resolves(
+        complexExperimentsOutput
+      )
+
+      stub(Watcher, 'onDidChangeFileSystem').returns({
+        dispose: () => undefined
+      } as Disposable)
 
       const mockDisposer = spy(Disposer, 'reset')
 
