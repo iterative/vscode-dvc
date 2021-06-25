@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
@@ -22,6 +22,10 @@ suite('Repository Test Suite', () => {
 
   beforeEach(() => {
     restore()
+  })
+
+  afterEach(() => {
+    disposable.dispose()
   })
 
   describe('Repository', () => {
