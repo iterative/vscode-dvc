@@ -65,7 +65,7 @@ export class Repository {
 
     this.setState()
     this.resetInProgress = false
-    this.processQueuedReset()
+    this.processQueued()
   }
 
   public async updateState() {
@@ -78,7 +78,7 @@ export class Repository {
     this.model.setState({ diffFromCache, diffFromHead, untracked })
     this.setState()
     this.updateInProgress = false
-    this.processQueuedUpdate()
+    this.processQueued()
   }
 
   private queueReset(): void {
@@ -89,20 +89,16 @@ export class Repository {
     this.queuedUpdate = true
   }
 
-  private processQueuedReset(): void {
-    if (!this.queuedReset) {
-      return
+  private processQueued(): void {
+    if (this.queuedReset) {
+      this.queuedReset = false
+      this.resetState()
     }
-    this.queuedReset = false
-    this.resetState()
-  }
 
-  private processQueuedUpdate(): void {
-    if (!this.queuedUpdate) {
-      return
+    if (this.queuedUpdate) {
+      this.queuedUpdate = false
+      this.updateState()
     }
-    this.queuedUpdate = false
-    this.updateState()
   }
 
   private getBaseData = (): [

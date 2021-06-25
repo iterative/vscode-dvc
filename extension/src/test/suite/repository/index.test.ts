@@ -62,7 +62,7 @@ suite('Repository Test Suite', () => {
   it('should queue an update and return early if an update is in progress', async () => {
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
-    stub(cliReader, 'listDvcOnlyRecursive').resolves([])
+    const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
 
     const mockDiff = stub(cliReader, 'diff').resolves({})
 
@@ -75,6 +75,7 @@ suite('Repository Test Suite', () => {
       new Repository(dvcDemoPath, internalCommands)
     )
     await repository.isReady()
+    mockList.resetHistory()
     mockDiff.resetHistory()
     mockStatus.resetHistory()
 
@@ -86,6 +87,7 @@ suite('Repository Test Suite', () => {
       repository.updateState()
     ])
 
+    expect(mockList).not.to.be.called
     expect(mockDiff).to.be.calledTwice
     expect(mockStatus).to.be.calledTwice
   })
