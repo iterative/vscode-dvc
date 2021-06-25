@@ -25,7 +25,7 @@ suite('Repository Test Suite', () => {
   })
 
   describe('resetState', () => {
-    it('should return early if a reset is in progress', async () => {
+    it('should queue a reset and return early if a reset is in progress', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([
