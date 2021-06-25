@@ -23,6 +23,7 @@ export class Repository {
   private readonly sourceControlManagement: SourceControlManagement
 
   private resetInProgress = false
+  private queuedReset = false
   private updateInProgress = false
 
   constructor(
@@ -52,16 +53,18 @@ export class Repository {
   }
 
   public async resetState() {
-    if (!this.resetInProgress) {
-      this.resetInProgress = true
-      const [diffFromHead, diffFromCache, untracked, tracked] =
-        await this.getResetData()
-
-      this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
-
-      this.setState()
-      this.resetInProgress = false
+    if (this.resetInProgress) {
+      return this.queueReset()
     }
+    this.resetInProgress = true
+    const [diffFromHead, diffFromCache, untracked, tracked] =
+      await this.getResetData()
+
+    this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
+
+    this.setState()
+    this.resetInProgress = false
+    this.processQueuedReset()
   }
 
   public async updateState() {
@@ -74,6 +77,18 @@ export class Repository {
       this.setState()
       this.updateInProgress = false
     }
+  }
+
+  private queueReset(): void {
+    this.queuedReset = true
+  }
+
+  private processQueuedReset(): void {
+    if (!this.queuedReset) {
+      return
+    }
+    this.queuedReset = false
+    this.resetState()
   }
 
   private getBaseData = (): [

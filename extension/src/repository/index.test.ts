@@ -451,37 +451,6 @@ describe('Repository', () => {
         untracked: emptySet
       })
     })
-
-    it('should only try to reset the data once if called in quick succession', async () => {
-      mockedDiff.mockResolvedValueOnce({})
-      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
-      mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
-
-      const decorationProvider = new DecorationProvider()
-
-      const repository = new Repository(
-        dvcRoot,
-        mockedInternalCommands,
-        decorationProvider
-      )
-      await repository.isReady()
-
-      mockedDiff.mockReset().mockResolvedValueOnce({})
-
-      mockedStatus.mockReset().mockResolvedValueOnce({})
-
-      mockedGetAllUntracked.mockReset().mockResolvedValueOnce(emptySet)
-
-      mockedListDvcOnlyRecursive.mockReset().mockResolvedValueOnce([])
-
-      await Promise.all([repository.resetState(), repository.resetState()])
-
-      expect(mockedDiff).toBeCalledTimes(1)
-      expect(mockedStatus).toBeCalledTimes(1)
-      expect(mockedGetAllUntracked).toBeCalledTimes(1)
-      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
-    })
   })
 
   describe('updateState', () => {

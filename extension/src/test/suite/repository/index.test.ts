@@ -80,9 +80,9 @@ suite('Repository Test Suite', () => {
         repository.resetState()
       ])
 
-      expect(mockList).to.be.calledOnce
-      expect(mockDiff).to.be.calledOnce
-      expect(mockStatus).to.be.calledOnce
+      expect(mockList).to.be.calledTwice
+      expect(mockDiff).to.be.calledTwice
+      expect(mockStatus).to.be.calledTwice
     })
   })
 })
