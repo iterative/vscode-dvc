@@ -44,10 +44,8 @@ suite('Experiments Table Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const testTable = new ExperimentsTable(
-        'demo',
-        internalCommands,
-        {} as ResourceLocator
+      const testTable = disposable.track(
+        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
       )
       await testTable.isReady()
       mockExperimentShow.resetHistory()
