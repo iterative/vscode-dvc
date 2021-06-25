@@ -88,10 +88,7 @@ module.exports = {
         title: WebviewType
       }),
       new ForkTsCheckerWebpackPlugin(),
-      new CleanWebpackPlugin(),
-      new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify('production')
-      })
+      new CleanWebpackPlugin()
     ]
   })(),
   resolve: {
