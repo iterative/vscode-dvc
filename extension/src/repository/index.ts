@@ -69,6 +69,10 @@ export class Repository {
   }
 
   public async updateState() {
+    if (this.resetInProgress) {
+      return this.queueReset()
+    }
+
     if (this.updateInProgress) {
       return this.queueUpdate()
     }
