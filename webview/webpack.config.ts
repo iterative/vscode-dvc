@@ -18,40 +18,45 @@ module.exports = {
         'X-Requested-With, content-type, Authorization',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Origin': '*'
-    }
+    },
+    hot: true
   },
   devtool: 'source-map',
   entry: [r('src/index.tsx')],
   module: {
     rules: [
       {
-        loaders: [styleLoader, cssLoader, 'less-loader'],
-        test: /\.less$/
+        test: /\.less$/,
+        use: [
+          { loader: styleLoader },
+          { loader: cssLoader },
+          { loader: 'less-loader' }
+        ]
       },
       {
-        loaders: [
-          styleLoader,
+        test: /\.css$/,
+        use: [
+          { loader: styleLoader },
           {
             loader: cssLoader,
             options: {
               modules: { auto: true }
             }
           }
-        ],
-        test: /\.css$/
+        ]
       },
       {
-        loaders: [
-          styleLoader,
+        test: /\.scss$/,
+        use: [
+          { loader: styleLoader },
           {
             loader: cssLoader,
             options: {
               modules: { auto: true }
             }
           },
-          'sass-loader'
-        ],
-        test: /\.scss$/
+          { loader: 'sass-loader' }
+        ]
       },
       {
         loader: 'file-loader',
@@ -64,12 +69,9 @@ module.exports = {
       }
     ]
   },
-  node: {
-    fs: 'empty'
-  },
   output: {
     chunkFilename: '[name]-[hash].js',
-    devtoolModuleFilenameTemplate: info => {
+    devtoolModuleFilenameTemplate: (info: { absoluteResourcePath: string }) => {
       let result = info.absoluteResourcePath.replace(/\\/g, '/')
       if (!result.startsWith('file:')) {
         // Some paths already start with the file scheme.
@@ -90,6 +92,7 @@ module.exports = {
     ]
   })(),
   resolve: {
-    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
+    extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
+    fallback: { fs: false }
   }
 } as webpack.Configuration

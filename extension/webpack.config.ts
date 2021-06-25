@@ -1,31 +1,14 @@
-import { readFileSync } from 'fs'
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import * as webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import CopyPlugin = require('copy-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
-
-function includeDependency(location: string) {
-  const content = readFileSync(join(location, 'package.json'), {
-    encoding: 'utf8'
-  })
-  const pkgName = JSON.parse(content).name
-
-  return new CopyPlugin([
-    {
-      from: location,
-      ignore: ['**/node_modules/**/*'],
-      to: r(`./dist/node_modules/${pkgName}`)
-    }
-  ])
-}
 
 module.exports = {
   devtool: 'source-map',
   entry: r('./src/extension'),
   externals: {
-    'dvc-vscode-webview': 'dvc-vscode-webview',
+    'dvc-vscode-webview': r('../webview/'),
     fsevents: "require('fsevents')",
     vscode: 'commonjs vscode'
   },
@@ -51,7 +34,7 @@ module.exports = {
     libraryTarget: 'commonjs2',
     path: r('./dist')
   },
-  plugins: [new CleanWebpackPlugin(), includeDependency(r('../webview/'))],
+  plugins: [new CleanWebpackPlugin()],
   resolve: {
     extensions: ['.ts', '.js']
   },
