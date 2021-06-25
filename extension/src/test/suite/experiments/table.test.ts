@@ -33,7 +33,7 @@ suite('Experiments Table Test Suite', () => {
   })
 
   describe('refresh', () => {
-    it('should return early if an update is in progress', async () => {
+    it('should queue another update and return early if an update is in progress', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
@@ -55,10 +55,13 @@ suite('Experiments Table Test Suite', () => {
       await Promise.all([
         testTable.refresh(),
         testTable.refresh(),
+        testTable.refresh(),
+        testTable.refresh(),
+        testTable.refresh(),
         testTable.refresh()
       ])
 
-      expect(mockExperimentShow).to.be.calledOnce
+      expect(mockExperimentShow).to.be.calledTwice
     })
   })
 
