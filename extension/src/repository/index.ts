@@ -25,6 +25,7 @@ export class Repository {
   private resetInProgress = false
   private queuedReset = false
   private updateInProgress = false
+  private queuedUpdate = false
 
   constructor(
     dvcRoot: string,
@@ -68,19 +69,24 @@ export class Repository {
   }
 
   public async updateState() {
-    if (!this.updateInProgress && !this.resetInProgress) {
-      this.updateInProgress = true
-      const [diffFromHead, diffFromCache, untracked] =
-        await this.getUpdateData()
-
-      this.model.setState({ diffFromCache, diffFromHead, untracked })
-      this.setState()
-      this.updateInProgress = false
+    if (this.updateInProgress) {
+      return this.queueUpdate()
     }
+    this.updateInProgress = true
+    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
+
+    this.model.setState({ diffFromCache, diffFromHead, untracked })
+    this.setState()
+    this.updateInProgress = false
+    this.processQueuedUpdate()
   }
 
   private queueReset(): void {
     this.queuedReset = true
+  }
+
+  private queueUpdate(): void {
+    this.queuedUpdate = true
   }
 
   private processQueuedReset(): void {
@@ -89,6 +95,14 @@ export class Repository {
     }
     this.queuedReset = false
     this.resetState()
+  }
+
+  private processQueuedUpdate(): void {
+    if (!this.queuedUpdate) {
+      return
+    }
+    this.queuedUpdate = false
+    this.updateState()
   }
 
   private getBaseData = (): [

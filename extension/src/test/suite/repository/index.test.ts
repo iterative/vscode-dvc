@@ -1,11 +1,11 @@
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import { beforeEach, describe, it, suite } from 'mocha'
 import chai from 'chai'
 import { stub, restore } from 'sinon'
 import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
-import { CliReader, ListOutput, StatusOutput } from '../../../cli/reader'
+import { CliReader } from '../../../cli/reader'
 import { Config } from '../../../config'
 import { InternalCommands } from '../../../internalCommands'
 import { Repository } from '../../../repository'
@@ -24,42 +24,15 @@ suite('Repository Test Suite', () => {
     restore()
   })
 
-  describe('resetState', () => {
+  describe('Repository', () => {
     it('should queue a reset and return early if a reset is in progress', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
-      const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([
-        { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte.gz') },
-        { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 't10k-labels-idx1-ubyte.gz') },
-        { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte.gz') },
-        { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte') },
-        { path: join('data', 'MNIST', 'raw', 'train-labels-idx1-ubyte.gz') },
-        { path: join('logs', 'acc.tsv') },
-        { path: join('logs', 'loss.tsv') },
-        { path: 'model.pt' }
-      ] as ListOutput[])
+      const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
 
-      const mockDiff = stub(cliReader, 'diff').resolves({
-        modified: [
-          { path: 'model.pt' },
-          { path: 'logs' },
-          { path: 'data/MNIST/raw' }
-        ]
-      })
+      const mockDiff = stub(cliReader, 'diff').resolves({})
 
-      const mockStatus = stub(cliReader, 'status').resolves({
-        'data/MNIST/raw.dvc': [
-          { 'changed outs': { 'data/MNIST/raw': 'modified' } }
-        ],
-        train: [
-          { 'changed deps': { 'data/MNIST': 'modified' } },
-          { 'changed outs': { logs: 'modified', 'model.pt': 'modified' } },
-          'always changed'
-        ]
-      } as unknown as StatusOutput)
+      const mockStatus = stub(cliReader, 'status').resolves({})
       const internalCommands = disposable.track(
         new InternalCommands(config, cliReader)
       )
@@ -84,5 +57,36 @@ suite('Repository Test Suite', () => {
       expect(mockDiff).to.be.calledTwice
       expect(mockStatus).to.be.calledTwice
     })
+  })
+
+  it('should queue an update and return early if an update is in progress', async () => {
+    const config = disposable.track(new Config())
+    const cliReader = disposable.track(new CliReader(config))
+    stub(cliReader, 'listDvcOnlyRecursive').resolves([])
+
+    const mockDiff = stub(cliReader, 'diff').resolves({})
+
+    const mockStatus = stub(cliReader, 'status').resolves({})
+    const internalCommands = disposable.track(
+      new InternalCommands(config, cliReader)
+    )
+
+    const repository = disposable.track(
+      new Repository(dvcDemoPath, internalCommands)
+    )
+    await repository.isReady()
+    mockDiff.resetHistory()
+    mockStatus.resetHistory()
+
+    await Promise.all([
+      repository.updateState(),
+      repository.updateState(),
+      repository.updateState(),
+      repository.updateState(),
+      repository.updateState()
+    ])
+
+    expect(mockDiff).to.be.calledTwice
+    expect(mockStatus).to.be.calledTwice
   })
 })
