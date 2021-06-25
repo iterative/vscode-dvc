@@ -69,7 +69,9 @@ suite('Experiments Table Test Suite', () => {
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
 
-      const internalCommands = new InternalCommands(config, cliReader)
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
 
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
@@ -91,7 +93,9 @@ suite('Experiments Table Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const internalCommands = new InternalCommands(config, cliReader)
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
