@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import { restore, spy, stub } from 'sinon'
-import sinonChai from 'sinon-chai'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../config'
@@ -9,9 +8,6 @@ import { CliRunner } from '../../../cli/runner'
 import * as ProcessExecution from '../../../processExecution'
 import { Command } from '../../../cli/args'
 import { CliResult } from '../../../cli'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Runner Test Suite', () => {
   window.showInformationMessage('Start all cli runner tests.')

@@ -1,15 +1,11 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
-import sinonChai from 'sinon-chai'
+import { expect } from 'chai'
 import { EventEmitter, window, OutputChannel as VSOutputChannel } from 'vscode'
 import { restore, stub, fake } from 'sinon'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { Disposable } from '../../../extension'
 import { Cli, CliResult } from '../../../cli'
 import { Config } from '../../../config'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Output Channel Test Suite', () => {
   window.showInformationMessage('Start all output channel tests.')

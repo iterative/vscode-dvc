@@ -1,14 +1,10 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
-import sinonChai from 'sinon-chai'
+import { expect } from 'chai'
 import { window } from 'vscode'
 import { restore } from 'sinon'
 import { Disposable } from '../../../extension'
 import { getGitRepositoryRoots } from '../../../extensions/git'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Git Extension Test Suite', () => {
   window.showInformationMessage('Start all git extension tests.')

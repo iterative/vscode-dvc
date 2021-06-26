@@ -1,8 +1,7 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import sinonChai from 'sinon-chai'
 import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -11,9 +10,6 @@ import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Experiments Table Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
