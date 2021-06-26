@@ -36,6 +36,7 @@ export class ExperimentsTable {
   private metrics?: Column[]
 
   private updateInProgress = false
+  private queuedRefresh = false
 
   constructor(
     dvcRoot: string,
@@ -61,11 +62,14 @@ export class ExperimentsTable {
   }
 
   public refresh = async () => {
-    if (!this.updateInProgress) {
-      this.updateInProgress = true
-      await this.updateData()
-      this.updateInProgress = false
+    if (this.updateInProgress) {
+      return this.queueRefresh()
     }
+
+    this.updateInProgress = true
+    await this.updateData()
+    this.updateInProgress = false
+    this.processQueuedRefresh()
   }
 
   public showWebview = async () => {
@@ -116,6 +120,18 @@ export class ExperimentsTable {
     this.params = params
     this.metrics = metrics
     return this.sendData()
+  }
+
+  private queueRefresh(): void {
+    this.queuedRefresh = true
+  }
+
+  private processQueuedRefresh(): void {
+    if (!this.queuedRefresh) {
+      return
+    }
+    this.queuedRefresh = false
+    this.refresh()
   }
 
   private async sendData() {
