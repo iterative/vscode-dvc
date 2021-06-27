@@ -2,6 +2,8 @@
 import { join, resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
+import chai from 'chai'
+import sinonChai from 'sinon-chai'
 import { Logger } from '../../common/logger'
 
 function setupNyc() {
@@ -36,6 +38,8 @@ export async function run() {
     color: true,
     ui: 'tdd'
   })
+
+  chai.use(sinonChai)
 
   const testsRoot = resolvePath(__dirname, '..')
 

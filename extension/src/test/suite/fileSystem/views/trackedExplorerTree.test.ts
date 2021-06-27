@@ -1,8 +1,7 @@
 import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import { stub, restore } from 'sinon'
-import sinonChai from 'sinon-chai'
 import { ensureFileSync } from 'fs-extra'
 import { window, commands, Uri, TextEditor, MessageItem } from 'vscode'
 import { Disposable } from '../../../../extension'
@@ -14,9 +13,6 @@ import { CliExecutor } from '../../../../cli/executor'
 import { Prompt } from '../../../../cli/output'
 import { Config } from '../../../../config'
 import * as Setup from '../../../../setup'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')

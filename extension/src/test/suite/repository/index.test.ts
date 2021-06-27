@@ -1,17 +1,13 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import { stub, restore } from 'sinon'
-import sinonChai from 'sinon-chai'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import { Config } from '../../../config'
 import { InternalCommands } from '../../../internalCommands'
 import { Repository } from '../../../repository'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Repository Test Suite', () => {
   window.showInformationMessage('Start all repository tests.')
