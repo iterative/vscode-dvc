@@ -1,8 +1,98 @@
-import { buildColumns, Column } from './buildColumns'
+import { Experiment } from './contract'
+import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
+import complexExperimentsOutput from './webview/complex-output-example.json'
 
-describe('buildColumns', () => {
+describe('overall transformer functionality', () => {
+  it('returns output matching a snapshot given complexExperimentsOutput', () =>
+    expect(
+      transformExperimentsRepo(complexExperimentsOutput)
+    ).toMatchSnapshot())
+})
+
+describe('branch and checkpoint nesting', () => {
+  it('returns an empty array if no branches are present', () => {
+    const { branches } = transformExperimentsRepo({
+      workspace: {
+        baseline: {}
+      }
+    })
+    expect(branches).toEqual([])
+  })
+
+  describe('a repo with two branches', () => {
+    const { branches, workspace } = transformExperimentsRepo({
+      brancha: {
+        baseline: {},
+        otherexp1: {},
+        otherexp2: {
+          checkpoint_tip: 'otherexp2'
+        },
+        otherexp2_1: {
+          checkpoint_tip: 'otherexp2'
+        }
+      },
+      branchb: {
+        baseline: {}
+      },
+      workspace: {
+        baseline: {}
+      }
+    })
+
+    it('defines workspace', () => expect(workspace).toBeDefined())
+    it('finds two branches', () => expect(branches.length).toEqual(2))
+    const [brancha, branchb] = branches
+    it('lists branches in the same order as the map', () => {
+      expect(brancha.baseline?.sha).toEqual('brancha')
+      expect(branchb.baseline?.sha).toEqual('branchb')
+    })
+    it('finds two experiments on brancha', () => {
+      expect(brancha.experiments?.length).toEqual(2)
+    })
+    it('finds no experiments on branchb', () => {
+      expect(branchb.experiments).toBeUndefined()
+    })
+  })
+
+  describe('a repo with one branch that has nested checkpoints', () => {
+    const {
+      branches: [brancha]
+    } = transformExperimentsRepo({
+      brancha: {
+        baseline: {},
+        tip1: {
+          checkpoint_tip: 'tip1'
+        },
+        tip1cp1: {
+          checkpoint_tip: 'tip1'
+        },
+        tip1cp2: {
+          checkpoint_tip: 'tip1'
+        },
+        tip1cp3: {
+          checkpoint_tip: 'tip1'
+        }
+      },
+      workspace: { baseline: {} }
+    })
+
+    it('only lists the tip as a top-level experiment', () =>
+      expect(brancha.experiments?.length).toEqual(1))
+    const [tip1] = brancha.experiments as Experiment[]
+    it('finds three checkpoints on the tip', () =>
+      expect(tip1.checkpoints?.length).toEqual(3))
+    const [tip1cp1, tip1cp2, tip1cp3] = tip1.checkpoints as Experiment[]
+    it('finds checkpoints in order', () => {
+      expect(tip1cp1.sha).toEqual('tip1cp1')
+      expect(tip1cp2.sha).toEqual('tip1cp2')
+      expect(tip1cp3.sha).toEqual('tip1cp3')
+    })
+  })
+})
+
+describe('metrics/params column schema builder', () => {
   it('Outputs both params and metrics when both are present', () => {
-    const { params, metrics } = buildColumns({
+    const { params, metrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           metrics: {
@@ -23,7 +113,7 @@ describe('buildColumns', () => {
   })
 
   it('Omits params when none exist in the source data', () => {
-    const { params, metrics } = buildColumns({
+    const { params, metrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           metrics: {
@@ -38,18 +128,19 @@ describe('buildColumns', () => {
     expect(metrics).toBeDefined()
   })
 
-  it('returns an empty object if input data is empty', () => {
-    const output = buildColumns({
+  it('returns undefined params and metrics if none are provided', () => {
+    const { params, metrics } = transformExperimentsRepo({
       workspace: {
         baseline: {}
       }
     })
-    expect(output).toEqual({})
+    expect(metrics).toBeUndefined()
+    expect(params).toBeUndefined()
   })
 
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       brancha: {
         baseline: {
           params: {
@@ -92,10 +183,10 @@ describe('buildColumns', () => {
 
     it('correctly identifies mixed type params', () =>
       expect(exampleMixedColumn.types).toEqual([
+        'number',
         'string',
         'boolean',
-        'null',
-        'number'
+        'null'
       ]))
 
     it('correctly identifies a number as the highest string length of a mixed column', () =>
@@ -108,8 +199,8 @@ describe('buildColumns', () => {
   })
 
   it('finds different minNumber and maxNumber on a mixed column', () => {
-    const { params } = buildColumns({
-      workspace: {
+    const { params } = transformExperimentsRepo({
+      branch1: {
         baseline: {
           params: {
             'params.yaml': {
@@ -138,6 +229,9 @@ describe('buildColumns', () => {
             }
           }
         }
+      },
+      workspace: {
+        baseline: {}
       }
     }) as { params: Column[] }
     const [paramsFileColumn] = params
@@ -148,8 +242,8 @@ describe('buildColumns', () => {
   })
 
   describe('Number features', () => {
-    const { params } = buildColumns({
-      workspace: {
+    const { params } = transformExperimentsRepo({
+      branch1: {
         baseline: {
           params: {
             'params.yaml': {
@@ -174,6 +268,9 @@ describe('buildColumns', () => {
             }
           }
         }
+      },
+      workspace: {
+        baseline: {}
       }
     }) as {
       params: Column[]
@@ -195,19 +292,19 @@ describe('buildColumns', () => {
   })
 
   it('aggregates multiple different field names', () => {
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       brancha: {
         baseline: {
           params: {
             'params.yaml': {
-              one: 1
+              two: 2
             }
           }
         },
         otherexp: {
           params: {
             'params.yaml': {
-              two: 2
+              three: 3
             }
           }
         }
@@ -216,7 +313,7 @@ describe('buildColumns', () => {
         baseline: {
           params: {
             'params.yaml': {
-              three: 3
+              four: 4
             }
           }
         }
@@ -225,7 +322,7 @@ describe('buildColumns', () => {
         baseline: {
           params: {
             'params.yaml': {
-              four: 4
+              one: 1
             }
           }
         }
@@ -244,7 +341,7 @@ describe('buildColumns', () => {
   })
 
   it('does not report types for columns without primitives or children for columns without objects', () => {
-    const { params } = buildColumns({
+    const { params } = transformExperimentsRepo({
       workspace: {
         baseline: {
           params: {

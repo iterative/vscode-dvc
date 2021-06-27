@@ -1,32 +1,50 @@
-export type Value = string | number | boolean | null | undefined
-export interface ValueTree {
-  [key: string]: Value | ValueTree
-}
+export type Value = string | number | boolean | null
 
-export interface DataDictRoot extends ValueTree {
+export interface ValueTreeRoot {
   [filename: string]: ValueTree
 }
 
-export interface ExperimentJSONOutput {
+export interface ValueTreeNode {
+  [key: string]: Value | ValueTree
+}
+
+export type ValueTree = ValueTreeRoot | ValueTreeNode
+
+export interface ExperimentFields {
   name?: string
   timestamp?: string | null
   queued?: boolean
-  params?: DataDictRoot
-  metrics?: DataDictRoot
+  params?: ValueTreeRoot
+  metrics?: ValueTreeRoot
   checkpoint_tip?: string
   checkpoint_parent?: string
 }
 
-export interface ExperimentsWorkspaceJSONOutput
-  extends ExperimentsBranchJSONOutput {
-  baseline: ExperimentJSONOutput
+export interface Experiment extends ExperimentFields {
+  sha: string
+  checkpoints?: Experiment[]
+}
+
+export interface ExperimentsWorkspace {
+  baseline: ExperimentFields
+}
+
+export interface ExperimentsBranch {
+  baseline: Experiment
+  experiments?: Experiment[]
+}
+
+export interface ExperimentsRepo {
+  workspace: ExperimentsBranch
+  branches: ExperimentsBranch[]
 }
 
 export interface ExperimentsBranchJSONOutput {
-  [sha: string]: ExperimentJSONOutput
+  [sha: string]: ExperimentFields
+  baseline: ExperimentFields
 }
 
 export interface ExperimentsRepoJSONOutput {
-  [name: string]: ExperimentsWorkspaceJSONOutput | ExperimentsBranchJSONOutput
-  workspace: ExperimentsWorkspaceJSONOutput
+  [name: string]: ExperimentsBranchJSONOutput
+  workspace: ExperimentsBranchJSONOutput
 }
