@@ -23,7 +23,9 @@ export class Repository {
   private readonly sourceControlManagement: SourceControlManagement
 
   private resetInProgress = false
+  private queuedReset = false
   private updateInProgress = false
+  private queuedUpdate = false
 
   constructor(
     dvcRoot: string,
@@ -52,27 +54,54 @@ export class Repository {
   }
 
   public async resetState() {
-    if (!this.resetInProgress) {
-      this.resetInProgress = true
-      const [diffFromHead, diffFromCache, untracked, tracked] =
-        await this.getResetData()
-
-      this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
-
-      this.setState()
-      this.resetInProgress = false
+    if (this.resetInProgress) {
+      return this.queueReset()
     }
+    this.resetInProgress = true
+    const [diffFromHead, diffFromCache, untracked, tracked] =
+      await this.getResetData()
+
+    this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
+
+    this.setState()
+    this.resetInProgress = false
+    this.processQueued()
   }
 
   public async updateState() {
-    if (!this.updateInProgress && !this.resetInProgress) {
-      this.updateInProgress = true
-      const [diffFromHead, diffFromCache, untracked] =
-        await this.getUpdateData()
+    if (this.resetInProgress) {
+      return this.queueReset()
+    }
 
-      this.model.setState({ diffFromCache, diffFromHead, untracked })
-      this.setState()
-      this.updateInProgress = false
+    if (this.updateInProgress) {
+      return this.queueUpdate()
+    }
+    this.updateInProgress = true
+    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
+
+    this.model.setState({ diffFromCache, diffFromHead, untracked })
+    this.setState()
+    this.updateInProgress = false
+    this.processQueued()
+  }
+
+  private queueReset(): void {
+    this.queuedReset = true
+  }
+
+  private queueUpdate(): void {
+    this.queuedUpdate = true
+  }
+
+  private processQueued(): void {
+    if (this.queuedReset) {
+      this.queuedReset = false
+      this.resetState()
+    }
+
+    if (this.queuedUpdate) {
+      this.queuedUpdate = false
+      this.updateState()
     }
   }
 

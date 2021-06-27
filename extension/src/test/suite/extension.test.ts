@@ -1,8 +1,7 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
-import sinonChai from 'sinon-chai'
 import {
   window,
   commands,
@@ -15,9 +14,6 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')

@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
+import { expect } from 'chai'
 import { fake, restore, stub } from 'sinon'
-import sinonChai from 'sinon-chai'
 import {
   window,
   commands,
@@ -13,9 +12,6 @@ import { Disposable } from '../../extension'
 import { Status } from '../../status'
 import { Cli, CliResult } from '../../cli'
 import { Config } from '../../config'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all status tests.')

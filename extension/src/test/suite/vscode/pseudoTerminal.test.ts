@@ -1,13 +1,9 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
-import chai from 'chai'
-import sinonChai from 'sinon-chai'
+import { expect } from 'chai'
 import { EventEmitter, Terminal, TerminalDataWriteEvent, window } from 'vscode'
 import { restore } from 'sinon'
 import { Disposable, Disposer } from '../../../extension'
 import { PseudoTerminal } from '../../../vscode/pseudoTerminal'
-
-chai.use(sinonChai)
-const { expect } = chai
 
 suite('Pseudo Terminal Test Suite', () => {
   window.showInformationMessage('Start all pseudo terminal tests.')
