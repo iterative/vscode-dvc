@@ -44,11 +44,11 @@ suite('Repository Test Suite', () => {
       mockStatus.resetHistory()
 
       await Promise.all([
-        repository.resetState(),
-        repository.resetState(),
-        repository.resetState(),
-        repository.resetState(),
-        repository.resetState()
+        repository.reset(),
+        repository.reset(),
+        repository.reset(),
+        repository.reset(),
+        repository.reset()
       ])
 
       expect(mockList).to.be.calledTwice
@@ -76,11 +76,11 @@ suite('Repository Test Suite', () => {
     mockStatus.resetHistory()
 
     await Promise.all([
-      repository.updateState(),
-      repository.updateState(),
-      repository.updateState(),
-      repository.updateState(),
-      repository.updateState()
+      repository.update(),
+      repository.update(),
+      repository.update(),
+      repository.update(),
+      repository.update()
     ])
 
     expect(mockList).not.to.be.called
@@ -107,12 +107,12 @@ suite('Repository Test Suite', () => {
     mockStatus.resetHistory()
 
     await Promise.all([
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState()
+      repository.reset(),
+      repository.update(),
+      repository.reset(),
+      repository.update(),
+      repository.reset(),
+      repository.update()
     ])
 
     expect(mockList).to.be.calledTwice
@@ -139,12 +139,12 @@ suite('Repository Test Suite', () => {
     mockStatus.resetHistory()
 
     await Promise.all([
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState()
+      repository.update(),
+      repository.reset(),
+      repository.update(),
+      repository.reset(),
+      repository.update(),
+      repository.reset()
     ])
 
     expect(mockList).to.be.calledTwice

@@ -8,6 +8,7 @@ import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { ProcessManager } from '../processManager'
 export class Repository {
   @observable
   private model: RepositoryModel
@@ -22,10 +23,7 @@ export class Repository {
   private decorationProvider?: DecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
 
-  private resetInProgress = false
-  private queuedReset = false
-  private updateInProgress = false
-  private queuedUpdate = false
+  private processManager: ProcessManager
 
   constructor(
     dvcRoot: string,
@@ -42,6 +40,13 @@ export class Repository {
       new SourceControlManagement(this.dvcRoot, this.getState())
     )
 
+    this.processManager = this.dispose.track(
+      new ProcessManager(
+        { name: 'update', process: () => this.updateState() },
+        { name: 'reset', process: () => this.resetState() }
+      )
+    )
+
     this.setup()
   }
 
@@ -53,56 +58,32 @@ export class Repository {
     return this.model.getState()
   }
 
-  public async resetState() {
-    if (this.resetInProgress) {
-      return this.queueReset()
+  public reset() {
+    return this.processManager.run('reset')
+  }
+
+  public update() {
+    if (this.processManager.isOngoing('reset')) {
+      return this.processManager.queue('reset')
     }
-    this.resetInProgress = true
+
+    return this.processManager.run('update')
+  }
+
+  private async resetState() {
     const [diffFromHead, diffFromCache, untracked, tracked] =
       await this.getResetData()
 
     this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
     this.setState()
-    this.resetInProgress = false
-    this.processQueued()
   }
 
-  public async updateState() {
-    if (this.resetInProgress) {
-      return this.queueReset()
-    }
-
-    if (this.updateInProgress) {
-      return this.queueUpdate()
-    }
-    this.updateInProgress = true
+  private async updateState() {
     const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
 
     this.model.setState({ diffFromCache, diffFromHead, untracked })
     this.setState()
-    this.updateInProgress = false
-    this.processQueued()
-  }
-
-  private queueReset(): void {
-    this.queuedReset = true
-  }
-
-  private queueUpdate(): void {
-    this.queuedUpdate = true
-  }
-
-  private processQueued(): void {
-    if (this.queuedReset) {
-      this.queuedReset = false
-      this.resetState()
-    }
-
-    if (this.queuedUpdate) {
-      this.queuedUpdate = false
-      this.updateState()
-    }
   }
 
   private getBaseData = (): [
@@ -150,7 +131,7 @@ export class Repository {
   }
 
   private async setup() {
-    await this.resetState()
+    await this.reset()
     return this.deferred.resolve()
   }
 }

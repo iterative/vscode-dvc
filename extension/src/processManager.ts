@@ -7,17 +7,19 @@ export class ProcessManager {
   private queued = new Set<string>()
   private locked = new Set<string>()
 
-  constructor(...processes: { name: string; func: () => Promise<unknown> }[]) {
+  constructor(
+    ...processes: { name: string; process: () => Promise<unknown> }[]
+  ) {
     processes.map(process => {
-      this.processes[process.name] = process.func
+      this.processes[process.name] = process.process
     })
   }
 
   public async run(name: string) {
-    this.can(name)
+    this.checkCanRun(name)
     const process = this.processes[name]
 
-    if (this.isLocked(name)) {
+    if (this.isOngoing(name)) {
       return this.queue(name)
     }
 
@@ -28,16 +30,20 @@ export class ProcessManager {
     return this.processQueued(name)
   }
 
+  public isOngoing(name: string) {
+    return this.locked.has(name)
+  }
+
+  public queue(name: string) {
+    return this.queued.add(name)
+  }
+
   private processQueued(name: string): void {
     if (!this.isQueued(name)) {
       return
     }
     this.deQueue(name)
     this.run(name)
-  }
-
-  private isLocked(name: string) {
-    return this.locked.has(name)
   }
 
   private lock(name: string) {
@@ -48,10 +54,6 @@ export class ProcessManager {
     return this.locked.delete(name)
   }
 
-  private queue(name: string) {
-    return this.queued.add(name)
-  }
-
   private isQueued(name: string): boolean {
     return this.queued.has(name)
   }
@@ -60,7 +62,7 @@ export class ProcessManager {
     return this.queued.delete(name)
   }
 
-  private can(name: string) {
+  private checkCanRun(name: string) {
     if (!this.processes[name]) {
       throw new Error('looking for an item to retry that does not exist')
     }

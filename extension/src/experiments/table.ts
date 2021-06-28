@@ -57,7 +57,7 @@ export class ExperimentsTable {
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
 
     this.processManager = this.dispose.track(
-      new ProcessManager({ func: () => this.updateData(), name: 'refresh' })
+      new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
 
     this.refresh().then(() => this.deferred.resolve())

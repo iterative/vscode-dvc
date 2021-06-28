@@ -160,7 +160,7 @@ describe('Repository', () => {
     })
   })
 
-  describe('resetState', () => {
+  describe('reset', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
@@ -208,7 +208,7 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(emptyState)
 
-      await repository.resetState()
+      await repository.reset()
 
       const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
 
@@ -311,7 +311,7 @@ describe('Repository', () => {
 
       expect(repository.getState()).toEqual(emptyState)
 
-      await repository.resetState()
+      await repository.reset()
 
       const deleted = new Set([join(dvcRoot, model)])
       const modified = new Set([join(dvcRoot, 'data/features')])
@@ -417,7 +417,7 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual(emptyState)
       mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
 
-      await repository.resetState()
+      await repository.reset()
 
       expect(mockedDelay).toBeCalledTimes(2)
       expect(mockedDelay).toBeCalledWith(500)
@@ -453,7 +453,7 @@ describe('Repository', () => {
     })
   })
 
-  describe('updateState', () => {
+  describe('update', () => {
     it('should retry if one of the underlying commands fails', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
@@ -498,7 +498,7 @@ describe('Repository', () => {
 
       mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
 
-      await repository.updateState()
+      await repository.update()
 
       expect(mockedDelay).toBeCalledTimes(2)
       expect(mockedDelay).toBeCalledWith(500)
