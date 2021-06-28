@@ -3,51 +3,66 @@ import { Disposable } from '@hediet/std/disposable'
 export class Retrier {
   public dispose = Disposable.fn()
 
-  private processNames = new Set<string>()
+  private processes: Record<string, () => Promise<unknown>> = {}
   private queued = new Set<string>()
   private locked = new Set<string>()
 
-  constructor(...processes: string[]) {
-    processes.map(queue => {
-      this.processNames.add(queue)
+  constructor(...processes: { name: string; func: () => Promise<unknown> }[]) {
+    processes.map(process => {
+      this.processes[process.name] = process.func
     })
   }
 
-  public isLocked(name: string): boolean {
+  public async retry(name: string) {
     this.can(name)
+    const process = this.processes[name]
 
-    return !!this.locked.has(name)
+    if (this.isLocked(name)) {
+      return this.queue(name)
+    }
+
+    this.lock(name)
+    await process()
+    this.unlock(name)
+
+    return this.processQueued(name)
   }
 
-  public lock(name: string): boolean {
-    this.can(name)
-
-    return !!this.locked.add(name)
+  private processQueued(name: string): void {
+    if (!this.isQueued(name)) {
+      return
+    }
+    this.deQueue(name)
+    this.retry(name)
   }
 
-  public unlock(name: string): boolean {
-    this.can(name)
-
-    return !!this.locked.delete(name)
+  private isLocked(name: string) {
+    return this.locked.has(name)
   }
 
-  public queue(name: string): boolean {
-    this.can(name)
-
-    return !!this.queued.add(name)
+  private lock(name: string) {
+    return this.locked.add(name)
   }
 
-  public isQueued(name: string): boolean {
+  private unlock(name: string) {
+    return this.locked.delete(name)
+  }
+
+  private queue(name: string) {
+    return this.queued.add(name)
+  }
+
+  private isQueued(name: string): boolean {
     return this.queued.has(name)
   }
 
-  public deQueue(name: string): boolean {
+  private deQueue(name: string): boolean {
     return this.queued.delete(name)
   }
 
   private can(name: string) {
-    if (!this.processNames.has(name)) {
-      throw new Error('looking for a locked item that does not exist')
+    if (!this.processes[name]) {
+      throw new Error('looking for an item to retry that does not exist')
     }
   }
 }

@@ -40,7 +40,7 @@ export class ExperimentsTable {
 
   private metrics?: Column[]
 
-  private retrier = this.dispose.track(new Retrier('refresh'))
+  private retrier: Retrier
 
   private workspace?: ExperimentsWorkspace
   private branches?: ExperimentsBranch[]
@@ -56,6 +56,10 @@ export class ExperimentsTable {
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
 
+    this.retrier = this.dispose.track(
+      new Retrier({ func: () => this.updateData(), name: 'refresh' })
+    )
+
     this.refresh().then(() => this.deferred.resolve())
   }
 
@@ -70,15 +74,8 @@ export class ExperimentsTable {
     this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
   }
 
-  public async refresh() {
-    if (this.retrier.isLocked('refresh')) {
-      return this.queueRefresh()
-    }
-
-    this.retrier.lock('refresh')
-    await this.updateData()
-    this.retrier.unlock('refresh')
-    this.processQueuedRefresh()
+  public refresh() {
+    return this.retrier.retry('refresh')
   }
 
   public showWebview = async () => {
@@ -132,18 +129,6 @@ export class ExperimentsTable {
     this.branches = branches
     this.workspace = workspace
     return this.sendData()
-  }
-
-  private queueRefresh(): void {
-    this.retrier.queue('refresh')
-  }
-
-  private processQueuedRefresh(): void {
-    if (!this.retrier.isQueued('refresh')) {
-      return
-    }
-    this.retrier.deQueue('refresh')
-    this.refresh()
   }
 
   private async sendData() {
