@@ -14,8 +14,7 @@ export interface Column extends ColumnAggregateData {
 }
 
 export interface TransformedExperiments {
-  metrics?: Column[]
-  params?: Column[]
+  columns: { metrics: Column[]; params: Column[] }
   branches: ExperimentsBranch[]
   workspace: ExperimentsWorkspace
 }
@@ -28,8 +27,10 @@ export const transformExperimentsRepo = (
 
   return {
     branches,
-    metrics: transformAndCollectFromColumnsIfAny(metricsMap),
-    params: transformAndCollectFromColumnsIfAny(paramsMap),
+    columns: {
+      metrics: transformAndCollectFromColumnsIfAny(metricsMap),
+      params: transformAndCollectFromColumnsIfAny(paramsMap)
+    },
     workspace
   } as TransformedExperiments
 }
