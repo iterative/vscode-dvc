@@ -30,7 +30,7 @@ export class ProcessManager {
     return this.runQueued()
   }
 
-  public hasProcess(name: string) {
+  public isOngoingOrQueued(name: string) {
     return this.isOngoing(name) || this.isQueued(name)
   }
 
