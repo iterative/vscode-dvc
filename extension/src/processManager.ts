@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 
-export class Retrier {
+export class ProcessManager {
   public dispose = Disposable.fn()
 
   private processes: Record<string, () => Promise<unknown>> = {}
@@ -13,7 +13,7 @@ export class Retrier {
     })
   }
 
-  public async retry(name: string) {
+  public async run(name: string) {
     this.can(name)
     const process = this.processes[name]
 
@@ -33,7 +33,7 @@ export class Retrier {
       return
     }
     this.deQueue(name)
-    this.retry(name)
+    this.run(name)
   }
 
   private isLocked(name: string) {

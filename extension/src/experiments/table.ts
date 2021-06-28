@@ -13,7 +13,7 @@ import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
-import { Retrier } from '../Retrier'
+import { ProcessManager } from '../processManager'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -40,7 +40,7 @@ export class ExperimentsTable {
 
   private metrics?: Column[]
 
-  private retrier: Retrier
+  private processManager: ProcessManager
 
   private workspace?: ExperimentsWorkspace
   private branches?: ExperimentsBranch[]
@@ -56,8 +56,8 @@ export class ExperimentsTable {
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
 
-    this.retrier = this.dispose.track(
-      new Retrier({ func: () => this.updateData(), name: 'refresh' })
+    this.processManager = this.dispose.track(
+      new ProcessManager({ func: () => this.updateData(), name: 'refresh' })
     )
 
     this.refresh().then(() => this.deferred.resolve())
@@ -75,7 +75,7 @@ export class ExperimentsTable {
   }
 
   public refresh() {
-    return this.retrier.retry('refresh')
+    return this.processManager.run('refresh')
   }
 
   public showWebview = async () => {
