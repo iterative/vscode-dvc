@@ -8,7 +8,8 @@ import {
   ExperimentsRepoJSONOutput,
   ExperimentsWorkspace
 } from './contract'
-import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
+import { transformExperimentsRepo } from './transformExperimentsRepo'
+import { Column } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -150,6 +151,8 @@ export class ExperimentsTable {
     if (this.data && this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
+        metrics: this.metrics,
+        params: this.params,
         tableData: this.data
       })
     }

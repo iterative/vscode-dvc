@@ -3,15 +3,9 @@ import {
   ExperimentsBranch,
   ExperimentsWorkspace
 } from './contract'
-import { collectFromRepo, ColumnAggregateData } from './collectFromRepo'
+import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
-
-export interface Column extends ColumnAggregateData {
-  name: string
-  types?: string[]
-  childColumns?: Column[]
-  ancestors?: string[]
-}
+import { Column } from './webview/contract'
 
 export interface TransformedExperiments {
   metrics?: Column[]

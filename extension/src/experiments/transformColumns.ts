@@ -1,5 +1,5 @@
 import { PartialColumnDescriptor, PartialColumnsMap } from './collectFromRepo'
-import { Column } from './transformExperimentsRepo'
+import { Column } from './webview/contract'
 
 const columnFromMapEntry = (
   entry: [string, PartialColumnDescriptor]
