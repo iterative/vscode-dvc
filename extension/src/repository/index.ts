@@ -58,11 +58,11 @@ export class Repository {
     return this.model.getState()
   }
 
-  public reset() {
+  public reset(): Promise<void> {
     return this.processManager.run('reset')
   }
 
-  public update() {
+  public update(): Promise<void> {
     if (this.processManager.isOngoing('reset')) {
       return this.processManager.queue('reset')
     }

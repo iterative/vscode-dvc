@@ -15,7 +15,7 @@ export class ProcessManager {
     })
   }
 
-  public async run(name: string) {
+  public async run(name: string): Promise<void> {
     this.checkCanRun(name)
     const process = this.processes[name]
 
@@ -27,23 +27,24 @@ export class ProcessManager {
     await process()
     this.unlock(name)
 
-    return this.processQueued(name)
+    return this.runQueued(name)
   }
 
   public isOngoing(name: string) {
     return this.locked.has(name)
   }
 
-  public queue(name: string) {
-    return this.queued.add(name)
+  public queue(name: string): Promise<void> {
+    this.queued.add(name)
+    return Promise.resolve()
   }
 
-  private processQueued(name: string): void {
+  private runQueued(name: string): Promise<void> {
     if (!this.isQueued(name)) {
-      return
+      return Promise.resolve()
     }
     this.deQueue(name)
-    this.run(name)
+    return this.run(name)
   }
 
   private lock(name: string) {
