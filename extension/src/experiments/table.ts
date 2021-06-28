@@ -13,6 +13,7 @@ import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { Retrier } from '../Retrier'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -39,8 +40,7 @@ export class ExperimentsTable {
 
   private metrics?: Column[]
 
-  private updateInProgress = false
-  private queuedRefresh = false
+  private retrier = this.dispose.track(new Retrier('refresh'))
 
   private workspace?: ExperimentsWorkspace
   private branches?: ExperimentsBranch[]
@@ -67,17 +67,17 @@ export class ExperimentsTable {
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
-    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
+    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
   }
 
-  public refresh = async () => {
-    if (this.updateInProgress) {
+  public async refresh() {
+    if (this.retrier.isLocked('refresh')) {
       return this.queueRefresh()
     }
 
-    this.updateInProgress = true
+    this.retrier.lock('refresh')
     await this.updateData()
-    this.updateInProgress = false
+    this.retrier.unlock('refresh')
     this.processQueuedRefresh()
   }
 
@@ -135,14 +135,14 @@ export class ExperimentsTable {
   }
 
   private queueRefresh(): void {
-    this.queuedRefresh = true
+    this.retrier.queue('refresh')
   }
 
   private processQueuedRefresh(): void {
-    if (!this.queuedRefresh) {
+    if (!this.retrier.isQueued('refresh')) {
       return
     }
-    this.queuedRefresh = false
+    this.retrier.deQueue('refresh')
     this.refresh()
   }
 
