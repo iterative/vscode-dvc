@@ -120,7 +120,7 @@ suite('Repository Test Suite', () => {
     expect(mockStatus).to.be.calledTwice
   })
 
-  it('will run both update and reset (and send further calls to the reset queue) if they are called in that order', async () => {
+  it('should run both update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
     const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
@@ -147,8 +147,8 @@ suite('Repository Test Suite', () => {
       repository.reset()
     ])
 
-    expect(mockList).to.be.calledTwice
-    expect(mockDiff).to.be.calledThrice
-    expect(mockStatus).to.be.calledThrice
+    expect(mockList).to.be.calledOnce
+    expect(mockDiff).to.be.calledTwice
+    expect(mockStatus).to.be.calledTwice
   })
 })

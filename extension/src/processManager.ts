@@ -19,7 +19,7 @@ export class ProcessManager {
     this.checkCanRun(name)
     const process = this.processes[name]
 
-    if (this.isOngoing(name)) {
+    if (this.anyOngoing()) {
       return this.queue(name)
     }
 
@@ -27,11 +27,11 @@ export class ProcessManager {
     await process()
     this.unlock(name)
 
-    return this.runQueued(name)
+    return this.runQueued()
   }
 
-  public isOngoing(name: string) {
-    return this.locked.has(name)
+  public hasProcess(name: string) {
+    return this.isOngoing(name) || this.isQueued(name)
   }
 
   public queue(name: string): Promise<void> {
@@ -39,12 +39,29 @@ export class ProcessManager {
     return Promise.resolve()
   }
 
-  private runQueued(name: string): Promise<void> {
-    if (!this.isQueued(name)) {
+  private anyOngoing(): boolean {
+    return !!this.locked.size
+  }
+
+  private runQueued(): Promise<void> {
+    const next = this.nextInQueue()
+    if (!next) {
       return Promise.resolve()
     }
-    this.deQueue(name)
-    return this.run(name)
+    this.deQueue(next)
+    return this.run(next)
+  }
+
+  private nextInQueue(): string | undefined {
+    return this.queued.values().next().value
+  }
+
+  private isOngoing(name: string) {
+    return this.locked.has(name)
+  }
+
+  private isQueued(name: string): boolean {
+    return this.queued.has(name)
   }
 
   private lock(name: string) {
@@ -53,10 +70,6 @@ export class ProcessManager {
 
   private unlock(name: string) {
     return this.locked.delete(name)
-  }
-
-  private isQueued(name: string): boolean {
-    return this.queued.has(name)
   }
 
   private deQueue(name: string): boolean {

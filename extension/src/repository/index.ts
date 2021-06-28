@@ -63,7 +63,7 @@ export class Repository {
   }
 
   public update(): Promise<void> {
-    if (this.processManager.isOngoing('reset')) {
+    if (this.processManager.hasProcess('reset')) {
       return this.processManager.queue('reset')
     }
 
