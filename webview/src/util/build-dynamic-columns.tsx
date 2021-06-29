@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-use-before-define */
 import React from 'react'
 import get from 'lodash/get'
-
 import { Column, Accessor } from 'react-table'
 import { ColumnData } from 'dvc/src/experiments/webview/contract'
-
 import { ExperimentWithSubRows } from './parse-experiments'
 import { formatFloat } from './number-formatting'
 
@@ -23,9 +20,7 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
   return <>{String(value)}</>
 }
 
-const getCellComponent = (): React.FC<{ value: Value }> => {
-  return Cell
-}
+const getCellComponent = (): React.FC<{ value: Value }> => Cell
 
 const buildColumnIdFromPath = (objectPath: string[]) =>
   objectPath.map(segment => `[${segment}]`).join('')
@@ -34,11 +29,11 @@ const buildAccessor: (valuePath: string[]) => Accessor<ExperimentWithSubRows> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
 
-const buildColumnsFromSchemaProperties = (
+const buildColumnsFromData = (
   properties: ColumnData[],
   objectPath: string[] = []
-): Column<ExperimentWithSubRows>[] => {
-  return properties.map(data => {
+): Column<ExperimentWithSubRows>[] =>
+  properties.map(data => {
     const currentPath = [...objectPath, data.name]
     const Cell = getCellComponent()
     const column: Column<ExperimentWithSubRows> & {
@@ -50,7 +45,7 @@ const buildColumnsFromSchemaProperties = (
       Header: data.name,
       accessor: buildAccessor(currentPath),
       columns: data?.childColumns?.length
-        ? buildColumnsFromSchemaProperties(data.childColumns, currentPath)
+        ? buildColumnsFromData(data.childColumns, currentPath)
         : undefined,
       id: buildColumnIdFromPath(currentPath),
       type: data.types
@@ -64,16 +59,13 @@ const buildColumnsFromSchemaProperties = (
     }
     return column
   })
-}
 
-const buildDynamicColumnsFromExperiments = (
+const buildDynamicColumns = (
   params: ColumnData[],
   metrics: ColumnData[]
-): Column<ExperimentWithSubRows>[] => {
-  return [
-    ...buildColumnsFromSchemaProperties(params, ['params']),
-    ...buildColumnsFromSchemaProperties(metrics, ['metrics'])
-  ]
-}
+): Column<ExperimentWithSubRows>[] => [
+  ...buildColumnsFromData(params, ['params']),
+  ...buildColumnsFromData(metrics, ['metrics'])
+]
 
-export default buildDynamicColumnsFromExperiments
+export default buildDynamicColumns
