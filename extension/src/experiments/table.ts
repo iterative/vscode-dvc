@@ -14,6 +14,7 @@ import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { ProcessManager } from '../processManager'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -40,8 +41,7 @@ export class ExperimentsTable {
 
   private metrics?: Column[]
 
-  private updateInProgress = false
-  private queuedRefresh = false
+  private processManager: ProcessManager
 
   private workspace?: ExperimentsWorkspace
   private branches?: ExperimentsBranch[]
@@ -57,6 +57,10 @@ export class ExperimentsTable {
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
 
+    this.processManager = this.dispose.track(
+      new ProcessManager({ name: 'refresh', process: () => this.updateData() })
+    )
+
     this.refresh().then(() => this.deferred.resolve())
   }
 
@@ -68,18 +72,11 @@ export class ExperimentsTable {
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
-    this.dispose.track(onDidChangeFileSystem(refsPath, this.refresh))
+    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
   }
 
-  public refresh = async () => {
-    if (this.updateInProgress) {
-      return this.queueRefresh()
-    }
-
-    this.updateInProgress = true
-    await this.updateData()
-    this.updateInProgress = false
-    this.processQueuedRefresh()
+  public refresh() {
+    return this.processManager.run('refresh')
   }
 
   public showWebview = async () => {
@@ -133,18 +130,6 @@ export class ExperimentsTable {
     this.branches = branches
     this.workspace = workspace
     return this.sendData()
-  }
-
-  private queueRefresh(): void {
-    this.queuedRefresh = true
-  }
-
-  private processQueuedRefresh(): void {
-    if (!this.queuedRefresh) {
-      return
-    }
-    this.queuedRefresh = false
-    this.refresh()
   }
 
   private async sendData() {

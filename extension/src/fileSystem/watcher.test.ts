@@ -25,8 +25,8 @@ describe('getRepositoryWatcher', () => {
   const mockedResetState = jest.fn()
   const mockedUpdateState = jest.fn()
   const repository = {
-    resetState: mockedResetState,
-    updateState: mockedUpdateState
+    reset: mockedResetState,
+    update: mockedUpdateState
   } as unknown as Repository
 
   const mockedRefresh = jest.fn()
