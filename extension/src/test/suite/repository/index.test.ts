@@ -44,11 +44,11 @@ suite('Repository Test Suite', () => {
       mockStatus.resetHistory()
 
       await Promise.all([
-        repository.resetState(),
-        repository.resetState(),
-        repository.resetState(),
-        repository.resetState(),
-        repository.resetState()
+        repository.reset(),
+        repository.reset(),
+        repository.reset(),
+        repository.reset(),
+        repository.reset()
       ])
 
       expect(mockList).to.be.calledTwice
@@ -76,11 +76,11 @@ suite('Repository Test Suite', () => {
     mockStatus.resetHistory()
 
     await Promise.all([
-      repository.updateState(),
-      repository.updateState(),
-      repository.updateState(),
-      repository.updateState(),
-      repository.updateState()
+      repository.update(),
+      repository.update(),
+      repository.update(),
+      repository.update(),
+      repository.update()
     ])
 
     expect(mockList).not.to.be.called
@@ -107,12 +107,12 @@ suite('Repository Test Suite', () => {
     mockStatus.resetHistory()
 
     await Promise.all([
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState()
+      repository.reset(),
+      repository.update(),
+      repository.reset(),
+      repository.update(),
+      repository.reset(),
+      repository.update()
     ])
 
     expect(mockList).to.be.calledTwice
@@ -120,7 +120,7 @@ suite('Repository Test Suite', () => {
     expect(mockStatus).to.be.calledTwice
   })
 
-  it('will run both update and reset (and send further calls to the reset queue) if they are called in that order', async () => {
+  it('should run update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
     const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
@@ -139,16 +139,16 @@ suite('Repository Test Suite', () => {
     mockStatus.resetHistory()
 
     await Promise.all([
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState(),
-      repository.updateState(),
-      repository.resetState()
+      repository.update(),
+      repository.reset(),
+      repository.update(),
+      repository.reset(),
+      repository.update(),
+      repository.reset()
     ])
 
-    expect(mockList).to.be.calledTwice
-    expect(mockDiff).to.be.calledThrice
-    expect(mockStatus).to.be.calledThrice
+    expect(mockList).to.be.calledOnce
+    expect(mockDiff).to.be.calledTwice
+    expect(mockStatus).to.be.calledTwice
   })
 })

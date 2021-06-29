@@ -25,11 +25,11 @@ export const getRepositoryWatcher =
     }
 
     if (requiresReset(path)) {
-      repository.resetState()
+      repository.reset()
       trackedExplorerTree.reset()
       return
     }
-    repository.updateState()
+    repository.update()
     trackedExplorerTree.refresh(path)
   }
 
