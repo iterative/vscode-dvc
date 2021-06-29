@@ -6,6 +6,7 @@ import { Column, Accessor } from 'react-table'
 import { Column as ColumnData } from 'dvc/src/experiments/webview/contract'
 
 import { ExperimentWithSubRows } from './parse-experiments'
+import { formatFloat } from './number-formatting'
 
 type SchemaType = string | string[]
 
@@ -21,11 +22,19 @@ type Value = string | number
 
 const UndefinedCell = <>-</>
 
-const StringCell: React.FC<{ value: Value }> = ({ value }) =>
-  value === undefined ? UndefinedCell : <>{String(value)}</>
+const Cell: React.FC<{ value: Value }> = ({ value }) => {
+  if (value === undefined) {
+    return UndefinedCell
+  }
+
+  if (typeof value === 'number' && !Number.isInteger(value)) {
+    return <>{formatFloat(value as number)}</>
+  }
+  return <>{String(value)}</>
+}
 
 const getCellComponent = (): React.FC<{ value: Value }> => {
-  return StringCell
+  return Cell
 }
 
 const buildColumnIdFromPath = (objectPath: string[]) =>
