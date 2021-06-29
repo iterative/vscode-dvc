@@ -2,14 +2,16 @@ import { PartialColumnDescriptor, PartialColumnsMap } from './collectFromRepo'
 import { ColumnData } from './webview/contract'
 
 const columnFromMapEntry = (
-  entry: [string, PartialColumnDescriptor]
+  entry: [string, PartialColumnDescriptor],
+  ancestors: string[]
 ): ColumnData => {
   const [name, partialColumnDescriptor] = entry
   const { types, maxStringLength, minNumber, maxNumber } =
     partialColumnDescriptor
-  const column = {
+  const column: ColumnData = {
+    ancestors,
     name
-  } as ColumnData
+  }
   if (maxStringLength) {
     column.maxStringLength = maxStringLength
   }
@@ -25,7 +27,7 @@ const columnFromMapEntry = (
 
 const transformAndCollectFromColumns = (
   columnsMap: PartialColumnsMap,
-  ancestors?: string[]
+  ancestors: string[]
 ): ColumnData[] => {
   const currentLevelColumns = []
   for (const entry of columnsMap) {
@@ -45,22 +47,18 @@ export const transformAndCollectFromColumnsIfAny = (
 
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
-  ancestors?: string[]
+  ancestors: string[]
 ): ColumnData => {
-  const finalColumn = columnFromMapEntry(entry)
+  const column = columnFromMapEntry(entry, ancestors)
 
   const [name, { childColumns }] = entry
 
-  if (ancestors) {
-    finalColumn.ancestors = ancestors
-  }
-
   if (childColumns) {
-    finalColumn.childColumns = transformAndCollectFromColumns(
+    column.childColumns = transformAndCollectFromColumns(
       childColumns,
       ancestors ? [...ancestors, name] : [name]
     )
   }
 
-  return finalColumn
+  return column
 }
