@@ -363,7 +363,7 @@ describe('metrics/params column schema builder', () => {
     expect(objectColumn.childColumns).toBeDefined()
     expect(objectColumn.types).toBeUndefined()
 
-    const primitiveColumn = (objectColumn.childColumns as ColumnData[])[0]
+    const [primitiveColumn] = objectColumn.childColumns as ColumnData[]
 
     expect(primitiveColumn.name).toEqual('onlyHasPrimitive')
     expect(primitiveColumn.types).toBeDefined()
