@@ -7,9 +7,9 @@ const columnFromMapEntry = (
   const [name, partialColumnDescriptor] = entry
   const { types, maxStringLength, minNumber, maxNumber } =
     partialColumnDescriptor
-  const column: ColumnData = {
+  const column = {
     name
-  }
+  } as ColumnData
   if (maxStringLength) {
     column.maxStringLength = maxStringLength
   }
@@ -36,9 +36,12 @@ const transformAndCollectFromColumns = (
 }
 
 export const transformAndCollectFromColumnsIfAny = (
-  columnsMap: PartialColumnsMap
+  columnsMap: PartialColumnsMap,
+  type: string
 ): ColumnData[] | undefined =>
-  columnsMap.size === 0 ? undefined : transformAndCollectFromColumns(columnsMap)
+  columnsMap.size === 0
+    ? undefined
+    : transformAndCollectFromColumns(columnsMap, [type])
 
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],

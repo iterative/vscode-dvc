@@ -22,8 +22,8 @@ export const transformExperimentsRepo = (
 
   return {
     branches,
-    metrics: transformAndCollectFromColumnsIfAny(metricsMap),
-    params: transformAndCollectFromColumnsIfAny(paramsMap),
+    metrics: transformAndCollectFromColumnsIfAny(metricsMap, 'metrics'),
+    params: transformAndCollectFromColumnsIfAny(paramsMap, 'params'),
     workspace
   } as TransformedExperiments
 }

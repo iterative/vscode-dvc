@@ -510,9 +510,13 @@ Object {
   ],
   "metrics": Array [
     Object {
+      "ancestors": Array [
+        "metrics",
+      ],
       "childColumns": Array [
         Object {
           "ancestors": Array [
+            "metrics",
             "summary.json",
           ],
           "maxNumber": 2.048856019973755,
@@ -525,6 +529,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "metrics",
             "summary.json",
           ],
           "maxNumber": 0.5926499962806702,
@@ -537,6 +542,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "metrics",
             "summary.json",
           ],
           "maxNumber": 1.9979370832443237,
@@ -549,6 +555,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "metrics",
             "summary.json",
           ],
           "maxNumber": 0.6704000234603882,
@@ -565,9 +572,13 @@ Object {
   ],
   "params": Array [
     Object {
+      "ancestors": Array [
+        "params",
+      ],
       "childColumns": Array [
         Object {
           "ancestors": Array [
+            "params",
             "params.yaml",
           ],
           "maxNumber": 5,
@@ -580,6 +591,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "params",
             "params.yaml",
           ],
           "maxNumber": 2.2e-7,
@@ -592,6 +604,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "params",
             "params.yaml",
           ],
           "maxStringLength": 8,
@@ -602,6 +615,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "params",
             "params.yaml",
           ],
           "maxStringLength": 8,
@@ -612,6 +626,7 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "params",
             "params.yaml",
           ],
           "maxNumber": 0.15,
@@ -624,11 +639,13 @@ Object {
         },
         Object {
           "ancestors": Array [
+            "params",
             "params.yaml",
           ],
           "childColumns": Array [
             Object {
               "ancestors": Array [
+                "params",
                 "params.yaml",
                 "process",
               ],
@@ -642,6 +659,7 @@ Object {
             },
             Object {
               "ancestors": Array [
+                "params",
                 "params.yaml",
                 "process",
               ],

@@ -5,7 +5,7 @@ export interface ColumnData extends ColumnAggregateData {
   name: string
   types?: string[]
   childColumns?: ColumnData[]
-  ancestors?: string[]
+  ancestors: string[]
 }
 
 export const WebviewType = 'Experiments'

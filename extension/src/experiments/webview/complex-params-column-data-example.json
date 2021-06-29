@@ -1,8 +1,9 @@
 [
   {
+    "ancestors": ["params"],
     "childColumns": [
       {
-        "ancestors": ["params.yaml"],
+        "ancestors": ["params", "params.yaml"],
         "maxNumber": 5,
         "maxStringLength": 1,
         "minNumber": 2,
@@ -10,7 +11,7 @@
         "types": ["number"]
       },
       {
-        "ancestors": ["params.yaml"],
+        "ancestors": ["params", "params.yaml"],
         "maxNumber": 2.2e-7,
         "maxStringLength": 6,
         "minNumber": 2e-12,
@@ -18,19 +19,19 @@
         "types": ["number"]
       },
       {
-        "ancestors": ["params.yaml"],
+        "ancestors": ["params", "params.yaml"],
         "maxStringLength": 8,
         "name": "dvc_logs_dir",
         "types": ["string"]
       },
       {
-        "ancestors": ["params.yaml"],
+        "ancestors": ["params", "params.yaml"],
         "maxStringLength": 8,
         "name": "log_file",
         "types": ["string"]
       },
       {
-        "ancestors": ["params.yaml"],
+        "ancestors": ["params", "params.yaml"],
         "maxNumber": 0.15,
         "maxStringLength": 5,
         "minNumber": 0.122,
@@ -38,10 +39,10 @@
         "types": ["number"]
       },
       {
-        "ancestors": ["params.yaml"],
+        "ancestors": ["params", "params.yaml"],
         "childColumns": [
           {
-            "ancestors": ["params.yaml", "process"],
+            "ancestors": ["params", "params.yaml", "process"],
             "maxNumber": 0.86,
             "maxStringLength": 4,
             "minNumber": 0.85,
@@ -49,7 +50,7 @@
             "types": ["number"]
           },
           {
-            "ancestors": ["params.yaml", "process"],
+            "ancestors": ["params", "params.yaml", "process"],
             "maxNumber": 3,
             "maxStringLength": 6,
             "minNumber": 3,

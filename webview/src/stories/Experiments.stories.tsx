@@ -5,6 +5,7 @@ import { action } from '@storybook/addon-actions'
 import complexExperimentsData from 'dvc/src/experiments/webview/complex-output-example.json'
 import complexMetricsColumnData from 'dvc/src/experiments/webview/complex-metric-column-data-example.json'
 import complexParamsColumnData from 'dvc/src/experiments/webview/complex-params-column-data-example.json'
+import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import Experiments from '../components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -35,8 +36,8 @@ export const ComplexTable: Story = ({ experiments, vsCodeApi }) => {
     <Experiments
       experiments={experiments}
       vsCodeApi={vsCodeApi}
-      metrics={complexMetricsColumnData}
-      params={complexParamsColumnData}
+      metrics={complexMetricsColumnData as ColumnData[]}
+      params={complexParamsColumnData as ColumnData[]}
     />
   )
 }

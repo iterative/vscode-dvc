@@ -30,11 +30,10 @@ const buildAccessor: (valuePath: string[]) => Accessor<ExperimentWithSubRows> =
     get(originalRow, pathArray)
 
 const buildColumnsFromData = (
-  properties: ColumnData[],
-  objectPath: string[] = []
+  properties: ColumnData[]
 ): Column<ExperimentWithSubRows>[] =>
   properties.map(data => {
-    const currentPath = [...objectPath, data.name]
+    const currentPath = [...data.ancestors, data.name]
     const Cell = getCellComponent()
     const column: Column<ExperimentWithSubRows> & {
       columns?: Column<ExperimentWithSubRows>[]
@@ -45,7 +44,7 @@ const buildColumnsFromData = (
       Header: data.name,
       accessor: buildAccessor(currentPath),
       columns: data?.childColumns?.length
-        ? buildColumnsFromData(data.childColumns, currentPath)
+        ? buildColumnsFromData(data.childColumns)
         : undefined,
       id: buildColumnIdFromPath(currentPath),
       type: data.types
@@ -64,8 +63,8 @@ const buildDynamicColumns = (
   params: ColumnData[],
   metrics: ColumnData[]
 ): Column<ExperimentWithSubRows>[] => [
-  ...buildColumnsFromData(params, ['params']),
-  ...buildColumnsFromData(metrics, ['metrics'])
+  ...buildColumnsFromData(params),
+  ...buildColumnsFromData(metrics)
 ]
 
 export default buildDynamicColumns
