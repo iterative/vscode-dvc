@@ -473,7 +473,7 @@
   "enableProposedApi": true,
   "scripts": {
     "dev": "shx rm -rf dist && tsc -watch -p ./",
-    "build": "yarn build-webpack && yarn package",
+    "build": "yarn build-webpack && yarn package -o ./vscode-dvc.vsix",
     "build-webpack": "webpack --mode production",
     "package": "vsce package --yarn",
     "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
