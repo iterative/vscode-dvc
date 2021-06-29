@@ -33,7 +33,7 @@ const buildColumnsFromData = (
   properties: ColumnData[]
 ): Column<ExperimentWithSubRows>[] =>
   properties.map(data => {
-    const currentPath = [...data.ancestors, data.name]
+    const { path } = data
     const Cell = getCellComponent()
     const column: Column<ExperimentWithSubRows> & {
       columns?: Column<ExperimentWithSubRows>[]
@@ -42,11 +42,11 @@ const buildColumnsFromData = (
     } = {
       Cell,
       Header: data.name,
-      accessor: buildAccessor(currentPath),
+      accessor: buildAccessor(path),
       columns: data?.childColumns?.length
         ? buildColumnsFromData(data.childColumns)
         : undefined,
-      id: buildColumnIdFromPath(currentPath),
+      id: buildColumnIdFromPath(path),
       type: data.types
     }
     switch (data.types) {

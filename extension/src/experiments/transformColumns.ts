@@ -9,8 +9,8 @@ const columnFromMapEntry = (
   const { types, maxStringLength, minNumber, maxNumber } =
     partialColumnDescriptor
   const column: ColumnData = {
-    ancestors,
-    name
+    name,
+    path: [...ancestors, name]
   }
   if (maxStringLength) {
     column.maxStringLength = maxStringLength
@@ -54,10 +54,10 @@ const buildColumn = (
   const [name, { childColumns }] = entry
 
   if (childColumns) {
-    column.childColumns = transformAndCollectFromColumns(
-      childColumns,
-      ancestors ? [...ancestors, name] : [name]
-    )
+    column.childColumns = transformAndCollectFromColumns(childColumns, [
+      ...ancestors,
+      name
+    ])
   }
 
   return column
