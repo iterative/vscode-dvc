@@ -3,7 +3,7 @@ import React from 'react'
 import get from 'lodash/get'
 
 import { Column, Accessor } from 'react-table'
-import { Column as ColumnData } from 'dvc/src/experiments/webview/contract'
+import { ColumnData } from 'dvc/src/experiments/webview/contract'
 
 import { ExperimentWithSubRows } from './parse-experiments'
 import { formatFloat } from './number-formatting'

@@ -1,6 +1,6 @@
 import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
 import {
-  Column,
+  ColumnData,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
@@ -39,10 +39,10 @@ export class Model {
   public experiments?: ExperimentsRepoJSONOutput | null = null
 
   @observable
-  public metrics: Column[] = []
+  public metrics: ColumnData[] = []
 
   @observable
-  public params: Column[] = []
+  public params: ColumnData[] = []
 
   @observable
   public dvcRoot?: string

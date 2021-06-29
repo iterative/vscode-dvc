@@ -19,7 +19,7 @@ import {
   WindowWithWebviewData,
   ExperimentsWebviewState,
   WebviewColorTheme,
-  Column
+  ColumnData
 } from './contract'
 import { ExperimentsRepoJSONOutput } from '../contract'
 import { Logger } from '../../common/logger'
@@ -168,8 +168,8 @@ export class ExperimentsWebview {
   public showExperiments(
     payload: {
       tableData?: ExperimentsRepoJSONOutput | null
-      params?: Column[]
-      metrics?: Column[]
+      params?: ColumnData[]
+      metrics?: ColumnData[]
       errors?: Error[]
     } = {}
   ): Thenable<boolean> {

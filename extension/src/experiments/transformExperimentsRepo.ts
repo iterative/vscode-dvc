@@ -5,11 +5,11 @@ import {
 } from './contract'
 import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
-import { Column } from './webview/contract'
+import { ColumnData } from './webview/contract'
 
 export interface TransformedExperiments {
-  metrics?: Column[]
-  params?: Column[]
+  metrics?: ColumnData[]
+  params?: ColumnData[]
   branches: ExperimentsBranch[]
   workspace: ExperimentsWorkspace
 }

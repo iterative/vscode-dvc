@@ -1,6 +1,6 @@
 import React from 'react'
 import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
-import { Column as ColumnData } from 'dvc/src/experiments/webview/contract'
+import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
