@@ -8,16 +8,6 @@ import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import { ExperimentWithSubRows } from './parse-experiments'
 import { formatFloat } from './number-formatting'
 
-type SchemaType = string | string[]
-
-interface SchemaProperty {
-  type: SchemaType
-  properties?: SchemaProperties
-  canBeNegative?: boolean
-  canBeFloat?: boolean
-}
-type SchemaProperties = Record<string, SchemaProperty>
-
 type Value = string | number
 
 const UndefinedCell = <>-</>
@@ -54,7 +44,7 @@ const buildColumnsFromSchemaProperties = (
     const column: Column<ExperimentWithSubRows> & {
       columns?: Column<ExperimentWithSubRows>[]
       sortType?: string
-      type?: SchemaType
+      type?: string[]
     } = {
       Cell,
       Header: data.name,
