@@ -5,27 +5,18 @@ import { readFileSync } from 'fs-extra'
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
-function includeDependency(location: string) {
+
+const includeDependency = (location: string) => {
   const content = readFileSync(join(location, 'package.json'), {
     encoding: 'utf8'
   })
   const pkgName = JSON.parse(content).name
 
   return new CopyWebpackPlugin({
-    patterns: [
-      {
-        from: `${location}/dist`,
-        to: r(`./dist/node_modules/${pkgName}/dist`)
-      },
-      {
-        from: `${location}/index.js`,
-        to: r(`./dist/node_modules/${pkgName}/index.js`)
-      },
-      {
-        from: `${location}/package.json`,
-        to: r(`./dist/node_modules/${pkgName}/package.json`)
-      }
-    ]
+    patterns: ['dist', 'index.js', 'package.json'].map(target => ({
+      from: `${location}/${target}`,
+      to: r(`./dist/node_modules/${pkgName}/${target}`)
+    }))
   })
 }
 
