@@ -519,7 +519,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "vsce": "^1.94.0",
+    "vsce": "^1.95.0",
     "vscode-test": "^1.5.2",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.40.0",
