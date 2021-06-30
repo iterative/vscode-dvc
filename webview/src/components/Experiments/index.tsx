@@ -1,5 +1,6 @@
 import React from 'react'
 import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
+import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
@@ -80,7 +81,8 @@ const orderByFn = (
 }
 
 const getColumns = (
-  flatExperiments: ExperimentWithSubRows[]
+  params: ColumnData[],
+  metrics: ColumnData[]
 ): Column<ExperimentWithSubRows>[] =>
   [
     {
@@ -108,12 +110,14 @@ const getColumns = (
       Header: 'Timestamp',
       accessor: 'timestamp'
     },
-    ...buildDynamicColumns(flatExperiments)
+    ...buildDynamicColumns(params, metrics)
   ] as Column<ExperimentWithSubRows>[]
 
 export const ExperimentsTable: React.FC<{
   experiments: ExperimentsRepoJSONOutput
-}> = ({ experiments: rawExperiments }) => {
+  params: ColumnData[]
+  metrics: ColumnData[]
+}> = ({ experiments: rawExperiments, params, metrics }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<ExperimentWithSubRows>> = {
@@ -123,10 +127,10 @@ export const ExperimentsTable: React.FC<{
   }, [])
 
   const [data, columns] = React.useMemo(() => {
-    const { experiments, flatExperiments } = parseExperiments(rawExperiments)
-    const columns = getColumns(flatExperiments)
+    const { experiments } = parseExperiments(rawExperiments)
+    const columns = getColumns(params, metrics)
     return [experiments, columns]
-  }, [rawExperiments])
+  }, [rawExperiments, params, metrics])
 
   const instance = useTable<ExperimentWithSubRows>(
     {
@@ -182,12 +186,18 @@ export const ExperimentsTable: React.FC<{
 
 const Experiments: React.FC<{
   experiments?: ExperimentsRepoJSONOutput | null
+  params: ColumnData[]
+  metrics: ColumnData[]
   vsCodeApi: VsCodeApi
-}> = ({ experiments }) => {
+}> = ({ experiments, params, metrics }) => {
   return (
     <div className={styles.experiments}>
       {experiments ? (
-        <ExperimentsTable experiments={experiments} />
+        <ExperimentsTable
+          experiments={experiments}
+          params={params}
+          metrics={metrics}
+        />
       ) : (
         <p>Loading experiments...</p>
       )}

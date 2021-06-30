@@ -1,6 +1,7 @@
 import { Experiment } from './contract'
-import { transformExperimentsRepo, Column } from './transformExperimentsRepo'
+import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
+import { ColumnData } from './webview/contract'
 
 describe('overall transformer functionality', () => {
   it('returns output matching a snapshot given complexExperimentsOutput', () =>
@@ -176,10 +177,10 @@ describe('metrics/params column schema builder', () => {
         }
       }
     }) as {
-      params: Column[]
+      params: ColumnData[]
     }
     const [paramsFileColumn] = params
-    const [exampleMixedColumn] = paramsFileColumn.childColumns as Column[]
+    const [exampleMixedColumn] = paramsFileColumn.childColumns as ColumnData[]
 
     it('correctly identifies mixed type params', () =>
       expect(exampleMixedColumn.types).toEqual([
@@ -233,9 +234,9 @@ describe('metrics/params column schema builder', () => {
       workspace: {
         baseline: {}
       }
-    }) as { params: Column[] }
+    }) as { params: ColumnData[] }
     const [paramsFileColumn] = params
-    const [mixedColumn] = paramsFileColumn.childColumns as Column[]
+    const [mixedColumn] = paramsFileColumn.childColumns as ColumnData[]
 
     expect(mixedColumn.minNumber).toEqual(-1)
     expect(mixedColumn.maxNumber).toEqual(1)
@@ -273,11 +274,11 @@ describe('metrics/params column schema builder', () => {
         baseline: {}
       }
     }) as {
-      params: Column[]
+      params: ColumnData[]
     }
     const [paramsFileColumn] = params
     const [columnWithNumbers, columnWithoutNumbers] =
-      paramsFileColumn.childColumns as Column[]
+      paramsFileColumn.childColumns as ColumnData[]
 
     it('does not add maxNumber or minNumber on a column with no numbers', () => {
       expect(columnWithoutNumbers.minNumber).toBeUndefined()
@@ -329,8 +330,8 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsYamlColumn] = params as Column[]
-    const paramsColumns = paramsYamlColumn.childColumns as Column[]
+    const [paramsYamlColumn] = params as ColumnData[]
+    const paramsColumns = paramsYamlColumn.childColumns as ColumnData[]
 
     expect(paramsColumns?.map(({ name }) => name)).toEqual([
       'one',
@@ -355,14 +356,14 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsYamlColumn] = params as Column[]
-    const [objectColumn] = paramsYamlColumn.childColumns as Column[]
+    const [paramsYamlColumn] = params as ColumnData[]
+    const [objectColumn] = paramsYamlColumn.childColumns as ColumnData[]
 
     expect(objectColumn.name).toEqual('onlyHasChild')
     expect(objectColumn.childColumns).toBeDefined()
     expect(objectColumn.types).toBeUndefined()
 
-    const primitiveColumn = (objectColumn.childColumns as Column[])[0]
+    const [primitiveColumn] = objectColumn.childColumns as ColumnData[]
 
     expect(primitiveColumn.name).toEqual('onlyHasPrimitive')
     expect(primitiveColumn.types).toBeDefined()

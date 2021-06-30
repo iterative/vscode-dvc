@@ -1,4 +1,13 @@
+import { ColumnAggregateData } from '../collectFromRepo'
 import { ExperimentsRepoJSONOutput } from '../contract'
+
+export interface ColumnData extends ColumnAggregateData {
+  name: string
+  types?: string[]
+  childColumns?: ColumnData[]
+  ancestors?: string[]
+}
+
 export const WebviewType = 'Experiments'
 
 export interface WindowWithWebviewData {
@@ -35,6 +44,8 @@ export type MessageToWebview = {
   | {
       type: MessageToWebviewType.showExperiments
       tableData?: ExperimentsRepoJSONOutput | null
+      params?: ColumnData[]
+      metrics?: ColumnData[]
     }
 )
 

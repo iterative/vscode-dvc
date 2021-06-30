@@ -1,13 +1,13 @@
 import { PartialColumnDescriptor, PartialColumnsMap } from './collectFromRepo'
-import { Column } from './transformExperimentsRepo'
+import { ColumnData } from './webview/contract'
 
 const columnFromMapEntry = (
   entry: [string, PartialColumnDescriptor]
-): Column => {
+): ColumnData => {
   const [name, partialColumnDescriptor] = entry
   const { types, maxStringLength, minNumber, maxNumber } =
     partialColumnDescriptor
-  const column: Column = {
+  const column: ColumnData = {
     name
   }
   if (maxStringLength) {
@@ -26,7 +26,7 @@ const columnFromMapEntry = (
 const transformAndCollectFromColumns = (
   columnsMap: PartialColumnsMap,
   ancestors?: string[]
-): Column[] => {
+): ColumnData[] => {
   const currentLevelColumns = []
   for (const entry of columnsMap) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -37,13 +37,13 @@ const transformAndCollectFromColumns = (
 
 export const transformAndCollectFromColumnsIfAny = (
   columnsMap: PartialColumnsMap
-): Column[] | undefined =>
+): ColumnData[] | undefined =>
   columnsMap.size === 0 ? undefined : transformAndCollectFromColumns(columnsMap)
 
 const buildColumn = (
   entry: [string, PartialColumnDescriptor],
   ancestors?: string[]
-): Column => {
+): ColumnData => {
   const finalColumn = columnFromMapEntry(entry)
 
   const [name, { childColumns }] = entry

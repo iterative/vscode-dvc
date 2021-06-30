@@ -1,5 +1,6 @@
 import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
 import {
+  ColumnData,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
@@ -36,6 +37,12 @@ export class Model {
 
   @observable
   public experiments?: ExperimentsRepoJSONOutput | null = null
+
+  @observable
+  public metrics: ColumnData[] = []
+
+  @observable
+  public params: ColumnData[] = []
 
   @observable
   public dvcRoot?: string
@@ -110,6 +117,8 @@ export class Model {
       case MessageToWebviewType.showExperiments:
         runInAction(() => {
           this.experiments = message.tableData
+          this.params = message.params || []
+          this.metrics = message.metrics || []
         })
         return
       case MessageToWebviewType.setDvcRoot:
