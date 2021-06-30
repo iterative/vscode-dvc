@@ -93,7 +93,7 @@ describe('branch and checkpoint nesting', () => {
 
 describe('metrics/params column schema builder', () => {
   it('Outputs both params and metrics when both are present', () => {
-    const { params, metrics } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {
           metrics: {
@@ -109,12 +109,14 @@ describe('metrics/params column schema builder', () => {
         }
       }
     })
+    const params = columns.find(column => column.group === 'params')
+    const metrics = columns.find(column => column.group === 'metrics')
     expect(params).toBeDefined()
     expect(metrics).toBeDefined()
   })
 
   it('Omits params when none exist in the source data', () => {
-    const { params, metrics } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {
           metrics: {
@@ -125,23 +127,24 @@ describe('metrics/params column schema builder', () => {
         }
       }
     })
+    const params = columns.find(column => column.group === 'params')
+    const metrics = columns.find(column => column.group === 'metrics')
     expect(params).toBeUndefined()
     expect(metrics).toBeDefined()
   })
 
-  it('returns undefined params and metrics if none are provided', () => {
-    const { params, metrics } = transformExperimentsRepo({
+  it('returns an empty array if no params and metrics are provided', () => {
+    const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {}
       }
     })
-    expect(metrics).toBeUndefined()
-    expect(params).toBeUndefined()
+    expect(columns).toEqual([])
   })
 
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
-    const { params } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       brancha: {
         baseline: {
           params: {
@@ -176,10 +179,11 @@ describe('metrics/params column schema builder', () => {
           }
         }
       }
-    }) as {
-      params: ColumnData[]
-    }
-    const [paramsFileColumn] = params
+    })
+
+    const [paramsFileColumn] = columns.filter(
+      column => column.group === 'params'
+    ) as ColumnData[]
     const [exampleMixedColumn] = paramsFileColumn.childColumns as ColumnData[]
 
     it('correctly identifies mixed type params', () =>
@@ -200,7 +204,7 @@ describe('metrics/params column schema builder', () => {
   })
 
   it('finds different minNumber and maxNumber on a mixed column', () => {
-    const { params } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       branch1: {
         baseline: {
           params: {
@@ -234,8 +238,10 @@ describe('metrics/params column schema builder', () => {
       workspace: {
         baseline: {}
       }
-    }) as { params: ColumnData[] }
-    const [paramsFileColumn] = params
+    })
+    const [paramsFileColumn] = columns.filter(
+      column => column.group === 'params'
+    ) as ColumnData[]
     const [mixedColumn] = paramsFileColumn.childColumns as ColumnData[]
 
     expect(mixedColumn.minNumber).toEqual(-1)
@@ -243,7 +249,7 @@ describe('metrics/params column schema builder', () => {
   })
 
   describe('Number features', () => {
-    const { params } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       branch1: {
         baseline: {
           params: {
@@ -273,10 +279,10 @@ describe('metrics/params column schema builder', () => {
       workspace: {
         baseline: {}
       }
-    }) as {
-      params: ColumnData[]
-    }
-    const [paramsFileColumn] = params
+    })
+    const [paramsFileColumn] = columns.filter(
+      column => column.group === 'params'
+    ) as ColumnData[]
     const [columnWithNumbers, columnWithoutNumbers] =
       paramsFileColumn.childColumns as ColumnData[]
 
@@ -293,7 +299,7 @@ describe('metrics/params column schema builder', () => {
   })
 
   it('aggregates multiple different field names', () => {
-    const { params } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       brancha: {
         baseline: {
           params: {
@@ -330,7 +336,9 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsYamlColumn] = params as ColumnData[]
+    const [paramsYamlColumn] = columns.filter(
+      column => column.group === 'params'
+    ) as ColumnData[]
     const paramsColumns = paramsYamlColumn.childColumns as ColumnData[]
 
     expect(paramsColumns?.map(({ name }) => name)).toEqual([
@@ -342,7 +350,7 @@ describe('metrics/params column schema builder', () => {
   })
 
   it('does not report types for columns without primitives or children for columns without objects', () => {
-    const { params } = transformExperimentsRepo({
+    const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {
           params: {
@@ -356,7 +364,9 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsYamlColumn] = params as ColumnData[]
+    const [paramsYamlColumn] = columns.filter(
+      column => column.group === 'params'
+    ) as ColumnData[]
     const [objectColumn] = paramsYamlColumn.childColumns as ColumnData[]
 
     expect(objectColumn.name).toEqual('onlyHasChild')

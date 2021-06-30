@@ -60,11 +60,7 @@ const buildColumnsFromData = (
   })
 
 const buildDynamicColumns = (
-  params: ColumnData[],
-  metrics: ColumnData[]
-): Column<ExperimentWithSubRows>[] => [
-  ...buildColumnsFromData(params),
-  ...buildColumnsFromData(metrics)
-]
+  columns: ColumnData[]
+): Column<ExperimentWithSubRows>[] => [...buildColumnsFromData(columns)]
 
 export default buildDynamicColumns

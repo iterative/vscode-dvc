@@ -9,6 +9,7 @@ const columnFromMapEntry = (
   const { types, maxStringLength, minNumber, maxNumber } =
     partialColumnDescriptor
   const column: ColumnData = {
+    group: ancestors[0],
     name,
     path: [...ancestors, name]
   }
@@ -40,9 +41,9 @@ const transformAndCollectFromColumns = (
 export const transformAndCollectFromColumnsIfAny = (
   columnsMap: PartialColumnsMap,
   type: string
-): ColumnData[] | undefined =>
+): ColumnData[] =>
   columnsMap.size === 0
-    ? undefined
+    ? []
     : transformAndCollectFromColumns(columnsMap, [type])
 
 const buildColumn = (
