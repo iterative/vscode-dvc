@@ -35,10 +35,7 @@ const countRowsAndAddIndexes: (
   return index
 }
 
-const getColumns = (
-  params: ColumnData[],
-  metrics: ColumnData[]
-): Column<ExperimentWithSubRows>[] =>
+const getColumns = (columns: ColumnData[]): Column<ExperimentWithSubRows>[] =>
   [
     {
       Header: 'Experiment',
@@ -65,14 +62,13 @@ const getColumns = (
       Header: 'Timestamp',
       accessor: 'timestamp'
     },
-    ...buildDynamicColumns(params, metrics)
+    ...buildDynamicColumns(columns)
   ] as Column<ExperimentWithSubRows>[]
 
 export const ExperimentsTable: React.FC<{
   experiments: ExperimentsRepoJSONOutput
-  params: ColumnData[]
-  metrics: ColumnData[]
-}> = ({ experiments: rawExperiments, params, metrics }) => {
+  columnData: ColumnData[]
+}> = ({ experiments: rawExperiments, columnData }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<ExperimentWithSubRows>> = {
@@ -83,9 +79,9 @@ export const ExperimentsTable: React.FC<{
 
   const [data, columns] = React.useMemo(() => {
     const { experiments } = parseExperiments(rawExperiments)
-    const columns = getColumns(params, metrics)
+    const columns = getColumns(columnData)
     return [experiments, columns]
-  }, [rawExperiments, params, metrics])
+  }, [rawExperiments, columnData])
 
   const instance = useTable<ExperimentWithSubRows>(
     {
@@ -136,18 +132,13 @@ export const ExperimentsTable: React.FC<{
 
 const Experiments: React.FC<{
   experiments?: ExperimentsRepoJSONOutput | null
-  params: ColumnData[]
-  metrics: ColumnData[]
+  columnData: ColumnData[]
   vsCodeApi: VsCodeApi
-}> = ({ experiments, params, metrics }) => {
+}> = ({ experiments, columnData }) => {
   return (
     <div className={styles.experiments}>
       {experiments ? (
-        <ExperimentsTable
-          experiments={experiments}
-          params={params}
-          metrics={metrics}
-        />
+        <ExperimentsTable columnData={columnData} experiments={experiments} />
       ) : (
         <p>Loading experiments...</p>
       )}

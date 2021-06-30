@@ -168,8 +168,7 @@ export class ExperimentsWebview {
   public showExperiments(
     payload: {
       tableData?: ExperimentsRepoJSONOutput | null
-      params?: ColumnData[]
-      metrics?: ColumnData[]
+      columnData?: ColumnData[]
       errors?: Error[]
     } = {}
   ): Thenable<boolean> {

@@ -39,10 +39,7 @@ export class Model {
   public experiments?: ExperimentsRepoJSONOutput | null = null
 
   @observable
-  public metrics: ColumnData[] = []
-
-  @observable
-  public params: ColumnData[] = []
+  public columnData: ColumnData[] = []
 
   @observable
   public dvcRoot?: string
@@ -117,8 +114,7 @@ export class Model {
       case MessageToWebviewType.showExperiments:
         runInAction(() => {
           this.experiments = message.tableData
-          this.params = message.params || []
-          this.metrics = message.metrics || []
+          this.columnData = message.columnData || []
         })
         return
       case MessageToWebviewType.setDvcRoot:

@@ -2,6 +2,7 @@ import { ColumnAggregateData } from '../collectFromRepo'
 import { ExperimentsRepoJSONOutput } from '../contract'
 
 export interface ColumnData extends ColumnAggregateData {
+  group: string
   name: string
   path: string[]
   types?: string[]
@@ -44,8 +45,7 @@ export type MessageToWebview = {
   | {
       type: MessageToWebviewType.showExperiments
       tableData?: ExperimentsRepoJSONOutput | null
-      params?: ColumnData[]
-      metrics?: ColumnData[]
+      columnData?: ColumnData[]
     }
 )
 

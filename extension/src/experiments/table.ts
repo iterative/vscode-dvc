@@ -37,9 +37,7 @@ export class ExperimentsTable {
 
   private data?: ExperimentsRepoJSONOutput
 
-  private params?: ColumnData[]
-
-  private metrics?: ColumnData[]
+  private columns?: ColumnData[]
 
   private processManager: ProcessManager
 
@@ -64,11 +62,21 @@ export class ExperimentsTable {
     this.refresh().then(() => this.deferred.resolve())
   }
 
-  public isReady = () => this.initialized
-  public getParams = () => this.params
-  public getMetrics = () => this.metrics
-  public getWorkspace = () => this.workspace
-  public getBranches = () => this.branches
+  public isReady() {
+    return this.initialized
+  }
+
+  public getColumns() {
+    return this.columns
+  }
+
+  public getWorkspace() {
+    return this.workspace
+  }
+
+  public getBranches() {
+    return this.branches
+  }
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
@@ -123,10 +131,8 @@ export class ExperimentsTable {
       'Experiments table update'
     )
     this.data = data
-    const { params, metrics, branches, workspace } =
-      transformExperimentsRepo(data)
-    this.params = params
-    this.metrics = metrics
+    const { columns, branches, workspace } = transformExperimentsRepo(data)
+    this.columns = columns
     this.branches = branches
     this.workspace = workspace
     return this.sendData()
@@ -136,8 +142,7 @@ export class ExperimentsTable {
     if (this.data && this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        metrics: this.metrics,
-        params: this.params,
+        columnData: this.columns,
         tableData: this.data
       })
     }
