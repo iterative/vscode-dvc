@@ -42,12 +42,6 @@ import {
   UseRowStateOptions,
   UseRowStateRowProps,
   UseRowStateState,
-  UseSortByColumnOptions,
-  UseSortByColumnProps,
-  UseSortByHooks,
-  UseSortByInstanceProps,
-  UseSortByOptions,
-  UseSortByState,
   HeaderGroup,
   Column
 } from 'react-table'
@@ -69,25 +63,16 @@ declare module 'react-table' {
       UseResizeColumnsOptions<D>,
       UseRowSelectOptions<D>,
       UseRowStateOptions<D>,
-      UseSortByOptions<D>,
       // note that having Record here allows you to add anything to the options, this matches the spirit of the
       // underlying js library, but might be cleaner if it's replaced by a more specific type that matches your
       // feature set, this is a safe default.
-      Record<string, unknown> {
-    orderByFn: (
-      rows: Array<Row<D>>,
-      sortFns: Array<SortByFn<D>>,
-      directions: boolean[],
-      parentRow: Row<D>
-    ) => Array<Row<D>>
-  }
+      Record<string, unknown> {}
 
   export interface Hooks<
     D extends Record<string, unknown> = Record<string, unknown>
   > extends UseExpandedHooks<D>,
       UseGroupByHooks<D>,
-      UseRowSelectHooks<D>,
-      UseSortByHooks<D> {}
+      UseRowSelectHooks<D> {}
 
   export interface TableInstance<
     D extends Record<string, unknown> = Record<string, unknown>
@@ -98,9 +83,7 @@ declare module 'react-table' {
       UseGroupByInstanceProps<D>,
       UsePaginationInstanceProps<D>,
       UseRowSelectInstanceProps<D>,
-      UseRowStateInstanceProps<D>,
-      UseSortByInstanceProps<D> {
-    sortedColumns: ColumnInstance<D>[]
+      UseRowStateInstanceProps<D> {
     groupedColumns: ColumnInstance<D>[]
   }
 
@@ -114,8 +97,7 @@ declare module 'react-table' {
       UsePaginationState<D>,
       UseResizeColumnsState<D>,
       UseRowSelectState<D>,
-      UseRowStateState<D>,
-      UseSortByState<D> {
+      UseRowStateState<D> {
     ungrouped?: boolean
   }
 
@@ -124,15 +106,13 @@ declare module 'react-table' {
   > extends UseFiltersColumnOptions<D>,
       UseGlobalFiltersColumnOptions<D>,
       UseGroupByColumnOptions<D>,
-      UseResizeColumnsColumnOptions<D>,
-      UseSortByColumnOptions<D> {}
+      UseResizeColumnsColumnOptions<D> {}
 
   export interface ColumnInstance<
     D extends Record<string, unknown> = Record<string, unknown>
   > extends UseFiltersColumnProps<D>,
       UseGroupByColumnProps<D>,
-      UseResizeColumnsColumnProps<D>,
-      UseSortByColumnProps<D> {}
+      UseResizeColumnsColumnProps<D> {}
 
   export interface Cell<
     D extends Record<string, unknown> = Record<string, unknown>,

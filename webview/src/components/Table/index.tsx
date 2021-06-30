@@ -4,7 +4,6 @@ import cx from 'classnames'
 import styles from './styles.module.scss'
 import { ExperimentWithSubRows } from '../../util/parse-experiments'
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
-import SortIconToggle from '../SortIconToggle'
 
 export interface InstanceProp {
   instance: TableInstance<ExperimentWithSubRows>
@@ -127,17 +126,11 @@ export const PrimaryHeaderGroup: React.FC<{
               >
                 <MenuItem
                   id={'Sort'}
-                  isSelected={header.isSorted}
-                  {...header.getHeaderProps(
-                    header.getSortByToggleProps({
-                      key: `sort-menu-item-asc_${header.id}`
-                    })
-                  )}
+                  {...header.getHeaderProps({
+                    key: `sort-menu-item-asc_${header.id}`
+                  })}
                 >
                   Sort Column
-                  {header.isSorted && (
-                    <SortIconToggle isSortedDesc={header.isSortedDesc} />
-                  )}
                 </MenuItem>
                 <MenuItem
                   id={'Visibility'}

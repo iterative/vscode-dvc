@@ -4,13 +4,10 @@ import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
-  ColumnInstance,
   useTable,
   useGroupBy,
   useExpanded,
-  useSortBy,
-  useFlexLayout,
-  SortByFn
+  useFlexLayout
 } from 'react-table'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
@@ -36,48 +33,6 @@ const countRowsAndAddIndexes: (
     }
   }
   return index
-}
-
-const isDesc = (direction: boolean | 'desc') =>
-  direction === false || direction === 'desc'
-
-const sortByDirection = (desc: boolean, sortInt: number) =>
-  desc ? -sortInt : sortInt
-
-const sortByFirstDirection = (
-  direction: boolean | 'desc',
-  rowA: Row<ExperimentWithSubRows>,
-  rowB: Row<ExperimentWithSubRows>
-) => (isDesc(direction) ? rowA.index - rowB.index : rowB.index - rowA.index)
-
-const getSortedRows = (
-  rows: Row<ExperimentWithSubRows>[],
-  sortFns: SortByFn<ExperimentWithSubRows>[],
-  directions: (boolean | 'desc')[]
-): Row<ExperimentWithSubRows>[] =>
-  [...rows].sort((rowA, rowB) => {
-    for (let i = 0; i < sortFns.length; i += 1) {
-      const sortFn = sortFns[i]
-      const desc = isDesc(directions[i])
-      const sortInt = sortFn(rowA, rowB, '', desc)
-      if (sortInt !== 0) {
-        return sortByDirection(desc, sortInt)
-      }
-    }
-    return sortByFirstDirection(directions[0], rowA, rowB)
-  })
-
-const orderByFn = (
-  rows: Row<ExperimentWithSubRows>[],
-  sortFns: SortByFn<ExperimentWithSubRows>[],
-  directions: (boolean | 'desc')[],
-  parentRow: Row<ExperimentWithSubRows>
-): Row<ExperimentWithSubRows>[] => {
-  if (parentRow && parentRow.depth === 0) {
-    return getSortedRows(rows, sortFns, directions)
-  } else {
-    return rows
-  }
 }
 
 const getColumns = (
@@ -139,8 +94,7 @@ export const ExperimentsTable: React.FC<{
       data,
       defaultColumn,
       expandSubRows: false,
-      initialState,
-      orderByFn
+      initialState
     },
     useFlexLayout,
     hooks => {
@@ -155,17 +109,13 @@ export const ExperimentsTable: React.FC<{
       })
     },
     useGroupBy,
-    useSortBy,
     useExpanded,
     hooks => {
       hooks.useInstance.push(instance => {
-        const { allColumns, rows } = instance
-        const sortedColumns: ColumnInstance<ExperimentWithSubRows>[] =
-          allColumns.filter(column => column.isSorted)
+        const { rows } = instance
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
-          expandedRowCount,
-          sortedColumns
+          expandedRowCount
         })
       })
     }
