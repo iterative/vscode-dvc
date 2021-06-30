@@ -8,8 +8,7 @@ import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData } from './webview/contract'
 
 export interface TransformedExperiments {
-  metrics?: ColumnData[]
-  params?: ColumnData[]
+  columns: ColumnData[]
   branches: ExperimentsBranch[]
   workspace: ExperimentsWorkspace
 }
@@ -22,8 +21,10 @@ export const transformExperimentsRepo = (
 
   return {
     branches,
-    metrics: transformAndCollectFromColumnsIfAny(metricsMap, 'metrics'),
-    params: transformAndCollectFromColumnsIfAny(paramsMap, 'params'),
+    columns: [
+      ...transformAndCollectFromColumnsIfAny(paramsMap, 'params'),
+      ...transformAndCollectFromColumnsIfAny(metricsMap, 'metrics')
+    ],
     workspace
-  } as TransformedExperiments
+  }
 }
