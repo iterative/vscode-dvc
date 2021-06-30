@@ -31,14 +31,11 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private data?: ExperimentsRepoJSONOutput
+  private data?: Experiment[]
 
   private columns?: ColumnData[]
 
   private processManager: ProcessManager
-
-  private workspace?: Experiment
-  private branches?: Experiment[]
 
   constructor(
     dvcRoot: string,
@@ -66,14 +63,6 @@ export class ExperimentsTable {
     return this.columns
   }
 
-  public getWorkspace() {
-    return this.workspace
-  }
-
-  public getBranches() {
-    return this.branches
-  }
-
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
     this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
@@ -92,9 +81,7 @@ export class ExperimentsTable {
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        experiments: [this.workspace, ...(this.branches || [])].filter(
-          Boolean
-        ) as Experiment[]
+        experiments: this.data
       },
       this.resourceLocator
     )
@@ -131,11 +118,11 @@ export class ExperimentsTable {
       getNewPromise,
       'Experiments table update'
     )
-    this.data = data
+
     const { columns, branches, workspace } = transformExperimentsRepo(data)
     this.columns = columns
-    this.branches = branches
-    this.workspace = workspace
+    this.data = [workspace, ...branches]
+
     return this.sendData()
   }
 
@@ -144,9 +131,7 @@ export class ExperimentsTable {
       await this.webview.isReady()
       return this.webview.showExperiments({
         columnData: this.columns,
-        tableData: [this.workspace, ...(this.branches || [])].filter(
-          Boolean
-        ) as Experiment[]
+        tableData: this.data
       })
     }
   }
