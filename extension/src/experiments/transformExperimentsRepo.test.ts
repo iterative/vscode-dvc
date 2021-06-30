@@ -4,10 +4,9 @@ import complexExperimentsOutput from './webview/complex-output-example.json'
 import { ColumnData } from './webview/contract'
 
 describe('overall transformer functionality', () => {
-  it('returns output matching a snapshot given complexExperimentsOutput', () =>
-    expect(
-      transformExperimentsRepo(complexExperimentsOutput)
-    ).toMatchSnapshot())
+  it('returns output matching a snapshot given complexExperimentsOutput', () => {
+    expect(transformExperimentsRepo(complexExperimentsOutput)).toMatchSnapshot()
+  })
 })
 
 describe('branch and checkpoint nesting', () => {
@@ -22,17 +21,17 @@ describe('branch and checkpoint nesting', () => {
 
   describe('a repo with two branches', () => {
     const { branches, workspace } = transformExperimentsRepo({
-      brancha: {
+      branchA: {
         baseline: {},
-        otherexp1: {},
-        otherexp2: {
-          checkpoint_tip: 'otherexp2'
+        otherExp1: {},
+        otherExp2: {
+          checkpoint_tip: 'otherExp2'
         },
-        otherexp2_1: {
-          checkpoint_tip: 'otherexp2'
+        otherExp2_1: {
+          checkpoint_tip: 'otherExp2'
         }
       },
-      branchb: {
+      branchB: {
         baseline: {}
       },
       workspace: {
@@ -40,26 +39,34 @@ describe('branch and checkpoint nesting', () => {
       }
     })
 
-    it('defines workspace', () => expect(workspace).toBeDefined())
-    it('finds two branches', () => expect(branches.length).toEqual(2))
-    const [brancha, branchb] = branches
+    it('defines workspace', () => {
+      expect(workspace).toBeDefined()
+    })
+
+    it('finds two branches', () => {
+      expect(branches.length).toEqual(2)
+    })
+
+    const [branchA, branchB] = branches
     it('lists branches in the same order as the map', () => {
-      expect(brancha.baseline?.sha).toEqual('brancha')
-      expect(branchb.baseline?.sha).toEqual('branchb')
+      expect(branchA.baseline?.sha).toEqual('branchA')
+      expect(branchB.baseline?.sha).toEqual('branchB')
     })
-    it('finds two experiments on brancha', () => {
-      expect(brancha.experiments?.length).toEqual(2)
+
+    it('finds two experiments on branchA', () => {
+      expect(branchA.experiments?.length).toEqual(2)
     })
-    it('finds no experiments on branchb', () => {
-      expect(branchb.experiments).toBeUndefined()
+
+    it('finds no experiments on branchB', () => {
+      expect(branchB.experiments).toBeUndefined()
     })
   })
 
   describe('a repo with one branch that has nested checkpoints', () => {
     const {
-      branches: [brancha]
+      branches: [branchA]
     } = transformExperimentsRepo({
-      brancha: {
+      branchA: {
         baseline: {},
         tip1: {
           checkpoint_tip: 'tip1'
@@ -77,12 +84,18 @@ describe('branch and checkpoint nesting', () => {
       workspace: { baseline: {} }
     })
 
-    it('only lists the tip as a top-level experiment', () =>
-      expect(brancha.experiments?.length).toEqual(1))
-    const [tip1] = brancha.experiments as Experiment[]
-    it('finds three checkpoints on the tip', () =>
-      expect(tip1.checkpoints?.length).toEqual(3))
+    it('only lists the tip as a top-level experiment', () => {
+      expect(branchA.experiments?.length).toEqual(1)
+    })
+
+    const [tip1] = branchA.experiments as Experiment[]
+
+    it('finds three checkpoints on the tip', () => {
+      expect(tip1.checkpoints?.length).toEqual(3)
+    })
+
     const [tip1cp1, tip1cp2, tip1cp3] = tip1.checkpoints as Experiment[]
+
     it('finds checkpoints in order', () => {
       expect(tip1cp1.sha).toEqual('tip1cp1')
       expect(tip1cp2.sha).toEqual('tip1cp2')
@@ -145,27 +158,27 @@ describe('metrics/params column schema builder', () => {
   describe('minimal mixed column example', () => {
     const exampleBigNumber = 3000000000
     const { columns } = transformExperimentsRepo({
-      brancha: {
+      branchA: {
         baseline: {
           params: {
             'params.yaml': {
-              mixedparam: 'string'
+              mixedParam: 'string'
             }
           }
         },
-        otherexp: {
+        otherExp: {
           params: {
             'params.yaml': {
-              mixedparam: true
+              mixedParam: true
             }
           }
         }
       },
-      branchb: {
+      branchB: {
         baseline: {
           params: {
             'params.yaml': {
-              mixedparam: null
+              mixedParam: null
             }
           }
         }
@@ -174,7 +187,7 @@ describe('metrics/params column schema builder', () => {
         baseline: {
           params: {
             'params.yaml': {
-              mixedparam: exampleBigNumber
+              mixedParam: exampleBigNumber
             }
           }
         }
@@ -186,16 +199,18 @@ describe('metrics/params column schema builder', () => {
     ) as ColumnData[]
     const [exampleMixedColumn] = paramsFileColumn.childColumns as ColumnData[]
 
-    it('correctly identifies mixed type params', () =>
+    it('correctly identifies mixed type params', () => {
       expect(exampleMixedColumn.types).toEqual([
         'number',
         'string',
         'boolean',
         'null'
-      ]))
+      ])
+    })
 
-    it('correctly identifies a number as the highest string length of a mixed column', () =>
-      expect(exampleMixedColumn.maxStringLength).toEqual(10))
+    it('correctly identifies a number as the highest string length of a mixed column', () => {
+      expect(exampleMixedColumn.maxStringLength).toEqual(10)
+    })
 
     it('adds a highest and lowest number from the one present', () => {
       expect(exampleMixedColumn.maxNumber).toEqual(exampleBigNumber)
@@ -209,28 +224,28 @@ describe('metrics/params column schema builder', () => {
         baseline: {
           params: {
             'params.yaml': {
-              mixednumber: null
+              mixedNumber: null
             }
           }
         },
         exp1: {
           params: {
             'params.yaml': {
-              mixednumber: 0
+              mixedNumber: 0
             }
           }
         },
         exp2: {
           params: {
             'params.yaml': {
-              mixednumber: -1
+              mixedNumber: -1
             }
           }
         },
         exp3: {
           params: {
             'params.yaml': {
-              mixednumber: 1
+              mixedNumber: 1
             }
           }
         }
@@ -290,17 +305,23 @@ describe('metrics/params column schema builder', () => {
       expect(columnWithoutNumbers.minNumber).toBeUndefined()
       expect(columnWithoutNumbers.maxNumber).toBeUndefined()
     })
-    it('finds the min number of -1', () =>
-      expect(columnWithNumbers.minNumber).toEqual(-1))
-    it('finds the max number of 2', () =>
-      expect(columnWithNumbers.maxNumber).toEqual(2))
-    it('finds a max string length of two from -1', () =>
-      expect(columnWithNumbers.maxStringLength).toEqual(2))
+
+    it('finds the min number of -1', () => {
+      expect(columnWithNumbers.minNumber).toEqual(-1)
+    })
+
+    it('finds the max number of 2', () => {
+      expect(columnWithNumbers.maxNumber).toEqual(2)
+    })
+
+    it('finds a max string length of two from -1', () => {
+      expect(columnWithNumbers.maxStringLength).toEqual(2)
+    })
   })
 
   it('aggregates multiple different field names', () => {
     const { columns } = transformExperimentsRepo({
-      brancha: {
+      branchA: {
         baseline: {
           params: {
             'params.yaml': {
@@ -308,7 +329,7 @@ describe('metrics/params column schema builder', () => {
             }
           }
         },
-        otherexp: {
+        otherExp: {
           params: {
             'params.yaml': {
               three: 3
@@ -316,7 +337,7 @@ describe('metrics/params column schema builder', () => {
           }
         }
       },
-      branchb: {
+      branchB: {
         baseline: {
           params: {
             'params.yaml': {
