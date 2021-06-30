@@ -3,9 +3,9 @@ import { ExperimentsRepoJSONOutput } from '../contract'
 
 export interface ColumnData extends ColumnAggregateData {
   name: string
+  path: string[]
   types?: string[]
   childColumns?: ColumnData[]
-  ancestors?: string[]
 }
 
 export const WebviewType = 'Experiments'
