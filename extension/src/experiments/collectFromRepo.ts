@@ -1,7 +1,6 @@
 import {
   Experiment,
   ExperimentFields,
-  ExperimentsBranch,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
@@ -24,8 +23,8 @@ interface ExperimentsAccumulator {
   paramsMap: PartialColumnsMap
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
-  branches: ExperimentsBranch[]
-  workspace: ExperimentsBranch
+  branches: Experiment[]
+  workspace: Experiment
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -172,8 +171,8 @@ const collectFromBranchEntry = (
     ExperimentsBranchJSONOutput
   ]
 ) => {
-  const baselineExperiment: Experiment = { sha: branchSha, ...baseline }
-  collectColumnsFromExperiment(acc, baselineExperiment)
+  const branch: Experiment = { sha: branchSha, ...baseline }
+  collectColumnsFromExperiment(acc, branch)
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
@@ -184,7 +183,6 @@ const collectFromBranchEntry = (
   }
   addCheckpointsToTips(experiments, checkpointsByTip)
 
-  const branch: ExperimentsBranch = { baseline: baselineExperiment }
   if (experiments.length > 0) {
     branch.subRows = experiments
   }
@@ -205,11 +203,15 @@ export const collectFromRepo = (
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = tableData
   const acc: ExperimentsAccumulator = {
-    branches: [] as ExperimentsBranch[],
+    branches: [] as Experiment[],
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
     paramsMap: new Map(),
-    workspace: workspace as unknown as ExperimentsBranch
+    workspace: {
+      ...workspace.baseline,
+      name: 'workspace',
+      sha: ''
+    }
   }
   collectColumnsFromExperiment(acc, workspace.baseline)
   collectFromBranchesObject(acc, branchesObject)

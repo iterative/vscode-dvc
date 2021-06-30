@@ -4,33 +4,30 @@ exports[`overall transformer functionality returns output matching a snapshot gi
 Object {
   "branches": Array [
     Object {
-      "baseline": Object {
-        "metrics": Object {
-          "summary.json": Object {
-            "accuracy": 0.4668000042438507,
-            "loss": 1.9293040037155151,
-            "val_accuracy": 0.5608000159263611,
-            "val_loss": 1.8770883083343506,
-          },
+      "metrics": Object {
+        "summary.json": Object {
+          "accuracy": 0.4668000042438507,
+          "loss": 1.9293040037155151,
+          "val_accuracy": 0.5608000159263611,
+          "val_loss": 1.8770883083343506,
         },
-        "name": "test-branch",
-        "params": Object {
-          "params.yaml": Object {
-            "dropout": 0.122,
-            "dvc_logs_dir": "dvc_logs",
-            "epochs": 2,
-            "learning_rate": 2.2e-7,
-            "log_file": "logs.csv",
-            "process": Object {
-              "test_arg": "string",
-              "threshold": 0.86,
-            },
-          },
-        },
-        "queued": false,
-        "sha": "42b8736b08170529903cd203a1f40382a4b4a8cd",
-        "timestamp": "2020-12-29T15:28:59",
       },
+      "name": "test-branch",
+      "params": Object {
+        "params.yaml": Object {
+          "dropout": 0.122,
+          "dvc_logs_dir": "dvc_logs",
+          "epochs": 2,
+          "learning_rate": 2.2e-7,
+          "log_file": "logs.csv",
+          "process": Object {
+            "test_arg": "string",
+            "threshold": 0.86,
+          },
+        },
+      },
+      "queued": false,
+      "sha": "42b8736b08170529903cd203a1f40382a4b4a8cd",
       "subRows": Array [
         Object {
           "checkpoint_parent": "f0778b3eb6a390d6f6731c735a2a4561d1792c3a",
@@ -120,34 +117,32 @@ Object {
           "timestamp": "2021-01-14T10:58:00",
         },
       ],
+      "timestamp": "2020-12-29T15:28:59",
     },
     Object {
-      "baseline": Object {
-        "metrics": Object {
-          "summary.json": Object {
-            "accuracy": 0.3484833240509033,
-            "loss": 2.048856019973755,
-            "val_accuracy": 0.4277999997138977,
-            "val_loss": 1.9979369640350342,
-          },
+      "metrics": Object {
+        "summary.json": Object {
+          "accuracy": 0.3484833240509033,
+          "loss": 2.048856019973755,
+          "val_accuracy": 0.4277999997138977,
+          "val_loss": 1.9979369640350342,
         },
-        "name": "master",
-        "params": Object {
-          "params.yaml": Object {
-            "dropout": 0.124,
-            "dvc_logs_dir": "dvc_logs",
-            "epochs": 5,
-            "learning_rate": 2.1e-7,
-            "log_file": "logs.csv",
-            "process": Object {
-              "threshold": 0.85,
-            },
-          },
-        },
-        "queued": false,
-        "sha": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
-        "timestamp": "2020-11-21T19:58:22",
       },
+      "name": "master",
+      "params": Object {
+        "params.yaml": Object {
+          "dropout": 0.124,
+          "dvc_logs_dir": "dvc_logs",
+          "epochs": 5,
+          "learning_rate": 2.1e-7,
+          "log_file": "logs.csv",
+          "process": Object {
+            "threshold": 0.85,
+          },
+        },
+      },
+      "queued": false,
+      "sha": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
       "subRows": Array [
         Object {
           "checkpoint_parent": "d1343a87c6ee4a2e82d19525964d2fb2cb6756c9",
@@ -506,6 +501,7 @@ Object {
           "timestamp": "2020-12-29T15:25:27",
         },
       ],
+      "timestamp": "2020-11-21T19:58:22",
     },
   ],
   "columns": Array [
@@ -706,31 +702,31 @@ Object {
     },
   ],
   "workspace": Object {
-    "baseline": Object {
-      "metrics": Object {
-        "summary.json": Object {
-          "accuracy": 0.4668000042438507,
-          "loss": 1.9293040037155151,
-          "val_accuracy": 0.5608000159263611,
-          "val_loss": 1.8770883083343506,
-        },
+    "metrics": Object {
+      "summary.json": Object {
+        "accuracy": 0.4668000042438507,
+        "loss": 1.9293040037155151,
+        "val_accuracy": 0.5608000159263611,
+        "val_loss": 1.8770883083343506,
       },
-      "params": Object {
-        "params.yaml": Object {
-          "dropout": 0.122,
-          "dvc_logs_dir": "dvc_logs",
-          "epochs": 2,
-          "learning_rate": 2.2e-7,
-          "log_file": "logs.csv",
-          "process": Object {
-            "test_arg": "string",
-            "threshold": 0.86,
-          },
-        },
-      },
-      "queued": false,
-      "timestamp": null,
     },
+    "name": "workspace",
+    "params": Object {
+      "params.yaml": Object {
+        "dropout": 0.122,
+        "dvc_logs_dir": "dvc_logs",
+        "epochs": 2,
+        "learning_rate": 2.2e-7,
+        "log_file": "logs.csv",
+        "process": Object {
+          "test_arg": "string",
+          "threshold": 0.86,
+        },
+      },
+    },
+    "queued": false,
+    "sha": "",
+    "timestamp": null,
   },
 }
 `;

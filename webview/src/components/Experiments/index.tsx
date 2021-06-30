@@ -1,5 +1,5 @@
 import React from 'react'
-import { Experiment, ExperimentsBranch } from 'dvc/src/experiments/contract'
+import { Experiment } from 'dvc/src/experiments/contract'
 import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
@@ -116,7 +116,7 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
   ] as Column<Experiment>[]
 
 export const ExperimentsTable: React.FC<{
-  experiments: ExperimentsBranch[]
+  experiments: Experiment[]
   columnData: ColumnData[]
 }> = ({ experiments: rawExperiments, columnData }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
@@ -128,11 +128,7 @@ export const ExperimentsTable: React.FC<{
   }, [])
 
   const [data, columns] = React.useMemo(() => {
-    const experiments = rawExperiments.map(x => {
-      const b = x.baseline
-      b.subRows = x.subRows
-      return b
-    })
+    const experiments = rawExperiments
 
     const columns = getColumns(columnData)
     return [experiments, columns]
@@ -192,7 +188,7 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments?: ExperimentsBranch[]
+  experiments?: Experiment[]
   columnData: ColumnData[]
   vsCodeApi: VsCodeApi
 }> = ({ experiments, columnData }) => {

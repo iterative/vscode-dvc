@@ -21,7 +21,7 @@ import {
   WebviewColorTheme,
   ColumnData
 } from './contract'
-import { ExperimentsBranch } from '../contract'
+import { Experiment } from '../contract'
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
@@ -166,7 +166,7 @@ export class ExperimentsWebview {
   }
 
   public showExperiments(payload: {
-    tableData: ExperimentsBranch[]
+    tableData: Experiment[]
     columnData?: ColumnData[]
     errors?: Error[]
   }): Thenable<boolean> {

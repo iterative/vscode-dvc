@@ -1,12 +1,12 @@
-import { ExperimentsRepoJSONOutput, ExperimentsBranch } from './contract'
+import { ExperimentsRepoJSONOutput, Experiment } from './contract'
 import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData } from './webview/contract'
 
 export interface TransformedExperiments {
   columns: ColumnData[]
-  branches: ExperimentsBranch[]
-  workspace: ExperimentsBranch
+  branches: Experiment[]
+  workspace: Experiment
 }
 
 export const transformExperimentsRepo = (

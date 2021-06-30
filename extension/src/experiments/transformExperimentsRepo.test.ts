@@ -49,8 +49,8 @@ describe('branch and checkpoint nesting', () => {
 
     const [branchA, branchB] = branches
     it('lists branches in the same order as the map', () => {
-      expect(branchA.baseline?.sha).toEqual('branchA')
-      expect(branchB.baseline?.sha).toEqual('branchB')
+      expect(branchA.sha).toEqual('branchA')
+      expect(branchB.sha).toEqual('branchB')
     })
 
     it('finds two experiments on branchA', () => {

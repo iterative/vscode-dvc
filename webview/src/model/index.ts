@@ -1,4 +1,4 @@
-import { ExperimentsBranch } from 'dvc/src/experiments/contract'
+import { Experiment } from 'dvc/src/experiments/contract'
 import {
   ColumnData,
   MessageFromWebview,
@@ -25,7 +25,7 @@ declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  experiments?: ExperimentsBranch[]
+  experiments?: Experiment[]
   dvcRoot?: string
 }
 
@@ -36,7 +36,7 @@ export class Model {
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
-  public experiments: ExperimentsBranch[] = []
+  public experiments: Experiment[] = []
 
   @observable
   public columnData: ColumnData[] = []
