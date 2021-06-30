@@ -4,7 +4,6 @@ import {
   ExperimentsBranch,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
-  ExperimentsWorkspace,
   Value,
   ValueTree
 } from './contract'
@@ -26,7 +25,7 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: ExperimentsBranch[]
-  workspace: ExperimentsWorkspace
+  workspace: ExperimentsBranch
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -159,9 +158,9 @@ const addCheckpointsToTips = (
   checkpointsByTip: Map<string, Experiment[]>
 ) => {
   for (const checkpointTip of experiments) {
-    const checkpoints = checkpointsByTip.get(checkpointTip.sha as string)
-    if (checkpoints) {
-      checkpointTip.checkpoints = checkpoints
+    const subRows = checkpointsByTip.get(checkpointTip.sha as string)
+    if (subRows) {
+      checkpointTip.subRows = subRows
     }
   }
 }
@@ -187,7 +186,7 @@ const collectFromBranchEntry = (
 
   const branch: ExperimentsBranch = { baseline: baselineExperiment }
   if (experiments.length > 0) {
-    branch.experiments = experiments
+    branch.subRows = experiments
   }
   acc.branches.push(branch)
 }
@@ -210,7 +209,7 @@ export const collectFromRepo = (
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
     paramsMap: new Map(),
-    workspace
+    workspace: workspace as unknown as ExperimentsBranch
   }
   collectColumnsFromExperiment(acc, workspace.baseline)
   collectFromBranchesObject(acc, branchesObject)

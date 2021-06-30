@@ -3,11 +3,7 @@ import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import {
-  ExperimentsBranch,
-  ExperimentsRepoJSONOutput,
-  ExperimentsWorkspace
-} from './contract'
+import { ExperimentsBranch, ExperimentsRepoJSONOutput } from './contract'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
@@ -41,7 +37,7 @@ export class ExperimentsTable {
 
   private processManager: ProcessManager
 
-  private workspace?: ExperimentsWorkspace
+  private workspace?: ExperimentsBranch
   private branches?: ExperimentsBranch[]
 
   constructor(
@@ -94,7 +90,12 @@ export class ExperimentsTable {
 
     const webview = await ExperimentsWebview.create(
       this.internalCommands,
-      { dvcRoot: this.dvcRoot, experiments: this.data },
+      {
+        dvcRoot: this.dvcRoot,
+        experiments: [this.workspace, ...(this.branches || [])].filter(
+          Boolean
+        ) as ExperimentsBranch[]
+      },
       this.resourceLocator
     )
 
@@ -143,7 +144,9 @@ export class ExperimentsTable {
       await this.webview.isReady()
       return this.webview.showExperiments({
         columnData: this.columns,
-        tableData: this.data
+        tableData: [this.workspace, ...(this.branches || [])].filter(
+          Boolean
+        ) as ExperimentsBranch[]
       })
     }
   }

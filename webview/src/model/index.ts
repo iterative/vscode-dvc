@@ -1,4 +1,4 @@
-import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
+import { ExperimentsBranch } from 'dvc/src/experiments/contract'
 import {
   ColumnData,
   MessageFromWebview,
@@ -25,7 +25,7 @@ declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  experiments?: ExperimentsRepoJSONOutput | null
+  experiments?: ExperimentsBranch[]
   dvcRoot?: string
 }
 
@@ -36,7 +36,7 @@ export class Model {
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
-  public experiments?: ExperimentsRepoJSONOutput | null = null
+  public experiments: ExperimentsBranch[] = []
 
   @observable
   public columnData: ColumnData[] = []
@@ -95,7 +95,7 @@ export class Model {
   }
 
   private setState(state: PersistedModelState) {
-    this.experiments = state.experiments
+    this.experiments = state.experiments || []
     this.dvcRoot = state.dvcRoot
   }
 

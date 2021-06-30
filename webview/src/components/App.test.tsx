@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
-import complexExperimentsOutput from 'dvc/src/experiments/webview/complex-output-example.json'
+import complexExperimentsOutput from 'dvc/src/experiments/webview/complex-parsed-example.json'
 import complexColumnData from 'dvc/src/experiments/webview/complex-column-data-example.json'
 import {
   MessageFromWebviewType,
