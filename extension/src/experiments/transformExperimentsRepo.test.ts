@@ -1,7 +1,6 @@
-import { Experiment } from './contract'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
-import { ColumnData } from './webview/contract'
+import { ColumnData, Experiment } from './webview/contract'
 
 describe('overall transformer functionality', () => {
   it('returns output matching a snapshot given complexExperimentsOutput', () => {

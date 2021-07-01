@@ -1,6 +1,9 @@
 import React from 'react'
-import { Experiment } from 'dvc/src/experiments/contract'
-import { ColumnData, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  ColumnData,
+  Experiment,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
@@ -11,11 +14,8 @@ import {
 } from 'react-table'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
-
 import styles from '../Table/styles.module.scss'
-
-import buildDynamicColumns from '../../util/build-dynamic-columns'
-
+import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { VsCodeApi } from '../../model'
 
 const countRowsAndAddIndexes: (

@@ -3,7 +3,6 @@ import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import { ExperimentsRepoJSONOutput } from './contract'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
@@ -11,6 +10,7 @@ import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 

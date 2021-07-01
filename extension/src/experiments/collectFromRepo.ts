@@ -1,17 +1,11 @@
+import { Experiment, ColumnAggregateData } from './webview/contract'
 import {
-  Experiment,
   ExperimentFields,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
   ValueTree
-} from './contract'
-
-export interface ColumnAggregateData {
-  maxStringLength?: number
-  maxNumber?: number
-  minNumber?: number
-}
+} from '../cli/reader'
 
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
@@ -209,9 +203,9 @@ const collectFromBranchesObject = (
 }
 
 export const collectFromRepo = (
-  tableData: ExperimentsRepoJSONOutput
+  data: ExperimentsRepoJSONOutput
 ): ExperimentsAccumulator => {
-  const { workspace, ...branchesObject } = tableData
+  const { workspace, ...branchesObject } = data
   const acc: ExperimentsAccumulator = {
     branches: [] as Experiment[],
     checkpointsByTip: new Map(),
