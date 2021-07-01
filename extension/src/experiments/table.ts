@@ -77,11 +77,16 @@ export class ExperimentsTable {
       return this.webview.reveal()
     }
 
+    await this.isReady()
+
     const webview = await ExperimentsWebview.create(
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        experiments: this.data
+        tableData:
+          this.columns && this.data
+            ? { columns: this.columns, rows: this.data }
+            : undefined
       },
       this.resourceLocator
     )
@@ -127,11 +132,10 @@ export class ExperimentsTable {
   }
 
   private async sendData() {
-    if (this.data && this.webview) {
+    if (this.data && this.columns && this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        columnData: this.columns,
-        tableData: this.data
+        tableData: { columns: this.columns, rows: this.data }
       })
     }
   }

@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
-import complexExperimentsOutput from 'dvc/src/experiments/webview/complex-parsed-example.json'
+import complexRowData from 'dvc/src/experiments/webview/complex-parsed-example.json'
 import complexColumnData from 'dvc/src/experiments/webview/complex-column-data-example.json'
 import {
   MessageFromWebviewType,
@@ -75,8 +75,10 @@ describe('App', () => {
   describe('Given a message to add experiments to the state', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
-        columns: complexColumnData,
-        tableData: complexExperimentsOutput,
+        tableData: {
+          columns: complexColumnData,
+          rows: complexRowData
+        },
         type: MessageToWebviewType.showExperiments
       }
     })

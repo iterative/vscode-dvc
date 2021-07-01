@@ -8,7 +8,7 @@ import { Model } from '../model'
 export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
   observer(({ model }) => {
     try {
-      const { errors, experiments, vsCodeApi, columnData } = model as Model
+      const { errors, tableData, vsCodeApi } = model as Model
       return (
         <>
           {errors?.map(
@@ -18,11 +18,7 @@ export const GUI: React.FC<{ model: Model }> = hotComponent(module)(
               </div>
             )
           )}
-          <ExperimentsGUI
-            experiments={experiments}
-            vsCodeApi={vsCodeApi}
-            columnData={columnData}
-          />
+          <ExperimentsGUI tableData={tableData} vsCodeApi={vsCodeApi} />
         </>
       )
     } catch (e) {

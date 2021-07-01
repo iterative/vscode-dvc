@@ -32,9 +32,8 @@ export default {
 export const ComplexTable: Story = ({ experiments, vsCodeApi }) => {
   return (
     <Experiments
-      experiments={experiments}
+      tableData={{ columns: complexColumnData, rows: experiments }}
       vsCodeApi={vsCodeApi}
-      columnData={complexColumnData}
     />
   )
 }

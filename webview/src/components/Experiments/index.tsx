@@ -1,6 +1,6 @@
 import React from 'react'
 import { Experiment } from 'dvc/src/experiments/contract'
-import { ColumnData } from 'dvc/src/experiments/webview/contract'
+import { ColumnData, TableData } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
@@ -188,14 +188,16 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments?: Experiment[]
-  columnData: ColumnData[]
   vsCodeApi: VsCodeApi
-}> = ({ experiments, columnData }) => {
+  tableData?: TableData | null
+}> = ({ tableData }) => {
   return (
     <div className={styles.experiments}>
-      {experiments?.length ? (
-        <ExperimentsTable columnData={columnData} experiments={experiments} />
+      {tableData ? (
+        <ExperimentsTable
+          columnData={tableData.columns}
+          experiments={tableData.rows}
+        />
       ) : (
         <p>Loading experiments...</p>
       )}

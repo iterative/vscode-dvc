@@ -44,8 +44,7 @@ export type MessageToWebview = {
     }
   | {
       type: MessageToWebviewType.showExperiments
-      tableData: Experiment[]
-      columnData?: ColumnData[]
+      tableData: TableData
     }
 )
 
@@ -55,7 +54,12 @@ export enum MessageToWebviewType {
   showExperiments = 'showExperiments'
 }
 
+export interface TableData {
+  rows: Experiment[]
+  columns: ColumnData[]
+}
+
 export interface ExperimentsWebviewState {
   dvcRoot: string
-  experiments?: Experiment[]
+  tableData?: TableData
 }

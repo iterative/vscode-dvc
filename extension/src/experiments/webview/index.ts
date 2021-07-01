@@ -19,9 +19,8 @@ import {
   WindowWithWebviewData,
   ExperimentsWebviewState,
   WebviewColorTheme,
-  ColumnData
+  TableData
 } from './contract'
-import { Experiment } from '../contract'
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
@@ -96,13 +95,14 @@ export class ExperimentsWebview {
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.setDvcRoot
         })
-        const experiments = state.experiments
-        if (experiments) {
-          this.sendMessage({
-            tableData: experiments,
-            type: MessageToWebviewType.showExperiments
-          })
+        const tableData = state.tableData
+        if (!tableData) {
+          throw new Error('GET FUCKED ')
         }
+        this.sendMessage({
+          tableData: tableData,
+          type: MessageToWebviewType.showExperiments
+        })
       })
     })
   }
@@ -166,8 +166,7 @@ export class ExperimentsWebview {
   }
 
   public showExperiments(payload: {
-    tableData: Experiment[]
-    columnData?: ColumnData[]
+    tableData: TableData
     errors?: Error[]
   }): Thenable<boolean> {
     return this.sendMessage({

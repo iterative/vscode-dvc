@@ -1,10 +1,9 @@
-import { Experiment } from 'dvc/src/experiments/contract'
 import {
-  ColumnData,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
+  TableData,
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/experiments/webview/contract'
@@ -25,7 +24,7 @@ declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  experiments?: Experiment[]
+  tableData?: TableData | null
   dvcRoot?: string
 }
 
@@ -36,10 +35,7 @@ export class Model {
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
-  public experiments: Experiment[] = []
-
-  @observable
-  public columnData: ColumnData[] = []
+  public tableData?: TableData | null = null // do not remove = null or webview will not load data
 
   @observable
   public dvcRoot?: string
@@ -90,13 +86,13 @@ export class Model {
   private getState(): PersistedModelState {
     return {
       dvcRoot: this.dvcRoot,
-      experiments: this.experiments
+      tableData: this.tableData
     }
   }
 
   private setState(state: PersistedModelState) {
-    this.experiments = state.experiments || []
     this.dvcRoot = state.dvcRoot
+    this.tableData = state.tableData
   }
 
   private sendMessage(message: MessageFromWebview): void {
@@ -113,15 +109,13 @@ export class Model {
         return
       case MessageToWebviewType.showExperiments:
         runInAction(() => {
-          this.experiments = message.tableData
-          this.columnData = message.columnData || []
+          this.tableData = message.tableData
         })
         return
       case MessageToWebviewType.setDvcRoot:
         runInAction(() => {
           this.dvcRoot = message.dvcRoot
         })
-
         return
       default:
         Logger.error(`Unexpected message: ${message}`)
