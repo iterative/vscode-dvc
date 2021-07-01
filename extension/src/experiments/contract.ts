@@ -21,7 +21,8 @@ export interface ExperimentFields {
 }
 
 export interface Experiment extends ExperimentFields {
-  sha: string
+  id: string
+  displayName: string
   subRows?: Experiment[]
 }
 

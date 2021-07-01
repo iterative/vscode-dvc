@@ -81,25 +81,8 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
   [
     {
       Header: 'Experiment',
-      accessor: ({
-        name,
-        sha
-      }: {
-        name: string | undefined
-        sha: string | undefined
-      }) => {
-        if (name) {
-          return name
-        }
-
-        if (sha) {
-          return sha.slice(0, 7)
-        }
-
-        return 'workspace'
-      },
-      id: 'id',
-      width: 150
+      accessor: 'displayName',
+      id: 'id'
     },
     {
       Cell: ({ value }: { value: string }) => {

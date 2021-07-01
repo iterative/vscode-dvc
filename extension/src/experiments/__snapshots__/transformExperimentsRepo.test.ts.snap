@@ -4,6 +4,8 @@ exports[`overall transformer functionality returns output matching a snapshot gi
 Object {
   "branches": Array [
     Object {
+      "displayName": "test-branch",
+      "id": "42b8736b08170529903cd203a1f40382a4b4a8cd",
       "metrics": Object {
         "summary.json": Object {
           "accuracy": 0.4668000042438507,
@@ -27,11 +29,12 @@ Object {
         },
       },
       "queued": false,
-      "sha": "42b8736b08170529903cd203a1f40382a4b4a8cd",
       "subRows": Array [
         Object {
           "checkpoint_parent": "f0778b3eb6a390d6f6731c735a2a4561d1792c3a",
           "checkpoint_tip": "d3f4a0d3661c5977540d2205d819470cf0d2145a",
+          "displayName": "exp-05694",
+          "id": "d3f4a0d3661c5977540d2205d819470cf0d2145a",
           "metrics": Object {
             "summary.json": Object {
               "accuracy": 0.5672000050544739,
@@ -55,11 +58,12 @@ Object {
             },
           },
           "queued": false,
-          "sha": "d3f4a0d3661c5977540d2205d819470cf0d2145a",
           "subRows": Array [
             Object {
               "checkpoint_parent": "f81f1b5a1248b9d9f595fb53136298c69f908e66",
               "checkpoint_tip": "d3f4a0d3661c5977540d2205d819470cf0d2145a",
+              "displayName": "f0778b3",
+              "id": "f0778b3eb6a390d6f6731c735a2a4561d1792c3a",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.5672000050544739,
@@ -82,12 +86,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "f0778b3eb6a390d6f6731c735a2a4561d1792c3a",
               "timestamp": "2021-01-14T10:57:59",
             },
             Object {
               "checkpoint_parent": "42b8736b08170529903cd203a1f40382a4b4a8cd",
               "checkpoint_tip": "d3f4a0d3661c5977540d2205d819470cf0d2145a",
+              "displayName": "f81f1b5",
+              "id": "f81f1b5a1248b9d9f595fb53136298c69f908e66",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.5202666521072388,
@@ -110,7 +115,6 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "f81f1b5a1248b9d9f595fb53136298c69f908e66",
               "timestamp": "2021-01-14T10:57:53",
             },
           ],
@@ -120,6 +124,8 @@ Object {
       "timestamp": "2020-12-29T15:28:59",
     },
     Object {
+      "displayName": "master",
+      "id": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
       "metrics": Object {
         "summary.json": Object {
           "accuracy": 0.3484833240509033,
@@ -142,11 +148,12 @@ Object {
         },
       },
       "queued": false,
-      "sha": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
       "subRows": Array [
         Object {
           "checkpoint_parent": "d1343a87c6ee4a2e82d19525964d2fb2cb6756c9",
           "checkpoint_tip": "4fb124aebddb2adf1545030907687fa9a4c80e70",
+          "displayName": "exp-e7a67",
+          "id": "4fb124aebddb2adf1545030907687fa9a4c80e70",
           "metrics": Object {
             "summary.json": Object {
               "accuracy": 0.3724166750907898,
@@ -170,11 +177,12 @@ Object {
             },
           },
           "queued": false,
-          "sha": "4fb124aebddb2adf1545030907687fa9a4c80e70",
           "subRows": Array [
             Object {
               "checkpoint_parent": "1ee5f2ecb0fa4d83cbf614386536344cf894dd53",
               "checkpoint_tip": "4fb124aebddb2adf1545030907687fa9a4c80e70",
+              "displayName": "d1343a8",
+              "id": "d1343a87c6ee4a2e82d19525964d2fb2cb6756c9",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.3724166750907898,
@@ -197,12 +205,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "d1343a87c6ee4a2e82d19525964d2fb2cb6756c9",
               "timestamp": "2020-12-29T15:31:51",
             },
             Object {
               "checkpoint_parent": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
               "checkpoint_tip": "4fb124aebddb2adf1545030907687fa9a4c80e70",
+              "displayName": "1ee5f2e",
+              "id": "1ee5f2ecb0fa4d83cbf614386536344cf894dd53",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.3723166584968567,
@@ -225,7 +234,6 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "1ee5f2ecb0fa4d83cbf614386536344cf894dd53",
               "timestamp": "2020-12-29T15:31:44",
             },
           ],
@@ -234,6 +242,8 @@ Object {
         Object {
           "checkpoint_parent": "217312476f8854dda1865450b737eb6bc7a3ba1b",
           "checkpoint_tip": "42b8736b08170529903cd203a1f40382a4b4a8cd",
+          "displayName": "test-branch",
+          "id": "42b8736b08170529903cd203a1f40382a4b4a8cd",
           "metrics": Object {
             "summary.json": Object {
               "accuracy": 0.4668000042438507,
@@ -257,11 +267,12 @@ Object {
             },
           },
           "queued": false,
-          "sha": "42b8736b08170529903cd203a1f40382a4b4a8cd",
           "subRows": Array [
             Object {
               "checkpoint_parent": "9523bde67538cf31230efaff2dbc47d38a944ab5",
               "checkpoint_tip": "42b8736b08170529903cd203a1f40382a4b4a8cd",
+              "displayName": "2173124",
+              "id": "217312476f8854dda1865450b737eb6bc7a3ba1b",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.4668000042438507,
@@ -284,12 +295,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "217312476f8854dda1865450b737eb6bc7a3ba1b",
               "timestamp": "2020-12-29T15:28:57",
             },
             Object {
               "checkpoint_parent": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
               "checkpoint_tip": "42b8736b08170529903cd203a1f40382a4b4a8cd",
+              "displayName": "9523bde",
+              "id": "9523bde67538cf31230efaff2dbc47d38a944ab5",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.4083833396434784,
@@ -312,7 +324,6 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "9523bde67538cf31230efaff2dbc47d38a944ab5",
               "timestamp": "2020-12-29T15:28:50",
             },
           ],
@@ -321,6 +332,8 @@ Object {
         Object {
           "checkpoint_parent": "22e40e1fa3c916ac567f69b85969e3066a91dda4",
           "checkpoint_tip": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
+          "displayName": "exp-83425",
+          "id": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
           "metrics": Object {
             "summary.json": Object {
               "accuracy": 0.5926499962806702,
@@ -343,11 +356,12 @@ Object {
             },
           },
           "queued": false,
-          "sha": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
           "subRows": Array [
             Object {
               "checkpoint_parent": "91116c1eae4b79cb1f5ab0312dfd9b3e43608e15",
               "checkpoint_tip": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
+              "displayName": "22e40e1",
+              "id": "22e40e1fa3c916ac567f69b85969e3066a91dda4",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.5926499962806702,
@@ -369,12 +383,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "22e40e1fa3c916ac567f69b85969e3066a91dda4",
               "timestamp": "2020-12-29T15:27:01",
             },
             Object {
               "checkpoint_parent": "e821416bfafb4bc28b3e0a8ddb322505b0ad2361",
               "checkpoint_tip": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
+              "displayName": "91116c1",
+              "id": "91116c1eae4b79cb1f5ab0312dfd9b3e43608e15",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.557449996471405,
@@ -396,12 +411,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "91116c1eae4b79cb1f5ab0312dfd9b3e43608e15",
               "timestamp": "2020-12-29T15:26:55",
             },
             Object {
               "checkpoint_parent": "c658f8b14ac819ac2a5ea0449da6c15dbe8eb880",
               "checkpoint_tip": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
+              "displayName": "e821416",
+              "id": "e821416bfafb4bc28b3e0a8ddb322505b0ad2361",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.5113166570663452,
@@ -423,12 +439,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "e821416bfafb4bc28b3e0a8ddb322505b0ad2361",
               "timestamp": "2020-12-29T15:26:49",
             },
             Object {
               "checkpoint_parent": "23250b33e3d6dd0e136262d1d26a2face031cb03",
               "checkpoint_tip": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
+              "displayName": "c658f8b",
+              "id": "c658f8b14ac819ac2a5ea0449da6c15dbe8eb880",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.46094998717308044,
@@ -450,12 +467,13 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "c658f8b14ac819ac2a5ea0449da6c15dbe8eb880",
               "timestamp": "2020-12-29T15:26:43",
             },
             Object {
               "checkpoint_parent": "53c3851f46955fa3e2b8f6e1c52999acc8c9ea77",
               "checkpoint_tip": "1ba7bcd6ce6154e72e18b155475663ecbbd1f49d",
+              "displayName": "23250b3",
+              "id": "23250b33e3d6dd0e136262d1d26a2face031cb03",
               "metrics": Object {
                 "summary.json": Object {
                   "accuracy": 0.40904998779296875,
@@ -477,13 +495,14 @@ Object {
                 },
               },
               "queued": false,
-              "sha": "23250b33e3d6dd0e136262d1d26a2face031cb03",
               "timestamp": "2020-12-29T15:26:36",
             },
           ],
           "timestamp": "2020-12-29T15:27:02",
         },
         Object {
+          "displayName": "90aea7f",
+          "id": "90aea7f2482117a55dfcadcdb901aaa6610fbbc9",
           "params": Object {
             "params.yaml": Object {
               "dropout": 0.124,
@@ -497,7 +516,6 @@ Object {
             },
           },
           "queued": true,
-          "sha": "90aea7f2482117a55dfcadcdb901aaa6610fbbc9",
           "timestamp": "2020-12-29T15:25:27",
         },
       ],
@@ -702,6 +720,8 @@ Object {
     },
   ],
   "workspace": Object {
+    "displayName": "workspace",
+    "id": "workspace",
     "metrics": Object {
       "summary.json": Object {
         "accuracy": 0.4668000042438507,
@@ -710,7 +730,6 @@ Object {
         "val_loss": 1.8770883083343506,
       },
     },
-    "name": "workspace",
     "params": Object {
       "params.yaml": Object {
         "dropout": 0.122,
@@ -725,7 +744,6 @@ Object {
       },
     },
     "queued": false,
-    "sha": "",
     "timestamp": null,
   },
 }

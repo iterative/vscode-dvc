@@ -144,8 +144,8 @@ const nestExperiment = (
   checkpointsByTip: Map<string, Experiment[]>,
   experiment: Experiment
 ) => {
-  const { checkpoint_tip, sha } = experiment
-  if (checkpoint_tip && checkpoint_tip !== sha) {
+  const { checkpoint_tip, id } = experiment
+  if (checkpoint_tip && checkpoint_tip !== id) {
     addToMapArray(checkpointsByTip, checkpoint_tip, experiment)
   } else {
     checkpointTips.push(experiment)
@@ -157,12 +157,15 @@ const addCheckpointsToTips = (
   checkpointsByTip: Map<string, Experiment[]>
 ) => {
   for (const checkpointTip of experiments) {
-    const subRows = checkpointsByTip.get(checkpointTip.sha as string)
+    const subRows = checkpointsByTip.get(checkpointTip.id as string)
     if (subRows) {
       checkpointTip.subRows = subRows
     }
   }
 }
+
+const getDisplayName = (name: string | undefined, sha: string) =>
+  name || sha.slice(0, 7)
 
 const collectFromBranchEntry = (
   acc: ExperimentsAccumulator,
@@ -171,13 +174,21 @@ const collectFromBranchEntry = (
     ExperimentsBranchJSONOutput
   ]
 ) => {
-  const branch: Experiment = { sha: branchSha, ...baseline }
+  const branch: Experiment = {
+    id: branchSha,
+    ...baseline,
+    displayName: getDisplayName(baseline.name, branchSha)
+  }
   collectColumnsFromExperiment(acc, branch)
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment: Experiment = { ...experimentData, sha }
+    const experiment: Experiment = {
+      ...experimentData,
+      displayName: getDisplayName(experimentData.name, sha),
+      id: sha
+    }
     collectColumnsFromExperiment(acc, experiment)
     nestExperiment(experiments, checkpointsByTip, experiment)
   }
@@ -209,8 +220,8 @@ export const collectFromRepo = (
     paramsMap: new Map(),
     workspace: {
       ...workspace.baseline,
-      name: 'workspace',
-      sha: ''
+      displayName: 'workspace',
+      id: 'workspace'
     }
   }
   collectColumnsFromExperiment(acc, workspace.baseline)

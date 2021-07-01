@@ -49,8 +49,8 @@ describe('branch and checkpoint nesting', () => {
 
     const [branchA, branchB] = branches
     it('lists branches in the same order as the map', () => {
-      expect(branchA.sha).toEqual('branchA')
-      expect(branchB.sha).toEqual('branchB')
+      expect(branchA.id).toEqual('branchA')
+      expect(branchB.id).toEqual('branchB')
     })
 
     it('finds two experiments on branchA', () => {
@@ -97,9 +97,9 @@ describe('branch and checkpoint nesting', () => {
     const [tip1cp1, tip1cp2, tip1cp3] = tip1.subRows as Experiment[]
 
     it('finds checkpoints in order', () => {
-      expect(tip1cp1.sha).toEqual('tip1cp1')
-      expect(tip1cp2.sha).toEqual('tip1cp2')
-      expect(tip1cp3.sha).toEqual('tip1cp3')
+      expect(tip1cp1.id).toEqual('tip1cp1')
+      expect(tip1cp2.id).toEqual('tip1cp2')
+      expect(tip1cp3.id).toEqual('tip1cp3')
     })
   })
 })
