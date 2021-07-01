@@ -1,10 +1,10 @@
 export type Value = string | number | boolean | null
 
-export interface ValueTreeRoot {
+interface ValueTreeRoot {
   [filename: string]: ValueTree
 }
 
-export interface ValueTreeNode {
+interface ValueTreeNode {
   [key: string]: Value | ValueTree
 }
 
@@ -26,15 +26,6 @@ export interface Experiment extends ExperimentFields {
   subRows?: Experiment[]
 }
 
-export interface ExperimentsWorkspace {
-  baseline: ExperimentFields
-}
-
-export interface ExperimentsBranch {
-  baseline: Experiment
-  subRows?: Experiment[]
-}
-
 export interface ExperimentsBranchJSONOutput {
   [sha: string]: ExperimentFields
   baseline: ExperimentFields
@@ -42,5 +33,5 @@ export interface ExperimentsBranchJSONOutput {
 
 export interface ExperimentsRepoJSONOutput {
   [name: string]: ExperimentsBranchJSONOutput
-  workspace: ExperimentsBranchJSONOutput
+  workspace: { baseline: ExperimentFields }
 }
