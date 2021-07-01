@@ -269,12 +269,6 @@ export const TableHead: React.FC<InstanceProp> = ({
 
   return (
     <div className={styles.thead}>
-      {/* {headerGroups.slice(0, lastHeaderGroupIndex).map((headerGroup, i) => (
-        <ParentHeaderGroup
-          headerGroup={headerGroup}
-          key={`header-group-${i}`}
-        />
-      ))} */}
       <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
     </div>
   )
@@ -287,9 +281,9 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
         <TableHead instance={instance} />
-        {rows.map(row => {
-          return <TableBody row={row} instance={instance} key={row.id} />
-        })}
+        {rows.map(row => (
+          <TableBody row={row} instance={instance} key={row.id} />
+        ))}
       </div>
     </div>
   )
