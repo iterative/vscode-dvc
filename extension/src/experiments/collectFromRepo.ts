@@ -1,10 +1,8 @@
 import {
   Experiment,
   ExperimentFields,
-  ExperimentsBranch,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
-  ExperimentsWorkspace,
   Value,
   ValueTree
 } from './contract'
@@ -25,8 +23,8 @@ interface ExperimentsAccumulator {
   paramsMap: PartialColumnsMap
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
-  branches: ExperimentsBranch[]
-  workspace: ExperimentsWorkspace
+  branches: Experiment[]
+  workspace: Experiment
 }
 
 const getValueType = (value: Value | ValueTree) => {
@@ -146,8 +144,8 @@ const nestExperiment = (
   checkpointsByTip: Map<string, Experiment[]>,
   experiment: Experiment
 ) => {
-  const { checkpoint_tip, sha } = experiment
-  if (checkpoint_tip && checkpoint_tip !== sha) {
+  const { checkpoint_tip, id } = experiment
+  if (checkpoint_tip && checkpoint_tip !== id) {
     addToMapArray(checkpointsByTip, checkpoint_tip, experiment)
   } else {
     checkpointTips.push(experiment)
@@ -159,12 +157,21 @@ const addCheckpointsToTips = (
   checkpointsByTip: Map<string, Experiment[]>
 ) => {
   for (const checkpointTip of experiments) {
-    const checkpoints = checkpointsByTip.get(checkpointTip.sha as string)
-    if (checkpoints) {
-      checkpointTip.checkpoints = checkpoints
+    const subRows = checkpointsByTip.get(checkpointTip.id as string)
+    if (subRows) {
+      checkpointTip.subRows = subRows
     }
   }
 }
+
+const consolidateExperimentData = (
+  sha: string,
+  baseline: ExperimentFields
+): Experiment => ({
+  id: sha,
+  ...baseline,
+  displayName: baseline.name || sha.slice(0, 7)
+})
 
 const collectFromBranchEntry = (
   acc: ExperimentsAccumulator,
@@ -173,21 +180,21 @@ const collectFromBranchEntry = (
     ExperimentsBranchJSONOutput
   ]
 ) => {
-  const baselineExperiment: Experiment = { sha: branchSha, ...baseline }
-  collectColumnsFromExperiment(acc, baselineExperiment)
+  const branch = consolidateExperimentData(branchSha, baseline)
+  collectColumnsFromExperiment(acc, branch)
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment: Experiment = { ...experimentData, sha }
+    const experiment = consolidateExperimentData(sha, experimentData)
+
     collectColumnsFromExperiment(acc, experiment)
     nestExperiment(experiments, checkpointsByTip, experiment)
   }
   addCheckpointsToTips(experiments, checkpointsByTip)
 
-  const branch: ExperimentsBranch = { baseline: baselineExperiment }
   if (experiments.length > 0) {
-    branch.experiments = experiments
+    branch.subRows = experiments
   }
   acc.branches.push(branch)
 }
@@ -206,11 +213,15 @@ export const collectFromRepo = (
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = tableData
   const acc: ExperimentsAccumulator = {
-    branches: [] as ExperimentsBranch[],
+    branches: [] as Experiment[],
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
     paramsMap: new Map(),
-    workspace
+    workspace: {
+      ...workspace.baseline,
+      displayName: 'workspace',
+      id: 'workspace'
+    }
   }
   collectColumnsFromExperiment(acc, workspace.baseline)
   collectFromBranchesObject(acc, branchesObject)

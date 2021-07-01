@@ -3,13 +3,9 @@ import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import {
-  ExperimentsBranch,
-  ExperimentsRepoJSONOutput,
-  ExperimentsWorkspace
-} from './contract'
+import { ExperimentsRepoJSONOutput } from './contract'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ColumnData } from './webview/contract'
+import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -35,14 +31,9 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private data?: ExperimentsRepoJSONOutput
-
-  private columns?: ColumnData[]
+  private tableData?: TableData
 
   private processManager: ProcessManager
-
-  private workspace?: ExperimentsWorkspace
-  private branches?: ExperimentsBranch[]
 
   constructor(
     dvcRoot: string,
@@ -66,18 +57,6 @@ export class ExperimentsTable {
     return this.initialized
   }
 
-  public getColumns() {
-    return this.columns
-  }
-
-  public getWorkspace() {
-    return this.workspace
-  }
-
-  public getBranches() {
-    return this.branches
-  }
-
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
     this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
@@ -94,7 +73,10 @@ export class ExperimentsTable {
 
     const webview = await ExperimentsWebview.create(
       this.internalCommands,
-      { dvcRoot: this.dvcRoot, experiments: this.data },
+      {
+        dvcRoot: this.dvcRoot,
+        tableData: this.tableData
+      },
       this.resourceLocator
     )
 
@@ -130,20 +112,18 @@ export class ExperimentsTable {
       getNewPromise,
       'Experiments table update'
     )
-    this.data = data
+
     const { columns, branches, workspace } = transformExperimentsRepo(data)
-    this.columns = columns
-    this.branches = branches
-    this.workspace = workspace
+    this.tableData = { columns, rows: [workspace, ...branches] }
+
     return this.sendData()
   }
 
   private async sendData() {
-    if (this.data && this.webview) {
+    if (this.tableData && this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        columnData: this.columns,
-        tableData: this.data
+        tableData: this.tableData
       })
     }
   }

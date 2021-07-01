@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 
-import complexExperimentsData from 'dvc/src/experiments/webview/complex-output-example.json'
+import complexRowData from 'dvc/src/experiments/webview/complex-parsed-example.json'
 import complexColumnData from 'dvc/src/experiments/webview/complex-column-data-example.json'
 import Experiments from '../components/Experiments'
 
@@ -22,19 +22,13 @@ export default {
     }
   },
   args: {
-    experiments: complexExperimentsData,
+    tableData: { columns: complexColumnData, rows: complexRowData },
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,
   title: 'Experiments/Table'
 } as Meta
 
-export const ComplexTable: Story = ({ experiments, vsCodeApi }) => {
-  return (
-    <Experiments
-      experiments={experiments}
-      vsCodeApi={vsCodeApi}
-      columnData={complexColumnData}
-    />
-  )
+export const ComplexTable: Story = ({ tableData, vsCodeApi }) => {
+  return <Experiments tableData={tableData} vsCodeApi={vsCodeApi} />
 }

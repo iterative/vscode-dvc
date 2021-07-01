@@ -1,5 +1,5 @@
 import { ColumnAggregateData } from '../collectFromRepo'
-import { ExperimentsRepoJSONOutput } from '../contract'
+import { Experiment } from '../contract'
 
 export interface ColumnData extends ColumnAggregateData {
   group: string
@@ -44,8 +44,7 @@ export type MessageToWebview = {
     }
   | {
       type: MessageToWebviewType.showExperiments
-      tableData?: ExperimentsRepoJSONOutput | null
-      columnData?: ColumnData[]
+      tableData: TableData
     }
 )
 
@@ -55,7 +54,12 @@ export enum MessageToWebviewType {
   showExperiments = 'showExperiments'
 }
 
+export interface TableData {
+  rows: Experiment[]
+  columns: ColumnData[]
+}
+
 export interface ExperimentsWebviewState {
   dvcRoot: string
-  experiments?: ExperimentsRepoJSONOutput
+  tableData?: TableData
 }
