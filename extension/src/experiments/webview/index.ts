@@ -96,13 +96,12 @@ export class ExperimentsWebview {
           type: MessageToWebviewType.setDvcRoot
         })
         const tableData = state.tableData
-        if (!tableData) {
-          throw new Error('GET FUCKED ')
+        if (tableData) {
+          this.sendMessage({
+            tableData: tableData,
+            type: MessageToWebviewType.showExperiments
+          })
         }
-        this.sendMessage({
-          tableData: tableData,
-          type: MessageToWebviewType.showExperiments
-        })
       })
     })
   }
