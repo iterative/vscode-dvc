@@ -57,10 +57,6 @@ export class ExperimentsTable {
     return this.initialized
   }
 
-  public getTableData() {
-    return this.tableData
-  }
-
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
     this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))

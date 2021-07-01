@@ -12,6 +12,7 @@ import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
+import { ExperimentsWebview } from '../../../experiments/webview'
 
 suite('Experiments Table Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -28,28 +29,6 @@ suite('Experiments Table Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     return commands.executeCommand('workbench.action.closeAllEditors')
-  })
-
-  describe('getTableData', () => {
-    it('should return a parsed version of the data provided by the reader', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const experimentTable = disposable.track(
-        new ExperimentsTable('parser', internalCommands, {} as ResourceLocator)
-      )
-      await experimentTable.isReady()
-
-      expect(experimentTable.getTableData()).to.deep.equal({
-        columns: complexColumnData,
-        rows: complexRowData
-      })
-    })
   })
 
   describe('refresh', () => {
@@ -100,7 +79,15 @@ suite('Experiments Table Test Suite', () => {
         new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
       )
 
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+
       const webview = await experimentsTable.showWebview()
+      expect(messageSpy).to.be.calledWith({
+        tableData: {
+          columns: complexColumnData,
+          rows: complexRowData
+        }
+      })
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
