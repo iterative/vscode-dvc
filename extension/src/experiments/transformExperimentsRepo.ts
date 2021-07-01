@@ -1,7 +1,7 @@
-import { ExperimentsRepoJSONOutput } from './types'
 import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData, Experiment } from './webview/contract'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 interface TransformedExperiments {
   columns: ColumnData[]
@@ -10,10 +10,9 @@ interface TransformedExperiments {
 }
 
 export const transformExperimentsRepo = (
-  tableData: ExperimentsRepoJSONOutput
+  data: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const { metricsMap, paramsMap, branches, workspace } =
-    collectFromRepo(tableData)
+  const { metricsMap, paramsMap, branches, workspace } = collectFromRepo(data)
 
   return {
     branches,

@@ -7,7 +7,6 @@ import {
   Flag,
   ListFlag
 } from './args'
-import { ExperimentsRepoJSONOutput } from '../experiments/types'
 import { trimAndSplit } from '../util/stdout'
 
 export type PathOutput = { path: string }
@@ -46,6 +45,38 @@ export type StageOrFileStatuses = Record<ChangedType, PathStatus>
 export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 
 export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
+
+export type Value = string | number | boolean | null
+
+interface ValueTreeRoot {
+  [filename: string]: ValueTree
+}
+
+interface ValueTreeNode {
+  [key: string]: Value | ValueTree
+}
+
+export type ValueTree = ValueTreeRoot | ValueTreeNode
+
+export interface ExperimentFields {
+  name?: string
+  timestamp?: string | null
+  queued?: boolean
+  params?: ValueTreeRoot
+  metrics?: ValueTreeRoot
+  checkpoint_tip?: string
+  checkpoint_parent?: string
+}
+
+export interface ExperimentsBranchJSONOutput {
+  [sha: string]: ExperimentFields
+  baseline: ExperimentFields
+}
+
+export interface ExperimentsRepoJSONOutput {
+  [name: string]: ExperimentsBranchJSONOutput
+  workspace: { baseline: ExperimentFields }
+}
 
 export const autoRegisteredCommands = {
   DIFF: 'diff',

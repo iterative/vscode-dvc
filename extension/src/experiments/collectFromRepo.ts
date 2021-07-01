@@ -1,11 +1,11 @@
+import { Experiment, ColumnAggregateData } from './webview/contract'
 import {
   ExperimentFields,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
   ValueTree
-} from './types'
-import { Experiment, ColumnAggregateData } from './webview/contract'
+} from '../cli/reader'
 
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>

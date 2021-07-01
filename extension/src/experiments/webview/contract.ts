@@ -1,4 +1,4 @@
-import { ExperimentFields } from '../types'
+import { ExperimentFields } from '../../cli/reader'
 
 export interface Experiment extends ExperimentFields {
   id: string
