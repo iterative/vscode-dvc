@@ -4,6 +4,7 @@ import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
 import { pickExperimentName } from './quickPick'
+import { SortDefinition } from './sorting'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -42,6 +43,15 @@ export class Experiments {
 
   public isReady() {
     return this.initialized
+  }
+
+  public async setSort(sortDefinition: SortDefinition | undefined) {
+    const tableRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!tableRoot) {
+      return
+    }
+    const table = this.experiments[tableRoot]
+    table.setCurrentSort(sortDefinition)
   }
 
   public getFocused(): ExperimentsTable | undefined {

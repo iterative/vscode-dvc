@@ -1,18 +1,25 @@
 import { join, resolve } from 'path'
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, window } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { TableData } from './webview/contract'
+import { ColumnData, Experiment, TableData } from './webview/contract'
+import { buildExperimentSortFunction, SortDefinition } from './sorting'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { QuickPickItemWithValue, quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
+
+const quickPickItemFromColumn = (cur: ColumnData) => ({
+  label: cur.path.join('.'),
+  value: cur.path
+})
 
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
@@ -33,7 +40,14 @@ export class ExperimentsTable {
 
   private tableData?: TableData
 
+  private columns?: ColumnData[]
+  private workspace?: Experiment
+  private unsortedRows?: Experiment[]
+  private sortedRows?: Experiment[]
+
   private processManager: ProcessManager
+
+  private currentSort?: SortDefinition
 
   constructor(
     dvcRoot: string,
@@ -102,6 +116,75 @@ export class ExperimentsTable {
     )
   }
 
+  public setCurrentSort(sort: SortDefinition | undefined) {
+    this.currentSort = sort
+    this.updateTableData()
+  }
+
+  public async pickCurrentSort() {
+    const columnsToPick = this.columns?.reduce<
+      QuickPickItemWithValue<string[]>[]
+    >((acc, cur) => {
+      const entry: QuickPickItemWithValue<string[]> =
+        quickPickItemFromColumn(cur)
+
+      return [...acc, entry]
+    }, [])
+    if (!columnsToPick || columnsToPick.length === 0) {
+      window.showWarningMessage('There are no columns to sort from!')
+      return
+    }
+    const columnPath = await quickPickValue<string[]>(columnsToPick, {
+      title: 'Select a column to sort'
+    })
+    if (!columnPath) {
+      return
+    }
+    const descending = await quickPickValue<boolean>(
+      [
+        { label: 'Ascending', value: false },
+        { label: 'Descending', value: true }
+      ],
+      { title: 'Select a direction to sort' }
+    )
+    if (!descending) {
+      return
+    }
+    return this.setCurrentSort({
+      columnPath,
+      descending
+    })
+  }
+
+  private updateSortedRows() {
+    if (this.currentSort) {
+      const sortFunction = buildExperimentSortFunction(
+        this.currentSort as SortDefinition
+      )
+      this.sortedRows = (this.unsortedRows as Experiment[]).map(branch => {
+        if (!branch.subRows) {
+          return branch
+        }
+        const sortedExperiments = [...branch.subRows].sort(sortFunction)
+        return {
+          ...branch,
+          subRows: sortedExperiments
+        }
+      })
+    } else {
+      this.sortedRows = this.unsortedRows
+    }
+  }
+
+  private updateTableData() {
+    this.updateSortedRows()
+    const { columns, workspace, sortedRows } = this
+    this.tableData = {
+      columns: columns as ColumnData[],
+      rows: [workspace as Experiment, ...(sortedRows as Experiment[])]
+    }
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
@@ -114,7 +197,12 @@ export class ExperimentsTable {
     )
 
     const { columns, branches, workspace } = transformExperimentsRepo(data)
-    this.tableData = { columns, rows: [workspace, ...branches] }
+
+    this.columns = columns
+    this.workspace = workspace
+    this.unsortedRows = branches
+
+    this.updateTableData()
 
     return this.sendData()
   }

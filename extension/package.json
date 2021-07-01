@@ -201,6 +201,11 @@
         "title": "%command.copyRelativeFilePath%",
         "command": "dvc.copyRelativeFilePath",
         "category": "DVC"
+      },
+      {
+        "title": "%command.setExperimentsTableSort%",
+        "command": "dvc.setExperimentsTableSort",
+        "category": "DVC"
       }
     ],
     "configuration": {
