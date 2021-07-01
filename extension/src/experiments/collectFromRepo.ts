@@ -164,8 +164,14 @@ const addCheckpointsToTips = (
   }
 }
 
-const getDisplayName = (name: string | undefined, sha: string) =>
-  name || sha.slice(0, 7)
+const consolidateExperimentData = (
+  sha: string,
+  baseline: ExperimentFields
+): Experiment => ({
+  id: sha,
+  ...baseline,
+  displayName: baseline.name || sha.slice(0, 7)
+})
 
 const collectFromBranchEntry = (
   acc: ExperimentsAccumulator,
@@ -174,21 +180,14 @@ const collectFromBranchEntry = (
     ExperimentsBranchJSONOutput
   ]
 ) => {
-  const branch: Experiment = {
-    id: branchSha,
-    ...baseline,
-    displayName: getDisplayName(baseline.name, branchSha)
-  }
+  const branch = consolidateExperimentData(branchSha, baseline)
   collectColumnsFromExperiment(acc, branch)
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment: Experiment = {
-      ...experimentData,
-      displayName: getDisplayName(experimentData.name, sha),
-      id: sha
-    }
+    const experiment = consolidateExperimentData(sha, experimentData)
+
     collectColumnsFromExperiment(acc, experiment)
     nestExperiment(experiments, checkpointsByTip, experiment)
   }
