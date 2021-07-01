@@ -6,6 +6,8 @@ import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
+import complexRowData from '../../../experiments/webview/complex-parsed-example.json'
+import complexColumnData from '../../../experiments/webview/complex-column-data-example.json'
 import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -26,6 +28,28 @@ suite('Experiments Table Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     return commands.executeCommand('workbench.action.closeAllEditors')
+  })
+
+  describe('getTableData', () => {
+    it('should return a parsed version of the data provided by the reader', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
+
+      const experimentTable = disposable.track(
+        new ExperimentsTable('parser', internalCommands, {} as ResourceLocator)
+      )
+      await experimentTable.isReady()
+
+      expect(experimentTable.getTableData()).to.deep.equal({
+        columns: complexColumnData,
+        rows: complexRowData
+      })
+    })
   })
 
   describe('refresh', () => {

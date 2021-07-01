@@ -1,12 +1,6 @@
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import complexExperimentsOutput from './webview/complex-output-example.json'
-import { ColumnData, Experiment } from './webview/contract'
 
-describe('overall transformer functionality', () => {
-  it('returns output matching a snapshot given complexExperimentsOutput', () => {
-    expect(transformExperimentsRepo(complexExperimentsOutput)).toMatchSnapshot()
-  })
-})
+import { ColumnData, Experiment } from './webview/contract'
 
 describe('branch and checkpoint nesting', () => {
   it('returns an empty array if no branches are present', () => {
