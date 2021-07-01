@@ -1,6 +1,9 @@
 import React from 'react'
-import { Experiment } from 'dvc/src/experiments/contract'
-import { ColumnData, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  ColumnData,
+  Experiment,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,

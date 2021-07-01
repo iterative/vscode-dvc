@@ -1,11 +1,10 @@
 import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
-
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 import SortIconToggle from '../SortIconToggle'
-import { Experiment } from '../../../../extension/src/experiments/contract'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>

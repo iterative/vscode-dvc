@@ -1,5 +1,16 @@
-import { ColumnAggregateData } from '../collectFromRepo'
-import { Experiment } from '../contract'
+import { ExperimentFields } from '../../cli/reader'
+
+export interface Experiment extends ExperimentFields {
+  id: string
+  displayName: string
+  subRows?: Experiment[]
+}
+
+export interface ColumnAggregateData {
+  maxStringLength?: number
+  maxNumber?: number
+  minNumber?: number
+}
 
 export interface ColumnData extends ColumnAggregateData {
   group: string
