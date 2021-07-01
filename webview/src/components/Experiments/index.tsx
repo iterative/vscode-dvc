@@ -14,11 +14,8 @@ import {
 } from 'react-table'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
-
 import styles from '../Table/styles.module.scss'
-
-import buildDynamicColumns from '../../util/build-dynamic-columns'
-
+import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { VsCodeApi } from '../../model'
 
 const countRowsAndAddIndexes: (
