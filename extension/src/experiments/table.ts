@@ -3,9 +3,9 @@ import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import { Experiment, ExperimentsRepoJSONOutput } from './contract'
+import { ExperimentsRepoJSONOutput } from './contract'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ColumnData } from './webview/contract'
+import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -31,9 +31,7 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private data?: Experiment[]
-
-  private columns?: ColumnData[]
+  private tableData?: TableData
 
   private processManager: ProcessManager
 
@@ -59,8 +57,8 @@ export class ExperimentsTable {
     return this.initialized
   }
 
-  public getColumns() {
-    return this.columns
+  public getTableData() {
+    return this.tableData
   }
 
   public onDidChangeData(gitRoot: string): void {
@@ -77,16 +75,11 @@ export class ExperimentsTable {
       return this.webview.reveal()
     }
 
-    await this.isReady()
-
     const webview = await ExperimentsWebview.create(
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData:
-          this.columns && this.data
-            ? { columns: this.columns, rows: this.data }
-            : undefined
+        tableData: this.tableData
       },
       this.resourceLocator
     )
@@ -125,17 +118,16 @@ export class ExperimentsTable {
     )
 
     const { columns, branches, workspace } = transformExperimentsRepo(data)
-    this.columns = columns
-    this.data = [workspace, ...branches]
+    this.tableData = { columns, rows: [workspace, ...branches] }
 
     return this.sendData()
   }
 
   private async sendData() {
-    if (this.data && this.columns && this.webview) {
+    if (this.tableData && this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: { columns: this.columns, rows: this.data }
+        tableData: this.tableData
       })
     }
   }
