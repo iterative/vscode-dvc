@@ -1,10 +1,20 @@
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
+import complexColumnData from './webview/complex-column-example.json'
+import complexRowData from './webview/complex-row-example.json'
+
 import { ColumnData, Experiment } from './webview/contract'
 
 describe('overall transformer functionality', () => {
-  it('returns output matching a snapshot given complexExperimentsOutput', () => {
-    expect(transformExperimentsRepo(complexExperimentsOutput)).toMatchSnapshot()
+  it('returns output that matches the data found in the webview contract', () => {
+    const { workspace, branches, columns } = transformExperimentsRepo(
+      complexExperimentsOutput
+    )
+    const [complexWorkspace, ...complexBranches] = complexRowData
+
+    expect(workspace).toEqual(complexWorkspace)
+    expect(branches).toEqual(complexBranches)
+    expect(columns).toEqual(complexColumnData)
   })
 })
 
