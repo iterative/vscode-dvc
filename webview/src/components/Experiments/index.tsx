@@ -82,7 +82,8 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
     {
       Header: 'Experiment',
       accessor: 'displayName',
-      id: 'id'
+      id: 'id',
+      width: 150
     },
     {
       Cell: ({ value }: { value: string }) => {
