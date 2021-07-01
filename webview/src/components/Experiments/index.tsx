@@ -116,9 +116,8 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
   ] as Column<Experiment>[]
 
 export const ExperimentsTable: React.FC<{
-  experiments: Experiment[]
-  columnData: ColumnData[]
-}> = ({ experiments: rawExperiments, columnData }) => {
+  tableData: TableData
+}> = ({ tableData }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {
@@ -128,11 +127,10 @@ export const ExperimentsTable: React.FC<{
   }, [])
 
   const [data, columns] = React.useMemo(() => {
-    const experiments = rawExperiments
-
-    const columns = getColumns(columnData)
-    return [experiments, columns]
-  }, [rawExperiments, columnData])
+    const data = tableData.rows
+    const columns = getColumns(tableData.columns)
+    return [data, columns]
+  }, [tableData])
 
   const instance = useTable<Experiment>(
     {
@@ -194,10 +192,7 @@ const Experiments: React.FC<{
   return (
     <div className={styles.experiments}>
       {tableData ? (
-        <ExperimentsTable
-          columnData={tableData.columns}
-          experiments={tableData.rows}
-        />
+        <ExperimentsTable tableData={tableData} />
       ) : (
         <p>Loading experiments...</p>
       )}
