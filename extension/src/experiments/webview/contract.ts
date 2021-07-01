@@ -1,6 +1,7 @@
 import { ColumnAggregateData } from '../collectFromRepo'
-import { Experiment } from '../types'
+import { Experiment as RowData } from '../types'
 
+export type Experiment = RowData
 export interface ColumnData extends ColumnAggregateData {
   group: string
   name: string
