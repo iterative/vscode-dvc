@@ -5,7 +5,7 @@ import styles from './styles.module.scss'
 
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 import SortIconToggle from '../SortIconToggle'
-import { Experiment } from '../../../../extension/src/experiments/contract'
+import { Experiment } from '../../../../extension/src/experiments/types'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>

@@ -3,7 +3,7 @@ import get from 'lodash/get'
 import { Column, Accessor } from 'react-table'
 import { ColumnData } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
-import { Experiment } from '../../../extension/src/experiments/contract'
+import { Experiment } from '../../../extension/src/experiments/types'
 
 type Value = string | number
 

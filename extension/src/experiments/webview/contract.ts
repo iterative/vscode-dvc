@@ -1,5 +1,5 @@
 import { ColumnAggregateData } from '../collectFromRepo'
-import { Experiment } from '../contract'
+import { Experiment } from '../types'
 
 export interface ColumnData extends ColumnAggregateData {
   group: string

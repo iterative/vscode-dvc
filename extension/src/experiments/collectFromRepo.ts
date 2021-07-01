@@ -5,7 +5,7 @@ import {
   ExperimentsRepoJSONOutput,
   Value,
   ValueTree
-} from './contract'
+} from './types'
 
 export interface ColumnAggregateData {
   maxStringLength?: number

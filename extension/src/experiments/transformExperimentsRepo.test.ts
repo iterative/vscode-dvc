@@ -1,4 +1,4 @@
-import { Experiment } from './contract'
+import { Experiment } from './types'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
 import { ColumnData } from './webview/contract'

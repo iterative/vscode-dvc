@@ -35,11 +35,6 @@ export interface ExperimentsBranch {
   subRows?: Experiment[]
 }
 
-export interface ExperimentsRepo {
-  workspace: ExperimentsBranch
-  branches: ExperimentsBranch[]
-}
-
 export interface ExperimentsBranchJSONOutput {
   [sha: string]: ExperimentFields
   baseline: ExperimentFields

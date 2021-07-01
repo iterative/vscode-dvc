@@ -1,4 +1,4 @@
-import { ExperimentsRepoJSONOutput, Experiment } from './contract'
+import { ExperimentsRepoJSONOutput, Experiment } from './types'
 import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData } from './webview/contract'
