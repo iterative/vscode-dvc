@@ -1,6 +1,6 @@
 import React from 'react'
-import { ExperimentsRepoJSONOutput } from 'dvc/src/experiments/contract'
-import { ColumnData } from 'dvc/src/experiments/webview/contract'
+import { Experiment } from 'dvc/src/experiments/contract'
+import { ColumnData, TableData } from 'dvc/src/experiments/webview/contract'
 import {
   Row,
   Column,
@@ -14,9 +14,6 @@ import {
 } from 'react-table'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
-import parseExperiments, {
-  ExperimentWithSubRows
-} from '../../util/parse-experiments'
 
 import styles from '../Table/styles.module.scss'
 
@@ -25,7 +22,7 @@ import buildDynamicColumns from '../../util/build-dynamic-columns'
 import { VsCodeApi } from '../../model'
 
 const countRowsAndAddIndexes: (
-  rows: Row<ExperimentWithSubRows>[],
+  rows: Row<Experiment>[],
   index?: number
 ) => number = (rows, index = 0) => {
   for (const row of rows) {
@@ -46,15 +43,15 @@ const sortByDirection = (desc: boolean, sortInt: number) =>
 
 const sortByFirstDirection = (
   direction: boolean | 'desc',
-  rowA: Row<ExperimentWithSubRows>,
-  rowB: Row<ExperimentWithSubRows>
+  rowA: Row<Experiment>,
+  rowB: Row<Experiment>
 ) => (isDesc(direction) ? rowA.index - rowB.index : rowB.index - rowA.index)
 
 const getSortedRows = (
-  rows: Row<ExperimentWithSubRows>[],
-  sortFns: SortByFn<ExperimentWithSubRows>[],
+  rows: Row<Experiment>[],
+  sortFns: SortByFn<Experiment>[],
   directions: (boolean | 'desc')[]
-): Row<ExperimentWithSubRows>[] =>
+): Row<Experiment>[] =>
   [...rows].sort((rowA, rowB) => {
     for (let i = 0; i < sortFns.length; i += 1) {
       const sortFn = sortFns[i]
@@ -68,11 +65,11 @@ const getSortedRows = (
   })
 
 const orderByFn = (
-  rows: Row<ExperimentWithSubRows>[],
-  sortFns: SortByFn<ExperimentWithSubRows>[],
+  rows: Row<Experiment>[],
+  sortFns: SortByFn<Experiment>[],
   directions: (boolean | 'desc')[],
-  parentRow: Row<ExperimentWithSubRows>
-): Row<ExperimentWithSubRows>[] => {
+  parentRow: Row<Experiment>
+): Row<Experiment>[] => {
   if (parentRow && parentRow.depth === 0) {
     return getSortedRows(rows, sortFns, directions)
   } else {
@@ -80,19 +77,11 @@ const orderByFn = (
   }
 }
 
-const getColumns = (columns: ColumnData[]): Column<ExperimentWithSubRows>[] =>
+const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
   [
     {
       Header: 'Experiment',
-      accessor: ({ name, id }: { name: string | undefined; id: string }) => {
-        if (name) {
-          return name
-        }
-        if (id === 'workspace') {
-          return id
-        }
-        return id.slice(0, 7)
-      },
+      accessor: 'displayName',
       id: 'id',
       width: 150
     },
@@ -108,27 +97,26 @@ const getColumns = (columns: ColumnData[]): Column<ExperimentWithSubRows>[] =>
       accessor: 'timestamp'
     },
     ...buildDynamicColumns(columns)
-  ] as Column<ExperimentWithSubRows>[]
+  ] as Column<Experiment>[]
 
 export const ExperimentsTable: React.FC<{
-  experiments: ExperimentsRepoJSONOutput
-  columnData: ColumnData[]
-}> = ({ experiments: rawExperiments, columnData }) => {
+  tableData: TableData
+}> = ({ tableData }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
-    const defaultColumn: Partial<Column<ExperimentWithSubRows>> = {
+    const defaultColumn: Partial<Column<Experiment>> = {
       width: 110
     }
     return [initialState, defaultColumn]
   }, [])
 
   const [data, columns] = React.useMemo(() => {
-    const { experiments } = parseExperiments(rawExperiments)
-    const columns = getColumns(columnData)
-    return [experiments, columns]
-  }, [rawExperiments, columnData])
+    const data = tableData.rows
+    const columns = getColumns(tableData.columns)
+    return [data, columns]
+  }, [tableData])
 
-  const instance = useTable<ExperimentWithSubRows>(
+  const instance = useTable<Experiment>(
     {
       autoResetExpanded: false,
       columns,
@@ -156,8 +144,9 @@ export const ExperimentsTable: React.FC<{
     hooks => {
       hooks.useInstance.push(instance => {
         const { allColumns, rows } = instance
-        const sortedColumns: ColumnInstance<ExperimentWithSubRows>[] =
-          allColumns.filter(column => column.isSorted)
+        const sortedColumns: ColumnInstance<Experiment>[] = allColumns.filter(
+          column => column.isSorted
+        )
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
           expandedRowCount,
@@ -181,14 +170,13 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  experiments?: ExperimentsRepoJSONOutput | null
-  columnData: ColumnData[]
   vsCodeApi: VsCodeApi
-}> = ({ experiments, columnData }) => {
+  tableData?: TableData | null
+}> = ({ tableData }) => {
   return (
     <div className={styles.experiments}>
-      {experiments ? (
-        <ExperimentsTable columnData={columnData} experiments={experiments} />
+      {tableData ? (
+        <ExperimentsTable tableData={tableData} />
       ) : (
         <p>Loading experiments...</p>
       )}

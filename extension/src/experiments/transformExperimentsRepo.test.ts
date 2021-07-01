@@ -49,16 +49,16 @@ describe('branch and checkpoint nesting', () => {
 
     const [branchA, branchB] = branches
     it('lists branches in the same order as the map', () => {
-      expect(branchA.baseline?.sha).toEqual('branchA')
-      expect(branchB.baseline?.sha).toEqual('branchB')
+      expect(branchA.id).toEqual('branchA')
+      expect(branchB.id).toEqual('branchB')
     })
 
     it('finds two experiments on branchA', () => {
-      expect(branchA.experiments?.length).toEqual(2)
+      expect(branchA.subRows?.length).toEqual(2)
     })
 
     it('finds no experiments on branchB', () => {
-      expect(branchB.experiments).toBeUndefined()
+      expect(branchB.subRows).toBeUndefined()
     })
   })
 
@@ -85,21 +85,21 @@ describe('branch and checkpoint nesting', () => {
     })
 
     it('only lists the tip as a top-level experiment', () => {
-      expect(branchA.experiments?.length).toEqual(1)
+      expect(branchA.subRows?.length).toEqual(1)
     })
 
-    const [tip1] = branchA.experiments as Experiment[]
+    const [tip1] = branchA.subRows as Experiment[]
 
     it('finds three checkpoints on the tip', () => {
-      expect(tip1.checkpoints?.length).toEqual(3)
+      expect(tip1.subRows?.length).toEqual(3)
     })
 
-    const [tip1cp1, tip1cp2, tip1cp3] = tip1.checkpoints as Experiment[]
+    const [tip1cp1, tip1cp2, tip1cp3] = tip1.subRows as Experiment[]
 
     it('finds checkpoints in order', () => {
-      expect(tip1cp1.sha).toEqual('tip1cp1')
-      expect(tip1cp2.sha).toEqual('tip1cp2')
-      expect(tip1cp3.sha).toEqual('tip1cp3')
+      expect(tip1cp1.id).toEqual('tip1cp1')
+      expect(tip1cp2.id).toEqual('tip1cp2')
+      expect(tip1cp3.id).toEqual('tip1cp3')
     })
   })
 })

@@ -21,8 +21,9 @@ export interface ExperimentFields {
 }
 
 export interface Experiment extends ExperimentFields {
-  sha: string
-  checkpoints?: Experiment[]
+  id: string
+  displayName: string
+  subRows?: Experiment[]
 }
 
 export interface ExperimentsWorkspace {
@@ -31,7 +32,7 @@ export interface ExperimentsWorkspace {
 
 export interface ExperimentsBranch {
   baseline: Experiment
-  experiments?: Experiment[]
+  subRows?: Experiment[]
 }
 
 export interface ExperimentsRepo {

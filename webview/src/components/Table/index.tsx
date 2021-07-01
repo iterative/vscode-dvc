@@ -2,20 +2,21 @@ import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { ExperimentWithSubRows } from '../../util/parse-experiments'
+
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 import SortIconToggle from '../SortIconToggle'
+import { Experiment } from '../../../../extension/src/experiments/contract'
 
 export interface InstanceProp {
-  instance: TableInstance<ExperimentWithSubRows>
+  instance: TableInstance<Experiment>
 }
 
 export interface RowProp {
-  row: Row<ExperimentWithSubRows>
+  row: Row<Experiment>
 }
 
 export const ParentHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<ExperimentWithSubRows>
+  headerGroup: HeaderGroup<Experiment>
 }> = ({ headerGroup }) => {
   return (
     <div
@@ -44,8 +45,8 @@ export const ParentHeaderGroup: React.FC<{
 }
 
 const getFirstCellProps = (
-  cell: Cell<ExperimentWithSubRows, unknown>,
-  row: Row<ExperimentWithSubRows>
+  cell: Cell<Experiment, unknown>,
+  row: Row<Experiment>
 ) => {
   const baseFirstCellProps = cell.getCellProps({
     className: cx(
@@ -75,7 +76,7 @@ const getFirstCellProps = (
 }
 
 export const FirstCell: React.FC<{
-  cell: Cell<ExperimentWithSubRows, unknown>
+  cell: Cell<Experiment, unknown>
 }> = ({ cell }) => {
   const { row } = cell
 
@@ -101,7 +102,7 @@ export const FirstCell: React.FC<{
 }
 
 export const PrimaryHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<ExperimentWithSubRows>
+  headerGroup: HeaderGroup<Experiment>
 }> = ({ headerGroup }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -164,7 +165,7 @@ export const PrimaryHeaderGroup: React.FC<{
   )
 }
 
-const getCells = (cells: Cell<ExperimentWithSubRows, unknown>[]) =>
+const getCells = (cells: Cell<Experiment, unknown>[]) =>
   cells.map(cell => {
     return (
       <div

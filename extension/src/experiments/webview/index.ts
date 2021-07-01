@@ -19,9 +19,8 @@ import {
   WindowWithWebviewData,
   ExperimentsWebviewState,
   WebviewColorTheme,
-  ColumnData
+  TableData
 } from './contract'
-import { ExperimentsRepoJSONOutput } from '../contract'
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
@@ -96,10 +95,10 @@ export class ExperimentsWebview {
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.setDvcRoot
         })
-        const experiments = state.experiments
-        if (experiments) {
+        const tableData = state.tableData
+        if (tableData) {
           this.sendMessage({
-            tableData: experiments,
+            tableData: tableData,
             type: MessageToWebviewType.showExperiments
           })
         }
@@ -165,13 +164,10 @@ export class ExperimentsWebview {
     return this
   }
 
-  public showExperiments(
-    payload: {
-      tableData?: ExperimentsRepoJSONOutput | null
-      columnData?: ColumnData[]
-      errors?: Error[]
-    } = {}
-  ): Thenable<boolean> {
+  public showExperiments(payload: {
+    tableData: TableData
+    errors?: Error[]
+  }): Thenable<boolean> {
     return this.sendMessage({
       type: MessageToWebviewType.showExperiments,
       ...payload

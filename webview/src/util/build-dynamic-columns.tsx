@@ -2,8 +2,8 @@ import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor } from 'react-table'
 import { ColumnData } from 'dvc/src/experiments/webview/contract'
-import { ExperimentWithSubRows } from './parse-experiments'
 import { formatFloat } from './number-formatting'
+import { Experiment } from '../../../extension/src/experiments/contract'
 
 type Value = string | number
 
@@ -25,18 +25,16 @@ const getCellComponent = (): React.FC<{ value: Value }> => Cell
 const buildColumnIdFromPath = (objectPath: string[]) =>
   objectPath.map(segment => `[${segment}]`).join('')
 
-const buildAccessor: (valuePath: string[]) => Accessor<ExperimentWithSubRows> =
+const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
 
-const buildDynamicColumns = (
-  properties: ColumnData[]
-): Column<ExperimentWithSubRows>[] =>
+const buildDynamicColumns = (properties: ColumnData[]): Column<Experiment>[] =>
   properties.map(data => {
     const { path } = data
     const Cell = getCellComponent()
-    const column: Column<ExperimentWithSubRows> & {
-      columns?: Column<ExperimentWithSubRows>[]
+    const column: Column<Experiment> & {
+      columns?: Column<Experiment>[]
       sortType?: string
       type?: string[]
     } = {
