@@ -20,12 +20,6 @@ export interface ExperimentFields {
   checkpoint_parent?: string
 }
 
-export interface Experiment extends ExperimentFields {
-  id: string
-  displayName: string
-  subRows?: Experiment[]
-}
-
 export interface ExperimentsBranchJSONOutput {
   [sha: string]: ExperimentFields
   baseline: ExperimentFields

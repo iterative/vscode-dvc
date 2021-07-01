@@ -1,9 +1,8 @@
 import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor } from 'react-table'
-import { ColumnData } from 'dvc/src/experiments/webview/contract'
+import { Experiment, ColumnData } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
-import { Experiment } from '../../../extension/src/experiments/types'
 
 type Value = string | number
 

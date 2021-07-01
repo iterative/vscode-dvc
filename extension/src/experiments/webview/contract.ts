@@ -1,7 +1,17 @@
-import { ColumnAggregateData } from '../collectFromRepo'
-import { Experiment as RowData } from '../types'
+import { ExperimentFields } from '../types'
 
-export type Experiment = RowData
+export interface Experiment extends ExperimentFields {
+  id: string
+  displayName: string
+  subRows?: Experiment[]
+}
+
+export interface ColumnAggregateData {
+  maxStringLength?: number
+  maxNumber?: number
+  minNumber?: number
+}
+
 export interface ColumnData extends ColumnAggregateData {
   group: string
   name: string
