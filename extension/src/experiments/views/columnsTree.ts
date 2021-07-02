@@ -1,6 +1,8 @@
 import { relative } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
+  Event,
+  EventEmitter,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -12,14 +14,25 @@ import { definedAndNonEmpty } from '../../util/array'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
+  public readonly onDidChangeTreeData: Event<string | void>
 
   private experiments: Experiments
   private pathRoots: Record<string, string> = {}
   private hasChildren: Record<string, boolean> = {}
+  private treeDataChanged: EventEmitter<string>
 
-  constructor(experiments: Experiments) {
+  constructor(
+    experiments: Experiments,
+    treeDataChanged?: EventEmitter<string>
+  ) {
     window.registerTreeDataProvider('dvc.views.experimentColumnsTree', this)
+
     this.experiments = experiments
+
+    this.treeDataChanged = this.dispose.track(
+      treeDataChanged || new EventEmitter()
+    )
+    this.onDidChangeTreeData = this.treeDataChanged.event
   }
 
   public getTreeItem(element: string): TreeItem {
