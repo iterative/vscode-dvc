@@ -465,7 +465,13 @@
           "name": "DVC Tracked"
         }
       ],
-      "dvc-views": []
+      "dvc-views": [
+        {
+          "id": "dvc.views.experimentColumnsTree",
+          "name": "Experiment Columns",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        }
+      ]
     },
     "viewsWelcome": [
       {
