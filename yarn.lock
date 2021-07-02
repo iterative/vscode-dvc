@@ -12704,9 +12704,10 @@ react-syntax-highlighter@^13.5.3:
     prismjs "^1.21.0"
     refractor "^3.1.0"
 
-"react-table@https://github.com/rogermparent/react-table.git":
-  version "1.0.0-semantic-release"
-  resolved "https://github.com/rogermparent/react-table.git#a01f95ff3d2f952a2915505006c9960f3f497a33"
+react-table@^7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/react-table/-/react-table-7.7.0.tgz#e2ce14d7fe3a559f7444e9ecfe8231ea8373f912"
+  integrity sha512-jBlj70iBwOTvvImsU9t01LjFjy4sXEtclBovl3mTiqjz23Reu0DKnRza4zlLtOPACx6j2/7MrQIthIK1Wi+LIA==
 
 react-textarea-autosize@^8.3.0:
   version "8.3.3"
