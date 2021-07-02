@@ -21,6 +21,17 @@ const quickPickItemFromColumn = (cur: ColumnData) => ({
   value: cur.path
 })
 
+const columnsToFlatQuickPicks = (
+  columns: ColumnData[]
+): QuickPickItemWithValue<string[]>[] =>
+  columns.reduce<QuickPickItemWithValue<string[]>[]>((acc, column) => {
+    const entry: QuickPickItemWithValue<string[]> =
+      quickPickItemFromColumn(column)
+    return column.childColumns
+      ? [...acc, entry, ...columnsToFlatQuickPicks(column.childColumns)]
+      : [...acc, entry]
+  }, [])
+
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
@@ -122,14 +133,11 @@ export class ExperimentsTable {
   }
 
   public async pickCurrentSort() {
-    const columnsToPick = this.columns?.reduce<
-      QuickPickItemWithValue<string[]>[]
-    >((acc, cur) => {
-      const entry: QuickPickItemWithValue<string[]> =
-        quickPickItemFromColumn(cur)
-
-      return [...acc, entry]
-    }, [])
+    if (!this.columns) {
+      window.showWarningMessage('There are no columns to sort from!')
+      return
+    }
+    const columnsToPick = columnsToFlatQuickPicks(this.columns)
     if (!columnsToPick || columnsToPick.length === 0) {
       window.showWarningMessage('There are no columns to sort from!')
       return
@@ -147,7 +155,7 @@ export class ExperimentsTable {
       ],
       { title: 'Select a direction to sort' }
     )
-    if (!descending) {
+    if (descending === undefined) {
       return
     }
     return this.setCurrentSort({
@@ -183,6 +191,7 @@ export class ExperimentsTable {
       columns: columns as ColumnData[],
       rows: [workspace as Experiment, ...(sortedRows as Experiment[])]
     }
+    this.sendData()
   }
 
   private async updateData(): Promise<boolean | undefined> {

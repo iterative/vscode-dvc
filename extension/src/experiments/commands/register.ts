@@ -49,7 +49,9 @@ const registerExperimentQuickPickCommands = (
   )
 
   experiments.dispose.track(
-    commands.registerCommand('dvc.setExperimentTableSort', () => {})
+    commands.registerCommand('dvc.setExperimentsTableSort', () =>
+      experiments.setSort()
+    )
   )
 }
 

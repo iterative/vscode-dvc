@@ -21,5 +21,5 @@ export const buildExperimentSortFunction = ({
   descending
 }: SortDefinition): ((a: Experiment, b: Experiment) => number) =>
   descending
-    ? (a, b) => compareExperimentsByPath(columnPath, a, b)
-    : (a, b) => compareExperimentsByPath(columnPath, b, a)
+    ? (a, b) => compareExperimentsByPath(columnPath, b, a)
+    : (a, b) => compareExperimentsByPath(columnPath, a, b)
