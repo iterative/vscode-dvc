@@ -61,14 +61,14 @@ describe('CliReader', () => {
   })
 
   describe('experimentShow', () => {
-    it('should match a snapshot when parsed', async () => {
+    it('should match the expected output', async () => {
       const cwd = __dirname
       mockedExecuteProcess.mockResolvedValueOnce(
         JSON.stringify(complexExperimentsOutput)
       )
 
       const experiments = await cliReader.experimentShow(cwd)
-      expect(experiments).toMatchSnapshot()
+      expect(experiments).toEqual(complexExperimentsOutput)
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,

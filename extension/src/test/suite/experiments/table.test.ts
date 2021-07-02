@@ -6,10 +6,13 @@ import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
+import complexRowData from '../../../experiments/webview/complex-row-example.json'
+import complexColumnData from '../../../experiments/webview/complex-column-example.json'
 import { ExperimentsTable } from '../../../experiments/table'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
+import { ExperimentsWebview } from '../../../experiments/webview'
 
 suite('Experiments Table Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -76,7 +79,15 @@ suite('Experiments Table Test Suite', () => {
         new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
       )
 
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+
       const webview = await experimentsTable.showWebview()
+      expect(messageSpy).to.be.calledWith({
+        tableData: {
+          columns: complexColumnData,
+          rows: complexRowData
+        }
+      })
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
