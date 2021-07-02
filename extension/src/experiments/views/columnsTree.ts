@@ -1,6 +1,7 @@
-import { relative } from 'path'
+import { join, relative, sep } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
+  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -19,30 +20,60 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   private experiments: Experiments
   private pathRoots: Record<string, string> = {}
   private hasChildren: Record<string, boolean> = {}
+  private parents: Record<string, string> = {}
+  private selected: Record<string, boolean> = {}
   private treeDataChanged: EventEmitter<string>
 
   constructor(
     experiments: Experiments,
     treeDataChanged?: EventEmitter<string>
   ) {
-    window.registerTreeDataProvider('dvc.views.experimentColumnsTree', this)
-
-    this.experiments = experiments
-
     this.treeDataChanged = this.dispose.track(
       treeDataChanged || new EventEmitter()
     )
     this.onDidChangeTreeData = this.treeDataChanged.event
+
+    this.dispose.track(
+      window.createTreeView('dvc.views.experimentColumnsTree', {
+        canSelectMany: true,
+        showCollapseAll: true,
+        treeDataProvider: this
+      })
+    )
+
+    this.experiments = experiments
+
+    this.dispose.track(
+      commands.registerCommand('toggle', resource => {
+        const selected = this.selected[resource]
+        this.selected[resource] = !selected
+        this.treeDataChanged.fire(resource)
+      })
+    )
+  }
+
+  public getParent(element: string): string {
+    return this.parents[element]
   }
 
   public getTreeItem(element: string): TreeItem {
     const resourceUri = Uri.file(element)
-    return new TreeItem(
+    const itemHasChildren = this.hasChildren[element]
+    const treeItem = new TreeItem(
       resourceUri,
-      this.hasChildren[element]
+      itemHasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
+    treeItem.command = {
+      arguments: [element],
+      command: 'toggle',
+      title: 'toggle'
+    }
+    if (!itemHasChildren && this.selected[element]) {
+      treeItem.iconPath = 'placeholder'
+    }
+    return treeItem
   }
 
   public getChildren(element?: string): string[] {
@@ -78,10 +109,14 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     const columnData = this.getColumnData(dvcRoot, path)
 
     return (
-      columnData?.map(x => {
-        const absPath = [dvcRoot, ...x.path].join('/')
+      columnData?.map(column => {
+        const absPath = join(dvcRoot, ...column.path)
         this.pathRoots[absPath] = dvcRoot
-        this.hasChildren[absPath] = !!x.childColumns
+        this.hasChildren[absPath] = !!column.childColumns
+        if (this.selected[absPath] === undefined) {
+          this.selected[absPath] = true
+        }
+        this.parents[absPath] = element
         return absPath
       }) || []
     )
@@ -91,13 +126,13 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     let cols = this.experiments.getColumns(dvcRoot)
 
     if (path) {
-      const steps = path.split('/')
+      const steps = path.split(sep)
 
       let p = ''
       steps.map(() => {
         if (p !== path) {
           cols = cols?.find(col => {
-            p = col.path.join('/')
+            p = join(...col.path)
             return path.includes(p)
           })?.childColumns
         }
