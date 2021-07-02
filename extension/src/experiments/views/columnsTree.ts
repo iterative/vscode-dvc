@@ -1,3 +1,4 @@
+import { relative } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   TreeDataProvider,
@@ -13,6 +14,8 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   private experiments: Experiments
+  private pathRoots: Record<string, string> = {}
+  private hasChildren: Record<string, boolean> = {}
 
   constructor(experiments: Experiments) {
     window.registerTreeDataProvider('dvc.views.experimentColumnsTree', this)
@@ -21,12 +24,17 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   public getTreeItem(element: string): TreeItem {
     const resourceUri = Uri.file(element)
-    return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
+    return new TreeItem(
+      resourceUri,
+      this.hasChildren[element]
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+    )
   }
 
   public getChildren(element?: string): string[] {
     if (element) {
-      return this.getColumns(element)
+      return this.getColumns(this.pathRoots[element], element)
     }
 
     const dvcRoots = this.experiments.getExperimentRoots()
@@ -39,15 +47,49 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   private getRootElements() {
     const rootElements = this.experiments.getExperimentRoots()
+    rootElements.map(dvcRoot => {
+      this.pathRoots[dvcRoot] = dvcRoot
+      this.hasChildren[dvcRoot] = true
+    })
 
     return rootElements.sort((a, b) => a.localeCompare(b))
   }
 
-  private getColumns(root: string): string[] {
-    if (!root) {
+  private getColumns(dvcRoot: string, element: string): string[] {
+    if (!element) {
       return []
     }
 
-    return this.experiments.getColumns(root)?.map(x => x.name) || []
+    const path = relative(dvcRoot, element)
+
+    const columnData = this.getColumnData(dvcRoot, path)
+
+    return (
+      columnData?.map(x => {
+        const absPath = [dvcRoot, ...x.path].join('/')
+        this.pathRoots[absPath] = dvcRoot
+        this.hasChildren[absPath] = !!x.childColumns
+        return absPath
+      }) || []
+    )
+  }
+
+  private getColumnData(dvcRoot: string, path: string) {
+    let cols = this.experiments.getColumns(dvcRoot)
+
+    if (path) {
+      const steps = path.split('/')
+
+      let p = ''
+      steps.map(() => {
+        if (p !== path) {
+          cols = cols?.find(col => {
+            p = col.path.join('/')
+            return path.includes(p)
+          })?.childColumns
+        }
+      })
+    }
+    return cols
   }
 }
