@@ -12,12 +12,14 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty } from '../../util/array'
+import { ResourceLocator } from '../../resourceLocator'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
   public readonly onDidChangeTreeData: Event<string | void>
 
-  private experiments: Experiments
+  private readonly experiments: Experiments
+  private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
   private hasChildren: Record<string, boolean> = {}
   private parents: Record<string, string> = {}
@@ -26,8 +28,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   constructor(
     experiments: Experiments,
+    resourceLocator: ResourceLocator,
     treeDataChanged?: EventEmitter<string>
   ) {
+    this.resourceLocator = resourceLocator
+
     this.treeDataChanged = this.dispose.track(
       treeDataChanged || new EventEmitter()
     )
@@ -70,9 +75,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       command: 'toggle',
       title: 'toggle'
     }
-    if (!itemHasChildren && this.selected[element]) {
-      treeItem.iconPath = 'placeholder'
-    }
+
+    treeItem.iconPath = this.selected[element]
+      ? this.resourceLocator.selectedCheckbox
+      : this.resourceLocator.unselectedCheckbox
+
     return treeItem
   }
 
@@ -94,6 +101,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     rootElements.map(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
       this.hasChildren[dvcRoot] = true
+      this.selected[dvcRoot] = true
     })
 
     return rootElements.sort((a, b) => a.localeCompare(b))

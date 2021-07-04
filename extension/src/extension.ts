@@ -114,7 +114,9 @@ export class Extension implements IExtension {
       new Experiments(this.internalCommands)
     )
 
-    this.dispose.track(new ExperimentsColumnsTree(this.experiments))
+    this.dispose.track(
+      new ExperimentsColumnsTree(this.experiments, this.resourceLocator)
+    )
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {

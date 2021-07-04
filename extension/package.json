@@ -454,7 +454,7 @@
         {
           "id": "dvc-views",
           "title": "DVC",
-          "icon": "media/dvc-monochrome.svg"
+          "icon": "resources/dvc-monochrome.svg"
         }
       ]
     },
