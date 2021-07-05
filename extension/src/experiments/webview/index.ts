@@ -136,7 +136,7 @@ export class ExperimentsWebview {
       }
     )
 
-    webviewPanel.iconPath = resourceLocator.dvcIconPath
+    webviewPanel.iconPath = resourceLocator.dvcIcon
 
     const view = new ExperimentsWebview(webviewPanel, internalCommands, state)
     await view.isReady()

@@ -4,7 +4,7 @@ import { Uri } from 'vscode'
 export class ResourceLocator {
   public dispose = Disposable.fn()
 
-  public readonly dvcIconPath: { dark: Uri; light: Uri }
+  public readonly dvcIcon: { dark: Uri; light: Uri }
   public readonly selectedCheckbox: { dark: Uri; light: Uri }
   public readonly unselectedCheckbox: { dark: Uri; light: Uri }
 
@@ -13,12 +13,14 @@ export class ResourceLocator {
   constructor(extensionUri: Uri) {
     this.extensionUri = extensionUri
 
-    this.dvcIconPath = this.getIconDetails('dvc-color.svg')
-    this.selectedCheckbox = this.getIconDetails('selected-checkbox.svg')
-    this.unselectedCheckbox = this.getIconDetails('unselected-checkbox.svg')
+    this.dvcIcon = this.getResourceLocations('dvc-color.svg')
+    this.selectedCheckbox = this.getResourceLocations('selected-checkbox.svg')
+    this.unselectedCheckbox = this.getResourceLocations(
+      'unselected-checkbox.svg'
+    )
   }
 
-  private getIconDetails(...path: string[]): { dark: Uri; light: Uri } {
+  private getResourceLocations(...path: string[]): { dark: Uri; light: Uri } {
     return {
       dark: this.getResourceLocation('dark', ...path),
       light: this.getResourceLocation('light', ...path)
