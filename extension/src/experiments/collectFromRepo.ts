@@ -31,6 +31,17 @@ const getValueType = (value: Value | ValueTree) => {
   return typeof value
 }
 
+const getEntryOrDefault = (
+  originalColumnsMap: PartialColumnsMap,
+  propertyKey: string,
+  ancestors: string[]
+) =>
+  originalColumnsMap.get(propertyKey) || {
+    group: ancestors[0],
+    parentPath: join(...ancestors),
+    path: join(...ancestors, propertyKey)
+  }
+
 const mergeNumberColumn = (
   columnDescriptor: PartialColumnDescriptor,
   newNumber: number
@@ -76,9 +87,8 @@ const mergeColumnsMap = (
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       mergeOrCreateColumnDescriptor(
         originalColumnsMap,
-        originalColumnsMap.get(propertyKey),
-        propertyValue,
         propertyKey,
+        propertyValue,
         ...ancestors
       )
     )
@@ -88,20 +98,17 @@ const mergeColumnsMap = (
 
 const mergeOrCreateColumnDescriptor = (
   originalColumnsMap: PartialColumnsMap,
-  columnDescriptor: PartialColumnDescriptor = {
-    group: '',
-    parentPath: '',
-    path: ''
-  },
-  newValue: Value | ValueTree,
   propertyKey: string,
+  newValue: Value | ValueTree,
   ...ancestors: string[]
 ): PartialColumnDescriptor => {
   const newValueType = getValueType(newValue)
 
-  columnDescriptor.group = ancestors[0]
-  columnDescriptor.parentPath = join(...ancestors)
-  columnDescriptor.path = join(columnDescriptor.parentPath, propertyKey)
+  const columnDescriptor = getEntryOrDefault(
+    originalColumnsMap,
+    propertyKey,
+    ancestors
+  )
 
   if (newValueType === 'object') {
     mergeColumnsMap(
