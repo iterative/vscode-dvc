@@ -53,7 +53,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         resource => {
           const dvcRoot = this.pathRoots[resource]
           const path = relative(dvcRoot, resource)
-          this.experiments.setSelected(dvcRoot, path)
+          this.experiments.setIsColumnSelected(dvcRoot, path)
           this.treeDataChanged.fire(resource)
         }
       )
@@ -79,7 +79,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     const path = relative(dvcRoot, element)
 
     if (path) {
-      treeItem.iconPath = this.experiments.getSelected(dvcRoot, path)
+      treeItem.iconPath = this.experiments.getIsColumnSelected(dvcRoot, path)
         ? this.resourceLocator.selectedCheckbox
         : this.resourceLocator.unselectedCheckbox
     }

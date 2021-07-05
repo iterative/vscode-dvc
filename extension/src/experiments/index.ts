@@ -59,12 +59,12 @@ export class Experiments {
     return this.experiments[dvcRoot].getColumns()
   }
 
-  public getSelected(dvcRoot: string, path: string) {
-    return this.experiments[dvcRoot].getSelected(path)
+  public getIsColumnSelected(dvcRoot: string, path: string) {
+    return this.experiments[dvcRoot].getIsColumnSelected(path)
   }
 
-  public setSelected(dvcRoot: string, path: string) {
-    return this.experiments[dvcRoot].setSelected(path)
+  public setIsColumnSelected(dvcRoot: string, path: string) {
+    return this.experiments[dvcRoot].setIsColumnSelected(path)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
