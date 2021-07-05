@@ -11,7 +11,6 @@ import {
   window
 } from 'vscode'
 import { Experiments } from '..'
-import { definedAndNonEmpty } from '../../util/array'
 import { ResourceLocator } from '../../resourceLocator'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
@@ -92,15 +91,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       return this.getColumns(this.pathRoots[element], element)
     }
 
-    const dvcRoots = this.experiments.getDvcRoots()
-    if (definedAndNonEmpty(dvcRoots)) {
-      return this.getRootElements(dvcRoots)
-    }
-
-    return []
+    return this.getRootElements()
   }
 
-  private getRootElements(dvcRoots: string[]) {
+  private getRootElements() {
+    const dvcRoots = this.experiments.getDvcRoots() || []
     dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
       this.hasChildren[dvcRoot] = true

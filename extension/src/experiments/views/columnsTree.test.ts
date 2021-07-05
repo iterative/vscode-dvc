@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { commands, EventEmitter, window } from 'vscode'
+import { commands, EventEmitter, TreeItem, window } from 'vscode'
 import { ExperimentsColumnsTree } from './columnsTree'
 import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
@@ -15,6 +15,7 @@ mockedTreeDataChanged.fire = mockedTreeDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
+const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
@@ -110,6 +111,36 @@ describe('ExperimentsColumnsTree', () => {
         join(paramsProcessPath, 'threshold'),
         join(paramsProcessPath, 'test_arg')
       ])
+    })
+  })
+
+  describe('getTreeItem', () => {
+    it('should return the correct tree item for a repository root', () => {
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        expect(collapsibleState).toEqual(1)
+        mockedItem = { collapsibleState, uri }
+        return mockedItem
+      })
+
+      const experimentColumnsTree = new ExperimentsColumnsTree(
+        mockedExperiments,
+        mockedResourceLocator,
+        mockedTreeDataChanged
+      )
+
+      const mockedDvcRoot = join('dvc', 'repo')
+
+      mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
+
+      experimentColumnsTree.getChildren()
+
+      const treeItem = experimentColumnsTree.getTreeItem(mockedDvcRoot)
+
+      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(treeItem).toEqual({
+        ...mockedItem
+      })
     })
   })
 })
