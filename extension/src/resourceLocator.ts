@@ -4,45 +4,36 @@ import { Uri } from 'vscode'
 export class ResourceLocator {
   public dispose = Disposable.fn()
 
-  public dvcIconPath: { dark: Uri; light: Uri }
-  public selectedCheckbox: { dark: Uri; light: Uri }
-  public unselectedCheckbox: { dark: Uri; light: Uri }
+  public readonly dvcIconPath: { dark: Uri; light: Uri }
+  public readonly selectedCheckbox: { dark: Uri; light: Uri }
+  public readonly unselectedCheckbox: { dark: Uri; light: Uri }
+
+  private extensionUri: Uri
 
   constructor(extensionUri: Uri) {
-    this.dvcIconPath = {
-      // placeholders for different svgs
-      dark: Uri.joinPath(extensionUri, 'resources', 'dvc-color.svg'),
-      light: Uri.joinPath(extensionUri, 'resources', 'dvc-color.svg')
-    }
+    this.extensionUri = extensionUri
 
-    this.selectedCheckbox = {
-      dark: Uri.joinPath(
-        extensionUri,
-        'resources',
-        'dark',
-        'selected-checkbox.svg'
-      ),
-      light: Uri.joinPath(
-        extensionUri,
-        'resources',
-        'light',
-        'selected-checkbox.svg'
-      )
-    }
+    this.dvcIconPath = this.getIconDetails('dvc-color.svg')
+    this.selectedCheckbox = this.getIconDetails('selected-checkbox.svg')
+    this.unselectedCheckbox = this.getIconDetails('unselected-checkbox.svg')
+  }
 
-    this.unselectedCheckbox = {
-      dark: Uri.joinPath(
-        extensionUri,
-        'resources',
-        'dark',
-        'unselected-checkbox.svg'
-      ),
-      light: Uri.joinPath(
-        extensionUri,
-        'resources',
-        'light',
-        'unselected-checkbox.svg'
-      )
+  private getIconDetails(...path: string[]): { dark: Uri; light: Uri } {
+    return {
+      dark: this.getDarkResourceLocation(...path),
+      light: this.getLightResourceLocation(...path)
     }
+  }
+
+  private getDarkResourceLocation(...path: string[]): Uri {
+    return this.getResourceLocation('dark', ...path)
+  }
+
+  private getLightResourceLocation(...path: string[]): Uri {
+    return this.getResourceLocation('light', ...path)
+  }
+
+  private getResourceLocation(...path: string[]): Uri {
+    return Uri.joinPath(this.extensionUri, 'resources', ...path)
   }
 }

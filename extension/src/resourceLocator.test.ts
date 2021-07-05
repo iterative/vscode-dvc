@@ -8,8 +8,8 @@ describe('ResourceLocator', () => {
     const mockPath = Uri.file('some/path')
     const resourceLocator = new ResourceLocator(mockPath)
 
-    const dark = Uri.file('some/path/resources/dvc-color.svg')
-    const light = Uri.file('some/path/resources/dvc-color.svg')
+    const dark = Uri.file('some/path/resources/dark/dvc-color.svg')
+    const light = Uri.file('some/path/resources/light/dvc-color.svg')
 
     expect(resourceLocator.dvcIconPath).toEqual({
       dark,
