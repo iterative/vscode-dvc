@@ -24,7 +24,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
   private hasChildren: Record<string, boolean> = {}
-  private parents: Record<string, string> = {}
   private selected: Record<string, boolean> = {}
 
   constructor(
@@ -59,10 +58,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         }
       )
     )
-  }
-
-  public getParent(element: string): string {
-    return this.parents[element]
   }
 
   public getTreeItem(element: string): TreeItem {
@@ -113,32 +108,32 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     const path = relative(dvcRoot, element)
 
-    const columnData = this.getColumnData(dvcRoot, path)
+    const columns = this.experiments.getColumns(dvcRoot)
 
     return (
-      columnData?.map(column => {
-        const absPath = join(dvcRoot, column.path)
-        this.pathRoots[absPath] = dvcRoot
-        this.hasChildren[absPath] = !!columnData.find(
-          otherColumn => column.path === otherColumn.parentPath
+      columns
+        ?.filter(column =>
+          path
+            ? column.parentPath === path
+            : ['metrics', 'params'].includes(column.parentPath)
         )
-        if (this.selected[absPath] === undefined) {
-          this.selected[absPath] = true
-        }
-        this.parents[absPath] = element
-        return absPath
-      }) || []
+        ?.map(column => this.processColumn(dvcRoot, column, columns)) || []
     )
   }
 
-  private getColumnData(dvcRoot: string, path: string) {
-    const columnData = this.experiments.getColumns(dvcRoot)
-
-    const filter = !path
-      ? (column: ColumnData) =>
-          ['metrics', 'params'].includes(column.parentPath)
-      : (column: ColumnData) => column.parentPath === path
-
-    return columnData?.filter(filter)
+  private processColumn(
+    dvcRoot: string,
+    column: ColumnData,
+    columnData: ColumnData[]
+  ) {
+    const absPath = join(dvcRoot, column.path)
+    this.pathRoots[absPath] = dvcRoot
+    this.hasChildren[absPath] = !!columnData.find(
+      otherColumn => column.path === otherColumn.parentPath
+    )
+    if (this.selected[absPath] === undefined) {
+      this.selected[absPath] = true
+    }
+    return absPath
   }
 }
