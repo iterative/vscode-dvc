@@ -35,8 +35,11 @@ const buildDynamicColumns = (
 ): Column<Experiment>[] =>
   properties.filter(filter).map(data => {
     const { path } = data
-    const childColumns = properties.filter(column => column.parentPath === path)
     const Cell = getCellComponent()
+    const childColumns = buildDynamicColumns(
+      properties,
+      column => column.parentPath === path
+    )
     const column: Column<Experiment> & {
       columns?: Column<Experiment>[]
       sortType?: string
@@ -45,9 +48,7 @@ const buildDynamicColumns = (
       Cell,
       Header: data.name,
       accessor: buildAccessor(path.split('/')),
-      columns: childColumns?.length
-        ? buildDynamicColumns(childColumns, () => true)
-        : undefined,
+      columns: childColumns.length ? childColumns : undefined,
       id: buildColumnIdFromPath(path.split('/')),
       type: data.types
     }
