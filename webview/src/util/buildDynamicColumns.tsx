@@ -35,39 +35,37 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
 
 const buildDynamicColumns = (
   properties: ColumnData[],
-  filter = (column: ColumnData) =>
-    ['params', 'metrics'].includes(column.parentPath)
+  parentPath: string
 ): Column<Experiment>[] =>
-  properties.filter(filter).map(data => {
-    const { path } = data
-    const Cell = getCellComponent()
-    const childColumns = buildDynamicColumns(
-      properties,
-      column => column.parentPath === path
-    )
+  properties
+    .filter(column => column.parentPath === parentPath)
+    .map(data => {
+      const { path } = data
+      const Cell = getCellComponent()
+      const childColumns = buildDynamicColumns(properties, path)
 
-    const pathArray = getPathArray(path)
+      const pathArray = getPathArray(path)
 
-    const column: Column<Experiment> & {
-      columns?: Column<Experiment>[]
-      sortType?: string
-      type?: string[]
-    } = {
-      Cell,
-      Header: data.name,
-      accessor: buildAccessor(pathArray),
-      columns: childColumns.length ? childColumns : undefined,
-      id: buildColumnIdFromPath(pathArray),
-      type: data.types
-    }
-    switch (data.types) {
-      case ['integer']:
-      case ['number']:
-        column.sortType = 'basic'
-        break
-      default:
-    }
-    return column
-  })
+      const column: Column<Experiment> & {
+        columns?: Column<Experiment>[]
+        sortType?: string
+        type?: string[]
+      } = {
+        Cell,
+        Header: data.name,
+        accessor: buildAccessor(pathArray),
+        columns: childColumns.length ? childColumns : undefined,
+        id: buildColumnIdFromPath(pathArray),
+        type: data.types
+      }
+      switch (data.types) {
+        case ['integer']:
+        case ['number']:
+          column.sortType = 'basic'
+          break
+        default:
+      }
+      return column
+    })
 
 export default buildDynamicColumns
