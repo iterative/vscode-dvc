@@ -20,17 +20,9 @@ export class ResourceLocator {
 
   private getIconDetails(...path: string[]): { dark: Uri; light: Uri } {
     return {
-      dark: this.getDarkResourceLocation(...path),
-      light: this.getLightResourceLocation(...path)
+      dark: this.getResourceLocation('dark', ...path),
+      light: this.getResourceLocation('light', ...path)
     }
-  }
-
-  private getDarkResourceLocation(...path: string[]): Uri {
-    return this.getResourceLocation('dark', ...path)
-  }
-
-  private getLightResourceLocation(...path: string[]): Uri {
-    return this.getResourceLocation('light', ...path)
   }
 
   private getResourceLocation(...path: string[]): Uri {
