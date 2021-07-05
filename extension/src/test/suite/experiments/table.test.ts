@@ -84,7 +84,10 @@ suite('Experiments Table Test Suite', () => {
       const webview = await experimentsTable.showWebview()
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          columns: complexColumnData,
+          columns: complexColumnData.map(column => ({
+            ...column,
+            isSelected: true
+          })),
           rows: complexRowData
         }
       })

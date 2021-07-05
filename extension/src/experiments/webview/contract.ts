@@ -67,7 +67,7 @@ export enum MessageToWebviewType {
 
 export interface TableData {
   rows: Experiment[]
-  columns: ColumnData[]
+  columns: (ColumnData & { isSelected: boolean })[]
 }
 
 export interface ExperimentsWebviewState {

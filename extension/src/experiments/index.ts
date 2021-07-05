@@ -59,6 +59,14 @@ export class Experiments {
     return this.experiments[dvcRoot].getColumns()
   }
 
+  public getSelected(dvcRoot: string, path: string) {
+    return this.experiments[dvcRoot].getSelected(path)
+  }
+
+  public setSelected(dvcRoot: string, path: string) {
+    return this.experiments[dvcRoot].setSelected(path)
+  }
+
   public getCwdThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {

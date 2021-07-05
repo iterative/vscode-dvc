@@ -24,7 +24,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
   private hasChildren: Record<string, boolean> = {}
-  private selected: Record<string, boolean> = {}
 
   constructor(
     experiments: Experiments,
@@ -52,8 +51,9 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       commands.registerCommand(
         'dvc.views.experimentColumnsTree.toggleSelected',
         resource => {
-          const selected = this.selected[resource]
-          this.selected[resource] = !selected
+          const dvcRoot = this.pathRoots[resource]
+          const path = relative(dvcRoot, resource)
+          this.experiments.setSelected(dvcRoot, path)
           this.treeDataChanged.fire(resource)
         }
       )
@@ -75,9 +75,14 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       title: 'toggle'
     }
 
-    treeItem.iconPath = this.selected[element]
-      ? this.resourceLocator.selectedCheckbox
-      : this.resourceLocator.unselectedCheckbox
+    const dvcRoot = this.pathRoots[element]
+    const path = relative(dvcRoot, element)
+
+    if (path) {
+      treeItem.iconPath = this.experiments.getSelected(dvcRoot, path)
+        ? this.resourceLocator.selectedCheckbox
+        : this.resourceLocator.unselectedCheckbox
+    }
 
     return treeItem
   }
@@ -95,7 +100,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
       this.hasChildren[dvcRoot] = true
-      this.selected[dvcRoot] = true
     })
 
     return dvcRoots.sort((a, b) => a.localeCompare(b))
@@ -131,9 +135,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     this.hasChildren[absPath] = !!columnData.find(
       otherColumn => column.path === otherColumn.parentPath
     )
-    if (this.selected[absPath] === undefined) {
-      this.selected[absPath] = true
-    }
     return absPath
   }
 }

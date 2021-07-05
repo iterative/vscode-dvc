@@ -33,6 +33,8 @@ export class ExperimentsTable {
 
   private tableData?: TableData
 
+  private columnSelected: Record<string, boolean> = {}
+
   private processManager: ProcessManager
 
   constructor(
@@ -68,6 +70,16 @@ export class ExperimentsTable {
 
   public getColumns() {
     return this.tableData?.columns
+  }
+
+  public getSelected(path: string) {
+    return this.columnSelected[path]
+  }
+
+  public setSelected(path: string) {
+    const isSelected = !this.columnSelected[path]
+    this.columnSelected[path] = isSelected
+    this.tableData?.columns.forEach(column => ({ ...column, isSelected }))
   }
 
   public showWebview = async () => {
@@ -118,7 +130,20 @@ export class ExperimentsTable {
     )
 
     const { columns, branches, workspace } = transformExperimentsRepo(data)
-    this.tableData = { columns, rows: [workspace, ...branches] }
+
+    columns.forEach(column => {
+      if (this.columnSelected[column.path] === undefined) {
+        this.columnSelected[column.path] = true
+      }
+    })
+
+    this.tableData = {
+      columns: columns.map(column => ({
+        ...column,
+        isSelected: this.columnSelected[column.path]
+      })),
+      rows: [workspace, ...branches]
+    }
 
     return this.sendData()
   }
