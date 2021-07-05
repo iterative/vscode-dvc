@@ -1,4 +1,4 @@
-import { join, relative, sep } from 'path'
+import { join, relative } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   commands,
@@ -12,6 +12,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
+import { ColumnData } from '../webview/contract'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -116,9 +117,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     return (
       columnData?.map(column => {
-        const absPath = join(dvcRoot, ...column.path)
+        const absPath = join(dvcRoot, column.path)
         this.pathRoots[absPath] = dvcRoot
-        this.hasChildren[absPath] = !!column.childColumns
+        this.hasChildren[absPath] = !!columnData.find(
+          otherColumn => column.path === otherColumn.parentPath
+        )
         if (this.selected[absPath] === undefined) {
           this.selected[absPath] = true
         }
@@ -129,21 +132,13 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   }
 
   private getColumnData(dvcRoot: string, path: string) {
-    let cols = this.experiments.getColumns(dvcRoot)
+    const columnData = this.experiments.getColumns(dvcRoot)
 
-    if (path) {
-      const steps = path.split(sep)
+    const filter = !path
+      ? (column: ColumnData) =>
+          ['metrics', 'params'].includes(column.parentPath)
+      : (column: ColumnData) => column.parentPath === path
 
-      let p = ''
-      steps.map(() => {
-        if (p !== path) {
-          cols = cols?.find(col => {
-            p = join(...col.path)
-            return path.includes(p)
-          })?.childColumns
-        }
-      })
-    }
-    return cols
+    return columnData?.filter(filter)
   }
 }

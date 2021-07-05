@@ -28,9 +28,14 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
 
-const buildDynamicColumns = (properties: ColumnData[]): Column<Experiment>[] =>
-  properties.map(data => {
+const buildDynamicColumns = (
+  properties: ColumnData[],
+  filter = (column: ColumnData) =>
+    ['params', 'metrics'].includes(column.parentPath)
+): Column<Experiment>[] =>
+  properties.filter(filter).map(data => {
     const { path } = data
+    const childColumns = properties.filter(column => column.parentPath === path)
     const Cell = getCellComponent()
     const column: Column<Experiment> & {
       columns?: Column<Experiment>[]
@@ -39,11 +44,11 @@ const buildDynamicColumns = (properties: ColumnData[]): Column<Experiment>[] =>
     } = {
       Cell,
       Header: data.name,
-      accessor: buildAccessor(path),
-      columns: data?.childColumns?.length
-        ? buildDynamicColumns(data.childColumns)
+      accessor: buildAccessor(path.split('/')),
+      columns: childColumns?.length
+        ? buildDynamicColumns(childColumns, () => true)
         : undefined,
-      id: buildColumnIdFromPath(path),
+      id: buildColumnIdFromPath(path.split('/')),
       type: data.types
     }
     switch (data.types) {
