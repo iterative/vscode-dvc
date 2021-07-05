@@ -21,6 +21,11 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
 
 const getCellComponent = (): React.FC<{ value: Value }> => Cell
 
+const getPathArray = (path: string): string[] => {
+  const sep = path.includes('/') ? '/' : '\\'
+  return path.split(sep)
+}
+
 const buildColumnIdFromPath = (objectPath: string[]) =>
   objectPath.map(segment => `[${segment}]`).join('')
 
@@ -40,6 +45,9 @@ const buildDynamicColumns = (
       properties,
       column => column.parentPath === path
     )
+
+    const pathArray = getPathArray(path)
+
     const column: Column<Experiment> & {
       columns?: Column<Experiment>[]
       sortType?: string
@@ -47,9 +55,9 @@ const buildDynamicColumns = (
     } = {
       Cell,
       Header: data.name,
-      accessor: buildAccessor(path.split('/')),
+      accessor: buildAccessor(pathArray),
       columns: childColumns.length ? childColumns : undefined,
-      id: buildColumnIdFromPath(path.split('/')),
+      id: buildColumnIdFromPath(pathArray),
       type: data.types
     }
     switch (data.types) {
