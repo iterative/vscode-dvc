@@ -16,7 +16,9 @@ import { ResourceLocator } from '../../resourceLocator'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
+
   public readonly onDidChangeTreeData: Event<string | void>
+  private treeDataChanged: EventEmitter<string | void>
 
   private readonly experiments: Experiments
   private readonly resourceLocator: ResourceLocator
@@ -24,12 +26,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   private hasChildren: Record<string, boolean> = {}
   private parents: Record<string, string> = {}
   private selected: Record<string, boolean> = {}
-  private treeDataChanged: EventEmitter<string>
 
   constructor(
     experiments: Experiments,
     resourceLocator: ResourceLocator,
-    treeDataChanged?: EventEmitter<string>
+    treeDataChanged?: EventEmitter<string | void>
   ) {
     this.resourceLocator = resourceLocator
 
@@ -49,11 +50,14 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     this.experiments = experiments
 
     this.dispose.track(
-      commands.registerCommand('toggle', resource => {
-        const selected = this.selected[resource]
-        this.selected[resource] = !selected
-        this.treeDataChanged.fire(resource)
-      })
+      commands.registerCommand(
+        'dvc.views.experimentColumnsTree.toggleSelected',
+        resource => {
+          const selected = this.selected[resource]
+          this.selected[resource] = !selected
+          this.treeDataChanged.fire(resource)
+        }
+      )
     )
   }
 
@@ -72,7 +76,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     )
     treeItem.command = {
       arguments: [element],
-      command: 'toggle',
+      command: 'dvc.views.experimentColumnsTree.toggleSelected',
       title: 'toggle'
     }
 
@@ -88,23 +92,22 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       return this.getColumns(this.pathRoots[element], element)
     }
 
-    const dvcRoots = this.experiments.getExperimentRoots()
+    const dvcRoots = this.experiments.getDvcRoots()
     if (definedAndNonEmpty(dvcRoots)) {
-      return this.getRootElements()
+      return this.getRootElements(dvcRoots)
     }
 
     return []
   }
 
-  private getRootElements() {
-    const rootElements = this.experiments.getExperimentRoots()
-    rootElements.map(dvcRoot => {
+  private getRootElements(dvcRoots: string[]) {
+    dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
       this.hasChildren[dvcRoot] = true
       this.selected[dvcRoot] = true
     })
 
-    return rootElements.sort((a, b) => a.localeCompare(b))
+    return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
   private getColumns(dvcRoot: string, element: string): string[] {

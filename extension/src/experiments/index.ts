@@ -51,7 +51,7 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public getExperimentRoots() {
+  public getDvcRoots() {
     return Object.keys(this.experiments)
   }
 
