@@ -66,6 +66,10 @@ export class ExperimentsTable {
     return this.processManager.run('refresh')
   }
 
+  public getColumns() {
+    return this.tableData?.columns
+  }
+
   public showWebview = async () => {
     if (this.webview) {
       return this.webview.reveal()

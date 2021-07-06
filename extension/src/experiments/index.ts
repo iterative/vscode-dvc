@@ -51,6 +51,14 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
+  public getDvcRoots() {
+    return Object.keys(this.experiments)
+  }
+
+  public getColumns(dvcRoot: string) {
+    return this.experiments[dvcRoot].getColumns()
+  }
+
   public getCwdThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
