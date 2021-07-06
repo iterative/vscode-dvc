@@ -79,15 +79,8 @@ export class ExperimentsTable {
   public setIsColumnSelected(path: string) {
     const isSelected = !this.isColumnSelected[path]
     this.isColumnSelected[path] = isSelected
-    if (this.tableData) {
-      this.tableData.columns = this.tableData.columns.map(column => {
-        if (column.path === path) {
-          column = { ...column, isSelected }
-        }
-        return column
-      })
-      this.sendData()
-    }
+    this.sendData()
+
     return this.isColumnSelected[path]
   }
 
@@ -147,10 +140,7 @@ export class ExperimentsTable {
     })
 
     this.tableData = {
-      columns: columns.map(column => ({
-        ...column,
-        isSelected: this.isColumnSelected[column.path]
-      })),
+      columns: columns,
       rows: [workspace, ...branches]
     }
 
@@ -161,7 +151,12 @@ export class ExperimentsTable {
     if (this.tableData && this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: this.tableData
+        tableData: {
+          columns: this.tableData.columns.filter(
+            column => this.isColumnSelected[column.path]
+          ),
+          rows: this.tableData.rows
+        }
       })
     }
   }

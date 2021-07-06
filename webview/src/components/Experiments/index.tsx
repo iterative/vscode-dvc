@@ -103,17 +103,13 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
 export const ExperimentsTable: React.FC<{
   tableData: TableData
 }> = ({ tableData }) => {
-  const hiddenColumns = tableData.columns
-    .filter(column => !column.isSelected)
-    .map(column => column.path)
-
   const [initialState, defaultColumn] = React.useMemo(() => {
-    const initialState = { hiddenColumns }
+    const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {
       width: 110
     }
     return [initialState, defaultColumn]
-  }, [hiddenColumns])
+  }, [])
 
   const [data, columns] = React.useMemo(() => {
     const data = tableData.rows
@@ -161,17 +157,11 @@ export const ExperimentsTable: React.FC<{
     }
   )
 
-  const { toggleAllRowsExpanded, toggleHideColumn } = instance
+  const { toggleAllRowsExpanded } = instance
 
   React.useEffect(() => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
-
-  React.useEffect(() => {
-    tableData.columns.forEach(column => {
-      toggleHideColumn(column.path, !column.isSelected)
-    })
-  }, [toggleHideColumn, tableData.columns])
 
   return (
     <>
