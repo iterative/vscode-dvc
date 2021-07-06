@@ -80,7 +80,7 @@ export class ExperimentsTable {
     const isSelected = !this.isColumnSelected[path]
     this.isColumnSelected[path] = isSelected
     if (this.tableData) {
-      this.tableData.columns = this.tableData?.columns.map(column => {
+      this.tableData.columns = this.tableData.columns.map(column => {
         if (column.path === path) {
           column = { ...column, isSelected }
         }
