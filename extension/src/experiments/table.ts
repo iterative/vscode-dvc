@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { TableData } from './webview/contract'
+import { ColumnData, Experiment, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -31,7 +31,8 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private tableData?: TableData
+  private columnData?: ColumnData[]
+  private rowData?: Experiment[]
 
   private isColumnSelected: Record<string, boolean> = {}
 
@@ -69,7 +70,7 @@ export class ExperimentsTable {
   }
 
   public getColumns() {
-    return this.tableData?.columns
+    return this.columnData
   }
 
   public getIsColumnSelected(path: string) {
@@ -93,7 +94,7 @@ export class ExperimentsTable {
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData: this.tableData
+        tableData: this.getTableData()
       },
       this.resourceLocator
     )
@@ -139,25 +140,27 @@ export class ExperimentsTable {
       }
     })
 
-    this.tableData = {
-      columns: columns,
-      rows: [workspace, ...branches]
-    }
+    this.columnData = columns
+    this.rowData = [workspace, ...branches]
 
     return this.sendData()
   }
 
   private async sendData() {
-    if (this.tableData && this.webview) {
+    if (this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: {
-          columns: this.tableData.columns.filter(
-            column => this.isColumnSelected[column.path]
-          ),
-          rows: this.tableData.rows
-        }
+        tableData: this.getTableData()
       })
+    }
+  }
+
+  private getTableData(): TableData {
+    return {
+      columns:
+        this.columnData?.filter(column => this.isColumnSelected[column.path]) ||
+        [],
+      rows: this.rowData || []
     }
   }
 
