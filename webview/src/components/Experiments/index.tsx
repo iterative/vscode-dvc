@@ -51,7 +51,8 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
       Header: 'Timestamp',
       accessor: 'timestamp'
     },
-    ...buildDynamicColumns(columns)
+    ...buildDynamicColumns(columns, 'params'),
+    ...buildDynamicColumns(columns, 'metrics')
   ] as Column<Experiment>[]
 
 export const ExperimentsTable: React.FC<{

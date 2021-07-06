@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { TableData } from './webview/contract'
+import { ColumnData, Experiment, TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -31,7 +31,10 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private tableData?: TableData
+  private columnData?: ColumnData[]
+  private rowData?: Experiment[]
+
+  private isColumnSelected: Record<string, boolean> = {}
 
   private processManager: ProcessManager
 
@@ -67,7 +70,19 @@ export class ExperimentsTable {
   }
 
   public getColumns() {
-    return this.tableData?.columns
+    return this.columnData
+  }
+
+  public getIsColumnSelected(path: string) {
+    return this.isColumnSelected[path]
+  }
+
+  public setIsColumnSelected(path: string) {
+    const isSelected = !this.isColumnSelected[path]
+    this.isColumnSelected[path] = isSelected
+    this.sendData()
+
+    return this.isColumnSelected[path]
   }
 
   public showWebview = async () => {
@@ -79,7 +94,7 @@ export class ExperimentsTable {
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData: this.tableData
+        tableData: this.getTableData()
       },
       this.resourceLocator
     )
@@ -118,17 +133,34 @@ export class ExperimentsTable {
     )
 
     const { columns, branches, workspace } = transformExperimentsRepo(data)
-    this.tableData = { columns, rows: [workspace, ...branches] }
+
+    columns.forEach(column => {
+      if (this.isColumnSelected[column.path] === undefined) {
+        this.isColumnSelected[column.path] = true
+      }
+    })
+
+    this.columnData = columns
+    this.rowData = [workspace, ...branches]
 
     return this.sendData()
   }
 
   private async sendData() {
-    if (this.tableData && this.webview) {
+    if (this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: this.tableData
+        tableData: this.getTableData()
       })
+    }
+  }
+
+  private getTableData(): TableData {
+    return {
+      columns:
+        this.columnData?.filter(column => this.isColumnSelected[column.path]) ||
+        [],
+      rows: this.rowData || []
     }
   }
 

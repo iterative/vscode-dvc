@@ -2,16 +2,23 @@ import { PartialColumnDescriptor, PartialColumnsMap } from './collectFromRepo'
 import { ColumnData } from './webview/contract'
 
 const columnFromMapEntry = (
-  entry: [string, PartialColumnDescriptor],
-  ancestors: string[]
+  entry: [string, PartialColumnDescriptor]
 ): ColumnData => {
   const [name, partialColumnDescriptor] = entry
-  const { types, maxStringLength, minNumber, maxNumber } =
-    partialColumnDescriptor
+  const {
+    group,
+    path,
+    parentPath,
+    types,
+    maxStringLength,
+    minNumber,
+    maxNumber
+  } = partialColumnDescriptor
   const column: ColumnData = {
-    group: ancestors[0],
+    group,
     name,
-    path: [...ancestors, name]
+    parentPath,
+    path
   }
   if (maxStringLength) {
     column.maxStringLength = maxStringLength
@@ -27,39 +34,16 @@ const columnFromMapEntry = (
 }
 
 const transformAndCollectFromColumns = (
-  columnsMap: PartialColumnsMap,
-  ancestors: string[]
+  columnsMap: PartialColumnsMap
 ): ColumnData[] => {
   const currentLevelColumns = []
   for (const entry of columnsMap) {
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    currentLevelColumns.push(buildColumn(entry, ancestors))
+    currentLevelColumns.push(columnFromMapEntry(entry))
   }
   return currentLevelColumns
 }
 
 export const transformAndCollectFromColumnsIfAny = (
-  columnsMap: PartialColumnsMap,
-  type: string
+  columnsMap: PartialColumnsMap
 ): ColumnData[] =>
-  columnsMap.size === 0
-    ? []
-    : transformAndCollectFromColumns(columnsMap, [type])
-
-const buildColumn = (
-  entry: [string, PartialColumnDescriptor],
-  ancestors: string[]
-): ColumnData => {
-  const column = columnFromMapEntry(entry, ancestors)
-
-  const [name, { childColumns }] = entry
-
-  if (childColumns) {
-    column.childColumns = transformAndCollectFromColumns(childColumns, [
-      ...ancestors,
-      name
-    ])
-  }
-
-  return column
-}
+  columnsMap.size === 0 ? [] : transformAndCollectFromColumns(columnsMap)

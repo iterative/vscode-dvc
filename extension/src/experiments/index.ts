@@ -56,7 +56,15 @@ export class Experiments {
   }
 
   public getColumns(dvcRoot: string) {
-    return this.experiments[dvcRoot].getColumns()
+    return this.getTable(dvcRoot).getColumns()
+  }
+
+  public getIsColumnSelected(dvcRoot: string, path: string) {
+    return this.getTable(dvcRoot).getIsColumnSelected(path)
+  }
+
+  public setIsColumnSelected(dvcRoot: string, path: string) {
+    return this.getTable(dvcRoot).setIsColumnSelected(path)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -172,22 +180,26 @@ export class Experiments {
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experimentsTable = this.experiments[dvcRoot]
+    const experimentsTable = this.getTable(dvcRoot)
     experimentsTable.onDidChangeData(gitRoot)
   }
 
   public refreshData(dvcRoot: string) {
-    const experimentsTable = this.experiments[dvcRoot]
+    const experimentsTable = this.getTable(dvcRoot)
     experimentsTable?.refresh()
   }
 
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experimentsTable = this.experiments[dvcRoot]
+    const experimentsTable = this.getTable(dvcRoot)
     if (!experimentsTable) {
       experimentsWebview.dispose()
     }
 
     experimentsTable.setWebview(experimentsWebview)
+  }
+
+  private getTable(dvcRoot: string) {
+    return this.experiments[dvcRoot]
   }
 
   private getFocusedOrDefaultOrPickProject() {
@@ -213,7 +225,7 @@ export class Experiments {
   private async showExperimentsWebview(
     dvcRoot: string
   ): Promise<ExperimentsTable> {
-    const experimentsTable = this.experiments[dvcRoot]
+    const experimentsTable = this.getTable(dvcRoot)
     await experimentsTable.showWebview()
     return experimentsTable
   }
