@@ -80,6 +80,7 @@ export class ExperimentsTable {
   public setIsColumnSelected(path: string) {
     const isSelected = !this.isColumnSelected[path]
     this.isColumnSelected[path] = isSelected
+    this.setAreChildrenSelected(path, isSelected)
     this.sendData()
 
     return this.isColumnSelected[path]
@@ -162,6 +163,16 @@ export class ExperimentsTable {
         [],
       rows: this.rowData || []
     }
+  }
+
+  private setAreChildrenSelected(path: string, isSelected: boolean) {
+    this.columnData
+      ?.filter(
+        column => column.path !== path && path.includes(column.parentPath)
+      )
+      .map(column => {
+        this.isColumnSelected[column.path] = isSelected
+      })
   }
 
   private resetWebview = () => {
