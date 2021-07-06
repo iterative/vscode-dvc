@@ -103,13 +103,17 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
 export const ExperimentsTable: React.FC<{
   tableData: TableData
 }> = ({ tableData }) => {
+  const hiddenColumns = tableData.columns
+    .filter(column => !column.isSelected)
+    .map(column => column.path)
+
   const [initialState, defaultColumn] = React.useMemo(() => {
-    const initialState = {}
+    const initialState = { hiddenColumns }
     const defaultColumn: Partial<Column<Experiment>> = {
       width: 110
     }
     return [initialState, defaultColumn]
-  }, [])
+  }, [hiddenColumns])
 
   const [data, columns] = React.useMemo(() => {
     const data = tableData.rows
