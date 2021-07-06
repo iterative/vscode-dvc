@@ -165,13 +165,7 @@ export const ExperimentsTable: React.FC<{
 
   React.useEffect(() => {
     tableData.columns.forEach(column => {
-      const sep = column.path.includes('/') ? '/' : '\\'
-      const id = column.path
-        .split(sep)
-        .map(segment => `[${segment}]`)
-        .join('')
-      const isSelected = !column.isSelected
-      toggleHideColumn(id, isSelected)
+      toggleHideColumn(column.path, !column.isSelected)
     })
   }, [toggleHideColumn, tableData.columns])
 
