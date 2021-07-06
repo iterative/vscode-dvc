@@ -4,7 +4,6 @@ import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
 import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
-import SortIconToggle from '../SortIconToggle'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>
@@ -127,17 +126,11 @@ export const PrimaryHeaderGroup: React.FC<{
               >
                 <MenuItem
                   id={'Sort'}
-                  isSelected={header.isSorted}
-                  {...header.getHeaderProps(
-                    header.getSortByToggleProps({
-                      key: `sort-menu-item-asc_${header.id}`
-                    })
-                  )}
+                  {...header.getHeaderProps({
+                    key: `sort-menu-item-asc_${header.id}`
+                  })}
                 >
                   Sort Column
-                  {header.isSorted && (
-                    <SortIconToggle isSortedDesc={header.isSortedDesc} />
-                  )}
                 </MenuItem>
                 <MenuItem
                   id={'Visibility'}
@@ -275,12 +268,6 @@ export const TableHead: React.FC<InstanceProp> = ({
 
   return (
     <div className={styles.thead}>
-      {/* {headerGroups.slice(0, lastHeaderGroupIndex).map((headerGroup, i) => (
-        <ParentHeaderGroup
-          headerGroup={headerGroup}
-          key={`header-group-${i}`}
-        />
-      ))} */}
       <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
     </div>
   )
@@ -293,9 +280,9 @@ export const Table: React.FC<InstanceProp> = ({ instance }) => {
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
         <TableHead instance={instance} />
-        {rows.map(row => {
-          return <TableBody row={row} instance={instance} key={row.id} />
-        })}
+        {rows.map(row => (
+          <TableBody row={row} instance={instance} key={row.id} />
+        ))}
       </div>
     </div>
   )

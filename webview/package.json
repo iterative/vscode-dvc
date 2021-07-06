@@ -24,7 +24,7 @@
     "mobx-react": "^7.0.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-table": "https://github.com/rogermparent/react-table.git"
+    "react-table": "^7.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
