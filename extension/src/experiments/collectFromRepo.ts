@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { Experiment, ColumnAggregateData } from './webview/contract'
 import {
   ExperimentFields,
@@ -9,7 +10,9 @@ import {
 
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
-  childColumns?: PartialColumnsMap
+  group: string
+  path: string
+  parentPath: string
 }
 export type PartialColumnsMap = Map<string, PartialColumnDescriptor>
 
@@ -27,6 +30,17 @@ const getValueType = (value: Value | ValueTree) => {
   }
   return typeof value
 }
+
+const getEntryOrDefault = (
+  originalColumnsMap: PartialColumnsMap,
+  propertyKey: string,
+  ancestors: string[]
+) =>
+  originalColumnsMap.get(propertyKey) || {
+    group: ancestors[0],
+    parentPath: join(...ancestors),
+    path: join(...ancestors, propertyKey)
+  }
 
 const mergeNumberColumn = (
   columnDescriptor: PartialColumnDescriptor,
@@ -63,7 +77,8 @@ const mergePrimitiveColumn = (
 
 const mergeColumnsMap = (
   originalColumnsMap: PartialColumnsMap,
-  valueTree: ValueTree
+  valueTree: ValueTree,
+  ...ancestors: string[]
 ): PartialColumnsMap => {
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
@@ -71,8 +86,10 @@ const mergeColumnsMap = (
       propertyKey,
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       mergeOrCreateColumnDescriptor(
-        originalColumnsMap.get(propertyKey),
-        propertyValue
+        originalColumnsMap,
+        propertyKey,
+        propertyValue,
+        ...ancestors
       )
     )
   }
@@ -80,15 +97,25 @@ const mergeColumnsMap = (
 }
 
 const mergeOrCreateColumnDescriptor = (
-  columnDescriptor: PartialColumnDescriptor = {},
-  newValue: Value | ValueTree
+  originalColumnsMap: PartialColumnsMap,
+  propertyKey: string,
+  newValue: Value | ValueTree,
+  ...ancestors: string[]
 ): PartialColumnDescriptor => {
   const newValueType = getValueType(newValue)
 
+  const columnDescriptor = getEntryOrDefault(
+    originalColumnsMap,
+    propertyKey,
+    ancestors
+  )
+
   if (newValueType === 'object') {
-    columnDescriptor.childColumns = mergeColumnsMap(
-      columnDescriptor.childColumns || new Map(),
-      newValue as ValueTree
+    mergeColumnsMap(
+      originalColumnsMap,
+      newValue as ValueTree,
+      ...ancestors,
+      propertyKey
     )
     return columnDescriptor as PartialColumnDescriptor
   } else {
@@ -126,10 +153,10 @@ const collectColumnsFromExperiment = (
   const { paramsMap, metricsMap } = acc
   const { params, metrics } = experiment
   if (params) {
-    mergeColumnsMap(paramsMap, params)
+    mergeColumnsMap(paramsMap, params, 'params')
   }
   if (metrics) {
-    mergeColumnsMap(metricsMap, metrics)
+    mergeColumnsMap(metricsMap, metrics, 'metrics')
   }
 }
 

@@ -1,4 +1,4 @@
-import { join, relative, sep } from 'path'
+import { join, relative } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   commands,
@@ -12,6 +12,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
+import { ColumnData } from '../webview/contract'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -23,7 +24,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
   private hasChildren: Record<string, boolean> = {}
-  private parents: Record<string, string> = {}
   private selected: Record<string, boolean> = {}
 
   constructor(
@@ -58,10 +58,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         }
       )
     )
-  }
-
-  public getParent(element: string): string {
-    return this.parents[element]
   }
 
   public getTreeItem(element: string): TreeItem {
@@ -112,38 +108,32 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     const path = relative(dvcRoot, element)
 
-    const columnData = this.getColumnData(dvcRoot, path)
+    const columns = this.experiments.getColumns(dvcRoot)
 
     return (
-      columnData?.map(column => {
-        const absPath = join(dvcRoot, ...column.path)
-        this.pathRoots[absPath] = dvcRoot
-        this.hasChildren[absPath] = !!column.childColumns
-        if (this.selected[absPath] === undefined) {
-          this.selected[absPath] = true
-        }
-        this.parents[absPath] = element
-        return absPath
-      }) || []
+      columns
+        ?.filter(column =>
+          path
+            ? column.parentPath === path
+            : ['metrics', 'params'].includes(column.parentPath)
+        )
+        ?.map(column => this.processColumn(dvcRoot, column, columns)) || []
     )
   }
 
-  private getColumnData(dvcRoot: string, path: string) {
-    let cols = this.experiments.getColumns(dvcRoot)
-
-    if (path) {
-      const steps = path.split(sep)
-
-      let p = ''
-      steps.map(() => {
-        if (p !== path) {
-          cols = cols?.find(col => {
-            p = join(...col.path)
-            return path.includes(p)
-          })?.childColumns
-        }
-      })
+  private processColumn(
+    dvcRoot: string,
+    column: ColumnData,
+    columnData: ColumnData[]
+  ) {
+    const absPath = join(dvcRoot, column.path)
+    this.pathRoots[absPath] = dvcRoot
+    this.hasChildren[absPath] = !!columnData.find(
+      otherColumn => column.path === otherColumn.parentPath
+    )
+    if (this.selected[absPath] === undefined) {
+      this.selected[absPath] = true
     }
-    return cols
+    return absPath
   }
 }

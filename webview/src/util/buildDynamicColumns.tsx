@@ -21,6 +21,11 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
 
 const getCellComponent = (): React.FC<{ value: Value }> => Cell
 
+const getPathArray = (path: string): string[] => {
+  const sep = path.includes('/') ? '/' : '\\'
+  return path.split(sep)
+}
+
 const buildColumnIdFromPath = (objectPath: string[]) =>
   objectPath.map(segment => `[${segment}]`).join('')
 
@@ -28,32 +33,39 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
 
-const buildDynamicColumns = (properties: ColumnData[]): Column<Experiment>[] =>
-  properties.map(data => {
-    const { path } = data
-    const Cell = getCellComponent()
-    const column: Column<Experiment> & {
-      columns?: Column<Experiment>[]
-      sortType?: string
-      type?: string[]
-    } = {
-      Cell,
-      Header: data.name,
-      accessor: buildAccessor(path),
-      columns: data?.childColumns?.length
-        ? buildDynamicColumns(data.childColumns)
-        : undefined,
-      id: buildColumnIdFromPath(path),
-      type: data.types
-    }
-    switch (data.types) {
-      case ['integer']:
-      case ['number']:
-        column.sortType = 'basic'
-        break
-      default:
-    }
-    return column
-  })
+const buildDynamicColumns = (
+  properties: ColumnData[],
+  parentPath: string
+): Column<Experiment>[] =>
+  properties
+    .filter(column => column.parentPath === parentPath)
+    .map(data => {
+      const { path } = data
+      const Cell = getCellComponent()
+      const childColumns = buildDynamicColumns(properties, path)
+
+      const pathArray = getPathArray(path)
+
+      const column: Column<Experiment> & {
+        columns?: Column<Experiment>[]
+        sortType?: string
+        type?: string[]
+      } = {
+        Cell,
+        Header: data.name,
+        accessor: buildAccessor(pathArray),
+        columns: childColumns.length ? childColumns : undefined,
+        id: buildColumnIdFromPath(pathArray),
+        type: data.types
+      }
+      switch (data.types) {
+        case ['integer']:
+        case ['number']:
+          column.sortType = 'basic'
+          break
+        default:
+      }
+      return column
+    })
 
 export default buildDynamicColumns

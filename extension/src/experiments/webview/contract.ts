@@ -15,9 +15,9 @@ export interface ColumnAggregateData {
 export interface ColumnData extends ColumnAggregateData {
   group: string
   name: string
-  path: string[]
+  path: string
+  parentPath: string
   types?: string[]
-  childColumns?: ColumnData[]
 }
 
 export const WebviewType = 'Experiments'
