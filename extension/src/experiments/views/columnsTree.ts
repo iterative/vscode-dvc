@@ -51,10 +51,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       commands.registerCommand(
         'dvc.views.experimentColumnsTree.toggleSelected',
         resource => {
-          const dvcRoot = this.pathRoots[resource]
+          const dvcRoot = this.getElementRoot(resource)
           const path = relative(dvcRoot, resource)
-          this.experiments.setIsColumnSelected(dvcRoot, path)
+          const isSelected = this.experiments.setIsColumnSelected(dvcRoot, path)
           this.treeDataChanged.fire(resource)
+          return isSelected
         }
       )
     )
@@ -93,6 +94,10 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     }
 
     return this.getRootElements()
+  }
+
+  private getElementRoot(element: string) {
+    return this.pathRoots[element]
   }
 
   private getRootElements() {

@@ -80,6 +80,7 @@ export class ExperimentsTable {
     const isSelected = !this.isColumnSelected[path]
     this.isColumnSelected[path] = isSelected
     this.tableData?.columns.forEach(column => ({ ...column, isSelected }))
+    return this.isColumnSelected[path]
   }
 
   public showWebview = async () => {
