@@ -19,10 +19,10 @@ const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetColumns = jest.fn()
+const mockedGetChildColumns = jest.fn()
 const mockedGetDvcRoots = jest.fn()
 const mockedExperiments = {
-  getColumns: mockedGetColumns,
+  getChildColumns: mockedGetChildColumns,
   getDvcRoots: mockedGetDvcRoots
 } as unknown as Experiments
 
@@ -80,19 +80,27 @@ describe('ExperimentsColumnsTree', () => {
 
       experimentColumnsTree.getChildren()
 
-      mockedGetColumns.mockReturnValueOnce(complexColumnData)
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(column =>
+          ['metrics', 'params'].includes(column.parentPath)
+        )
+      )
 
       const children = experimentColumnsTree.getChildren(mockedDvcRoot)
-      const paramsPath = join(mockedDvcRoot, 'params', 'params.yaml')
+      const relParamsPath = join('params', 'params.yaml')
+      const paramsPath = join(mockedDvcRoot, relParamsPath)
 
       expect(children).toEqual([
         paramsPath,
         join(mockedDvcRoot, 'metrics', 'summary.json')
       ])
 
-      mockedGetColumns.mockReturnValueOnce(complexColumnData)
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(column => relParamsPath === column.parentPath)
+      )
       const grandChildren = experimentColumnsTree.getChildren(paramsPath)
-      const paramsProcessPath = join(paramsPath, 'process')
+      const relParamsProcessPath = join(relParamsPath, 'process')
+      const paramsProcessPath = join(mockedDvcRoot, relParamsProcessPath)
 
       expect(grandChildren).toEqual([
         join(paramsPath, 'epochs'),
@@ -103,7 +111,11 @@ describe('ExperimentsColumnsTree', () => {
         paramsProcessPath
       ])
 
-      mockedGetColumns.mockReturnValueOnce(complexColumnData)
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(
+          column => relParamsProcessPath === column.parentPath
+        )
+      )
       const greatGrandChildren =
         experimentColumnsTree.getChildren(paramsProcessPath)
 

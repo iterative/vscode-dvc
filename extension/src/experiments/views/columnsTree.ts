@@ -23,7 +23,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   private readonly experiments: Experiments
   private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
-  private hasChildren: Record<string, boolean> = {}
 
   constructor(
     experiments: Experiments,
@@ -62,27 +61,33 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   public getTreeItem(element: string): TreeItem {
     const resourceUri = Uri.file(element)
-    const itemHasChildren = this.hasChildren[element]
+
+    const [dvcRoot, path] = this.getDetails(element)
+
+    if (!path) {
+      return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
+    }
+
+    const column = this.experiments.getColumn(dvcRoot, path)
+    const hasChildren = !!column?.hasChildren
+    const isSelected = !!column?.isSelected
+
     const treeItem = new TreeItem(
       resourceUri,
-      itemHasChildren
+      hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
 
-    const [dvcRoot, path] = this.getDetails(element)
-
-    if (path) {
-      treeItem.command = {
-        arguments: [element],
-        command: 'dvc.views.experimentColumnsTree.toggleSelected',
-        title: 'toggle'
-      }
-
-      treeItem.iconPath = this.experiments.getIsColumnSelected(dvcRoot, path)
-        ? this.resourceLocator.selectedCheckbox
-        : this.resourceLocator.unselectedCheckbox
+    treeItem.command = {
+      arguments: [element],
+      command: 'dvc.views.experimentColumnsTree.toggleSelected',
+      title: 'toggle'
     }
+
+    treeItem.iconPath = isSelected
+      ? this.resourceLocator.selectedCheckbox
+      : this.resourceLocator.unselectedCheckbox
 
     return treeItem
   }
@@ -99,7 +104,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     const dvcRoots = this.experiments.getDvcRoots() || []
     dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
-      this.hasChildren[dvcRoot] = true
     })
 
     return dvcRoots.sort((a, b) => a.localeCompare(b))
@@ -111,29 +115,14 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     }
 
     const [dvcRoot, path] = this.getDetails(element)
-    const columns = this.experiments.getColumns(dvcRoot)
+    const columns = this.experiments.getChildColumns(dvcRoot, path)
 
-    return (
-      columns
-        ?.filter(column =>
-          path
-            ? column.parentPath === path
-            : ['metrics', 'params'].includes(column.parentPath)
-        )
-        ?.map(column => this.processColumn(dvcRoot, column, columns)) || []
-    )
+    return columns?.map(column => this.processColumn(dvcRoot, column)) || []
   }
 
-  private processColumn(
-    dvcRoot: string,
-    column: ColumnData,
-    columnData: ColumnData[]
-  ) {
+  private processColumn(dvcRoot: string, column: ColumnData) {
     const absPath = join(dvcRoot, column.path)
     this.pathRoots[absPath] = dvcRoot
-    this.hasChildren[absPath] = !!columnData.find(
-      otherColumn => column.path === otherColumn.parentPath
-    )
     return absPath
   }
 

@@ -69,12 +69,19 @@ export class ExperimentsTable {
     return this.processManager.run('refresh')
   }
 
-  public getColumns() {
-    return this.columnData
+  public getColumn(path: string) {
+    const column = this.columnData?.find(column => column.path === path)
+    if (column) {
+      return { ...column, isSelected: this.isColumnSelected[column.path] }
+    }
   }
 
-  public getIsColumnSelected(path: string) {
-    return this.isColumnSelected[path]
+  public getChildColumns(path: string) {
+    return this.columnData?.filter(column =>
+      path
+        ? column.parentPath === path
+        : ['metrics', 'params'].includes(column.parentPath)
+    )
   }
 
   public setIsColumnSelected(path: string) {
@@ -166,13 +173,11 @@ export class ExperimentsTable {
   }
 
   private setAreChildrenSelected(path: string, isSelected: boolean) {
-    this.columnData
-      ?.filter(
-        column => column.path !== path && path.includes(column.parentPath)
-      )
-      .map(column => {
-        this.isColumnSelected[column.path] = isSelected
-      })
+    return this.getChildColumns(path)?.map(column => {
+      const path = column.path
+      this.isColumnSelected[path] = isSelected
+      this.setAreChildrenSelected(path, isSelected)
+    })
   }
 
   private resetWebview = () => {
