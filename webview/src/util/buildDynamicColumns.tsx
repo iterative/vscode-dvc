@@ -26,9 +26,6 @@ const getPathArray = (path: string): string[] => {
   return path.split(sep)
 }
 
-const buildColumnIdFromPath = (objectPath: string[]) =>
-  objectPath.map(segment => `[${segment}]`).join('')
-
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
@@ -55,7 +52,7 @@ const buildDynamicColumns = (
         Header: data.name,
         accessor: buildAccessor(pathArray),
         columns: childColumns.length ? childColumns : undefined,
-        id: buildColumnIdFromPath(pathArray),
+        id: path,
         type: data.types
       }
       switch (data.types) {
