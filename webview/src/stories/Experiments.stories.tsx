@@ -22,7 +22,13 @@ export default {
     }
   },
   args: {
-    tableData: { columns: complexColumnData, rows: complexRowData },
+    tableData: {
+      columns: complexColumnData.map(column => ({
+        ...column,
+        isSelected: true
+      })),
+      rows: complexRowData
+    },
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,
