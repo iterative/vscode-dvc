@@ -79,7 +79,15 @@ export class ExperimentsTable {
   public setIsColumnSelected(path: string) {
     const isSelected = !this.isColumnSelected[path]
     this.isColumnSelected[path] = isSelected
-    this.tableData?.columns.forEach(column => ({ ...column, isSelected }))
+    if (this.tableData) {
+      this.tableData.columns = this.tableData?.columns.map(column => {
+        if (column.path === path) {
+          column = { ...column, isSelected }
+        }
+        return column
+      })
+      this.sendData()
+    }
     return this.isColumnSelected[path]
   }
 

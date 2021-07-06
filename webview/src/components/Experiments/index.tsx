@@ -103,13 +103,23 @@ const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
 export const ExperimentsTable: React.FC<{
   tableData: TableData
 }> = ({ tableData }) => {
+  const hiddenColumns = tableData.columns
+    .filter(column => !column.isSelected)
+    .map(column => {
+      const sep = column.path.includes('/') ? '/' : '\\'
+      return column.path
+        .split(sep)
+        .map(segment => `[${segment}]`)
+        .join('')
+    })
+
   const [initialState, defaultColumn] = React.useMemo(() => {
-    const initialState = {}
+    const initialState = { hiddenColumns }
     const defaultColumn: Partial<Column<Experiment>> = {
       width: 110
     }
     return [initialState, defaultColumn]
-  }, [])
+  }, [hiddenColumns])
 
   const [data, columns] = React.useMemo(() => {
     const data = tableData.rows
@@ -157,11 +167,23 @@ export const ExperimentsTable: React.FC<{
     }
   )
 
-  const { toggleAllRowsExpanded } = instance
+  const { toggleAllRowsExpanded, toggleHideColumn } = instance
 
   React.useEffect(() => {
     toggleAllRowsExpanded()
   }, [toggleAllRowsExpanded])
+
+  React.useEffect(() => {
+    tableData.columns.forEach(column => {
+      const sep = column.path.includes('/') ? '/' : '\\'
+      const id = column.path
+        .split(sep)
+        .map(segment => `[${segment}]`)
+        .join('')
+      const isSelected = !column.isSelected
+      toggleHideColumn(id, isSelected)
+    })
+  }, [toggleHideColumn, tableData.columns])
 
   return (
     <>
