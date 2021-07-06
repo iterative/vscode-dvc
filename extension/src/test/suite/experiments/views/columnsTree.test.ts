@@ -1,4 +1,4 @@
-import path from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
@@ -15,8 +15,6 @@ import { InternalCommands } from '../../../../internalCommands'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all experiment columns tree tests.')
-
-  const { join, resolve } = path
 
   const dvcDemoPath = resolve(
     __dirname,
@@ -50,6 +48,7 @@ suite('Extension Test Suite', () => {
 
   describe('ExperimentColumnsTree', () => {
     it('should be able to toggle whether an experiments column is selected with dvc.views.experimentColumnsTree.toggleSelected', async () => {
+      const toggleCommand = 'dvc.views.experimentColumnsTree.toggleSelected'
       const relPath = join('params', 'params.yaml', 'learning_rate')
       const absPath = join(
         dvcDemoPath,
@@ -57,11 +56,12 @@ suite('Extension Test Suite', () => {
         'params.yaml',
         'learning_rate'
       )
-      stub(path, 'relative').returns(relPath)
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((ExperimentsColumnsTree as any).prototype, 'getElementRoot').returns(
-        dvcDemoPath
-      )
+      stub((ExperimentsColumnsTree as any).prototype, 'getDetails').returns([
+        dvcDemoPath,
+        relPath
+      ])
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -83,19 +83,20 @@ suite('Extension Test Suite', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getTable').returns(experimentsTable)
 
-      const isUnselected = await commands.executeCommand(
-        'dvc.views.experimentColumnsTree.toggleSelected',
-        absPath
-      )
+      const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
       expect(isUnselected).to.be.false
 
-      const isSelected = await commands.executeCommand(
-        'dvc.views.experimentColumnsTree.toggleSelected',
+      const isSelected = await commands.executeCommand(toggleCommand, absPath)
+
+      expect(isSelected).to.be.true
+
+      const isUnselectedAgain = await commands.executeCommand(
+        toggleCommand,
         absPath
       )
 
-      expect(isSelected).to.be.true
+      expect(isUnselectedAgain).to.be.false
     })
   })
 })

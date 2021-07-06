@@ -51,8 +51,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       commands.registerCommand(
         'dvc.views.experimentColumnsTree.toggleSelected',
         resource => {
-          const dvcRoot = this.getElementRoot(resource)
-          const path = relative(dvcRoot, resource)
+          const [dvcRoot, path] = this.getDetails(resource)
           const isSelected = this.experiments.setIsColumnSelected(dvcRoot, path)
           this.treeDataChanged.fire(resource)
           return isSelected
@@ -70,16 +69,16 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
-    treeItem.command = {
-      arguments: [element],
-      command: 'dvc.views.experimentColumnsTree.toggleSelected',
-      title: 'toggle'
-    }
 
-    const dvcRoot = this.pathRoots[element]
-    const path = relative(dvcRoot, element)
+    const [dvcRoot, path] = this.getDetails(element)
 
     if (path) {
+      treeItem.command = {
+        arguments: [element],
+        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        title: 'toggle'
+      }
+
       treeItem.iconPath = this.experiments.getIsColumnSelected(dvcRoot, path)
         ? this.resourceLocator.selectedCheckbox
         : this.resourceLocator.unselectedCheckbox
@@ -90,14 +89,10 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   public getChildren(element?: string): string[] {
     if (element) {
-      return this.getColumns(this.pathRoots[element], element)
+      return this.getColumns(element)
     }
 
     return this.getRootElements()
-  }
-
-  private getElementRoot(element: string) {
-    return this.pathRoots[element]
   }
 
   private getRootElements() {
@@ -110,13 +105,12 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
-  private getColumns(dvcRoot: string, element: string): string[] {
+  private getColumns(element: string): string[] {
     if (!element) {
       return []
     }
 
-    const path = relative(dvcRoot, element)
-
+    const [dvcRoot, path] = this.getDetails(element)
     const columns = this.experiments.getColumns(dvcRoot)
 
     return (
@@ -141,5 +135,15 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       otherColumn => column.path === otherColumn.parentPath
     )
     return absPath
+  }
+
+  private getDetails(element: string) {
+    const dvcRoot = this.getRoot(element)
+    const path = relative(dvcRoot, element)
+    return [dvcRoot, path]
+  }
+
+  private getRoot(element: string) {
+    return this.pathRoots[element]
   }
 }
