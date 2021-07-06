@@ -8,6 +8,7 @@ const columnFromMapEntry = (
   const {
     group,
     path,
+    hasChildren,
     parentPath,
     types,
     maxStringLength,
@@ -16,6 +17,7 @@ const columnFromMapEntry = (
   } = partialColumnDescriptor
   const column: ColumnData = {
     group,
+    hasChildren,
     name,
     parentPath,
     path
