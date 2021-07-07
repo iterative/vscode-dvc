@@ -131,6 +131,7 @@ export class ExperimentsTable {
   public setCurrentSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
     this.updateRowData()
+    this.sendData()
   }
 
   public async pickCurrentSort() {
@@ -170,7 +171,6 @@ export class ExperimentsTable {
       columnPath: pickedColumn.path.split('/'),
       descending
     })
-    this.sendData()
   }
 
   private applySorts() {
