@@ -14,6 +14,7 @@ export interface ColumnAggregateData {
 
 export interface ColumnData extends ColumnAggregateData {
   group: string
+  hasChildren: boolean
   name: string
   path: string
   parentPath: string

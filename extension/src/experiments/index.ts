@@ -55,12 +55,12 @@ export class Experiments {
     return Object.keys(this.experiments)
   }
 
-  public getColumns(dvcRoot: string) {
-    return this.getTable(dvcRoot).getColumns()
+  public getColumn(dvcRoot: string, path: string) {
+    return this.getTable(dvcRoot).getColumn(path)
   }
 
-  public getIsColumnSelected(dvcRoot: string, path: string) {
-    return this.getTable(dvcRoot).getIsColumnSelected(path)
+  public getChildColumns(dvcRoot: string, path: string) {
+    return this.getTable(dvcRoot).getChildColumns(path)
   }
 
   public setIsColumnSelected(dvcRoot: string, path: string) {

@@ -1,6 +1,7 @@
 [
   {
     "group": "params",
+    "hasChildren": false,
     "name": "epochs",
     "parentPath": "params/params.yaml",
     "path": "params/params.yaml/epochs",
@@ -11,6 +12,7 @@
   },
   {
     "group": "params",
+    "hasChildren": false,
     "name": "learning_rate",
     "parentPath": "params/params.yaml",
     "path": "params/params.yaml/learning_rate",
@@ -21,6 +23,7 @@
   },
   {
     "group": "params",
+    "hasChildren": false,
     "name": "dvc_logs_dir",
     "parentPath": "params/params.yaml",
     "path": "params/params.yaml/dvc_logs_dir",
@@ -29,6 +32,7 @@
   },
   {
     "group": "params",
+    "hasChildren": false,
     "name": "log_file",
     "parentPath": "params/params.yaml",
     "path": "params/params.yaml/log_file",
@@ -37,6 +41,7 @@
   },
   {
     "group": "params",
+    "hasChildren": false,
     "name": "dropout",
     "parentPath": "params/params.yaml",
     "path": "params/params.yaml/dropout",
@@ -47,6 +52,7 @@
   },
   {
     "group": "params",
+    "hasChildren": false,
     "name": "threshold",
     "parentPath": "params/params.yaml/process",
     "path": "params/params.yaml/process/threshold",
@@ -57,6 +63,7 @@
   },
   {
     "group": "params",
+    "hasChildren": false,
     "name": "test_arg",
     "parentPath": "params/params.yaml/process",
     "path": "params/params.yaml/process/test_arg",
@@ -67,18 +74,21 @@
   },
   {
     "group": "params",
+    "hasChildren": true,
     "name": "process",
     "parentPath": "params/params.yaml",
     "path": "params/params.yaml/process"
   },
   {
     "group": "params",
+    "hasChildren": true,
     "name": "params.yaml",
     "parentPath": "params",
     "path": "params/params.yaml"
   },
   {
     "group": "metrics",
+    "hasChildren": false,
     "name": "loss",
     "parentPath": "metrics/summary.json",
     "path": "metrics/summary.json/loss",
@@ -89,6 +99,7 @@
   },
   {
     "group": "metrics",
+    "hasChildren": false,
     "name": "accuracy",
     "parentPath": "metrics/summary.json",
     "path": "metrics/summary.json/accuracy",
@@ -99,6 +110,7 @@
   },
   {
     "group": "metrics",
+    "hasChildren": false,
     "name": "val_loss",
     "parentPath": "metrics/summary.json",
     "path": "metrics/summary.json/val_loss",
@@ -109,6 +121,7 @@
   },
   {
     "group": "metrics",
+    "hasChildren": false,
     "name": "val_accuracy",
     "parentPath": "metrics/summary.json",
     "path": "metrics/summary.json/val_accuracy",
@@ -119,6 +132,7 @@
   },
   {
     "group": "metrics",
+    "hasChildren": true,
     "name": "summary.json",
     "parentPath": "metrics",
     "path": "metrics/summary.json"
