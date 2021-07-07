@@ -16,22 +16,6 @@ import { QuickPickItemWithValue, quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
-const quickPickItemFromColumn = (cur: ColumnData) => ({
-  label: cur.path.join('.'),
-  value: cur.path
-})
-
-const columnsToFlatQuickPicks = (
-  columns: ColumnData[]
-): QuickPickItemWithValue<string[]>[] =>
-  columns.reduce<QuickPickItemWithValue<string[]>[]>((acc, column) => {
-    const entry: QuickPickItemWithValue<string[]> =
-      quickPickItemFromColumn(column)
-    return column.childColumns
-      ? [...acc, entry, ...columnsToFlatQuickPicks(column.childColumns)]
-      : [...acc, entry]
-  }, [])
-
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
@@ -49,16 +33,17 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private tableData?: TableData
-
-  private columns?: ColumnData[]
+  private currentSort?: SortDefinition
   private workspace?: Experiment
   private unsortedRows?: Experiment[]
   private sortedRows?: Experiment[]
 
-  private processManager: ProcessManager
+  private columnData?: ColumnData[]
+  private rowData?: Experiment[]
 
-  private currentSort?: SortDefinition
+  private isColumnSelected: Record<string, boolean> = {}
+
+  private processManager: ProcessManager
 
   constructor(
     dvcRoot: string,
@@ -91,6 +76,22 @@ export class ExperimentsTable {
     return this.processManager.run('refresh')
   }
 
+  public getColumns() {
+    return this.columnData
+  }
+
+  public getIsColumnSelected(path: string) {
+    return this.isColumnSelected[path]
+  }
+
+  public setIsColumnSelected(path: string) {
+    const isSelected = !this.isColumnSelected[path]
+    this.isColumnSelected[path] = isSelected
+    this.sendData()
+
+    return this.isColumnSelected[path]
+  }
+
   public showWebview = async () => {
     if (this.webview) {
       return this.webview.reveal()
@@ -100,7 +101,7 @@ export class ExperimentsTable {
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData: this.tableData
+        tableData: this.getTableData()
       },
       this.resourceLocator
     )
@@ -129,23 +130,30 @@ export class ExperimentsTable {
 
   public setCurrentSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
-    this.updateTableData()
+    this.updateRowData()
   }
 
   public async pickCurrentSort() {
-    if (!this.columns) {
+    if (!this.columnData) {
       window.showWarningMessage('There are no columns to sort from!')
       return
     }
-    const columnsToPick = columnsToFlatQuickPicks(this.columns)
-    if (!columnsToPick || columnsToPick.length === 0) {
+    const columnQuickPickItems: QuickPickItemWithValue<ColumnData>[] =
+      this.columnData.map(column => ({
+        label: column.name,
+        value: column
+      }))
+    if (!columnQuickPickItems || columnQuickPickItems.length === 0) {
       window.showWarningMessage('There are no columns to sort from!')
       return
     }
-    const columnPath = await quickPickValue<string[]>(columnsToPick, {
-      title: 'Select a column to sort'
-    })
-    if (!columnPath) {
+    const pickedColumn = await quickPickValue<ColumnData>(
+      columnQuickPickItems,
+      {
+        title: 'Select a column to sort'
+      }
+    )
+    if (!pickedColumn) {
       return
     }
     const descending = await quickPickValue<boolean>(
@@ -159,12 +167,12 @@ export class ExperimentsTable {
       return
     }
     return this.setCurrentSort({
-      columnPath,
+      columnPath: pickedColumn.path.split('/'),
       descending
     })
   }
 
-  private updateSortedRows() {
+  private applySorts() {
     if (this.currentSort) {
       const sortFunction = buildExperimentSortFunction(
         this.currentSort as SortDefinition
@@ -173,10 +181,10 @@ export class ExperimentsTable {
         if (!branch.subRows) {
           return branch
         }
-        const sortedExperiments = [...branch.subRows].sort(sortFunction)
+        const sortedRows = [...branch.subRows].sort(sortFunction)
         return {
           ...branch,
-          subRows: sortedExperiments
+          subRows: sortedRows
         }
       })
     } else {
@@ -184,14 +192,11 @@ export class ExperimentsTable {
     }
   }
 
-  private updateTableData() {
-    this.updateSortedRows()
-    const { columns, workspace, sortedRows } = this
-    this.tableData = {
-      columns: columns as ColumnData[],
-      rows: [workspace as Experiment, ...(sortedRows as Experiment[])]
-    }
-    this.sendData()
+  private updateRowData(): void {
+    const { workspace, sortedRows } = this
+    this.rowData = sortedRows
+      ? [workspace as Experiment, ...(sortedRows as Experiment[])]
+      : [workspace as Experiment]
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -207,21 +212,37 @@ export class ExperimentsTable {
 
     const { columns, branches, workspace } = transformExperimentsRepo(data)
 
-    this.columns = columns
+    columns.forEach(column => {
+      if (this.isColumnSelected[column.path] === undefined) {
+        this.isColumnSelected[column.path] = true
+      }
+    })
+
+    this.columnData = columns
     this.workspace = workspace
     this.unsortedRows = branches
 
-    this.updateTableData()
+    this.applySorts()
+    this.updateRowData()
 
     return this.sendData()
   }
 
   private async sendData() {
-    if (this.tableData && this.webview) {
+    if (this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: this.tableData
+        tableData: this.getTableData()
       })
+    }
+  }
+
+  private getTableData(): TableData {
+    return {
+      columns:
+        this.columnData?.filter(column => this.isColumnSelected[column.path]) ||
+        [],
+      rows: this.rowData || []
     }
   }
 

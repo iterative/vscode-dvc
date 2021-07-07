@@ -454,11 +454,27 @@
         }
       ]
     },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dvc-views",
+          "title": "DVC",
+          "icon": "resources/dvc-monochrome.svg"
+        }
+      ]
+    },
     "views": {
       "explorer": [
         {
           "id": "dvc.views.trackedExplorerTree",
           "name": "DVC Tracked"
+        }
+      ],
+      "dvc-views": [
+        {
+          "id": "dvc.views.experimentColumnsTree",
+          "name": "Experiment Columns",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         }
       ]
     },

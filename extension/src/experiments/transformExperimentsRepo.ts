@@ -17,8 +17,8 @@ export const transformExperimentsRepo = (
   return {
     branches,
     columns: [
-      ...transformAndCollectFromColumnsIfAny(paramsMap, 'params'),
-      ...transformAndCollectFromColumnsIfAny(metricsMap, 'metrics')
+      ...transformAndCollectFromColumnsIfAny(paramsMap),
+      ...transformAndCollectFromColumnsIfAny(metricsMap)
     ],
     workspace
   }

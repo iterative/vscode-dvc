@@ -1,9 +1,11 @@
+import { join } from 'path'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
 import complexColumnData from './webview/complex-column-example.json'
 import complexRowData from './webview/complex-row-example.json'
-
 import { ColumnData, Experiment } from './webview/contract'
+
+const paramsYaml = 'params.yaml'
 
 describe('overall transformer functionality', () => {
   it('returns output that matches the data found in the webview contract', () => {
@@ -203,10 +205,9 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsFileColumn] = columns.filter(
-      column => column.group === 'params'
-    ) as ColumnData[]
-    const [exampleMixedColumn] = paramsFileColumn.childColumns as ColumnData[]
+    const exampleMixedColumn = columns.find(
+      column => column.parentPath === join('params', paramsYaml)
+    ) as ColumnData
 
     it('correctly identifies mixed type params', () => {
       expect(exampleMixedColumn.types).toEqual([
@@ -263,10 +264,9 @@ describe('metrics/params column schema builder', () => {
         baseline: {}
       }
     })
-    const [paramsFileColumn] = columns.filter(
-      column => column.group === 'params'
-    ) as ColumnData[]
-    const [mixedColumn] = paramsFileColumn.childColumns as ColumnData[]
+    const mixedColumn = columns.find(
+      column => column.path === join('params', paramsYaml, 'mixedNumber')
+    ) as ColumnData
 
     expect(mixedColumn.minNumber).toEqual(-1)
     expect(mixedColumn.maxNumber).toEqual(1)
@@ -304,11 +304,10 @@ describe('metrics/params column schema builder', () => {
         baseline: {}
       }
     })
-    const [paramsFileColumn] = columns.filter(
+    const paramsFileColumn = columns.filter(
       column => column.group === 'params'
     ) as ColumnData[]
-    const [columnWithNumbers, columnWithoutNumbers] =
-      paramsFileColumn.childColumns as ColumnData[]
+    const [columnWithNumbers, columnWithoutNumbers] = paramsFileColumn
 
     it('does not add maxNumber or minNumber on a column with no numbers', () => {
       expect(columnWithoutNumbers.minNumber).toBeUndefined()
@@ -366,10 +365,9 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsYamlColumn] = columns.filter(
-      column => column.group === 'params'
+    const paramsColumns = columns.filter(
+      column => column.parentPath === join('params', paramsYaml)
     ) as ColumnData[]
-    const paramsColumns = paramsYamlColumn.childColumns as ColumnData[]
 
     expect(paramsColumns?.map(({ name }) => name)).toEqual([
       'one',
@@ -394,19 +392,26 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const [paramsYamlColumn] = columns.filter(
-      column => column.group === 'params'
-    ) as ColumnData[]
-    const [objectColumn] = paramsYamlColumn.childColumns as ColumnData[]
+    const objectColumn = columns.find(
+      column => column.parentPath === join('params', paramsYaml)
+    ) as ColumnData
 
     expect(objectColumn.name).toEqual('onlyHasChild')
-    expect(objectColumn.childColumns).toBeDefined()
     expect(objectColumn.types).toBeUndefined()
 
-    const [primitiveColumn] = objectColumn.childColumns as ColumnData[]
+    const primitiveColumn = columns.find(
+      column => column.parentPath === join('params', paramsYaml, 'onlyHasChild')
+    ) as ColumnData
 
     expect(primitiveColumn.name).toEqual('onlyHasPrimitive')
     expect(primitiveColumn.types).toBeDefined()
-    expect(primitiveColumn.childColumns).toBeUndefined()
+
+    const onlyHasPrimitiveChild = columns.find(
+      column =>
+        column.parentPath ===
+        join('params', paramsYaml, 'onlyHasChild', 'onlyHasPrimitive')
+    ) as ColumnData
+
+    expect(onlyHasPrimitiveChild).toBeUndefined()
   })
 })
