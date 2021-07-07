@@ -52,7 +52,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         resource => {
           const [dvcRoot, path] = this.getDetails(resource)
           const isSelected = this.experiments.setIsColumnSelected(dvcRoot, path)
-          this.treeDataChanged.fire(resource)
+          this.treeDataChanged.fire()
           return isSelected
         }
       )
