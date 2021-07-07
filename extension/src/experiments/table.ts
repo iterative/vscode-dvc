@@ -182,20 +182,28 @@ export class ExperimentsTable {
   }
 
   private setAreParentsSelected(path: string, isSelected: boolean) {
-    const OGcolumn = this.columnData?.find(column => column.path === path)
-    const parent = this.columnData?.find(
-      column => OGcolumn?.parentPath === column.path
-    )
+    const changedColumn = this.getColumn(path)
+    if (!changedColumn) {
+      return
+    }
+    const parent = this.getColumn(changedColumn.parentPath)
     if (!parent) {
       return
     }
-    if (isSelected) {
-      this.isColumnSelected[parent.path] = isSelected
-      this.setAreParentsSelected(parent.path, isSelected)
+
+    return this.checkSiblings(parent.path, isSelected)
+  }
+
+  private checkSiblings(parentPath: string, isSelected: boolean) {
+    const isAnySiblingSelected = !!this.columnData?.find(
+      column =>
+        parentPath === column.parentPath && this.isColumnSelected[column.path]
+    )
+
+    if ((!isAnySiblingSelected && !isSelected) || isSelected) {
+      this.isColumnSelected[parentPath] = isSelected
+      this.setAreParentsSelected(parentPath, isSelected)
     }
-    // const siblings = this.columnData?.filter(
-    //   column => column.parentPath === OGcolumn.parentPath
-    // )
   }
 
   private resetWebview = () => {
