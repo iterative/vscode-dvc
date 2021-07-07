@@ -166,10 +166,11 @@ export class ExperimentsTable {
     if (descending === undefined) {
       return
     }
-    return this.setCurrentSort({
+    this.setCurrentSort({
       columnPath: pickedColumn.path.split('/'),
       descending
     })
+    this.sendData()
   }
 
   private applySorts() {
@@ -193,6 +194,7 @@ export class ExperimentsTable {
   }
 
   private updateRowData(): void {
+    this.applySorts()
     const { workspace, sortedRows } = this
     this.rowData = sortedRows
       ? [workspace as Experiment, ...(sortedRows as Experiment[])]
@@ -222,7 +224,6 @@ export class ExperimentsTable {
     this.workspace = workspace
     this.unsortedRows = branches
 
-    this.applySorts()
     this.updateRowData()
 
     return this.sendData()
