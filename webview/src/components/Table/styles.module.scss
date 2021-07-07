@@ -197,11 +197,10 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     white-space: nowrap;
     text-align: left;
     min-width: 0;
-    padding: 0 0.25rem;
   }
   .td {
     padding: 0 0.25rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     line-height: 2rem;
     align-items: center;
   }
@@ -210,32 +209,23 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     padding-left: 0.7rem;
   }
   .groupedCell,
-  .groupedHeader {
+  .placeholderHeaderCell {
     transition: 0.2s all;
-    background-color: var(--vscode-button-background);
-    &:hover {
-      background-color: var(--vscode-button-hoverBackground);
-    }
-  }
-  .parentHeaderCell {
-    text-align: left;
-    padding: 0.1rem 0.2rem;
-    font-size: 0.8rem;
-  }
-  .headersRow {
-    text-align: center;
-    font-weight: bold;
-    font-size: 0.9rem;
-    user-select: none;
     background-color: inherit;
-    border-bottom: 1px solid white;
-    .th {
-      border-bottom: 2px solid rgba(255, 255, 255, 0.5);
-      padding: 0.4rem 0.25rem;
-    }
-    .sortedHeader {
-      border-bottom: 2px solid rgba(255, 255, 255);
-    }
+    border-right: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  .headerCell {
+    @extend .placeholderHeaderCell;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    font-family: 'monospace';
+    font-size: 0.9rem;
+  }
+  .thead {
+    @extend .headerCell;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
   }
 }
 .webviewHeader {
@@ -250,27 +240,4 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 .experimentsButton:active {
   position: relative;
   top: 1px;
-}
-
-.pageHeading {
-  font-size: 1.6rem;
-  margin: 1rem;
-}
-
-.optionsPanel {
-  margin: 0.5rem 1rem;
-  summary {
-    outline: none;
-  }
-}
-
-.tableOptions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 0 1rem;
-  button {
-    background-color: rgb(54, 54, 54);
-  }
 }
