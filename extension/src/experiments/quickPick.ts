@@ -1,6 +1,7 @@
-import { window } from 'vscode'
+import { QuickPickOptions, window } from 'vscode'
+import { ColumnData } from './webview/contract'
 import { GcPreserveFlag } from '../cli/args'
-import { quickPickManyValues } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -38,4 +39,17 @@ export const pickGarbageCollectionFlags = () =>
       }
     ],
     { placeHolder: 'Select which Experiments to preserve' }
+  )
+
+export const pickFromColumnData = (
+  columnData: ColumnData[],
+  quickPickOptions: QuickPickOptions
+) =>
+  quickPickValue<ColumnData>(
+    columnData.map(column => ({
+      description: column.path,
+      label: column.name,
+      value: column
+    })),
+    quickPickOptions
   )

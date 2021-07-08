@@ -6,13 +6,14 @@ import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { buildExperimentSortFunction, SortDefinition } from './sorting'
+import { pickFromColumnData } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { QuickPickItemWithValue, quickPickValue } from '../vscode/quickPick'
+import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -144,26 +145,12 @@ export class ExperimentsTable {
   }
 
   public async pickSort() {
-    if (!this.columnData) {
-      window.showWarningMessage('There are no columns to sort from!')
-      return
+    if (!this.columnData || this.columnData.length === 0) {
+      return window.showErrorMessage('There are no columns to sort with!')
     }
-    const columnQuickPickItems: QuickPickItemWithValue<ColumnData>[] =
-      this.columnData.map(column => ({
-        description: column.path,
-        label: column.name,
-        value: column
-      }))
-    if (!columnQuickPickItems || columnQuickPickItems.length === 0) {
-      window.showWarningMessage('There are no columns to sort from!')
-      return
-    }
-    const pickedColumn = await quickPickValue<ColumnData>(
-      columnQuickPickItems,
-      {
-        title: 'Select a column to sort'
-      }
-    )
+    const pickedColumn = await pickFromColumnData(this.columnData, {
+      title: 'Select a column to sort by'
+    })
     if (!pickedColumn) {
       return
     }
@@ -172,13 +159,13 @@ export class ExperimentsTable {
         { label: 'Ascending', value: false },
         { label: 'Descending', value: true }
       ],
-      { title: 'Select a direction to sort' }
+      { title: 'Select a direction to sort in' }
     )
     if (descending === undefined) {
       return
     }
-    this.setSort({
-      columnPath: pickedColumn.path.split('/'),
+    return this.setSort({
+      columnPath: pickedColumn.path,
       descending
     })
   }

@@ -1,9 +1,10 @@
-import { get } from 'lodash'
+import path from 'path'
+import get from 'lodash.get'
 import { Experiment } from './webview/contract'
 
 export interface SortDefinition {
   descending: boolean
-  columnPath: string[]
+  columnPath: string
 }
 
 const compareExperimentsByPath = (
@@ -19,7 +20,9 @@ const compareExperimentsByPath = (
 export const buildExperimentSortFunction = ({
   columnPath,
   descending
-}: SortDefinition): ((a: Experiment, b: Experiment) => number) =>
-  descending
-    ? (a, b) => compareExperimentsByPath(columnPath, b, a)
-    : (a, b) => compareExperimentsByPath(columnPath, a, b)
+}: SortDefinition): ((a: Experiment, b: Experiment) => number) => {
+  const columnPathArray = columnPath.split(path.sep)
+  return descending
+    ? (a, b) => compareExperimentsByPath(columnPathArray, b, a)
+    : (a, b) => compareExperimentsByPath(columnPathArray, a, b)
+}
