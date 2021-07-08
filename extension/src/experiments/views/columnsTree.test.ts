@@ -1,11 +1,12 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { commands, EventEmitter, TreeItem, window } from 'vscode'
+import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { ExperimentsColumnsTree } from './columnsTree'
 import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
+import { ColumnData } from '../webview/contract'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -19,22 +20,26 @@ const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetColumns = jest.fn()
+const mockedGetChildColumns = jest.fn()
+const mockedGetColumn = jest.fn()
 const mockedGetDvcRoots = jest.fn()
 const mockedExperiments = {
-  getColumns: mockedGetColumns,
+  getChildColumns: mockedGetChildColumns,
+  getColumn: mockedGetColumn,
   getDvcRoots: mockedGetDvcRoots
 } as unknown as Experiments
 
+const mockedSelectedCheckbox = {
+  dark: join('path', 'to', 'selected-checkbox.svg'),
+  light: join('path', 'to', 'selected-checkbox.svg')
+}
+const mockedUnselectedCheckbox = {
+  dark: join('path', 'to', 'unselected-checkbox.svg'),
+  light: join('path', 'to', 'unselected-checkbox.svg')
+}
 const mockedResourceLocator = {
-  selectedCheckbox: {
-    dark: join('path', 'to', 'selected-checkbox.svg'),
-    light: join('path', 'to', 'selected-checkbox.svg')
-  },
-  unselectedCheckbox: {
-    dark: join('path', 'to', 'unselected-checkbox.svg'),
-    light: join('path', 'to', 'unselected-checkbox.svg')
-  }
+  selectedCheckbox: mockedSelectedCheckbox,
+  unselectedCheckbox: mockedUnselectedCheckbox
 } as unknown as ResourceLocator
 
 jest.mock('vscode')
@@ -80,19 +85,27 @@ describe('ExperimentsColumnsTree', () => {
 
       experimentColumnsTree.getChildren()
 
-      mockedGetColumns.mockReturnValueOnce(complexColumnData)
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(column =>
+          ['metrics', 'params'].includes(column.parentPath)
+        )
+      )
 
       const children = experimentColumnsTree.getChildren(mockedDvcRoot)
-      const paramsPath = join(mockedDvcRoot, 'params', 'params.yaml')
+      const relParamsPath = join('params', 'params.yaml')
+      const paramsPath = join(mockedDvcRoot, relParamsPath)
 
       expect(children).toEqual([
         paramsPath,
         join(mockedDvcRoot, 'metrics', 'summary.json')
       ])
 
-      mockedGetColumns.mockReturnValueOnce(complexColumnData)
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(column => relParamsPath === column.parentPath)
+      )
       const grandChildren = experimentColumnsTree.getChildren(paramsPath)
-      const paramsProcessPath = join(paramsPath, 'process')
+      const relParamsProcessPath = join(relParamsPath, 'process')
+      const paramsProcessPath = join(mockedDvcRoot, relParamsProcessPath)
 
       expect(grandChildren).toEqual([
         join(paramsPath, 'epochs'),
@@ -103,7 +116,11 @@ describe('ExperimentsColumnsTree', () => {
         paramsProcessPath
       ])
 
-      mockedGetColumns.mockReturnValueOnce(complexColumnData)
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(
+          column => relParamsProcessPath === column.parentPath
+        )
+      )
       const greatGrandChildren =
         experimentColumnsTree.getChildren(paramsProcessPath)
 
@@ -141,6 +158,90 @@ describe('ExperimentsColumnsTree', () => {
       expect(treeItem).toEqual({
         ...mockedItem
       })
+    })
+  })
+
+  it('should return the correct tree item for a selected column with children', () => {
+    const mockedDvcRoot = join('dvc', 'repo')
+    mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+      return { collapsibleState, uri }
+    })
+
+    const experimentColumnsTree = new ExperimentsColumnsTree(
+      mockedExperiments,
+      mockedResourceLocator,
+      mockedTreeDataChanged
+    )
+
+    const relParamsPath = join('params', 'params.yml')
+    const paramsPath = join(mockedDvcRoot, relParamsPath)
+
+    jest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .spyOn(experimentColumnsTree as any, 'getDetails')
+      .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
+
+    mockedGetColumn.mockReturnValueOnce({
+      hasChildren: true,
+      isSelected: true
+    } as unknown as ColumnData)
+
+    const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
+
+    expect(mockedTreeItem).toBeCalledTimes(1)
+    expect(mockedGetColumn).toBeCalledTimes(1)
+    expect(mockedGetColumn).toBeCalledWith(mockedDvcRoot, relParamsPath)
+    expect(treeItem).toEqual({
+      collapsibleState: 1,
+      command: {
+        arguments: [paramsPath],
+        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        title: 'toggle'
+      },
+      iconPath: mockedSelectedCheckbox,
+      uri: Uri.file(paramsPath)
+    })
+  })
+
+  it('should return the correct tree item for a unselected column without children', () => {
+    const mockedDvcRoot = join('dvc', 'repo')
+    mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+      return { collapsibleState, uri }
+    })
+
+    const experimentColumnsTree = new ExperimentsColumnsTree(
+      mockedExperiments,
+      mockedResourceLocator,
+      mockedTreeDataChanged
+    )
+
+    const relParamsPath = join('params', 'prms.yml')
+    const paramsPath = join(mockedDvcRoot, relParamsPath)
+
+    jest
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .spyOn(experimentColumnsTree as any, 'getDetails')
+      .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
+
+    mockedGetColumn.mockReturnValueOnce({
+      hasChildren: false,
+      isSelected: false
+    } as unknown as ColumnData)
+
+    const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
+
+    expect(mockedTreeItem).toBeCalledTimes(1)
+    expect(mockedGetColumn).toBeCalledTimes(1)
+    expect(mockedGetColumn).toBeCalledWith(mockedDvcRoot, relParamsPath)
+    expect(treeItem).toEqual({
+      collapsibleState: 0,
+      command: {
+        arguments: [paramsPath],
+        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        title: 'toggle'
+      },
+      iconPath: mockedUnselectedCheckbox,
+      uri: Uri.file(paramsPath)
     })
   })
 })

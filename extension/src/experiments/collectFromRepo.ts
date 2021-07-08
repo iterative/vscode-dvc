@@ -10,6 +10,7 @@ import {
 
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
+  hasChildren: boolean
   group: string
   path: string
   parentPath: string
@@ -38,6 +39,7 @@ const getEntryOrDefault = (
 ) =>
   originalColumnsMap.get(propertyKey) || {
     group: ancestors[0],
+    hasChildren: false,
     parentPath: join(...ancestors),
     path: join(...ancestors, propertyKey)
   }
@@ -117,6 +119,7 @@ const mergeOrCreateColumnDescriptor = (
       ...ancestors,
       propertyKey
     )
+    columnDescriptor.hasChildren = true
     return columnDescriptor as PartialColumnDescriptor
   } else {
     if (!columnDescriptor.types) {

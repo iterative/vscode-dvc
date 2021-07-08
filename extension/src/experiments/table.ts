@@ -76,17 +76,26 @@ export class ExperimentsTable {
     return this.processManager.run('refresh')
   }
 
-  public getColumns() {
-    return this.columnData
+  public getColumn(path: string) {
+    const column = this.columnData?.find(column => column.path === path)
+    if (column) {
+      return { ...column, isSelected: this.isColumnSelected[column.path] }
+    }
   }
 
-  public getIsColumnSelected(path: string) {
-    return this.isColumnSelected[path]
+  public getChildColumns(path: string) {
+    return this.columnData?.filter(column =>
+      path
+        ? column.parentPath === path
+        : ['metrics', 'params'].includes(column.parentPath)
+    )
   }
 
   public setIsColumnSelected(path: string) {
     const isSelected = !this.isColumnSelected[path]
     this.isColumnSelected[path] = isSelected
+    this.setAreParentsSelected(path, isSelected)
+    this.setAreChildrenSelected(path, isSelected)
     this.sendData()
 
     return this.isColumnSelected[path]
@@ -245,6 +254,39 @@ export class ExperimentsTable {
         this.columnData?.filter(column => this.isColumnSelected[column.path]) ||
         [],
       rows: this.rowData || []
+    }
+  }
+
+  private setAreChildrenSelected(path: string, isSelected: boolean) {
+    return this.getChildColumns(path)?.map(column => {
+      const path = column.path
+      this.isColumnSelected[path] = isSelected
+      this.setAreChildrenSelected(path, isSelected)
+    })
+  }
+
+  private setAreParentsSelected(path: string, isSelected: boolean) {
+    const changedColumn = this.getColumn(path)
+    if (!changedColumn) {
+      return
+    }
+    const parent = this.getColumn(changedColumn.parentPath)
+    if (!parent) {
+      return
+    }
+
+    return this.checkSiblings(parent.path, isSelected)
+  }
+
+  private checkSiblings(parentPath: string, isSelected: boolean) {
+    const isAnySiblingSelected = !!this.columnData?.find(
+      column =>
+        parentPath === column.parentPath && this.isColumnSelected[column.path]
+    )
+
+    if ((!isAnySiblingSelected && !isSelected) || isSelected) {
+      this.isColumnSelected[parentPath] = isSelected
+      this.setAreParentsSelected(parentPath, isSelected)
     }
   }
 
