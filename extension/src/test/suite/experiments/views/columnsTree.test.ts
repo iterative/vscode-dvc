@@ -152,7 +152,7 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  it("should be able to select a child and set all it's ancestors to indeterminate selected with dvc.views.experimentColumnsTree.toggleSelected", async () => {
+  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentColumnsTree.toggleSelected", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
