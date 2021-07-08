@@ -93,7 +93,7 @@ export class ExperimentsTable {
   public setIsColumnSelected(path: string) {
     const isSelected = this.getNextStatus(path)
     this.isColumnSelected[path] = isSelected
-    this.setAreParentsSelected(path, isSelected)
+    this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, isSelected)
     this.sendData()
 
@@ -187,7 +187,7 @@ export class ExperimentsTable {
     })
   }
 
-  private setAreParentsSelected(path: string, isSelected: ColumnStatus) {
+  private setAreParentsSelected(path: string) {
     const changedColumn = this.getColumn(path)
     if (!changedColumn) {
       return
@@ -197,24 +197,48 @@ export class ExperimentsTable {
       return
     }
 
-    return this.checkSiblings(parent.path, isSelected)
+    const parentPath = parent.path
+
+    const status = this.getStatusFromChildren(parentPath)
+    this.isColumnSelected[parentPath] = status
+    this.setAreParentsSelected(parentPath)
   }
 
-  private checkSiblings(parentPath: string, isSelected: ColumnStatus) {
-    const isAnySiblingSelected = !!this.columnData?.find(
-      column =>
-        parentPath === column.parentPath && this.isColumnSelected[column.path]
-    )
+  private getStatusFromChildren(parentPath: string) {
+    const statuses = this.getChildStatuses(parentPath)
 
-    if ((!isAnySiblingSelected && !isSelected) || isSelected) {
-      this.isColumnSelected[parentPath] = isSelected
-      this.setAreParentsSelected(parentPath, isSelected)
+    const isAnySiblingSelected = statuses.includes(ColumnStatus.selected)
+    const isAnySiblingUnselected = statuses.includes(ColumnStatus.unselected)
+    const isAnySiblingPartial = statuses.includes(ColumnStatus.partially)
+
+    if (
+      (isAnySiblingSelected && isAnySiblingUnselected) ||
+      isAnySiblingPartial
+    ) {
+      return ColumnStatus.partially
     }
+
+    if (!isAnySiblingUnselected) {
+      return ColumnStatus.selected
+    }
+
+    return ColumnStatus.unselected
+  }
+
+  private getChildStatuses(parentPath: string): ColumnStatus[] {
+    return (
+      this.getChildColumns(parentPath)?.map(
+        column => this.isColumnSelected[column.path]
+      ) || []
+    )
   }
 
   private getNextStatus(path: string) {
     const isSelected = this.isColumnSelected[path]
-    return !isSelected ? ColumnStatus.selected : ColumnStatus.unselected
+    if (isSelected === ColumnStatus.selected) {
+      return ColumnStatus.unselected
+    }
+    return ColumnStatus.selected
   }
 
   private resetWebview = () => {

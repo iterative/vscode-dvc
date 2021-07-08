@@ -152,7 +152,7 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  it("should be able to select a child and set all it's ancestors to selected with dvc.views.experimentColumnsTree.toggleSelected", async () => {
+  it("should be able to select a child and set all it's ancestors to partially selected with dvc.views.experimentColumnsTree.toggleSelected", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
@@ -214,11 +214,11 @@ suite('Extension Test Suite', () => {
     expect(isSelected).to.equal(ColumnStatus.selected)
 
     expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
-      isSelected
+      ColumnStatus.partially
     )
 
     expect(experimentsTable.getColumn(grandParentPath)?.isSelected).to.equal(
-      isSelected
+      ColumnStatus.partially
     )
   })
 
