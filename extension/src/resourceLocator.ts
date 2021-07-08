@@ -1,12 +1,15 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Uri } from 'vscode'
 
+type Resource = { dark: Uri; light: Uri }
+
 export class ResourceLocator {
   public dispose = Disposable.fn()
 
-  public readonly dvcIcon: { dark: Uri; light: Uri }
-  public readonly selectedCheckbox: { dark: Uri; light: Uri }
-  public readonly unselectedCheckbox: { dark: Uri; light: Uri }
+  public readonly dvcIcon: Resource
+  public readonly selectedCheckbox: Resource
+  public readonly unselectedCheckbox: Resource
+  public readonly partialSelectedCheckbox: Resource
 
   private extensionUri: Uri
 
@@ -17,6 +20,9 @@ export class ResourceLocator {
     this.selectedCheckbox = this.getResourceLocations('selected-checkbox.svg')
     this.unselectedCheckbox = this.getResourceLocations(
       'unselected-checkbox.svg'
+    )
+    this.partialSelectedCheckbox = this.getResourceLocations(
+      'partial-selected-checkbox.svg'
     )
   }
 
