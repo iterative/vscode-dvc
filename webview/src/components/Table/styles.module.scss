@@ -209,23 +209,20 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     padding-left: 0.7rem;
   }
   .groupedCell,
+  .thead {
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+  }
   .placeholderHeaderCell {
     background-color: inherit;
     border-right: 1px solid rgba(255, 255, 255, 0.5);
   }
-
   .headerCell {
     @extend .placeholderHeaderCell;
     text-align: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     font-family: 'monospace';
     font-size: 0.9rem;
-  }
-  .thead {
-    @extend .headerCell;
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    border-left: 1px solid rgba(255, 255, 255, 0.5);
-    border-right: none;
   }
 }
 .webviewHeader {
