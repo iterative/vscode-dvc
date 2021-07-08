@@ -7,6 +7,7 @@ import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { ColumnData } from '../webview/contract'
+import { ColumnStatus } from '../table'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -183,7 +184,7 @@ describe('ExperimentsColumnsTree', () => {
 
     mockedGetColumn.mockReturnValueOnce({
       hasChildren: true,
-      isSelected: true
+      isSelected: ColumnStatus.selected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
@@ -225,7 +226,7 @@ describe('ExperimentsColumnsTree', () => {
 
     mockedGetColumn.mockReturnValueOnce({
       hasChildren: false,
-      isSelected: false
+      isSelected: ColumnStatus.unselected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)

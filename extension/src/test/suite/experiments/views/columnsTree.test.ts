@@ -7,7 +7,7 @@ import { Disposable } from '../../../../extension'
 import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
 import { ExperimentsColumnsTree } from '../../../../experiments/views/columnsTree'
 import { Experiments } from '../../../../experiments'
-import { ExperimentsTable } from '../../../../experiments/table'
+import { ColumnStatus, ExperimentsTable } from '../../../../experiments/table'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
@@ -81,18 +81,18 @@ suite('Extension Test Suite', () => {
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
-      expect(isUnselected).to.be.false
+      expect(isUnselected).to.equal(ColumnStatus.unselected)
 
       const isSelected = await commands.executeCommand(toggleCommand, absPath)
 
-      expect(isSelected).to.be.true
+      expect(isSelected).to.equal(ColumnStatus.selected)
 
       const isUnselectedAgain = await commands.executeCommand(
         toggleCommand,
         absPath
       )
 
-      expect(isUnselectedAgain).to.be.false
+      expect(isUnselectedAgain).to.equal(ColumnStatus.unselected)
     })
 
     it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentColumnsTree.toggleSelected", async () => {
@@ -134,14 +134,15 @@ suite('Extension Test Suite', () => {
 
       const allChildren = [...selectedChildren, ...selectedGrandChildren]
 
-      allChildren.map(
-        column =>
-          expect(experimentsTable.getColumn(column.path)?.isSelected).to.be.true
+      allChildren.map(column =>
+        expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+          ColumnStatus.selected
+        )
       )
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
-      expect(isUnselected).to.be.false
+      expect(isUnselected).to.equal(ColumnStatus.unselected)
 
       allChildren.map(column =>
         expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
@@ -197,9 +198,10 @@ suite('Extension Test Suite', () => {
 
     await commands.executeCommand(toggleCommand, absPath)
 
-    allColumns.map(
-      column =>
-        expect(experimentsTable.getColumn(column.path)?.isSelected).to.be.false
+    allColumns.map(column =>
+      expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+        ColumnStatus.unselected
+      )
     )
 
     const [firstGrandChild] = selectedGrandChildren
@@ -209,7 +211,7 @@ suite('Extension Test Suite', () => {
       join(dvcDemoPath, firstGrandChild.path)
     )
 
-    expect(isSelected).to.be.true
+    expect(isSelected).to.equal(ColumnStatus.selected)
 
     expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
       isSelected
@@ -265,17 +267,18 @@ suite('Extension Test Suite', () => {
       join(dvcDemoPath, firstGrandChild.path)
     )
 
-    expect(isSelected).to.be.true
+    expect(isSelected).to.equal(ColumnStatus.selected)
 
-    expect(experimentsTable.getColumn(secondGrandChild.path)?.isSelected).to.be
-      .false
+    expect(
+      experimentsTable.getColumn(secondGrandChild.path)?.isSelected
+    ).to.equal(ColumnStatus.unselected)
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
       join(dvcDemoPath, firstGrandChild.path)
     )
 
-    expect(lastSelectedIsUnselected).to.be.false
+    expect(lastSelectedIsUnselected).to.equal(ColumnStatus.unselected)
     expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
       lastSelectedIsUnselected
     )
