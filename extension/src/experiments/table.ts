@@ -128,19 +128,20 @@ export class ExperimentsTable {
     )
   }
 
-  public setCurrentSort(sort: SortDefinition | undefined) {
+  public setSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
     this.updateRowData()
     this.sendData()
   }
 
-  public async pickCurrentSort() {
+  public async pickSort() {
     if (!this.columnData) {
       window.showWarningMessage('There are no columns to sort from!')
       return
     }
     const columnQuickPickItems: QuickPickItemWithValue<ColumnData>[] =
       this.columnData.map(column => ({
+        description: column.path,
         label: column.name,
         value: column
       }))
@@ -167,7 +168,7 @@ export class ExperimentsTable {
     if (descending === undefined) {
       return
     }
-    this.setCurrentSort({
+    this.setSort({
       columnPath: pickedColumn.path.split('/'),
       descending
     })

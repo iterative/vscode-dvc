@@ -44,13 +44,22 @@ export class Experiments {
     return this.initialized
   }
 
-  public async setSort() {
+  public async pickSort() {
     const tableRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!tableRoot) {
       return
     }
     const table = this.experiments[tableRoot]
-    table.pickCurrentSort()
+    table.pickSort()
+  }
+
+  public async clearSort() {
+    const tableRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!tableRoot) {
+      return
+    }
+    const table = this.experiments[tableRoot]
+    table.setSort(undefined)
   }
 
   public getFocused(): ExperimentsTable | undefined {

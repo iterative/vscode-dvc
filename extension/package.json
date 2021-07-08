@@ -206,6 +206,11 @@
         "title": "%command.setExperimentsTableSort%",
         "command": "dvc.setExperimentsTableSort",
         "category": "DVC"
+      },
+      {
+        "title": "%command.clearExperimentsTableSort%",
+        "command": "dvc.clearExperimentsTableSort",
+        "category": "DVC"
       }
     ],
     "configuration": {
