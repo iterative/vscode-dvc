@@ -14,6 +14,12 @@ import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
+export enum ColumnStatus {
+  selected = 2,
+  indeterminate = 1,
+  unselected = 0
+}
+
 export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
@@ -34,7 +40,7 @@ export class ExperimentsTable {
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
 
-  private isColumnSelected: Record<string, boolean> = {}
+  private columnStatus: Record<string, ColumnStatus> = {}
 
   private processManager: ProcessManager
 
@@ -72,7 +78,7 @@ export class ExperimentsTable {
   public getColumn(path: string) {
     const column = this.columnData?.find(column => column.path === path)
     if (column) {
-      return { ...column, isSelected: this.isColumnSelected[column.path] }
+      return { ...column, isSelected: this.columnStatus[column.path] }
     }
   }
 
@@ -85,13 +91,13 @@ export class ExperimentsTable {
   }
 
   public setIsColumnSelected(path: string) {
-    const isSelected = !this.isColumnSelected[path]
-    this.isColumnSelected[path] = isSelected
-    this.setAreParentsSelected(path, isSelected)
+    const isSelected = this.getNextStatus(path)
+    this.columnStatus[path] = isSelected
+    this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, isSelected)
     this.sendData()
 
-    return this.isColumnSelected[path]
+    return this.columnStatus[path]
   }
 
   public showWebview = async () => {
@@ -144,8 +150,8 @@ export class ExperimentsTable {
     const { columns, branches, workspace } = transformExperimentsRepo(data)
 
     columns.forEach(column => {
-      if (this.isColumnSelected[column.path] === undefined) {
-        this.isColumnSelected[column.path] = true
+      if (this.columnStatus[column.path] === undefined) {
+        this.columnStatus[column.path] = ColumnStatus.selected
       }
     })
 
@@ -167,21 +173,22 @@ export class ExperimentsTable {
   private getTableData(): TableData {
     return {
       columns:
-        this.columnData?.filter(column => this.isColumnSelected[column.path]) ||
-        [],
+        this.columnData?.filter(
+          column => this.columnStatus[column.path] !== ColumnStatus.unselected
+        ) || [],
       rows: this.rowData || []
     }
   }
 
-  private setAreChildrenSelected(path: string, isSelected: boolean) {
+  private setAreChildrenSelected(path: string, isSelected: ColumnStatus) {
     return this.getChildColumns(path)?.map(column => {
       const path = column.path
-      this.isColumnSelected[path] = isSelected
+      this.columnStatus[path] = isSelected
       this.setAreChildrenSelected(path, isSelected)
     })
   }
 
-  private setAreParentsSelected(path: string, isSelected: boolean) {
+  private setAreParentsSelected(path: string) {
     const changedColumn = this.getColumn(path)
     if (!changedColumn) {
       return
@@ -191,19 +198,50 @@ export class ExperimentsTable {
       return
     }
 
-    return this.checkSiblings(parent.path, isSelected)
+    const parentPath = parent.path
+
+    const status = this.getStatusFromChildren(parentPath)
+    this.columnStatus[parentPath] = status
+    this.setAreParentsSelected(parentPath)
   }
 
-  private checkSiblings(parentPath: string, isSelected: boolean) {
-    const isAnySiblingSelected = !!this.columnData?.find(
-      column =>
-        parentPath === column.parentPath && this.isColumnSelected[column.path]
+  private getStatusFromChildren(parentPath: string) {
+    const statuses = this.getChildStatuses(parentPath)
+
+    const isAnyChildSelected = statuses.includes(ColumnStatus.selected)
+    const isAnyChildUnselected = statuses.includes(ColumnStatus.unselected)
+    const isAnyChildIndeterminate = statuses.includes(
+      ColumnStatus.indeterminate
     )
 
-    if ((!isAnySiblingSelected && !isSelected) || isSelected) {
-      this.isColumnSelected[parentPath] = isSelected
-      this.setAreParentsSelected(parentPath, isSelected)
+    if (
+      (isAnyChildSelected && isAnyChildUnselected) ||
+      isAnyChildIndeterminate
+    ) {
+      return ColumnStatus.indeterminate
     }
+
+    if (!isAnyChildUnselected) {
+      return ColumnStatus.selected
+    }
+
+    return ColumnStatus.unselected
+  }
+
+  private getChildStatuses(parentPath: string): ColumnStatus[] {
+    return (
+      this.getChildColumns(parentPath)?.map(
+        column => this.columnStatus[column.path]
+      ) || []
+    )
+  }
+
+  private getNextStatus(path: string) {
+    const isSelected = this.columnStatus[path]
+    if (isSelected === ColumnStatus.selected) {
+      return ColumnStatus.unselected
+    }
+    return ColumnStatus.selected
   }
 
   private resetWebview = () => {

@@ -7,6 +7,7 @@ import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { ColumnData } from '../webview/contract'
+import { ColumnStatus } from '../table'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -30,16 +31,21 @@ const mockedExperiments = {
 } as unknown as Experiments
 
 const mockedSelectedCheckbox = {
-  dark: join('path', 'to', 'selected-checkbox.svg'),
-  light: join('path', 'to', 'selected-checkbox.svg')
+  dark: join('path', 'to', 'checkbox-c.svg'),
+  light: join('path', 'to', 'checkbox-c.svg')
 }
-const mockedUnselectedCheckbox = {
-  dark: join('path', 'to', 'unselected-checkbox.svg'),
-  light: join('path', 'to', 'unselected-checkbox.svg')
+const mockedIndeterminateCheckbox = {
+  dark: join('path', 'to', 'checkbox-i.svg'),
+  light: join('path', 'to', 'checkbox-i.svg')
+}
+const mockedEmptyCheckbox = {
+  dark: join('path', 'to', 'checkbox-e.svg'),
+  light: join('path', 'to', 'checkbox-e.svg')
 }
 const mockedResourceLocator = {
-  selectedCheckbox: mockedSelectedCheckbox,
-  unselectedCheckbox: mockedUnselectedCheckbox
+  checkedCheckbox: mockedSelectedCheckbox,
+  emptyCheckbox: mockedEmptyCheckbox,
+  indeterminateCheckbox: mockedIndeterminateCheckbox
 } as unknown as ResourceLocator
 
 jest.mock('vscode')
@@ -183,7 +189,7 @@ describe('ExperimentsColumnsTree', () => {
 
     mockedGetColumn.mockReturnValueOnce({
       hasChildren: true,
-      isSelected: true
+      isSelected: ColumnStatus.selected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
@@ -225,7 +231,7 @@ describe('ExperimentsColumnsTree', () => {
 
     mockedGetColumn.mockReturnValueOnce({
       hasChildren: false,
-      isSelected: false
+      isSelected: ColumnStatus.unselected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
@@ -240,7 +246,7 @@ describe('ExperimentsColumnsTree', () => {
         command: 'dvc.views.experimentColumnsTree.toggleSelected',
         title: 'toggle'
       },
-      iconPath: mockedUnselectedCheckbox,
+      iconPath: mockedEmptyCheckbox,
       uri: Uri.file(paramsPath)
     })
   })
