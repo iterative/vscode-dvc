@@ -213,10 +213,12 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-left: 1px solid rgba(255, 255, 255, 0.5);
   }
+
   .placeholderHeaderCell {
     background-color: inherit;
     border-right: 1px solid rgba(255, 255, 255, 0.5);
   }
+
   .headerCell {
     @extend .placeholderHeaderCell;
     text-align: center;
