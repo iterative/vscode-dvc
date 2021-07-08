@@ -1,5 +1,6 @@
 import { QuickPickOptions, window } from 'vscode'
 import { ColumnData } from './webview/contract'
+import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 
@@ -53,3 +54,32 @@ export const pickFromColumnData = (
     })),
     quickPickOptions
   )
+
+export const pickSort = async (
+  columnData: ColumnData[] | undefined
+): Promise<SortDefinition | undefined> => {
+  if (!columnData || columnData.length === 0) {
+    window.showErrorMessage('There are no columns to sort with!')
+    return
+  }
+  const pickedColumn = await pickFromColumnData(columnData, {
+    title: 'Select a column to sort by'
+  })
+  if (pickedColumn === undefined) {
+    return
+  }
+  const descending = await quickPickValue<boolean>(
+    [
+      { label: 'Ascending', value: false },
+      { label: 'Descending', value: true }
+    ],
+    { title: 'Select a direction to sort in' }
+  )
+  if (descending === undefined) {
+    return
+  }
+  return {
+    columnPath: pickedColumn.path,
+    descending
+  }
+}

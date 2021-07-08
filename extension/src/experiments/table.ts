@@ -1,19 +1,18 @@
 import { join, resolve } from 'path'
-import { Event, EventEmitter, window } from 'vscode'
+import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { buildExperimentSortFunction, SortDefinition } from './sorting'
-import { pickFromColumnData } from './quickPick'
+import { pickSort } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -151,29 +150,10 @@ export class ExperimentsTable {
   }
 
   public async pickSort() {
-    if (!this.columnData || this.columnData.length === 0) {
-      return window.showErrorMessage('There are no columns to sort with!')
+    const pickedSortDefinition = await pickSort(this.columnData)
+    if (pickedSortDefinition) {
+      return this.setSort(pickedSortDefinition)
     }
-    const pickedColumn = await pickFromColumnData(this.columnData, {
-      title: 'Select a column to sort by'
-    })
-    if (!pickedColumn) {
-      return
-    }
-    const descending = await quickPickValue<boolean>(
-      [
-        { label: 'Ascending', value: false },
-        { label: 'Descending', value: true }
-      ],
-      { title: 'Select a direction to sort in' }
-    )
-    if (descending === undefined) {
-      return
-    }
-    return this.setSort({
-      columnPath: pickedColumn.path,
-      descending
-    })
   }
 
   private applySorts() {
