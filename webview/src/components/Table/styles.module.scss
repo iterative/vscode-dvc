@@ -225,6 +225,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     @extend .headerCell;
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-left: 1px solid rgba(255, 255, 255, 0.5);
+    border-right: none;
   }
 }
 .webviewHeader {
