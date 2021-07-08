@@ -13,6 +13,7 @@ import {
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
 import { ColumnData } from '../webview/contract'
+import { ColumnStatus } from '../table'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -70,7 +71,6 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     const column = this.experiments.getColumn(dvcRoot, path)
     const hasChildren = !!column?.hasChildren
-    const isSelected = !!column?.isSelected
 
     const treeItem = new TreeItem(
       resourceUri,
@@ -85,22 +85,21 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       title: 'toggle'
     }
 
-    treeItem.iconPath = isSelected
-      ? this.resourceLocator.selectedCheckbox
-      : this.resourceLocator.unselectedCheckbox
+    treeItem.iconPath = this.getIconPath(column?.isSelected)
 
     return treeItem
   }
 
-  public getChildren(element?: string): string[] {
+  public getChildren(element?: string): Promise<string[]> {
     if (element) {
-      return this.getColumns(element)
+      return Promise.resolve(this.getColumns(element))
     }
 
     return this.getRootElements()
   }
 
-  private getRootElements() {
+  private async getRootElements() {
+    await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots() || []
     dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
@@ -134,5 +133,15 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   private getRoot(element: string) {
     return this.pathRoots[element]
+  }
+
+  private getIconPath(status?: ColumnStatus) {
+    if (status === ColumnStatus.selected) {
+      return this.resourceLocator.checkedCheckbox
+    }
+    if (status === ColumnStatus.indeterminate) {
+      return this.resourceLocator.indeterminateCheckbox
+    }
+    return this.resourceLocator.emptyCheckbox
   }
 }
