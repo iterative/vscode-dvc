@@ -3,7 +3,6 @@ import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
-import { Menu, MenuToggle, MenuItemGroup, MenuItem } from '../Menu'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>
@@ -13,7 +12,7 @@ export interface RowProp {
   row: Row<Experiment>
 }
 
-export const ParentHeaderGroup: React.FC<{
+export const MergedHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
 }> = ({ headerGroup }) => {
   return (
@@ -29,8 +28,7 @@ export const ParentHeaderGroup: React.FC<{
               styles.th,
               column.placeholderOf
                 ? styles.placeholderHeaderCell
-                : styles.parentHeaderCell,
-              column.isGrouped && styles.groupedHeader
+                : styles.headerCell
             )
           })}
           key={column.id}
@@ -95,64 +93,6 @@ export const FirstCell: React.FC<{
         className={row.original.queued ? styles.queuedBullet : styles.bullet}
       />
       {cell.isPlaceholder ? null : cell.render('Cell')}
-    </div>
-  )
-}
-
-export const PrimaryHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<Experiment>
-}> = ({ headerGroup }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
-
-  const onToggle = (isOpen: boolean) => {
-    setIsOpen(isOpen)
-  }
-
-  return (
-    <div
-      {...headerGroup.getHeaderGroupProps({
-        className: cx(styles.tr, styles.headersRow)
-      })}
-    >
-      {headerGroup.headers.map(header => (
-        <div key={`sort-header-${header.id}`}>
-          <Menu
-            id={`sort-menu-${header.id}`}
-            key={`sort-menu-${header.id}`}
-            menuItems={[
-              <MenuItemGroup
-                key={`sort-menu-item-group-${header.id}`}
-                id={`sort-menu-item-group-${header.id}`}
-              >
-                <MenuItem
-                  id={'Sort'}
-                  {...header.getHeaderProps({
-                    key: `sort-menu-item-asc_${header.id}`
-                  })}
-                >
-                  Sort Column
-                </MenuItem>
-                <MenuItem
-                  id={'Visibility'}
-                  key={`sort-menu-item-visibility-${header.id}`}
-                  onClick={() => header.toggleHidden()}
-                >
-                  Hide Column
-                </MenuItem>
-              </MenuItemGroup>
-            ]}
-            isOpen={isOpen}
-            toggle={
-              <MenuToggle
-                onToggle={onToggle}
-                toggleTemplate={header.Header}
-                id="toggle"
-                key={`sort-toggle-${header.id}`}
-              />
-            }
-          />
-        </div>
-      ))}
     </div>
   )
 }
@@ -263,12 +203,14 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
 export const TableHead: React.FC<InstanceProp> = ({
   instance: { headerGroups }
 }) => {
-  const lastHeaderGroupIndex = headerGroups.length - 1
-  const lastHeaderGroup = headerGroups[lastHeaderGroupIndex]
-
   return (
     <div className={styles.thead}>
-      <PrimaryHeaderGroup headerGroup={lastHeaderGroup} />
+      {headerGroups.map((headerGroup, i) => (
+        <MergedHeaderGroup
+          headerGroup={headerGroup}
+          key={`header-group-${i}`}
+        />
+      ))}
     </div>
   )
 }
