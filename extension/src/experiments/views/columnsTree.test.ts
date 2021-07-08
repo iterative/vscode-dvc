@@ -34,11 +34,16 @@ const mockedSelectedCheckbox = {
   dark: join('path', 'to', 'selected-checkbox.svg'),
   light: join('path', 'to', 'selected-checkbox.svg')
 }
+const mockedPartialSelectedCheckbox = {
+  dark: join('path', 'to', 'partial-selected-checkbox.svg'),
+  light: join('path', 'to', 'partial-selected-checkbox.svg')
+}
 const mockedUnselectedCheckbox = {
   dark: join('path', 'to', 'unselected-checkbox.svg'),
   light: join('path', 'to', 'unselected-checkbox.svg')
 }
 const mockedResourceLocator = {
+  partialSelectedCheckbox: mockedPartialSelectedCheckbox,
   selectedCheckbox: mockedSelectedCheckbox,
   unselectedCheckbox: mockedUnselectedCheckbox
 } as unknown as ResourceLocator
