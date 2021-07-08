@@ -27,7 +27,8 @@ const mockedGetDvcRoots = jest.fn()
 const mockedExperiments = {
   getChildColumns: mockedGetChildColumns,
   getColumn: mockedGetColumn,
-  getDvcRoots: mockedGetDvcRoots
+  getDvcRoots: mockedGetDvcRoots,
+  isReady: () => true
 } as unknown as Experiments
 
 const mockedSelectedCheckbox = {
@@ -63,7 +64,7 @@ beforeEach(() => {
 
 describe('ExperimentsColumnsTree', () => {
   describe('getChildren', () => {
-    it('should return the experiments roots if no path is provided', () => {
+    it('should return the experiments roots if no path is provided', async () => {
       const experimentColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedResourceLocator,
@@ -76,10 +77,10 @@ describe('ExperimentsColumnsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce(mockedDvcRoots)
 
-      expect(experimentColumnsTree.getChildren()).toEqual(mockedDvcRoots)
+      expect(await experimentColumnsTree.getChildren()).toEqual(mockedDvcRoots)
     })
 
-    it("should return the column's children if a path is provided", () => {
+    it("should return the column's children if a path is provided", async () => {
       const experimentColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedResourceLocator,
@@ -89,7 +90,7 @@ describe('ExperimentsColumnsTree', () => {
       const mockedDvcRoot = join('path', 'to', 'dvc', 'repo')
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
 
-      experimentColumnsTree.getChildren()
+      await experimentColumnsTree.getChildren()
 
       mockedGetChildColumns.mockReturnValueOnce(
         complexColumnData.filter(column =>
@@ -97,7 +98,7 @@ describe('ExperimentsColumnsTree', () => {
         )
       )
 
-      const children = experimentColumnsTree.getChildren(mockedDvcRoot)
+      const children = await experimentColumnsTree.getChildren(mockedDvcRoot)
       const relParamsPath = join('params', 'params.yaml')
       const paramsPath = join(mockedDvcRoot, relParamsPath)
 
@@ -109,7 +110,7 @@ describe('ExperimentsColumnsTree', () => {
       mockedGetChildColumns.mockReturnValueOnce(
         complexColumnData.filter(column => relParamsPath === column.parentPath)
       )
-      const grandChildren = experimentColumnsTree.getChildren(paramsPath)
+      const grandChildren = await experimentColumnsTree.getChildren(paramsPath)
       const relParamsProcessPath = join(relParamsPath, 'process')
       const paramsProcessPath = join(mockedDvcRoot, relParamsProcessPath)
 
@@ -127,8 +128,9 @@ describe('ExperimentsColumnsTree', () => {
           column => relParamsProcessPath === column.parentPath
         )
       )
-      const greatGrandChildren =
-        experimentColumnsTree.getChildren(paramsProcessPath)
+      const greatGrandChildren = await experimentColumnsTree.getChildren(
+        paramsProcessPath
+      )
 
       expect(greatGrandChildren).toEqual([
         join(paramsProcessPath, 'threshold'),
@@ -138,7 +140,7 @@ describe('ExperimentsColumnsTree', () => {
   })
 
   describe('getTreeItem', () => {
-    it('should return the correct tree item for a repository root', () => {
+    it('should return the correct tree item for a repository root', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(1)
@@ -156,7 +158,7 @@ describe('ExperimentsColumnsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
 
-      experimentColumnsTree.getChildren()
+      await experimentColumnsTree.getChildren()
 
       const treeItem = experimentColumnsTree.getTreeItem(mockedDvcRoot)
 

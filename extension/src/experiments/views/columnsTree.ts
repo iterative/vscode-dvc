@@ -90,15 +90,16 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     return treeItem
   }
 
-  public getChildren(element?: string): string[] {
+  public getChildren(element?: string): Promise<string[]> {
     if (element) {
-      return this.getColumns(element)
+      return Promise.resolve(this.getColumns(element))
     }
 
     return this.getRootElements()
   }
 
-  private getRootElements() {
+  private async getRootElements() {
+    await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots() || []
     dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
