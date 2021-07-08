@@ -1,6 +1,10 @@
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
-import { pickGarbageCollectionFlags, pickExperimentName } from './quickPick'
+import {
+  pickGarbageCollectionFlags,
+  pickExperimentName,
+  pickFromColumnData
+} from './quickPick'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 
 jest.mock('vscode')
@@ -84,6 +88,65 @@ describe('pickGarbageCollectionFlags', () => {
         canPickMany: true,
         placeHolder: 'Select which Experiments to preserve'
       }
+    )
+  })
+})
+
+describe('pickFromColumnData', () => {
+  it('invokes a QuickPick with the correct options', async () => {
+    const params = 'params'
+    const paramsYamlPath = 'params/params.yaml'
+    const epochsColumn = {
+      group: params,
+      hasChildren: false,
+      maxNumber: 5,
+      maxStringLength: 1,
+      minNumber: 2,
+      name: 'epochs',
+      parentPath: paramsYamlPath,
+      path: 'params/params.yaml/epochs',
+      types: ['number']
+    }
+    const testArgColumn = {
+      group: params,
+      hasChildren: false,
+      maxNumber: 3,
+      maxStringLength: 6,
+      minNumber: 3,
+      name: 'test_arg',
+      parentPath: 'params/params.yaml/process',
+      path: 'params/params.yaml/process/test_arg',
+      types: ['string', 'number']
+    }
+    const paramsYamlColumn = {
+      group: params,
+      hasChildren: true,
+      name: 'params.yaml',
+      parentPath: params,
+      path: paramsYamlPath
+    }
+    const testColumns = [epochsColumn, testArgColumn, paramsYamlColumn]
+    const title = 'Test title'
+    await pickFromColumnData(testColumns, { title })
+    expect(mockedShowQuickPick).toBeCalledWith(
+      [
+        {
+          description: 'params/params.yaml/epochs',
+          label: 'epochs',
+          value: epochsColumn
+        },
+        {
+          description: 'params/params.yaml/process/test_arg',
+          label: 'test_arg',
+          value: testArgColumn
+        },
+        {
+          description: paramsYamlPath,
+          label: 'params.yaml',
+          value: paramsYamlColumn
+        }
+      ],
+      { title }
     )
   })
 })
