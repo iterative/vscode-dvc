@@ -31,21 +31,21 @@ const mockedExperiments = {
 } as unknown as Experiments
 
 const mockedSelectedCheckbox = {
-  dark: join('path', 'to', 'selected-checkbox.svg'),
-  light: join('path', 'to', 'selected-checkbox.svg')
+  dark: join('path', 'to', 'checkbox-c.svg'),
+  light: join('path', 'to', 'checkbox-c.svg')
 }
-const mockedPartialSelectedCheckbox = {
-  dark: join('path', 'to', 'partial-selected-checkbox.svg'),
-  light: join('path', 'to', 'partial-selected-checkbox.svg')
+const mockedIndeterminateCheckbox = {
+  dark: join('path', 'to', 'checkbox-i.svg'),
+  light: join('path', 'to', 'checkbox-i.svg')
 }
-const mockedUnselectedCheckbox = {
-  dark: join('path', 'to', 'unselected-checkbox.svg'),
-  light: join('path', 'to', 'unselected-checkbox.svg')
+const mockedEmptyCheckbox = {
+  dark: join('path', 'to', 'checkbox-e.svg'),
+  light: join('path', 'to', 'checkbox-e.svg')
 }
 const mockedResourceLocator = {
-  partialSelectedCheckbox: mockedPartialSelectedCheckbox,
-  selectedCheckbox: mockedSelectedCheckbox,
-  unselectedCheckbox: mockedUnselectedCheckbox
+  checkedCheckbox: mockedSelectedCheckbox,
+  emptyCheckbox: mockedEmptyCheckbox,
+  indeterminateCheckbox: mockedIndeterminateCheckbox
 } as unknown as ResourceLocator
 
 jest.mock('vscode')
@@ -246,7 +246,7 @@ describe('ExperimentsColumnsTree', () => {
         command: 'dvc.views.experimentColumnsTree.toggleSelected',
         title: 'toggle'
       },
-      iconPath: mockedUnselectedCheckbox,
+      iconPath: mockedEmptyCheckbox,
       uri: Uri.file(paramsPath)
     })
   })

@@ -136,11 +136,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   private getIconPath(status?: ColumnStatus) {
     if (status === ColumnStatus.selected) {
-      return this.resourceLocator.selectedCheckbox
+      return this.resourceLocator.checkedCheckbox
     }
-    if (status === ColumnStatus.partially) {
-      return this.resourceLocator.partialSelectedCheckbox
+    if (status === ColumnStatus.indeterminate) {
+      return this.resourceLocator.indeterminateCheckbox
     }
-    return this.resourceLocator.unselectedCheckbox
+    return this.resourceLocator.emptyCheckbox
   }
 }

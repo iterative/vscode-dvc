@@ -16,7 +16,7 @@ export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
 export enum ColumnStatus {
   selected = 2,
-  partially = 1,
+  indeterminate = 1,
   unselected = 0
 }
 
@@ -40,7 +40,7 @@ export class ExperimentsTable {
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
 
-  private isColumnSelected: Record<string, ColumnStatus> = {}
+  private columnStatus: Record<string, ColumnStatus> = {}
 
   private processManager: ProcessManager
 
@@ -78,7 +78,7 @@ export class ExperimentsTable {
   public getColumn(path: string) {
     const column = this.columnData?.find(column => column.path === path)
     if (column) {
-      return { ...column, isSelected: this.isColumnSelected[column.path] }
+      return { ...column, isSelected: this.columnStatus[column.path] }
     }
   }
 
@@ -92,12 +92,12 @@ export class ExperimentsTable {
 
   public setIsColumnSelected(path: string) {
     const isSelected = this.getNextStatus(path)
-    this.isColumnSelected[path] = isSelected
+    this.columnStatus[path] = isSelected
     this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, isSelected)
     this.sendData()
 
-    return this.isColumnSelected[path]
+    return this.columnStatus[path]
   }
 
   public showWebview = async () => {
@@ -150,8 +150,8 @@ export class ExperimentsTable {
     const { columns, branches, workspace } = transformExperimentsRepo(data)
 
     columns.forEach(column => {
-      if (this.isColumnSelected[column.path] === undefined) {
-        this.isColumnSelected[column.path] = ColumnStatus.selected
+      if (this.columnStatus[column.path] === undefined) {
+        this.columnStatus[column.path] = ColumnStatus.selected
       }
     })
 
@@ -173,8 +173,9 @@ export class ExperimentsTable {
   private getTableData(): TableData {
     return {
       columns:
-        this.columnData?.filter(column => this.isColumnSelected[column.path]) ||
-        [],
+        this.columnData?.filter(
+          column => this.columnStatus[column.path] !== ColumnStatus.unselected
+        ) || [],
       rows: this.rowData || []
     }
   }
@@ -182,7 +183,7 @@ export class ExperimentsTable {
   private setAreChildrenSelected(path: string, isSelected: ColumnStatus) {
     return this.getChildColumns(path)?.map(column => {
       const path = column.path
-      this.isColumnSelected[path] = isSelected
+      this.columnStatus[path] = isSelected
       this.setAreChildrenSelected(path, isSelected)
     })
   }
@@ -200,25 +201,27 @@ export class ExperimentsTable {
     const parentPath = parent.path
 
     const status = this.getStatusFromChildren(parentPath)
-    this.isColumnSelected[parentPath] = status
+    this.columnStatus[parentPath] = status
     this.setAreParentsSelected(parentPath)
   }
 
   private getStatusFromChildren(parentPath: string) {
     const statuses = this.getChildStatuses(parentPath)
 
-    const isAnySiblingSelected = statuses.includes(ColumnStatus.selected)
-    const isAnySiblingUnselected = statuses.includes(ColumnStatus.unselected)
-    const isAnySiblingPartial = statuses.includes(ColumnStatus.partially)
+    const isAnyChildSelected = statuses.includes(ColumnStatus.selected)
+    const isAnyChildUnselected = statuses.includes(ColumnStatus.unselected)
+    const isAnyChildIndeterminate = statuses.includes(
+      ColumnStatus.indeterminate
+    )
 
     if (
-      (isAnySiblingSelected && isAnySiblingUnselected) ||
-      isAnySiblingPartial
+      (isAnyChildSelected && isAnyChildUnselected) ||
+      isAnyChildIndeterminate
     ) {
-      return ColumnStatus.partially
+      return ColumnStatus.indeterminate
     }
 
-    if (!isAnySiblingUnselected) {
+    if (!isAnyChildUnselected) {
       return ColumnStatus.selected
     }
 
@@ -228,13 +231,13 @@ export class ExperimentsTable {
   private getChildStatuses(parentPath: string): ColumnStatus[] {
     return (
       this.getChildColumns(parentPath)?.map(
-        column => this.isColumnSelected[column.path]
+        column => this.columnStatus[column.path]
       ) || []
     )
   }
 
   private getNextStatus(path: string) {
-    const isSelected = this.isColumnSelected[path]
+    const isSelected = this.columnStatus[path]
     if (isSelected === ColumnStatus.selected) {
       return ColumnStatus.unselected
     }
