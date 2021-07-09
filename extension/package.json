@@ -468,7 +468,12 @@
       "dvc-views": [
         {
           "id": "dvc.views.experimentColumnsTree",
-          "name": "Experiment Columns",
+          "name": "Columns",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
+          "id": "dvc.views.experimentSortByTree",
+          "name": "Sort By",
           "when": "dvc.commands.available == true && dvc.project.available == true"
         }
       ]
