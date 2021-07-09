@@ -190,8 +190,9 @@ describe('ExperimentsColumnsTree', () => {
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
     mockedGetColumn.mockReturnValueOnce({
+      descendantMetadata: '3/4',
       hasChildren: true,
-      isSelected: ColumnStatus.selected
+      status: ColumnStatus.selected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
@@ -203,9 +204,10 @@ describe('ExperimentsColumnsTree', () => {
       collapsibleState: 1,
       command: {
         arguments: [paramsPath],
-        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        command: 'dvc.views.experimentColumnsTree.toggleStatus',
         title: 'toggle'
       },
+      description: '3/4',
       iconPath: mockedSelectedCheckbox,
       uri: Uri.file(paramsPath)
     })
@@ -233,7 +235,7 @@ describe('ExperimentsColumnsTree', () => {
 
     mockedGetColumn.mockReturnValueOnce({
       hasChildren: false,
-      isSelected: ColumnStatus.unselected
+      status: ColumnStatus.unselected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
@@ -245,7 +247,7 @@ describe('ExperimentsColumnsTree', () => {
       collapsibleState: 0,
       command: {
         arguments: [paramsPath],
-        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        command: 'dvc.views.experimentColumnsTree.toggleStatus',
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,
