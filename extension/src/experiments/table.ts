@@ -81,7 +81,7 @@ export class ExperimentsTable {
       return {
         ...column,
         descendantMetadata: this.getDescendantMetaData(column),
-        isSelected: this.columnStatus[column.path]
+        status: this.columnStatus[column.path]
       }
     }
   }
@@ -95,10 +95,10 @@ export class ExperimentsTable {
   }
 
   public setIsColumnSelected(path: string) {
-    const isSelected = this.getNextStatus(path)
-    this.columnStatus[path] = isSelected
+    const status = this.getNextStatus(path)
+    this.columnStatus[path] = status
     this.setAreParentsSelected(path)
-    this.setAreChildrenSelected(path, isSelected)
+    this.setAreChildrenSelected(path, status)
     this.sendData()
 
     return this.columnStatus[path]
@@ -184,11 +184,11 @@ export class ExperimentsTable {
     }
   }
 
-  private setAreChildrenSelected(path: string, isSelected: ColumnStatus) {
+  private setAreChildrenSelected(path: string, status: ColumnStatus) {
     return this.getChildColumns(path)?.map(column => {
       const path = column.path
-      this.columnStatus[path] = isSelected
-      this.setAreChildrenSelected(path, isSelected)
+      this.columnStatus[path] = status
+      this.setAreChildrenSelected(path, status)
     })
   }
 
@@ -240,8 +240,8 @@ export class ExperimentsTable {
   }
 
   private getNextStatus(path: string) {
-    const isSelected = this.columnStatus[path]
-    if (isSelected === ColumnStatus.selected) {
+    const status = this.columnStatus[path]
+    if (status === ColumnStatus.selected) {
       return ColumnStatus.unselected
     }
     return ColumnStatus.selected

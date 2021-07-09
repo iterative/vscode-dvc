@@ -135,7 +135,7 @@ suite('Extension Test Suite', () => {
       const allChildren = [...selectedChildren, ...selectedGrandChildren]
 
       allChildren.map(column =>
-        expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+        expect(experimentsTable.getColumn(column.path)?.status).to.equal(
           ColumnStatus.selected
         )
       )
@@ -149,7 +149,7 @@ suite('Extension Test Suite', () => {
       expect(isUnselected).to.equal(ColumnStatus.unselected)
 
       allChildren.map(column =>
-        expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+        expect(experimentsTable.getColumn(column.path)?.status).to.equal(
           isUnselected
         )
       )
@@ -207,7 +207,7 @@ suite('Extension Test Suite', () => {
     await commands.executeCommand(toggleCommand, absPath)
 
     allColumns.map(column =>
-      expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+      expect(experimentsTable.getColumn(column.path)?.status).to.equal(
         ColumnStatus.unselected
       )
     )
@@ -222,11 +222,11 @@ suite('Extension Test Suite', () => {
     expect(isSelected).to.equal(ColumnStatus.selected)
 
     const parentColumn = experimentsTable.getColumn(parentPath)
-    expect(parentColumn?.isSelected).to.equal(ColumnStatus.indeterminate)
+    expect(parentColumn?.status).to.equal(ColumnStatus.indeterminate)
     expect(parentColumn?.descendantMetadata).to.equal('1/2')
 
     const grandParentColumn = experimentsTable.getColumn(grandParentPath)
-    expect(grandParentColumn?.isSelected).to.equal(ColumnStatus.indeterminate)
+    expect(grandParentColumn?.status).to.equal(ColumnStatus.indeterminate)
     expect(grandParentColumn?.descendantMetadata).to.equal('2/8')
   })
 
@@ -277,9 +277,9 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(ColumnStatus.selected)
 
-    expect(
-      experimentsTable.getColumn(secondGrandChild.path)?.isSelected
-    ).to.equal(ColumnStatus.unselected)
+    expect(experimentsTable.getColumn(secondGrandChild.path)?.status).to.equal(
+      ColumnStatus.unselected
+    )
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
@@ -289,11 +289,11 @@ suite('Extension Test Suite', () => {
     expect(lastSelectedIsUnselected).to.equal(ColumnStatus.unselected)
 
     const parentColumn = experimentsTable.getColumn(parentPath)
-    expect(parentColumn?.isSelected).to.equal(lastSelectedIsUnselected)
+    expect(parentColumn?.status).to.equal(lastSelectedIsUnselected)
     expect(parentColumn?.descendantMetadata).to.equal('0/2')
 
     const grandParentColumn = experimentsTable.getColumn(grandParentPath)
-    expect(grandParentColumn?.isSelected).to.equal(lastSelectedIsUnselected)
+    expect(grandParentColumn?.status).to.equal(lastSelectedIsUnselected)
     expect(grandParentColumn?.descendantMetadata).to.equal('0/8')
   })
 })

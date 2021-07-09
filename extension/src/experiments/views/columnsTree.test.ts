@@ -192,7 +192,7 @@ describe('ExperimentsColumnsTree', () => {
     mockedGetColumn.mockReturnValueOnce({
       descendantMetadata: '3/4',
       hasChildren: true,
-      isSelected: ColumnStatus.selected
+      status: ColumnStatus.selected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
@@ -235,7 +235,7 @@ describe('ExperimentsColumnsTree', () => {
 
     mockedGetColumn.mockReturnValueOnce({
       hasChildren: false,
-      isSelected: ColumnStatus.unselected
+      status: ColumnStatus.unselected
     } as unknown as ColumnData)
 
     const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
