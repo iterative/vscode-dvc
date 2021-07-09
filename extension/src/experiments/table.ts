@@ -233,10 +233,11 @@ export class ExperimentsTable {
   }
 
   private getChildStatuses(parentPath: string): ColumnStatus[] {
-    return (
-      this.getChildColumns(parentPath)?.map(
-        column => this.columnStatus[column.path]
-      ) || []
+    return ([] as ColumnStatus[]).concat(
+      ...(this.getChildColumns(parentPath)?.map(column => [
+        this.columnStatus[column.path],
+        ...this.getChildStatuses(column.path)
+      ]) || [])
     )
   }
 

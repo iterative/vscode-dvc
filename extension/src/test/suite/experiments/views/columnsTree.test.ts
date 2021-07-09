@@ -213,13 +213,13 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(ColumnStatus.selected)
 
-    expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
-      ColumnStatus.indeterminate
-    )
+    const parentColumn = experimentsTable.getColumn(parentPath)
+    expect(parentColumn?.isSelected).to.equal(ColumnStatus.indeterminate)
+    expect(parentColumn?.childSelectionInfo).to.equal('1/2')
 
-    expect(experimentsTable.getColumn(grandParentPath)?.isSelected).to.equal(
-      ColumnStatus.indeterminate
-    )
+    const grandParentColumn = experimentsTable.getColumn(grandParentPath)
+    expect(grandParentColumn?.isSelected).to.equal(ColumnStatus.indeterminate)
+    expect(grandParentColumn?.childSelectionInfo).to.equal('2/8')
   })
 
   it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentColumnsTree.toggleSelected", async () => {
