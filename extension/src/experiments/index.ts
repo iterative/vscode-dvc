@@ -81,8 +81,8 @@ export class Experiments {
     return this.getTable(dvcRoot).getChildColumns(path)
   }
 
-  public setIsColumnSelected(dvcRoot: string, path: string) {
-    return this.getTable(dvcRoot).setIsColumnSelected(path)
+  public toggleColumnStatus(dvcRoot: string, path: string) {
+    return this.getTable(dvcRoot).toggleColumnStatus(path)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {

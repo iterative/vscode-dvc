@@ -35,7 +35,7 @@ import { ResourceLocator } from './resourceLocator'
 import { reset } from './util/disposable'
 import { setup } from './setup'
 import { Status } from './status'
-import { definedAndNonEmpty } from './util/array'
+import { definedAndNonEmpty, flatten } from './util/array'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './vscode/webviewSerializer'
@@ -188,7 +188,7 @@ export class Extension implements IExtension {
       )
     )
 
-    this.dvcRoots = ([] as string[]).concat(...dvcRoots)
+    this.dvcRoots = flatten(dvcRoots)
     this.config.setDvcRoots(this.dvcRoots)
   }
 

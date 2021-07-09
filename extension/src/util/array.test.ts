@@ -1,4 +1,4 @@
-import { definedAndNonEmpty, joinTruthyItems } from './array'
+import { definedAndNonEmpty, flatten, joinTruthyItems } from './array'
 
 describe('definedAndNonEmpty', () => {
   it('should return true given a non empty array', () => {
@@ -55,5 +55,13 @@ describe('joinTruthyItems', () => {
     )
 
     expect(string).toEqual('a:b:c:d:e')
+  })
+})
+
+describe('flatten', () => {
+  it('should flatten an array of arrays', () => {
+    expect(flatten<number>([[1], [2, 3, 4], [5, 6, 7, 8, 9, 10]])).toEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+    ])
   })
 })

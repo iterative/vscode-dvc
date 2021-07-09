@@ -36,7 +36,7 @@ suite('Extension Test Suite', () => {
     '..',
     'resources'
   )
-  const toggleCommand = 'dvc.views.experimentColumnsTree.toggleSelected'
+  const toggleCommand = 'dvc.views.experimentColumnsTree.toggleStatus'
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 
@@ -49,7 +49,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('ExperimentColumnsTree', () => {
-    it('should be able to toggle whether an experiments column is selected with dvc.views.experimentColumnsTree.toggleSelected', async () => {
+    it('should be able to toggle whether an experiments column is selected with dvc.views.experimentColumnsTree.toggleStatus', async () => {
       const relPath = join('params', paramsFile, 'learning_rate')
       const absPath = join(dvcDemoPath, relPath)
 
@@ -95,8 +95,8 @@ suite('Extension Test Suite', () => {
       expect(isUnselectedAgain).to.equal(ColumnStatus.unselected)
     })
 
-    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentColumnsTree.toggleSelected", async () => {
-      const toggleCommand = 'dvc.views.experimentColumnsTree.toggleSelected'
+    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentColumnsTree.toggleStatus", async () => {
+      const toggleCommand = 'dvc.views.experimentColumnsTree.toggleStatus'
       const relPath = join('params', paramsFile)
       const absPath = join(dvcDemoPath, relPath)
 
@@ -135,9 +135,13 @@ suite('Extension Test Suite', () => {
       const allChildren = [...selectedChildren, ...selectedGrandChildren]
 
       allChildren.map(column =>
-        expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+        expect(experimentsTable.getColumn(column.path)?.status).to.equal(
           ColumnStatus.selected
         )
+      )
+
+      expect(experimentsTable.getColumn(relPath)?.descendantMetadata).to.equal(
+        '8/8'
       )
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
@@ -145,14 +149,18 @@ suite('Extension Test Suite', () => {
       expect(isUnselected).to.equal(ColumnStatus.unselected)
 
       allChildren.map(column =>
-        expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+        expect(experimentsTable.getColumn(column.path)?.status).to.equal(
           isUnselected
         )
+      )
+
+      expect(experimentsTable.getColumn(relPath)?.descendantMetadata).to.equal(
+        '0/8'
       )
     })
   })
 
-  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentColumnsTree.toggleSelected", async () => {
+  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentColumnsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
@@ -199,7 +207,7 @@ suite('Extension Test Suite', () => {
     await commands.executeCommand(toggleCommand, absPath)
 
     allColumns.map(column =>
-      expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
+      expect(experimentsTable.getColumn(column.path)?.status).to.equal(
         ColumnStatus.unselected
       )
     )
@@ -213,16 +221,16 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(ColumnStatus.selected)
 
-    expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
-      ColumnStatus.indeterminate
-    )
+    const parentColumn = experimentsTable.getColumn(parentPath)
+    expect(parentColumn?.status).to.equal(ColumnStatus.indeterminate)
+    expect(parentColumn?.descendantMetadata).to.equal('1/2')
 
-    expect(experimentsTable.getColumn(grandParentPath)?.isSelected).to.equal(
-      ColumnStatus.indeterminate
-    )
+    const grandParentColumn = experimentsTable.getColumn(grandParentPath)
+    expect(grandParentColumn?.status).to.equal(ColumnStatus.indeterminate)
+    expect(grandParentColumn?.descendantMetadata).to.equal('2/8')
   })
 
-  it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentColumnsTree.toggleSelected", async () => {
+  it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentColumnsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
@@ -269,9 +277,9 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(ColumnStatus.selected)
 
-    expect(
-      experimentsTable.getColumn(secondGrandChild.path)?.isSelected
-    ).to.equal(ColumnStatus.unselected)
+    expect(experimentsTable.getColumn(secondGrandChild.path)?.status).to.equal(
+      ColumnStatus.unselected
+    )
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
@@ -279,11 +287,13 @@ suite('Extension Test Suite', () => {
     )
 
     expect(lastSelectedIsUnselected).to.equal(ColumnStatus.unselected)
-    expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
-      lastSelectedIsUnselected
-    )
-    expect(experimentsTable.getColumn(grandParentPath)?.isSelected).to.equal(
-      lastSelectedIsUnselected
-    )
+
+    const parentColumn = experimentsTable.getColumn(parentPath)
+    expect(parentColumn?.status).to.equal(lastSelectedIsUnselected)
+    expect(parentColumn?.descendantMetadata).to.equal('0/2')
+
+    const grandParentColumn = experimentsTable.getColumn(grandParentPath)
+    expect(grandParentColumn?.status).to.equal(lastSelectedIsUnselected)
+    expect(grandParentColumn?.descendantMetadata).to.equal('0/8')
   })
 })

@@ -13,6 +13,7 @@ import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { flatten } from '../util/array'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -85,7 +86,11 @@ export class ExperimentsTable {
   public getColumn(path: string) {
     const column = this.columnData?.find(column => column.path === path)
     if (column) {
-      return { ...column, isSelected: this.columnStatus[column.path] }
+      return {
+        ...column,
+        descendantMetadata: this.getDescendantMetaData(column),
+        status: this.columnStatus[column.path]
+      }
     }
   }
 
@@ -97,11 +102,11 @@ export class ExperimentsTable {
     )
   }
 
-  public setIsColumnSelected(path: string) {
-    const isSelected = this.getNextStatus(path)
-    this.columnStatus[path] = isSelected
+  public toggleColumnStatus(path: string) {
+    const status = this.getNextStatus(path)
+    this.columnStatus[path] = status
     this.setAreParentsSelected(path)
-    this.setAreChildrenSelected(path, isSelected)
+    this.setAreChildrenSelected(path, status)
     this.sendData()
 
     return this.columnStatus[path]
@@ -231,11 +236,11 @@ export class ExperimentsTable {
     }
   }
 
-  private setAreChildrenSelected(path: string, isSelected: ColumnStatus) {
+  private setAreChildrenSelected(path: string, status: ColumnStatus) {
     return this.getChildColumns(path)?.map(column => {
       const path = column.path
-      this.columnStatus[path] = isSelected
-      this.setAreChildrenSelected(path, isSelected)
+      this.columnStatus[path] = status
+      this.setAreChildrenSelected(path, status)
     })
   }
 
@@ -251,24 +256,18 @@ export class ExperimentsTable {
 
     const parentPath = parent.path
 
-    const status = this.getStatusFromChildren(parentPath)
+    const status = this.getStatus(parentPath)
     this.columnStatus[parentPath] = status
     this.setAreParentsSelected(parentPath)
   }
 
-  private getStatusFromChildren(parentPath: string) {
-    const statuses = this.getChildStatuses(parentPath)
+  private getStatus(parentPath: string) {
+    const statuses = this.getDescendantsStatuses(parentPath)
 
     const isAnyChildSelected = statuses.includes(ColumnStatus.selected)
     const isAnyChildUnselected = statuses.includes(ColumnStatus.unselected)
-    const isAnyChildIndeterminate = statuses.includes(
-      ColumnStatus.indeterminate
-    )
 
-    if (
-      (isAnyChildSelected && isAnyChildUnselected) ||
-      isAnyChildIndeterminate
-    ) {
+    if (isAnyChildSelected && isAnyChildUnselected) {
       return ColumnStatus.indeterminate
     }
 
@@ -279,20 +278,37 @@ export class ExperimentsTable {
     return ColumnStatus.unselected
   }
 
-  private getChildStatuses(parentPath: string): ColumnStatus[] {
-    return (
-      this.getChildColumns(parentPath)?.map(
-        column => this.columnStatus[column.path]
-      ) || []
+  private getDescendantsStatuses(parentPath: string): ColumnStatus[] {
+    const nestedStatuses = (this.getChildColumns(parentPath) || []).map(
+      column => {
+        const descendantsStatuses = column.hasChildren
+          ? this.getDescendantsStatuses(column.path)
+          : []
+        return [this.columnStatus[column.path], ...descendantsStatuses]
+      }
     )
+
+    return flatten<ColumnStatus>(nestedStatuses)
   }
 
   private getNextStatus(path: string) {
-    const isSelected = this.columnStatus[path]
-    if (isSelected === ColumnStatus.selected) {
+    const status = this.columnStatus[path]
+    if (status === ColumnStatus.selected) {
       return ColumnStatus.unselected
     }
     return ColumnStatus.selected
+  }
+
+  private getDescendantMetaData(column: ColumnData) {
+    if (!column.hasChildren) {
+      return
+    }
+    const statuses = this.getDescendantsStatuses(column.path)
+    return `${
+      statuses.filter(status =>
+        [ColumnStatus.selected, ColumnStatus.indeterminate].includes(status)
+      ).length
+    }/${statuses.length}`
   }
 
   private resetWebview = () => {
