@@ -80,7 +80,7 @@ export class ExperimentsTable {
     if (column) {
       return {
         ...column,
-        childSelectionInfo: this.getChildSelectionInfo(column),
+        descendantMetadata: this.getDescendantMetaData(column),
         isSelected: this.columnStatus[column.path]
       }
     }
@@ -204,24 +204,18 @@ export class ExperimentsTable {
 
     const parentPath = parent.path
 
-    const status = this.getStatusFromChildren(parentPath)
+    const status = this.getStatus(parentPath)
     this.columnStatus[parentPath] = status
     this.setAreParentsSelected(parentPath)
   }
 
-  private getStatusFromChildren(parentPath: string) {
-    const statuses = this.getChildStatuses(parentPath)
+  private getStatus(parentPath: string) {
+    const statuses = this.getDescendantsStatuses(parentPath)
 
     const isAnyChildSelected = statuses.includes(ColumnStatus.selected)
     const isAnyChildUnselected = statuses.includes(ColumnStatus.unselected)
-    const isAnyChildIndeterminate = statuses.includes(
-      ColumnStatus.indeterminate
-    )
 
-    if (
-      (isAnyChildSelected && isAnyChildUnselected) ||
-      isAnyChildIndeterminate
-    ) {
+    if (isAnyChildSelected && isAnyChildUnselected) {
       return ColumnStatus.indeterminate
     }
 
@@ -232,13 +226,17 @@ export class ExperimentsTable {
     return ColumnStatus.unselected
   }
 
-  private getChildStatuses(parentPath: string): ColumnStatus[] {
-    return ([] as ColumnStatus[]).concat(
-      ...(this.getChildColumns(parentPath)?.map(column => [
-        this.columnStatus[column.path],
-        ...this.getChildStatuses(column.path)
-      ]) || [])
+  private getDescendantsStatuses(parentPath: string): ColumnStatus[] {
+    const nestedStatuses = (this.getChildColumns(parentPath) || []).map(
+      column => {
+        const descendantsStatuses = column.hasChildren
+          ? this.getDescendantsStatuses(column.path)
+          : []
+        return [this.columnStatus[column.path], ...descendantsStatuses]
+      }
     )
+
+    return ([] as ColumnStatus[]).concat(...nestedStatuses)
   }
 
   private getNextStatus(path: string) {
@@ -249,11 +247,11 @@ export class ExperimentsTable {
     return ColumnStatus.selected
   }
 
-  private getChildSelectionInfo(column: ColumnData) {
+  private getDescendantMetaData(column: ColumnData) {
     if (!column.hasChildren) {
       return
     }
-    const statuses = this.getChildStatuses(column.path)
+    const statuses = this.getDescendantsStatuses(column.path)
     return `${
       statuses.filter(status =>
         [ColumnStatus.selected, ColumnStatus.indeterminate].includes(status)

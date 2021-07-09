@@ -190,7 +190,7 @@ describe('ExperimentsColumnsTree', () => {
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
     mockedGetColumn.mockReturnValueOnce({
-      childSelectionInfo: '3/4',
+      descendantMetadata: '3/4',
       hasChildren: true,
       isSelected: ColumnStatus.selected
     } as unknown as ColumnData)
