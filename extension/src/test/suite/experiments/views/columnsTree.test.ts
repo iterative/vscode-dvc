@@ -140,6 +140,10 @@ suite('Extension Test Suite', () => {
         )
       )
 
+      expect(experimentsTable.getColumn(relPath)?.childSelectionInfo).to.equal(
+        '8/8'
+      )
+
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
       expect(isUnselected).to.equal(ColumnStatus.unselected)
@@ -148,6 +152,10 @@ suite('Extension Test Suite', () => {
         expect(experimentsTable.getColumn(column.path)?.isSelected).to.equal(
           isUnselected
         )
+      )
+
+      expect(experimentsTable.getColumn(relPath)?.childSelectionInfo).to.equal(
+        '0/8'
       )
     })
   })
@@ -279,11 +287,13 @@ suite('Extension Test Suite', () => {
     )
 
     expect(lastSelectedIsUnselected).to.equal(ColumnStatus.unselected)
-    expect(experimentsTable.getColumn(parentPath)?.isSelected).to.equal(
-      lastSelectedIsUnselected
-    )
-    expect(experimentsTable.getColumn(grandParentPath)?.isSelected).to.equal(
-      lastSelectedIsUnselected
-    )
+
+    const parentColumn = experimentsTable.getColumn(parentPath)
+    expect(parentColumn?.isSelected).to.equal(lastSelectedIsUnselected)
+    expect(parentColumn?.childSelectionInfo).to.equal('0/2')
+
+    const grandParentColumn = experimentsTable.getColumn(grandParentPath)
+    expect(grandParentColumn?.isSelected).to.equal(lastSelectedIsUnselected)
+    expect(grandParentColumn?.childSelectionInfo).to.equal('0/8')
   })
 })
