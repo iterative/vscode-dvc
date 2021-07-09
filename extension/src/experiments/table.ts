@@ -78,7 +78,11 @@ export class ExperimentsTable {
   public getColumn(path: string) {
     const column = this.columnData?.find(column => column.path === path)
     if (column) {
-      return { ...column, isSelected: this.columnStatus[column.path] }
+      return {
+        ...column,
+        childSelectionInfo: this.getChildSelectionInfo(column),
+        isSelected: this.columnStatus[column.path]
+      }
     }
   }
 
@@ -242,6 +246,18 @@ export class ExperimentsTable {
       return ColumnStatus.unselected
     }
     return ColumnStatus.selected
+  }
+
+  private getChildSelectionInfo(column: ColumnData) {
+    if (!column.hasChildren) {
+      return
+    }
+    const statuses = this.getChildStatuses(column.path)
+    return `${
+      statuses.filter(status =>
+        [ColumnStatus.selected, ColumnStatus.indeterminate].includes(status)
+      ).length
+    }/${statuses.length}`
   }
 
   private resetWebview = () => {

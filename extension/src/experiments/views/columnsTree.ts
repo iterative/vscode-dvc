@@ -87,6 +87,10 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     treeItem.iconPath = this.getIconPath(column?.isSelected)
 
+    if (hasChildren) {
+      treeItem.description = column?.childSelectionInfo
+    }
+
     return treeItem
   }
 
