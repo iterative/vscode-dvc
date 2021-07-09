@@ -11,6 +11,7 @@ import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { flatten } from '../util/array'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -236,7 +237,7 @@ export class ExperimentsTable {
       }
     )
 
-    return ([] as ColumnStatus[]).concat(...nestedStatuses)
+    return flatten<ColumnStatus>(nestedStatuses)
   }
 
   private getNextStatus(path: string) {
