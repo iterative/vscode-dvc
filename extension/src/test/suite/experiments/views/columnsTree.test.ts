@@ -36,7 +36,7 @@ suite('Extension Test Suite', () => {
     '..',
     'resources'
   )
-  const toggleCommand = 'dvc.views.experimentColumnsTree.toggleSelected'
+  const toggleCommand = 'dvc.views.experimentColumnsTree.toggleStatus'
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 
@@ -49,7 +49,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('ExperimentColumnsTree', () => {
-    it('should be able to toggle whether an experiments column is selected with dvc.views.experimentColumnsTree.toggleSelected', async () => {
+    it('should be able to toggle whether an experiments column is selected with dvc.views.experimentColumnsTree.toggleStatus', async () => {
       const relPath = join('params', paramsFile, 'learning_rate')
       const absPath = join(dvcDemoPath, relPath)
 
@@ -95,8 +95,8 @@ suite('Extension Test Suite', () => {
       expect(isUnselectedAgain).to.equal(ColumnStatus.unselected)
     })
 
-    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentColumnsTree.toggleSelected", async () => {
-      const toggleCommand = 'dvc.views.experimentColumnsTree.toggleSelected'
+    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentColumnsTree.toggleStatus", async () => {
+      const toggleCommand = 'dvc.views.experimentColumnsTree.toggleStatus'
       const relPath = join('params', paramsFile)
       const absPath = join(dvcDemoPath, relPath)
 
@@ -160,7 +160,7 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentColumnsTree.toggleSelected", async () => {
+  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentColumnsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
@@ -230,7 +230,7 @@ suite('Extension Test Suite', () => {
     expect(grandParentColumn?.descendantMetadata).to.equal('2/8')
   })
 
-  it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentColumnsTree.toggleSelected", async () => {
+  it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentColumnsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)

@@ -94,7 +94,7 @@ export class ExperimentsTable {
     )
   }
 
-  public setIsColumnSelected(path: string) {
+  public toggleColumnStatus(path: string) {
     const status = this.getNextStatus(path)
     this.columnStatus[path] = status
     this.setAreParentsSelected(path)

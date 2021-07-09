@@ -204,7 +204,7 @@ describe('ExperimentsColumnsTree', () => {
       collapsibleState: 1,
       command: {
         arguments: [paramsPath],
-        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        command: 'dvc.views.experimentColumnsTree.toggleStatus',
         title: 'toggle'
       },
       description: '3/4',
@@ -247,7 +247,7 @@ describe('ExperimentsColumnsTree', () => {
       collapsibleState: 0,
       command: {
         arguments: [paramsPath],
-        command: 'dvc.views.experimentColumnsTree.toggleSelected',
+        command: 'dvc.views.experimentColumnsTree.toggleStatus',
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,
