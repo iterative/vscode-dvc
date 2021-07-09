@@ -17,7 +17,6 @@ export class ExperimentsSortedByTree implements TreeDataProvider<string> {
   private treeDataChanged: EventEmitter<string | void>
 
   private readonly experiments: Experiments
-  private pathRoots: Record<string, string> = {}
 
   constructor(
     experiments: Experiments,
@@ -40,24 +39,12 @@ export class ExperimentsSortedByTree implements TreeDataProvider<string> {
   }
 
   public getTreeItem(element: string): TreeItem {
-    return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
+    return new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
   }
 
-  public getChildren(element?: string): Promise<string[]> {
-    if (element) {
-      return Promise.resolve([''])
-    }
-
-    return this.getRootElements()
-  }
-
-  private async getRootElements() {
+  public async getChildren(): Promise<string[]> {
     await this.experiments.isReady()
-    const dvcRoots = this.experiments.getDvcRoots() || []
-    dvcRoots.forEach(dvcRoot => {
-      this.pathRoots[dvcRoot] = dvcRoot
-    })
-
-    return dvcRoots.sort((a, b) => a.localeCompare(b))
+    const sorts = this.experiments.getSortedBy()
+    return sorts.sort((a, b) => a.localeCompare(b))
   }
 }
