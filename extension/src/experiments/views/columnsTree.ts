@@ -49,12 +49,12 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     this.dispose.track(
       commands.registerCommand(
-        'dvc.views.experimentColumnsTree.toggleSelected',
+        'dvc.views.experimentColumnsTree.toggleStatus',
         resource => {
           const [dvcRoot, path] = this.getDetails(resource)
-          const isSelected = this.experiments.setIsColumnSelected(dvcRoot, path)
+          const status = this.experiments.toggleColumnStatus(dvcRoot, path)
           this.treeDataChanged.fire()
-          return isSelected
+          return status
         }
       )
     )
@@ -81,11 +81,15 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     treeItem.command = {
       arguments: [element],
-      command: 'dvc.views.experimentColumnsTree.toggleSelected',
+      command: 'dvc.views.experimentColumnsTree.toggleStatus',
       title: 'toggle'
     }
 
-    treeItem.iconPath = this.getIconPath(column?.isSelected)
+    treeItem.iconPath = this.getIconPath(column?.status)
+
+    if (hasChildren) {
+      treeItem.description = column?.descendantMetadata
+    }
 
     return treeItem
   }
