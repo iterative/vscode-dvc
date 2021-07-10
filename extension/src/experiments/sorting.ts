@@ -17,7 +17,7 @@ const compareExperimentsByPath = (
   return valueA === valueB ? 0 : valueA < valueB ? -1 : 1
 }
 
-export const buildExperimentSortFunction = ({
+const buildExperimentSortFunction = ({
   columnPath,
   descending
 }: SortDefinition): ((a: Experiment, b: Experiment) => number) => {
@@ -25,4 +25,26 @@ export const buildExperimentSortFunction = ({
   return descending
     ? (a, b) => compareExperimentsByPath(columnPathArray, b, a)
     : (a, b) => compareExperimentsByPath(columnPathArray, a, b)
+}
+
+export const sortRows = (
+  sortDefinition: SortDefinition | undefined,
+  unsortedRows: Experiment[] | undefined
+) => {
+  if (!sortDefinition || !unsortedRows) {
+    return unsortedRows
+  }
+  const sortFunction = buildExperimentSortFunction(
+    sortDefinition as SortDefinition
+  )
+  return unsortedRows.map(branch => {
+    if (!branch.subRows) {
+      return branch
+    }
+    const sortedRows = [...branch.subRows].sort(sortFunction)
+    return {
+      ...branch,
+      subRows: sortedRows
+    }
+  })
 }

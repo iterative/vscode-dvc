@@ -5,7 +5,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
-import { buildExperimentSortFunction, SortDefinition } from './sorting'
+import { SortDefinition, sortRows } from './sorting'
 import { pickSort } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
@@ -43,7 +43,6 @@ export class ExperimentsTable {
   private currentSort?: SortDefinition
   private workspace?: Experiment
   private unsortedRows?: Experiment[]
-  private sortedRows?: Experiment[]
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
@@ -161,32 +160,16 @@ export class ExperimentsTable {
     }
   }
 
-  private applySorts() {
-    if (this.currentSort) {
-      const sortFunction = buildExperimentSortFunction(
-        this.currentSort as SortDefinition
-      )
-      this.sortedRows = (this.unsortedRows as Experiment[]).map(branch => {
-        if (!branch.subRows) {
-          return branch
-        }
-        const sortedRows = [...branch.subRows].sort(sortFunction)
-        return {
-          ...branch,
-          subRows: sortedRows
-        }
-      })
-    } else {
-      this.sortedRows = this.unsortedRows
-    }
-  }
-
   private updateRowData(): void {
-    this.applySorts()
-    const { workspace, sortedRows } = this
-    this.rowData = sortedRows
-      ? [workspace as Experiment, ...(sortedRows as Experiment[])]
-      : [workspace as Experiment]
+    const sortedRows = sortRows(this.currentSort, this.unsortedRows)
+    if (sortedRows) {
+      const { workspace } = this
+      this.rowData = sortedRows
+        ? [workspace as Experiment, ...(sortedRows as Experiment[])]
+        : [workspace as Experiment]
+    } else {
+      this.rowData = undefined
+    }
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -213,7 +196,6 @@ export class ExperimentsTable {
     this.unsortedRows = branches
 
     this.updateRowData()
-
     return this.sendData()
   }
 
