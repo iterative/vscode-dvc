@@ -45,20 +45,12 @@ export class Experiments {
   }
 
   public async pickSort() {
-    const tableRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!tableRoot) {
-      return
-    }
-    const table = this.experiments[tableRoot]
+    const table = await this.getFocusedTable()
     table.pickSort()
   }
 
   public async clearSort() {
-    const tableRoot = await this.getFocusedOrDefaultOrPickProject()
-    if (!tableRoot) {
-      return
-    }
-    const table = this.experiments[tableRoot]
+    const table = await this.getFocusedTable()
     table.setSort(undefined)
   }
 
@@ -218,6 +210,10 @@ export class Experiments {
 
   private getTable(dvcRoot: string) {
     return this.experiments[dvcRoot]
+  }
+
+  private async getFocusedTable() {
+    return this.getTable(await this.getFocusedOrDefaultOrPickProject())
   }
 
   private getFocusedOrDefaultOrPickProject() {
