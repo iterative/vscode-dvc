@@ -475,6 +475,11 @@
           "id": "dvc.views.experimentsSortByTree",
           "name": "Sort By",
           "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
+          "id": "dvc.views.experimentFilterByTree",
+          "name": "Filter By",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         }
       ]
     },
@@ -492,6 +497,10 @@
       {
         "view": "dvc.views.experimentsSortByTree",
         "contents": "No sorts applied. \n[Add Sort](command:dvc.selectDvcPath)\n"
+      },
+      {
+        "view": "dvc.views.experimentFilterByTree",
+        "contents": "No filters applied. \n[Add Filter](command:dvc.selectDvcPath)\n"
       }
     ]
   },
