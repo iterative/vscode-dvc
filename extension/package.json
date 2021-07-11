@@ -462,31 +462,33 @@
       "view/item/context": [
         {
           "command": "dvc.deleteTarget",
-          "when": "viewItem != dvcData",
-          "group": "DVC"
+          "group": "DVC",
+          "when": "viewItem =~ /^dvcTracked/"
         },
         {
           "command": "dvc.removeTarget",
-          "when": "viewItem == dvcData",
+          "when": "viewItem == dvcTrackedData",
           "group": "DVC"
         },
         {
           "command": "dvc.pushTarget",
           "group": "DVC",
-          "when": "viewItem != dvc"
+          "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
         },
         {
           "command": "dvc.pullTarget",
           "group": "DVC",
-          "when": "viewItem != dvc"
+          "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
         },
         {
           "command": "dvc.copyFilePath",
-          "group": "6_copypath@1"
+          "group": "6_copypath@1",
+          "when": "viewItem =~ /^dvcTracked/"
         },
         {
           "command": "dvc.copyRelativeFilePath",
-          "group": "6_copypath@2"
+          "group": "6_copypath@2",
+          "when": "viewItem =~ /^dvcTracked/"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",

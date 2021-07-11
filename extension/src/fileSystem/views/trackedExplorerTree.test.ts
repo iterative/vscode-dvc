@@ -117,7 +117,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'dvc'
+        contextValue: 'dvcTracked'
       })
     })
 
@@ -148,7 +148,7 @@ describe('TrackedTreeView', () => {
           command: 'dvc.views.trackedExplorerTree.openFile',
           title: 'Open File'
         },
-        contextValue: 'dvcHasRemote'
+        contextValue: 'dvcTrackedHasRemote'
       })
     })
   })
