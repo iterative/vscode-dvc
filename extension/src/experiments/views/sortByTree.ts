@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 
-export class ExperimentsSortedByTree implements TreeDataProvider<string> {
+export class ExperimentsSortByTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
