@@ -36,15 +36,37 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
 
     this.experiments = experiments
+    this.dispose.track(
+      experiments.onDidRunsOrQueuedChange(() => this.treeDataChanged.fire())
+    )
   }
 
   public getTreeItem(element: string): TreeItem {
     return new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
   }
 
-  public async getChildren(): Promise<string[]> {
+  public async getChildren(element?: string): Promise<string[]> {
     await this.experiments.isReady()
-    const runs = this.experiments.getRunningOrQueued()
-    return runs.sort((a, b) => a.localeCompare(b))
+
+    if (element) {
+      return this.getSubExperiment()
+    }
+
+    const runs = await this.experiments.getRunningOrQueued()
+    return runs
+      .sort((a, b) => {
+        if (a.queued === b.queued) {
+          return a.name.localeCompare(b.name)
+        }
+        return a.queued ? -1 : 1
+      })
+      .map(exp => exp.name)
+  }
+
+  private getSubExperiment() {
+    return []
   }
 }
+
+// watch
+// run

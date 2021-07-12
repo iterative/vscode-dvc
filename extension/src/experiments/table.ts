@@ -25,6 +25,7 @@ export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
+  public readonly onDidRunsOrQueuedChange: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -37,6 +38,8 @@ export class ExperimentsTable {
 
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
+
+  private readonly runsOrQueuedChanged = new EventEmitter<void>()
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
@@ -55,6 +58,7 @@ export class ExperimentsTable {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
+    this.onDidRunsOrQueuedChange = this.runsOrQueuedChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -69,7 +73,12 @@ export class ExperimentsTable {
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
-    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
+    this.dispose.track(
+      onDidChangeFileSystem(refsPath, () => {
+        this.refresh()
+        this.runsOrQueuedChanged.fire()
+      })
+    )
   }
 
   public refresh() {
@@ -138,6 +147,24 @@ export class ExperimentsTable {
       view.onDidChangeIsFocused(dvcRoot => {
         this.isWebviewFocusedChanged.fire(dvcRoot)
       })
+    )
+  }
+
+  public async getRunningOrQueued(): Promise<
+    { name: string; queued: boolean }[]
+  > {
+    const allExperiments = this.rowData?.map(exp => ({
+      name: exp.name || exp.displayName,
+      queued: !!exp.queued
+    }))
+
+    const existing = await this.internalCommands.executeCommand<string[]>(
+      AvailableCommands.EXPERIMENT_LIST_CURRENT,
+      this.dvcRoot
+    )
+
+    return (allExperiments || []).filter(
+      exp => !existing.includes(exp.name) || exp.queued
     )
   }
 

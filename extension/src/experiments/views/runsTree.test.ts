@@ -18,7 +18,8 @@ const mockedDisposable = mocked(Disposable)
 const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   getRunningOrQueued: mockedGetRunningOrQueued,
-  isReady: () => true
+  isReady: () => true,
+  onDidRunsOrQueuedChange: jest.fn()
 } as unknown as Experiments
 
 jest.mock('vscode')

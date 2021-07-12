@@ -1,5 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
+import { Event, EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
@@ -13,6 +14,7 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../internalCommands'
+import { flatten } from '../util/array'
 
 type ExperimentsTables = Record<string, ExperimentsTable>
 
@@ -21,12 +23,14 @@ export class Experiments {
   private focusedWebviewDvcRoot: string | undefined
 
   public dispose = Disposable.fn()
+  public readonly onDidRunsOrQueuedChange: Event<void>
 
   private experiments: ExperimentsTables = {}
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
   private readonly internalCommands: InternalCommands
+  private readonly runsOrQueuedChanged = new EventEmitter<void>()
 
   constructor(
     internalCommands: InternalCommands,
@@ -38,6 +42,8 @@ export class Experiments {
     if (experiments) {
       this.experiments = experiments
     }
+
+    this.onDidRunsOrQueuedChange = this.runsOrQueuedChanged.event
   }
 
   public isReady() {
@@ -75,8 +81,13 @@ export class Experiments {
     return []
   }
 
-  public getRunningOrQueued(): string[] {
-    return []
+  public async getRunningOrQueued(): Promise<
+    { name: string; queued: boolean }[]
+  > {
+    const x = await Promise.all(
+      Object.values(this.experiments).map(table => table.getRunningOrQueued())
+    )
+    return flatten(x)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -252,9 +263,14 @@ export class Experiments {
 
     this.experiments[dvcRoot] = experimentsTable
 
-    this.dispose.track(
+    experimentsTable.dispose.track(
       experimentsTable.onDidChangeIsWebviewFocused(
         dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
+      )
+    )
+    experimentsTable.dispose.track(
+      experimentsTable.onDidRunsOrQueuedChange(() =>
+        this.runsOrQueuedChanged.fire()
       )
     )
     return experimentsTable
