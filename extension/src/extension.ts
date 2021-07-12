@@ -42,6 +42,7 @@ import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
 import { ExperimentsColumnsTree } from './experiments/views/columnsTree'
+import { ExperimentsSortByTree } from './experiments/views/sortByTree'
 
 export { Disposable, Disposer }
 
@@ -117,6 +118,8 @@ export class Extension implements IExtension {
     this.dispose.track(
       new ExperimentsColumnsTree(this.experiments, this.resourceLocator)
     )
+
+    this.dispose.track(new ExperimentsSortByTree(this.experiments))
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
