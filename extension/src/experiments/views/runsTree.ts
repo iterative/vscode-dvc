@@ -80,7 +80,10 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
   private getChildExperiments(element: string) {
     const dvcRoot = this.runRoots[element]
-    return this.experiments.getChildExperiments(dvcRoot, element)
+    return this.experiments.getChildExperiments(dvcRoot, element).map(child => {
+      this.runRoots[child] = dvcRoot
+      return child
+    })
   }
 
   private getIcon(experiment?: { queued: boolean }) {
