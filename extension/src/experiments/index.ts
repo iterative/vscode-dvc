@@ -67,6 +67,10 @@ export class Experiments {
     return this.getTable(dvcRoot).toggleColumnStatus(path)
   }
 
+  public getSortedBy(): string[] {
+    return []
+  }
+
   public getCwdThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
