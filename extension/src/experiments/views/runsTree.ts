@@ -6,7 +6,6 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  Uri,
   window
 } from 'vscode'
 import { Experiments } from '..'
@@ -54,7 +53,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
 
-    const item = new TreeItem(Uri.file(element), collapsibleState)
+    const item = new TreeItem(element, collapsibleState)
     item.iconPath = this.getIcon(experiment)
     return item
   }
