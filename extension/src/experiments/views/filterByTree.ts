@@ -28,7 +28,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     this.onDidChangeTreeData = this.treeDataChanged.event
 
     this.dispose.track(
-      window.createTreeView('dvc.views.experimentFilterByTree', {
+      window.createTreeView('dvc.views.experimentsFilterByTree', {
         canSelectMany: true,
         showCollapseAll: true,
         treeDataProvider: this
@@ -44,7 +44,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
   public async getChildren(): Promise<string[]> {
     await this.experiments.isReady()
-    const sorts = this.experiments.getFilteredBy()
-    return sorts.sort((a, b) => a.localeCompare(b))
+    const filters = this.experiments.getFilteredBy()
+    return filters.sort((a, b) => a.localeCompare(b))
   }
 }
