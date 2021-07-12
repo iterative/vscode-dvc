@@ -3,7 +3,6 @@ import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { TrackedExplorerTree } from './trackedExplorerTree'
-import { exists } from '..'
 import { Config } from '../../config'
 import { InternalCommands } from '../../internalCommands'
 
@@ -31,12 +30,9 @@ mockedInternalCommands.registerCommand('listDvcOnly', (...args) =>
   mockedListDvcOnly(...args)
 )
 
-const mockedExists = mocked(exists)
-
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('../../cli/reader')
-jest.mock('..')
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -121,35 +117,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'dvcTracked'
-      })
-    })
-
-    it('should return the correct tree item for a directory which is tracked by DVC', async () => {
-      let mockedItem = {}
-      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        mockedItem = { collapsibleState, uri }
-        return mockedItem
-      })
-
-      mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
-
-      const trackedTreeView = new TrackedExplorerTree(
-        mockedInternalCommands,
-        mockedWorkspaceChanged,
-        mockedTreeDataChanged
-      )
-      trackedTreeView.initialize([dvcDemoPath])
-      mockedExists.mockReturnValueOnce(true)
-
-      await trackedTreeView.getChildren()
-
-      const treeItem = trackedTreeView.getTreeItem(join(dvcDemoPath, 'data'))
-
-      expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(treeItem).toEqual({
-        ...mockedItem,
-        contextValue: 'dvcTrackedData'
+        contextValue: 'dvc'
       })
     })
 
@@ -180,7 +148,7 @@ describe('TrackedTreeView', () => {
           command: 'dvc.views.trackedExplorerTree.openFile',
           title: 'Open File'
         },
-        contextValue: 'dvcTrackedHasRemote'
+        contextValue: 'dvcHasRemote'
       })
     })
   })

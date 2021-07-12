@@ -421,33 +421,31 @@
       "view/item/context": [
         {
           "command": "dvc.deleteTarget",
-          "group": "DVC",
-          "when": "viewItem =~ /^dvcTracked/"
+          "when": "viewItem != dvcData",
+          "group": "DVC"
         },
         {
           "command": "dvc.removeTarget",
-          "when": "viewItem == dvcTrackedData",
+          "when": "viewItem == dvcData",
           "group": "DVC"
         },
         {
           "command": "dvc.pushTarget",
           "group": "DVC",
-          "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
+          "when": "viewItem != dvc"
         },
         {
           "command": "dvc.pullTarget",
           "group": "DVC",
-          "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
+          "when": "viewItem != dvc"
         },
         {
           "command": "dvc.copyFilePath",
-          "group": "6_copypath@1",
-          "when": "viewItem =~ /^dvcTracked/"
+          "group": "6_copypath@1"
         },
         {
           "command": "dvc.copyRelativeFilePath",
-          "group": "6_copypath@2",
-          "when": "viewItem =~ /^dvcTracked/"
+          "group": "6_copypath@2"
         }
       ]
     },
@@ -469,7 +467,7 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentColumnsTree",
+          "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available == true && dvc.project.available == true"
         },
