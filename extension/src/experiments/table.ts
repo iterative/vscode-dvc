@@ -73,12 +73,7 @@ export class ExperimentsTable {
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
-    this.dispose.track(
-      onDidChangeFileSystem(refsPath, () => {
-        this.refresh()
-        this.runsOrQueuedChanged.fire()
-      })
-    )
+    this.dispose.track(onDidChangeFileSystem(refsPath, () => this.refresh()))
   }
 
   public refresh() {
@@ -194,6 +189,7 @@ export class ExperimentsTable {
     this.columnData = columns
     this.rowData = [workspace, ...branches]
 
+    this.runsOrQueuedChanged.fire()
     return this.sendData()
   }
 
