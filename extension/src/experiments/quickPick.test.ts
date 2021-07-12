@@ -156,6 +156,22 @@ describe('Column-based QuickPicks', () => {
       expect(mockedShowQuickPick).not.toBeCalled()
       expect(resolvedPromise).toBe(undefined)
     })
+
+    it('resolves with no value if canceled at column select', async () => {
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      expect(await pickSort(exampleColumns)).toBe(undefined)
+      expect(mockedShowQuickPick).toBeCalledTimes(1)
+    })
+
+    it('resolves with no value if canceled at order select', async () => {
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      expect(await pickSort(exampleColumns)).toBe(undefined)
+      expect(mockedShowQuickPick).toBeCalledTimes(2)
+    })
+
     describe('valid input', () => {
       it('invokes a descending sort with the expected quickpick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
