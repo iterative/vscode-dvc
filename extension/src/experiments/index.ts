@@ -75,6 +75,10 @@ export class Experiments {
     return []
   }
 
+  public getRunningOrQueued(): string[] {
+    return []
+  }
+
   public getCwdThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
