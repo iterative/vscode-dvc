@@ -477,8 +477,23 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentColumnsTree",
-          "name": "Experiment Columns",
+          "id": "dvc.views.experimentsColumnsTree",
+          "name": "Columns",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
+          "id": "dvc.views.experimentsRunsTree",
+          "name": "Runs",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
+          "id": "dvc.views.experimentsSortByTree",
+          "name": "Sort By",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
+          "id": "dvc.views.experimentsFilterByTree",
+          "name": "Filter By",
           "when": "dvc.commands.available == true && dvc.project.available == true"
         }
       ]
@@ -493,6 +508,18 @@
         "view": "dvc.views.trackedExplorerTree",
         "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC and this extension please read [our docs](https://dvc.org/doc).",
         "when": "dvc.commands.available == true && dvc.project.available == false"
+      },
+      {
+        "view": "dvc.views.experimentsRunsTree",
+        "contents": "No running or queued experiments. \n[Run Experiment](command:dvc.runExperiment)\n"
+      },
+      {
+        "view": "dvc.views.experimentsSortByTree",
+        "contents": "No sorts applied. \n[Add Sort](command:dvc.selectDvcPath)\n"
+      },
+      {
+        "view": "dvc.views.experimentsFilterByTree",
+        "contents": "No filters applied. \n[Add Filter](command:dvc.selectDvcPath)\n"
       }
     ]
   },
