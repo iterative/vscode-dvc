@@ -42,6 +42,9 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   public getTreeItem(element: string): TreeItem {
+    // icons
+    // watch - queued
+    // run - running
     return new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
   }
 
@@ -67,6 +70,3 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     return []
   }
 }
-
-// watch
-// run

@@ -84,10 +84,10 @@ export class Experiments {
   public async getRunningOrQueued(): Promise<
     { name: string; queued: boolean }[]
   > {
-    const x = await Promise.all(
+    const runningOrQueued = await Promise.all(
       Object.values(this.experiments).map(table => table.getRunningOrQueued())
     )
-    return flatten(x)
+    return flatten(runningOrQueued)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -269,7 +269,7 @@ export class Experiments {
       )
     )
     experimentsTable.dispose.track(
-      experimentsTable.onDidRunsOrQueuedChange(() =>
+      experimentsTable.onDidChangeRunsOrQueued(() =>
         this.runsOrQueuedChanged.fire()
       )
     )
