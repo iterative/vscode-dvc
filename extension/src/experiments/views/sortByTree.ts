@@ -28,7 +28,7 @@ export class ExperimentsSortByTree implements TreeDataProvider<string> {
     this.onDidChangeTreeData = this.treeDataChanged.event
 
     this.dispose.track(
-      window.createTreeView('dvc.views.experimentSortByTree', {
+      window.createTreeView('dvc.views.experimentsSortByTree', {
         canSelectMany: true,
         showCollapseAll: true,
         treeDataProvider: this

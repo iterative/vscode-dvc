@@ -472,7 +472,7 @@
           "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
-          "id": "dvc.views.experimentSortByTree",
+          "id": "dvc.views.experimentsSortByTree",
           "name": "Sort By",
           "when": "dvc.commands.available == true && dvc.project.available == true"
         }
@@ -490,7 +490,7 @@
         "when": "dvc.commands.available == true && dvc.project.available == false"
       },
       {
-        "view": "dvc.views.experimentSortByTree",
+        "view": "dvc.views.experimentsSortByTree",
         "contents": "No sorts applied. \n[Add Sort](command:dvc.selectDvcPath)\n"
       }
     ]
