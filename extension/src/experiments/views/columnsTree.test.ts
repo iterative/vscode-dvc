@@ -65,7 +65,7 @@ beforeEach(() => {
 describe('ExperimentsColumnsTree', () => {
   describe('getChildren', () => {
     it('should return the experiments roots if no path is provided', async () => {
-      const experimentColumnsTree = new ExperimentsColumnsTree(
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedResourceLocator,
         mockedTreeDataChanged
@@ -77,11 +77,11 @@ describe('ExperimentsColumnsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce(mockedDvcRoots)
 
-      expect(await experimentColumnsTree.getChildren()).toEqual(mockedDvcRoots)
+      expect(await experimentsColumnsTree.getChildren()).toEqual(mockedDvcRoots)
     })
 
     it("should return the column's children if a path is provided", async () => {
-      const experimentColumnsTree = new ExperimentsColumnsTree(
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedResourceLocator,
         mockedTreeDataChanged
@@ -90,7 +90,7 @@ describe('ExperimentsColumnsTree', () => {
       const mockedDvcRoot = join('path', 'to', 'dvc', 'repo')
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
 
-      await experimentColumnsTree.getChildren()
+      await experimentsColumnsTree.getChildren()
 
       mockedGetChildColumns.mockReturnValueOnce(
         complexColumnData.filter(column =>
@@ -98,7 +98,7 @@ describe('ExperimentsColumnsTree', () => {
         )
       )
 
-      const children = await experimentColumnsTree.getChildren(mockedDvcRoot)
+      const children = await experimentsColumnsTree.getChildren(mockedDvcRoot)
       const relParamsPath = join('params', 'params.yaml')
       const paramsPath = join(mockedDvcRoot, relParamsPath)
 
@@ -110,7 +110,7 @@ describe('ExperimentsColumnsTree', () => {
       mockedGetChildColumns.mockReturnValueOnce(
         complexColumnData.filter(column => relParamsPath === column.parentPath)
       )
-      const grandChildren = await experimentColumnsTree.getChildren(paramsPath)
+      const grandChildren = await experimentsColumnsTree.getChildren(paramsPath)
       const relParamsProcessPath = join(relParamsPath, 'process')
       const paramsProcessPath = join(mockedDvcRoot, relParamsProcessPath)
 
@@ -128,7 +128,7 @@ describe('ExperimentsColumnsTree', () => {
           column => relParamsProcessPath === column.parentPath
         )
       )
-      const greatGrandChildren = await experimentColumnsTree.getChildren(
+      const greatGrandChildren = await experimentsColumnsTree.getChildren(
         paramsProcessPath
       )
 
@@ -148,7 +148,7 @@ describe('ExperimentsColumnsTree', () => {
         return mockedItem
       })
 
-      const experimentColumnsTree = new ExperimentsColumnsTree(
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedResourceLocator,
         mockedTreeDataChanged
@@ -158,9 +158,9 @@ describe('ExperimentsColumnsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
 
-      await experimentColumnsTree.getChildren()
+      await experimentsColumnsTree.getChildren()
 
-      const treeItem = experimentColumnsTree.getTreeItem(mockedDvcRoot)
+      const treeItem = experimentsColumnsTree.getTreeItem(mockedDvcRoot)
 
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
@@ -175,7 +175,7 @@ describe('ExperimentsColumnsTree', () => {
       return { collapsibleState, uri }
     })
 
-    const experimentColumnsTree = new ExperimentsColumnsTree(
+    const experimentsColumnsTree = new ExperimentsColumnsTree(
       mockedExperiments,
       mockedResourceLocator,
       mockedTreeDataChanged
@@ -186,7 +186,7 @@ describe('ExperimentsColumnsTree', () => {
 
     jest
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .spyOn(experimentColumnsTree as any, 'getDetails')
+      .spyOn(experimentsColumnsTree as any, 'getDetails')
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
     mockedGetColumn.mockReturnValueOnce({
@@ -195,7 +195,7 @@ describe('ExperimentsColumnsTree', () => {
       status: ColumnStatus.selected
     } as unknown as ColumnData)
 
-    const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
+    const treeItem = experimentsColumnsTree.getTreeItem(paramsPath)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
     expect(mockedGetColumn).toBeCalledTimes(1)
@@ -204,7 +204,7 @@ describe('ExperimentsColumnsTree', () => {
       collapsibleState: 1,
       command: {
         arguments: [paramsPath],
-        command: 'dvc.views.experimentColumnsTree.toggleStatus',
+        command: 'dvc.views.experimentsColumnsTree.toggleStatus',
         title: 'toggle'
       },
       description: '3/4',
@@ -219,7 +219,7 @@ describe('ExperimentsColumnsTree', () => {
       return { collapsibleState, uri }
     })
 
-    const experimentColumnsTree = new ExperimentsColumnsTree(
+    const experimentsColumnsTree = new ExperimentsColumnsTree(
       mockedExperiments,
       mockedResourceLocator,
       mockedTreeDataChanged
@@ -230,7 +230,7 @@ describe('ExperimentsColumnsTree', () => {
 
     jest
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .spyOn(experimentColumnsTree as any, 'getDetails')
+      .spyOn(experimentsColumnsTree as any, 'getDetails')
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
     mockedGetColumn.mockReturnValueOnce({
@@ -238,7 +238,7 @@ describe('ExperimentsColumnsTree', () => {
       status: ColumnStatus.unselected
     } as unknown as ColumnData)
 
-    const treeItem = experimentColumnsTree.getTreeItem(paramsPath)
+    const treeItem = experimentsColumnsTree.getTreeItem(paramsPath)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
     expect(mockedGetColumn).toBeCalledTimes(1)
@@ -247,7 +247,7 @@ describe('ExperimentsColumnsTree', () => {
       collapsibleState: 0,
       command: {
         arguments: [paramsPath],
-        command: 'dvc.views.experimentColumnsTree.toggleStatus',
+        command: 'dvc.views.experimentsColumnsTree.toggleStatus',
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,

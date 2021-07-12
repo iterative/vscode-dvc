@@ -38,7 +38,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     this.onDidChangeTreeData = this.treeDataChanged.event
 
     this.dispose.track(
-      window.createTreeView('dvc.views.experimentColumnsTree', {
+      window.createTreeView('dvc.views.experimentsColumnsTree', {
         canSelectMany: true,
         showCollapseAll: true,
         treeDataProvider: this
@@ -49,7 +49,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     this.dispose.track(
       commands.registerCommand(
-        'dvc.views.experimentColumnsTree.toggleStatus',
+        'dvc.views.experimentsColumnsTree.toggleStatus',
         resource => {
           const [dvcRoot, path] = this.getDetails(resource)
           const status = this.experiments.toggleColumnStatus(dvcRoot, path)
@@ -81,7 +81,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     treeItem.command = {
       arguments: [element],
-      command: 'dvc.views.experimentColumnsTree.toggleStatus',
+      command: 'dvc.views.experimentsColumnsTree.toggleStatus',
       title: 'toggle'
     }
 

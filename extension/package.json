@@ -467,7 +467,7 @@
       ],
       "dvc-views": [
         {
-          "id": "dvc.views.experimentColumnsTree",
+          "id": "dvc.views.experimentsColumnsTree",
           "name": "Columns",
           "when": "dvc.commands.available == true && dvc.project.available == true"
         },
