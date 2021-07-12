@@ -82,12 +82,20 @@ export class Experiments {
   }
 
   public async getRunningOrQueued(): Promise<
-    { name: string; queued: boolean }[]
+    { dvcRoot: string; name: string; queued: boolean }[]
   > {
     const runningOrQueued = await Promise.all(
       Object.values(this.experiments).map(table => table.getRunningOrQueued())
     )
     return flatten(runningOrQueued)
+  }
+
+  public getChildExperiments(dvcRoot: string, name: string) {
+    return this.getTable(dvcRoot).getChildExperiments(name)
+  }
+
+  public getExperiment(dvcRoot: string, name: string) {
+    return this.getTable(dvcRoot).getExperiment(name)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {

@@ -18,6 +18,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private treeDataChanged: EventEmitter<string | void>
 
   private readonly experiments: Experiments
+  private runRoots: Record<string, string> = {}
 
   constructor(
     experiments: Experiments,
@@ -43,9 +44,18 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   public getTreeItem(element: string): TreeItem {
-    // run - running
-    const item = new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
-    item.iconPath = new ThemeIcon('watch') // assume queued for now
+    const experiment = this.experiments.getExperiment(
+      this.runRoots[element],
+      element
+    )
+
+    const collapsibleState =
+      experiment?.queued === false
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+
+    const item = new TreeItem(Uri.file(element), collapsibleState)
+    item.iconPath = this.getIcon(experiment)
     return item
   }
 
@@ -53,21 +63,33 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     await this.experiments.isReady()
 
     if (element) {
-      return this.getSubExperiment()
+      return this.getChildExperiments(element)
     }
 
     const runs = await this.experiments.getRunningOrQueued()
+    runs.forEach(run => (this.runRoots[run.name] = run.dvcRoot))
     return runs
       .sort((a, b) => {
         if (a.queued === b.queued) {
           return a.name.localeCompare(b.name)
         }
-        return a.queued ? -1 : 1
+        return a.queued ? 1 : -1
       })
       .map(exp => exp.name)
   }
 
-  private getSubExperiment() {
-    return []
+  private getChildExperiments(element: string) {
+    const dvcRoot = this.runRoots[element]
+    return this.experiments.getChildExperiments(dvcRoot, element)
+  }
+
+  private getIcon(experiment?: { queued: boolean }) {
+    if (!experiment) {
+      return new ThemeIcon('primitive-dot')
+    }
+    if (experiment.queued) {
+      return new ThemeIcon('watch')
+    }
+    return new ThemeIcon('run')
   }
 }

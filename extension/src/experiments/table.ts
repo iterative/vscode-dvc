@@ -145,12 +145,40 @@ export class ExperimentsTable {
     )
   }
 
+  public getExperiment(name: string) {
+    return flatten(
+      (this.rowData || []).map(exp =>
+        (exp.subRows || []).map(subRow => ({
+          name: subRow.name || subRow.displayName,
+          queued: !!subRow.queued
+        }))
+      )
+    ).find(exp => exp.name === name)
+  }
+
+  public getChildExperiments(name: string): string[] {
+    const children = flatten(
+      flatten(
+        (this.rowData || []).map(exp =>
+          (exp.subRows || [])
+            .filter(
+              subRow => name === subRow.name || name === subRow.displayName
+            )
+            .map(subRow => subRow.subRows || [])
+        )
+      )
+    )
+
+    return children.map(checkPoint => checkPoint.name || checkPoint.displayName)
+  }
+
   public async getRunningOrQueued(): Promise<
-    { name: string; queued: boolean }[]
+    { name: string; queued: boolean; dvcRoot: string }[]
   > {
     const allExperiments = flatten(
       (this.rowData || []).map(exp =>
         (exp.subRows || []).map(subRow => ({
+          dvcRoot: this.dvcRoot,
           name: subRow.name || subRow.displayName,
           queued: !!subRow.queued
         }))
