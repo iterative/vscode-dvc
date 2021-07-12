@@ -153,10 +153,14 @@ export class ExperimentsTable {
   public async getRunningOrQueued(): Promise<
     { name: string; queued: boolean }[]
   > {
-    const allExperiments = this.rowData?.map(exp => ({
-      name: exp.name || exp.displayName,
-      queued: !!exp.queued
-    }))
+    const allExperiments = flatten(
+      (this.rowData || []).map(exp =>
+        (exp.subRows || []).map(subRow => ({
+          name: subRow.name || subRow.displayName,
+          queued: !!subRow.queued
+        }))
+      )
+    )
 
     const existing = await this.internalCommands.executeCommand<string[]>(
       AvailableCommands.EXPERIMENT_LIST_CURRENT,

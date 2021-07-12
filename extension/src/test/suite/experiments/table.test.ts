@@ -62,6 +62,36 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
+  describe('getRunningOrQueued', () => {
+    it('should return the currently runnning experiment and a list of queued ones', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      const mockExperimentList = stub(
+        cliReader,
+        'experimentListCurrent'
+      ).resolves(['exp-05694', 'exp-e7a67', 'test-branch'])
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
+
+      const experimentsTable = disposable.track(
+        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      )
+      await experimentsTable.isReady()
+
+      const runningOrQueued = await experimentsTable.getRunningOrQueued()
+
+      expect(runningOrQueued).to.deep.equal([
+        { name: 'exp-83425', queued: false },
+        { name: '90aea7f', queued: true }
+      ])
+
+      expect(mockExperimentList).to.be.calledOnce
+    })
+  })
+
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
       const config = disposable.track(new Config())
