@@ -2,6 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
   EventEmitter,
+  ThemeIcon,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -42,10 +43,10 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   public getTreeItem(element: string): TreeItem {
-    // icons
-    // watch - queued
     // run - running
-    return new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
+    const item = new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
+    item.iconPath = new ThemeIcon('watch') // assume queued for now
+    return item
   }
 
   public async getChildren(element?: string): Promise<string[]> {
