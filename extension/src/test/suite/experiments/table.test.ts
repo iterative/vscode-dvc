@@ -62,38 +62,8 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
-  describe('getRunningOrQueued', () => {
-    it('should return the currently runnning experiment and a list of queued ones', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const mockExperimentList = stub(
-        cliReader,
-        'experimentListCurrent'
-      ).resolves(['exp-05694', 'exp-e7a67', 'test-branch'])
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const experimentsTable = disposable.track(
-        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
-      )
-      await experimentsTable.isReady()
-
-      const runningOrQueued = await experimentsTable.getRunningOrQueued()
-
-      expect(runningOrQueued).to.deep.equal([
-        { dvcRoot: 'demo', name: 'exp-83425', queued: false },
-        { dvcRoot: 'demo', name: '90aea7f', queued: true }
-      ])
-
-      expect(mockExperimentList).to.be.calledOnce
-    })
-  })
-
-  describe('getRunning', () => {
-    it('should return the currently runnning experiment and a list of queued ones', async () => {
+  describe('getQueuedExperiments', () => {
+    it('should return the currently queued experiments', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -107,15 +77,9 @@ suite('Experiments Table Test Suite', () => {
       )
       await experimentsTable.isReady()
 
-      const children = experimentsTable.getChildExperiments('exp-83425')
+      const queued = experimentsTable.getQueuedExperiments()
 
-      expect(children).to.deep.equal([
-        '22e40e1',
-        '91116c1',
-        'e821416',
-        'c658f8b',
-        '23250b3'
-      ])
+      expect(queued).to.deep.equal(['90aea7f'])
     })
   })
 

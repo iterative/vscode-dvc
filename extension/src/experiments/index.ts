@@ -14,7 +14,6 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../internalCommands'
-import { flatten } from '../util/array'
 
 type ExperimentsTables = Record<string, ExperimentsTable>
 
@@ -81,21 +80,8 @@ export class Experiments {
     return []
   }
 
-  public async getRunningOrQueued(): Promise<
-    { dvcRoot: string; name: string; queued: boolean }[]
-  > {
-    const runningOrQueued = await Promise.all(
-      Object.values(this.experiments).map(table => table.getRunningOrQueued())
-    )
-    return flatten(runningOrQueued)
-  }
-
-  public getChildExperiments(dvcRoot: string, name: string) {
-    return this.getTable(dvcRoot).getChildExperiments(name)
-  }
-
-  public getExperiment(dvcRoot: string, name: string) {
-    return this.getTable(dvcRoot).getExperiment(name)
+  public getQueuedExperiments(dvcRoot: string): string[] {
+    return this.getTable(dvcRoot).getQueuedExperiments()
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {

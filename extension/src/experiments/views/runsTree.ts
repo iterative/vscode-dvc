@@ -6,9 +6,11 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
+  Uri,
   window
 } from 'vscode'
 import { Experiments } from '..'
+import { definedAndNonEmpty, flatten } from '../../util/array'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -43,55 +45,46 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   public getTreeItem(element: string): TreeItem {
-    const experiment = this.experiments.getExperiment(
-      this.runRoots[element],
-      element
-    )
+    if (this.isRoot(element)) {
+      return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
+    }
 
-    const collapsibleState =
-      experiment?.queued === false
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
-
-    const item = new TreeItem(element, collapsibleState)
-    item.iconPath = this.getIcon(experiment)
+    const item = new TreeItem(element, TreeItemCollapsibleState.None)
+    item.iconPath = new ThemeIcon('watch')
     return item
   }
 
-  public async getChildren(element?: string): Promise<string[]> {
-    await this.experiments.isReady()
-
+  public getChildren(element?: string): Promise<string[]> {
     if (element) {
-      return this.getChildExperiments(element)
+      return Promise.resolve(this.getQueuedExperiments(element))
     }
 
-    const runs = await this.experiments.getRunningOrQueued()
-    runs.forEach(run => (this.runRoots[run.name] = run.dvcRoot))
-    return runs
-      .sort((a, b) => {
-        if (a.queued === b.queued) {
-          return a.name.localeCompare(b.name)
-        }
-        return a.queued ? 1 : -1
+    return this.getRootElements()
+  }
+
+  private async getRootElements() {
+    await this.experiments.isReady()
+    const dvcRoots = this.experiments.getDvcRoots()
+    const queued = flatten(
+      dvcRoots.map(dvcRoot => {
+        this.runRoots[dvcRoot] = dvcRoot
+        return this.experiments.getQueuedExperiments(dvcRoot)
       })
-      .map(exp => exp.name)
+    )
+    if (definedAndNonEmpty(queued)) {
+      return dvcRoots.sort((a, b) => a.localeCompare(b))
+    }
+
+    return []
   }
 
-  private getChildExperiments(element: string) {
-    const dvcRoot = this.runRoots[element]
-    return this.experiments.getChildExperiments(dvcRoot, element).map(child => {
-      this.runRoots[child] = dvcRoot
-      return child
-    })
+  private getQueuedExperiments(dvcRoot: string): string[] {
+    const queued = this.experiments.getQueuedExperiments(dvcRoot)
+    queued.forEach(experiment => (this.runRoots[experiment] = dvcRoot))
+    return queued
   }
 
-  private getIcon(experiment?: { queued: boolean }) {
-    if (!experiment) {
-      return new ThemeIcon('primitive-dot')
-    }
-    if (experiment.queued) {
-      return new ThemeIcon('watch')
-    }
-    return new ThemeIcon('run')
+  private isRoot(element: string) {
+    return Object.values(this.runRoots).includes(element)
   }
 }
