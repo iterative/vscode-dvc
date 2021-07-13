@@ -11,9 +11,9 @@ import { ColumnStatus } from '../table'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedTreeDataChanged = mocked(new EventEmitter<string | void>())
-const mockedTreeDataChangedFire = jest.fn()
-mockedTreeDataChanged.fire = mockedTreeDataChangedFire
+const mockedExperimentsColumnsChanged = mocked(new EventEmitter<void>())
+const mockedExperimentsColumnsChangedFire = jest.fn()
+mockedExperimentsColumnsChanged.fire = mockedExperimentsColumnsChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -25,6 +25,7 @@ const mockedGetChildColumns = jest.fn()
 const mockedGetColumn = jest.fn()
 const mockedGetDvcRoots = jest.fn()
 const mockedExperiments = {
+  experimentsColumnsChanged: mockedExperimentsColumnsChanged,
   getChildColumns: mockedGetChildColumns,
   getColumn: mockedGetColumn,
   getDvcRoots: mockedGetDvcRoots,
@@ -67,8 +68,7 @@ describe('ExperimentsColumnsTree', () => {
     it('should return the experiments roots if no path is provided', async () => {
       const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
-        mockedResourceLocator,
-        mockedTreeDataChanged
+        mockedResourceLocator
       )
       const mockedDvcRoots = [
         join('path', 'to', 'first', 'root'),
@@ -83,8 +83,7 @@ describe('ExperimentsColumnsTree', () => {
     it("should return the column's children if a path is provided", async () => {
       const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
-        mockedResourceLocator,
-        mockedTreeDataChanged
+        mockedResourceLocator
       )
 
       const mockedDvcRoot = join('path', 'to', 'dvc', 'repo')
@@ -150,8 +149,7 @@ describe('ExperimentsColumnsTree', () => {
 
       const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
-        mockedResourceLocator,
-        mockedTreeDataChanged
+        mockedResourceLocator
       )
 
       const mockedDvcRoot = join('dvc', 'repo')
@@ -177,8 +175,7 @@ describe('ExperimentsColumnsTree', () => {
 
     const experimentsColumnsTree = new ExperimentsColumnsTree(
       mockedExperiments,
-      mockedResourceLocator,
-      mockedTreeDataChanged
+      mockedResourceLocator
     )
 
     const relParamsPath = join('params', 'params.yml')
@@ -221,8 +218,7 @@ describe('ExperimentsColumnsTree', () => {
 
     const experimentsColumnsTree = new ExperimentsColumnsTree(
       mockedExperiments,
-      mockedResourceLocator,
-      mockedTreeDataChanged
+      mockedResourceLocator
     )
 
     const relParamsPath = join('params', 'prms.yml')

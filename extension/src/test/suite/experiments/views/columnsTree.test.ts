@@ -102,7 +102,7 @@ suite('Extension Test Suite', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((ExperimentsColumnsTree as any).prototype, 'getDetails').callsFake(
-        path => [dvcDemoPath, relative(dvcDemoPath, path)]
+        (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
       )
 
       const config = disposable.track(new Config())
@@ -167,7 +167,7 @@ suite('Extension Test Suite', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     stub((ExperimentsColumnsTree as any).prototype, 'getDetails').callsFake(
-      path => [dvcDemoPath, relative(dvcDemoPath, path)]
+      (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
     )
 
     const config = disposable.track(new Config())
@@ -237,7 +237,7 @@ suite('Extension Test Suite', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     stub((ExperimentsColumnsTree as any).prototype, 'getDetails').callsFake(
-      path => [dvcDemoPath, relative(dvcDemoPath, path)]
+      (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
     )
 
     const config = disposable.track(new Config())

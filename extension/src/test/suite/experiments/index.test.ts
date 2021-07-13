@@ -14,6 +14,7 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../internalCommands'
+import { CliExecutor } from '../../../cli/executor'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -239,6 +240,25 @@ suite('Experiments Test Suite', () => {
       const focusedAgain = onDidChangeIsWebviewFocused(experimentsTable)
       await commands.executeCommand('workbench.action.previousEditor')
       expect(await focusedAgain).to.equal(dvcDemoPath)
+    })
+  })
+
+  describe('dvc.queueExperiment', () => {
+    it('should be able to queue an experiment', async () => {
+      const mockExperimentRunQueue = stub(
+        CliExecutor.prototype,
+        'experimentRunQueue'
+      ).resolves('true')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+        dvcDemoPath
+      )
+
+      await commands.executeCommand('dvc.queueExperiment')
+
+      expect(mockExperimentRunQueue).to.be.calledOnce
+      expect(mockExperimentRunQueue).to.be.calledWith(dvcDemoPath)
     })
   })
 })

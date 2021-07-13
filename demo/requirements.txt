@@ -1,4 +1,4 @@
-dvc[s3]>=2.4.1
+git+https://github.com/iterative/dvc
 dvclive
 torch
 torchvision

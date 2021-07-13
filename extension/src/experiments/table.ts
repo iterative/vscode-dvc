@@ -25,6 +25,8 @@ export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
+  public readonly onDidChangeExperimentsRows: Event<void>
+  public readonly onDidChangeExperimentsColumns: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -38,8 +40,12 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
+  private readonly experimentsRowsChanged = new EventEmitter<void>()
+  private readonly experimentsColumnsChanged = new EventEmitter<void>()
+
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
+  private queued: string[] = []
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -55,6 +61,8 @@ export class ExperimentsTable {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
+    this.onDidChangeExperimentsRows = this.experimentsRowsChanged.event
+    this.onDidChangeExperimentsColumns = this.experimentsColumnsChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -100,7 +108,8 @@ export class ExperimentsTable {
     this.columnStatus[path] = status
     this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, status)
-    this.sendData()
+
+    this.notifyColumnsChanged()
 
     return this.columnStatus[path]
   }
@@ -141,6 +150,10 @@ export class ExperimentsTable {
     )
   }
 
+  public getQueuedExperiments(): string[] {
+    return this.queued
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
@@ -152,7 +165,8 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, workspace } = transformExperimentsRepo(data)
+    const { columns, branches, queued, workspace } =
+      transformExperimentsRepo(data)
 
     columns.forEach(column => {
       if (this.columnStatus[column.path] === undefined) {
@@ -162,7 +176,18 @@ export class ExperimentsTable {
 
     this.columnData = columns
     this.rowData = [workspace, ...branches]
+    this.queued = queued
 
+    return this.notifyChanged()
+  }
+
+  private notifyChanged() {
+    this.experimentsRowsChanged.fire()
+    return this.notifyColumnsChanged()
+  }
+
+  private notifyColumnsChanged() {
+    this.experimentsColumnsChanged.fire()
     return this.sendData()
   }
 

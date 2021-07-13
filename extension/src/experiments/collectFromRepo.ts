@@ -22,6 +22,7 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: Experiment[]
+  queued: string[]
   workspace: Experiment
 }
 
@@ -205,12 +206,17 @@ const collectFromBranchEntry = (
   ]
 ) => {
   const branch = consolidateExperimentData(branchSha, baseline)
+
   collectColumnsFromExperiment(acc, branch)
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const experiment = consolidateExperimentData(sha, experimentData)
+
+    if (experiment.queued) {
+      acc.queued.push(experiment.displayName)
+    }
 
     collectColumnsFromExperiment(acc, experiment)
     nestExperiment(experiments, checkpointsByTip, experiment)
@@ -241,6 +247,7 @@ export const collectFromRepo = (
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
     paramsMap: new Map(),
+    queued: [],
     workspace: {
       ...workspace.baseline,
       displayName: 'workspace',
