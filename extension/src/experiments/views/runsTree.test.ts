@@ -6,9 +6,9 @@ import { Experiments } from '..'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedTreeDataChanged = mocked(new EventEmitter<string | void>())
-const mockedTreeDataChangedFire = jest.fn()
-mockedTreeDataChanged.fire = mockedTreeDataChangedFire
+const mockedExperimentsRowsChanged = mocked(new EventEmitter<string | void>())
+const mockedExperimentDataChangedFire = jest.fn()
+mockedExperimentsRowsChanged.fire = mockedExperimentDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -20,10 +20,10 @@ const mockedDisposable = mocked(Disposable)
 const mockedGetDvcRoots = jest.fn()
 const mockedGetQueuedExperiments = jest.fn()
 const mockedExperiments = {
+  experimentsRowsChanged: mockedExperimentsRowsChanged,
   getDvcRoots: mockedGetDvcRoots,
   getQueuedExperiments: mockedGetQueuedExperiments,
-  isReady: () => true,
-  onDidChangeExperimentsData: jest.fn()
+  isReady: () => true
 } as unknown as Experiments
 
 jest.mock('vscode')

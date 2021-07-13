@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { Event, EventEmitter } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
@@ -22,14 +22,14 @@ export class Experiments {
   private focusedWebviewDvcRoot: string | undefined
 
   public dispose = Disposable.fn()
-  public readonly onDidChangeExperimentsData: Event<void>
+  public readonly experimentsRowsChanged = new EventEmitter<void>()
+  public readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private experiments: ExperimentsTables = {}
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
   private readonly internalCommands: InternalCommands
-  private readonly experimentsDataChanged = new EventEmitter<void>()
 
   constructor(
     internalCommands: InternalCommands,
@@ -41,8 +41,6 @@ export class Experiments {
     if (experiments) {
       this.experiments = experiments
     }
-
-    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
   }
 
   public isReady() {
@@ -263,8 +261,14 @@ export class Experiments {
       )
     )
     experimentsTable.dispose.track(
-      experimentsTable.onDidChangeExperimentsData(() =>
-        this.experimentsDataChanged.fire()
+      experimentsTable.onDidChangeExperimentsRows(() =>
+        this.experimentsRowsChanged.fire()
+      )
+    )
+
+    experimentsTable.dispose.track(
+      experimentsTable.onDidChangeExperimentsColumns(() =>
+        this.experimentsColumnsChanged.fire()
       )
     )
     return experimentsTable

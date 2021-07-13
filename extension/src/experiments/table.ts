@@ -25,7 +25,8 @@ export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
-  public readonly onDidChangeExperimentsData: Event<void>
+  public readonly onDidChangeExperimentsRows: Event<void>
+  public readonly onDidChangeExperimentsColumns: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -39,7 +40,8 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private readonly experimentsDataChanged = new EventEmitter<void>()
+  private readonly experimentsRowsChanged = new EventEmitter<void>()
+  private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
@@ -59,7 +61,8 @@ export class ExperimentsTable {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
-    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
+    this.onDidChangeExperimentsRows = this.experimentsRowsChanged.event
+    this.onDidChangeExperimentsColumns = this.experimentsColumnsChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -105,7 +108,8 @@ export class ExperimentsTable {
     this.columnStatus[path] = status
     this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, status)
-    this.sendData()
+
+    this.notifyColumnsChanged()
 
     return this.columnStatus[path]
   }
@@ -174,7 +178,16 @@ export class ExperimentsTable {
     this.rowData = [workspace, ...branches]
     this.queued = queued
 
-    this.experimentsDataChanged.fire()
+    return this.notifyChanged()
+  }
+
+  private notifyChanged() {
+    this.experimentsRowsChanged.fire()
+    return this.notifyColumnsChanged()
+  }
+
+  private notifyColumnsChanged() {
+    this.experimentsColumnsChanged.fire()
     return this.sendData()
   }
 
