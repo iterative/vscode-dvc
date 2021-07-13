@@ -169,6 +169,16 @@ export class ExperimentsTable {
     return this.queued
   }
 
+  public getTableData(): TableData {
+    return {
+      columns:
+        this.columnData?.filter(
+          column => this.columnStatus[column.path] !== ColumnStatus.unselected
+        ) || [],
+      rows: this.rowData || []
+    }
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
@@ -212,16 +222,6 @@ export class ExperimentsTable {
       return this.webview.showExperiments({
         tableData: this.getTableData()
       })
-    }
-  }
-
-  private getTableData(): TableData {
-    return {
-      columns:
-        this.columnData?.filter(
-          column => this.columnStatus[column.path] !== ColumnStatus.unselected
-        ) || [],
-      rows: this.rowData || []
     }
   }
 
