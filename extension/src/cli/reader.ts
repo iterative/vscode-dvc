@@ -62,6 +62,7 @@ export interface ExperimentFields {
   name?: string
   timestamp?: string | null
   queued?: boolean
+  running?: boolean
   params?: ValueTreeRoot
   metrics?: ValueTreeRoot
   checkpoint_tip?: string
