@@ -13,6 +13,8 @@
         }
       },
       "queued": false,
+      "running": true,
+      "executor": "workspace",
       "metrics": {
         "summary.json": {
           "loss": 1.9293040037155151,
@@ -37,6 +39,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.9293040037155151,
@@ -61,6 +65,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.8168506622314453,
@@ -86,6 +92,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.8168506622314453,
@@ -110,6 +118,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.8722929954528809,
@@ -135,6 +145,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 2.048856019973755,
@@ -159,6 +171,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 2.0205044746398926,
@@ -184,6 +198,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 2.0205044746398926,
@@ -208,6 +224,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 2.020392894744873,
@@ -232,6 +250,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.9293040037155151,
@@ -257,6 +277,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.9293040037155151,
@@ -281,6 +303,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.9882521629333496,
@@ -305,6 +329,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.775016188621521,
@@ -330,6 +356,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.775016188621521,
@@ -354,6 +382,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.8261293172836304,
@@ -378,6 +408,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.8798457384109497,
@@ -402,6 +434,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.9329891204833984,
@@ -426,6 +460,8 @@
         }
       },
       "queued": false,
+      "running": false,
+      "executor": null,
       "metrics": {
         "summary.json": {
           "loss": 1.9896177053451538,
