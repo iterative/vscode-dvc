@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
-  EventEmitter,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -16,19 +15,12 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
-  private treeDataChanged: EventEmitter<string | void>
 
   private readonly experiments: Experiments
   private runRoots: Record<string, string> = {}
 
-  constructor(
-    experiments: Experiments,
-    treeDataChanged?: EventEmitter<string | void>
-  ) {
-    this.treeDataChanged = this.dispose.track(
-      treeDataChanged || new EventEmitter()
-    )
-    this.onDidChangeTreeData = this.treeDataChanged.event
+  constructor(experiments: Experiments) {
+    this.onDidChangeTreeData = experiments.experimentsDataChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsRunsTree', {
@@ -39,9 +31,6 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
 
     this.experiments = experiments
-    this.dispose.track(
-      experiments.onDidChangeExperimentsData(() => this.treeDataChanged.fire())
-    )
   }
 
   public getTreeItem(element: string): TreeItem {
