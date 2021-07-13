@@ -71,6 +71,16 @@ const getFirstCellProps = (
   })
 }
 
+const getBulletStyle = (experiment: Experiment): string => {
+  if (experiment.running) {
+    return styles.runningBullet
+  }
+  if (experiment.queued) {
+    return styles.queuedBullet
+  }
+  return styles.bullet
+}
+
 export const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
 }> = ({ cell }) => {
@@ -89,9 +99,7 @@ export const FirstCell: React.FC<{
             : styles.rowArrowPlaceholder
         }
       />
-      <span
-        className={row.original.queued ? styles.queuedBullet : styles.bullet}
-      />
+      <span className={getBulletStyle(row.original)} />
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
