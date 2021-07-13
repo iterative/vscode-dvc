@@ -43,6 +43,7 @@ export class ExperimentsTable {
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
+  private queued: string[] = []
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -146,13 +147,7 @@ export class ExperimentsTable {
   }
 
   public getQueuedExperiments(): string[] {
-    return flatten(
-      (this.rowData || []).map(exp =>
-        (exp.subRows || [])
-          .filter(subRow => subRow.queued)
-          .map(subRow => subRow.name || subRow.displayName)
-      )
-    ).filter(Boolean)
+    return this.queued
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -166,7 +161,8 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, workspace } = transformExperimentsRepo(data)
+    const { columns, branches, queued, workspace } =
+      transformExperimentsRepo(data)
 
     columns.forEach(column => {
       if (this.columnStatus[column.path] === undefined) {
@@ -176,6 +172,7 @@ export class ExperimentsTable {
 
     this.columnData = columns
     this.rowData = [workspace, ...branches]
+    this.queued = queued
 
     this.runsOrQueuedChanged.fire()
     return this.sendData()
