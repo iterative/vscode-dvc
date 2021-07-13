@@ -7,12 +7,14 @@ interface TransformedExperiments {
   columns: ColumnData[]
   branches: Experiment[]
   workspace: Experiment
+  queued: string[]
 }
 
 export const transformExperimentsRepo = (
   data: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const { metricsMap, paramsMap, branches, workspace } = collectFromRepo(data)
+  const { metricsMap, paramsMap, branches, workspace, queued } =
+    collectFromRepo(data)
 
   return {
     branches,
@@ -20,6 +22,7 @@ export const transformExperimentsRepo = (
       ...transformAndCollectFromColumnsIfAny(paramsMap),
       ...transformAndCollectFromColumnsIfAny(metricsMap)
     ],
+    queued,
     workspace
   }
 }

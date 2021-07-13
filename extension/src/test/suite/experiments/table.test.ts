@@ -62,6 +62,27 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
+  describe('getQueuedExperiments', () => {
+    it('should return the currently queued experiments', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
+
+      const experimentsTable = disposable.track(
+        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      )
+      await experimentsTable.isReady()
+
+      const queued = experimentsTable.getQueuedExperiments()
+
+      expect(queued).to.deep.equal(['90aea7f'])
+    })
+  })
+
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
       const config = disposable.track(new Config())

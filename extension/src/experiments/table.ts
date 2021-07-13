@@ -25,6 +25,7 @@ export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
+  public readonly onDidChangeExperimentsData: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -38,8 +39,11 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
+  private readonly experimentsDataChanged = new EventEmitter<void>()
+
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
+  private queued: string[] = []
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -55,6 +59,7 @@ export class ExperimentsTable {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
+    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -141,6 +146,10 @@ export class ExperimentsTable {
     )
   }
 
+  public getQueuedExperiments(): string[] {
+    return this.queued
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
@@ -152,7 +161,8 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, workspace } = transformExperimentsRepo(data)
+    const { columns, branches, queued, workspace } =
+      transformExperimentsRepo(data)
 
     columns.forEach(column => {
       if (this.columnStatus[column.path] === undefined) {
@@ -162,7 +172,9 @@ export class ExperimentsTable {
 
     this.columnData = columns
     this.rowData = [workspace, ...branches]
+    this.queued = queued
 
+    this.experimentsDataChanged.fire()
     return this.sendData()
   }
 
