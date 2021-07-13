@@ -108,8 +108,8 @@ export class ExperimentsTable {
     this.columnStatus[path] = status
     this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, status)
-    this.experimentsColumnsChanged.fire()
-    this.sendData()
+
+    this.notifyColumnsChanged()
 
     return this.columnStatus[path]
   }
@@ -178,6 +178,15 @@ export class ExperimentsTable {
     this.rowData = [workspace, ...branches]
     this.queued = queued
 
+    return this.notifyRowsChanged()
+  }
+
+  private notifyColumnsChanged() {
+    this.experimentsColumnsChanged.fire()
+    return this.sendData()
+  }
+
+  private notifyRowsChanged() {
     this.experimentsDataChanged.fire()
     return this.sendData()
   }
