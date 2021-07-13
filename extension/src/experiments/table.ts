@@ -26,6 +26,7 @@ export class ExperimentsTable {
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
   public readonly onDidChangeExperimentsData: Event<void>
+  public readonly onDidChangeExperimentsColumns: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -40,6 +41,7 @@ export class ExperimentsTable {
   private readonly resourceLocator: ResourceLocator
 
   private readonly experimentsDataChanged = new EventEmitter<void>()
+  private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
@@ -60,6 +62,7 @@ export class ExperimentsTable {
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidChangeExperimentsData = this.experimentsDataChanged.event
+    this.onDidChangeExperimentsColumns = this.experimentsColumnsChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -105,6 +108,7 @@ export class ExperimentsTable {
     this.columnStatus[path] = status
     this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, status)
+    this.experimentsColumnsChanged.fire()
     this.sendData()
 
     return this.columnStatus[path]

@@ -23,6 +23,7 @@ export class Experiments {
 
   public dispose = Disposable.fn()
   public readonly experimentsDataChanged = new EventEmitter<void>()
+  public readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private experiments: ExperimentsTables = {}
 
@@ -262,6 +263,12 @@ export class Experiments {
     experimentsTable.dispose.track(
       experimentsTable.onDidChangeExperimentsData(() =>
         this.experimentsDataChanged.fire()
+      )
+    )
+
+    experimentsTable.dispose.track(
+      experimentsTable.onDidChangeExperimentsColumns(() =>
+        this.experimentsColumnsChanged.fire()
       )
     )
     return experimentsTable
