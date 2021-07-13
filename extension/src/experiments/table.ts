@@ -178,16 +178,16 @@ export class ExperimentsTable {
     this.rowData = [workspace, ...branches]
     this.queued = queued
 
-    return this.notifyRowsChanged()
+    return this.notifyChanged()
+  }
+
+  private notifyChanged() {
+    this.experimentsDataChanged.fire()
+    return this.notifyColumnsChanged()
   }
 
   private notifyColumnsChanged() {
     this.experimentsColumnsChanged.fire()
-    return this.sendData()
-  }
-
-  private notifyRowsChanged() {
-    this.experimentsDataChanged.fire()
     return this.sendData()
   }
 
