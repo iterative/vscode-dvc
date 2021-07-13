@@ -22,14 +22,14 @@ export class Experiments {
   private focusedWebviewDvcRoot: string | undefined
 
   public dispose = Disposable.fn()
-  public readonly onDidRunsOrQueuedChange: Event<void>
+  public readonly onDidChangeExperimentsData: Event<void>
 
   private experiments: ExperimentsTables = {}
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
   private readonly internalCommands: InternalCommands
-  private readonly runsOrQueuedChanged = new EventEmitter<void>()
+  private readonly experimentsDataChanged = new EventEmitter<void>()
 
   constructor(
     internalCommands: InternalCommands,
@@ -42,7 +42,7 @@ export class Experiments {
       this.experiments = experiments
     }
 
-    this.onDidRunsOrQueuedChange = this.runsOrQueuedChanged.event
+    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
   }
 
   public isReady() {
@@ -263,8 +263,8 @@ export class Experiments {
       )
     )
     experimentsTable.dispose.track(
-      experimentsTable.onDidChangeRunsOrQueued(() =>
-        this.runsOrQueuedChanged.fire()
+      experimentsTable.onDidChangeExperimentsData(() =>
+        this.experimentsDataChanged.fire()
       )
     )
     return experimentsTable

@@ -23,7 +23,7 @@ const mockedExperiments = {
   getDvcRoots: mockedGetDvcRoots,
   getQueuedExperiments: mockedGetQueuedExperiments,
   isReady: () => true,
-  onDidRunsOrQueuedChange: jest.fn()
+  onDidChangeExperimentsData: jest.fn()
 } as unknown as Experiments
 
 jest.mock('vscode')

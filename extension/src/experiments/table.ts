@@ -25,7 +25,7 @@ export class ExperimentsTable {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
-  public readonly onDidChangeRunsOrQueued: Event<void>
+  public readonly onDidChangeExperimentsData: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -39,7 +39,7 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
-  private readonly runsOrQueuedChanged = new EventEmitter<void>()
+  private readonly experimentsDataChanged = new EventEmitter<void>()
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
@@ -59,7 +59,7 @@ export class ExperimentsTable {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
-    this.onDidChangeRunsOrQueued = this.runsOrQueuedChanged.event
+    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -174,7 +174,7 @@ export class ExperimentsTable {
     this.rowData = [workspace, ...branches]
     this.queued = queued
 
-    this.runsOrQueuedChanged.fire()
+    this.experimentsDataChanged.fire()
     return this.sendData()
   }
 

@@ -40,7 +40,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     this.experiments = experiments
     this.dispose.track(
-      experiments.onDidRunsOrQueuedChange(() => this.treeDataChanged.fire())
+      experiments.onDidChangeExperimentsData(() => this.treeDataChanged.fire())
     )
   }
 
