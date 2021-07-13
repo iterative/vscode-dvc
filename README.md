@@ -32,6 +32,10 @@ check's details and to the summary of the Check run:
 
 ![Guide to get from Checks status to Artifacts](https://user-images.githubusercontent.com/9111807/118057990-19bacb00-b35b-11eb-9030-558e802668f1.png)
 
+Once you have downloaded and extracted the `vsix` file, you can install it
+following the
+[official documentation](https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix).
+
 ### Installing and Integrating With DVC CLI
 
 There are quite a few options for installing DVC, with one big split being

@@ -1,5 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
+import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
@@ -21,6 +22,8 @@ export class Experiments {
   private focusedWebviewDvcRoot: string | undefined
 
   public dispose = Disposable.fn()
+  public readonly experimentsRowsChanged = new EventEmitter<void>()
+  public readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private experiments: ExperimentsTables = {}
 
@@ -85,8 +88,8 @@ export class Experiments {
     return []
   }
 
-  public getRunningOrQueued(): string[] {
-    return []
+  public getQueuedExperiments(dvcRoot: string): string[] {
+    return this.getTable(dvcRoot).getQueuedExperiments()
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -266,9 +269,20 @@ export class Experiments {
 
     this.experiments[dvcRoot] = experimentsTable
 
-    this.dispose.track(
+    experimentsTable.dispose.track(
       experimentsTable.onDidChangeIsWebviewFocused(
         dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
+      )
+    )
+    experimentsTable.dispose.track(
+      experimentsTable.onDidChangeExperimentsRows(() =>
+        this.experimentsRowsChanged.fire()
+      )
+    )
+
+    experimentsTable.dispose.track(
+      experimentsTable.onDidChangeExperimentsColumns(() =>
+        this.experimentsColumnsChanged.fire()
       )
     )
     return experimentsTable

@@ -6,7 +6,7 @@ import { AvailableCommands } from '../../internalCommands'
 const registerExperimentCwdCommands = (experiments: Experiments): void => {
   experiments.dispose.track(
     commands.registerCommand('dvc.queueExperiment', () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_QUEUED)
+      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
     )
   )
 }
