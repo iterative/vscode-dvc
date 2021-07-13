@@ -20,7 +20,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private runRoots: Record<string, string> = {}
 
   constructor(experiments: Experiments) {
-    this.onDidChangeTreeData = experiments.experimentsDataChanged.event
+    this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsRunsTree', {

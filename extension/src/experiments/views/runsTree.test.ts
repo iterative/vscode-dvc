@@ -6,9 +6,9 @@ import { Experiments } from '..'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsDataChanged = mocked(new EventEmitter<string | void>())
+const mockedExperimentsRowsChanged = mocked(new EventEmitter<string | void>())
 const mockedExperimentDataChangedFire = jest.fn()
-mockedExperimentsDataChanged.fire = mockedExperimentDataChangedFire
+mockedExperimentsRowsChanged.fire = mockedExperimentDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -20,7 +20,7 @@ const mockedDisposable = mocked(Disposable)
 const mockedGetDvcRoots = jest.fn()
 const mockedGetQueuedExperiments = jest.fn()
 const mockedExperiments = {
-  experimentsDataChanged: mockedExperimentsDataChanged,
+  experimentsRowsChanged: mockedExperimentsRowsChanged,
   getDvcRoots: mockedGetDvcRoots,
   getQueuedExperiments: mockedGetQueuedExperiments,
   isReady: () => true
