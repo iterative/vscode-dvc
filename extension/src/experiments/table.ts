@@ -43,8 +43,6 @@ export class ExperimentsTable {
   private readonly resourceLocator: ResourceLocator
 
   private currentSort?: SortDefinition
-  private workspace?: Experiment
-  private unsortedRows?: Experiment[]
   private readonly experimentsRowsChanged = new EventEmitter<void>()
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
@@ -157,8 +155,7 @@ export class ExperimentsTable {
 
   public setSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
-    this.updateRowData()
-    this.sendData()
+    this.updateData()
   }
 
   public async pickSort() {
@@ -170,18 +167,6 @@ export class ExperimentsTable {
 
   public getQueuedExperiments(): string[] {
     return this.queued
-  }
-
-  private updateRowData(): void {
-    const sortedRows = sortRows(this.currentSort, this.unsortedRows)
-    if (sortedRows) {
-      const { workspace } = this
-      this.rowData = sortedRows
-        ? [workspace as Experiment, ...(sortedRows as Experiment[])]
-        : [workspace as Experiment]
-    } else {
-      this.rowData = undefined
-    }
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -205,10 +190,8 @@ export class ExperimentsTable {
     })
 
     this.columnData = columns
-    this.workspace = workspace
-    this.unsortedRows = branches
     this.queued = queued
-    this.rowData = [workspace, ...branches]
+    this.rowData = [workspace, ...sortRows(this.currentSort, branches)]
 
     return this.notifyChanged()
   }

@@ -27,12 +27,6 @@ describe('sortRows', () => {
     ).toEqual(unsortedRows)
   })
 
-  it('Early returns undefined if rows argument is undefined', () => {
-    expect(
-      sortRows({ columnPath: testColumnPath, descending: false }, undefined)
-    ).toEqual(undefined)
-  })
-
   it('Maintains the same order if all items are equal', () => {
     const testData = [
       {

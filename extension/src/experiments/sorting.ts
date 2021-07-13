@@ -29,9 +29,9 @@ const buildExperimentSortFunction = ({
 
 export const sortRows = (
   sortDefinition: SortDefinition | undefined,
-  unsortedRows: Experiment[] | undefined
-) => {
-  if (!sortDefinition || !unsortedRows) {
+  unsortedRows: Experiment[]
+): Experiment[] => {
+  if (!sortDefinition) {
     return unsortedRows
   }
   const sortFunction = buildExperimentSortFunction(
