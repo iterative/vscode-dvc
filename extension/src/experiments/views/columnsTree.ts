@@ -3,7 +3,6 @@ import { Disposable } from '@hediet/std/disposable'
 import {
   commands,
   Event,
-  EventEmitter,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -19,23 +18,15 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
-  private treeDataChanged: EventEmitter<string | void>
 
   private readonly experiments: Experiments
   private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
 
-  constructor(
-    experiments: Experiments,
-    resourceLocator: ResourceLocator,
-    treeDataChanged?: EventEmitter<string | void>
-  ) {
+  constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
     this.resourceLocator = resourceLocator
 
-    this.treeDataChanged = this.dispose.track(
-      treeDataChanged || new EventEmitter()
-    )
-    this.onDidChangeTreeData = this.treeDataChanged.event
+    this.onDidChangeTreeData = experiments.experimentsColumnsChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsColumnsTree', {
@@ -52,9 +43,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         'dvc.views.experimentsColumnsTree.toggleStatus',
         resource => {
           const [dvcRoot, path] = this.getDetails(resource)
-          const status = this.experiments.toggleColumnStatus(dvcRoot, path)
-          this.treeDataChanged.fire()
-          return status
+          return this.experiments.toggleColumnStatus(dvcRoot, path)
         }
       )
     )
@@ -104,7 +93,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   private async getRootElements() {
     await this.experiments.isReady()
-    const dvcRoots = this.experiments.getDvcRoots() || []
+    const dvcRoots = this.experiments.getDvcRoots()
     dvcRoots.forEach(dvcRoot => {
       this.pathRoots[dvcRoot] = dvcRoot
     })

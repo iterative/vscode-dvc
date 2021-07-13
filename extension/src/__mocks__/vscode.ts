@@ -8,6 +8,7 @@ export const extensions = jest.fn()
 export const scm = jest.fn()
 export const Terminal = jest.fn()
 export const ThemeColor = jest.fn()
+export const ThemeIcon = jest.fn()
 export const TreeItem = jest.fn()
 export enum TreeItemCollapsibleState {
   None = 0,

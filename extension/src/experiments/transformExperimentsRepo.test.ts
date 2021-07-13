@@ -9,7 +9,7 @@ const paramsYaml = 'params.yaml'
 
 describe('overall transformer functionality', () => {
   it('returns output that matches the data found in the webview contract', () => {
-    const { workspace, branches, columns } = transformExperimentsRepo(
+    const { workspace, branches, columns, queued } = transformExperimentsRepo(
       complexExperimentsOutput
     )
     const [complexWorkspace, ...complexBranches] = complexRowData
@@ -17,6 +17,7 @@ describe('overall transformer functionality', () => {
     expect(workspace).toEqual(complexWorkspace)
     expect(branches).toEqual(complexBranches)
     expect(columns).toEqual(complexColumnData)
+    expect(queued).toEqual(['90aea7f'])
   })
 })
 

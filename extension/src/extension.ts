@@ -43,6 +43,8 @@ import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
 import { ExperimentsColumnsTree } from './experiments/views/columnsTree'
 import { ExperimentsSortByTree } from './experiments/views/sortByTree'
+import { ExperimentsRunsTree } from './experiments/views/runsTree'
+import { ExperimentsFilterByTree } from './experiments/views/filterByTree'
 
 export { Disposable, Disposer }
 
@@ -120,6 +122,10 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(new ExperimentsSortByTree(this.experiments))
+
+    this.dispose.track(new ExperimentsFilterByTree(this.experiments))
+
+    this.dispose.track(new ExperimentsRunsTree(this.experiments))
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
