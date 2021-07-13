@@ -33,6 +33,37 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 
 // Concrete selectors
 
+.runningBullet {
+  @extend %bullet;
+  border: 1.5px solid $row-bg-color;
+  border-radius: 100%;
+  border-right: 1.5px solid rgb(255, 255, 255);
+  border-top: 1.5px solid rgb(255, 255, 255);
+  width: 12px;
+  height: 12px;
+  animation: spin 1s ease-in-out infinite;
+}
+
+.oddRunningBullet {
+  @extend %bullet;
+  border: 1.5px solid $row-bg-alt-color;
+  border-radius: 100%;
+  border-right: 1.5px solid rgb(255, 255, 255);
+  border-top: 1.5px solid rgb(255, 255, 255);
+  width: 12px;
+  height: 12px;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .queuedBullet {
   @extend %bullet;
   width: 9px;
@@ -64,16 +95,6 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     border-radius: 100%;
     top: calc(50% - 3px);
   }
-}
-
-.runningBullet {
-  margin: 0 6px;
-  height: 6px;
-  width: 6px;
-  border-style: solid;
-  border-width: 5px 0px 5px 8px;
-  border-color: transparent transparent transparent rgb(127, 127, 127);
-  box-sizing: border-box;
 }
 
 .rowArrowPlaceholder {
