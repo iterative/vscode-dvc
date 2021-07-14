@@ -27,7 +27,10 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: Experiment[]
-  runningOrQueued: Map<string, { status: RowStatus; children?: string[] }>
+  runningOrQueued: Map<
+    string,
+    { status: RowStatus; children?: string[]; id?: string }
+  >
   workspace: Experiment
 }
 
@@ -205,18 +208,32 @@ const consolidateExperimentData = (
 
 const addToRunningOrQueued = (
   acc: ExperimentsAccumulator,
-  experiment: Experiment,
-  experiments: Experiment[]
+  experiment: Experiment
 ) => {
   if (experiment.running) {
     return acc.runningOrQueued.set(experiment.displayName, {
-      children: experiments.map(exp => exp.displayName),
+      id: experiment.id,
       status: RowStatus.RUNNING
     })
   }
   return acc.runningOrQueued.set(experiment.displayName, {
     status: RowStatus.QUEUED
   })
+}
+
+const addCheckpointsToRunning = (
+  acc: ExperimentsAccumulator,
+  checkpointsByTip: Map<string, Experiment[]>
+) => {
+  for (const [key, value] of acc.runningOrQueued.entries()) {
+    if (value.status === RowStatus.RUNNING) {
+      const checkpoints = checkpointsByTip.get(value.id || '')
+      acc.runningOrQueued.set(key, {
+        children: checkpoints?.map(checkpoint => checkpoint.displayName),
+        status: value.status
+      })
+    }
+  }
 }
 
 const collectFromBranchEntry = (
@@ -239,10 +256,11 @@ const collectFromBranchEntry = (
     nestExperiment(experiments, checkpointsByTip, experiment)
 
     if (experiment.queued || experiment.running) {
-      addToRunningOrQueued(acc, experiment, experiments)
+      addToRunningOrQueued(acc, experiment)
     }
   }
   addCheckpointsToTips(experiments, checkpointsByTip)
+  addCheckpointsToRunning(acc, checkpointsByTip)
 
   if (experiments.length > 0) {
     branch.subRows = experiments

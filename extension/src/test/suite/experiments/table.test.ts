@@ -79,7 +79,11 @@ suite('Experiments Table Test Suite', () => {
 
       const runningOrQueued = experimentsTable.getRunningOrQueued()
 
-      expect(runningOrQueued).to.deep.equal(['workspace', '90aea7f'])
+      expect(runningOrQueued).to.deep.equal([
+        'workspace',
+        'exp-e7a67',
+        '90aea7f'
+      ])
     })
   })
 

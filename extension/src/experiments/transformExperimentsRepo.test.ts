@@ -21,6 +21,10 @@ describe('overall transformer functionality', () => {
     expect(runningOrQueued).toEqual(
       new Map([
         ['workspace', { status: RowStatus.RUNNING }],
+        [
+          'exp-e7a67',
+          { children: ['d1343a8', '1ee5f2e'], status: RowStatus.RUNNING }
+        ],
         ['90aea7f', { status: RowStatus.QUEUED }]
       ])
     )
