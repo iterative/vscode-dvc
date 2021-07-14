@@ -8,6 +8,11 @@ import {
   ValueTree
 } from '../cli/reader'
 
+export enum RowStatus {
+  RUNNING = 'running',
+  QUEUED = 'queued'
+}
+
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
   hasChildren: boolean
@@ -22,7 +27,7 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: Experiment[]
-  queued: string[]
+  runningOrQueued: { name: string; status: RowStatus }[]
   workspace: Experiment
 }
 
@@ -215,7 +220,10 @@ const collectFromBranchEntry = (
     const experiment = consolidateExperimentData(sha, experimentData)
 
     if (experiment.queued) {
-      acc.queued.push(experiment.displayName)
+      acc.runningOrQueued.push({
+        name: experiment.displayName,
+        status: RowStatus.QUEUED
+      })
     }
 
     collectColumnsFromExperiment(acc, experiment)
@@ -247,7 +255,7 @@ export const collectFromRepo = (
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
     paramsMap: new Map(),
-    queued: [],
+    runningOrQueued: [],
     workspace: {
       ...workspace.baseline,
       displayName: 'workspace',

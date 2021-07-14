@@ -3,6 +3,7 @@ import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsRunsTree } from './runsTree'
 import { Experiments } from '..'
+import { RowStatus } from '../collectFromRepo'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -18,11 +19,11 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
-const mockedGetQueuedExperiments = jest.fn()
+const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
   getDvcRoots: mockedGetDvcRoots,
-  getQueuedExperiments: mockedGetQueuedExperiments,
+  getRunningOrQueued: mockedGetRunningOrQueued,
   isReady: () => true
 } as unknown as Experiments
 
@@ -44,7 +45,7 @@ describe('ExperimentsRunsTree', () => {
     it('should return an empty array when no experiments are queued for any of the repositories', async () => {
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetQueuedExperiments.mockReturnValueOnce([])
+      mockedGetRunningOrQueued.mockReturnValueOnce([])
 
       const rootElements = await experimentsRunsTree.getChildren()
 
@@ -55,9 +56,11 @@ describe('ExperimentsRunsTree', () => {
       const dvcRoots = ['demo', 'and/mock', 'other/repo']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
-      mockedGetQueuedExperiments.mockReturnValueOnce([])
-      mockedGetQueuedExperiments.mockReturnValueOnce([])
-      mockedGetQueuedExperiments.mockReturnValueOnce(['90aea7f'])
+      mockedGetRunningOrQueued.mockReturnValueOnce([])
+      mockedGetRunningOrQueued.mockReturnValueOnce([])
+      mockedGetRunningOrQueued.mockReturnValueOnce([
+        { name: '90aea7f', status: RowStatus.QUEUED }
+      ])
 
       const rootElements = await experimentsRunsTree.getChildren()
 
@@ -65,17 +68,21 @@ describe('ExperimentsRunsTree', () => {
     })
 
     it('should return an array of queued experiment names when an element is provided', async () => {
-      const queuedExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
+      const queuedExperiments = [
+        { name: '90aea7f', status: RowStatus.QUEUED },
+        { name: 'f0778b3', status: RowStatus.QUEUED },
+        { name: 'f81f1b5', status: RowStatus.QUEUED }
+      ]
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
-      mockedGetQueuedExperiments.mockReturnValueOnce(queuedExperiments)
-      mockedGetQueuedExperiments.mockReturnValueOnce(queuedExperiments)
+      mockedGetRunningOrQueued.mockReturnValueOnce(queuedExperiments)
+      mockedGetRunningOrQueued.mockReturnValueOnce(queuedExperiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       await experimentsRunsTree.getChildren()
 
       const children = await experimentsRunsTree.getChildren('repo')
 
-      expect(children).toEqual(queuedExperiments)
+      expect(children).toEqual(['90aea7f', 'f0778b3', 'f81f1b5'])
     })
   })
 
@@ -90,7 +97,7 @@ describe('ExperimentsRunsTree', () => {
 
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetQueuedExperiments.mockReturnValueOnce([])
+      mockedGetRunningOrQueued.mockReturnValueOnce([])
 
       await experimentsRunsTree.getChildren()
 
@@ -111,8 +118,11 @@ describe('ExperimentsRunsTree', () => {
 
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetQueuedExperiments.mockReturnValueOnce(['f0778b3'])
-      mockedGetQueuedExperiments.mockReturnValueOnce(['f0778b3'])
+      const mockedQueuedExperiment = [
+        { name: 'f0778b3', status: RowStatus.QUEUED }
+      ]
+      mockedGetRunningOrQueued.mockReturnValueOnce(mockedQueuedExperiment)
+      mockedGetRunningOrQueued.mockReturnValueOnce(mockedQueuedExperiment)
 
       await experimentsRunsTree.getChildren()
       await experimentsRunsTree.getChildren('demo')

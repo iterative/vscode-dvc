@@ -61,7 +61,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     const queued = flatten(
       dvcRoots.map(dvcRoot => {
         this.runRoots[dvcRoot] = dvcRoot
-        return this.experiments.getQueuedExperiments(dvcRoot)
+        return this.experiments.getRunningOrQueued(dvcRoot)
       })
     )
     if (definedAndNonEmpty(queued)) {
@@ -72,9 +72,11 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   private getQueuedExperiments(dvcRoot: string): string[] {
-    const queued = this.experiments.getQueuedExperiments(dvcRoot)
-    queued.forEach(experiment => (this.runRoots[experiment] = dvcRoot))
-    return queued
+    const runningOrQueued = this.experiments.getRunningOrQueued(dvcRoot)
+    return runningOrQueued.map(experiment => {
+      this.runRoots[experiment.name] = dvcRoot
+      return experiment.name
+    })
   }
 
   private isRoot(element: string) {

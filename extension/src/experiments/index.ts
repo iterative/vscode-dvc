@@ -4,6 +4,7 @@ import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
+import { RowStatus } from './collectFromRepo'
 import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
@@ -78,8 +79,10 @@ export class Experiments {
     return []
   }
 
-  public getQueuedExperiments(dvcRoot: string): string[] {
-    return this.getTable(dvcRoot).getQueuedExperiments()
+  public getRunningOrQueued(
+    dvcRoot: string
+  ): { name: string; status: RowStatus }[] {
+    return this.getTable(dvcRoot).getRunningOrQueued()
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
