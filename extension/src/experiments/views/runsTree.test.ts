@@ -19,10 +19,12 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
+const mockedGetRow = jest.fn()
 const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
   getDvcRoots: mockedGetDvcRoots,
+  getRow: mockedGetRow,
   getRunningOrQueued: mockedGetRunningOrQueued,
   isReady: () => true
 } as unknown as Experiments
@@ -123,6 +125,7 @@ describe('ExperimentsRunsTree', () => {
       ]
       mockedGetRunningOrQueued.mockReturnValueOnce(mockedQueuedExperiment)
       mockedGetRunningOrQueued.mockReturnValueOnce(mockedQueuedExperiment)
+      mockedGetRow.mockReturnValueOnce({ status: RowStatus.QUEUED })
 
       await experimentsRunsTree.getChildren()
       await experimentsRunsTree.getChildren('demo')

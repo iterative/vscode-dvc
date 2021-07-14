@@ -10,6 +10,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
+import { RowStatus } from '../collectFromRepo'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -38,8 +39,13 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
+    const row = this.experiments.getRow(this.runRoots[element], element)
+    const running = row?.status === RowStatus.RUNNING
+
     const item = new TreeItem(element, TreeItemCollapsibleState.None)
-    item.iconPath = new ThemeIcon('watch')
+    item.iconPath = running
+      ? new ThemeIcon('loading~spin')
+      : new ThemeIcon('watch')
     return item
   }
 
@@ -49,7 +55,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     if (this.isRoot(element)) {
-      return Promise.resolve(this.getQueuedExperiments(element))
+      return Promise.resolve(this.getRunningOrQueued(element))
     }
 
     return Promise.resolve([])
@@ -71,7 +77,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     return []
   }
 
-  private getQueuedExperiments(dvcRoot: string): string[] {
+  private getRunningOrQueued(dvcRoot: string): string[] {
     const runningOrQueued = this.experiments.getRunningOrQueued(dvcRoot)
     return runningOrQueued.map(experiment => {
       this.runRoots[experiment.name] = dvcRoot

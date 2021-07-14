@@ -155,6 +155,10 @@ export class ExperimentsTable {
     return this.runningOrQueued
   }
 
+  public getRow(name: string) {
+    return this.runningOrQueued.find(experiment => experiment.name === name)
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(

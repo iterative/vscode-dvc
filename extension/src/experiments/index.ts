@@ -85,6 +85,10 @@ export class Experiments {
     return this.getTable(dvcRoot).getRunningOrQueued()
   }
 
+  public getRow(dvcRoot: string, name: string) {
+    return this.getTable(dvcRoot).getRow(name)
+  }
+
   public getCwdThenRun = async (commandId: CommandId) => {
     const cwd = await this.getFocusedOrDefaultOrPickProject()
     if (!cwd) {
