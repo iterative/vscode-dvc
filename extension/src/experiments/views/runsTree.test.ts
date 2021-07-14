@@ -62,9 +62,7 @@ describe('ExperimentsRunsTree', () => {
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
       mockedGetRunningOrQueued.mockReturnValueOnce([])
       mockedGetRunningOrQueued.mockReturnValueOnce([])
-      mockedGetRunningOrQueued.mockReturnValueOnce([
-        { name: '90aea7f', status: RowStatus.QUEUED }
-      ])
+      mockedGetRunningOrQueued.mockReturnValueOnce(['90aea7f'])
 
       const rootElements = await experimentsRunsTree.getChildren()
 
