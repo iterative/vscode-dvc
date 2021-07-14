@@ -79,10 +79,8 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
   private getRunningOrQueued(dvcRoot: string): string[] {
     const runningOrQueued = this.experiments.getRunningOrQueued(dvcRoot)
-    return runningOrQueued.map(experiment => {
-      this.runRoots[experiment.name] = dvcRoot
-      return experiment.name
-    })
+    runningOrQueued.forEach(experiment => (this.runRoots[experiment] = dvcRoot))
+    return runningOrQueued
   }
 
   private isRoot(element: string) {

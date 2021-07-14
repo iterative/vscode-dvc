@@ -46,7 +46,7 @@ export class ExperimentsTable {
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
-  private runningOrQueued: { name: string; status: RowStatus }[] = []
+  private runningOrQueued: Map<string, { status: RowStatus }> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -151,12 +151,12 @@ export class ExperimentsTable {
     )
   }
 
-  public getRunningOrQueued(): { name: string; status: RowStatus }[] {
-    return this.runningOrQueued
+  public getRunningOrQueued(): string[] {
+    return [...this.runningOrQueued.keys()]
   }
 
   public getRow(name: string) {
-    return this.runningOrQueued.find(experiment => experiment.name === name)
+    return this.runningOrQueued.get(name)
   }
 
   private async updateData(): Promise<boolean | undefined> {

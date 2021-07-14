@@ -27,7 +27,7 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: Experiment[]
-  runningOrQueued: { name: string; status: RowStatus }[]
+  runningOrQueued: Map<string, { status: RowStatus }>
   workspace: Experiment
 }
 
@@ -208,10 +208,7 @@ const addToRunningOrQueued = (
   experiment: Experiment
 ) => {
   const status = experiment.running ? RowStatus.RUNNING : RowStatus.QUEUED
-  acc.runningOrQueued.push({
-    name: experiment.displayName,
-    status
-  })
+  acc.runningOrQueued.set(experiment.displayName, { status })
 }
 
 const collectFromBranchEntry = (
@@ -263,7 +260,7 @@ export const collectFromRepo = (
     checkpointsByTip: new Map(),
     metricsMap: new Map(),
     paramsMap: new Map(),
-    runningOrQueued: [],
+    runningOrQueued: new Map(),
     workspace: {
       ...workspace.baseline,
       displayName: 'workspace',
@@ -273,8 +270,7 @@ export const collectFromRepo = (
   collectColumnsFromExperiment(acc, workspace.baseline)
 
   if (workspace.baseline.running) {
-    acc.runningOrQueued.push({
-      name: 'workspace',
+    acc.runningOrQueued.set('workspace', {
       status: RowStatus.RUNNING
     })
   }

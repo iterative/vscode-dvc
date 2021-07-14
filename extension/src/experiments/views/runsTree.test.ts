@@ -70,11 +70,7 @@ describe('ExperimentsRunsTree', () => {
     })
 
     it('should return an array of queued experiment names when an element is provided', async () => {
-      const queuedExperiments = [
-        { name: '90aea7f', status: RowStatus.QUEUED },
-        { name: 'f0778b3', status: RowStatus.QUEUED },
-        { name: 'f81f1b5', status: RowStatus.QUEUED }
-      ]
+      const queuedExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetRunningOrQueued.mockReturnValueOnce(queuedExperiments)
       mockedGetRunningOrQueued.mockReturnValueOnce(queuedExperiments)
@@ -84,7 +80,7 @@ describe('ExperimentsRunsTree', () => {
 
       const children = await experimentsRunsTree.getChildren('repo')
 
-      expect(children).toEqual(['90aea7f', 'f0778b3', 'f81f1b5'])
+      expect(children).toEqual(queuedExperiments)
     })
   })
 

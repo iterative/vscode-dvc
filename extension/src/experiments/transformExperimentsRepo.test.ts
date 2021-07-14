@@ -17,10 +17,13 @@ describe('overall transformer functionality', () => {
     expect(workspace).toEqual(complexWorkspace)
     expect(branches).toEqual(complexBranches)
     expect(columns).toEqual(complexColumnData)
-    expect(runningOrQueued).toEqual([
-      { name: 'workspace', status: RowStatus.RUNNING },
-      { name: '90aea7f', status: RowStatus.QUEUED }
-    ])
+
+    expect(runningOrQueued).toEqual(
+      new Map([
+        ['workspace', { status: RowStatus.RUNNING }],
+        ['90aea7f', { status: RowStatus.QUEUED }]
+      ])
+    )
   })
 })
 

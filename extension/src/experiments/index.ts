@@ -4,7 +4,6 @@ import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsTable } from './table'
-import { RowStatus } from './collectFromRepo'
 import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
@@ -79,9 +78,7 @@ export class Experiments {
     return []
   }
 
-  public getRunningOrQueued(
-    dvcRoot: string
-  ): { name: string; status: RowStatus }[] {
+  public getRunningOrQueued(dvcRoot: string): string[] {
     return this.getTable(dvcRoot).getRunningOrQueued()
   }
 

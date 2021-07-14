@@ -13,7 +13,6 @@ import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
-import { RowStatus } from '../../../experiments/collectFromRepo'
 
 suite('Experiments Table Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -78,12 +77,9 @@ suite('Experiments Table Test Suite', () => {
       )
       await experimentsTable.isReady()
 
-      const queued = experimentsTable.getRunningOrQueued()
+      const runningOrQueued = experimentsTable.getRunningOrQueued()
 
-      expect(queued).to.deep.equal([
-        { name: 'workspace', status: RowStatus.RUNNING },
-        { name: '90aea7f', status: RowStatus.QUEUED }
-      ])
+      expect(runningOrQueued).to.deep.equal(['workspace', '90aea7f'])
     })
   })
 
