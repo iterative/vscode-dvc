@@ -5,7 +5,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
-import { RowStatus } from './collectFromRepo'
+import { RunningOrQueued } from './collectFromRepo'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -46,10 +46,7 @@ export class ExperimentsTable {
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
-  private runningOrQueued: Map<
-    string,
-    { status: RowStatus; children?: string[] }
-  > = new Map()
+  private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 

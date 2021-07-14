@@ -13,6 +13,8 @@ export enum RowStatus {
   QUEUED = 'queued'
 }
 
+export type RunningOrQueued = { status: RowStatus; children?: string[] }
+
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
   hasChildren: boolean
@@ -27,10 +29,7 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: Experiment[]
-  runningOrQueued: Map<
-    string,
-    { status: RowStatus; children?: string[]; id?: string }
-  >
+  runningOrQueued: Map<string, RunningOrQueued & { id?: string }>
   workspace: Experiment
 }
 
