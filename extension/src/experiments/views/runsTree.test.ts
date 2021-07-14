@@ -153,6 +153,37 @@ describe('ExperimentsRunsTree', () => {
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
     })
 
+    it('should return a tree item for a running experiment', async () => {
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
+        expect(collapsibleState).toEqual(1)
+        mockedItem = { collapsibleState, label }
+        return mockedItem
+      })
+      mockedThemeIcon.mockImplementationOnce(function (id) {
+        return { id }
+      })
+
+      const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      const mockedRunningExperiment = 'f0778b3'
+      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetRow.mockReturnValueOnce({
+        children: ['e5855d7', '6e5e782'],
+        status: RowStatus.RUNNING
+      })
+
+      await experimentsRunsTree.getChildren()
+      await experimentsRunsTree.getChildren('demo')
+
+      const treeItem = experimentsRunsTree.getTreeItem(mockedRunningExperiment)
+      expect(treeItem).toEqual({
+        ...mockedItem,
+        iconPath: { id: 'loading~spin' }
+      })
+    })
+
     it("should return a tree item for an experiment's checkpoint", () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
