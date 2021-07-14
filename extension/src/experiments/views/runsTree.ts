@@ -39,13 +39,14 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    const row = this.experiments.getRow(this.runRoots[element], element)
-
-    if (!row) {
+    const dvcRoot = this.runRoots[element]
+    if (!dvcRoot) {
       const item = new TreeItem(element, TreeItemCollapsibleState.None)
       item.iconPath = new ThemeIcon('primitive-dot')
       return item
     }
+
+    const row = this.experiments.getRow(dvcRoot, element)
 
     const running = row?.status === RowStatus.RUNNING
     const hasChildren = definedAndNonEmpty(row?.children)
