@@ -40,6 +40,13 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     const row = this.experiments.getRow(this.runRoots[element], element)
+
+    if (!row) {
+      const item = new TreeItem(element, TreeItemCollapsibleState.None)
+      item.iconPath = new ThemeIcon('primitive-dot')
+      return item
+    }
+
     const running = row?.status === RowStatus.RUNNING
     const hasChildren = definedAndNonEmpty(row?.children)
 
@@ -63,7 +70,9 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return Promise.resolve(this.getRunningOrQueued(element))
     }
 
-    return Promise.resolve([])
+    return Promise.resolve(
+      this.experiments.getChildRows(this.runRoots[element], element) || []
+    )
   }
 
   private async getRootElements() {

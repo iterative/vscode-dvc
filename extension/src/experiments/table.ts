@@ -162,6 +162,10 @@ export class ExperimentsTable {
     return this.runningOrQueued.get(name)
   }
 
+  public getChildRows(name: string) {
+    return this.runningOrQueued.get(name)?.children
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
