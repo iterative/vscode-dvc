@@ -51,7 +51,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     const hasChildren = definedAndNonEmpty(row?.children)
 
     const collapsibleState = hasChildren
-      ? TreeItemCollapsibleState.Expanded
+      ? TreeItemCollapsibleState.Collapsed
       : TreeItemCollapsibleState.None
 
     const item = new TreeItem(element, collapsibleState)
@@ -78,13 +78,13 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
-    const queued = flatten(
+    const runningOrQueued = flatten(
       dvcRoots.map(dvcRoot => {
         this.runRoots[dvcRoot] = dvcRoot
         return this.experiments.getRunningOrQueued(dvcRoot)
       })
     )
-    if (definedAndNonEmpty(queued)) {
+    if (definedAndNonEmpty(runningOrQueued)) {
       return dvcRoots.sort((a, b) => a.localeCompare(b))
     }
 
