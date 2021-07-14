@@ -203,6 +203,17 @@ const consolidateExperimentData = (
   displayName: baseline.name || sha.slice(0, 7)
 })
 
+const addToRunningOrQueued = (
+  acc: ExperimentsAccumulator,
+  experiment: Experiment
+) => {
+  const status = experiment.running ? RowStatus.RUNNING : RowStatus.QUEUED
+  acc.runningOrQueued.push({
+    name: experiment.displayName,
+    status
+  })
+}
+
 const collectFromBranchEntry = (
   acc: ExperimentsAccumulator,
   [branchSha, { baseline, ...experimentsObject }]: [
@@ -219,11 +230,8 @@ const collectFromBranchEntry = (
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const experiment = consolidateExperimentData(sha, experimentData)
 
-    if (experiment.queued) {
-      acc.runningOrQueued.push({
-        name: experiment.displayName,
-        status: RowStatus.QUEUED
-      })
+    if (experiment.queued || experiment.running) {
+      addToRunningOrQueued(acc, experiment)
     }
 
     collectColumnsFromExperiment(acc, experiment)
@@ -263,6 +271,14 @@ export const collectFromRepo = (
     }
   }
   collectColumnsFromExperiment(acc, workspace.baseline)
+
+  if (workspace.baseline.running) {
+    acc.runningOrQueued.push({
+      name: 'workspace',
+      status: RowStatus.RUNNING
+    })
+  }
+
   collectFromBranchesObject(acc, branchesObject)
   return acc
 }

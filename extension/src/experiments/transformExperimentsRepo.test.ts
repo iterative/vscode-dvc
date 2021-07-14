@@ -18,6 +18,7 @@ describe('overall transformer functionality', () => {
     expect(branches).toEqual(complexBranches)
     expect(columns).toEqual(complexColumnData)
     expect(runningOrQueued).toEqual([
+      { name: 'workspace', status: RowStatus.RUNNING },
       { name: '90aea7f', status: RowStatus.QUEUED }
     ])
   })
