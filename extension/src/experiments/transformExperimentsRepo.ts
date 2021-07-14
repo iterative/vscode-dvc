@@ -7,7 +7,7 @@ interface TransformedExperiments {
   columns: ColumnData[]
   branches: Experiment[]
   workspace: Experiment
-  runningOrQueued: Map<string, { status: RowStatus }>
+  runningOrQueued: Map<string, { status: RowStatus; children?: string[] }>
 }
 
 export const transformExperimentsRepo = (

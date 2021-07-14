@@ -46,7 +46,10 @@ export class ExperimentsTable {
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
-  private runningOrQueued: Map<string, { status: RowStatus }> = new Map()
+  private runningOrQueued: Map<
+    string,
+    { status: RowStatus; children?: string[] }
+  > = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 

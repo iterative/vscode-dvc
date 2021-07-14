@@ -41,8 +41,13 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     const row = this.experiments.getRow(this.runRoots[element], element)
     const running = row?.status === RowStatus.RUNNING
+    const hasChildren = definedAndNonEmpty(row?.children)
 
-    const item = new TreeItem(element, TreeItemCollapsibleState.None)
+    const collapsibleState = hasChildren
+      ? TreeItemCollapsibleState.Expanded
+      : TreeItemCollapsibleState.None
+
+    const item = new TreeItem(element, collapsibleState)
     item.iconPath = running
       ? new ThemeIcon('loading~spin')
       : new ThemeIcon('watch')
