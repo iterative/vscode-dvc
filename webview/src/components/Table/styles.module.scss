@@ -3,6 +3,11 @@
 $row-bg-color: var(--vscode-editor-background);
 $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 
+$backgroundColors: (
+  Even: $row-bg-color,
+  Odd: $row-bg-alt-color
+);
+
 // Extendable Silent Rules
 
 %fullwidth {
@@ -31,28 +36,27 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
 }
 
+// wacky mixins
+
+@mixin rowRunningBullets {
+  @each $name, $rgba in $backgroundColors {
+    &#{$name} {
+      @extend %bullet;
+      border: 1.5px solid $rgba;
+      border-radius: 100%;
+      border-right: 1.5px solid rgb(255, 255, 255);
+      border-top: 1.5px solid rgb(255, 255, 255);
+      width: 12px;
+      height: 12px;
+      animation: spin 1s ease-in-out infinite;
+    }
+  }
+}
+
 // Concrete selectors
 
 .runningBullet {
-  @extend %bullet;
-  border: 1.5px solid $row-bg-color;
-  border-radius: 100%;
-  border-right: 1.5px solid rgb(255, 255, 255);
-  border-top: 1.5px solid rgb(255, 255, 255);
-  width: 12px;
-  height: 12px;
-  animation: spin 1s ease-in-out infinite;
-}
-
-.oddRunningBullet {
-  @extend %bullet;
-  border: 1.5px solid $row-bg-alt-color;
-  border-radius: 100%;
-  border-right: 1.5px solid rgb(255, 255, 255);
-  border-top: 1.5px solid rgb(255, 255, 255);
-  width: 12px;
-  height: 12px;
-  animation: spin 1s ease-in-out infinite;
+  @include rowRunningBullets;
 }
 
 @keyframes spin {

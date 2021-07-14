@@ -74,8 +74,8 @@ const getFirstCellProps = (
 const getBulletStyle = (row: Row<Experiment>): string => {
   if (row.original.running) {
     return row.flatIndex % 2 === 0
-      ? styles.runningBullet
-      : styles.oddRunningBullet
+      ? styles.runningBulletEven
+      : styles.runningBulletOdd
   }
   if (row.original.queued) {
     return styles.queuedBullet
