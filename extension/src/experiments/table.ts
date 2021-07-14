@@ -46,8 +46,10 @@ export class ExperimentsTable {
   private readonly experimentsRowsChanged = new EventEmitter<void>()
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
+  private workspace?: Experiment
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
+  private branches?: Experiment[]
   private queued: string[] = []
 
   private columnStatus: Record<string, ColumnStatus> = {}
@@ -155,7 +157,10 @@ export class ExperimentsTable {
 
   public setSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
-    this.updateData()
+
+    this.applySort()
+
+    return this.notifyChanged()
   }
 
   public async pickSort() {
@@ -201,9 +206,19 @@ export class ExperimentsTable {
 
     this.columnData = columns
     this.queued = queued
-    this.rowData = [workspace, ...sortRows(this.currentSort, branches)]
+    this.workspace = workspace
+    this.branches = branches
+
+    this.applySort()
 
     return this.notifyChanged()
+  }
+
+  private applySort() {
+    this.rowData = [
+      this.workspace as Experiment,
+      ...sortRows(this.currentSort, this.branches as Experiment[])
+    ]
   }
 
   private notifyChanged() {
