@@ -205,19 +205,21 @@ const consolidateExperimentData = (
   displayName: baseline.name || sha.slice(0, 7)
 })
 
-const addToRunningOrQueued = (
+const collectRunningOrQueued = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
   if (experiment.running) {
-    return acc.runningOrQueued.set(experiment.displayName, {
+    acc.runningOrQueued.set(experiment.displayName, {
       id: experiment.id,
       status: RowStatus.RUNNING
     })
   }
-  return acc.runningOrQueued.set(experiment.displayName, {
-    status: RowStatus.QUEUED
-  })
+  if (experiment.queued) {
+    acc.runningOrQueued.set(experiment.displayName, {
+      status: RowStatus.QUEUED
+    })
+  }
 }
 
 const addCheckpointsToRunning = (
@@ -246,10 +248,7 @@ const collectFromExperimentsObject = (
 
     collectColumnsFromExperiment(acc, experiment)
     nestExperiment(experiments, checkpointsByTip, experiment)
-
-    if (experiment.queued || experiment.running) {
-      addToRunningOrQueued(acc, experiment)
-    }
+    collectRunningOrQueued(acc, experiment)
   }
 }
 
