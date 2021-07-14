@@ -44,11 +44,15 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   public getChildren(element?: string): Promise<string[]> {
-    if (element) {
+    if (!element) {
+      return this.getRootElements()
+    }
+
+    if (this.isRoot(element)) {
       return Promise.resolve(this.getQueuedExperiments(element))
     }
 
-    return this.getRootElements()
+    return Promise.resolve([])
   }
 
   private async getRootElements() {

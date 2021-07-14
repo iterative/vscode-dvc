@@ -68,10 +68,14 @@ describe('ExperimentsRunsTree', () => {
       const queuedExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetQueuedExperiments.mockReturnValueOnce(queuedExperiments)
+      mockedGetQueuedExperiments.mockReturnValueOnce(queuedExperiments)
 
-      const rootElements = await experimentsRunsTree.getChildren('repo')
+      mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      await experimentsRunsTree.getChildren()
 
-      expect(rootElements).toEqual(queuedExperiments)
+      const children = await experimentsRunsTree.getChildren('repo')
+
+      expect(children).toEqual(queuedExperiments)
     })
   })
 
