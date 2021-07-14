@@ -20,9 +20,11 @@ const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
 const mockedGetRow = jest.fn()
+const mockedGetChildRows = jest.fn()
 const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
+  getChildRows: mockedGetChildRows,
   getDvcRoots: mockedGetDvcRoots,
   getRow: mockedGetRow,
   getRunningOrQueued: mockedGetRunningOrQueued,
@@ -81,6 +83,29 @@ describe('ExperimentsRunsTree', () => {
       const children = await experimentsRunsTree.getChildren('repo')
 
       expect(children).toEqual(queuedExperiments)
+    })
+
+    it('should return an array of checkpoints when a non root element is provided', async () => {
+      const runningOrQueuedExperiments = [
+        'ebbd66f',
+        'e5855d7',
+        '6e5e782',
+        '15c9c56'
+      ]
+      const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
+      mockedGetRunningOrQueued.mockReturnValueOnce(runningOrQueuedExperiments)
+      mockedGetRunningOrQueued.mockReturnValueOnce(runningOrQueuedExperiments)
+
+      mockedGetDvcRoots.mockReturnValueOnce(['repo'])
+      await experimentsRunsTree.getChildren()
+      await experimentsRunsTree.getChildren('repo')
+
+      const checkpoints = ['aaaaaaa', 'bbbbbbb']
+      mockedGetChildRows.mockReturnValueOnce(checkpoints)
+
+      const children = await experimentsRunsTree.getChildren('ebbd66f')
+
+      expect(children).toEqual(checkpoints)
     })
   })
 
