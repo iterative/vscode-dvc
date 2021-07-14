@@ -224,13 +224,31 @@ const addCheckpointsToRunning = (
   acc: ExperimentsAccumulator,
   checkpointsByTip: Map<string, Experiment[]>
 ) => {
-  for (const [key, value] of acc.runningOrQueued.entries()) {
-    if (value.status === RowStatus.RUNNING) {
-      const checkpoints = checkpointsByTip.get(value.id || '')
-      acc.runningOrQueued.set(key, {
+  for (const [displayName, { id, status }] of acc.runningOrQueued.entries()) {
+    if (status === RowStatus.RUNNING && id) {
+      const checkpoints = checkpointsByTip.get(id)
+      acc.runningOrQueued.set(displayName, {
         children: checkpoints?.map(checkpoint => checkpoint.displayName),
-        status: value.status
+        status
       })
+    }
+  }
+}
+
+const collectFromExperimentsObject = (
+  acc: ExperimentsAccumulator,
+  experiments: Experiment[],
+  checkpointsByTip: Map<string, Experiment[]>,
+  experimentsObject: { [sha: string]: ExperimentFields }
+) => {
+  for (const [sha, experimentData] of Object.entries(experimentsObject)) {
+    const experiment = consolidateExperimentData(sha, experimentData)
+
+    collectColumnsFromExperiment(acc, experiment)
+    nestExperiment(experiments, checkpointsByTip, experiment)
+
+    if (experiment.queued || experiment.running) {
+      addToRunningOrQueued(acc, experiment)
     }
   }
 }
@@ -248,16 +266,13 @@ const collectFromBranchEntry = (
   const experiments: Experiment[] = []
   const checkpointsByTip = new Map<string, Experiment[]>()
 
-  for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment = consolidateExperimentData(sha, experimentData)
+  collectFromExperimentsObject(
+    acc,
+    experiments,
+    checkpointsByTip,
+    experimentsObject
+  )
 
-    collectColumnsFromExperiment(acc, experiment)
-    nestExperiment(experiments, checkpointsByTip, experiment)
-
-    if (experiment.queued || experiment.running) {
-      addToRunningOrQueued(acc, experiment)
-    }
-  }
   addCheckpointsToTips(experiments, checkpointsByTip)
   addCheckpointsToRunning(acc, checkpointsByTip)
 
