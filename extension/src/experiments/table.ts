@@ -50,7 +50,6 @@ export class ExperimentsTable {
   private workspace?: Experiment
   private columnData?: ColumnData[]
   private branches?: Experiment[]
-  private queued: string[] = []
   private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
@@ -169,10 +168,6 @@ export class ExperimentsTable {
     }
   }
 
-  public getQueuedExperiments(): string[] {
-    return this.queued
-  }
-
   public getRunningOrQueued(): string[] {
     return [...this.runningOrQueued.keys()]
   }
@@ -186,15 +181,15 @@ export class ExperimentsTable {
   }
 
   public getTableData(): TableData {
+    const { workspace, branches } = this
     return {
       columns:
         this.columnData?.filter(
           column => this.columnStatus[column.path] !== ColumnStatus.unselected
         ) || [],
-      rows: [
-        this.workspace as Experiment,
-        ...sortRows(this.currentSort, this.branches as Experiment[])
-      ]
+      rows: branches
+        ? [workspace as Experiment, ...sortRows(this.currentSort, branches)]
+        : []
     }
   }
 
