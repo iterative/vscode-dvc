@@ -59,7 +59,7 @@ export const pickSort = async (
   columnData: ColumnData[] | undefined
 ): Promise<SortDefinition | undefined> => {
   if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to sort with!')
+    window.showErrorMessage('There are no columns to sort with')
     return
   }
   const pickedColumn = await pickFromColumnData(columnData, {
