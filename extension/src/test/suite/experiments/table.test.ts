@@ -64,7 +64,7 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
-  describe('getQueuedExperiments', () => {
+  describe('getRunningOrQueued', () => {
     it('should return the currently queued experiments', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -79,9 +79,13 @@ suite('Experiments Table Test Suite', () => {
       )
       await experimentsTable.isReady()
 
-      const queued = experimentsTable.getQueuedExperiments()
+      const runningOrQueued = experimentsTable.getRunningOrQueued()
 
-      expect(queued).to.deep.equal(['90aea7f'])
+      expect(runningOrQueued).to.deep.equal([
+        'workspace',
+        'exp-e7a67',
+        '90aea7f'
+      ])
     })
   })
 

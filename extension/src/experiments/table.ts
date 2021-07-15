@@ -7,6 +7,7 @@ import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
 import { pickSort } from './quickPick'
+import { RunningOrQueued } from './collectFromRepo'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -51,6 +52,7 @@ export class ExperimentsTable {
   private rowData?: Experiment[]
   private branches?: Experiment[]
   private queued: string[] = []
+  private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -158,7 +160,7 @@ export class ExperimentsTable {
   public setSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
 
-    this.applySort()
+    this.sortRowData()
 
     return this.notifyChanged()
   }
@@ -172,6 +174,18 @@ export class ExperimentsTable {
 
   public getQueuedExperiments(): string[] {
     return this.queued
+  }
+
+  public getRunningOrQueued(): string[] {
+    return [...this.runningOrQueued.keys()]
+  }
+
+  public getRow(name: string) {
+    return this.runningOrQueued.get(name)
+  }
+
+  public getChildRows(name: string) {
+    return this.runningOrQueued.get(name)?.children
   }
 
   public getTableData(): TableData {
@@ -195,7 +209,7 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, queued, workspace } =
+    const { columns, branches, runningOrQueued, workspace } =
       transformExperimentsRepo(data)
 
     columns.forEach(column => {
@@ -205,16 +219,15 @@ export class ExperimentsTable {
     })
 
     this.columnData = columns
-    this.queued = queued
     this.workspace = workspace
     this.branches = branches
-
-    this.applySort()
+    this.runningOrQueued = runningOrQueued
+    this.sortRowData()
 
     return this.notifyChanged()
   }
 
-  private applySort() {
+  private sortRowData() {
     this.rowData = [
       this.workspace as Experiment,
       ...sortRows(this.currentSort, this.branches as Experiment[])
