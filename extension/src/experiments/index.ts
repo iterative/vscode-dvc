@@ -47,11 +47,25 @@ export class Experiments {
     return this.initialized
   }
 
-  public getFocused(): ExperimentsTable | undefined {
+  public getFocusedTable(): ExperimentsTable | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
     return this.experiments[this.focusedWebviewDvcRoot]
+  }
+
+  public async getFocusedOrDefaultOrPickTable() {
+    return this.getTable(await this.getFocusedOrDefaultOrPickProject())
+  }
+
+  public async pickSort() {
+    const table = await this.getFocusedOrDefaultOrPickTable()
+    table.pickSort()
+  }
+
+  public async clearSort() {
+    const table = await this.getFocusedOrDefaultOrPickTable()
+    table.setSort(undefined)
   }
 
   public getDvcRoots() {

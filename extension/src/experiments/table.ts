@@ -5,6 +5,8 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
+import { SortDefinition, sortRows } from './sorting'
+import { pickSort } from './quickPick'
 import { RunningOrQueued } from './collectFromRepo'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
@@ -41,11 +43,13 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
+  private currentSort?: SortDefinition
   private readonly experimentsRowsChanged = new EventEmitter<void>()
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
+  private workspace?: Experiment
   private columnData?: ColumnData[]
-  private rowData?: Experiment[]
+  private branches?: Experiment[]
   private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
@@ -151,6 +155,19 @@ export class ExperimentsTable {
     )
   }
 
+  public setSort(sort: SortDefinition | undefined) {
+    this.currentSort = sort
+
+    return this.notifyChanged()
+  }
+
+  public async pickSort() {
+    const pickedSortDefinition = await pickSort(this.columnData)
+    if (pickedSortDefinition) {
+      return this.setSort(pickedSortDefinition)
+    }
+  }
+
   public getRunningOrQueued(): string[] {
     return [...this.runningOrQueued.keys()]
   }
@@ -161,6 +178,19 @@ export class ExperimentsTable {
 
   public getChildRows(name: string) {
     return this.runningOrQueued.get(name)?.children
+  }
+
+  public getTableData(): TableData {
+    const { workspace, branches } = this
+    return {
+      columns:
+        this.columnData?.filter(
+          column => this.columnStatus[column.path] !== ColumnStatus.unselected
+        ) || [],
+      rows: branches
+        ? [workspace as Experiment, ...sortRows(this.currentSort, branches)]
+        : []
+    }
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -184,7 +214,8 @@ export class ExperimentsTable {
     })
 
     this.columnData = columns
-    this.rowData = [workspace, ...branches]
+    this.workspace = workspace
+    this.branches = branches
     this.runningOrQueued = runningOrQueued
 
     return this.notifyChanged()
@@ -206,16 +237,6 @@ export class ExperimentsTable {
       return this.webview.showExperiments({
         tableData: this.getTableData()
       })
-    }
-  }
-
-  private getTableData(): TableData {
-    return {
-      columns:
-        this.columnData?.filter(
-          column => this.columnStatus[column.path] !== ColumnStatus.unselected
-        ) || [],
-      rows: this.rowData || []
     }
   }
 

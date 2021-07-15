@@ -201,6 +201,16 @@
         "title": "%command.copyRelativeFilePath%",
         "command": "dvc.copyRelativeFilePath",
         "category": "DVC"
+      },
+      {
+        "title": "%command.setExperimentsTableSort%",
+        "command": "dvc.setExperimentsTableSort",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.clearExperimentsTableSort%",
+        "command": "dvc.clearExperimentsTableSort",
+        "category": "DVC"
       }
     ],
     "configuration": {
@@ -536,6 +546,7 @@
     "execa": "^5.0.0",
     "fs-extra": "^10.0.0",
     "lodash.debounce": "^4.0.8",
+    "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
     "mobx": "^6.0.4",
@@ -547,6 +558,7 @@
     "@types/fs-extra": "^9.0.7",
     "@types/jest": "^26.0.23",
     "@types/lodash.debounce": "^4.0.6",
+    "@types/lodash.get": "^4.4.6",
     "@types/lodash.isequal": "^4.5.5",
     "@types/lodash.uniqwith": "^4.5.6",
     "@types/mocha": "^8.2.0",
