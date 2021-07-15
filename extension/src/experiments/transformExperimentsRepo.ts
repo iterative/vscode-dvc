@@ -5,7 +5,7 @@ import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 interface TransformedExperiments {
   columns: ColumnData[]
-  branches: Experiment[]
+  experiments: Experiment[]
   workspace: Experiment
   runningOrQueued: Map<string, RunningOrQueued>
 }
@@ -13,15 +13,15 @@ interface TransformedExperiments {
 export const transformExperimentsRepo = (
   data: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const { metricsMap, paramsMap, branches, workspace, runningOrQueued } =
+  const { metricsMap, paramsMap, experiments, workspace, runningOrQueued } =
     collectFromRepo(data)
 
   return {
-    branches,
     columns: [
       ...transformAndCollectFromColumnsIfAny(paramsMap),
       ...transformAndCollectFromColumnsIfAny(metricsMap)
     ],
+    experiments,
     runningOrQueued,
     workspace
   }

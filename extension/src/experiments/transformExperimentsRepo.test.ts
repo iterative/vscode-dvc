@@ -10,12 +10,12 @@ const paramsYaml = 'params.yaml'
 
 describe('overall transformer functionality', () => {
   it('returns output that matches the data found in the webview contract', () => {
-    const { workspace, branches, columns, runningOrQueued } =
+    const { workspace, experiments, columns, runningOrQueued } =
       transformExperimentsRepo(complexExperimentsOutput)
     const [complexWorkspace, ...complexBranches] = complexRowData
 
     expect(workspace).toEqual(complexWorkspace)
-    expect(branches).toEqual(complexBranches)
+    expect(experiments).toEqual(complexBranches)
     expect(columns).toEqual(complexColumnData)
 
     expect(runningOrQueued).toEqual(
@@ -30,7 +30,7 @@ describe('overall transformer functionality', () => {
 
 describe('branch and checkpoint nesting', () => {
   it('returns an empty array if no branches are present', () => {
-    const { branches } = transformExperimentsRepo({
+    const { experiments: branches } = transformExperimentsRepo({
       workspace: {
         baseline: {}
       }
@@ -39,7 +39,7 @@ describe('branch and checkpoint nesting', () => {
   })
 
   describe('a repo with two branches', () => {
-    const { branches: experiments, workspace } = transformExperimentsRepo({
+    const { experiments, workspace } = transformExperimentsRepo({
       branchA: {
         baseline: {},
         otherExp1: {},
@@ -91,7 +91,7 @@ describe('branch and checkpoint nesting', () => {
   })
 
   describe('a repo with one branch that has nested checkpoints', () => {
-    const { branches } = transformExperimentsRepo({
+    const { experiments } = transformExperimentsRepo({
       branchA: {
         baseline: {},
         tip1: {
@@ -110,19 +110,19 @@ describe('branch and checkpoint nesting', () => {
       workspace: { baseline: {} }
     })
 
-    const experiments = branches.filter(
+    const branchAExperiments = experiments.filter(
       branch => branch.parentPath === 'branchA'
     )
 
-    const [tip1] = experiments
+    const [tip1] = branchAExperiments
 
     it('only lists the tip as a top-level experiment', () => {
-      expect(experiments.length).toEqual(1)
+      expect(branchAExperiments.length).toEqual(1)
 
       expect(tip1.id).toEqual('tip1')
     })
 
-    const checkpoints = branches.filter(
+    const checkpoints = experiments.filter(
       branch => branch.parentPath === tip1.path
     )
 

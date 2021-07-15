@@ -180,7 +180,7 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, runningOrQueued, workspace } =
+    const { columns, experiments, runningOrQueued, workspace } =
       transformExperimentsRepo(data)
 
     columns.forEach(column => {
@@ -190,7 +190,7 @@ export class ExperimentsTable {
     })
 
     this.columnData = columns
-    this.rowData = [workspace, ...branches]
+    this.rowData = [workspace, ...experiments]
     this.runningOrQueued = runningOrQueued
 
     return this.notifyChanged()

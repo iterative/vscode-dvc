@@ -28,7 +28,7 @@ interface ExperimentsAccumulator {
   paramsMap: PartialColumnsMap
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
-  branches: Experiment[]
+  experiments: Experiment[]
   runningOrQueued: Map<string, RunningOrQueued>
   workspace: Experiment
 }
@@ -194,14 +194,14 @@ const collectFromExperimentsObject = (
 
     const { checkpoint_tip, id } = experiment
     if (checkpoint_tip && checkpoint_tip !== id) {
-      acc.branches.push({
+      acc.experiments.push({
         ...experiment,
         level: 3,
         parentPath: join(parentId, checkpoint_tip),
         path: join(parentId, checkpoint_tip, experiment.id)
       })
     } else {
-      acc.branches.push({
+      acc.experiments.push({
         ...experiment,
         level: 2,
         parentPath: parentId,
@@ -230,7 +230,7 @@ const collectFromBranchEntry = (
 
   collectFromExperimentsObject(acc, experimentsObject, branchSha)
 
-  acc.branches.push(branch)
+  acc.experiments.push(branch)
 }
 
 const collectFromBranchesObject = (
@@ -247,8 +247,8 @@ export const collectFromRepo = (
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
   const acc: ExperimentsAccumulator = {
-    branches: [] as Experiment[],
     checkpointsByTip: new Map(),
+    experiments: [] as Experiment[],
     metricsMap: new Map(),
     paramsMap: new Map(),
     runningOrQueued: new Map(),
