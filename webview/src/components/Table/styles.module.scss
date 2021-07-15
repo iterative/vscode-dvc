@@ -9,16 +9,13 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   @extend %fullwidth;
 }
 
-%rowArrowBase {
+%expandableRowArrow {
   width: 8px;
   height: 8px;
-  margin: 0 6px;
+  top: 0;
+  left: 0;
   display: inline-block;
-}
-
-%expandableRowArrow {
-  @extend %rowArrowBase;
-  position: relative;
+  position: absolute;
   border: 2px solid rgba(255, 255, 255, 0.21);
   border-top: unset;
   border-left: unset;
@@ -41,6 +38,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   width: 24px;
   flex: 0 0 24px;
   text-align: center;
+  position: relative;
   &::before {
     display: inline-block;
     margin: 0 5px;
@@ -81,7 +79,12 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 }
 
 .rowArrowPlaceholder {
-  @extend %rowArrowBase;
+  width: 8px;
+  height: 8px;
+  margin: 0 6px;
+  flex: 0 0 8px;
+  display: inline-block;
+  position: relative;
 }
 
 .expandedRowArrow {
@@ -131,6 +134,29 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     .nestedRow {
       .firstCell {
         padding-left: 2rem;
+      }
+    }
+    &.expandedGroup .nestedRow {
+      .bullet {
+        &::after {
+          content: '';
+          height: 100%;
+          top: 0;
+          right: 50%;
+          position: absolute;
+          border-right: 1px solid rgb(127, 127, 127);
+        }
+      }
+      &:first-of-type {
+        .bullet::after {
+          height: 50%;
+          top: 50%;
+        }
+      }
+      &:last-of-type {
+        .bullet::after {
+          height: 50%;
+        }
       }
     }
   }

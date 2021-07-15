@@ -80,15 +80,17 @@ export const FirstCell: React.FC<{
 
   return (
     <div {...firstCellProps}>
-      <span
-        className={
-          row.canExpand
-            ? row.isExpanded
-              ? styles.expandedRowArrow
-              : styles.contractedRowArrow
-            : styles.rowArrowPlaceholder
-        }
-      />
+      <span className={styles.rowArrowPlaceholder}>
+        {row.canExpand && (
+          <span
+            className={
+              row.isExpanded
+                ? styles.expandedRowArrow
+                : styles.contractedRowArrow
+            }
+          />
+        )}
+      </span>
       <span className={styles.bullet} />
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
@@ -168,7 +170,7 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
     <div
       className={cx(
         styles.experimentGroup,
-        row.isExpanded && styles.expandedGroup
+        row.isExpanded && row.subRows.length > 0 && styles.expandedGroup
       )}
     >
       <NestedRow row={row} instance={instance} />
