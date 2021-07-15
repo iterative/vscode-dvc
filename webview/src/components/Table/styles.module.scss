@@ -3,21 +3,10 @@
 $row-bg-color: var(--vscode-editor-background);
 $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 
-$backgroundColors: (
-  Even: $row-bg-color,
-  Odd: $row-bg-alt-color
-);
-
 // Extendable Silent Rules
 
 %fullwidth {
   @extend %fullwidth;
-}
-
-%bullet {
-  display: inline-block;
-  border-radius: 99px;
-  margin: 0 5px;
 }
 
 %rowArrowBase {
@@ -36,28 +25,7 @@ $backgroundColors: (
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
 }
 
-// wacky mixins
-
-@mixin rowRunningBullets {
-  @each $name, $rgba in $backgroundColors {
-    &#{$name} {
-      @extend %bullet;
-      border: 1.5px solid $rgba;
-      border-radius: 100%;
-      border-right: 1.5px solid rgb(255, 255, 255);
-      border-top: 1.5px solid rgb(255, 255, 255);
-      width: 12px;
-      height: 12px;
-      animation: spin 1s ease-in-out infinite;
-    }
-  }
-}
-
 // Concrete selectors
-
-.runningBullet {
-  @include rowRunningBullets;
-}
 
 @keyframes spin {
   0% {
@@ -68,36 +36,47 @@ $backgroundColors: (
   }
 }
 
-.queuedBullet {
-  @extend %bullet;
-  width: 9px;
-  height: 9px;
-  margin: 0 6px;
-  background: conic-gradient(
-    from 180deg at 50% 50%,
-    rgba(255, 255, 255, 0.5) 0deg,
-    rgba(255, 255, 255, 0) 180.31deg,
-    rgba(255, 255, 255, 0) 360deg
-  );
-  border: 1px solid #ffffff;
-}
-
 .bullet {
-  @extend %bullet;
-  position: relative;
-  height: 100%;
-  margin: 0 10px;
+  display: inline-block;
+  width: 24px;
+  flex: 0 0 24px;
+  text-align: center;
   &::before {
-    content: '';
-    position: absolute;
-    left: -3px;
     display: inline-block;
+    margin: 0 5px;
+    position: relative;
+    content: '';
+    border-radius: 99px;
     width: 6px;
     height: 6px;
-    line-height: 0;
-    background: rgb(127, 127, 127);
-    border-radius: 100%;
-    top: calc(50% - 3px);
+    .normalExperiment & {
+      line-height: 0;
+      background: rgb(127, 127, 127);
+      border-radius: 100%;
+    }
+    .queuedExperiment & {
+      background: conic-gradient(
+        from 180deg at 50% 50%,
+        rgba(255, 255, 255, 0.5) 0deg,
+        rgba(255, 255, 255, 0) 180.31deg,
+        rgba(255, 255, 255, 0) 360deg
+      );
+      border: 1px solid #ffffff;
+    }
+    .runningExperiment & {
+      width: 8px;
+      height: 8px;
+      vertical-align: middle;
+      border: 1.5px solid $row-bg-color;
+      border-radius: 100%;
+      border-right: 1.5px solid rgb(255, 255, 255);
+      border-top: 1.5px solid rgb(255, 255, 255);
+      animation: spin 1s ease-in-out infinite;
+      .oddRow & {
+        border-left: 1.5px solid $row-bg-alt-color;
+        border-bottom: 1.5px solid $row-bg-alt-color;
+      }
+    }
   }
 }
 
@@ -152,29 +131,6 @@ $backgroundColors: (
     .nestedRow {
       .firstCell {
         padding-left: 2rem;
-      }
-    }
-    &.expandedGroup .nestedRow {
-      .bullet {
-        &::after {
-          content: '';
-          height: 100%;
-          top: 0;
-          right: 0;
-          position: absolute;
-          border-right: 1px solid rgb(127, 127, 127);
-        }
-      }
-      &:first-of-type {
-        .bullet::after {
-          height: 50%;
-          top: 50%;
-        }
-      }
-      &:last-of-type {
-        .bullet::after {
-          height: 50%;
-        }
       }
     }
   }
