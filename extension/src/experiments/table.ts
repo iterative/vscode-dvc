@@ -49,7 +49,6 @@ export class ExperimentsTable {
 
   private workspace?: Experiment
   private columnData?: ColumnData[]
-  private rowData?: Experiment[]
   private branches?: Experiment[]
   private queued: string[] = []
   private runningOrQueued: Map<string, RunningOrQueued> = new Map()
@@ -160,8 +159,6 @@ export class ExperimentsTable {
   public setSort(sort: SortDefinition | undefined) {
     this.currentSort = sort
 
-    this.sortRowData()
-
     return this.notifyChanged()
   }
 
@@ -194,7 +191,10 @@ export class ExperimentsTable {
         this.columnData?.filter(
           column => this.columnStatus[column.path] !== ColumnStatus.unselected
         ) || [],
-      rows: this.rowData || []
+      rows: [
+        this.workspace as Experiment,
+        ...sortRows(this.currentSort, this.branches as Experiment[])
+      ]
     }
   }
 
@@ -222,16 +222,8 @@ export class ExperimentsTable {
     this.workspace = workspace
     this.branches = branches
     this.runningOrQueued = runningOrQueued
-    this.sortRowData()
 
     return this.notifyChanged()
-  }
-
-  private sortRowData() {
-    this.rowData = [
-      this.workspace as Experiment,
-      ...sortRows(this.currentSort, this.branches as Experiment[])
-    ]
   }
 
   private notifyChanged() {
