@@ -1,4 +1,4 @@
-import { collectFromRepo } from './collectFromRepo'
+import { collectFromRepo, RunningOrQueued } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData, Experiment } from './webview/contract'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
@@ -7,13 +7,13 @@ interface TransformedExperiments {
   columns: ColumnData[]
   branches: Experiment[]
   workspace: Experiment
-  queued: string[]
+  runningOrQueued: Map<string, RunningOrQueued>
 }
 
 export const transformExperimentsRepo = (
   data: ExperimentsRepoJSONOutput
 ): TransformedExperiments => {
-  const { metricsMap, paramsMap, branches, workspace, queued } =
+  const { metricsMap, paramsMap, branches, workspace, runningOrQueued } =
     collectFromRepo(data)
 
   return {
@@ -22,7 +22,7 @@ export const transformExperimentsRepo = (
       ...transformAndCollectFromColumnsIfAny(paramsMap),
       ...transformAndCollectFromColumnsIfAny(metricsMap)
     ],
-    queued,
+    runningOrQueued,
     workspace
   }
 }

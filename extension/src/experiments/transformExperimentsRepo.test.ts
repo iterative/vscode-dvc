@@ -4,20 +4,30 @@ import complexExperimentsOutput from './webview/complex-output-example.json'
 import complexColumnData from './webview/complex-column-example.json'
 import complexRowData from './webview/complex-row-example.json'
 import { ColumnData, Experiment } from './webview/contract'
+import { RowStatus } from './collectFromRepo'
 
 const paramsYaml = 'params.yaml'
 
 describe('overall transformer functionality', () => {
   it('returns output that matches the data found in the webview contract', () => {
-    const { workspace, branches, columns, queued } = transformExperimentsRepo(
-      complexExperimentsOutput
-    )
+    const { workspace, branches, columns, runningOrQueued } =
+      transformExperimentsRepo(complexExperimentsOutput)
     const [complexWorkspace, ...complexBranches] = complexRowData
 
     expect(workspace).toEqual(complexWorkspace)
     expect(branches).toEqual(complexBranches)
     expect(columns).toEqual(complexColumnData)
-    expect(queued).toEqual(['90aea7f'])
+
+    expect(runningOrQueued).toEqual(
+      new Map([
+        ['workspace', { status: RowStatus.RUNNING }],
+        [
+          'exp-e7a67',
+          { children: ['d1343a8', '1ee5f2e'], status: RowStatus.RUNNING }
+        ],
+        ['90aea7f', { status: RowStatus.QUEUED }]
+      ])
+    )
   })
 })
 
