@@ -70,10 +70,10 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
       border-right: 1.5px solid rgb(255, 255, 255);
       border-top: 1.5px solid rgb(255, 255, 255);
       animation: spin 1s ease-in-out infinite;
-      .oddRow & {
-        border-left: 1.5px solid $row-bg-alt-color;
-        border-bottom: 1.5px solid $row-bg-alt-color;
-      }
+    }
+    .runningExperiment.oddRow > .firstCell & {
+      border-left: 1.5px solid $row-bg-alt-color;
+      border-bottom: 1.5px solid $row-bg-alt-color;
     }
   }
 }
