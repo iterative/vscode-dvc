@@ -5,6 +5,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
+import { RunningOrQueued } from './collectFromRepo'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -45,7 +46,7 @@ export class ExperimentsTable {
 
   private columnData?: ColumnData[]
   private rowData?: Experiment[]
-  private queued: string[] = []
+  private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -150,8 +151,16 @@ export class ExperimentsTable {
     )
   }
 
-  public getQueuedExperiments(): string[] {
-    return this.queued
+  public getRunningOrQueued(): string[] {
+    return [...this.runningOrQueued.keys()]
+  }
+
+  public getRow(name: string) {
+    return this.runningOrQueued.get(name)
+  }
+
+  public getChildRows(name: string) {
+    return this.runningOrQueued.get(name)?.children
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -165,7 +174,7 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, queued, workspace } =
+    const { columns, branches, runningOrQueued, workspace } =
       transformExperimentsRepo(data)
 
     columns.forEach(column => {
@@ -176,7 +185,7 @@ export class ExperimentsTable {
 
     this.columnData = columns
     this.rowData = [workspace, ...branches]
-    this.queued = queued
+    this.runningOrQueued = runningOrQueued
 
     return this.notifyChanged()
   }
