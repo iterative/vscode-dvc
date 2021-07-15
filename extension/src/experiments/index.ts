@@ -78,8 +78,16 @@ export class Experiments {
     return []
   }
 
-  public getQueuedExperiments(dvcRoot: string): string[] {
-    return this.getTable(dvcRoot).getQueuedExperiments()
+  public getRunningOrQueued(dvcRoot: string): string[] {
+    return this.getTable(dvcRoot).getRunningOrQueued()
+  }
+
+  public getRow(dvcRoot: string, name: string) {
+    return this.getTable(dvcRoot).getRow(name)
+  }
+
+  public getChildRows(dvcRoot: string, name: string) {
+    return this.getTable(dvcRoot).getChildRows(name)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
