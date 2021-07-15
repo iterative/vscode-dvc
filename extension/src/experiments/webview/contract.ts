@@ -3,7 +3,9 @@ import { ExperimentFields } from '../../cli/reader'
 export interface Experiment extends ExperimentFields {
   id: string
   displayName: string
-  subRows?: Experiment[]
+  path: string
+  level?: number
+  parentPath?: string
 }
 
 export interface ColumnAggregateData {

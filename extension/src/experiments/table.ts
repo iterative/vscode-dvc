@@ -160,7 +160,13 @@ export class ExperimentsTable {
   }
 
   public getChildRows(name: string) {
-    return this.runningOrQueued.get(name)?.children
+    const path = this.rowData?.find(exp => exp.displayName === name)?.path
+    if (!path) {
+      return
+    }
+    return this.rowData
+      ?.filter(exp => exp.parentPath === path)
+      .map(exp => exp.displayName)
   }
 
   private async updateData(): Promise<boolean | undefined> {

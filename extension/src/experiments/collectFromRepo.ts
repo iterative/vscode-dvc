@@ -13,7 +13,7 @@ export enum RowStatus {
   QUEUED = 'queued'
 }
 
-export type RunningOrQueued = { status: RowStatus; children?: string[] }
+export type RunningOrQueued = { status: RowStatus }
 
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
@@ -29,7 +29,7 @@ interface ExperimentsAccumulator {
   metricsMap: PartialColumnsMap
   checkpointsByTip: Map<string, Experiment[]>
   branches: Experiment[]
-  runningOrQueued: Map<string, RunningOrQueued & { id?: string }>
+  runningOrQueued: Map<string, RunningOrQueued>
   workspace: Experiment
 }
 
@@ -143,20 +143,6 @@ const mergeOrCreateColumnDescriptor = (
   }
 }
 
-const addToMapArray = <K = string, V = unknown>(
-  map: Map<K, V[]>,
-  key: K,
-  value: V
-): void => {
-  const existingArray = map.get(key)
-  if (existingArray) {
-    existingArray.push(value)
-  } else {
-    const newArray = [value]
-    map.set(key, newArray)
-  }
-}
-
 const collectColumnsFromExperiment = (
   acc: ExperimentsAccumulator,
   experiment: Experiment | ExperimentFields
@@ -171,35 +157,10 @@ const collectColumnsFromExperiment = (
   }
 }
 
-const nestExperiment = (
-  checkpointTips: Experiment[],
-  checkpointsByTip: Map<string, Experiment[]>,
-  experiment: Experiment
-) => {
-  const { checkpoint_tip, id } = experiment
-  if (checkpoint_tip && checkpoint_tip !== id) {
-    addToMapArray(checkpointsByTip, checkpoint_tip, experiment)
-  } else {
-    checkpointTips.push(experiment)
-  }
-}
-
-const addCheckpointsToTips = (
-  experiments: Experiment[],
-  checkpointsByTip: Map<string, Experiment[]>
-) => {
-  for (const checkpointTip of experiments) {
-    const subRows = checkpointsByTip.get(checkpointTip.id as string)
-    if (subRows) {
-      checkpointTip.subRows = subRows
-    }
-  }
-}
-
 const consolidateExperimentData = (
   sha: string,
   baseline: ExperimentFields
-): Experiment => ({
+): ExperimentFields & { id: string; displayName: string } => ({
   id: sha,
   ...baseline,
   displayName: baseline.name || sha.slice(0, 7)
@@ -207,11 +168,10 @@ const consolidateExperimentData = (
 
 const collectRunningOrQueued = (
   acc: ExperimentsAccumulator,
-  experiment: Experiment
+  experiment: ExperimentFields & { id: string; displayName: string }
 ) => {
   if (experiment.running) {
     acc.runningOrQueued.set(experiment.displayName, {
-      id: experiment.id,
       status: RowStatus.RUNNING
     })
   }
@@ -222,32 +182,33 @@ const collectRunningOrQueued = (
   }
 }
 
-const addCheckpointsToRunning = (
-  acc: ExperimentsAccumulator,
-  checkpointsByTip: Map<string, Experiment[]>
-) => {
-  for (const [displayName, { id, status }] of acc.runningOrQueued.entries()) {
-    if (status === RowStatus.RUNNING && id) {
-      const checkpoints = checkpointsByTip.get(id)
-      acc.runningOrQueued.set(displayName, {
-        children: checkpoints?.map(checkpoint => checkpoint.displayName),
-        status
-      })
-    }
-  }
-}
-
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
-  experiments: Experiment[],
-  checkpointsByTip: Map<string, Experiment[]>,
-  experimentsObject: { [sha: string]: ExperimentFields }
+  experimentsObject: { [sha: string]: ExperimentFields },
+  parentId: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const experiment = consolidateExperimentData(sha, experimentData)
 
     collectColumnsFromExperiment(acc, experiment)
-    nestExperiment(experiments, checkpointsByTip, experiment)
+
+    const { checkpoint_tip, id } = experiment
+    if (checkpoint_tip && checkpoint_tip !== id) {
+      acc.branches.push({
+        ...experiment,
+        level: 3,
+        parentPath: join(parentId, checkpoint_tip),
+        path: join(parentId, checkpoint_tip, experiment.id)
+      })
+    } else {
+      acc.branches.push({
+        ...experiment,
+        level: 2,
+        parentPath: parentId,
+        path: join(parentId, experiment.id)
+      })
+    }
+
     collectRunningOrQueued(acc, experiment)
   }
 }
@@ -259,25 +220,16 @@ const collectFromBranchEntry = (
     ExperimentsBranchJSONOutput
   ]
 ) => {
-  const branch = consolidateExperimentData(branchSha, baseline)
+  const branch = {
+    ...consolidateExperimentData(branchSha, baseline),
+    level: 1,
+    path: branchSha
+  }
 
   collectColumnsFromExperiment(acc, branch)
-  const experiments: Experiment[] = []
-  const checkpointsByTip = new Map<string, Experiment[]>()
 
-  collectFromExperimentsObject(
-    acc,
-    experiments,
-    checkpointsByTip,
-    experimentsObject
-  )
+  collectFromExperimentsObject(acc, experimentsObject, branchSha)
 
-  addCheckpointsToTips(experiments, checkpointsByTip)
-  addCheckpointsToRunning(acc, checkpointsByTip)
-
-  if (experiments.length > 0) {
-    branch.subRows = experiments
-  }
   acc.branches.push(branch)
 }
 
@@ -303,7 +255,9 @@ export const collectFromRepo = (
     workspace: {
       ...workspace.baseline,
       displayName: 'workspace',
-      id: 'workspace'
+      id: 'workspace',
+      level: 1,
+      path: 'workspace'
     }
   }
   collectColumnsFromExperiment(acc, workspace.baseline)

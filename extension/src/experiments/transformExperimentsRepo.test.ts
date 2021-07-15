@@ -3,7 +3,7 @@ import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
 import complexColumnData from './webview/complex-column-example.json'
 import complexRowData from './webview/complex-row-example.json'
-import { ColumnData, Experiment } from './webview/contract'
+import { ColumnData } from './webview/contract'
 import { RowStatus } from './collectFromRepo'
 
 const paramsYaml = 'params.yaml'
@@ -21,10 +21,7 @@ describe('overall transformer functionality', () => {
     expect(runningOrQueued).toEqual(
       new Map([
         ['workspace', { status: RowStatus.RUNNING }],
-        [
-          'exp-e7a67',
-          { children: ['d1343a8', '1ee5f2e'], status: RowStatus.RUNNING }
-        ],
+        ['exp-e7a67', { status: RowStatus.RUNNING }],
         ['90aea7f', { status: RowStatus.QUEUED }]
       ])
     )
@@ -42,7 +39,7 @@ describe('branch and checkpoint nesting', () => {
   })
 
   describe('a repo with two branches', () => {
-    const { branches, workspace } = transformExperimentsRepo({
+    const { branches: experiments, workspace } = transformExperimentsRepo({
       branchA: {
         baseline: {},
         otherExp1: {},
@@ -65,29 +62,36 @@ describe('branch and checkpoint nesting', () => {
       expect(workspace).toBeDefined()
     })
 
+    const branches = experiments.filter(branch => branch.level === 1)
+
     it('finds two branches', () => {
       expect(branches.length).toEqual(2)
     })
 
     const [branchA, branchB] = branches
+
     it('lists branches in the same order as the map', () => {
       expect(branchA.id).toEqual('branchA')
       expect(branchB.id).toEqual('branchB')
     })
 
     it('finds two experiments on branchA', () => {
-      expect(branchA.subRows?.length).toEqual(2)
+      const branchAExperiments = experiments.filter(
+        branch => branch.parentPath === 'branchA'
+      )
+      expect(branchAExperiments.length).toEqual(2)
     })
 
     it('finds no experiments on branchB', () => {
-      expect(branchB.subRows).toBeUndefined()
+      const branchBExperiments = experiments.filter(
+        branch => branch.parentPath === 'branchB'
+      )
+      expect(branchBExperiments).toEqual([])
     })
   })
 
   describe('a repo with one branch that has nested checkpoints', () => {
-    const {
-      branches: [branchA]
-    } = transformExperimentsRepo({
+    const { branches } = transformExperimentsRepo({
       branchA: {
         baseline: {},
         tip1: {
@@ -106,17 +110,27 @@ describe('branch and checkpoint nesting', () => {
       workspace: { baseline: {} }
     })
 
+    const experiments = branches.filter(
+      branch => branch.parentPath === 'branchA'
+    )
+
+    const [tip1] = experiments
+
     it('only lists the tip as a top-level experiment', () => {
-      expect(branchA.subRows?.length).toEqual(1)
+      expect(experiments.length).toEqual(1)
+
+      expect(tip1.id).toEqual('tip1')
     })
 
-    const [tip1] = branchA.subRows as Experiment[]
+    const checkpoints = branches.filter(
+      branch => branch.parentPath === tip1.path
+    )
 
     it('finds three checkpoints on the tip', () => {
-      expect(tip1.subRows?.length).toEqual(3)
+      expect(checkpoints.length).toEqual(3)
     })
 
-    const [tip1cp1, tip1cp2, tip1cp3] = tip1.subRows as Experiment[]
+    const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
 
     it('finds checkpoints in order', () => {
       expect(tip1cp1.id).toEqual('tip1cp1')

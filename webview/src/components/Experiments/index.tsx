@@ -17,6 +17,7 @@ import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { VsCodeApi } from '../../model'
+import buildDynamicRows from '../../util/buildDynamicRows'
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -67,7 +68,7 @@ export const ExperimentsTable: React.FC<{
   }, [])
 
   const [data, columns] = React.useMemo(() => {
-    const data = tableData.rows
+    const data = buildDynamicRows(tableData.rows) // getRows goes here
     const columns = getColumns(tableData.columns)
     return [data, columns]
   }, [tableData])

@@ -47,7 +47,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     const row = this.experiments.getRow(dvcRoot, element)
 
     if (row?.status === RowStatus.RUNNING) {
-      return this.getRunningTreeItem(element, row?.children)
+      return this.getRunningTreeItem(element, ['a', 'b']) // fix
     }
 
     return this.getQueuedTreeItem(element)
