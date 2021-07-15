@@ -10,6 +10,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
+import { RowStatus } from '../collectFromRepo'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -38,39 +39,88 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    const item = new TreeItem(element, TreeItemCollapsibleState.None)
-    item.iconPath = new ThemeIcon('watch')
-    return item
+    const dvcRoot = this.runRoots[element]
+    if (!dvcRoot) {
+      return this.getChildTreeItem(element)
+    }
+
+    const row = this.experiments.getRow(dvcRoot, element)
+
+    if (row?.status === RowStatus.RUNNING) {
+      return this.getRunningTreeItem(element, row?.children)
+    }
+
+    return this.getQueuedTreeItem(element)
   }
 
   public getChildren(element?: string): Promise<string[]> {
-    if (element) {
-      return Promise.resolve(this.getQueuedExperiments(element))
+    if (!element) {
+      return this.getRootElements()
     }
 
-    return this.getRootElements()
+    if (this.isRoot(element)) {
+      return Promise.resolve(this.getRunningOrQueued(element))
+    }
+
+    return Promise.resolve(
+      this.experiments.getChildRows(this.runRoots[element], element) || []
+    )
+  }
+
+  private getChildTreeItem(element: string) {
+    return this.getTreeItemWithIcon(
+      element,
+      TreeItemCollapsibleState.None,
+      'primitive-dot'
+    )
+  }
+
+  private getRunningTreeItem(element: string, children?: string[]) {
+    const collapsibleState = definedAndNonEmpty(children)
+      ? TreeItemCollapsibleState.Collapsed
+      : TreeItemCollapsibleState.None
+
+    return this.getTreeItemWithIcon(element, collapsibleState, 'loading~spin')
+  }
+
+  private getQueuedTreeItem(element: string) {
+    return this.getTreeItemWithIcon(
+      element,
+      TreeItemCollapsibleState.None,
+      'watch'
+    )
+  }
+
+  private getTreeItemWithIcon(
+    element: string,
+    collapsibleState: TreeItemCollapsibleState,
+    iconId: string
+  ) {
+    const item = new TreeItem(element, collapsibleState)
+    item.iconPath = new ThemeIcon(iconId)
+    return item
   }
 
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
-    const queued = flatten(
+    const runningOrQueued = flatten(
       dvcRoots.map(dvcRoot => {
         this.runRoots[dvcRoot] = dvcRoot
-        return this.experiments.getQueuedExperiments(dvcRoot)
+        return this.experiments.getRunningOrQueued(dvcRoot)
       })
     )
-    if (definedAndNonEmpty(queued)) {
+    if (definedAndNonEmpty(runningOrQueued)) {
       return dvcRoots.sort((a, b) => a.localeCompare(b))
     }
 
     return []
   }
 
-  private getQueuedExperiments(dvcRoot: string): string[] {
-    const queued = this.experiments.getQueuedExperiments(dvcRoot)
-    queued.forEach(experiment => (this.runRoots[experiment] = dvcRoot))
-    return queued
+  private getRunningOrQueued(dvcRoot: string): string[] {
+    const runningOrQueued = this.experiments.getRunningOrQueued(dvcRoot)
+    runningOrQueued.forEach(name => (this.runRoots[name] = dvcRoot))
+    return runningOrQueued
   }
 
   private isRoot(element: string) {

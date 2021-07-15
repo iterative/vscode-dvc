@@ -5,6 +5,9 @@ import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
+import { SortDefinition, sortRows } from './sorting'
+import { pickSort } from './quickPick'
+import { RunningOrQueued } from './collectFromRepo'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -40,12 +43,14 @@ export class ExperimentsTable {
   private webview?: ExperimentsWebview
   private readonly resourceLocator: ResourceLocator
 
+  private currentSort?: SortDefinition
   private readonly experimentsRowsChanged = new EventEmitter<void>()
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
+  private workspace?: Experiment
   private columnData?: ColumnData[]
-  private rowData?: Experiment[]
-  private queued: string[] = []
+  private branches?: Experiment[]
+  private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -150,8 +155,42 @@ export class ExperimentsTable {
     )
   }
 
-  public getQueuedExperiments(): string[] {
-    return this.queued
+  public setSort(sort: SortDefinition | undefined) {
+    this.currentSort = sort
+
+    return this.notifyChanged()
+  }
+
+  public async pickSort() {
+    const pickedSortDefinition = await pickSort(this.columnData)
+    if (pickedSortDefinition) {
+      return this.setSort(pickedSortDefinition)
+    }
+  }
+
+  public getRunningOrQueued(): string[] {
+    return [...this.runningOrQueued.keys()]
+  }
+
+  public getRow(name: string) {
+    return this.runningOrQueued.get(name)
+  }
+
+  public getChildRows(name: string) {
+    return this.runningOrQueued.get(name)?.children
+  }
+
+  public getTableData(): TableData {
+    const { workspace, branches } = this
+    return {
+      columns:
+        this.columnData?.filter(
+          column => this.columnStatus[column.path] !== ColumnStatus.unselected
+        ) || [],
+      rows: branches
+        ? [workspace as Experiment, ...sortRows(this.currentSort, branches)]
+        : []
+    }
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -165,7 +204,7 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, queued, workspace } =
+    const { columns, branches, runningOrQueued, workspace } =
       transformExperimentsRepo(data)
 
     columns.forEach(column => {
@@ -175,8 +214,9 @@ export class ExperimentsTable {
     })
 
     this.columnData = columns
-    this.rowData = [workspace, ...branches]
-    this.queued = queued
+    this.workspace = workspace
+    this.branches = branches
+    this.runningOrQueued = runningOrQueued
 
     return this.notifyChanged()
   }
@@ -197,16 +237,6 @@ export class ExperimentsTable {
       return this.webview.showExperiments({
         tableData: this.getTableData()
       })
-    }
-  }
-
-  private getTableData(): TableData {
-    return {
-      columns:
-        this.columnData?.filter(
-          column => this.columnStatus[column.path] !== ColumnStatus.unselected
-        ) || [],
-      rows: this.rowData || []
     }
   }
 

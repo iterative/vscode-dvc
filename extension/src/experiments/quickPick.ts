@@ -1,6 +1,8 @@
-import { window } from 'vscode'
+import { QuickPickOptions, window } from 'vscode'
+import { ColumnData } from './webview/contract'
+import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
-import { quickPickManyValues } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -39,3 +41,45 @@ export const pickGarbageCollectionFlags = () =>
     ],
     { placeHolder: 'Select which Experiments to preserve' }
   )
+
+export const pickFromColumnData = (
+  columnData: ColumnData[],
+  quickPickOptions: QuickPickOptions
+) =>
+  quickPickValue<ColumnData>(
+    columnData.map(column => ({
+      description: column.path,
+      label: column.name,
+      value: column
+    })),
+    quickPickOptions
+  )
+
+export const pickSort = async (
+  columnData: ColumnData[] | undefined
+): Promise<SortDefinition | undefined> => {
+  if (!columnData || columnData.length === 0) {
+    window.showErrorMessage('There are no columns to sort with')
+    return
+  }
+  const pickedColumn = await pickFromColumnData(columnData, {
+    title: 'Select a column to sort by'
+  })
+  if (pickedColumn === undefined) {
+    return
+  }
+  const descending = await quickPickValue<boolean>(
+    [
+      { label: 'Ascending', value: false },
+      { label: 'Descending', value: true }
+    ],
+    { title: 'Select a direction to sort in' }
+  )
+  if (descending === undefined) {
+    return
+  }
+  return {
+    columnPath: pickedColumn.path,
+    descending
+  }
+}

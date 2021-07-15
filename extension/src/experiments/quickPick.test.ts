@@ -1,6 +1,11 @@
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
-import { pickGarbageCollectionFlags, pickExperimentName } from './quickPick'
+import {
+  pickGarbageCollectionFlags,
+  pickExperimentName,
+  pickFromColumnData,
+  pickSort
+} from './quickPick'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 
 jest.mock('vscode')
@@ -11,7 +16,11 @@ const mockedShowQuickPick = mocked<
     items: QuickPickItemWithValue[],
     options: QuickPickOptions
   ) => Thenable<
-    QuickPickItemWithValue[] | QuickPickItemWithValue | string | undefined
+    | QuickPickItemWithValue[]
+    | QuickPickItemWithValue
+    | string
+    | undefined
+    | unknown
   >
 >(window.showQuickPick)
 
@@ -85,5 +94,116 @@ describe('pickGarbageCollectionFlags', () => {
         placeHolder: 'Select which Experiments to preserve'
       }
     )
+  })
+})
+
+describe('Column-based QuickPicks', () => {
+  const params = 'params'
+  const paramsYaml = 'params.yaml'
+  const paramsYamlPath = 'params/params.yaml'
+  const epochsParamPath = 'params/params.yaml/epochs'
+  const epochsColumn = {
+    group: params,
+    hasChildren: false,
+    maxNumber: 5,
+    maxStringLength: 1,
+    minNumber: 2,
+    name: 'epochs',
+    parentPath: paramsYamlPath,
+    path: epochsParamPath,
+    types: ['number']
+  }
+  const paramsYamlColumn = {
+    group: params,
+    hasChildren: true,
+    name: paramsYaml,
+    parentPath: params,
+    path: paramsYamlPath
+  }
+  const exampleColumns = [epochsColumn, paramsYamlColumn]
+
+  describe('pickFromColumnData', () => {
+    it('invokes a QuickPick with the correct options', async () => {
+      const title = 'Test title'
+      await pickFromColumnData(exampleColumns, { title })
+      expect(mockedShowQuickPick).toBeCalledWith(
+        [
+          {
+            description: epochsParamPath,
+            label: 'epochs',
+            value: epochsColumn
+          },
+          {
+            description: paramsYamlPath,
+            label: paramsYaml,
+            value: paramsYamlColumn
+          }
+        ],
+        { title }
+      )
+    })
+  })
+
+  describe('pickSort', () => {
+    it('does not invoke a quickpick if passed undefined', async () => {
+      const resolvedPromise = await pickSort(undefined)
+      expect(mockedShowQuickPick).not.toBeCalled()
+      expect(resolvedPromise).toBe(undefined)
+    })
+
+    it('does not invoke a quickpick if an empty array', async () => {
+      const resolvedPromise = await pickSort([])
+      expect(mockedShowQuickPick).not.toBeCalled()
+      expect(resolvedPromise).toBe(undefined)
+    })
+
+    it('resolves with no value if canceled at column select', async () => {
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      expect(await pickSort(exampleColumns)).toBe(undefined)
+      expect(mockedShowQuickPick).toBeCalledTimes(1)
+    })
+
+    it('resolves with no value if canceled at order select', async () => {
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      expect(await pickSort(exampleColumns)).toBe(undefined)
+      expect(mockedShowQuickPick).toBeCalledTimes(2)
+    })
+
+    describe('valid input', () => {
+      it('invokes a descending sort with the expected quickpick calls', async () => {
+        mockedShowQuickPick.mockResolvedValueOnce({
+          value: epochsColumn
+        } as unknown)
+        mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
+        const resolvedPromise = await pickSort(exampleColumns)
+        expect(mockedShowQuickPick).toBeCalledTimes(2)
+        expect(mockedShowQuickPick).toBeCalledWith(
+          [
+            { label: 'Ascending', value: false },
+            { label: 'Descending', value: true }
+          ],
+          { title: 'Select a direction to sort in' }
+        )
+        expect(resolvedPromise).toEqual({
+          columnPath: epochsParamPath,
+          descending: false
+        })
+      })
+      it('invokes an ascending sort with the expected quickpick calls', async () => {
+        mockedShowQuickPick.mockResolvedValueOnce({
+          value: paramsYamlColumn
+        } as unknown)
+        mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
+        const resolvedPromise = await pickSort(exampleColumns)
+        expect(mockedShowQuickPick).toBeCalledTimes(2)
+        expect(resolvedPromise).toEqual({
+          columnPath: paramsYamlPath,
+          descending: false
+        })
+      })
+    })
   })
 })

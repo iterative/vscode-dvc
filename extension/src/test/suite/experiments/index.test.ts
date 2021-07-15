@@ -86,7 +86,7 @@ suite('Experiments Test Suite', () => {
       expect(await focused).to.equal(dvcDemoPath)
       expect(configSpy).to.be.calledOnce
       expect(mockQuickPickOne).not.to.be.called
-      expect(experiments.getFocused()).to.equal(experimentsTable)
+      expect(experiments.getFocusedTable()).to.equal(experimentsTable)
 
       configSpy.resetHistory()
       mockQuickPickOne.resetHistory()
@@ -135,7 +135,7 @@ suite('Experiments Test Suite', () => {
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
-      expect(experiments.getFocused()).to.equal(experimentsTable)
+      expect(experiments.getFocusedTable()).to.equal(experimentsTable)
 
       mockQuickPickOne.resetHistory()
 
@@ -216,7 +216,7 @@ suite('Experiments Test Suite', () => {
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
       expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
-      expect(experiments.getFocused()).to.equal(experimentsTable)
+      expect(experiments.getFocusedTable()).to.equal(experimentsTable)
 
       mockQuickPickOne.resetHistory()
 
@@ -235,7 +235,7 @@ suite('Experiments Test Suite', () => {
       await window.showTextDocument(document)
 
       expect(await unfocused).to.be.undefined
-      expect(experiments.getFocused()).to.be.undefined
+      expect(experiments.getFocusedTable()).to.be.undefined
 
       const focusedAgain = onDidChangeIsWebviewFocused(experimentsTable)
       await commands.executeCommand('workbench.action.previousEditor')

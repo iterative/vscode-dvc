@@ -13,6 +13,8 @@ import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
+import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import { ColumnData } from '../../../experiments/webview/contract'
 
 suite('Experiments Table Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -62,7 +64,7 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
-  describe('getQueuedExperiments', () => {
+  describe('getRunningOrQueued', () => {
     it('should return the currently queued experiments', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -77,9 +79,13 @@ suite('Experiments Table Test Suite', () => {
       )
       await experimentsTable.isReady()
 
-      const queued = experimentsTable.getQueuedExperiments()
+      const runningOrQueued = experimentsTable.getRunningOrQueued()
 
-      expect(queued).to.deep.equal(['90aea7f'])
+      expect(runningOrQueued).to.deep.equal([
+        'workspace',
+        'exp-e7a67',
+        '90aea7f'
+      ])
     })
   })
 
@@ -157,5 +163,123 @@ suite('Experiments Table Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
       expect(mockExperimentShow).not.to.have.been.called
     })
+  })
+
+  it('should be able to sort', async () => {
+    const config = disposable.track(new Config())
+    const cliReader = disposable.track(new CliReader(config))
+    const buildTestExperiment = (testparam: number) => ({
+      params: {
+        'params.yaml': {
+          test: testparam
+        }
+      }
+    })
+    stub(cliReader, 'experimentShow').resolves({
+      testBranch: {
+        baseline: buildTestExperiment(10),
+        testExp1: buildTestExperiment(2),
+        testExp2: buildTestExperiment(1),
+        testExp3: buildTestExperiment(3)
+      },
+      workspace: {
+        baseline: buildTestExperiment(10)
+      }
+    })
+
+    const internalCommands = disposable.track(
+      new InternalCommands(config, cliReader)
+    )
+    const resourceLocator = disposable.track(
+      new ResourceLocator(Uri.file(resourcePath))
+    )
+    const experimentsTable = disposable.track(
+      new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+    )
+    await experimentsTable.isReady()
+
+    const { rows: unsortedRows } = experimentsTable.getTableData()
+    expect(unsortedRows).deep.equals([
+      {
+        displayName: 'workspace',
+        id: 'workspace',
+        params: { 'params.yaml': { test: 10 } }
+      },
+      {
+        displayName: 'testBra',
+        id: 'testBranch',
+        params: { 'params.yaml': { test: 10 } },
+        subRows: [
+          {
+            displayName: 'testExp',
+            id: 'testExp1',
+            params: { 'params.yaml': { test: 2 } }
+          },
+          {
+            displayName: 'testExp',
+            id: 'testExp2',
+            params: { 'params.yaml': { test: 1 } }
+          },
+          {
+            displayName: 'testExp',
+            id: 'testExp3',
+            params: { 'params.yaml': { test: 3 } }
+          }
+        ]
+      }
+    ])
+
+    const stubbedShowQuickPick = stub(window, 'showQuickPick')
+    stubbedShowQuickPick.onFirstCall().resolves({
+      label: 'test',
+      value: {
+        path: 'params/params.yaml/test'
+      }
+    } as QuickPickItemWithValue<ColumnData>)
+
+    stubbedShowQuickPick.onSecondCall().resolves({
+      label: 'Ascending',
+      value: false
+    } as QuickPickItemWithValue<boolean>)
+
+    const tableChangePromise = new Promise(resolve => {
+      experimentsTable.onDidChangeExperimentsRows(resolve)
+    })
+
+    const pickPromise = experimentsTable.pickSort()
+    await pickPromise
+    await tableChangePromise
+
+    const { rows: sortedRows } = experimentsTable.getTableData()
+
+    expect(sortedRows).deep.equals([
+      {
+        displayName: 'workspace',
+        id: 'workspace',
+        params: { 'params.yaml': { test: 10 } }
+      },
+      {
+        displayName: 'testBra',
+        id: 'testBranch',
+        params: { 'params.yaml': { test: 10 } },
+        subRows: [
+          {
+            displayName: 'testExp',
+            id: 'testExp2',
+            params: { 'params.yaml': { test: 1 } }
+          },
+          {
+            displayName: 'testExp',
+            id: 'testExp1',
+            params: { 'params.yaml': { test: 2 } }
+          },
+          {
+            displayName: 'testExp',
+            id: 'testExp3',
+            params: { 'params.yaml': { test: 3 } }
+          }
+        ]
+      }
+    ])
   })
 })
