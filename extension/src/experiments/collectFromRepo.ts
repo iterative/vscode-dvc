@@ -175,13 +175,13 @@ const collectColumnsFromExperiment = (
 const collectExperimentOrCheckpoint = (
   acc: ExperimentsAccumulator,
   experiment: Experiment,
-  branchSha: string
+  branchName: string
 ) => {
   const { checkpoint_tip, id } = experiment
   if (checkpoint_tip && checkpoint_tip !== id) {
     addToMapArray(acc.checkpointsByTip, checkpoint_tip, experiment)
   } else {
-    addToMapArray(acc.experimentsByBranch, branchSha, experiment)
+    addToMapArray(acc.experimentsByBranch, branchName, experiment)
   }
 }
 
@@ -226,41 +226,31 @@ const addCheckpointsToRunning = (acc: ExperimentsAccumulator) => {
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: { [sha: string]: ExperimentFields },
-  branchSha: string
+  branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
     const experiment = consolidateExperimentData(sha, experimentData)
 
     collectColumnsFromExperiment(acc, experiment)
-    collectExperimentOrCheckpoint(acc, experiment, branchSha)
+    collectExperimentOrCheckpoint(acc, experiment, branchName)
     collectRunningOrQueued(acc, experiment)
   }
-}
-
-const collectFromBranchEntry = (
-  acc: ExperimentsAccumulator,
-  [branchSha, { baseline, ...experimentsObject }]: [
-    string,
-    ExperimentsBranchJSONOutput
-  ]
-) => {
-  const branch = consolidateExperimentData(branchSha, baseline)
-
-  collectColumnsFromExperiment(acc, branch)
-
-  collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
-
-  addCheckpointsToRunning(acc)
-
-  acc.branches.push(branch)
 }
 
 const collectFromBranchesObject = (
   acc: ExperimentsAccumulator,
   branchesObject: { [name: string]: ExperimentsBranchJSONOutput }
 ) => {
-  for (const branchEntry of Object.entries(branchesObject)) {
-    collectFromBranchEntry(acc, branchEntry)
+  for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
+    branchesObject
+  )) {
+    const branch = consolidateExperimentData(branchSha, baseline)
+
+    collectColumnsFromExperiment(acc, branch)
+    collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
+    addCheckpointsToRunning(acc)
+
+    acc.branches.push(branch)
   }
 }
 
