@@ -3,8 +3,7 @@ import { Experiment } from './webview/contract'
 import {
   ExperimentsAccumulator,
   PartialColumnDescriptor,
-  PartialColumnsMap,
-  RowStatus
+  PartialColumnsMap
 } from './accumulator'
 import {
   ExperimentFields,
@@ -174,35 +173,6 @@ const consolidateExperimentData = (
   displayName: baseline.name || sha.slice(0, 7)
 })
 
-const collectRunningOrQueued = (
-  acc: ExperimentsAccumulator,
-  experiment: Experiment
-) => {
-  if (experiment.running) {
-    acc.runningOrQueued.set(experiment.displayName, {
-      id: experiment.id,
-      status: RowStatus.RUNNING
-    })
-  }
-  if (experiment.queued) {
-    acc.runningOrQueued.set(experiment.displayName, {
-      status: RowStatus.QUEUED
-    })
-  }
-}
-
-const addCheckpointsToRunning = (acc: ExperimentsAccumulator) => {
-  for (const [displayName, { id, status }] of acc.runningOrQueued.entries()) {
-    if (status === RowStatus.RUNNING && id) {
-      const checkpoints = acc.checkpointsByTip.get(id)
-      acc.runningOrQueued.set(displayName, {
-        children: checkpoints?.map(checkpoint => checkpoint.displayName),
-        status
-      })
-    }
-  }
-}
-
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
   experimentsObject: { [sha: string]: ExperimentFields },
@@ -213,7 +183,6 @@ const collectFromExperimentsObject = (
 
     collectColumnsFromExperiment(acc, experiment)
     collectExperimentOrCheckpoint(acc, experiment, branchName)
-    collectRunningOrQueued(acc, experiment)
   }
 }
 
@@ -228,7 +197,6 @@ const collectFromBranchesObject = (
 
     collectColumnsFromExperiment(acc, branch)
     collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
-    addCheckpointsToRunning(acc)
 
     acc.branches.push(branch)
   }

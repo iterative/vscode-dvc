@@ -3,7 +3,6 @@ import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsRunsTree } from './runsTree'
 import { Experiments } from '..'
-import { RowStatus } from '../accumulator'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -19,14 +18,14 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
-const mockedGetRow = jest.fn()
-const mockedGetChildRows = jest.fn()
+const mockedGetExperiment = jest.fn()
+const mockedGetCheckpointNames = jest.fn()
 const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
-  getChildRows: mockedGetChildRows,
+  getCheckpointNames: mockedGetCheckpointNames,
   getDvcRoots: mockedGetDvcRoots,
-  getRow: mockedGetRow,
+  getExperiment: mockedGetExperiment,
   getRunningOrQueued: mockedGetRunningOrQueued,
   isReady: () => true
 } as unknown as Experiments
@@ -99,7 +98,7 @@ describe('ExperimentsRunsTree', () => {
       await experimentsRunsTree.getChildren('repo')
 
       const checkpoints = ['aaaaaaa', 'bbbbbbb']
-      mockedGetChildRows.mockReturnValueOnce(checkpoints)
+      mockedGetCheckpointNames.mockReturnValueOnce(checkpoints)
 
       const children = await experimentsRunsTree.getChildren('ebbd66f')
 
@@ -142,13 +141,44 @@ describe('ExperimentsRunsTree', () => {
       const mockedQueuedExperiment = 'f0778b3'
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
-      mockedGetRow.mockReturnValueOnce({ status: RowStatus.QUEUED })
+      mockedGetExperiment.mockReturnValueOnce({
+        queued: true,
+        running: false
+      })
 
       await experimentsRunsTree.getChildren()
       await experimentsRunsTree.getChildren('demo')
 
       const treeItem = experimentsRunsTree.getTreeItem(mockedQueuedExperiment)
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
+    })
+
+    it('should return a tree item for the workspace (running experiment)', async () => {
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
+        expect(collapsibleState).toEqual(0)
+        expect(label).toEqual('workspace')
+        mockedItem = { collapsibleState, label }
+        return mockedItem
+      })
+      mockedThemeIcon.mockImplementationOnce(function (id) {
+        return { id }
+      })
+
+      const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      const mockedRunningExperiment = 'workspace'
+      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
+
+      await experimentsRunsTree.getChildren()
+      await experimentsRunsTree.getChildren('demo')
+
+      const treeItem = experimentsRunsTree.getTreeItem(mockedRunningExperiment)
+      expect(treeItem).toEqual({
+        ...mockedItem,
+        iconPath: { id: 'loading~spin' }
+      })
     })
 
     it('should return a tree item for a running experiment', async () => {
@@ -167,9 +197,9 @@ describe('ExperimentsRunsTree', () => {
       const mockedRunningExperiment = 'f0778b3'
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetRow.mockReturnValueOnce({
-        children: ['e5855d7', '6e5e782'],
-        status: RowStatus.RUNNING
+      mockedGetExperiment.mockReturnValueOnce({
+        hasChildren: true,
+        running: true
       })
 
       await experimentsRunsTree.getChildren()

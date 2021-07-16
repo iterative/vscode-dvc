@@ -7,7 +7,6 @@ import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
 import { pickSort } from './quickPick'
-import { RunningOrQueued } from './accumulator'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -52,7 +51,6 @@ export class ExperimentsTable {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
 
@@ -171,15 +169,36 @@ export class ExperimentsTable {
   }
 
   public getRunningOrQueued(): string[] {
-    return [...this.runningOrQueued.keys()]
+    return (
+      [this.workspace, ...this.getExperiments()].filter(
+        experiment => experiment?.queued || experiment?.running
+      ) as Experiment[]
+    ).map(experiment => experiment.displayName)
   }
 
-  public getRow(name: string) {
-    return this.runningOrQueued.get(name)
+  public getExperiment(name: string) {
+    const experiment = this.getExperiments().find(
+      experiment => experiment.displayName === name
+    )
+
+    if (!experiment) {
+      return
+    }
+
+    return {
+      ...experiment,
+      hasChildren: !!this.checkpointsByTip.get(experiment.id)
+    }
   }
 
-  public getChildRows(name: string) {
-    return this.runningOrQueued.get(name)?.children
+  public getCheckpointNames(name: string) {
+    const id = this.getExperiment(name)?.id
+    if (!id) {
+      return
+    }
+    return this.checkpointsByTip
+      .get(id)
+      ?.map(checkpoint => checkpoint.displayName)
   }
 
   public getTableData(): TableData {
@@ -222,6 +241,13 @@ export class ExperimentsTable {
     return sortRows(this.currentSort, experiments)
   }
 
+  private getExperiments() {
+    const flatExperiments = flatten<Experiment>([
+      ...this.experimentsByBranch.values()
+    ])
+    return sortRows(this.currentSort, flatExperiments)
+  }
+
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
@@ -244,7 +270,6 @@ export class ExperimentsTable {
       branches,
       experimentsByBranch,
       checkpointsByTip,
-      runningOrQueued,
       workspace
     } = transformExperimentsRepo(data)
 
@@ -259,7 +284,6 @@ export class ExperimentsTable {
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
-    this.runningOrQueued = runningOrQueued
   }
 
   private notifyChanged() {

@@ -1,29 +1,8 @@
 import { join } from 'path'
-import { RowStatus } from './accumulator'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import complexExperimentsOutput from './webview/complex-output-example.json'
 import { ColumnData, Experiment } from './webview/contract'
 
 const paramsYaml = 'params.yaml'
-
-describe('overall transformer functionality', () => {
-  it('returns the running or queued experiments', () => {
-    const { runningOrQueued } = transformExperimentsRepo(
-      complexExperimentsOutput
-    )
-
-    expect(runningOrQueued).toEqual(
-      new Map([
-        ['workspace', { status: RowStatus.RUNNING }],
-        [
-          'exp-e7a67',
-          { children: ['d1343a8', '1ee5f2e'], status: RowStatus.RUNNING }
-        ],
-        ['90aea7f', { status: RowStatus.QUEUED }]
-      ])
-    )
-  })
-})
 
 describe('branch and checkpoint nesting', () => {
   it('returns an empty array if no branches are present', () => {

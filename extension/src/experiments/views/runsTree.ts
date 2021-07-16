@@ -10,7 +10,6 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { RowStatus } from '../accumulator'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -41,16 +40,16 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     const dvcRoot = this.runRoots[element]
     if (!dvcRoot) {
-      return this.getChildTreeItem(element)
+      return this.getRunningCheckpoint(element)
     }
 
-    const row = this.experiments.getRow(dvcRoot, element)
+    const experiment = this.experiments.getExperiment(dvcRoot, element)
 
-    if (row?.status === RowStatus.RUNNING) {
-      return this.getRunningTreeItem(element, row?.children)
+    if (element === 'workspace' || experiment?.running) {
+      return this.getRunning(element, experiment?.hasChildren)
     }
 
-    return this.getQueuedTreeItem(element)
+    return this.getQueued(element)
   }
 
   public getChildren(element?: string): Promise<string[]> {
@@ -63,11 +62,11 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     return Promise.resolve(
-      this.experiments.getChildRows(this.runRoots[element], element) || []
+      this.experiments.getCheckpointNames(this.runRoots[element], element) || []
     )
   }
 
-  private getChildTreeItem(element: string) {
+  private getRunningCheckpoint(element: string) {
     return this.getTreeItemWithIcon(
       element,
       TreeItemCollapsibleState.None,
@@ -75,15 +74,15 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
   }
 
-  private getRunningTreeItem(element: string, children?: string[]) {
-    const collapsibleState = definedAndNonEmpty(children)
+  private getRunning(element: string, hasChildren?: boolean) {
+    const collapsibleState = hasChildren
       ? TreeItemCollapsibleState.Collapsed
       : TreeItemCollapsibleState.None
 
     return this.getTreeItemWithIcon(element, collapsibleState, 'loading~spin')
   }
 
-  private getQueuedTreeItem(element: string) {
+  private getQueued(element: string) {
     return this.getTreeItemWithIcon(
       element,
       TreeItemCollapsibleState.None,
