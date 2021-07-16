@@ -1,5 +1,11 @@
 import { join } from 'path'
-import { Experiment, ColumnAggregateData } from './webview/contract'
+import { Experiment } from './webview/contract'
+import {
+  ExperimentsAccumulator,
+  PartialColumnDescriptor,
+  PartialColumnsMap,
+  RowStatus
+} from './accumulator'
 import {
   ExperimentFields,
   ExperimentsBranchJSONOutput,
@@ -7,32 +13,6 @@ import {
   Value,
   ValueTree
 } from '../cli/reader'
-
-export enum RowStatus {
-  RUNNING = 'running',
-  QUEUED = 'queued'
-}
-
-export type RunningOrQueued = { status: RowStatus; children?: string[] }
-
-export interface PartialColumnDescriptor extends ColumnAggregateData {
-  types?: Set<string>
-  hasChildren: boolean
-  group: string
-  path: string
-  parentPath: string
-}
-export type PartialColumnsMap = Map<string, PartialColumnDescriptor>
-
-interface ExperimentsAccumulator {
-  paramsMap: PartialColumnsMap
-  metricsMap: PartialColumnsMap
-  branches: Experiment[]
-  experimentsByBranch: Map<string, Experiment[]>
-  checkpointsByTip: Map<string, Experiment[]>
-  runningOrQueued: Map<string, RunningOrQueued & { id?: string }>
-  workspace: Experiment
-}
 
 const getValueType = (value: Value | ValueTree) => {
   if (value === null) {
@@ -258,26 +238,8 @@ export const collectFromRepo = (
   data: ExperimentsRepoJSONOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
-  const acc: ExperimentsAccumulator = {
-    branches: [] as Experiment[],
-    checkpointsByTip: new Map(),
-    experimentsByBranch: new Map(),
-    metricsMap: new Map(),
-    paramsMap: new Map(),
-    runningOrQueued: new Map(),
-    workspace: {
-      ...workspace.baseline,
-      displayName: 'workspace',
-      id: 'workspace'
-    }
-  }
+  const acc = new ExperimentsAccumulator(workspace)
   collectColumnsFromExperiment(acc, workspace.baseline)
-
-  if (workspace.baseline.running) {
-    acc.runningOrQueued.set('workspace', {
-      status: RowStatus.RUNNING
-    })
-  }
 
   collectFromBranchesObject(acc, branchesObject)
   return acc

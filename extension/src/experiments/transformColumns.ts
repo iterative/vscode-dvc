@@ -1,4 +1,4 @@
-import { PartialColumnDescriptor, PartialColumnsMap } from './collectFromRepo'
+import { PartialColumnDescriptor, PartialColumnsMap } from './accumulator'
 import { ColumnData } from './webview/contract'
 
 const columnFromMapEntry = (

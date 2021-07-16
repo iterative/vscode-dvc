@@ -1,4 +1,5 @@
-import { collectFromRepo, RunningOrQueued } from './collectFromRepo'
+import { RunningOrQueued } from './accumulator'
+import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData, Experiment } from './webview/contract'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'

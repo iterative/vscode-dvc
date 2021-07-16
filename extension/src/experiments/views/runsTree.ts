@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { RowStatus } from '../collectFromRepo'
+import { RowStatus } from '../accumulator'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()

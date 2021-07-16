@@ -1,8 +1,8 @@
 import { join } from 'path'
+import { RowStatus } from './accumulator'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
 import { ColumnData, Experiment } from './webview/contract'
-import { RowStatus } from './collectFromRepo'
 
 const paramsYaml = 'params.yaml'
 
