@@ -183,33 +183,36 @@ export class ExperimentsTable {
   }
 
   public getTableData(): TableData {
-    const { workspace, branches } = this
     return {
       columns:
         this.columnData?.filter(
           column => this.columnStatus[column.path] !== ColumnStatus.unselected
         ) || [],
-      rows: branches ? [workspace as Experiment, ...this.getRowData()] : []
+      rows: this.getRowData()
     }
   }
 
   private getRowData() {
-    return (this.branches || []).map(branch => {
-      const experiments = this.experimentsByBranch.get(branch.displayName)
-      if (!experiments) {
-        return branch
-      }
-      return {
-        ...branch,
-        subRows: sortRows(this.currentSort, experiments).map(experiment => {
-          const checkpoints = this.checkpointsByTip.get(experiment.id)
-          if (!checkpoints) {
-            return experiment
-          }
-          return { ...experiment, subRows: checkpoints }
-        })
-      }
-    })
+    const { workspace, branches } = this
+    return [
+      workspace as Experiment,
+      ...(branches || []).map(branch => {
+        const experiments = this.experimentsByBranch.get(branch.displayName)
+        if (!experiments) {
+          return branch
+        }
+        return {
+          ...branch,
+          subRows: sortRows(this.currentSort, experiments).map(experiment => {
+            const checkpoints = this.checkpointsByTip.get(experiment.id)
+            if (!checkpoints) {
+              return experiment
+            }
+            return { ...experiment, subRows: checkpoints }
+          })
+        }
+      })
+    ]
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -223,6 +226,12 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
+    this.transformAndSet(data)
+
+    return this.notifyChanged()
+  }
+
+  private transformAndSet(data: ExperimentsRepoJSONOutput) {
     const {
       columns,
       branches,
@@ -244,8 +253,6 @@ export class ExperimentsTable {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
     this.runningOrQueued = runningOrQueued
-
-    return this.notifyChanged()
   }
 
   private notifyChanged() {

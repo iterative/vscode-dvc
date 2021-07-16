@@ -6,7 +6,7 @@ export interface Experiment extends ExperimentFields {
 }
 
 export interface RowData extends Experiment {
-  subRows?: Experiment[]
+  subRows?: RowData[]
 }
 
 export interface ColumnAggregateData {
