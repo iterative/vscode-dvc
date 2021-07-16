@@ -122,7 +122,7 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
-  describe('getCheckpointsByExperiment', () => {
+  describe('getCheckpointNames', () => {
     it('should return the correct checkpoint names for the given experiment name', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
