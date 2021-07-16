@@ -48,8 +48,8 @@ export class ExperimentsTable {
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private workspace?: Experiment
-  private columnData?: ColumnData[]
-  private branches?: Experiment[]
+  private columnData: ColumnData[] = []
+  private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private runningOrQueued: Map<string, RunningOrQueued> = new Map()
@@ -193,11 +193,10 @@ export class ExperimentsTable {
   }
 
   private getRowData() {
-    const { workspace, branches } = this
     return [
-      workspace as Experiment,
-      ...(branches || []).map(branch => {
-        const experiments = this.experimentsByBranch.get(branch.displayName)
+      this.workspace as Experiment,
+      ...this.branches.map(branch => {
+        const experiments = this.getExperimentsByBranch(branch)
         if (!experiments) {
           return branch
         }
@@ -213,6 +212,14 @@ export class ExperimentsTable {
         }
       })
     ]
+  }
+
+  private getExperimentsByBranch(branch: Experiment) {
+    const experiments = this.experimentsByBranch.get(branch.displayName)
+    if (!experiments) {
+      return
+    }
+    return sortRows(this.currentSort, experiments)
   }
 
   private async updateData(): Promise<boolean | undefined> {
