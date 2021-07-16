@@ -1,4 +1,3 @@
-import { RunningOrQueued } from './accumulator'
 import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
 import { ColumnData, Experiment } from './webview/contract'
@@ -10,7 +9,6 @@ interface TransformedExperiments {
   experimentsByBranch: Map<string, Experiment[]>
   checkpointsByTip: Map<string, Experiment[]>
   workspace: Experiment
-  runningOrQueued: Map<string, RunningOrQueued>
 }
 
 export const transformExperimentsRepo = (
@@ -22,8 +20,7 @@ export const transformExperimentsRepo = (
     workspace,
     branches,
     experimentsByBranch,
-    checkpointsByTip,
-    runningOrQueued
+    checkpointsByTip
   } = collectFromRepo(data)
 
   return {
@@ -34,7 +31,6 @@ export const transformExperimentsRepo = (
       ...transformAndCollectFromColumnsIfAny(metricsMap)
     ],
     experimentsByBranch,
-    runningOrQueued,
     workspace
   }
 }

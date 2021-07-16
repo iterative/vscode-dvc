@@ -3,7 +3,6 @@ import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsRunsTree } from './runsTree'
 import { Experiments } from '..'
-import { RowStatus } from '../accumulator'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -143,7 +142,8 @@ describe('ExperimentsRunsTree', () => {
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
       mockedGetExperimentByName.mockReturnValueOnce({
-        status: RowStatus.QUEUED
+        queued: true,
+        running: false
       })
 
       await experimentsRunsTree.getChildren()
