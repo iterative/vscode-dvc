@@ -18,14 +18,14 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
-const mockedGetExperimentByName = jest.fn()
-const mockedGetCheckpointsByExperiment = jest.fn()
+const mockedGetExperiment = jest.fn()
+const mockedGetCheckpointNames = jest.fn()
 const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
-  getCheckpointsByExperiment: mockedGetCheckpointsByExperiment,
+  getCheckpointNames: mockedGetCheckpointNames,
   getDvcRoots: mockedGetDvcRoots,
-  getExperimentByName: mockedGetExperimentByName,
+  getExperiment: mockedGetExperiment,
   getRunningOrQueued: mockedGetRunningOrQueued,
   isReady: () => true
 } as unknown as Experiments
@@ -98,7 +98,7 @@ describe('ExperimentsRunsTree', () => {
       await experimentsRunsTree.getChildren('repo')
 
       const checkpoints = ['aaaaaaa', 'bbbbbbb']
-      mockedGetCheckpointsByExperiment.mockReturnValueOnce(checkpoints)
+      mockedGetCheckpointNames.mockReturnValueOnce(checkpoints)
 
       const children = await experimentsRunsTree.getChildren('ebbd66f')
 
@@ -141,7 +141,7 @@ describe('ExperimentsRunsTree', () => {
       const mockedQueuedExperiment = 'f0778b3'
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
-      mockedGetExperimentByName.mockReturnValueOnce({
+      mockedGetExperiment.mockReturnValueOnce({
         queued: true,
         running: false
       })
@@ -197,7 +197,7 @@ describe('ExperimentsRunsTree', () => {
       const mockedRunningExperiment = 'f0778b3'
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetExperimentByName.mockReturnValueOnce({
+      mockedGetExperiment.mockReturnValueOnce({
         hasChildren: true,
         running: true
       })

@@ -47,7 +47,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return this.getRunningCheckpoint(element)
     }
 
-    const experiment = this.experiments.getExperimentByName(dvcRoot, element)
+    const experiment = this.experiments.getExperiment(dvcRoot, element)
 
     if (experiment?.running) {
       return this.getRunning(element, experiment?.hasChildren)
@@ -66,10 +66,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     return Promise.resolve(
-      this.experiments.getCheckpointsByExperiment(
-        this.runRoots[element],
-        element
-      ) || []
+      this.experiments.getCheckpointNames(this.runRoots[element], element) || []
     )
   }
 

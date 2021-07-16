@@ -89,6 +89,65 @@ suite('Experiments Table Test Suite', () => {
     })
   })
 
+  describe('getExperimentByName', () => {
+    it('should return the correct experiments details for the given name', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
+
+      const experimentsTable = disposable.track(
+        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      )
+      await experimentsTable.isReady()
+
+      const notAnExperimentName = ':weeeee:'
+      const notAnExperiment =
+        experimentsTable.getExperiment(notAnExperimentName)
+      expect(notAnExperiment).to.be.undefined
+
+      const experiment = experimentsTable.getExperiment('exp-05694')
+
+      expect(experiment?.checkpoint_parent).to.equal(
+        'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
+      )
+      expect(experiment?.checkpoint_tip).to.equal(
+        'd3f4a0d3661c5977540d2205d819470cf0d2145a'
+      )
+      expect(experiment?.hasChildren).to.equal(true)
+      expect(experiment?.name).to.equal('exp-05694')
+    })
+  })
+
+  describe('getCheckpointsByExperiment', () => {
+    it('should return the correct checkpoint names for the given experiment name', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
+
+      const experimentsTable = disposable.track(
+        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      )
+      await experimentsTable.isReady()
+
+      const notAnExperimentName = ':cartwheel:'
+      const notCheckpoints =
+        experimentsTable.getCheckpointNames(notAnExperimentName)
+      expect(notCheckpoints).to.be.undefined
+
+      const checkpoints = experimentsTable.getCheckpointNames('exp-05694')
+
+      expect(checkpoints).to.deep.equal(['f0778b3', 'f81f1b5'])
+    })
+  })
+
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
       const config = disposable.track(new Config())

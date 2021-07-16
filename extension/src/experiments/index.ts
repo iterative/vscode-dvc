@@ -96,12 +96,12 @@ export class Experiments {
     return this.getTable(dvcRoot).getRunningOrQueued()
   }
 
-  public getExperimentByName(dvcRoot: string, name: string) {
-    return this.getTable(dvcRoot).getExperimentByName(name)
+  public getExperiment(dvcRoot: string, name: string) {
+    return this.getTable(dvcRoot).getExperiment(name)
   }
 
-  public getCheckpointsByExperiment(dvcRoot: string, name: string) {
-    return this.getTable(dvcRoot).getCheckpointsByExperiment(name)
+  public getCheckpointNames(dvcRoot: string, experimentName: string) {
+    return this.getTable(dvcRoot).getCheckpointNames(experimentName)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
