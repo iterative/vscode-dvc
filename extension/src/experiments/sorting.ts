@@ -1,6 +1,6 @@
 import path from 'path'
 import get from 'lodash.get'
-import { RowData as Experiment } from './webview/contract'
+import { Experiment } from './webview/contract'
 
 export interface SortDefinition {
   descending: boolean
