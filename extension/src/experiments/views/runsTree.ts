@@ -38,10 +38,6 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    if (element === 'workspace') {
-      return this.getRunning(element, false)
-    }
-
     const dvcRoot = this.runRoots[element]
     if (!dvcRoot) {
       return this.getRunningCheckpoint(element)
@@ -49,7 +45,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     const experiment = this.experiments.getExperiment(dvcRoot, element)
 
-    if (experiment?.running) {
+    if (element === 'workspace' || experiment?.running) {
       return this.getRunning(element, experiment?.hasChildren)
     }
 
