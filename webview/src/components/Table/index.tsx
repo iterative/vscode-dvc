@@ -71,16 +71,6 @@ const getFirstCellProps = (
   })
 }
 
-const getBulletStyle = (experiment: Experiment): string => {
-  if (experiment.running) {
-    return styles.runningBullet
-  }
-  if (experiment.queued) {
-    return styles.queuedBullet
-  }
-  return styles.bullet
-}
-
 export const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
 }> = ({ cell }) => {
@@ -90,16 +80,18 @@ export const FirstCell: React.FC<{
 
   return (
     <div {...firstCellProps}>
-      <span
-        className={
-          row.canExpand
-            ? row.isExpanded
-              ? styles.expandedRowArrow
-              : styles.contractedRowArrow
-            : styles.rowArrowPlaceholder
-        }
-      />
-      <span className={getBulletStyle(row.original)} />
+      <span className={styles.rowArrowPlaceholder}>
+        {row.canExpand && (
+          <span
+            className={
+              row.isExpanded
+                ? styles.expandedRowArrow
+                : styles.contractedRowArrow
+            }
+          />
+        )}
+      </span>
+      <span className={styles.bullet} />
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
@@ -124,30 +116,42 @@ const getCells = (cells: Cell<Experiment, unknown>[]) =>
     )
   })
 
-export const RowContent: React.FC<RowProp & { className?: string }> = ({
-  row,
-  className
-}): JSX.Element => {
-  const [firstCell, ...cells] = row.cells
-  return (
-    <div
-      {...row.getRowProps({
-        className: cx(
-          className,
-          styles.tr,
-          row.flatIndex % 2 === 0 || styles.oddRow,
-          row.values.id === 'workspace'
-            ? styles.workspaceRow
-            : styles.normalRow,
-          styles.row
-        )
-      })}
-    >
-      <FirstCell cell={firstCell} />
-      {getCells(cells)}
-    </div>
-  )
+const getExperimentTypeClass = ({ running, queued }: Experiment) => {
+  if (running) {
+    return styles.runningExperiment
+  }
+  if (queued) {
+    return styles.queuedExperiment
+  }
+  return styles.normalExperiment
 }
+
+export const RowContent: React.FC<RowProp & { className?: string }> = ({
+  row: {
+    getRowProps,
+    cells: [firstCell, ...cells],
+    original,
+    flatIndex,
+    values: { id }
+  },
+  className
+}): JSX.Element => (
+  <div
+    {...getRowProps({
+      className: cx(
+        className,
+        styles.tr,
+        getExperimentTypeClass(original),
+        flatIndex % 2 === 0 || styles.oddRow,
+        id === 'workspace' ? styles.workspaceRow : styles.normalRow,
+        styles.row
+      )
+    })}
+  >
+    <FirstCell cell={firstCell} />
+    {getCells(cells)}
+  </div>
+)
 
 export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   row,
@@ -166,7 +170,7 @@ export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
     <div
       className={cx(
         styles.experimentGroup,
-        row.isExpanded && styles.expandedGroup
+        row.isExpanded && row.subRows.length > 0 && styles.expandedGroup
       )}
     >
       <NestedRow row={row} instance={instance} />
