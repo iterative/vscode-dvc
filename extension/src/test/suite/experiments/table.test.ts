@@ -168,10 +168,10 @@ suite('Experiments Table Test Suite', () => {
   it('should be able to sort', async () => {
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
-    const buildTestExperiment = (testparam: number) => ({
+    const buildTestExperiment = (testParam: number) => ({
       params: {
         'params.yaml': {
-          test: testparam
+          test: testParam
         }
       }
     })

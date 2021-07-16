@@ -48,8 +48,10 @@ export class ExperimentsTable {
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
 
   private workspace?: Experiment
-  private columnData?: ColumnData[]
-  private branches?: Experiment[]
+  private columnData: ColumnData[] = []
+  private branches: Experiment[] = []
+  private experimentsByBranch: Map<string, Experiment[]> = new Map()
+  private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private runningOrQueued: Map<string, RunningOrQueued> = new Map()
 
   private columnStatus: Record<string, ColumnStatus> = {}
@@ -181,16 +183,43 @@ export class ExperimentsTable {
   }
 
   public getTableData(): TableData {
-    const { workspace, branches } = this
     return {
       columns:
         this.columnData?.filter(
           column => this.columnStatus[column.path] !== ColumnStatus.unselected
         ) || [],
-      rows: branches
-        ? [workspace as Experiment, ...sortRows(this.currentSort, branches)]
-        : []
+      rows: this.getRowData()
     }
+  }
+
+  private getRowData() {
+    return [
+      this.workspace as Experiment,
+      ...this.branches.map(branch => {
+        const experiments = this.getExperimentsByBranch(branch)
+        if (!experiments) {
+          return branch
+        }
+        return {
+          ...branch,
+          subRows: sortRows(this.currentSort, experiments).map(experiment => {
+            const checkpoints = this.checkpointsByTip.get(experiment.id)
+            if (!checkpoints) {
+              return experiment
+            }
+            return { ...experiment, subRows: checkpoints }
+          })
+        }
+      })
+    ]
+  }
+
+  private getExperimentsByBranch(branch: Experiment) {
+    const experiments = this.experimentsByBranch.get(branch.displayName)
+    if (!experiments) {
+      return
+    }
+    return sortRows(this.currentSort, experiments)
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -204,8 +233,20 @@ export class ExperimentsTable {
       'Experiments table update'
     )
 
-    const { columns, branches, runningOrQueued, workspace } =
-      transformExperimentsRepo(data)
+    this.transformAndSet(data)
+
+    return this.notifyChanged()
+  }
+
+  private transformAndSet(data: ExperimentsRepoJSONOutput) {
+    const {
+      columns,
+      branches,
+      experimentsByBranch,
+      checkpointsByTip,
+      runningOrQueued,
+      workspace
+    } = transformExperimentsRepo(data)
 
     columns.forEach(column => {
       if (this.columnStatus[column.path] === undefined) {
@@ -216,9 +257,9 @@ export class ExperimentsTable {
     this.columnData = columns
     this.workspace = workspace
     this.branches = branches
+    this.experimentsByBranch = experimentsByBranch
+    this.checkpointsByTip = checkpointsByTip
     this.runningOrQueued = runningOrQueued
-
-    return this.notifyChanged()
   }
 
   private notifyChanged() {

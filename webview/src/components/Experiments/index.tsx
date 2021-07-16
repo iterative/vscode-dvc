@@ -1,7 +1,7 @@
 import React from 'react'
 import {
   ColumnData,
-  Experiment,
+  RowData as Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
 import {

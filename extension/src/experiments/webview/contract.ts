@@ -3,7 +3,10 @@ import { ExperimentFields } from '../../cli/reader'
 export interface Experiment extends ExperimentFields {
   id: string
   displayName: string
-  subRows?: Experiment[]
+}
+
+export interface RowData extends Experiment {
+  subRows?: RowData[]
 }
 
 export interface ColumnAggregateData {
@@ -67,7 +70,7 @@ export enum MessageToWebviewType {
 }
 
 export interface TableData {
-  rows: Experiment[]
+  rows: RowData[]
   columns: ColumnData[]
 }
 
