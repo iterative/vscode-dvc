@@ -10,7 +10,6 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { RowStatus } from '../accumulator'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -46,8 +45,8 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     const row = this.experiments.getRow(dvcRoot, element)
 
-    if (row?.status === RowStatus.RUNNING) {
-      return this.getRunningTreeItem(element, row?.children)
+    if (row?.running) {
+      return this.getRunningTreeItem(element, row?.hasChildren)
     }
 
     return this.getQueuedTreeItem(element)
@@ -75,8 +74,8 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
   }
 
-  private getRunningTreeItem(element: string, children?: string[]) {
-    const collapsibleState = definedAndNonEmpty(children)
+  private getRunningTreeItem(element: string, hasChildren: boolean) {
+    const collapsibleState = hasChildren
       ? TreeItemCollapsibleState.Collapsed
       : TreeItemCollapsibleState.None
 

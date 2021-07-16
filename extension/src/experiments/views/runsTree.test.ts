@@ -168,8 +168,8 @@ describe('ExperimentsRunsTree', () => {
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
       mockedGetRow.mockReturnValueOnce({
-        children: ['e5855d7', '6e5e782'],
-        status: RowStatus.RUNNING
+        hasChildren: true,
+        running: true
       })
 
       await experimentsRunsTree.getChildren()
