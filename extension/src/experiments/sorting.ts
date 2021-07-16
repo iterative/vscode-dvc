@@ -1,6 +1,6 @@
 import path from 'path'
 import get from 'lodash.get'
-import { Experiment } from './webview/contract'
+import { RowData as Experiment } from './webview/contract'
 
 export interface SortDefinition {
   descending: boolean
@@ -37,14 +37,5 @@ export const sortRows = (
   const sortFunction = buildExperimentSortFunction(
     sortDefinition as SortDefinition
   )
-  return unsortedRows.map(branch => {
-    if (!branch.subRows) {
-      return branch
-    }
-    const sortedRows = [...branch.subRows].sort(sortFunction)
-    return {
-      ...branch,
-      subRows: sortedRows
-    }
-  })
+  return unsortedRows.sort(sortFunction)
 }

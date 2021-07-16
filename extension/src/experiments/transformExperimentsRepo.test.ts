@@ -1,22 +1,16 @@
 import { join } from 'path'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import complexExperimentsOutput from './webview/complex-output-example.json'
-import complexColumnData from './webview/complex-column-example.json'
-import complexRowData from './webview/complex-row-example.json'
 import { ColumnData, Experiment } from './webview/contract'
 import { RowStatus } from './collectFromRepo'
 
 const paramsYaml = 'params.yaml'
 
 describe('overall transformer functionality', () => {
-  it('returns output that matches the data found in the webview contract', () => {
-    const { workspace, branches, columns, runningOrQueued } =
-      transformExperimentsRepo(complexExperimentsOutput)
-    const [complexWorkspace, ...complexBranches] = complexRowData
-
-    expect(workspace).toEqual(complexWorkspace)
-    expect(branches).toEqual(complexBranches)
-    expect(columns).toEqual(complexColumnData)
+  it('returns the running or queued experiments', () => {
+    const { runningOrQueued } = transformExperimentsRepo(
+      complexExperimentsOutput
+    )
 
     expect(runningOrQueued).toEqual(
       new Map([
@@ -42,24 +36,25 @@ describe('branch and checkpoint nesting', () => {
   })
 
   describe('a repo with two branches', () => {
-    const { branches, workspace } = transformExperimentsRepo({
-      branchA: {
-        baseline: {},
-        otherExp1: {},
-        otherExp2: {
-          checkpoint_tip: 'otherExp2'
+    const { branches, experimentsByBranch, workspace } =
+      transformExperimentsRepo({
+        branchA: {
+          baseline: {},
+          otherExp1: {},
+          otherExp2: {
+            checkpoint_tip: 'otherExp2'
+          },
+          otherExp2_1: {
+            checkpoint_tip: 'otherExp2'
+          }
         },
-        otherExp2_1: {
-          checkpoint_tip: 'otherExp2'
+        branchB: {
+          baseline: {}
+        },
+        workspace: {
+          baseline: {}
         }
-      },
-      branchB: {
-        baseline: {}
-      },
-      workspace: {
-        baseline: {}
-      }
-    })
+      })
 
     it('defines workspace', () => {
       expect(workspace).toBeDefined()
@@ -76,18 +71,16 @@ describe('branch and checkpoint nesting', () => {
     })
 
     it('finds two experiments on branchA', () => {
-      expect(branchA.subRows?.length).toEqual(2)
+      expect(experimentsByBranch.get('branchA')?.length).toEqual(2)
     })
 
     it('finds no experiments on branchB', () => {
-      expect(branchB.subRows).toBeUndefined()
+      expect(experimentsByBranch.get('branchB')).toBeUndefined()
     })
   })
 
   describe('a repo with one branch that has nested checkpoints', () => {
-    const {
-      branches: [branchA]
-    } = transformExperimentsRepo({
+    const { experimentsByBranch, checkpointsByTip } = transformExperimentsRepo({
       branchA: {
         baseline: {},
         tip1: {
@@ -107,16 +100,16 @@ describe('branch and checkpoint nesting', () => {
     })
 
     it('only lists the tip as a top-level experiment', () => {
-      expect(branchA.subRows?.length).toEqual(1)
+      expect(experimentsByBranch.size).toEqual(1)
     })
 
-    const [tip1] = branchA.subRows as Experiment[]
+    const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
 
     it('finds three checkpoints on the tip', () => {
-      expect(tip1.subRows?.length).toEqual(3)
+      expect(checkpoints?.length).toEqual(3)
     })
 
-    const [tip1cp1, tip1cp2, tip1cp3] = tip1.subRows as Experiment[]
+    const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
 
     it('finds checkpoints in order', () => {
       expect(tip1cp1.id).toEqual('tip1cp1')

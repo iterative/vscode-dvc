@@ -1,7 +1,7 @@
 import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
 
 export interface InstanceProp {
