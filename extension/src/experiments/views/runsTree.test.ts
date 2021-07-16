@@ -19,14 +19,14 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
-const mockedGetRow = jest.fn()
-const mockedGetChildRows = jest.fn()
+const mockedGetExperimentByName = jest.fn()
+const mockedGetCheckpointsByExperiment = jest.fn()
 const mockedGetRunningOrQueued = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
-  getChildRows: mockedGetChildRows,
+  getCheckpointsByExperiment: mockedGetCheckpointsByExperiment,
   getDvcRoots: mockedGetDvcRoots,
-  getRow: mockedGetRow,
+  getExperimentByName: mockedGetExperimentByName,
   getRunningOrQueued: mockedGetRunningOrQueued,
   isReady: () => true
 } as unknown as Experiments
@@ -99,7 +99,7 @@ describe('ExperimentsRunsTree', () => {
       await experimentsRunsTree.getChildren('repo')
 
       const checkpoints = ['aaaaaaa', 'bbbbbbb']
-      mockedGetChildRows.mockReturnValueOnce(checkpoints)
+      mockedGetCheckpointsByExperiment.mockReturnValueOnce(checkpoints)
 
       const children = await experimentsRunsTree.getChildren('ebbd66f')
 
@@ -142,7 +142,9 @@ describe('ExperimentsRunsTree', () => {
       const mockedQueuedExperiment = 'f0778b3'
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
-      mockedGetRow.mockReturnValueOnce({ status: RowStatus.QUEUED })
+      mockedGetExperimentByName.mockReturnValueOnce({
+        status: RowStatus.QUEUED
+      })
 
       await experimentsRunsTree.getChildren()
       await experimentsRunsTree.getChildren('demo')
@@ -167,7 +169,7 @@ describe('ExperimentsRunsTree', () => {
       const mockedRunningExperiment = 'f0778b3'
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
       mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetRow.mockReturnValueOnce({
+      mockedGetExperimentByName.mockReturnValueOnce({
         hasChildren: true,
         running: true
       })

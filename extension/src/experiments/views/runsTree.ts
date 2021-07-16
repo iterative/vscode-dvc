@@ -40,16 +40,16 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     const dvcRoot = this.runRoots[element]
     if (!dvcRoot) {
-      return this.getChildTreeItem(element)
+      return this.getRunningCheckpoint(element)
     }
 
-    const row = this.experiments.getRow(dvcRoot, element)
+    const experiment = this.experiments.getExperimentByName(dvcRoot, element)
 
-    if (row?.running) {
-      return this.getRunningTreeItem(element, row?.hasChildren)
+    if (experiment?.running) {
+      return this.getRunning(element, experiment?.hasChildren)
     }
 
-    return this.getQueuedTreeItem(element)
+    return this.getQueued(element)
   }
 
   public getChildren(element?: string): Promise<string[]> {
@@ -62,11 +62,14 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     return Promise.resolve(
-      this.experiments.getChildRows(this.runRoots[element], element) || []
+      this.experiments.getCheckpointsByExperiment(
+        this.runRoots[element],
+        element
+      ) || []
     )
   }
 
-  private getChildTreeItem(element: string) {
+  private getRunningCheckpoint(element: string) {
     return this.getTreeItemWithIcon(
       element,
       TreeItemCollapsibleState.None,
@@ -74,7 +77,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
   }
 
-  private getRunningTreeItem(element: string, hasChildren: boolean) {
+  private getRunning(element: string, hasChildren: boolean) {
     const collapsibleState = hasChildren
       ? TreeItemCollapsibleState.Collapsed
       : TreeItemCollapsibleState.None
@@ -82,7 +85,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     return this.getTreeItemWithIcon(element, collapsibleState, 'loading~spin')
   }
 
-  private getQueuedTreeItem(element: string) {
+  private getQueued(element: string) {
     return this.getTreeItemWithIcon(
       element,
       TreeItemCollapsibleState.None,

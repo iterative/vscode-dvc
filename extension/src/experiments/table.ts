@@ -176,7 +176,7 @@ export class ExperimentsTable {
     ).map(experiment => experiment.displayName)
   }
 
-  public getRow(name: string) {
+  public getExperimentByName(name: string) {
     const experiment = flatten<Experiment>([
       ...this.experimentsByBranch.values()
     ]).find(experiment => experiment.displayName === name)
@@ -191,8 +191,8 @@ export class ExperimentsTable {
     }
   }
 
-  public getChildRows(name: string) {
-    const id = this.getRow(name)?.id
+  public getCheckpointsByExperiment(name: string) {
+    const id = this.getExperimentByName(name)?.id
     if (!id) {
       return
     }
