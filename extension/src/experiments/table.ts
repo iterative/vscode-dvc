@@ -3,7 +3,6 @@ import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
-import { TableData } from './webview/contract'
 import { SortDefinition } from './sorting'
 import { pickSort } from './quickPick'
 import { ExperimentsModel } from './model'
@@ -101,7 +100,7 @@ export class ExperimentsTable {
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData: this.getTableData()
+        tableData: this.model.getTableData()
       },
       this.resourceLocator
     )
@@ -154,10 +153,6 @@ export class ExperimentsTable {
     return this.model.getCheckpointNames(name)
   }
 
-  public getTableData(): TableData {
-    return this.model.getTableData()
-  }
-
   private async updateData(): Promise<boolean | undefined> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
@@ -188,7 +183,7 @@ export class ExperimentsTable {
     if (this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: this.getTableData()
+        tableData: this.model.getTableData()
       })
     }
   }

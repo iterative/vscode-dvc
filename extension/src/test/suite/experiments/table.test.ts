@@ -246,6 +246,8 @@ suite('Experiments Table Test Suite', () => {
       }
     })
 
+    const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+
     const internalCommands = disposable.track(
       new InternalCommands(config, cliReader)
     )
@@ -256,9 +258,9 @@ suite('Experiments Table Test Suite', () => {
       new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
     )
     await experimentsTable.isReady()
+    await experimentsTable.showWebview()
 
-    const { rows: unsortedRows } = experimentsTable.getTableData()
-    expect(unsortedRows).deep.equals([
+    expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
       {
         displayName: 'workspace',
         id: 'workspace',
@@ -309,9 +311,7 @@ suite('Experiments Table Test Suite', () => {
     await pickPromise
     await tableChangePromise
 
-    const { rows: sortedRows } = experimentsTable.getTableData()
-
-    expect(sortedRows).deep.equals([
+    expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
       {
         displayName: 'workspace',
         id: 'workspace',
