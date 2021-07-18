@@ -26,18 +26,18 @@ export class ExperimentsTable {
     this.dispose.track(new EventEmitter())
 
   private readonly dvcRoot: string
+
   private readonly internalCommands: InternalCommands
+  private readonly resourceLocator: ResourceLocator
+
+  private webview?: ExperimentsWebview
+  private model: ExperimentsModel
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private webview?: ExperimentsWebview
-  private readonly resourceLocator: ResourceLocator
-
   private readonly experimentsRowsChanged = new EventEmitter<void>()
   private readonly experimentsColumnsChanged = new EventEmitter<void>()
-
-  private model: ExperimentsModel
 
   private processManager: ProcessManager
 
