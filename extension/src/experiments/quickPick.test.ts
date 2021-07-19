@@ -212,6 +212,36 @@ describe('Column-based QuickPicks', () => {
   })
 
   describe('pickFilter', () => {
+    it('should early if no column is picked', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      const filter = await pickFilter(columns)
+      expect(filter).toBeUndefined()
+    })
+
+    it('should return early if no operator is picked', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      const filter = await pickFilter(columns)
+      expect(filter).toBeUndefined()
+    })
+
+    it('should return early if no value is provided', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: '==='
+      } as unknown)
+      mockedGetInput.mockResolvedValueOnce(undefined)
+      const filter = await pickFilter(columns)
+      expect(filter).toBeUndefined()
+    })
+
     it('should return a filter definition', async () => {
       const columns = [epochsColumn]
       mockedShowQuickPick.mockResolvedValueOnce({

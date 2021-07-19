@@ -91,11 +91,19 @@ interface FilterDefinition {
   value: string | number
 }
 
+const operators = [
+  { description: 'Equal', label: '=', value: '===' },
+  { description: 'Greater than', label: '>', value: '>' },
+  { description: 'Greater than or equal to', label: '>=', value: '>=' },
+  { description: 'Less than', label: '<', value: '<' },
+  { description: 'Less than or equal to', label: '<=', value: '<=' }
+]
+
 export const pickFilter = async (
   columnData: ColumnData[] | undefined
 ): Promise<FilterDefinition | undefined> => {
   if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to sort with')
+    window.showErrorMessage('There are no columns to filter by')
     return
   }
   const pickedColumn = await pickFromColumnData(columnData, {
@@ -104,16 +112,9 @@ export const pickFilter = async (
   if (!pickedColumn) {
     return
   }
-  const operator = await quickPickValue<string>(
-    [
-      { description: 'Equal', label: '=', value: '===' },
-      { description: 'Greater than', label: '>', value: '>' },
-      { description: 'Greater than or equal to', label: '>=', value: '>=' },
-      { description: 'Less than', label: '<', value: '<' },
-      { description: 'Less than or equal to', label: '<=', value: '<=' }
-    ],
-    { title: 'Select an operator' }
-  )
+  const operator = await quickPickValue<string>(operators, {
+    title: 'Select an operator'
+  })
   if (!operator) {
     return
   }
