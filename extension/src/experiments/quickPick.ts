@@ -44,10 +44,14 @@ export const pickGarbageCollectionFlags = () =>
   )
 
 export const pickFromColumnData = (
-  columnData: ColumnData[],
+  columnData: ColumnData[] | undefined,
   quickPickOptions: QuickPickOptions
-) =>
-  quickPickValue<ColumnData>(
+) => {
+  if (!columnData || columnData.length === 0) {
+    window.showErrorMessage('There are no columns to sort with')
+    return
+  }
+  return quickPickValue<ColumnData>(
     columnData.map(column => ({
       description: column.path,
       label: column.name,
@@ -55,14 +59,11 @@ export const pickFromColumnData = (
     })),
     quickPickOptions
   )
+}
 
 export const pickSort = async (
   columnData: ColumnData[] | undefined
 ): Promise<SortDefinition | undefined> => {
-  if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to sort with')
-    return
-  }
   const pickedColumn = await pickFromColumnData(columnData, {
     title: 'Select a column to sort by'
   })
@@ -102,10 +103,6 @@ const operators = [
 export const pickFilter = async (
   columnData: ColumnData[] | undefined
 ): Promise<FilterDefinition | undefined> => {
-  if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to filter by')
-    return
-  }
   const pickedColumn = await pickFromColumnData(columnData, {
     title: 'Select a column to filter by'
   })

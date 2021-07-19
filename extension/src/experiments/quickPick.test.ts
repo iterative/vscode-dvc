@@ -127,6 +127,13 @@ describe('Column-based QuickPicks', () => {
   const exampleColumns = [epochsColumn, paramsYamlColumn]
 
   describe('pickFromColumnData', () => {
+    it('should return early if no columns are provided', async () => {
+      const pickedColumn = await pickFromColumnData([], {
+        title: "can't pick from no columns"
+      })
+      expect(pickedColumn).toBeUndefined()
+    })
+
     it('invokes a QuickPick with the correct options', async () => {
       const title = 'Test title'
       await pickFromColumnData(exampleColumns, { title })
