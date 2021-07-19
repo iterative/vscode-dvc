@@ -7,7 +7,7 @@ import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
 import { Experiments } from '../../../experiments'
-import { ExperimentsTable } from '../../../experiments/table'
+import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
@@ -35,15 +35,16 @@ suite('Experiments Test Suite', () => {
   })
 
   const onDidChangeIsWebviewFocused = (
-    experimentsTable: ExperimentsTable
+    experimentsRepository: ExperimentsRepository
   ): Promise<string | undefined> =>
     new Promise(resolve => {
-      const listener: Disposable = experimentsTable.onDidChangeIsWebviewFocused(
-        (event: string | undefined) => {
-          listener.dispose()
-          return resolve(event)
-        }
-      )
+      const listener: Disposable =
+        experimentsRepository.onDidChangeIsWebviewFocused(
+          (event: string | undefined) => {
+            listener.dispose()
+            return resolve(event)
+          }
+        )
     })
 
   describe('showExperimentsTable', () => {
@@ -64,36 +65,37 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const mockExperimentsTable = {
-        'other/dvc/root': {} as ExperimentsTable
-      } as Record<string, ExperimentsTable>
+      const mockExperimentsRepository = {
+        'other/dvc/root': {} as ExperimentsRepository
+      } as Record<string, ExperimentsRepository>
 
       const experiments = new Experiments(
         internalCommands,
-        mockExperimentsTable
+        mockExperimentsRepository
       )
-      const [experimentsTable] = experiments.create(
+      const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
         resourceLocator
       )
 
       await experiments.isReady()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsTable)
+      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
 
       await experiments.showExperimentsTable()
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(configSpy).to.be.calledOnce
       expect(mockQuickPickOne).not.to.be.called
-      expect(experiments.getFocusedTable()).to.equal(experimentsTable)
+      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
 
       configSpy.resetHistory()
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsTable = await experiments.showExperimentsTable()
+      const focusedExperimentsRepository =
+        await experiments.showExperimentsTable()
 
-      expect(focusedExperimentsTable).to.equal(experimentsTable)
+      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
       expect(mockQuickPickOne).not.to.be.called
       expect(configSpy).to.be.calledOnce
     })
@@ -114,34 +116,35 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const mockExperimentsTable = {
-        'other/dvc/root': {} as ExperimentsTable
-      } as Record<string, ExperimentsTable>
+      const mockExperimentsRepository = {
+        'other/dvc/root': {} as ExperimentsRepository
+      } as Record<string, ExperimentsRepository>
 
       const experiments = new Experiments(
         internalCommands,
-        mockExperimentsTable
+        mockExperimentsRepository
       )
-      const [experimentsTable] = experiments.create(
+      const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
         resourceLocator
       )
 
       await experiments.isReady()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsTable)
+      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
 
       await experiments.showExperimentsTable()
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
-      expect(experiments.getFocusedTable()).to.equal(experimentsTable)
+      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsTable = await experiments.showExperimentsTable()
+      const focusedExperimentsRepository =
+        await experiments.showExperimentsTable()
 
-      expect(focusedExperimentsTable).to.equal(experimentsTable)
+      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
       expect(mockQuickPickOne).to.be.calledOnce
     })
 
@@ -192,22 +195,22 @@ suite('Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const mockExperimentsTable = {
-        'other/dvc/root': { cliReader } as unknown as ExperimentsTable
-      } as Record<string, ExperimentsTable>
+      const mockExperimentsRepository = {
+        'other/dvc/root': { cliReader } as unknown as ExperimentsRepository
+      } as Record<string, ExperimentsRepository>
 
       const experiments = new Experiments(
         internalCommands,
-        mockExperimentsTable
+        mockExperimentsRepository
       )
-      const [experimentsTable] = experiments.create(
+      const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
         resourceLocator
       )
 
       await experiments.isReady()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsTable)
+      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
 
       await experiments.showExperimentsTableThenRun(
         AvailableCommands.EXPERIMENT_RUN_QUEUED
@@ -216,19 +219,19 @@ suite('Experiments Test Suite', () => {
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
       expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
-      expect(experiments.getFocusedTable()).to.equal(experimentsTable)
+      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsTable =
+      const focusedExperimentsRepository =
         await experiments.showExperimentsTableThenRun(
           AvailableCommands.EXPERIMENT_RUN_QUEUED
         )
 
-      expect(focusedExperimentsTable).to.equal(experimentsTable)
+      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
       expect(mockQuickPickOne).not.to.be.called
 
-      const unfocused = onDidChangeIsWebviewFocused(experimentsTable)
+      const unfocused = onDidChangeIsWebviewFocused(experimentsRepository)
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
 
       const document = await workspace.openTextDocument(uri)
@@ -237,7 +240,7 @@ suite('Experiments Test Suite', () => {
       expect(await unfocused).to.be.undefined
       expect(experiments.getFocusedTable()).to.be.undefined
 
-      const focusedAgain = onDidChangeIsWebviewFocused(experimentsTable)
+      const focusedAgain = onDidChangeIsWebviewFocused(experimentsRepository)
       await commands.executeCommand('workbench.action.previousEditor')
       expect(await focusedAgain).to.equal(dvcDemoPath)
     })

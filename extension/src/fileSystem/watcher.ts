@@ -4,7 +4,7 @@ import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
 import { TrackedExplorerTree } from './views/trackedExplorerTree'
 import { Repository } from '../repository'
-import { EXPERIMENTS_GIT_REFS } from '../experiments/table'
+import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 
 const isExcluded = (path: string) =>
   !path || path.includes(EXPERIMENTS_GIT_REFS)
