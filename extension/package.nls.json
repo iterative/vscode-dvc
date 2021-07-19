@@ -2,6 +2,7 @@
   "displayName": "DVC",
   "description": "DVC VSCode extension",
   "command.addTarget": "Add Target",
+  "command.addExperimentsTableFilter": "Add Filter To Experiments Table",
   "command.checkout": "Checkout",
   "command.checkoutTarget": "Checkout Target",
   "command.commit": "Commit",

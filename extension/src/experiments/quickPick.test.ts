@@ -4,11 +4,14 @@ import {
   pickGarbageCollectionFlags,
   pickExperimentName,
   pickFromColumnData,
-  pickSort
+  pickSort,
+  pickFilter
 } from './quickPick'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
+import { getInput } from '../vscode/inputBox'
 
 jest.mock('vscode')
+jest.mock('../vscode/inputBox')
 
 const mockedShowErrorMessage = mocked(window.showErrorMessage)
 const mockedShowQuickPick = mocked<
@@ -23,6 +26,7 @@ const mockedShowQuickPick = mocked<
     | unknown
   >
 >(window.showQuickPick)
+const mockedGetInput = mocked(getInput)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -203,6 +207,25 @@ describe('Column-based QuickPicks', () => {
           columnPath: paramsYamlPath,
           descending: false
         })
+      })
+    })
+  })
+
+  describe('pickFilter', () => {
+    it('should return a filter definition', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: '==='
+      } as unknown)
+      mockedGetInput.mockResolvedValueOnce('5')
+      const filter = await pickFilter(columns)
+      expect(filter).toEqual({
+        columnPath: epochsColumn.path,
+        operator: '===',
+        value: '5'
       })
     })
   })

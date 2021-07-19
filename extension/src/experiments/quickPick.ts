@@ -3,6 +3,7 @@ import { ColumnData } from './webview/contract'
 import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
+import { getInput } from '../vscode/inputBox'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -81,5 +82,51 @@ export const pickSort = async (
   return {
     columnPath: pickedColumn.path,
     descending
+  }
+}
+
+interface FilterDefinition {
+  columnPath: string
+  operator: string
+  value: string | number
+}
+
+export const pickFilter = async (
+  columnData: ColumnData[] | undefined
+): Promise<FilterDefinition | undefined> => {
+  if (!columnData || columnData.length === 0) {
+    window.showErrorMessage('There are no columns to sort with')
+    return
+  }
+  const pickedColumn = await pickFromColumnData(columnData, {
+    title: 'Select a column to filter by'
+  })
+  if (!pickedColumn) {
+    return
+  }
+  const operator = await quickPickValue<string>(
+    [
+      { description: 'Equal', label: '=', value: '===' },
+      { description: 'Greater than', label: '>', value: '>' },
+      { description: 'Greater than or equal to', label: '>=', value: '>=' },
+      { description: 'Less than', label: '<', value: '<' },
+      { description: 'Less than or equal to', label: '<=', value: '<=' }
+    ],
+    { title: 'Select an operator' }
+  )
+  if (!operator) {
+    return
+  }
+
+  const value = await getInput('Enter a value')
+
+  if (!value) {
+    return
+  }
+
+  return {
+    columnPath: pickedColumn.path,
+    operator,
+    value
   }
 }

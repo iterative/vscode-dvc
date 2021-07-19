@@ -58,6 +58,11 @@ export class Experiments {
     return this.getRepository(await this.getFocusedOrDefaultOrPickProject())
   }
 
+  public async addFilter() {
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
+    repository.addFilter()
+  }
+
   public async pickSort() {
     const repository = await this.getFocusedOrDefaultOrPickRepo()
     repository.pickSort()
