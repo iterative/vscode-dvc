@@ -8,7 +8,7 @@ import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
 import complexRowData from '../../../experiments/webview/complex-row-example.json'
 import complexColumnData from '../../../experiments/webview/complex-column-example.json'
-import { ExperimentsTable } from '../../../experiments/table'
+import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
@@ -16,7 +16,7 @@ import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ColumnData } from '../../../experiments/webview/contract'
 
-suite('Experiments Table Test Suite', () => {
+suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
@@ -46,7 +46,11 @@ suite('Experiments Table Test Suite', () => {
       )
 
       const testTable = disposable.track(
-        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+        new ExperimentsRepository(
+          'demo',
+          internalCommands,
+          {} as ResourceLocator
+        )
       )
       await testTable.isReady()
       mockExperimentShow.resetHistory()
@@ -74,12 +78,16 @@ suite('Experiments Table Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const experimentsTable = disposable.track(
-        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          'demo',
+          internalCommands,
+          {} as ResourceLocator
+        )
       )
-      await experimentsTable.isReady()
+      await experimentsRepository.isReady()
 
-      const runningOrQueued = experimentsTable.getRunningOrQueued()
+      const runningOrQueued = experimentsRepository.getRunningOrQueued()
 
       expect(runningOrQueued).to.deep.equal([
         'workspace',
@@ -99,17 +107,21 @@ suite('Experiments Table Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const experimentsTable = disposable.track(
-        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          'demo',
+          internalCommands,
+          {} as ResourceLocator
+        )
       )
-      await experimentsTable.isReady()
+      await experimentsRepository.isReady()
 
       const notAnExperimentName = ':weeeee:'
       const notAnExperiment =
-        experimentsTable.getExperiment(notAnExperimentName)
+        experimentsRepository.getExperiment(notAnExperimentName)
       expect(notAnExperiment).to.be.undefined
 
-      const experiment = experimentsTable.getExperiment('exp-05694')
+      const experiment = experimentsRepository.getExperiment('exp-05694')
 
       expect(experiment?.checkpoint_parent).to.equal(
         'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
@@ -132,17 +144,21 @@ suite('Experiments Table Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const experimentsTable = disposable.track(
-        new ExperimentsTable('demo', internalCommands, {} as ResourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          'demo',
+          internalCommands,
+          {} as ResourceLocator
+        )
       )
-      await experimentsTable.isReady()
+      await experimentsRepository.isReady()
 
       const notAnExperimentName = ':cartwheel:'
       const notCheckpoints =
-        experimentsTable.getCheckpointNames(notAnExperimentName)
+        experimentsRepository.getCheckpointNames(notAnExperimentName)
       expect(notCheckpoints).to.be.undefined
 
-      const checkpoints = experimentsTable.getCheckpointNames('exp-05694')
+      const checkpoints = experimentsRepository.getCheckpointNames('exp-05694')
 
       expect(checkpoints).to.deep.equal(['f0778b3', 'f81f1b5'])
     })
@@ -161,13 +177,17 @@ suite('Experiments Table Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
-      const webview = await experimentsTable.showWebview()
+      const webview = await experimentsRepository.showWebview()
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
@@ -192,8 +212,12 @@ suite('Experiments Table Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
       const windowSpy = spy(window, 'createWebviewPanel')
@@ -204,7 +228,7 @@ suite('Experiments Table Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const webview = await experimentsTable.showWebview()
+      const webview = await experimentsRepository.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockExperimentShow).to.have.been.calledOnce
@@ -215,7 +239,7 @@ suite('Experiments Table Test Suite', () => {
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await experimentsTable.showWebview()
+      const sameWebview = await experimentsRepository.showWebview()
 
       expect(webview === sameWebview).to.be.true
 
@@ -254,11 +278,11 @@ suite('Experiments Table Test Suite', () => {
     const resourceLocator = disposable.track(
       new ResourceLocator(Uri.file(resourcePath))
     )
-    const experimentsTable = disposable.track(
-      new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+    const experimentsRepository = disposable.track(
+      new ExperimentsRepository(dvcDemoPath, internalCommands, resourceLocator)
     )
-    await experimentsTable.isReady()
-    await experimentsTable.showWebview()
+    await experimentsRepository.isReady()
+    await experimentsRepository.showWebview()
 
     expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
       {
@@ -304,10 +328,10 @@ suite('Experiments Table Test Suite', () => {
     } as QuickPickItemWithValue<boolean>)
 
     const tableChangePromise = new Promise(resolve => {
-      experimentsTable.onDidChangeExperimentsRows(resolve)
+      experimentsRepository.onDidChangeExperimentsRows(resolve)
     })
 
-    const pickPromise = experimentsTable.pickSort()
+    const pickPromise = experimentsRepository.pickSort()
     await pickPromise
     await tableChangePromise
 

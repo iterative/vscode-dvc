@@ -7,7 +7,7 @@ import { Disposable } from '../../../../extension'
 import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
 import { ExperimentsColumnsTree } from '../../../../experiments/views/columnsTree'
 import { Experiments } from '../../../../experiments'
-import { ExperimentsTable } from '../../../../experiments/table'
+import { ExperimentsRepository } from '../../../../experiments/repository'
 import { ColumnStatus } from '../../../../experiments/model'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
@@ -71,14 +71,20 @@ suite('Extension Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
-      await experimentsTable.isReady()
+      await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getTable').returns(experimentsTable)
+      stub((Experiments as any).prototype, 'getRepository').returns(
+        experimentsRepository
+      )
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
@@ -117,47 +123,54 @@ suite('Extension Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const experimentsTable = disposable.track(
-        new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
-      await experimentsTable.isReady()
+      await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getTable').returns(experimentsTable)
+      stub((Experiments as any).prototype, 'getRepository').returns(
+        experimentsRepository
+      )
 
-      const selectedChildren = experimentsTable.getChildColumns(relPath) || []
+      const selectedChildren =
+        experimentsRepository.getChildColumns(relPath) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
       const selectedGrandChildren =
-        experimentsTable.getChildColumns(join(relPath, 'process')) || []
+        experimentsRepository.getChildColumns(join(relPath, 'process')) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
       const allChildren = [...selectedChildren, ...selectedGrandChildren]
 
       allChildren.map(column =>
-        expect(experimentsTable.getColumn(column.path)?.status).to.equal(
+        expect(experimentsRepository.getColumn(column.path)?.status).to.equal(
           ColumnStatus.selected
         )
       )
 
-      expect(experimentsTable.getColumn(relPath)?.descendantMetadata).to.equal(
-        '8/8'
-      )
+      expect(
+        experimentsRepository.getColumn(relPath)?.descendantMetadata
+      ).to.equal('8/8')
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
       expect(isUnselected).to.equal(ColumnStatus.unselected)
 
       allChildren.map(column =>
-        expect(experimentsTable.getColumn(column.path)?.status).to.equal(
+        expect(experimentsRepository.getColumn(column.path)?.status).to.equal(
           isUnselected
         )
       )
 
-      expect(experimentsTable.getColumn(relPath)?.descendantMetadata).to.equal(
-        '0/8'
-      )
+      expect(
+        experimentsRepository.getColumn(relPath)?.descendantMetadata
+      ).to.equal('0/8')
     })
   })
 
@@ -182,21 +195,23 @@ suite('Extension Test Suite', () => {
     const resourceLocator = disposable.track(
       new ResourceLocator(Uri.file(resourcePath))
     )
-    const experimentsTable = disposable.track(
-      new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+    const experimentsRepository = disposable.track(
+      new ExperimentsRepository(dvcDemoPath, internalCommands, resourceLocator)
     )
 
-    await experimentsTable.isReady()
+    await experimentsRepository.isReady()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((Experiments as any).prototype, 'getTable').returns(experimentsTable)
+    stub((Experiments as any).prototype, 'getRepository').returns(
+      experimentsRepository
+    )
 
     const selectedChildren =
-      experimentsTable.getChildColumns(grandParentPath) || []
+      experimentsRepository.getChildColumns(grandParentPath) || []
     expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
     const selectedGrandChildren =
-      experimentsTable.getChildColumns(parentPath) || []
+      experimentsRepository.getChildColumns(parentPath) || []
     expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
     const allColumns = [
@@ -208,7 +223,7 @@ suite('Extension Test Suite', () => {
     await commands.executeCommand(toggleCommand, absPath)
 
     allColumns.map(column =>
-      expect(experimentsTable.getColumn(column.path)?.status).to.equal(
+      expect(experimentsRepository.getColumn(column.path)?.status).to.equal(
         ColumnStatus.unselected
       )
     )
@@ -222,11 +237,11 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(ColumnStatus.selected)
 
-    const parentColumn = experimentsTable.getColumn(parentPath)
+    const parentColumn = experimentsRepository.getColumn(parentPath)
     expect(parentColumn?.status).to.equal(ColumnStatus.indeterminate)
     expect(parentColumn?.descendantMetadata).to.equal('1/2')
 
-    const grandParentColumn = experimentsTable.getColumn(grandParentPath)
+    const grandParentColumn = experimentsRepository.getColumn(grandParentPath)
     expect(grandParentColumn?.status).to.equal(ColumnStatus.indeterminate)
     expect(grandParentColumn?.descendantMetadata).to.equal('2/8')
   })
@@ -252,17 +267,19 @@ suite('Extension Test Suite', () => {
     const resourceLocator = disposable.track(
       new ResourceLocator(Uri.file(resourcePath))
     )
-    const experimentsTable = disposable.track(
-      new ExperimentsTable(dvcDemoPath, internalCommands, resourceLocator)
+    const experimentsRepository = disposable.track(
+      new ExperimentsRepository(dvcDemoPath, internalCommands, resourceLocator)
     )
 
-    await experimentsTable.isReady()
+    await experimentsRepository.isReady()
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((Experiments as any).prototype, 'getTable').returns(experimentsTable)
+    stub((Experiments as any).prototype, 'getRepository').returns(
+      experimentsRepository
+    )
 
     const selectedGrandChildren =
-      experimentsTable.getChildColumns(parentPath) || []
+      experimentsRepository.getChildColumns(parentPath) || []
     expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
     await commands.executeCommand(toggleCommand, absPath)
@@ -278,9 +295,9 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(ColumnStatus.selected)
 
-    expect(experimentsTable.getColumn(secondGrandChild.path)?.status).to.equal(
-      ColumnStatus.unselected
-    )
+    expect(
+      experimentsRepository.getColumn(secondGrandChild.path)?.status
+    ).to.equal(ColumnStatus.unselected)
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
@@ -289,11 +306,11 @@ suite('Extension Test Suite', () => {
 
     expect(lastSelectedIsUnselected).to.equal(ColumnStatus.unselected)
 
-    const parentColumn = experimentsTable.getColumn(parentPath)
+    const parentColumn = experimentsRepository.getColumn(parentPath)
     expect(parentColumn?.status).to.equal(lastSelectedIsUnselected)
     expect(parentColumn?.descendantMetadata).to.equal('0/2')
 
-    const grandParentColumn = experimentsTable.getColumn(grandParentPath)
+    const grandParentColumn = experimentsRepository.getColumn(grandParentPath)
     expect(grandParentColumn?.status).to.equal(lastSelectedIsUnselected)
     expect(grandParentColumn?.descendantMetadata).to.equal('0/8')
   })

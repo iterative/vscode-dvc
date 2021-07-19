@@ -3,7 +3,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
-import { ExperimentsTable } from './table'
+import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
@@ -15,7 +15,7 @@ import {
   InternalCommands
 } from '../internalCommands'
 
-type ExperimentsTables = Record<string, ExperimentsTable>
+type ExperimentsRepositories = Record<string, ExperimentsRepository>
 
 export class Experiments {
   @observable
@@ -25,7 +25,7 @@ export class Experiments {
   public readonly experimentsRowsChanged = new EventEmitter<void>()
   public readonly experimentsColumnsChanged = new EventEmitter<void>()
 
-  private experiments: ExperimentsTables = {}
+  private experiments: ExperimentsRepositories = {}
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -33,7 +33,7 @@ export class Experiments {
 
   constructor(
     internalCommands: InternalCommands,
-    experiments?: Record<string, ExperimentsTable>
+    experiments?: Record<string, ExperimentsRepository>
   ) {
     makeObservable(this)
 
@@ -47,25 +47,25 @@ export class Experiments {
     return this.initialized
   }
 
-  public getFocusedTable(): ExperimentsTable | undefined {
+  public getFocusedTable(): ExperimentsRepository | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public async getFocusedOrDefaultOrPickTable() {
-    return this.getTable(await this.getFocusedOrDefaultOrPickProject())
+  public async getFocusedOrDefaultOrPickRepo() {
+    return this.getRepository(await this.getFocusedOrDefaultOrPickProject())
   }
 
   public async pickSort() {
-    const table = await this.getFocusedOrDefaultOrPickTable()
-    table.pickSort()
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
+    repository.pickSort()
   }
 
   public async clearSort() {
-    const table = await this.getFocusedOrDefaultOrPickTable()
-    table.setSort(undefined)
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
+    repository.setSort(undefined)
   }
 
   public getDvcRoots() {
@@ -73,15 +73,15 @@ export class Experiments {
   }
 
   public getColumn(dvcRoot: string, path: string) {
-    return this.getTable(dvcRoot).getColumn(path)
+    return this.getRepository(dvcRoot).getColumn(path)
   }
 
   public getChildColumns(dvcRoot: string, path: string) {
-    return this.getTable(dvcRoot).getChildColumns(path)
+    return this.getRepository(dvcRoot).getChildColumns(path)
   }
 
   public toggleColumnStatus(dvcRoot: string, path: string) {
-    return this.getTable(dvcRoot).toggleColumnStatus(path)
+    return this.getRepository(dvcRoot).toggleColumnStatus(path)
   }
 
   public getSortedBy(): string[] {
@@ -93,15 +93,15 @@ export class Experiments {
   }
 
   public getRunningOrQueued(dvcRoot: string): string[] {
-    return this.getTable(dvcRoot).getRunningOrQueued()
+    return this.getRepository(dvcRoot).getRunningOrQueued()
   }
 
   public getExperiment(dvcRoot: string, name: string) {
-    return this.getTable(dvcRoot).getExperiment(name)
+    return this.getRepository(dvcRoot).getExperiment(name)
   }
 
   public getCheckpointNames(dvcRoot: string, experimentName: string) {
-    return this.getTable(dvcRoot).getCheckpointNames(experimentName)
+    return this.getRepository(dvcRoot).getCheckpointNames(experimentName)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -186,25 +186,25 @@ export class Experiments {
       return
     }
 
-    const experimentsTable = await this.showExperimentsWebview(dvcRoot)
-    if (!experimentsTable) {
+    const experimentsRepository = await this.showExperimentsWebview(dvcRoot)
+    if (!experimentsRepository) {
       return
     }
 
     this.internalCommands.executeCommand(commandId, dvcRoot)
-    return experimentsTable
+    return experimentsRepository
   }
 
   public create(
     dvcRoots: string[],
     resourceLocator: ResourceLocator
-  ): ExperimentsTable[] {
+  ): ExperimentsRepository[] {
     const experiments = dvcRoots.map(dvcRoot =>
-      this.createExperimentsTable(dvcRoot, resourceLocator)
+      this.createExperimentsRepository(dvcRoot, resourceLocator)
     )
 
     Promise.all(
-      experiments.map(experimentsTable => experimentsTable.isReady())
+      experiments.map(experimentsRepository => experimentsRepository.isReady())
     ).then(() => {
       this.deferred.resolve()
     })
@@ -213,29 +213,32 @@ export class Experiments {
   }
 
   public reset(): void {
-    this.experiments = reset<ExperimentsTables>(this.experiments, this.dispose)
+    this.experiments = reset<ExperimentsRepositories>(
+      this.experiments,
+      this.dispose
+    )
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experimentsTable = this.getTable(dvcRoot)
-    experimentsTable.onDidChangeData(gitRoot)
+    const experimentsRepository = this.getRepository(dvcRoot)
+    experimentsRepository.onDidChangeData(gitRoot)
   }
 
   public refreshData(dvcRoot: string) {
-    const experimentsTable = this.getTable(dvcRoot)
-    experimentsTable?.refresh()
+    const experimentsRepository = this.getRepository(dvcRoot)
+    experimentsRepository?.refresh()
   }
 
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experimentsTable = this.getTable(dvcRoot)
-    if (!experimentsTable) {
+    const experimentsRepository = this.getRepository(dvcRoot)
+    if (!experimentsRepository) {
       experimentsWebview.dispose()
     }
 
-    experimentsTable.setWebview(experimentsWebview)
+    experimentsRepository.setWebview(experimentsWebview)
   }
 
-  private getTable(dvcRoot: string) {
+  private getRepository(dvcRoot: string) {
     return this.experiments[dvcRoot]
   }
 
@@ -261,38 +264,38 @@ export class Experiments {
 
   private async showExperimentsWebview(
     dvcRoot: string
-  ): Promise<ExperimentsTable> {
-    const experimentsTable = this.getTable(dvcRoot)
-    await experimentsTable.showWebview()
-    return experimentsTable
+  ): Promise<ExperimentsRepository> {
+    const experimentsRepository = this.getRepository(dvcRoot)
+    await experimentsRepository.showWebview()
+    return experimentsRepository
   }
 
-  private createExperimentsTable(
+  private createExperimentsRepository(
     dvcRoot: string,
     resourceLocator: ResourceLocator
   ) {
-    const experimentsTable = this.dispose.track(
-      new ExperimentsTable(dvcRoot, this.internalCommands, resourceLocator)
+    const experimentsRepository = this.dispose.track(
+      new ExperimentsRepository(dvcRoot, this.internalCommands, resourceLocator)
     )
 
-    this.experiments[dvcRoot] = experimentsTable
+    this.experiments[dvcRoot] = experimentsRepository
 
-    experimentsTable.dispose.track(
-      experimentsTable.onDidChangeIsWebviewFocused(
+    experimentsRepository.dispose.track(
+      experimentsRepository.onDidChangeIsWebviewFocused(
         dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
       )
     )
-    experimentsTable.dispose.track(
-      experimentsTable.onDidChangeExperimentsRows(() =>
+    experimentsRepository.dispose.track(
+      experimentsRepository.onDidChangeExperimentsRows(() =>
         this.experimentsRowsChanged.fire()
       )
     )
 
-    experimentsTable.dispose.track(
-      experimentsTable.onDidChangeExperimentsColumns(() =>
+    experimentsRepository.dispose.track(
+      experimentsRepository.onDidChangeExperimentsColumns(() =>
         this.experimentsColumnsChanged.fire()
       )
     )
-    return experimentsTable
+    return experimentsRepository
   }
 }

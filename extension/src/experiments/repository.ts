@@ -15,7 +15,7 @@ import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
-export class ExperimentsTable {
+export class ExperimentsRepository {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
