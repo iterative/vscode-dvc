@@ -7,7 +7,7 @@ import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { ColumnData } from '../webview/contract'
-import { ColumnStatus } from '../table'
+import { ColumnStatus } from '../model'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
