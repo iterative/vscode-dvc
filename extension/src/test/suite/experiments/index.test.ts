@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, workspace, Uri } from 'vscode'
+import { window, commands, workspace, Uri, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
@@ -267,8 +267,8 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('dvc.addExperimentsTableFilter', () => {
-    it('should be able to add a filter to the experiments repository selected', async () => {
-      const mockQuickPickValue = stub(QuickPick, 'quickPickValue')
+    it('should be able to add a filter to the experiments selected repository', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
       const config = disposable.track(new Config())
@@ -295,8 +295,12 @@ suite('Experiments Test Suite', () => {
       const lossPath = 'metrics/summary.json/loss'
 
       const loss = complexColumnData.find(column => column.path === lossPath)
-      mockQuickPickValue.onFirstCall().resolves(loss)
-      mockQuickPickValue.onSecondCall().resolves('<')
+      mockShowQuickPick
+        .onFirstCall()
+        .resolves({ value: loss } as unknown as QuickPickItem)
+      mockShowQuickPick
+        .onSecondCall()
+        .resolves({ value: '<' } as unknown as QuickPickItem)
       mockShowInputBox.resolves('2')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
