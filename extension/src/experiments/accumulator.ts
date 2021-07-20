@@ -1,6 +1,4 @@
 import { ColumnAggregateData, Experiment } from './webview/contract'
-import { ExperimentsBranchJSONOutput } from '../cli/reader'
-
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
   hasChildren: boolean
@@ -11,18 +9,16 @@ export interface PartialColumnDescriptor extends ColumnAggregateData {
 export type PartialColumnsMap = Map<string, PartialColumnDescriptor>
 
 export class ExperimentsAccumulator {
-  public workspace: Experiment
+  public workspace = {} as Experiment
   public branches: Experiment[] = []
   public checkpointsByTip: Map<string, Experiment[]> = new Map()
   public experimentsByBranch: Map<string, Experiment[]> = new Map()
   public metricsMap: PartialColumnsMap = new Map()
   public paramsMap: PartialColumnsMap = new Map()
 
-  constructor(workspace: ExperimentsBranchJSONOutput) {
-    this.workspace = {
-      ...workspace.baseline,
-      displayName: 'workspace',
-      id: 'workspace'
+  constructor(workspace?: Experiment) {
+    if (workspace) {
+      this.workspace = workspace
     }
   }
 }
