@@ -69,7 +69,7 @@ suite('Experiments Repository Test Suite', () => {
   })
 
   describe('getRunningOrQueued', () => {
-    it('should return the currently queued experiments', async () => {
+    it('should return the currently running or queued experiments', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -188,6 +188,9 @@ suite('Experiments Repository Test Suite', () => {
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const webview = await experimentsRepository.showWebview()
+      const x = messageSpy.lastCall.args[0].tableData
+      x.columns.map((v, i) => expect(v).to.deep.equal(complexColumnData[i]))
+      x.rows.map((v, i) => expect(v).to.deep.equal(complexRowData[i]))
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
@@ -254,19 +257,19 @@ suite('Experiments Repository Test Suite', () => {
     const buildTestExperiment = (testParam: number) => ({
       params: {
         'params.yaml': {
-          test: testParam
+          data: { test: testParam }
         }
       }
     })
     stub(cliReader, 'experimentShow').resolves({
       testBranch: {
-        baseline: buildTestExperiment(10),
-        testExp1: buildTestExperiment(2),
-        testExp2: buildTestExperiment(1),
-        testExp3: buildTestExperiment(3)
+        baseline: { data: buildTestExperiment(10) },
+        testExp1: { data: buildTestExperiment(2) },
+        testExp2: { data: buildTestExperiment(1) },
+        testExp3: { data: buildTestExperiment(3) }
       },
       workspace: {
-        baseline: buildTestExperiment(10)
+        baseline: { data: buildTestExperiment(10) }
       }
     })
 

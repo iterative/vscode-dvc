@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Experiment } from './webview/contract'
+import { Experiment, ParamsOrMetrics } from './webview/contract'
 import {
   ExperimentsAccumulator,
   PartialColumnDescriptor,
@@ -7,10 +7,13 @@ import {
 } from './accumulator'
 import {
   ExperimentFields,
+  ExperimentFieldsOrError,
+  ExperimentOutput,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
-  ValueTree
+  ValueTree,
+  ValueTreeRoot
 } from '../cli/reader'
 
 const getValueType = (value: Value | ValueTree) => {
@@ -139,7 +142,7 @@ const addToMapArray = <K = string, V = unknown>(
 
 const collectColumnsFromExperiment = (
   acc: ExperimentsAccumulator,
-  experiment: Experiment | ExperimentFields
+  experiment: Experiment
 ) => {
   const { paramsMap, metricsMap } = acc
   const { params, metrics } = experiment
@@ -164,25 +167,79 @@ const collectExperimentOrCheckpoint = (
   }
 }
 
-const consolidateExperimentData = (
-  sha: string,
-  baseline: ExperimentFields
-): Experiment => ({
-  id: sha,
-  ...baseline,
-  displayName: baseline.name || sha.slice(0, 7)
+const reduceParamsOrMetrics = (paramsOrMetrics?: ValueTreeRoot) => {
+  if (paramsOrMetrics) {
+    return Object.entries(paramsOrMetrics).reduce(
+      (paramsOrMetrics, [file, dataOrError]) => {
+        const data = dataOrError?.data
+        if (data) {
+          paramsOrMetrics[file] = data
+        }
+        return paramsOrMetrics
+      },
+      {} as ParamsOrMetrics
+    )
+  }
+}
+
+const reduceParamsAndMetrics = (
+  experiment: ExperimentOutput
+): {
+  metrics: ParamsOrMetrics | undefined
+  params: ParamsOrMetrics | undefined
+} => ({
+  metrics: reduceParamsOrMetrics(experiment.metrics),
+  params: reduceParamsOrMetrics(experiment.params)
 })
+
+const transformParamsAndMetrics = (
+  experiment: Experiment,
+  experimentFields: ExperimentFields
+) => {
+  const { metrics, params } = reduceParamsAndMetrics(experimentFields)
+
+  if (metrics) {
+    experiment.metrics = metrics
+  }
+  if (params) {
+    experiment.params = params
+  }
+}
+
+const transformExperimentData = (
+  sha: string,
+  experimentFieldsOrError: ExperimentFieldsOrError,
+  fallbackDisplayNameLength = 7
+): Experiment | undefined => {
+  const experimentFields = experimentFieldsOrError.data
+  if (!experimentFields) {
+    return
+  }
+
+  const experiment = {
+    id: sha,
+    ...experimentFields,
+    displayName:
+      experimentFields?.name || sha.slice(0, fallbackDisplayNameLength)
+  } as Experiment
+
+  transformParamsAndMetrics(experiment, experimentFields)
+
+  return experiment
+}
 
 const collectFromExperimentsObject = (
   acc: ExperimentsAccumulator,
-  experimentsObject: { [sha: string]: ExperimentFields },
+  experimentsObject: { [sha: string]: ExperimentFieldsOrError },
   branchName: string
 ) => {
   for (const [sha, experimentData] of Object.entries(experimentsObject)) {
-    const experiment = consolidateExperimentData(sha, experimentData)
+    const experiment = transformExperimentData(sha, experimentData)
 
-    collectColumnsFromExperiment(acc, experiment)
-    collectExperimentOrCheckpoint(acc, experiment, branchName)
+    if (experiment) {
+      collectColumnsFromExperiment(acc, experiment)
+      collectExperimentOrCheckpoint(acc, experiment, branchName)
+    }
   }
 }
 
@@ -193,12 +250,14 @@ const collectFromBranchesObject = (
   for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
   )) {
-    const branch = consolidateExperimentData(branchSha, baseline)
+    const branch = transformExperimentData(branchSha, baseline)
 
-    collectColumnsFromExperiment(acc, branch)
-    collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
+    if (branch) {
+      collectColumnsFromExperiment(acc, branch)
+      collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
 
-    acc.branches.push(branch)
+      acc.branches.push(branch)
+    }
   }
 }
 
@@ -206,8 +265,17 @@ export const collectFromRepo = (
   data: ExperimentsRepoJSONOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
-  const acc = new ExperimentsAccumulator(workspace)
-  collectColumnsFromExperiment(acc, workspace.baseline)
+  const workspaceBaseline = transformExperimentData(
+    'workspace',
+    workspace.baseline,
+    9
+  )
+
+  const acc = new ExperimentsAccumulator(workspaceBaseline)
+
+  if (workspaceBaseline) {
+    collectColumnsFromExperiment(acc, workspaceBaseline)
+  }
 
   collectFromBranchesObject(acc, branchesObject)
   return acc

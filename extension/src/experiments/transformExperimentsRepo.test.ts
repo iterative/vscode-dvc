@@ -18,17 +18,17 @@ describe('branch and checkpoint nesting', () => {
     const { branches, experimentsByBranch, workspace } =
       transformExperimentsRepo({
         branchA: {
-          baseline: {},
-          otherExp1: {},
+          baseline: { data: {} },
+          otherExp1: { data: {} },
           otherExp2: {
-            checkpoint_tip: 'otherExp2'
+            data: { checkpoint_tip: 'otherExp2' }
           },
           otherExp2_1: {
-            checkpoint_tip: 'otherExp2'
+            data: { checkpoint_tip: 'otherExp2' }
           }
         },
         branchB: {
-          baseline: {}
+          baseline: { data: {} }
         },
         workspace: {
           baseline: {}
@@ -61,18 +61,18 @@ describe('branch and checkpoint nesting', () => {
   describe('a repo with one branch that has nested checkpoints', () => {
     const { experimentsByBranch, checkpointsByTip } = transformExperimentsRepo({
       branchA: {
-        baseline: {},
+        baseline: { data: {} },
         tip1: {
-          checkpoint_tip: 'tip1'
+          data: { checkpoint_tip: 'tip1' }
         },
         tip1cp1: {
-          checkpoint_tip: 'tip1'
+          data: { checkpoint_tip: 'tip1' }
         },
         tip1cp2: {
-          checkpoint_tip: 'tip1'
+          data: { checkpoint_tip: 'tip1' }
         },
         tip1cp3: {
-          checkpoint_tip: 'tip1'
+          data: { checkpoint_tip: 'tip1' }
         }
       },
       workspace: { baseline: {} }
@@ -87,7 +87,6 @@ describe('branch and checkpoint nesting', () => {
     it('finds three checkpoints on the tip', () => {
       expect(checkpoints?.length).toEqual(3)
     })
-
     const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
 
     it('finds checkpoints in order', () => {
@@ -103,14 +102,18 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {
-          metrics: {
-            1: {
-              2: 3
-            }
-          },
-          params: {
-            a: {
-              b: 'c'
+          data: {
+            metrics: {
+              1: {
+                data: { 2: 3 }
+              }
+            },
+            params: {
+              a: {
+                data: {
+                  b: 'c'
+                }
+              }
             }
           }
         }
@@ -126,9 +129,11 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {
-          metrics: {
-            1: {
-              2: 3
+          data: {
+            metrics: {
+              1: {
+                data: { 2: 3 }
+              }
             }
           }
         }
@@ -154,34 +159,42 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       branchA: {
         baseline: {
-          params: {
-            'params.yaml': {
-              mixedParam: 'string'
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedParam: 'string' }
+              }
             }
           }
         },
         otherExp: {
-          params: {
-            'params.yaml': {
-              mixedParam: true
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedParam: true }
+              }
             }
           }
         }
       },
       branchB: {
         baseline: {
-          params: {
-            'params.yaml': {
-              mixedParam: null
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedParam: null }
+              }
             }
           }
         }
       },
       workspace: {
         baseline: {
-          params: {
-            'params.yaml': {
-              mixedParam: exampleBigNumber
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedParam: exampleBigNumber }
+              }
             }
           }
         }
@@ -215,30 +228,38 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       branch1: {
         baseline: {
-          params: {
-            'params.yaml': {
-              mixedNumber: null
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: null }
+              }
             }
           }
         },
         exp1: {
-          params: {
-            'params.yaml': {
-              mixedNumber: 0
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: 0 }
+              }
             }
           }
         },
         exp2: {
-          params: {
-            'params.yaml': {
-              mixedNumber: -1
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: -1 }
+              }
             }
           }
         },
         exp3: {
-          params: {
-            'params.yaml': {
-              mixedNumber: 1
+          data: {
+            params: {
+              'params.yaml': {
+                data: { mixedNumber: 1 }
+              }
             }
           }
         }
@@ -259,26 +280,29 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       branch1: {
         baseline: {
-          params: {
-            'params.yaml': {
-              withNumbers: -1,
-              withoutNumbers: 'a'
+          data: {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: -1, withoutNumbers: 'a' }
+              }
             }
           }
         },
         exp1: {
-          params: {
-            'params.yaml': {
-              withNumbers: 2,
-              withoutNumbers: 'b'
+          data: {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: 2, withoutNumbers: 'b' }
+              }
             }
           }
         },
         exp2: {
-          params: {
-            'params.yaml': {
-              withNumbers: 'c',
-              withoutNumbers: 'b'
+          data: {
+            params: {
+              'params.yaml': {
+                data: { withNumbers: 'c', withoutNumbers: 'b' }
+              }
             }
           }
         }
@@ -314,34 +338,42 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       branchA: {
         baseline: {
-          params: {
-            'params.yaml': {
-              two: 2
+          data: {
+            params: {
+              'params.yaml': {
+                data: { two: 2 }
+              }
             }
           }
         },
         otherExp: {
-          params: {
-            'params.yaml': {
-              three: 3
+          data: {
+            params: {
+              'params.yaml': {
+                data: { three: 3 }
+              }
             }
           }
         }
       },
       branchB: {
         baseline: {
-          params: {
-            'params.yaml': {
-              four: 4
+          data: {
+            params: {
+              'params.yaml': {
+                data: { four: 4 }
+              }
             }
           }
         }
       },
       workspace: {
         baseline: {
-          params: {
-            'params.yaml': {
-              one: 1
+          data: {
+            params: {
+              'params.yaml': {
+                data: { one: 1 }
+              }
             }
           }
         }
@@ -364,10 +396,14 @@ describe('metrics/params column schema builder', () => {
     const { columns } = transformExperimentsRepo({
       workspace: {
         baseline: {
-          params: {
-            'params.yaml': {
-              onlyHasChild: {
-                onlyHasPrimitive: 1
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  onlyHasChild: {
+                    onlyHasPrimitive: 1
+                  }
+                }
               }
             }
           }

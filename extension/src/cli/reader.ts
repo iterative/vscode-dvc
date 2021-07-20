@@ -48,8 +48,13 @@ export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export type Value = string | number | boolean | null
 
-interface ValueTreeRoot {
-  [filename: string]: ValueTree
+interface ExperimentDataOrError {
+  data?: ValueTree
+  error?: { type: string; msg: string }
+}
+
+export interface ValueTreeRoot {
+  [filename: string]: ExperimentDataOrError
 }
 
 interface ValueTreeNode {
@@ -64,20 +69,30 @@ export interface ExperimentFields {
   queued?: boolean
   running?: boolean
   executor?: string | null
-  params?: ValueTreeRoot
-  metrics?: ValueTreeRoot
   checkpoint_tip?: string
   checkpoint_parent?: string
 }
 
+export interface ExperimentOutput extends ExperimentFields {
+  params?: ValueTreeRoot
+  metrics?: ValueTreeRoot
+}
+
+export interface ExperimentFieldsOrError {
+  data?: ExperimentOutput
+  error?: { type: string; msg: string }
+}
+
 export interface ExperimentsBranchJSONOutput {
-  [sha: string]: ExperimentFields
-  baseline: ExperimentFields
+  [sha: string]: ExperimentFieldsOrError
+  baseline: ExperimentFieldsOrError
 }
 
 export interface ExperimentsRepoJSONOutput {
   [name: string]: ExperimentsBranchJSONOutput
-  workspace: { baseline: ExperimentFields }
+  workspace: {
+    baseline: ExperimentFieldsOrError
+  }
 }
 
 export const autoRegisteredCommands = {

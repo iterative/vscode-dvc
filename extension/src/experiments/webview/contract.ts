@@ -1,8 +1,14 @@
-import { ExperimentFields } from '../../cli/reader'
+import { ExperimentFields, ValueTree } from '../../cli/reader'
+
+export interface ParamsOrMetrics {
+  [filename: string]: ValueTree
+}
 
 export interface Experiment extends ExperimentFields {
   id: string
   displayName: string
+  params?: ParamsOrMetrics
+  metrics?: ParamsOrMetrics
 }
 
 export interface RowData extends Experiment {
