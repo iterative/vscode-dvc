@@ -240,7 +240,8 @@ export class Experiments {
   }
 
   private async getFocusedOrDefaultOrPickRepo() {
-    return this.getRepository(await this.getFocusedOrDefaultOrPickProject())
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    return this.getRepository(dvcRoot)
   }
 
   private getRepository(dvcRoot: string) {
