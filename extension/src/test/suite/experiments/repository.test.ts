@@ -188,9 +188,6 @@ suite('Experiments Repository Test Suite', () => {
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const webview = await experimentsRepository.showWebview()
-      const x = messageSpy.lastCall.args[0].tableData
-      x.columns.map((v, i) => expect(v).to.deep.equal(complexColumnData[i]))
-      x.rows.map((v, i) => expect(v).to.deep.equal(complexRowData[i]))
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
