@@ -48,13 +48,13 @@ export type StatusOutput = Record<string, StatusesOrAlwaysChanged[]>
 
 export type Value = string | number | boolean | null
 
-interface ExperimentDataOrError {
+interface ValueTreeOrError {
   data?: ValueTree
   error?: { type: string; msg: string }
 }
 
 export interface ValueTreeRoot {
-  [filename: string]: ExperimentDataOrError
+  [filename: string]: ValueTreeOrError
 }
 
 interface ValueTreeNode {
