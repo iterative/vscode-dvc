@@ -54,13 +54,9 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public async getFocusedOrDefaultOrPickRepo() {
-    return this.getRepository(await this.getFocusedOrDefaultOrPickProject())
-  }
-
   public async addFilter() {
     const repository = await this.getFocusedOrDefaultOrPickRepo()
-    repository.addFilter()
+    return repository.addFilter()
   }
 
   public async pickSort() {
@@ -241,6 +237,10 @@ export class Experiments {
     }
 
     experimentsRepository.setWebview(experimentsWebview)
+  }
+
+  private async getFocusedOrDefaultOrPickRepo() {
+    return this.getRepository(await this.getFocusedOrDefaultOrPickProject())
   }
 
   private getRepository(dvcRoot: string) {

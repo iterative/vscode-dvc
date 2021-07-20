@@ -109,6 +109,7 @@ export const pickFilter = async (
   if (!pickedColumn) {
     return
   }
+
   const operator = await quickPickValue<string>(operators, {
     title: 'Select an operator'
   })
@@ -117,7 +118,6 @@ export const pickFilter = async (
   }
 
   const value = await getInput('Enter a value')
-
   if (!value) {
     return
   }
