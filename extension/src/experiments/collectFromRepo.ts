@@ -6,9 +6,8 @@ import {
   PartialColumnsMap
 } from './accumulator'
 import {
-  ExperimentFields,
   ExperimentFieldsOrError,
-  ExperimentOutput,
+  ExperimentFields,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
@@ -183,7 +182,7 @@ const reduceParamsOrMetrics = (paramsOrMetrics?: ValueTreeRoot) => {
 }
 
 const reduceParamsAndMetrics = (
-  experiment: ExperimentOutput
+  experiment: ExperimentFields
 ): {
   metrics: ParamsOrMetrics | undefined
   params: ParamsOrMetrics | undefined

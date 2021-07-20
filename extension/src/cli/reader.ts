@@ -63,7 +63,7 @@ interface ValueTreeNode {
 
 export type ValueTree = ValueTreeRoot | ValueTreeNode
 
-export interface ExperimentFields {
+export interface BaseExperimentFields {
   name?: string
   timestamp?: string | null
   queued?: boolean
@@ -73,13 +73,13 @@ export interface ExperimentFields {
   checkpoint_parent?: string
 }
 
-export interface ExperimentOutput extends ExperimentFields {
+export interface ExperimentFields extends BaseExperimentFields {
   params?: ValueTreeRoot
   metrics?: ValueTreeRoot
 }
 
 export interface ExperimentFieldsOrError {
-  data?: ExperimentOutput
+  data?: ExperimentFields
   error?: { type: string; msg: string }
 }
 
