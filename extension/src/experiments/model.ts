@@ -57,6 +57,10 @@ export class ExperimentsModel {
     return [...this.filters.values()]
   }
 
+  public getFilter(path: string) {
+    return this.filters.get(path)
+  }
+
   public addFilter(filter: FilterDefinition) {
     this.filters.set(this.getFilterId(filter), filter)
   }

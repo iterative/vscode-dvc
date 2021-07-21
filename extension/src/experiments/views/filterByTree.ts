@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
-  EventEmitter,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -9,23 +8,18 @@ import {
   window
 } from 'vscode'
 import { Experiments } from '..'
+import { definedAndNonEmpty, flatten } from '../../util/array'
 
 export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
-  private treeDataChanged: EventEmitter<string | void>
 
   private readonly experiments: Experiments
+  private filterRoots: Record<string, string> = {}
 
-  constructor(
-    experiments: Experiments,
-    treeDataChanged?: EventEmitter<string | void>
-  ) {
-    this.treeDataChanged = this.dispose.track(
-      treeDataChanged || new EventEmitter()
-    )
-    this.onDidChangeTreeData = this.treeDataChanged.event
+  constructor(experiments: Experiments) {
+    this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsFilterByTree', {
@@ -39,12 +33,44 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   }
 
   public getTreeItem(element: string): TreeItem {
-    return new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
+    if (this.isRoot(element)) {
+      return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
+    }
+
+    return new TreeItem(element, TreeItemCollapsibleState.None)
   }
 
-  public async getChildren(): Promise<string[]> {
+  public getChildren(element?: string): Promise<string[]> {
+    if (!element) {
+      return this.getRootElements()
+    }
+
+    return Promise.resolve(
+      this.experiments.getFilteredBy(element).map(filter => {
+        const id = [filter.columnPath, filter.operator, filter.value].join(' ')
+        this.filterRoots[id] = element
+        return id
+      })
+    )
+  }
+
+  private async getRootElements() {
     await this.experiments.isReady()
-    const filters = this.experiments.getFilteredBy()
-    return filters.sort((a, b) => a.localeCompare(b))
+    const dvcRoots = this.experiments.getDvcRoots()
+    const filters = flatten(
+      dvcRoots.map(dvcRoot => {
+        this.filterRoots[dvcRoot] = dvcRoot
+        return this.experiments.getFilteredBy(dvcRoot)
+      })
+    )
+    if (definedAndNonEmpty(filters)) {
+      return dvcRoots.sort((a, b) => a.localeCompare(b))
+    }
+
+    return []
+  }
+
+  private isRoot(element: string) {
+    return Object.values(this.filterRoots).includes(element)
   }
 }

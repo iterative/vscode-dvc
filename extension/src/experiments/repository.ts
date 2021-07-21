@@ -141,6 +141,14 @@ export class ExperimentsRepository {
     }
   }
 
+  public getFilters() {
+    return this.model.getFilters()
+  }
+
+  public getFilter(path: string) {
+    return this.model.getFilter(path)
+  }
+
   public async addFilter() {
     const columns = this.model.getTerminalNodeColumns()
     const filterToAdd = await pickFilterToAdd(columns)

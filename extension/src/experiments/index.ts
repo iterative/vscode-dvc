@@ -3,6 +3,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
+import { FilterDefinition } from './filtering'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
@@ -94,8 +95,15 @@ export class Experiments {
     return []
   }
 
-  public getFilteredBy(): string[] {
-    return []
+  public getFilteredBy(dvcRoot: string): FilterDefinition[] {
+    return this.getRepository(dvcRoot).getFilters()
+  }
+
+  public getFilter(
+    dvcRoot: string,
+    path: string
+  ): FilterDefinition | undefined {
+    return this.getRepository(dvcRoot).getFilter(path)
   }
 
   public getRunningOrQueued(dvcRoot: string): string[] {
