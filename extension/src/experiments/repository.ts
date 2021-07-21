@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { SortDefinition } from './sorting'
-import { pickSort } from './quickPick'
+import { pickFilter, pickSort } from './quickPick'
 import { ExperimentsModel } from './model'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
@@ -139,6 +139,11 @@ export class ExperimentsRepository {
     if (pickedSortDefinition) {
       return this.setSort(pickedSortDefinition)
     }
+  }
+
+  public addFilter() {
+    const columns = this.model.getTerminalNodeColumns()
+    return pickFilter(columns)
   }
 
   public getRunningOrQueued(): string[] {

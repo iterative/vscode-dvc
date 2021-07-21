@@ -54,6 +54,10 @@ export class ExperimentsModel {
     return this.columnData
   }
 
+  public getTerminalNodeColumns() {
+    return this.columnData.filter(column => !column.hasChildren)
+  }
+
   public getColumn(path: string) {
     const column = this.columnData?.find(column => column.path === path)
     if (column) {

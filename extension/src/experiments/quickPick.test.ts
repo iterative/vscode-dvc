@@ -4,11 +4,14 @@ import {
   pickGarbageCollectionFlags,
   pickExperimentName,
   pickFromColumnData,
-  pickSort
+  pickSort,
+  pickFilter
 } from './quickPick'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
+import { getInput } from '../vscode/inputBox'
 
 jest.mock('vscode')
+jest.mock('../vscode/inputBox')
 
 const mockedShowErrorMessage = mocked(window.showErrorMessage)
 const mockedShowQuickPick = mocked<
@@ -23,6 +26,7 @@ const mockedShowQuickPick = mocked<
     | unknown
   >
 >(window.showQuickPick)
+const mockedGetInput = mocked(getInput)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -123,6 +127,13 @@ describe('Column-based QuickPicks', () => {
   const exampleColumns = [epochsColumn, paramsYamlColumn]
 
   describe('pickFromColumnData', () => {
+    it('should return early if no columns are provided', async () => {
+      const pickedColumn = await pickFromColumnData([], {
+        title: "can't pick from no columns"
+      })
+      expect(pickedColumn).toBeUndefined()
+    })
+
     it('invokes a QuickPick with the correct options', async () => {
       const title = 'Test title'
       await pickFromColumnData(exampleColumns, { title })
@@ -145,13 +156,13 @@ describe('Column-based QuickPicks', () => {
   })
 
   describe('pickSort', () => {
-    it('does not invoke a quickpick if passed undefined', async () => {
+    it('does not invoke a quickPick if passed undefined', async () => {
       const resolvedPromise = await pickSort(undefined)
       expect(mockedShowQuickPick).not.toBeCalled()
       expect(resolvedPromise).toBe(undefined)
     })
 
-    it('does not invoke a quickpick if an empty array', async () => {
+    it('does not invoke a quickPick if an empty array', async () => {
       const resolvedPromise = await pickSort([])
       expect(mockedShowQuickPick).not.toBeCalled()
       expect(resolvedPromise).toBe(undefined)
@@ -173,7 +184,7 @@ describe('Column-based QuickPicks', () => {
     })
 
     describe('valid input', () => {
-      it('invokes a descending sort with the expected quickpick calls', async () => {
+      it('invokes a descending sort with the expected quickPick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
           value: epochsColumn
         } as unknown)
@@ -192,7 +203,7 @@ describe('Column-based QuickPicks', () => {
           descending: false
         })
       })
-      it('invokes an ascending sort with the expected quickpick calls', async () => {
+      it('invokes an ascending sort with the expected quickPick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
           value: paramsYamlColumn
         } as unknown)
@@ -203,6 +214,55 @@ describe('Column-based QuickPicks', () => {
           columnPath: paramsYamlPath,
           descending: false
         })
+      })
+    })
+  })
+
+  describe('pickFilter', () => {
+    it('should return early if no column is picked', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      const filter = await pickFilter(columns)
+      expect(filter).toBeUndefined()
+    })
+
+    it('should return early if no operator is picked', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce(undefined)
+      const filter = await pickFilter(columns)
+      expect(filter).toBeUndefined()
+    })
+
+    it('should return early if no value is provided', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: '==='
+      } as unknown)
+      mockedGetInput.mockResolvedValueOnce(undefined)
+      const filter = await pickFilter(columns)
+      expect(filter).toBeUndefined()
+    })
+
+    it('should return a filter definition if all of the steps are completed', async () => {
+      const columns = [epochsColumn]
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: epochsColumn
+      } as unknown)
+      mockedShowQuickPick.mockResolvedValueOnce({
+        value: '==='
+      } as unknown)
+      mockedGetInput.mockResolvedValueOnce('5')
+      const filter = await pickFilter(columns)
+      expect(filter).toEqual({
+        columnPath: epochsColumn.path,
+        operator: '===',
+        value: '5'
       })
     })
   })

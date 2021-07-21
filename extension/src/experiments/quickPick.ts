@@ -3,6 +3,7 @@ import { ColumnData } from './webview/contract'
 import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
+import { getInput } from '../vscode/inputBox'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -43,10 +44,14 @@ export const pickGarbageCollectionFlags = () =>
   )
 
 export const pickFromColumnData = (
-  columnData: ColumnData[],
+  columnData: ColumnData[] | undefined,
   quickPickOptions: QuickPickOptions
-) =>
-  quickPickValue<ColumnData>(
+) => {
+  if (!columnData || columnData.length === 0) {
+    window.showErrorMessage('There are no columns to sort with')
+    return
+  }
+  return quickPickValue<ColumnData>(
     columnData.map(column => ({
       description: column.path,
       label: column.name,
@@ -54,14 +59,11 @@ export const pickFromColumnData = (
     })),
     quickPickOptions
   )
+}
 
 export const pickSort = async (
   columnData: ColumnData[] | undefined
 ): Promise<SortDefinition | undefined> => {
-  if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to sort with')
-    return
-  }
   const pickedColumn = await pickFromColumnData(columnData, {
     title: 'Select a column to sort by'
   })
@@ -81,5 +83,48 @@ export const pickSort = async (
   return {
     columnPath: pickedColumn.path,
     descending
+  }
+}
+
+interface FilterDefinition {
+  columnPath: string
+  operator: string
+  value: string | number
+}
+
+const operators = [
+  { description: 'Equal', label: '=', value: '===' },
+  { description: 'Greater than', label: '>', value: '>' },
+  { description: 'Greater than or equal to', label: '>=', value: '>=' },
+  { description: 'Less than', label: '<', value: '<' },
+  { description: 'Less than or equal to', label: '<=', value: '<=' }
+]
+
+export const pickFilter = async (
+  columnData: ColumnData[] | undefined
+): Promise<FilterDefinition | undefined> => {
+  const pickedColumn = await pickFromColumnData(columnData, {
+    title: 'Select a column to filter by'
+  })
+  if (!pickedColumn) {
+    return
+  }
+
+  const operator = await quickPickValue<string>(operators, {
+    title: 'Select an operator'
+  })
+  if (!operator) {
+    return
+  }
+
+  const value = await getInput('Enter a value')
+  if (!value) {
+    return
+  }
+
+  return {
+    columnPath: pickedColumn.path,
+    operator,
+    value
   }
 }
