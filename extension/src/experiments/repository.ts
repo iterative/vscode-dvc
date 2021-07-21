@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { SortDefinition } from './sorting'
-import { pickFilter, pickSort } from './quickPick'
+import { pickFilterToAdd, pickFiltersToRemove, pickSort } from './quickPick'
 import { ExperimentsModel } from './model'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
@@ -141,9 +141,23 @@ export class ExperimentsRepository {
     }
   }
 
-  public addFilter() {
+  public async addFilter() {
     const columns = this.model.getTerminalNodeColumns()
-    return pickFilter(columns)
+    const filterToAdd = await pickFilterToAdd(columns)
+    if (!filterToAdd) {
+      return
+    }
+    this.model.addFilter(filterToAdd)
+    return filterToAdd
+  }
+
+  public async removeFilter() {
+    const filters = this.model.getFilters()
+    const filtersToRemove = await pickFiltersToRemove(filters)
+    if (!filtersToRemove) {
+      return
+    }
+    this.model.removeFilters(filtersToRemove)
   }
 
   public getRunningOrQueued(): string[] {

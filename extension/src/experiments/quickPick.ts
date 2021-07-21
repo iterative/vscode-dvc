@@ -4,6 +4,7 @@ import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
 import { getInput } from '../vscode/inputBox'
+import { definedAndNonEmpty } from '../util/array'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -48,7 +49,7 @@ export const pickFromColumnData = (
   quickPickOptions: QuickPickOptions
 ) => {
   if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to sort with')
+    window.showErrorMessage('There are no columns to select from')
     return
   }
   return quickPickValue<ColumnData>(
@@ -86,7 +87,7 @@ export const pickSort = async (
   }
 }
 
-interface FilterDefinition {
+export interface FilterDefinition {
   columnPath: string
   operator: string
   value: string | number
@@ -100,7 +101,7 @@ const operators = [
   { description: 'Less than or equal to', label: '<=', value: '<=' }
 ]
 
-export const pickFilter = async (
+export const pickFilterToAdd = async (
   columnData: ColumnData[] | undefined
 ): Promise<FilterDefinition | undefined> => {
   const pickedColumn = await pickFromColumnData(columnData, {
@@ -127,4 +128,24 @@ export const pickFilter = async (
     operator,
     value
   }
+}
+
+export const pickFiltersToRemove = (
+  filters: FilterDefinition[]
+): Thenable<FilterDefinition[] | undefined> => {
+  if (!definedAndNonEmpty(filters)) {
+    window.showErrorMessage('There are no filters to remove.')
+    return Promise.resolve(undefined)
+  }
+
+  return quickPickManyValues<FilterDefinition>(
+    filters.map(filter => ({
+      description: [filter.operator, filter.value].join(' '),
+      label: filter.columnPath,
+      value: filter
+    })),
+    {
+      title: 'Select filter(s) to remove'
+    }
+  )
 }

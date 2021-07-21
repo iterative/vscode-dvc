@@ -208,6 +208,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.removeExperimentsTableFilter%",
+        "command": "dvc.removeExperimentsTableFilter",
+        "category": "DVC"
+      },
+      {
         "title": "%command.setExperimentsTableSort%",
         "command": "dvc.setExperimentsTableSort",
         "category": "DVC"
