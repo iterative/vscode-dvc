@@ -4,7 +4,7 @@ import { Experiment } from './webview/contract'
 
 describe('filterExperiments', () => {
   const paramsFile = 'params.yaml'
-  const testData = [
+  const experiments = [
     {
       id: 1,
       params: {
@@ -35,7 +35,6 @@ describe('filterExperiments', () => {
   ] as unknown as Experiment[]
 
   it('should return the original experiments if no filters are provided', () => {
-    const experiments = [{ id: 1 }, { id: 2 }] as unknown as Experiment[]
     const unFilteredExperiments = filterExperiments([], experiments)
     expect(unFilteredExperiments).toEqual(experiments)
   })
@@ -49,7 +48,7 @@ describe('filterExperiments', () => {
           value: '2'
         }
       ],
-      testData
+      experiments
     )
     expect(filteredExperiments.map(experiment => experiment.id)).toEqual([3])
   })
@@ -63,7 +62,7 @@ describe('filterExperiments', () => {
           value: '2'
         }
       ],
-      testData
+      experiments
     )
     expect(filteredExperiments.map(experiment => experiment.id)).toEqual([2])
   })
@@ -82,7 +81,7 @@ describe('filterExperiments', () => {
           value: '2'
         }
       ],
-      testData
+      experiments
     )
     expect(filteredExperiments.map(experiment => experiment.id)).toEqual([1, 2])
   })
@@ -92,8 +91,13 @@ describe('filterExperiments', () => {
       [
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '>',
+          operator: '>=',
           value: '0'
+        },
+        {
+          columnPath: join('params', paramsFile, 'filter'),
+          operator: '<',
+          value: '10'
         },
         {
           columnPath: join('params', paramsFile, 'sort'),
@@ -101,8 +105,8 @@ describe('filterExperiments', () => {
           value: '10'
         }
       ],
-      testData
+      experiments
     )
-    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([])
+    expect(filteredExperiments).toEqual([])
   })
 })
