@@ -156,13 +156,13 @@ describe('Column-based QuickPicks', () => {
   })
 
   describe('pickSort', () => {
-    it('does not invoke a quickpick if passed undefined', async () => {
+    it('does not invoke a quickPick if passed undefined', async () => {
       const resolvedPromise = await pickSort(undefined)
       expect(mockedShowQuickPick).not.toBeCalled()
       expect(resolvedPromise).toBe(undefined)
     })
 
-    it('does not invoke a quickpick if an empty array', async () => {
+    it('does not invoke a quickPick if an empty array', async () => {
       const resolvedPromise = await pickSort([])
       expect(mockedShowQuickPick).not.toBeCalled()
       expect(resolvedPromise).toBe(undefined)
@@ -184,7 +184,7 @@ describe('Column-based QuickPicks', () => {
     })
 
     describe('valid input', () => {
-      it('invokes a descending sort with the expected quickpick calls', async () => {
+      it('invokes a descending sort with the expected quickPick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
           value: epochsColumn
         } as unknown)
@@ -203,7 +203,7 @@ describe('Column-based QuickPicks', () => {
           descending: false
         })
       })
-      it('invokes an ascending sort with the expected quickpick calls', async () => {
+      it('invokes an ascending sort with the expected quickPick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
           value: paramsYamlColumn
         } as unknown)

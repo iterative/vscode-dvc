@@ -142,7 +142,7 @@ export class ExperimentsRepository {
   }
 
   public addFilter() {
-    const columns = this.model.getColumns()
+    const columns = this.model.getTerminalNodeColumns()
     return pickFilter(columns)
   }
 
