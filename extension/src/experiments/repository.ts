@@ -4,7 +4,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from './webview'
 import { SortDefinition } from './sorting'
-import { pickFilter, pickFiltersToRemove, pickSort } from './quickPick'
+import { pickFilterToAdd, pickFiltersToRemove, pickSort } from './quickPick'
 import { ExperimentsModel } from './model'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
@@ -143,7 +143,7 @@ export class ExperimentsRepository {
 
   public async addFilter() {
     const columns = this.model.getTerminalNodeColumns()
-    const filterToAdd = await pickFilter(columns)
+    const filterToAdd = await pickFilterToAdd(columns)
     if (!filterToAdd) {
       return
     }

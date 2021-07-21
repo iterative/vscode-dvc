@@ -5,7 +5,7 @@ import {
   pickExperimentName,
   pickFromColumnData,
   pickSort,
-  pickFilter,
+  pickFilterToAdd,
   pickFiltersToRemove,
   FilterDefinition
 } from './quickPick'
@@ -220,11 +220,11 @@ describe('Column-based QuickPicks', () => {
     })
   })
 
-  describe('pickFilter', () => {
+  describe('pickFilterToAdd', () => {
     it('should return early if no column is picked', async () => {
       const columns = [epochsColumn]
       mockedShowQuickPick.mockResolvedValueOnce(undefined)
-      const filter = await pickFilter(columns)
+      const filter = await pickFilterToAdd(columns)
       expect(filter).toBeUndefined()
     })
 
@@ -234,7 +234,7 @@ describe('Column-based QuickPicks', () => {
         value: epochsColumn
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce(undefined)
-      const filter = await pickFilter(columns)
+      const filter = await pickFilterToAdd(columns)
       expect(filter).toBeUndefined()
     })
 
@@ -247,7 +247,7 @@ describe('Column-based QuickPicks', () => {
         value: '==='
       } as unknown)
       mockedGetInput.mockResolvedValueOnce(undefined)
-      const filter = await pickFilter(columns)
+      const filter = await pickFilterToAdd(columns)
       expect(filter).toBeUndefined()
     })
 
@@ -260,7 +260,7 @@ describe('Column-based QuickPicks', () => {
         value: '==='
       } as unknown)
       mockedGetInput.mockResolvedValueOnce('5')
-      const filter = await pickFilter(columns)
+      const filter = await pickFilterToAdd(columns)
       expect(filter).toEqual({
         columnPath: epochsColumn.path,
         operator: '===',
@@ -269,7 +269,7 @@ describe('Column-based QuickPicks', () => {
     })
   })
 
-  describe('pickFilterToRemove', () => {
+  describe('pickFiltersToRemove', () => {
     it('should return early if no filters are available', async () => {
       const filters: FilterDefinition[] = []
       const filter = await pickFiltersToRemove(filters)

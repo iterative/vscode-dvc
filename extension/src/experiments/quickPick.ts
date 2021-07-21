@@ -101,7 +101,7 @@ const operators = [
   { description: 'Less than or equal to', label: '<=', value: '<=' }
 ]
 
-export const pickFilter = async (
+export const pickFilterToAdd = async (
   columnData: ColumnData[] | undefined
 ): Promise<FilterDefinition | undefined> => {
   const pickedColumn = await pickFromColumnData(columnData, {
