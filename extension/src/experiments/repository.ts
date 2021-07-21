@@ -148,6 +148,7 @@ export class ExperimentsRepository {
       return
     }
     this.model.addFilter(filterToAdd)
+    this.notifyChanged()
     return filterToAdd
   }
 
@@ -158,6 +159,7 @@ export class ExperimentsRepository {
       return
     }
     this.model.removeFilters(filtersToRemove)
+    this.notifyChanged()
   }
 
   public getRunningOrQueued(): string[] {

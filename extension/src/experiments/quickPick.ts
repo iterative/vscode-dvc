@@ -89,7 +89,7 @@ export const pickSort = async (
 }
 
 const operators = [
-  { description: 'Equal', label: '=', value: '===' },
+  { description: 'Equal', label: '=', value: '==' },
   { description: 'Greater than', label: '>', value: '>' },
   { description: 'Greater than or equal to', label: '>=', value: '>=' },
   { description: 'Less than', label: '<', value: '<' },

@@ -1,9 +1,9 @@
 import { Disposable } from '@hediet/std/disposable'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
-import { FilterDefinition } from './filtering'
+import { FilterDefinition, filterExperiments } from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { flatten } from '../util/array'
+import { definedAndNonEmpty, flatten } from '../util/array'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export enum ColumnStatus {
@@ -148,17 +148,18 @@ export class ExperimentsModel {
 
   private getRowData() {
     return [
-      this.workspace,
-      ...this.branches.map(branch => {
+      ...this.getWorkspace(),
+      ...this.getBranches().map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
-        if (!experiments) {
+
+        if (!definedAndNonEmpty(experiments)) {
           return branch
         }
         return {
           ...branch,
-          subRows: sortRows(this.currentSort, experiments).map(experiment => {
-            const checkpoints = this.checkpointsByTip.get(experiment.id)
-            if (!checkpoints) {
+          subRows: experiments.map(experiment => {
+            const checkpoints = this.getCheckpointsByTip(experiment.id)
+            if (!definedAndNonEmpty(checkpoints)) {
               return experiment
             }
             return { ...experiment, subRows: checkpoints }
@@ -168,12 +169,28 @@ export class ExperimentsModel {
     ]
   }
 
+  private getWorkspace() {
+    return this.filter([this.workspace])
+  }
+
+  private getBranches() {
+    return this.filter(this.branches)
+  }
+
+  private getCheckpointsByTip(id: string) {
+    const checkpoints = this.checkpointsByTip.get(id)
+    if (!checkpoints) {
+      return
+    }
+    return this.filter(checkpoints)
+  }
+
   private getExperimentsByBranch(branch: Experiment) {
     const experiments = this.experimentsByBranch.get(branch.displayName)
     if (!experiments) {
       return
     }
-    return sortRows(this.currentSort, experiments)
+    return this.sort(this.filter(experiments))
   }
 
   private getExperiments() {
@@ -181,6 +198,14 @@ export class ExperimentsModel {
       ...this.experimentsByBranch.values()
     ])
     return sortRows(this.currentSort, flatExperiments)
+  }
+
+  private sort(experiments: Experiment[]) {
+    return sortRows(this.currentSort, experiments)
+  }
+
+  private filter(experiments: Experiment[]) {
+    return filterExperiments(this.getFilters(), experiments)
   }
 
   private setAreChildrenSelected(path: string, status: ColumnStatus) {

@@ -46,12 +46,26 @@ describe('filterExperiments', () => {
         {
           columnPath: join('params', paramsFile, 'filter'),
           operator: '>',
-          value: 2
+          value: '2'
         }
       ],
       testData
     )
     expect(filteredExperiments.map(experiment => experiment.id)).toEqual([3])
+  })
+
+  it('should filter the experiments by an equals filter', () => {
+    const filteredExperiments = filterExperiments(
+      [
+        {
+          columnPath: join('params', paramsFile, 'filter'),
+          operator: '==',
+          value: '2'
+        }
+      ],
+      testData
+    )
+    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([2])
   })
 
   it('should filter the experiments by multiple filters', () => {
@@ -60,12 +74,12 @@ describe('filterExperiments', () => {
         {
           columnPath: join('params', paramsFile, 'filter'),
           operator: '>',
-          value: 0
+          value: '0'
         },
         {
           columnPath: join('params', paramsFile, 'filter'),
           operator: '<=',
-          value: 2
+          value: '2'
         }
       ],
       testData
@@ -79,12 +93,12 @@ describe('filterExperiments', () => {
         {
           columnPath: join('params', paramsFile, 'filter'),
           operator: '>',
-          value: 0
+          value: '0'
         },
         {
           columnPath: join('params', paramsFile, 'sort'),
-          operator: '===',
-          value: 10
+          operator: '==',
+          value: '10'
         }
       ],
       testData

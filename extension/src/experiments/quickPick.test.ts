@@ -244,7 +244,7 @@ describe('Column-based QuickPicks', () => {
         value: epochsColumn
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce({
-        value: '==='
+        value: '=='
       } as unknown)
       mockedGetInput.mockResolvedValueOnce(undefined)
       const filter = await pickFilterToAdd(columns)
@@ -257,13 +257,13 @@ describe('Column-based QuickPicks', () => {
         value: epochsColumn
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce({
-        value: '==='
+        value: '=='
       } as unknown)
       mockedGetInput.mockResolvedValueOnce('5')
       const filter = await pickFilterToAdd(columns)
       expect(filter).toEqual({
         columnPath: epochsColumn.path,
-        operator: '===',
+        operator: '==',
         value: '5'
       })
     })
@@ -283,7 +283,7 @@ describe('Column-based QuickPicks', () => {
       ]
       const allFilters = [
         ...selectedFilters,
-        { columnPath: epochsColumn.path, operator: '===', value: '4' }
+        { columnPath: epochsColumn.path, operator: '==', value: '4' }
       ]
       mockedShowQuickPick.mockResolvedValueOnce(
         selectedFilters.map(filter => ({ value: filter }))

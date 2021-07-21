@@ -10,26 +10,27 @@ export interface FilterDefinition {
 }
 
 const evaluate = <T>(
-  value: T,
+  valueToEvaluate: T,
   operator: string,
-  valueToEvaluate: T
+  filterValue: T
 ): boolean => {
   if (operator === '>') {
-    return value > valueToEvaluate
+    return valueToEvaluate > filterValue
   }
   if (operator === '<') {
-    return value < valueToEvaluate
+    return valueToEvaluate < filterValue
   }
-  if (operator === '===') {
-    return value === valueToEvaluate
+  if (operator === '==') {
+    // eslint-disable-next-line eqeqeq
+    return valueToEvaluate == filterValue
   }
 
   if (operator === '>=') {
-    return value >= valueToEvaluate
+    return valueToEvaluate >= filterValue
   }
 
   if (operator === '<=') {
-    return value <= valueToEvaluate
+    return valueToEvaluate <= filterValue
   }
   throw Error('filter operator not found')
 }
@@ -43,7 +44,7 @@ const buildFilter =
       const columnPathArray = filter.columnPath.split(sep)
       const value = get(experiment, columnPathArray)
 
-      return !evaluate(value, filter.operator, filter.value)
+      return !evaluate<typeof value>(value, filter.operator, filter.value)
     })
     return !firstFailure
   }
