@@ -18,6 +18,7 @@
   "command.push": "Push",
   "command.pushTarget": "Push",
   "command.removeTarget": "Remove",
+  "command.removeExperimentsTableFilter": "Remove Filter From Experiments Table",
   "command.runExperiment": "Run Experiment",
   "command.runResetExperiment": "Run and Reset Experiment",
   "command.queueExperiment": "Queue Experiment",

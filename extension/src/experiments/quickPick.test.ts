@@ -5,7 +5,9 @@ import {
   pickExperimentName,
   pickFromColumnData,
   pickSort,
-  pickFilter
+  pickFilter,
+  pickFiltersToRemove,
+  FilterDefinition
 } from './quickPick'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 import { getInput } from '../vscode/inputBox'
@@ -264,6 +266,31 @@ describe('Column-based QuickPicks', () => {
         operator: '===',
         value: '5'
       })
+    })
+  })
+
+  describe('pickFilterToRemove', () => {
+    it('should return early if no filters are available', async () => {
+      const filters: FilterDefinition[] = []
+      const filter = await pickFiltersToRemove(filters)
+      expect(filter).toBeUndefined()
+    })
+
+    it('should return the selected filters', async () => {
+      const selectedFilters = [
+        { columnPath: epochsColumn.path, operator: '>', value: '2' },
+        { columnPath: epochsColumn.path, operator: '<', value: '8' }
+      ]
+      const allFilters = [
+        ...selectedFilters,
+        { columnPath: epochsColumn.path, operator: '===', value: '4' }
+      ]
+      mockedShowQuickPick.mockResolvedValueOnce(
+        selectedFilters.map(filter => ({ value: filter }))
+      )
+
+      const filtersToRemove = await pickFiltersToRemove(allFilters)
+      expect(filtersToRemove).toEqual(selectedFilters)
     })
   })
 })
