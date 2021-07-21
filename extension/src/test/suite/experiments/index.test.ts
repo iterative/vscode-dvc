@@ -292,6 +292,9 @@ suite('Experiments Test Suite', () => {
       )
 
       await experimentsRepository.isReady()
+      const experimentsWebview = await experimentsRepository.showWebview()
+      await experimentsWebview.isReady()
+      const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const lossPath = 'metrics/summary.json/loss'
 
@@ -301,8 +304,8 @@ suite('Experiments Test Suite', () => {
         .resolves({ value: loss } as unknown as QuickPickItem)
       mockShowQuickPick
         .onSecondCall()
-        .resolves({ value: '<' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('2')
+        .resolves({ value: '>' } as unknown as QuickPickItem)
+      mockShowInputBox.resolves('10')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getRepository').returns(
@@ -314,16 +317,19 @@ suite('Experiments Test Suite', () => {
         'getFocusedOrDefaultOrPickProject'
       ).returns(dvcDemoPath)
 
-      const filter = await commands.executeCommand(
-        'dvc.addExperimentsTableFilter'
-      )
+      const tableChangePromise = new Promise(resolve => {
+        experimentsRepository.onDidChangeExperimentsRows(resolve)
+      })
 
-      expect(mockShowInputBox).to.be.calledOnce
+      await commands.executeCommand('dvc.addExperimentsTableFilter')
 
-      expect(filter).to.deep.equal({
-        columnPath: lossPath,
-        operator: '<',
-        value: '2'
+      await tableChangePromise
+
+      expect(messageSpy).to.be.calledWith({
+        tableData: {
+          columns: complexColumnData,
+          rows: []
+        }
       })
     })
   })

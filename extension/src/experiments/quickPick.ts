@@ -1,5 +1,6 @@
 import { QuickPickOptions, window } from 'vscode'
 import { ColumnData } from './webview/contract'
+import { FilterDefinition } from './filtering'
 import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
@@ -87,14 +88,8 @@ export const pickSort = async (
   }
 }
 
-export interface FilterDefinition {
-  columnPath: string
-  operator: string
-  value: string | number
-}
-
 const operators = [
-  { description: 'Equal', label: '=', value: '===' },
+  { description: 'Equal', label: '=', value: '==' },
   { description: 'Greater than', label: '>', value: '>' },
   { description: 'Greater than or equal to', label: '>=', value: '>=' },
   { description: 'Less than', label: '<', value: '<' },

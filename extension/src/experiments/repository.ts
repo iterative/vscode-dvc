@@ -148,7 +148,7 @@ export class ExperimentsRepository {
       return
     }
     this.model.addFilter(filterToAdd)
-    return filterToAdd
+    return this.notifyChanged()
   }
 
   public async removeFilter() {
@@ -158,6 +158,7 @@ export class ExperimentsRepository {
       return
     }
     this.model.removeFilters(filtersToRemove)
+    return this.notifyChanged()
   }
 
   public getRunningOrQueued(): string[] {
