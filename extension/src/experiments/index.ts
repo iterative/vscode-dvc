@@ -65,6 +65,10 @@ export class Experiments {
     return repository.removeFilter()
   }
 
+  public removeFilterById(dvcRoot: string, path: string) {
+    return this.getRepository(dvcRoot).removeFilterById(path)
+  }
+
   public async pickSort() {
     const repository = await this.getFocusedOrDefaultOrPickRepo()
     repository.pickSort()

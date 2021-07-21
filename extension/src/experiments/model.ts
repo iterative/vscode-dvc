@@ -147,7 +147,7 @@ export class ExperimentsModel {
   }
 
   private getFilterId(filter: FilterDefinition) {
-    return [filter.columnPath, filter.operator, filter.value].join(' ')
+    return [filter.columnPath, filter.operator, filter.value].join('')
   }
 
   private getRowData() {

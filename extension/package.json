@@ -221,6 +221,12 @@
         "title": "%command.clearExperimentsTableSort%",
         "command": "dvc.clearExperimentsTableSort",
         "category": "DVC"
+      },
+      {
+        "title": "%command.views.experimentsFilterByTree.removeFilter%",
+        "command": "dvc.views.experimentsFilterByTree.removeFilter",
+        "category": "DVC",
+        "icon": "$(close)"
       }
     ],
     "configuration": {
@@ -349,6 +355,10 @@
         {
           "command": "dvc.copyRelativeFilePath",
           "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeFilter",
+          "when": "false"
         }
       ],
       "scm/title": [
@@ -466,6 +476,11 @@
         {
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeFilter",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcFilter"
         }
       ]
     },

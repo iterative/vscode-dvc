@@ -169,6 +169,14 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
+  public removeFilterById(path: string) {
+    const filter = this.getFilter(path)
+    if (filter) {
+      this.model.removeFilters([filter])
+      return this.notifyChanged()
+    }
+  }
+
   public getRunningOrQueued(): string[] {
     return this.model.getRunningOrQueued()
   }

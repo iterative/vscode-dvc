@@ -1,6 +1,9 @@
+import { join, relative } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
+  commands,
   Event,
+  ThemeIcon,
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
@@ -30,6 +33,13 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     )
 
     this.experiments = experiments
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.experimentsFilterByTree.removeFilter',
+        resource => this.removeFilter(resource)
+      )
+    )
   }
 
   public getTreeItem(element: string): TreeItem {
@@ -37,7 +47,22 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    return new TreeItem(element, TreeItemCollapsibleState.None)
+    const [dvcRoot, path] = this.getDetails(element)
+    const filter = this.experiments.getFilter(dvcRoot, path)
+
+    const item = new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
+
+    if (!filter) {
+      return item
+    }
+
+    item.iconPath = new ThemeIcon('filter')
+
+    item.label = filter.columnPath
+    item.description = [filter.operator, filter.value].join(' ')
+    item.contextValue = 'dvcFilter'
+
+    return item
   }
 
   public getChildren(element?: string): Promise<string[]> {
@@ -47,7 +72,10 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
     return Promise.resolve(
       this.experiments.getFilteredBy(element).map(filter => {
-        const id = [filter.columnPath, filter.operator, filter.value].join(' ')
+        const id = join(
+          element,
+          [filter.columnPath, filter.operator, filter.value].join('')
+        )
         this.filterRoots[id] = element
         return id
       })
@@ -68,6 +96,17 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     }
 
     return []
+  }
+
+  private removeFilter(element: string) {
+    const [dvcRoot, path] = this.getDetails(element)
+    this.experiments.removeFilterById(dvcRoot, path)
+  }
+
+  private getDetails(element: string) {
+    const dvcRoot = this.filterRoots[element]
+    const path = relative(dvcRoot, element)
+    return [dvcRoot, path]
   }
 
   private isRoot(element: string) {
