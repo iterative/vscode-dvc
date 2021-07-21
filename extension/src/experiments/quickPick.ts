@@ -145,7 +145,7 @@ export const pickFiltersToRemove = (
       value: filter
     })),
     {
-      title: 'Select a filter to remove'
+      title: 'Select filter(s) to remove'
     }
   )
 }
