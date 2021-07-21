@@ -197,7 +197,7 @@ export class ExperimentsModel {
     const flatExperiments = flatten<Experiment>([
       ...this.experimentsByBranch.values()
     ])
-    return sortRows(this.currentSort, flatExperiments)
+    return this.sort(flatExperiments)
   }
 
   private sort(experiments: Experiment[]) {
