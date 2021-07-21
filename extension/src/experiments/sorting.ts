@@ -1,4 +1,4 @@
-import path from 'path'
+import { sep } from 'path'
 import get from 'lodash.get'
 import { Experiment } from './webview/contract'
 
@@ -21,7 +21,7 @@ const buildExperimentSortFunction = ({
   columnPath,
   descending
 }: SortDefinition): ((a: Experiment, b: Experiment) => number) => {
-  const columnPathArray = columnPath.split(path.sep)
+  const columnPathArray = columnPath.split(sep)
   return descending
     ? (a, b) => compareExperimentsByPath(columnPathArray, b, a)
     : (a, b) => compareExperimentsByPath(columnPathArray, a, b)

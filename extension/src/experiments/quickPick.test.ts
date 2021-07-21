@@ -6,9 +6,9 @@ import {
   pickFromColumnData,
   pickSort,
   pickFilterToAdd,
-  pickFiltersToRemove,
-  FilterDefinition
+  pickFiltersToRemove
 } from './quickPick'
+import { FilterDefinition } from './filtering'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 import { getInput } from '../vscode/inputBox'
 

@@ -1,8 +1,8 @@
 import { Disposable } from '@hediet/std/disposable'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
+import { FilterDefinition } from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { FilterDefinition } from './quickPick'
 import { flatten } from '../util/array'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
