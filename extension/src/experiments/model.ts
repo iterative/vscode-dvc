@@ -1,7 +1,12 @@
 import { Disposable } from '@hediet/std/disposable'
-import { ColumnData, Experiment, TableData } from './webview/contract'
+import { ColumnData, Experiment, RowData, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
-import { FilterDefinition, filterExperiments, getFilterId } from './filtering'
+import {
+  FilterDefinition,
+  filterExperiment,
+  filterExperiments,
+  getFilterId
+} from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { definedAndNonEmpty, flatten } from '../util/array'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
@@ -152,8 +157,8 @@ export class ExperimentsModel {
 
   private getRowData() {
     return [
-      ...this.getWorkspace(),
-      ...this.getBranches().map(branch => {
+      this.workspace,
+      ...this.branches.map(branch => {
         const experiments = this.getExperimentsByBranch(branch)
 
         if (!definedAndNonEmpty(experiments)) {
@@ -161,32 +166,39 @@ export class ExperimentsModel {
         }
         return {
           ...branch,
-          subRows: experiments.map(experiment => {
-            const checkpoints = this.getCheckpointsByTip(experiment.id)
-            if (!definedAndNonEmpty(checkpoints)) {
-              return experiment
-            }
-            return { ...experiment, subRows: checkpoints }
-          })
+          subRows: experiments
+            .map(experiment => {
+              const checkpoints = this.getFilteredCheckpointsByTip(
+                experiment.id
+              )
+              if (!checkpoints) {
+                return experiment
+              }
+              return { ...experiment, subRows: checkpoints }
+            })
+            .filter((row: RowData) => this.filterExperimentRow(row))
         }
       })
     ]
   }
 
-  private getWorkspace() {
-    return this.filter([this.workspace])
+  private filterExperimentRow(row: RowData): boolean {
+    const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
+    if (hasUnfilteredCheckpoints) {
+      return true
+    }
+    if (filterExperiment(this.getFilters(), row)) {
+      return true
+    }
+    return false
   }
 
-  private getBranches() {
-    return this.filter(this.branches)
-  }
-
-  private getCheckpointsByTip(id: string) {
+  private getFilteredCheckpointsByTip(id: string) {
     const checkpoints = this.checkpointsByTip.get(id)
     if (!checkpoints) {
       return
     }
-    return this.filter(checkpoints)
+    return filterExperiments(this.getFilters(), checkpoints)
   }
 
   private getExperimentsByBranch(branch: Experiment) {
@@ -194,22 +206,11 @@ export class ExperimentsModel {
     if (!experiments) {
       return
     }
-    return this.sort(this.filter(experiments))
-  }
-
-  private getExperiments() {
-    const flatExperiments = flatten<Experiment>([
-      ...this.experimentsByBranch.values()
-    ])
-    return this.sort(flatExperiments)
-  }
-
-  private sort(experiments: Experiment[]) {
     return sortRows(this.currentSort, experiments)
   }
 
-  private filter(experiments: Experiment[]) {
-    return filterExperiments(this.getFilters(), experiments)
+  private getExperiments() {
+    return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 
   private setAreChildrenSelected(path: string, status: ColumnStatus) {

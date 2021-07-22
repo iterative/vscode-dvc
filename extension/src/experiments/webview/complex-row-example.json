@@ -99,7 +99,7 @@
             "executor": null,
             "metrics": {
               "summary.json": {
-                "loss": 1.8168506622314453,
+                "loss": 1.6168506622314453,
                 "accuracy": 0.5672000050544739,
                 "val_loss": 1.7643483877182007,
                 "val_accuracy": 0.6463000178337097
