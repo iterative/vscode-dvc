@@ -1,6 +1,6 @@
 import { QuickPickOptions, window } from 'vscode'
 import { ColumnData } from './webview/contract'
-import { FilterDefinition } from './filtering'
+import { FilterDefinition, Operator } from './filtering'
 import { SortDefinition } from './sorting'
 import { GcPreserveFlag } from '../cli/args'
 import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
@@ -120,7 +120,7 @@ export const pickFilterToAdd = async (
 
   return {
     columnPath: pickedColumn.path,
-    operator,
+    operator: operator as Operator,
     value
   }
 }

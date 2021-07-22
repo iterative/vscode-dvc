@@ -15,7 +15,7 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { CliRunner } from '../../../../cli/runner'
 import { InternalCommands } from '../../../../internalCommands'
 import { ExperimentsFilterByTree } from '../../../../experiments/views/filterByTree'
-import { getFilterId } from '../../../../experiments/filtering'
+import { getFilterId, Operator } from '../../../../experiments/filtering'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
@@ -81,7 +81,7 @@ suite('Experiments Test Suite', () => {
 
       const lossFilter = {
         columnPath: 'metrics/summary.json/loss',
-        operator: '<=',
+        operator: Operator.LESS_THAN_OR_EQUAL,
         value: '1.6170'
       }
 
