@@ -65,8 +65,8 @@ export class Experiments {
     return repository.removeFilters()
   }
 
-  public removeFilterById(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).removeFilterById(path)
+  public removeFilter(dvcRoot: string, id: string) {
+    return this.getRepository(dvcRoot).removeFilter(id)
   }
 
   public async pickSort() {
@@ -99,15 +99,12 @@ export class Experiments {
     return []
   }
 
-  public getFilteredBy(dvcRoot: string): FilterDefinition[] {
+  public getFilters(dvcRoot: string): FilterDefinition[] {
     return this.getRepository(dvcRoot).getFilters()
   }
 
-  public getFilter(
-    dvcRoot: string,
-    path: string
-  ): FilterDefinition | undefined {
-    return this.getRepository(dvcRoot).getFilter(path)
+  public getFilter(dvcRoot: string, id: string): FilterDefinition | undefined {
+    return this.getRepository(dvcRoot).getFilter(id)
   }
 
   public getRunningOrQueued(dvcRoot: string): string[] {

@@ -47,9 +47,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     if (this.isRoot(element)) {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
-
-    const [dvcRoot, path] = this.getDetails(element)
-    const filter = this.experiments.getFilter(dvcRoot, path)
+    const filter = this.getFilter(element)
 
     const item = new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
 
@@ -72,7 +70,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     }
 
     return Promise.resolve(
-      this.experiments.getFilteredBy(element).map(filter => {
+      this.experiments.getFilters(element).map(filter => {
         const id = join(element, getFilterId(filter))
         this.filterRoots[id] = element
         return id
@@ -86,7 +84,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     const filters = flatten(
       dvcRoots.map(dvcRoot => {
         this.filterRoots[dvcRoot] = dvcRoot
-        return this.experiments.getFilteredBy(dvcRoot)
+        return this.experiments.getFilters(dvcRoot)
       })
     )
     if (definedAndNonEmpty(filters)) {
@@ -96,15 +94,20 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     return []
   }
 
+  private getFilter(element: string) {
+    const [dvcRoot, id] = this.getDetails(element)
+    return this.experiments.getFilter(dvcRoot, id)
+  }
+
   private removeFilter(element: string) {
-    const [dvcRoot, path] = this.getDetails(element)
-    this.experiments.removeFilterById(dvcRoot, path)
+    const [dvcRoot, id] = this.getDetails(element)
+    this.experiments.removeFilter(dvcRoot, id)
   }
 
   private getDetails(element: string) {
     const dvcRoot = this.filterRoots[element]
-    const path = relative(dvcRoot, element)
-    return [dvcRoot, path]
+    const id = relative(dvcRoot, element)
+    return [dvcRoot, id]
   }
 
   private isRoot(element: string) {

@@ -19,13 +19,13 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
-const mockedGetFilteredBy = jest.fn()
+const mockedGetFilters = jest.fn()
 const mockedGetFilter = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
   getDvcRoots: mockedGetDvcRoots,
   getFilter: mockedGetFilter,
-  getFilteredBy: mockedGetFilteredBy,
+  getFilters: mockedGetFilters,
   isReady: () => true
 } as unknown as Experiments
 
@@ -59,7 +59,7 @@ describe('ExperimentsFilterByTree', () => {
       mockedExperiments
     )
     mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-    mockedGetFilteredBy.mockReturnValueOnce([])
+    mockedGetFilters.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
     expect(rootElements).toEqual([])
   })
@@ -70,10 +70,10 @@ describe('ExperimentsFilterByTree', () => {
     )
     const dvcRoots = ['demo', 'other']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
-    mockedGetFilteredBy.mockReturnValueOnce([
+    mockedGetFilters.mockReturnValueOnce([
       join('params', 'params.yaml', 'param==90000')
     ])
-    mockedGetFilteredBy.mockReturnValueOnce([])
+    mockedGetFilters.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
     expect(rootElements).toEqual(dvcRoots)
   })
@@ -97,12 +97,12 @@ describe('ExperimentsFilterByTree', () => {
     )
     const dvcRoots = ['demo', 'and', 'another']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
-    mockedGetFilteredBy.mockReturnValueOnce(mockedFilters)
-    mockedGetFilteredBy.mockReturnValueOnce([])
-    mockedGetFilteredBy.mockReturnValueOnce([])
+    mockedGetFilters.mockReturnValueOnce(mockedFilters)
+    mockedGetFilters.mockReturnValueOnce([])
+    mockedGetFilters.mockReturnValueOnce([])
     await experimentsFilterByTree.getChildren()
 
-    mockedGetFilteredBy.mockReturnValueOnce(mockedFilters)
+    mockedGetFilters.mockReturnValueOnce(mockedFilters)
     const filters = await experimentsFilterByTree.getChildren('demo')
 
     expect(filters).toEqual([
@@ -123,7 +123,7 @@ describe('ExperimentsFilterByTree', () => {
         mockedExperiments
       )
       const dvcRoot = 'other'
-      mockedGetFilteredBy.mockReturnValueOnce([])
+      mockedGetFilters.mockReturnValueOnce([])
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
       await experimentsFilterByTree.getChildren()
       const item = experimentsFilterByTree.getTreeItem(dvcRoot)
@@ -152,10 +152,10 @@ describe('ExperimentsFilterByTree', () => {
       )
       const dvcRoot = 'other'
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
-      mockedGetFilteredBy.mockReturnValueOnce([mockedFilter])
+      mockedGetFilters.mockReturnValueOnce([mockedFilter])
       await experimentsFilterByTree.getChildren()
 
-      mockedGetFilteredBy.mockReturnValueOnce([mockedFilter])
+      mockedGetFilters.mockReturnValueOnce([mockedFilter])
       await experimentsFilterByTree.getChildren('demo')
 
       mockedGetFilter.mockReturnValueOnce(mockedFilter)

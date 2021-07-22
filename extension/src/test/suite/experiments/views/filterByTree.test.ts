@@ -15,13 +15,31 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { CliRunner } from '../../../../cli/runner'
 import { InternalCommands } from '../../../../internalCommands'
 import { ExperimentsFilterByTree } from '../../../../experiments/views/filterByTree'
+import { getFilterId } from '../../../../experiments/filtering'
 
 suite('Experiments Test Suite', () => {
-  window.showInformationMessage('Start all experiments tests.')
+  window.showInformationMessage('Start all experiments filter by tree tests.')
 
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
-  const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
-
+  const dvcDemoPath = resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'demo'
+  )
+  const resourcePath = resolve(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    '..',
+    'resources'
+  )
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -33,7 +51,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('experimentsFilterByTree', () => {
-    it('should be able to add and remove a given filter', async () => {
+    it('should be able to add and remove a given filter and have the table update', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
@@ -61,6 +79,12 @@ suite('Experiments Test Suite', () => {
       await experimentsWebview.isReady()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
+      const lossFilter = {
+        columnPath: 'metrics/summary.json/loss',
+        operator: '>',
+        value: '10'
+      }
+
       const lossPath = 'metrics/summary.json/loss'
 
       const loss = complexColumnData.find(column => column.path === lossPath)
@@ -69,8 +93,8 @@ suite('Experiments Test Suite', () => {
         .resolves({ value: loss } as unknown as QuickPickItem)
       mockShowQuickPick
         .onSecondCall()
-        .resolves({ value: '>' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('10')
+        .resolves({ value: lossFilter.operator } as unknown as QuickPickItem)
+      mockShowInputBox.resolves(lossFilter.value)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getRepository').returns(
@@ -82,13 +106,13 @@ suite('Experiments Test Suite', () => {
         'getFocusedOrDefaultOrPickProject'
       ).returns(dvcDemoPath)
 
-      const tableFilteredPromise = new Promise(resolve => {
+      const tableFilterAdded = new Promise(resolve => {
         experimentsRepository.onDidChangeExperimentsRows(resolve)
       })
 
       await commands.executeCommand('dvc.addExperimentsTableFilter')
 
-      await tableFilteredPromise
+      await tableFilterAdded
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
@@ -97,7 +121,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const tableUnfilteredPromise = new Promise(resolve => {
+      const tableFilterRemoved = new Promise(resolve => {
         experimentsRepository.onDidChangeExperimentsRows(resolve)
       })
 
@@ -105,14 +129,14 @@ suite('Experiments Test Suite', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((ExperimentsFilterByTree as any).prototype, 'getDetails').callsFake(
-        (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
+        (id: string) => [dvcDemoPath, relative(dvcDemoPath, id)]
       )
 
       await commands.executeCommand(
         'dvc.views.experimentsFilterByTree.removeFilter',
-        [join(dvcDemoPath, lossPath), '>10'].join('')
+        join(dvcDemoPath, getFilterId(lossFilter))
       )
-      await tableUnfilteredPromise
+      await tableFilterRemoved
 
       expect(messageSpy).to.be.calledWith({
         tableData: {

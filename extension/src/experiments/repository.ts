@@ -145,8 +145,8 @@ export class ExperimentsRepository {
     return this.model.getFilters()
   }
 
-  public getFilter(path: string) {
-    return this.model.getFilter(path)
+  public getFilter(id: string) {
+    return this.model.getFilter(id)
   }
 
   public async addFilter() {
@@ -169,10 +169,8 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public removeFilterById(path: string) {
-    const filter = this.getFilter(path)
-    if (filter) {
-      this.model.removeFilters([filter])
+  public removeFilter(id: string) {
+    if (this.model.removeFilter(id)) {
       return this.notifyChanged()
     }
   }

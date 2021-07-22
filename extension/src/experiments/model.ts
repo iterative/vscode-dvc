@@ -57,8 +57,8 @@ export class ExperimentsModel {
     return [...this.filters.values()]
   }
 
-  public getFilter(path: string) {
-    return this.filters.get(path)
+  public getFilter(id: string) {
+    return this.filters.get(id)
   }
 
   public addFilter(filter: FilterDefinition) {
@@ -66,7 +66,11 @@ export class ExperimentsModel {
   }
 
   public removeFilters(filters: FilterDefinition[]) {
-    filters.map(filter => this.filters.delete(getFilterId(filter)))
+    filters.map(filter => this.removeFilter(getFilterId(filter)))
+  }
+
+  public removeFilter(id: string) {
+    return this.filters.delete(id)
   }
 
   public getColumns() {
