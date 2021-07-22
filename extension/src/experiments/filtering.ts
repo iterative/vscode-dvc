@@ -62,3 +62,14 @@ export const filterExperiments = (
   const filterFunction = buildFilter(filterDefinitions)
   return unfilteredExperiments.filter(filterFunction)
 }
+
+export const filterExperiment = (
+  filterDefinitions: FilterDefinition[],
+  experiment: Experiment
+): Experiment | undefined => {
+  if (!definedAndNonEmpty(filterDefinitions)) {
+    return experiment
+  }
+  const filterFunction = buildFilter(filterDefinitions)
+  return filterFunction(experiment) ? experiment : undefined
+}

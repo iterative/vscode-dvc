@@ -51,7 +51,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('experimentsFilterByTree', () => {
-    it('should be able to add and remove a given filter and have the table update', async () => {
+    it('should be able to update the table data by adding and removing a filter', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
@@ -81,8 +81,8 @@ suite('Experiments Test Suite', () => {
 
       const lossFilter = {
         columnPath: 'metrics/summary.json/loss',
-        operator: '>',
-        value: '10'
+        operator: '<=',
+        value: '1.6170'
       }
 
       const lossPath = 'metrics/summary.json/loss'
@@ -114,10 +114,27 @@ suite('Experiments Test Suite', () => {
 
       await tableFilterAdded
 
+      const [workspace, testBranch, master] = complexRowData
+
+      const filteredRows = [
+        workspace,
+        {
+          ...testBranch,
+          subRows: testBranch.subRows?.map(experiment => ({
+            ...experiment,
+            subRows: experiment.subRows?.filter(checkpoint => {
+              const loss = checkpoint.metrics?.['summary.json']?.loss
+              return loss && loss <= 1.617
+            })
+          }))
+        },
+        { ...master, subRows: [] }
+      ]
+
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
-          rows: []
+          rows: filteredRows
         }
       })
 
