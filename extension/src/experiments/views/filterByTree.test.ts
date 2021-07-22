@@ -1,6 +1,7 @@
+import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { commands, EventEmitter, window } from 'vscode'
+import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsFilterByTree } from './filterByTree'
 import { Experiments } from '..'
 
@@ -12,14 +13,18 @@ mockedExperimentsRowsChanged.fire = mockedExperimentDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
+const mockedTreeItem = mocked(TreeItem)
+const mockedThemeIcon = mocked(ThemeIcon)
 
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
 const mockedGetFilteredBy = jest.fn()
+const mockedGetFilter = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
   getDvcRoots: mockedGetDvcRoots,
+  getFilter: mockedGetFilter,
   getFilteredBy: mockedGetFilteredBy,
   isReady: () => true
 } as unknown as Experiments
@@ -57,5 +62,114 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetFilteredBy.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
     expect(rootElements).toEqual([])
+  })
+
+  it('should return an array of dvcRoots if one has a filter applied', async () => {
+    const experimentsFilterByTree = new ExperimentsFilterByTree(
+      mockedExperiments
+    )
+    const dvcRoots = ['demo', 'other']
+    mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
+    mockedGetFilteredBy.mockReturnValueOnce([
+      join('params', 'params.yaml', 'param==90000')
+    ])
+    mockedGetFilteredBy.mockReturnValueOnce([])
+    const rootElements = await experimentsFilterByTree.getChildren()
+    expect(rootElements).toEqual(dvcRoots)
+  })
+
+  it("should return the dvcRoot's filters if one is provided", async () => {
+    const mockedFilters = [
+      {
+        columnPath: join('params', 'params.yml', 'param'),
+        operator: '==',
+        value: 90000
+      },
+      {
+        columnPath: join('metrics', 'logs.json', 'metric'),
+        operator: '<',
+        value: '1'
+      }
+    ]
+
+    const experimentsFilterByTree = new ExperimentsFilterByTree(
+      mockedExperiments
+    )
+    const dvcRoots = ['demo', 'and', 'another']
+    mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
+    mockedGetFilteredBy.mockReturnValueOnce(mockedFilters)
+    mockedGetFilteredBy.mockReturnValueOnce([])
+    mockedGetFilteredBy.mockReturnValueOnce([])
+    await experimentsFilterByTree.getChildren()
+
+    mockedGetFilteredBy.mockReturnValueOnce(mockedFilters)
+    const filters = await experimentsFilterByTree.getChildren('demo')
+
+    expect(filters).toEqual([
+      join('demo', 'params', 'params.yml', 'param==90000'),
+      join('demo', 'metrics', 'logs.json', 'metric<1')
+    ])
+  })
+
+  describe('getTreeItem', () => {
+    it('should return a tree item for a root element', async () => {
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        expect(collapsibleState).toEqual(1)
+        mockedItem = { collapsibleState, uri }
+        return mockedItem
+      })
+      const experimentsFilterByTree = new ExperimentsFilterByTree(
+        mockedExperiments
+      )
+      const dvcRoot = 'other'
+      mockedGetFilteredBy.mockReturnValueOnce([])
+      mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
+      await experimentsFilterByTree.getChildren()
+      const item = experimentsFilterByTree.getTreeItem(dvcRoot)
+
+      expect(item).toEqual(mockedItem)
+    })
+
+    it('should return a tree item for a filter', async () => {
+      const mockedFilter = {
+        columnPath: join('metrics', 'summary.json', 'success_metric'),
+        operator: '>=',
+        value: '100'
+      }
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        expect(collapsibleState).toEqual(0)
+        mockedItem = { collapsibleState, uri }
+        return mockedItem
+      })
+      mockedThemeIcon.mockImplementationOnce(function (id) {
+        return { id }
+      })
+
+      const experimentsFilterByTree = new ExperimentsFilterByTree(
+        mockedExperiments
+      )
+      const dvcRoot = 'other'
+      mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
+      mockedGetFilteredBy.mockReturnValueOnce([mockedFilter])
+      await experimentsFilterByTree.getChildren()
+
+      mockedGetFilteredBy.mockReturnValueOnce([mockedFilter])
+      await experimentsFilterByTree.getChildren('demo')
+
+      mockedGetFilter.mockReturnValueOnce(mockedFilter)
+      const item = experimentsFilterByTree.getTreeItem(
+        join('demo', 'metrics', 'summary.json', 'success_metric>=100')
+      )
+
+      expect(item).toEqual({
+        ...mockedItem,
+        contextValue: 'dvcFilter',
+        description: '>= 100',
+        iconPath: { id: 'filter' },
+        label: mockedFilter.columnPath
+      })
+    })
   })
 })

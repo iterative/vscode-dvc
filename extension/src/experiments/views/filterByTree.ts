@@ -12,6 +12,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
+import { getFilterId } from '../filtering'
 
 export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -72,10 +73,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
     return Promise.resolve(
       this.experiments.getFilteredBy(element).map(filter => {
-        const id = join(
-          element,
-          [filter.columnPath, filter.operator, filter.value].join('')
-        )
+        const id = join(element, getFilterId(filter))
         this.filterRoots[id] = element
         return id
       })
