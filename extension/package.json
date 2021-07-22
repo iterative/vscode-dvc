@@ -205,7 +205,8 @@
       {
         "title": "%command.addExperimentsTableFilter%",
         "command": "dvc.addExperimentsTableFilter",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(add)"
       },
       {
         "title": "%command.removeExperimentsTableFilters%",
@@ -481,6 +482,13 @@
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcFilter"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "dvc.addExperimentsTableFilter",
+          "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation"
         }
       ]
     },
