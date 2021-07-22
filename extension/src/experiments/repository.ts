@@ -141,6 +141,14 @@ export class ExperimentsRepository {
     }
   }
 
+  public getFilters() {
+    return this.model.getFilters()
+  }
+
+  public getFilter(id: string) {
+    return this.model.getFilter(id)
+  }
+
   public async addFilter() {
     const columns = this.model.getTerminalNodeColumns()
     const filterToAdd = await pickFilterToAdd(columns)
@@ -151,7 +159,7 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public async removeFilter() {
+  public async removeFilters() {
     const filters = this.model.getFilters()
     const filtersToRemove = await pickFiltersToRemove(filters)
     if (!filtersToRemove) {
@@ -159,6 +167,12 @@ export class ExperimentsRepository {
     }
     this.model.removeFilters(filtersToRemove)
     return this.notifyChanged()
+  }
+
+  public removeFilter(id: string) {
+    if (this.model.removeFilter(id)) {
+      return this.notifyChanged()
+    }
   }
 
   public getRunningOrQueued(): string[] {

@@ -266,75 +266,7 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  // eslint-disable-next-line sonarjs/no-duplicate-string
-  describe('dvc.addExperimentsTableFilter', () => {
-    it('should be able to add a filter to the experiments selected repository', async () => {
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
-
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const cliRunner = disposable.track(new CliRunner(config))
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = new ExperimentsRepository(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator
-      )
-
-      await experimentsRepository.isReady()
-      const experimentsWebview = await experimentsRepository.showWebview()
-      await experimentsWebview.isReady()
-      const messageSpy = spy(experimentsWebview, 'showExperiments')
-
-      const lossPath = 'metrics/summary.json/loss'
-
-      const loss = complexColumnData.find(column => column.path === lossPath)
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: '>' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('10')
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
-      )
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
-      ).returns(dvcDemoPath)
-
-      const tableChangePromise = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperimentsRows(resolve)
-      })
-
-      await commands.executeCommand('dvc.addExperimentsTableFilter')
-
-      await tableChangePromise
-
-      expect(messageSpy).to.be.calledWith({
-        tableData: {
-          columns: complexColumnData,
-          rows: []
-        }
-      })
-    })
-  })
-
-  describe('dvc.removeExperimentsTableFilter', () => {
+  describe('dvc.removeExperimentsTableFilters', () => {
     it('should be able to remove filters from the experiments selected repository', async () => {
       const addFilterCommand = 'dvc.addExperimentsTableFilter'
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -398,7 +330,7 @@ suite('Experiments Test Suite', () => {
       mockShowQuickPick.resetHistory()
       mockShowQuickPick.onFirstCall().resolves(undefined)
 
-      await commands.executeCommand('dvc.removeExperimentsTableFilter')
+      await commands.executeCommand('dvc.removeExperimentsTableFilters')
 
       expect(mockShowQuickPick).to.be.calledWith(
         [

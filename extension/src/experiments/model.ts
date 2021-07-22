@@ -1,7 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import { ColumnData, Experiment, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
-import { FilterDefinition, filterExperiments } from './filtering'
+import { FilterDefinition, filterExperiments, getFilterId } from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
 import { definedAndNonEmpty, flatten } from '../util/array'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
@@ -57,12 +57,20 @@ export class ExperimentsModel {
     return [...this.filters.values()]
   }
 
+  public getFilter(id: string) {
+    return this.filters.get(id)
+  }
+
   public addFilter(filter: FilterDefinition) {
-    this.filters.set(this.getFilterId(filter), filter)
+    this.filters.set(getFilterId(filter), filter)
   }
 
   public removeFilters(filters: FilterDefinition[]) {
-    filters.map(filter => this.filters.delete(this.getFilterId(filter)))
+    filters.map(filter => this.removeFilter(getFilterId(filter)))
+  }
+
+  public removeFilter(id: string) {
+    return this.filters.delete(id)
   }
 
   public getColumns() {
@@ -140,10 +148,6 @@ export class ExperimentsModel {
         ) || [],
       rows: this.getRowData()
     }
-  }
-
-  private getFilterId(filter: FilterDefinition) {
-    return [filter.columnPath, filter.operator, filter.value].join(' ')
   }
 
   private getRowData() {

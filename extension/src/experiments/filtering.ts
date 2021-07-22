@@ -49,6 +49,9 @@ const buildFilter =
     return !firstFailure
   }
 
+export const getFilterId = (filter: FilterDefinition): string =>
+  [filter.columnPath, filter.operator, filter.value].join('')
+
 export const filterExperiments = (
   filterDefinitions: FilterDefinition[],
   unfilteredExperiments: Experiment[]

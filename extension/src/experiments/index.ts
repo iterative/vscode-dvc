@@ -3,6 +3,7 @@ import { Deferred } from '@hediet/std/synchronization'
 import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
+import { FilterDefinition } from './filtering'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { ResourceLocator } from '../resourceLocator'
@@ -59,9 +60,13 @@ export class Experiments {
     return repository.addFilter()
   }
 
-  public async removeFilter() {
+  public async removeFilters() {
     const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.removeFilter()
+    return repository.removeFilters()
+  }
+
+  public removeFilter(dvcRoot: string, id: string) {
+    return this.getRepository(dvcRoot).removeFilter(id)
   }
 
   public async pickSort() {
@@ -94,8 +99,12 @@ export class Experiments {
     return []
   }
 
-  public getFilteredBy(): string[] {
-    return []
+  public getFilters(dvcRoot: string): FilterDefinition[] {
+    return this.getRepository(dvcRoot).getFilters()
+  }
+
+  public getFilter(dvcRoot: string, id: string): FilterDefinition | undefined {
+    return this.getRepository(dvcRoot).getFilter(id)
   }
 
   public getRunningOrQueued(dvcRoot: string): string[] {
