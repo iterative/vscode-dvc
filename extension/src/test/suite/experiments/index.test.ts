@@ -266,7 +266,7 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('dvc.removeExperimentsTableFilter', () => {
+  describe('dvc.removeExperimentsTableFilters', () => {
     it('should be able to remove filters from the experiments selected repository', async () => {
       const addFilterCommand = 'dvc.addExperimentsTableFilter'
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -330,7 +330,7 @@ suite('Experiments Test Suite', () => {
       mockShowQuickPick.resetHistory()
       mockShowQuickPick.onFirstCall().resolves(undefined)
 
-      await commands.executeCommand('dvc.removeExperimentsTableFilter')
+      await commands.executeCommand('dvc.removeExperimentsTableFilters')
 
       expect(mockShowQuickPick).to.be.calledWith(
         [

@@ -159,7 +159,7 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public async removeFilter() {
+  public async removeFilters() {
     const filters = this.model.getFilters()
     const filtersToRemove = await pickFiltersToRemove(filters)
     if (!filtersToRemove) {

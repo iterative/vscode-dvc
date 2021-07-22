@@ -60,9 +60,9 @@ export class Experiments {
     return repository.addFilter()
   }
 
-  public async removeFilter() {
+  public async removeFilters() {
     const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.removeFilter()
+    return repository.removeFilters()
   }
 
   public removeFilterById(dvcRoot: string, path: string) {
