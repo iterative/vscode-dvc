@@ -51,7 +51,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('experimentsFilterByTree', () => {
-    it('should be able to add and remove a given filter and have the table update', async () => {
+    it('should be able to update the table data by adding and removing a filter', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
