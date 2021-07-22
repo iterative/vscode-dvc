@@ -544,7 +544,7 @@
       },
       {
         "view": "dvc.views.experimentsFilterByTree",
-        "contents": "No filters applied. \n[Add Filter](command:dvc.selectDvcPath)\n"
+        "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
       }
     ]
   },
