@@ -134,7 +134,7 @@ export class ExperimentsRepository {
   }
 
   public async pickSort() {
-    const columns = this.model.getColumns()
+    const columns = this.model.getTerminalNodeColumns()
     const pickedSortDefinition = await pickSort(columns)
     if (pickedSortDefinition) {
       return this.setSort(pickedSortDefinition)
