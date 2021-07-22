@@ -176,13 +176,13 @@ export class ExperimentsModel {
               }
               return { ...experiment, subRows: checkpoints }
             })
-            .filter((row: RowData) => this.filterExperimentRow(row))
+            .filter((row: RowData) => this.filterTableRow(row))
         }
       })
     ]
   }
 
-  private filterExperimentRow(row: RowData): boolean {
+  private filterTableRow(row: RowData): boolean {
     const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
     if (hasUnfilteredCheckpoints) {
       return true
