@@ -228,6 +228,33 @@ describe('ExperimentsRunsTree', () => {
       const treeItem = experimentsRunsTree.getTreeItem('f0778b3')
       expect(treeItem).toEqual({
         ...mockedItem,
+        iconPath: { id: 'debug-stackframe-dot' }
+      })
+    })
+
+    it('should return a tree item for an existing experiment', async () => {
+      let mockedItem = {}
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        mockedItem = { collapsibleState, uri }
+        return mockedItem
+      })
+      mockedThemeIcon.mockImplementationOnce(function (id) {
+        return { id }
+      })
+
+      const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      const mockedExistingExperiment = 'f0998a3'
+      mockedGetExperimentNames.mockReturnValueOnce([mockedExistingExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedExistingExperiment])
+      mockedGetExperiment.mockReturnValueOnce({})
+
+      await experimentsRunsTree.getChildren()
+      await experimentsRunsTree.getChildren('demo')
+
+      const treeItem = experimentsRunsTree.getTreeItem(mockedExistingExperiment)
+      expect(treeItem).toEqual({
+        ...mockedItem,
         iconPath: { id: 'primitive-dot' }
       })
     })

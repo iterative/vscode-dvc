@@ -1,7 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
-  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -75,7 +74,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     return this.getTreeItemWithIcon(
       element,
       TreeItemCollapsibleState.None,
-      'primitive-dot'
+      'debug-stackframe-dot'
     )
   }
 
@@ -96,17 +95,13 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   private getExistingExperiment(element: string, hasChildren?: boolean) {
-    const item = new TreeItem(
+    return this.getTreeItemWithIcon(
       element,
       hasChildren
         ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
+        : TreeItemCollapsibleState.None,
+      'primitive-dot'
     )
-    item.iconPath = new ThemeIcon(
-      'primitive-dot',
-      new ThemeColor('textLink.activeForeground')
-    )
-    return item
   }
 
   private getTreeItemWithIcon(
