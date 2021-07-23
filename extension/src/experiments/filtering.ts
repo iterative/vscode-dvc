@@ -3,36 +3,44 @@ import get from 'lodash.get'
 import { Experiment } from './webview/contract'
 import { definedAndNonEmpty } from '../util/array'
 
+export enum Operator {
+  EQUAL = '==',
+  GREATER_THAN = '>',
+  GREATER_THAN_OR_EQUAL = '>=',
+  LESS_THAN = '<',
+  LESS_THAN_OR_EQUAL = '<=',
+  NOT_EQUAL = '!='
+}
+
 export interface FilterDefinition {
   columnPath: string
-  operator: string
+  operator: Operator
   value: string | number
 }
 
 const evaluate = <T>(
   valueToEvaluate: T,
-  operator: string,
+  operator: Operator,
   filterValue: T
 ): boolean => {
-  if (operator === '>') {
-    return valueToEvaluate > filterValue
+  switch (operator) {
+    case Operator.GREATER_THAN:
+      return valueToEvaluate > filterValue
+    case Operator.LESS_THAN:
+      return valueToEvaluate < filterValue
+    case Operator.EQUAL:
+      // eslint-disable-next-line eqeqeq
+      return valueToEvaluate == filterValue
+    case Operator.GREATER_THAN_OR_EQUAL:
+      return valueToEvaluate >= filterValue
+    case Operator.LESS_THAN_OR_EQUAL:
+      return valueToEvaluate <= filterValue
+    case Operator.NOT_EQUAL:
+      // eslint-disable-next-line eqeqeq
+      return valueToEvaluate != filterValue
+    default:
+      throw Error('filter operator not found')
   }
-  if (operator === '<') {
-    return valueToEvaluate < filterValue
-  }
-  if (operator === '==') {
-    // eslint-disable-next-line eqeqeq
-    return valueToEvaluate == filterValue
-  }
-
-  if (operator === '>=') {
-    return valueToEvaluate >= filterValue
-  }
-
-  if (operator === '<=') {
-    return valueToEvaluate <= filterValue
-  }
-  throw Error('filter operator not found')
 }
 
 const buildFilter =
