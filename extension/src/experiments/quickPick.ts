@@ -89,11 +89,32 @@ export const pickSort = async (
 }
 
 const operators = [
-  { description: 'Equal', label: '=', value: '==' },
-  { description: 'Greater than', label: '>', value: '>' },
-  { description: 'Greater than or equal to', label: '>=', value: '>=' },
-  { description: 'Less than', label: '<', value: '<' },
-  { description: 'Less than or equal to', label: '<=', value: '<=' }
+  { description: 'Equal', label: '=', value: Operator.EQUAL },
+  {
+    description: 'Not equal',
+    label: Operator.NOT_EQUAL,
+    value: Operator.NOT_EQUAL
+  },
+  {
+    description: 'Greater than',
+    label: Operator.GREATER_THAN,
+    value: Operator.GREATER_THAN
+  },
+  {
+    description: 'Greater than or equal',
+    label: Operator.GREATER_THAN_OR_EQUAL,
+    value: Operator.GREATER_THAN_OR_EQUAL
+  },
+  {
+    description: 'Less than',
+    label: Operator.LESS_THAN,
+    value: Operator.LESS_THAN
+  },
+  {
+    description: 'Less than or equal',
+    label: Operator.LESS_THAN_OR_EQUAL,
+    value: Operator.LESS_THAN_OR_EQUAL
+  }
 ]
 
 export const pickFilterToAdd = async (
