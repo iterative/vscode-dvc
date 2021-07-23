@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { filterExperiments } from './filtering'
+import { filterExperiments, Operator } from './filtering'
 import { Experiment } from './webview/contract'
 
 describe('filterExperiments', () => {
@@ -44,7 +44,7 @@ describe('filterExperiments', () => {
       [
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '>',
+          operator: Operator.GREATER_THAN,
           value: '2'
         }
       ],
@@ -58,7 +58,7 @@ describe('filterExperiments', () => {
       [
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '==',
+          operator: Operator.EQUAL,
           value: '2'
         }
       ],
@@ -67,17 +67,31 @@ describe('filterExperiments', () => {
     expect(filteredExperiments.map(experiment => experiment.id)).toEqual([2])
   })
 
+  it('should filter the experiments by a not equals filter', () => {
+    const filteredExperiments = filterExperiments(
+      [
+        {
+          columnPath: join('params', paramsFile, 'filter'),
+          operator: Operator.NOT_EQUAL,
+          value: '2'
+        }
+      ],
+      experiments
+    )
+    expect(filteredExperiments.map(experiment => experiment.id)).toEqual([1, 3])
+  })
+
   it('should filter the experiments by multiple filters', () => {
     const filteredExperiments = filterExperiments(
       [
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '>',
+          operator: Operator.GREATER_THAN,
           value: '0'
         },
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '<=',
+          operator: Operator.LESS_THAN_OR_EQUAL,
           value: '2'
         }
       ],
@@ -91,17 +105,17 @@ describe('filterExperiments', () => {
       [
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '>=',
+          operator: Operator.GREATER_THAN_OR_EQUAL,
           value: '0'
         },
         {
           columnPath: join('params', paramsFile, 'filter'),
-          operator: '<',
+          operator: Operator.LESS_THAN,
           value: '10'
         },
         {
           columnPath: join('params', paramsFile, 'sort'),
-          operator: '==',
+          operator: Operator.EQUAL,
           value: '10'
         }
       ],
