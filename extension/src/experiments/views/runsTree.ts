@@ -38,6 +38,24 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
+    return this.getExperimentTreeItem(element)
+  }
+
+  public getChildren(element?: string): Promise<string[]> {
+    if (!element) {
+      return this.getRootElements()
+    }
+
+    if (this.isRoot(element)) {
+      return Promise.resolve(this.getExperimentNames(element))
+    }
+
+    return Promise.resolve(
+      this.experiments.getCheckpointNames(this.runRoots[element], element) || []
+    )
+  }
+
+  private getExperimentTreeItem(element: string) {
     const dvcRoot = this.runRoots[element]
     if (!dvcRoot) {
       return this.getRunningCheckpoint(element)
@@ -54,20 +72,6 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     return this.getExistingExperiment(element, experiment?.hasChildren)
-  }
-
-  public getChildren(element?: string): Promise<string[]> {
-    if (!element) {
-      return this.getRootElements()
-    }
-
-    if (this.isRoot(element)) {
-      return Promise.resolve(this.getExperimentNames(element))
-    }
-
-    return Promise.resolve(
-      this.experiments.getCheckpointNames(this.runRoots[element], element) || []
-    )
   }
 
   private getRunningCheckpoint(element: string) {
