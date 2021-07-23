@@ -366,6 +366,10 @@
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
+          "when": "false"
         }
       ],
       "scm/title": [
