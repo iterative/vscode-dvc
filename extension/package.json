@@ -214,6 +214,12 @@
         "category": "DVC"
       },
       {
+        "title": "%command.views.experimentsFilterByTree.removeAllFilters%",
+        "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
+        "category": "DVC",
+        "icon": "$(close-all)"
+      },
+      {
         "title": "%command.setExperimentsTableSort%",
         "command": "dvc.setExperimentsTableSort",
         "category": "DVC"
@@ -482,11 +488,21 @@
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcFilter"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
         }
       ],
       "view/title": [
         {
           "command": "dvc.addExperimentsTableFilter",
+          "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree",
           "group": "navigation"
         }

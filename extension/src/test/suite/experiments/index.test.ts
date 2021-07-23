@@ -2,11 +2,10 @@ import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, workspace, Uri, QuickPickItem } from 'vscode'
+import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
-import complexColumnData from '../../../experiments/webview/complex-column-example.json'
 import { Experiments } from '../../../experiments'
 import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
@@ -263,90 +262,6 @@ suite('Experiments Test Suite', () => {
 
       expect(mockExperimentRunQueue).to.be.calledOnce
       expect(mockExperimentRunQueue).to.be.calledWith(dvcDemoPath)
-    })
-  })
-
-  describe('dvc.removeExperimentsTableFilters', () => {
-    it('should be able to remove filters from the experiments selected repository', async () => {
-      const addFilterCommand = 'dvc.addExperimentsTableFilter'
-      const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockShowInputBox = stub(window, 'showInputBox')
-
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const cliRunner = disposable.track(new CliRunner(config))
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = new ExperimentsRepository(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator
-      )
-
-      await experimentsRepository.isReady()
-
-      const lossPath = 'metrics/summary.json/loss'
-
-      const loss = complexColumnData.find(column => column.path === lossPath)
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: '<' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('2')
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
-      )
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
-      ).returns(dvcDemoPath)
-
-      await commands.executeCommand(addFilterCommand)
-
-      mockShowQuickPick.resetHistory()
-      mockShowQuickPick
-        .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: '>' } as unknown as QuickPickItem)
-      mockShowInputBox.resolves('0')
-
-      await commands.executeCommand(addFilterCommand)
-
-      mockShowQuickPick.resetHistory()
-      mockShowQuickPick.onFirstCall().resolves(undefined)
-
-      await commands.executeCommand('dvc.removeExperimentsTableFilters')
-
-      expect(mockShowQuickPick).to.be.calledWith(
-        [
-          {
-            description: '< 2',
-            label: lossPath,
-            value: { columnPath: lossPath, operator: '<', value: '2' }
-          },
-          {
-            description: '> 0',
-            label: lossPath,
-            value: { columnPath: lossPath, operator: '>', value: '0' }
-          }
-        ],
-        { canPickMany: true, title: 'Select filter(s) to remove' }
-      )
     })
   })
 })

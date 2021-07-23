@@ -41,12 +41,25 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
         resource => this.removeFilter(resource)
       )
     )
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.experimentsFilterByTree.removeAllFilters',
+        resource => this.removeAllFilters(resource)
+      )
+    )
   }
 
   public getTreeItem(element: string): TreeItem {
     if (this.isRoot(element)) {
-      return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
+      const item = new TreeItem(
+        Uri.file(element),
+        TreeItemCollapsibleState.Collapsed
+      )
+      item.contextValue = 'dvcFilterRoot'
+      return item
     }
+
     const filter = this.getFilter(element)
 
     const item = new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
@@ -97,6 +110,17 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   private getFilter(element: string) {
     const [dvcRoot, id] = this.getDetails(element)
     return this.experiments.getFilter(dvcRoot, id)
+  }
+
+  private async removeAllFilters(element: string | undefined) {
+    if (!element) {
+      const dvcRoots = await this.getRootElements()
+      dvcRoots.map(dvcRoot => this.removeAllFilters(dvcRoot))
+      return
+    }
+
+    const filters = await this.getChildren(element)
+    filters.map(filter => this.removeFilter(filter))
   }
 
   private removeFilter(element: string) {

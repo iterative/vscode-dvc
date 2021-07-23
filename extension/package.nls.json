@@ -19,6 +19,7 @@
   "command.pushTarget": "Push",
   "command.removeTarget": "Remove",
   "command.views.experimentsFilterByTree.removeFilter": "Remove Filter From Experiments Table",
+  "command.views.experimentsFilterByTree.removeAllFilters": "Remove All Filters From Experiments Table",
   "command.removeExperimentsTableFilters": "Remove Filter(s) From Experiments Table",
   "command.runExperiment": "Run Experiment",
   "command.runResetExperiment": "Run and Reset Experiment",
