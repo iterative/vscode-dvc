@@ -83,15 +83,10 @@ describe('ExperimentsRunsTree', () => {
     })
 
     it('should return an array of checkpoints when a non root element is provided', async () => {
-      const runningOrQueuedExperiments = [
-        'ebbd66f',
-        'e5855d7',
-        '6e5e782',
-        '15c9c56'
-      ]
+      const experimentNames = ['ebbd66f', 'e5855d7', '6e5e782', '15c9c56']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(runningOrQueuedExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(runningOrQueuedExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(experimentNames)
+      mockedGetExperimentNames.mockReturnValueOnce(experimentNames)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       await experimentsRunsTree.getChildren()

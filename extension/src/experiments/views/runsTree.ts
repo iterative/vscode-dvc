@@ -121,13 +121,13 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
-    const runningOrQueued = flatten(
+    const experimentNames = flatten(
       dvcRoots.map(dvcRoot => {
         this.runRoots[dvcRoot] = dvcRoot
         return this.experiments.getExperimentNames(dvcRoot)
       })
     )
-    if (definedAndNonEmpty(runningOrQueued)) {
+    if (definedAndNonEmpty(experimentNames)) {
       return dvcRoots.sort((a, b) => a.localeCompare(b))
     }
 
@@ -135,9 +135,9 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   }
 
   private getExperimentNames(dvcRoot: string): string[] {
-    const runningOrQueued = this.experiments.getExperimentNames(dvcRoot)
-    runningOrQueued.forEach(name => (this.runRoots[name] = dvcRoot))
-    return runningOrQueued
+    const experimentNames = this.experiments.getExperimentNames(dvcRoot)
+    experimentNames.forEach(name => (this.runRoots[name] = dvcRoot))
+    return experimentNames
   }
 
   private isRoot(element: string) {

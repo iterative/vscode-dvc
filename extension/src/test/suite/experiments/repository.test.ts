@@ -87,9 +87,9 @@ suite('Experiments Repository Test Suite', () => {
       )
       await experimentsRepository.isReady()
 
-      const runningOrQueued = experimentsRepository.getExperimentNames()
+      const experimentNames = experimentsRepository.getExperimentNames()
 
-      expect(runningOrQueued).to.deep.equal([
+      expect(experimentNames).to.deep.equal([
         'workspace',
         'exp-05694',
         'exp-e7a67',
