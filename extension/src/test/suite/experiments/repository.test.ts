@@ -68,8 +68,8 @@ suite('Experiments Repository Test Suite', () => {
     })
   })
 
-  describe('getRunningOrQueued', () => {
-    it('should return the currently running or queued experiments', async () => {
+  describe('getExperimentNames', () => {
+    it("should return all existing experiments' names", async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -87,11 +87,14 @@ suite('Experiments Repository Test Suite', () => {
       )
       await experimentsRepository.isReady()
 
-      const runningOrQueued = experimentsRepository.getRunningOrQueued()
+      const runningOrQueued = experimentsRepository.getExperimentNames()
 
       expect(runningOrQueued).to.deep.equal([
         'workspace',
+        'exp-05694',
         'exp-e7a67',
+        'test-branch',
+        'exp-83425',
         '90aea7f'
       ])
     })

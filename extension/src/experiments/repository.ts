@@ -175,8 +175,8 @@ export class ExperimentsRepository {
     }
   }
 
-  public getRunningOrQueued(): string[] {
-    return this.model.getRunningOrQueued()
+  public getExperimentNames(): string[] {
+    return this.model.getExperimentNames()
   }
 
   public getExperiment(name: string) {

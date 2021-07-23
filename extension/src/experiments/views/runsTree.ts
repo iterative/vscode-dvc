@@ -1,6 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
+  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -49,7 +50,11 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       return this.getRunning(element, experiment?.hasChildren)
     }
 
-    return this.getQueued(element)
+    if (experiment?.queued) {
+      return this.getQueued(element)
+    }
+
+    return this.getExistingExperiment(element, experiment?.hasChildren)
   }
 
   public getChildren(element?: string): Promise<string[]> {
@@ -58,7 +63,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     }
 
     if (this.isRoot(element)) {
-      return Promise.resolve(this.getRunningOrQueued(element))
+      return Promise.resolve(this.getExperimentNames(element))
     }
 
     return Promise.resolve(
@@ -90,6 +95,20 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
   }
 
+  private getExistingExperiment(element: string, hasChildren?: boolean) {
+    const item = new TreeItem(
+      element,
+      hasChildren
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None
+    )
+    item.iconPath = new ThemeIcon(
+      'primitive-dot',
+      new ThemeColor('textLink.activeForeground')
+    )
+    return item
+  }
+
   private getTreeItemWithIcon(
     element: string,
     collapsibleState: TreeItemCollapsibleState,
@@ -106,7 +125,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     const runningOrQueued = flatten(
       dvcRoots.map(dvcRoot => {
         this.runRoots[dvcRoot] = dvcRoot
-        return this.experiments.getRunningOrQueued(dvcRoot)
+        return this.experiments.getExperimentNames(dvcRoot)
       })
     )
     if (definedAndNonEmpty(runningOrQueued)) {
@@ -116,8 +135,8 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     return []
   }
 
-  private getRunningOrQueued(dvcRoot: string): string[] {
-    const runningOrQueued = this.experiments.getRunningOrQueued(dvcRoot)
+  private getExperimentNames(dvcRoot: string): string[] {
+    const runningOrQueued = this.experiments.getExperimentNames(dvcRoot)
     runningOrQueued.forEach(name => (this.runRoots[name] = dvcRoot))
     return runningOrQueued
   }

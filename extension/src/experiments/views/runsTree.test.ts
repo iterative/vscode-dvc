@@ -20,13 +20,13 @@ const mockedDisposable = mocked(Disposable)
 const mockedGetDvcRoots = jest.fn()
 const mockedGetExperiment = jest.fn()
 const mockedGetCheckpointNames = jest.fn()
-const mockedGetRunningOrQueued = jest.fn()
+const mockedGetExperimentNames = jest.fn()
 const mockedExperiments = {
   experimentsRowsChanged: mockedExperimentsRowsChanged,
   getCheckpointNames: mockedGetCheckpointNames,
   getDvcRoots: mockedGetDvcRoots,
   getExperiment: mockedGetExperiment,
-  getRunningOrQueued: mockedGetRunningOrQueued,
+  getExperimentNames: mockedGetExperimentNames,
   isReady: () => true
 } as unknown as Experiments
 
@@ -48,7 +48,7 @@ describe('ExperimentsRunsTree', () => {
     it('should return an empty array when no experiments are queued for any of the repositories', async () => {
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetRunningOrQueued.mockReturnValueOnce([])
+      mockedGetExperimentNames.mockReturnValueOnce([])
 
       const rootElements = await experimentsRunsTree.getChildren()
 
@@ -59,9 +59,9 @@ describe('ExperimentsRunsTree', () => {
       const dvcRoots = ['demo', 'and/mock', 'other/repo']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
-      mockedGetRunningOrQueued.mockReturnValueOnce([])
-      mockedGetRunningOrQueued.mockReturnValueOnce([])
-      mockedGetRunningOrQueued.mockReturnValueOnce(['90aea7f'])
+      mockedGetExperimentNames.mockReturnValueOnce([])
+      mockedGetExperimentNames.mockReturnValueOnce([])
+      mockedGetExperimentNames.mockReturnValueOnce(['90aea7f'])
 
       const rootElements = await experimentsRunsTree.getChildren()
 
@@ -71,8 +71,8 @@ describe('ExperimentsRunsTree', () => {
     it('should return an array of queued experiment names when an element is provided', async () => {
       const queuedExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
-      mockedGetRunningOrQueued.mockReturnValueOnce(queuedExperiments)
-      mockedGetRunningOrQueued.mockReturnValueOnce(queuedExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(queuedExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(queuedExperiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       await experimentsRunsTree.getChildren()
@@ -90,8 +90,8 @@ describe('ExperimentsRunsTree', () => {
         '15c9c56'
       ]
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
-      mockedGetRunningOrQueued.mockReturnValueOnce(runningOrQueuedExperiments)
-      mockedGetRunningOrQueued.mockReturnValueOnce(runningOrQueuedExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(runningOrQueuedExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(runningOrQueuedExperiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       await experimentsRunsTree.getChildren()
@@ -117,7 +117,7 @@ describe('ExperimentsRunsTree', () => {
 
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetRunningOrQueued.mockReturnValueOnce([])
+      mockedGetExperimentNames.mockReturnValueOnce([])
 
       await experimentsRunsTree.getChildren()
 
@@ -139,8 +139,8 @@ describe('ExperimentsRunsTree', () => {
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
       const mockedQueuedExperiment = 'f0778b3'
-      mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
-      mockedGetRunningOrQueued.mockReturnValueOnce([mockedQueuedExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedQueuedExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedQueuedExperiment])
       mockedGetExperiment.mockReturnValueOnce({
         queued: true,
         running: false
@@ -168,8 +168,8 @@ describe('ExperimentsRunsTree', () => {
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
       const mockedRunningExperiment = 'workspace'
-      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
 
       await experimentsRunsTree.getChildren()
       await experimentsRunsTree.getChildren('demo')
@@ -195,8 +195,8 @@ describe('ExperimentsRunsTree', () => {
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
       const mockedRunningExperiment = 'f0778b3'
-      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetRunningOrQueued.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
+      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
       mockedGetExperiment.mockReturnValueOnce({
         hasChildren: true,
         running: true

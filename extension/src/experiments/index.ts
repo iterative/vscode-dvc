@@ -107,8 +107,8 @@ export class Experiments {
     return this.getRepository(dvcRoot).getFilter(id)
   }
 
-  public getRunningOrQueued(dvcRoot: string): string[] {
-    return this.getRepository(dvcRoot).getRunningOrQueued()
+  public getExperimentNames(dvcRoot: string): string[] {
+    return this.getRepository(dvcRoot).getExperimentNames()
   }
 
   public getExperiment(dvcRoot: string, name: string) {
