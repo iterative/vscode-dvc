@@ -8,7 +8,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './quickPick'
-import { FilterDefinition } from './filtering'
+import { FilterDefinition, Operator } from './filtering'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 import { getInput } from '../vscode/inputBox'
 
@@ -278,12 +278,20 @@ describe('Column-based QuickPicks', () => {
 
     it('should return the selected filters', async () => {
       const selectedFilters = [
-        { columnPath: epochsColumn.path, operator: '>', value: '2' },
-        { columnPath: epochsColumn.path, operator: '<', value: '8' }
+        {
+          columnPath: epochsColumn.path,
+          operator: Operator.GREATER_THAN,
+          value: '2'
+        },
+        {
+          columnPath: epochsColumn.path,
+          operator: Operator.LESS_THAN,
+          value: '8'
+        }
       ]
       const allFilters = [
         ...selectedFilters,
-        { columnPath: epochsColumn.path, operator: '==', value: '4' }
+        { columnPath: epochsColumn.path, operator: Operator.EQUAL, value: '4' }
       ]
       mockedShowQuickPick.mockResolvedValueOnce(
         selectedFilters.map(filter => ({ value: filter }))

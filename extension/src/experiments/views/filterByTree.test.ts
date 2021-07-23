@@ -128,7 +128,7 @@ describe('ExperimentsFilterByTree', () => {
       await experimentsFilterByTree.getChildren()
       const item = experimentsFilterByTree.getTreeItem(dvcRoot)
 
-      expect(item).toEqual(mockedItem)
+      expect(item).toEqual({ ...mockedItem, contextValue: 'dvcFilterRoot' })
     })
 
     it('should return a tree item for a filter', async () => {
