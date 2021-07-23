@@ -114,10 +114,11 @@ export class ExperimentsModel {
     return this.columnStatus[path]
   }
 
-  public getRunningOrQueued(): string[] {
-    return [this.workspace, ...this.getExperiments()]
-      .filter(experiment => experiment?.queued || experiment?.running)
-      .map(experiment => experiment.displayName)
+  public getExperimentNames(): string[] {
+    const workspace = this.workspace.running ? [this.workspace] : []
+    return [...workspace, ...this.getExperiments()].map(
+      experiment => experiment?.displayName
+    )
   }
 
   public getExperiment(name: string) {
