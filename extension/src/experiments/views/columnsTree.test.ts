@@ -65,7 +65,7 @@ beforeEach(() => {
 
 describe('ExperimentsColumnsTree', () => {
   describe('getChildren', () => {
-    it('should return the experiments roots if no path is provided', async () => {
+    it('should return the experiments roots if there are multiple repositories and no path is provided', async () => {
       const experimentsColumnsTree = new ExperimentsColumnsTree(
         mockedExperiments,
         mockedResourceLocator
@@ -78,6 +78,28 @@ describe('ExperimentsColumnsTree', () => {
       mockedGetDvcRoots.mockReturnValueOnce(mockedDvcRoots)
 
       expect(await experimentsColumnsTree.getChildren()).toEqual(mockedDvcRoots)
+    })
+
+    it('should return the params and metrics if there is only a single repository and no path is provided', async () => {
+      const experimentsColumnsTree = new ExperimentsColumnsTree(
+        mockedExperiments,
+        mockedResourceLocator
+      )
+      const mockedDvcRoot = join('path', 'to', 'only', 'root')
+
+      mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
+      mockedGetChildColumns.mockReturnValueOnce(
+        complexColumnData.filter(column =>
+          ['metrics', 'params'].includes(column.parentPath)
+        )
+      )
+
+      const children = await experimentsColumnsTree.getChildren()
+
+      expect(children).toEqual([
+        join(mockedDvcRoot, 'params', 'params.yaml'),
+        join(mockedDvcRoot, 'metrics', 'summary.json')
+      ])
     })
 
     it("should return the column's children if a path is provided", async () => {
