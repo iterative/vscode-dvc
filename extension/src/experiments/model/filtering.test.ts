@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { filterExperiments, Operator } from './filtering'
-import { Experiment } from './webview/contract'
+import { Experiment } from '../webview/contract'
 
 describe('filterExperiments', () => {
   const paramsFile = 'params.yaml'

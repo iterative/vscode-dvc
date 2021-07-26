@@ -12,7 +12,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { getFilterId } from '../filtering'
+import { getFilterId } from '../model/filtering'
 
 export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()

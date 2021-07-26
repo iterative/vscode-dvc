@@ -1,10 +1,10 @@
 import { join } from 'path'
-import { Experiment, ParamsOrMetrics } from './webview/contract'
 import {
   ExperimentsAccumulator,
   PartialColumnDescriptor,
   PartialColumnsMap
 } from './accumulator'
+import { Experiment, ParamsOrMetrics } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
@@ -13,7 +13,7 @@ import {
   Value,
   ValueTree,
   ValueTreeRoot
-} from '../cli/reader'
+} from '../../cli/reader'
 
 const getValueType = (value: Value | ValueTree) => {
   if (value === null) {

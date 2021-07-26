@@ -8,7 +8,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './quickPick'
-import { FilterDefinition, Operator } from './filtering'
+import { FilterDefinition, Operator } from './model/filtering'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 import { getInput } from '../vscode/inputBox'
 

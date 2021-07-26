@@ -1,5 +1,4 @@
 import { Disposable } from '@hediet/std/disposable'
-import { ColumnData, Experiment, RowData, TableData } from './webview/contract'
 import { SortDefinition, sortRows } from './sorting'
 import {
   FilterDefinition,
@@ -8,8 +7,9 @@ import {
   getFilterId
 } from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { definedAndNonEmpty, flatten } from '../util/array'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { ColumnData, Experiment, RowData, TableData } from '../webview/contract'
+import { definedAndNonEmpty, flatten } from '../../util/array'
+import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 export enum ColumnStatus {
   selected = 2,

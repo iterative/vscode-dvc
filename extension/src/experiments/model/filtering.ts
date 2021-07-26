@@ -1,7 +1,7 @@
 import { sep } from 'path'
 import get from 'lodash.get'
-import { Experiment } from './webview/contract'
-import { definedAndNonEmpty } from '../util/array'
+import { Experiment } from '../webview/contract'
+import { definedAndNonEmpty } from '../../util/array'
 
 export enum Operator {
   EQUAL = '==',

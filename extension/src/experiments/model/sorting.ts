@@ -1,6 +1,6 @@
 import { sep } from 'path'
 import get from 'lodash.get'
-import { Experiment } from './webview/contract'
+import { Experiment } from '../webview/contract'
 
 export interface SortDefinition {
   descending: boolean
