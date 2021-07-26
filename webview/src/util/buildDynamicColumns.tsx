@@ -1,7 +1,7 @@
 import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor } from 'react-table'
-import { Experiment, ColumnData } from 'dvc/src/experiments/webview/contract'
+import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 
 type Value = string | number
@@ -31,7 +31,7 @@ const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
     get(originalRow, pathArray)
 
 const buildDynamicColumns = (
-  properties: ColumnData[],
+  properties: ParamOrMetric[],
   parentPath: string
 ): Column<Experiment>[] =>
   properties

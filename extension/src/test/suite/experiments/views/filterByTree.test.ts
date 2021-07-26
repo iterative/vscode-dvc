@@ -82,12 +82,14 @@ suite('Experiments Test Suite', () => {
       const lossPath = 'metrics/summary.json/loss'
 
       const lossFilter = {
-        columnPath: lossPath,
         operator: Operator.LESS_THAN_OR_EQUAL,
+        path: lossPath,
         value: '1.6170'
       }
 
-      const loss = complexColumnData.find(column => column.path === lossPath)
+      const loss = complexColumnData.find(
+        paramOrMetric => paramOrMetric.path === lossPath
+      )
       mockShowQuickPick
         .onFirstCall()
         .resolves({ value: loss } as unknown as QuickPickItem)
@@ -191,7 +193,9 @@ suite('Experiments Test Suite', () => {
 
       const lossPath = 'metrics/summary.json/loss'
 
-      const loss = complexColumnData.find(column => column.path === lossPath)
+      const loss = complexColumnData.find(
+        paramOrMetric => paramOrMetric.path === lossPath
+      )
       mockShowQuickPick
         .onFirstCall()
         .resolves({ value: loss } as unknown as QuickPickItem)
@@ -233,12 +237,12 @@ suite('Experiments Test Suite', () => {
           {
             description: '< 2',
             label: lossPath,
-            value: { columnPath: lossPath, operator: '<', value: '2' }
+            value: { operator: '<', path: lossPath, value: '2' }
           },
           {
             description: '> 0',
             label: lossPath,
-            value: { columnPath: lossPath, operator: '>', value: '0' }
+            value: { operator: '>', path: lossPath, value: '0' }
           }
         ],
         { canPickMany: true, title: 'Select filter(s) to remove' }

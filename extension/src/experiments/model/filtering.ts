@@ -13,7 +13,7 @@ export enum Operator {
 }
 
 export interface FilterDefinition {
-  columnPath: string
+  path: string
   operator: Operator
   value: string | number
 }
@@ -49,8 +49,8 @@ const buildFilter =
   ): ((experiment: Experiment) => boolean) =>
   experiment => {
     const firstFailure = filterDefinitions.find(filter => {
-      const columnPathArray = filter.columnPath.split(sep)
-      const value = get(experiment, columnPathArray)
+      const pathArray = filter.path.split(sep)
+      const value = get(experiment, pathArray)
 
       return !evaluate<typeof value>(value, filter.operator, filter.value)
     })
@@ -58,7 +58,7 @@ const buildFilter =
   }
 
 export const getFilterId = (filter: FilterDefinition): string =>
-  [filter.columnPath, filter.operator, filter.value].join('')
+  [filter.path, filter.operator, filter.value].join('')
 
 export const filterExperiments = (
   filterDefinitions: FilterDefinition[],
