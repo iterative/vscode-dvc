@@ -14,7 +14,7 @@ import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { ColumnData } from '../../../experiments/webview/contract'
+import { ParamOrMetric } from '../../../experiments/webview/contract'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -323,7 +323,7 @@ suite('Experiments Repository Test Suite', () => {
       value: {
         path: 'params/params.yaml/test'
       }
-    } as QuickPickItemWithValue<ColumnData>)
+    } as QuickPickItemWithValue<ParamOrMetric>)
 
     stubbedShowQuickPick.onSecondCall().resolves({
       label: 'Ascending',

@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  ColumnData,
+  ParamOrMetric,
   RowData as Experiment,
   TableData
 } from 'dvc/src/experiments/webview/contract'
@@ -32,7 +32,7 @@ const countRowsAndAddIndexes: (
   return index
 }
 
-const getColumns = (columns: ColumnData[]): Column<Experiment>[] =>
+const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
   [
     {
       Header: 'Experiment',

@@ -1,8 +1,8 @@
 import { join } from 'path'
 import {
   ExperimentsAccumulator,
-  PartialColumnDescriptor,
-  PartialColumnsMap
+  PartialParamOrMetricDescriptor,
+  PartialParamsOrMetricsMap
 } from './accumulator'
 import { Experiment, ParamsOrMetrics } from '../webview/contract'
 import {
@@ -23,102 +23,94 @@ const getValueType = (value: Value | ValueTree) => {
 }
 
 const getEntryOrDefault = (
-  originalColumnsMap: PartialColumnsMap,
+  originalMap: PartialParamsOrMetricsMap,
   propertyKey: string,
   ancestors: string[]
 ) =>
-  originalColumnsMap.get(propertyKey) || {
+  originalMap.get(propertyKey) || {
     group: ancestors[0],
     hasChildren: false,
     parentPath: join(...ancestors),
-    path: join(...ancestors, propertyKey)
+    path: join(...ancestors, propertyKey),
+    types: new Set<string>()
   }
 
-const mergeNumberColumn = (
-  columnDescriptor: PartialColumnDescriptor,
+const mergeNumberParamOrMetric = (
+  descriptor: PartialParamOrMetricDescriptor,
   newNumber: number
 ): void => {
-  const { maxNumber, minNumber } = columnDescriptor
+  const { maxNumber, minNumber } = descriptor
   if (maxNumber === undefined || maxNumber < newNumber) {
-    columnDescriptor.maxNumber = newNumber
+    descriptor.maxNumber = newNumber
   }
   if (minNumber === undefined || minNumber > newNumber) {
-    columnDescriptor.minNumber = newNumber
+    descriptor.minNumber = newNumber
   }
 }
 
-const mergePrimitiveColumn = (
-  columnDescriptor: PartialColumnDescriptor,
+const mergePrimitiveParamOrMetric = (
+  descriptor: PartialParamOrMetricDescriptor,
   newValue: Value,
   newValueType: string
-): PartialColumnDescriptor => {
-  const { maxStringLength } = columnDescriptor
+): PartialParamOrMetricDescriptor => {
+  const { maxStringLength } = descriptor
 
   const stringifiedAddition = String(newValue)
   const additionStringLength = stringifiedAddition.length
   if (maxStringLength === undefined || maxStringLength < additionStringLength) {
-    columnDescriptor.maxStringLength = additionStringLength
+    descriptor.maxStringLength = additionStringLength
   }
 
   if (newValueType === 'number') {
-    mergeNumberColumn(columnDescriptor, newValue as number)
+    mergeNumberParamOrMetric(descriptor, newValue as number)
   }
 
-  return columnDescriptor as PartialColumnDescriptor
+  return descriptor as PartialParamOrMetricDescriptor
 }
 
-const mergeColumnsMap = (
-  originalColumnsMap: PartialColumnsMap,
+const mergeParamsOrMetricsMap = (
+  originalMap: PartialParamsOrMetricsMap,
   valueTree: ValueTree,
   ...ancestors: string[]
-): PartialColumnsMap => {
+): PartialParamsOrMetricsMap => {
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
-    originalColumnsMap.set(
+    originalMap.set(
       propertyKey,
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      mergeOrCreateColumnDescriptor(
-        originalColumnsMap,
+      mergeOrCreateDescriptor(
+        originalMap,
         propertyKey,
         propertyValue,
         ...ancestors
       )
     )
   }
-  return originalColumnsMap
+  return originalMap
 }
-
-const mergeOrCreateColumnDescriptor = (
-  originalColumnsMap: PartialColumnsMap,
+const mergeOrCreateDescriptor = (
+  originalMap: PartialParamsOrMetricsMap,
   propertyKey: string,
   newValue: Value | ValueTree,
   ...ancestors: string[]
-): PartialColumnDescriptor => {
+): PartialParamOrMetricDescriptor => {
   const newValueType = getValueType(newValue)
 
-  const columnDescriptor = getEntryOrDefault(
-    originalColumnsMap,
-    propertyKey,
-    ancestors
-  )
+  const descriptor = getEntryOrDefault(originalMap, propertyKey, ancestors)
 
   if (newValueType === 'object') {
-    mergeColumnsMap(
-      originalColumnsMap,
+    mergeParamsOrMetricsMap(
+      originalMap,
       newValue as ValueTree,
       ...ancestors,
       propertyKey
     )
-    columnDescriptor.hasChildren = true
-    return columnDescriptor as PartialColumnDescriptor
+    descriptor.hasChildren = true
+    return descriptor as PartialParamOrMetricDescriptor
   } else {
-    if (!columnDescriptor.types) {
-      columnDescriptor.types = new Set()
-    }
-    const { types } = columnDescriptor
-    types.add(newValueType)
-    return mergePrimitiveColumn(
-      columnDescriptor,
+    descriptor.types.add(newValueType)
+    return mergePrimitiveParamOrMetric(
+      descriptor,
       newValue as Value,
       newValueType
     )
@@ -139,17 +131,17 @@ const addToMapArray = <K = string, V = unknown>(
   }
 }
 
-const collectColumnsFromExperiment = (
+const collectParamsAndMetrics = (
   acc: ExperimentsAccumulator,
   experiment: Experiment
 ) => {
   const { paramsMap, metricsMap } = acc
   const { params, metrics } = experiment
   if (params) {
-    mergeColumnsMap(paramsMap, params, 'params')
+    mergeParamsOrMetricsMap(paramsMap, params, 'params')
   }
   if (metrics) {
-    mergeColumnsMap(metricsMap, metrics, 'metrics')
+    mergeParamsOrMetricsMap(metricsMap, metrics, 'metrics')
   }
 }
 
@@ -236,7 +228,7 @@ const collectFromExperimentsObject = (
     const experiment = transformExperimentData(sha, experimentData)
 
     if (experiment) {
-      collectColumnsFromExperiment(acc, experiment)
+      collectParamsAndMetrics(acc, experiment)
       collectExperimentOrCheckpoint(acc, experiment, branchName)
     }
   }
@@ -252,7 +244,7 @@ const collectFromBranchesObject = (
     const branch = transformExperimentData(branchSha, baseline)
 
     if (branch) {
-      collectColumnsFromExperiment(acc, branch)
+      collectParamsAndMetrics(acc, branch)
       collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
 
       acc.branches.push(branch)
@@ -273,7 +265,7 @@ export const collectFromRepo = (
   const acc = new ExperimentsAccumulator(workspaceBaseline)
 
   if (workspaceBaseline) {
-    collectColumnsFromExperiment(acc, workspaceBaseline)
+    collectParamsAndMetrics(acc, workspaceBaseline)
   }
 
   collectFromBranchesObject(acc, branchesObject)
