@@ -1,4 +1,4 @@
-import { ColumnAggregateData, Experiment } from './webview/contract'
+import { ColumnAggregateData, Experiment } from '../webview/contract'
 export interface PartialColumnDescriptor extends ColumnAggregateData {
   types?: Set<string>
   hasChildren: boolean

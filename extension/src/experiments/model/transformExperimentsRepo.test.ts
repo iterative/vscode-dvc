@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ColumnData, Experiment } from './webview/contract'
+import { ColumnData, Experiment } from '../webview/contract'
 
 const paramsYaml = 'params.yaml'
 

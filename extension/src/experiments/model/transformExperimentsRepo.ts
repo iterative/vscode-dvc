@@ -1,7 +1,7 @@
 import { collectFromRepo } from './collectFromRepo'
 import { transformAndCollectFromColumnsIfAny } from './transformColumns'
-import { ColumnData, Experiment } from './webview/contract'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { ColumnData, Experiment } from '../webview/contract'
+import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 interface TransformedExperiments {
   columns: ColumnData[]

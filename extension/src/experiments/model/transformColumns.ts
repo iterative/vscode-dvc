@@ -1,5 +1,5 @@
 import { PartialColumnDescriptor, PartialColumnsMap } from './accumulator'
-import { ColumnData } from './webview/contract'
+import { ColumnData } from '../webview/contract'
 
 const columnFromMapEntry = (
   entry: [string, PartialColumnDescriptor]

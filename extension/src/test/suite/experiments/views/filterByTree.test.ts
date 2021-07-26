@@ -15,7 +15,7 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { CliRunner } from '../../../../cli/runner'
 import { InternalCommands } from '../../../../internalCommands'
 import { ExperimentsFilterByTree } from '../../../../experiments/views/filterByTree'
-import { getFilterId, Operator } from '../../../../experiments/filtering'
+import { getFilterId, Operator } from '../../../../experiments/model/filtering'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
