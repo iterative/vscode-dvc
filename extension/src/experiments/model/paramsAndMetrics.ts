@@ -68,6 +68,13 @@ export class ParamsAndMetrics {
     return this.status[path]
   }
 
+  public getTerminalNodeStatuses() {
+    const terminalNodes = this.getTerminalNodes()
+    return terminalNodes
+      .map(paramOrMetric => this.status[paramOrMetric.path])
+      .filter(paramOrMetric => paramOrMetric !== undefined)
+  }
+
   private setAreChildrenSelected(path: string, status: Status) {
     return this.getChildren(path)?.map(paramOrMetric => {
       const path = paramOrMetric.path

@@ -6,6 +6,7 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
+  TreeView,
   Uri,
   window
 } from 'vscode'
@@ -13,6 +14,7 @@ import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
 import { ParamOrMetric } from '../webview/contract'
 import { Status } from '../model/paramsAndMetrics'
+import { flatten } from '../../util/array'
 
 export class ExperimentsParamsAndMetricsTree
   implements TreeDataProvider<string>
@@ -25,12 +27,14 @@ export class ExperimentsParamsAndMetricsTree
   private readonly resourceLocator: ResourceLocator
   private pathRoots: Record<string, string> = {}
 
+  private view: TreeView<string>
+
   constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
 
-    this.dispose.track(
+    this.view = this.dispose.track(
       window.createTreeView('dvc.views.experimentsParamsAndMetricsTree', {
         canSelectMany: true,
         showCollapseAll: true,
@@ -49,6 +53,8 @@ export class ExperimentsParamsAndMetricsTree
         }
       )
     )
+
+    this.updateDescriptionOnChange()
   }
 
   public getTreeItem(element: string): TreeItem {
@@ -91,6 +97,24 @@ export class ExperimentsParamsAndMetricsTree
     }
 
     return this.getRootElements()
+  }
+
+  private updateDescriptionOnChange() {
+    this.dispose.track(
+      this.onDidChangeTreeData(() => {
+        const dvcRoots = this.experiments.getDvcRoots()
+        const statuses = flatten<Status>(
+          dvcRoots.map(dvcRoot =>
+            this.experiments.getParamsAndMetricsStatuses(dvcRoot)
+          )
+        )
+        this.view.description = `${
+          statuses.filter(status =>
+            [Status.selected, Status.indeterminate].includes(status)
+          ).length
+        } of ${statuses.length}`
+      })
+    )
   }
 
   private async getRootElements() {
