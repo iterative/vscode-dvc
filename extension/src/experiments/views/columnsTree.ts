@@ -12,7 +12,7 @@ import {
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
 import { ColumnData } from '../webview/contract'
-import { ColumnStatus } from '../model'
+import { ColumnStatus } from '../model/columns'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()

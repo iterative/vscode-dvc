@@ -7,28 +7,21 @@ import {
   getFilterId
 } from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ColumnData, Experiment, RowData, TableData } from '../webview/contract'
+import { Columns } from './columns'
+import { Experiment, RowData, TableData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-
-export enum ColumnStatus {
-  selected = 2,
-  indeterminate = 1,
-  unselected = 0
-}
 
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
   private workspace = {} as Experiment
-  private columnData: ColumnData[] = []
+  private columns = new Columns()
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
 
   private filters: Map<string, FilterDefinition> = new Map()
-
-  private columnStatus: Record<string, ColumnStatus> = {}
 
   private currentSort?: SortDefinition
 
@@ -41,13 +34,8 @@ export class ExperimentsModel {
       workspace
     } = transformExperimentsRepo(data)
 
-    columns.forEach(column => {
-      if (this.columnStatus[column.path] === undefined) {
-        this.columnStatus[column.path] = ColumnStatus.selected
-      }
-    })
+    this.columns.update(columns)
 
-    this.columnData = columns
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
@@ -79,39 +67,23 @@ export class ExperimentsModel {
   }
 
   public getColumns() {
-    return this.columnData
+    return this.columns.getColumns()
   }
 
   public getTerminalNodeColumns() {
-    return this.columnData.filter(column => !column.hasChildren)
+    return this.columns.getTerminalNodeColumns()
   }
 
   public getColumn(path: string) {
-    const column = this.columnData?.find(column => column.path === path)
-    if (column) {
-      return {
-        ...column,
-        descendantMetadata: this.getDescendantMetaData(column),
-        status: this.columnStatus[column.path]
-      }
-    }
+    return this.columns.getColumn(path)
   }
 
   public getChildColumns(path: string) {
-    return this.columnData?.filter(column =>
-      path
-        ? column.parentPath === path
-        : ['metrics', 'params'].includes(column.parentPath)
-    )
+    return this.columns.getChildColumns(path)
   }
 
   public toggleColumnStatus(path: string) {
-    const status = this.getNextStatus(path)
-    this.columnStatus[path] = status
-    this.setAreParentsSelected(path)
-    this.setAreChildrenSelected(path, status)
-
-    return this.columnStatus[path]
+    return this.columns.toggleColumnStatus(path)
   }
 
   public getExperimentNames(): string[] {
@@ -148,10 +120,7 @@ export class ExperimentsModel {
 
   public getTableData(): TableData {
     return {
-      columns:
-        this.columnData?.filter(
-          column => this.columnStatus[column.path] !== ColumnStatus.unselected
-        ) || [],
+      columns: this.columns.getSelected(),
       rows: this.getRowData()
     }
   }
@@ -212,80 +181,5 @@ export class ExperimentsModel {
 
   private getExperiments() {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
-  }
-
-  private setAreChildrenSelected(path: string, status: ColumnStatus) {
-    return this.getChildColumns(path)?.map(column => {
-      const path = column.path
-      this.columnStatus[path] = status
-      this.setAreChildrenSelected(path, status)
-    })
-  }
-
-  private setAreParentsSelected(path: string) {
-    const changedColumn = this.getColumn(path)
-    if (!changedColumn) {
-      return
-    }
-    const parent = this.getColumn(changedColumn.parentPath)
-    if (!parent) {
-      return
-    }
-
-    const parentPath = parent.path
-
-    const status = this.getStatus(parentPath)
-    this.columnStatus[parentPath] = status
-    this.setAreParentsSelected(parentPath)
-  }
-
-  private getStatus(parentPath: string) {
-    const statuses = this.getDescendantsStatuses(parentPath)
-
-    const isAnyChildSelected = statuses.includes(ColumnStatus.selected)
-    const isAnyChildUnselected = statuses.includes(ColumnStatus.unselected)
-
-    if (isAnyChildSelected && isAnyChildUnselected) {
-      return ColumnStatus.indeterminate
-    }
-
-    if (!isAnyChildUnselected) {
-      return ColumnStatus.selected
-    }
-
-    return ColumnStatus.unselected
-  }
-
-  private getDescendantsStatuses(parentPath: string): ColumnStatus[] {
-    const nestedStatuses = (this.getChildColumns(parentPath) || []).map(
-      column => {
-        const descendantsStatuses = column.hasChildren
-          ? this.getDescendantsStatuses(column.path)
-          : []
-        return [this.columnStatus[column.path], ...descendantsStatuses]
-      }
-    )
-
-    return flatten<ColumnStatus>(nestedStatuses)
-  }
-
-  private getNextStatus(path: string) {
-    const status = this.columnStatus[path]
-    if (status === ColumnStatus.selected) {
-      return ColumnStatus.unselected
-    }
-    return ColumnStatus.selected
-  }
-
-  private getDescendantMetaData(column: ColumnData) {
-    if (!column.hasChildren) {
-      return
-    }
-    const statuses = this.getDescendantsStatuses(column.path)
-    return `${
-      statuses.filter(status =>
-        [ColumnStatus.selected, ColumnStatus.indeterminate].includes(status)
-      ).length
-    }/${statuses.length}`
   }
 }
