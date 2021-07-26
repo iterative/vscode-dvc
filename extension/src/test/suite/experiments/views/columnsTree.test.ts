@@ -8,7 +8,7 @@ import complexExperimentsOutput from '../../../../experiments/webview/complex-ou
 import { ExperimentsColumnsTree } from '../../../../experiments/views/columnsTree'
 import { Experiments } from '../../../../experiments'
 import { ExperimentsRepository } from '../../../../experiments/repository'
-import { ColumnStatus } from '../../../../experiments/model/columns'
+import { Status } from '../../../../experiments/model/paramsAndMetrics'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
@@ -50,7 +50,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('experimentsColumnsTree', () => {
-    it('should be able to toggle whether an experiments column is selected with dvc.views.experimentsColumnsTree.toggleStatus', async () => {
+    it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsColumnsTree.toggleStatus', async () => {
       const relPath = join('params', paramsFile, 'learning_rate')
       const absPath = join(dvcDemoPath, relPath)
 
@@ -88,18 +88,18 @@ suite('Extension Test Suite', () => {
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
-      expect(isUnselected).to.equal(ColumnStatus.unselected)
+      expect(isUnselected).to.equal(Status.unselected)
 
       const isSelected = await commands.executeCommand(toggleCommand, absPath)
 
-      expect(isSelected).to.equal(ColumnStatus.selected)
+      expect(isSelected).to.equal(Status.selected)
 
       const isUnselectedAgain = await commands.executeCommand(
         toggleCommand,
         absPath
       )
 
-      expect(isUnselectedAgain).to.equal(ColumnStatus.unselected)
+      expect(isUnselectedAgain).to.equal(Status.unselected)
     })
 
     it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
@@ -139,37 +139,39 @@ suite('Extension Test Suite', () => {
       )
 
       const selectedChildren =
-        experimentsRepository.getChildColumns(relPath) || []
+        experimentsRepository.getChildParamsOrMetrics(relPath) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
       const selectedGrandChildren =
-        experimentsRepository.getChildColumns(join(relPath, 'process')) || []
+        experimentsRepository.getChildParamsOrMetrics(
+          join(relPath, 'process')
+        ) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
       const allChildren = [...selectedChildren, ...selectedGrandChildren]
 
-      allChildren.map(column =>
-        expect(experimentsRepository.getColumn(column.path)?.status).to.equal(
-          ColumnStatus.selected
-        )
+      allChildren.map(paramOrMetric =>
+        expect(
+          experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
+        ).to.equal(Status.selected)
       )
 
       expect(
-        experimentsRepository.getColumn(relPath)?.descendantMetadata
+        experimentsRepository.getParamOrMetric(relPath)?.descendantMetadata
       ).to.equal('8/8')
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
-      expect(isUnselected).to.equal(ColumnStatus.unselected)
+      expect(isUnselected).to.equal(Status.unselected)
 
-      allChildren.map(column =>
-        expect(experimentsRepository.getColumn(column.path)?.status).to.equal(
-          isUnselected
-        )
+      allChildren.map(paramOrMetric =>
+        expect(
+          experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
+        ).to.equal(isUnselected)
       )
 
       expect(
-        experimentsRepository.getColumn(relPath)?.descendantMetadata
+        experimentsRepository.getParamOrMetric(relPath)?.descendantMetadata
       ).to.equal('0/8')
     })
   })
@@ -207,11 +209,11 @@ suite('Extension Test Suite', () => {
     )
 
     const selectedChildren =
-      experimentsRepository.getChildColumns(grandParentPath) || []
+      experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
     expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
     const selectedGrandChildren =
-      experimentsRepository.getChildColumns(parentPath) || []
+      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
     expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
     const allColumns = [
@@ -222,10 +224,10 @@ suite('Extension Test Suite', () => {
 
     await commands.executeCommand(toggleCommand, absPath)
 
-    allColumns.map(column =>
-      expect(experimentsRepository.getColumn(column.path)?.status).to.equal(
-        ColumnStatus.unselected
-      )
+    allColumns.map(paramOrMetric =>
+      expect(
+        experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
+      ).to.equal(Status.unselected)
     )
 
     const [firstGrandChild] = selectedGrandChildren
@@ -235,14 +237,15 @@ suite('Extension Test Suite', () => {
       join(dvcDemoPath, firstGrandChild.path)
     )
 
-    expect(isSelected).to.equal(ColumnStatus.selected)
+    expect(isSelected).to.equal(Status.selected)
 
-    const parentColumn = experimentsRepository.getColumn(parentPath)
-    expect(parentColumn?.status).to.equal(ColumnStatus.indeterminate)
+    const parentColumn = experimentsRepository.getParamOrMetric(parentPath)
+    expect(parentColumn?.status).to.equal(Status.indeterminate)
     expect(parentColumn?.descendantMetadata).to.equal('1/2')
 
-    const grandParentColumn = experimentsRepository.getColumn(grandParentPath)
-    expect(grandParentColumn?.status).to.equal(ColumnStatus.indeterminate)
+    const grandParentColumn =
+      experimentsRepository.getParamOrMetric(grandParentPath)
+    expect(grandParentColumn?.status).to.equal(Status.indeterminate)
     expect(grandParentColumn?.descendantMetadata).to.equal('2/8')
   })
 
@@ -279,7 +282,7 @@ suite('Extension Test Suite', () => {
     )
 
     const selectedGrandChildren =
-      experimentsRepository.getChildColumns(parentPath) || []
+      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
     expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
     await commands.executeCommand(toggleCommand, absPath)
@@ -293,24 +296,25 @@ suite('Extension Test Suite', () => {
       join(dvcDemoPath, firstGrandChild.path)
     )
 
-    expect(isSelected).to.equal(ColumnStatus.selected)
+    expect(isSelected).to.equal(Status.selected)
 
     expect(
-      experimentsRepository.getColumn(secondGrandChild.path)?.status
-    ).to.equal(ColumnStatus.unselected)
+      experimentsRepository.getParamOrMetric(secondGrandChild.path)?.status
+    ).to.equal(Status.unselected)
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
       join(dvcDemoPath, firstGrandChild.path)
     )
 
-    expect(lastSelectedIsUnselected).to.equal(ColumnStatus.unselected)
+    expect(lastSelectedIsUnselected).to.equal(Status.unselected)
 
-    const parentColumn = experimentsRepository.getColumn(parentPath)
+    const parentColumn = experimentsRepository.getParamOrMetric(parentPath)
     expect(parentColumn?.status).to.equal(lastSelectedIsUnselected)
     expect(parentColumn?.descendantMetadata).to.equal('0/2')
 
-    const grandParentColumn = experimentsRepository.getColumn(grandParentPath)
+    const grandParentColumn =
+      experimentsRepository.getParamOrMetric(grandParentPath)
     expect(grandParentColumn?.status).to.equal(lastSelectedIsUnselected)
     expect(grandParentColumn?.descendantMetadata).to.equal('0/8')
   })

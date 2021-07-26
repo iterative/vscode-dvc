@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ColumnData, Experiment } from '../webview/contract'
+import { ParamOrMetric, Experiment } from '../webview/contract'
 
 const paramsYaml = 'params.yaml'
 
@@ -97,9 +97,9 @@ describe('branch and checkpoint nesting', () => {
   })
 })
 
-describe('metrics/params column schema builder', () => {
+describe('metrics/params schema builder', () => {
   it('Outputs both params and metrics when both are present', () => {
-    const { columns } = transformExperimentsRepo({
+    const { paramsAndMetrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           data: {
@@ -119,14 +119,18 @@ describe('metrics/params column schema builder', () => {
         }
       }
     })
-    const params = columns.find(column => column.group === 'params')
-    const metrics = columns.find(column => column.group === 'metrics')
+    const params = paramsAndMetrics.find(
+      paramOrMetric => paramOrMetric.group === 'params'
+    )
+    const metrics = paramsAndMetrics.find(
+      paramOrMetric => paramOrMetric.group === 'metrics'
+    )
     expect(params).toBeDefined()
     expect(metrics).toBeDefined()
   })
 
   it('Omits params when none exist in the source data', () => {
-    const { columns } = transformExperimentsRepo({
+    const { paramsAndMetrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           data: {
@@ -139,24 +143,28 @@ describe('metrics/params column schema builder', () => {
         }
       }
     })
-    const params = columns.find(column => column.group === 'params')
-    const metrics = columns.find(column => column.group === 'metrics')
+    const params = paramsAndMetrics.find(
+      paramOrMetric => paramOrMetric.group === 'params'
+    )
+    const metrics = paramsAndMetrics.find(
+      paramOrMetric => paramOrMetric.group === 'metrics'
+    )
     expect(params).toBeUndefined()
     expect(metrics).toBeDefined()
   })
 
   it('returns an empty array if no params and metrics are provided', () => {
-    const { columns } = transformExperimentsRepo({
+    const { paramsAndMetrics } = transformExperimentsRepo({
       workspace: {
         baseline: {}
       }
     })
-    expect(columns).toEqual([])
+    expect(paramsAndMetrics).toEqual([])
   })
 
-  describe('minimal mixed column example', () => {
+  describe('minimal mixed param example', () => {
     const exampleBigNumber = 3000000000
-    const { columns } = transformExperimentsRepo({
+    const { paramsAndMetrics } = transformExperimentsRepo({
       branchA: {
         baseline: {
           data: {
@@ -201,12 +209,12 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const exampleMixedColumn = columns.find(
-      column => column.parentPath === join('params', paramsYaml)
-    ) as ColumnData
+    const exampleMixedParam = paramsAndMetrics.find(
+      paramOrMetric => paramOrMetric.parentPath === join('params', paramsYaml)
+    ) as ParamOrMetric
 
     it('correctly identifies mixed type params', () => {
-      expect(exampleMixedColumn.types).toEqual([
+      expect(exampleMixedParam.types).toEqual([
         'number',
         'string',
         'boolean',
@@ -214,18 +222,18 @@ describe('metrics/params column schema builder', () => {
       ])
     })
 
-    it('correctly identifies a number as the highest string length of a mixed column', () => {
-      expect(exampleMixedColumn.maxStringLength).toEqual(10)
+    it('correctly identifies a number as the highest string length of a mixed param', () => {
+      expect(exampleMixedParam.maxStringLength).toEqual(10)
     })
 
     it('adds a highest and lowest number from the one present', () => {
-      expect(exampleMixedColumn.maxNumber).toEqual(exampleBigNumber)
-      expect(exampleMixedColumn.minNumber).toEqual(exampleBigNumber)
+      expect(exampleMixedParam.maxNumber).toEqual(exampleBigNumber)
+      expect(exampleMixedParam.minNumber).toEqual(exampleBigNumber)
     })
   })
 
-  it('finds different minNumber and maxNumber on a mixed column', () => {
-    const { columns } = transformExperimentsRepo({
+  it('finds different minNumber and maxNumber on a mixed param', () => {
+    const { paramsAndMetrics } = transformExperimentsRepo({
       branch1: {
         baseline: {
           data: {
@@ -268,16 +276,17 @@ describe('metrics/params column schema builder', () => {
         baseline: {}
       }
     })
-    const mixedColumn = columns.find(
-      column => column.path === join('params', paramsYaml, 'mixedNumber')
-    ) as ColumnData
+    const mixedParam = paramsAndMetrics.find(
+      paramOrMetric =>
+        paramOrMetric.path === join('params', paramsYaml, 'mixedNumber')
+    ) as ParamOrMetric
 
-    expect(mixedColumn.minNumber).toEqual(-1)
-    expect(mixedColumn.maxNumber).toEqual(1)
+    expect(mixedParam.minNumber).toEqual(-1)
+    expect(mixedParam.maxNumber).toEqual(1)
   })
 
   describe('Number features', () => {
-    const { columns } = transformExperimentsRepo({
+    const { paramsAndMetrics } = transformExperimentsRepo({
       branch1: {
         baseline: {
           data: {
@@ -311,31 +320,31 @@ describe('metrics/params column schema builder', () => {
         baseline: {}
       }
     })
-    const paramsFileColumn = columns.filter(
-      column => column.group === 'params'
-    ) as ColumnData[]
-    const [columnWithNumbers, columnWithoutNumbers] = paramsFileColumn
+    const param = paramsAndMetrics.filter(
+      paramOrMetric => paramOrMetric.group === 'params'
+    ) as ParamOrMetric[]
+    const [paramWithNumbers, paramWithoutNumbers] = param
 
-    it('does not add maxNumber or minNumber on a column with no numbers', () => {
-      expect(columnWithoutNumbers.minNumber).toBeUndefined()
-      expect(columnWithoutNumbers.maxNumber).toBeUndefined()
+    it('does not add maxNumber or minNumber on a param with no numbers', () => {
+      expect(paramWithoutNumbers.minNumber).toBeUndefined()
+      expect(paramWithoutNumbers.maxNumber).toBeUndefined()
     })
 
     it('finds the min number of -1', () => {
-      expect(columnWithNumbers.minNumber).toEqual(-1)
+      expect(paramWithNumbers.minNumber).toEqual(-1)
     })
 
     it('finds the max number of 2', () => {
-      expect(columnWithNumbers.maxNumber).toEqual(2)
+      expect(paramWithNumbers.maxNumber).toEqual(2)
     })
 
     it('finds a max string length of two from -1', () => {
-      expect(columnWithNumbers.maxStringLength).toEqual(2)
+      expect(paramWithNumbers.maxStringLength).toEqual(2)
     })
   })
 
   it('aggregates multiple different field names', () => {
-    const { columns } = transformExperimentsRepo({
+    const { paramsAndMetrics } = transformExperimentsRepo({
       branchA: {
         baseline: {
           data: {
@@ -380,11 +389,11 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const paramsColumns = columns.filter(
-      column => column.parentPath === join('params', paramsYaml)
-    ) as ColumnData[]
+    const params = paramsAndMetrics.filter(
+      paramOrMetric => paramOrMetric.parentPath === join('params', paramsYaml)
+    ) as ParamOrMetric[]
 
-    expect(paramsColumns?.map(({ name }) => name)).toEqual([
+    expect(params?.map(({ name }) => name)).toEqual([
       'one',
       'two',
       'three',
@@ -392,8 +401,8 @@ describe('metrics/params column schema builder', () => {
     ])
   })
 
-  it('does not report types for columns without primitives or children for columns without objects', () => {
-    const { columns } = transformExperimentsRepo({
+  it('does not report types for params and metrics without primitives or children for params and metrics without objects', () => {
+    const { paramsAndMetrics } = transformExperimentsRepo({
       workspace: {
         baseline: {
           data: {
@@ -411,25 +420,26 @@ describe('metrics/params column schema builder', () => {
       }
     })
 
-    const objectColumn = columns.find(
-      column => column.parentPath === join('params', paramsYaml)
-    ) as ColumnData
+    const objectParam = paramsAndMetrics.find(
+      paramOrMetric => paramOrMetric.parentPath === join('params', paramsYaml)
+    ) as ParamOrMetric
 
-    expect(objectColumn.name).toEqual('onlyHasChild')
-    expect(objectColumn.types).toBeUndefined()
+    expect(objectParam.name).toEqual('onlyHasChild')
+    expect(objectParam.types).toBeUndefined()
 
-    const primitiveColumn = columns.find(
-      column => column.parentPath === join('params', paramsYaml, 'onlyHasChild')
-    ) as ColumnData
+    const primitiveParam = paramsAndMetrics.find(
+      paramOrMetric =>
+        paramOrMetric.parentPath === join('params', paramsYaml, 'onlyHasChild')
+    ) as ParamOrMetric
 
-    expect(primitiveColumn.name).toEqual('onlyHasPrimitive')
-    expect(primitiveColumn.types).toBeDefined()
+    expect(primitiveParam.name).toEqual('onlyHasPrimitive')
+    expect(primitiveParam.types).toBeDefined()
 
-    const onlyHasPrimitiveChild = columns.find(
-      column =>
-        column.parentPath ===
+    const onlyHasPrimitiveChild = paramsAndMetrics.find(
+      paramOrMetric =>
+        paramOrMetric.parentPath ===
         join('params', paramsYaml, 'onlyHasChild', 'onlyHasPrimitive')
-    ) as ColumnData
+    ) as ParamOrMetric
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
   })

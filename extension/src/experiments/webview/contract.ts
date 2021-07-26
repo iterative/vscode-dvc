@@ -15,13 +15,13 @@ export interface RowData extends Experiment {
   subRows?: RowData[]
 }
 
-export interface ColumnAggregateData {
+export interface ParamOrMetricAggregateData {
   maxStringLength?: number
   maxNumber?: number
   minNumber?: number
 }
 
-export interface ColumnData extends ColumnAggregateData {
+export interface ParamOrMetric extends ParamOrMetricAggregateData {
   group: string
   hasChildren: boolean
   name: string
@@ -77,7 +77,7 @@ export enum MessageToWebviewType {
 
 export interface TableData {
   rows: RowData[]
-  columns: ColumnData[]
+  columns: ParamOrMetric[]
 }
 
 export interface ExperimentsWebviewState {

@@ -4,7 +4,7 @@ import { Experiment } from '../webview/contract'
 
 export interface SortDefinition {
   descending: boolean
-  columnPath: string
+  path: string
 }
 
 const compareExperimentsByPath = (
@@ -18,13 +18,13 @@ const compareExperimentsByPath = (
 }
 
 const buildExperimentSortFunction = ({
-  columnPath,
+  path,
   descending
 }: SortDefinition): ((a: Experiment, b: Experiment) => number) => {
-  const columnPathArray = columnPath.split(sep)
+  const pathArray = path.split(sep)
   return descending
-    ? (a, b) => compareExperimentsByPath(columnPathArray, b, a)
-    : (a, b) => compareExperimentsByPath(columnPathArray, a, b)
+    ? (a, b) => compareExperimentsByPath(pathArray, b, a)
+    : (a, b) => compareExperimentsByPath(pathArray, a, b)
 }
 
 export const sortRows = (

@@ -6,14 +6,14 @@ import { ExperimentsColumnsTree } from './columnsTree'
 import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
-import { ColumnData } from '../webview/contract'
-import { ColumnStatus } from '../model/columns'
+import { ParamOrMetric } from '../webview/contract'
+import { Status } from '../model/paramsAndMetrics'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsColumnsChanged = mocked(new EventEmitter<void>())
-const mockedExperimentsColumnsChangedFire = jest.fn()
-mockedExperimentsColumnsChanged.fire = mockedExperimentsColumnsChangedFire
+const mockedParamsOrMetricsChanged = mocked(new EventEmitter<void>())
+const mockedParamsOrMetricsChangedFire = jest.fn()
+mockedParamsOrMetricsChanged.fire = mockedParamsOrMetricsChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -21,15 +21,15 @@ const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetChildColumns = jest.fn()
-const mockedGetColumn = jest.fn()
+const mockedGetChildParamsOrMetrics = jest.fn()
+const mockedGetParamOrMetric = jest.fn()
 const mockedGetDvcRoots = jest.fn()
 const mockedExperiments = {
-  experimentsColumnsChanged: mockedExperimentsColumnsChanged,
-  getChildColumns: mockedGetChildColumns,
-  getColumn: mockedGetColumn,
+  getChildParamsOrMetrics: mockedGetChildParamsOrMetrics,
   getDvcRoots: mockedGetDvcRoots,
-  isReady: () => true
+  getParamOrMetric: mockedGetParamOrMetric,
+  isReady: () => true,
+  paramsOrMetricsChanged: mockedParamsOrMetricsChanged
 } as unknown as Experiments
 
 const mockedSelectedCheckbox = {
@@ -88,7 +88,7 @@ describe('ExperimentsColumnsTree', () => {
       const mockedDvcRoot = join('path', 'to', 'only', 'root')
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
-      mockedGetChildColumns.mockReturnValueOnce(
+      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
         complexColumnData.filter(column =>
           ['metrics', 'params'].includes(column.parentPath)
         )
@@ -113,7 +113,7 @@ describe('ExperimentsColumnsTree', () => {
 
       await experimentsColumnsTree.getChildren()
 
-      mockedGetChildColumns.mockReturnValueOnce(
+      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
         complexColumnData.filter(column =>
           ['metrics', 'params'].includes(column.parentPath)
         )
@@ -128,7 +128,7 @@ describe('ExperimentsColumnsTree', () => {
         join(mockedDvcRoot, 'metrics', 'summary.json')
       ])
 
-      mockedGetChildColumns.mockReturnValueOnce(
+      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
         complexColumnData.filter(column => relParamsPath === column.parentPath)
       )
       const grandChildren = await experimentsColumnsTree.getChildren(paramsPath)
@@ -144,7 +144,7 @@ describe('ExperimentsColumnsTree', () => {
         paramsProcessPath
       ])
 
-      mockedGetChildColumns.mockReturnValueOnce(
+      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
         complexColumnData.filter(
           column => relParamsProcessPath === column.parentPath
         )
@@ -208,17 +208,17 @@ describe('ExperimentsColumnsTree', () => {
       .spyOn(experimentsColumnsTree as any, 'getDetails')
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
-    mockedGetColumn.mockReturnValueOnce({
+    mockedGetParamOrMetric.mockReturnValueOnce({
       descendantMetadata: '3/4',
       hasChildren: true,
-      status: ColumnStatus.selected
-    } as unknown as ColumnData)
+      status: Status.selected
+    } as unknown as ParamOrMetric)
 
     const treeItem = experimentsColumnsTree.getTreeItem(paramsPath)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
-    expect(mockedGetColumn).toBeCalledTimes(1)
-    expect(mockedGetColumn).toBeCalledWith(mockedDvcRoot, relParamsPath)
+    expect(mockedGetParamOrMetric).toBeCalledTimes(1)
+    expect(mockedGetParamOrMetric).toBeCalledWith(mockedDvcRoot, relParamsPath)
     expect(treeItem).toEqual({
       collapsibleState: 1,
       command: {
@@ -251,16 +251,16 @@ describe('ExperimentsColumnsTree', () => {
       .spyOn(experimentsColumnsTree as any, 'getDetails')
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
-    mockedGetColumn.mockReturnValueOnce({
+    mockedGetParamOrMetric.mockReturnValueOnce({
       hasChildren: false,
-      status: ColumnStatus.unselected
-    } as unknown as ColumnData)
+      status: Status.unselected
+    } as unknown as ParamOrMetric)
 
     const treeItem = experimentsColumnsTree.getTreeItem(paramsPath)
 
     expect(mockedTreeItem).toBeCalledTimes(1)
-    expect(mockedGetColumn).toBeCalledTimes(1)
-    expect(mockedGetColumn).toBeCalledWith(mockedDvcRoot, relParamsPath)
+    expect(mockedGetParamOrMetric).toBeCalledTimes(1)
+    expect(mockedGetParamOrMetric).toBeCalledWith(mockedDvcRoot, relParamsPath)
     expect(treeItem).toEqual({
       collapsibleState: 0,
       command: {

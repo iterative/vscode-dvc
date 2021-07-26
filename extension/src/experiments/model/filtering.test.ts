@@ -43,8 +43,8 @@ describe('filterExperiments', () => {
     const filteredExperiments = filterExperiments(
       [
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.GREATER_THAN,
+          path: join('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -57,8 +57,8 @@ describe('filterExperiments', () => {
     const filteredExperiments = filterExperiments(
       [
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.EQUAL,
+          path: join('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -71,8 +71,8 @@ describe('filterExperiments', () => {
     const filteredExperiments = filterExperiments(
       [
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.NOT_EQUAL,
+          path: join('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -85,13 +85,13 @@ describe('filterExperiments', () => {
     const filteredExperiments = filterExperiments(
       [
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.GREATER_THAN,
+          path: join('params', paramsFile, 'filter'),
           value: '0'
         },
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.LESS_THAN_OR_EQUAL,
+          path: join('params', paramsFile, 'filter'),
           value: '2'
         }
       ],
@@ -100,22 +100,22 @@ describe('filterExperiments', () => {
     expect(filteredExperiments.map(experiment => experiment.id)).toEqual([1, 2])
   })
 
-  it('should filter the experiments by multiple filters on multiple columns', () => {
+  it('should filter the experiments by multiple filters on multiple params', () => {
     const filteredExperiments = filterExperiments(
       [
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.GREATER_THAN_OR_EQUAL,
+          path: join('params', paramsFile, 'filter'),
           value: '0'
         },
         {
-          columnPath: join('params', paramsFile, 'filter'),
           operator: Operator.LESS_THAN,
+          path: join('params', paramsFile, 'filter'),
           value: '10'
         },
         {
-          columnPath: join('params', paramsFile, 'sort'),
           operator: Operator.EQUAL,
+          path: join('params', paramsFile, 'sort'),
           value: '10'
         }
       ],

@@ -70,7 +70,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
     item.iconPath = new ThemeIcon('filter')
 
-    item.label = filter.columnPath
+    item.label = filter.path
     item.description = [filter.operator, filter.value].join(' ')
     item.contextValue = 'dvcFilter'
 

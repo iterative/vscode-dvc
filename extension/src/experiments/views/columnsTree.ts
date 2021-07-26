@@ -11,8 +11,8 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
-import { ColumnData } from '../webview/contract'
-import { ColumnStatus } from '../model/columns'
+import { ParamOrMetric } from '../webview/contract'
+import { Status } from '../model/paramsAndMetrics'
 
 export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -26,7 +26,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
   constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
     this.resourceLocator = resourceLocator
 
-    this.onDidChangeTreeData = experiments.experimentsColumnsChanged.event
+    this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsColumnsTree', {
@@ -43,7 +43,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
         'dvc.views.experimentsColumnsTree.toggleStatus',
         resource => {
           const [dvcRoot, path] = this.getDetails(resource)
-          return this.experiments.toggleColumnStatus(dvcRoot, path)
+          return this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
         }
       )
     )
@@ -58,7 +58,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const column = this.experiments.getColumn(dvcRoot, path)
+    const column = this.experiments.getParamOrMetric(dvcRoot, path)
     const hasChildren = !!column?.hasChildren
 
     const treeItem = new TreeItem(
@@ -112,12 +112,12 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     }
 
     const [dvcRoot, path] = this.getDetails(element)
-    const columns = this.experiments.getChildColumns(dvcRoot, path)
+    const columns = this.experiments.getChildParamsOrMetrics(dvcRoot, path)
 
     return columns?.map(column => this.processColumn(dvcRoot, column)) || []
   }
 
-  private processColumn(dvcRoot: string, column: ColumnData) {
+  private processColumn(dvcRoot: string, column: ParamOrMetric) {
     const absPath = join(dvcRoot, column.path)
     this.pathRoots[absPath] = dvcRoot
     return absPath
@@ -133,11 +133,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     return this.pathRoots[element]
   }
 
-  private getIconPath(status?: ColumnStatus) {
-    if (status === ColumnStatus.selected) {
+  private getIconPath(status?: Status) {
+    if (status === Status.selected) {
       return this.resourceLocator.checkedCheckbox
     }
-    if (status === ColumnStatus.indeterminate) {
+    if (status === Status.indeterminate) {
       return this.resourceLocator.indeterminateCheckbox
     }
     return this.resourceLocator.emptyCheckbox
