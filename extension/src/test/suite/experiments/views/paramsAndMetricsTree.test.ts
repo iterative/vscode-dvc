@@ -104,7 +104,7 @@ suite('Extension Test Suite', () => {
       expect(isUnselectedAgain).to.equal(Status.unselected)
     })
 
-    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
+    it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const toggleCommand =
         'dvc.views.experimentsParamsAndMetricsTree.toggleStatus'
       const relPath = join('params', paramsFile)
@@ -198,7 +198,7 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
+  it("should be able to select a child and set all of the ancestors' statuses to indeterminate with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)

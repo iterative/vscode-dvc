@@ -96,8 +96,8 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
       mockedGetChildParamsOrMetrics.mockReturnValueOnce(
-        complexColumnData.filter(column =>
-          ['metrics', 'params'].includes(column.parentPath)
+        complexColumnData.filter(paramOrMetric =>
+          ['metrics', 'params'].includes(paramOrMetric.parentPath)
         )
       )
 
@@ -109,7 +109,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       ])
     })
 
-    it("should return the column's children if a path is provided", async () => {
+    it("should return the param's children if a path is provided", async () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
