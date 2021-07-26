@@ -85,7 +85,11 @@ export class ExperimentsParamsAndMetricsTree
     treeItem.iconPath = this.getIconPath(paramOrMetric?.status)
 
     if (hasChildren) {
-      treeItem.description = paramOrMetric?.descendantMetadata
+      treeItem.description = `${
+        paramOrMetric?.descendantStatuses.filter(status =>
+          [Status.selected, Status.indeterminate].includes(status)
+        ).length
+      }/${paramOrMetric?.descendantStatuses.length}`
     }
 
     return treeItem

@@ -224,7 +224,12 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
     mockedGetParamOrMetric.mockReturnValueOnce({
-      descendantMetadata: '3/4',
+      descendantStatuses: [
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.unselected
+      ],
       hasChildren: true,
       status: Status.selected
     } as unknown as ParamOrMetric)

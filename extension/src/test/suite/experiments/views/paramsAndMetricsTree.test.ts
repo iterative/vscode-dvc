@@ -161,8 +161,17 @@ suite('Extension Test Suite', () => {
       )
 
       expect(
-        experimentsRepository.getParamOrMetric(relPath)?.descendantMetadata
-      ).to.equal('8/8')
+        experimentsRepository.getParamOrMetric(relPath)?.descendantStatuses
+      ).to.deep.equal([
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.selected
+      ])
 
       const isUnselected = await commands.executeCommand(toggleCommand, absPath)
 
@@ -175,8 +184,17 @@ suite('Extension Test Suite', () => {
       )
 
       expect(
-        experimentsRepository.getParamOrMetric(relPath)?.descendantMetadata
-      ).to.equal('0/8')
+        experimentsRepository.getParamOrMetric(relPath)?.descendantStatuses
+      ).to.deep.equal([
+        Status.unselected,
+        Status.unselected,
+        Status.unselected,
+        Status.unselected,
+        Status.unselected,
+        Status.unselected,
+        Status.unselected,
+        Status.unselected
+      ])
     })
   })
 
@@ -246,12 +264,24 @@ suite('Extension Test Suite', () => {
 
     const parentParam = experimentsRepository.getParamOrMetric(parentPath)
     expect(parentParam?.status).to.equal(Status.indeterminate)
-    expect(parentParam?.descendantMetadata).to.equal('1/2')
+    expect(parentParam?.descendantStatuses).to.deep.equal([
+      Status.selected,
+      Status.unselected
+    ])
 
     const grandParentParam =
       experimentsRepository.getParamOrMetric(grandParentPath)
     expect(grandParentParam?.status).to.equal(Status.indeterminate)
-    expect(grandParentParam?.descendantMetadata).to.equal('2/8')
+    expect(grandParentParam?.descendantStatuses).to.deep.equal([
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.indeterminate,
+      Status.selected,
+      Status.unselected
+    ])
   })
 
   it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
@@ -317,11 +347,23 @@ suite('Extension Test Suite', () => {
 
     const parentParam = experimentsRepository.getParamOrMetric(parentPath)
     expect(parentParam?.status).to.equal(lastSelectedIsUnselected)
-    expect(parentParam?.descendantMetadata).to.equal('0/2')
+    expect(parentParam?.descendantStatuses).to.deep.equal([
+      Status.unselected,
+      Status.unselected
+    ])
 
     const grandParentParam =
       experimentsRepository.getParamOrMetric(grandParentPath)
     expect(grandParentParam?.status).to.equal(lastSelectedIsUnselected)
-    expect(grandParentParam?.descendantMetadata).to.equal('0/8')
+    expect(grandParentParam?.descendantStatuses).to.deep.equal([
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected,
+      Status.unselected
+    ])
   })
 })
