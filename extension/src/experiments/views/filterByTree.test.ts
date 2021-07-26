@@ -71,8 +71,8 @@ describe('ExperimentsFilterByTree', () => {
     )
     const mockedFilters = [
       {
-        columnPath: join('params', 'params.yaml', 'param'),
         operator: Operator.EQUAL,
+        path: join('params', 'params.yaml', 'param'),
         value: '90000'
       }
     ]
