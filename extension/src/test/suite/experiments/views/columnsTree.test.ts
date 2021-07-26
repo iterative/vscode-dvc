@@ -8,7 +8,7 @@ import complexExperimentsOutput from '../../../../experiments/webview/complex-ou
 import { ExperimentsColumnsTree } from '../../../../experiments/views/columnsTree'
 import { Experiments } from '../../../../experiments'
 import { ExperimentsRepository } from '../../../../experiments/repository'
-import { ColumnStatus } from '../../../../experiments/model'
+import { ColumnStatus } from '../../../../experiments/model/columns'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
