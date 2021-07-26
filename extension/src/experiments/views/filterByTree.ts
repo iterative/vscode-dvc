@@ -93,7 +93,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
   private async getRootElements() {
     await this.experiments.isReady()
-    const dvcRoots = this.experiments.getDvcRoots()
+    const dvcRoots = this.getDvcRoots()
     const filters = flatten(
       dvcRoots.map(dvcRoot => {
         this.filterRoots[dvcRoot] = dvcRoot
@@ -101,6 +101,11 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
       })
     )
     if (definedAndNonEmpty(filters)) {
+      if (dvcRoots.length === 1) {
+        const [onlyRepo] = dvcRoots
+        return this.getChildren(onlyRepo)
+      }
+
       return dvcRoots.sort((a, b) => a.localeCompare(b))
     }
 
@@ -114,7 +119,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
   private async removeAllFilters(element: string | undefined) {
     if (!element) {
-      const dvcRoots = await this.getRootElements()
+      const dvcRoots = this.getDvcRoots()
       dvcRoots.map(dvcRoot => this.removeAllFilters(dvcRoot))
       return
     }
@@ -136,5 +141,9 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
 
   private isRoot(element: string) {
     return Object.values(this.filterRoots).includes(element)
+  }
+
+  private getDvcRoots() {
+    return this.experiments.getDvcRoots()
   }
 }

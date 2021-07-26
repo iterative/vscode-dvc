@@ -45,7 +45,18 @@ beforeEach(() => {
 
 describe('ExperimentsRunsTree', () => {
   describe('getChildren', () => {
-    it('should return an empty array when no experiments are queued for any of the repositories', async () => {
+    it('should return an empty array when no experiments exist for any of the multiple repositories', async () => {
+      const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
+      mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
+      mockedGetExperimentNames.mockReturnValueOnce([])
+      mockedGetExperimentNames.mockReturnValueOnce([])
+
+      const rootElements = await experimentsRunsTree.getChildren()
+
+      expect(rootElements).toEqual([])
+    })
+
+    it('should return an empty array when no experiments exist for the single repository', async () => {
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
       mockedGetExperimentNames.mockReturnValueOnce([])
@@ -55,7 +66,7 @@ describe('ExperimentsRunsTree', () => {
       expect(rootElements).toEqual([])
     })
 
-    it('should return an array of root elements when at least one experiments is queued in one of the repositories', async () => {
+    it('should return an array of root elements when at least one experiment exists in one of the repositories', async () => {
       const dvcRoots = ['demo', 'and/mock', 'other/repo']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
@@ -68,18 +79,17 @@ describe('ExperimentsRunsTree', () => {
       expect(rootElements).toEqual(dvcRoots)
     })
 
-    it('should return an array of queued experiment names when an element is provided', async () => {
-      const queuedExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
+    it('should return an array of existing experiment names when only a single repository is available', async () => {
+      const existingExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(queuedExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(queuedExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(existingExperiments)
+      mockedGetExperimentNames.mockReturnValueOnce(existingExperiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      await experimentsRunsTree.getChildren()
 
-      const children = await experimentsRunsTree.getChildren('repo')
+      const children = await experimentsRunsTree.getChildren()
 
-      expect(children).toEqual(queuedExperiments)
+      expect(children).toEqual(existingExperiments)
     })
 
     it('should return an array of checkpoints when a non root element is provided', async () => {
@@ -90,7 +100,6 @@ describe('ExperimentsRunsTree', () => {
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
       await experimentsRunsTree.getChildren()
-      await experimentsRunsTree.getChildren('repo')
 
       const checkpoints = ['aaaaaaa', 'bbbbbbb']
       mockedGetCheckpointNames.mockReturnValueOnce(checkpoints)
@@ -111,7 +120,8 @@ describe('ExperimentsRunsTree', () => {
       })
 
       const experimentsRunsTree = new ExperimentsRunsTree(mockedExperiments)
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
+      mockedGetDvcRoots.mockReturnValueOnce(['demo', 'other'])
+      mockedGetExperimentNames.mockReturnValueOnce([])
       mockedGetExperimentNames.mockReturnValueOnce([])
 
       await experimentsRunsTree.getChildren()
@@ -142,7 +152,6 @@ describe('ExperimentsRunsTree', () => {
       })
 
       await experimentsRunsTree.getChildren()
-      await experimentsRunsTree.getChildren('demo')
 
       const treeItem = experimentsRunsTree.getTreeItem(mockedQueuedExperiment)
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
@@ -167,7 +176,6 @@ describe('ExperimentsRunsTree', () => {
       mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
 
       await experimentsRunsTree.getChildren()
-      await experimentsRunsTree.getChildren('demo')
 
       const treeItem = experimentsRunsTree.getTreeItem(mockedRunningExperiment)
       expect(treeItem).toEqual({
@@ -198,7 +206,6 @@ describe('ExperimentsRunsTree', () => {
       })
 
       await experimentsRunsTree.getChildren()
-      await experimentsRunsTree.getChildren('demo')
 
       const treeItem = experimentsRunsTree.getTreeItem(mockedRunningExperiment)
       expect(treeItem).toEqual({
@@ -245,7 +252,6 @@ describe('ExperimentsRunsTree', () => {
       mockedGetExperiment.mockReturnValueOnce({})
 
       await experimentsRunsTree.getChildren()
-      await experimentsRunsTree.getChildren('demo')
 
       const treeItem = experimentsRunsTree.getTreeItem(mockedExistingExperiment)
       expect(treeItem).toEqual({

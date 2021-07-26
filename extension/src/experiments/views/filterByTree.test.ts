@@ -4,6 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsFilterByTree } from './filterByTree'
 import { Experiments } from '..'
+import { Operator } from '../model/filtering'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -64,6 +65,28 @@ describe('ExperimentsFilterByTree', () => {
     expect(rootElements).toEqual([])
   })
 
+  it("should return the repository's filters if there is only one repository", async () => {
+    const experimentsFilterByTree = new ExperimentsFilterByTree(
+      mockedExperiments
+    )
+    const mockedFilters = [
+      {
+        columnPath: join('params', 'params.yaml', 'param'),
+        operator: Operator.EQUAL,
+        value: '90000'
+      }
+    ]
+    const dvcRoots = ['demo']
+    mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
+    mockedGetFilters.mockReturnValueOnce(mockedFilters)
+    mockedGetFilters.mockReturnValueOnce(mockedFilters)
+
+    const filters = await experimentsFilterByTree.getChildren()
+    expect(filters).toEqual([
+      join('demo', 'params', 'params.yaml', 'param==90000')
+    ])
+  })
+
   it('should return an array of dvcRoots if one has a filter applied', async () => {
     const experimentsFilterByTree = new ExperimentsFilterByTree(
       mockedExperiments
@@ -71,7 +94,11 @@ describe('ExperimentsFilterByTree', () => {
     const dvcRoots = ['demo', 'other']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
     mockedGetFilters.mockReturnValueOnce([
-      join('params', 'params.yaml', 'param==90000')
+      {
+        columnPath: join('params', 'params.yaml', 'param'),
+        operator: Operator.EQUAL,
+        value: '90000'
+      }
     ])
     mockedGetFilters.mockReturnValueOnce([])
     const rootElements = await experimentsFilterByTree.getChildren()
@@ -153,14 +180,12 @@ describe('ExperimentsFilterByTree', () => {
       const dvcRoot = 'other'
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
       mockedGetFilters.mockReturnValueOnce([mockedFilter])
-      await experimentsFilterByTree.getChildren()
-
       mockedGetFilters.mockReturnValueOnce([mockedFilter])
-      await experimentsFilterByTree.getChildren('demo')
+      await experimentsFilterByTree.getChildren()
 
       mockedGetFilter.mockReturnValueOnce(mockedFilter)
       const item = experimentsFilterByTree.getTreeItem(
-        join('demo', 'metrics', 'summary.json', 'success_metric>=100')
+        join(dvcRoot, 'metrics', 'summary.json', 'success_metric>=100')
       )
 
       expect(item).toEqual({
