@@ -5,7 +5,7 @@ import { stub, restore } from 'sinon'
 import { window, commands, Uri } from 'vscode'
 import { Disposable } from '../../../../extension'
 import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
-import { ExperimentsColumnsTree } from '../../../../experiments/views/columnsTree'
+import { ExperimentsParamsAndMetricsTree } from '../../../../experiments/views/paramsAndMetricsTree'
 import { Experiments } from '../../../../experiments'
 import { ExperimentsRepository } from '../../../../experiments/repository'
 import { Status } from '../../../../experiments/model/paramsAndMetrics'
@@ -15,7 +15,9 @@ import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
 
 suite('Extension Test Suite', () => {
-  window.showInformationMessage('Start all experiment columns tree tests.')
+  window.showInformationMessage(
+    'Start all experiments params and metrics tree tests.'
+  )
 
   const dvcDemoPath = resolve(
     __dirname,
@@ -37,7 +39,7 @@ suite('Extension Test Suite', () => {
     '..',
     'resources'
   )
-  const toggleCommand = 'dvc.views.experimentsColumnsTree.toggleStatus'
+  const toggleCommand = 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus'
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 
@@ -49,16 +51,16 @@ suite('Extension Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('experimentsColumnsTree', () => {
-    it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsColumnsTree.toggleStatus', async () => {
+  describe('experimentsParamsAndMetricsTree', () => {
+    it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const relPath = join('params', paramsFile, 'learning_rate')
       const absPath = join(dvcDemoPath, relPath)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((ExperimentsColumnsTree as any).prototype, 'getDetails').returns([
-        dvcDemoPath,
-        relPath
-      ])
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (ExperimentsParamsAndMetricsTree as any).prototype,
+        'getDetails'
+      ).returns([dvcDemoPath, relPath])
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -102,15 +104,17 @@ suite('Extension Test Suite', () => {
       expect(isUnselectedAgain).to.equal(Status.unselected)
     })
 
-    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
-      const toggleCommand = 'dvc.views.experimentsColumnsTree.toggleStatus'
+    it("should be able to toggle a parents and change the selected status of it's children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
+      const toggleCommand =
+        'dvc.views.experimentsParamsAndMetricsTree.toggleStatus'
       const relPath = join('params', paramsFile)
       const absPath = join(dvcDemoPath, relPath)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((ExperimentsColumnsTree as any).prototype, 'getDetails').callsFake(
-        (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (ExperimentsParamsAndMetricsTree as any).prototype,
+        'getDetails'
+      ).callsFake((path: string) => [dvcDemoPath, relative(dvcDemoPath, path)])
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -176,15 +180,16 @@ suite('Extension Test Suite', () => {
     })
   })
 
-  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
+  it("should be able to select a child and set all it's ancestors' statuses to indeterminate with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((ExperimentsColumnsTree as any).prototype, 'getDetails').callsFake(
-      (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
-    )
+    stub(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ExperimentsParamsAndMetricsTree as any).prototype,
+      'getDetails'
+    ).callsFake((path: string) => [dvcDemoPath, relative(dvcDemoPath, path)])
 
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
@@ -216,7 +221,7 @@ suite('Extension Test Suite', () => {
       experimentsRepository.getChildParamsOrMetrics(parentPath) || []
     expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
-    const allColumns = [
+    const allParamsAndMetrics = [
       ...selectedChildren,
       { path: grandParentPath },
       ...selectedGrandChildren
@@ -224,7 +229,7 @@ suite('Extension Test Suite', () => {
 
     await commands.executeCommand(toggleCommand, absPath)
 
-    allColumns.map(paramOrMetric =>
+    allParamsAndMetrics.map(paramOrMetric =>
       expect(
         experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
       ).to.equal(Status.unselected)
@@ -239,25 +244,26 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(Status.selected)
 
-    const parentColumn = experimentsRepository.getParamOrMetric(parentPath)
-    expect(parentColumn?.status).to.equal(Status.indeterminate)
-    expect(parentColumn?.descendantMetadata).to.equal('1/2')
+    const parentParam = experimentsRepository.getParamOrMetric(parentPath)
+    expect(parentParam?.status).to.equal(Status.indeterminate)
+    expect(parentParam?.descendantMetadata).to.equal('1/2')
 
-    const grandParentColumn =
+    const grandParentParam =
       experimentsRepository.getParamOrMetric(grandParentPath)
-    expect(grandParentColumn?.status).to.equal(Status.indeterminate)
-    expect(grandParentColumn?.descendantMetadata).to.equal('2/8')
+    expect(grandParentParam?.status).to.equal(Status.indeterminate)
+    expect(grandParentParam?.descendantMetadata).to.equal('2/8')
   })
 
-  it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsColumnsTree.toggleStatus", async () => {
+  it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
     const absPath = join(dvcDemoPath, grandParentPath)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((ExperimentsColumnsTree as any).prototype, 'getDetails').callsFake(
-      (path: string) => [dvcDemoPath, relative(dvcDemoPath, path)]
-    )
+    stub(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ExperimentsParamsAndMetricsTree as any).prototype,
+      'getDetails'
+    ).callsFake((path: string) => [dvcDemoPath, relative(dvcDemoPath, path)])
 
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
@@ -309,13 +315,13 @@ suite('Extension Test Suite', () => {
 
     expect(lastSelectedIsUnselected).to.equal(Status.unselected)
 
-    const parentColumn = experimentsRepository.getParamOrMetric(parentPath)
-    expect(parentColumn?.status).to.equal(lastSelectedIsUnselected)
-    expect(parentColumn?.descendantMetadata).to.equal('0/2')
+    const parentParam = experimentsRepository.getParamOrMetric(parentPath)
+    expect(parentParam?.status).to.equal(lastSelectedIsUnselected)
+    expect(parentParam?.descendantMetadata).to.equal('0/2')
 
-    const grandParentColumn =
+    const grandParentParam =
       experimentsRepository.getParamOrMetric(grandParentPath)
-    expect(grandParentColumn?.status).to.equal(lastSelectedIsUnselected)
-    expect(grandParentColumn?.descendantMetadata).to.equal('0/8')
+    expect(grandParentParam?.status).to.equal(lastSelectedIsUnselected)
+    expect(grandParentParam?.descendantMetadata).to.equal('0/8')
   })
 })

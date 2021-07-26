@@ -14,7 +14,9 @@ import { ResourceLocator } from '../../resourceLocator'
 import { ParamOrMetric } from '../webview/contract'
 import { Status } from '../model/paramsAndMetrics'
 
-export class ExperimentsColumnsTree implements TreeDataProvider<string> {
+export class ExperimentsParamsAndMetricsTree
+  implements TreeDataProvider<string>
+{
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
@@ -29,7 +31,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
 
     this.dispose.track(
-      window.createTreeView('dvc.views.experimentsColumnsTree', {
+      window.createTreeView('dvc.views.experimentsParamsAndMetricsTree', {
         canSelectMany: true,
         showCollapseAll: true,
         treeDataProvider: this
@@ -40,7 +42,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     this.dispose.track(
       commands.registerCommand(
-        'dvc.views.experimentsColumnsTree.toggleStatus',
+        'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
         resource => {
           const [dvcRoot, path] = this.getDetails(resource)
           return this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
@@ -58,8 +60,8 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const column = this.experiments.getParamOrMetric(dvcRoot, path)
-    const hasChildren = !!column?.hasChildren
+    const paramOrMetric = this.experiments.getParamOrMetric(dvcRoot, path)
+    const hasChildren = !!paramOrMetric?.hasChildren
 
     const treeItem = new TreeItem(
       resourceUri,
@@ -70,14 +72,14 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
     treeItem.command = {
       arguments: [element],
-      command: 'dvc.views.experimentsColumnsTree.toggleStatus',
+      command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
       title: 'toggle'
     }
 
-    treeItem.iconPath = this.getIconPath(column?.status)
+    treeItem.iconPath = this.getIconPath(paramOrMetric?.status)
 
     if (hasChildren) {
-      treeItem.description = column?.descendantMetadata
+      treeItem.description = paramOrMetric?.descendantMetadata
     }
 
     return treeItem
@@ -85,7 +87,7 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
 
   public getChildren(element?: string): Promise<string[]> {
     if (element) {
-      return Promise.resolve(this.getColumns(element))
+      return Promise.resolve(this.getParamsOrMetrics(element))
     }
 
     return this.getRootElements()
@@ -106,19 +108,26 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
     return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
-  private getColumns(element: string): string[] {
+  private getParamsOrMetrics(element: string): string[] {
     if (!element) {
       return []
     }
 
     const [dvcRoot, path] = this.getDetails(element)
-    const columns = this.experiments.getChildParamsOrMetrics(dvcRoot, path)
+    const paramsOrMetrics = this.experiments.getChildParamsOrMetrics(
+      dvcRoot,
+      path
+    )
 
-    return columns?.map(column => this.processColumn(dvcRoot, column)) || []
+    return (
+      paramsOrMetrics?.map(paramOrMetric =>
+        this.processParamOrMetric(dvcRoot, paramOrMetric)
+      ) || []
+    )
   }
 
-  private processColumn(dvcRoot: string, column: ParamOrMetric) {
-    const absPath = join(dvcRoot, column.path)
+  private processParamOrMetric(dvcRoot: string, paramOrMetric: ParamOrMetric) {
+    const absPath = join(dvcRoot, paramOrMetric.path)
     this.pathRoots[absPath] = dvcRoot
     return absPath
   }
