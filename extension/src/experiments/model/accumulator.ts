@@ -1,4 +1,5 @@
 import { ParamOrMetricAggregateData, Experiment } from '../webview/contract'
+
 export interface PartialParamOrMetricDescriptor
   extends ParamOrMetricAggregateData {
   types: Set<string>
@@ -7,6 +8,7 @@ export interface PartialParamOrMetricDescriptor
   path: string
   parentPath: string
 }
+
 export type PartialParamsOrMetricsMap = Map<
   string,
   PartialParamOrMetricDescriptor
