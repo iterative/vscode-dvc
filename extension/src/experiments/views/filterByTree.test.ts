@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsFilterByTree } from './filterByTree'
 import { Experiments } from '..'
-import { Operator } from '../filtering'
+import { Operator } from '../model/filtering'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
