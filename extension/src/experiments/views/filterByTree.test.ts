@@ -95,8 +95,8 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
     mockedGetFilters.mockReturnValueOnce([
       {
-        columnPath: join('params', 'params.yaml', 'param'),
         operator: Operator.EQUAL,
+        path: join('params', 'params.yaml', 'param'),
         value: '90000'
       }
     ])
