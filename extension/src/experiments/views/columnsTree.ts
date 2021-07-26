@@ -98,6 +98,11 @@ export class ExperimentsColumnsTree implements TreeDataProvider<string> {
       this.pathRoots[dvcRoot] = dvcRoot
     })
 
+    if (dvcRoots.length === 1) {
+      const [onlyRepo] = dvcRoots
+      return this.getChildren(onlyRepo)
+    }
+
     return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
