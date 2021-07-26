@@ -128,6 +128,10 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
       })
     )
     if (definedAndNonEmpty(experimentNames)) {
+      if (dvcRoots.length === 1) {
+        const [onlyRepo] = dvcRoots
+        return this.getChildren(onlyRepo)
+      }
       return dvcRoots.sort((a, b) => a.localeCompare(b))
     }
 
