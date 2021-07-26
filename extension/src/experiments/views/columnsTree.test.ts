@@ -88,7 +88,7 @@ describe('ExperimentsColumnsTree', () => {
       const mockedDvcRoot = join('path', 'to', 'only', 'root')
 
       mockedGetDvcRoots.mockReturnValueOnce([mockedDvcRoot])
-      mockedGetChildColumns.mockReturnValueOnce(
+      mockedGetChildParamsOrMetrics.mockReturnValueOnce(
         complexColumnData.filter(column =>
           ['metrics', 'params'].includes(column.parentPath)
         )
