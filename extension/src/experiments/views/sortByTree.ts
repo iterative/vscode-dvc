@@ -71,6 +71,7 @@ export class ExperimentsSortByTree
     )
 
     projectTreeItem.id = rootPath
+    projectTreeItem.contextValue = 'sortByTreeProject'
 
     return projectTreeItem
   }
@@ -83,6 +84,7 @@ export class ExperimentsSortByTree
     sortDefinitionTreeItem.iconPath = new ThemeIcon(
       sortDefinition.descending ? 'arrow-down' : 'arrow-up'
     )
+    sortDefinitionTreeItem.contextValue = 'sortByTreeSortDefinition'
 
     return sortDefinitionTreeItem
   }
