@@ -9,14 +9,36 @@ export enum Operator {
   GREATER_THAN_OR_EQUAL = '>=',
   LESS_THAN = '<',
   LESS_THAN_OR_EQUAL = '<=',
-  NOT_EQUAL = '!='
+  NOT_EQUAL = '!=',
+
+  CONTAINS = '∈',
+  NOT_CONTAINS = '!∈',
+
+  IS_TRUE = '⊤',
+  IS_FALSE = '⊥'
 }
 
 export interface FilterDefinition {
   path: string
   operator: Operator
-  value: string | number
+  value: string | number | undefined
 }
+
+const stringContains = (
+  valueToEvaluate: unknown,
+  filterValue: unknown
+): boolean =>
+  !!(
+    typeof valueToEvaluate === 'string' &&
+    typeof filterValue === 'string' &&
+    valueToEvaluate.includes(filterValue)
+  )
+
+const evaluateBoolean = (
+  valueToEvaluate: unknown,
+  filterValue: boolean
+): boolean =>
+  typeof valueToEvaluate === 'boolean' && valueToEvaluate === filterValue
 
 const evaluate = <T>(
   valueToEvaluate: T,
@@ -38,6 +60,14 @@ const evaluate = <T>(
     case Operator.NOT_EQUAL:
       // eslint-disable-next-line eqeqeq
       return valueToEvaluate != filterValue
+    case Operator.IS_TRUE:
+      return evaluateBoolean(valueToEvaluate, true)
+    case Operator.IS_FALSE:
+      return evaluateBoolean(valueToEvaluate, false)
+    case Operator.CONTAINS:
+      return stringContains(valueToEvaluate, filterValue)
+    case Operator.NOT_CONTAINS:
+      return !stringContains(valueToEvaluate, filterValue)
     default:
       throw Error('filter operator not found')
   }
