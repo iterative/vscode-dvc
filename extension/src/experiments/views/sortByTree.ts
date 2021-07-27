@@ -47,7 +47,7 @@ export class ExperimentsSortByTree
     }
 
     const sortDefinitionTreeItem = new TreeItem({
-      label: `${element.columnPath}`
+      label: `${element.path}`
     })
 
     sortDefinitionTreeItem.iconPath = new ThemeIcon(
