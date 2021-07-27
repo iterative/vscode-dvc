@@ -108,8 +108,8 @@ describe('pickGarbageCollectionFlags', () => {
 describe('Params and metrics-based QuickPicks', () => {
   const params = 'params'
   const paramsYaml = 'params.yaml'
-  const paramsYamlPath = 'params/params.yaml'
-  const epochsParamPath = 'params/params.yaml/epochs'
+  const paramsYamlPath = join(params, paramsYaml)
+  const epochsParamPath = join(paramsYamlPath, 'epochs')
   const epochsParam = {
     group: params,
     hasChildren: false,
@@ -124,15 +124,14 @@ describe('Params and metrics-based QuickPicks', () => {
   const boolParam = {
     group: params,
     hasChildren: false,
-    maxNumber: 5,
-    maxStringLength: 44,
-    minNumber: 2,
+    maxNumber: 1,
+    maxStringLength: 1,
+    minNumber: 0,
     name: 'bool',
     parentPath: paramsYamlPath,
     path: join(paramsYamlPath, 'bool'),
     types: ['boolean']
   }
-
   const mixedParam = {
     group: params,
     hasChildren: false,
