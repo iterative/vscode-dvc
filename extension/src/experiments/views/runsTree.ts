@@ -10,7 +10,7 @@ import {
   window
 } from 'vscode'
 import { Experiments } from '..'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { ExperimentStatus } from '../model'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
@@ -36,30 +36,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
     this.experiments = experiments
 
-    this.dispose.track(
-      this.onDidChangeTreeData(() => {
-        const dvcRoots = this.experiments.getDvcRoots()
-
-        const statuses = flatten<ExperimentStatus>(
-          dvcRoots.map(dvcRoot =>
-            this.experiments.getExperimentStatuses(dvcRoot)
-          )
-        )
-        const active = statuses.filter(
-          status => status === ExperimentStatus.RUNNING
-        ).length
-        const activeText = active ? `${active} active` : undefined
-
-        const queued = statuses.filter(
-          status => status === ExperimentStatus.QUEUED
-        ).length
-        const queuedText = queued ? `${queued} queued` : undefined
-
-        this.view.description = [activeText, queuedText]
-          .filter(Boolean)
-          .join(', ')
-      })
-    )
+    this.updateDescriptionOnChange()
   }
 
   public getTreeItem(element: string): TreeItem {
@@ -175,5 +152,54 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
   private isRoot(element: string) {
     return Object.values(this.runRoots).includes(element)
+  }
+
+  private updateDescriptionOnChange() {
+    this.dispose.track(
+      this.onDidChangeTreeData(() => {
+        const statuses = this.getStatuses()
+        this.view.description = this.getDescription(statuses)
+      })
+    )
+  }
+
+  private getStatuses() {
+    const dvcRoots = this.experiments.getDvcRoots()
+
+    return flatten<ExperimentStatus>(
+      dvcRoots.map(dvcRoot => this.experiments.getExperimentStatuses(dvcRoot))
+    )
+  }
+
+  private getDescription(statuses: ExperimentStatus[]) {
+    if (!definedAndNonEmpty(statuses)) {
+      return
+    }
+
+    const { active, queued } = statuses.reduce(
+      (acc, status) => {
+        if (status === ExperimentStatus.RUNNING) {
+          acc.active += 1
+        }
+
+        if (status === ExperimentStatus.QUEUED) {
+          acc.queued += 1
+        }
+
+        return acc
+      },
+      { active: 0, queued: 0 }
+    )
+    return joinTruthyItems(
+      [
+        this.getSubDescription(active, 'active'),
+        this.getSubDescription(queued, 'queued')
+      ],
+      ', '
+    )
+  }
+
+  private getSubDescription(count: number, label: string) {
+    return count ? `${count} ${label}` : ''
   }
 }
