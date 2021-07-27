@@ -570,7 +570,7 @@
       },
       {
         "view": "dvc.views.experimentsSortByTree",
-        "contents": "No sorts applied. \n[Add Sort](command:dvc.selectDvcPath)\n"
+        "contents": "No sorts applied. \n[Add Sort](command:dvc.setExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",

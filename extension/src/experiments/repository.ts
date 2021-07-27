@@ -133,6 +133,10 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
+  public getSort() {
+    return this.model.getSort()
+  }
+
   public async pickSort() {
     const columns = this.model.getTerminalNodeColumns()
     const pickedSortDefinition = await pickSort(columns)

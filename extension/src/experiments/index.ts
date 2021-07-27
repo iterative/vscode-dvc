@@ -253,6 +253,10 @@ export class Experiments {
     experimentsRepository.setWebview(experimentsWebview)
   }
 
+  public getSort(dvcRoot: string) {
+    return this.getRepository(dvcRoot)?.getSort()
+  }
+
   private async getFocusedOrDefaultOrPickRepo() {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     return this.getRepository(dvcRoot)

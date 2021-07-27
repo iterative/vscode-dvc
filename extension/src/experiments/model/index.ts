@@ -46,6 +46,10 @@ export class ExperimentsModel {
     this.currentSort = sort
   }
 
+  public getSort(): SortDefinition | undefined {
+    return this.currentSort
+  }
+
   public getFilters() {
     return [...this.filters.values()]
   }
