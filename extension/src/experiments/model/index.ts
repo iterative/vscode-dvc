@@ -7,7 +7,7 @@ import {
   getFilterId
 } from './filtering'
 import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { Columns } from './columns'
+import { ParamsAndMetrics } from './paramsAndMetrics'
 import { Experiment, RowData, TableData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
@@ -16,7 +16,7 @@ export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
   private workspace = {} as Experiment
-  private columns = new Columns()
+  private paramsAndMetrics = new ParamsAndMetrics()
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
@@ -27,14 +27,14 @@ export class ExperimentsModel {
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     const {
-      columns,
+      paramsAndMetrics,
       branches,
       experimentsByBranch,
       checkpointsByTip,
       workspace
     } = transformExperimentsRepo(data)
 
-    this.columns.update(columns)
+    this.paramsAndMetrics.update(paramsAndMetrics)
 
     this.workspace = workspace
     this.branches = branches
@@ -70,24 +70,24 @@ export class ExperimentsModel {
     return this.filters.delete(id)
   }
 
-  public getColumns() {
-    return this.columns.getColumns()
+  public getParamsAndMetrics() {
+    return this.paramsAndMetrics.getParamsAndMetrics()
   }
 
-  public getTerminalNodeColumns() {
-    return this.columns.getTerminalNodeColumns()
+  public getTerminalParamsAndMetrics() {
+    return this.paramsAndMetrics.getTerminalNodes()
   }
 
-  public getColumn(path: string) {
-    return this.columns.getColumn(path)
+  public getParamOrMetric(path: string) {
+    return this.paramsAndMetrics.getParamOrMetric(path)
   }
 
-  public getChildColumns(path: string) {
-    return this.columns.getChildColumns(path)
+  public getChildParamsOrMetrics(path: string) {
+    return this.paramsAndMetrics.getChildren(path)
   }
 
-  public toggleColumnStatus(path: string) {
-    return this.columns.toggleColumnStatus(path)
+  public toggleParamOrMetricStatus(path: string) {
+    return this.paramsAndMetrics.toggleStatus(path)
   }
 
   public getExperimentNames(): string[] {
@@ -124,7 +124,7 @@ export class ExperimentsModel {
 
   public getTableData(): TableData {
     return {
-      columns: this.columns.getSelected(),
+      columns: this.paramsAndMetrics.getSelected(),
       rows: this.getRowData()
     }
   }

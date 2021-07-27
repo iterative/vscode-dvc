@@ -1,5 +1,5 @@
 import { QuickPickOptions, window } from 'vscode'
-import { ColumnData } from './webview/contract'
+import { ParamOrMetric } from './webview/contract'
 import { FilterDefinition, Operator } from './model/filtering'
 import { SortDefinition } from './model/sorting'
 import { GcPreserveFlag } from '../cli/args'
@@ -45,31 +45,31 @@ export const pickGarbageCollectionFlags = () =>
     { placeHolder: 'Select which Experiments to preserve' }
   )
 
-export const pickFromColumnData = (
-  columnData: ColumnData[] | undefined,
+export const pickFromParamsAndMetrics = (
+  paramsAndMetrics: ParamOrMetric[] | undefined,
   quickPickOptions: QuickPickOptions
 ) => {
-  if (!columnData || columnData.length === 0) {
-    window.showErrorMessage('There are no columns to select from')
+  if (!paramsAndMetrics || paramsAndMetrics.length === 0) {
+    window.showErrorMessage('There are no params or metrics to select from')
     return
   }
-  return quickPickValue<ColumnData>(
-    columnData.map(column => ({
-      description: column.path,
-      label: column.name,
-      value: column
+  return quickPickValue<ParamOrMetric>(
+    paramsAndMetrics.map(paramOrMetric => ({
+      description: paramOrMetric.path,
+      label: paramOrMetric.name,
+      value: paramOrMetric
     })),
     quickPickOptions
   )
 }
 
 export const pickSort = async (
-  columnData: ColumnData[] | undefined
+  paramsAndMetrics: ParamOrMetric[] | undefined
 ): Promise<SortDefinition | undefined> => {
-  const pickedColumn = await pickFromColumnData(columnData, {
-    title: 'Select a column to sort by'
+  const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
+    title: 'Select a param or metric to sort by'
   })
-  if (pickedColumn === undefined) {
+  if (picked === undefined) {
     return
   }
   const descending = await quickPickValue<boolean>(
@@ -83,8 +83,8 @@ export const pickSort = async (
     return
   }
   return {
-    columnPath: pickedColumn.path,
-    descending
+    descending,
+    path: picked.path
   }
 }
 
@@ -118,12 +118,12 @@ const operators = [
 ]
 
 export const pickFilterToAdd = async (
-  columnData: ColumnData[] | undefined
+  paramsAndMetrics: ParamOrMetric[] | undefined
 ): Promise<FilterDefinition | undefined> => {
-  const pickedColumn = await pickFromColumnData(columnData, {
-    title: 'Select a column to filter by'
+  const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
+    title: 'Select a param or metric to filter by'
   })
-  if (!pickedColumn) {
+  if (!picked) {
     return
   }
 
@@ -140,8 +140,8 @@ export const pickFilterToAdd = async (
   }
 
   return {
-    columnPath: pickedColumn.path,
     operator: operator as Operator,
+    path: picked.path,
     value
   }
 }
@@ -157,7 +157,7 @@ export const pickFiltersToRemove = (
   return quickPickManyValues<FilterDefinition>(
     filters.map(filter => ({
       description: [filter.operator, filter.value].join(' '),
-      label: filter.columnPath,
+      label: filter.path,
       value: filter
     })),
     {

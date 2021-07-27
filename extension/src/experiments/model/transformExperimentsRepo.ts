@@ -1,10 +1,10 @@
 import { collectFromRepo } from './collectFromRepo'
-import { transformAndCollectFromColumnsIfAny } from './transformColumns'
-import { ColumnData, Experiment } from '../webview/contract'
+import { transformAndCollectIfAny } from './transformParamsAndMetrics'
+import { ParamOrMetric, Experiment } from '../webview/contract'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 interface TransformedExperiments {
-  columns: ColumnData[]
+  paramsAndMetrics: ParamOrMetric[]
   branches: Experiment[]
   experimentsByBranch: Map<string, Experiment[]>
   checkpointsByTip: Map<string, Experiment[]>
@@ -26,11 +26,11 @@ export const transformExperimentsRepo = (
   return {
     branches,
     checkpointsByTip,
-    columns: [
-      ...transformAndCollectFromColumnsIfAny(paramsMap),
-      ...transformAndCollectFromColumnsIfAny(metricsMap)
-    ],
     experimentsByBranch,
+    paramsAndMetrics: [
+      ...transformAndCollectIfAny(paramsMap),
+      ...transformAndCollectIfAny(metricsMap)
+    ],
     workspace
   }
 }

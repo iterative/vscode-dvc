@@ -71,8 +71,8 @@ describe('ExperimentsFilterByTree', () => {
     )
     const mockedFilters = [
       {
-        columnPath: join('params', 'params.yaml', 'param'),
         operator: Operator.EQUAL,
+        path: join('params', 'params.yaml', 'param'),
         value: '90000'
       }
     ]
@@ -95,8 +95,8 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
     mockedGetFilters.mockReturnValueOnce([
       {
-        columnPath: join('params', 'params.yaml', 'param'),
         operator: Operator.EQUAL,
+        path: join('params', 'params.yaml', 'param'),
         value: '90000'
       }
     ])
@@ -108,13 +108,13 @@ describe('ExperimentsFilterByTree', () => {
   it("should return the dvcRoot's filters if one is provided", async () => {
     const mockedFilters = [
       {
-        columnPath: join('params', 'params.yml', 'param'),
         operator: '==',
+        path: join('params', 'params.yml', 'param'),
         value: 90000
       },
       {
-        columnPath: join('metrics', 'logs.json', 'metric'),
         operator: '<',
+        path: join('metrics', 'logs.json', 'metric'),
         value: '1'
       }
     ]
@@ -160,8 +160,8 @@ describe('ExperimentsFilterByTree', () => {
 
     it('should return a tree item for a filter', async () => {
       const mockedFilter = {
-        columnPath: join('metrics', 'summary.json', 'success_metric'),
         operator: '>=',
+        path: join('metrics', 'summary.json', 'success_metric'),
         value: '100'
       }
       let mockedItem = {}
@@ -193,7 +193,7 @@ describe('ExperimentsFilterByTree', () => {
         contextValue: 'dvcFilter',
         description: '>= 100',
         iconPath: { id: 'filter' },
-        label: mockedFilter.columnPath
+        label: mockedFilter.path
       })
     })
   })

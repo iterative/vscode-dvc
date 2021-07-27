@@ -20,7 +20,7 @@ export class ExperimentsRepository {
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
   public readonly onDidChangeExperimentsRows: Event<void>
-  public readonly onDidChangeExperimentsColumns: Event<void>
+  public readonly onDidChangeParamsOrMetrics: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -37,7 +37,7 @@ export class ExperimentsRepository {
   private readonly initialized = this.deferred.promise
 
   private readonly experimentsRowsChanged = new EventEmitter<void>()
-  private readonly experimentsColumnsChanged = new EventEmitter<void>()
+  private readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private processManager: ProcessManager
 
@@ -53,7 +53,7 @@ export class ExperimentsRepository {
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidChangeExperimentsRows = this.experimentsRowsChanged.event
-    this.onDidChangeExperimentsColumns = this.experimentsColumnsChanged.event
+    this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -75,18 +75,18 @@ export class ExperimentsRepository {
     return this.processManager.run('refresh')
   }
 
-  public getColumn(path: string) {
-    return this.model.getColumn(path)
+  public getParamOrMetric(path: string) {
+    return this.model.getParamOrMetric(path)
   }
 
-  public getChildColumns(path: string) {
-    return this.model.getChildColumns(path)
+  public getChildParamsOrMetrics(path: string) {
+    return this.model.getChildParamsOrMetrics(path)
   }
 
-  public toggleColumnStatus(path: string) {
-    const status = this.model.toggleColumnStatus(path)
+  public toggleParamOrMetricStatus(path: string) {
+    const status = this.model.toggleParamOrMetricStatus(path)
 
-    this.notifyColumnsChanged()
+    this.notifyParamsOrMetricsChanged()
 
     return status
   }
@@ -138,8 +138,8 @@ export class ExperimentsRepository {
   }
 
   public async pickSort() {
-    const columns = this.model.getTerminalNodeColumns()
-    const pickedSortDefinition = await pickSort(columns)
+    const paramsAndMetrics = this.model.getTerminalParamsAndMetrics()
+    const pickedSortDefinition = await pickSort(paramsAndMetrics)
     if (pickedSortDefinition) {
       return this.setSort(pickedSortDefinition)
     }
@@ -154,8 +154,8 @@ export class ExperimentsRepository {
   }
 
   public async addFilter() {
-    const columns = this.model.getTerminalNodeColumns()
-    const filterToAdd = await pickFilterToAdd(columns)
+    const paramsAndMetrics = this.model.getTerminalParamsAndMetrics()
+    const filterToAdd = await pickFilterToAdd(paramsAndMetrics)
     if (!filterToAdd) {
       return
     }
@@ -209,11 +209,11 @@ export class ExperimentsRepository {
 
   private notifyChanged() {
     this.experimentsRowsChanged.fire()
-    return this.notifyColumnsChanged()
+    return this.notifyParamsOrMetricsChanged()
   }
 
-  private notifyColumnsChanged() {
-    this.experimentsColumnsChanged.fire()
+  private notifyParamsOrMetricsChanged() {
+    this.paramsOrMetricsChanged.fire()
     return this.sendData()
   }
 

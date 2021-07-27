@@ -15,15 +15,15 @@ describe('sortRows', () => {
     queued: false,
     timestamp: testTimestamp
   }
-  const testColumnPathArray = ['params', 'params.yaml', 'test']
-  const testColumnPath = path.join(...testColumnPathArray)
+  const testPathArray = ['params', 'params.yaml', 'test']
+  const testPath = path.join(...testPathArray)
   const getTestParam = (experiment: Experiment) =>
-    get(experiment, testColumnPathArray)
+    get(experiment, testPathArray)
 
   it('Returns unsorted rows if sort definition argument is undefined', () => {
     const unsortedRows = [{ id: 1 }, { id: 2 }] as unknown as Experiment[]
     expect(
-      sortRows({ columnPath: testColumnPath, descending: false }, unsortedRows)
+      sortRows({ descending: false, path: testPath }, unsortedRows)
     ).toEqual(unsortedRows)
   })
 
@@ -62,7 +62,7 @@ describe('sortRows', () => {
     expect(
       (
         sortRows(
-          { columnPath: testSortPath, descending: true },
+          { descending: true, path: testSortPath },
           testData
         ) as Experiment[]
       ).map(getTestParam)
@@ -71,7 +71,7 @@ describe('sortRows', () => {
     expect(
       (
         sortRows(
-          { columnPath: testSortPath, descending: false },
+          { descending: false, path: testSortPath },
           testData
         ) as Experiment[]
       ).map(getTestParam)
@@ -110,7 +110,7 @@ describe('sortRows', () => {
       expect(
         (
           sortRows(
-            { columnPath: testColumnPath, descending: false },
+            { descending: false, path: testPath },
             testData
           ) as Experiment[]
         ).map(getTestParam)
@@ -121,7 +121,7 @@ describe('sortRows', () => {
       expect(
         (
           sortRows(
-            { columnPath: testColumnPath, descending: true },
+            { descending: true, path: testPath },
             testData
           ) as Experiment[]
         ).map(getTestParam)

@@ -3,7 +3,7 @@ import { QuickPickOptions, window } from 'vscode'
 import {
   pickGarbageCollectionFlags,
   pickExperimentName,
-  pickFromColumnData,
+  pickFromParamsAndMetrics,
   pickSort,
   pickFilterToAdd,
   pickFiltersToRemove
@@ -103,12 +103,12 @@ describe('pickGarbageCollectionFlags', () => {
   })
 })
 
-describe('Column-based QuickPicks', () => {
+describe('Params and metrics-based QuickPicks', () => {
   const params = 'params'
   const paramsYaml = 'params.yaml'
   const paramsYamlPath = 'params/params.yaml'
   const epochsParamPath = 'params/params.yaml/epochs'
-  const epochsColumn = {
+  const epochsParam = {
     group: params,
     hasChildren: false,
     maxNumber: 5,
@@ -119,37 +119,37 @@ describe('Column-based QuickPicks', () => {
     path: epochsParamPath,
     types: ['number']
   }
-  const paramsYamlColumn = {
+  const paramsYamlParam = {
     group: params,
     hasChildren: true,
     name: paramsYaml,
     parentPath: params,
     path: paramsYamlPath
   }
-  const exampleColumns = [epochsColumn, paramsYamlColumn]
+  const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
 
-  describe('pickFromColumnData', () => {
-    it('should return early if no columns are provided', async () => {
-      const pickedColumn = await pickFromColumnData([], {
-        title: "can't pick from no columns"
+  describe('pickFromParamsAndMetrics', () => {
+    it('should return early if no params or metrics are provided', async () => {
+      const picked = await pickFromParamsAndMetrics([], {
+        title: "can't pick from no params or metrics"
       })
-      expect(pickedColumn).toBeUndefined()
+      expect(picked).toBeUndefined()
     })
 
     it('invokes a QuickPick with the correct options', async () => {
       const title = 'Test title'
-      await pickFromColumnData(exampleColumns, { title })
+      await pickFromParamsAndMetrics(exampleParamsAndMetrics, { title })
       expect(mockedShowQuickPick).toBeCalledWith(
         [
           {
             description: epochsParamPath,
             label: 'epochs',
-            value: epochsColumn
+            value: epochsParam
           },
           {
             description: paramsYamlPath,
             label: paramsYaml,
-            value: paramsYamlColumn
+            value: paramsYamlParam
           }
         ],
         { title }
@@ -170,28 +170,28 @@ describe('Column-based QuickPicks', () => {
       expect(resolvedPromise).toBe(undefined)
     })
 
-    it('resolves with no value if canceled at column select', async () => {
+    it('resolves with no value if canceled at param or metric select', async () => {
       mockedShowQuickPick.mockResolvedValueOnce(undefined)
-      expect(await pickSort(exampleColumns)).toBe(undefined)
+      expect(await pickSort(exampleParamsAndMetrics)).toBe(undefined)
       expect(mockedShowQuickPick).toBeCalledTimes(1)
     })
 
     it('resolves with no value if canceled at order select', async () => {
       mockedShowQuickPick.mockResolvedValueOnce({
-        value: epochsColumn
+        value: epochsParam
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce(undefined)
-      expect(await pickSort(exampleColumns)).toBe(undefined)
+      expect(await pickSort(exampleParamsAndMetrics)).toBe(undefined)
       expect(mockedShowQuickPick).toBeCalledTimes(2)
     })
 
     describe('valid input', () => {
       it('invokes a descending sort with the expected quickPick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
-          value: epochsColumn
+          value: epochsParam
         } as unknown)
         mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
-        const resolvedPromise = await pickSort(exampleColumns)
+        const resolvedPromise = await pickSort(exampleParamsAndMetrics)
         expect(mockedShowQuickPick).toBeCalledTimes(2)
         expect(mockedShowQuickPick).toBeCalledWith(
           [
@@ -201,69 +201,69 @@ describe('Column-based QuickPicks', () => {
           { title: 'Select a direction to sort in' }
         )
         expect(resolvedPromise).toEqual({
-          columnPath: epochsParamPath,
-          descending: false
+          descending: false,
+          path: epochsParamPath
         })
       })
       it('invokes an ascending sort with the expected quickPick calls', async () => {
         mockedShowQuickPick.mockResolvedValueOnce({
-          value: paramsYamlColumn
+          value: paramsYamlParam
         } as unknown)
         mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
-        const resolvedPromise = await pickSort(exampleColumns)
+        const resolvedPromise = await pickSort(exampleParamsAndMetrics)
         expect(mockedShowQuickPick).toBeCalledTimes(2)
         expect(resolvedPromise).toEqual({
-          columnPath: paramsYamlPath,
-          descending: false
+          descending: false,
+          path: paramsYamlPath
         })
       })
     })
   })
 
   describe('pickFilterToAdd', () => {
-    it('should return early if no column is picked', async () => {
-      const columns = [epochsColumn]
+    it('should return early if no param or metric is picked', async () => {
+      const params = [epochsParam]
       mockedShowQuickPick.mockResolvedValueOnce(undefined)
-      const filter = await pickFilterToAdd(columns)
+      const filter = await pickFilterToAdd(params)
       expect(filter).toBeUndefined()
     })
 
     it('should return early if no operator is picked', async () => {
-      const columns = [epochsColumn]
+      const params = [epochsParam]
       mockedShowQuickPick.mockResolvedValueOnce({
-        value: epochsColumn
+        value: epochsParam
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce(undefined)
-      const filter = await pickFilterToAdd(columns)
+      const filter = await pickFilterToAdd(params)
       expect(filter).toBeUndefined()
     })
 
     it('should return early if no value is provided', async () => {
-      const columns = [epochsColumn]
+      const params = [epochsParam]
       mockedShowQuickPick.mockResolvedValueOnce({
-        value: epochsColumn
+        value: epochsParam
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce({
         value: '=='
       } as unknown)
       mockedGetInput.mockResolvedValueOnce(undefined)
-      const filter = await pickFilterToAdd(columns)
+      const filter = await pickFilterToAdd(params)
       expect(filter).toBeUndefined()
     })
 
     it('should return a filter definition if all of the steps are completed', async () => {
-      const columns = [epochsColumn]
+      const params = [epochsParam]
       mockedShowQuickPick.mockResolvedValueOnce({
-        value: epochsColumn
+        value: epochsParam
       } as unknown)
       mockedShowQuickPick.mockResolvedValueOnce({
         value: '=='
       } as unknown)
       mockedGetInput.mockResolvedValueOnce('5')
-      const filter = await pickFilterToAdd(columns)
+      const filter = await pickFilterToAdd(params)
       expect(filter).toEqual({
-        columnPath: epochsColumn.path,
         operator: '==',
+        path: epochsParam.path,
         value: '5'
       })
     })
@@ -279,19 +279,19 @@ describe('Column-based QuickPicks', () => {
     it('should return the selected filters', async () => {
       const selectedFilters = [
         {
-          columnPath: epochsColumn.path,
           operator: Operator.GREATER_THAN,
+          path: epochsParam.path,
           value: '2'
         },
         {
-          columnPath: epochsColumn.path,
           operator: Operator.LESS_THAN,
+          path: epochsParam.path,
           value: '8'
         }
       ]
       const allFilters = [
         ...selectedFilters,
-        { columnPath: epochsColumn.path, operator: Operator.EQUAL, value: '4' }
+        { operator: Operator.EQUAL, path: epochsParam.path, value: '4' }
       ]
       mockedShowQuickPick.mockResolvedValueOnce(
         selectedFilters.map(filter => ({ value: filter }))

@@ -24,7 +24,7 @@ export class Experiments {
 
   public dispose = Disposable.fn()
   public readonly experimentsRowsChanged = new EventEmitter<void>()
-  public readonly experimentsColumnsChanged = new EventEmitter<void>()
+  public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private experiments: ExperimentsRepositories = {}
 
@@ -83,16 +83,16 @@ export class Experiments {
     return Object.keys(this.experiments)
   }
 
-  public getColumn(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getColumn(path)
+  public getParamOrMetric(dvcRoot: string, path: string) {
+    return this.getRepository(dvcRoot).getParamOrMetric(path)
   }
 
-  public getChildColumns(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getChildColumns(path)
+  public getChildParamsOrMetrics(dvcRoot: string, path: string) {
+    return this.getRepository(dvcRoot).getChildParamsOrMetrics(path)
   }
 
-  public toggleColumnStatus(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).toggleColumnStatus(path)
+  public toggleParamOrMetricStatus(dvcRoot: string, path: string) {
+    return this.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
   }
 
   public getSortedBy(): string[] {
@@ -316,8 +316,8 @@ export class Experiments {
     )
 
     experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperimentsColumns(() =>
-        this.experimentsColumnsChanged.fire()
+      experimentsRepository.onDidChangeParamsOrMetrics(() =>
+        this.paramsOrMetricsChanged.fire()
       )
     )
     return experimentsRepository

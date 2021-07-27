@@ -41,7 +41,7 @@ import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
-import { ExperimentsColumnsTree } from './experiments/views/columnsTree'
+import { ExperimentsParamsAndMetricsTree } from './experiments/views/paramsAndMetricsTree'
 import { ExperimentsSortByTree } from './experiments/views/sortByTree'
 import { ExperimentsRunsTree } from './experiments/views/runsTree'
 import { ExperimentsFilterByTree } from './experiments/views/filterByTree'
@@ -118,7 +118,10 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      new ExperimentsColumnsTree(this.experiments, this.resourceLocator)
+      new ExperimentsParamsAndMetricsTree(
+        this.experiments,
+        this.resourceLocator
+      )
     )
 
     this.dispose.track(new ExperimentsSortByTree(this.experiments))
