@@ -151,6 +151,19 @@ export const operators = [
   }
 ]
 
+const addFilterValue = async (path: string, operator: Operator) => {
+  const value = await getInput('Enter a filter value')
+  if (!value) {
+    return
+  }
+
+  return {
+    operator: operator,
+    path,
+    value
+  }
+}
+
 export const pickFilterToAdd = async (
   paramsAndMetrics: ParamOrMetric[] | undefined
 ): Promise<FilterDefinition | undefined> => {
@@ -180,16 +193,7 @@ export const pickFilterToAdd = async (
     }
   }
 
-  const value = await getInput('Enter a value')
-  if (!value) {
-    return
-  }
-
-  return {
-    operator: operator,
-    path: picked.path,
-    value
-  }
+  return addFilterValue(picked.path, operator)
 }
 
 export const pickFiltersToRemove = (
