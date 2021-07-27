@@ -91,6 +91,10 @@ export class ExperimentsRepository {
     return status
   }
 
+  public getParamsAndMetricsStatuses() {
+    return this.model.getParamsAndMetricsStatuses()
+  }
+
   public showWebview = async () => {
     if (this.webview) {
       return this.webview.reveal()

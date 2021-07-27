@@ -83,6 +83,10 @@ export class ExperimentsModel {
     return this.paramsAndMetrics.getParamOrMetric(path)
   }
 
+  public getParamsAndMetricsStatuses() {
+    return this.paramsAndMetrics.getTerminalNodeStatuses()
+  }
+
   public getChildParamsOrMetrics(path: string) {
     return this.paramsAndMetrics.getChildren(path)
   }
