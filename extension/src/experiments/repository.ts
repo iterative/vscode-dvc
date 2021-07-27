@@ -137,8 +137,8 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public getSort() {
-    return this.model.getSort()
+  public getSorts() {
+    return this.model.getSorts()
   }
 
   public async pickSort() {

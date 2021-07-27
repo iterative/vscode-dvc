@@ -6,6 +6,7 @@ import { ExperimentsWebview } from './webview'
 import { FilterDefinition } from './model/filtering'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
+import { SortDefinition } from './model/sorting'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -99,8 +100,8 @@ export class Experiments {
     return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
   }
 
-  public getSortedBy(): string[] {
-    return []
+  public getSorts(dvcRoot: string): SortDefinition[] {
+    return this.getRepository(dvcRoot).getSorts()
   }
 
   public getFilters(dvcRoot: string): FilterDefinition[] {
@@ -259,10 +260,6 @@ export class Experiments {
     }
 
     experimentsRepository.setWebview(experimentsWebview)
-  }
-
-  public getSort(dvcRoot: string) {
-    return this.getRepository(dvcRoot)?.getSort()
   }
 
   private async getFocusedOrDefaultOrPickRepo() {

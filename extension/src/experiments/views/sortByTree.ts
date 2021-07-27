@@ -5,7 +5,8 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  window
+  window,
+  Uri
 } from 'vscode'
 import { Experiments } from '..'
 import { SortDefinition } from '../model/sorting'
@@ -38,37 +39,51 @@ export class ExperimentsSortByTree
 
   public getTreeItem(element: string | SortDefinition): TreeItem {
     if (typeof element === 'string') {
-      const projectTreeItem = new TreeItem(
-        element,
-        TreeItemCollapsibleState.Expanded
-      )
-      projectTreeItem.id = element
-      return projectTreeItem
+      return this.getTreeItemFromDvcRoot(element as string)
+    }
+    return this.getTreeItemFromSortDefinition(element as SortDefinition)
+  }
+
+  public getChildren(
+    parent: undefined | string
+  ): string[] | SortDefinition[] | Promise<string[] | SortDefinition[]> {
+    if (parent === undefined) {
+      return this.getRootItems()
     }
 
+    return this.experiments.getSorts(parent)
+  }
+
+  private async getRootItems() {
+    await this.experiments.isReady()
+    const roots = this.experiments.getDvcRoots()
+    if (roots.length === 1) {
+      return this.getChildren(roots[0])
+    } else {
+      return roots
+    }
+  }
+
+  private getTreeItemFromDvcRoot(rootPath: string) {
+    const projectTreeItem = new TreeItem(
+      Uri.file(rootPath),
+      TreeItemCollapsibleState.Expanded
+    )
+
+    projectTreeItem.id = rootPath
+
+    return projectTreeItem
+  }
+
+  private getTreeItemFromSortDefinition(sortDefinition: SortDefinition) {
     const sortDefinitionTreeItem = new TreeItem({
-      label: `${element.path}`
+      label: `${sortDefinition.path}`
     })
 
     sortDefinitionTreeItem.iconPath = new ThemeIcon(
-      element.descending ? 'arrow-down' : 'arrow-up'
+      sortDefinition.descending ? 'arrow-down' : 'arrow-up'
     )
 
     return sortDefinitionTreeItem
-  }
-
-  public getChildren(parent: undefined | string): string[] | SortDefinition[] {
-    if (parent === undefined) {
-      const roots = this.experiments.getDvcRoots()
-      if (roots.length === 1) {
-        return this.getChildren(roots[0])
-      } else {
-        return roots
-      }
-    }
-
-    const sort = this.experiments.getSort(parent)
-
-    return sort ? [sort] : []
   }
 }

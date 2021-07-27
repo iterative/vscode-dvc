@@ -46,11 +46,11 @@ beforeEach(() => {
 
 describe('ExperimentsSortByTree', () => {
   describe('getChildren', () => {
-    it('should return an empty array', () => {
+    it('should return an empty array', async () => {
       mockedGetSortedBy.mockReturnValue([])
       mockedGetDvcRoots.mockReturnValueOnce([])
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
-      const rootElements = experimentsSortByTree.getChildren(undefined)
+      const rootElements = await experimentsSortByTree.getChildren(undefined)
       expect(rootElements).toEqual([])
     })
   })

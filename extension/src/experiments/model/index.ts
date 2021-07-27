@@ -51,8 +51,8 @@ export class ExperimentsModel {
     this.currentSort = sort
   }
 
-  public getSort(): SortDefinition | undefined {
-    return this.currentSort
+  public getSorts(): SortDefinition[] {
+    return this.currentSort ? [this.currentSort] : []
   }
 
   public getFilters() {
