@@ -60,7 +60,7 @@ export class ExperimentsSortByTree
     if (roots.length === 1) {
       return this.getChildren(roots[0])
     } else {
-      return roots
+      return roots.sort((a, b) => a.localeCompare(b))
     }
   }
 
