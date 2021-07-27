@@ -14,7 +14,7 @@ import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
 import { ParamOrMetric } from '../webview/contract'
 import { Status } from '../model/paramsAndMetrics'
-import { flatten } from '../../util/array'
+import { definedAndNonEmpty, flatten } from '../../util/array'
 
 export class ExperimentsParamsAndMetricsTree
   implements TreeDataProvider<string>
@@ -68,6 +68,7 @@ export class ExperimentsParamsAndMetricsTree
 
     const paramOrMetric = this.experiments.getParamOrMetric(dvcRoot, path)
     const hasChildren = !!paramOrMetric?.hasChildren
+    const descendantStatuses = paramOrMetric?.descendantStatuses
 
     const treeItem = new TreeItem(
       resourceUri,
@@ -84,12 +85,8 @@ export class ExperimentsParamsAndMetricsTree
 
     treeItem.iconPath = this.getIconPath(paramOrMetric?.status)
 
-    if (hasChildren) {
-      treeItem.description = `${
-        paramOrMetric?.descendantStatuses.filter(status =>
-          [Status.selected, Status.indeterminate].includes(status)
-        ).length
-      }/${paramOrMetric?.descendantStatuses.length}`
+    if (hasChildren && descendantStatuses) {
+      treeItem.description = this.getDescription(descendantStatuses, '/')
     }
 
     return treeItem
@@ -112,11 +109,7 @@ export class ExperimentsParamsAndMetricsTree
             this.experiments.getParamsAndMetricsStatuses(dvcRoot)
           )
         )
-        this.view.description = `${
-          statuses.filter(status =>
-            [Status.selected, Status.indeterminate].includes(status)
-          ).length
-        } of ${statuses.length}`
+        this.view.description = this.getDescription(statuses, ' of ')
       })
     )
   }
@@ -178,5 +171,16 @@ export class ExperimentsParamsAndMetricsTree
       return this.resourceLocator.indeterminateCheckbox
     }
     return this.resourceLocator.emptyCheckbox
+  }
+
+  private getDescription(statuses: Status[], separator: string) {
+    if (!definedAndNonEmpty(statuses)) {
+      return
+    }
+    return `${
+      statuses.filter(status =>
+        [Status.selected, Status.indeterminate].includes(status)
+      ).length
+    }${separator}${statuses.length}`
   }
 }
