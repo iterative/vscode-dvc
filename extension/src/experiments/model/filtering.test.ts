@@ -9,8 +9,10 @@ describe('filterExperiments', () => {
       id: 1,
       params: {
         'params.yaml': {
+          bool: true,
           filter: 1,
-          sort: 1
+          sort: 1,
+          text: 'abcdefghijklmnop'
         }
       }
     },
@@ -18,8 +20,10 @@ describe('filterExperiments', () => {
       id: 2,
       params: {
         'params.yaml': {
+          bool: false,
           filter: 2,
-          sort: 1
+          sort: 1,
+          text: 'fun'
         }
       }
     },
@@ -122,5 +126,95 @@ describe('filterExperiments', () => {
       experiments
     )
     expect(filteredExperiments).toEqual([])
+  })
+
+  it('should filter the experiments using string contains', () => {
+    const experimentsWithText = filterExperiments(
+      [
+        {
+          operator: Operator.CONTAINS,
+          path: join('params', paramsFile, 'text'),
+          value: 'def'
+        }
+      ],
+      experiments
+    )
+    expect(experimentsWithText.map(experiment => experiment.id)).toEqual([1])
+  })
+
+  it('should filter all experiments if given a numeric column to filter with string contains', () => {
+    const noExperiments = filterExperiments(
+      [
+        {
+          operator: Operator.CONTAINS,
+          path: join('params', paramsFile, 'filter'),
+          value: '1'
+        }
+      ],
+      experiments
+    )
+    expect(noExperiments).toEqual([])
+  })
+
+  it('should not filter any experiments if given a numeric column to filter with string does not contain', () => {
+    const unfilteredExperiments = filterExperiments(
+      [
+        {
+          operator: Operator.NOT_CONTAINS,
+          path: join('params', paramsFile, 'filter'),
+          value: '1'
+        }
+      ],
+      experiments
+    )
+    expect(unfilteredExperiments).toEqual(experiments)
+  })
+
+  it('should filter the experiments using string does not contain', () => {
+    const experimentsWithoutText = filterExperiments(
+      [
+        {
+          operator: Operator.NOT_CONTAINS,
+          path: join('params', paramsFile, 'text'),
+          value: 'def'
+        }
+      ],
+      experiments
+    )
+    expect(experimentsWithoutText.map(experiment => experiment.id)).toEqual([
+      2, 3
+    ])
+  })
+
+  it('should filter the experiments using boolean is true', () => {
+    const experimentsWithTrueBool = filterExperiments(
+      [
+        {
+          operator: Operator.IS_TRUE,
+          path: join('params', paramsFile, 'bool'),
+          value: undefined
+        }
+      ],
+      experiments
+    )
+    expect(experimentsWithTrueBool.map(experiment => experiment.id)).toEqual([
+      1
+    ])
+  })
+
+  it('should filter the experiments using boolean is false', () => {
+    const experimentsWithFalseBool = filterExperiments(
+      [
+        {
+          operator: Operator.IS_FALSE,
+          path: join('params', paramsFile, 'bool'),
+          value: undefined
+        }
+      ],
+      experiments
+    )
+    expect(experimentsWithFalseBool.map(experiment => experiment.id)).toEqual([
+      2
+    ])
   })
 })
