@@ -503,14 +503,29 @@
       ],
       "view/title": [
         {
+          "command": "dvc.runExperiment",
+          "when": "view == dvc.views.experimentsRunsTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "when": "view == dvc.views.experimentsRunsTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.queueExperiment",
+          "when": "view == dvc.views.experimentsRunsTree",
+          "group": "navigation@3"
+        },
+        {
           "command": "dvc.addExperimentsTableFilter",
           "when": "view == dvc.views.experimentsFilterByTree",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree",
-          "group": "navigation"
+          "group": "navigation@2"
         }
       ]
     },

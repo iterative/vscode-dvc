@@ -95,6 +95,10 @@ export class Experiments {
     return this.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
   }
 
+  public getParamsAndMetricsStatuses(dvcRoot: string) {
+    return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
+  }
+
   public getSortedBy(): string[] {
     return []
   }
@@ -109,6 +113,10 @@ export class Experiments {
 
   public getExperimentNames(dvcRoot: string): string[] {
     return this.getRepository(dvcRoot).getExperimentNames()
+  }
+
+  public getExperimentStatuses(dvcRoot: string): number[] {
+    return this.getRepository(dvcRoot).getExperimentStatuses()
   }
 
   public getExperiment(dvcRoot: string, name: string) {

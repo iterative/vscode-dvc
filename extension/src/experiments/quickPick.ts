@@ -88,34 +88,81 @@ export const pickSort = async (
   }
 }
 
-const operators = [
-  { description: 'Equal', label: '=', value: Operator.EQUAL },
+export const operators = [
+  {
+    description: 'Equal',
+    label: '=',
+    types: ['number', 'string'],
+    value: Operator.EQUAL
+  },
   {
     description: 'Not equal',
     label: Operator.NOT_EQUAL,
+    types: ['number', 'string'],
     value: Operator.NOT_EQUAL
+  },
+  {
+    description: 'Is true',
+    label: Operator.IS_TRUE,
+    types: ['boolean'],
+    value: Operator.IS_TRUE
+  },
+  {
+    description: 'Is false',
+    label: Operator.IS_FALSE,
+    types: ['boolean'],
+    value: Operator.IS_FALSE
   },
   {
     description: 'Greater than',
     label: Operator.GREATER_THAN,
+    types: ['number'],
     value: Operator.GREATER_THAN
   },
   {
     description: 'Greater than or equal',
     label: Operator.GREATER_THAN_OR_EQUAL,
+    types: ['number'],
     value: Operator.GREATER_THAN_OR_EQUAL
   },
   {
     description: 'Less than',
     label: Operator.LESS_THAN,
+    types: ['number'],
     value: Operator.LESS_THAN
   },
   {
     description: 'Less than or equal',
     label: Operator.LESS_THAN_OR_EQUAL,
+    types: ['number'],
     value: Operator.LESS_THAN_OR_EQUAL
+  },
+  {
+    description: 'Contains',
+    label: Operator.CONTAINS,
+    types: ['string'],
+    value: Operator.CONTAINS
+  },
+  {
+    description: 'Does not contain',
+    label: Operator.NOT_CONTAINS,
+    types: ['string'],
+    value: Operator.NOT_CONTAINS
   }
 ]
+
+const addFilterValue = async (path: string, operator: Operator) => {
+  const value = await getInput('Enter a filter value')
+  if (!value) {
+    return
+  }
+
+  return {
+    operator: operator,
+    path,
+    value
+  }
+}
 
 export const pickFilterToAdd = async (
   paramsAndMetrics: ParamOrMetric[] | undefined
@@ -127,23 +174,26 @@ export const pickFilterToAdd = async (
     return
   }
 
-  const operator = await quickPickValue<string>(operators, {
+  const typedOperators = operators.filter(operator =>
+    operator.types.some(type => picked.types?.includes(type))
+  )
+
+  const operator = await quickPickValue<Operator>(typedOperators, {
     title: 'Select an operator'
   })
   if (!operator) {
     return
   }
 
-  const value = await getInput('Enter a value')
-  if (!value) {
-    return
+  if ([Operator.IS_TRUE, Operator.IS_FALSE].includes(operator)) {
+    return {
+      operator: operator,
+      path: picked.path,
+      value: undefined
+    }
   }
 
-  return {
-    operator: operator as Operator,
-    path: picked.path,
-    value
-  }
+  return addFilterValue(picked.path, operator)
 }
 
 export const pickFiltersToRemove = (

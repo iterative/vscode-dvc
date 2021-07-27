@@ -91,6 +91,10 @@ export class ExperimentsRepository {
     return status
   }
 
+  public getParamsAndMetricsStatuses() {
+    return this.model.getParamsAndMetricsStatuses()
+  }
+
   public showWebview = async () => {
     if (this.webview) {
       return this.webview.reveal()
@@ -181,6 +185,10 @@ export class ExperimentsRepository {
 
   public getExperimentNames(): string[] {
     return this.model.getExperimentNames()
+  }
+
+  public getExperimentStatuses(): number[] {
+    return this.model.getExperimentStatuses()
   }
 
   public getExperiment(name: string) {

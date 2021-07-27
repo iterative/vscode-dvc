@@ -45,7 +45,7 @@ export class ParamsAndMetrics {
     if (paramOrMetric) {
       return {
         ...paramOrMetric,
-        descendantMetadata: this.getDescendantMetaData(paramOrMetric),
+        descendantStatuses: this.getDescendantsStatuses(paramOrMetric.path),
         status: this.status[paramOrMetric.path]
       }
     }
@@ -66,6 +66,13 @@ export class ParamsAndMetrics {
     this.setAreChildrenSelected(path, status)
 
     return this.status[path]
+  }
+
+  public getTerminalNodeStatuses() {
+    const terminalNodes = this.getTerminalNodes()
+    return terminalNodes
+      .map(paramOrMetric => this.status[paramOrMetric.path])
+      .filter(paramOrMetric => paramOrMetric !== undefined)
   }
 
   private setAreChildrenSelected(path: string, status: Status) {
@@ -129,17 +136,5 @@ export class ParamsAndMetrics {
       return Status.unselected
     }
     return Status.selected
-  }
-
-  private getDescendantMetaData(paramOrMetric: ParamOrMetric) {
-    if (!paramOrMetric.hasChildren) {
-      return
-    }
-    const statuses = this.getDescendantsStatuses(paramOrMetric.path)
-    return `${
-      statuses.filter(status =>
-        [Status.selected, Status.indeterminate].includes(status)
-      ).length
-    }/${statuses.length}`
   }
 }

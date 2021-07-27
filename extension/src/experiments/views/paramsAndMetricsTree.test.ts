@@ -13,7 +13,10 @@ const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
 const mockedParamsOrMetricsChanged = mocked(new EventEmitter<void>())
 const mockedParamsOrMetricsChangedFire = jest.fn()
+const mockedParamsOrMetricsChangedEvent = jest.fn()
 mockedParamsOrMetricsChanged.fire = mockedParamsOrMetricsChangedFire
+mockedParamsOrMetricsChanged.event = mockedParamsOrMetricsChangedEvent
+
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -221,7 +224,12 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       .mockReturnValueOnce([mockedDvcRoot, relParamsPath])
 
     mockedGetParamOrMetric.mockReturnValueOnce({
-      descendantMetadata: '3/4',
+      descendantStatuses: [
+        Status.selected,
+        Status.selected,
+        Status.selected,
+        Status.unselected
+      ],
       hasChildren: true,
       status: Status.selected
     } as unknown as ParamOrMetric)

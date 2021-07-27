@@ -5,11 +5,13 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
+  TreeView,
   Uri,
   window
 } from 'vscode'
 import { Experiments } from '..'
-import { definedAndNonEmpty, flatten } from '../../util/array'
+import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
+import { ExperimentStatus } from '../model'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -19,10 +21,12 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private readonly experiments: Experiments
   private runRoots: Record<string, string> = {}
 
+  private view: TreeView<string>
+
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
 
-    this.dispose.track(
+    this.view = this.dispose.track(
       window.createTreeView('dvc.views.experimentsRunsTree', {
         canSelectMany: true,
         showCollapseAll: true,
@@ -31,6 +35,8 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
 
     this.experiments = experiments
+
+    this.updateDescriptionOnChange()
   }
 
   public getTreeItem(element: string): TreeItem {
@@ -146,5 +152,54 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
 
   private isRoot(element: string) {
     return Object.values(this.runRoots).includes(element)
+  }
+
+  private updateDescriptionOnChange() {
+    this.dispose.track(
+      this.onDidChangeTreeData(() => {
+        const statuses = this.getStatuses()
+        this.view.description = this.getDescription(statuses)
+      })
+    )
+  }
+
+  private getStatuses() {
+    const dvcRoots = this.experiments.getDvcRoots()
+
+    return flatten<ExperimentStatus>(
+      dvcRoots.map(dvcRoot => this.experiments.getExperimentStatuses(dvcRoot))
+    )
+  }
+
+  private getDescription(statuses: ExperimentStatus[]) {
+    if (!definedAndNonEmpty(statuses)) {
+      return
+    }
+
+    const { active, queued } = statuses.reduce(
+      (acc, status) => {
+        if (status === ExperimentStatus.RUNNING) {
+          acc.active += 1
+        }
+
+        if (status === ExperimentStatus.QUEUED) {
+          acc.queued += 1
+        }
+
+        return acc
+      },
+      { active: 0, queued: 0 }
+    )
+    return joinTruthyItems(
+      [
+        this.getSubDescription(active, 'active'),
+        this.getSubDescription(queued, 'queued')
+      ],
+      ', '
+    )
+  }
+
+  private getSubDescription(count: number, label: string) {
+    return count ? `${count} ${label}` : ''
   }
 }
