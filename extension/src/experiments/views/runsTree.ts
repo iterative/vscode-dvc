@@ -5,11 +5,13 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
+  TreeView,
   Uri,
   window
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten } from '../../util/array'
+import { ExperimentStatus } from '../model'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -19,10 +21,12 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private readonly experiments: Experiments
   private runRoots: Record<string, string> = {}
 
+  private view: TreeView<string>
+
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
 
-    this.dispose.track(
+    this.view = this.dispose.track(
       window.createTreeView('dvc.views.experimentsRunsTree', {
         canSelectMany: true,
         showCollapseAll: true,
@@ -31,6 +35,31 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     )
 
     this.experiments = experiments
+
+    this.dispose.track(
+      this.onDidChangeTreeData(() => {
+        const dvcRoots = this.experiments.getDvcRoots()
+
+        const statuses = flatten<ExperimentStatus>(
+          dvcRoots.map(dvcRoot =>
+            this.experiments.getExperimentStatuses(dvcRoot)
+          )
+        )
+        const active = statuses.filter(
+          status => status === ExperimentStatus.RUNNING
+        ).length
+        const activeText = active ? `${active} active` : undefined
+
+        const queued = statuses.filter(
+          status => status === ExperimentStatus.QUEUED
+        ).length
+        const queuedText = queued ? `${queued} queued` : undefined
+
+        this.view.description = [activeText, queuedText]
+          .filter(Boolean)
+          .join(', ')
+      })
+    )
   }
 
   public getTreeItem(element: string): TreeItem {

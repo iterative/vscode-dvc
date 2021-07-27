@@ -179,6 +179,10 @@ export class ExperimentsRepository {
     return this.model.getExperimentNames()
   }
 
+  public getExperimentStatuses(): number[] {
+    return this.model.getExperimentStatuses()
+  }
+
   public getExperiment(name: string) {
     return this.model.getExperiment(name)
   }
