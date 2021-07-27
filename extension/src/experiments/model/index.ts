@@ -12,6 +12,11 @@ import { Experiment, RowData, TableData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
+export enum ExperimentStatus {
+  RUNNING = 1,
+  QUEUED = 2
+}
+
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -84,6 +89,14 @@ export class ExperimentsModel {
 
   public toggleParamOrMetricStatus(path: string) {
     return this.paramsAndMetrics.toggleStatus(path)
+  }
+
+  public getExperimentStatuses(): number[] {
+    return [this.workspace, ...this.getExperiments()]
+      .filter(experiment => experiment.running || experiment.queued)
+      .map(experiment =>
+        experiment.running ? ExperimentStatus.RUNNING : ExperimentStatus.QUEUED
+      )
   }
 
   public getExperimentNames(): string[] {

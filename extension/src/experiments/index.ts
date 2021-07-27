@@ -111,6 +111,10 @@ export class Experiments {
     return this.getRepository(dvcRoot).getExperimentNames()
   }
 
+  public getExperimentStatuses(dvcRoot: string): number[] {
+    return this.getRepository(dvcRoot).getExperimentStatuses()
+  }
+
   public getExperiment(dvcRoot: string, name: string) {
     return this.getRepository(dvcRoot).getExperiment(name)
   }
