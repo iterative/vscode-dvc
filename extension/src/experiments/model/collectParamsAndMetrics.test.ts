@@ -1,105 +1,10 @@
 import { join } from 'path'
-import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ParamOrMetric, Experiment } from '../webview/contract'
-
-const paramsYaml = 'params.yaml'
-
-describe('branch and checkpoint nesting', () => {
-  it('returns an empty array if no branches are present', () => {
-    const { branches } = transformExperimentsRepo({
-      workspace: {
-        baseline: {}
-      }
-    })
-    expect(branches).toEqual([])
-  })
-
-  describe('a repo with two branches', () => {
-    const { branches, experimentsByBranch, workspace } =
-      transformExperimentsRepo({
-        branchA: {
-          baseline: { data: {} },
-          otherExp1: { data: {} },
-          otherExp2: {
-            data: { checkpoint_tip: 'otherExp2' }
-          },
-          otherExp2_1: {
-            data: { checkpoint_tip: 'otherExp2' }
-          }
-        },
-        branchB: {
-          baseline: { data: {} }
-        },
-        workspace: {
-          baseline: {}
-        }
-      })
-
-    it('defines workspace', () => {
-      expect(workspace).toBeDefined()
-    })
-
-    it('finds two branches', () => {
-      expect(branches.length).toEqual(2)
-    })
-
-    const [branchA, branchB] = branches
-    it('lists branches in the same order as the map', () => {
-      expect(branchA.id).toEqual('branchA')
-      expect(branchB.id).toEqual('branchB')
-    })
-
-    it('finds two experiments on branchA', () => {
-      expect(experimentsByBranch.get('branchA')?.length).toEqual(2)
-    })
-
-    it('finds no experiments on branchB', () => {
-      expect(experimentsByBranch.get('branchB')).toBeUndefined()
-    })
-  })
-
-  describe('a repo with one branch that has nested checkpoints', () => {
-    const { experimentsByBranch, checkpointsByTip } = transformExperimentsRepo({
-      branchA: {
-        baseline: { data: {} },
-        tip1: {
-          data: { checkpoint_tip: 'tip1' }
-        },
-        tip1cp1: {
-          data: { checkpoint_tip: 'tip1' }
-        },
-        tip1cp2: {
-          data: { checkpoint_tip: 'tip1' }
-        },
-        tip1cp3: {
-          data: { checkpoint_tip: 'tip1' }
-        }
-      },
-      workspace: { baseline: {} }
-    })
-
-    it('only lists the tip as a top-level experiment', () => {
-      expect(experimentsByBranch.size).toEqual(1)
-    })
-
-    const checkpoints = checkpointsByTip.get('tip1') as Experiment[]
-
-    it('finds three checkpoints on the tip', () => {
-      expect(checkpoints?.length).toEqual(3)
-    })
-    const [tip1cp1, tip1cp2, tip1cp3] = checkpoints
-
-    it('finds checkpoints in order', () => {
-      expect(tip1cp1.id).toEqual('tip1cp1')
-      expect(tip1cp2.id).toEqual('tip1cp2')
-      expect(tip1cp3.id).toEqual('tip1cp3')
-    })
-  })
-})
+import { collectParamsAndMetrics } from './collectParamsAndMetrics'
+import { ParamOrMetric } from '../webview/contract'
 
 describe('metrics/params schema builder', () => {
   it('Outputs both params and metrics when both are present', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       workspace: {
         baseline: {
           data: {
@@ -130,7 +35,7 @@ describe('metrics/params schema builder', () => {
   })
 
   it('Omits params when none exist in the source data', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       workspace: {
         baseline: {
           data: {
@@ -154,7 +59,7 @@ describe('metrics/params schema builder', () => {
   })
 
   it('returns an empty array if no params and metrics are provided', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       workspace: {
         baseline: {}
       }
@@ -164,7 +69,7 @@ describe('metrics/params schema builder', () => {
 
   describe('minimal mixed param example', () => {
     const exampleBigNumber = 3000000000
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       branchA: {
         baseline: {
           data: {
@@ -210,7 +115,8 @@ describe('metrics/params schema builder', () => {
     })
 
     const exampleMixedParam = paramsAndMetrics.find(
-      paramOrMetric => paramOrMetric.parentPath === join('params', paramsYaml)
+      paramOrMetric =>
+        paramOrMetric.parentPath === join('params', 'params.yaml')
     ) as ParamOrMetric
 
     it('correctly identifies mixed type params', () => {
@@ -233,7 +139,7 @@ describe('metrics/params schema builder', () => {
   })
 
   it('finds different minNumber and maxNumber on a mixed param', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       branch1: {
         baseline: {
           data: {
@@ -278,7 +184,7 @@ describe('metrics/params schema builder', () => {
     })
     const mixedParam = paramsAndMetrics.find(
       paramOrMetric =>
-        paramOrMetric.path === join('params', paramsYaml, 'mixedNumber')
+        paramOrMetric.path === join('params', 'params.yaml', 'mixedNumber')
     ) as ParamOrMetric
 
     expect(mixedParam.minNumber).toEqual(-1)
@@ -286,7 +192,7 @@ describe('metrics/params schema builder', () => {
   })
 
   describe('Number features', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       branch1: {
         baseline: {
           data: {
@@ -344,7 +250,7 @@ describe('metrics/params schema builder', () => {
   })
 
   it('aggregates multiple different field names', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       branchA: {
         baseline: {
           data: {
@@ -390,7 +296,8 @@ describe('metrics/params schema builder', () => {
     })
 
     const params = paramsAndMetrics.filter(
-      paramOrMetric => paramOrMetric.parentPath === join('params', paramsYaml)
+      paramOrMetric =>
+        paramOrMetric.parentPath === join('params', 'params.yaml')
     ) as ParamOrMetric[]
 
     expect(params?.map(({ name }) => name)).toEqual([
@@ -402,7 +309,7 @@ describe('metrics/params schema builder', () => {
   })
 
   it('does not report types for params and metrics without primitives or children for params and metrics without objects', () => {
-    const { paramsAndMetrics } = transformExperimentsRepo({
+    const paramsAndMetrics = collectParamsAndMetrics({
       workspace: {
         baseline: {
           data: {
@@ -421,7 +328,8 @@ describe('metrics/params schema builder', () => {
     })
 
     const objectParam = paramsAndMetrics.find(
-      paramOrMetric => paramOrMetric.parentPath === join('params', paramsYaml)
+      paramOrMetric =>
+        paramOrMetric.parentPath === join('params', 'params.yaml')
     ) as ParamOrMetric
 
     expect(objectParam.name).toEqual('onlyHasChild')
@@ -429,7 +337,8 @@ describe('metrics/params schema builder', () => {
 
     const primitiveParam = paramsAndMetrics.find(
       paramOrMetric =>
-        paramOrMetric.parentPath === join('params', paramsYaml, 'onlyHasChild')
+        paramOrMetric.parentPath ===
+        join('params', 'params.yaml', 'onlyHasChild')
     ) as ParamOrMetric
 
     expect(primitiveParam.name).toEqual('onlyHasPrimitive')
@@ -438,7 +347,7 @@ describe('metrics/params schema builder', () => {
     const onlyHasPrimitiveChild = paramsAndMetrics.find(
       paramOrMetric =>
         paramOrMetric.parentPath ===
-        join('params', paramsYaml, 'onlyHasChild', 'onlyHasPrimitive')
+        join('params', 'params.yaml', 'onlyHasChild', 'onlyHasPrimitive')
     ) as ParamOrMetric
 
     expect(onlyHasPrimitiveChild).toBeUndefined()

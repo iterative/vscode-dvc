@@ -6,7 +6,8 @@ import {
   filterExperiments,
   getFilterId
 } from './filtering'
-import { transformExperimentsRepo } from './transformExperimentsRepo'
+import { collectParamsAndMetrics } from './collectParamsAndMetrics'
+import { collectExperiments } from './collectExperiments'
 import { ParamsAndMetrics } from './paramsAndMetrics'
 import { Experiment, RowData, TableData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -31,13 +32,10 @@ export class ExperimentsModel {
   private currentSort?: SortDefinition
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
-    const {
-      paramsAndMetrics,
-      branches,
-      experimentsByBranch,
-      checkpointsByTip,
-      workspace
-    } = transformExperimentsRepo(data)
+    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
+      collectExperiments(data)
+
+    const paramsAndMetrics = collectParamsAndMetrics(data)
 
     this.paramsAndMetrics.update(paramsAndMetrics)
 
