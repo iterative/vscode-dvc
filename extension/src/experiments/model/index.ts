@@ -1,5 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SortDefinition, sortRows } from './sorting'
+import { SortDefinition, sortExperiments } from './sorting'
 import {
   FilterDefinition,
   filterExperiment,
@@ -11,7 +11,7 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
-export enum ExperimentStatus {
+export enum Status {
   RUNNING = 1,
   QUEUED = 2
 }
@@ -65,9 +65,7 @@ export class ExperimentsModel {
   public getExperimentStatuses(): number[] {
     return [this.workspace, ...this.getExperiments()]
       .filter(experiment => experiment.running || experiment.queued)
-      .map(experiment =>
-        experiment.running ? ExperimentStatus.RUNNING : ExperimentStatus.QUEUED
-      )
+      .map(experiment => (experiment.running ? Status.RUNNING : Status.QUEUED))
   }
 
   public getExperimentNames(): string[] {
@@ -153,7 +151,7 @@ export class ExperimentsModel {
     if (!experiments) {
       return
     }
-    return sortRows(this.currentSort, experiments)
+    return sortExperiments(this.currentSort, experiments)
   }
 
   private getExperiments() {

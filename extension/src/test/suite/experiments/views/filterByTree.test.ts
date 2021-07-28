@@ -109,7 +109,7 @@ suite('Experiments Test Suite', () => {
       ).returns(dvcDemoPath)
 
       const tableFilterAdded = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperimentsRows(resolve)
+        experimentsRepository.onDidChangeExperiments(resolve)
       })
 
       // eslint-disable-next-line sonarjs/no-duplicate-string
@@ -142,7 +142,7 @@ suite('Experiments Test Suite', () => {
       })
 
       const tableFilterRemoved = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperimentsRows(resolve)
+        experimentsRepository.onDidChangeExperiments(resolve)
       })
 
       messageSpy.resetHistory()

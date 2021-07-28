@@ -23,7 +23,7 @@ export class Experiments {
   private focusedWebviewDvcRoot: string | undefined
 
   public dispose = Disposable.fn()
-  public readonly experimentsRowsChanged = new EventEmitter<void>()
+  public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private experiments: ExperimentsRepositories = {}
@@ -314,8 +314,8 @@ export class Experiments {
       )
     )
     experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperimentsRows(() =>
-        this.experimentsRowsChanged.fire()
+      experimentsRepository.onDidChangeExperiments(() =>
+        this.experimentsChanged.fire()
       )
     )
 
