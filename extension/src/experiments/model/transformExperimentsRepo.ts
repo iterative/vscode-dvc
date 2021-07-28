@@ -1,5 +1,4 @@
 import { collectExperiments } from './collectFromRepo'
-import { transformAndCollectIfAny } from './transformParamsAndMetrics'
 import { collectParamsAndMetrics } from './collectParamsAndMetrics'
 import { ParamOrMetric, Experiment } from '../webview/contract'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
@@ -18,16 +17,13 @@ export const transformExperimentsRepo = (
   const { workspace, branches, experimentsByBranch, checkpointsByTip } =
     collectExperiments(data)
 
-  const { metricsMap, paramsMap } = collectParamsAndMetrics(data)
+  const paramsAndMetrics = collectParamsAndMetrics(data)
 
   return {
     branches,
     checkpointsByTip,
     experimentsByBranch,
-    paramsAndMetrics: [
-      ...transformAndCollectIfAny(paramsMap),
-      ...transformAndCollectIfAny(metricsMap)
-    ],
+    paramsAndMetrics,
     workspace
   }
 }
