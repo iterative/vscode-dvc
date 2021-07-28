@@ -1,18 +1,4 @@
-import { ParamOrMetricAggregateData, Experiment } from '../webview/contract'
-
-export interface PartialParamOrMetricDescriptor
-  extends ParamOrMetricAggregateData {
-  types: Set<string>
-  hasChildren: boolean
-  group: string
-  path: string
-  parentPath: string
-}
-
-export type PartialParamsOrMetricsMap = Map<
-  string,
-  PartialParamOrMetricDescriptor
->
+import { Experiment } from '../webview/contract'
 
 export class ExperimentsAccumulator {
   public workspace = {} as Experiment
