@@ -44,7 +44,7 @@ import { InternalCommands } from './internalCommands'
 import { ExperimentsParamsAndMetricsTree } from './experiments/views/paramsAndMetricsTree'
 import { ExperimentsSortByTree } from './experiments/views/sortByTree'
 import { ExperimentsRunsTree } from './experiments/views/runsTree'
-import { ExperimentsFilterByTree } from './experiments/views/filterByTree'
+import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 
 export { Disposable, Disposer }
 

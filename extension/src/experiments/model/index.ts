@@ -5,7 +5,7 @@ import {
   filterExperiment,
   filterExperiments,
   getFilterId
-} from './filtering'
+} from './filterBy'
 import { collectExperiments } from './collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
