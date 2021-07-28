@@ -331,7 +331,7 @@ suite('Experiments Repository Test Suite', () => {
     } as QuickPickItemWithValue<boolean>)
 
     const tableChangePromise = new Promise(resolve => {
-      experimentsRepository.onDidChangeExperimentsRows(resolve)
+      experimentsRepository.onDidChangeExperiments(resolve)
     })
 
     const pickPromise = experimentsRepository.pickSort()

@@ -11,7 +11,7 @@ import {
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
-import { ExperimentStatus } from '../model'
+import { Status } from '../model'
 
 export class ExperimentsRunsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -24,7 +24,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private view: TreeView<string>
 
   constructor(experiments: Experiments) {
-    this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
+    this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
       window.createTreeView('dvc.views.experimentsRunsTree', {
@@ -166,23 +166,23 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
   private getStatuses() {
     const dvcRoots = this.experiments.getDvcRoots()
 
-    return flatten<ExperimentStatus>(
+    return flatten<Status>(
       dvcRoots.map(dvcRoot => this.experiments.getExperimentStatuses(dvcRoot))
     )
   }
 
-  private getDescription(statuses: ExperimentStatus[]) {
+  private getDescription(statuses: Status[]) {
     if (!definedAndNonEmpty(statuses)) {
       return
     }
 
     const { active, queued } = statuses.reduce(
       (acc, status) => {
-        if (status === ExperimentStatus.RUNNING) {
+        if (status === Status.RUNNING) {
           acc.active += 1
         }
 
-        if (status === ExperimentStatus.QUEUED) {
+        if (status === Status.QUEUED) {
           acc.queued += 1
         }
 

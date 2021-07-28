@@ -6,11 +6,11 @@ import { Experiments } from '..'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsRowsChanged = mocked(new EventEmitter<string | void>())
+const mockedExperimentsChanged = mocked(new EventEmitter<string | void>())
 const mockedExperimentDataChangedFire = jest.fn()
-mockedExperimentsRowsChanged.fire = mockedExperimentDataChangedFire
+mockedExperimentsChanged.fire = mockedExperimentDataChangedFire
 const mockedExperimentDataChangedEvent = jest.fn()
-mockedExperimentsRowsChanged.event = mockedExperimentDataChangedEvent
+mockedExperimentsChanged.event = mockedExperimentDataChangedEvent
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -24,7 +24,7 @@ const mockedGetExperiment = jest.fn()
 const mockedGetCheckpointNames = jest.fn()
 const mockedGetExperimentNames = jest.fn()
 const mockedExperiments = {
-  experimentsRowsChanged: mockedExperimentsRowsChanged,
+  experimentsChanged: mockedExperimentsChanged,
   getCheckpointNames: mockedGetCheckpointNames,
   getDvcRoots: mockedGetDvcRoots,
   getExperiment: mockedGetExperiment,

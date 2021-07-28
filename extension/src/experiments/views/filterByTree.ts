@@ -23,7 +23,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   private filterRoots: Record<string, string> = {}
 
   constructor(experiments: Experiments) {
-    this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
+    this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsFilterByTree', {

@@ -20,7 +20,7 @@ export class ExperimentsRepository {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
-  public readonly onDidChangeExperimentsRows: Event<void>
+  public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
@@ -38,7 +38,7 @@ export class ExperimentsRepository {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private readonly experimentsRowsChanged = new EventEmitter<void>()
+  private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private processManager: ProcessManager
@@ -53,7 +53,7 @@ export class ExperimentsRepository {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
-    this.onDidChangeExperimentsRows = this.experimentsRowsChanged.event
+    this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
 
     this.processManager = this.dispose.track(
@@ -216,7 +216,7 @@ export class ExperimentsRepository {
   }
 
   private notifyChanged() {
-    this.experimentsRowsChanged.fire()
+    this.experimentsChanged.fire()
     return this.notifyParamsOrMetricsChanged()
   }
 

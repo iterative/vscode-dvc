@@ -8,9 +8,9 @@ import { Operator } from '../model/filtering'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsRowsChanged = mocked(new EventEmitter<string | void>())
+const mockedExperimentsChanged = mocked(new EventEmitter<string | void>())
 const mockedExperimentDataChangedFire = jest.fn()
-mockedExperimentsRowsChanged.fire = mockedExperimentDataChangedFire
+mockedExperimentsChanged.fire = mockedExperimentDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -23,7 +23,7 @@ const mockedGetDvcRoots = jest.fn()
 const mockedGetFilters = jest.fn()
 const mockedGetFilter = jest.fn()
 const mockedExperiments = {
-  experimentsRowsChanged: mockedExperimentsRowsChanged,
+  experimentsChanged: mockedExperimentsChanged,
   getDvcRoots: mockedGetDvcRoots,
   getFilter: mockedGetFilter,
   getFilters: mockedGetFilters,
