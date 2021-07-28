@@ -19,8 +19,6 @@ export class ExperimentsAccumulator {
   public branches: Experiment[] = []
   public checkpointsByTip: Map<string, Experiment[]> = new Map()
   public experimentsByBranch: Map<string, Experiment[]> = new Map()
-  public metricsMap: PartialParamsOrMetricsMap = new Map()
-  public paramsMap: PartialParamsOrMetricsMap = new Map()
 
   constructor(workspace?: Experiment) {
     if (workspace) {

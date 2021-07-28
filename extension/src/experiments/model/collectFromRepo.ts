@@ -1,121 +1,12 @@
-import { join } from 'path'
-import {
-  ExperimentsAccumulator,
-  PartialParamOrMetricDescriptor,
-  PartialParamsOrMetricsMap
-} from './accumulator'
+import { ExperimentsAccumulator } from './accumulator'
 import { Experiment, ParamsOrMetrics } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
-  Value,
-  ValueTree,
   ValueTreeRoot
 } from '../../cli/reader'
-
-const getValueType = (value: Value | ValueTree) => {
-  if (value === null) {
-    return 'null'
-  }
-  return typeof value
-}
-
-const getEntryOrDefault = (
-  originalMap: PartialParamsOrMetricsMap,
-  propertyKey: string,
-  ancestors: string[]
-) =>
-  originalMap.get(propertyKey) || {
-    group: ancestors[0],
-    hasChildren: false,
-    parentPath: join(...ancestors),
-    path: join(...ancestors, propertyKey),
-    types: new Set<string>()
-  }
-
-const mergeNumberParamOrMetric = (
-  descriptor: PartialParamOrMetricDescriptor,
-  newNumber: number
-): void => {
-  const { maxNumber, minNumber } = descriptor
-  if (maxNumber === undefined || maxNumber < newNumber) {
-    descriptor.maxNumber = newNumber
-  }
-  if (minNumber === undefined || minNumber > newNumber) {
-    descriptor.minNumber = newNumber
-  }
-}
-
-const mergePrimitiveParamOrMetric = (
-  descriptor: PartialParamOrMetricDescriptor,
-  newValue: Value,
-  newValueType: string
-): PartialParamOrMetricDescriptor => {
-  const { maxStringLength } = descriptor
-
-  const stringifiedAddition = String(newValue)
-  const additionStringLength = stringifiedAddition.length
-  if (maxStringLength === undefined || maxStringLength < additionStringLength) {
-    descriptor.maxStringLength = additionStringLength
-  }
-
-  if (newValueType === 'number') {
-    mergeNumberParamOrMetric(descriptor, newValue as number)
-  }
-
-  return descriptor as PartialParamOrMetricDescriptor
-}
-
-const mergeParamsOrMetricsMap = (
-  originalMap: PartialParamsOrMetricsMap,
-  valueTree: ValueTree,
-  ...ancestors: string[]
-): PartialParamsOrMetricsMap => {
-  const sampleEntries = Object.entries(valueTree)
-  for (const [propertyKey, propertyValue] of sampleEntries) {
-    originalMap.set(
-      propertyKey,
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      mergeOrCreateDescriptor(
-        originalMap,
-        propertyKey,
-        propertyValue,
-        ...ancestors
-      )
-    )
-  }
-  return originalMap
-}
-const mergeOrCreateDescriptor = (
-  originalMap: PartialParamsOrMetricsMap,
-  propertyKey: string,
-  newValue: Value | ValueTree,
-  ...ancestors: string[]
-): PartialParamOrMetricDescriptor => {
-  const newValueType = getValueType(newValue)
-
-  const descriptor = getEntryOrDefault(originalMap, propertyKey, ancestors)
-
-  if (newValueType === 'object') {
-    mergeParamsOrMetricsMap(
-      originalMap,
-      newValue as ValueTree,
-      ...ancestors,
-      propertyKey
-    )
-    descriptor.hasChildren = true
-    return descriptor as PartialParamOrMetricDescriptor
-  } else {
-    descriptor.types.add(newValueType)
-    return mergePrimitiveParamOrMetric(
-      descriptor,
-      newValue as Value,
-      newValueType
-    )
-  }
-}
 
 const addToMapArray = <K = string, V = unknown>(
   map: Map<K, V[]>,
@@ -128,20 +19,6 @@ const addToMapArray = <K = string, V = unknown>(
   } else {
     const newArray = [value]
     map.set(key, newArray)
-  }
-}
-
-const collectParamsAndMetrics = (
-  acc: ExperimentsAccumulator,
-  experiment: Experiment
-) => {
-  const { paramsMap, metricsMap } = acc
-  const { params, metrics } = experiment
-  if (params) {
-    mergeParamsOrMetricsMap(paramsMap, params, 'params')
-  }
-  if (metrics) {
-    mergeParamsOrMetricsMap(metricsMap, metrics, 'metrics')
   }
 }
 
@@ -228,7 +105,6 @@ const collectFromExperimentsObject = (
     const experiment = transformExperimentData(sha, experimentData)
 
     if (experiment) {
-      collectParamsAndMetrics(acc, experiment)
       collectExperimentOrCheckpoint(acc, experiment, branchName)
     }
   }
@@ -244,7 +120,6 @@ const collectFromBranchesObject = (
     const branch = transformExperimentData(branchSha, baseline)
 
     if (branch) {
-      collectParamsAndMetrics(acc, branch)
       collectFromExperimentsObject(acc, experimentsObject, branch.displayName)
 
       acc.branches.push(branch)
@@ -252,7 +127,7 @@ const collectFromBranchesObject = (
   }
 }
 
-export const collectFromRepo = (
+export const collectExperiments = (
   data: ExperimentsRepoJSONOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
@@ -263,10 +138,6 @@ export const collectFromRepo = (
   )
 
   const acc = new ExperimentsAccumulator(workspaceBaseline)
-
-  if (workspaceBaseline) {
-    collectParamsAndMetrics(acc, workspaceBaseline)
-  }
 
   collectFromBranchesObject(acc, branchesObject)
   return acc
