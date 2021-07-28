@@ -7,9 +7,7 @@ import {
   getFilterId
 } from './filtering'
 import { collectExperiments } from './collect'
-import { ParamsAndMetricsModel } from '../paramsAndMetrics/model'
-import { collectParamsAndMetrics } from '../paramsAndMetrics/collect'
-import { Experiment, RowData, TableData } from '../webview/contract'
+import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
@@ -22,7 +20,6 @@ export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
   private workspace = {} as Experiment
-  private paramsAndMetrics = new ParamsAndMetricsModel()
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
@@ -34,10 +31,6 @@ export class ExperimentsModel {
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(data)
-
-    const paramsAndMetrics = collectParamsAndMetrics(data)
-
-    this.paramsAndMetrics.update(paramsAndMetrics)
 
     this.workspace = workspace
     this.branches = branches
@@ -67,30 +60,6 @@ export class ExperimentsModel {
 
   public removeFilter(id: string) {
     return this.filters.delete(id)
-  }
-
-  public getParamsAndMetrics() {
-    return this.paramsAndMetrics.getParamsAndMetrics()
-  }
-
-  public getTerminalParamsAndMetrics() {
-    return this.paramsAndMetrics.getTerminalNodes()
-  }
-
-  public getParamOrMetric(path: string) {
-    return this.paramsAndMetrics.getParamOrMetric(path)
-  }
-
-  public getParamsAndMetricsStatuses() {
-    return this.paramsAndMetrics.getTerminalNodeStatuses()
-  }
-
-  public getChildParamsOrMetrics(path: string) {
-    return this.paramsAndMetrics.getChildren(path)
-  }
-
-  public toggleParamOrMetricStatus(path: string) {
-    return this.paramsAndMetrics.toggleStatus(path)
   }
 
   public getExperimentStatuses(): number[] {
@@ -133,14 +102,7 @@ export class ExperimentsModel {
       ?.map(checkpoint => checkpoint.displayName)
   }
 
-  public getTableData(): TableData {
-    return {
-      columns: this.paramsAndMetrics.getSelected(),
-      rows: this.getRowData()
-    }
-  }
-
-  private getRowData() {
+  public getRowData() {
     return [
       this.workspace,
       ...this.branches.map(branch => {
