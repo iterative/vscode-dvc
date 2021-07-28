@@ -49,25 +49,25 @@ const paramsYamlParam = {
 const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
 
 describe('pickSort', () => {
-  it('does not invoke a quickPick if passed undefined', async () => {
+  it('should not invoke a quickPick if passed undefined', async () => {
     const resolvedPromise = await pickSort(undefined)
     expect(mockedShowQuickPick).not.toBeCalled()
     expect(resolvedPromise).toBe(undefined)
   })
 
-  it('does not invoke a quickPick if an empty array', async () => {
+  it('should not invoke a quickPick if an empty array', async () => {
     const resolvedPromise = await pickSort([])
     expect(mockedShowQuickPick).not.toBeCalled()
     expect(resolvedPromise).toBe(undefined)
   })
 
-  it('resolves with no value if canceled at param or metric select', async () => {
+  it('should resolve with no value if canceled at param or metric select', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
     expect(await pickSort(exampleParamsAndMetrics)).toBe(undefined)
     expect(mockedShowQuickPick).toBeCalledTimes(1)
   })
 
-  it('resolves with no value if canceled at order select', async () => {
+  it('should resolve with no value if canceled at order select', async () => {
     mockedShowQuickPick.mockResolvedValueOnce({
       value: epochsParam
     } as unknown)
@@ -76,37 +76,36 @@ describe('pickSort', () => {
     expect(mockedShowQuickPick).toBeCalledTimes(2)
   })
 
-  describe('valid input', () => {
-    it('invokes a descending sort with the expected quickPick calls', async () => {
-      mockedShowQuickPick.mockResolvedValueOnce({
-        value: epochsParam
-      } as unknown)
-      mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
-      const resolvedPromise = await pickSort(exampleParamsAndMetrics)
-      expect(mockedShowQuickPick).toBeCalledTimes(2)
-      expect(mockedShowQuickPick).toBeCalledWith(
-        [
-          { label: 'Ascending', value: false },
-          { label: 'Descending', value: true }
-        ],
-        { title: 'Select a direction to sort in' }
-      )
-      expect(resolvedPromise).toEqual({
-        descending: false,
-        path: epochsParamPath
-      })
+  it('should invoke a descending sort with the expected quickPick calls', async () => {
+    mockedShowQuickPick.mockResolvedValueOnce({
+      value: epochsParam
+    } as unknown)
+    mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
+    const resolvedPromise = await pickSort(exampleParamsAndMetrics)
+    expect(mockedShowQuickPick).toBeCalledTimes(2)
+    expect(mockedShowQuickPick).toBeCalledWith(
+      [
+        { label: 'Ascending', value: false },
+        { label: 'Descending', value: true }
+      ],
+      { title: 'Select a direction to sort in' }
+    )
+    expect(resolvedPromise).toEqual({
+      descending: false,
+      path: epochsParamPath
     })
-    it('invokes an ascending sort with the expected quickPick calls', async () => {
-      mockedShowQuickPick.mockResolvedValueOnce({
-        value: paramsYamlParam
-      } as unknown)
-      mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
-      const resolvedPromise = await pickSort(exampleParamsAndMetrics)
-      expect(mockedShowQuickPick).toBeCalledTimes(2)
-      expect(resolvedPromise).toEqual({
-        descending: false,
-        path: paramsYamlPath
-      })
+  })
+
+  it('should invoke an ascending sort with the expected quickPick calls', async () => {
+    mockedShowQuickPick.mockResolvedValueOnce({
+      value: paramsYamlParam
+    } as unknown)
+    mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
+    const resolvedPromise = await pickSort(exampleParamsAndMetrics)
+    expect(mockedShowQuickPick).toBeCalledTimes(2)
+    expect(resolvedPromise).toEqual({
+      descending: false,
+      path: paramsYamlPath
     })
   })
 })

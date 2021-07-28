@@ -59,7 +59,7 @@ describe('pickExperimentName', () => {
 })
 
 describe('pickGarbageCollectionFlags', () => {
-  it('invokes a QuickPick with the correct options', async () => {
+  it('should invoke a QuickPick with the correct options', async () => {
     await pickGarbageCollectionFlags()
     expect(mockedShowQuickPick).toBeCalledWith(
       [

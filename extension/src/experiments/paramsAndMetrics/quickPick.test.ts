@@ -54,7 +54,7 @@ describe('pickFromParamsAndMetrics', () => {
     expect(picked).toBeUndefined()
   })
 
-  it('invokes a QuickPick with the correct options', async () => {
+  it('should invoke a QuickPick with the correct options', async () => {
     const title = 'Test title'
     await pickFromParamsAndMetrics(exampleParamsAndMetrics, { title })
     expect(mockedShowQuickPick).toBeCalledWith(
