@@ -1,11 +1,11 @@
 import { ExperimentsAccumulator } from './accumulator'
-import { Experiment, ParamsOrMetrics } from '../webview/contract'
+import { reduceParamsAndMetrics } from './reduceParamsAndMetrics'
+import { Experiment } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
   ExperimentsBranchJSONOutput,
-  ExperimentsRepoJSONOutput,
-  ValueTreeRoot
+  ExperimentsRepoJSONOutput
 } from '../../cli/reader'
 
 const addToMapArray = <K = string, V = unknown>(
@@ -34,32 +34,6 @@ const collectExperimentOrCheckpoint = (
     addToMapArray(acc.experimentsByBranch, branchName, experiment)
   }
 }
-
-const reduceParamsOrMetrics = (paramsOrMetrics?: ValueTreeRoot) => {
-  if (paramsOrMetrics) {
-    return Object.entries(paramsOrMetrics).reduce(
-      (paramsOrMetrics, [file, dataOrError]) => {
-        const data = dataOrError?.data
-        if (data) {
-          paramsOrMetrics[file] = data
-        }
-        return paramsOrMetrics
-      },
-      {} as ParamsOrMetrics
-    )
-  }
-}
-
-const reduceParamsAndMetrics = (
-  experiment: ExperimentFields
-): {
-  metrics: ParamsOrMetrics | undefined
-  params: ParamsOrMetrics | undefined
-} => ({
-  metrics: reduceParamsOrMetrics(experiment.metrics),
-  params: reduceParamsOrMetrics(experiment.params)
-})
-
 const transformParamsAndMetrics = (
   experiment: Experiment,
   experimentFields: ExperimentFields

@@ -1,16 +1,15 @@
 import { join } from 'path'
+import { reduceParamsAndMetrics } from './reduceParamsAndMetrics'
 import {
   ParamOrMetricAggregateData,
   ParamsOrMetrics
 } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentFields,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
-  ValueTree,
-  ValueTreeRoot
+  ValueTree
 } from '../../cli/reader'
 
 const getValueType = (value: Value | ValueTree) => {
@@ -131,31 +130,6 @@ const mergeParamsAndMetrics = (
     mergeParamsOrMetricsMap(metricsMap, metrics, 'metrics')
   }
 }
-
-const reduceParamsOrMetrics = (paramsOrMetrics?: ValueTreeRoot) => {
-  if (paramsOrMetrics) {
-    return Object.entries(paramsOrMetrics).reduce(
-      (paramsOrMetrics, [file, dataOrError]) => {
-        const data = dataOrError?.data
-        if (data) {
-          paramsOrMetrics[file] = data
-        }
-        return paramsOrMetrics
-      },
-      {} as ParamsOrMetrics
-    )
-  }
-}
-
-const reduceParamsAndMetrics = (
-  experiment: ExperimentFields
-): {
-  metrics: ParamsOrMetrics | undefined
-  params: ParamsOrMetrics | undefined
-} => ({
-  metrics: reduceParamsOrMetrics(experiment.metrics),
-  params: reduceParamsOrMetrics(experiment.params)
-})
 
 const transformExperimentData = (
   experimentFieldsOrError: ExperimentFieldsOrError
