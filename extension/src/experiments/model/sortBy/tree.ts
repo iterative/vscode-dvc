@@ -8,7 +8,7 @@ import {
   Uri,
   window
 } from 'vscode'
-import { Experiments } from '..'
+import { Experiments } from '../..'
 
 export class ExperimentsSortByTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()

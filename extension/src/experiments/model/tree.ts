@@ -13,7 +13,7 @@ import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { Status } from '../model'
 
-export class ExperimentsRunsTree implements TreeDataProvider<string> {
+export class ExperimentsTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
@@ -27,7 +27,7 @@ export class ExperimentsRunsTree implements TreeDataProvider<string> {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
-      window.createTreeView('dvc.views.experimentsRunsTree', {
+      window.createTreeView('dvc.views.experimentsTree', {
         canSelectMany: true,
         showCollapseAll: true,
         treeDataProvider: this

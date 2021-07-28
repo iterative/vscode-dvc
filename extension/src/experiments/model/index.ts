@@ -1,11 +1,11 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SortDefinition, sortExperiments } from './sorting'
+import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
   filterExperiment,
   filterExperiments,
   getFilterId
-} from './filtering'
+} from './filterBy'
 import { collectExperiments } from './collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
