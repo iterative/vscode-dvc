@@ -1,5 +1,8 @@
+import { Disposable } from '@hediet/std/disposable'
+import { collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten } from '../../util/array'
+import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 export enum Status {
   selected = 2,
@@ -8,6 +11,8 @@ export enum Status {
 }
 
 export class ParamsAndMetricsModel {
+  public dispose = Disposable.fn()
+
   private status: Record<string, Status> = {}
 
   private data: ParamOrMetric[] = []
@@ -20,7 +25,9 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  public update(paramsAndMetrics: ParamOrMetric[]) {
+  public transformAndSet(data: ExperimentsRepoJSONOutput) {
+    const paramsAndMetrics = collectParamsAndMetrics(data)
+
     paramsAndMetrics.forEach(paramOrMetric => {
       if (this.status[paramOrMetric.path] === undefined) {
         this.status[paramOrMetric.path] = Status.selected
