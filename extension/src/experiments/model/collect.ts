@@ -1,5 +1,5 @@
 import { ExperimentsAccumulator } from './accumulator'
-import { reduceParamsAndMetrics } from './reduceParamsAndMetrics'
+import { reduceParamsAndMetrics } from '../paramsAndMetrics/reduce'
 import { Experiment } from '../webview/contract'
 import {
   ExperimentFieldsOrError,

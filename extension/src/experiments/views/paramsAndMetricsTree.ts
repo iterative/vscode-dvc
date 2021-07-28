@@ -13,7 +13,7 @@ import {
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
 import { ParamOrMetric } from '../webview/contract'
-import { Status } from '../model/paramsAndMetrics'
+import { Status } from '../paramsAndMetrics/model'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 
 export class ExperimentsParamsAndMetricsTree

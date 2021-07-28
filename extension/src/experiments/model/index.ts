@@ -6,9 +6,9 @@ import {
   filterExperiments,
   getFilterId
 } from './filtering'
-import { collectParamsAndMetrics } from './collectParamsAndMetrics'
-import { collectExperiments } from './collectExperiments'
-import { ParamsAndMetrics } from './paramsAndMetrics'
+import { collectExperiments } from './collect'
+import { ParamsAndMetricsModel } from '../paramsAndMetrics/model'
+import { collectParamsAndMetrics } from '../paramsAndMetrics/collect'
 import { Experiment, RowData, TableData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
@@ -22,7 +22,7 @@ export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
   private workspace = {} as Experiment
-  private paramsAndMetrics = new ParamsAndMetrics()
+  private paramsAndMetrics = new ParamsAndMetricsModel()
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()

@@ -7,7 +7,7 @@ export enum Status {
   unselected = 0
 }
 
-export class ParamsAndMetrics {
+export class ParamsAndMetricsModel {
   private status: Record<string, Status> = {}
 
   private data: ParamOrMetric[] = []
