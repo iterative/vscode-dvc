@@ -1,7 +1,7 @@
 import path from 'path'
 import get from 'lodash.get'
-import { sortExperiments } from './sorting'
-import { Experiment } from '../webview/contract'
+import { sortExperiments } from '.'
+import { Experiment } from '../../webview/contract'
 
 describe('sortExperiments', () => {
   const testId = 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'

@@ -42,7 +42,7 @@ import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
-import { ExperimentsSortByTree } from './experiments/views/sortByTree'
+import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsRunsTree } from './experiments/views/runsTree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 

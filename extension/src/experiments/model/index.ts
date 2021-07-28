@@ -1,5 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SortDefinition, sortExperiments } from './sorting'
+import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
   filterExperiment,

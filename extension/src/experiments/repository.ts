@@ -6,11 +6,11 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { pickSort } from './quickPick'
+import { pickSort } from './model/sortBy/quickPick'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { SortDefinition } from './model/sorting'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'

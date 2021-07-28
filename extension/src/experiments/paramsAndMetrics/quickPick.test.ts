@@ -1,8 +1,8 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
+import { pickFromParamsAndMetrics } from './quickPick'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
-import { pickFromParamsAndMetrics } from '../quickPick'
 
 const mockedShowQuickPick = mocked<
   (

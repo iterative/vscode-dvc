@@ -1,8 +1,6 @@
-import { QuickPickOptions, window } from 'vscode'
-import { ParamOrMetric } from './webview/contract'
-import { SortDefinition } from './model/sorting'
+import { window } from 'vscode'
 import { GcPreserveFlag } from '../cli/args'
-import { quickPickManyValues, quickPickValue } from '../vscode/quickPick'
+import { quickPickManyValues } from '../vscode/quickPick'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -41,46 +39,3 @@ export const pickGarbageCollectionFlags = () =>
     ],
     { placeHolder: 'Select which Experiments to preserve' }
   )
-
-export const pickFromParamsAndMetrics = (
-  paramsAndMetrics: ParamOrMetric[] | undefined,
-  quickPickOptions: QuickPickOptions
-) => {
-  if (!paramsAndMetrics || paramsAndMetrics.length === 0) {
-    window.showErrorMessage('There are no params or metrics to select from')
-    return
-  }
-  return quickPickValue<ParamOrMetric>(
-    paramsAndMetrics.map(paramOrMetric => ({
-      description: paramOrMetric.path,
-      label: paramOrMetric.name,
-      value: paramOrMetric
-    })),
-    quickPickOptions
-  )
-}
-
-export const pickSort = async (
-  paramsAndMetrics: ParamOrMetric[] | undefined
-): Promise<SortDefinition | undefined> => {
-  const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
-    title: 'Select a param or metric to sort by'
-  })
-  if (picked === undefined) {
-    return
-  }
-  const descending = await quickPickValue<boolean>(
-    [
-      { label: 'Ascending', value: false },
-      { label: 'Descending', value: true }
-    ],
-    { title: 'Select a direction to sort in' }
-  )
-  if (descending === undefined) {
-    return
-  }
-  return {
-    descending,
-    path: picked.path
-  }
-}
