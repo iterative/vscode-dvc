@@ -8,7 +8,7 @@ import complexExperimentsOutput from '../../../../experiments/webview/complex-ou
 import { ExperimentsParamsAndMetricsTree } from '../../../../experiments/views/paramsAndMetricsTree'
 import { Experiments } from '../../../../experiments'
 import { ExperimentsRepository } from '../../../../experiments/repository'
-import { Status } from '../../../../experiments/model/paramsAndMetrics'
+import { Status } from '../../../../experiments/paramsAndMetrics/model'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'

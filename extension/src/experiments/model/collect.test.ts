@@ -1,4 +1,4 @@
-import { collectExperiments } from './collectExperiments'
+import { collectExperiments } from './collect'
 import { Experiment } from '../webview/contract'
 
 describe('collectExperiments', () => {

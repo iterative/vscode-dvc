@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { collectParamsAndMetrics } from './collectParamsAndMetrics'
+import { collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 
 describe('collectParamsAndMetrics', () => {
