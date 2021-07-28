@@ -1,5 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SortDefinition, sortRows } from './sorting'
+import { SortDefinition, sortExperiments } from './sorting'
 import {
   FilterDefinition,
   filterExperiment,
@@ -151,7 +151,7 @@ export class ExperimentsModel {
     if (!experiments) {
       return
     }
-    return sortRows(this.currentSort, experiments)
+    return sortExperiments(this.currentSort, experiments)
   }
 
   private getExperiments() {
