@@ -3,19 +3,22 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, Uri, QuickPickItem } from 'vscode'
-import { Disposable } from '../../../../extension'
-import { CliReader } from '../../../../cli/reader'
-import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
-import complexColumnData from '../../../../experiments/webview/complex-column-example.json'
-import complexRowData from '../../../../experiments/webview/complex-row-example.json'
-import { Experiments } from '../../../../experiments'
-import { ExperimentsRepository } from '../../../../experiments/repository'
-import { Config } from '../../../../config'
-import { ResourceLocator } from '../../../../resourceLocator'
-import { CliRunner } from '../../../../cli/runner'
-import { InternalCommands } from '../../../../internalCommands'
-import { ExperimentsFilterByTree } from '../../../../experiments/views/filterByTree'
-import { getFilterId, Operator } from '../../../../experiments/model/filtering'
+import { Disposable } from '../../../../../extension'
+import { CliReader } from '../../../../../cli/reader'
+import complexExperimentsOutput from '../../../../../experiments/webview/complex-output-example.json'
+import complexColumnData from '../../../../../experiments/webview/complex-column-example.json'
+import complexRowData from '../../../../../experiments/webview/complex-row-example.json'
+import { Experiments } from '../../../../../experiments'
+import { ExperimentsRepository } from '../../../../../experiments/repository'
+import { Config } from '../../../../../config'
+import { ResourceLocator } from '../../../../../resourceLocator'
+import { CliRunner } from '../../../../../cli/runner'
+import { InternalCommands } from '../../../../../internalCommands'
+import { ExperimentsFilterByTree } from '../../../../../experiments/model/filterBy/tree'
+import {
+  getFilterId,
+  Operator
+} from '../../../../../experiments/model/filterBy'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
@@ -109,7 +112,7 @@ suite('Experiments Test Suite', () => {
       ).returns(dvcDemoPath)
 
       const tableFilterAdded = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperimentsRows(resolve)
+        experimentsRepository.onDidChangeExperiments(resolve)
       })
 
       // eslint-disable-next-line sonarjs/no-duplicate-string
@@ -142,7 +145,7 @@ suite('Experiments Test Suite', () => {
       })
 
       const tableFilterRemoved = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperimentsRows(resolve)
+        experimentsRepository.onDidChangeExperiments(resolve)
       })
 
       messageSpy.resetHistory()

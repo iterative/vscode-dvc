@@ -8,8 +8,8 @@ import {
   window,
   Uri
 } from 'vscode'
-import { Experiments } from '..'
-import { SortDefinition } from '../model/sorting'
+import { SortDefinition } from './'
+import { Experiments } from '../..'
 
 export class ExperimentsSortByTree
   implements TreeDataProvider<string | SortDefinition>
@@ -21,7 +21,7 @@ export class ExperimentsSortByTree
   private readonly experiments: Experiments
 
   constructor(experiments: Experiments) {
-    this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
+    this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
       window.createTreeView<string | SortDefinition>(

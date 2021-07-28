@@ -1,14 +1,14 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, window } from 'vscode'
-import { ExperimentsSortByTree } from './sortByTree'
-import { Experiments } from '..'
+import { ExperimentsSortByTree } from './tree'
+import { Experiments } from '../..'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsRowsChanged = mocked(new EventEmitter<string | void>())
+const mockedExperimentsChanged = mocked(new EventEmitter<string | void>())
 const mockedExperimentDataChangedFire = jest.fn()
-mockedExperimentsRowsChanged.fire = mockedExperimentDataChangedFire
+mockedExperimentsChanged.fire = mockedExperimentDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -20,7 +20,7 @@ const mockedGetDvcRoots = jest.fn()
 const mockedGetFilters = jest.fn()
 const mockedGetFilter = jest.fn()
 const mockedExperiments = {
-  experimentsRowsChanged: mockedExperimentsRowsChanged,
+  experimentsChanged: mockedExperimentsChanged,
   getDvcRoots: mockedGetDvcRoots,
   getFilter: mockedGetFilter,
   getFilters: mockedGetFilters,

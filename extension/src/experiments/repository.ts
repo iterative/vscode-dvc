@@ -2,10 +2,15 @@ import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
+import {
+  pickFilterToAdd,
+  pickFiltersToRemove
+} from './model/filterBy/quickPick'
+import { pickSort } from './model/sortBy/quickPick'
 import { ExperimentsWebview } from './webview'
-import { pickFilterToAdd, pickFiltersToRemove, pickSort } from './quickPick'
 import { ExperimentsModel } from './model'
-import { SortDefinition } from './model/sorting'
+import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -19,7 +24,7 @@ export class ExperimentsRepository {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
-  public readonly onDidChangeExperimentsRows: Event<void>
+  public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
@@ -31,12 +36,13 @@ export class ExperimentsRepository {
   private readonly resourceLocator: ResourceLocator
 
   private webview?: ExperimentsWebview
-  private model: ExperimentsModel
+  private experiments = this.dispose.track(new ExperimentsModel())
+  private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private readonly experimentsRowsChanged = new EventEmitter<void>()
+  private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private processManager: ProcessManager
@@ -49,10 +55,9 @@ export class ExperimentsRepository {
     this.dvcRoot = dvcRoot
     this.internalCommands = internalCommands
     this.resourceLocator = resourceLocator
-    this.model = this.dispose.track(new ExperimentsModel())
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
-    this.onDidChangeExperimentsRows = this.experimentsRowsChanged.event
+    this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
 
     this.processManager = this.dispose.track(
@@ -76,15 +81,15 @@ export class ExperimentsRepository {
   }
 
   public getParamOrMetric(path: string) {
-    return this.model.getParamOrMetric(path)
+    return this.paramsAndMetrics.getParamOrMetric(path)
   }
 
   public getChildParamsOrMetrics(path: string) {
-    return this.model.getChildParamsOrMetrics(path)
+    return this.paramsAndMetrics.getChildren(path)
   }
 
   public toggleParamOrMetricStatus(path: string) {
-    const status = this.model.toggleParamOrMetricStatus(path)
+    const status = this.paramsAndMetrics.toggleStatus(path)
 
     this.notifyParamsOrMetricsChanged()
 
@@ -92,7 +97,7 @@ export class ExperimentsRepository {
   }
 
   public getParamsAndMetricsStatuses() {
-    return this.model.getParamsAndMetricsStatuses()
+    return this.paramsAndMetrics.getTerminalNodeStatuses()
   }
 
   public showWebview = async () => {
@@ -104,7 +109,7 @@ export class ExperimentsRepository {
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData: this.model.getTableData()
+        tableData: this.getTableData()
       },
       this.resourceLocator
     )
@@ -132,17 +137,17 @@ export class ExperimentsRepository {
   }
 
   public setSort(sort: SortDefinition | undefined) {
-    this.model.setSort(sort)
+    this.experiments.setSort(sort)
 
     return this.notifyChanged()
   }
 
   public getSorts() {
-    return this.model.getSorts()
+    return this.experiments.getSorts()
   }
 
   public async pickSort() {
-    const paramsAndMetrics = this.model.getTerminalParamsAndMetrics()
+    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
     const pickedSortDefinition = await pickSort(paramsAndMetrics)
     if (pickedSortDefinition) {
       return this.setSort(pickedSortDefinition)
@@ -150,53 +155,53 @@ export class ExperimentsRepository {
   }
 
   public getFilters() {
-    return this.model.getFilters()
+    return this.experiments.getFilters()
   }
 
   public getFilter(id: string) {
-    return this.model.getFilter(id)
+    return this.experiments.getFilter(id)
   }
 
   public async addFilter() {
-    const paramsAndMetrics = this.model.getTerminalParamsAndMetrics()
+    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
     const filterToAdd = await pickFilterToAdd(paramsAndMetrics)
     if (!filterToAdd) {
       return
     }
-    this.model.addFilter(filterToAdd)
+    this.experiments.addFilter(filterToAdd)
     return this.notifyChanged()
   }
 
   public async removeFilters() {
-    const filters = this.model.getFilters()
+    const filters = this.experiments.getFilters()
     const filtersToRemove = await pickFiltersToRemove(filters)
     if (!filtersToRemove) {
       return
     }
-    this.model.removeFilters(filtersToRemove)
+    this.experiments.removeFilters(filtersToRemove)
     return this.notifyChanged()
   }
 
   public removeFilter(id: string) {
-    if (this.model.removeFilter(id)) {
+    if (this.experiments.removeFilter(id)) {
       return this.notifyChanged()
     }
   }
 
   public getExperimentNames(): string[] {
-    return this.model.getExperimentNames()
+    return this.experiments.getExperimentNames()
   }
 
   public getExperimentStatuses(): number[] {
-    return this.model.getExperimentStatuses()
+    return this.experiments.getExperimentStatuses()
   }
 
   public getExperiment(name: string) {
-    return this.model.getExperiment(name)
+    return this.experiments.getExperiment(name)
   }
 
   public getCheckpointNames(name: string) {
-    return this.model.getCheckpointNames(name)
+    return this.experiments.getCheckpointNames(name)
   }
 
   private async updateData(): Promise<boolean | undefined> {
@@ -210,13 +215,16 @@ export class ExperimentsRepository {
       'Experiments table update'
     )
 
-    this.model.transformAndSet(data)
+    await Promise.all([
+      this.paramsAndMetrics.transformAndSet(data),
+      this.experiments.transformAndSet(data)
+    ])
 
     return this.notifyChanged()
   }
 
   private notifyChanged() {
-    this.experimentsRowsChanged.fire()
+    this.experimentsChanged.fire()
     return this.notifyParamsOrMetricsChanged()
   }
 
@@ -229,8 +237,15 @@ export class ExperimentsRepository {
     if (this.webview) {
       await this.webview.isReady()
       return this.webview.showExperiments({
-        tableData: this.model.getTableData()
+        tableData: this.getTableData()
       })
+    }
+  }
+
+  private getTableData() {
+    return {
+      columns: this.paramsAndMetrics.getSelected(),
+      rows: this.experiments.getRowData()
     }
   }
 

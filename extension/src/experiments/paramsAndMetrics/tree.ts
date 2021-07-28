@@ -10,10 +10,10 @@ import {
   Uri,
   window
 } from 'vscode'
+import { Status } from './model'
 import { Experiments } from '..'
 import { ResourceLocator } from '../../resourceLocator'
 import { ParamOrMetric } from '../webview/contract'
-import { Status } from '../model/paramsAndMetrics'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 
 export class ExperimentsParamsAndMetricsTree

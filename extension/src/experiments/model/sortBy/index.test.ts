@@ -1,9 +1,9 @@
 import path from 'path'
 import get from 'lodash.get'
-import { sortRows } from './sorting'
-import { Experiment } from '../webview/contract'
+import { sortExperiments } from '.'
+import { Experiment } from '../../webview/contract'
 
-describe('sortRows', () => {
+describe('sortExperiments', () => {
   const testId = 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
   const testDisplayName = 'f0778b3'
   const testTimestamp = '2021-01-14T10:57:59'
@@ -23,7 +23,7 @@ describe('sortRows', () => {
   it('Returns unsorted rows if sort definition argument is undefined', () => {
     const unsortedRows = [{ id: 1 }, { id: 2 }] as unknown as Experiment[]
     expect(
-      sortRows({ descending: false, path: testPath }, unsortedRows)
+      sortExperiments({ descending: false, path: testPath }, unsortedRows)
     ).toEqual(unsortedRows)
   })
 
@@ -61,7 +61,7 @@ describe('sortRows', () => {
     const testSortPath = path.join('params', 'params.yaml', 'sort')
     expect(
       (
-        sortRows(
+        sortExperiments(
           { descending: true, path: testSortPath },
           testData
         ) as Experiment[]
@@ -70,7 +70,7 @@ describe('sortRows', () => {
 
     expect(
       (
-        sortRows(
+        sortExperiments(
           { descending: false, path: testSortPath },
           testData
         ) as Experiment[]
@@ -109,7 +109,7 @@ describe('sortRows', () => {
     it('Can sort ascending', () => {
       expect(
         (
-          sortRows(
+          sortExperiments(
             { descending: false, path: testPath },
             testData
           ) as Experiment[]
@@ -120,7 +120,7 @@ describe('sortRows', () => {
     it('Can sort descending', () => {
       expect(
         (
-          sortRows(
+          sortExperiments(
             { descending: true, path: testPath },
             testData
           ) as Experiment[]

@@ -1,6 +1,6 @@
 import { sep } from 'path'
 import get from 'lodash.get'
-import { Experiment } from '../webview/contract'
+import { Experiment } from '../../webview/contract'
 
 export interface SortDefinition {
   descending: boolean
@@ -27,7 +27,7 @@ const buildExperimentSortFunction = ({
     : (a, b) => compareExperimentsByPath(pathArray, a, b)
 }
 
-export const sortRows = (
+export const sortExperiments = (
   sortDefinition: SortDefinition | undefined,
   unsortedRows: Experiment[]
 ): Experiment[] => {

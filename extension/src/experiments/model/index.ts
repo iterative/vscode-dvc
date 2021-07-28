@@ -1,18 +1,17 @@
 import { Disposable } from '@hediet/std/disposable'
-import { SortDefinition, sortRows } from './sorting'
+import { SortDefinition, sortExperiments } from './sortBy'
 import {
   FilterDefinition,
   filterExperiment,
   filterExperiments,
   getFilterId
-} from './filtering'
-import { transformExperimentsRepo } from './transformExperimentsRepo'
-import { ParamsAndMetrics } from './paramsAndMetrics'
-import { Experiment, RowData, TableData } from '../webview/contract'
+} from './filterBy'
+import { collectExperiments } from './collect'
+import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
-export enum ExperimentStatus {
+export enum Status {
   RUNNING = 1,
   QUEUED = 2
 }
@@ -21,7 +20,6 @@ export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
   private workspace = {} as Experiment
-  private paramsAndMetrics = new ParamsAndMetrics()
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
@@ -31,15 +29,8 @@ export class ExperimentsModel {
   private currentSort?: SortDefinition
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
-    const {
-      paramsAndMetrics,
-      branches,
-      experimentsByBranch,
-      checkpointsByTip,
-      workspace
-    } = transformExperimentsRepo(data)
-
-    this.paramsAndMetrics.update(paramsAndMetrics)
+    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
+      collectExperiments(data)
 
     this.workspace = workspace
     this.branches = branches
@@ -75,36 +66,10 @@ export class ExperimentsModel {
     return this.filters.delete(id)
   }
 
-  public getParamsAndMetrics() {
-    return this.paramsAndMetrics.getParamsAndMetrics()
-  }
-
-  public getTerminalParamsAndMetrics() {
-    return this.paramsAndMetrics.getTerminalNodes()
-  }
-
-  public getParamOrMetric(path: string) {
-    return this.paramsAndMetrics.getParamOrMetric(path)
-  }
-
-  public getParamsAndMetricsStatuses() {
-    return this.paramsAndMetrics.getTerminalNodeStatuses()
-  }
-
-  public getChildParamsOrMetrics(path: string) {
-    return this.paramsAndMetrics.getChildren(path)
-  }
-
-  public toggleParamOrMetricStatus(path: string) {
-    return this.paramsAndMetrics.toggleStatus(path)
-  }
-
   public getExperimentStatuses(): number[] {
     return [this.workspace, ...this.getExperiments()]
       .filter(experiment => experiment.running || experiment.queued)
-      .map(experiment =>
-        experiment.running ? ExperimentStatus.RUNNING : ExperimentStatus.QUEUED
-      )
+      .map(experiment => (experiment.running ? Status.RUNNING : Status.QUEUED))
   }
 
   public getExperimentNames(): string[] {
@@ -139,14 +104,7 @@ export class ExperimentsModel {
       ?.map(checkpoint => checkpoint.displayName)
   }
 
-  public getTableData(): TableData {
-    return {
-      columns: this.paramsAndMetrics.getSelected(),
-      rows: this.getRowData()
-    }
-  }
-
-  private getRowData() {
+  public getRowData() {
     return [
       this.workspace,
       ...this.branches.map(branch => {
@@ -197,7 +155,7 @@ export class ExperimentsModel {
     if (!experiments) {
       return
     }
-    return sortRows(this.currentSort, experiments)
+    return sortExperiments(this.currentSort, experiments)
   }
 
   private getExperiments() {

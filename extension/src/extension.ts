@@ -41,10 +41,10 @@ import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './internalCommands'
-import { ExperimentsParamsAndMetricsTree } from './experiments/views/paramsAndMetricsTree'
-import { ExperimentsSortByTree } from './experiments/views/sortByTree'
-import { ExperimentsRunsTree } from './experiments/views/runsTree'
-import { ExperimentsFilterByTree } from './experiments/views/filterByTree'
+import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
+import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
+import { ExperimentsTree } from './experiments/model/tree'
+import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 
 export { Disposable, Disposer }
 
@@ -128,7 +128,7 @@ export class Extension implements IExtension {
 
     this.dispose.track(new ExperimentsFilterByTree(this.experiments))
 
-    this.dispose.track(new ExperimentsRunsTree(this.experiments))
+    this.dispose.track(new ExperimentsTree(this.experiments))
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {

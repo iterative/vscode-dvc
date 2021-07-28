@@ -10,9 +10,9 @@ import {
   Uri,
   window
 } from 'vscode'
-import { Experiments } from '..'
-import { definedAndNonEmpty, flatten } from '../../util/array'
-import { getFilterId } from '../model/filtering'
+import { getFilterId } from '.'
+import { Experiments } from '../..'
+import { definedAndNonEmpty, flatten } from '../../../util/array'
 
 export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -23,7 +23,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
   private filterRoots: Record<string, string> = {}
 
   constructor(experiments: Experiments) {
-    this.onDidChangeTreeData = experiments.experimentsRowsChanged.event
+    this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
       window.createTreeView('dvc.views.experimentsFilterByTree', {

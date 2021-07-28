@@ -2,12 +2,12 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
-import { ExperimentsParamsAndMetricsTree } from './paramsAndMetricsTree'
+import { ExperimentsParamsAndMetricsTree } from './tree'
 import complexColumnData from '../webview/complex-column-example.json'
 import { ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { ParamOrMetric } from '../webview/contract'
-import { Status } from '../model/paramsAndMetrics'
+import { Status } from '../paramsAndMetrics/model'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()

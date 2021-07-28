@@ -3,10 +3,10 @@ import { Deferred } from '@hediet/std/synchronization'
 import { EventEmitter } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
-import { FilterDefinition } from './model/filtering'
+import { FilterDefinition } from './model/filterBy'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
-import { SortDefinition } from './model/sorting'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -24,7 +24,7 @@ export class Experiments {
   private focusedWebviewDvcRoot: string | undefined
 
   public dispose = Disposable.fn()
-  public readonly experimentsRowsChanged = new EventEmitter<void>()
+  public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private experiments: ExperimentsRepositories = {}
@@ -315,8 +315,8 @@ export class Experiments {
       )
     )
     experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperimentsRows(() =>
-        this.experimentsRowsChanged.fire()
+      experimentsRepository.onDidChangeExperiments(() =>
+        this.experimentsChanged.fire()
       )
     )
 
