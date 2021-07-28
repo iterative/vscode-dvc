@@ -13,6 +13,26 @@ import {
   ValueTree
 } from '../../cli/reader'
 
+interface PartialDescriptor extends ParamOrMetricAggregateData {
+  types: Set<string>
+  hasChildren: boolean
+  group: string
+  path: string
+  parentPath: string
+}
+
+type PartialMap = Map<string, PartialDescriptor>
+
+type Accumulator = {
+  metricsMap: PartialMap
+  paramsMap: PartialMap
+}
+
+type ParamsAndMetrics = {
+  metrics: ParamsOrMetrics | undefined
+  params: ParamsOrMetrics | undefined
+}
+
 const getValueType = (value: Value | ValueTree) => {
   if (value === null) {
     return 'null'
@@ -21,7 +41,7 @@ const getValueType = (value: Value | ValueTree) => {
 }
 
 const getEntryOrDefault = (
-  originalMap: PartialParamsOrMetricsMap,
+  originalMap: PartialMap,
   propertyKey: string,
   ancestors: string[]
 ) =>
@@ -33,8 +53,8 @@ const getEntryOrDefault = (
     types: new Set<string>()
   }
 
-const mergeNumberParamOrMetric = (
-  descriptor: PartialParamOrMetricDescriptor,
+const mergeNumber = (
+  descriptor: PartialDescriptor,
   newNumber: number
 ): void => {
   const { maxNumber, minNumber } = descriptor
@@ -46,11 +66,11 @@ const mergeNumberParamOrMetric = (
   }
 }
 
-const mergePrimitiveParamOrMetric = (
-  descriptor: PartialParamOrMetricDescriptor,
+const mergePrimitiveValue = (
+  descriptor: PartialDescriptor,
   newValue: Value,
   newValueType: string
-): PartialParamOrMetricDescriptor => {
+): PartialDescriptor => {
   const { maxStringLength } = descriptor
 
   const stringifiedAddition = String(newValue)
@@ -60,17 +80,17 @@ const mergePrimitiveParamOrMetric = (
   }
 
   if (newValueType === 'number') {
-    mergeNumberParamOrMetric(descriptor, newValue as number)
+    mergeNumber(descriptor, newValue as number)
   }
 
-  return descriptor as PartialParamOrMetricDescriptor
+  return descriptor as PartialDescriptor
 }
 
-const mergeParamsOrMetricsMap = (
-  originalMap: PartialParamsOrMetricsMap,
+const mergeMap = (
+  originalMap: PartialMap,
   valueTree: ValueTree,
   ...ancestors: string[]
-): PartialParamsOrMetricsMap => {
+): PartialMap => {
   const sampleEntries = Object.entries(valueTree)
   for (const [propertyKey, propertyValue] of sampleEntries) {
     originalMap.set(
@@ -87,59 +107,42 @@ const mergeParamsOrMetricsMap = (
   return originalMap
 }
 const mergeOrCreateDescriptor = (
-  originalMap: PartialParamsOrMetricsMap,
+  originalMap: PartialMap,
   propertyKey: string,
   newValue: Value | ValueTree,
   ...ancestors: string[]
-): PartialParamOrMetricDescriptor => {
+): PartialDescriptor => {
   const newValueType = getValueType(newValue)
 
   const descriptor = getEntryOrDefault(originalMap, propertyKey, ancestors)
 
   if (newValueType === 'object') {
-    mergeParamsOrMetricsMap(
-      originalMap,
-      newValue as ValueTree,
-      ...ancestors,
-      propertyKey
-    )
+    mergeMap(originalMap, newValue as ValueTree, ...ancestors, propertyKey)
     descriptor.hasChildren = true
-    return descriptor as PartialParamOrMetricDescriptor
+    return descriptor as PartialDescriptor
   } else {
     descriptor.types.add(newValueType)
-    return mergePrimitiveParamOrMetric(
-      descriptor,
-      newValue as Value,
-      newValueType
-    )
+    return mergePrimitiveValue(descriptor, newValue as Value, newValueType)
   }
 }
 
 const mergeParamsAndMetrics = (
-  acc: ParamsAndMetricsAccumulator,
-  paramsAndMetrics: {
-    metrics: ParamsOrMetrics | undefined
-    params: ParamsOrMetrics | undefined
-  }
+  acc: Accumulator,
+  paramsAndMetrics: ParamsAndMetrics
 ) => {
   const { paramsMap, metricsMap } = acc
   const { params, metrics } = paramsAndMetrics
   if (params) {
-    mergeParamsOrMetricsMap(paramsMap, params, 'params')
+    mergeMap(paramsMap, params, 'params')
   }
   if (metrics) {
-    mergeParamsOrMetricsMap(metricsMap, metrics, 'metrics')
+    mergeMap(metricsMap, metrics, 'metrics')
   }
 }
 
-const transformExperimentData = (
+const extractExperimentFields = (
   experimentFieldsOrError: ExperimentFieldsOrError
-):
-  | {
-      metrics: ParamsOrMetrics | undefined
-      params: ParamsOrMetrics | undefined
-    }
-  | undefined => {
+): ParamsAndMetrics | undefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
     return
@@ -148,11 +151,11 @@ const transformExperimentData = (
 }
 
 const collectFromExperimentsObject = (
-  acc: ParamsAndMetricsAccumulator,
+  acc: Accumulator,
   experimentsObject: { [sha: string]: ExperimentFieldsOrError }
 ) => {
-  for (const experimentData of Object.values(experimentsObject)) {
-    const experimentFields = transformExperimentData(experimentData)
+  for (const experiment of Object.values(experimentsObject)) {
+    const experimentFields = extractExperimentFields(experiment)
 
     if (experimentFields) {
       mergeParamsAndMetrics(acc, experimentFields)
@@ -161,11 +164,11 @@ const collectFromExperimentsObject = (
 }
 
 const collectFromBranchesObject = (
-  acc: ParamsAndMetricsAccumulator,
+  acc: Accumulator,
   branchesObject: { [name: string]: ExperimentsBranchJSONOutput }
 ) => {
   for (const { baseline, ...experiments } of Object.values(branchesObject)) {
-    const branch = transformExperimentData(baseline)
+    const branch = extractExperimentFields(baseline)
 
     if (branch) {
       mergeParamsAndMetrics(acc, branch)
@@ -174,28 +177,9 @@ const collectFromBranchesObject = (
   }
 }
 
-export interface PartialParamOrMetricDescriptor
-  extends ParamOrMetricAggregateData {
-  types: Set<string>
-  hasChildren: boolean
-  group: string
-  path: string
-  parentPath: string
-}
-
-export type PartialParamsOrMetricsMap = Map<
-  string,
-  PartialParamOrMetricDescriptor
->
-
-export class ParamsAndMetricsAccumulator {
-  public metricsMap: PartialParamsOrMetricsMap = new Map()
-  public paramsMap: PartialParamsOrMetricsMap = new Map()
-}
-
 const createInitial = (
   name: string,
-  descriptor: PartialParamOrMetricDescriptor
+  descriptor: PartialDescriptor
 ): ParamOrMetric => {
   const { group, path, hasChildren, parentPath } = descriptor
 
@@ -210,7 +194,7 @@ const createInitial = (
 
 const enrich = (
   paramOrMetric: ParamOrMetric,
-  descriptor: PartialParamOrMetricDescriptor
+  descriptor: PartialDescriptor
 ): ParamOrMetric => {
   const { types, maxStringLength, minNumber, maxNumber } = descriptor
 
@@ -227,42 +211,46 @@ const enrich = (
   return paramOrMetric
 }
 
-const paramOrMetricFromMap = ([name, descriptor]: [
+const transformMap = ([name, descriptor]: [
   string,
-  PartialParamOrMetricDescriptor
+  PartialDescriptor
 ]): ParamOrMetric => {
   const paramOrMetric = createInitial(name, descriptor)
   return enrich(paramOrMetric, descriptor)
 }
 
 const transformAndCollect = (
-  paramsOrMetricsMap: PartialParamsOrMetricsMap
+  paramsOrMetricsMap: PartialMap
 ): ParamOrMetric[] => {
   const paramsAndMetrics = []
   for (const entry of paramsOrMetricsMap) {
-    paramsAndMetrics.push(paramOrMetricFromMap(entry))
+    paramsAndMetrics.push(transformMap(entry))
   }
   return paramsAndMetrics
 }
 
 export const transformAndCollectIfAny = (
-  paramsOrMetricsMap: PartialParamsOrMetricsMap
+  paramsOrMetricsMap: PartialMap
 ): ParamOrMetric[] =>
-  paramsOrMetricsMap.size === 0 ? [] : transformAndCollect(paramsOrMetricsMap)
+  paramsOrMetricsMap.size ? transformAndCollect(paramsOrMetricsMap) : []
 
 export const collectParamsAndMetrics = (
   data: ExperimentsRepoJSONOutput
 ): ParamOrMetric[] => {
   const { workspace, ...branchesObject } = data
-  const workspaceBaseline = transformExperimentData(workspace.baseline)
+  const workspaceBaseline = extractExperimentFields(workspace.baseline)
 
-  const acc = new ParamsAndMetricsAccumulator()
+  const acc = {
+    metricsMap: new Map(),
+    paramsMap: new Map()
+  }
 
   if (workspaceBaseline) {
     mergeParamsAndMetrics(acc, workspaceBaseline)
   }
 
   collectFromBranchesObject(acc, branchesObject)
+
   return [
     ...transformAndCollectIfAny(acc.paramsMap),
     ...transformAndCollectIfAny(acc.metricsMap)
