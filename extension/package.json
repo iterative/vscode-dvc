@@ -222,12 +222,14 @@
       {
         "title": "%command.setExperimentsTableSort%",
         "command": "dvc.setExperimentsTableSort",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(add)"
       },
       {
         "title": "%command.clearExperimentsTableSort%",
         "command": "dvc.clearExperimentsTableSort",
-        "category": "DVC"
+        "category": "DVC",
+        "icon": "$(close-all)"
       },
       {
         "title": "%command.views.experimentsFilterByTree.removeFilter%",
@@ -525,6 +527,16 @@
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.setExperimentsTableSort",
+          "when": "view == dvc.views.experimentsSortByTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.clearExperimentsTableSort",
+          "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@2"
         }
       ]
