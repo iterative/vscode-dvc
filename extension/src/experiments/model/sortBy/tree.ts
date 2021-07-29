@@ -77,9 +77,7 @@ export class ExperimentsSortByTree
   }
 
   private getTreeItemFromSortDefinition(sortDefinition: SortDefinition) {
-    const sortDefinitionTreeItem = new TreeItem({
-      label: `${sortDefinition.path}`
-    })
+    const sortDefinitionTreeItem = new TreeItem(sortDefinition.path)
 
     sortDefinitionTreeItem.iconPath = new ThemeIcon(
       sortDefinition.descending ? 'arrow-down' : 'arrow-up'
