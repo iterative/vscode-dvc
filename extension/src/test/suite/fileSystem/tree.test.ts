@@ -19,17 +19,9 @@ suite('Extension Test Suite', () => {
 
   const { join, resolve } = path
 
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
+  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const disposable = Disposable.fn()
+
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
   const noOpenUnsupportedOption =
     'dvc.views.trackedExplorerTree.noOpenUnsupported'
