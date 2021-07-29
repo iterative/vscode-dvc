@@ -52,14 +52,9 @@ const buildExperimentSortFunction = (
     : buildMultiExperimentSortFunction(sortDefinitions)
 
 export const sortExperiments = (
-  sortDefinition: SortDefinition | undefined,
+  sortDefinitions: SortDefinition[],
   unsortedRows: Experiment[]
-): Experiment[] => {
-  if (!sortDefinition) {
-    return unsortedRows
-  }
-  const sortFunction = buildExperimentSortFunction([
-    sortDefinition as SortDefinition
-  ])
-  return unsortedRows.sort(sortFunction)
-}
+): Experiment[] =>
+  sortDefinitions.length === 0
+    ? unsortedRows
+    : unsortedRows.sort(buildExperimentSortFunction(sortDefinitions))

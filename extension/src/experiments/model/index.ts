@@ -155,7 +155,7 @@ export class ExperimentsModel {
     if (!experiments) {
       return
     }
-    return sortExperiments(this.currentSort, experiments)
+    return sortExperiments(this.getSorts(), experiments)
   }
 
   private getExperiments() {
