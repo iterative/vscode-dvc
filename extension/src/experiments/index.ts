@@ -75,7 +75,7 @@ export class Experiments {
     repository.pickSort()
   }
 
-  public async clearSort() {
+  public async clearSorts() {
     const repository = await this.getFocusedOrDefaultOrPickRepo()
     repository.setSort(undefined)
   }
