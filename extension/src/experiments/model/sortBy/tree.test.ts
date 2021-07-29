@@ -112,7 +112,7 @@ describe('ExperimentsSortByTree', () => {
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
       expect(experimentsSortByTree.getTreeItem('demo')).toEqual({
         collapsibleState: TreeItemCollapsibleState.Expanded,
-        contextValue: 'sortByTreeProject',
+        contextValue: 'dvcSortByTreeProject',
         id: 'demo',
         resourceUri: Uri.file('demo')
       })
@@ -123,7 +123,7 @@ describe('ExperimentsSortByTree', () => {
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
       expect(experimentsSortByTree.getTreeItem(exampleSortDefinition)).toEqual({
         collapsibleState: TreeItemCollapsibleState.None,
-        contextValue: 'sortByTreeSortDefinition',
+        contextValue: 'dvcSortByTreeSortDefinition',
         iconPath: new ThemeIcon('arrow-down'),
         label: examplePath
       })
@@ -140,7 +140,7 @@ describe('ExperimentsSortByTree', () => {
         })
       ).toEqual({
         collapsibleState: TreeItemCollapsibleState.None,
-        contextValue: 'sortByTreeSortDefinition',
+        contextValue: 'dvcSortByTreeSortDefinition',
         iconPath: new ThemeIcon('arrow-down'),
         label: otherPath
       })
