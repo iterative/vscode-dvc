@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
-import { Operator } from '.'
+import { FilterDefinition, Operator } from '.'
 import { ExperimentsFilterByTree } from './tree'
 import { Experiments } from '../..'
 
@@ -83,7 +83,13 @@ describe('ExperimentsFilterByTree', () => {
 
     const filters = await experimentsFilterByTree.getChildren()
     expect(filters).toEqual([
-      join('demo', 'params', 'params.yaml', 'param==90000')
+      {
+        dvcRoot: 'demo',
+        id: join('demo', 'params', 'params.yaml', 'param==90000'),
+        operator: '==',
+        path: join('params', 'params.yaml', 'param'),
+        value: '90000'
+      }
     ])
   })
 
@@ -133,8 +139,20 @@ describe('ExperimentsFilterByTree', () => {
     const filters = await experimentsFilterByTree.getChildren('demo')
 
     expect(filters).toEqual([
-      join('demo', 'params', 'params.yml', 'param==90000'),
-      join('demo', 'metrics', 'logs.json', 'metric<1')
+      {
+        dvcRoot: 'demo',
+        id: join('demo', 'params', 'params.yml', 'param==90000'),
+        operator: '==',
+        path: join('params', 'params.yml', 'param'),
+        value: 90000
+      },
+      {
+        dvcRoot: 'demo',
+        id: join('demo', 'metrics', 'logs.json', 'metric<1'),
+        operator: '<',
+        path: join('metrics', 'logs.json', 'metric'),
+        value: '1'
+      }
     ])
   })
 
@@ -184,9 +202,11 @@ describe('ExperimentsFilterByTree', () => {
       await experimentsFilterByTree.getChildren()
 
       mockedGetFilter.mockReturnValueOnce(mockedFilter)
-      const item = experimentsFilterByTree.getTreeItem(
-        join(dvcRoot, 'metrics', 'summary.json', 'success_metric>=100')
-      )
+      const item = experimentsFilterByTree.getTreeItem({
+        dvcRoot,
+        id: join(dvcRoot, 'metrics', 'summary.json', 'success_metric>=100'),
+        ...mockedFilter
+      } as FilterDefinition & { dvcRoot: string; id: string })
 
       expect(item).toEqual({
         ...mockedItem,
