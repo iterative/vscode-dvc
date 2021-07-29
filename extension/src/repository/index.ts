@@ -1,7 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { observable, makeObservable } from 'mobx'
-import { SourceControlManagement } from './views/sourceControlManagement'
+import { SourceControlManagement } from './sourceControlManagement'
 import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'

@@ -2,7 +2,7 @@ import { join, resolve } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { Repository } from '.'
-import { SourceControlManagement } from './views/sourceControlManagement'
+import { SourceControlManagement } from './sourceControlManagement'
 import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { DiffOutput, ListOutput, Status, StatusOutput } from '../cli/reader'
@@ -12,7 +12,7 @@ import { InternalCommands } from '../internalCommands'
 import { Config } from '../config'
 
 jest.mock('@hediet/std/disposable')
-jest.mock('./views/sourceControlManagement')
+jest.mock('./sourceControlManagement')
 jest.mock('./decorationProvider')
 jest.mock('../cli/reader')
 jest.mock('../git')
