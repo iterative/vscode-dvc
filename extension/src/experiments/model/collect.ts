@@ -34,6 +34,7 @@ const collectExperimentOrCheckpoint = (
     addToMapArray(acc.experimentsByBranch, branchName, experiment)
   }
 }
+
 const transformParamsAndMetrics = (
   experiment: Experiment,
   experimentFields: ExperimentFields

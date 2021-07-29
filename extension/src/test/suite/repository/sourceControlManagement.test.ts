@@ -3,12 +3,12 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
-import { Disposable } from '../../../../extension'
-import { CliExecutor } from '../../../../cli/executor'
-import { Prompt } from '../../../../cli/output'
+import { Disposable } from '../../../extension'
+import { CliExecutor } from '../../../cli/executor'
+import { Prompt } from '../../../cli/output'
 
 suite('Extension Test Suite', () => {
-  window.showInformationMessage('Start all tracked explorer tree tests.')
+  window.showInformationMessage('Start all source control management tests.')
 
   const dvcDemoPath = resolve(
     __dirname,
