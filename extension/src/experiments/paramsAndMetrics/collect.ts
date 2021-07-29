@@ -177,7 +177,7 @@ const collectFromBranchesObject = (
   }
 }
 
-const createInitial = (
+const createEntry = (
   name: string,
   descriptor: PartialDescriptor
 ): ParamOrMetric => {
@@ -192,7 +192,7 @@ const createInitial = (
   }
 }
 
-const enrich = (
+const addMetadata = (
   paramOrMetric: ParamOrMetric,
   descriptor: PartialDescriptor
 ): ParamOrMetric => {
@@ -215,8 +215,8 @@ const transformMap = ([name, descriptor]: [
   string,
   PartialDescriptor
 ]): ParamOrMetric => {
-  const paramOrMetric = createInitial(name, descriptor)
-  return enrich(paramOrMetric, descriptor)
+  const paramOrMetric = createEntry(name, descriptor)
+  return addMetadata(paramOrMetric, descriptor)
 }
 
 const transformAndCollect = (
@@ -228,11 +228,6 @@ const transformAndCollect = (
   }
   return paramsAndMetrics
 }
-
-export const transformAndCollectIfAny = (
-  paramsOrMetricsMap: PartialMap
-): ParamOrMetric[] =>
-  paramsOrMetricsMap.size ? transformAndCollect(paramsOrMetricsMap) : []
 
 export const collectParamsAndMetrics = (
   data: ExperimentsRepoJSONOutput
@@ -252,7 +247,7 @@ export const collectParamsAndMetrics = (
   collectFromBranchesObject(acc, branchesObject)
 
   return [
-    ...transformAndCollectIfAny(acc.paramsMap),
-    ...transformAndCollectIfAny(acc.metricsMap)
+    ...transformAndCollect(acc.paramsMap),
+    ...transformAndCollect(acc.metricsMap)
   ]
 }
