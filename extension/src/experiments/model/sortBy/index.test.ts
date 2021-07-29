@@ -162,7 +162,7 @@ describe('sortExperiments', () => {
       }
     ]
 
-    it('Can sort ascending', () => {
+    it('Can sort with first definition given priority', () => {
       const result = sortExperiments(
         [
           { descending: false, path: otherTestPath },
@@ -171,6 +171,20 @@ describe('sortExperiments', () => {
         testData
       ) as Experiment[]
       expect(result.map(getTestParam)).toEqual([3, 1, 2])
+      expect(result.map(item => get(item, otherTestPathArray))).toEqual([
+        1, 2, 2
+      ])
+    })
+
+    it('Can sort with two different directions', () => {
+      const result = sortExperiments(
+        [
+          { descending: false, path: otherTestPath },
+          { descending: true, path: testPath }
+        ],
+        testData
+      ) as Experiment[]
+      expect(result.map(getTestParam)).toEqual([3, 2, 1])
       expect(result.map(item => get(item, otherTestPathArray))).toEqual([
         1, 2, 2
       ])
