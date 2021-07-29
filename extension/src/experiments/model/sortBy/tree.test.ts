@@ -43,13 +43,9 @@ const mockedDisposable = mocked(Disposable)
 
 const mockedGetSorts = jest.fn()
 const mockedGetDvcRoots = jest.fn()
-const mockedGetFilters = jest.fn()
-const mockedGetFilter = jest.fn()
 const mockedExperiments = {
   experimentsChanged: mockedExperimentsChanged,
   getDvcRoots: mockedGetDvcRoots,
-  getFilter: mockedGetFilter,
-  getFilters: mockedGetFilters,
   getSorts: mockedGetSorts,
   isReady: () => true
 } as unknown as Experiments
