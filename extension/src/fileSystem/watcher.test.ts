@@ -2,7 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import debounce from 'lodash.debounce'
 import { FSWatcher, watch } from 'chokidar'
-import { TrackedExplorerTree } from './views/trackedExplorerTree'
+import { TrackedExplorerTree } from './tree'
 import {
   getRepositoryWatcher,
   ignoredDotDirectories,

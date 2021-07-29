@@ -1,6 +1,6 @@
 import { dirname, resolve } from 'path'
 import { Disposable } from '@hediet/std/disposable'
-import { SourceControlManagementModel } from './views/sourceControlManagement'
+import { SourceControlManagementModel } from './sourceControlManagement'
 import { DecorationModel } from './decorationProvider'
 import {
   ChangedType,
