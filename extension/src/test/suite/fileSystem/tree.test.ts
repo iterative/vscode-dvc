@@ -4,32 +4,24 @@ import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
 import { window, commands, Uri, TextEditor, MessageItem } from 'vscode'
-import { Disposable } from '../../../../extension'
-import { exists } from '../../../../fileSystem'
-import * as Workspace from '../../../../fileSystem/workspace'
-import * as FileSystem from '../../../../fileSystem'
-import { getConfigValue, setConfigValue } from '../../../../vscode/config'
-import { CliExecutor } from '../../../../cli/executor'
-import { Prompt } from '../../../../cli/output'
-import { Config } from '../../../../config'
-import * as Setup from '../../../../setup'
+import { Disposable } from '../../../extension'
+import { exists } from '../../../fileSystem'
+import * as Workspace from '../../../fileSystem/workspace'
+import * as FileSystem from '../../../fileSystem'
+import { getConfigValue, setConfigValue } from '../../../vscode/config'
+import { CliExecutor } from '../../../cli/executor'
+import { Prompt } from '../../../cli/output'
+import { Config } from '../../../config'
+import * as Setup from '../../../setup'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
 
   const { join, resolve } = path
 
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
+  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const disposable = Disposable.fn()
+
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
   const noOpenUnsupportedOption =
     'dvc.views.trackedExplorerTree.noOpenUnsupported'

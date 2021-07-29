@@ -10,17 +10,17 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { definedAndNonEmpty } from '../../util/array'
-import { deleteTarget } from '../workspace'
-import { exists } from '..'
-import { ListOutput } from '../../cli/reader'
-import { getConfigValue, setConfigValue } from '../../vscode/config'
-import { tryThenMaybeForce } from '../../cli/actions'
+import { exists } from '.'
+import { deleteTarget } from './workspace'
+import { definedAndNonEmpty } from '../util/array'
+import { ListOutput } from '../cli/reader'
+import { getConfigValue, setConfigValue } from '../vscode/config'
+import { tryThenMaybeForce } from '../cli/actions'
 import {
   CommandId,
   AvailableCommands,
   InternalCommands
-} from '../../internalCommands'
+} from '../internalCommands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
