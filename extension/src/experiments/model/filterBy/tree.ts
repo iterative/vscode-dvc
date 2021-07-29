@@ -24,7 +24,6 @@ export class ExperimentsFilterByTree
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: Experiments
-  private filterRoots: Record<string, string> = {}
 
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
@@ -105,10 +104,7 @@ export class ExperimentsFilterByTree
     await this.experiments.isReady()
     const dvcRoots = this.getDvcRoots()
     const filters = flatten(
-      dvcRoots.map(dvcRoot => {
-        this.filterRoots[dvcRoot] = dvcRoot
-        return this.experiments.getFilters(dvcRoot)
-      })
+      dvcRoots.map(dvcRoot => this.experiments.getFilters(dvcRoot))
     )
     if (definedAndNonEmpty(filters)) {
       if (dvcRoots.length === 1) {
