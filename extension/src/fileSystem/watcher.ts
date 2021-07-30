@@ -2,7 +2,7 @@ import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
 import debounce from 'lodash.debounce'
-import { TrackedExplorerTree } from './views/trackedExplorerTree'
+import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 

@@ -22,7 +22,7 @@ import { getGitRepositoryRoots } from './extensions/git'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
-import { TrackedExplorerTree } from './fileSystem/views/trackedExplorerTree'
+import { TrackedExplorerTree } from './fileSystem/tree'
 import {
   getRepositoryWatcher,
   onDidChangeFileSystem

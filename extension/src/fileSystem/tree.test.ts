@@ -2,10 +2,10 @@ import { join } from 'path'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { TrackedExplorerTree } from './trackedExplorerTree'
-import { exists } from '..'
-import { Config } from '../../config'
-import { InternalCommands } from '../../internalCommands'
+import { exists } from '.'
+import { TrackedExplorerTree } from './tree'
+import { Config } from '../config'
+import { InternalCommands } from '../internalCommands'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
@@ -35,8 +35,8 @@ const mockedExists = mocked(exists)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../../cli/reader')
-jest.mock('..')
+jest.mock('.')
+jest.mock('../cli/reader')
 
 beforeEach(() => {
   jest.resetAllMocks()
