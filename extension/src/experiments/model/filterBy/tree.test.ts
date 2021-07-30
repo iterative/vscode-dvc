@@ -2,8 +2,8 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
-import { FilterDefinition, Operator } from '.'
-import { ExperimentsFilterByTree } from './tree'
+import { Operator } from '.'
+import { ExperimentsFilterByTree, FilterItem } from './tree'
 import { Experiments } from '../..'
 
 const mockedCommands = mocked(commands)
@@ -84,11 +84,11 @@ describe('ExperimentsFilterByTree', () => {
     const filters = await experimentsFilterByTree.getChildren()
     expect(filters).toEqual([
       {
+        description: '== 90000',
         dvcRoot: 'demo',
-        id: join('demo', 'params', 'params.yaml', 'param==90000'),
-        operator: '==',
-        path: join('params', 'params.yaml', 'param'),
-        value: '90000'
+        id: join('params', 'params.yaml', 'param==90000'),
+        label: join('params', 'params.yaml', 'param'),
+        path: join('demo', 'params', 'params.yaml', 'param==90000')
       }
     ])
   })
@@ -140,18 +140,18 @@ describe('ExperimentsFilterByTree', () => {
 
     expect(filters).toEqual([
       {
+        description: '== 90000',
         dvcRoot: 'demo',
-        id: join('demo', 'params', 'params.yml', 'param==90000'),
-        operator: '==',
-        path: join('params', 'params.yml', 'param'),
-        value: 90000
+        id: join('params', 'params.yml', 'param==90000'),
+        label: join('params', 'params.yml', 'param'),
+        path: join('demo', 'params', 'params.yml', 'param==90000')
       },
       {
+        description: '< 1',
         dvcRoot: 'demo',
-        id: join('demo', 'metrics', 'logs.json', 'metric<1'),
-        operator: '<',
-        path: join('metrics', 'logs.json', 'metric'),
-        value: '1'
+        id: join('metrics', 'logs.json', 'metric<1'),
+        label: join('metrics', 'logs.json', 'metric'),
+        path: join('demo', 'metrics', 'logs.json', 'metric<1')
       }
     ])
   })
@@ -203,10 +203,12 @@ describe('ExperimentsFilterByTree', () => {
 
       mockedGetFilter.mockReturnValueOnce(mockedFilter)
       const item = experimentsFilterByTree.getTreeItem({
+        description: '>= 100',
         dvcRoot,
-        id: join(dvcRoot, 'metrics', 'summary.json', 'success_metric>=100'),
-        ...mockedFilter
-      } as FilterDefinition & { dvcRoot: string; id: string })
+        id: join('metrics', 'summary.json', 'success_metric>=100'),
+        label: join('metrics', 'summary.json', 'success_metric'),
+        path: join(dvcRoot, 'metrics', 'summary.json', 'success_metric>=100')
+      } as FilterItem)
 
       expect(item).toEqual({
         ...mockedItem,

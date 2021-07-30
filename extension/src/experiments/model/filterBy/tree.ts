@@ -10,14 +10,20 @@ import {
   Uri,
   window
 } from 'vscode'
-import { FilterDefinition, getFilterId } from '.'
+import { getFilterId } from '.'
 import { Experiments } from '../..'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
 
-type Filter = FilterDefinition & { dvcRoot: string; id: string }
+export type FilterItem = {
+  description: string
+  dvcRoot: string
+  id: string
+  label: string
+  path: string
+}
 
 export class ExperimentsFilterByTree
-  implements TreeDataProvider<string | Filter>
+  implements TreeDataProvider<string | FilterItem>
 {
   public dispose = Disposable.fn()
 
@@ -29,7 +35,7 @@ export class ExperimentsFilterByTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
-      window.createTreeView<string | Filter>(
+      window.createTreeView<string | FilterItem>(
         'dvc.views.experimentsFilterByTree',
         {
           canSelectMany: true,
@@ -44,7 +50,7 @@ export class ExperimentsFilterByTree
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsFilterByTree.removeFilter',
-        resource => this.removeFilter(resource as Filter)
+        resource => this.removeFilter(resource as FilterItem)
       )
     )
 
@@ -56,7 +62,7 @@ export class ExperimentsFilterByTree
     )
   }
 
-  public getTreeItem(element: string | Filter): TreeItem {
+  public getTreeItem(element: string | FilterItem): TreeItem {
     if (this.isRoot(element)) {
       const item = new TreeItem(
         Uri.file(element),
@@ -66,35 +72,34 @@ export class ExperimentsFilterByTree
       return item
     }
 
-    const filter = element as Filter
-    const { id } = filter
-
-    const item = new TreeItem(Uri.file(id), TreeItemCollapsibleState.None)
-
-    if (!id) {
-      return item
-    }
+    const item = new TreeItem(
+      Uri.file(element.path),
+      TreeItemCollapsibleState.None
+    )
 
     item.iconPath = new ThemeIcon('filter')
 
-    item.label = filter.path
-    item.description = [filter.operator, filter.value].join(' ')
+    item.label = element.label
+    item.description = element.description
     item.contextValue = 'dvcFilter'
 
     return item
   }
 
-  public getChildren(element?: string): Promise<string[] | Filter[]> {
+  public getChildren(element?: string): Promise<string[] | FilterItem[]> {
     if (!element) {
       return this.getRootElements()
     }
 
     return Promise.resolve(
       this.experiments.getFilters(element).map(filter => {
+        const id = getFilterId(filter)
         return {
-          ...filter,
+          description: [filter.operator, filter.value].join(' '),
           dvcRoot: element,
-          id: join(element, getFilterId(filter))
+          id,
+          label: filter.path,
+          path: join(element, id)
         }
       })
     )
@@ -126,14 +131,14 @@ export class ExperimentsFilterByTree
     }
 
     const filters = await this.getChildren(element)
-    filters.map(filter => this.removeFilter(filter as Filter))
+    filters.map(filter => this.removeFilter(filter as FilterItem))
   }
 
-  private removeFilter(filter: Filter) {
-    this.experiments.removeFilter(filter.dvcRoot, getFilterId(filter))
+  private removeFilter(filter: FilterItem) {
+    this.experiments.removeFilter(filter.dvcRoot, filter.id)
   }
 
-  private isRoot(element: string | Filter): element is string {
+  private isRoot(element: string | FilterItem): element is string {
     return typeof element === 'string'
   }
 

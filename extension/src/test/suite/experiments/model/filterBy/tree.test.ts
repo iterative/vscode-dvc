@@ -152,9 +152,11 @@ suite('Experiments Test Suite', () => {
       await commands.executeCommand(
         'dvc.views.experimentsFilterByTree.removeFilter',
         {
+          description: lossPath,
           dvcRoot: dvcDemoPath,
-          id: join(dvcDemoPath, getFilterId(lossFilter)),
-          ...lossFilter
+          id: getFilterId(lossFilter),
+          label: [lossFilter.operator, lossFilter.value].join(' '),
+          path: join(dvcDemoPath, getFilterId(lossFilter))
         }
       )
       await tableFilterRemoved
