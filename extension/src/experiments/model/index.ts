@@ -46,10 +46,6 @@ export class ExperimentsModel {
     return [...this.filters.values()]
   }
 
-  public getFilter(id: string) {
-    return this.filters.get(id)
-  }
-
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
   }
