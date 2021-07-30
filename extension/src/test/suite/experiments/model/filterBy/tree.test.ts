@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -155,8 +155,7 @@ suite('Experiments Test Suite', () => {
           description: lossPath,
           dvcRoot: dvcDemoPath,
           id: getFilterId(lossFilter),
-          label: [lossFilter.operator, lossFilter.value].join(' '),
-          path: join(dvcDemoPath, getFilterId(lossFilter))
+          label: [lossFilter.operator, lossFilter.value].join(' ')
         }
       )
       await tableFilterRemoved

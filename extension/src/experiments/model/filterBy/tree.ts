@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   commands,
@@ -14,12 +13,11 @@ import { getFilterId } from '.'
 import { Experiments } from '../..'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
 
-export type FilterItem = {
+type FilterItem = {
   description: string
   dvcRoot: string
   id: string
   label: string
-  path: string
 }
 
 export class ExperimentsFilterByTree
@@ -72,14 +70,9 @@ export class ExperimentsFilterByTree
       return item
     }
 
-    const item = new TreeItem(
-      Uri.file(element.path),
-      TreeItemCollapsibleState.None
-    )
+    const item = new TreeItem(element.label, TreeItemCollapsibleState.None)
 
     item.iconPath = new ThemeIcon('filter')
-
-    item.label = element.label
     item.description = element.description
     item.contextValue = 'dvcFilter'
 
@@ -92,16 +85,12 @@ export class ExperimentsFilterByTree
     }
 
     return Promise.resolve(
-      this.experiments.getFilters(element).map(filter => {
-        const id = getFilterId(filter)
-        return {
-          description: [filter.operator, filter.value].join(' '),
-          dvcRoot: element,
-          id,
-          label: filter.path,
-          path: join(element, id)
-        }
-      })
+      this.experiments.getFilters(element).map(filter => ({
+        description: [filter.operator, filter.value].join(' '),
+        dvcRoot: element,
+        id: getFilterId(filter),
+        label: filter.path
+      }))
     )
   }
 
