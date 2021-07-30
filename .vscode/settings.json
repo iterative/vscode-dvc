@@ -17,7 +17,6 @@
     "DVCPATH",
     "Interactors",
     "MNIST",
-    "bufferutil",
     "camelcase",
     "conda",
     "dvcignore",
