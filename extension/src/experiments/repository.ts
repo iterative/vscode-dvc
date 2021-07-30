@@ -154,10 +154,6 @@ export class ExperimentsRepository {
     return this.experiments.getFilters()
   }
 
-  public getFilter(id: string) {
-    return this.experiments.getFilter(id)
-  }
-
   public async addFilter() {
     const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
     const filterToAdd = await pickFilterToAdd(paramsAndMetrics)

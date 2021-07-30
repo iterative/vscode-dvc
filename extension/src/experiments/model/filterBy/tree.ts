@@ -1,4 +1,3 @@
-import { join, relative } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   commands,
@@ -14,23 +13,34 @@ import { getFilterId } from '.'
 import { Experiments } from '../..'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
 
-export class ExperimentsFilterByTree implements TreeDataProvider<string> {
+type FilterItem = {
+  description: string
+  dvcRoot: string
+  id: string
+  label: string
+}
+
+export class ExperimentsFilterByTree
+  implements TreeDataProvider<string | FilterItem>
+{
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: Experiments
-  private filterRoots: Record<string, string> = {}
 
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
-      window.createTreeView('dvc.views.experimentsFilterByTree', {
-        canSelectMany: true,
-        showCollapseAll: true,
-        treeDataProvider: this
-      })
+      window.createTreeView<string | FilterItem>(
+        'dvc.views.experimentsFilterByTree',
+        {
+          canSelectMany: true,
+          showCollapseAll: true,
+          treeDataProvider: this
+        }
+      )
     )
 
     this.experiments = experiments
@@ -38,7 +48,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsFilterByTree.removeFilter',
-        resource => this.removeFilter(resource)
+        resource => this.removeFilter(resource as FilterItem)
       )
     )
 
@@ -50,7 +60,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     )
   }
 
-  public getTreeItem(element: string): TreeItem {
+  public getTreeItem(element: string | FilterItem): TreeItem {
     if (this.isRoot(element)) {
       const item = new TreeItem(
         Uri.file(element),
@@ -60,34 +70,27 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
       return item
     }
 
-    const filter = this.getFilter(element)
-
-    const item = new TreeItem(Uri.file(element), TreeItemCollapsibleState.None)
-
-    if (!filter) {
-      return item
-    }
+    const item = new TreeItem(element.label, TreeItemCollapsibleState.None)
 
     item.iconPath = new ThemeIcon('filter')
-
-    item.label = filter.path
-    item.description = [filter.operator, filter.value].join(' ')
+    item.description = element.description
     item.contextValue = 'dvcFilter'
 
     return item
   }
 
-  public getChildren(element?: string): Promise<string[]> {
+  public getChildren(element?: string): Promise<string[] | FilterItem[]> {
     if (!element) {
       return this.getRootElements()
     }
 
     return Promise.resolve(
-      this.experiments.getFilters(element).map(filter => {
-        const id = join(element, getFilterId(filter))
-        this.filterRoots[id] = element
-        return id
-      })
+      this.experiments.getFilters(element).map(filter => ({
+        description: [filter.operator, filter.value].join(' '),
+        dvcRoot: element,
+        id: getFilterId(filter),
+        label: filter.path
+      }))
     )
   }
 
@@ -95,10 +98,7 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     await this.experiments.isReady()
     const dvcRoots = this.getDvcRoots()
     const filters = flatten(
-      dvcRoots.map(dvcRoot => {
-        this.filterRoots[dvcRoot] = dvcRoot
-        return this.experiments.getFilters(dvcRoot)
-      })
+      dvcRoots.map(dvcRoot => this.experiments.getFilters(dvcRoot))
     )
     if (definedAndNonEmpty(filters)) {
       if (dvcRoots.length === 1) {
@@ -112,11 +112,6 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     return []
   }
 
-  private getFilter(element: string) {
-    const [dvcRoot, id] = this.getDetails(element)
-    return this.experiments.getFilter(dvcRoot, id)
-  }
-
   private async removeAllFilters(element: string | undefined) {
     if (!element) {
       const dvcRoots = this.getDvcRoots()
@@ -125,22 +120,15 @@ export class ExperimentsFilterByTree implements TreeDataProvider<string> {
     }
 
     const filters = await this.getChildren(element)
-    filters.map(filter => this.removeFilter(filter))
+    filters.map(filter => this.removeFilter(filter as FilterItem))
   }
 
-  private removeFilter(element: string) {
-    const [dvcRoot, id] = this.getDetails(element)
-    this.experiments.removeFilter(dvcRoot, id)
+  private removeFilter(filter: FilterItem) {
+    this.experiments.removeFilter(filter.dvcRoot, filter.id)
   }
 
-  private getDetails(element: string) {
-    const dvcRoot = this.filterRoots[element]
-    const id = relative(dvcRoot, element)
-    return [dvcRoot, id]
-  }
-
-  private isRoot(element: string) {
-    return Object.values(this.filterRoots).includes(element)
+  private isRoot(element: string | FilterItem): element is string {
+    return typeof element === 'string'
   }
 
   private getDvcRoots() {

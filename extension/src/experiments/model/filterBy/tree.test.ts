@@ -83,7 +83,12 @@ describe('ExperimentsFilterByTree', () => {
 
     const filters = await experimentsFilterByTree.getChildren()
     expect(filters).toEqual([
-      join('demo', 'params', 'params.yaml', 'param==90000')
+      {
+        description: '== 90000',
+        dvcRoot: 'demo',
+        id: join('params', 'params.yaml', 'param==90000'),
+        label: join('params', 'params.yaml', 'param')
+      }
     ])
   })
 
@@ -133,8 +138,18 @@ describe('ExperimentsFilterByTree', () => {
     const filters = await experimentsFilterByTree.getChildren('demo')
 
     expect(filters).toEqual([
-      join('demo', 'params', 'params.yml', 'param==90000'),
-      join('demo', 'metrics', 'logs.json', 'metric<1')
+      {
+        description: '== 90000',
+        dvcRoot: 'demo',
+        id: join('params', 'params.yml', 'param==90000'),
+        label: join('params', 'params.yml', 'param')
+      },
+      {
+        description: '< 1',
+        dvcRoot: 'demo',
+        id: join('metrics', 'logs.json', 'metric<1'),
+        label: join('metrics', 'logs.json', 'metric')
+      }
     ])
   })
 
@@ -165,9 +180,9 @@ describe('ExperimentsFilterByTree', () => {
         value: '100'
       }
       let mockedItem = {}
-      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+      mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
         expect(collapsibleState).toEqual(0)
-        mockedItem = { collapsibleState, uri }
+        mockedItem = { collapsibleState, label }
         return mockedItem
       })
       mockedThemeIcon.mockImplementationOnce(function (id) {
@@ -184,16 +199,18 @@ describe('ExperimentsFilterByTree', () => {
       await experimentsFilterByTree.getChildren()
 
       mockedGetFilter.mockReturnValueOnce(mockedFilter)
-      const item = experimentsFilterByTree.getTreeItem(
-        join(dvcRoot, 'metrics', 'summary.json', 'success_metric>=100')
-      )
+      const item = experimentsFilterByTree.getTreeItem({
+        description: '>= 100',
+        dvcRoot,
+        id: join('metrics', 'summary.json', 'success_metric>=100'),
+        label: join('metrics', 'summary.json', 'success_metric')
+      })
 
       expect(item).toEqual({
         ...mockedItem,
         contextValue: 'dvcFilter',
         description: '>= 100',
-        iconPath: { id: 'filter' },
-        label: mockedFilter.path
+        iconPath: { id: 'filter' }
       })
     })
   })
