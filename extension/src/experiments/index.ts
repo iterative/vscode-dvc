@@ -107,10 +107,6 @@ export class Experiments {
     return this.getRepository(dvcRoot).getFilters()
   }
 
-  public getFilter(dvcRoot: string, id: string): FilterDefinition | undefined {
-    return this.getRepository(dvcRoot).getFilter(id)
-  }
-
   public getExperimentNames(dvcRoot: string): string[] {
     return this.getRepository(dvcRoot).getExperimentNames()
   }
