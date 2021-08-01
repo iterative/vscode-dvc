@@ -59,11 +59,19 @@ export class ParamsAndMetricsModel {
   }
 
   public getChildren(path: string) {
-    return this.data?.filter(paramOrMetric =>
-      path
-        ? paramOrMetric.parentPath === path
-        : ['metrics', 'params'].includes(paramOrMetric.parentPath)
-    )
+    return this.data
+      ?.filter(paramOrMetric =>
+        path
+          ? paramOrMetric.parentPath === path
+          : ['metrics', 'params'].includes(paramOrMetric.parentPath)
+      )
+      .map(paramOrMetric => {
+        return {
+          ...paramOrMetric,
+          descendantStatuses: this.getDescendantsStatuses(paramOrMetric.path),
+          status: this.status[paramOrMetric.path]
+        }
+      })
   }
 
   public toggleStatus(path: string) {

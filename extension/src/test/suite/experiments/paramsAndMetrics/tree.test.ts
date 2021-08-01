@@ -1,11 +1,10 @@
-import { join, relative, resolve } from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { window, commands, Uri } from 'vscode'
 import { Disposable } from '../../../../extension'
 import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
-import { ExperimentsParamsAndMetricsTree } from '../../../../experiments/paramsAndMetrics/tree'
 import { Experiments } from '../../../../experiments'
 import { ExperimentsRepository } from '../../../../experiments/repository'
 import { Status } from '../../../../experiments/paramsAndMetrics/model'
@@ -53,14 +52,7 @@ suite('Extension Test Suite', () => {
 
   describe('experimentsParamsAndMetricsTree', () => {
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
-      const relPath = join('params', paramsFile, 'learning_rate')
-      const absPath = join(dvcDemoPath, relPath)
-
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsParamsAndMetricsTree as any).prototype,
-        'getDetails'
-      ).returns([dvcDemoPath, relPath])
+      const path = join('params', paramsFile, 'learning_rate')
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -88,33 +80,30 @@ suite('Extension Test Suite', () => {
         experimentsRepository
       )
 
-      const isUnselected = await commands.executeCommand(toggleCommand, absPath)
+      const isUnselected = await commands.executeCommand(toggleCommand, {
+        dvcRoot: dvcDemoPath,
+        path
+      })
 
       expect(isUnselected).to.equal(Status.unselected)
 
-      const isSelected = await commands.executeCommand(toggleCommand, absPath)
+      const isSelected = await commands.executeCommand(toggleCommand, {
+        dvcRoot: dvcDemoPath,
+        path
+      })
 
       expect(isSelected).to.equal(Status.selected)
 
-      const isUnselectedAgain = await commands.executeCommand(
-        toggleCommand,
-        absPath
-      )
+      const isUnselectedAgain = await commands.executeCommand(toggleCommand, {
+        dvcRoot: dvcDemoPath,
+        path
+      })
 
       expect(isUnselectedAgain).to.equal(Status.unselected)
     })
 
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
-      const toggleCommand =
-        'dvc.views.experimentsParamsAndMetricsTree.toggleStatus'
-      const relPath = join('params', paramsFile)
-      const absPath = join(dvcDemoPath, relPath)
-
-      stub(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (ExperimentsParamsAndMetricsTree as any).prototype,
-        'getDetails'
-      ).callsFake((path: string) => [dvcDemoPath, relative(dvcDemoPath, path)])
+      const path = join('params', paramsFile)
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -143,13 +132,12 @@ suite('Extension Test Suite', () => {
       )
 
       const selectedChildren =
-        experimentsRepository.getChildParamsOrMetrics(relPath) || []
+        experimentsRepository.getChildParamsOrMetrics(path) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
       const selectedGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(
-          join(relPath, 'process')
-        ) || []
+        experimentsRepository.getChildParamsOrMetrics(join(path, 'process')) ||
+        []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
       const allChildren = [...selectedChildren, ...selectedGrandChildren]
@@ -161,7 +149,7 @@ suite('Extension Test Suite', () => {
       )
 
       expect(
-        experimentsRepository.getParamOrMetric(relPath)?.descendantStatuses
+        experimentsRepository.getParamOrMetric(path)?.descendantStatuses
       ).to.deep.equal([
         Status.selected,
         Status.selected,
@@ -173,7 +161,10 @@ suite('Extension Test Suite', () => {
         Status.selected
       ])
 
-      const isUnselected = await commands.executeCommand(toggleCommand, absPath)
+      const isUnselected = await commands.executeCommand(toggleCommand, {
+        dvcRoot: dvcDemoPath,
+        path
+      })
 
       expect(isUnselected).to.equal(Status.unselected)
 
@@ -184,7 +175,7 @@ suite('Extension Test Suite', () => {
       )
 
       expect(
-        experimentsRepository.getParamOrMetric(relPath)?.descendantStatuses
+        experimentsRepository.getParamOrMetric(path)?.descendantStatuses
       ).to.deep.equal([
         Status.unselected,
         Status.unselected,
@@ -201,13 +192,6 @@ suite('Extension Test Suite', () => {
   it("should be able to select a child and set all of the ancestors' statuses to indeterminate with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
-    const absPath = join(dvcDemoPath, grandParentPath)
-
-    stub(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ExperimentsParamsAndMetricsTree as any).prototype,
-      'getDetails'
-    ).callsFake((path: string) => [dvcDemoPath, relative(dvcDemoPath, path)])
 
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
@@ -245,7 +229,10 @@ suite('Extension Test Suite', () => {
       ...selectedGrandChildren
     ]
 
-    await commands.executeCommand(toggleCommand, absPath)
+    await commands.executeCommand(toggleCommand, {
+      dvcRoot: dvcDemoPath,
+      path: grandParentPath
+    })
 
     allParamsAndMetrics.map(paramOrMetric =>
       expect(
@@ -255,10 +242,10 @@ suite('Extension Test Suite', () => {
 
     const [firstGrandChild] = selectedGrandChildren
 
-    const isSelected = await commands.executeCommand(
-      toggleCommand,
-      join(dvcDemoPath, firstGrandChild.path)
-    )
+    const isSelected = await commands.executeCommand(toggleCommand, {
+      dvcRoot: dvcDemoPath,
+      path: firstGrandChild.path
+    })
 
     expect(isSelected).to.equal(Status.selected)
 
@@ -287,13 +274,6 @@ suite('Extension Test Suite', () => {
   it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
     const grandParentPath = join('params', paramsFile)
     const parentPath = join(grandParentPath, 'process')
-    const absPath = join(dvcDemoPath, grandParentPath)
-
-    stub(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (ExperimentsParamsAndMetricsTree as any).prototype,
-      'getDetails'
-    ).callsFake((path: string) => [dvcDemoPath, relative(dvcDemoPath, path)])
 
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
@@ -321,16 +301,19 @@ suite('Extension Test Suite', () => {
       experimentsRepository.getChildParamsOrMetrics(parentPath) || []
     expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
-    await commands.executeCommand(toggleCommand, absPath)
+    await commands.executeCommand(toggleCommand, {
+      dvcRoot: dvcDemoPath,
+      path: grandParentPath
+    })
 
     expect(selectedGrandChildren).to.have.lengthOf(2)
 
     const [firstGrandChild, secondGrandChild] = selectedGrandChildren
 
-    const isSelected = await commands.executeCommand(
-      toggleCommand,
-      join(dvcDemoPath, firstGrandChild.path)
-    )
+    const isSelected = await commands.executeCommand(toggleCommand, {
+      dvcRoot: dvcDemoPath,
+      path: firstGrandChild.path
+    })
 
     expect(isSelected).to.equal(Status.selected)
 
@@ -340,7 +323,10 @@ suite('Extension Test Suite', () => {
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
-      join(dvcDemoPath, firstGrandChild.path)
+      {
+        dvcRoot: dvcDemoPath,
+        path: firstGrandChild.path
+      }
     )
 
     expect(lastSelectedIsUnselected).to.equal(Status.unselected)
