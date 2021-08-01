@@ -6,13 +6,19 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
   window,
-  Uri
+  Uri,
+  commands
 } from 'vscode'
 import { SortDefinition } from './'
 import { Experiments } from '../..'
 
+export interface SortDefinitionWithParent {
+  sort: SortDefinition
+  parent: string
+}
+
 export class ExperimentsSortByTree
-  implements TreeDataProvider<string | SortDefinition>
+  implements TreeDataProvider<string | SortDefinitionWithParent>
 {
   public dispose = Disposable.fn()
 
@@ -24,7 +30,7 @@ export class ExperimentsSortByTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
-      window.createTreeView<string | SortDefinition>(
+      window.createTreeView<string | SortDefinitionWithParent>(
         'dvc.views.experimentsSortByTree',
         {
           canSelectMany: true,
@@ -34,24 +40,60 @@ export class ExperimentsSortByTree
       )
     )
 
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.experimentsSortByTree.removeSort',
+        (arg1: SortDefinitionWithParent) => {
+          const {
+            parent,
+            sort: { path }
+          } = arg1
+          this.experiments.removeSort(path, parent)
+        }
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.experimentsSortByTree.addSort',
+        (dvcRoot: string) => {
+          this.experiments.buildAndAddSort(dvcRoot)
+        }
+      )
+    )
+
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.experimentsSortByTree.removeAllSorts',
+        (dvcRoot: string) => {
+          this.experiments.clearSorts(dvcRoot)
+        }
+      )
+    )
+
     this.experiments = experiments
   }
 
-  public getTreeItem(element: string | SortDefinition): TreeItem {
+  public getTreeItem(element: string | SortDefinitionWithParent): TreeItem {
     if (typeof element === 'string') {
       return this.getTreeItemFromDvcRoot(element as string)
     }
-    return this.getTreeItemFromSortDefinition(element as SortDefinition)
+    return this.getTreeItemFromSortDefinition(
+      element as SortDefinitionWithParent
+    )
   }
 
   public getChildren(
     parent: undefined | string
-  ): string[] | SortDefinition[] | Promise<string[] | SortDefinition[]> {
+  ):
+    | string[]
+    | SortDefinitionWithParent[]
+    | Promise<string[] | SortDefinitionWithParent[]> {
     if (parent === undefined) {
       return this.getRootItems()
     }
 
-    return this.experiments.getSorts(parent)
+    return this.experiments.getSorts(parent).map(sort => ({ parent, sort }))
   }
 
   private async getRootItems() {
@@ -71,18 +113,21 @@ export class ExperimentsSortByTree
     )
 
     projectTreeItem.id = rootPath
-    projectTreeItem.contextValue = 'dvcSortByTreeProject'
+    projectTreeItem.contextValue = 'dvcSortRoot'
 
     return projectTreeItem
   }
 
-  private getTreeItemFromSortDefinition(sortDefinition: SortDefinition) {
-    const sortDefinitionTreeItem = new TreeItem(sortDefinition.path)
+  private getTreeItemFromSortDefinition(
+    sortWithParent: SortDefinitionWithParent
+  ) {
+    const { sort } = sortWithParent
+    const sortDefinitionTreeItem = new TreeItem(sort.path)
 
     sortDefinitionTreeItem.iconPath = new ThemeIcon(
-      sortDefinition.descending ? 'arrow-down' : 'arrow-up'
+      sort.descending ? 'arrow-down' : 'arrow-up'
     )
-    sortDefinitionTreeItem.contextValue = 'dvcSortByTreeSortDefinition'
+    sortDefinitionTreeItem.contextValue = 'dvcSort'
 
     return sortDefinitionTreeItem
   }

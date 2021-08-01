@@ -70,14 +70,19 @@ export class Experiments {
     return this.getRepository(dvcRoot).removeFilter(id)
   }
 
-  public async pickSort() {
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    repository.pickSort()
+  public async buildAndAddSort(dvcRoot?: string) {
+    const repository = await this.getOrPickRepo(dvcRoot)
+    repository.buildAndAddSort()
   }
 
-  public async clearSorts() {
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    repository.setSort(undefined)
+  public async clearSorts(dvcRoot?: string) {
+    const repository = await this.getOrPickRepo(dvcRoot)
+    repository.clearSorts()
+  }
+
+  public async removeSort(pathToRemove: string, dvcRoot: string) {
+    const repository = await this.getOrPickRepo(dvcRoot)
+    repository.removeSortByPath(pathToRemove)
   }
 
   public getDvcRoots() {
@@ -265,6 +270,12 @@ export class Experiments {
   private async getFocusedOrDefaultOrPickRepo() {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     return this.getRepository(dvcRoot)
+  }
+
+  private async getOrPickRepo(dvcRoot?: string) {
+    return dvcRoot
+      ? this.getRepository(dvcRoot)
+      : await this.getFocusedOrDefaultOrPickRepo()
   }
 
   private getRepository(dvcRoot: string) {

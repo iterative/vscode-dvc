@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
-import { pickSort } from './quickPick'
+import { buildSortQuickPick } from './quickPick'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 
 jest.mock('vscode')
@@ -50,20 +50,20 @@ const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
 
 describe('pickSort', () => {
   it('should not invoke a quickPick if passed undefined', async () => {
-    const resolvedPromise = await pickSort(undefined)
+    const resolvedPromise = await buildSortQuickPick(undefined)
     expect(mockedShowQuickPick).not.toBeCalled()
     expect(resolvedPromise).toBe(undefined)
   })
 
   it('should not invoke a quickPick if an empty array', async () => {
-    const resolvedPromise = await pickSort([])
+    const resolvedPromise = await buildSortQuickPick([])
     expect(mockedShowQuickPick).not.toBeCalled()
     expect(resolvedPromise).toBe(undefined)
   })
 
   it('should resolve with no value if canceled at param or metric select', async () => {
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    expect(await pickSort(exampleParamsAndMetrics)).toBe(undefined)
+    expect(await buildSortQuickPick(exampleParamsAndMetrics)).toBe(undefined)
     expect(mockedShowQuickPick).toBeCalledTimes(1)
   })
 
@@ -72,7 +72,7 @@ describe('pickSort', () => {
       value: epochsParam
     } as unknown)
     mockedShowQuickPick.mockResolvedValueOnce(undefined)
-    expect(await pickSort(exampleParamsAndMetrics)).toBe(undefined)
+    expect(await buildSortQuickPick(exampleParamsAndMetrics)).toBe(undefined)
     expect(mockedShowQuickPick).toBeCalledTimes(2)
   })
 
@@ -81,7 +81,7 @@ describe('pickSort', () => {
       value: epochsParam
     } as unknown)
     mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
-    const resolvedPromise = await pickSort(exampleParamsAndMetrics)
+    const resolvedPromise = await buildSortQuickPick(exampleParamsAndMetrics)
     expect(mockedShowQuickPick).toBeCalledTimes(2)
     expect(mockedShowQuickPick).toBeCalledWith(
       [
@@ -101,7 +101,7 @@ describe('pickSort', () => {
       value: paramsYamlParam
     } as unknown)
     mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
-    const resolvedPromise = await pickSort(exampleParamsAndMetrics)
+    const resolvedPromise = await buildSortQuickPick(exampleParamsAndMetrics)
     expect(mockedShowQuickPick).toBeCalledTimes(2)
     expect(resolvedPromise).toEqual({
       descending: false,

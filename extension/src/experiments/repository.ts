@@ -6,7 +6,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { pickSort } from './model/sortBy/quickPick'
+import { buildSortQuickPick } from './model/sortBy/quickPick'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
@@ -136,22 +136,34 @@ export class ExperimentsRepository {
     )
   }
 
-  public setSort(sort: SortDefinition | undefined) {
-    this.experiments.setSort(sort)
-
-    return this.notifyChanged()
+  public addSort(sort: SortDefinition) {
+    this.experiments.addSort(sort)
+    this.notifyChanged()
   }
 
   public getSorts() {
     return this.experiments.getSorts()
   }
 
-  public async pickSort() {
-    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const pickedSortDefinition = await pickSort(paramsAndMetrics)
-    if (pickedSortDefinition) {
-      return this.setSort(pickedSortDefinition)
+  public buildSort() {
+    return buildSortQuickPick(this.paramsAndMetrics.getTerminalNodes())
+  }
+
+  public removeSortByPath(pathToRemove: string) {
+    this.experiments.removeSort(pathToRemove)
+    this.notifyChanged()
+  }
+
+  public async buildAndAddSort() {
+    const pickedSort = await this.buildSort()
+    if (pickedSort) {
+      this.addSort(pickedSort)
     }
+  }
+
+  public clearSorts() {
+    this.experiments.clearSorts()
+    this.notifyChanged()
   }
 
   public getFilters() {
@@ -169,7 +181,7 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.addFilter(filterToAdd)
-    return this.notifyChanged()
+    this.notifyChanged()
   }
 
   public async removeFilters() {
@@ -179,12 +191,12 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.removeFilters(filtersToRemove)
-    return this.notifyChanged()
+    this.notifyChanged()
   }
 
   public removeFilter(id: string) {
     if (this.experiments.removeFilter(id)) {
-      return this.notifyChanged()
+      this.notifyChanged()
     }
   }
 
@@ -204,7 +216,7 @@ export class ExperimentsRepository {
     return this.experiments.getCheckpointNames(name)
   }
 
-  private async updateData(): Promise<boolean | undefined> {
+  private async updateData(): Promise<void> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
         AvailableCommands.EXPERIMENT_SHOW,
@@ -220,12 +232,12 @@ export class ExperimentsRepository {
       this.experiments.transformAndSet(data)
     ])
 
-    return this.notifyChanged()
+    this.notifyChanged()
   }
 
   private notifyChanged() {
     this.experimentsChanged.fire()
-    return this.notifyParamsOrMetricsChanged()
+    this.notifyParamsOrMetricsChanged()
   }
 
   private notifyParamsOrMetricsChanged() {
