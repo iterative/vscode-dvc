@@ -140,26 +140,14 @@ suite('Extension Test Suite', () => {
         []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
-      const allChildren = [...selectedChildren, ...selectedGrandChildren]
+      const allSelectedChildren = [
+        ...selectedChildren,
+        ...selectedGrandChildren
+      ]
 
-      allChildren.map(paramOrMetric =>
-        expect(
-          experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
-        ).to.equal(Status.selected)
+      allSelectedChildren.map(paramOrMetric =>
+        expect(paramOrMetric.status).to.equal(Status.selected)
       )
-
-      expect(
-        experimentsRepository.getParamOrMetric(path)?.descendantStatuses
-      ).to.deep.equal([
-        Status.selected,
-        Status.selected,
-        Status.selected,
-        Status.selected,
-        Status.selected,
-        Status.selected,
-        Status.selected,
-        Status.selected
-      ])
 
       const isUnselected = await commands.executeCommand(toggleCommand, {
         dvcRoot: dvcDemoPath,
@@ -168,24 +156,22 @@ suite('Extension Test Suite', () => {
 
       expect(isUnselected).to.equal(Status.unselected)
 
-      allChildren.map(paramOrMetric =>
-        expect(
-          experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
-        ).to.equal(isUnselected)
-      )
+      const unselectedChildren =
+        experimentsRepository.getChildParamsOrMetrics(path) || []
+      expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
-      expect(
-        experimentsRepository.getParamOrMetric(path)?.descendantStatuses
-      ).to.deep.equal([
-        Status.unselected,
-        Status.unselected,
-        Status.unselected,
-        Status.unselected,
-        Status.unselected,
-        Status.unselected,
-        Status.unselected,
-        Status.unselected
-      ])
+      const unselectedGrandChildren =
+        experimentsRepository.getChildParamsOrMetrics(join(path, 'process')) ||
+        []
+
+      const allUnselectedChildren = [
+        ...unselectedChildren,
+        ...unselectedGrandChildren
+      ]
+
+      allUnselectedChildren.map(paramOrMetric =>
+        expect(paramOrMetric.status).to.equal(Status.unselected)
+      )
     })
   })
 
@@ -215,32 +201,26 @@ suite('Extension Test Suite', () => {
       experimentsRepository
     )
 
-    const selectedChildren =
-      experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
-    expect(selectedChildren).to.have.lengthOf.greaterThan(1)
-
-    const selectedGrandChildren =
-      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
-    expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
-
-    const allParamsAndMetrics = [
-      ...selectedChildren,
-      { path: grandParentPath },
-      ...selectedGrandChildren
-    ]
-
     await commands.executeCommand(toggleCommand, {
       dvcRoot: dvcDemoPath,
       path: grandParentPath
     })
 
-    allParamsAndMetrics.map(paramOrMetric =>
-      expect(
-        experimentsRepository.getParamOrMetric(paramOrMetric.path)?.status
-      ).to.equal(Status.unselected)
+    const unselectedChildren =
+      experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
+    expect(unselectedChildren).to.have.lengthOf.greaterThan(1)
+
+    const unselectedGrandChildren =
+      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+    expect(unselectedGrandChildren).to.have.lengthOf.greaterThan(1)
+
+    const allUnselected = [...unselectedChildren, ...unselectedGrandChildren]
+
+    allUnselected.map(paramOrMetric =>
+      expect(paramOrMetric?.status).to.equal(Status.unselected)
     )
 
-    const [firstGrandChild] = selectedGrandChildren
+    const [firstGrandChild] = unselectedGrandChildren
 
     const isSelected = await commands.executeCommand(toggleCommand, {
       dvcRoot: dvcDemoPath,
@@ -249,26 +229,27 @@ suite('Extension Test Suite', () => {
 
     expect(isSelected).to.equal(Status.selected)
 
-    const parentParam = experimentsRepository.getParamOrMetric(parentPath)
-    expect(parentParam?.status).to.equal(Status.indeterminate)
-    expect(parentParam?.descendantStatuses).to.deep.equal([
-      Status.selected,
-      Status.unselected
-    ])
+    const indeterminateChildren =
+      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
 
-    const grandParentParam =
-      experimentsRepository.getParamOrMetric(grandParentPath)
-    expect(grandParentParam?.status).to.equal(Status.indeterminate)
-    expect(grandParentParam?.descendantStatuses).to.deep.equal([
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.indeterminate,
-      Status.selected,
-      Status.unselected
-    ])
+    expect(
+      indeterminateChildren.map(paramOrMetric => paramOrMetric.status)
+    ).to.deep.equal([Status.selected, Status.unselected])
+
+    const unselectedOrIndeterminateParams =
+      experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
+
+    expect(
+      unselectedOrIndeterminateParams.find(
+        paramOrMetric => paramOrMetric.path === parentPath
+      )?.status
+    ).to.equal(Status.indeterminate)
+
+    unselectedOrIndeterminateParams
+      .filter(paramOrMetric => paramOrMetric.path !== parentPath)
+      .map(paramOrMetric =>
+        expect(paramOrMetric.status).to.equal(Status.unselected)
+      )
   })
 
   it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
@@ -308,18 +289,24 @@ suite('Extension Test Suite', () => {
 
     expect(selectedGrandChildren).to.have.lengthOf(2)
 
-    const [firstGrandChild, secondGrandChild] = selectedGrandChildren
+    const [firstGrandChild] = selectedGrandChildren
 
-    const isSelected = await commands.executeCommand(toggleCommand, {
+    selectedGrandChildren.map(paramOrMetric =>
+      expect(paramOrMetric.status).to.equal(Status.selected)
+    )
+
+    await commands.executeCommand(toggleCommand, {
       dvcRoot: dvcDemoPath,
       path: firstGrandChild.path
     })
 
-    expect(isSelected).to.equal(Status.selected)
+    const indeterminateGrandChildren =
+      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+    expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
     expect(
-      experimentsRepository.getParamOrMetric(secondGrandChild.path)?.status
-    ).to.equal(Status.unselected)
+      indeterminateGrandChildren.map(paramOrMetric => paramOrMetric.status)
+    ).to.deep.equal([Status.selected, Status.unselected])
 
     const lastSelectedIsUnselected = await commands.executeCommand(
       toggleCommand,
@@ -331,25 +318,18 @@ suite('Extension Test Suite', () => {
 
     expect(lastSelectedIsUnselected).to.equal(Status.unselected)
 
-    const parentParam = experimentsRepository.getParamOrMetric(parentPath)
-    expect(parentParam?.status).to.equal(lastSelectedIsUnselected)
-    expect(parentParam?.descendantStatuses).to.deep.equal([
-      Status.unselected,
-      Status.unselected
-    ])
+    const unselectedChildren =
+      experimentsRepository.getChildParamsOrMetrics(parentPath) || []
 
-    const grandParentParam =
-      experimentsRepository.getParamOrMetric(grandParentPath)
-    expect(grandParentParam?.status).to.equal(lastSelectedIsUnselected)
-    expect(grandParentParam?.descendantStatuses).to.deep.equal([
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected,
-      Status.unselected
-    ])
+    unselectedChildren.map(paramOrMetric =>
+      expect(paramOrMetric.status).to.equal(Status.unselected)
+    )
+
+    const unselectedGrandChildren =
+      experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
+
+    unselectedGrandChildren.map(paramOrMetric =>
+      expect(paramOrMetric.status).to.equal(Status.unselected)
+    )
   })
 })
