@@ -56,7 +56,7 @@ allows for a few different methods for picking how to run DVC.
 
 ## How to Use
 
-This extension, makes extensive use of the
+This extension makes extensive use of the
 [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
 Every feature should be available from the Command Palette, and from there
 additional GUI elements are added for convenience.
