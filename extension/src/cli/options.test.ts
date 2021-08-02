@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { getArgs, getExecutable } from './command'
+import { getArgs, getExecutable } from './options'
 import { Command, Flag } from './args'
 
 describe('getArgs', () => {

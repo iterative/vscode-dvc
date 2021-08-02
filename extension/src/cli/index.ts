@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
-import { getArgs, getExecutable } from './command'
+import { getArgs, getExecutable } from './options'
 import { CliError, MaybeConsoleError } from './error'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
