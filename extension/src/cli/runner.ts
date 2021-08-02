@@ -140,10 +140,6 @@ export class CliRunner implements ICli {
     return !!this.currentProcess
   }
 
-  public getRunningProcess() {
-    return this.currentProcess
-  }
-
   private getOverrideOrCliPath() {
     if (this.executable) {
       return this.executable
