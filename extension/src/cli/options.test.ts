@@ -5,7 +5,7 @@ import { Command, Flag } from './args'
 describe('getOptions', () => {
   const cwd = join('path', 'to', 'work', 'dir')
 
-  it('should give the correct command string given a basic environment', () => {
+  it('should give the correct options given a basic environment', () => {
     const options = getOptions(undefined, '', cwd, Command.CHECKOUT, Flag.FORCE)
     expect(options).toEqual({
       args: ['checkout', '-f'],
@@ -26,7 +26,7 @@ describe('getOptions', () => {
     })
   })
 
-  it('should not append -m dvc to the args args if both an isolated python env and direct path to dvc are in use', () => {
+  it('should only use the path to the cli if both an isolated python env and path to dvc are in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
     const cliPath = join('custom', 'path', 'to', 'dvc')
     const options = getOptions(pythonBinPath, cliPath, cwd, Command.DIFF)
