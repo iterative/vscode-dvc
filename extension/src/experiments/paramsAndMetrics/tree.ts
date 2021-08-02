@@ -12,15 +12,15 @@ import {
 } from 'vscode'
 import { Status } from './model'
 import { Experiments } from '..'
-import { ResourceLocator } from '../../resourceLocator'
+import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 
 type ParamsAndMetricsItem = {
-  descendantStatuses?: Status[]
+  description: string | undefined
   dvcRoot: string
-  hasChildren: boolean
+  collapsibleState: TreeItemCollapsibleState
   path: string
-  status: Status
+  iconPath: Resource
 }
 
 export class ExperimentsParamsAndMetricsTree
@@ -72,27 +72,22 @@ export class ExperimentsParamsAndMetricsTree
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const { dvcRoot, path, hasChildren, descendantStatuses, status } = element
-
-    const resourceUri = Uri.file(join(dvcRoot, path))
+    const { dvcRoot, path, collapsibleState, description, iconPath } = element
 
     const treeItem = new TreeItem(
-      resourceUri,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
+      Uri.file(join(dvcRoot, path)),
+      collapsibleState
     )
 
     treeItem.command = {
-      arguments: [element],
+      arguments: [{ dvcRoot, path }],
       command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
       title: 'toggle'
     }
 
-    treeItem.iconPath = this.getIconPath(status)
-
-    if (hasChildren && descendantStatuses) {
-      treeItem.description = this.getDescription(descendantStatuses, '/')
+    treeItem.iconPath = iconPath
+    if (description) {
+      treeItem.description = description
     }
 
     return treeItem
@@ -147,7 +142,14 @@ export class ExperimentsParamsAndMetricsTree
       .getChildParamsOrMetrics(dvcRoot, path)
       .map(paramOrMetric => {
         const { descendantStatuses, hasChildren, path, status } = paramOrMetric
-        return { descendantStatuses, dvcRoot, hasChildren, path, status }
+
+        const description = this.getDescription(descendantStatuses, '/')
+        const iconPath = this.getIconPath(status)
+        const collapsibleState = hasChildren
+          ? TreeItemCollapsibleState.Collapsed
+          : TreeItemCollapsibleState.None
+
+        return { collapsibleState, description, dvcRoot, iconPath, path }
       })
   }
 

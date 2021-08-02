@@ -1,7 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Uri } from 'vscode'
 
-type Resource = { dark: Uri; light: Uri }
+export type Resource = { dark: Uri; light: Uri }
 
 export class ResourceLocator {
   public dispose = Disposable.fn()

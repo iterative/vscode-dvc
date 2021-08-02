@@ -1,10 +1,17 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
+import {
+  commands,
+  EventEmitter,
+  TreeItem,
+  TreeItemCollapsibleState,
+  Uri,
+  window
+} from 'vscode'
 import { ExperimentsParamsAndMetricsTree } from './tree'
 import complexColumnData from '../webview/complex-column-example.json'
-import { ResourceLocator } from '../../resourceLocator'
+import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { Status } from '../paramsAndMetrics/model'
 
@@ -35,15 +42,15 @@ const mockedExperiments = {
 const mockedSelectedCheckbox = {
   dark: join('path', 'to', 'checkbox-c.svg'),
   light: join('path', 'to', 'checkbox-c.svg')
-}
+} as unknown as Resource
 const mockedIndeterminateCheckbox = {
   dark: join('path', 'to', 'checkbox-i.svg'),
   light: join('path', 'to', 'checkbox-i.svg')
-}
+} as unknown as Resource
 const mockedEmptyCheckbox = {
   dark: join('path', 'to', 'checkbox-e.svg'),
   light: join('path', 'to', 'checkbox-e.svg')
-}
+} as unknown as Resource
 const mockedResourceLocator = {
   checkedCheckbox: mockedSelectedCheckbox,
   emptyCheckbox: mockedEmptyCheckbox,
@@ -108,18 +115,18 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
       expect(children).toEqual([
         {
-          descendantStatuses: [],
+          collapsibleState: 1,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
-          hasChildren: true,
-          path: join('params', 'params.yaml'),
-          status: Status.selected
+          iconPath: mockedSelectedCheckbox,
+          path: join('params', 'params.yaml')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 1,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
-          hasChildren: true,
-          path: join('metrics', 'summary.json'),
-          status: Status.selected
+          iconPath: mockedSelectedCheckbox,
+          path: join('metrics', 'summary.json')
         }
       ])
     })
@@ -149,18 +156,18 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
       expect(children).toEqual([
         {
-          descendantStatuses: [],
+          collapsibleState: 1,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
-          hasChildren: true,
-          path: paramsPath,
-          status: Status.selected
+          iconPath: mockedSelectedCheckbox,
+          path: paramsPath
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 1,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
-          hasChildren: true,
-          path: join('metrics', 'summary.json'),
-          status: Status.selected
+          iconPath: mockedSelectedCheckbox,
+          path: join('metrics', 'summary.json')
         }
       ])
 
@@ -169,59 +176,67 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           .filter(paramOrMetric => paramsPath === paramOrMetric.parentPath)
           .map(param => ({
             ...param,
-            descendantStatuses: [],
+            descendantStatuses: [
+              Status.selected,
+              Status.selected,
+              Status.selected,
+              Status.selected,
+              Status.selected,
+              Status.unselected
+            ],
             hasChildren: param.path === processPath,
-            status: Status.selected
+            status: Status.indeterminate
           }))
       )
       const grandChildren = await experimentsParamsAndMetricsTree.getChildren({
+        collapsibleState: TreeItemCollapsibleState.Collapsed,
+        description: undefined,
         dvcRoot: mockedDvcRoot,
-        hasChildren: true,
-        path: paramsPath,
-        status: Status.selected
+        iconPath: mockedSelectedCheckbox,
+        path: paramsPath
       })
       expect(grandChildren).toEqual([
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(paramsPath, 'epochs'),
-          status: Status.selected
+          iconPath: mockedIndeterminateCheckbox,
+          path: join(paramsPath, 'epochs')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(paramsPath, 'learning_rate'),
-          status: Status.selected
+          iconPath: mockedIndeterminateCheckbox,
+          path: join(paramsPath, 'learning_rate')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(paramsPath, 'dvc_logs_dir'),
-          status: Status.selected
+          iconPath: mockedIndeterminateCheckbox,
+          path: join(paramsPath, 'dvc_logs_dir')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(paramsPath, 'log_file'),
-          status: Status.selected
+          iconPath: mockedIndeterminateCheckbox,
+          path: join(paramsPath, 'log_file')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(paramsPath, 'dropout'),
-          status: Status.selected
+          iconPath: mockedIndeterminateCheckbox,
+          path: join(paramsPath, 'dropout')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 1,
+          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          hasChildren: true,
-          path: processPath,
-          status: Status.selected
+          iconPath: mockedIndeterminateCheckbox,
+          path: processPath
         }
       ])
 
@@ -230,33 +245,34 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           .filter(paramOrMetric => processPath === paramOrMetric.parentPath)
           .map(param => ({
             ...param,
-            descendantStatuses: [],
+            descendantStatuses: undefined,
             hasChildren: false,
-            status: Status.selected
+            status: Status.unselected
           }))
       )
       const greatGrandChildren =
         await experimentsParamsAndMetricsTree.getChildren({
+          collapsibleState: TreeItemCollapsibleState.Collapsed,
+          description: '0/2',
           dvcRoot: mockedDvcRoot,
-          hasChildren: true,
-          path: processPath,
-          status: Status.selected
+          iconPath: mockedEmptyCheckbox,
+          path: processPath
         })
 
       expect(greatGrandChildren).toEqual([
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(processPath, 'threshold'),
-          status: Status.selected
+          iconPath: mockedEmptyCheckbox,
+          path: join(processPath, 'threshold')
         },
         {
-          descendantStatuses: [],
+          collapsibleState: 0,
+          description: undefined,
           dvcRoot: mockedDvcRoot,
-          hasChildren: false,
-          path: join(processPath, 'test_arg'),
-          status: Status.selected
+          iconPath: mockedEmptyCheckbox,
+          path: join(processPath, 'test_arg')
         }
       ])
     })
@@ -304,16 +320,11 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     const paramsPath = join(mockedDvcRoot, relParamsPath)
 
     const paramsAndMetricsItem = {
-      descendantStatuses: [
-        Status.selected,
-        Status.selected,
-        Status.selected,
-        Status.unselected
-      ],
+      collapsibleState: TreeItemCollapsibleState.Collapsed,
+      description: '3/4',
       dvcRoot: mockedDvcRoot,
-      hasChildren: true,
-      path: relParamsPath,
-      status: Status.selected
+      iconPath: mockedSelectedCheckbox,
+      path: relParamsPath
     }
 
     const treeItem =
@@ -323,7 +334,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     expect(treeItem).toEqual({
       collapsibleState: 1,
       command: {
-        arguments: [paramsAndMetricsItem],
+        arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
         command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
         title: 'toggle'
       },
@@ -348,10 +359,11 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     const paramsPath = join(mockedDvcRoot, relParamsPath)
 
     const paramsAndMetricsItem = {
+      collapsibleState: TreeItemCollapsibleState.None,
+      description: undefined,
       dvcRoot: mockedDvcRoot,
-      hasChildren: false,
-      path: relParamsPath,
-      status: Status.unselected
+      iconPath: mockedEmptyCheckbox,
+      path: relParamsPath
     }
 
     const treeItem =
@@ -361,7 +373,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     expect(treeItem).toEqual({
       collapsibleState: 0,
       command: {
-        arguments: [paramsAndMetricsItem],
+        arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
         command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
         title: 'toggle'
       },
