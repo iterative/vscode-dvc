@@ -10,14 +10,14 @@ describe('getArgs', () => {
 
   it('should append -m dvc to the args if only an isolated python env is in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
-    const commandString = getArgs(pythonBinPath, '', Command.DIFF)
-    expect(commandString).toEqual(['-m', 'dvc', 'diff'])
+    const args = getArgs(pythonBinPath, '', Command.DIFF)
+    expect(args).toEqual(['-m', 'dvc', 'diff'])
   })
 
   it('should not append -m dvc to the args args if both an isolated python env and direct path to dvc are in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
-    const commandString = getArgs(pythonBinPath, 'dvc', Command.DIFF)
-    expect(commandString).toEqual(['diff'])
+    const args = getArgs(pythonBinPath, 'dvc', Command.DIFF)
+    expect(args).toEqual(['diff'])
   })
 })
 
