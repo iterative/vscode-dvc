@@ -24,9 +24,7 @@ suite('Runner Test Suite', () => {
 
   describe('CliRunner', () => {
     it('should only be able to run a single command at a time', async () => {
-      const cliRunner = disposable.track(
-        new CliRunner({ getCliPath: () => '' } as Config, 'sleep')
-      )
+      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
 
       const windowErrorMessageSpy = spy(window, 'showErrorMessage')
       const cwd = __dirname
@@ -38,9 +36,7 @@ suite('Runner Test Suite', () => {
     }).timeout(6000)
 
     it('should be able to stop a started command', async () => {
-      const cliRunner = disposable.track(
-        new CliRunner({ getCliPath: () => '' } as Config, 'sleep')
-      )
+      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
       const cwd = __dirname
 
       const executeCommandSpy = spy(commands, 'executeCommand')
@@ -118,7 +114,7 @@ suite('Runner Test Suite', () => {
       const cwd = __dirname
 
       const cliRunner = disposable.track(
-        new CliRunner({ getCliPath: () => '' } as Config, 'echo', {
+        new CliRunner({} as Config, 'echo', {
           processCompleted: processCompleted,
           processOutput: processOutput,
           processStarted: processStarted

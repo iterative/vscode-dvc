@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
-import { getArgs, getExecutable } from './options'
+import { getOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
@@ -65,8 +65,12 @@ export class Cli implements ICli {
   }
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
-    const options = this.getExecutionOptions(cwd, args)
-    const command = [options.executable, ...options.args].join(' ')
+    const { command, ...options } = getOptions(
+      this.config.pythonBinPath,
+      this.config.getCliPath(),
+      cwd,
+      ...args
+    )
     try {
       this.processStarted.fire()
       const stdout = await executeProcess(options)
@@ -79,21 +83,6 @@ export class Cli implements ICli {
       })
       this.processCompleted.fire({ command, cwd, stderr: cliError.stderr })
       throw cliError
-    }
-  }
-
-  private getExecutionOptions(cwd: string, args: Args) {
-    return {
-      args: getArgs(
-        this.config.pythonBinPath,
-        this.config.getCliPath(),
-        ...args
-      ),
-      cwd,
-      executable: getExecutable(
-        this.config.pythonBinPath,
-        this.config.getCliPath()
-      )
     }
   }
 }

@@ -1,45 +1,40 @@
 import { join } from 'path'
-import { getArgs, getExecutable } from './options'
+import { getOptions } from './options'
 import { Command, Flag } from './args'
 
-describe('getArgs', () => {
+describe('getOptions', () => {
+  const cwd = join('path', 'to', 'work', 'dir')
+
   it('should give the correct command string given a basic environment', () => {
-    const args = getArgs(undefined, 'dvc', Command.CHECKOUT, Flag.FORCE)
-    expect(args).toEqual(['checkout', '-f'])
+    const options = getOptions(undefined, '', cwd, Command.CHECKOUT, Flag.FORCE)
+    expect(options).toEqual({
+      args: ['checkout', '-f'],
+      command: 'dvc checkout -f',
+      cwd,
+      executable: 'dvc'
+    })
   })
 
   it('should append -m dvc to the args if only an isolated python env is in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
-    const args = getArgs(pythonBinPath, '', Command.DIFF)
-    expect(args).toEqual(['-m', 'dvc', 'diff'])
+    const options = getOptions(pythonBinPath, '', cwd, Command.DIFF)
+    expect(options).toEqual({
+      args: ['-m', 'dvc', 'diff'],
+      command: `${pythonBinPath} -m dvc diff`,
+      cwd,
+      executable: pythonBinPath
+    })
   })
 
   it('should not append -m dvc to the args args if both an isolated python env and direct path to dvc are in use', () => {
     const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
-    const args = getArgs(pythonBinPath, 'dvc', Command.DIFF)
-    expect(args).toEqual(['diff'])
-  })
-})
-
-describe('getExecutable', () => {
-  it('should return the path to the cli if both an isolated python env and direct path to dvc are in use', () => {
-    const pythonBinPath = join('path', 'to', 'conda', '.venv', 'python')
     const cliPath = join('custom', 'path', 'to', 'dvc')
-    const executable = getExecutable(pythonBinPath, cliPath)
-    expect(executable).toEqual(cliPath)
-  })
-
-  it('should return the path to python if only an isolated python env is in use', () => {
-    const pythonBinPath = join('path', 'to', 'conda', '.venv', 'python')
-    const cliPath = ''
-    const executable = getExecutable(pythonBinPath, cliPath)
-    expect(executable).toEqual(pythonBinPath)
-  })
-
-  it('should return dvc as a default', () => {
-    const pythonBinPath = undefined
-    const cliPath = ''
-    const executable = getExecutable(pythonBinPath, cliPath)
-    expect(executable).toEqual('dvc')
+    const options = getOptions(pythonBinPath, cliPath, cwd, Command.DIFF)
+    expect(options).toEqual({
+      args: ['diff'],
+      command: `${cliPath} diff`,
+      cwd,
+      executable: cliPath
+    })
   })
 })
