@@ -66,7 +66,7 @@ export class Cli implements ICli {
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
     const options = this.getExecutionOptions(cwd, args)
-    const command = [options.executable, ...args].join(' ')
+    const command = [options.executable, ...options.args].join(' ')
     try {
       this.processStarted.fire()
       const stdout = await executeProcess(options)
