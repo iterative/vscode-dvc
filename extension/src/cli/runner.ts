@@ -2,7 +2,7 @@ import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { CliResult, ICli, typeCheckCommands } from '.'
 import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
-import { getArgs, getCommandString, getExecutable } from './command'
+import { getArgs, getExecutable } from './command'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
@@ -148,11 +148,16 @@ export class CliRunner implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const process = createProcess({
-      args: getArgs(this.config.pythonBinPath, this.config.getCliPath(), args),
+    const options = {
+      args: getArgs(
+        this.config.pythonBinPath,
+        this.config.getCliPath(),
+        ...args
+      ),
       cwd,
       executable: this.getOverrideOrCliPath()
-    })
+    }
+    const process = createProcess(options)
 
     this.processStarted.fire()
 
@@ -165,18 +170,16 @@ export class CliRunner implements ICli {
       )
     )
 
-    process.on('close', () => this.fireCompleted(cwd, args))
+    process.on('close', () =>
+      this.fireCompleted(cwd, [options.executable, ...options.args].join(' '))
+    )
 
     return process
   }
 
-  private fireCompleted(cwd: string, args: Args) {
+  private fireCompleted(cwd: string, command: string) {
     return this.processCompleted.fire({
-      command: getCommandString(
-        this.config.pythonBinPath,
-        this.executable || this.config.getCliPath(),
-        ...args
-      ),
+      command,
       cwd
     })
   }

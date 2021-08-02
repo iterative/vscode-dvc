@@ -84,7 +84,11 @@ export class Cli implements ICli {
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
-      args: getArgs(this.config.pythonBinPath, this.config.getCliPath(), args),
+      args: getArgs(
+        this.config.pythonBinPath,
+        this.config.getCliPath(),
+        ...args
+      ),
       cwd,
       executable: getExecutable(
         this.config.pythonBinPath,
