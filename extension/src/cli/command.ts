@@ -1,12 +1,22 @@
-import { join } from 'path'
 import { Args } from './args'
-import { joinTruthyItems } from '../util/array'
+
+export const getArgs = (
+  pythonBinPath: string | undefined,
+  cliPath: string,
+  args: Args
+) => (!cliPath && pythonBinPath ? ['-m', 'dvc', ...args] : args)
+
+export const getExecutable = (
+  pythonBinPath: string | undefined,
+  cliPath: string
+) => cliPath || pythonBinPath || 'dvc'
 
 export const getCommandString = (
   pythonBinPath: string | undefined,
-  executable: string,
+  cliPath: string,
   ...args: Args
 ): string => {
-  const prefix = pythonBinPath ? join(pythonBinPath, 'python') : undefined
-  return `${joinTruthyItems([prefix, executable])} ${args.join(' ')}`
+  const executable = getExecutable(pythonBinPath, cliPath)
+  const argsString = getArgs(pythonBinPath, cliPath, args).join(' ')
+  return [executable, argsString].join(' ')
 }

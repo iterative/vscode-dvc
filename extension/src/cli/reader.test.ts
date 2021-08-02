@@ -4,25 +4,18 @@ import { EventEmitter } from 'vscode'
 import { CliResult } from '.'
 import { CliReader } from './reader'
 import { executeProcess } from '../processExecution'
-import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
 import { Config } from '../config'
 
 jest.mock('vscode')
 jest.mock('fs')
 jest.mock('../processExecution')
-jest.mock('../env')
 
 const mockedExecuteProcess = mocked(executeProcess)
-const mockedGetProcessEnv = mocked(getProcessEnv)
-const mockedEnv = {
-  PATH: '/all/of/the/goodies:/in/my/path'
-}
 const SHOW_JSON = '--show-json'
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedGetProcessEnv.mockReturnValueOnce(mockedEnv)
 })
 
 describe('CliReader', () => {
@@ -54,7 +47,6 @@ describe('CliReader', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['exp', 'list', '--names-only'],
         cwd,
-        env: mockedEnv,
         executable: 'dvc'
       })
     })
@@ -72,7 +64,6 @@ describe('CliReader', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,
-        env: mockedEnv,
         executable: 'dvc'
       })
     })
@@ -103,7 +94,6 @@ describe('CliReader', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['diff', SHOW_JSON],
         cwd,
-        env: mockedEnv,
         executable: 'dvc'
       })
     })
@@ -162,7 +152,6 @@ describe('CliReader', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['-h'],
         cwd,
-        env: mockedEnv,
         executable: 'dvc'
       })
     })
@@ -184,7 +173,6 @@ describe('CliReader', () => {
       expect(mockedExecuteProcess).toBeCalledWith({
         args: ['list', '.', path, '--dvc-only', '--show-json'],
         cwd,
-        env: mockedEnv,
         executable: 'dvc'
       })
     })
@@ -253,7 +241,6 @@ describe('CliReader', () => {
         expect(mockedExecuteProcess).toBeCalledWith({
           args: ['list', '.', '--dvc-only', '-R', SHOW_JSON],
           cwd,
-          env: mockedEnv,
           executable: 'dvc'
         })
       })
@@ -268,7 +255,6 @@ describe('CliReader', () => {
           expect(mockedExecuteProcess).toBeCalledWith({
             args: ['root'],
             cwd,
-            env: mockedEnv,
             executable: 'dvc'
           })
         })
@@ -284,7 +270,6 @@ describe('CliReader', () => {
           expect(mockedExecuteProcess).toBeCalledWith({
             args: ['root'],
             cwd,
-            env: mockedEnv,
             executable: 'dvc'
           })
         })
@@ -312,7 +297,6 @@ describe('CliReader', () => {
         expect(mockedExecuteProcess).toBeCalledWith({
           args: ['status', SHOW_JSON],
           cwd,
-          env: mockedEnv,
           executable: 'dvc'
         })
       })

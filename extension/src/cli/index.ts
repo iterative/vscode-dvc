@@ -1,24 +1,10 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
-import { getCommandString } from './command'
-import { CliError } from './error'
-import { getProcessEnv } from '../env'
+import { getArgs, getCommandString, getExecutable } from './command'
+import { CliError, MaybeConsoleError } from './error'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
-import { joinTruthyItems } from '../util/array'
-
-const getPATH = (existingPath: string, pythonBinPath?: string): string =>
-  joinTruthyItems([pythonBinPath, existingPath], ':')
-
-export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
-  const env = getProcessEnv()
-  const PATH = getPATH(env?.PATH as string, pythonBinPath)
-  return {
-    ...env,
-    PATH
-  }
-}
 
 export type CliResult = { stderr?: string; command: string; cwd: string }
 
@@ -91,7 +77,10 @@ export class Cli implements ICli {
       this.processCompleted.fire({ command, cwd })
       return stdout
     } catch (error) {
-      const cliError = new CliError({ baseError: error, options })
+      const cliError = new CliError({
+        baseError: error as MaybeConsoleError,
+        options
+      })
       this.processCompleted.fire({ command, cwd, stderr: cliError.stderr })
       throw cliError
     }
@@ -99,10 +88,12 @@ export class Cli implements ICli {
 
   private getExecutionOptions(cwd: string, args: Args) {
     return {
-      args,
+      args: getArgs(this.config.pythonBinPath, this.config.getCliPath(), args),
       cwd,
-      env: getEnv(this.config.pythonBinPath),
-      executable: this.config.getCliPath() || 'dvc'
+      executable: getExecutable(
+        this.config.pythonBinPath,
+        this.config.getCliPath()
+      )
     }
   }
 }

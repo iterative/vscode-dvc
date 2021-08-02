@@ -1,6 +1,4 @@
-import { join } from 'path'
 import { Event, extensions, Extension, Uri } from 'vscode'
-import { executeProcess } from '../processExecution'
 
 export interface PythonExtensionAPI {
   ready: Thenable<void>
@@ -38,15 +36,7 @@ export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
-  const pythonBin = pythonExecutionDetails?.join(' ')
-  if (pythonBin) {
-    const output = await executeProcess({
-      args: ['-c', 'import sys; print(sys.prefix)'],
-      cwd: process.cwd(),
-      executable: pythonBin
-    })
-    return join(output, 'bin')
-  }
+  return pythonExecutionDetails?.join(' ')
 }
 
 export const getOnDidChangePythonExecutionDetails = async () =>

@@ -8,7 +8,6 @@ interface ExecutionOptions {
   executable: string
   args: Args
   cwd: string
-  env: NodeJS.ProcessEnv
 }
 
 interface CLIProcessErrorArgs {

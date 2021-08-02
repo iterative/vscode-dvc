@@ -13,18 +13,16 @@ describe('getCommandString', () => {
     expect(commandString).toEqual('dvc checkout -f')
   })
 
-  it('should give the correct command string given an isolated python env is in use', () => {
-    const pythonBinPath = join('path', 'to', 'python', '.venv')
-    const commandString = getCommandString(pythonBinPath, 'dvc', Command.DIFF)
-    expect(commandString).toEqual(`${join(pythonBinPath, 'python')} dvc diff`)
+  it('should give the correct command string if only an isolated python env is in use', () => {
+    const pythonBinPath = join('path', 'to', 'python', '.venv', 'python')
+    const commandString = getCommandString(pythonBinPath, '', Command.DIFF)
+    expect(commandString).toEqual(`${pythonBinPath} -m dvc diff`)
   })
 
-  it('should give the correct command string given both an isolated python env and direct path to dvc are in use', () => {
-    const pythonBinPath = join('path', 'to', 'conda', '.venv')
+  it('should return only the path to the cli if both an isolated python env and direct path to dvc are in use', () => {
+    const pythonBinPath = join('path', 'to', 'conda', '.venv', 'python')
     const cliPath = join('custom', 'path', 'to', 'dvc')
     const commandString = getCommandString(pythonBinPath, cliPath, Command.PUSH)
-    expect(commandString).toEqual(
-      `${join(pythonBinPath, 'python')} ${cliPath} push`
-    )
+    expect(commandString).toEqual(`${cliPath} push`)
   })
 })

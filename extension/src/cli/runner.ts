@@ -1,8 +1,8 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { CliResult, getEnv, ICli, typeCheckCommands } from '.'
+import { CliResult, ICli, typeCheckCommands } from '.'
 import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
-import { getCommandString } from './command'
+import { getArgs, getCommandString, getExecutable } from './command'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
@@ -148,14 +148,13 @@ export class CliRunner implements ICli {
     if (this.executable) {
       return this.executable
     }
-    return this.config.getCliPath() || 'dvc'
+    return getExecutable(this.config.pythonBinPath, this.config.getCliPath())
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
     const process = createProcess({
-      args,
+      args: getArgs(this.config.pythonBinPath, this.config.getCliPath(), args),
       cwd,
-      env: getEnv(this.config.pythonBinPath),
       executable: this.getOverrideOrCliPath()
     })
 

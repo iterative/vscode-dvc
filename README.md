@@ -42,26 +42,21 @@ There are quite a few options for installing DVC, with one big split being
 whether DVC is installed globally or in a virtual environment. This extension
 allows for a few different methods for picking how to run DVC.
 
+- The `dvc.dvcPath` setting can be set to a specific binary path in order to use
+  a specific dvc executable and skip all `ms-python` inference. This option
+  cannot be used with a virtual environment. The "Select DVC CLI Path" command
+  in the Command Palette can be used to set the `dvc.dvcPath` option.
+
 - Virtual environment recognition powered by the
   [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
   extension.
 
-- The `dvc.dvcPath` setting can be set to a specific binary path in order to use
-  a specific dvc executable and skip all `ms-python` inference.
-
-- Simply calling `dvc` on the CLI is used as a fallback.
-
-Using the Python extension is the easiest way to use virtual environments, and
-using a global install of dvc is the easiest way to not use the Python
-extension. For other niche cases, the `dvc.dvcPath` setting should hopefully
-serve as an escape hatch.
-
-The "Select DVC CLI Path" command in the Command Palette can be used to set the
-`dvc.dvcPath` option from a more user-friendly QuickPick menu.
+- Simply calling `dvc` is used as a fallback if neither of the above options are
+  set.
 
 ## How to Use
 
-This extension, especially in this early state, makes extensive use of the
+This extension, makes extensive use of the
 [Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
 Every feature should be available from the Command Palette, and from there
 additional GUI elements are added for convenience.
