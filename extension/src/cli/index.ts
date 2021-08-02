@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
-import { getArgs, getCommandString, getExecutable } from './command'
+import { getArgs, getExecutable } from './command'
 import { CliError, MaybeConsoleError } from './error'
 import { executeProcess } from '../processExecution'
 import { Config } from '../config'
@@ -66,11 +66,7 @@ export class Cli implements ICli {
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
     const options = this.getExecutionOptions(cwd, args)
-    const command = getCommandString(
-      this.config.pythonBinPath,
-      options.executable,
-      ...args
-    )
+    const command = [options.executable, ...args].join(' ')
     try {
       this.processStarted.fire()
       const stdout = await executeProcess(options)

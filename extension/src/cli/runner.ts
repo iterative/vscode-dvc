@@ -178,7 +178,7 @@ export class CliRunner implements ICli {
     return this.processCompleted.fire({
       command: getCommandString(
         this.config.pythonBinPath,
-        this.getOverrideOrCliPath(),
+        this.executable || this.config.getCliPath(),
         ...args
       ),
       cwd
