@@ -1,4 +1,4 @@
-import { join, relative, resolve } from 'path'
+import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -14,7 +14,6 @@ import { Config } from '../../../../../config'
 import { ResourceLocator } from '../../../../../resourceLocator'
 import { CliRunner } from '../../../../../cli/runner'
 import { InternalCommands } from '../../../../../internalCommands'
-import { ExperimentsFilterByTree } from '../../../../../experiments/model/filterBy/tree'
 import {
   getFilterId,
   Operator
@@ -150,14 +149,14 @@ suite('Experiments Test Suite', () => {
 
       messageSpy.resetHistory()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((ExperimentsFilterByTree as any).prototype, 'getDetails').callsFake(
-        (id: string) => [dvcDemoPath, relative(dvcDemoPath, id)]
-      )
-
       await commands.executeCommand(
         'dvc.views.experimentsFilterByTree.removeFilter',
-        join(dvcDemoPath, getFilterId(lossFilter))
+        {
+          description: lossPath,
+          dvcRoot: dvcDemoPath,
+          id: getFilterId(lossFilter),
+          label: [lossFilter.operator, lossFilter.value].join(' ')
+        }
       )
       await tableFilterRemoved
 
@@ -256,11 +255,6 @@ suite('Experiments Test Suite', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getDvcRoots').returns([dvcDemoPath])
       stub(Experiments.prototype, 'isReady').resolves(undefined)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((ExperimentsFilterByTree as any).prototype, 'getDetails').callsFake(
-        (id: string) => [dvcDemoPath, relative(dvcDemoPath, id)]
-      )
 
       await commands.executeCommand(
         'dvc.views.experimentsFilterByTree.removeAllFilters'
