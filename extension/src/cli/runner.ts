@@ -162,12 +162,7 @@ export class CliRunner implements ICli {
     this.processStarted.fire()
 
     process.all?.on('data', chunk =>
-      this.processOutput.fire(
-        chunk
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
-      )
+      this.processOutput.fire(this.transformChunk(chunk))
     )
 
     process.on('close', () =>
@@ -178,6 +173,13 @@ export class CliRunner implements ICli {
     )
 
     return process
+  }
+
+  private transformChunk(chunk: Buffer) {
+    return chunk
+      .toString()
+      .split(/(\r?\n)/g)
+      .join('\r')
   }
 
   private startProcess(cwd: string, args: Args) {
