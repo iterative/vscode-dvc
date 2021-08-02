@@ -171,17 +171,13 @@ export class CliRunner implements ICli {
     )
 
     process.on('close', () =>
-      this.fireCompleted(cwd, [options.executable, ...options.args].join(' '))
+      this.processCompleted.fire({
+        command: [options.executable, ...options.args].join(' '),
+        cwd
+      })
     )
 
     return process
-  }
-
-  private fireCompleted(cwd: string, command: string) {
-    return this.processCompleted.fire({
-      command,
-      cwd
-    })
   }
 
   private startProcess(cwd: string, args: Args) {
