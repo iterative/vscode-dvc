@@ -8,7 +8,7 @@ A Visual Studio Code Extension that aims to allow users of all technical
 backgrounds to effectively use [DVC](https://dvc.org/), particularly the new
 [Experiments](https://dvc.org/doc/start/experiments) feature.
 
-This project is in a very early state, and will definitely change in the future.
+This project is in a developmental state, and constantly evolving.
 
 ## Setup
 
@@ -51,6 +51,10 @@ allows for a few different methods for picking how to run DVC.
 
 - Simply calling `dvc` on the CLI is used as a fallback.
 
+- Please disable the CLI's analytics as they severely impact the overall
+  performance of the extension. You can do this by running
+  `dvc config core.analytics false --global` in your terminal.
+
 Using the Python extension is the easiest way to use virtual environments, and
 using a global install of dvc is the easiest way to not use the Python
 extension. For other niche cases, the `dvc.dvcPath` setting should hopefully
@@ -73,6 +77,9 @@ command from the Command Palette.
 
 To run experiments, use the "Run Experiment" command or use the UI elements
 available when the table is visible.
+
+There are experiments related views available in the DVC view container which
+can be selected through the DVC icon in the activity bar.
 
 ![Experiment GUI Buttons](https://user-images.githubusercontent.com/9111807/118054967-40760300-b355-11eb-8ee6-38a344bdaced.png)
 

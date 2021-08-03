@@ -18,7 +18,9 @@ Note: When using any project that relies on an isolated python environment
 (conda, venv, etc) the
 [ms-python.python](https://github.com/Microsoft/vscode-python) extension needs
 to be installed into VS Code. It is used by this extension to locate and utilize
-the required environment.
+the required environment. Also the CLI's analytics should be disabled as they
+severely impact the overall performance of the extension. You can do this by
+running `dvc config core.analytics false --global` in your terminal.
 
 ## Development Environment
 
