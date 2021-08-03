@@ -33,7 +33,8 @@ export const createProcess = ({
     all: true,
     cwd,
     env,
-    extendEnv: true
+    extendEnv: true,
+    windowsHide: true
   })
 }
 
