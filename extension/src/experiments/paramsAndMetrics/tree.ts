@@ -1,4 +1,4 @@
-import { join, relative } from 'path'
+import { join } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   commands,
@@ -12,12 +12,19 @@ import {
 } from 'vscode'
 import { Status } from './model'
 import { Experiments } from '..'
-import { ResourceLocator } from '../../resourceLocator'
-import { ParamOrMetric } from '../webview/contract'
+import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 
+type ParamsAndMetricsItem = {
+  description: string | undefined
+  dvcRoot: string
+  collapsibleState: TreeItemCollapsibleState
+  path: string
+  iconPath: Resource
+}
+
 export class ExperimentsParamsAndMetricsTree
-  implements TreeDataProvider<string>
+  implements TreeDataProvider<string | ParamsAndMetricsItem>
 {
   public dispose = Disposable.fn()
 
@@ -25,9 +32,8 @@ export class ExperimentsParamsAndMetricsTree
 
   private readonly experiments: Experiments
   private readonly resourceLocator: ResourceLocator
-  private pathRoots: Record<string, string> = {}
 
-  private view: TreeView<string>
+  private view: TreeView<string | ParamsAndMetricsItem>
 
   constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
     this.resourceLocator = resourceLocator
@@ -35,11 +41,14 @@ export class ExperimentsParamsAndMetricsTree
     this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
 
     this.view = this.dispose.track(
-      window.createTreeView('dvc.views.experimentsParamsAndMetricsTree', {
-        canSelectMany: true,
-        showCollapseAll: true,
-        treeDataProvider: this
-      })
+      window.createTreeView<string | ParamsAndMetricsItem>(
+        'dvc.views.experimentsParamsAndMetricsTree',
+        {
+          canSelectMany: true,
+          showCollapseAll: true,
+          treeDataProvider: this
+        }
+      )
     )
 
     this.experiments = experiments
@@ -48,7 +57,7 @@ export class ExperimentsParamsAndMetricsTree
       commands.registerCommand(
         'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
         resource => {
-          const [dvcRoot, path] = this.getDetails(resource)
+          const { dvcRoot, path } = resource
           return this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
         }
       )
@@ -57,42 +66,36 @@ export class ExperimentsParamsAndMetricsTree
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string): TreeItem {
-    const resourceUri = Uri.file(element)
-
-    const [dvcRoot, path] = this.getDetails(element)
-
-    if (!path) {
+  public getTreeItem(element: string | ParamsAndMetricsItem): TreeItem {
+    if (this.isRoot(element)) {
+      const resourceUri = Uri.file(element)
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const paramOrMetric = this.experiments.getParamOrMetric(dvcRoot, path)
-    const hasChildren = !!paramOrMetric?.hasChildren
-    const descendantStatuses = paramOrMetric?.descendantStatuses
+    const { dvcRoot, path, collapsibleState, description, iconPath } = element
 
     const treeItem = new TreeItem(
-      resourceUri,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None
+      Uri.file(join(dvcRoot, path)),
+      collapsibleState
     )
 
     treeItem.command = {
-      arguments: [element],
+      arguments: [{ dvcRoot, path }],
       command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
       title: 'toggle'
     }
 
-    treeItem.iconPath = this.getIconPath(paramOrMetric?.status)
-
-    if (hasChildren && descendantStatuses) {
-      treeItem.description = this.getDescription(descendantStatuses, '/')
+    treeItem.iconPath = iconPath
+    if (description) {
+      treeItem.description = description
     }
 
     return treeItem
   }
 
-  public getChildren(element?: string): Promise<string[]> {
+  public getChildren(
+    element?: string | ParamsAndMetricsItem
+  ): Promise<ParamsAndMetricsItem[] | string[]> {
     if (element) {
       return Promise.resolve(this.getParamsOrMetrics(element))
     }
@@ -117,9 +120,6 @@ export class ExperimentsParamsAndMetricsTree
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
-    dvcRoots.forEach(dvcRoot => {
-      this.pathRoots[dvcRoot] = dvcRoot
-    })
 
     if (dvcRoots.length === 1) {
       const [onlyRepo] = dvcRoots
@@ -129,38 +129,36 @@ export class ExperimentsParamsAndMetricsTree
     return dvcRoots.sort((a, b) => a.localeCompare(b))
   }
 
-  private getParamsOrMetrics(element: string): string[] {
+  private getParamsOrMetrics(
+    element: string | ParamsAndMetricsItem
+  ): ParamsAndMetricsItem[] {
     if (!element) {
       return []
     }
 
     const [dvcRoot, path] = this.getDetails(element)
-    const paramsOrMetrics = this.experiments.getChildParamsOrMetrics(
-      dvcRoot,
-      path
-    )
 
-    return (
-      paramsOrMetrics?.map(paramOrMetric =>
-        this.processParamOrMetric(dvcRoot, paramOrMetric)
-      ) || []
-    )
+    return this.experiments
+      .getChildParamsOrMetrics(dvcRoot, path)
+      .map(paramOrMetric => {
+        const { descendantStatuses, hasChildren, path, status } = paramOrMetric
+
+        const description = this.getDescription(descendantStatuses, '/')
+        const iconPath = this.getIconPath(status)
+        const collapsibleState = hasChildren
+          ? TreeItemCollapsibleState.Collapsed
+          : TreeItemCollapsibleState.None
+
+        return { collapsibleState, description, dvcRoot, iconPath, path }
+      })
   }
 
-  private processParamOrMetric(dvcRoot: string, paramOrMetric: ParamOrMetric) {
-    const absPath = join(dvcRoot, paramOrMetric.path)
-    this.pathRoots[absPath] = dvcRoot
-    return absPath
-  }
-
-  private getDetails(element: string) {
-    const dvcRoot = this.getRoot(element)
-    const path = relative(dvcRoot, element)
+  private getDetails(element: string | ParamsAndMetricsItem) {
+    if (this.isRoot(element)) {
+      return [element, '']
+    }
+    const { dvcRoot, path } = element
     return [dvcRoot, path]
-  }
-
-  private getRoot(element: string) {
-    return this.pathRoots[element]
   }
 
   private getIconPath(status?: Status) {
@@ -182,5 +180,9 @@ export class ExperimentsParamsAndMetricsTree
         [Status.selected, Status.indeterminate].includes(status)
       ).length
     }${separator}${statuses.length}`
+  }
+
+  private isRoot(element: string | ParamsAndMetricsItem): element is string {
+    return typeof element === 'string'
   }
 }

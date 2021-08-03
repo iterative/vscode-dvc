@@ -89,10 +89,6 @@ export class Experiments {
     return Object.keys(this.experiments)
   }
 
-  public getParamOrMetric(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getParamOrMetric(path)
-  }
-
   public getChildParamsOrMetrics(dvcRoot: string, path: string) {
     return this.getRepository(dvcRoot).getChildParamsOrMetrics(path)
   }
