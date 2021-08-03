@@ -325,10 +325,10 @@ suite('Extension Test Suite', () => {
       expect(paramOrMetric.status).to.equal(Status.unselected)
     )
 
-    const unselectedGrandChildren =
+    const unselectedParents =
       experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
 
-    unselectedGrandChildren.map(paramOrMetric =>
+    unselectedParents.map(paramOrMetric =>
       expect(paramOrMetric.status).to.equal(Status.unselected)
     )
   })
