@@ -45,25 +45,20 @@ export class ParamsAndMetricsModel {
     return this.data.filter(paramOrMetric => !paramOrMetric.hasChildren)
   }
 
-  public getParamOrMetric(path: string) {
-    const paramOrMetric = this.data?.find(
-      paramOrMetric => paramOrMetric.path === path
-    )
-    if (paramOrMetric) {
-      return {
-        ...paramOrMetric,
-        descendantStatuses: this.getDescendantsStatuses(paramOrMetric.path),
-        status: this.status[paramOrMetric.path]
-      }
-    }
-  }
-
   public getChildren(path: string) {
-    return this.data?.filter(paramOrMetric =>
-      path
-        ? paramOrMetric.parentPath === path
-        : ['metrics', 'params'].includes(paramOrMetric.parentPath)
-    )
+    return this.data
+      ?.filter(paramOrMetric =>
+        path
+          ? paramOrMetric.parentPath === path
+          : ['metrics', 'params'].includes(paramOrMetric.parentPath)
+      )
+      .map(paramOrMetric => {
+        return {
+          ...paramOrMetric,
+          descendantStatuses: this.getDescendantsStatuses(paramOrMetric.path),
+          status: this.status[paramOrMetric.path]
+        }
+      })
   }
 
   public toggleStatus(path: string) {
@@ -88,6 +83,10 @@ export class ParamsAndMetricsModel {
       this.status[path] = status
       this.setAreChildrenSelected(path, status)
     })
+  }
+
+  private getParamOrMetric(path: string) {
+    return this.data?.find(paramOrMetric => paramOrMetric.path === path)
   }
 
   private setAreParentsSelected(path: string) {
