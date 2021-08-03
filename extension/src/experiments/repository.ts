@@ -80,10 +80,6 @@ export class ExperimentsRepository {
     return this.processManager.run('refresh')
   }
 
-  public getParamOrMetric(path: string) {
-    return this.paramsAndMetrics.getParamOrMetric(path)
-  }
-
   public getChildParamsOrMetrics(path: string) {
     return this.paramsAndMetrics.getChildren(path)
   }
