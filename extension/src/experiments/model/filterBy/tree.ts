@@ -6,12 +6,12 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  Uri,
-  window
+  Uri
 } from 'vscode'
 import { getFilterId } from '.'
 import { Experiments } from '../..'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
+import { createTreeView } from '../../../vscode/tree'
 
 type FilterItem = {
   description: string
@@ -33,14 +33,7 @@ export class ExperimentsFilterByTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
-      window.createTreeView<string | FilterItem>(
-        'dvc.views.experimentsFilterByTree',
-        {
-          canSelectMany: true,
-          showCollapseAll: true,
-          treeDataProvider: this
-        }
-      )
+      createTreeView<FilterItem>('dvc.views.experimentsFilterByTree', this)
     )
 
     this.experiments = experiments

@@ -7,13 +7,13 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
   TreeView,
-  Uri,
-  window
+  Uri
 } from 'vscode'
 import { Status } from './model'
 import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
+import { createTreeView } from '../../vscode/tree'
 
 type ParamsAndMetricsItem = {
   description: string | undefined
@@ -41,13 +41,9 @@ export class ExperimentsParamsAndMetricsTree
     this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
 
     this.view = this.dispose.track(
-      window.createTreeView<string | ParamsAndMetricsItem>(
+      createTreeView<ParamsAndMetricsItem>(
         'dvc.views.experimentsParamsAndMetricsTree',
-        {
-          canSelectMany: true,
-          showCollapseAll: true,
-          treeDataProvider: this
-        }
+        this
       )
     )
 
