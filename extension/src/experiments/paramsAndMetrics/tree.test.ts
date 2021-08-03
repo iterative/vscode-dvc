@@ -174,20 +174,24 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       mockedGetChildParamsOrMetrics.mockReturnValueOnce(
         complexColumnData
           .filter(paramOrMetric => paramsPath === paramOrMetric.parentPath)
-          .map(param => ({
-            ...param,
-            descendantStatuses: [
-              Status.selected,
-              Status.selected,
-              Status.selected,
-              Status.selected,
-              Status.selected,
-              Status.unselected
-            ],
-            hasChildren: param.path === processPath,
-            status: Status.indeterminate
-          }))
+          .map(param => {
+            if (param.path === processPath) {
+              return {
+                ...param,
+                descendantStatuses: [Status.unselected, Status.selected],
+                hasChildren: true,
+                status: Status.indeterminate
+              }
+            }
+            return {
+              ...param,
+              descendantStatuses: undefined,
+              hasChildren: false,
+              status: Status.selected
+            }
+          })
       )
+
       const grandChildren = await experimentsParamsAndMetricsTree.getChildren({
         collapsibleState: TreeItemCollapsibleState.Collapsed,
         description: undefined,
@@ -198,42 +202,37 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       expect(grandChildren).toEqual([
         {
           collapsibleState: 0,
-          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedIndeterminateCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(paramsPath, 'epochs')
         },
         {
           collapsibleState: 0,
-          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedIndeterminateCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(paramsPath, 'learning_rate')
         },
         {
           collapsibleState: 0,
-          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedIndeterminateCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(paramsPath, 'dvc_logs_dir')
         },
         {
           collapsibleState: 0,
-          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedIndeterminateCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(paramsPath, 'log_file')
         },
         {
           collapsibleState: 0,
-          description: '5/6',
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedIndeterminateCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(paramsPath, 'dropout')
         },
         {
           collapsibleState: 1,
-          description: '5/6',
+          description: '1/2',
           dvcRoot: mockedDvcRoot,
           iconPath: mockedIndeterminateCheckbox,
           path: processPath
@@ -247,15 +246,15 @@ describe('ExperimentsParamsAndMetricsTree', () => {
             ...param,
             descendantStatuses: undefined,
             hasChildren: false,
-            status: Status.unselected
+            status: Status.selected
           }))
       )
       const greatGrandChildren =
         await experimentsParamsAndMetricsTree.getChildren({
           collapsibleState: TreeItemCollapsibleState.Collapsed,
-          description: '0/2',
+          description: '1/2',
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedEmptyCheckbox,
+          iconPath: mockedIndeterminateCheckbox,
           path: processPath
         })
 
@@ -264,14 +263,14 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           collapsibleState: 0,
           description: undefined,
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedEmptyCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(processPath, 'threshold')
         },
         {
           collapsibleState: 0,
           description: undefined,
           dvcRoot: mockedDvcRoot,
-          iconPath: mockedEmptyCheckbox,
+          iconPath: mockedSelectedCheckbox,
           path: join(processPath, 'test_arg')
         }
       ])
