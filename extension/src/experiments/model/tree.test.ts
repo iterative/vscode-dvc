@@ -79,7 +79,7 @@ describe('ExperimentsTree', () => {
       expect(rootElements).toEqual(dvcRoots)
     })
 
-    it('should return an array of existing experiment names when only a single repository is available', async () => {
+    it('should return an array of experiment items when only a single repository is available', async () => {
       mockedThemeIcon.mockImplementation(function (id) {
         return { id }
       })
@@ -119,7 +119,7 @@ describe('ExperimentsTree', () => {
       ])
     })
 
-    it('should return an array of checkpoints when a non root element is provided', async () => {
+    it('should return an array of checkpoint items when a non root element is provided', async () => {
       mockedThemeIcon.mockImplementation(function (id) {
         return { id }
       })
