@@ -177,7 +177,7 @@ export class ExperimentsRepository {
   }
 
   public getExperiments() {
-    return this.experiments.getExperimentNames()
+    return this.experiments.getExperiments()
   }
 
   public getExperimentStatuses(): number[] {

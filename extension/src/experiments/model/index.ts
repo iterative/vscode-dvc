@@ -59,14 +59,14 @@ export class ExperimentsModel {
   }
 
   public getExperimentStatuses(): number[] {
-    return [this.workspace, ...this.getExperiments()]
+    return [this.workspace, ...this.flattenExperiments()]
       .filter(experiment => experiment.running || experiment.queued)
       .map(experiment => (experiment.running ? Status.RUNNING : Status.QUEUED))
   }
 
-  public getExperimentNames(): (Experiment & { hasChildren: boolean })[] {
+  public getExperiments(): (Experiment & { hasChildren: boolean })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
-    return [...workspace, ...this.getExperiments()].map(experiment => ({
+    return [...workspace, ...this.flattenExperiments()].map(experiment => ({
       ...experiment,
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
     }))
@@ -136,7 +136,7 @@ export class ExperimentsModel {
     return sortExperiments(this.currentSort, experiments)
   }
 
-  private getExperiments() {
+  private flattenExperiments() {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 }
