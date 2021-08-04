@@ -176,7 +176,7 @@ export class ExperimentsRepository {
     }
   }
 
-  public getExperimentNames(): string[] {
+  public getExperiments() {
     return this.experiments.getExperimentNames()
   }
 
@@ -184,12 +184,8 @@ export class ExperimentsRepository {
     return this.experiments.getExperimentStatuses()
   }
 
-  public getExperiment(name: string) {
-    return this.experiments.getExperiment(name)
-  }
-
-  public getCheckpointNames(name: string) {
-    return this.experiments.getCheckpointNames(name)
+  public getCheckpoints(name: string) {
+    return this.experiments.getCheckpoints(name)
   }
 
   private async updateData(): Promise<boolean | undefined> {

@@ -64,36 +64,22 @@ export class ExperimentsModel {
       .map(experiment => (experiment.running ? Status.RUNNING : Status.QUEUED))
   }
 
-  public getExperimentNames(): string[] {
+  public getExperimentNames(): (Experiment & { hasChildren: boolean })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
-    return [...workspace, ...this.getExperiments()].map(
-      experiment => experiment?.displayName
-    )
-  }
-
-  public getExperiment(name: string) {
-    const experiment = this.getExperiments().find(
-      experiment => experiment.displayName === name
-    )
-
-    if (!experiment) {
-      return
-    }
-
-    return {
+    return [...workspace, ...this.getExperiments()].map(experiment => ({
       ...experiment,
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
-    }
+    }))
   }
 
-  public getCheckpointNames(name: string) {
-    const id = this.getExperiment(name)?.id
+  public getCheckpoints(name: string) {
+    const id = this.getExperiments().find(
+      experiment => experiment.displayName === name
+    )?.id
     if (!id) {
       return
     }
-    return this.checkpointsByTip
-      .get(id)
-      ?.map(checkpoint => checkpoint.displayName)
+    return this.checkpointsByTip.get(id)
   }
 
   public getRowData() {
