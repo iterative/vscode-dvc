@@ -180,8 +180,8 @@ export class ExperimentsRepository {
     return this.experiments.getExperiments()
   }
 
-  public getCheckpoints(name: string) {
-    return this.experiments.getCheckpoints(name)
+  public getCheckpoints(experimentId: string) {
+    return this.experiments.getCheckpoints(experimentId)
   }
 
   private async updateData(): Promise<boolean | undefined> {

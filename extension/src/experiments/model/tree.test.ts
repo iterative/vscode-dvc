@@ -85,9 +85,19 @@ describe('ExperimentsTree', () => {
       })
 
       const experiments = [
-        { displayName: '90aea7f', hasChildren: true },
-        { displayName: 'f0778b3', hasChildren: false, running: true },
-        { displayName: 'f81f1b5', hasChildren: false, queued: true }
+        { displayName: '90aea7f', hasChildren: true, id: '90aea7f' },
+        {
+          displayName: 'f0778b3',
+          hasChildren: false,
+          id: 'f0778b3',
+          running: true
+        },
+        {
+          displayName: 'f81f1b5',
+          hasChildren: false,
+          id: 'f81f1b5',
+          queued: true
+        }
       ]
       const experimentsTree = new ExperimentsTree(mockedExperiments)
       mockedGetExperiments.mockReturnValueOnce(experiments)
@@ -102,18 +112,21 @@ describe('ExperimentsTree', () => {
           collapsibleState: 1,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('primitive-dot'),
+          id: '90aea7f',
           label: '90aea7f'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('loading~spin'),
+          id: 'f0778b3',
           label: 'f0778b3'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('watch'),
+          id: 'f81f1b5',
           label: 'f81f1b5'
         }
       ])
@@ -127,8 +140,8 @@ describe('ExperimentsTree', () => {
       const experimentsTree = new ExperimentsTree(mockedExperiments)
 
       const checkpoints = [
-        { displayName: 'aaaaaaa' },
-        { displayName: 'bbbbbbb' }
+        { displayName: 'aaaaaaa', id: 'aaaaaaaaaaaaaaaaa' },
+        { displayName: 'bbbbbbb', id: 'bbbbbbbbbbbbbbbbb' }
       ]
       mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
 
@@ -136,6 +149,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 1,
         dvcRoot: 'repo',
         iconPath: new ThemeIcon('loading~spin'),
+        id: 'ebbd66f',
         label: 'ebbd66f'
       })
 
@@ -144,12 +158,14 @@ describe('ExperimentsTree', () => {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('debug-stackframe-dot'),
+          id: 'aaaaaaaaaaaaaaaaa',
           label: 'aaaaaaa'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('debug-stackframe-dot'),
+          id: 'bbbbbbbbbbbbbbbbb',
           label: 'bbbbbbb'
         }
       ])
@@ -193,6 +209,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 0,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('watch'),
+        id: 'f0778b3',
         label: 'f0778b3'
       })
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
@@ -216,6 +233,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 0,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
+        id: 'workspace',
         label: 'workspace'
       })
 
@@ -242,6 +260,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 1,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
+        id: 'f0778b3',
         label: 'f0778b3'
       })
 
@@ -268,6 +287,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 0,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('debug-stackframe-dot'),
+        id: 'f0778b3',
         label: 'f0778b3'
       })
       expect(treeItem).toEqual({
@@ -293,6 +313,7 @@ describe('ExperimentsTree', () => {
         collapsibleState: 1,
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('primitive-dot'),
+        id: 'f0998a3',
         label: 'f0998a3'
       })
 

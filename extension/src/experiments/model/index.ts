@@ -61,14 +61,8 @@ export class ExperimentsModel {
     }))
   }
 
-  public getCheckpoints(name: string): Experiment[] | undefined {
-    const id = this.getExperiments().find(
-      experiment => experiment.displayName === name
-    )?.id
-    if (!id) {
-      return
-    }
-    return this.checkpointsByTip.get(id)
+  public getCheckpoints(experimentId: string): Experiment[] | undefined {
+    return this.checkpointsByTip.get(experimentId)
   }
 
   public getRowData() {

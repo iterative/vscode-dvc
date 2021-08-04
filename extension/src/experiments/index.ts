@@ -107,8 +107,8 @@ export class Experiments {
     return this.getRepository(dvcRoot).getExperiments()
   }
 
-  public getCheckpoints(dvcRoot: string, experimentName: string) {
-    return this.getRepository(dvcRoot).getCheckpoints(experimentName)
+  public getCheckpoints(dvcRoot: string, experimentId: string) {
+    return this.getRepository(dvcRoot).getCheckpoints(experimentId)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {

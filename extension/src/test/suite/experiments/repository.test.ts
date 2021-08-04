@@ -103,7 +103,7 @@ suite('Experiments Repository Test Suite', () => {
   })
 
   describe('getCheckpoints', () => {
-    it('should return the correct checkpoints for the given experiment name', async () => {
+    it("should return the correct checkpoints for an experiment's id", async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -121,12 +121,14 @@ suite('Experiments Repository Test Suite', () => {
       )
       await experimentsRepository.isReady()
 
-      const notAnExperimentName = ':cartwheel:'
+      const notAnExperimentId = ':cartwheel:'
       const notCheckpoints =
-        experimentsRepository.getCheckpoints(notAnExperimentName)
+        experimentsRepository.getCheckpoints(notAnExperimentId)
       expect(notCheckpoints).to.be.undefined
 
-      const checkpoints = experimentsRepository.getCheckpoints('exp-05694')
+      const checkpoints = experimentsRepository.getCheckpoints(
+        'd3f4a0d3661c5977540d2205d819470cf0d2145a'
+      )
 
       expect(
         checkpoints?.map(checkpoint => checkpoint.displayName)

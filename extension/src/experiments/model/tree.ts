@@ -19,6 +19,7 @@ enum Status {
 
 type ExperimentItem = {
   dvcRoot: string
+  id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
   iconPath: ThemeIcon
@@ -69,8 +70,8 @@ export class ExperimentsTree
       return Promise.resolve(this.getExperiments(element))
     }
 
-    const { dvcRoot, label } = element
-    return Promise.resolve(this.getCheckpoints(dvcRoot, label) || [])
+    const { dvcRoot, id } = element
+    return Promise.resolve(this.getCheckpoints(dvcRoot, id) || [])
   }
 
   private async getRootElements() {
@@ -97,6 +98,7 @@ export class ExperimentsTree
         : TreeItemCollapsibleState.None,
       dvcRoot,
       iconPath: this.getExperimentThemeIcon(experiment),
+      id: experiment.id,
       label: experiment.displayName
     }))
   }
@@ -121,12 +123,13 @@ export class ExperimentsTree
     return new ThemeIcon('primitive-dot')
   }
 
-  private getCheckpoints(dvcRoot: string, name: string) {
-    return (this.experiments.getCheckpoints(dvcRoot, name) || []).map(
+  private getCheckpoints(dvcRoot: string, experimentId: string) {
+    return (this.experiments.getCheckpoints(dvcRoot, experimentId) || []).map(
       checkpoint => ({
         collapsibleState: TreeItemCollapsibleState.None,
         dvcRoot,
         iconPath: new ThemeIcon('debug-stackframe-dot'),
+        id: checkpoint.id,
         label: checkpoint.displayName
       })
     )
