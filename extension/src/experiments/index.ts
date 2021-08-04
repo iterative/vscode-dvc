@@ -107,10 +107,6 @@ export class Experiments {
     return this.getRepository(dvcRoot).getExperiments()
   }
 
-  public getExperimentStatuses(dvcRoot: string): number[] {
-    return this.getRepository(dvcRoot).getExperimentStatuses()
-  }
-
   public getCheckpoints(dvcRoot: string, experimentName: string) {
     return this.getRepository(dvcRoot).getCheckpoints(experimentName)
   }

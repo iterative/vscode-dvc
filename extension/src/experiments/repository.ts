@@ -180,10 +180,6 @@ export class ExperimentsRepository {
     return this.experiments.getExperiments()
   }
 
-  public getExperimentStatuses(): number[] {
-    return this.experiments.getExperimentStatuses()
-  }
-
   public getCheckpoints(name: string) {
     return this.experiments.getCheckpoints(name)
   }

@@ -11,11 +11,6 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
-export enum Status {
-  RUNNING = 1,
-  QUEUED = 2
-}
-
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -58,12 +53,6 @@ export class ExperimentsModel {
     return this.filters.delete(id)
   }
 
-  public getExperimentStatuses(): number[] {
-    return [this.workspace, ...this.flattenExperiments()]
-      .filter(experiment => experiment.running || experiment.queued)
-      .map(experiment => (experiment.running ? Status.RUNNING : Status.QUEUED))
-  }
-
   public getExperiments(): (Experiment & { hasChildren: boolean })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
     return [...workspace, ...this.flattenExperiments()].map(experiment => ({
@@ -72,7 +61,7 @@ export class ExperimentsModel {
     }))
   }
 
-  public getCheckpoints(name: string) {
+  public getCheckpoints(name: string): Experiment[] | undefined {
     const id = this.getExperiments().find(
       experiment => experiment.displayName === name
     )?.id

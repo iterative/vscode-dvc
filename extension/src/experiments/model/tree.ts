@@ -11,7 +11,11 @@ import {
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
-import { Status } from '../model'
+
+enum Status {
+  RUNNING = 1,
+  QUEUED = 2
+}
 
 type ExperimentItem = {
   dvcRoot: string
@@ -141,7 +145,14 @@ export class ExperimentsTree
     const dvcRoots = this.experiments.getDvcRoots()
 
     return flatten<Status>(
-      dvcRoots.map(dvcRoot => this.experiments.getExperimentStatuses(dvcRoot))
+      dvcRoots.map(dvcRoot =>
+        this.experiments
+          .getExperiments(dvcRoot)
+          .filter(experiment => experiment.running || experiment.queued)
+          .map(experiment =>
+            experiment.running ? Status.RUNNING : Status.QUEUED
+          )
+      )
     )
   }
 
