@@ -1,14 +1,11 @@
-import { dirname } from 'path'
+import { delimiter, dirname } from 'path'
 import { Args } from './args'
 import { getProcessEnv } from '../env'
 import { joinTruthyItems } from '../util/array'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   const python = pythonBinPath ? dirname(pythonBinPath) : ''
-  return joinTruthyItems(
-    [python, existingPath],
-    process.platform === 'win32' ? ';' : ':'
-  )
+  return joinTruthyItems([python, existingPath], delimiter)
 }
 
 const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
