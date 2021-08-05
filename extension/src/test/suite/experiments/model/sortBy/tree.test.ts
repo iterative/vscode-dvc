@@ -194,8 +194,8 @@ suite('Experiments Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParam132Path = path.join(...testParamPathArray)
-      const testParam121Path = path.join(...otherTestParamPathArray)
+      const testParamPath = path.join(...testParamPathArray)
+      const otherTestParamPath = path.join(...otherTestParamPathArray)
 
       const pluckTestParams = (messageArg: { tableData: TableData }) =>
         messageArg.tableData.rows[1].subRows?.map((exp: Experiment) =>
@@ -214,7 +214,7 @@ suite('Experiments Test Suite', () => {
 
       // Setup done, perform the test
 
-      await addSortWithMocks(testParam132Path, false)
+      await addSortWithMocks(testParamPath, false)
       expect(
         pluckTestParams(messageSpy.getCall(0).firstArg),
         'single sort'
@@ -226,22 +226,34 @@ suite('Experiments Test Suite', () => {
         'first clear'
       ).to.deep.equal([1, 3, 2])
 
-      await addSortWithMocks(testParam121Path, false)
+      await addSortWithMocks(otherTestParamPath, false)
       expect(
         pluckTestParams(messageSpy.getCall(2).firstArg),
         'secondary sort'
       ).to.deep.equal([1, 3, 2])
 
-      await addSortWithMocks(testParam132Path, true)
+      await addSortWithMocks(testParamPath, true)
       expect(
         pluckTestParams(messageSpy.getCall(3).firstArg),
         'two sorts'
       ).to.deep.equal([3, 1, 2])
 
-      await clearSorts()
+      await commands.executeCommand(
+        'dvc.views.experimentsSortByTree.removeSort',
+        {
+          parent: dvcDemoPath,
+          sort: { path: otherTestParamPath }
+        }
+      )
       expect(
         pluckTestParams(messageSpy.getCall(4).firstArg),
-        'second clear'
+        'remove first sort'
+      ).to.deep.equal([3, 2, 1])
+
+      await clearSorts()
+      expect(
+        pluckTestParams(messageSpy.getCall(5).firstArg),
+        'final clear'
       ).to.deep.equal([1, 3, 2])
     })
   })
