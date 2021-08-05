@@ -20,15 +20,13 @@ const mockedThemeIcon = mocked(ThemeIcon)
 const mockedDisposable = mocked(Disposable)
 
 const mockedGetDvcRoots = jest.fn()
-const mockedGetExperiment = jest.fn()
-const mockedGetCheckpointNames = jest.fn()
-const mockedGetExperimentNames = jest.fn()
+const mockedGetCheckpoints = jest.fn()
+const mockedGetExperiments = jest.fn()
 const mockedExperiments = {
   experimentsChanged: mockedExperimentsChanged,
-  getCheckpointNames: mockedGetCheckpointNames,
+  getCheckpoints: mockedGetCheckpoints,
   getDvcRoots: mockedGetDvcRoots,
-  getExperiment: mockedGetExperiment,
-  getExperimentNames: mockedGetExperimentNames,
+  getExperiments: mockedGetExperiments,
   isReady: () => true
 } as unknown as Experiments
 
@@ -50,8 +48,8 @@ describe('ExperimentsTree', () => {
     it('should return an empty array when no experiments exist for any of the multiple repositories', async () => {
       const experimentsTree = new ExperimentsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
-      mockedGetExperimentNames.mockReturnValueOnce([])
-      mockedGetExperimentNames.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
 
       const rootElements = await experimentsTree.getChildren()
 
@@ -61,7 +59,7 @@ describe('ExperimentsTree', () => {
     it('should return an empty array when no experiments exist for the single repository', async () => {
       const experimentsTree = new ExperimentsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      mockedGetExperimentNames.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
 
       const rootElements = await experimentsTree.getChildren()
 
@@ -72,43 +70,105 @@ describe('ExperimentsTree', () => {
       const dvcRoots = ['demo', 'and/mock', 'other/repo']
       const experimentsTree = new ExperimentsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
-      mockedGetExperimentNames.mockReturnValueOnce([])
-      mockedGetExperimentNames.mockReturnValueOnce([])
-      mockedGetExperimentNames.mockReturnValueOnce(['90aea7f'])
+      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([{ displayName: '90aea7f' }])
 
       const rootElements = await experimentsTree.getChildren()
 
       expect(rootElements).toEqual(dvcRoots)
     })
 
-    it('should return an array of existing experiment names when only a single repository is available', async () => {
-      const existingExperiments = ['90aea7f', 'f0778b3', 'f81f1b5']
+    it('should return an array of experiment items when only a single repository is available', async () => {
+      mockedThemeIcon.mockImplementation(function (id) {
+        return { id }
+      })
+
+      const experiments = [
+        { displayName: '90aea7f', hasChildren: true, id: '90aea7f' },
+        {
+          displayName: 'f0778b3',
+          hasChildren: false,
+          id: 'f0778b3',
+          running: true
+        },
+        {
+          displayName: 'f81f1b5',
+          hasChildren: false,
+          id: 'f81f1b5',
+          queued: true
+        }
+      ]
       const experimentsTree = new ExperimentsTree(mockedExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(existingExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(existingExperiments)
+      mockedGetExperiments.mockReturnValueOnce(experiments)
+      mockedGetExperiments.mockReturnValueOnce(experiments)
 
       mockedGetDvcRoots.mockReturnValueOnce(['repo'])
 
       const children = await experimentsTree.getChildren()
 
-      expect(children).toEqual(existingExperiments)
+      expect(children).toEqual([
+        {
+          collapsibleState: 1,
+          dvcRoot: 'repo',
+          iconPath: new ThemeIcon('primitive-dot'),
+          id: '90aea7f',
+          label: '90aea7f'
+        },
+        {
+          collapsibleState: 0,
+          dvcRoot: 'repo',
+          iconPath: new ThemeIcon('loading~spin'),
+          id: 'f0778b3',
+          label: 'f0778b3'
+        },
+        {
+          collapsibleState: 0,
+          dvcRoot: 'repo',
+          iconPath: new ThemeIcon('watch'),
+          id: 'f81f1b5',
+          label: 'f81f1b5'
+        }
+      ])
     })
 
-    it('should return an array of checkpoints when a non root element is provided', async () => {
-      const experimentNames = ['ebbd66f', 'e5855d7', '6e5e782', '15c9c56']
+    it('should return an array of checkpoint items when a non root element is provided', async () => {
+      mockedThemeIcon.mockImplementation(function (id) {
+        return { id }
+      })
+
       const experimentsTree = new ExperimentsTree(mockedExperiments)
-      mockedGetExperimentNames.mockReturnValueOnce(experimentNames)
-      mockedGetExperimentNames.mockReturnValueOnce(experimentNames)
 
-      mockedGetDvcRoots.mockReturnValueOnce(['repo'])
-      await experimentsTree.getChildren()
+      const checkpoints = [
+        { displayName: 'aaaaaaa', id: 'aaaaaaaaaaaaaaaaa' },
+        { displayName: 'bbbbbbb', id: 'bbbbbbbbbbbbbbbbb' }
+      ]
+      mockedGetCheckpoints.mockReturnValueOnce(checkpoints)
 
-      const checkpoints = ['aaaaaaa', 'bbbbbbb']
-      mockedGetCheckpointNames.mockReturnValueOnce(checkpoints)
+      const children = await experimentsTree.getChildren({
+        collapsibleState: 1,
+        dvcRoot: 'repo',
+        iconPath: new ThemeIcon('loading~spin'),
+        id: 'ebbd66f',
+        label: 'ebbd66f'
+      })
 
-      const children = await experimentsTree.getChildren('ebbd66f')
-
-      expect(children).toEqual(checkpoints)
+      expect(children).toEqual([
+        {
+          collapsibleState: 0,
+          dvcRoot: 'repo',
+          iconPath: new ThemeIcon('debug-stackframe-dot'),
+          id: 'aaaaaaaaaaaaaaaaa',
+          label: 'aaaaaaa'
+        },
+        {
+          collapsibleState: 0,
+          dvcRoot: 'repo',
+          iconPath: new ThemeIcon('debug-stackframe-dot'),
+          id: 'bbbbbbbbbbbbbbbbb',
+          label: 'bbbbbbb'
+        }
+      ])
     })
   })
 
@@ -123,8 +183,8 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'other'])
-      mockedGetExperimentNames.mockReturnValueOnce([])
-      mockedGetExperimentNames.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
+      mockedGetExperiments.mockReturnValueOnce([])
 
       await experimentsTree.getChildren()
 
@@ -132,7 +192,7 @@ describe('ExperimentsTree', () => {
       expect(treeItem).toEqual({ ...mockedItem })
     })
 
-    it('should return a tree item for a queued experiment', async () => {
+    it('should return a tree item for a queued experiment', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(0)
@@ -144,22 +204,18 @@ describe('ExperimentsTree', () => {
       })
 
       const experimentsTree = new ExperimentsTree(mockedExperiments)
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      const mockedQueuedExperiment = 'f0778b3'
-      mockedGetExperimentNames.mockReturnValueOnce([mockedQueuedExperiment])
-      mockedGetExperimentNames.mockReturnValueOnce([mockedQueuedExperiment])
-      mockedGetExperiment.mockReturnValueOnce({
-        queued: true,
-        running: false
+
+      const treeItem = experimentsTree.getTreeItem({
+        collapsibleState: 0,
+        dvcRoot: 'demo',
+        iconPath: new ThemeIcon('watch'),
+        id: 'f0778b3',
+        label: 'f0778b3'
       })
-
-      await experimentsTree.getChildren()
-
-      const treeItem = experimentsTree.getTreeItem(mockedQueuedExperiment)
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
     })
 
-    it('should return a tree item for the workspace (running experiment)', async () => {
+    it('should return a tree item for the workspace (running experiment)', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
         expect(collapsibleState).toEqual(0)
@@ -172,21 +228,22 @@ describe('ExperimentsTree', () => {
       })
 
       const experimentsTree = new ExperimentsTree(mockedExperiments)
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      const mockedRunningExperiment = 'workspace'
-      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
 
-      await experimentsTree.getChildren()
+      const treeItem = experimentsTree.getTreeItem({
+        collapsibleState: 0,
+        dvcRoot: 'demo',
+        iconPath: new ThemeIcon('loading~spin'),
+        id: 'workspace',
+        label: 'workspace'
+      })
 
-      const treeItem = experimentsTree.getTreeItem(mockedRunningExperiment)
       expect(treeItem).toEqual({
         ...mockedItem,
         iconPath: { id: 'loading~spin' }
       })
     })
 
-    it('should return a tree item for a running experiment', async () => {
+    it('should return a tree item for a running experiment', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (label, collapsibleState) {
         expect(collapsibleState).toEqual(1)
@@ -198,18 +255,15 @@ describe('ExperimentsTree', () => {
       })
 
       const experimentsTree = new ExperimentsTree(mockedExperiments)
-      mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      const mockedRunningExperiment = 'f0778b3'
-      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetExperimentNames.mockReturnValueOnce([mockedRunningExperiment])
-      mockedGetExperiment.mockReturnValueOnce({
-        hasChildren: true,
-        running: true
+
+      const treeItem = experimentsTree.getTreeItem({
+        collapsibleState: 1,
+        dvcRoot: 'demo',
+        iconPath: new ThemeIcon('loading~spin'),
+        id: 'f0778b3',
+        label: 'f0778b3'
       })
 
-      await experimentsTree.getChildren()
-
-      const treeItem = experimentsTree.getTreeItem(mockedRunningExperiment)
       expect(treeItem).toEqual({
         ...mockedItem,
         iconPath: { id: 'loading~spin' }
@@ -229,14 +283,20 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(mockedExperiments)
 
-      const treeItem = experimentsTree.getTreeItem('f0778b3')
+      const treeItem = experimentsTree.getTreeItem({
+        collapsibleState: 0,
+        dvcRoot: 'demo',
+        iconPath: new ThemeIcon('debug-stackframe-dot'),
+        id: 'f0778b3',
+        label: 'f0778b3'
+      })
       expect(treeItem).toEqual({
         ...mockedItem,
         iconPath: { id: 'debug-stackframe-dot' }
       })
     })
 
-    it('should return a tree item for an existing experiment', async () => {
+    it('should return a tree item for an existing experiment', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         mockedItem = { collapsibleState, uri }
@@ -248,14 +308,15 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(mockedExperiments)
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
-      const mockedExistingExperiment = 'f0998a3'
-      mockedGetExperimentNames.mockReturnValueOnce([mockedExistingExperiment])
-      mockedGetExperimentNames.mockReturnValueOnce([mockedExistingExperiment])
-      mockedGetExperiment.mockReturnValueOnce({})
 
-      await experimentsTree.getChildren()
+      const treeItem = experimentsTree.getTreeItem({
+        collapsibleState: 1,
+        dvcRoot: 'demo',
+        iconPath: new ThemeIcon('primitive-dot'),
+        id: 'f0998a3',
+        label: 'f0998a3'
+      })
 
-      const treeItem = experimentsTree.getTreeItem(mockedExistingExperiment)
       expect(treeItem).toEqual({
         ...mockedItem,
         iconPath: { id: 'primitive-dot' }
