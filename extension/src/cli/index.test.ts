@@ -104,7 +104,7 @@ describe('executeProcess', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       args,
       cwd,
-      env: { PATH: `${pythonBinPath}:${existingPath}`, SECRET_KEY },
+      env: { PATH: `/some/path/to:${existingPath}`, SECRET_KEY },
       executable: '/some/path/to/dvc'
     })
   })

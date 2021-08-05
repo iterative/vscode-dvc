@@ -1,3 +1,4 @@
+import { dirname } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
@@ -8,8 +9,10 @@ import { executeProcess } from '../processExecution'
 import { Config } from '../config'
 import { joinTruthyItems } from '../util/array'
 
-const getPATH = (existingPath: string, pythonBinPath?: string): string =>
-  joinTruthyItems([pythonBinPath, existingPath], ':')
+const getPATH = (existingPath: string, pythonBinPath?: string): string => {
+  const python = pythonBinPath ? dirname(pythonBinPath) : ''
+  return joinTruthyItems([python, existingPath], ':')
+}
 
 export const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
   const env = getProcessEnv()
