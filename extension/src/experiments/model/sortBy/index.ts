@@ -57,4 +57,4 @@ export const sortExperiments = (
 ): Experiment[] =>
   sortDefinitions.length === 0
     ? unsortedRows
-    : unsortedRows.sort(buildExperimentSortFunction(sortDefinitions))
+    : [...unsortedRows].sort(buildExperimentSortFunction(sortDefinitions))
