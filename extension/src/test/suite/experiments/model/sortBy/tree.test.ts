@@ -180,14 +180,6 @@ suite('Experiments Test Suite', () => {
         mockShowQuickPick.reset()
       }
 
-      const clearSorts = async () => {
-        const tableSortRemoved = new Promise(resolve => {
-          experimentsRepository.onDidChangeExperiments(resolve)
-        })
-        await commands.executeCommand('dvc.clearExperimentsTableSort')
-        await tableSortRemoved
-      }
-
       const testParamParentPathArray = ['params', 'params.yaml']
       const testParamPathArray = [...testParamParentPathArray, 'testparam']
       const otherTestParamPathArray = [
@@ -220,7 +212,11 @@ suite('Experiments Test Suite', () => {
         'single sort'
       ).to.deep.equal([1, 2, 3])
 
-      await clearSorts()
+      const tableSortRemoved = new Promise(resolve => {
+        experimentsRepository.onDidChangeExperiments(resolve)
+      })
+      await commands.executeCommand('dvc.clearExperimentsTableSort')
+      await tableSortRemoved
       expect(
         pluckTestParams(messageSpy.getCall(1).firstArg),
         'first clear'
@@ -250,10 +246,13 @@ suite('Experiments Test Suite', () => {
         'remove first sort'
       ).to.deep.equal([3, 2, 1])
 
-      await clearSorts()
+      await commands.executeCommand(
+        'dvc.views.experimentsSortByTree.removeAllSorts',
+        dvcDemoPath
+      )
       expect(
         pluckTestParams(messageSpy.getCall(5).firstArg),
-        'final clear'
+        'clear with removeAllSorts'
       ).to.deep.equal([1, 3, 2])
     })
   })
