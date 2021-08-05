@@ -5,7 +5,10 @@ import { joinTruthyItems } from '../util/array'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   const python = pythonBinPath ? dirname(pythonBinPath) : ''
-  return joinTruthyItems([python, existingPath], ':')
+  return joinTruthyItems(
+    [python, existingPath],
+    process.platform === 'win32' ? ';' : ':'
+  )
 }
 
 const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
