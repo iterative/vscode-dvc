@@ -11,11 +11,6 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
-export enum Status {
-  RUNNING = 1,
-  QUEUED = 2
-}
-
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -58,42 +53,16 @@ export class ExperimentsModel {
     return this.filters.delete(id)
   }
 
-  public getExperimentStatuses(): number[] {
-    return [this.workspace, ...this.getExperiments()]
-      .filter(experiment => experiment.running || experiment.queued)
-      .map(experiment => (experiment.running ? Status.RUNNING : Status.QUEUED))
-  }
-
-  public getExperimentNames(): string[] {
+  public getExperiments(): (Experiment & { hasChildren: boolean })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
-    return [...workspace, ...this.getExperiments()].map(
-      experiment => experiment?.displayName
-    )
-  }
-
-  public getExperiment(name: string) {
-    const experiment = this.getExperiments().find(
-      experiment => experiment.displayName === name
-    )
-
-    if (!experiment) {
-      return
-    }
-
-    return {
+    return [...workspace, ...this.flattenExperiments()].map(experiment => ({
       ...experiment,
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
-    }
+    }))
   }
 
-  public getCheckpointNames(name: string) {
-    const id = this.getExperiment(name)?.id
-    if (!id) {
-      return
-    }
-    return this.checkpointsByTip
-      .get(id)
-      ?.map(checkpoint => checkpoint.displayName)
+  public getCheckpoints(experimentId: string): Experiment[] | undefined {
+    return this.checkpointsByTip.get(experimentId)
   }
 
   public getRowData() {
@@ -150,7 +119,7 @@ export class ExperimentsModel {
     return sortExperiments(this.currentSort, experiments)
   }
 
-  private getExperiments() {
+  private flattenExperiments() {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 }

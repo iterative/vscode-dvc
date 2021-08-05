@@ -6,32 +6,41 @@ import {
   TreeItem,
   TreeItemCollapsibleState,
   TreeView,
-  Uri,
-  window
+  Uri
 } from 'vscode'
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
-import { Status } from '../model'
+import { createTreeView } from '../../vscode/tree'
 
-export class ExperimentsTree implements TreeDataProvider<string> {
+enum Status {
+  RUNNING = 1,
+  QUEUED = 2
+}
+
+type ExperimentItem = {
+  dvcRoot: string
+  id: string
+  label: string
+  collapsibleState: TreeItemCollapsibleState
+  iconPath: ThemeIcon
+}
+
+export class ExperimentsTree
+  implements TreeDataProvider<string | ExperimentItem>
+{
   public dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: Experiments
-  private runRoots: Record<string, string> = {}
 
-  private view: TreeView<string>
+  private view: TreeView<string | ExperimentItem>
 
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
-      window.createTreeView('dvc.views.experimentsTree', {
-        canSelectMany: true,
-        showCollapseAll: true,
-        treeDataProvider: this
-      })
+      createTreeView<ExperimentItem>('dvc.views.experimentsTree', this)
     )
 
     this.experiments = experiments
@@ -39,99 +48,37 @@ export class ExperimentsTree implements TreeDataProvider<string> {
     this.updateDescriptionOnChange()
   }
 
-  public getTreeItem(element: string): TreeItem {
+  public getTreeItem(element: string | ExperimentItem): TreeItem {
     if (this.isRoot(element)) {
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    return this.getExperimentTreeItem(element)
+    const { label, collapsibleState, iconPath } = element
+    const item = new TreeItem(label, collapsibleState)
+    item.iconPath = iconPath
+    return item
   }
 
-  public getChildren(element?: string): Promise<string[]> {
+  public getChildren(
+    element?: string | ExperimentItem
+  ): Promise<string[] | ExperimentItem[]> {
     if (!element) {
       return this.getRootElements()
     }
 
     if (this.isRoot(element)) {
-      return Promise.resolve(this.getExperimentNames(element))
+      return Promise.resolve(this.getExperiments(element))
     }
 
-    return Promise.resolve(
-      this.experiments.getCheckpointNames(this.runRoots[element], element) || []
-    )
-  }
-
-  private getExperimentTreeItem(element: string) {
-    const dvcRoot = this.runRoots[element]
-    if (!dvcRoot) {
-      return this.getRunningCheckpoint(element)
-    }
-
-    const experiment = this.experiments.getExperiment(dvcRoot, element)
-
-    if (element === 'workspace' || experiment?.running) {
-      return this.getRunning(element, experiment?.hasChildren)
-    }
-
-    if (experiment?.queued) {
-      return this.getQueued(element)
-    }
-
-    return this.getExistingExperiment(element, experiment?.hasChildren)
-  }
-
-  private getRunningCheckpoint(element: string) {
-    return this.getTreeItemWithIcon(
-      element,
-      TreeItemCollapsibleState.None,
-      'debug-stackframe-dot'
-    )
-  }
-
-  private getRunning(element: string, hasChildren?: boolean) {
-    const collapsibleState = hasChildren
-      ? TreeItemCollapsibleState.Collapsed
-      : TreeItemCollapsibleState.None
-
-    return this.getTreeItemWithIcon(element, collapsibleState, 'loading~spin')
-  }
-
-  private getQueued(element: string) {
-    return this.getTreeItemWithIcon(
-      element,
-      TreeItemCollapsibleState.None,
-      'watch'
-    )
-  }
-
-  private getExistingExperiment(element: string, hasChildren?: boolean) {
-    return this.getTreeItemWithIcon(
-      element,
-      hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None,
-      'primitive-dot'
-    )
-  }
-
-  private getTreeItemWithIcon(
-    element: string,
-    collapsibleState: TreeItemCollapsibleState,
-    iconId: string
-  ) {
-    const item = new TreeItem(element, collapsibleState)
-    item.iconPath = new ThemeIcon(iconId)
-    return item
+    const { dvcRoot, id } = element
+    return Promise.resolve(this.getCheckpoints(dvcRoot, id) || [])
   }
 
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
     const experimentNames = flatten(
-      dvcRoots.map(dvcRoot => {
-        this.runRoots[dvcRoot] = dvcRoot
-        return this.experiments.getExperimentNames(dvcRoot)
-      })
+      dvcRoots.map(dvcRoot => this.experiments.getExperiments(dvcRoot))
     )
     if (definedAndNonEmpty(experimentNames)) {
       if (dvcRoots.length === 1) {
@@ -144,14 +91,48 @@ export class ExperimentsTree implements TreeDataProvider<string> {
     return []
   }
 
-  private getExperimentNames(dvcRoot: string): string[] {
-    const experimentNames = this.experiments.getExperimentNames(dvcRoot)
-    experimentNames.forEach(name => (this.runRoots[name] = dvcRoot))
-    return experimentNames
+  private getExperiments(dvcRoot: string): ExperimentItem[] {
+    return this.experiments.getExperiments(dvcRoot).map(experiment => ({
+      collapsibleState: experiment.hasChildren
+        ? TreeItemCollapsibleState.Collapsed
+        : TreeItemCollapsibleState.None,
+      dvcRoot,
+      iconPath: this.getExperimentThemeIcon(experiment),
+      id: experiment.id,
+      label: experiment.displayName
+    }))
   }
 
-  private isRoot(element: string) {
-    return Object.values(this.runRoots).includes(element)
+  private getExperimentThemeIcon({
+    displayName,
+    running,
+    queued
+  }: {
+    displayName: string
+    running?: boolean
+    queued?: boolean
+  }): ThemeIcon {
+    if (displayName === 'workspace' || running) {
+      return new ThemeIcon('loading~spin')
+    }
+
+    if (queued) {
+      return new ThemeIcon('watch')
+    }
+
+    return new ThemeIcon('primitive-dot')
+  }
+
+  private getCheckpoints(dvcRoot: string, experimentId: string) {
+    return (this.experiments.getCheckpoints(dvcRoot, experimentId) || []).map(
+      checkpoint => ({
+        collapsibleState: TreeItemCollapsibleState.None,
+        dvcRoot,
+        iconPath: new ThemeIcon('debug-stackframe-dot'),
+        id: checkpoint.id,
+        label: checkpoint.displayName
+      })
+    )
   }
 
   private updateDescriptionOnChange() {
@@ -167,7 +148,14 @@ export class ExperimentsTree implements TreeDataProvider<string> {
     const dvcRoots = this.experiments.getDvcRoots()
 
     return flatten<Status>(
-      dvcRoots.map(dvcRoot => this.experiments.getExperimentStatuses(dvcRoot))
+      dvcRoots.map(dvcRoot =>
+        this.experiments
+          .getExperiments(dvcRoot)
+          .filter(experiment => experiment.running || experiment.queued)
+          .map(experiment =>
+            experiment.running ? Status.RUNNING : Status.QUEUED
+          )
+      )
     )
   }
 
@@ -201,5 +189,9 @@ export class ExperimentsTree implements TreeDataProvider<string> {
 
   private getSubDescription(count: number, label: string) {
     return count ? `${count} ${label}` : ''
+  }
+
+  private isRoot(element: string | ExperimentItem): element is string {
+    return typeof element === 'string'
   }
 }
