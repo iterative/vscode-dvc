@@ -14,7 +14,8 @@ import { CliRunner } from '../../../../../cli/runner'
 import { InternalCommands } from '../../../../../internalCommands'
 import {
   Experiment,
-  ParamOrMetric
+  ParamOrMetric,
+  TableData
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 
@@ -33,14 +34,6 @@ suite('Experiments Test Suite', () => {
         data: {
           ...commonFields,
           name: 'test-branch',
-          params: {
-            'params.yaml': {
-              data: {
-                testparam: 10,
-                testparam2: 2
-              }
-            }
-          },
           timestamp: '2020-12-29T15:28:59'
         }
       },
@@ -54,7 +47,7 @@ suite('Experiments Test Suite', () => {
             'params.yaml': {
               data: {
                 testparam: 1,
-                testparam2: 2
+                testparam2: 1
               }
             }
           },
@@ -99,14 +92,6 @@ suite('Experiments Test Suite', () => {
         data: {
           ...commonFields,
           executor: 'workspace',
-          params: {
-            'params.yaml': {
-              data: {
-                testparam: 1,
-                testparam2: 2
-              }
-            }
-          },
           timestamp: null
         }
       }
@@ -145,6 +130,8 @@ suite('Experiments Test Suite', () => {
 
   describe('experimentsSortByTree', () => {
     it('should be able to update the table data by adding and removing a sort', async () => {
+      // setup
+
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
       const config = disposable.track(new Config())
@@ -173,25 +160,47 @@ suite('Experiments Test Suite', () => {
       await experimentsWebview.isReady()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const testParamPathArray = ['params', 'params.yaml', 'testparam']
-      const testParamPath = path.join(...testParamPathArray)
+      const addSortWithMocks = async (
+        paramPath: string,
+        descending: boolean
+      ) => {
+        mockShowQuickPick.onFirstCall().resolves({
+          value: {
+            path: paramPath
+          }
+        } as QuickPickItemWithValue<ParamOrMetric>)
+        mockShowQuickPick
+          .onSecondCall()
+          .resolves({ value: descending } as QuickPickItemWithValue<boolean>)
+        const tableSortAdded = new Promise(resolve => {
+          experimentsRepository.onDidChangeExperiments(resolve)
+        })
+        await commands.executeCommand('dvc.addNewExperimentsTableSort')
+        await tableSortAdded
+        mockShowQuickPick.reset()
+      }
 
-      mockShowQuickPick.onFirstCall().resolves({
-        value: {
-          group: 'params',
-          hasChildren: false,
-          maxNumber: 10,
-          maxStringLength: 2,
-          minNumber: 1,
-          name: 'testparam',
-          parentPath: 'params/params.yaml',
-          path: testParamPath,
-          types: ['number']
-        }
-      } as QuickPickItemWithValue<ParamOrMetric>)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: false } as QuickPickItemWithValue<boolean>)
+      const clearSorts = async () => {
+        const tableSortRemoved = new Promise(resolve => {
+          experimentsRepository.onDidChangeExperiments(resolve)
+        })
+        await commands.executeCommand('dvc.clearExperimentsTableSort')
+        await tableSortRemoved
+      }
+
+      const testParamParentPathArray = ['params', 'params.yaml']
+      const testParamPathArray = [...testParamParentPathArray, 'testparam']
+      const otherTestParamPathArray = [
+        ...testParamParentPathArray,
+        'testparam2'
+      ]
+      const testParam132Path = path.join(...testParamPathArray)
+      const testParam121Path = path.join(...otherTestParamPathArray)
+
+      const pluckTestParams = (messageArg: { tableData: TableData }) =>
+        messageArg.tableData.rows[1].subRows?.map((exp: Experiment) =>
+          get(exp, testParamPathArray)
+        )
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getRepository').returns(
@@ -203,34 +212,36 @@ suite('Experiments Test Suite', () => {
         'getFocusedOrDefaultOrPickProject'
       ).returns(dvcDemoPath)
 
-      const tableSortAdded = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperiments(resolve)
-      })
+      // Setup done, perform the test
 
-      await commands.executeCommand('dvc.addNewExperimentsTableSort')
-
-      await tableSortAdded
-
-      const tableSortRemoved = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperiments(resolve)
-      })
-
-      await commands.executeCommand('dvc.clearExperimentsTableSort')
-      await tableSortRemoved
-
+      await addSortWithMocks(testParam132Path, false)
       expect(
-        messageSpy
-          .getCall(0)
-          .firstArg.tableData.rows[1].subRows.map((exp: Experiment) =>
-            get(exp, testParamPathArray)
-          )
+        pluckTestParams(messageSpy.getCall(0).firstArg),
+        'single sort'
       ).to.deep.equal([1, 2, 3])
+
+      await clearSorts()
       expect(
-        messageSpy
-          .getCall(-1)
-          .firstArg.tableData.rows[1].subRows.map((exp: Experiment) =>
-            get(exp, testParamPathArray)
-          )
+        pluckTestParams(messageSpy.getCall(1).firstArg),
+        'first clear'
+      ).to.deep.equal([1, 3, 2])
+
+      await addSortWithMocks(testParam121Path, false)
+      expect(
+        pluckTestParams(messageSpy.getCall(2).firstArg),
+        'secondary sort'
+      ).to.deep.equal([1, 3, 2])
+
+      await addSortWithMocks(testParam132Path, true)
+      expect(
+        pluckTestParams(messageSpy.getCall(3).firstArg),
+        'two sorts'
+      ).to.deep.equal([3, 1, 2])
+
+      await clearSorts()
+      expect(
+        pluckTestParams(messageSpy.getCall(4).firstArg),
+        'second clear'
       ).to.deep.equal([1, 3, 2])
     })
   })
