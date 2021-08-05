@@ -192,20 +192,12 @@ export class ExperimentsRepository {
     }
   }
 
-  public getExperimentNames(): string[] {
-    return this.experiments.getExperimentNames()
+  public getExperiments() {
+    return this.experiments.getExperiments()
   }
 
-  public getExperimentStatuses(): number[] {
-    return this.experiments.getExperimentStatuses()
-  }
-
-  public getExperiment(name: string) {
-    return this.experiments.getExperiment(name)
-  }
-
-  public getCheckpointNames(name: string) {
-    return this.experiments.getCheckpointNames(name)
+  public getCheckpoints(experimentId: string) {
+    return this.experiments.getCheckpoints(experimentId)
   }
 
   private async updateData(): Promise<void> {

@@ -109,20 +109,12 @@ export class Experiments {
     return this.getRepository(dvcRoot).getFilters()
   }
 
-  public getExperimentNames(dvcRoot: string): string[] {
-    return this.getRepository(dvcRoot).getExperimentNames()
+  public getExperiments(dvcRoot: string) {
+    return this.getRepository(dvcRoot).getExperiments()
   }
 
-  public getExperimentStatuses(dvcRoot: string): number[] {
-    return this.getRepository(dvcRoot).getExperimentStatuses()
-  }
-
-  public getExperiment(dvcRoot: string, name: string) {
-    return this.getRepository(dvcRoot).getExperiment(name)
-  }
-
-  public getCheckpointNames(dvcRoot: string, experimentName: string) {
-    return this.getRepository(dvcRoot).getCheckpointNames(experimentName)
+  public getCheckpoints(dvcRoot: string, experimentId: string) {
+    return this.getRepository(dvcRoot).getCheckpoints(experimentId)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {

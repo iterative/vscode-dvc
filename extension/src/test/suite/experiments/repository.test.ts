@@ -68,8 +68,8 @@ suite('Experiments Repository Test Suite', () => {
     })
   })
 
-  describe('getExperimentNames', () => {
-    it("should return all existing experiments' names", async () => {
+  describe('getExperiments', () => {
+    it('should return all existing experiments', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -87,9 +87,11 @@ suite('Experiments Repository Test Suite', () => {
       )
       await experimentsRepository.isReady()
 
-      const experimentNames = experimentsRepository.getExperimentNames()
+      const experiments = experimentsRepository.getExperiments()
 
-      expect(experimentNames).to.deep.equal([
+      expect(
+        experiments.map(experiment => experiment.displayName)
+      ).to.deep.equal([
         'workspace',
         'exp-05694',
         'exp-e7a67',
@@ -100,8 +102,8 @@ suite('Experiments Repository Test Suite', () => {
     })
   })
 
-  describe('getExperimentByName', () => {
-    it('should return the correct experiments details for the given name', async () => {
+  describe('getCheckpoints', () => {
+    it("should return the correct checkpoints for an experiment's id", async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
@@ -119,51 +121,18 @@ suite('Experiments Repository Test Suite', () => {
       )
       await experimentsRepository.isReady()
 
-      const notAnExperimentName = ':weeeee:'
-      const notAnExperiment =
-        experimentsRepository.getExperiment(notAnExperimentName)
-      expect(notAnExperiment).to.be.undefined
-
-      const experiment = experimentsRepository.getExperiment('exp-05694')
-
-      expect(experiment?.checkpoint_parent).to.equal(
-        'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
-      )
-      expect(experiment?.checkpoint_tip).to.equal(
-        'd3f4a0d3661c5977540d2205d819470cf0d2145a'
-      )
-      expect(experiment?.hasChildren).to.equal(true)
-      expect(experiment?.name).to.equal('exp-05694')
-    })
-  })
-
-  describe('getCheckpointNames', () => {
-    it('should return the correct checkpoint names for the given experiment name', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          'demo',
-          internalCommands,
-          {} as ResourceLocator
-        )
-      )
-      await experimentsRepository.isReady()
-
-      const notAnExperimentName = ':cartwheel:'
+      const notAnExperimentId = ':cartwheel:'
       const notCheckpoints =
-        experimentsRepository.getCheckpointNames(notAnExperimentName)
+        experimentsRepository.getCheckpoints(notAnExperimentId)
       expect(notCheckpoints).to.be.undefined
 
-      const checkpoints = experimentsRepository.getCheckpointNames('exp-05694')
+      const checkpoints = experimentsRepository.getCheckpoints(
+        'd3f4a0d3661c5977540d2205d819470cf0d2145a'
+      )
 
-      expect(checkpoints).to.deep.equal(['f0778b3', 'f81f1b5'])
+      expect(
+        checkpoints?.map(checkpoint => checkpoint.displayName)
+      ).to.deep.equal(['f0778b3', 'f81f1b5'])
     })
   })
 
