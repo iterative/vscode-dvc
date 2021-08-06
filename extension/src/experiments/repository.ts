@@ -134,7 +134,7 @@ export class ExperimentsRepository {
 
   public addSort(sort: SortDefinition) {
     this.experiments.addSort(sort)
-    this.notifyChanged()
+    return this.notifyChanged()
   }
 
   public getSorts() {
@@ -147,7 +147,7 @@ export class ExperimentsRepository {
 
   public removeSortByPath(pathToRemove: string) {
     this.experiments.removeSort(pathToRemove)
-    this.notifyChanged()
+    return this.notifyChanged()
   }
 
   public async buildAndAddSort() {
@@ -159,7 +159,7 @@ export class ExperimentsRepository {
 
   public clearSorts() {
     this.experiments.clearSorts()
-    this.notifyChanged()
+    return this.notifyChanged()
   }
 
   public getFilters() {
@@ -173,7 +173,7 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.addFilter(filterToAdd)
-    this.notifyChanged()
+    return this.notifyChanged()
   }
 
   public async removeFilters() {
@@ -183,12 +183,12 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.removeFilters(filtersToRemove)
-    this.notifyChanged()
+    return this.notifyChanged()
   }
 
   public removeFilter(id: string) {
     if (this.experiments.removeFilter(id)) {
-      this.notifyChanged()
+      return this.notifyChanged()
     }
   }
 
@@ -216,7 +216,7 @@ export class ExperimentsRepository {
       this.experiments.transformAndSet(data)
     ])
 
-    this.notifyChanged()
+    return this.notifyChanged()
   }
 
   private notifyChanged() {
