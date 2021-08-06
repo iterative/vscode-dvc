@@ -160,10 +160,7 @@ suite('Experiments Test Suite', () => {
       await experimentsWebview.isReady()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const addSortWithMocks = async (
-        paramPath: string,
-        descending: boolean
-      ) => {
+      const mockSortQuickPicks = (paramPath: string, descending: boolean) => {
         mockShowQuickPick.onFirstCall().resolves({
           value: {
             path: paramPath
@@ -172,11 +169,17 @@ suite('Experiments Test Suite', () => {
         mockShowQuickPick
           .onSecondCall()
           .resolves({ value: descending } as QuickPickItemWithValue<boolean>)
-        const tableSortAdded = new Promise(resolve => {
+      }
+      const addSortWithMocks = async (
+        paramPath: string,
+        descending: boolean
+      ) => {
+        mockSortQuickPicks(paramPath, descending)
+        const tableChangedPromise = new Promise(resolve => {
           experimentsRepository.onDidChangeExperiments(resolve)
         })
         await commands.executeCommand('dvc.addNewExperimentsTableSort')
-        await tableSortAdded
+        await tableChangedPromise
         mockShowQuickPick.reset()
       }
 
@@ -206,10 +209,19 @@ suite('Experiments Test Suite', () => {
 
       // Setup done, perform the test
 
-      await addSortWithMocks(testParamPath, false)
+      mockSortQuickPicks(testParamPath, false)
+      const tableChangedPromise = new Promise(resolve => {
+        experimentsRepository.onDidChangeExperiments(resolve)
+      })
+      await commands.executeCommand(
+        'dvc.views.experimentsSortByTree.addSort',
+        dvcDemoPath
+      )
+      await tableChangedPromise
+      mockShowQuickPick.reset()
       expect(
         pluckTestParams(messageSpy.getCall(0).firstArg),
-        'single sort'
+        'single sort with table command'
       ).to.deep.equal([1, 2, 3])
 
       const tableSortRemoved = new Promise(resolve => {

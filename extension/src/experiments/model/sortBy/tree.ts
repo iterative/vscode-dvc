@@ -43,31 +43,22 @@ export class ExperimentsSortByTree
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.removeSort',
-        (arg1: SortDefinitionWithParent) => {
-          const {
-            parent,
-            sort: { path }
-          } = arg1
+        ({ parent, sort: { path } }: SortDefinitionWithParent) =>
           this.experiments.removeSort(path, parent)
-        }
       )
     )
 
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.addSort',
-        (dvcRoot: string) => {
-          this.experiments.buildAndAddSort(dvcRoot)
-        }
+        (dvcRoot: string) => this.experiments.buildAndAddSort(dvcRoot)
       )
     )
 
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.removeAllSorts',
-        (dvcRoot: string) => {
-          this.experiments.clearSorts(dvcRoot)
-        }
+        (dvcRoot: string) => this.experiments.clearSorts(dvcRoot)
       )
     )
 

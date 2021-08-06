@@ -72,7 +72,7 @@ export class Experiments {
 
   public async buildAndAddSort(dvcRoot?: string) {
     const repository = await this.getOrPickRepo(dvcRoot)
-    repository.buildAndAddSort()
+    return repository.buildAndAddSort()
   }
 
   public async clearSorts(dvcRoot?: string) {
