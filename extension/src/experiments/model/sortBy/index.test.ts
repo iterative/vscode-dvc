@@ -27,7 +27,7 @@ describe('sortExperiments', () => {
     ).toEqual(unsortedRows)
   })
 
-  it('Maintains the same order if all items are equal', () => {
+  it('Maintains the same order if all items are equal with a single sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -63,6 +63,64 @@ describe('sortExperiments', () => {
       (
         sortExperiments(
           [{ descending: true, path: testSortPath }],
+          testData
+        ) as Experiment[]
+      ).map(getTestParam)
+    ).toEqual([1, 2, 3])
+
+    expect(
+      (
+        sortExperiments(
+          [{ descending: false, path: testSortPath }],
+          testData
+        ) as Experiment[]
+      ).map(getTestParam)
+    ).toEqual([1, 2, 3])
+  })
+
+  it('Maintains the same order if all items are equal in a multi-sort', () => {
+    const testData = [
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            sort: 1,
+            sort2: 1,
+            test: 1
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            sort: 1,
+            sort2: 1,
+            test: 2
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            sort: 1,
+            sort2: 1,
+            test: 3
+          }
+        }
+      }
+    ]
+
+    const testSortPath = path.join('params', 'params.yaml', 'sort')
+    const testSortPath2 = path.join('params', 'params.yaml', 'sort2')
+    expect(
+      (
+        sortExperiments(
+          [
+            { descending: false, path: testSortPath },
+            { descending: true, path: testSortPath2 }
+          ],
           testData
         ) as Experiment[]
       ).map(getTestParam)
