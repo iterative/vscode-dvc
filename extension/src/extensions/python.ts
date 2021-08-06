@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Event, extensions, Extension, Uri } from 'vscode'
 import { executeProcess } from '../processExecution'
 
@@ -40,12 +39,11 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
   const pythonBin = pythonExecutionDetails?.join(' ')
   if (pythonBin) {
-    const output = await executeProcess({
-      args: ['-c', 'import sys; print(sys.prefix)'],
+    return executeProcess({
+      args: ['-c', 'import sys; print(sys.executable)'],
       cwd: process.cwd(),
       executable: pythonBin
     })
-    return join(output, 'bin')
   }
 }
 
