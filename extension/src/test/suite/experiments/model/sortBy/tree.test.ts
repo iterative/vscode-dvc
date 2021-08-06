@@ -242,9 +242,41 @@ suite('Experiments Test Suite', () => {
 
       await addSortWithMocks(testParamPath, true)
       expect(
+        experimentsRepository.getSorts(),
+        'two sort definitions are applied'
+      ).to.deep.equal([
+        {
+          descending: false,
+          path: otherTestParamPath
+        },
+        {
+          descending: true,
+          path: testParamPath
+        }
+      ])
+      expect(
         pluckTestParams(messageSpy.getCall(3).firstArg),
-        'two sorts'
+        'the result of both sorts is sent to the webview'
       ).to.deep.equal([3, 1, 2])
+
+      await addSortWithMocks(otherTestParamPath, true)
+      expect(
+        experimentsRepository.getSorts(),
+        'the direction of the first sort definition is switched'
+      ).to.deep.equal([
+        {
+          descending: true,
+          path: otherTestParamPath
+        },
+        {
+          descending: true,
+          path: testParamPath
+        }
+      ])
+      expect(
+        pluckTestParams(messageSpy.getCall(4).firstArg),
+        'the result of the switched sort is sent to the webview'
+      ).to.deep.equal([2, 3, 1])
 
       await commands.executeCommand(
         'dvc.views.experimentsSortByTree.removeSort',
@@ -254,7 +286,7 @@ suite('Experiments Test Suite', () => {
         }
       )
       expect(
-        pluckTestParams(messageSpy.getCall(4).firstArg),
+        pluckTestParams(messageSpy.getCall(5).firstArg),
         'remove first sort'
       ).to.deep.equal([3, 2, 1])
 
@@ -263,7 +295,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
       expect(
-        pluckTestParams(messageSpy.getCall(5).firstArg),
+        pluckTestParams(messageSpy.getCall(6).firstArg),
         'clear with removeAllSorts'
       ).to.deep.equal([1, 3, 2])
     })
