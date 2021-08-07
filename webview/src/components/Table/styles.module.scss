@@ -52,21 +52,6 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
       background: white;
       border-radius: 100%;
     }
-    .normalExperiment .bullet1::before {
-      background: var(--vscode-dvc-expLegend01);
-    }
-    .bullet2 {
-      background: var(--vscode-dvc-expLegend02);
-    }
-    .bullet3 {
-      background: var(--vscode-dvc-expLegend03);
-    }
-    .bullet4 {
-      background: var(--vscode-dvc-expLegend04);
-    }
-    .bullet5 {
-      background: var(--vscode-dvc-expLegend05);
-    }
     .queuedExperiment & {
       background: conic-gradient(
         from 180deg at 50% 50%,
@@ -90,6 +75,31 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
       border-left: 1.5px solid $row-bg-alt-color;
       border-bottom: 1.5px solid $row-bg-alt-color;
     }
+  }
+}
+.bulletColor1 {
+  .normalExperiment &::before {
+    background: var(--vscode-dvc-expLegend01);
+  }
+}
+.bulletColor2 {
+  .normalExperiment &::before {
+    background: var(--vscode-dvc-expLegend02);
+  }
+}
+.bulletColor3 {
+  .normalExperiment &::before {
+    background: var(--vscode-dvc-expLegend03);
+  }
+}
+.bulletColor4 {
+  .normalExperiment &::before {
+    background: var(--vscode-dvc-expLegend04);
+  }
+}
+.bulletColor5 {
+  .normalExperiment &::before {
+    background: var(--vscode-dvc-expLegend05);
   }
 }
 
