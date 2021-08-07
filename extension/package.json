@@ -70,18 +70,18 @@
         "id": "dvc.expLegend04",
         "description": "Experiment legend color 041",
         "defaults": {
-          "dark": "#808080",
-          "highContrast": "#808080",
-          "light": "#808080"
+          "dark": "#f46837",
+          "highContrast": "#f46837",
+          "light": "#f46837"
         }
       },
       {
         "id": "dvc.expLegend05",
         "description": "Experiment legend color 05",
         "defaults": {
-          "dark": "#f46837",
-          "highContrast": "#f46837",
-          "light": "#f46837"
+          "dark": "#f4e737",
+          "highContrast": "#f4e737",
+          "light": "#f4e737"
         }
       }
     ],

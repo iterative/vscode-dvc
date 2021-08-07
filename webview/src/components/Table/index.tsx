@@ -2,6 +2,7 @@ import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
+import { ExperimentLegendColorTheme } from 'dvc/src/experiments/legendColor'
 import styles from './styles.module.scss'
 
 export interface InstanceProp {
@@ -11,6 +12,16 @@ export interface InstanceProp {
 export interface RowProp {
   row: Row<Experiment>
 }
+
+interface ExperimentGroupContextProps {
+  /**
+   * Iteration index of the `ExperimentGroup` item
+   */
+  index: number
+}
+
+const ExperimentGroupContext =
+  React.createContext<ExperimentGroupContextProps | null>(null)
 
 export const MergedHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
@@ -73,10 +84,15 @@ const getFirstCellProps = (
 
 export const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
-  index?: number
+  // eslint-disable-next-line sonarjs/cognitive-complexity
 }> = ({ cell }) => {
+  const context = React.useContext(ExperimentGroupContext)
   const { row } = cell
   const firstCellProps = getFirstCellProps(cell, row)
+  const bulletColorClassName =
+    context && !row.original.queued && !row.original.running
+      ? `bulletColor${ExperimentLegendColorTheme.getIndex(context.index) + 1}`
+      : null
 
   return (
     <div {...firstCellProps}>
@@ -91,7 +107,12 @@ export const FirstCell: React.FC<{
           />
         )}
       </span>
-      <span className={cx(styles.bullet, styles.bullet1)} />
+      <span
+        className={cx(
+          styles.bullet,
+          bulletColorClassName && styles[bulletColorClassName]
+        )}
+      />
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
@@ -126,9 +147,7 @@ const getExperimentTypeClass = ({ running, queued }: Experiment) => {
   return styles.normalExperiment
 }
 
-export const RowContent: React.FC<
-  RowProp & { className?: string; index?: number }
-> = ({
+export const RowContent: React.FC<RowProp & { className?: string }> = ({
   row: {
     getRowProps,
     cells: [firstCell, ...cells],
@@ -136,8 +155,7 @@ export const RowContent: React.FC<
     flatIndex,
     values: { id }
   },
-  className,
-  index
+  className
 }): JSX.Element => (
   <div
     {...getRowProps({
@@ -151,7 +169,7 @@ export const RowContent: React.FC<
       )
     })}
   >
-    <FirstCell cell={firstCell} index={index} />
+    <FirstCell cell={firstCell} />
     {getCells(cells)}
   </div>
 )
@@ -164,9 +182,10 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   return <RowContent row={row} className={styles.nestedRow} />
 }
 
-export const ExperimentGroup: React.FC<
-  RowProp & InstanceProp & { index: number }
-> = ({ row, instance }) => {
+export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
+  row,
+  instance
+}) => {
   instance.prepareRow(row)
   return (
     <div
@@ -203,13 +222,17 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
     >
       <RowContent row={row} />
       {row.isExpanded &&
-        row.subRows.map((subRow, i) => (
-          <ExperimentGroup
-            index={i}
-            row={subRow}
-            instance={instance}
+        row.subRows.map((subRow, index) => (
+          <ExperimentGroupContext.Provider
             key={subRow.values.id}
-          />
+            value={{ index }}
+          >
+            <ExperimentGroup
+              row={subRow}
+              instance={instance}
+              key={subRow.values.id}
+            />
+          </ExperimentGroupContext.Provider>
         ))}
     </div>
   )

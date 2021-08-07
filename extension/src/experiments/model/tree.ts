@@ -1,6 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
+  ThemeColor,
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
@@ -11,7 +12,7 @@ import {
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
-import { LegendColor } from '../legendColor'
+import { ExperimentLegendColorTheme } from '../legendColor'
 
 enum Status {
   RUNNING = 1,
@@ -124,7 +125,10 @@ export class ExperimentsTree
       return new ThemeIcon('watch')
     }
 
-    return new ThemeIcon('primitive-dot', LegendColor.getByIndex(index))
+    return new ThemeIcon(
+      'primitive-dot',
+      new ThemeColor(ExperimentLegendColorTheme.getByIndex(index))
+    )
   }
 
   private getCheckpoints(dvcRoot: string, experimentId: string) {
