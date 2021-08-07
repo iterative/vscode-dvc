@@ -11,6 +11,7 @@ import {
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
+import { LegendColor } from '../legendColor'
 
 enum Status {
   RUNNING = 1,
@@ -92,26 +93,29 @@ export class ExperimentsTree
   }
 
   private getExperiments(dvcRoot: string): ExperimentItem[] {
-    return this.experiments.getExperiments(dvcRoot).map(experiment => ({
+    return this.experiments.getExperiments(dvcRoot).map((experiment, i) => ({
       collapsibleState: experiment.hasChildren
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None,
       dvcRoot,
-      iconPath: this.getExperimentThemeIcon(experiment),
+      iconPath: this.getExperimentThemeIcon(experiment, i),
       id: experiment.id,
       label: experiment.displayName
     }))
   }
 
-  private getExperimentThemeIcon({
-    displayName,
-    running,
-    queued
-  }: {
-    displayName: string
-    running?: boolean
-    queued?: boolean
-  }): ThemeIcon {
+  private getExperimentThemeIcon(
+    {
+      displayName,
+      running,
+      queued
+    }: {
+      displayName: string
+      running?: boolean
+      queued?: boolean
+    },
+    index: number
+  ): ThemeIcon {
     if (displayName === 'workspace' || running) {
       return new ThemeIcon('loading~spin')
     }
@@ -120,7 +124,7 @@ export class ExperimentsTree
       return new ThemeIcon('watch')
     }
 
-    return new ThemeIcon('primitive-dot')
+    return new ThemeIcon('primitive-dot', LegendColor.getByIndex(index))
   }
 
   private getCheckpoints(dvcRoot: string, experimentId: string) {

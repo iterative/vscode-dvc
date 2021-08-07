@@ -38,6 +38,53 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "colors": [
+      {
+        "id": "dvc.expLegend01",
+        "description": "Experiment legend color 01",
+        "defaults": {
+          "dark": "#13adc7",
+          "highContrast": "#13adc7",
+          "light": "#13adc7"
+        }
+      },
+      {
+        "id": "dvc.expLegend02",
+        "description": "Experiment legend color 02",
+        "defaults": {
+          "dark": "#48bb78",
+          "highContrast": "#48bb78",
+          "light": "#48bb78"
+        }
+      },
+      {
+        "id": "dvc.expLegend03",
+        "description": "Experiment legend color 03",
+        "defaults": {
+          "dark": "#945dd6",
+          "highContrast": "#945dd6",
+          "light": "#945dd6"
+        }
+      },
+      {
+        "id": "dvc.expLegend04",
+        "description": "Experiment legend color 041",
+        "defaults": {
+          "dark": "#808080",
+          "highContrast": "#808080",
+          "light": "#808080"
+        }
+      },
+      {
+        "id": "dvc.expLegend05",
+        "description": "Experiment legend color 05",
+        "defaults": {
+          "dark": "#f46837",
+          "highContrast": "#f46837",
+          "light": "#f46837"
+        }
+      }
+    ],
     "commands": [
       {
         "title": "%command.showExperiments%",

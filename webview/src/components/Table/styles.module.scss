@@ -49,8 +49,23 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     height: 6px;
     .normalExperiment & {
       line-height: 0;
-      background: rgb(127, 127, 127);
+      background: white;
       border-radius: 100%;
+    }
+    .normalExperiment .bullet1::before {
+      background: var(--vscode-dvc-expLegend01);
+    }
+    .bullet2 {
+      background: var(--vscode-dvc-expLegend02);
+    }
+    .bullet3 {
+      background: var(--vscode-dvc-expLegend03);
+    }
+    .bullet4 {
+      background: var(--vscode-dvc-expLegend04);
+    }
+    .bullet5 {
+      background: var(--vscode-dvc-expLegend05);
     }
     .queuedExperiment & {
       background: conic-gradient(

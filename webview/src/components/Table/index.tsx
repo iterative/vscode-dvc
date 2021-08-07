@@ -73,9 +73,9 @@ const getFirstCellProps = (
 
 export const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
+  index?: number
 }> = ({ cell }) => {
   const { row } = cell
-
   const firstCellProps = getFirstCellProps(cell, row)
 
   return (
@@ -91,7 +91,7 @@ export const FirstCell: React.FC<{
           />
         )}
       </span>
-      <span className={styles.bullet} />
+      <span className={cx(styles.bullet, styles.bullet1)} />
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
@@ -126,7 +126,9 @@ const getExperimentTypeClass = ({ running, queued }: Experiment) => {
   return styles.normalExperiment
 }
 
-export const RowContent: React.FC<RowProp & { className?: string }> = ({
+export const RowContent: React.FC<
+  RowProp & { className?: string; index?: number }
+> = ({
   row: {
     getRowProps,
     cells: [firstCell, ...cells],
@@ -134,7 +136,8 @@ export const RowContent: React.FC<RowProp & { className?: string }> = ({
     flatIndex,
     values: { id }
   },
-  className
+  className,
+  index
 }): JSX.Element => (
   <div
     {...getRowProps({
@@ -148,7 +151,7 @@ export const RowContent: React.FC<RowProp & { className?: string }> = ({
       )
     })}
   >
-    <FirstCell cell={firstCell} />
+    <FirstCell cell={firstCell} index={index} />
     {getCells(cells)}
   </div>
 )
@@ -161,10 +164,9 @@ export const NestedRow: React.FC<RowProp & InstanceProp> = ({
   return <RowContent row={row} className={styles.nestedRow} />
 }
 
-export const ExperimentGroup: React.FC<RowProp & InstanceProp> = ({
-  row,
-  instance
-}) => {
+export const ExperimentGroup: React.FC<
+  RowProp & InstanceProp & { index: number }
+> = ({ row, instance }) => {
   instance.prepareRow(row)
   return (
     <div
@@ -201,8 +203,9 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
     >
       <RowContent row={row} />
       {row.isExpanded &&
-        row.subRows.map(subRow => (
+        row.subRows.map((subRow, i) => (
           <ExperimentGroup
+            index={i}
             row={subRow}
             instance={instance}
             key={subRow.values.id}
