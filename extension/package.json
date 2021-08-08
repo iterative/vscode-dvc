@@ -40,48 +40,453 @@
   "contributes": {
     "colors": [
       {
-        "id": "dvc.expLegend01",
-        "description": "Experiment legend color 01",
+        "id": "dvc.expLegend00",
+        "description": "Experiment legend color 000",
         "defaults": {
-          "dark": "#13adc7",
-          "highContrast": "#13adc7",
-          "light": "#13adc7"
+          "dark": "#ac85e2",
+          "light": "#ac85e2",
+          "highContrast": "#ac85e2"
+        }
+      },
+      {
+        "id": "dvc.expLegend01",
+        "description": "Experiment legend color 001",
+        "defaults": {
+          "dark": "#3d78af",
+          "light": "#3d78af",
+          "highContrast": "#3d78af"
         }
       },
       {
         "id": "dvc.expLegend02",
-        "description": "Experiment legend color 02",
+        "description": "Experiment legend color 002",
         "defaults": {
-          "dark": "#48bb78",
-          "highContrast": "#48bb78",
-          "light": "#48bb78"
+          "dark": "#2a4c43",
+          "light": "#2a4c43",
+          "highContrast": "#2a4c43"
         }
       },
       {
         "id": "dvc.expLegend03",
-        "description": "Experiment legend color 03",
+        "description": "Experiment legend color 003",
         "defaults": {
-          "dark": "#945dd6",
-          "highContrast": "#945dd6",
-          "light": "#945dd6"
+          "dark": "#28367c",
+          "light": "#28367c",
+          "highContrast": "#28367c"
         }
       },
       {
         "id": "dvc.expLegend04",
-        "description": "Experiment legend color 041",
+        "description": "Experiment legend color 004",
         "defaults": {
-          "dark": "#f46837",
-          "highContrast": "#f46837",
-          "light": "#f46837"
+          "dark": "#d2b5dc",
+          "light": "#d2b5dc",
+          "highContrast": "#d2b5dc"
         }
       },
       {
         "id": "dvc.expLegend05",
-        "description": "Experiment legend color 05",
+        "description": "Experiment legend color 005",
         "defaults": {
-          "dark": "#f4e737",
-          "highContrast": "#f4e737",
-          "light": "#f4e737"
+          "dark": "#dd636e",
+          "light": "#dd636e",
+          "highContrast": "#dd636e"
+        }
+      },
+      {
+        "id": "dvc.expLegend06",
+        "description": "Experiment legend color 006",
+        "defaults": {
+          "dark": "#12b0fb",
+          "light": "#12b0fb",
+          "highContrast": "#12b0fb"
+        }
+      },
+      {
+        "id": "dvc.expLegend07",
+        "description": "Experiment legend color 007",
+        "defaults": {
+          "dark": "#f4230d",
+          "light": "#f4230d",
+          "highContrast": "#f4230d"
+        }
+      },
+      {
+        "id": "dvc.expLegend08",
+        "description": "Experiment legend color 008",
+        "defaults": {
+          "dark": "#2ae3fd",
+          "light": "#2ae3fd",
+          "highContrast": "#2ae3fd"
+        }
+      },
+      {
+        "id": "dvc.expLegend09",
+        "description": "Experiment legend color 009",
+        "defaults": {
+          "dark": "#cc7964",
+          "light": "#cc7964",
+          "highContrast": "#cc7964"
+        }
+      },
+      {
+        "id": "dvc.expLegend10",
+        "description": "Experiment legend color 010",
+        "defaults": {
+          "dark": "#376bc9",
+          "light": "#376bc9",
+          "highContrast": "#376bc9"
+        }
+      },
+      {
+        "id": "dvc.expLegend11",
+        "description": "Experiment legend color 011",
+        "defaults": {
+          "dark": "#93af1c",
+          "light": "#93af1c",
+          "highContrast": "#93af1c"
+        }
+      },
+      {
+        "id": "dvc.expLegend12",
+        "description": "Experiment legend color 012",
+        "defaults": {
+          "dark": "#80c94c",
+          "light": "#80c94c",
+          "highContrast": "#80c94c"
+        }
+      },
+      {
+        "id": "dvc.expLegend13",
+        "description": "Experiment legend color 013",
+        "defaults": {
+          "dark": "#9b6382",
+          "light": "#9b6382",
+          "highContrast": "#9b6382"
+        }
+      },
+      {
+        "id": "dvc.expLegend14",
+        "description": "Experiment legend color 014",
+        "defaults": {
+          "dark": "#c03340",
+          "light": "#c03340",
+          "highContrast": "#c03340"
+        }
+      },
+      {
+        "id": "dvc.expLegend15",
+        "description": "Experiment legend color 015",
+        "defaults": {
+          "dark": "#8060a4",
+          "light": "#8060a4",
+          "highContrast": "#8060a4"
+        }
+      },
+      {
+        "id": "dvc.expLegend16",
+        "description": "Experiment legend color 016",
+        "defaults": {
+          "dark": "#bc497f",
+          "light": "#bc497f",
+          "highContrast": "#bc497f"
+        }
+      },
+      {
+        "id": "dvc.expLegend17",
+        "description": "Experiment legend color 017",
+        "defaults": {
+          "dark": "#a4f27f",
+          "light": "#a4f27f",
+          "highContrast": "#a4f27f"
+        }
+      },
+      {
+        "id": "dvc.expLegend18",
+        "description": "Experiment legend color 018",
+        "defaults": {
+          "dark": "#b5badd",
+          "light": "#b5badd",
+          "highContrast": "#b5badd"
+        }
+      },
+      {
+        "id": "dvc.expLegend19",
+        "description": "Experiment legend color 019",
+        "defaults": {
+          "dark": "#77508d",
+          "light": "#77508d",
+          "highContrast": "#77508d"
+        }
+      },
+      {
+        "id": "dvc.expLegend20",
+        "description": "Experiment legend color 020",
+        "defaults": {
+          "dark": "#ab3366",
+          "light": "#ab3366",
+          "highContrast": "#ab3366"
+        }
+      },
+      {
+        "id": "dvc.expLegend21",
+        "description": "Experiment legend color 021",
+        "defaults": {
+          "dark": "#038627",
+          "light": "#038627",
+          "highContrast": "#038627"
+        }
+      },
+      {
+        "id": "dvc.expLegend22",
+        "description": "Experiment legend color 022",
+        "defaults": {
+          "dark": "#50dec9",
+          "light": "#50dec9",
+          "highContrast": "#50dec9"
+        }
+      },
+      {
+        "id": "dvc.expLegend23",
+        "description": "Experiment legend color 023",
+        "defaults": {
+          "dark": "#cfef55",
+          "light": "#cfef55",
+          "highContrast": "#cfef55"
+        }
+      },
+      {
+        "id": "dvc.expLegend24",
+        "description": "Experiment legend color 024",
+        "defaults": {
+          "dark": "#1bb7a5",
+          "light": "#1bb7a5",
+          "highContrast": "#1bb7a5"
+        }
+      },
+      {
+        "id": "dvc.expLegend25",
+        "description": "Experiment legend color 025",
+        "defaults": {
+          "dark": "#f106e3",
+          "light": "#f106e3",
+          "highContrast": "#f106e3"
+        }
+      },
+      {
+        "id": "dvc.expLegend26",
+        "description": "Experiment legend color 026",
+        "defaults": {
+          "dark": "#658f74",
+          "light": "#658f74",
+          "highContrast": "#658f74"
+        }
+      },
+      {
+        "id": "dvc.expLegend27",
+        "description": "Experiment legend color 027",
+        "defaults": {
+          "dark": "#555874",
+          "light": "#555874",
+          "highContrast": "#555874"
+        }
+      },
+      {
+        "id": "dvc.expLegend28",
+        "description": "Experiment legend color 028",
+        "defaults": {
+          "dark": "#0981fc",
+          "light": "#0981fc",
+          "highContrast": "#0981fc"
+        }
+      },
+      {
+        "id": "dvc.expLegend29",
+        "description": "Experiment legend color 029",
+        "defaults": {
+          "dark": "#5dad8f",
+          "light": "#5dad8f",
+          "highContrast": "#5dad8f"
+        }
+      },
+      {
+        "id": "dvc.expLegend30",
+        "description": "Experiment legend color 030",
+        "defaults": {
+          "dark": "#a4e467",
+          "light": "#a4e467",
+          "highContrast": "#a4e467"
+        }
+      },
+      {
+        "id": "dvc.expLegend31",
+        "description": "Experiment legend color 031",
+        "defaults": {
+          "dark": "#8be40b",
+          "light": "#8be40b",
+          "highContrast": "#8be40b"
+        }
+      },
+      {
+        "id": "dvc.expLegend32",
+        "description": "Experiment legend color 032",
+        "defaults": {
+          "dark": "#111950",
+          "light": "#111950",
+          "highContrast": "#111950"
+        }
+      },
+      {
+        "id": "dvc.expLegend33",
+        "description": "Experiment legend color 033",
+        "defaults": {
+          "dark": "#892b27",
+          "light": "#892b27",
+          "highContrast": "#892b27"
+        }
+      },
+      {
+        "id": "dvc.expLegend34",
+        "description": "Experiment legend color 034",
+        "defaults": {
+          "dark": "#99cb8a",
+          "light": "#99cb8a",
+          "highContrast": "#99cb8a"
+        }
+      },
+      {
+        "id": "dvc.expLegend35",
+        "description": "Experiment legend color 035",
+        "defaults": {
+          "dark": "#dd73e4",
+          "light": "#dd73e4",
+          "highContrast": "#dd73e4"
+        }
+      },
+      {
+        "id": "dvc.expLegend36",
+        "description": "Experiment legend color 036",
+        "defaults": {
+          "dark": "#9c1ad5",
+          "light": "#9c1ad5",
+          "highContrast": "#9c1ad5"
+        }
+      },
+      {
+        "id": "dvc.expLegend37",
+        "description": "Experiment legend color 037",
+        "defaults": {
+          "dark": "#28d625",
+          "light": "#28d625",
+          "highContrast": "#28d625"
+        }
+      },
+      {
+        "id": "dvc.expLegend38",
+        "description": "Experiment legend color 038",
+        "defaults": {
+          "dark": "#542309",
+          "light": "#542309",
+          "highContrast": "#542309"
+        }
+      },
+      {
+        "id": "dvc.expLegend39",
+        "description": "Experiment legend color 039",
+        "defaults": {
+          "dark": "#a0ca9f",
+          "light": "#a0ca9f",
+          "highContrast": "#a0ca9f"
+        }
+      },
+      {
+        "id": "dvc.expLegend40",
+        "description": "Experiment legend color 040",
+        "defaults": {
+          "dark": "#6856dc",
+          "light": "#6856dc",
+          "highContrast": "#6856dc"
+        }
+      },
+      {
+        "id": "dvc.expLegend41",
+        "description": "Experiment legend color 041",
+        "defaults": {
+          "dark": "#793fd8",
+          "light": "#793fd8",
+          "highContrast": "#793fd8"
+        }
+      },
+      {
+        "id": "dvc.expLegend42",
+        "description": "Experiment legend color 042",
+        "defaults": {
+          "dark": "#f7d33e",
+          "light": "#f7d33e",
+          "highContrast": "#f7d33e"
+        }
+      },
+      {
+        "id": "dvc.expLegend43",
+        "description": "Experiment legend color 043",
+        "defaults": {
+          "dark": "#cfe62c",
+          "light": "#cfe62c",
+          "highContrast": "#cfe62c"
+        }
+      },
+      {
+        "id": "dvc.expLegend44",
+        "description": "Experiment legend color 044",
+        "defaults": {
+          "dark": "#1c2ddc",
+          "light": "#1c2ddc",
+          "highContrast": "#1c2ddc"
+        }
+      },
+      {
+        "id": "dvc.expLegend45",
+        "description": "Experiment legend color 045",
+        "defaults": {
+          "dark": "#13907f",
+          "light": "#13907f",
+          "highContrast": "#13907f"
+        }
+      },
+      {
+        "id": "dvc.expLegend46",
+        "description": "Experiment legend color 046",
+        "defaults": {
+          "dark": "#f20c77",
+          "light": "#f20c77",
+          "highContrast": "#f20c77"
+        }
+      },
+      {
+        "id": "dvc.expLegend47",
+        "description": "Experiment legend color 047",
+        "defaults": {
+          "dark": "#b7ca4a",
+          "light": "#b7ca4a",
+          "highContrast": "#b7ca4a"
+        }
+      },
+      {
+        "id": "dvc.expLegend48",
+        "description": "Experiment legend color 048",
+        "defaults": {
+          "dark": "#2efa49",
+          "light": "#2efa49",
+          "highContrast": "#2efa49"
+        }
+      },
+      {
+        "id": "dvc.expLegend49",
+        "description": "Experiment legend color 049",
+        "defaults": {
+          "dark": "#3e7805",
+          "light": "#3e7805",
+          "highContrast": "#3e7805"
         }
       }
     ],

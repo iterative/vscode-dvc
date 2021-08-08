@@ -12,7 +12,7 @@ import {
 import { Experiments } from '..'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
-import { ExperimentLegendColorTheme } from '../legendColor'
+import { ExperimentLegendThemeColor } from '../legendThemeColor'
 
 enum Status {
   RUNNING = 1,
@@ -127,7 +127,7 @@ export class ExperimentsTree
 
     return new ThemeIcon(
       'primitive-dot',
-      new ThemeColor(ExperimentLegendColorTheme.getByIndex(index))
+      new ThemeColor(ExperimentLegendThemeColor.getThemeId(index))
     )
   }
 

@@ -77,31 +77,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     }
   }
 }
-.bulletColor1 {
-  .normalExperiment &::before {
-    background: var(--vscode-dvc-expLegend01);
-  }
-}
-.bulletColor2 {
-  .normalExperiment &::before {
-    background: var(--vscode-dvc-expLegend02);
-  }
-}
-.bulletColor3 {
-  .normalExperiment &::before {
-    background: var(--vscode-dvc-expLegend03);
-  }
-}
-.bulletColor4 {
-  .normalExperiment &::before {
-    background: var(--vscode-dvc-expLegend04);
-  }
-}
-.bulletColor5 {
-  .normalExperiment &::before {
-    background: var(--vscode-dvc-expLegend05);
-  }
-}
+@import './bulletStyles.module.scss';
 
 .rowArrowPlaceholder {
   width: 8px;

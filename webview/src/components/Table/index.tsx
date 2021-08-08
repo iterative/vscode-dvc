@@ -2,7 +2,7 @@ import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
-import { ExperimentLegendColorTheme } from 'dvc/src/experiments/legendColor'
+import { ExperimentLegendThemeColor } from 'dvc/src/experiments/legendThemeColor'
 import styles from './styles.module.scss'
 
 export interface InstanceProp {
@@ -91,7 +91,9 @@ export const FirstCell: React.FC<{
   const firstCellProps = getFirstCellProps(cell, row)
   const bulletColorClassName =
     context && !row.original.queued && !row.original.running
-      ? `bulletColor${ExperimentLegendColorTheme.getIndex(context.index) + 1}`
+      ? `bulletThemeColor${ExperimentLegendThemeColor.getColorIndex(
+          context.index
+        )}`
       : null
 
   return (
