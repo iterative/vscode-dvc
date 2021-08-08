@@ -49,7 +49,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     height: 6px;
     .normalExperiment & {
       line-height: 0;
-      background: white;
+      background: rgb(127, 127, 127);
       border-radius: 100%;
     }
     .queuedExperiment & {
