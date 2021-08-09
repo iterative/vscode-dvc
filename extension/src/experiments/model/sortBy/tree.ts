@@ -5,12 +5,12 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  window,
   Uri,
   commands
 } from 'vscode'
 import { SortDefinition } from './'
 import { Experiments } from '../..'
+import { createTreeView } from '../../../vscode/tree'
 
 export interface SortDefinitionWithParent {
   sort: SortDefinition
@@ -30,13 +30,9 @@ export class ExperimentsSortByTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
-      window.createTreeView<string | SortDefinitionWithParent>(
+      createTreeView<string | SortDefinitionWithParent>(
         'dvc.views.experimentsSortByTree',
-        {
-          canSelectMany: true,
-          showCollapseAll: true,
-          treeDataProvider: this
-        }
+        this
       )
     )
 
