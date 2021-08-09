@@ -203,7 +203,7 @@
         "category": "DVC"
       },
       {
-        "title": "%command.setExperimentsTableSort%",
+        "title": "%command.addExperimentsTableSort%",
         "command": "dvc.addExperimentsTableSort",
         "category": "DVC",
         "icon": "$(add)"
