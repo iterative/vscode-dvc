@@ -6,7 +6,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { buildSortQuickPick } from './model/sortBy/quickPick'
+import { sortDefinitionQuickPick } from './model/sortBy/quickPick'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
@@ -141,8 +141,8 @@ export class ExperimentsRepository {
     return this.experiments.getSorts()
   }
 
-  public buildSort() {
-    return buildSortQuickPick(this.paramsAndMetrics.getTerminalNodes())
+  public pickSort() {
+    return sortDefinitionQuickPick(this.paramsAndMetrics.getTerminalNodes())
   }
 
   public removeSortByPath(pathToRemove: string) {
@@ -150,15 +150,15 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public async buildAndAddSort() {
-    const pickedSort = await this.buildSort()
+  public async pickAndAddSort() {
+    const pickedSort = await this.pickSort()
     if (pickedSort) {
       this.addSort(pickedSort)
     }
   }
 
-  public clearSorts() {
-    this.experiments.clearSorts()
+  public removeSorts() {
+    this.experiments.removeSorts()
     return this.notifyChanged()
   }
 

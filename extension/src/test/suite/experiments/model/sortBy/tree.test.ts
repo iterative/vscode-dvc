@@ -178,7 +178,7 @@ suite('Experiments Test Suite', () => {
         const tableChangedPromise = new Promise(resolve => {
           experimentsRepository.onDidChangeExperiments(resolve)
         })
-        await commands.executeCommand('dvc.addNewExperimentsTableSort')
+        await commands.executeCommand('dvc.addExperimentsTableSort')
         await tableChangedPromise
         mockShowQuickPick.reset()
       }

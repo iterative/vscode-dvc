@@ -3,7 +3,7 @@ import { quickPickValue } from '../../../vscode/quickPick'
 import { pickFromParamsAndMetrics } from '../../paramsAndMetrics/quickPick'
 import { ParamOrMetric } from '../../webview/contract'
 
-export const buildSortQuickPick = async (
+export const sortDefinitionQuickPick = async (
   paramsAndMetrics: ParamOrMetric[] | undefined
 ): Promise<SortDefinition | undefined> => {
   const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {

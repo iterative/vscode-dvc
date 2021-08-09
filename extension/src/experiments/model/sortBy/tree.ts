@@ -14,7 +14,7 @@ import { Experiments } from '../..'
 
 export interface SortDefinitionWithParent {
   sort: SortDefinition
-  parent: string
+  dvcRoot: string
 }
 
 export class ExperimentsSortByTree
@@ -43,8 +43,8 @@ export class ExperimentsSortByTree
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.removeSort',
-        ({ parent, sort: { path } }: SortDefinitionWithParent) =>
-          this.experiments.removeSort(path, parent)
+        ({ dvcRoot, sort: { path } }: SortDefinitionWithParent) =>
+          this.experiments.removeSort(path, dvcRoot)
       )
     )
 
@@ -58,7 +58,7 @@ export class ExperimentsSortByTree
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.removeAllSorts',
-        (dvcRoot: string) => this.experiments.clearSorts(dvcRoot)
+        (dvcRoot: string) => this.experiments.removeSorts(dvcRoot)
       )
     )
 
@@ -75,16 +75,16 @@ export class ExperimentsSortByTree
   }
 
   public getChildren(
-    parent: undefined | string
+    dvcRoot: undefined | string
   ):
     | string[]
     | SortDefinitionWithParent[]
     | Promise<string[] | SortDefinitionWithParent[]> {
-    if (parent === undefined) {
+    if (dvcRoot === undefined) {
       return this.getRootItems()
     }
 
-    return this.experiments.getSorts(parent).map(sort => ({ parent, sort }))
+    return this.experiments.getSorts(dvcRoot).map(sort => ({ dvcRoot, sort }))
   }
 
   private async getRootItems() {

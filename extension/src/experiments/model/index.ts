@@ -33,7 +33,7 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
   }
 
-  public clearSorts() {
+  public removeSorts() {
     this.currentSorts = []
   }
 
