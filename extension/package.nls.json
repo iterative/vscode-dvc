@@ -36,7 +36,7 @@
   "command.selectDefaultProject": "Select Default Project",
   "command.selectDvcPath": "Select CLI Path",
   "command.setExperimentsTableSort": "Sort Experiments Table",
-  "command.clearExperimentsTableSort": "Clear Experiments Table Sort",
+  "command.removeExperimentsTableSorts": "Clear Experiments Table Sort",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
   "config.dvcPath.title": "DVC CLI Path",

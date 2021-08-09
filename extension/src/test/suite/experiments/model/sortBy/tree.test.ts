@@ -129,7 +129,7 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('experimentsSortByTree', () => {
-    it('should be able to update the table data by adding and removing a sort', async () => {
+    it('should be able to properly add and remove sorts with a variety of commands', async () => {
       // setup
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -227,7 +227,7 @@ suite('Experiments Test Suite', () => {
       const tableSortRemoved = new Promise(resolve => {
         experimentsRepository.onDidChangeExperiments(resolve)
       })
-      await commands.executeCommand('dvc.clearExperimentsTableSort')
+      await commands.executeCommand('dvc.removeExperimentsTableSorts')
       await tableSortRemoved
       expect(
         pluckTestParams(messageSpy.getCall(1).firstArg),

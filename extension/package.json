@@ -209,8 +209,8 @@
         "icon": "$(add)"
       },
       {
-        "title": "%command.clearExperimentsTableSort%",
-        "command": "dvc.clearExperimentsTableSort",
+        "title": "%command.removeExperimentsTableSorts%",
+        "command": "dvc.removeExperimentsTableSorts",
         "category": "DVC",
         "icon": "$(close-all)"
       },
@@ -580,7 +580,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "dvc.clearExperimentsTableSort",
+          "command": "dvc.removeExperimentsTableSorts",
           "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@2"
         }
