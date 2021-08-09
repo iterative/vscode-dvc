@@ -21,27 +21,13 @@ import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
 
-  const commonFields = {
-    executor: null,
-    queued: false,
-    running: false
-  }
-
   const testData = {
-    '42b8736b08170529903cd203a1f40382a4b4a8cd': {
+    testBranch: {
       baseline: {
-        data: {
-          ...commonFields,
-          name: 'test-branch',
-          timestamp: '2020-12-29T15:28:59'
-        }
+        data: {}
       },
-      d3f4a0d3661c5977540d2205d819470cf0d2145a: {
+      exp1: {
         data: {
-          ...commonFields,
-          checkpoint_parent: '42b8736b08170529903cd203a1f40382a4b4a8cd',
-          checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
-          name: 'exp-05694',
           params: {
             'params.yaml': {
               data: {
@@ -49,15 +35,11 @@ suite('Experiments Test Suite', () => {
                 testparam2: 1
               }
             }
-          },
-          timestamp: '2021-01-14T10:58:00'
+          }
         }
       },
-      f0778b3eb6a390d6f6731c735a2a4561d1792c3a: {
+      exp2: {
         data: {
-          ...commonFields,
-          checkpoint_parent: '42b8736b08170529903cd203a1f40382a4b4a8cd',
-          checkpoint_tip: 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a',
           params: {
             'params.yaml': {
               data: {
@@ -65,15 +47,11 @@ suite('Experiments Test Suite', () => {
                 testparam2: 1
               }
             }
-          },
-          timestamp: '2021-01-14T10:57:59'
+          }
         }
       },
-      f81f1b5a1248b9d9f595fb53136298c69f908e66: {
+      exp3: {
         data: {
-          ...commonFields,
-          checkpoint_parent: '42b8736b08170529903cd203a1f40382a4b4a8cd',
-          checkpoint_tip: 'f81f1b5a1248b9d9f595fb53136298c69f908e66',
           params: {
             'params.yaml': {
               data: {
@@ -81,15 +59,13 @@ suite('Experiments Test Suite', () => {
                 testparam2: 2
               }
             }
-          },
-          timestamp: '2021-01-14T10:57:53'
+          }
         }
       }
     },
     workspace: {
       baseline: {
         data: {
-          ...commonFields,
           executor: 'workspace',
           timestamp: null
         }
