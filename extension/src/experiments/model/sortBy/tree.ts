@@ -67,11 +67,9 @@ export class ExperimentsSortByTree
 
   public getTreeItem(element: string | SortDefinitionWithParent): TreeItem {
     if (typeof element === 'string') {
-      return this.getTreeItemFromDvcRoot(element as string)
+      return this.getTreeItemFromDvcRoot(element)
     }
-    return this.getTreeItemFromSortDefinition(
-      element as SortDefinitionWithParent
-    )
+    return this.getTreeItemFromSortDefinition(element)
   }
 
   public getChildren(
@@ -90,10 +88,16 @@ export class ExperimentsSortByTree
   private async getRootItems() {
     await this.experiments.isReady()
     const roots = this.experiments.getDvcRoots()
+    if (roots.length === 0) {
+      return []
+    }
     if (roots.length === 1) {
       return this.getChildren(roots[0])
-    } else {
+    }
+    if (roots.find(dvcRoot => this.experiments.getSorts(dvcRoot).length > 0)) {
       return roots.sort((a, b) => a.localeCompare(b))
+    } else {
+      return []
     }
   }
 

@@ -77,17 +77,24 @@ describe('ExperimentsSortByTree', () => {
   const singleSortDefinitionWithParentArray = [exampleSortDefinitionWithParent]
 
   describe('getChildren', () => {
-    it('should return an empty array', async () => {
-      mockedGetSorts.mockReturnValueOnce([])
+    it('should return an empty array if no roots are defined', async () => {
       mockedGetDvcRoots.mockReturnValueOnce([])
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
       const rootElements = await experimentsSortByTree.getChildren(undefined)
       expect(rootElements).toEqual([])
     })
 
-    it('should not display projects when only one project exists', async () => {
-      mockedGetSorts.mockReturnValueOnce(singleSortDefinitionArray)
+    it('should return an empty array if there are roots but no sorts', async () => {
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
+      mockedGetSorts.mockReturnValue([])
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const rootElements = await experimentsSortByTree.getChildren(undefined)
+      expect(rootElements).toEqual([])
+    })
+
+    it('should display sorts at the top level when only one project exists', async () => {
+      mockedGetSorts.mockReturnValue(singleSortDefinitionArray)
+      mockedGetDvcRoots.mockReturnValue([dvcRoot])
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
       expect(await experimentsSortByTree.getChildren(undefined)).toEqual(
         singleSortDefinitionWithParentArray
@@ -96,6 +103,7 @@ describe('ExperimentsSortByTree', () => {
 
     it('should display projects at the top level when more than one exists', async () => {
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot, 'demo2'])
+      mockedGetSorts.mockReturnValue(singleSortDefinitionArray)
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
       expect(await experimentsSortByTree.getChildren(undefined)).toEqual([
         dvcRoot,
