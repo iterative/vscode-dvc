@@ -40,28 +40,36 @@ following the
 
 There are quite a few options for installing DVC, with one big split being
 whether DVC is installed globally or in a virtual environment. This extension
-allows for a few different methods for picking how to run DVC.
+allows for a few different methods for picking how to run DVC. See below for
+some different use cases and how to get setup:
 
-- Virtual environment recognition powered by the
-  [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-  extension.
+- Virtual environment for Python dependencies which **excludes DVC**
 
-- The `dvc.dvcPath` setting can be set to a specific binary path in order to use
-  a specific dvc executable and skip all `ms-python` inference.
+  - Set `dvc.dvcPath` to the absolute path of the dvc binary.
+  - Use the
+    [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+    extension to identify the virtual environment.
 
-- Simply calling `dvc` on the CLI is used as a fallback.
+- Virtual environment for Python dependencies which **includes DVC**
 
-- Please disable the CLI's analytics as they severely impact the overall
-  performance of the extension. You can do this by running
-  `dvc config core.analytics false --global` in your terminal.
+  - Use the
+    [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+    extension to identify the virtual environment.
 
-Using the Python extension is the easiest way to use virtual environments, and
-using a global install of dvc is the easiest way to not use the Python
-extension. For other niche cases, the `dvc.dvcPath` setting should hopefully
-serve as an escape hatch.
+- DVC is installed globally but cannot be found via running a `dvc` command in
+  the terminal.
 
-The "Select DVC CLI Path" command in the Command Palette can be used to set the
-`dvc.dvcPath` option from a more user-friendly QuickPick menu.
+  - Set `dvc.dvcPath` to the absolute path of the dvc binary.
+
+Notes:
+
+- The "Select DVC CLI Path" command in the Command Palette can be used to set
+  the `dvc.dvcPath` option from a more user-friendly QuickPick menu.
+
+- Currently it is necessary to disable the CLI's analytics as they severely
+  impact the overall performance of the extension. You can do this by running
+  `dvc config core.analytics false --global` in your terminal. We will be
+  looking into improving this experience shortly.
 
 ## How to Use
 
