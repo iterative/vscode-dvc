@@ -215,12 +215,6 @@
         "icon": "$(close-all)"
       },
       {
-        "title": "%command.views.experimentsSortByTree.addSort%",
-        "command": "dvc.views.experimentsSortByTree.addSort",
-        "category": "DVC",
-        "icon": "$(add)"
-      },
-      {
         "title": "%command.views.experimentsSortByTree.removeSort%",
         "command": "dvc.views.experimentsSortByTree.removeSort",
         "category": "DVC",
@@ -386,10 +380,6 @@
           "when": "false"
         },
         {
-          "command": "dvc.views.experimentsSortByTree.addSort",
-          "when": "false"
-        },
-        {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "when": "false"
         }
@@ -513,7 +503,7 @@
           "when": "viewItem =~ /^dvcTracked/"
         },
         {
-          "command": "dvc.views.experimentsSortByTree.addSort",
+          "command": "dvc.addExperimentsTableSort",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
         },

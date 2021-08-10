@@ -194,10 +194,7 @@ suite('Experiments Test Suite', () => {
       const tableChangedPromise = new Promise(resolve => {
         experimentsRepository.onDidChangeExperiments(resolve)
       })
-      await commands.executeCommand(
-        'dvc.views.experimentsSortByTree.addSort',
-        dvcDemoPath
-      )
+      await commands.executeCommand('dvc.addExperimentsTableSort', dvcDemoPath)
       await tableChangedPromise
       mockShowQuickPick.reset()
       expect(
@@ -266,15 +263,16 @@ suite('Experiments Test Suite', () => {
           sort: { path: otherTestParamPath }
         }
       )
-      expect(getTestParamsArray(), 'remove first sort').to.deep.equal([3, 2, 1])
+      expect(
+        getTestParamsArray(),
+        'remove first sort individually'
+      ).to.deep.equal([3, 2, 1])
 
       await commands.executeCommand(
-        'dvc.views.experimentsSortByTree.removeAllSorts',
+        'dvc.removeExperimentsTableSorts',
         dvcDemoPath
       )
-      expect(getTestParamsArray(), 'clear with removeAllSorts').to.deep.equal([
-        1, 3, 2
-      ])
+      expect(getTestParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2])
     })
   })
 })
