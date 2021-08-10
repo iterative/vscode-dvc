@@ -40,7 +40,7 @@ export class ExperimentsSortByTree
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.removeSort',
         ({ dvcRoot, sort: { path } }: SortDefinitionWithParent) =>
-          this.experiments.removeSort(path, dvcRoot)
+          this.experiments.removeSort(dvcRoot, path)
       )
     )
 

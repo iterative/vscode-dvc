@@ -80,9 +80,8 @@ export class Experiments {
     repository.removeSorts()
   }
 
-  public async removeSort(pathToRemove: string, dvcRoot: string) {
-    const repository = await this.getOrPickRepo(dvcRoot)
-    repository.removeSortByPath(pathToRemove)
+  public removeSort(dvcRoot: string, pathToRemove: string) {
+    this.getRepository(dvcRoot).removeSortByPath(pathToRemove)
   }
 
   public getDvcRoots() {
