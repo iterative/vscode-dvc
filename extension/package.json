@@ -251,6 +251,12 @@
           "type": "string",
           "default": null
         },
+        "dvc.noCLIUnavailableInfo": {
+          "title": "%config.noCLIUnavailableInfo.title%",
+          "description": "%config.noCLIUnavailableInfo.description%",
+          "type": "boolean",
+          "default": false
+        },
         "dvc.views.trackedExplorerTree.noOpenUnsupported": {
           "title": "%config.noOpenUnsupported.title%",
           "description": "%config.noOpenUnsupported.description%",

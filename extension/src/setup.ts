@@ -1,5 +1,6 @@
 import { window } from 'vscode'
 import { IExtension } from './interfaces'
+import { getConfigValue, setConfigValue } from './vscode/config'
 
 export const setup = async (extension: IExtension) => {
   const hasWorkspaceFolder = extension.hasWorkspaceFolder()
@@ -15,8 +16,17 @@ export const setup = async (extension: IExtension) => {
 
   extension.reset()
 
-  window.showInformationMessage(
-    'DVC extension is unable to initialize as the cli is not available.\n' +
-      'Update your config options to try again.'
+  if (getConfigValue('dvc.noCLIUnavailableInfo')) {
+    return
+  }
+
+  const response = await window.showInformationMessage(
+    'The DVC extension cannot currently access the CLI.\n' +
+      'Update your config to try again.',
+    "Don't Show Again"
   )
+
+  if (response) {
+    return setConfigValue('dvc.noCLIUnavailableInfo', true)
+  }
 }
