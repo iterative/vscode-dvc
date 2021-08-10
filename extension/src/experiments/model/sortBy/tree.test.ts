@@ -12,7 +12,7 @@ import {
   window
 } from 'vscode'
 import { SortDefinition } from '.'
-import { ExperimentsSortByTree, SortDefinitionWithParent } from './tree'
+import { ExperimentsSortByTree, SortItem } from './tree'
 import { Experiments } from '../..'
 
 function buildMockedTreeItem(
@@ -69,7 +69,7 @@ describe('ExperimentsSortByTree', () => {
     descending: true,
     path: examplePath
   }
-  const exampleSortDefinitionWithParent: SortDefinitionWithParent = {
+  const exampleSortDefinitionWithParent: SortItem = {
     dvcRoot,
     sort: exampleSortDefinition
   }

@@ -12,13 +12,13 @@ import { SortDefinition } from './'
 import { Experiments } from '../..'
 import { createTreeView } from '../../../vscode/tree'
 
-export interface SortDefinitionWithParent {
+export type SortItem = {
   sort: SortDefinition
   dvcRoot: string
 }
 
 export class ExperimentsSortByTree
-  implements TreeDataProvider<string | SortDefinitionWithParent>
+  implements TreeDataProvider<string | SortItem>
 {
   public dispose = Disposable.fn()
 
@@ -30,16 +30,13 @@ export class ExperimentsSortByTree
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
-      createTreeView<string | SortDefinitionWithParent>(
-        'dvc.views.experimentsSortByTree',
-        this
-      )
+      createTreeView<string | SortItem>('dvc.views.experimentsSortByTree', this)
     )
 
     this.dispose.track(
       commands.registerCommand(
         'dvc.views.experimentsSortByTree.removeSort',
-        ({ dvcRoot, sort: { path } }: SortDefinitionWithParent) =>
+        ({ dvcRoot, sort: { path } }: SortItem) =>
           this.experiments.removeSort(dvcRoot, path)
       )
     )
@@ -47,7 +44,7 @@ export class ExperimentsSortByTree
     this.experiments = experiments
   }
 
-  public getTreeItem(element: string | SortDefinitionWithParent): TreeItem {
+  public getTreeItem(element: string | SortItem): TreeItem {
     if (typeof element === 'string') {
       return this.getTreeItemFromDvcRoot(element)
     }
@@ -56,10 +53,7 @@ export class ExperimentsSortByTree
 
   public getChildren(
     dvcRoot: undefined | string
-  ):
-    | string[]
-    | SortDefinitionWithParent[]
-    | Promise<string[] | SortDefinitionWithParent[]> {
+  ): string[] | SortItem[] | Promise<string[] | SortItem[]> {
     if (dvcRoot === undefined) {
       return this.getRootItems()
     }
@@ -95,9 +89,7 @@ export class ExperimentsSortByTree
     return projectTreeItem
   }
 
-  private getTreeItemFromSortDefinition(
-    sortWithParent: SortDefinitionWithParent
-  ) {
+  private getTreeItemFromSortDefinition(sortWithParent: SortItem) {
     const { sort } = sortWithParent
     const sortDefinitionTreeItem = new TreeItem(sort.path)
 
