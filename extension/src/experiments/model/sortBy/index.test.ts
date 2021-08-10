@@ -78,7 +78,7 @@ describe('sortExperiments', () => {
     ).toEqual([1, 2, 3])
   })
 
-  it('Maintains the same order if all items are equal in a multi-sort', () => {
+  it('Should maintain the same order if all items are equal in a multi-sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -136,7 +136,7 @@ describe('sortExperiments', () => {
     ).toEqual([1, 2, 3])
   })
 
-  describe('Can sort both ascending and descending', () => {
+  describe('Should sort both ascending and descending', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -164,7 +164,7 @@ describe('sortExperiments', () => {
       }
     ]
 
-    it('Can sort ascending', () => {
+    it('Should sort ascending', () => {
       expect(
         (
           sortExperiments(
@@ -175,7 +175,7 @@ describe('sortExperiments', () => {
       ).toEqual([1, 2, 3])
     })
 
-    it('Can sort descending', () => {
+    it('Should sort descending', () => {
       expect(
         (
           sortExperiments(
@@ -187,7 +187,7 @@ describe('sortExperiments', () => {
     })
   })
 
-  describe('Can use multiple sort definitions', () => {
+  describe('Should use multiple sort definitions', () => {
     const otherTestPathArray = ['params', 'params.yaml', 'othertest']
     const otherTestPath = join(...otherTestPathArray)
     const testData = [
@@ -220,7 +220,7 @@ describe('sortExperiments', () => {
       }
     ]
 
-    it('Can sort with first definition given priority', () => {
+    it('Should sort with first definition given priority', () => {
       const result = sortExperiments(
         [
           { descending: false, path: otherTestPath },
@@ -234,7 +234,7 @@ describe('sortExperiments', () => {
       ])
     })
 
-    it('Can sort with two different directions', () => {
+    it('Should sort with two different directions', () => {
       const result = sortExperiments(
         [
           { descending: false, path: otherTestPath },

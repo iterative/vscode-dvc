@@ -6,17 +6,18 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { sortDefinitionQuickPick } from './model/sortBy/quickPick'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { SortDefinition } from './model/sortBy'
+import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -141,8 +142,28 @@ export class ExperimentsRepository {
     return this.experiments.getSorts()
   }
 
-  public pickSort() {
-    return sortDefinitionQuickPick(this.paramsAndMetrics.getTerminalNodes())
+  public async pickSort() {
+    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
+    const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
+      title: 'Select a param or metric to sort by'
+    })
+    if (picked === undefined) {
+      return
+    }
+    const descending = await quickPickValue<boolean>(
+      [
+        { label: 'Ascending', value: false },
+        { label: 'Descending', value: true }
+      ],
+      { title: 'Select a direction to sort in' }
+    )
+    if (descending === undefined) {
+      return
+    }
+    return {
+      descending,
+      path: picked.path
+    }
   }
 
   public removeSortByPath(pathToRemove: string) {
