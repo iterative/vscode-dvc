@@ -29,7 +29,7 @@ const buildSingleExperimentSortFunction = ({
     : (a, b) => compareExperimentsByPath(pathArray, a, b)
 }
 
-const buildMultiExperimentSortFunction = (
+const buildExperimentSortFunction = (
   sortDefinitions: SortDefinition[]
 ): SortFunction => {
   const sortFunctions = sortDefinitions.map(buildSingleExperimentSortFunction)
@@ -43,13 +43,6 @@ const buildMultiExperimentSortFunction = (
     return 0
   }
 }
-
-const buildExperimentSortFunction = (
-  sortDefinitions: SortDefinition[]
-): SortFunction =>
-  sortDefinitions.length === 1
-    ? buildSingleExperimentSortFunction(sortDefinitions[0])
-    : buildMultiExperimentSortFunction(sortDefinitions)
 
 export const sortExperiments = (
   sortDefinitions: SortDefinition[],

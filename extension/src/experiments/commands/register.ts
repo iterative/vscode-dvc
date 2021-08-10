@@ -63,7 +63,7 @@ const registerExperimentQuickPickCommands = (
   experiments.dispose.track(
     commands.registerCommand(
       'dvc.addExperimentsTableSort',
-      (dvcRoot?: string) => experiments.buildAndAddSort(dvcRoot)
+      (dvcRoot?: string) => experiments.pickAndAddSort(dvcRoot)
     )
   )
 
