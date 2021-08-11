@@ -1,10 +1,7 @@
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { commands, window } from 'vscode'
-import {
-  QuickPickItemWithValue,
-  quickPickOneOrInput
-} from '../../../vscode/quickPick'
+import { quickPickOneOrInput } from '../../../vscode/quickPick'
 
 suite('Quick Pick Test Suite', () => {
   window.showInformationMessage('Start all quick pick tests.')
@@ -23,7 +20,7 @@ suite('Quick Pick Test Suite', () => {
 
       const resultPromise = quickPickOneOrInput(
         items,
-        'pick the item',
+        'pick the second item',
         'do not want this value'
       )
 
@@ -38,12 +35,11 @@ suite('Quick Pick Test Suite', () => {
     })
 
     it('should return the default when no items are selected and no text is entered', async () => {
-      const items = [] as QuickPickItemWithValue[]
       const expectedDefault = 'want this value'
 
       const resultPromise = quickPickOneOrInput(
-        items,
-        'pick the item',
+        [],
+        'no items to pick from (get the default)',
         expectedDefault
       )
 
