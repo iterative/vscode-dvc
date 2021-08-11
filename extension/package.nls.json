@@ -34,7 +34,6 @@
   "command.runQueuedExperiments": "Run All Queued Experiments",
   "command.experimentGarbageCollect": "Garbage Collect Experiments",
   "command.selectDefaultProject": "Select Default Project",
-  "command.selectDvcPath": "Select CLI Path",
   "command.setupWorkspace": "Setup The Workspace",
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",

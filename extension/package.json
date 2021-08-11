@@ -117,11 +117,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.selectDvcPath%",
-        "command": "dvc.selectDvcPath",
-        "category": "DVC"
-      },
-      {
         "title": "%command.setupWorkspace%",
         "command": "dvc.setupWorkspace",
         "category": "DVC"
