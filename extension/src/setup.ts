@@ -1,35 +1,23 @@
 import { IExtension } from './interfaces'
-import { getInput } from './vscode/inputBox'
-import { quickPickValue } from './vscode/quickPick'
+import { quickPickOneWithInput, quickPickValue } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
 const setDvcPath = (path: string | undefined) =>
   setConfigValue('dvc.dvcPath', path)
 
-const pickToEnterOrFind = () =>
-  quickPickValue(
+const enterPathOrFind = (): Promise<string | undefined> =>
+  quickPickOneWithInput(
     [
       {
         description: 'Browse the filesystem for a DVC executable',
         label: 'Find',
         value: 'pick'
-      },
-      {
-        label: 'Enter a value',
-        value: 'enter'
       }
     ],
-    { placeHolder: 'is DVC available globally?' }
+    'Enter path to a DVC CLI',
+    'pick'
   )
-
-const enterPath = async () => {
-  const value = await getInput('Enter the path to DVC')
-  if (!value) {
-    return
-  }
-  return setDvcPath(value)
-}
 
 const findPath = async () => {
   const path = await pickFile('Select a DVC executable')
@@ -39,15 +27,15 @@ const findPath = async () => {
   return setDvcPath(path)
 }
 
-const pickFileOrEnterPath = async () => {
-  const pickedOption = await pickToEnterOrFind()
+const enterPathOrPickFile = async () => {
+  const pickOrPath = await enterPathOrFind()
 
-  if (pickedOption === undefined) {
+  if (pickOrPath === undefined) {
     return
   }
 
-  if (pickedOption === 'enter') {
-    return enterPath()
+  if (pickOrPath !== 'pick') {
+    return setDvcPath(pickOrPath)
   }
 
   return findPath()
@@ -89,7 +77,7 @@ const pickCliPath = async () => {
     return setDvcPath('dvc')
   }
 
-  return pickFileOrEnterPath()
+  return enterPathOrPickFile()
 }
 
 const pickVenvOptions = async () => {

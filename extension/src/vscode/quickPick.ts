@@ -29,3 +29,33 @@ export const quickPickOne = (
     canPickMany: false,
     placeHolder
   })
+
+export const quickPickOneWithInput = (
+  items: QuickPickItemWithValue[],
+  placeholder: string,
+  defaultValue: string
+): Promise<string | undefined> =>
+  new Promise(resolve => {
+    const quickPick = window.createQuickPick<QuickPickItemWithValue>()
+
+    quickPick.placeholder = placeholder
+    quickPick.canSelectMany = false
+    quickPick.items = items
+
+    let selected: string | undefined
+    quickPick.onDidChangeValue((text: string) => {
+      selected = text
+    })
+
+    quickPick.onDidAccept(() => {
+      quickPick.dispose()
+      resolve(quickPick.activeItems?.[0]?.value || selected || defaultValue)
+    })
+
+    quickPick.onDidHide(() => {
+      quickPick.dispose()
+      resolve(undefined)
+    })
+
+    quickPick.show()
+  })

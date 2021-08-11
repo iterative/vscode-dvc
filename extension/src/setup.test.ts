@@ -2,12 +2,10 @@ import { resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { setup, setupWorkspace } from './setup'
 import { setConfigValue } from './vscode/config'
-import { getInput } from './vscode/inputBox'
 import { pickFile } from './vscode/pickFile'
-import { quickPickValue } from './vscode/quickPick'
+import { quickPickOneWithInput, quickPickValue } from './vscode/quickPick'
 
 jest.mock('./vscode/config')
-jest.mock('./vscode/inputBox')
 jest.mock('./vscode/pickFile')
 jest.mock('./vscode/quickPick')
 
@@ -20,7 +18,7 @@ const mockedReset = jest.fn()
 
 const mockedQuickPickValue = mocked(quickPickValue)
 const mockedSetConfigValue = mocked(setConfigValue)
-const mockedGetInput = mocked(getInput)
+const mockedQuickPickOneWithInput = mocked(quickPickOneWithInput)
 const mockedPickFile = mocked(pickFile)
 
 beforeEach(() => {
@@ -84,13 +82,12 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(true)
     mockedQuickPickValue.mockResolvedValueOnce(false)
     mockedQuickPickValue.mockResolvedValueOnce(false)
-    mockedQuickPickValue.mockResolvedValueOnce('enter')
-    mockedGetInput.mockResolvedValueOnce(mockedDvcPath)
+    mockedQuickPickOneWithInput.mockResolvedValueOnce(mockedDvcPath)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(4)
-    expect(mockedGetInput).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(3)
+    expect(mockedQuickPickOneWithInput).toBeCalledTimes(1)
     expect(mockedPickFile).not.toBeCalled()
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
   })
@@ -100,14 +97,14 @@ describe('setupWorkspace', () => {
     mockedQuickPickValue.mockResolvedValueOnce(true)
     mockedQuickPickValue.mockResolvedValueOnce(false)
     mockedQuickPickValue.mockResolvedValueOnce(false)
-    mockedQuickPickValue.mockResolvedValueOnce('pick')
+    mockedQuickPickOneWithInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedDvcPath)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValue).toBeCalledTimes(4)
+    expect(mockedQuickPickValue).toBeCalledTimes(3)
+    expect(mockedQuickPickOneWithInput).toBeCalledTimes(1)
     expect(mockedPickFile).toBeCalledTimes(1)
-    expect(mockedGetInput).not.toBeCalled()
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
   })
 })
