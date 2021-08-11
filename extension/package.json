@@ -208,6 +208,24 @@
         "category": "DVC"
       },
       {
+        "title": "%command.addExperimentsTableSort%",
+        "command": "dvc.addExperimentsTableSort",
+        "category": "DVC",
+        "icon": "$(add)"
+      },
+      {
+        "title": "%command.removeExperimentsTableSorts%",
+        "command": "dvc.removeExperimentsTableSorts",
+        "category": "DVC",
+        "icon": "$(close-all)"
+      },
+      {
+        "title": "%command.views.experimentsSortByTree.removeSort%",
+        "command": "dvc.views.experimentsSortByTree.removeSort",
+        "category": "DVC",
+        "icon": "$(close)"
+      },
+      {
         "title": "%command.addExperimentsTableFilter%",
         "command": "dvc.addExperimentsTableFilter",
         "category": "DVC",
@@ -223,16 +241,6 @@
         "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
         "category": "DVC",
         "icon": "$(close-all)"
-      },
-      {
-        "title": "%command.setExperimentsTableSort%",
-        "command": "dvc.setExperimentsTableSort",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.clearExperimentsTableSort%",
-        "command": "dvc.clearExperimentsTableSort",
-        "category": "DVC"
       },
       {
         "title": "%command.views.experimentsFilterByTree.removeFilter%",
@@ -375,6 +383,10 @@
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsSortByTree.removeSort",
+          "when": "false"
         }
       ],
       "scm/title": [
@@ -496,6 +508,21 @@
           "when": "viewItem =~ /^dvcTracked/"
         },
         {
+          "command": "dvc.addExperimentsTableSort",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+        },
+        {
+          "command": "dvc.views.experimentsSortByTree.removeSort",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcSort"
+        },
+        {
+          "command": "dvc.removeExperimentsTableSorts",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcFilter"
@@ -530,6 +557,16 @@
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.addExperimentsTableSort",
+          "when": "view == dvc.views.experimentsSortByTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.removeExperimentsTableSorts",
+          "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@2"
         }
       ]
@@ -590,7 +627,7 @@
       },
       {
         "view": "dvc.views.experimentsSortByTree",
-        "contents": "No sorts applied. \n[Add Sort](command:dvc.selectDvcPath)\n"
+        "contents": "No sorts applied. \n[Add Sort](command:dvc.addExperimentsTableSort)\n"
       },
       {
         "view": "dvc.views.experimentsFilterByTree",

@@ -303,7 +303,7 @@ suite('Experiments Repository Test Suite', () => {
       experimentsRepository.onDidChangeExperiments(resolve)
     })
 
-    const pickPromise = experimentsRepository.pickSort()
+    const pickPromise = experimentsRepository.pickAndAddSort()
     await pickPromise
     await tableChangePromise
 

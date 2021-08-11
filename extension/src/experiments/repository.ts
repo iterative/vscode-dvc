@@ -6,17 +6,18 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { pickSort } from './model/sortBy/quickPick'
 import { ExperimentsWebview } from './webview'
 import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { SortDefinition } from './model/sortBy'
+import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
@@ -132,18 +133,54 @@ export class ExperimentsRepository {
     )
   }
 
-  public setSort(sort: SortDefinition | undefined) {
-    this.experiments.setSort(sort)
-
+  public addSort(sort: SortDefinition) {
+    this.experiments.addSort(sort)
     return this.notifyChanged()
+  }
+
+  public getSorts() {
+    return this.experiments.getSorts()
   }
 
   public async pickSort() {
     const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const pickedSortDefinition = await pickSort(paramsAndMetrics)
-    if (pickedSortDefinition) {
-      return this.setSort(pickedSortDefinition)
+    const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
+      title: 'Select a param or metric to sort by'
+    })
+    if (picked === undefined) {
+      return
     }
+    const descending = await quickPickValue<boolean>(
+      [
+        { label: 'Ascending', value: false },
+        { label: 'Descending', value: true }
+      ],
+      { title: 'Select a direction to sort in' }
+    )
+    if (descending === undefined) {
+      return
+    }
+    return {
+      descending,
+      path: picked.path
+    }
+  }
+
+  public removeSortByPath(pathToRemove: string) {
+    this.experiments.removeSort(pathToRemove)
+    return this.notifyChanged()
+  }
+
+  public async pickAndAddSort() {
+    const pickedSort = await this.pickSort()
+    if (pickedSort) {
+      this.addSort(pickedSort)
+    }
+  }
+
+  public removeSorts() {
+    this.experiments.removeSorts()
+    return this.notifyChanged()
   }
 
   public getFilters() {
@@ -184,7 +221,7 @@ export class ExperimentsRepository {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  private async updateData(): Promise<boolean | undefined> {
+  private async updateData(): Promise<void> {
     const getNewPromise = () =>
       this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
         AvailableCommands.EXPERIMENT_SHOW,
@@ -205,7 +242,7 @@ export class ExperimentsRepository {
 
   private notifyChanged() {
     this.experimentsChanged.fire()
-    return this.notifyParamsOrMetricsChanged()
+    this.notifyParamsOrMetricsChanged()
   }
 
   private notifyParamsOrMetricsChanged() {

@@ -21,7 +21,7 @@ export class ExperimentsModel {
 
   private filters: Map<string, FilterDefinition> = new Map()
 
-  private currentSort?: SortDefinition
+  private currentSorts: SortDefinition[] = []
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
@@ -33,8 +33,28 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
   }
 
-  public setSort(sort: SortDefinition | undefined) {
-    this.currentSort = sort
+  public removeSorts() {
+    this.currentSorts = []
+  }
+
+  public removeSort(pathToRemove: string) {
+    const indexOfSortToRemove = this.findIndexByPath(pathToRemove)
+    if (indexOfSortToRemove >= 0) {
+      this.currentSorts.splice(indexOfSortToRemove, 1)
+    }
+  }
+
+  public addSort(sort: SortDefinition) {
+    const indexOfSortToRemove = this.findIndexByPath(sort.path)
+    if (indexOfSortToRemove < 0) {
+      this.currentSorts.push(sort)
+    } else {
+      this.currentSorts.splice(indexOfSortToRemove, 1, sort)
+    }
+  }
+
+  public getSorts(): SortDefinition[] {
+    return this.currentSorts
   }
 
   public getFilters() {
@@ -92,6 +112,10 @@ export class ExperimentsModel {
     ]
   }
 
+  private findIndexByPath(pathToRemove: string) {
+    return this.currentSorts.findIndex(({ path }) => path === pathToRemove)
+  }
+
   private filterTableRow(row: RowData): boolean {
     const hasUnfilteredCheckpoints = definedAndNonEmpty(row.subRows)
     if (hasUnfilteredCheckpoints) {
@@ -116,7 +140,7 @@ export class ExperimentsModel {
     if (!experiments) {
       return
     }
-    return sortExperiments(this.currentSort, experiments)
+    return sortExperiments(this.getSorts(), experiments)
   }
 
   private flattenExperiments() {

@@ -1,23 +1,52 @@
+import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { commands, EventEmitter, window } from 'vscode'
-import { ExperimentsSortByTree } from './tree'
+import {
+  commands,
+  EventEmitter,
+  ThemeIcon,
+  TreeItem,
+  TreeItemCollapsibleState,
+  TreeItemLabel,
+  Uri,
+  window
+} from 'vscode'
+import { SortDefinition } from '.'
+import { ExperimentsSortByTree, SortItem } from './tree'
 import { Experiments } from '../..'
+
+function buildMockedTreeItem(
+  arg1: string | TreeItemLabel | Uri,
+  collapsibleState: TreeItemCollapsibleState = TreeItemCollapsibleState.None
+) {
+  const item: TreeItem = { collapsibleState }
+  if (typeof arg1 === 'object' && (arg1 as Uri).path) {
+    item.resourceUri = arg1 as Uri
+  } else {
+    item.label = arg1 as TreeItemLabel
+  }
+  return item
+}
+
+const mockedTreeItem = mocked(TreeItem)
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedTreeDataChanged = mocked(new EventEmitter<string | void>())
-const mockedTreeDataChangedFire = jest.fn()
-mockedTreeDataChanged.fire = mockedTreeDataChangedFire
+const mockedExperimentsChanged = mocked(new EventEmitter<string | void>())
+const mockedExperimentDataChangedFire = jest.fn()
+mockedExperimentsChanged.fire = mockedExperimentDataChangedFire
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetSortedBy = jest.fn()
+const mockedGetSorts = jest.fn()
+const mockedGetDvcRoots = jest.fn()
 const mockedExperiments = {
-  getSortedBy: mockedGetSortedBy,
+  experimentsChanged: mockedExperimentsChanged,
+  getDvcRoots: mockedGetDvcRoots,
+  getSorts: mockedGetSorts,
   isReady: () => true
 } as unknown as Experiments
 
@@ -26,7 +55,6 @@ jest.mock('@hediet/std/disposable')
 
 beforeEach(() => {
   jest.resetAllMocks()
-
   mockedDisposable.fn.mockReturnValue({
     track: function <T>(disposable: T): T {
       return disposable
@@ -35,12 +63,106 @@ beforeEach(() => {
 })
 
 describe('ExperimentsSortByTree', () => {
+  const dvcRoot = 'demo'
+  const examplePath = join('params', 'test')
+  const exampleSortDefinition: SortDefinition = {
+    descending: true,
+    path: examplePath
+  }
+  const exampleSortDefinitionWithParent: SortItem = {
+    dvcRoot,
+    sort: exampleSortDefinition
+  }
+  const singleSortDefinitionArray = [exampleSortDefinition]
+  const singleSortDefinitionWithParentArray = [exampleSortDefinitionWithParent]
+
   describe('getChildren', () => {
-    it('(placeholder) should return an empty array', async () => {
+    it('should return an empty array if no roots are defined', async () => {
+      mockedGetDvcRoots.mockReturnValueOnce([])
       const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
-      mockedGetSortedBy.mockReturnValue([])
-      const rootElements = await experimentsSortByTree.getChildren()
+      const rootElements = await experimentsSortByTree.getChildren(undefined)
       expect(rootElements).toEqual([])
+    })
+
+    it('should return an empty array if there are roots but no sorts', async () => {
+      mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
+      mockedGetSorts.mockReturnValue([])
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const rootElements = await experimentsSortByTree.getChildren(undefined)
+      expect(rootElements).toEqual([])
+    })
+
+    it('should display sorts at the top level when only one project exists', async () => {
+      mockedGetSorts.mockReturnValue(singleSortDefinitionArray)
+      mockedGetDvcRoots.mockReturnValue([dvcRoot])
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      expect(await experimentsSortByTree.getChildren(undefined)).toEqual(
+        singleSortDefinitionWithParentArray
+      )
+    })
+
+    it('should display projects at the top level when more than one exists', async () => {
+      mockedGetDvcRoots.mockReturnValueOnce([dvcRoot, 'demo2'])
+      mockedGetSorts.mockReturnValue(singleSortDefinitionArray)
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      expect(await experimentsSortByTree.getChildren(undefined)).toEqual([
+        dvcRoot,
+        'demo2'
+      ])
+    })
+
+    it('should be able to display sort items under a top-level project', async () => {
+      mockedGetSorts.mockReturnValueOnce(singleSortDefinitionArray)
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      expect(await experimentsSortByTree.getChildren(dvcRoot)).toEqual(
+        singleSortDefinitionWithParentArray
+      )
+    })
+  })
+
+  describe('getTreeItem', () => {
+    it('should be able to make a TreeItem from a dvcRoot string', () => {
+      mockedTreeItem.mockImplementation(buildMockedTreeItem)
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      expect(experimentsSortByTree.getTreeItem(dvcRoot)).toEqual({
+        collapsibleState: TreeItemCollapsibleState.Expanded,
+        contextValue: 'dvcSortRoot',
+        id: dvcRoot,
+        resourceUri: Uri.file(dvcRoot)
+      })
+    })
+
+    it('should be able to make a TreeItem from a descending SortDefinition', () => {
+      mockedTreeItem.mockImplementation(buildMockedTreeItem)
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      expect(
+        experimentsSortByTree.getTreeItem(exampleSortDefinitionWithParent)
+      ).toEqual({
+        collapsibleState: TreeItemCollapsibleState.None,
+        contextValue: 'dvcSort',
+        iconPath: new ThemeIcon('arrow-down'),
+        label: examplePath
+      })
+    })
+
+    it('should be able to make a TreeItem from an ascending SortDefinition', () => {
+      mockedTreeItem.mockImplementation(buildMockedTreeItem)
+      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const otherPath = join('other', dvcRoot, 'path')
+      expect(
+        experimentsSortByTree.getTreeItem({
+          dvcRoot,
+          sort: {
+            descending: false,
+            path: otherPath
+          }
+        })
+      ).toEqual({
+        collapsibleState: TreeItemCollapsibleState.None,
+        contextValue: 'dvcSort',
+        iconPath: new ThemeIcon('arrow-down'),
+        label: otherPath
+      })
     })
   })
 })

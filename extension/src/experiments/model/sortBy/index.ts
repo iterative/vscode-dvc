@@ -7,6 +7,8 @@ export interface SortDefinition {
   path: string
 }
 
+type SortFunction = (a: Experiment, b: Experiment) => number
+
 const compareExperimentsByPath = (
   path: string[],
   a: Experiment,
@@ -17,25 +19,35 @@ const compareExperimentsByPath = (
   return valueA === valueB ? 0 : valueA < valueB ? -1 : 1
 }
 
-const buildExperimentSortFunction = ({
+const buildSingleExperimentSortFunction = ({
   path,
   descending
-}: SortDefinition): ((a: Experiment, b: Experiment) => number) => {
+}: SortDefinition): SortFunction => {
   const pathArray = path.split(sep)
   return descending
     ? (a, b) => compareExperimentsByPath(pathArray, b, a)
     : (a, b) => compareExperimentsByPath(pathArray, a, b)
 }
 
-export const sortExperiments = (
-  sortDefinition: SortDefinition | undefined,
-  unsortedRows: Experiment[]
-): Experiment[] => {
-  if (!sortDefinition) {
-    return unsortedRows
+const buildExperimentSortFunction = (
+  sortDefinitions: SortDefinition[]
+): SortFunction => {
+  const sortFunctions = sortDefinitions.map(buildSingleExperimentSortFunction)
+  return (a, b) => {
+    for (const sortFunction of sortFunctions) {
+      const result = sortFunction(a, b)
+      if (result !== 0) {
+        return result
+      }
+    }
+    return 0
   }
-  const sortFunction = buildExperimentSortFunction(
-    sortDefinition as SortDefinition
-  )
-  return unsortedRows.sort(sortFunction)
 }
+
+export const sortExperiments = (
+  sortDefinitions: SortDefinition[],
+  unsortedRows: Experiment[]
+): Experiment[] =>
+  sortDefinitions.length === 0
+    ? unsortedRows
+    : [...unsortedRows].sort(buildExperimentSortFunction(sortDefinitions))

@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from 'path'
 import get from 'lodash.get'
 import { sortExperiments } from '.'
 import { Experiment } from '../../webview/contract'
@@ -16,18 +16,18 @@ describe('sortExperiments', () => {
     timestamp: testTimestamp
   }
   const testPathArray = ['params', 'params.yaml', 'test']
-  const testPath = path.join(...testPathArray)
+  const testPath = join(...testPathArray)
   const getTestParam = (experiment: Experiment) =>
     get(experiment, testPathArray)
 
   it('Returns unsorted rows if sort definition argument is undefined', () => {
     const unsortedRows = [{ id: 1 }, { id: 2 }] as unknown as Experiment[]
     expect(
-      sortExperiments({ descending: false, path: testPath }, unsortedRows)
+      sortExperiments([{ descending: false, path: testPath }], unsortedRows)
     ).toEqual(unsortedRows)
   })
 
-  it('Maintains the same order if all items are equal', () => {
+  it('Maintains the same order if all items are equal with a single sort', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -58,11 +58,11 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = path.join('params', 'params.yaml', 'sort')
+    const testSortPath = join('params', 'params.yaml', 'sort')
     expect(
       (
         sortExperiments(
-          { descending: true, path: testSortPath },
+          [{ descending: true, path: testSortPath }],
           testData
         ) as Experiment[]
       ).map(getTestParam)
@@ -71,14 +71,72 @@ describe('sortExperiments', () => {
     expect(
       (
         sortExperiments(
-          { descending: false, path: testSortPath },
+          [{ descending: false, path: testSortPath }],
           testData
         ) as Experiment[]
       ).map(getTestParam)
     ).toEqual([1, 2, 3])
   })
 
-  describe('Can sort both ascending and descending', () => {
+  it('Should maintain the same order if all items are equal in a multi-sort', () => {
+    const testData = [
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            sort: 1,
+            sort2: 1,
+            test: 1
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            sort: 1,
+            sort2: 1,
+            test: 2
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            sort: 1,
+            sort2: 1,
+            test: 3
+          }
+        }
+      }
+    ]
+
+    const testSortPath = join('params', 'params.yaml', 'sort')
+    const testSortPath2 = join('params', 'params.yaml', 'sort2')
+    expect(
+      (
+        sortExperiments(
+          [
+            { descending: false, path: testSortPath },
+            { descending: true, path: testSortPath2 }
+          ],
+          testData
+        ) as Experiment[]
+      ).map(getTestParam)
+    ).toEqual([1, 2, 3])
+
+    expect(
+      (
+        sortExperiments(
+          [{ descending: false, path: testSortPath }],
+          testData
+        ) as Experiment[]
+      ).map(getTestParam)
+    ).toEqual([1, 2, 3])
+  })
+
+  describe('Should sort both ascending and descending', () => {
     const testData = [
       {
         ...irrelevantExperimentData,
@@ -106,26 +164,88 @@ describe('sortExperiments', () => {
       }
     ]
 
-    it('Can sort ascending', () => {
+    it('Should sort ascending', () => {
       expect(
         (
           sortExperiments(
-            { descending: false, path: testPath },
+            [{ descending: false, path: testPath }],
             testData
           ) as Experiment[]
         ).map(getTestParam)
       ).toEqual([1, 2, 3])
     })
 
-    it('Can sort descending', () => {
+    it('Should sort descending', () => {
       expect(
         (
           sortExperiments(
-            { descending: true, path: testPath },
+            [{ descending: true, path: testPath }],
             testData
           ) as Experiment[]
         ).map(getTestParam)
       ).toEqual([3, 2, 1])
+    })
+  })
+
+  describe('Should use multiple sort definitions', () => {
+    const otherTestPathArray = ['params', 'params.yaml', 'othertest']
+    const otherTestPath = join(...otherTestPathArray)
+    const testData = [
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            othertest: 2,
+            test: 2
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            othertest: 1,
+            test: 3
+          }
+        }
+      },
+      {
+        ...irrelevantExperimentData,
+        params: {
+          'params.yaml': {
+            othertest: 2,
+            test: 1
+          }
+        }
+      }
+    ]
+
+    it('Should sort with first definition given priority', () => {
+      const result = sortExperiments(
+        [
+          { descending: false, path: otherTestPath },
+          { descending: false, path: testPath }
+        ],
+        testData
+      ) as Experiment[]
+      expect(result.map(getTestParam)).toEqual([3, 1, 2])
+      expect(result.map(item => get(item, otherTestPathArray))).toEqual([
+        1, 2, 2
+      ])
+    })
+
+    it('Should sort with two different directions', () => {
+      const result = sortExperiments(
+        [
+          { descending: false, path: otherTestPath },
+          { descending: true, path: testPath }
+        ],
+        testData
+      ) as Experiment[]
+      expect(result.map(getTestParam)).toEqual([3, 2, 1])
+      expect(result.map(item => get(item, otherTestPathArray))).toEqual([
+        1, 2, 2
+      ])
     })
   })
 })

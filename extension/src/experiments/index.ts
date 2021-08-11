@@ -6,6 +6,7 @@ import { ExperimentsWebview } from './webview'
 import { FilterDefinition } from './model/filterBy'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
+import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { report } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -69,14 +70,25 @@ export class Experiments {
     return this.getRepository(dvcRoot).removeFilter(id)
   }
 
-  public async pickSort() {
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    repository.pickSort()
+  public async pickAndAddSort(dvcRoot?: string) {
+    const repository = dvcRoot
+      ? this.getRepository(dvcRoot)
+      : await this.getFocusedOrDefaultOrPickRepo()
+    return repository.pickAndAddSort()
   }
 
-  public async clearSort() {
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    repository.setSort(undefined)
+  public removeSorts(dvcRoot?: string) {
+    if (dvcRoot === undefined) {
+      this.getDvcRoots().forEach(dvcRoot => {
+        this.getRepository(dvcRoot).removeSorts()
+      })
+    } else {
+      this.getRepository(dvcRoot).removeSorts()
+    }
+  }
+
+  public removeSort(dvcRoot: string, pathToRemove: string) {
+    this.getRepository(dvcRoot).removeSortByPath(pathToRemove)
   }
 
   public getDvcRoots() {
@@ -95,8 +107,8 @@ export class Experiments {
     return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
   }
 
-  public getSortedBy(): string[] {
-    return []
+  public getSorts(dvcRoot: string): SortDefinition[] {
+    return this.getRepository(dvcRoot).getSorts()
   }
 
   public getFilters(dvcRoot: string): FilterDefinition[] {
