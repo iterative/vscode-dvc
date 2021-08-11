@@ -1,8 +1,6 @@
-import { afterEach, beforeEach, describe, it, suite } from 'mocha'
+import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { commands, window } from 'vscode'
-import { restore } from 'sinon'
-import { Disposable } from '../../../extension'
 import {
   QuickPickItemWithValue,
   quickPickOneOrInput
@@ -10,16 +8,6 @@ import {
 
 suite('Quick Pick Test Suite', () => {
   window.showInformationMessage('Start all quick pick tests.')
-
-  const disposable = Disposable.fn()
-
-  beforeEach(() => {
-    restore()
-  })
-
-  afterEach(() => {
-    disposable.dispose()
-  })
 
   describe('quickPickOneOrInput', () => {
     it('should return the currently selected value', async () => {
