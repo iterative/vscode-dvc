@@ -1,5 +1,5 @@
 import { IExtension } from './interfaces'
-import { quickPickOneWithInput, quickPickValue } from './vscode/quickPick'
+import { quickPickOneOrInput, quickPickValue } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
@@ -7,7 +7,7 @@ const setDvcPath = (path: string | undefined) =>
   setConfigValue('dvc.dvcPath', path)
 
 const enterPathOrFind = (): Promise<string | undefined> =>
-  quickPickOneWithInput(
+  quickPickOneOrInput(
     [
       {
         description: 'Browse the filesystem for a DVC executable',

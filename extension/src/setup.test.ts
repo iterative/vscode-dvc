@@ -3,7 +3,7 @@ import { mocked } from 'ts-jest/utils'
 import { setup, setupWorkspace } from './setup'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
-import { quickPickOneWithInput, quickPickValue } from './vscode/quickPick'
+import { quickPickOneOrInput, quickPickValue } from './vscode/quickPick'
 
 jest.mock('./vscode/config')
 jest.mock('./vscode/pickFile')
@@ -18,7 +18,7 @@ const mockedReset = jest.fn()
 
 const mockedQuickPickValue = mocked(quickPickValue)
 const mockedSetConfigValue = mocked(setConfigValue)
-const mockedQuickPickOneWithInput = mocked(quickPickOneWithInput)
+const mockedQuickPickOneWithInput = mocked(quickPickOneOrInput)
 const mockedPickFile = mocked(pickFile)
 
 beforeEach(() => {
