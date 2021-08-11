@@ -74,15 +74,12 @@ const pickYesOrNo = (
     { placeHolder }
   )
 
-const pickIsCliGlobal = () =>
-  pickYesOrNo(
+const pickCliPath = async () => {
+  const isGlobal = await pickYesOrNo(
     'is DVC available globally?',
     "DVC can be located via the system's PATH environment variable",
     'I need to specify a path'
   )
-
-const pickCliPath = async () => {
-  const isGlobal = await pickIsCliGlobal()
 
   if (isGlobal === undefined) {
     return
@@ -95,15 +92,12 @@ const pickCliPath = async () => {
   return pickFileOrEnterPath()
 }
 
-const pickIsDVCInVenv = () =>
-  pickYesOrNo(
+const pickVenvOptions = async () => {
+  const dvcInVenv = await pickYesOrNo(
     'is DVC installed within the environment?',
     "all of the project's requirements are in the virtual environment",
     'this project needs access to a DVC CLI outside of the virtual environment'
   )
-
-const pickVenvOptions = async () => {
-  const dvcInVenv = await pickIsDVCInVenv()
   if (dvcInVenv === undefined) {
     return
   }
@@ -115,16 +109,13 @@ const pickVenvOptions = async () => {
   return pickCliPath()
 }
 
-const pickUsesVenv = () =>
-  pickYesOrNo(
+export const setupWorkspace = async (): Promise<void | undefined> => {
+  // insert 3rd option to select interpreter
+  const usesVenv = await pickYesOrNo(
     'Does your project use a Python virtual environment?',
     'needs ms-python extension installed',
     'all of the modules required to run this project are globally available'
   )
-
-export const setupWorkspace = async (): Promise<void | undefined> => {
-  // insert 3rd option to select interpreter
-  const usesVenv = await pickUsesVenv()
 
   if (usesVenv === undefined) {
     return
