@@ -122,6 +122,11 @@
         "category": "DVC"
       },
       {
+        "title": "Setup the workspace for DVC",
+        "command": "dvc.setupWorkspace",
+        "category": "DVC"
+      },
+      {
         "title": "%command.init%",
         "command": "dvc.init",
         "category": "DVC"
