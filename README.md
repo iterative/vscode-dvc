@@ -39,9 +39,9 @@ following the
 ### Installing and Integrating With DVC CLI
 
 As you probably already know there are quite a few options for installing DVC.
-This extension allows for integration with a few different setups. Use the
-workspace setup wizard to set the required config options. This can be done via
-the welcome view underneath the DVC Tracked view in the side bar's explorer view
+This extension can integrate with a few different setups. Use the workspace
+setup wizard to set the required config options. This can be done via the
+welcome view underneath the DVC Tracked view in the side bar's explorer view
 container or "Setup The Workspace" in the command palette.
 
 - Currently it is necessary to disable the CLI's analytics as they severely
