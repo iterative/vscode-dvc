@@ -36,6 +36,7 @@ export class Config {
   private readonly initialized = this.deferred.promise
 
   private dvcPathOption = 'dvc.dvcPath'
+  private dvcPath = this.getCliPath()
   private defaultProjectOption = 'dvc.defaultProject'
 
   private dvcPathQuickPickItems = [
@@ -91,6 +92,16 @@ export class Config {
     this.dispose.track(
       window.onDidChangeActiveColorTheme(() => {
         this.vsCodeTheme = window.activeColorTheme
+      })
+    )
+
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(e => {
+        if (e.affectsConfiguration(this.dvcPathOption)) {
+          const oldPath = this.dvcPath
+          this.dvcPath = this.getCliPath()
+          this.notifyIfChanged(oldPath, this.dvcPath)
+        }
       })
     )
   }
