@@ -179,6 +179,8 @@ suite('Experiments Test Suite', () => {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDvcRoots').returns([dvcDemoPath])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
