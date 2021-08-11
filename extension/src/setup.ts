@@ -98,7 +98,6 @@ const pickVenvOptions = async () => {
 }
 
 export const setupWorkspace = async (): Promise<void | undefined> => {
-  // insert 3rd option to select interpreter
   const usesVenv = await pickYesOrNo(
     'Does your project use a Python virtual environment?',
     'needs ms-python extension installed',
