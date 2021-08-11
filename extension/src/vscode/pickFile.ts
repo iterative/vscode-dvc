@@ -8,8 +8,7 @@ export const pickFile = async (title: string): Promise<string | undefined> => {
   })
 
   if (uris) {
-    const [uri] = uris
-    const { fsPath } = uri
+    const [{ fsPath }] = uris
     return fsPath
   }
 }
