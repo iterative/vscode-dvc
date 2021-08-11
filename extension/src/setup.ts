@@ -53,22 +53,32 @@ const pickFileOrEnterPath = async () => {
   return findPath()
 }
 
-const pickIsCliGlobal = () =>
+const pickYesOrNo = (
+  placeHolder: string,
+  descriptionYes: string,
+  descriptionNo: string
+) =>
   quickPickValue(
     [
       {
-        description:
-          "DVC can be located via the system's PATH environment variable",
+        description: descriptionYes,
         label: 'Yes',
         value: true
       },
       {
-        description: 'I need to specify a path',
+        description: descriptionNo,
         label: 'No',
         value: false
       }
     ],
-    { placeHolder: 'is DVC available globally?' }
+    { placeHolder }
+  )
+
+const pickIsCliGlobal = () =>
+  pickYesOrNo(
+    'is DVC available globally?',
+    "DVC can be located via the system's PATH environment variable",
+    'I need to specify a path'
   )
 
 const pickCliPath = async () => {
@@ -86,22 +96,10 @@ const pickCliPath = async () => {
 }
 
 const pickIsDVCInVenv = () =>
-  quickPickValue(
-    [
-      {
-        description:
-          "all of the project's requirements are in the virtual environment",
-        label: 'Yes',
-        value: true
-      },
-      {
-        description:
-          'this project needs access to a DVC CLI outside of the virtual environment',
-        label: 'No',
-        value: false
-      }
-    ],
-    { placeHolder: 'is DVC installed within the environment?' }
+  pickYesOrNo(
+    'is DVC installed within the environment?',
+    "all of the project's requirements are in the virtual environment",
+    'this project needs access to a DVC CLI outside of the virtual environment'
   )
 
 const pickVenvOptions = async () => {
@@ -118,21 +116,10 @@ const pickVenvOptions = async () => {
 }
 
 const pickUsesVenv = () =>
-  quickPickValue(
-    [
-      {
-        description: 'needs ms-python extension installed',
-        label: 'Yes',
-        value: true
-      },
-      {
-        description:
-          'all of the modules required to run this project are globally available',
-        label: 'No',
-        value: false
-      }
-    ],
-    { placeHolder: 'Does your project use a Python virtual environment?' }
+  pickYesOrNo(
+    'Does your project use a Python virtual environment?',
+    'needs ms-python extension installed',
+    'all of the modules required to run this project are globally available'
   )
 
 export const setupWorkspace = async (): Promise<void | undefined> => {
