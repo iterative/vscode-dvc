@@ -7,35 +7,31 @@ import { pickFile } from './vscode/pickFile'
 const setDvcPath = (path: string | undefined) =>
   setConfigValue('dvc.dvcPath', path)
 
-const pickFileOrEnterPath = async () => {
-  const pickedOption = await quickPickValue(
+const pickToEnterOrFind = () =>
+  quickPickValue(
     [
-      {
-        label: 'Enter a value',
-        value: 'enter'
-      },
       {
         description: 'Browse the filesystem for a DVC executable',
         label: 'Find',
         value: 'pick'
+      },
+      {
+        label: 'Enter a value',
+        value: 'enter'
       }
     ],
     { placeHolder: 'is DVC available globally?' }
   )
 
-  if (pickedOption === undefined) {
+const enterPath = async () => {
+  const value = await getInput('Enter the path to DVC')
+  if (!value) {
     return
   }
+  return setDvcPath(value)
+}
 
-  if (pickedOption === 'enter') {
-    const value = await getInput('Enter the path to DVC')
-    if (!value) {
-      return
-    }
-
-    return setDvcPath(value)
-  }
-
+const findPath = async () => {
   const path = await pickFile('Select a DVC executable')
   if (!path) {
     return
@@ -43,8 +39,22 @@ const pickFileOrEnterPath = async () => {
   return setDvcPath(path)
 }
 
-const chooseCliPath = async () => {
-  const dvcGlobal = await quickPickValue(
+const pickFileOrEnterPath = async () => {
+  const pickedOption = await pickToEnterOrFind()
+
+  if (pickedOption === undefined) {
+    return
+  }
+
+  if (pickedOption === 'enter') {
+    return enterPath()
+  }
+
+  return findPath()
+}
+
+const pickIsCliGlobal = () =>
+  quickPickValue(
     [
       {
         description:
@@ -61,19 +71,22 @@ const chooseCliPath = async () => {
     { placeHolder: 'is DVC available globally?' }
   )
 
-  if (dvcGlobal === undefined) {
+const pickCliPath = async () => {
+  const isGlobal = await pickIsCliGlobal()
+
+  if (isGlobal === undefined) {
     return
   }
 
-  if (dvcGlobal) {
+  if (isGlobal) {
     return setDvcPath('dvc')
   }
 
   return pickFileOrEnterPath()
 }
 
-const pickVenvOptions = async () => {
-  const dvcInVenv = await quickPickValue(
+const pickIsDVCInVenv = () =>
+  quickPickValue(
     [
       {
         description:
@@ -90,6 +103,9 @@ const pickVenvOptions = async () => {
     ],
     { placeHolder: 'is DVC installed within the environment?' }
   )
+
+const pickVenvOptions = async () => {
+  const dvcInVenv = await pickIsDVCInVenv()
   if (dvcInVenv === undefined) {
     return
   }
@@ -98,12 +114,11 @@ const pickVenvOptions = async () => {
     return setDvcPath(undefined)
   }
 
-  return chooseCliPath()
+  return pickCliPath()
 }
 
-export const setupWorkspace = async (): Promise<void | undefined> => {
-  // insert 3rd option to select interpreter
-  const usesVenv = await quickPickValue(
+const pickUsesVenv = () =>
+  quickPickValue(
     [
       {
         description: 'needs ms-python extension installed',
@@ -120,6 +135,10 @@ export const setupWorkspace = async (): Promise<void | undefined> => {
     { placeHolder: 'Does your project use a Python virtual environment?' }
   )
 
+export const setupWorkspace = async (): Promise<void | undefined> => {
+  // insert 3rd option to select interpreter
+  const usesVenv = await pickUsesVenv()
+
   if (usesVenv === undefined) {
     return
   }
@@ -128,7 +147,7 @@ export const setupWorkspace = async (): Promise<void | undefined> => {
     return pickVenvOptions()
   }
 
-  return chooseCliPath()
+  return pickCliPath()
 }
 
 export const setup = async (extension: IExtension) => {
