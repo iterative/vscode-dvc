@@ -61,6 +61,18 @@ suite('Experiments Test Suite', () => {
             }
           }
         }
+      },
+      exp4: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: {
+                testparam: 4,
+                testparam2: 2
+              }
+            }
+          }
+        }
       }
     },
     workspace: {
@@ -167,16 +179,12 @@ suite('Experiments Test Suite', () => {
       const testParamPath = path.join(...testParamPathArray)
       const otherTestParamPath = path.join(...otherTestParamPathArray)
 
-      let callIndex = 0
-      const getTestParamsArray = () => {
-        const result = messageSpy
-          .getCall(callIndex)
+      const getParamsArray = (selector = testParamPathArray) =>
+        messageSpy
+          .getCall(-1)
           .firstArg.tableData.rows[1].subRows?.map((exp: Experiment) =>
-            get(exp, testParamPathArray)
+            get(exp, selector)
           )
-        callIndex++
-        return result
-      }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((Experiments as any).prototype, 'getDvcRoots').returns([dvcDemoPath])
@@ -199,10 +207,9 @@ suite('Experiments Test Suite', () => {
       await commands.executeCommand('dvc.addExperimentsTableSort', dvcDemoPath)
       await tableChangedPromise
       mockShowQuickPick.reset()
-      expect(
-        getTestParamsArray(),
-        'single sort with table command'
-      ).to.deep.equal([1, 2, 3])
+      expect(getParamsArray(), 'single sort with table command').to.deep.equal([
+        1, 2, 3, 4
+      ])
 
       const tableSortRemoved = new Promise(resolve => {
         experimentsRepository.onDidChangeExperiments(resolve)
@@ -210,15 +217,15 @@ suite('Experiments Test Suite', () => {
       await commands.executeCommand('dvc.removeExperimentsTableSorts')
       await tableSortRemoved
       expect(
-        getTestParamsArray(),
+        getParamsArray(),
         'row order is reset after first clear'
-      ).to.deep.equal([1, 3, 2])
+      ).to.deep.equal([1, 3, 2, 4])
 
       await addSortWithMocks(otherTestParamPath, false)
       expect(
-        getTestParamsArray(),
-        `row order is changed after applying a sort on ${otherTestParamPath}`
-      ).to.deep.equal([1, 3, 2])
+        getParamsArray(),
+        `row order is maintained after applying a sort on ${otherTestParamPath}`
+      ).to.deep.equal([1, 3, 2, 4])
 
       await addSortWithMocks(testParamPath, true)
       expect(
@@ -235,9 +242,9 @@ suite('Experiments Test Suite', () => {
         }
       ])
       expect(
-        getTestParamsArray(),
+        getParamsArray(),
         'the result of both sorts is sent to the webview'
-      ).to.deep.equal([3, 1, 2])
+      ).to.deep.equal([3, 1, 4, 2])
 
       await addSortWithMocks(otherTestParamPath, true)
       expect(
@@ -254,27 +261,27 @@ suite('Experiments Test Suite', () => {
         }
       ])
       expect(
-        getTestParamsArray(),
+        getParamsArray(),
         'the result of the switched sort is sent to the webview'
-      ).to.deep.equal([2, 3, 1])
+      ).to.deep.equal([4, 2, 3, 1])
 
       await commands.executeCommand(
         'dvc.views.experimentsSortByTree.removeSort',
         {
           parent: dvcDemoPath,
-          sort: { path: otherTestParamPath }
+          sort: { path: testParamPath }
         }
       )
       expect(
-        getTestParamsArray(),
-        'remove first sort individually'
-      ).to.deep.equal([3, 2, 1])
+        getParamsArray(),
+        'when removing a sort that changes the order of ties, those ties should reflect their original order'
+      ).to.deep.equal([2, 4, 1, 3])
 
       await commands.executeCommand(
         'dvc.removeExperimentsTableSorts',
         dvcDemoPath
       )
-      expect(getTestParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2])
+      expect(getParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2, 4])
     })
   })
 })
