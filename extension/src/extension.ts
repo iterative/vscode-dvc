@@ -33,7 +33,7 @@ import { registerRepositoryCommands } from './repository/commands/register'
 import { DecorationProvider } from './repository/decorationProvider'
 import { ResourceLocator } from './resourceLocator'
 import { reset } from './util/disposable'
-import { setup } from './setup'
+import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { definedAndNonEmpty, flatten } from './util/array'
 import { setContextValue } from './vscode/context'
@@ -179,6 +179,10 @@ export class Extension implements IExtension {
     this.registerConfigCommands()
 
     reRegisterVsCodeCommands(this.dispose)
+
+    this.dispose.track(
+      commands.registerCommand('dvc.setupWorkspace', () => setupWorkspace())
+    )
   }
 
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
