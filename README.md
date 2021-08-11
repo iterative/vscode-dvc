@@ -38,33 +38,11 @@ following the
 
 ### Installing and Integrating With DVC CLI
 
-There are quite a few options for installing DVC, with one big split being
-whether DVC is installed globally or in a virtual environment. This extension
-allows for a few different methods for picking how to run DVC. See below for
-some different use cases and how to get setup:
-
-- Virtual environment for Python dependencies which **excludes DVC**
-
-  - Set `dvc.dvcPath` to the absolute path of the dvc binary.
-  - Use the
-    [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-    extension to identify the virtual environment.
-
-- Virtual environment for Python dependencies which **includes DVC**
-
-  - Use the
-    [`ms-python`](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-    extension to identify the virtual environment.
-
-- DVC is installed globally but cannot be found via running a `dvc` command in
-  the terminal.
-
-  - Set `dvc.dvcPath` to the absolute path of the dvc binary.
-
-Notes:
-
-- The "Select DVC CLI Path" command in the Command Palette can be used to set
-  the `dvc.dvcPath` option from a more user-friendly QuickPick menu.
+As you probably already know there are quite a few options for installing DVC.
+This extension allows for integration with a few different setups. Use the
+workspace setup wizard to set the required config options. This can be done via
+the welcome view underneath the DVC Tracked view in the side bar's explorer view
+container or "Setup The Workspace" in the command palette.
 
 - Currently it is necessary to disable the CLI's analytics as they severely
   impact the overall performance of the extension. You can do this by running
