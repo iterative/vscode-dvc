@@ -66,7 +66,7 @@ describe('setupWorkspace', () => {
     expect(mockedSetConfigValue).not.toBeCalled()
   })
 
-  it("should set the dvc path option to dvc if there is a virtual environment that doesn't include a globally available CLI", async () => {
+  it("should set the dvc path option to dvc if there is a virtual environment which doesn't include the CLI but it is available globally", async () => {
     mockedQuickPickValue.mockResolvedValueOnce(true)
     mockedQuickPickValue.mockResolvedValueOnce(false)
     mockedQuickPickValue.mockResolvedValueOnce(true)
@@ -92,7 +92,7 @@ describe('setupWorkspace', () => {
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
   })
 
-  it("should set the dvc path option to the picked value if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
+  it("should set the dvc path option to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
     const mockedDvcPath = resolve('some', 'path', 'to', 'dvc')
     mockedQuickPickValue.mockResolvedValueOnce(true)
     mockedQuickPickValue.mockResolvedValueOnce(false)
