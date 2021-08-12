@@ -91,7 +91,7 @@ export const quickPickYesOrNo = (
   descriptionYes: string,
   descriptionNo: string
 ) =>
-  quickPickValueWithEvents(
+  quickPickValueWithEvents<boolean>(
     [
       {
         description: descriptionYes,
