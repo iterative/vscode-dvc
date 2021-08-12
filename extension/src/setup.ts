@@ -7,8 +7,10 @@ import {
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
-const setDvcPath = (path: string | undefined) =>
-  setConfigValue('dvc.dvcPath', path)
+const setDvcPath = async (path: string | undefined) => {
+  await setConfigValue('dvc.dvcPath', path)
+  return true
+}
 
 const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
@@ -26,20 +28,22 @@ const enterPathOrFind = (text: string): Promise<string | undefined> =>
 const findPath = async (option: string, text: string) => {
   const path = await pickFile(`Select a ${text}`)
   if (!path) {
-    return
+    return false
   }
-  return setConfigValue(option, path)
+  await setConfigValue(option, path)
+  return true
 }
 
 const enterPathOrPickFile = async (option: string, description: string) => {
   const pickOrPath = await enterPathOrFind(description)
 
   if (pickOrPath === undefined) {
-    return
+    return false
   }
 
   if (pickOrPath !== 'pick') {
-    return setConfigValue(option, pickOrPath)
+    await setConfigValue(option, pickOrPath)
+    return true
   }
 
   return findPath(option, description)
@@ -53,7 +57,7 @@ const pickCliPath = async () => {
   )
 
   if (isGlobal === undefined) {
-    return
+    return false
   }
 
   if (isGlobal) {
@@ -70,7 +74,7 @@ const pickVenvOptions = async () => {
     'this project needs access to a DVC CLI outside of the virtual environment'
   )
   if (dvcInVenv === undefined) {
-    return
+    return false
   }
 
   if (dvcInVenv) {
@@ -104,17 +108,26 @@ const quickPickVenvOption = () =>
     'Does your project use a Python virtual environment?'
   )
 
-export const setupWorkspace = async (): Promise<void | undefined> => {
+const quickPickOrUnsetPythonInterpreter = async (usesVenv: number) => {
+  if (usesVenv === 1) {
+    return enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
+  }
+
+  await setConfigValue('dvc.pythonPath', undefined)
+  return true
+}
+
+export const setupWorkspace = async (): Promise<boolean> => {
   const usesVenv = await quickPickVenvOption()
 
   if (usesVenv === undefined) {
-    return
+    return false
   }
 
   if (usesVenv) {
-    usesVenv === 1
-      ? await enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
-      : setConfigValue('dvc.pythonPath', undefined)
+    if (!(await quickPickOrUnsetPythonInterpreter(usesVenv))) {
+      return false
+    }
 
     return pickVenvOptions()
   }

@@ -127,6 +127,18 @@ describe('setupWorkspace', () => {
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
   })
 
+  it('should not set the python or dvc path options if the user cancels the dialog at the pick a python interpreter step', async () => {
+    mockedQuickPickValueWithEvents.mockResolvedValueOnce(1)
+    mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
+
+    await setupWorkspace()
+
+    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).not.toBeCalled()
+    expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
+    expect(mockedSetConfigValue).not.toBeCalled()
+  })
+
   it("should set the python and dvc path options to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
     const mockedPythonPath = resolve('some', 'path', 'to', 'python')
     const mockedDvcPath = resolve('some', 'path', 'to', 'dvc')
