@@ -25,9 +25,13 @@ export class Config {
   @observable
   private vsCodeTheme: ColorTheme
 
+  @observable
+  private dvcPath = this.getCliPath()
+
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeExecutionDetails: Event<void>
+
   private readonly executionDetailsChanged: EventEmitter<void>
 
   private dvcRoots: string[] = []
@@ -37,7 +41,6 @@ export class Config {
 
   private dvcPathOption = 'dvc.dvcPath'
   private pythonPathOption = 'dvc.pythonPath'
-  private dvcPath = this.getCliPath()
   private defaultProjectOption = 'dvc.defaultProject'
 
   constructor() {
@@ -115,11 +118,7 @@ export class Config {
       await getOnDidChangePythonExecutionDetails()
     this.dispose.track(
       onDidChangePythonExecutionDetails?.(async () => {
-        if (!getConfigValue(this.pythonPathOption)) {
-          const oldPath = this.pythonBinPath
-          this.pythonBinPath = await getPythonBinPath()
-          this.notifyIfChanged(oldPath, this.pythonBinPath)
-        }
+        this.notifyIfChanged(this.pythonBinPath, await this.getPythonBinPath())
       })
     )
   }
@@ -128,14 +127,13 @@ export class Config {
     this.dispose.track(
       workspace.onDidChangeConfiguration(async e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
-          const oldPath = this.dvcPath
-          this.dvcPath = this.getCliPath()
-          this.notifyIfChanged(oldPath, this.dvcPath)
+          this.notifyIfChanged(this.dvcPath, this.getCliPath())
         }
         if (e.affectsConfiguration(this.pythonPathOption)) {
-          const oldPath = this.pythonBinPath
-          this.pythonBinPath = await this.getPythonBinPath()
-          this.notifyIfChanged(oldPath, this.pythonBinPath)
+          this.notifyIfChanged(
+            this.pythonBinPath,
+            await this.getPythonBinPath()
+          )
         }
       })
     )

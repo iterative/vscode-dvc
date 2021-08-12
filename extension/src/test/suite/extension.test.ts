@@ -35,11 +35,11 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const configurationChangeEvent = () =>
+    const configurationChangeEvent = (option = dvcPathOption) =>
       new Promise(resolve => {
         const listener: Disposable = workspace.onDidChangeConfiguration(
           (event: ConfigurationChangeEvent) => {
-            if (event.affectsConfiguration(dvcPathOption)) {
+            if (event.affectsConfiguration(option)) {
               delay(200).then(() => resolve(event))
             }
           }
@@ -132,6 +132,60 @@ suite('Extension Test Suite', () => {
         null
       )
     })
+
+    it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
+      const mockPath = resolve('file', 'picked', 'path', 'to', 'python')
+      stub(window, 'showOpenDialog').resolves([Uri.file(mockPath)])
+      const pythonChanged = configurationChangeEvent('dvc.pythonPath')
+
+      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const isAvailableGloballyQuickPick =
+        window.createQuickPick<QuickPickItemWithValue>()
+
+      const mockCreateQuickPick = stub(window, 'createQuickPick')
+        .onFirstCall()
+        .returns(venvQuickPick)
+
+      const venvQuickPickActive = new Promise(resolve =>
+        venvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+      const globalQuickPickActive = new Promise(resolve =>
+        isAvailableGloballyQuickPick.onDidChangeActive(e => resolve(e))
+      )
+
+      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+
+      await venvQuickPickActive
+
+      mockCreateQuickPick.restore()
+
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      stub(window, 'createQuickPick')
+        .onFirstCall()
+        .returns(isAvailableGloballyQuickPick)
+
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await globalQuickPickActive
+
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await pythonChanged
+
+      await setupWorkspaceWizard
+
+      expect(workspace.getConfiguration().get('dvc.pythonPath')).to.equal(
+        mockPath
+      )
+    }).timeout(5000)
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
       const mockPath = resolve('file', 'picked', 'path', 'to', 'dvc')
