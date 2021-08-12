@@ -109,9 +109,9 @@ export const setupWorkspace = async (): Promise<void | undefined> => {
   }
 
   if (usesVenv) {
-    if (usesVenv === 1) {
-      await enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
-    }
+    usesVenv === 1
+      ? await enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
+      : setConfigValue('dvc.pythonPath', undefined)
 
     return pickVenvOptions()
   }

@@ -48,7 +48,8 @@ describe('setupWorkspace', () => {
 
     expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(1)
-    expect(mockedSetConfigValue).not.toBeCalled()
+    expect(mockedSetConfigValue).toBeCalledTimes(1)
+    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
   })
 
   it('should set the dvc path option to undefined if the CLI is installed in a virtual environment', async () => {
@@ -71,7 +72,8 @@ describe('setupWorkspace', () => {
 
     expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
-    expect(mockedSetConfigValue).not.toBeCalled()
+    expect(mockedSetConfigValue).toBeCalledTimes(1)
+    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
   })
 
   it("should set the dvc path option to dvc if there is a virtual environment which doesn't include the CLI but it is available globally", async () => {
