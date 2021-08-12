@@ -15,6 +15,7 @@ import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
 import { delay } from '../../util/time'
+import { QuickPickItemWithValue } from '../../vscode/quickPick'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -35,17 +36,35 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.setupWorkspace', () => {
     const selectDvcPathFromFilePicker = async () => {
-      const selectionPromise = commands.executeCommand('dvc.setupWorkspace')
+      const isInVenvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const isAvailableGloballyQuickPick =
+        window.createQuickPick<QuickPickItemWithValue>()
 
-      await delay(200)
+      const mockCreateQuickPick = stub(window, 'createQuickPick')
+        .onFirstCall()
+        .returns(isInVenvQuickPick)
+        .onSecondCall()
+        .returns(isAvailableGloballyQuickPick)
 
-      await commands.executeCommand('workbench.action.quickOpenNavigateNext')
+      const venvQuickPickActive = new Promise(resolve =>
+        isInVenvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+      const globalQuickPickActive = new Promise(resolve =>
+        isAvailableGloballyQuickPick.onDidChangeActive(e => resolve(e))
+      )
+
+      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      await venvQuickPickActive
+
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'
       )
 
-      await delay(200)
-      await commands.executeCommand('workbench.action.quickOpenNavigateNext')
+      await globalQuickPickActive
+      mockCreateQuickPick.restore()
+
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'
       )
@@ -54,7 +73,7 @@ suite('Extension Test Suite', () => {
         'workbench.action.acceptSelectedQuickOpenItem'
       )
 
-      await selectionPromise
+      await setupWorkspaceWizard
     }
 
     const configurationChangeEvent = () => {
@@ -69,30 +88,45 @@ suite('Extension Test Suite', () => {
     }
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
-      const mockShowInputBox = stub(window, 'showInputBox')
-
-      const selectionPromise = commands.executeCommand('dvc.setupWorkspace')
-
-      await delay(200)
-      await commands.executeCommand(
-        'workbench.action.acceptSelectedQuickOpenItem'
-      )
-      await delay(200)
-      await commands.executeCommand(
-        'workbench.action.acceptSelectedQuickOpenItem'
-      )
-
-      await selectionPromise
-
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
+      await workspace.getConfiguration().update(dvcPathOption, '/fun')
+
+      const isInVenvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const isDVCInVenvQuickPick =
+        window.createQuickPick<QuickPickItemWithValue>()
+
+      stub(window, 'createQuickPick')
+        .onFirstCall()
+        .returns(isInVenvQuickPick)
+        .onSecondCall()
+        .returns(isDVCInVenvQuickPick)
+
+      const venvQuickPickActive = new Promise(resolve =>
+        isInVenvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+      const dvcInVenvQuickPickActive = new Promise(resolve =>
+        isDVCInVenvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+
+      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      await venvQuickPickActive
+
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+      await dvcInVenvQuickPickActive
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await setupWorkspaceWizard
+
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         null
       )
-
-      expect(mockShowInputBox).not.to.have.been.called
     })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
@@ -162,7 +196,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.be.calledOnce
 
       await configChanged
-      await delay(200)
+      await delay(20)
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         mockPath
@@ -211,7 +245,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.be.calledOnce
 
       await configChanged
-      await delay(200)
+      await delay(20)
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
@@ -238,7 +272,7 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.be.calledOnce
 
       await configChanged
-      await delay(200)
+      await delay(20)
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called

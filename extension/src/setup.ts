@@ -1,5 +1,5 @@
 import { IExtension } from './interfaces'
-import { quickPickOneOrInput, quickPickValue } from './vscode/quickPick'
+import { quickPickOneOrInput, quickPickValue_ } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
@@ -46,7 +46,7 @@ const pickYesOrNo = (
   descriptionYes: string,
   descriptionNo: string
 ) =>
-  quickPickValue(
+  quickPickValue_(
     [
       {
         description: descriptionYes,
@@ -59,7 +59,7 @@ const pickYesOrNo = (
         value: false
       }
     ],
-    { placeHolder }
+    placeHolder
   )
 
 const pickCliPath = async () => {
