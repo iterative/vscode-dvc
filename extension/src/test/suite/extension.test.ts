@@ -69,6 +69,7 @@ suite('Extension Test Suite', () => {
       await venvQuickPickActive
 
       await commands.executeCommand('workbench.action.quickOpenSelectNext')
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'
       )

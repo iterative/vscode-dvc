@@ -1,44 +1,48 @@
 import { IExtension } from './interfaces'
-import { quickPickOneOrInput, quickPickYesOrNo } from './vscode/quickPick'
+import {
+  quickPickOneOrInput,
+  quickPickValueWithEvents,
+  quickPickYesOrNo
+} from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
 const setDvcPath = (path: string | undefined) =>
   setConfigValue('dvc.dvcPath', path)
 
-const enterPathOrFind = (): Promise<string | undefined> =>
+const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
     [
       {
-        description: 'Browse the filesystem for a DVC executable',
-        label: 'Find',
+        detail: `Browse the filesystem for a ${text}.`,
+        label: 'Find...',
         value: 'pick'
       }
     ],
-    'Enter path to a DVC CLI',
+    `Enter path to a ${text}`,
     'pick'
   )
 
-const findPath = async () => {
-  const path = await pickFile('Select a DVC executable')
+const findPath = async (option: string, text: string) => {
+  const path = await pickFile(`Select a ${text}`)
   if (!path) {
     return
   }
-  return setDvcPath(path)
+  return setConfigValue(option, path)
 }
 
-const enterPathOrPickFile = async () => {
-  const pickOrPath = await enterPathOrFind()
+const enterPathOrPickFile = async (option: string, description: string) => {
+  const pickOrPath = await enterPathOrFind(description)
 
   if (pickOrPath === undefined) {
     return
   }
 
   if (pickOrPath !== 'pick') {
-    return setDvcPath(pickOrPath)
+    return setConfigValue(option, pickOrPath)
   }
 
-  return findPath()
+  return findPath(option, description)
 }
 
 const pickCliPath = async () => {
@@ -56,7 +60,7 @@ const pickCliPath = async () => {
     return setDvcPath('dvc')
   }
 
-  return enterPathOrPickFile()
+  return enterPathOrPickFile('dvc.dvcPath', 'DVC CLI')
 }
 
 const pickVenvOptions = async () => {
@@ -77,10 +81,27 @@ const pickVenvOptions = async () => {
 }
 
 export const setupWorkspace = async (): Promise<void | undefined> => {
-  const usesVenv = await quickPickYesOrNo(
-    'Does your project use a Python virtual environment?',
-    '(needs ms-python extension installed)',
-    'all of the modules required to run this project are globally available'
+  const usesVenv = await quickPickValueWithEvents<number>(
+    [
+      {
+        description: 'use the interpreter selected by the ms-python extension',
+        label: 'Yes',
+        value: 2
+      },
+      {
+        description: 'I want to select the python interpreter',
+        label: 'Yes',
+        value: 1
+      },
+
+      {
+        description:
+          'all of the modules required to run this project are globally available',
+        label: 'No',
+        value: 0
+      }
+    ],
+    'Does your project use a Python virtual environment?'
   )
 
   if (usesVenv === undefined) {
@@ -88,6 +109,10 @@ export const setupWorkspace = async (): Promise<void | undefined> => {
   }
 
   if (usesVenv) {
+    if (usesVenv === 1) {
+      await enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
+    }
+
     return pickVenvOptions()
   }
 

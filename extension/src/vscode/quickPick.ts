@@ -62,7 +62,7 @@ export const quickPickOneOrInput = (
     quickPick.show()
   })
 
-const quickPickValueWithEvents = <T = string>(
+export const quickPickValueWithEvents = <T = string>(
   items: QuickPickItemWithValue<T>[],
   placeholder: string
 ): Promise<T | undefined> =>

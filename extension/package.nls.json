@@ -38,6 +38,8 @@
   "command.showExperiments": "Show Experiments",
   "config.dvcPath.description": "Call DVC from this path. Follows Python Extension when blank.",
   "config.dvcPath.title": "DVC CLI Path",
+  "config.pythonPath.description": "Required Virtual Environment's Python Interpreter Path",
+  "config.pythonPath.title": "DVC Python Interpreter Path",
   "config.defaultProject.description": "When enabled all generic commands will be run against this project.",
   "config.defaultProject.title": "DVC Default Project",
   "config.noOpenUnsupported.description": "Do not attempt to open dvc tracked files that are not supported by the text editor.",
