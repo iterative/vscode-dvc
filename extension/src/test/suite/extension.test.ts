@@ -35,6 +35,18 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
+    const configurationChangeEvent = () =>
+      new Promise(resolve => {
+        const listener: Disposable = workspace.onDidChangeConfiguration(
+          (event: ConfigurationChangeEvent) => {
+            if (event.affectsConfiguration(dvcPathOption)) {
+              delay(200).then(() => resolve(event))
+            }
+          }
+        )
+        disposable.track(listener)
+      })
+
     const selectDvcPathFromFilePicker = async () => {
       const isInVenvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
       const isAvailableGloballyQuickPick =
@@ -73,20 +85,10 @@ suite('Extension Test Suite', () => {
         'workbench.action.acceptSelectedQuickOpenItem'
       )
 
-      await setupWorkspaceWizard
-    }
+      await configurationChangeEvent()
 
-    const configurationChangeEvent = () =>
-      new Promise(resolve => {
-        const listener: Disposable = workspace.onDidChangeConfiguration(
-          (event: ConfigurationChangeEvent) => {
-            if (event.affectsConfiguration(dvcPathOption)) {
-              delay(200).then(() => resolve(event))
-            }
-          }
-        )
-        disposable.track(listener)
-      })
+      return setupWorkspaceWizard
+    }
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(CliReader.prototype, 'experimentShow').resolves(
@@ -191,12 +193,9 @@ suite('Extension Test Suite', () => {
         ]
       } as unknown as StatusOutput)
 
-      const configChanged = configurationChangeEvent()
       await selectDvcPathFromFilePicker()
 
       expect(mockShowOpenDialog).to.be.calledOnce
-
-      await configChanged
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         mockPath
@@ -238,14 +237,9 @@ suite('Extension Test Suite', () => {
 
       const mockStatus = stub(CliReader.prototype, 'status').resolves({})
 
-      const configChanged = configurationChangeEvent()
-
       await selectDvcPathFromFilePicker()
 
       expect(mockShowOpenDialog).to.be.calledOnce
-
-      await configChanged
-
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
@@ -264,13 +258,9 @@ suite('Extension Test Suite', () => {
 
       const mockDisposer = spy(Disposer, 'reset')
 
-      const configChanged = configurationChangeEvent()
-
       await selectDvcPathFromFilePicker()
 
       expect(mockShowOpenDialog).to.be.calledOnce
-
-      await configChanged
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
