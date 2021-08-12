@@ -85,6 +85,8 @@ describe('setupWorkspace', () => {
 
     expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
+    expect(mockedSetConfigValue).toBeCalledTimes(2)
+    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', 'dvc')
   })
 
@@ -101,6 +103,8 @@ describe('setupWorkspace', () => {
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
     expect(mockedPickFile).not.toBeCalled()
+    expect(mockedSetConfigValue).toBeCalledTimes(2)
+    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
   })
 
@@ -118,6 +122,33 @@ describe('setupWorkspace', () => {
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
     expect(mockedPickFile).toBeCalledTimes(1)
+    expect(mockedSetConfigValue).toBeCalledTimes(2)
+    expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
+    expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
+  })
+
+  it("should set the python and dvc path options to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
+    const mockedPythonPath = resolve('some', 'path', 'to', 'python')
+    const mockedDvcPath = resolve('some', 'path', 'to', 'dvc')
+    mockedQuickPickValueWithEvents.mockResolvedValueOnce(1)
+    mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
+    mockedPickFile.mockResolvedValueOnce(mockedPythonPath)
+    mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
+    mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
+    mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
+    mockedPickFile.mockResolvedValueOnce(mockedDvcPath)
+
+    await setupWorkspace()
+
+    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
+    expect(mockedQuickPickOneOrInput).toBeCalledTimes(2)
+    expect(mockedPickFile).toBeCalledTimes(2)
+    expect(mockedSetConfigValue).toBeCalledTimes(2)
+    expect(mockedSetConfigValue).toBeCalledWith(
+      'dvc.pythonPath',
+      mockedPythonPath
+    )
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', mockedDvcPath)
   })
 })

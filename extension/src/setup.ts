@@ -80,8 +80,8 @@ const pickVenvOptions = async () => {
   return pickCliPath()
 }
 
-export const setupWorkspace = async (): Promise<void | undefined> => {
-  const usesVenv = await quickPickValueWithEvents<number>(
+const quickPickVenvOption = () =>
+  quickPickValueWithEvents<number>(
     [
       {
         description: 'use the interpreter selected by the ms-python extension',
@@ -103,6 +103,9 @@ export const setupWorkspace = async (): Promise<void | undefined> => {
     ],
     'Does your project use a Python virtual environment?'
   )
+
+export const setupWorkspace = async (): Promise<void | undefined> => {
+  const usesVenv = await quickPickVenvOption()
 
   if (usesVenv === undefined) {
     return
