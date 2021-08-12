@@ -89,7 +89,7 @@ const quickPickVenvOption = () =>
         value: 2
       },
       {
-        description: 'I want to select the python interpreter',
+        description: 'and I want to select the python interpreter',
         label: 'Yes',
         value: 1
       },
