@@ -48,18 +48,18 @@ suite('Extension Test Suite', () => {
       })
 
     const selectDvcPathFromFilePicker = async () => {
-      const isInVenvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
       const isAvailableGloballyQuickPick =
         window.createQuickPick<QuickPickItemWithValue>()
 
       const mockCreateQuickPick = stub(window, 'createQuickPick')
         .onFirstCall()
-        .returns(isInVenvQuickPick)
+        .returns(venvQuickPick)
         .onSecondCall()
         .returns(isAvailableGloballyQuickPick)
 
       const venvQuickPickActive = new Promise(resolve =>
-        isInVenvQuickPick.onDidChangeActive(e => resolve(e))
+        venvQuickPick.onDidChangeActive(e => resolve(e))
       )
       const globalQuickPickActive = new Promise(resolve =>
         isAvailableGloballyQuickPick.onDidChangeActive(e => resolve(e))
@@ -97,18 +97,18 @@ suite('Extension Test Suite', () => {
 
       await workspace.getConfiguration().update(dvcPathOption, '/fun')
 
-      const isInVenvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
       const isDVCInVenvQuickPick =
         window.createQuickPick<QuickPickItemWithValue>()
 
       stub(window, 'createQuickPick')
         .onFirstCall()
-        .returns(isInVenvQuickPick)
+        .returns(venvQuickPick)
         .onSecondCall()
         .returns(isDVCInVenvQuickPick)
 
       const venvQuickPickActive = new Promise(resolve =>
-        isInVenvQuickPick.onDidChangeActive(e => resolve(e))
+        venvQuickPick.onDidChangeActive(e => resolve(e))
       )
       const dvcInVenvQuickPickActive = new Promise(resolve =>
         isDVCInVenvQuickPick.onDidChangeActive(e => resolve(e))
