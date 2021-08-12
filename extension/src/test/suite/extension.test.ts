@@ -189,7 +189,7 @@ suite('Extension Test Suite', () => {
       expect(workspace.getConfiguration().get('dvc.pythonPath')).to.equal(
         mockPath
       )
-    }).timeout(5000)
+    })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
       const mockPath = resolve('file', 'picked', 'path', 'to', 'dvc')
