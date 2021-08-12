@@ -117,26 +117,31 @@ export class Config {
     const onDidChangePythonExecutionDetails =
       await getOnDidChangePythonExecutionDetails()
     this.dispose.track(
-      onDidChangePythonExecutionDetails?.(async () => {
-        this.notifyIfChanged(this.pythonBinPath, await this.getPythonBinPath())
+      onDidChangePythonExecutionDetails?.(() => {
+        this.setPythonAndNotifyIfChanged()
       })
     )
   }
 
   private onDidConfigurationChange() {
     this.dispose.track(
-      workspace.onDidChangeConfiguration(async e => {
+      workspace.onDidChangeConfiguration(e => {
         if (e.affectsConfiguration(this.dvcPathOption)) {
-          this.notifyIfChanged(this.dvcPath, this.getCliPath())
+          const oldPath = this.dvcPath
+          this.dvcPath = this.getCliPath()
+          this.notifyIfChanged(oldPath, this.dvcPath)
         }
         if (e.affectsConfiguration(this.pythonPathOption)) {
-          this.notifyIfChanged(
-            this.pythonBinPath,
-            await this.getPythonBinPath()
-          )
+          this.setPythonAndNotifyIfChanged()
         }
       })
     )
+  }
+
+  private async setPythonAndNotifyIfChanged() {
+    const oldPath = this.pythonBinPath
+    this.pythonBinPath = await this.getPythonBinPath()
+    this.notifyIfChanged(oldPath, this.pythonBinPath)
   }
 
   private notifyIfChanged(

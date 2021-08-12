@@ -21,6 +21,7 @@ suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
 
   const dvcPathOption = 'dvc.dvcPath'
+  const pythonPathOption = 'dvc.pythonPath'
 
   const disposable = Disposable.fn()
 
@@ -28,10 +29,13 @@ suite('Extension Test Suite', () => {
     restore()
   })
 
-  afterEach(async () => {
+  afterEach(() => {
     disposable.dispose()
-    await workspace.getConfiguration().update(dvcPathOption, undefined, false)
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return Promise.all([
+      workspace.getConfiguration().update(dvcPathOption, undefined, false),
+      workspace.getConfiguration().update(pythonPathOption, undefined, false),
+      commands.executeCommand('workbench.action.closeAllEditors')
+    ])
   })
 
   describe('dvc.setupWorkspace', () => {
