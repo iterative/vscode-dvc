@@ -7,10 +7,19 @@ import {
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
-const setDvcPath = async (path: string | undefined) => {
-  await setConfigValue('dvc.dvcPath', path)
+const setConfigPath = async (
+  option: string,
+  path: string | undefined
+): Promise<true> => {
+  await setConfigValue(option, path)
   return true
 }
+
+const setDvcPath = (path: string | undefined) =>
+  setConfigPath('dvc.dvcPath', path)
+
+const setPythonPath = (path: string | undefined) =>
+  setConfigPath('dvc.pythonPath', path)
 
 const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
@@ -30,8 +39,7 @@ const findPath = async (option: string, text: string) => {
   if (!path) {
     return false
   }
-  await setConfigValue(option, path)
-  return true
+  return setConfigPath(option, path)
 }
 
 const enterPathOrPickFile = async (option: string, description: string) => {
@@ -42,8 +50,7 @@ const enterPathOrPickFile = async (option: string, description: string) => {
   }
 
   if (pickOrPath !== 'pick') {
-    await setConfigValue(option, pickOrPath)
-    return true
+    return setConfigPath(option, pickOrPath)
   }
 
   return findPath(option, description)
@@ -108,13 +115,12 @@ const quickPickVenvOption = () =>
     'Does your project use a Python virtual environment?'
   )
 
-const quickPickOrUnsetPythonInterpreter = async (usesVenv: number) => {
+const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
   if (usesVenv === 1) {
     return enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
   }
 
-  await setConfigValue('dvc.pythonPath', undefined)
-  return true
+  return setPythonPath(undefined)
 }
 
 export const setupWorkspace = async (): Promise<boolean> => {
