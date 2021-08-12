@@ -76,16 +76,17 @@ suite('Extension Test Suite', () => {
       await setupWorkspaceWizard
     }
 
-    const configurationChangeEvent = () => {
-      return new Promise(resolve => {
+    const configurationChangeEvent = () =>
+      new Promise(resolve => {
         const listener: Disposable = workspace.onDidChangeConfiguration(
           (event: ConfigurationChangeEvent) => {
-            return resolve(event)
+            if (event.affectsConfiguration(dvcPathOption)) {
+              delay(200).then(() => resolve(event))
+            }
           }
         )
         disposable.track(listener)
       })
-    }
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(CliReader.prototype, 'experimentShow').resolves(
@@ -196,7 +197,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.be.calledOnce
 
       await configChanged
-      await delay(20)
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         mockPath
@@ -245,7 +245,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.be.calledOnce
 
       await configChanged
-      await delay(20)
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
@@ -272,7 +271,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.be.calledOnce
 
       await configChanged
-      await delay(20)
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
