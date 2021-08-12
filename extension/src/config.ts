@@ -36,6 +36,7 @@ export class Config {
   private readonly initialized = this.deferred.promise
 
   private dvcPathOption = 'dvc.dvcPath'
+  private pythonPathOption = 'dvc.pythonPath'
   private dvcPath = this.getCliPath()
   private defaultProjectOption = 'dvc.defaultProject'
 
@@ -45,21 +46,9 @@ export class Config {
     this.executionDetailsChanged = this.dispose.track(new EventEmitter())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
-    getPythonBinPath().then(path => {
-      this.pythonBinPath = path
-      return this.deferred.resolve()
-    })
+    this.setPythonBinPath()
 
-    getOnDidChangePythonExecutionDetails().then(
-      onDidChangePythonExecutionDetails =>
-        this.dispose.track(
-          onDidChangePythonExecutionDetails?.(async () => {
-            const oldPath = this.pythonBinPath
-            this.pythonBinPath = await getPythonBinPath()
-            this.notifyIfChanged(oldPath, this.pythonBinPath)
-          })
-        )
-    )
+    this.onDidChangePythonExecutionDetails()
 
     this.vsCodeTheme = window.activeColorTheme
 
@@ -69,15 +58,7 @@ export class Config {
       })
     )
 
-    this.dispose.track(
-      workspace.onDidChangeConfiguration(e => {
-        if (e.affectsConfiguration(this.dvcPathOption)) {
-          const oldPath = this.dvcPath
-          this.dvcPath = this.getCliPath()
-          this.notifyIfChanged(oldPath, this.dvcPath)
-        }
-      })
-    )
+    this.onDidConfigurationChange()
   }
 
   public setDvcRoots(dvcRoots: string[]): void {
@@ -118,6 +99,46 @@ export class Config {
     if (dvcRoot) {
       this.setDefaultProject(dvcRoot)
     }
+  }
+
+  private async getPythonBinPath() {
+    return getConfigValue('dvc.pythonPath') || (await getPythonBinPath())
+  }
+
+  private async setPythonBinPath() {
+    this.pythonBinPath = await this.getPythonBinPath()
+    return this.deferred.resolve()
+  }
+
+  private async onDidChangePythonExecutionDetails() {
+    const onDidChangePythonExecutionDetails =
+      await getOnDidChangePythonExecutionDetails()
+    this.dispose.track(
+      onDidChangePythonExecutionDetails?.(async () => {
+        if (!getConfigValue(this.pythonPathOption)) {
+          const oldPath = this.pythonBinPath
+          this.pythonBinPath = await getPythonBinPath()
+          this.notifyIfChanged(oldPath, this.pythonBinPath)
+        }
+      })
+    )
+  }
+
+  private onDidConfigurationChange() {
+    this.dispose.track(
+      workspace.onDidChangeConfiguration(async e => {
+        if (e.affectsConfiguration(this.dvcPathOption)) {
+          const oldPath = this.dvcPath
+          this.dvcPath = this.getCliPath()
+          this.notifyIfChanged(oldPath, this.dvcPath)
+        }
+        if (e.affectsConfiguration(this.pythonPathOption)) {
+          const oldPath = this.pythonBinPath
+          this.pythonBinPath = await this.getPythonBinPath()
+          this.notifyIfChanged(oldPath, this.pythonBinPath)
+        }
+      })
+    )
   }
 
   private notifyIfChanged(
