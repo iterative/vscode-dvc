@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy } from 'sinon'
+import { stub, restore, spy, SinonStub } from 'sinon'
 import {
   window,
   commands,
@@ -15,7 +15,6 @@ import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
 import { delay } from '../../util/time'
-import { QuickPickItemWithValue } from '../../vscode/quickPick'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -51,23 +50,24 @@ suite('Extension Test Suite', () => {
         disposable.track(listener)
       })
 
+    const quickPickInitialized = (mockShowQuickPick: SinonStub, call: number) =>
+      new Promise(resolve => {
+        mockShowQuickPick.onCall(call).callsFake((items, options) =>
+          mockShowQuickPick.wrappedMethod(items, {
+            ...options,
+            onDidSelectItem: (item: unknown) => {
+              resolve(item)
+              options?.onDidSelectItem
+            }
+          })
+        )
+      })
+
     const selectDvcPathFromFilePicker = async () => {
-      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
-      const isAvailableGloballyQuickPick =
-        window.createQuickPick<QuickPickItemWithValue>()
+      const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const mockCreateQuickPick = stub(window, 'createQuickPick')
-        .onFirstCall()
-        .returns(venvQuickPick)
-        .onSecondCall()
-        .returns(isAvailableGloballyQuickPick)
-
-      const venvQuickPickActive = new Promise(resolve =>
-        venvQuickPick.onDidChangeActive(e => resolve(e))
-      )
-      const globalQuickPickActive = new Promise(resolve =>
-        isAvailableGloballyQuickPick.onDidChangeActive(e => resolve(e))
-      )
+      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
+      const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
       const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
       await venvQuickPickActive
@@ -79,7 +79,7 @@ suite('Extension Test Suite', () => {
       )
 
       await globalQuickPickActive
-      mockCreateQuickPick.restore()
+      mockShowQuickPick.restore()
 
       await commands.executeCommand('workbench.action.quickOpenSelectNext')
       await commands.executeCommand(
@@ -96,27 +96,17 @@ suite('Extension Test Suite', () => {
     }
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
       await workspace.getConfiguration().update(dvcPathOption, '/fun')
 
-      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
-      const isDVCInVenvQuickPick =
-        window.createQuickPick<QuickPickItemWithValue>()
-
-      stub(window, 'createQuickPick')
-        .onFirstCall()
-        .returns(venvQuickPick)
-        .onSecondCall()
-        .returns(isDVCInVenvQuickPick)
-
-      const venvQuickPickActive = new Promise(resolve =>
-        venvQuickPick.onDidChangeActive(e => resolve(e))
-      )
-      const dvcInVenvQuickPickActive = new Promise(resolve =>
-        isDVCInVenvQuickPick.onDidChangeActive(e => resolve(e))
+      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
+      const dvcInVenvQuickPickActive = quickPickInitialized(
+        mockShowQuickPick,
+        1
       )
 
       const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
@@ -125,6 +115,7 @@ suite('Extension Test Suite', () => {
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'
       )
+
       await dvcInVenvQuickPickActive
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'
@@ -138,39 +129,22 @@ suite('Extension Test Suite', () => {
     })
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockPath = resolve('file', 'picked', 'path', 'to', 'python')
       stub(window, 'showOpenDialog').resolves([Uri.file(mockPath)])
       const pythonChanged = configurationChangeEvent('dvc.pythonPath')
 
-      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
-      const isAvailableGloballyQuickPick =
-        window.createQuickPick<QuickPickItemWithValue>()
-
-      const mockCreateQuickPick = stub(window, 'createQuickPick')
-        .onFirstCall()
-        .returns(venvQuickPick)
-
-      const venvQuickPickActive = new Promise(resolve =>
-        venvQuickPick.onDidChangeActive(e => resolve(e))
-      )
-      const globalQuickPickActive = new Promise(resolve =>
-        isAvailableGloballyQuickPick.onDidChangeActive(e => resolve(e))
-      )
+      const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
+      const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
       const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
 
       await venvQuickPickActive
 
-      mockCreateQuickPick.restore()
-
       await commands.executeCommand('workbench.action.quickOpenSelectNext')
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'
       )
-
-      stub(window, 'createQuickPick')
-        .onFirstCall()
-        .returns(isAvailableGloballyQuickPick)
 
       await commands.executeCommand(
         'workbench.action.acceptSelectedQuickOpenItem'

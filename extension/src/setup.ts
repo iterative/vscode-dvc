@@ -1,7 +1,7 @@
 import { IExtension } from './interfaces'
 import {
   quickPickOneOrInput,
-  quickPickValueWithEvents,
+  quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
@@ -92,7 +92,7 @@ const pickVenvOptions = async () => {
 }
 
 const quickPickVenvOption = () =>
-  quickPickValueWithEvents<number>(
+  quickPickValue<number>(
     [
       {
         description: 'use the interpreter selected by the ms-python extension',
@@ -112,7 +112,7 @@ const quickPickVenvOption = () =>
         value: 0
       }
     ],
-    'Does your project use a Python virtual environment?'
+    { placeHolder: 'Does your project use a Python virtual environment?' }
   )
 
 const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {

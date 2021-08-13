@@ -62,36 +62,12 @@ export const quickPickOneOrInput = (
     quickPick.show()
   })
 
-export const quickPickValueWithEvents = <T = string>(
-  items: QuickPickItemWithValue<T>[],
-  placeholder: string
-): Promise<T | undefined> =>
-  new Promise(resolve => {
-    const quickPick = window.createQuickPick<QuickPickItemWithValue<T>>()
-
-    quickPick.placeholder = placeholder
-    quickPick.canSelectMany = false
-    quickPick.items = items
-
-    quickPick.onDidAccept(() => {
-      resolve(quickPick.activeItems?.[0]?.value)
-      quickPick.dispose()
-    })
-
-    quickPick.onDidHide(() => {
-      resolve(undefined)
-      quickPick.dispose()
-    })
-
-    quickPick.show()
-  })
-
 export const quickPickYesOrNo = (
   placeHolder: string,
   descriptionYes: string,
   descriptionNo: string
 ) =>
-  quickPickValueWithEvents<boolean>(
+  quickPickValue<boolean>(
     [
       {
         description: descriptionYes,
@@ -104,5 +80,5 @@ export const quickPickYesOrNo = (
         value: false
       }
     ],
-    placeHolder
+    { placeHolder }
   )
