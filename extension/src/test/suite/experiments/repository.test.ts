@@ -15,6 +15,7 @@ import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
+import { experimentsUpdatedEvent } from '../util'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -299,9 +300,7 @@ suite('Experiments Repository Test Suite', () => {
       value: false
     } as QuickPickItemWithValue<boolean>)
 
-    const tableChangePromise = new Promise(resolve => {
-      experimentsRepository.onDidChangeExperiments(resolve)
-    })
+    const tableChangePromise = experimentsUpdatedEvent(experimentsRepository)
 
     const pickPromise = experimentsRepository.pickAndAddSort()
     await pickPromise

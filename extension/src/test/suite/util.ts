@@ -1,5 +1,6 @@
 import { SinonStub } from 'sinon'
 import { ConfigurationChangeEvent, workspace } from 'vscode'
+import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
 
 export const configurationChangeEvent = (
@@ -31,4 +32,11 @@ export const quickPickInitialized = (
         }
       })
     )
+  })
+
+export const experimentsUpdatedEvent = (
+  experimentsRepository: ExperimentsRepository
+) =>
+  new Promise(resolve => {
+    experimentsRepository.onDidChangeExperiments(resolve)
   })

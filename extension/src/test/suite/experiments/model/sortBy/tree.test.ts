@@ -17,6 +17,7 @@ import {
   ParamOrMetric
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
+import { experimentsUpdatedEvent } from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
@@ -162,9 +163,10 @@ suite('Experiments Test Suite', () => {
         descending: boolean
       ) => {
         mockSortQuickPicks(paramPath, descending)
-        const tableChangedPromise = new Promise(resolve => {
-          experimentsRepository.onDidChangeExperiments(resolve)
-        })
+        const tableChangedPromise = experimentsUpdatedEvent(
+          experimentsRepository
+        )
+
         await commands.executeCommand('dvc.addExperimentsTableSort')
         await tableChangedPromise
         mockShowQuickPick.reset()
@@ -201,9 +203,8 @@ suite('Experiments Test Suite', () => {
       // Setup done, perform the test
 
       mockSortQuickPicks(testParamPath, false)
-      const tableChangedPromise = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperiments(resolve)
-      })
+      const tableChangedPromise = experimentsUpdatedEvent(experimentsRepository)
+
       await commands.executeCommand('dvc.addExperimentsTableSort', dvcDemoPath)
       await tableChangedPromise
       mockShowQuickPick.reset()
@@ -211,9 +212,8 @@ suite('Experiments Test Suite', () => {
         1, 2, 3, 4
       ])
 
-      const tableSortRemoved = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperiments(resolve)
-      })
+      const tableSortRemoved = experimentsUpdatedEvent(experimentsRepository)
+
       await commands.executeCommand('dvc.removeExperimentsTableSorts')
       await tableSortRemoved
       expect(
