@@ -294,12 +294,20 @@ suite('Extension Test Suite', () => {
         'GONE AGAIN'
       )
 
-      const mockDisposer = spy(Disposer, 'reset')
+      const mockDisposer = stub(Disposer, 'reset')
+
+      const disposalEvent = new Promise(resolve => {
+        mockDisposer.callsFake((...args) => {
+          mockDisposer.wrappedMethod(...args)
+          resolve(undefined)
+        })
+      })
 
       await selectDvcPathFromFilePicker()
 
-      expect(mockShowOpenDialog).to.be.calledOnce
+      await disposalEvent
 
+      expect(mockShowOpenDialog).to.be.calledOnce
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
