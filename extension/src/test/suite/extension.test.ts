@@ -62,7 +62,7 @@ suite('Extension Test Suite', () => {
         )
       })
 
-    const onDidChangeFileSystemEvent = () =>
+    const onDidChangeFileSystemSetupEvent = () =>
       new Promise(resolve =>
         stub(Watcher, 'onDidChangeFileSystem').callsFake(() => {
           resolve(undefined)
@@ -187,7 +187,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const onDidChangeFileSystemCalled = onDidChangeFileSystemEvent()
+      const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -258,7 +258,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const onDidChangeFileSystemCalled = onDidChangeFileSystemEvent()
+      const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
 
       const mockDisposer = spy(Disposer, 'reset')
 
