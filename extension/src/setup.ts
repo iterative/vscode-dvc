@@ -1,44 +1,59 @@
 import { IExtension } from './interfaces'
-import { quickPickOneOrInput, quickPickYesOrNo } from './vscode/quickPick'
+import {
+  quickPickOneOrInput,
+  quickPickValueWithEvents,
+  quickPickYesOrNo
+} from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
-const setDvcPath = (path: string | undefined) =>
-  setConfigValue('dvc.dvcPath', path)
+const setConfigPath = async (
+  option: string,
+  path: string | undefined
+): Promise<true> => {
+  await setConfigValue(option, path)
+  return true
+}
 
-const enterPathOrFind = (): Promise<string | undefined> =>
+const setDvcPath = (path: string | undefined) =>
+  setConfigPath('dvc.dvcPath', path)
+
+const setPythonPath = (path: string | undefined) =>
+  setConfigPath('dvc.pythonPath', path)
+
+const enterPathOrFind = (text: string): Promise<string | undefined> =>
   quickPickOneOrInput(
     [
       {
-        description: 'Browse the filesystem for a DVC executable',
-        label: 'Find',
+        detail: `Browse the filesystem for a ${text}.`,
+        label: 'Find...',
         value: 'pick'
       }
     ],
-    'Enter path to a DVC CLI',
+    `Enter path to a ${text}`,
     'pick'
   )
 
-const findPath = async () => {
-  const path = await pickFile('Select a DVC executable')
+const findPath = async (option: string, text: string) => {
+  const path = await pickFile(`Select a ${text}`)
   if (!path) {
-    return
+    return false
   }
-  return setDvcPath(path)
+  return setConfigPath(option, path)
 }
 
-const enterPathOrPickFile = async () => {
-  const pickOrPath = await enterPathOrFind()
+const enterPathOrPickFile = async (option: string, description: string) => {
+  const pickOrPath = await enterPathOrFind(description)
 
   if (pickOrPath === undefined) {
-    return
+    return false
   }
 
   if (pickOrPath !== 'pick') {
-    return setDvcPath(pickOrPath)
+    return setConfigPath(option, pickOrPath)
   }
 
-  return findPath()
+  return findPath(option, description)
 }
 
 const pickCliPath = async () => {
@@ -49,14 +64,14 @@ const pickCliPath = async () => {
   )
 
   if (isGlobal === undefined) {
-    return
+    return false
   }
 
   if (isGlobal) {
     return setDvcPath('dvc')
   }
 
-  return enterPathOrPickFile()
+  return enterPathOrPickFile('dvc.dvcPath', 'DVC CLI')
 }
 
 const pickVenvOptions = async () => {
@@ -66,7 +81,7 @@ const pickVenvOptions = async () => {
     'this project needs access to a DVC CLI outside of the virtual environment'
   )
   if (dvcInVenv === undefined) {
-    return
+    return false
   }
 
   if (dvcInVenv) {
@@ -76,18 +91,50 @@ const pickVenvOptions = async () => {
   return pickCliPath()
 }
 
-export const setupWorkspace = async (): Promise<void | undefined> => {
-  const usesVenv = await quickPickYesOrNo(
-    'Does your project use a Python virtual environment?',
-    '(needs ms-python extension installed)',
-    'all of the modules required to run this project are globally available'
+const quickPickVenvOption = () =>
+  quickPickValueWithEvents<number>(
+    [
+      {
+        description: 'use the interpreter selected by the ms-python extension',
+        label: 'Yes',
+        value: 2
+      },
+      {
+        description: 'and I want to select the python interpreter',
+        label: 'Yes',
+        value: 1
+      },
+
+      {
+        description:
+          'all of the modules required to run this project are globally available',
+        label: 'No',
+        value: 0
+      }
+    ],
+    'Does your project use a Python virtual environment?'
   )
 
+const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {
+  if (usesVenv === 1) {
+    return enterPathOrPickFile('dvc.pythonPath', 'Python interpreter')
+  }
+
+  return setPythonPath(undefined)
+}
+
+export const setupWorkspace = async (): Promise<boolean> => {
+  const usesVenv = await quickPickVenvOption()
+
   if (usesVenv === undefined) {
-    return
+    return false
   }
 
   if (usesVenv) {
+    if (!(await quickPickOrUnsetPythonInterpreter(usesVenv))) {
+      return false
+    }
+
     return pickVenvOptions()
   }
 

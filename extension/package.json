@@ -259,6 +259,12 @@
           "type": "string",
           "default": null
         },
+        "dvc.pythonPath": {
+          "title": "%config.pythonPath.title%",
+          "description": "%config.pythonPath.description%",
+          "type": "string",
+          "default": null
+        },
         "dvc.views.trackedExplorerTree.noOpenUnsupported": {
           "title": "%config.noOpenUnsupported.title%",
           "description": "%config.noOpenUnsupported.description%",
