@@ -247,12 +247,6 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.selectDvcPath', () =>
-        this.config.selectDvcPath()
-      )
-    )
-
-    this.dispose.track(
       commands.registerCommand('dvc.selectDefaultProject', () =>
         this.config.selectDefaultProject()
       )

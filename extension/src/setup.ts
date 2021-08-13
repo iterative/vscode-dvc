@@ -1,5 +1,5 @@
 import { IExtension } from './interfaces'
-import { quickPickOneOrInput, quickPickValue } from './vscode/quickPick'
+import { quickPickOneOrInput, quickPickYesOrNo } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 
@@ -41,29 +41,8 @@ const enterPathOrPickFile = async () => {
   return findPath()
 }
 
-const pickYesOrNo = (
-  placeHolder: string,
-  descriptionYes: string,
-  descriptionNo: string
-) =>
-  quickPickValue(
-    [
-      {
-        description: descriptionYes,
-        label: 'Yes',
-        value: true
-      },
-      {
-        description: descriptionNo,
-        label: 'No',
-        value: false
-      }
-    ],
-    { placeHolder }
-  )
-
 const pickCliPath = async () => {
-  const isGlobal = await pickYesOrNo(
+  const isGlobal = await quickPickYesOrNo(
     'Is DVC available globally?',
     "DVC can be located via the system's PATH environment variable",
     'I need to specify a path'
@@ -81,7 +60,7 @@ const pickCliPath = async () => {
 }
 
 const pickVenvOptions = async () => {
-  const dvcInVenv = await pickYesOrNo(
+  const dvcInVenv = await quickPickYesOrNo(
     'Is DVC installed within the environment?',
     "all of the project's requirements are in the virtual environment",
     'this project needs access to a DVC CLI outside of the virtual environment'
@@ -98,7 +77,7 @@ const pickVenvOptions = async () => {
 }
 
 export const setupWorkspace = async (): Promise<void | undefined> => {
-  const usesVenv = await pickYesOrNo(
+  const usesVenv = await quickPickYesOrNo(
     'Does your project use a Python virtual environment?',
     '(needs ms-python extension installed)',
     'all of the modules required to run this project are globally available'

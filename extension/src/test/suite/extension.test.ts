@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
@@ -14,6 +14,8 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
+import { delay } from '../../util/time'
+import { QuickPickItemWithValue } from '../../vscode/quickPick'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -32,53 +34,109 @@ suite('Extension Test Suite', () => {
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
-  describe('dvc.selectDvcPath', () => {
-    const testUri = Uri.file('/file/picked/path/to/dvc')
-    const mockFilePickerResolve = [testUri]
-
-    const selectDvcPathItem = async (selection: number) => {
-      const selectionPromise = commands.executeCommand('dvc.selectDvcPath')
-
-      for (let i = 0; i <= selection; i++) {
-        await commands.executeCommand('workbench.action.quickOpenSelectNext')
-      }
-      await commands.executeCommand(
-        'workbench.action.acceptSelectedQuickOpenItem'
-      )
-      await selectionPromise
-    }
-
-    const configurationChangeEvent = () => {
-      return new Promise(resolve => {
+  describe('dvc.setupWorkspace', () => {
+    const configurationChangeEvent = () =>
+      new Promise(resolve => {
         const listener: Disposable = workspace.onDidChangeConfiguration(
           (event: ConfigurationChangeEvent) => {
-            return resolve(event)
+            if (event.affectsConfiguration(dvcPathOption)) {
+              delay(200).then(() => resolve(event))
+            }
           }
         )
         disposable.track(listener)
       })
+
+    const selectDvcPathFromFilePicker = async () => {
+      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const isAvailableGloballyQuickPick =
+        window.createQuickPick<QuickPickItemWithValue>()
+
+      const mockCreateQuickPick = stub(window, 'createQuickPick')
+        .onFirstCall()
+        .returns(venvQuickPick)
+        .onSecondCall()
+        .returns(isAvailableGloballyQuickPick)
+
+      const venvQuickPickActive = new Promise(resolve =>
+        venvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+      const globalQuickPickActive = new Promise(resolve =>
+        isAvailableGloballyQuickPick.onDidChangeActive(e => resolve(e))
+      )
+
+      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      await venvQuickPickActive
+
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await globalQuickPickActive
+      mockCreateQuickPick.restore()
+
+      await commands.executeCommand('workbench.action.quickOpenSelectNext')
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await configurationChangeEvent()
+
+      return setupWorkspaceWizard
     }
 
-    it('should set dvc.dvcPath to blank on the first option', async () => {
-      const mockShowInputBox = stub(window, 'showInputBox')
-
-      await selectDvcPathItem(0)
-
+    it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
 
+      await workspace.getConfiguration().update(dvcPathOption, '/fun')
+
+      const venvQuickPick = window.createQuickPick<QuickPickItemWithValue>()
+      const isDVCInVenvQuickPick =
+        window.createQuickPick<QuickPickItemWithValue>()
+
+      stub(window, 'createQuickPick')
+        .onFirstCall()
+        .returns(venvQuickPick)
+        .onSecondCall()
+        .returns(isDVCInVenvQuickPick)
+
+      const venvQuickPickActive = new Promise(resolve =>
+        venvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+      const dvcInVenvQuickPickActive = new Promise(resolve =>
+        isDVCInVenvQuickPick.onDidChangeActive(e => resolve(e))
+      )
+
+      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      await venvQuickPickActive
+
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+      await dvcInVenvQuickPickActive
+      await commands.executeCommand(
+        'workbench.action.acceptSelectedQuickOpenItem'
+      )
+
+      await setupWorkspaceWizard
+
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         null
       )
-
-      expect(mockShowInputBox).not.to.have.been.called
     })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
-      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        mockFilePickerResolve
-      )
+      const mockPath = resolve('file', 'picked', 'path', 'to', 'dvc')
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
+        Uri.file(mockPath)
+      ])
       const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I WORK NOW'
       )
@@ -135,12 +193,12 @@ suite('Extension Test Suite', () => {
         ]
       } as unknown as StatusOutput)
 
-      await selectDvcPathItem(1)
+      await selectDvcPathFromFilePicker()
 
-      await configurationChangeEvent()
+      expect(mockShowOpenDialog).to.be.calledOnce
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
-        testUri.fsPath
+        mockPath
       )
 
       expect(mockShowOpenDialog).to.have.been.called
@@ -151,9 +209,9 @@ suite('Extension Test Suite', () => {
     })
 
     it('should dispose of the current repositories and experiments before creating new ones', async () => {
-      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        mockFilePickerResolve
-      )
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
+        Uri.file(resolve('different', 'file', 'picked', 'path', 'to', 'dvc'))
+      ])
       const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I STILL WORK'
       )
@@ -179,10 +237,9 @@ suite('Extension Test Suite', () => {
 
       const mockStatus = stub(CliReader.prototype, 'status').resolves({})
 
-      await selectDvcPathItem(1)
+      await selectDvcPathFromFilePicker()
 
-      await configurationChangeEvent()
-
+      expect(mockShowOpenDialog).to.be.calledOnce
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
@@ -192,18 +249,18 @@ suite('Extension Test Suite', () => {
     })
 
     it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
-      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves(
-        mockFilePickerResolve
-      )
+      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
+        Uri.file(resolve('path', 'to', 'dvc'))
+      ])
       const mockCanRunCli = stub(CliReader.prototype, 'help').rejects(
         'GONE AGAIN'
       )
 
       const mockDisposer = spy(Disposer, 'reset')
 
-      await selectDvcPathItem(1)
+      await selectDvcPathFromFilePicker()
 
-      await configurationChangeEvent()
+      expect(mockShowOpenDialog).to.be.calledOnce
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called

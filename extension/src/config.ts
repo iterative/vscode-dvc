@@ -39,32 +39,6 @@ export class Config {
   private dvcPath = this.getCliPath()
   private defaultProjectOption = 'dvc.defaultProject'
 
-  private dvcPathQuickPickItems = [
-    {
-      description: 'Use Python Extension virtual environment if available',
-      label: 'Default',
-      picked: true,
-      value: undefined
-    },
-    {
-      description: 'Browse the filesystem for a DVC executable',
-      label: 'Find',
-      value: async () => {
-        const result = await window.showOpenDialog({
-          title: 'Select a DVC executable'
-        })
-        if (result) {
-          const [input] = result
-          const { fsPath } = input
-          this.setDvcPath(fsPath)
-          return fsPath
-        } else {
-          return undefined
-        }
-      }
-    }
-  ]
-
   constructor() {
     makeObservable(this)
 
@@ -132,20 +106,6 @@ export class Config {
     return getConfigValue(this.dvcPathOption)
   }
 
-  public selectDvcPath = async (): Promise<void> => {
-    const result = await window.showQuickPick(this.dvcPathQuickPickItems, {
-      placeHolder: 'Please choose...'
-    })
-    if (result) {
-      const { value } = result
-      if (typeof value === 'function') {
-        await value()
-      } else {
-        this.setDvcPath(value)
-      }
-    }
-  }
-
   public getDefaultProject(): string {
     return getConfigValue(this.defaultProjectOption)
   }
@@ -167,11 +127,6 @@ export class Config {
     if (oldPath !== newPath) {
       this.executionDetailsChanged.fire()
     }
-  }
-
-  private setDvcPath(path?: string): Thenable<void> {
-    this.notifyIfChanged(this.getCliPath(), path)
-    return setConfigValue(this.dvcPathOption, path)
   }
 
   private getDefaultProjectOptions(
