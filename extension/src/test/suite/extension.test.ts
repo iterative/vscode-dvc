@@ -263,8 +263,8 @@ suite('Extension Test Suite', () => {
 
       const disposalEvent = new Promise(resolve => {
         mockDisposer.callsFake((...args) => {
-          mockDisposer.wrappedMethod(...args)
           resolve(undefined)
+          return mockDisposer.wrappedMethod(...args)
         })
       })
 
