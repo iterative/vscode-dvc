@@ -5,7 +5,7 @@ import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/pickFile'
 import {
   quickPickOneOrInput,
-  quickPickValueWithEvents,
+  quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
 
@@ -21,7 +21,7 @@ const mockedInitializePreCheck = jest.fn()
 const mockedReset = jest.fn()
 
 const mockedQuickPickYesOrNo = mocked(quickPickYesOrNo)
-const mockedQuickPickValueWithEvents = mocked(quickPickValueWithEvents)
+const mockedQuickPickValue = mocked(quickPickValue)
 const mockedSetConfigValue = mocked(setConfigValue)
 const mockedQuickPickOneOrInput = mocked(quickPickOneOrInput)
 const mockedPickFile = mocked(pickFile)
@@ -32,58 +32,58 @@ beforeEach(() => {
 
 describe('setupWorkspace', () => {
   it('should return without setting any options if the dialog is cancelled at the virtual environment step', async () => {
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(undefined)
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedSetConfigValue).not.toBeCalled()
   })
 
   it('should return without setting any options if the dialog is cancelled at the DVC in virtual environment step', async () => {
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(2)
+    mockedQuickPickValue.mockResolvedValueOnce(2)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(undefined)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(1)
     expect(mockedSetConfigValue).toBeCalledTimes(1)
     expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
   })
 
   it('should set the dvc path option to undefined if the CLI is installed in a virtual environment', async () => {
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(2)
+    mockedQuickPickValue.mockResolvedValueOnce(2)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(true)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(1)
     expect(mockedSetConfigValue).toBeCalledWith('dvc.dvcPath', undefined)
   })
 
   it('should return without setting any options if the dialog is cancelled at the virtual environment without DVC step', async () => {
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(2)
+    mockedQuickPickValue.mockResolvedValueOnce(2)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(undefined)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedSetConfigValue).toBeCalledTimes(1)
     expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
   })
 
   it("should set the dvc path option to dvc if there is a virtual environment which doesn't include the CLI but it is available globally", async () => {
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(2)
+    mockedQuickPickValue.mockResolvedValueOnce(2)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(true)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedSetConfigValue).toBeCalledTimes(2)
     expect(mockedSetConfigValue).toBeCalledWith('dvc.pythonPath', undefined)
@@ -92,14 +92,14 @@ describe('setupWorkspace', () => {
 
   it("should set the dvc path option to the entered value if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
     const mockedDvcPath = resolve('some', 'path', 'to', 'dvc')
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(2)
+    mockedQuickPickValue.mockResolvedValueOnce(2)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(mockedDvcPath)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
     expect(mockedPickFile).not.toBeCalled()
@@ -110,7 +110,7 @@ describe('setupWorkspace', () => {
 
   it("should set the dvc path option to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
     const mockedDvcPath = resolve('some', 'path', 'to', 'dvc')
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(2)
+    mockedQuickPickValue.mockResolvedValueOnce(2)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
@@ -118,7 +118,7 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
     expect(mockedPickFile).toBeCalledTimes(1)
@@ -128,12 +128,12 @@ describe('setupWorkspace', () => {
   })
 
   it('should not set the python or dvc path options if the user cancels the dialog at the pick a python interpreter step', async () => {
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(1)
+    mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce(undefined)
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).not.toBeCalled()
     expect(mockedQuickPickOneOrInput).toBeCalledTimes(1)
     expect(mockedSetConfigValue).not.toBeCalled()
@@ -142,7 +142,7 @@ describe('setupWorkspace', () => {
   it("should set the python and dvc path options to the picked file's path if there is a virtual environment that doesn't include a CLI and there is no global option", async () => {
     const mockedPythonPath = resolve('some', 'path', 'to', 'python')
     const mockedDvcPath = resolve('some', 'path', 'to', 'dvc')
-    mockedQuickPickValueWithEvents.mockResolvedValueOnce(1)
+    mockedQuickPickValue.mockResolvedValueOnce(1)
     mockedQuickPickOneOrInput.mockResolvedValueOnce('pick')
     mockedPickFile.mockResolvedValueOnce(mockedPythonPath)
     mockedQuickPickYesOrNo.mockResolvedValueOnce(false)
@@ -152,7 +152,7 @@ describe('setupWorkspace', () => {
 
     await setupWorkspace()
 
-    expect(mockedQuickPickValueWithEvents).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
     expect(mockedQuickPickYesOrNo).toBeCalledTimes(2)
     expect(mockedQuickPickOneOrInput).toBeCalledTimes(2)
     expect(mockedPickFile).toBeCalledTimes(2)
