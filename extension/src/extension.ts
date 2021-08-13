@@ -254,7 +254,7 @@ export class Extension implements IExtension {
   }
 
   private initializeRepositories = () => {
-    reset(this.repositories, this.dispose)
+    this.repositories = reset<Repositories>(this.repositories, this.dispose)
 
     this.dvcRoots.forEach(dvcRoot => {
       const repository = new Repository(

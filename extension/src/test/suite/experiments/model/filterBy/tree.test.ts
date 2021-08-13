@@ -18,6 +18,7 @@ import {
   getFilterId,
   Operator
 } from '../../../../../experiments/model/filterBy'
+import { experimentsUpdatedEvent } from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
@@ -110,9 +111,7 @@ suite('Experiments Test Suite', () => {
         'getFocusedOrDefaultOrPickProject'
       ).returns(dvcDemoPath)
 
-      const tableFilterAdded = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperiments(resolve)
-      })
+      const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
 
       // eslint-disable-next-line sonarjs/no-duplicate-string
       await commands.executeCommand('dvc.addExperimentsTableFilter')
@@ -143,9 +142,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const tableFilterRemoved = new Promise(resolve => {
-        experimentsRepository.onDidChangeExperiments(resolve)
-      })
+      const tableFilterRemoved = experimentsUpdatedEvent(experimentsRepository)
 
       messageSpy.resetHistory()
 
