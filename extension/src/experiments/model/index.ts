@@ -21,7 +21,11 @@ export class ExperimentsModel {
 
   private filters: Map<string, FilterDefinition> = new Map()
 
-  private currentSorts: SortDefinition[] = []
+  private currentSorts: SortDefinition[]
+
+  constructor(initialSorts: SortDefinition[]) {
+    this.currentSorts = initialSorts
+  }
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =

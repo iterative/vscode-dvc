@@ -1,5 +1,5 @@
 import { join, resolve } from 'path'
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import {
@@ -21,6 +21,10 @@ import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
+const enum MementoPrefixes {
+  sortBy = 'dvc-vscode:ExperimentsRepository:sortBy:'
+}
+
 export class ExperimentsRepository {
   public readonly dispose = Disposable.fn()
 
@@ -37,7 +41,7 @@ export class ExperimentsRepository {
   private readonly resourceLocator: ResourceLocator
 
   private webview?: ExperimentsWebview
-  private experiments = this.dispose.track(new ExperimentsModel())
+  private experiments: ExperimentsModel
   private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
 
   private readonly deferred = new Deferred()
@@ -48,10 +52,13 @@ export class ExperimentsRepository {
 
   private processManager: ProcessManager
 
+  private readonly workspaceState: Memento
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    resourceLocator: ResourceLocator
+    resourceLocator: ResourceLocator,
+    workspaceState: Memento
   ) {
     this.dvcRoot = dvcRoot
     this.internalCommands = internalCommands
@@ -60,6 +67,14 @@ export class ExperimentsRepository {
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
+
+    this.workspaceState = workspaceState
+
+    this.experiments = this.dispose.track(
+      new ExperimentsModel(
+        workspaceState.get(MementoPrefixes.sortBy + this.dvcRoot, [])
+      )
+    )
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
@@ -135,6 +150,7 @@ export class ExperimentsRepository {
 
   public addSort(sort: SortDefinition) {
     this.experiments.addSort(sort)
+    this.persistSorts()
     return this.notifyChanged()
   }
 
@@ -168,6 +184,7 @@ export class ExperimentsRepository {
 
   public removeSortByPath(pathToRemove: string) {
     this.experiments.removeSort(pathToRemove)
+    this.persistSorts()
     return this.notifyChanged()
   }
 
@@ -180,6 +197,7 @@ export class ExperimentsRepository {
 
   public removeSorts() {
     this.experiments.removeSorts()
+    this.persistSorts()
     return this.notifyChanged()
   }
 
@@ -238,6 +256,13 @@ export class ExperimentsRepository {
     ])
 
     return this.notifyChanged()
+  }
+
+  private persistSorts() {
+    this.workspaceState.update(
+      MementoPrefixes.sortBy + this.dvcRoot,
+      this.getSorts()
+    )
   }
 
   private notifyChanged() {

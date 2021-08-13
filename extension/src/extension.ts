@@ -114,7 +114,7 @@ export class Extension implements IExtension {
     )
 
     this.experiments = this.dispose.track(
-      new Experiments(this.internalCommands)
+      new Experiments(this.internalCommands, context.workspaceState)
     )
 
     this.dispose.track(
