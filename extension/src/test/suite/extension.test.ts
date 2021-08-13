@@ -14,7 +14,6 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
-import { delay } from '../../util/time'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -43,7 +42,7 @@ suite('Extension Test Suite', () => {
         const listener: Disposable = workspace.onDidChangeConfiguration(
           (event: ConfigurationChangeEvent) => {
             if (event.affectsConfiguration(option)) {
-              delay(200).then(() => resolve(event))
+              resolve(event)
             }
           }
         )
@@ -62,6 +61,16 @@ suite('Extension Test Suite', () => {
           })
         )
       })
+
+    const onDidChangeFileSystemSetupEvent = () =>
+      new Promise(resolve =>
+        stub(Watcher, 'onDidChangeFileSystem').callsFake(() => {
+          resolve(undefined)
+          return {
+            dispose: () => undefined
+          } as Disposable
+        })
+      )
 
     const selectDvcPathFromFilePicker = async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
@@ -174,16 +183,11 @@ suite('Extension Test Suite', () => {
         'I WORK NOW'
       )
 
-      const mockOnDidChangeFileSystem = stub(
-        Watcher,
-        'onDidChangeFileSystem'
-      ).returns({
-        dispose: () => undefined
-      } as Disposable)
-
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
+
+      const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -234,9 +238,10 @@ suite('Extension Test Suite', () => {
         mockPath
       )
 
+      await onDidChangeFileSystemCalled
+
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
-      expect(mockOnDidChangeFileSystem).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
     })
@@ -253,9 +258,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      stub(Watcher, 'onDidChangeFileSystem').returns({
-        dispose: () => undefined
-      } as Disposable)
+      const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
 
       const mockDisposer = spy(Disposer, 'reset')
 
@@ -271,6 +274,8 @@ suite('Extension Test Suite', () => {
       const mockStatus = stub(CliReader.prototype, 'status').resolves({})
 
       await selectDvcPathFromFilePicker()
+
+      await onDidChangeFileSystemCalled
 
       expect(mockShowOpenDialog).to.be.calledOnce
       expect(mockShowOpenDialog).to.have.been.called
@@ -289,12 +294,20 @@ suite('Extension Test Suite', () => {
         'GONE AGAIN'
       )
 
-      const mockDisposer = spy(Disposer, 'reset')
+      const mockDisposer = stub(Disposer, 'reset')
+
+      const disposalEvent = new Promise(resolve => {
+        mockDisposer.callsFake((...args) => {
+          mockDisposer.wrappedMethod(...args)
+          resolve(undefined)
+        })
+      })
 
       await selectDvcPathFromFilePicker()
 
-      expect(mockShowOpenDialog).to.be.calledOnce
+      await disposalEvent
 
+      expect(mockShowOpenDialog).to.be.calledOnce
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
