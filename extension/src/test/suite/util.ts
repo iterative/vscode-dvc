@@ -1,5 +1,5 @@
 import { SinonStub } from 'sinon'
-import { ConfigurationChangeEvent, workspace } from 'vscode'
+import { commands, ConfigurationChangeEvent, workspace } from 'vscode'
 import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
 
@@ -33,6 +33,13 @@ export const quickPickInitialized = (
       })
     )
   })
+
+export const selectQuickPickItem = async (number: number) => {
+  for (let i = 1; i < number; i++) {
+    await commands.executeCommand('workbench.action.quickOpenSelectNext')
+  }
+  return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
+}
 
 export const experimentsUpdatedEvent = (
   experimentsRepository: ExperimentsRepository

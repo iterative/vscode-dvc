@@ -1,7 +1,8 @@
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { commands, window } from 'vscode'
+import { window } from 'vscode'
 import { quickPickOneOrInput } from '../../../vscode/quickPick'
+import { selectQuickPickItem } from '../util'
 
 suite('Quick Pick Test Suite', () => {
   window.showInformationMessage('Start all quick pick tests.')
@@ -24,10 +25,7 @@ suite('Quick Pick Test Suite', () => {
         'do not want this value'
       )
 
-      await commands.executeCommand('workbench.action.quickOpenNavigateNext')
-      await commands.executeCommand(
-        'workbench.action.acceptSelectedQuickOpenItem'
-      )
+      await selectQuickPickItem(2)
 
       const result = await resultPromise
 
@@ -43,9 +41,7 @@ suite('Quick Pick Test Suite', () => {
         expectedDefault
       )
 
-      await commands.executeCommand(
-        'workbench.action.acceptSelectedQuickOpenItem'
-      )
+      await selectQuickPickItem(1)
 
       const result = await resultPromise
 
