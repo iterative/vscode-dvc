@@ -2,6 +2,8 @@ import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
+import { readFileSync } from 'fs-extra'
+import { load } from 'js-yaml'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
@@ -16,7 +18,7 @@ import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { ExperimentsRepoJSONOutput, ValueTreeRoot } from '../cli/reader'
 import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
@@ -32,6 +34,8 @@ export class ExperimentsRepository {
     this.dispose.track(new EventEmitter())
 
   private readonly dvcRoot: string
+  private readonly dvcLock: string
+  private paramsFile: string
 
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
@@ -65,8 +69,22 @@ export class ExperimentsRepository {
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
 
+    this.dvcLock = join(this.dvcRoot, 'dvc.lock')
+
+    this.dispose.track(onDidChangeFileSystem(this.dvcLock, () => undefined)) // check to see if params file moved!
+
+    const yaml = load(readFileSync(this.dvcLock, 'utf-8')) as {
+      stages: {
+        train: {
+          params: ValueTreeRoot
+        }
+      }
+    }
+    const [paramsFile] = Object.keys(yaml.stages.train.params)
+    this.paramsFile = join(this.dvcRoot, paramsFile)
+
     this.dispose.track(
-      onDidChangeFileSystem(join(this.dvcRoot, 'params.yaml'), () =>
+      onDidChangeFileSystem(this.paramsFile, () =>
         this.refresh().then(() => {
           this.deferred.resolve()
         })

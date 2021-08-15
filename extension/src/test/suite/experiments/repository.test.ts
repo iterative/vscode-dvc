@@ -48,7 +48,7 @@ suite('Experiments Repository Test Suite', () => {
 
       const testTable = disposable.track(
         new ExperimentsRepository(
-          'demo',
+          dvcDemoPath,
           internalCommands,
           {} as ResourceLocator
         )
@@ -81,7 +81,7 @@ suite('Experiments Repository Test Suite', () => {
 
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
-          'demo',
+          dvcDemoPath,
           internalCommands,
           {} as ResourceLocator
         )
@@ -115,7 +115,7 @@ suite('Experiments Repository Test Suite', () => {
 
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
-          'demo',
+          dvcDemoPath,
           internalCommands,
           {} as ResourceLocator
         )
