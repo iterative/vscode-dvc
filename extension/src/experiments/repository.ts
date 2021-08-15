@@ -65,7 +65,13 @@ export class ExperimentsRepository {
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
 
-    this.refresh().then(() => this.deferred.resolve())
+    this.dispose.track(
+      onDidChangeFileSystem(join(this.dvcRoot, 'params.yaml'), () =>
+        this.refresh().then(() => {
+          this.deferred.resolve()
+        })
+      )
+    )
   }
 
   public isReady() {

@@ -18,7 +18,7 @@ import { ParamOrMetric } from '../../../experiments/webview/contract'
 import { experimentsUpdatedEvent } from '../util'
 
 suite('Experiments Repository Test Suite', () => {
-  window.showInformationMessage('Start all experiments tests.')
+  window.showInformationMessage('Start all experiment repository tests.')
 
   const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
