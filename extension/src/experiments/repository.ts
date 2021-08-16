@@ -1,6 +1,5 @@
 import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import {
   pickFilterToAdd,
@@ -36,14 +35,11 @@ export class ExperimentsRepository {
 
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
+  private readonly workspaceParams: WorkspaceParams
 
   private webview?: ExperimentsWebview
   private experiments = this.dispose.track(new ExperimentsModel())
   private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
-  private workspaceParams: WorkspaceParams
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
 
   private initialDataLoaded = false
 
@@ -75,13 +71,12 @@ export class ExperimentsRepository {
 
     this.updateData().then(async () => {
       await this.workspaceParams.isReady()
-      this.deferred.resolve()
       this.initialDataLoaded = true
     })
   }
 
   public isReady() {
-    return this.initialized
+    return this.workspaceParams.isReady()
   }
 
   public onDidChangeData(gitRoot: string): void {
