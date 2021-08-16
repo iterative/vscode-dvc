@@ -3,10 +3,20 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { readFileSync } from 'fs-extra'
 import { load } from 'js-yaml'
-import isEqual from 'lodash.isequal'
 import { ValueTreeRoot } from '../../cli/reader'
 import { onDidChangeFileSystem } from '../../fileSystem/watcher'
 import { reset } from '../../util/disposable'
+import { sameContents } from '../../util/array'
+
+type Updater = () => Promise<void>
+
+type PartialLockFile = {
+  stages: {
+    train: {
+      params: ValueTreeRoot
+    }
+  }
+}
 
 export class WorkspaceParams {
   public readonly dispose = Disposable.fn()
@@ -19,21 +29,11 @@ export class WorkspaceParams {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  constructor(dvcRoot: string, updater: () => Promise<void>) {
+  constructor(dvcRoot: string, updater: Updater) {
     this.dvcRoot = dvcRoot
     this.dvcLock = join(dvcRoot, 'dvc.lock')
 
-    this.dispose.track(
-      onDidChangeFileSystem(this.dvcLock, () => {
-        const paramsFiles = this.findParams()
-        if (!isEqual(this.paramsFiles, paramsFiles)) {
-          this.watchers = reset(this.watchers, this.dispose)
-
-          this.paramsFiles = paramsFiles
-          this.watchParams(updater)
-        }
-      })
-    )
+    this.watchLockFile(updater)
 
     this.findAndWatchParams(updater).then(() => this.deferred.resolve())
   }
@@ -42,26 +42,36 @@ export class WorkspaceParams {
     return this.initialized
   }
 
-  private findAndWatchParams(updater: () => Promise<void>) {
+  private watchLockFile(updater: Updater) {
+    this.dispose.track(
+      onDidChangeFileSystem(this.dvcLock, () => {
+        const paramsFiles = this.findParams()
+        if (!sameContents(this.paramsFiles, paramsFiles)) {
+          this.watchers = reset(this.watchers, this.dispose)
+
+          this.paramsFiles = paramsFiles
+          this.watchParams(updater)
+        }
+      })
+    )
+  }
+
+  private findAndWatchParams(updater: Updater) {
     this.paramsFiles = this.findParams()
     return this.watchParams(updater)
   }
 
   private findParams() {
-    const yaml = load(readFileSync(this.dvcLock, 'utf-8')) as {
-      stages: {
-        train: {
-          params: ValueTreeRoot
-        }
-      }
-    }
+    const lockFileYaml = load(
+      readFileSync(this.dvcLock, 'utf-8')
+    ) as PartialLockFile
 
-    return Object.keys(yaml.stages.train.params).map(paramsFile =>
+    return Object.keys(lockFileYaml.stages.train.params).map(paramsFile =>
       join(this.dvcRoot, paramsFile)
     )
   }
 
-  private watchParams(updater: () => Promise<void>) {
+  private watchParams(updater: Updater) {
     return Promise.all(
       this.paramsFiles.map(paramsFile => {
         const { isReady, ...disposable } = this.dispose.track(
