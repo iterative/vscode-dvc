@@ -1,9 +1,6 @@
 import { join, resolve } from 'path'
 import { Event, EventEmitter } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
-import { readFileSync } from 'fs-extra'
-import { load } from 'js-yaml'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
@@ -13,12 +10,13 @@ import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { SortDefinition } from './model/sortBy'
 import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
+import { WorkspaceParams } from './paramsAndMetrics/workspace'
 import { ResourceLocator } from '../resourceLocator'
 import { onDidChangeFileSystem } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
-import { ExperimentsRepoJSONOutput, ValueTreeRoot } from '../cli/reader'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
@@ -34,18 +32,14 @@ export class ExperimentsRepository {
     this.dispose.track(new EventEmitter())
 
   private readonly dvcRoot: string
-  private readonly dvcLock: string
-  private paramsFile: string
 
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
+  private readonly workspaceParams: WorkspaceParams
 
   private webview?: ExperimentsWebview
   private experiments = this.dispose.track(new ExperimentsModel())
   private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
@@ -69,31 +63,13 @@ export class ExperimentsRepository {
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
 
-    this.dvcLock = join(this.dvcRoot, 'dvc.lock')
-
-    this.dispose.track(onDidChangeFileSystem(this.dvcLock, () => undefined)) // check to see if params file moved!
-
-    const yaml = load(readFileSync(this.dvcLock, 'utf-8')) as {
-      stages: {
-        train: {
-          params: ValueTreeRoot
-        }
-      }
-    }
-    const [paramsFile] = Object.keys(yaml.stages.train.params)
-    this.paramsFile = join(this.dvcRoot, paramsFile)
-
-    this.dispose.track(
-      onDidChangeFileSystem(this.paramsFile, () =>
-        this.refresh().then(() => {
-          this.deferred.resolve()
-        })
-      )
+    this.workspaceParams = this.dispose.track(
+      new WorkspaceParams(dvcRoot, () => this.refresh())
     )
   }
 
   public isReady() {
-    return this.initialized
+    return this.workspaceParams.isReady()
   }
 
   public onDidChangeData(gitRoot: string): void {
