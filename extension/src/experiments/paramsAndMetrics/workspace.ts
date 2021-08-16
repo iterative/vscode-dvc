@@ -11,7 +11,7 @@ export class WorkspaceParams {
 
   private readonly dvcRoot: string
   private readonly dvcLock: string
-  private paramsFiles: string[]
+  private paramsFiles: string[] = []
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -22,6 +22,14 @@ export class WorkspaceParams {
 
     this.dispose.track(onDidChangeFileSystem(this.dvcLock, () => undefined)) // check to see if params file moved!
 
+    this.findAndWatchParams(updater).then(() => this.deferred.resolve())
+  }
+
+  public isReady() {
+    return this.initialized
+  }
+
+  private findAndWatchParams(updater: () => Promise<void>) {
     const yaml = load(readFileSync(this.dvcLock, 'utf-8')) as {
       stages: {
         train: {
@@ -34,18 +42,13 @@ export class WorkspaceParams {
       join(this.dvcRoot, paramsFile)
     )
 
-    this.paramsFiles.forEach(paramsFile => {
-      this.dispose.track(
-        onDidChangeFileSystem(paramsFile, () =>
-          updater().then(() => {
-            this.deferred.resolve()
-          })
+    return Promise.all(
+      this.paramsFiles.map(paramsFile => {
+        const { isReady } = this.dispose.track(
+          onDidChangeFileSystem(paramsFile, () => updater())
         )
-      )
-    })
-  }
-
-  public isReady() {
-    return this.initialized
+        return isReady
+      })
+    )
   }
 }
