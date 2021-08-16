@@ -8,6 +8,7 @@ import jsYaml from 'js-yaml'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
 import * as Watcher from '../../../../fileSystem/watcher'
+import { exists } from '../../../../fileSystem'
 import * as Disposer from '../../../../util/disposable'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 
@@ -74,6 +75,8 @@ suite('Experiments Test Suite', () => {
       )
 
       const mockDisposer = spy(Disposer, 'reset')
+
+      expect(exists(join(dvcDemoPath, 'dvc.lock'))).to.be.true
 
       const touchTime = new Date()
       await utimes(join(dvcDemoPath, 'dvc.lock'), touchTime, touchTime)
