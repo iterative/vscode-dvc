@@ -60,8 +60,8 @@ suite('Experiments Test Suite', () => {
         })
       })
 
-      const ee = new EventEmitter<void>()
-      const event = ee.event
+      const mockDVCLockChanged = new EventEmitter<void>()
+      const mockOnDidChangeDVCLock = mockDVCLockChanged.event
 
       const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
       mockOnDidChangeFileSystem
@@ -71,7 +71,7 @@ suite('Experiments Test Suite', () => {
         )
         .onSecondCall()
         .callsFake((path: string, watcher: (path: string) => void) => {
-          event(() => watcher(path))
+          mockOnDidChangeDVCLock(() => watcher(path))
           return {
             dispose: () => undefined,
             isReady: Promise.resolve(undefined)
@@ -98,7 +98,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      ee.fire()
+      mockDVCLockChanged.fire()
 
       await disposalEvent
 
