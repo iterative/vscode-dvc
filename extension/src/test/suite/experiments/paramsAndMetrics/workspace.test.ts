@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window } from 'vscode'
-import { appendFileSync } from 'fs-extra'
+import { utimes } from 'fs-extra'
 import jsYaml from 'js-yaml'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
@@ -25,6 +25,8 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('WorkspaceParams', () => {
+    const dvcDemoLock = join(dvcDemoPath, 'dvc.lock')
+
     it('should call the updater function on setup', async () => {
       const mockUpdater = stub()
       const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
@@ -43,7 +45,7 @@ suite('Experiments Test Suite', () => {
       )
 
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
-        join(dvcDemoPath, 'dvc.lock')
+        dvcDemoLock
       )
     })
 
@@ -71,14 +73,15 @@ suite('Experiments Test Suite', () => {
         stages: {
           train: {
             params: {
-              'newParams.yaml': { seed: 10000, weight_decay: 0 },
+              'newParams.yml': { seed: 10000, weight_decay: 0 },
               'params.yaml': { lr: 400 }
             }
           }
         }
       })
 
-      appendFileSync(join(dvcDemoPath, 'dvc.lock'), '\n')
+      const touchTime = new Date()
+      await utimes(dvcDemoLock, touchTime, touchTime)
 
       await disposalEvent
 
@@ -87,7 +90,7 @@ suite('Experiments Test Suite', () => {
 
       expect(onDidChangeFileSystemSpy).to.be.calledTwice
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 0)).to.equal(
-        join(dvcDemoPath, 'newParams.yaml')
+        join(dvcDemoPath, 'newParams.yml')
       )
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
         join(dvcDemoPath, 'params.yaml')
