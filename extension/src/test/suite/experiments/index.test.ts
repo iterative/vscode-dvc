@@ -15,12 +15,13 @@ import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { CliExecutor } from '../../../cli/executor'
-import { dvcDemoPath, resourcePath } from '../util'
+import { buildMockMemento, dvcDemoPath, resourcePath } from '../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
 
   const disposable = Disposable.fn()
+  const mockMemento = buildMockMemento()
 
   beforeEach(() => {
     restore()
@@ -69,6 +70,7 @@ suite('Experiments Test Suite', () => {
 
       const experiments = new Experiments(
         internalCommands,
+        mockMemento,
         mockExperimentsRepository
       )
       const [experimentsRepository] = experiments.create(
@@ -120,6 +122,7 @@ suite('Experiments Test Suite', () => {
 
       const experiments = new Experiments(
         internalCommands,
+        mockMemento,
         mockExperimentsRepository
       )
       const [experimentsRepository] = experiments.create(
@@ -163,7 +166,7 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = new Experiments(internalCommands)
+      const experiments = new Experiments(internalCommands, mockMemento)
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -199,6 +202,7 @@ suite('Experiments Test Suite', () => {
 
       const experiments = new Experiments(
         internalCommands,
+        mockMemento,
         mockExperimentsRepository
       )
       const [experimentsRepository] = experiments.create(

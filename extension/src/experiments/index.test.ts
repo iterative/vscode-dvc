@@ -1,5 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
+import { Memento } from 'vscode'
 import { Experiments } from '.'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
@@ -42,6 +43,12 @@ describe('Experiments', () => {
     getDefaultProject: mockedGetDefaultProject
   } as unknown as Config)
 
+  const mockedWorkspaceState = {
+    get: jest.fn(),
+    keys: jest.fn(),
+    update: jest.fn()
+  } as Memento
+
   const mockedCommandId = 'mockedExpFunc' as CommandId
   mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
     mockedExpFunc(...args)
@@ -57,16 +64,20 @@ describe('Experiments', () => {
     (...args) => mockedRun(...args)
   )
 
-  const experiments = new Experiments(mockedInternalCommands, {
-    '/my/dvc/root': {
-      getDvcRoot: () => mockedDvcRoot,
-      showWebview: mockedShowWebview
-    } as unknown as ExperimentsRepository,
-    '/my/fun/dvc/root': {
-      getDvcRoot: () => mockedOtherDvcRoot,
-      showWebview: jest.fn()
-    } as unknown as ExperimentsRepository
-  })
+  const experiments = new Experiments(
+    mockedInternalCommands,
+    mockedWorkspaceState,
+    {
+      '/my/dvc/root': {
+        getDvcRoot: () => mockedDvcRoot,
+        showWebview: mockedShowWebview
+      } as unknown as ExperimentsRepository,
+      '/my/fun/dvc/root': {
+        getDvcRoot: () => mockedOtherDvcRoot,
+        showWebview: jest.fn()
+      } as unknown as ExperimentsRepository
+    }
+  )
 
   describe('getCwdThenRun', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {

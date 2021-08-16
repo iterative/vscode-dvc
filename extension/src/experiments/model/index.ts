@@ -23,8 +23,12 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
 
-  constructor(initialSorts: SortDefinition[]) {
+  constructor(
+    initialSorts: SortDefinition[],
+    initialFilters: [string, FilterDefinition][]
+  ) {
     this.currentSorts = initialSorts
+    this.filters = new Map(initialFilters)
   }
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
@@ -59,6 +63,10 @@ export class ExperimentsModel {
 
   public getSorts(): SortDefinition[] {
     return this.currentSorts
+  }
+
+  public getRawFilters() {
+    return this.filters
   }
 
   public getFilters() {

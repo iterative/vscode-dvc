@@ -18,6 +18,7 @@ import {
   Operator
 } from '../../../../../experiments/model/filterBy'
 import {
+  buildMockMemento,
   dvcDemoPath,
   experimentsUpdatedEvent,
   resourcePath
@@ -25,6 +26,7 @@ import {
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
+  const mockMemento = buildMockMemento()
 
   const disposable = Disposable.fn()
 
@@ -57,7 +59,8 @@ suite('Experiments Test Suite', () => {
       const experimentsRepository = new ExperimentsRepository(
         dvcDemoPath,
         internalCommands,
-        resourceLocator
+        resourceLocator,
+        mockMemento
       )
 
       await experimentsRepository.isReady()
@@ -168,7 +171,8 @@ suite('Experiments Test Suite', () => {
       const experimentsRepository = new ExperimentsRepository(
         dvcDemoPath,
         internalCommands,
-        resourceLocator
+        resourceLocator,
+        mockMemento
       )
 
       await experimentsRepository.isReady()

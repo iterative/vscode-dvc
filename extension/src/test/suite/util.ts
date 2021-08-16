@@ -1,11 +1,21 @@
 import { resolve } from 'path'
 import { SinonSpy, SinonStub } from 'sinon'
-import { commands, ConfigurationChangeEvent, workspace } from 'vscode'
+import { commands, ConfigurationChangeEvent, Memento, workspace } from 'vscode'
 import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
 
 export const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 export const resourcePath = resolve(__dirname, '..', '..', '..', 'resources')
+
+export const buildMockMemento = (values: Record<string, unknown> = {}) =>
+  ({
+    get: (key: string, defaultValue: unknown) => values[key] || defaultValue,
+    keys: () => [],
+    update: (key: string, value: unknown) =>
+      new Promise(() => {
+        values[key] = value
+      })
+  } as unknown as Memento)
 
 export const configurationChangeEvent = (
   option: string,

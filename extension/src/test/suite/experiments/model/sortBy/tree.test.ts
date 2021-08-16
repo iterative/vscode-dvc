@@ -18,6 +18,7 @@ import {
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import {
+  buildMockMemento,
   dvcDemoPath,
   experimentsUpdatedEvent,
   resourcePath
@@ -25,6 +26,7 @@ import {
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
+  const mockMemento = buildMockMemento()
 
   const testData = {
     testBranch: {
@@ -124,7 +126,8 @@ suite('Experiments Test Suite', () => {
       const experimentsRepository = new ExperimentsRepository(
         dvcDemoPath,
         internalCommands,
-        resourceLocator
+        resourceLocator,
+        mockMemento
       )
 
       await experimentsRepository.isReady()

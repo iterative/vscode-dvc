@@ -15,7 +15,12 @@ import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
-import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
+import {
+  buildMockMemento,
+  dvcDemoPath,
+  experimentsUpdatedEvent,
+  resourcePath
+} from '../util'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -43,11 +48,14 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
+      const mockMemento = buildMockMemento()
+
       const testTable = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          {} as ResourceLocator
+          {} as ResourceLocator,
+          mockMemento
         )
       )
       await testTable.isReady()
@@ -76,11 +84,14 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
+      const mockMemento = buildMockMemento()
+
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          {} as ResourceLocator
+          {} as ResourceLocator,
+          mockMemento
         )
       )
       await experimentsRepository.isReady()
@@ -110,11 +121,14 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
+      const mockMemento = buildMockMemento()
+
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          {} as ResourceLocator
+          {} as ResourceLocator,
+          mockMemento
         )
       )
       await experimentsRepository.isReady()
@@ -147,11 +161,13 @@ suite('Experiments Repository Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
+      const mockMemento = buildMockMemento()
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          mockMemento
         )
       )
 
@@ -182,11 +198,13 @@ suite('Experiments Repository Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
+      const mockMemento = buildMockMemento()
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          mockMemento
         )
       )
 
@@ -248,8 +266,14 @@ suite('Experiments Repository Test Suite', () => {
     const resourceLocator = disposable.track(
       new ResourceLocator(Uri.file(resourcePath))
     )
+    const mockMemento = buildMockMemento()
     const experimentsRepository = disposable.track(
-      new ExperimentsRepository(dvcDemoPath, internalCommands, resourceLocator)
+      new ExperimentsRepository(
+        dvcDemoPath,
+        internalCommands,
+        resourceLocator,
+        mockMemento
+      )
     )
     await experimentsRepository.isReady()
     await experimentsRepository.showWebview()

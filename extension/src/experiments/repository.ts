@@ -23,7 +23,8 @@ import { quickPickValue } from '../vscode/quickPick'
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
 const enum MementoPrefixes {
-  sortBy = 'dvc-vscode:ExperimentsRepository:sortBy:'
+  sortBy = 'sortBy:',
+  filterBy = 'filterBy:'
 }
 
 export class ExperimentsRepository {
@@ -76,7 +77,8 @@ export class ExperimentsRepository {
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(
-        workspaceState.get(MementoPrefixes.sortBy + this.dvcRoot, [])
+        workspaceState.get(MementoPrefixes.sortBy + this.dvcRoot, []),
+        workspaceState.get(MementoPrefixes.filterBy + this.dvcRoot, [])
       )
     )
 
@@ -227,6 +229,7 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.addFilter(filterToAdd)
+    this.persistFilters()
     return this.notifyChanged()
   }
 
@@ -237,11 +240,13 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.removeFilters(filtersToRemove)
+    this.persistFilters()
     return this.notifyChanged()
   }
 
   public removeFilter(id: string) {
     if (this.experiments.removeFilter(id)) {
+      this.persistFilters()
       return this.notifyChanged()
     }
   }
@@ -274,10 +279,16 @@ export class ExperimentsRepository {
   }
 
   private persistSorts() {
-    this.workspaceState.update(
+    return this.workspaceState.update(
       MementoPrefixes.sortBy + this.dvcRoot,
       this.getSorts()
     )
+  }
+
+  private persistFilters() {
+    return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
+      ...this.experiments.getRawFilters()
+    ])
   }
 
   private notifyChanged() {

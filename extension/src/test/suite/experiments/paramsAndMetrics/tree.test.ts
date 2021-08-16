@@ -12,7 +12,7 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
-import { dvcDemoPath, resourcePath } from '../../util'
+import { buildMockMemento, dvcDemoPath, resourcePath } from '../../util'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage(
@@ -30,6 +30,7 @@ suite('Extension Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
   })
+  const mockMemento = buildMockMemento()
 
   describe('experimentsParamsAndMetricsTree', () => {
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
@@ -50,7 +51,8 @@ suite('Extension Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          mockMemento
         )
       )
 
@@ -101,7 +103,8 @@ suite('Extension Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          mockMemento
         )
       )
 
@@ -172,7 +175,12 @@ suite('Extension Test Suite', () => {
       new ResourceLocator(Uri.file(resourcePath))
     )
     const experimentsRepository = disposable.track(
-      new ExperimentsRepository(dvcDemoPath, internalCommands, resourceLocator)
+      new ExperimentsRepository(
+        dvcDemoPath,
+        internalCommands,
+        resourceLocator,
+        mockMemento
+      )
     )
 
     await experimentsRepository.isReady()
@@ -249,7 +257,12 @@ suite('Extension Test Suite', () => {
       new ResourceLocator(Uri.file(resourcePath))
     )
     const experimentsRepository = disposable.track(
-      new ExperimentsRepository(dvcDemoPath, internalCommands, resourceLocator)
+      new ExperimentsRepository(
+        dvcDemoPath,
+        internalCommands,
+        resourceLocator,
+        mockMemento
+      )
     )
 
     await experimentsRepository.isReady()
