@@ -37,11 +37,13 @@ suite('Experiments Test Suite', () => {
 
       expect(mockUpdater).to.be.calledOnce
       expect(onDidChangeFileSystemSpy).to.be.calledTwice
+
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 0)).to.equal(
-        join(dvcDemoPath, 'dvc.lock')
-      )
-      expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
         join(dvcDemoPath, 'params.yaml')
+      )
+
+      expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
+        join(dvcDemoPath, 'dvc.lock')
       )
     })
 

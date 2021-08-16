@@ -66,8 +66,6 @@ export const onDidChangeFileSystem = (
   const isReady = new Promise<void>(resolve =>
     pathWatcher.on('ready', () => {
       onReady(debouncedWatcher, path, pathWatcher)
-      // eslint-disable-next-line no-console
-      console.error(path)
       resolve(undefined)
     })
   )

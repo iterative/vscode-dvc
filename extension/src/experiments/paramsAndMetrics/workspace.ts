@@ -33,10 +33,9 @@ export class WorkspaceParams {
     this.dvcRoot = dvcRoot
     this.dvcLock = join(dvcRoot, 'dvc.lock')
 
-    Promise.all([
-      this.watchLockFile(updater),
-      ...this.findAndWatchParams(updater)
-    ]).then(() => this.deferred.resolve())
+    Promise.all(this.findAndWatchParams(updater))
+      .then(() => this.watchLockFile(updater))
+      .then(() => this.deferred.resolve())
   }
 
   public isReady() {
@@ -51,6 +50,7 @@ export class WorkspaceParams {
         if (!sameContents(existingParamsFiles, paramsFiles)) {
           this.watchers = reset(this.watchers, this.dispose)
           this.paramsFiles = paramsFiles
+
           this.watchParams(updater)
         }
       })
