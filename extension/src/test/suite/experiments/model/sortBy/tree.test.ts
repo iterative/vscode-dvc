@@ -18,11 +18,11 @@ import {
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import {
-  buildMockMemento,
   dvcDemoPath,
   experimentsUpdatedEvent,
   resourcePath
 } from '../../../util'
+import { buildMockMemento } from '../../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')

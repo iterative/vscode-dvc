@@ -62,13 +62,17 @@ export class WorkspaceParams {
   }
 
   private findParams() {
-    const lockFileYaml = load(
-      readFileSync(this.dvcLock, 'utf-8')
-    ) as PartialLockFile
+    try {
+      const lockFileYaml = load(
+        readFileSync(this.dvcLock, 'utf-8')
+      ) as PartialLockFile
 
-    return Object.keys(lockFileYaml.stages.train.params).map(paramsFile =>
-      join(this.dvcRoot, paramsFile)
-    )
+      return Object.keys(lockFileYaml.stages.train.params).map(paramsFile =>
+        join(this.dvcRoot, paramsFile)
+      )
+    } catch (e) {
+      return []
+    }
   }
 
   private watchParams(updater: Updater) {

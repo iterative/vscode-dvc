@@ -12,7 +12,8 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
-import { buildMockMemento, dvcDemoPath, resourcePath } from '../../util'
+import { dvcDemoPath, resourcePath } from '../../util'
+import { buildMockMemento } from '../../../util'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage(

@@ -15,12 +15,8 @@ import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
-import {
-  buildMockMemento,
-  dvcDemoPath,
-  experimentsUpdatedEvent,
-  resourcePath
-} from '../util'
+import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
+import { buildMockMemento } from '../../util'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')

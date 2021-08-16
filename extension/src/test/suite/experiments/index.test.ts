@@ -15,7 +15,8 @@ import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { CliExecutor } from '../../../cli/executor'
-import { buildMockMemento, dvcDemoPath, resourcePath } from '../util'
+import { dvcDemoPath, resourcePath } from '../util'
+import { buildMockMemento } from '../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')

@@ -1,8 +1,14 @@
 import { join } from 'path'
+import { EventEmitter as VSEventEmitter } from 'vscode'
 import { URI, Utils } from 'vscode-uri'
 
+export function EventEmitter<T = void>(this: VSEventEmitter<T>) {
+  this.dispose = jest.fn()
+  this.event = jest.fn()
+  this.fire = jest.fn()
+}
+
 export const commands = jest.fn()
-export const EventEmitter = jest.fn()
 export const Extension = jest.fn()
 export const extensions = jest.fn()
 export const scm = jest.fn()

@@ -2,9 +2,20 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
 import { ExperimentsRepository } from './repository'
+import { SortDefinition } from './model/sortBy'
+import complexExperimentsOutput from './webview/complex-output-example.json'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
+import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { ResourceLocator } from '../resourceLocator'
+import { buildMockMemento } from '../test/util'
+import { Config } from '../config'
 
-jest.mock('@hediet/std/disposable')
+jest.mock('../fileSystem/watcher', () => ({ onDidChangeFileSystem: jest.fn() }))
+jest.mock('@hediet/std/disposable', () => ({
+  Disposable: {
+    fn: () => ({ track: (tracked: unknown) => tracked })
+  }
+}))
 jest.mock('vscode')
 
 const mockedShowQuickPick = mocked<
@@ -50,14 +61,53 @@ const paramsYamlParam = {
 const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
 
 describe('ExperimentsRepository', () => {
-  const mockGetTerminalNodes = jest.fn()
-  const pickSort = ExperimentsRepository.prototype.pickSort.bind({
-    paramsAndMetrics: {
-      getTerminalNodes: mockGetTerminalNodes
-    }
+  describe('persisted state', () => {
+    const mockedInternalCommands = new InternalCommands({
+      getDefaultProject: jest.fn()
+    } as unknown as Config)
+    mockedInternalCommands.registerCommand(
+      AvailableCommands.EXPERIMENT_SHOW,
+      () => Promise.resolve(complexExperimentsOutput)
+    )
+    it('Properly initializes with no persisted state', async () => {
+      const testRepository = new ExperimentsRepository(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        buildMockMemento()
+      )
+      await expect(testRepository.isReady()).resolves.toBe(undefined)
+    })
+    it('Properly initializes with persisted state', async () => {
+      const sortDefinitions: SortDefinition[] = [
+        { descending: false, path: 'params/params.yaml/test' },
+        { descending: true, path: 'params/params.yaml/other' }
+      ]
+      const mockMemento = buildMockMemento({
+        'sortBy:test': sortDefinitions
+      })
+      const mementoSpy = jest.spyOn(mockMemento, 'get')
+      const testRepository = new ExperimentsRepository(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        mockMemento
+      )
+      await expect(testRepository.isReady()).resolves.toBe(undefined)
+      expect(mementoSpy).toBeCalledWith('sortBy:test', [])
+      expect(testRepository.getSorts()).toEqual(sortDefinitions)
+    })
   })
 
   describe('pickSort', () => {
+    const mockGetTerminalNodes = jest.fn()
+
+    const pickSort = ExperimentsRepository.prototype.pickSort.bind({
+      paramsAndMetrics: {
+        getTerminalNodes: mockGetTerminalNodes
+      }
+    })
+
     it('should not invoke a quickPick if passed undefined', async () => {
       mockGetTerminalNodes.mockReturnValueOnce(undefined)
       const resolvedPromise = await pickSort()

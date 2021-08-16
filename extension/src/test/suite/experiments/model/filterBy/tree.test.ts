@@ -18,11 +18,11 @@ import {
   Operator
 } from '../../../../../experiments/model/filterBy'
 import {
-  buildMockMemento,
   dvcDemoPath,
   experimentsUpdatedEvent,
   resourcePath
 } from '../../../util'
+import { buildMockMemento } from '../../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
