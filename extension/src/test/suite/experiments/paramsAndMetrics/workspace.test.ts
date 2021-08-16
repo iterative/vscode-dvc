@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -9,21 +9,10 @@ import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
 import * as Watcher from '../../../../fileSystem/watcher'
 import * as Disposer from '../../../../util/disposable'
-import { getFirstArgOfCall } from '../../util'
+import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments workspace params tests.')
-
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
 
   const disposable = Disposable.fn()
 

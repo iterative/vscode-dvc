@@ -17,7 +17,7 @@ import {
   ParamOrMetric
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import { experimentsUpdatedEvent } from '../../../util'
+import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
@@ -86,17 +86,6 @@ suite('Experiments Test Suite', () => {
     }
   }
 
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
   const resourcePath = resolve(
     __dirname,
     '..',

@@ -15,12 +15,11 @@ import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
-import { experimentsUpdatedEvent } from '../util'
+import { dvcDemoPath, experimentsUpdatedEvent } from '../util'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
 
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
 
   const disposable = Disposable.fn()

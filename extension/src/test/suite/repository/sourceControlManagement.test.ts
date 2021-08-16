@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
@@ -6,20 +6,11 @@ import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
+import { dvcDemoPath } from '../util'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all source control management tests.')
 
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
   const disposable = Disposable.fn()
   const rootUri = Uri.file(dvcDemoPath)
   const relPath = join('data', 'MNIST')

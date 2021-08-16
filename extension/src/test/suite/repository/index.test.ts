@@ -1,4 +1,3 @@
-import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
@@ -8,11 +7,10 @@ import { CliReader } from '../../../cli/reader'
 import { Config } from '../../../config'
 import { InternalCommands } from '../../../internalCommands'
 import { Repository } from '../../../repository'
+import { dvcDemoPath } from '../util'
 
 suite('Repository Test Suite', () => {
   window.showInformationMessage('Start all repository tests.')
-
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
 
   const disposable = Disposable.fn()
 

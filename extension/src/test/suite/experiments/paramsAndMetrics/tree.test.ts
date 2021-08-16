@@ -12,22 +12,13 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
+import { dvcDemoPath } from '../../util'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage(
     'Start all experiments params and metrics tree tests.'
   )
 
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
   const resourcePath = resolve(
     __dirname,
     '..',

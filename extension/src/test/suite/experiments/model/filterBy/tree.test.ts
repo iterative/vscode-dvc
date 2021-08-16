@@ -18,22 +18,11 @@ import {
   getFilterId,
   Operator
 } from '../../../../../experiments/model/filterBy'
-import { experimentsUpdatedEvent } from '../../../util'
+import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
 
-  const dvcDemoPath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'demo'
-  )
   const resourcePath = resolve(
     __dirname,
     '..',

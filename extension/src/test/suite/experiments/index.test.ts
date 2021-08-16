@@ -15,11 +15,11 @@ import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { CliExecutor } from '../../../cli/executor'
+import { dvcDemoPath } from '../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
 
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
 
   const disposable = Disposable.fn()
