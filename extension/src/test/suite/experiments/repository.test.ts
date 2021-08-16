@@ -15,13 +15,10 @@ import { InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
-import { experimentsUpdatedEvent } from '../util'
+import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
 
 suite('Experiments Repository Test Suite', () => {
-  window.showInformationMessage('Start all experiments tests.')
-
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
-  const resourcePath = resolve(__dirname, '..', '..', '..', '..', 'resources')
+  window.showInformationMessage('Start all experiment repository tests.')
 
   const disposable = Disposable.fn()
 
@@ -48,7 +45,7 @@ suite('Experiments Repository Test Suite', () => {
 
       const testTable = disposable.track(
         new ExperimentsRepository(
-          'demo',
+          dvcDemoPath,
           internalCommands,
           {} as ResourceLocator
         )
@@ -81,7 +78,7 @@ suite('Experiments Repository Test Suite', () => {
 
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
-          'demo',
+          dvcDemoPath,
           internalCommands,
           {} as ResourceLocator
         )
@@ -115,7 +112,7 @@ suite('Experiments Repository Test Suite', () => {
 
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
-          'demo',
+          dvcDemoPath,
           internalCommands,
           {} as ResourceLocator
         )

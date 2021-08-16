@@ -1,7 +1,11 @@
-import { SinonStub } from 'sinon'
+import { resolve } from 'path'
+import { SinonSpy, SinonStub } from 'sinon'
 import { commands, ConfigurationChangeEvent, workspace } from 'vscode'
 import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
+
+export const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
+export const resourcePath = resolve(__dirname, '..', '..', '..', 'resources')
 
 export const configurationChangeEvent = (
   option: string,
@@ -47,3 +51,6 @@ export const experimentsUpdatedEvent = (
   new Promise(resolve => {
     experimentsRepository.onDidChangeExperiments(resolve)
   })
+
+export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
+  spy.getCall(call).args[0]

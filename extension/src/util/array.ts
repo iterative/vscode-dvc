@@ -1,3 +1,5 @@
+import isEqual from 'lodash.isequal'
+
 export const definedAndNonEmpty = (
   maybeArray: unknown[] | undefined
 ): maybeArray is unknown[] => {
@@ -9,3 +11,8 @@ export const flatten = <T = string>(arrayOfArrays: T[][]): T[] =>
 
 export const joinTruthyItems = (array: (string | undefined)[], sep = ' ') =>
   array.filter(Boolean).join(sep)
+
+export const sameContents = (
+  array: (null | string | number | undefined)[],
+  otherArray: (null | string | number | undefined)[]
+) => isEqual(array.sort(), otherArray.sort())
