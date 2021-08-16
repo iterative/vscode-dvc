@@ -6,6 +6,7 @@ import { Disposable, Disposer } from '../../extension'
 
 export const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
 export const resourcePath = resolve(__dirname, '..', '..', '..', 'resources')
+
 export const configurationChangeEvent = (
   option: string,
   disposable: Disposer
