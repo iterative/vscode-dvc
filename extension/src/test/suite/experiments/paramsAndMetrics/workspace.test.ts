@@ -3,12 +3,11 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window } from 'vscode'
-import { utimes } from 'fs-extra'
+import { readFileSync, writeFileSync } from 'fs-extra'
 import jsYaml from 'js-yaml'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
 import * as Watcher from '../../../../fileSystem/watcher'
-import { exists } from '../../../../fileSystem'
 import * as Disposer from '../../../../util/disposable'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 
@@ -76,10 +75,10 @@ suite('Experiments Test Suite', () => {
 
       const mockDisposer = spy(Disposer, 'reset')
 
-      expect(exists(join(dvcDemoPath, 'dvc.lock'))).to.be.true
-
-      const touchTime = new Date()
-      await utimes(join(dvcDemoPath, 'dvc.lock'), touchTime, touchTime)
+      writeFileSync(
+        join(dvcDemoPath, 'dvc.lock'),
+        readFileSync(join(dvcDemoPath, 'dvc.lock'))
+      )
 
       await jsYamlLoadEvent
 
