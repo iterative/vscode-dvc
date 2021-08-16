@@ -73,10 +73,9 @@ suite('Extension Test Suite', () => {
     }
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
+      stub(CliReader.prototype, 'help').rejects('do not run setup')
+
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
 
       await workspace.getConfiguration().update(dvcPathOption, '/fun')
 
@@ -105,6 +104,8 @@ suite('Extension Test Suite', () => {
     })
 
     it('should set dvc.pythonPath to the picked value when the user selects to pick a Python interpreter', async () => {
+      stub(CliReader.prototype, 'help').rejects('still do not run setup')
+
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockPath = resolve('file', 'picked', 'path', 'to', 'python')
       stub(window, 'showOpenDialog').resolves([Uri.file(mockPath)])

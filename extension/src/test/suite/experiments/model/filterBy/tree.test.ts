@@ -23,7 +23,7 @@ import {
   resourcePath
 } from '../../../util'
 
-suite('Experiments Test Suite', () => {
+suite('Experiments Filter By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
 
   const disposable = Disposable.fn()
@@ -36,7 +36,7 @@ suite('Experiments Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('experimentsFilterByTree', () => {
+  describe('ExperimentsFilterByTree', () => {
     it('should be able to update the table data by adding and removing a filter', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
@@ -54,10 +54,12 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experimentsRepository = new ExperimentsRepository(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
       await experimentsRepository.isReady()
@@ -165,10 +167,12 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experimentsRepository = new ExperimentsRepository(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
       await experimentsRepository.isReady()

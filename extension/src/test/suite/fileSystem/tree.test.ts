@@ -15,7 +15,7 @@ import { Config } from '../../../config'
 import * as Setup from '../../../setup'
 import { dvcDemoPath } from '../util'
 
-suite('Extension Test Suite', () => {
+suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
 
   const { join } = path

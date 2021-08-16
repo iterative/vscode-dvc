@@ -13,7 +13,7 @@ import { Status } from '../../status'
 import { Cli, CliResult } from '../../cli'
 import { Config } from '../../config'
 
-suite('Extension Test Suite', () => {
+suite('Status Test Suite', () => {
   window.showInformationMessage('Start all status tests.')
 
   const dvcPathOption = 'dvc.dvcPath'
