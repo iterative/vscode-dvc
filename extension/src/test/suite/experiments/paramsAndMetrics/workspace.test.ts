@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window } from 'vscode'
-import { utimes } from 'fs-extra'
+import { appendFileSync } from 'fs-extra'
 import jsYaml from 'js-yaml'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
@@ -78,8 +78,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const touchTime = new Date()
-      await utimes(join(dvcDemoPath, 'dvc.lock'), touchTime, touchTime)
+      appendFileSync(join(dvcDemoPath, 'dvc.lock'), '\n')
 
       await disposalEvent
 
