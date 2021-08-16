@@ -45,7 +45,7 @@ export class ExperimentsRepository {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private initialDataLoad = false
+  private initialDataLoaded = false
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
@@ -76,7 +76,7 @@ export class ExperimentsRepository {
     this.updateData().then(async () => {
       await this.workspaceParams.isReady()
       this.deferred.resolve()
-      this.initialDataLoad = true
+      this.initialDataLoaded = true
     })
   }
 
@@ -90,7 +90,7 @@ export class ExperimentsRepository {
   }
 
   public refresh() {
-    if (!this.initialDataLoad) {
+    if (!this.initialDataLoaded) {
       return Promise.resolve(undefined)
     }
     return this.processManager.run('refresh')
