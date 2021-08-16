@@ -48,15 +48,6 @@ suite('Experiments Test Suite', () => {
     it('should dispose of current watchers and instantiate new ones if the params files change', async () => {
       const mockUpdater = stub()
 
-      const mockDisposer = stub(Disposer, 'reset')
-
-      const disposalEvent = new Promise(resolve => {
-        mockDisposer.callsFake((...args) => {
-          resolve(undefined)
-          return mockDisposer.wrappedMethod(...args)
-        })
-      })
-
       const workspaceParams = disposable.track(
         new WorkspaceParams(dvcDemoPath, mockUpdater)
       )
@@ -74,6 +65,15 @@ suite('Experiments Test Suite', () => {
             }
           }
         }
+      })
+
+      const mockDisposer = stub(Disposer, 'reset')
+
+      const disposalEvent = new Promise(resolve => {
+        mockDisposer.callsFake((...args) => {
+          resolve(undefined)
+          return mockDisposer.wrappedMethod(...args)
+        })
       })
 
       const touchTime = new Date()
