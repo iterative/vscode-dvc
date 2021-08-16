@@ -1,15 +1,13 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy, stub } from 'sinon'
+import { restore, spy } from 'sinon'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../config'
 import { CliRunner } from '../../../cli/runner'
-import * as ProcessExecution from '../../../processExecution'
-import { Command } from '../../../cli/args'
 import { CliResult } from '../../../cli'
 
-suite('Runner Test Suite', () => {
+suite('CLI Runner Test Suite', () => {
   window.showInformationMessage('Start all cli runner tests.')
 
   const disposable = Disposable.fn()
@@ -127,25 +125,5 @@ suite('Runner Test Suite', () => {
       expect((await eventStream).includes(text)).to.be.true
       return completed
     }).timeout(12000)
-
-    it('should call createProcess with the correct arguments when no executable is provided', async () => {
-      const mockCreateProcess = stub(ProcessExecution, 'createProcess').returns(
-        { on: spy() } as unknown as ProcessExecution.Process
-      )
-      const cwd = __dirname
-
-      const cliRunner = disposable.track(
-        new CliRunner({ getCliPath: () => undefined } as unknown as Config)
-      )
-
-      await cliRunner.run(cwd, Command.ADD)
-      expect(mockCreateProcess).to.have.been.calledOnce
-      expect(mockCreateProcess).to.have.been.calledWith({
-        args: [Command.ADD],
-        cwd,
-        env: process.env,
-        executable: 'dvc'
-      })
-    })
   })
 })

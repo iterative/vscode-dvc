@@ -24,7 +24,7 @@ import {
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
 
-suite('Experiments Test Suite', () => {
+suite('Experiments Sort By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
   const mockMemento = buildMockMemento()
 
@@ -102,7 +102,7 @@ suite('Experiments Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('experimentsSortByTree', () => {
+  describe('ExperimentsSortByTree', () => {
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       // setup
 
@@ -123,11 +123,13 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experimentsRepository = new ExperimentsRepository(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator,
-        mockMemento
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator,
+          mockMemento
+        )
       )
 
       await experimentsRepository.isReady()

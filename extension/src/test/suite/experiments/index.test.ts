@@ -69,10 +69,12 @@ suite('Experiments Test Suite', () => {
         'other/dvc/root': {} as ExperimentsRepository
       } as Record<string, ExperimentsRepository>
 
-      const experiments = new Experiments(
-        internalCommands,
-        mockMemento,
-        mockExperimentsRepository
+      const experiments = disposable.track(
+        new Experiments(
+          internalCommands,
+          mockMemento,
+          mockExperimentsRepository
+        )
       )
       const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
@@ -121,10 +123,12 @@ suite('Experiments Test Suite', () => {
         'other/dvc/root': {} as ExperimentsRepository
       } as Record<string, ExperimentsRepository>
 
-      const experiments = new Experiments(
-        internalCommands,
-        mockMemento,
-        mockExperimentsRepository
+      const experiments = disposable.track(
+        new Experiments(
+          internalCommands,
+          mockMemento,
+          mockExperimentsRepository
+        )
       )
       const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
@@ -167,7 +171,9 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = new Experiments(internalCommands, mockMemento)
+      const experiments = disposable.track(
+        new Experiments(internalCommands, mockMemento)
+      )
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -201,10 +207,12 @@ suite('Experiments Test Suite', () => {
         'other/dvc/root': { cliReader } as unknown as ExperimentsRepository
       } as Record<string, ExperimentsRepository>
 
-      const experiments = new Experiments(
-        internalCommands,
-        mockMemento,
-        mockExperimentsRepository
+      const experiments = disposable.track(
+        new Experiments(
+          internalCommands,
+          mockMemento,
+          mockExperimentsRepository
+        )
       )
       const [experimentsRepository] = experiments.create(
         [dvcDemoPath],

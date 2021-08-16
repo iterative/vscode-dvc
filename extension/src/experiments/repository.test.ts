@@ -10,7 +10,9 @@ import { ResourceLocator } from '../resourceLocator'
 import { buildMockMemento } from '../test/util'
 import { Config } from '../config'
 
-jest.mock('../fileSystem/watcher', () => ({ onDidChangeFileSystem: jest.fn() }))
+jest.mock('../fileSystem/watcher', () => ({
+  onDidChangeFileSystem: () => ({ isReady: () => Promise.resolve() })
+}))
 jest.mock('@hediet/std/disposable', () => ({
   Disposable: {
     fn: () => ({ track: (tracked: unknown) => tracked })
