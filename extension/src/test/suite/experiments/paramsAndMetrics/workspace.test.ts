@@ -56,30 +56,29 @@ suite('Experiments Test Suite', () => {
 
       const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
 
-      const mockJsYamlLoad = stub(jsYaml, 'load').returns({
-        stages: {
-          train: {
-            params: {
-              'newParams.yaml': { seed: 10000, weight_decay: 0 },
-              'params.yaml': { lr: 400 }
+      const mockJsYamlLoad = stub(jsYaml, 'load')
+      const jsYamlLoadEvent = new Promise(resolve =>
+        mockJsYamlLoad.callsFake(() => {
+          resolve(undefined)
+          return {
+            stages: {
+              train: {
+                params: {
+                  'newParams.yaml': { seed: 10000, weight_decay: 0 },
+                  'params.yaml': { lr: 400 }
+                }
+              }
             }
           }
-        }
-      })
-
-      const mockDisposer = stub(Disposer, 'reset')
-
-      const disposalEvent = new Promise(resolve => {
-        mockDisposer.callsFake((...args) => {
-          resolve(undefined)
-          return mockDisposer.wrappedMethod(...args)
         })
-      })
+      )
+
+      const mockDisposer = spy(Disposer, 'reset')
 
       const touchTime = new Date()
       await utimes(join(dvcDemoPath, 'dvc.lock'), touchTime, touchTime)
 
-      await disposalEvent
+      await jsYamlLoadEvent
 
       expect(mockDisposer).to.be.called
       expect(mockJsYamlLoad).to.be.called

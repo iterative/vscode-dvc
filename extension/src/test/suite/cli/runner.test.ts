@@ -130,7 +130,7 @@ suite('CLI Runner Test Suite', () => {
 
     it('should call createProcess with the correct arguments when no executable is provided', async () => {
       const mockCreateProcess = stub(ProcessExecution, 'createProcess').returns(
-        { on: spy() } as unknown as ProcessExecution.Process
+        { on: stub() } as unknown as ProcessExecution.Process
       )
       const cwd = __dirname
 
