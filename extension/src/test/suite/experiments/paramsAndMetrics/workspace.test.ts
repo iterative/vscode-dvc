@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window } from 'vscode'
-import { readFileSync, writeFileSync } from 'fs-extra'
+import { utimes } from 'fs-extra'
 import jsYaml from 'js-yaml'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
@@ -48,6 +48,15 @@ suite('Experiments Test Suite', () => {
     it('should dispose of current watchers and instantiate new ones if the params files change', async () => {
       const mockUpdater = stub()
 
+      const mockDisposer = stub(Disposer, 'reset')
+
+      const disposalEvent = new Promise(resolve => {
+        mockDisposer.callsFake((...args) => {
+          resolve(undefined)
+          return mockDisposer.wrappedMethod(...args)
+        })
+      })
+
       const workspaceParams = disposable.track(
         new WorkspaceParams(dvcDemoPath, mockUpdater)
       )
@@ -56,31 +65,21 @@ suite('Experiments Test Suite', () => {
 
       const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
 
-      const mockJsYamlLoad = stub(jsYaml, 'load')
-      const jsYamlLoadEvent = new Promise(resolve =>
-        mockJsYamlLoad.callsFake(() => {
-          resolve(undefined)
-          return {
-            stages: {
-              train: {
-                params: {
-                  'newParams.yaml': { seed: 10000, weight_decay: 0 },
-                  'params.yaml': { lr: 400 }
-                }
-              }
+      const mockJsYamlLoad = stub(jsYaml, 'load').returns({
+        stages: {
+          train: {
+            params: {
+              'newParams.yaml': { seed: 10000, weight_decay: 0 },
+              'params.yaml': { lr: 400 }
             }
           }
-        })
-      )
+        }
+      })
 
-      const mockDisposer = spy(Disposer, 'reset')
+      const touchTime = new Date()
+      await utimes(join(dvcDemoPath, 'dvc.lock'), touchTime, touchTime)
 
-      writeFileSync(
-        join(dvcDemoPath, 'dvc.lock'),
-        readFileSync(join(dvcDemoPath, 'dvc.lock'))
-      )
-
-      await jsYamlLoadEvent
+      await disposalEvent
 
       expect(mockDisposer).to.be.called
       expect(mockJsYamlLoad).to.be.called
