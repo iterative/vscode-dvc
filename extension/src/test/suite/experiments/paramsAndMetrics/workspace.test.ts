@@ -2,8 +2,7 @@ import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window } from 'vscode'
-import { utimes } from 'fs-extra'
+import { EventEmitter, window } from 'vscode'
 import jsYaml from 'js-yaml'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
@@ -61,11 +60,30 @@ suite('Experiments Test Suite', () => {
         })
       })
 
+      const ee = new EventEmitter<void>()
+      const event = ee.event
+
+      const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
+      mockOnDidChangeFileSystem
+        .onFirstCall()
+        .callsFake((...args) =>
+          mockOnDidChangeFileSystem.wrappedMethod(...args)
+        )
+        .onSecondCall()
+        .callsFake((path: string, watcher: (path: string) => void) => {
+          event(() => watcher(path))
+          return {
+            dispose: () => undefined,
+            isReady: Promise.resolve(undefined)
+          }
+        })
+
       const workspaceParams = disposable.track(
         new WorkspaceParams(dvcDemoPath, mockUpdater)
       )
 
       await workspaceParams.isReady()
+      mockOnDidChangeFileSystem.restore()
 
       const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
 
@@ -80,8 +98,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const touchTime = new Date()
-      await utimes(dvcDemoLock, touchTime, touchTime)
+      ee.fire()
 
       await disposalEvent
 
