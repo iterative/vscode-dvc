@@ -41,8 +41,9 @@ suite('Extension Test Suite', () => {
         stub(Watcher, 'onDidChangeFileSystem').callsFake(() => {
           resolve(undefined)
           return {
-            dispose: () => undefined
-          } as Disposable
+            dispose: () => undefined,
+            isReady: Promise.resolve(undefined)
+          }
         })
       )
 

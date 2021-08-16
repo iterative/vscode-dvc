@@ -94,10 +94,12 @@ suite('Experiments Test Suite', () => {
     '..',
     '..',
     '..',
+    '..',
     'demo'
   )
   const resourcePath = resolve(
     __dirname,
+    '..',
     '..',
     '..',
     '..',

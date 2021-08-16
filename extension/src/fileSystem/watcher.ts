@@ -53,7 +53,7 @@ export const onReady = (
 export const onDidChangeFileSystem = (
   path: string,
   watcher: (path: string) => void
-): Disposable => {
+): Disposable & { isReady: Promise<void> } => {
   const debouncedWatcher = debounce(watcher, 500, {
     leading: true,
     trailing: false
@@ -63,7 +63,12 @@ export const onDidChangeFileSystem = (
     ignored: ignoredDotDirectories
   })
 
-  pathWatcher.on('ready', () => onReady(debouncedWatcher, path, pathWatcher))
+  const isReady = new Promise<void>(resolve =>
+    pathWatcher.on('ready', () => {
+      onReady(debouncedWatcher, path, pathWatcher)
+      resolve(undefined)
+    })
+  )
 
-  return { dispose: () => pathWatcher.close() }
+  return { dispose: () => pathWatcher.close(), isReady }
 }
