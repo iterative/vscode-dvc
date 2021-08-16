@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
@@ -12,23 +12,13 @@ import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
-import { dvcDemoPath } from '../../util'
+import { dvcDemoPath, resourcePath } from '../../util'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage(
     'Start all experiments params and metrics tree tests.'
   )
 
-  const resourcePath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'resources'
-  )
   const toggleCommand = 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus'
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()

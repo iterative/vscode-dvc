@@ -1,4 +1,3 @@
-import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -18,22 +17,15 @@ import {
   getFilterId,
   Operator
 } from '../../../../../experiments/model/filterBy'
-import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
+import {
+  dvcDemoPath,
+  experimentsUpdatedEvent,
+  resourcePath
+} from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
 
-  const resourcePath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'resources'
-  )
   const disposable = Disposable.fn()
 
   beforeEach(() => {

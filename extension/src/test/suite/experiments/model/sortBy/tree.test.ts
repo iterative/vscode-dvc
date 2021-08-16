@@ -1,4 +1,4 @@
-import path, { resolve } from 'path'
+import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -17,7 +17,11 @@ import {
   ParamOrMetric
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
+import {
+  dvcDemoPath,
+  experimentsUpdatedEvent,
+  resourcePath
+} from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
@@ -86,17 +90,6 @@ suite('Experiments Test Suite', () => {
     }
   }
 
-  const resourcePath = resolve(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    '..',
-    'resources'
-  )
   const disposable = Disposable.fn()
 
   beforeEach(() => {
