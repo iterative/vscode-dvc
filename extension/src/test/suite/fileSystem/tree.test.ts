@@ -13,13 +13,13 @@ import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import { Config } from '../../../config'
 import * as Setup from '../../../setup'
+import { dvcDemoPath } from '../util'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
 
-  const { join, resolve } = path
+  const { join } = path
 
-  const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', '..', 'demo')
   const disposable = Disposable.fn()
 
   const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
