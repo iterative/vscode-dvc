@@ -75,9 +75,6 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'help').rejects('do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
 
       await workspace.getConfiguration().update(dvcPathOption, '/fun')
 
