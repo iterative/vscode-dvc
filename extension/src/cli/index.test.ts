@@ -68,7 +68,7 @@ describe('executeProcess', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       args,
       cwd,
-      env: processEnv,
+      env: { ...processEnv, DVC_ANALYTICS: 'false' },
       executable: 'dvc'
     })
   })
@@ -104,7 +104,11 @@ describe('executeProcess', () => {
     expect(mockedExecuteProcess).toBeCalledWith({
       args,
       cwd,
-      env: { PATH: `/some/path/to:${existingPath}`, SECRET_KEY },
+      env: {
+        DVC_ANALYTICS: 'false',
+        PATH: `/some/path/to:${existingPath}`,
+        SECRET_KEY
+      },
       executable: '/some/path/to/dvc'
     })
   })
