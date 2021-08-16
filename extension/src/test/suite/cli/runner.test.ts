@@ -9,7 +9,7 @@ import * as ProcessExecution from '../../../processExecution'
 import { Command } from '../../../cli/args'
 import { CliResult } from '../../../cli'
 
-suite('Runner Test Suite', () => {
+suite('CLI Runner Test Suite', () => {
   window.showInformationMessage('Start all cli runner tests.')
 
   const disposable = Disposable.fn()

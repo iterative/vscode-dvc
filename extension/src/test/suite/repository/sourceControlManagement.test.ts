@@ -8,7 +8,7 @@ import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import { dvcDemoPath } from '../util'
 
-suite('Extension Test Suite', () => {
+suite('Source Control Management Test Suite', () => {
   window.showInformationMessage('Start all source control management tests.')
 
   const disposable = Disposable.fn()
