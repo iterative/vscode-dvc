@@ -20,7 +20,7 @@ export class WorkspaceParams {
     this.dvcRoot = dvcRoot
     this.dvcLock = join(dvcRoot, 'dvc.lock')
 
-    this.dispose.track(onDidChangeFileSystem(this.dvcLock, () => undefined)) // check to see if params file moved!
+    // check to see if params file moved! this.dispose.track(onDidChangeFileSystem(this.dvcLock, () => undefined))
 
     this.findAndWatchParams(updater).then(() => this.deferred.resolve())
   }
