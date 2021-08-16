@@ -23,7 +23,7 @@ import {
   resourcePath
 } from '../../../util'
 
-suite('Experiments Test Suite', () => {
+suite('Experiments Sort By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
 
   const testData = {
@@ -100,7 +100,7 @@ suite('Experiments Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('experimentsSortByTree', () => {
+  describe('ExperimentsSortByTree', () => {
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       // setup
 

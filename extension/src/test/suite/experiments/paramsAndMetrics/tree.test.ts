@@ -14,7 +14,7 @@ import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
 import { dvcDemoPath, resourcePath } from '../../util'
 
-suite('Extension Test Suite', () => {
+suite('Experiments Params And Metrics Tree Test Suite', () => {
   window.showInformationMessage(
     'Start all experiments params and metrics tree tests.'
   )
@@ -31,7 +31,7 @@ suite('Extension Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('experimentsParamsAndMetricsTree', () => {
+  describe('ExperimentsParamsAndMetricsTree', () => {
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = join('params', paramsFile, 'learning_rate')
 
