@@ -24,6 +24,9 @@ suite('Extension Test Suite', () => {
 
   beforeEach(() => {
     restore()
+    stub(CliReader.prototype, 'experimentShow').resolves(
+      complexExperimentsOutput
+    )
   })
 
   afterEach(() => {
@@ -74,9 +77,6 @@ suite('Extension Test Suite', () => {
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
 
       await workspace.getConfiguration().update(dvcPathOption, '/fun')
 
@@ -149,10 +149,6 @@ suite('Extension Test Suite', () => {
         'I WORK NOW'
       )
 
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
       const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
@@ -218,10 +214,6 @@ suite('Extension Test Suite', () => {
       ])
       const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I STILL WORK'
-      )
-
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
       )
 
       const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()

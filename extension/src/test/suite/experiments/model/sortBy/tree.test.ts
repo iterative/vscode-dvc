@@ -121,10 +121,12 @@ suite('Experiments Sort By Tree Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experimentsRepository = new ExperimentsRepository(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator
+        )
       )
 
       await experimentsRepository.isReady()
