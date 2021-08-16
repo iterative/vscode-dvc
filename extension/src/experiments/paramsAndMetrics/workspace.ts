@@ -35,7 +35,7 @@ export class WorkspaceParams {
 
     Promise.all([
       this.watchLockFile(updater),
-      this.findAndWatchParams(updater)
+      ...this.findAndWatchParams(updater)
     ]).then(() => this.deferred.resolve())
   }
 
@@ -44,7 +44,7 @@ export class WorkspaceParams {
   }
 
   private watchLockFile(updater: Updater) {
-    this.dispose.track(
+    const { isReady } = this.dispose.track(
       onDidChangeFileSystem(this.dvcLock, () => {
         const paramsFiles = this.findParams()
         const existingParamsFiles = this.getParamsFiles()
@@ -55,6 +55,7 @@ export class WorkspaceParams {
         }
       })
     )
+    return isReady
   }
 
   private getParamsFiles() {
@@ -77,15 +78,13 @@ export class WorkspaceParams {
   }
 
   private watchParams(updater: Updater) {
-    return Promise.all(
-      this.paramsFiles.map(paramsFile => {
-        const { isReady, ...disposable } = this.dispose.track(
-          onDidChangeFileSystem(paramsFile, () => updater())
-        )
-        this.watchers[paramsFile] = disposable
+    return this.paramsFiles.map(paramsFile => {
+      const { isReady, ...disposable } = this.dispose.track(
+        onDidChangeFileSystem(paramsFile, () => updater())
+      )
+      this.watchers[paramsFile] = disposable
 
-        return isReady
-      })
-    )
+      return isReady
+    })
   }
 }
