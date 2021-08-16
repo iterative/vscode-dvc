@@ -36,15 +36,18 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const onDidChangeFileSystemSetupEvent = () => {
-      const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
-      return new Promise(resolve =>
-        mockOnDidChangeFileSystem.callsFake((...args) => {
+    const onDidChangeFileSystemSetupEvent = () =>
+      new Promise(resolve => {
+        const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
+        mockOnDidChangeFileSystem.callsFake(() => {
           resolve(undefined)
-          return mockOnDidChangeFileSystem.wrappedMethod(...args)
+          mockOnDidChangeFileSystem.restore()
+          return {
+            dispose: () => undefined,
+            isReady: Promise.resolve(undefined)
+          }
         })
-      )
-    }
+      })
 
     const selectDvcPathFromFilePicker = async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
