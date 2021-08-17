@@ -28,13 +28,14 @@ const enum MementoPrefixes {
 }
 
 export class ExperimentsRepository {
-  public readonly dispose
+  public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
 
-  protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined>
+  protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
+    this.dispose.track(new EventEmitter())
 
   private readonly dvcRoot: string
 
@@ -43,16 +44,16 @@ export class ExperimentsRepository {
 
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
+  private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
   private workspaceParams: WorkspaceParams
-  private paramsAndMetrics: ParamsAndMetricsModel
 
-  private readonly deferred: Deferred
-  private readonly initialized: Promise<void>
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
 
   private initialDataLoaded = false
 
-  private readonly experimentsChanged
-  private readonly paramsOrMetricsChanged
+  private readonly experimentsChanged = new EventEmitter<void>()
+  private readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private processManager: ProcessManager
 
@@ -64,20 +65,10 @@ export class ExperimentsRepository {
     resourceLocator: ResourceLocator,
     workspaceState: Memento
   ) {
-    this.dispose = Disposable.fn()
-
-    this.deferred = new Deferred()
-    this.initialized = this.deferred.promise
-
     this.dvcRoot = dvcRoot
     this.internalCommands = internalCommands
     this.resourceLocator = resourceLocator
 
-    this.paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
-
-    this.isWebviewFocusedChanged = new EventEmitter<string | undefined>()
-    this.experimentsChanged = new EventEmitter<void>()
-    this.paramsOrMetricsChanged = new EventEmitter<void>()
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
