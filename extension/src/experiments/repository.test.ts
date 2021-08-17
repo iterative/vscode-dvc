@@ -4,6 +4,7 @@ import { QuickPickOptions, window } from 'vscode'
 import { ExperimentsRepository } from './repository'
 import { SortDefinition } from './model/sortBy'
 import complexExperimentsOutput from './webview/complex-output-example.json'
+import { FilterDefinition, Operator } from './model/filterBy'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ResourceLocator } from '../resourceLocator'
@@ -85,7 +86,16 @@ describe('ExperimentsRepository', () => {
         { descending: false, path: 'params/params.yaml/test' },
         { descending: true, path: 'params/params.yaml/other' }
       ]
+      const filterDefinition = {
+        operator: Operator.EQUAL,
+        path: 'params/params.yaml/test',
+        value: 1
+      }
+      const filterMapEntries: [string, FilterDefinition][] = [
+        ['filterId', filterDefinition]
+      ]
       const mockMemento = buildMockMemento({
+        'filterBy:test': filterMapEntries,
         'sortBy:test': sortDefinitions
       })
       const mementoSpy = jest.spyOn(mockMemento, 'get')
@@ -97,7 +107,9 @@ describe('ExperimentsRepository', () => {
       )
       await expect(testRepository.isReady()).resolves.toBe(undefined)
       expect(mementoSpy).toBeCalledWith('sortBy:test', [])
+      expect(mementoSpy).toBeCalledWith('filterBy:test', [])
       expect(testRepository.getSorts()).toEqual(sortDefinitions)
+      expect(testRepository.getFilters()).toEqual([filterDefinition])
     })
   })
 

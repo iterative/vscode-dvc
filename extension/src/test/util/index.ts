@@ -5,7 +5,7 @@ export const buildMockMemento = (
 ): Memento =>
   ({
     get: (key: string, defaultValue: unknown) => values[key] || defaultValue,
-    keys: () => [],
+    keys: () => Object.keys(values),
     update: (key: string, value: unknown) =>
       new Promise(() => {
         values[key] = value
