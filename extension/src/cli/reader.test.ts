@@ -16,7 +16,7 @@ jest.mock('../env')
 const mockedExecuteProcess = mocked(executeProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
-  DVC_ANALYTICS: 'false',
+  DVC_NO_ANALYTICS: 'true',
   PATH: '/all/of/the/goodies:/in/my/path'
 }
 const SHOW_JSON = '--show-json'

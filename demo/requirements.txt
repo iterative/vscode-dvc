@@ -1,4 +1,4 @@
-dvc[s3]>=2.6.1
+dvc[s3]>=2.6.3
 dvclive
 torch
 torchvision
