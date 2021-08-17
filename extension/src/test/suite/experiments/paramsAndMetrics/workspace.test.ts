@@ -24,8 +24,6 @@ suite('Experiments Test Suite', () => {
   })
 
   describe('WorkspaceParams', () => {
-    const dvcDemoLock = join(dvcDemoPath, 'dvc.lock')
-
     it('should call the updater function on setup', async () => {
       const mockUpdater = stub()
       const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
@@ -40,11 +38,11 @@ suite('Experiments Test Suite', () => {
       expect(onDidChangeFileSystemSpy).to.be.calledTwice
 
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 0)).to.equal(
-        join(dvcDemoPath, 'params.yaml')
+        join(dvcDemoPath, '**', 'dvc.lock')
       )
 
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
-        dvcDemoLock
+        join(dvcDemoPath, 'params.yaml')
       )
     })
 
@@ -66,17 +64,14 @@ suite('Experiments Test Suite', () => {
       const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
       mockOnDidChangeFileSystem
         .onFirstCall()
+        .callsFake((path: string, watcher: (path: string) => void) => {
+          mockOnDidChangeDVCLock(() => watcher(path))
+          return mockOnDidChangeFileSystem.wrappedMethod(path, watcher)
+        })
+        .onSecondCall()
         .callsFake((...args) =>
           mockOnDidChangeFileSystem.wrappedMethod(...args)
         )
-        .onSecondCall()
-        .callsFake((path: string, watcher: (path: string) => void) => {
-          mockOnDidChangeDVCLock(() => watcher(path))
-          return {
-            dispose: () => undefined,
-            isReady: Promise.resolve(undefined)
-          }
-        })
 
       const workspaceParams = disposable.track(
         new WorkspaceParams(dvcDemoPath, mockUpdater)
@@ -112,6 +107,6 @@ suite('Experiments Test Suite', () => {
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
         join(dvcDemoPath, 'params.yaml')
       )
-    })
+    }).timeout(10000)
   })
 })
