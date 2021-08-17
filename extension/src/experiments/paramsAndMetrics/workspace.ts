@@ -29,8 +29,7 @@ export class WorkspaceParams {
 
   private readonly dvcRoot: string
   private readonly dvcLocks = new Set<string>()
-  private paramsFiles: string[] = []
-  private watchers: FSWatchers = {}
+  private fsWatchers: FSWatchers = {}
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -66,7 +65,7 @@ export class WorkspaceParams {
   }
 
   private getParamsFiles() {
-    return this.paramsFiles
+    return Object.keys(this.fsWatchers)
   }
 
   private isInitialScanCompleted() {
@@ -94,26 +93,25 @@ export class WorkspaceParams {
 
   private watchDvcLock(path: string, updater: Updater) {
     if (isDvcLock(path)) {
-      const paramsFiles = this.findParams()
+      const paramsFiles = this.findParamsFiles()
       const existingParamsFiles = this.getParamsFiles()
       if (
         this.isInitialScanCompleted() &&
         !sameContents(existingParamsFiles, paramsFiles)
       ) {
-        this.watchers = reset<FSWatchers>(this.watchers, this.dispose)
-        this.paramsFiles = paramsFiles
+        this.fsWatchers = reset<FSWatchers>(this.fsWatchers, this.dispose)
 
-        this.watchParams(updater)
+        this.watchParamsFiles(paramsFiles, updater)
       }
     }
   }
 
   private findAndWatchParams(updater: Updater) {
-    this.paramsFiles = this.findParams()
-    return this.watchParams(updater)
+    const paramsFiles = this.findParamsFiles()
+    return this.watchParamsFiles(paramsFiles, updater)
   }
 
-  private findParams() {
+  private findParamsFiles() {
     return flattenUnique(
       [...this.dvcLocks].map(dvcLock => {
         const lockFileYaml = load(
@@ -127,12 +125,12 @@ export class WorkspaceParams {
     )
   }
 
-  private watchParams(updater: Updater) {
-    return this.paramsFiles.map(paramsFile => {
+  private watchParamsFiles(paramsFiles: string[], updater: Updater) {
+    return paramsFiles.map(paramsFile => {
       const watcher = this.dispose.track(
         onDidChangeFileSystem(paramsFile, () => updater())
       )
-      this.watchers[paramsFile] = watcher
+      this.fsWatchers[paramsFile] = watcher
 
       return watcher.isReady
     })
