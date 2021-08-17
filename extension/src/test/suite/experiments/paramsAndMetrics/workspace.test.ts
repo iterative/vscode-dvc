@@ -107,6 +107,6 @@ suite('Experiments Test Suite', () => {
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 1)).to.equal(
         join(dvcDemoPath, 'params.yaml')
       )
-    }).timeout(10000)
+    })
   })
 })
