@@ -10,7 +10,7 @@ import {
   isDvcLock
 } from '../../fileSystem/watcher'
 import { reset } from '../../util/disposable'
-import { flatten, sameContents } from '../../util/array'
+import { flattenUnique, sameContents } from '../../util/array'
 
 type Updater = () => Promise<void>
 
@@ -107,12 +107,12 @@ export class WorkspaceParams {
   }
 
   private findAndWatchParams(updater: Updater) {
-    this.paramsFiles = [...new Set(this.findParams())]
+    this.paramsFiles = this.findParams()
     return this.watchParams(updater)
   }
 
   private findParams() {
-    return flatten(
+    return flattenUnique(
       [...this.dvcLocks].map(dvcLock => {
         const lockFileYaml = load(
           readFileSync(dvcLock, 'utf-8')
