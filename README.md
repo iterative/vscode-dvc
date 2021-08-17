@@ -44,11 +44,6 @@ setup wizard to set the required config options. This can be done via the
 welcome view underneath the DVC Tracked view in the side bar's explorer view
 container or "Setup The Workspace" in the command palette.
 
-- Currently it is necessary to disable the CLI's analytics as they severely
-  impact the overall performance of the extension. You can do this by running
-  `dvc config core.analytics false --global` in your terminal. We will be
-  looking into improving this experience shortly.
-
 ## How to Use
 
 This extension, especially in this early state, makes extensive use of the

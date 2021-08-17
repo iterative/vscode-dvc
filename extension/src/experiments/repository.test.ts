@@ -2,23 +2,8 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
 import { ExperimentsRepository } from './repository'
-import { SortDefinition } from './model/sortBy'
-import complexExperimentsOutput from './webview/complex-output-example.json'
-import { FilterDefinition, Operator } from './model/filterBy'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
-import { AvailableCommands, InternalCommands } from '../internalCommands'
-import { ResourceLocator } from '../resourceLocator'
-import { buildMockMemento } from '../test/util'
-import { Config } from '../config'
 
-jest.mock('../fileSystem/watcher', () => ({
-  onDidChangeFileSystem: () => ({ isReady: () => Promise.resolve() })
-}))
-jest.mock('@hediet/std/disposable', () => ({
-  Disposable: {
-    fn: () => ({ track: (tracked: unknown) => tracked })
-  }
-}))
 jest.mock('vscode')
 
 const mockedShowQuickPick = mocked<
@@ -38,126 +23,33 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-const params = 'params'
-const paramsYaml = 'params.yaml'
-const paramsYamlPath = join(params, paramsYaml)
-const epochsParamPath = join(paramsYamlPath, 'epochs')
-const epochsParam = {
-  group: params,
-  hasChildren: false,
-  maxNumber: 5,
-  maxStringLength: 1,
-  minNumber: 2,
-  name: 'epochs',
-  parentPath: paramsYamlPath,
-  path: epochsParamPath,
-  types: ['number']
-}
-
-const paramsYamlParam = {
-  group: params,
-  hasChildren: true,
-  name: paramsYaml,
-  parentPath: params,
-  path: paramsYamlPath
-}
-const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
-
 describe('ExperimentsRepository', () => {
-  describe('persisted state', () => {
-    const firstSortDefinition = {
-      descending: false,
-      path: 'params/params.yaml/test'
-    }
-    const secondSortDefinition = {
-      descending: true,
-      path: 'params/params.yaml/other'
-    }
-    const sortDefinitions: SortDefinition[] = [
-      firstSortDefinition,
-      secondSortDefinition
-    ]
-    const filterDefinition = {
-      operator: Operator.EQUAL,
-      path: 'params/params.yaml/test',
-      value: 1
-    }
-    const filterMapEntries: [string, FilterDefinition][] = [
-      ['filterId', filterDefinition]
-    ]
-
-    const mockedInternalCommands = new InternalCommands({
-      getDefaultProject: jest.fn()
-    } as unknown as Config)
-    mockedInternalCommands.registerCommand(
-      AvailableCommands.EXPERIMENT_SHOW,
-      () => Promise.resolve(complexExperimentsOutput)
-    )
-
-    it('should work given no persisted state', async () => {
-      const testRepository = new ExperimentsRepository(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        buildMockMemento()
-      )
-      await expect(testRepository.isReady()).resolves.toBe(undefined)
-    })
-
-    it('should initialize with state reflected from the given Memento', async () => {
-      const mockMemento = buildMockMemento({
-        'filterBy:test': filterMapEntries,
-        'sortBy:test': sortDefinitions
-      })
-
-      const mementoSpy = jest.spyOn(mockMemento, 'get')
-      const testRepository = new ExperimentsRepository(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
-      )
-      await expect(testRepository.isReady()).resolves.toBe(undefined)
-      expect(mementoSpy).toBeCalledWith('sortBy:test', [])
-      expect(mementoSpy).toBeCalledWith('filterBy:test', [])
-      expect(testRepository.getSorts()).toEqual(sortDefinitions)
-      expect(testRepository.getFilters()).toEqual([filterDefinition])
-    })
-
-    it('should persist added sorts', async () => {
-      const mockMemento = buildMockMemento()
-      const testRepository = new ExperimentsRepository(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
-      )
-      await expect(testRepository.isReady()).resolves.toBe(undefined)
-
-      expect(mockMemento.keys()).toEqual([])
-      expect(testRepository.getSorts()).toEqual([])
-
-      testRepository.addSort(firstSortDefinition)
-
-      expect(mockMemento.keys()).toEqual(['sortBy:test'])
-      expect(testRepository.getSorts()).toEqual([firstSortDefinition])
-
-      testRepository.addSort(secondSortDefinition)
-
-      expect(testRepository.getSorts()).toEqual([
-        firstSortDefinition,
-        secondSortDefinition
-      ])
-
-      testRepository.removeSortByPath(firstSortDefinition.path)
-      expect(testRepository.getSorts()).toEqual([secondSortDefinition])
-
-      testRepository.removeSorts()
-      expect(testRepository.getSorts()).toEqual([])
-    })
-  })
-
   describe('pickSort', () => {
+    const params = 'params'
+    const paramsYaml = 'params.yaml'
+    const paramsYamlPath = join(params, paramsYaml)
+    const epochsParamPath = join(paramsYamlPath, 'epochs')
+    const epochsParam = {
+      group: params,
+      hasChildren: false,
+      maxNumber: 5,
+      maxStringLength: 1,
+      minNumber: 2,
+      name: 'epochs',
+      parentPath: paramsYamlPath,
+      path: epochsParamPath,
+      types: ['number']
+    }
+
+    const paramsYamlParam = {
+      group: params,
+      hasChildren: true,
+      name: paramsYaml,
+      parentPath: params,
+      path: paramsYamlPath
+    }
+    const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
+
     const mockGetTerminalNodes = jest.fn()
 
     const pickSort = ExperimentsRepository.prototype.pickSort.bind({

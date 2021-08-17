@@ -11,12 +11,14 @@ import complexColumnData from '../../../experiments/webview/complex-column-examp
 import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import { InternalCommands } from '../../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
 import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
+import { SortDefinition } from '../../../experiments/model/sortBy'
+import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -346,5 +348,100 @@ suite('Experiments Repository Test Suite', () => {
         ]
       }
     ])
+  })
+
+  describe('persisted state', () => {
+    const firstSortDefinition = {
+      descending: false,
+      path: 'params/params.yaml/test'
+    }
+    const secondSortDefinition = {
+      descending: true,
+      path: 'params/params.yaml/other'
+    }
+    const sortDefinitions: SortDefinition[] = [
+      firstSortDefinition,
+      secondSortDefinition
+    ]
+    const filterDefinition = {
+      operator: Operator.EQUAL,
+      path: 'params/params.yaml/test',
+      value: 1
+    }
+    const filterMapEntries: [string, FilterDefinition][] = [
+      ['filterId', filterDefinition]
+    ]
+
+    const mockedInternalCommands = new InternalCommands({
+      getDefaultProject: stub()
+    } as unknown as Config)
+    mockedInternalCommands.registerCommand(
+      AvailableCommands.EXPERIMENT_SHOW,
+      () => Promise.resolve(complexExperimentsOutput)
+    )
+
+    it('should work given no persisted state', async () => {
+      const testRepository = new ExperimentsRepository(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        buildMockMemento()
+      )
+      await testRepository.isReady()
+      expect(testRepository.getSorts()).to.deep.equal([])
+      expect(testRepository.getFilters()).to.deep.equal([])
+    })
+
+    it('should initialize with state reflected from the given Memento', async () => {
+      const mockMemento = buildMockMemento({
+        'filterBy:test': filterMapEntries,
+        'sortBy:test': sortDefinitions
+      })
+
+      const mementoSpy = spy(mockMemento, 'get')
+      const testRepository = new ExperimentsRepository(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        mockMemento
+      )
+      await testRepository.isReady()
+      expect(mementoSpy).to.be.calledWith('sortBy:test', [])
+      expect(mementoSpy).to.be.calledWith('filterBy:test', [])
+      expect(testRepository.getSorts()).to.deep.equal(sortDefinitions)
+      expect(testRepository.getFilters()).to.deep.equal([filterDefinition])
+    })
+
+    it('should persist added sorts', async () => {
+      const mockMemento = buildMockMemento()
+      const testRepository = new ExperimentsRepository(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        mockMemento
+      )
+      await testRepository.isReady()
+
+      expect(mockMemento.keys()).to.deep.equal([])
+      expect(testRepository.getSorts()).to.deep.equal([])
+
+      testRepository.addSort(firstSortDefinition)
+
+      expect(mockMemento.keys()).to.deep.equal(['sortBy:test'])
+      expect(testRepository.getSorts()).to.deep.equal([firstSortDefinition])
+
+      testRepository.addSort(secondSortDefinition)
+
+      expect(testRepository.getSorts()).to.deep.equal([
+        firstSortDefinition,
+        secondSortDefinition
+      ])
+
+      testRepository.removeSortByPath(firstSortDefinition.path)
+      expect(testRepository.getSorts()).to.deep.equal([secondSortDefinition])
+
+      testRepository.removeSorts()
+      expect(testRepository.getSorts()).to.deep.equal([])
+    })
   })
 })
