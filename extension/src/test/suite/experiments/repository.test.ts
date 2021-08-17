@@ -378,10 +378,15 @@ suite('Experiments Repository Test Suite', () => {
       path: 'params/params.yaml/other',
       value: 'testcontains'
     }
-    const filterMapEntries: [string, FilterDefinition][] = [
-      [firstFilterId, firstFilterDefinition],
-      [secondFilterId, secondFilterDefinition]
+    const firstFilterMapEntry: [string, FilterDefinition] = [
+      firstFilterId,
+      firstFilterDefinition
     ]
+    const secondFilterMapEntry: [string, FilterDefinition] = [
+      secondFilterId,
+      secondFilterDefinition
+    ]
+    const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     const mockedInternalCommands = new InternalCommands({
       getDefaultProject: stub()
@@ -439,7 +444,7 @@ suite('Experiments Repository Test Suite', () => {
       expect(
         mockMemento.get('filterBy:test'),
         'first filter should be added to memento after addFilter'
-      ).to.deep.equal([filterMapEntries[0]])
+      ).to.deep.equal([firstFilterMapEntry])
 
       pickFilterStub.onSecondCall().resolves(secondFilterDefinition)
       await testRepository.addFilter()
@@ -452,7 +457,7 @@ suite('Experiments Repository Test Suite', () => {
       expect(
         mockMemento.get('filterBy:test'),
         'first filter should be removed from memento after removeFilter'
-      ).to.deep.equal([filterMapEntries[1]])
+      ).to.deep.equal([secondFilterMapEntry])
 
       testRepository.removeSortByPath(firstSortDefinition.path)
       expect(
@@ -464,6 +469,24 @@ suite('Experiments Repository Test Suite', () => {
       expect(
         mockMemento.get('sortBy:test'),
         'all sorts should be removed from memento after removeSorts'
+      ).to.deep.equal([])
+
+      pickFilterStub.reset()
+      pickFilterStub.onFirstCall().resolves(firstFilterDefinition)
+      await testRepository.addFilter()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'first filter should be re-added'
+      ).to.deep.equal([secondFilterMapEntry, firstFilterMapEntry])
+
+      const pickFiltersStub = stub(filterQuickPicks, 'pickFiltersToRemove')
+      pickFiltersStub
+        .onFirstCall()
+        .resolves([firstFilterDefinition, secondFilterDefinition])
+      await testRepository.removeFilters()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
     })
 
