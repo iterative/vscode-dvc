@@ -19,6 +19,7 @@ import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
+import * as filterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -300,15 +301,16 @@ suite('Experiments Repository Test Suite', () => {
       }
     ])
 
-    const stubbedShowQuickPick = stub(window, 'showQuickPick')
-    stubbedShowQuickPick.onFirstCall().resolves({
+    const mockShowQuickPick = stub(window, 'showQuickPick')
+
+    mockShowQuickPick.onFirstCall().resolves({
       label: 'test',
       value: {
         path: 'params/params.yaml/test'
       }
     } as QuickPickItemWithValue<ParamOrMetric>)
 
-    stubbedShowQuickPick.onSecondCall().resolves({
+    mockShowQuickPick.onSecondCall().resolves({
       label: 'Ascending',
       value: false
     } as QuickPickItemWithValue<boolean>)
@@ -363,13 +365,22 @@ suite('Experiments Repository Test Suite', () => {
       firstSortDefinition,
       secondSortDefinition
     ]
-    const filterDefinition = {
+
+    const firstFilterId = 'params/params.yaml/test==1'
+    const firstFilterDefinition = {
       operator: Operator.EQUAL,
       path: 'params/params.yaml/test',
       value: 1
     }
+    const secondFilterId = 'params/params.yaml/other∈testcontains'
+    const secondFilterDefinition = {
+      operator: Operator.CONTAINS,
+      path: 'params/params.yaml/other',
+      value: 'testcontains'
+    }
     const filterMapEntries: [string, FilterDefinition][] = [
-      ['filterId', filterDefinition]
+      [firstFilterId, firstFilterDefinition],
+      [secondFilterId, secondFilterDefinition]
     ]
 
     const mockedInternalCommands = new InternalCommands({
@@ -380,16 +391,80 @@ suite('Experiments Repository Test Suite', () => {
       () => Promise.resolve(complexExperimentsOutput)
     )
 
-    it('should work given no persisted state', async () => {
+    it('should initialize given no persisted state and update persistence given any change', async () => {
+      const mockMemento = buildMockMemento()
+      const mementoSpy = spy(mockMemento, 'get')
       const testRepository = new ExperimentsRepository(
         'test',
         mockedInternalCommands,
         {} as ResourceLocator,
-        buildMockMemento()
+        mockMemento
       )
       await testRepository.isReady()
-      expect(testRepository.getSorts()).to.deep.equal([])
-      expect(testRepository.getFilters()).to.deep.equal([])
+      expect(
+        mementoSpy,
+        'workspaceContext is called for sort initialization'
+      ).to.be.calledWith('sortBy:test', [])
+      expect(
+        mementoSpy,
+        'workspaceContext is called for filter initialization'
+      ).to.be.calledWith('filterBy:test', [])
+
+      expect(
+        testRepository.getSorts(),
+        'ExperimentsRepository starts with no sorts'
+      ).to.deep.equal([])
+      expect(mockMemento.keys(), 'Memento starts with no keys').to.deep.equal(
+        []
+      )
+
+      testRepository.addSort(firstSortDefinition)
+
+      expect(
+        mockMemento.get('sortBy:test'),
+        'first sort is added to memento'
+      ).to.deep.equal([firstSortDefinition])
+
+      testRepository.addSort(secondSortDefinition)
+
+      expect(
+        mockMemento.get('sortBy:test'),
+        'second sort is added to the memento'
+      ).to.deep.equal(sortDefinitions)
+
+      const pickFilterStub = stub(filterQuickPicks, 'pickFilterToAdd')
+
+      pickFilterStub.onFirstCall().resolves(firstFilterDefinition)
+      await testRepository.addFilter()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'first filter should be added to memento after addFilter'
+      ).to.deep.equal([filterMapEntries[0]])
+
+      pickFilterStub.onSecondCall().resolves(secondFilterDefinition)
+      await testRepository.addFilter()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'second filter should be added to memento after addFilter'
+      ).to.deep.equal(filterMapEntries)
+
+      testRepository.removeFilter(firstFilterId)
+      expect(
+        mockMemento.get('filterBy:test'),
+        'first filter should be removed from memento after removeFilter'
+      ).to.deep.equal([filterMapEntries[1]])
+
+      testRepository.removeSortByPath(firstSortDefinition.path)
+      expect(
+        mockMemento.get('sortBy:test'),
+        'first sort should be removed from memento after removeSortByPath'
+      ).to.deep.equal([secondSortDefinition])
+
+      testRepository.removeSorts()
+      expect(
+        mockMemento.get('sortBy:test'),
+        'all sorts should be removed from memento after removeSorts'
+      ).to.deep.equal([])
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
@@ -409,39 +484,10 @@ suite('Experiments Repository Test Suite', () => {
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])
       expect(testRepository.getSorts()).to.deep.equal(sortDefinitions)
-      expect(testRepository.getFilters()).to.deep.equal([filterDefinition])
-    })
-
-    it('should persist added sorts', async () => {
-      const mockMemento = buildMockMemento()
-      const testRepository = new ExperimentsRepository(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
-      )
-      await testRepository.isReady()
-
-      expect(mockMemento.keys()).to.deep.equal([])
-      expect(testRepository.getSorts()).to.deep.equal([])
-
-      testRepository.addSort(firstSortDefinition)
-
-      expect(mockMemento.keys()).to.deep.equal(['sortBy:test'])
-      expect(testRepository.getSorts()).to.deep.equal([firstSortDefinition])
-
-      testRepository.addSort(secondSortDefinition)
-
-      expect(testRepository.getSorts()).to.deep.equal([
-        firstSortDefinition,
-        secondSortDefinition
+      expect(testRepository.getFilters()).to.deep.equal([
+        firstFilterDefinition,
+        secondFilterDefinition
       ])
-
-      testRepository.removeSortByPath(firstSortDefinition.path)
-      expect(testRepository.getSorts()).to.deep.equal([secondSortDefinition])
-
-      testRepository.removeSorts()
-      expect(testRepository.getSorts()).to.deep.equal([])
     })
   })
 })
