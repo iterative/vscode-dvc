@@ -42,7 +42,9 @@ suite('Extension Test Suite', () => {
           resolve(undefined)
           return {
             dispose: () => undefined,
-            isReady: Promise.resolve(undefined)
+            isReady: Promise.resolve(undefined),
+            on: stub(),
+            unwatch: stub()
           }
         })
       )

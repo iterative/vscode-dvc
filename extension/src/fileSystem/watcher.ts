@@ -6,13 +6,23 @@ import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 
+export type FSWatcher = Disposable & {
+  isReady: Promise<void>
+  on: (
+    event: 'add' | 'addDir' | 'change' | 'unlink',
+    listener: (path: string) => void
+  ) => void
+  unwatch: (paths: string | readonly string[]) => void
+}
+
 const isExcluded = (path: string) =>
   !path || path.includes(EXPERIMENTS_GIT_REFS)
 
+export const isDvcLock = (path: string): boolean =>
+  basename(path) === 'dvc.lock'
+
 const requiresReset = (path: string) =>
-  extname(path) === '.dvc' ||
-  basename(path) === 'dvc.lock' ||
-  basename(path) === 'dvc.yaml'
+  extname(path) === '.dvc' || isDvcLock(path) || basename(path) === 'dvc.yaml'
 
 export const getRepositoryWatcher =
   (
@@ -53,7 +63,7 @@ export const onReady = (
 export const onDidChangeFileSystem = (
   path: string,
   watcher: (path: string) => void
-): Disposable & { isReady: Promise<void> } => {
+): FSWatcher => {
   const debouncedWatcher = debounce(watcher, 500, {
     leading: true,
     trailing: false
@@ -70,5 +80,10 @@ export const onDidChangeFileSystem = (
     })
   )
 
-  return { dispose: () => pathWatcher.close(), isReady }
+  return {
+    dispose: () => pathWatcher.close(),
+    isReady,
+    on: (event, listener) => pathWatcher.on(event, listener),
+    unwatch: path => pathWatcher.unwatch(path)
+  }
 }

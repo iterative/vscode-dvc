@@ -1,6 +1,7 @@
 import {
   definedAndNonEmpty,
   flatten,
+  flattenUnique,
   joinTruthyItems,
   sameContents
 } from './array'
@@ -68,6 +69,30 @@ describe('flatten', () => {
     expect(flatten<number>([[1], [2, 3, 4], [5, 6, 7, 8, 9, 10]])).toEqual([
       1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     ])
+  })
+
+  it('should return all of the original items', () => {
+    expect(
+      flatten<number>([[1], [2, 3, 4, 5, 6, 7, 8], [5, 6, 7, 8, 9, 10]])
+    ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 5, 6, 7, 8, 9, 10])
+  })
+})
+
+describe('flattenUnique', () => {
+  it('should return only unique items', () => {
+    expect(
+      flattenUnique<number>([[1], [2, 3, 4, 5, 6, 7, 8], [5, 6, 7, 8, 9, 10]])
+    ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  })
+
+  it('should return only unique items from mixed type arrays', () => {
+    expect(
+      flattenUnique<number | undefined | string>([
+        [1],
+        [2, undefined, 4, 5, 6, 7, 8],
+        ['5', undefined, 1, undefined, 6, 7, 8, 9, 10]
+      ])
+    ).toEqual([1, 2, undefined, 4, 5, 6, 7, 8, '5', 9, 10])
   })
 })
 
