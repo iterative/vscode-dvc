@@ -56,21 +56,7 @@ export class WorkspaceParams {
     const fsWatcher = this.dispose.track(
       onDidChangeFileSystem(
         join(this.dvcRoot, '**', 'dvc.lock'),
-        (path: string) => {
-          if (isDvcLock(path)) {
-            const paramsFiles = this.findParams()
-            const existingParamsFiles = this.getParamsFiles()
-            if (
-              this.isInitialScanCompleted() &&
-              !sameContents(existingParamsFiles, paramsFiles)
-            ) {
-              this.watchers = reset<FSWatchers>(this.watchers, this.dispose)
-              this.paramsFiles = paramsFiles
-
-              this.watchParams(updater)
-            }
-          }
-        }
+        (path: string) => this.watchDvcLock(path, updater)
       )
     )
 
@@ -104,6 +90,22 @@ export class WorkspaceParams {
     on('unlink', path => {
       this.dvcLocks.delete(path)
     })
+  }
+
+  private watchDvcLock(path: string, updater: Updater) {
+    if (isDvcLock(path)) {
+      const paramsFiles = this.findParams()
+      const existingParamsFiles = this.getParamsFiles()
+      if (
+        this.isInitialScanCompleted() &&
+        !sameContents(existingParamsFiles, paramsFiles)
+      ) {
+        this.watchers = reset<FSWatchers>(this.watchers, this.dispose)
+        this.paramsFiles = paramsFiles
+
+        this.watchParams(updater)
+      }
+    }
   }
 
   private findAndWatchParams(updater: Updater) {
