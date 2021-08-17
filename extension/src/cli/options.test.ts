@@ -9,7 +9,7 @@ jest.mock('../env')
 const mockedPATH = '/some/special/path'
 
 const mockedEnv = {
-  DVC_ANALYTICS: 'false',
+  DVC_NO_ANALYTICS: 'true',
   PATH: mockedPATH
 }
 const mockedGetProcessEnv = mocked(getProcessEnv)
@@ -41,7 +41,7 @@ describe('getOptions', () => {
       command: `${pythonBinPath} -m dvc diff`,
       cwd,
       env: {
-        DVC_ANALYTICS: 'false',
+        DVC_NO_ANALYTICS: 'true',
         PATH: `${join('path', 'to', 'python', '.venv')}:${mockedPATH}`
       },
       executable: pythonBinPath
@@ -57,7 +57,7 @@ describe('getOptions', () => {
       command: `${cliPath} diff`,
       cwd,
       env: {
-        DVC_ANALYTICS: 'false',
+        DVC_NO_ANALYTICS: 'true',
         PATH: `${join('path', 'to', 'python', '.venv')}:${mockedPATH}`
       },
       executable: cliPath
