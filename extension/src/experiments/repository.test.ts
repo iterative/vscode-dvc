@@ -65,6 +65,27 @@ const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
 
 describe('ExperimentsRepository', () => {
   describe('persisted state', () => {
+    const firstSortDefinition = {
+      descending: false,
+      path: 'params/params.yaml/test'
+    }
+    const secondSortDefinition = {
+      descending: true,
+      path: 'params/params.yaml/other'
+    }
+    const sortDefinitions: SortDefinition[] = [
+      firstSortDefinition,
+      secondSortDefinition
+    ]
+    const filterDefinition = {
+      operator: Operator.EQUAL,
+      path: 'params/params.yaml/test',
+      value: 1
+    }
+    const filterMapEntries: [string, FilterDefinition][] = [
+      ['filterId', filterDefinition]
+    ]
+
     const mockedInternalCommands = new InternalCommands({
       getDefaultProject: jest.fn()
     } as unknown as Config)
@@ -72,7 +93,8 @@ describe('ExperimentsRepository', () => {
       AvailableCommands.EXPERIMENT_SHOW,
       () => Promise.resolve(complexExperimentsOutput)
     )
-    it('Properly initializes with no persisted state', async () => {
+
+    it('should work given no persisted state', async () => {
       const testRepository = new ExperimentsRepository(
         'test',
         mockedInternalCommands,
@@ -81,23 +103,13 @@ describe('ExperimentsRepository', () => {
       )
       await expect(testRepository.isReady()).resolves.toBe(undefined)
     })
-    it('Properly initializes with persisted state', async () => {
-      const sortDefinitions: SortDefinition[] = [
-        { descending: false, path: 'params/params.yaml/test' },
-        { descending: true, path: 'params/params.yaml/other' }
-      ]
-      const filterDefinition = {
-        operator: Operator.EQUAL,
-        path: 'params/params.yaml/test',
-        value: 1
-      }
-      const filterMapEntries: [string, FilterDefinition][] = [
-        ['filterId', filterDefinition]
-      ]
+
+    it('should initialize with state reflected from the given Memento', async () => {
       const mockMemento = buildMockMemento({
         'filterBy:test': filterMapEntries,
         'sortBy:test': sortDefinitions
       })
+
       const mementoSpy = jest.spyOn(mockMemento, 'get')
       const testRepository = new ExperimentsRepository(
         'test',
@@ -110,6 +122,38 @@ describe('ExperimentsRepository', () => {
       expect(mementoSpy).toBeCalledWith('filterBy:test', [])
       expect(testRepository.getSorts()).toEqual(sortDefinitions)
       expect(testRepository.getFilters()).toEqual([filterDefinition])
+    })
+
+    it('should persist added sorts', async () => {
+      const mockMemento = buildMockMemento()
+      const testRepository = new ExperimentsRepository(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        mockMemento
+      )
+      await expect(testRepository.isReady()).resolves.toBe(undefined)
+
+      expect(mockMemento.keys()).toEqual([])
+      expect(testRepository.getSorts()).toEqual([])
+
+      testRepository.addSort(firstSortDefinition)
+
+      expect(mockMemento.keys()).toEqual(['sortBy:test'])
+      expect(testRepository.getSorts()).toEqual([firstSortDefinition])
+
+      testRepository.addSort(secondSortDefinition)
+
+      expect(testRepository.getSorts()).toEqual([
+        firstSortDefinition,
+        secondSortDefinition
+      ])
+
+      testRepository.removeSortByPath(firstSortDefinition.path)
+      expect(testRepository.getSorts()).toEqual([secondSortDefinition])
+
+      testRepository.removeSorts()
+      expect(testRepository.getSorts()).toEqual([])
     })
   })
 
