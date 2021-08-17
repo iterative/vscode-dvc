@@ -44,14 +44,12 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const mockMemento = buildMockMemento()
-
       const testTable = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
           {} as ResourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
       await testTable.isReady()
@@ -80,14 +78,12 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const mockMemento = buildMockMemento()
-
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
           {} as ResourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
       await experimentsRepository.isReady()
@@ -117,14 +113,12 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const mockMemento = buildMockMemento()
-
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
           {} as ResourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
       await experimentsRepository.isReady()
@@ -157,13 +151,13 @@ suite('Experiments Repository Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const mockMemento = buildMockMemento()
+
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 
@@ -194,13 +188,13 @@ suite('Experiments Repository Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const mockMemento = buildMockMemento()
+
       const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 
@@ -262,13 +256,13 @@ suite('Experiments Repository Test Suite', () => {
     const resourceLocator = disposable.track(
       new ResourceLocator(Uri.file(resourcePath))
     )
-    const mockMemento = buildMockMemento()
+
     const experimentsRepository = disposable.track(
       new ExperimentsRepository(
         dvcDemoPath,
         internalCommands,
         resourceLocator,
-        mockMemento
+        buildMockMemento()
       )
     )
     await experimentsRepository.isReady()

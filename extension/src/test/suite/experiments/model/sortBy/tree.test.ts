@@ -26,7 +26,6 @@ import { buildMockMemento } from '../../../../util'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
-  const mockMemento = buildMockMemento()
 
   const testData = {
     testBranch: {
@@ -128,7 +127,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 

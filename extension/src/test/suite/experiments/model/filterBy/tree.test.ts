@@ -26,7 +26,6 @@ import { buildMockMemento } from '../../../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
-  const mockMemento = buildMockMemento()
 
   const disposable = Disposable.fn()
 
@@ -61,7 +60,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 
@@ -175,7 +174,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 

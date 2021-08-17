@@ -22,7 +22,6 @@ suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
 
   const disposable = Disposable.fn()
-  const mockMemento = buildMockMemento()
 
   beforeEach(() => {
     restore()
@@ -72,7 +71,7 @@ suite('Experiments Test Suite', () => {
       const experiments = disposable.track(
         new Experiments(
           internalCommands,
-          mockMemento,
+          buildMockMemento(),
           mockExperimentsRepository
         )
       )
@@ -126,7 +125,7 @@ suite('Experiments Test Suite', () => {
       const experiments = disposable.track(
         new Experiments(
           internalCommands,
-          mockMemento,
+          buildMockMemento(),
           mockExperimentsRepository
         )
       )
@@ -172,7 +171,7 @@ suite('Experiments Test Suite', () => {
       )
 
       const experiments = disposable.track(
-        new Experiments(internalCommands, mockMemento)
+        new Experiments(internalCommands, buildMockMemento())
       )
       experiments.create([dvcDemoPath], resourceLocator)
 
@@ -210,7 +209,7 @@ suite('Experiments Test Suite', () => {
       const experiments = disposable.track(
         new Experiments(
           internalCommands,
-          mockMemento,
+          buildMockMemento(),
           mockExperimentsRepository
         )
       )

@@ -31,7 +31,6 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
   })
-  const mockMemento = buildMockMemento()
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsParamsAndMetricsTree', () => {
@@ -54,7 +53,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 
@@ -106,7 +105,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 
@@ -180,7 +179,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 
@@ -262,7 +261,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          mockMemento
+          buildMockMemento()
         )
       )
 

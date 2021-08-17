@@ -1,6 +1,5 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { Memento } from 'vscode'
 import { Experiments } from '.'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
@@ -12,6 +11,7 @@ import {
   InternalCommands
 } from '../internalCommands'
 import { getInput } from '../vscode/inputBox'
+import { buildMockMemento } from '../test/util'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -43,12 +43,6 @@ describe('Experiments', () => {
     getDefaultProject: mockedGetDefaultProject
   } as unknown as Config)
 
-  const mockedWorkspaceState = {
-    get: jest.fn(),
-    keys: jest.fn(),
-    update: jest.fn()
-  } as Memento
-
   const mockedCommandId = 'mockedExpFunc' as CommandId
   mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
     mockedExpFunc(...args)
@@ -66,7 +60,7 @@ describe('Experiments', () => {
 
   const experiments = new Experiments(
     mockedInternalCommands,
-    mockedWorkspaceState,
+    buildMockMemento(),
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
