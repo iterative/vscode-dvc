@@ -4,6 +4,7 @@ import { QuickPickOptions, window } from 'vscode'
 import { ExperimentsRepository } from './repository'
 import { QuickPickItemWithValue } from '../vscode/quickPick'
 
+jest.mock('@hediet/std/disposable')
 jest.mock('vscode')
 
 const mockedShowQuickPick = mocked<
@@ -23,41 +24,40 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
+const params = 'params'
+const paramsYaml = 'params.yaml'
+const paramsYamlPath = join(params, paramsYaml)
+const epochsParamPath = join(paramsYamlPath, 'epochs')
+const epochsParam = {
+  group: params,
+  hasChildren: false,
+  maxNumber: 5,
+  maxStringLength: 1,
+  minNumber: 2,
+  name: 'epochs',
+  parentPath: paramsYamlPath,
+  path: epochsParamPath,
+  types: ['number']
+}
+
+const paramsYamlParam = {
+  group: params,
+  hasChildren: true,
+  name: paramsYaml,
+  parentPath: params,
+  path: paramsYamlPath
+}
+const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
+
 describe('ExperimentsRepository', () => {
+  const mockGetTerminalNodes = jest.fn()
+  const pickSort = ExperimentsRepository.prototype.pickSort.bind({
+    paramsAndMetrics: {
+      getTerminalNodes: mockGetTerminalNodes
+    }
+  })
+
   describe('pickSort', () => {
-    const params = 'params'
-    const paramsYaml = 'params.yaml'
-    const paramsYamlPath = join(params, paramsYaml)
-    const epochsParamPath = join(paramsYamlPath, 'epochs')
-    const epochsParam = {
-      group: params,
-      hasChildren: false,
-      maxNumber: 5,
-      maxStringLength: 1,
-      minNumber: 2,
-      name: 'epochs',
-      parentPath: paramsYamlPath,
-      path: epochsParamPath,
-      types: ['number']
-    }
-
-    const paramsYamlParam = {
-      group: params,
-      hasChildren: true,
-      name: paramsYaml,
-      parentPath: params,
-      path: paramsYamlPath
-    }
-    const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
-
-    const mockGetTerminalNodes = jest.fn()
-
-    const pickSort = ExperimentsRepository.prototype.pickSort.bind({
-      paramsAndMetrics: {
-        getTerminalNodes: mockGetTerminalNodes
-      }
-    })
-
     it('should not invoke a quickPick if passed undefined', async () => {
       mockGetTerminalNodes.mockReturnValueOnce(undefined)
       const resolvedPromise = await pickSort()
