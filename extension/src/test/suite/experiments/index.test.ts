@@ -16,6 +16,7 @@ import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath, resourcePath } from '../util'
+import { buildMockMemento } from '../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -68,7 +69,11 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsRepository>
 
       const experiments = disposable.track(
-        new Experiments(internalCommands, mockExperimentsRepository)
+        new Experiments(
+          internalCommands,
+          buildMockMemento(),
+          mockExperimentsRepository
+        )
       )
       const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
@@ -118,7 +123,11 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsRepository>
 
       const experiments = disposable.track(
-        new Experiments(internalCommands, mockExperimentsRepository)
+        new Experiments(
+          internalCommands,
+          buildMockMemento(),
+          mockExperimentsRepository
+        )
       )
       const [experimentsRepository] = experiments.create(
         [dvcDemoPath],
@@ -161,7 +170,9 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
 
-      const experiments = disposable.track(new Experiments(internalCommands))
+      const experiments = disposable.track(
+        new Experiments(internalCommands, buildMockMemento())
+      )
       experiments.create([dvcDemoPath], resourceLocator)
 
       await experiments.isReady()
@@ -196,7 +207,11 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsRepository>
 
       const experiments = disposable.track(
-        new Experiments(internalCommands, mockExperimentsRepository)
+        new Experiments(
+          internalCommands,
+          buildMockMemento(),
+          mockExperimentsRepository
+        )
       )
       const [experimentsRepository] = experiments.create(
         [dvcDemoPath],

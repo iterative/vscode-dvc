@@ -1,5 +1,5 @@
 import { join, resolve } from 'path'
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
 import {
@@ -38,7 +38,7 @@ export class ExperimentsRepository {
   private readonly resourceLocator: ResourceLocator
 
   private webview?: ExperimentsWebview
-  private experiments = this.dispose.track(new ExperimentsModel())
+  private experiments: ExperimentsModel
   private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
   private workspaceParams: WorkspaceParams
 
@@ -55,7 +55,8 @@ export class ExperimentsRepository {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    resourceLocator: ResourceLocator
+    resourceLocator: ResourceLocator,
+    workspaceState: Memento
   ) {
     this.dvcRoot = dvcRoot
     this.internalCommands = internalCommands
@@ -64,6 +65,10 @@ export class ExperimentsRepository {
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
+
+    this.experiments = this.dispose.track(
+      new ExperimentsModel(dvcRoot, workspaceState)
+    )
 
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })

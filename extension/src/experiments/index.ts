@@ -1,6 +1,6 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { EventEmitter } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
 import { FilterDefinition } from './model/filterBy'
@@ -33,11 +33,16 @@ export class Experiments {
   private readonly initialized = this.deferred.promise
   private readonly internalCommands: InternalCommands
 
+  private readonly workspaceState: Memento
+
   constructor(
     internalCommands: InternalCommands,
+    workspaceState: Memento,
     experiments?: Record<string, ExperimentsRepository>
   ) {
     makeObservable(this)
+
+    this.workspaceState = workspaceState
 
     this.internalCommands = internalCommands
     if (experiments) {
@@ -299,7 +304,12 @@ export class Experiments {
     resourceLocator: ResourceLocator
   ) {
     const experimentsRepository = this.dispose.track(
-      new ExperimentsRepository(dvcRoot, this.internalCommands, resourceLocator)
+      new ExperimentsRepository(
+        dvcRoot,
+        this.internalCommands,
+        resourceLocator,
+        this.workspaceState
+      )
     )
 
     this.experiments[dvcRoot] = experimentsRepository

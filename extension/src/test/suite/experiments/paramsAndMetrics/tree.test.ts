@@ -13,6 +13,7 @@ import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../internalCommands'
 import { dvcDemoPath, resourcePath } from '../../util'
+import { buildMockMemento } from '../../../util'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   window.showInformationMessage(
@@ -51,7 +52,8 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          buildMockMemento()
         )
       )
 
@@ -102,7 +104,8 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          buildMockMemento()
         )
       )
 
@@ -175,7 +178,8 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          buildMockMemento()
         )
       )
 
@@ -256,7 +260,8 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          buildMockMemento()
         )
       )
 

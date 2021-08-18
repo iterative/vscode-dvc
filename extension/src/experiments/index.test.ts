@@ -11,6 +11,7 @@ import {
   InternalCommands
 } from '../internalCommands'
 import { getInput } from '../vscode/inputBox'
+import { buildMockMemento } from '../test/util'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -57,16 +58,20 @@ describe('Experiments', () => {
     (...args) => mockedRun(...args)
   )
 
-  const experiments = new Experiments(mockedInternalCommands, {
-    '/my/dvc/root': {
-      getDvcRoot: () => mockedDvcRoot,
-      showWebview: mockedShowWebview
-    } as unknown as ExperimentsRepository,
-    '/my/fun/dvc/root': {
-      getDvcRoot: () => mockedOtherDvcRoot,
-      showWebview: jest.fn()
-    } as unknown as ExperimentsRepository
-  })
+  const experiments = new Experiments(
+    mockedInternalCommands,
+    buildMockMemento(),
+    {
+      '/my/dvc/root': {
+        getDvcRoot: () => mockedDvcRoot,
+        showWebview: mockedShowWebview
+      } as unknown as ExperimentsRepository,
+      '/my/fun/dvc/root': {
+        getDvcRoot: () => mockedOtherDvcRoot,
+        showWebview: jest.fn()
+      } as unknown as ExperimentsRepository
+    }
+  )
 
   describe('getCwdThenRun', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {

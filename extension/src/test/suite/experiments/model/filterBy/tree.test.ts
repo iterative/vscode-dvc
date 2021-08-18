@@ -22,6 +22,7 @@ import {
   experimentsUpdatedEvent,
   resourcePath
 } from '../../../util'
+import { buildMockMemento } from '../../../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
@@ -58,7 +59,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          buildMockMemento()
         )
       )
 
@@ -171,7 +173,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
-          resourceLocator
+          resourceLocator,
+          buildMockMemento()
         )
       )
 
