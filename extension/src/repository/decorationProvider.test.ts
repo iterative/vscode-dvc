@@ -1,9 +1,10 @@
 import { join } from 'path'
-import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter, Uri } from 'vscode'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { DecorationProvider, DecorationState } from './decorationProvider'
 
+jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
 const mockedDisposable = mocked(Disposable)
