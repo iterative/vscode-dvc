@@ -132,7 +132,16 @@ describe('DecorationProvider', () => {
     decorationProvider.setState(updatedState)
 
     expect(mockedDecorationsChangedFire).toBeCalledWith(
-      [...tracked].map(path => Uri.file(path))
+      [
+        ...added,
+        ...deleted,
+        ...modified,
+        ...notInCache,
+        dataDir,
+        logAcc,
+        logDir,
+        logLoss
+      ].map(path => Uri.file(path))
     )
   })
 })

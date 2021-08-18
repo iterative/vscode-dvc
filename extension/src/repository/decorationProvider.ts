@@ -9,6 +9,7 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
+import { flattenUnique } from '../util/array'
 
 export type DecorationState = Record<Status, Set<string>>
 
@@ -120,11 +121,9 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   private getUnion(existingState: DecorationState, newState: DecorationState) {
-    return [
-      ...new Set([
-        ...(existingState.tracked || []),
-        ...(newState.tracked || [])
-      ])
-    ].map(path => Uri.file(path))
+    return flattenUnique([
+      ...Object.values(existingState).map(status => [...(status || [])]),
+      ...Object.values(newState).map(status => [...(status || [])])
+    ]).map(path => Uri.file(path))
   }
 }
