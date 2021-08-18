@@ -1,3 +1,4 @@
+import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { SortDefinition, sortExperiments } from './sortBy'
 import {
@@ -11,6 +12,11 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
+const enum MementoPrefixes {
+  sortBy = 'sortBy:',
+  filterBy = 'filterBy:'
+}
+
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
@@ -23,12 +29,16 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
 
-  constructor(
-    initialSorts: SortDefinition[],
-    initialFilters: [string, FilterDefinition][]
-  ) {
-    this.currentSorts = initialSorts
-    this.filters = new Map(initialFilters)
+  private dvcRoot: string
+  private workspaceState: Memento
+
+  constructor(dvcRoot: string, workspaceState: Memento) {
+    this.currentSorts = workspaceState.get(MementoPrefixes.sortBy + dvcRoot, [])
+    this.filters = new Map(
+      workspaceState.get(MementoPrefixes.filterBy + dvcRoot, [])
+    )
+    this.dvcRoot = dvcRoot
+    this.workspaceState = workspaceState
   }
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
@@ -43,6 +53,7 @@ export class ExperimentsModel {
 
   public removeSorts() {
     this.currentSorts = []
+    this.persistSorts()
   }
 
   public removeSort(pathToRemove: string) {
@@ -50,6 +61,7 @@ export class ExperimentsModel {
     if (indexOfSortToRemove >= 0) {
       this.currentSorts.splice(indexOfSortToRemove, 1)
     }
+    this.persistSorts()
   }
 
   public addSort(sort: SortDefinition) {
@@ -59,14 +71,11 @@ export class ExperimentsModel {
     } else {
       this.currentSorts.splice(indexOfSortToRemove, 1, sort)
     }
+    this.persistSorts()
   }
 
   public getSorts(): SortDefinition[] {
     return this.currentSorts
-  }
-
-  public getRawFilters() {
-    return this.filters
   }
 
   public getFilters() {
@@ -75,14 +84,18 @@ export class ExperimentsModel {
 
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
+    this.persistFilters()
   }
 
   public removeFilters(filters: FilterDefinition[]) {
     filters.map(filter => this.removeFilter(getFilterId(filter)))
+    this.persistFilters()
   }
 
   public removeFilter(id: string) {
-    return this.filters.delete(id)
+    const result = this.filters.delete(id)
+    this.persistFilters()
+    return result
   }
 
   public getExperiments(): (Experiment & { hasChildren: boolean })[] {
@@ -157,5 +170,18 @@ export class ExperimentsModel {
 
   private flattenExperiments() {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
+  }
+
+  private persistSorts() {
+    return this.workspaceState.update(
+      MementoPrefixes.sortBy + this.dvcRoot,
+      this.currentSorts
+    )
+  }
+
+  private persistFilters() {
+    return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
+      ...this.filters
+    ])
   }
 }

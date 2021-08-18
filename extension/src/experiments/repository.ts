@@ -22,11 +22,6 @@ import { quickPickValue } from '../vscode/quickPick'
 
 export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
 
-const enum MementoPrefixes {
-  sortBy = 'sortBy:',
-  filterBy = 'filterBy:'
-}
-
 export class ExperimentsRepository {
   public readonly dispose = Disposable.fn()
 
@@ -57,8 +52,6 @@ export class ExperimentsRepository {
 
   private processManager: ProcessManager
 
-  private readonly workspaceState: Memento
-
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -73,13 +66,8 @@ export class ExperimentsRepository {
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
 
-    this.workspaceState = workspaceState
-
     this.experiments = this.dispose.track(
-      new ExperimentsModel(
-        workspaceState.get(MementoPrefixes.sortBy + this.dvcRoot, []),
-        workspaceState.get(MementoPrefixes.filterBy + this.dvcRoot, [])
-      )
+      new ExperimentsModel(dvcRoot, workspaceState)
     )
 
     this.processManager = this.dispose.track(
@@ -167,7 +155,6 @@ export class ExperimentsRepository {
 
   public addSort(sort: SortDefinition) {
     this.experiments.addSort(sort)
-    this.persistSorts()
     return this.notifyChanged()
   }
 
@@ -201,7 +188,6 @@ export class ExperimentsRepository {
 
   public removeSortByPath(pathToRemove: string) {
     this.experiments.removeSort(pathToRemove)
-    this.persistSorts()
     return this.notifyChanged()
   }
 
@@ -214,7 +200,6 @@ export class ExperimentsRepository {
 
   public removeSorts() {
     this.experiments.removeSorts()
-    this.persistSorts()
     return this.notifyChanged()
   }
 
@@ -229,7 +214,6 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.addFilter(filterToAdd)
-    this.persistFilters()
     return this.notifyChanged()
   }
 
@@ -240,13 +224,11 @@ export class ExperimentsRepository {
       return
     }
     this.experiments.removeFilters(filtersToRemove)
-    this.persistFilters()
     return this.notifyChanged()
   }
 
   public removeFilter(id: string) {
     if (this.experiments.removeFilter(id)) {
-      this.persistFilters()
       return this.notifyChanged()
     }
   }
@@ -276,19 +258,6 @@ export class ExperimentsRepository {
     ])
 
     return this.notifyChanged()
-  }
-
-  private persistSorts() {
-    return this.workspaceState.update(
-      MementoPrefixes.sortBy + this.dvcRoot,
-      this.getSorts()
-    )
-  }
-
-  private persistFilters() {
-    return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
-      ...this.experiments.getRawFilters()
-    ])
   }
 
   private notifyChanged() {
