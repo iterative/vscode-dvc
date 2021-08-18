@@ -9,9 +9,9 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
-import { isStringInEnum } from '../util'
+import { flattenUnique } from '../util/array'
 
-type DecorationState = Record<Status, Set<string>>
+export type DecorationState = Record<Status, Set<string>>
 
 export interface DecorationModel {
   getState: () => DecorationState
@@ -86,12 +86,14 @@ export class DecorationProvider implements FileDecorationProvider {
       stageModified: DecorationProvider.DecorationStageModified
     }
 
-  constructor() {
+  constructor(decorationsChanged?: EventEmitter<Uri[]>) {
     makeObservable(this)
 
     this.state = {} as DecorationState
 
-    this.decorationsChanged = this.dispose.track(new EventEmitter())
+    this.decorationsChanged = this.dispose.track(
+      decorationsChanged || new EventEmitter()
+    )
     this.onDidChangeFileDecorations = this.decorationsChanged.event
 
     this.dispose.track(window.registerFileDecorationProvider(this))
@@ -113,30 +115,15 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   public setState = (state: DecorationState) => {
+    const urisToUpdate = this.getUnion(this.state, state)
     this.state = state
-    this.decorationsChanged.fire(this.getUrisFromState())
+    this.decorationsChanged.fire(urisToUpdate)
   }
 
-  private isValidStatus(status: string): boolean {
-    return isStringInEnum(status, Status)
-  }
-
-  private getUrisFromSet(paths: Set<string>): Uri[] {
-    return [...paths].map(path => Uri.file(path))
-  }
-
-  private getUrisFromState() {
-    const reduceState = (
-      toDecorate: Uri[],
-      entry: [string, Set<string>]
-    ): Uri[] => {
-      const [status, paths] = entry as [Status, Set<string>]
-      if (!this.isValidStatus(status)) {
-        return toDecorate
-      }
-      return [...toDecorate, ...this.getUrisFromSet(paths)]
-    }
-
-    return Object.entries(this.state).reduce(reduceState, [])
+  private getUnion(existingState: DecorationState, newState: DecorationState) {
+    return flattenUnique([
+      ...Object.values(existingState).map(status => [...(status || [])]),
+      ...Object.values(newState).map(status => [...(status || [])])
+    ]).map(path => Uri.file(path))
   }
 }

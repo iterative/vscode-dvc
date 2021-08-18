@@ -88,7 +88,10 @@ describe('RepositoryState', () => {
         ]),
         notInCache: emptySet,
         renamed: new Set([join(dvcRoot, renamed)]),
-        stageModified: new Set([join(dvcRoot, output)]),
+        stageModified: new Set([
+          join(dvcRoot, output),
+          join(dvcRoot, predictions)
+        ]),
         tracked: new Set([
           ...list.map(entry => join(dvcRoot, entry.path)),
           join(dvcRoot, rawDataDir),
@@ -167,9 +170,11 @@ describe('RepositoryState', () => {
       })
     })
 
-    it('should filter the diff and status down to tracked paths', () => {
+    it('should not filter the diff and status down to tracked paths (efficiency)', () => {
+      const rawDataDir = 'data/MNIST/raw'
+
       const diff = {
-        modified: [{ path: 'data/MNIST/raw' }]
+        modified: [{ path: rawDataDir }]
       }
 
       const status = {
@@ -191,7 +196,7 @@ describe('RepositoryState', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
+        stageModified: new Set([join(dvcRoot, rawDataDir)]),
         tracked: emptySet,
         untracked: emptySet
       })
