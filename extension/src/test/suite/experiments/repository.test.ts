@@ -19,7 +19,7 @@ import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
-import * as filterQuickPicks from '../../../experiments/model/filterBy/quickPick'
+import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -437,16 +437,16 @@ suite('Experiments Repository Test Suite', () => {
         'second sort is added to the memento'
       ).to.deep.equal(sortDefinitions)
 
-      const pickFilterStub = stub(filterQuickPicks, 'pickFilterToAdd')
+      const mockPickFilter = stub(FilterQuickPicks, 'pickFilterToAdd')
 
-      pickFilterStub.onFirstCall().resolves(firstFilterDefinition)
+      mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()
       expect(
         mockMemento.get('filterBy:test'),
         'first filter should be added to memento after addFilter'
       ).to.deep.equal([firstFilterMapEntry])
 
-      pickFilterStub.onSecondCall().resolves(secondFilterDefinition)
+      mockPickFilter.onSecondCall().resolves(secondFilterDefinition)
       await testRepository.addFilter()
       expect(
         mockMemento.get('filterBy:test'),
@@ -471,15 +471,15 @@ suite('Experiments Repository Test Suite', () => {
         'all sorts should be removed from memento after removeSorts'
       ).to.deep.equal([])
 
-      pickFilterStub.reset()
-      pickFilterStub.onFirstCall().resolves(firstFilterDefinition)
+      mockPickFilter.reset()
+      mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
       await testRepository.addFilter()
       expect(
         mockMemento.get('filterBy:test'),
         'first filter should be re-added'
       ).to.deep.equal([secondFilterMapEntry, firstFilterMapEntry])
 
-      const pickFiltersStub = stub(filterQuickPicks, 'pickFiltersToRemove')
+      const pickFiltersStub = stub(FilterQuickPicks, 'pickFiltersToRemove')
       pickFiltersStub
         .onFirstCall()
         .resolves([firstFilterDefinition, secondFilterDefinition])
