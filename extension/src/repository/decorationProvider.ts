@@ -9,7 +9,6 @@ import {
   Uri,
   ThemeColor
 } from 'vscode'
-import { isStringInEnum } from '../util'
 
 export type DecorationState = Record<Status, Set<string>>
 
@@ -115,42 +114,17 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   public setState = (state: DecorationState) => {
-    const urisToUpdate = this.getUrisFromState(state, this.state)
+    const urisToUpdate = this.getUnion(this.state, state)
     this.state = state
     this.decorationsChanged.fire(urisToUpdate)
   }
 
-  private isValidStatus(status: string): boolean {
-    return isStringInEnum(status, Status)
-  }
-
-  private getUrisFromSet(paths: Set<string>): Uri[] {
-    return [...paths].map(path => Uri.file(path))
-  }
-
-  private getUrisFromState(
-    newState: DecorationState,
-    existingState: DecorationState
-  ) {
-    const reduceState = (
-      toDecorate: Uri[],
-      entry: [string, Set<string>]
-    ): Uri[] => {
-      const [status, paths] = entry as [Status, Set<string>]
-      if (!this.isValidStatus(status)) {
-        return toDecorate
-      }
-      return [...toDecorate, ...this.getUrisFromSet(paths)]
-    }
-
-    const state = Object.values(Status).reduce((combinedState, status) => {
-      combinedState[status] = new Set([
-        ...(newState?.[status] || []),
-        ...(existingState?.[status] || [])
+  private getUnion(existingState: DecorationState, newState: DecorationState) {
+    return [
+      ...new Set([
+        ...(existingState.tracked || []),
+        ...(newState.tracked || [])
       ])
-      return combinedState
-    }, {} as DecorationState)
-
-    return Object.entries(state).reduce(reduceState, [])
+    ].map(path => Uri.file(path))
   }
 }
