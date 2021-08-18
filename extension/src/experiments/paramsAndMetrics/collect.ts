@@ -251,3 +251,22 @@ export const collectParamsAndMetrics = (
     ...transformAndCollect(acc.metricsMap)
   ]
 }
+
+export const collectFiles = (data: ExperimentsRepoJSONOutput): string[] => {
+  const { workspace } = data
+  const workspaceBaseline = extractExperimentFields(workspace.baseline)
+
+  const files = new Set<string>()
+
+  if (workspaceBaseline) {
+    const { params, metrics } = workspaceBaseline
+
+    if (params) {
+      Object.keys(params).forEach(file => files.add(file))
+    }
+    if (metrics) {
+      Object.keys(metrics).forEach(file => files.add(file))
+    }
+  }
+  return [...files]
+}
