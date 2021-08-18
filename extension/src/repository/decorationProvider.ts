@@ -11,7 +11,7 @@ import {
 } from 'vscode'
 import { isStringInEnum } from '../util'
 
-type DecorationState = Record<Status, Set<string>>
+export type DecorationState = Record<Status, Set<string>>
 
 export interface DecorationModel {
   getState: () => DecorationState
@@ -86,12 +86,14 @@ export class DecorationProvider implements FileDecorationProvider {
       stageModified: DecorationProvider.DecorationStageModified
     }
 
-  constructor() {
+  constructor(decorationsChanged?: EventEmitter<Uri[]>) {
     makeObservable(this)
 
     this.state = {} as DecorationState
 
-    this.decorationsChanged = this.dispose.track(new EventEmitter())
+    this.decorationsChanged = this.dispose.track(
+      decorationsChanged || new EventEmitter()
+    )
     this.onDidChangeFileDecorations = this.decorationsChanged.event
 
     this.dispose.track(window.registerFileDecorationProvider(this))
@@ -113,8 +115,9 @@ export class DecorationProvider implements FileDecorationProvider {
   }
 
   public setState = (state: DecorationState) => {
+    const urisToUpdate = this.getUrisFromState(state, this.state)
     this.state = state
-    this.decorationsChanged.fire(this.getUrisFromState())
+    this.decorationsChanged.fire(urisToUpdate)
   }
 
   private isValidStatus(status: string): boolean {
@@ -125,7 +128,10 @@ export class DecorationProvider implements FileDecorationProvider {
     return [...paths].map(path => Uri.file(path))
   }
 
-  private getUrisFromState() {
+  private getUrisFromState(
+    newState: DecorationState,
+    existingState: DecorationState
+  ) {
     const reduceState = (
       toDecorate: Uri[],
       entry: [string, Set<string>]
@@ -137,6 +143,14 @@ export class DecorationProvider implements FileDecorationProvider {
       return [...toDecorate, ...this.getUrisFromSet(paths)]
     }
 
-    return Object.entries(this.state).reduce(reduceState, [])
+    const state = Object.values(Status).reduce((combinedState, status) => {
+      combinedState[status] = new Set([
+        ...(newState?.[status] || []),
+        ...(existingState?.[status] || [])
+      ])
+      return combinedState
+    }, {} as DecorationState)
+
+    return Object.entries(state).reduce(reduceState, [])
   }
 }

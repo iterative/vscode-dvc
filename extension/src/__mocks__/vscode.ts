@@ -22,6 +22,7 @@ export const Uri = {
 export const window = {
   createOutputChannel: jest.fn(),
   createTreeView: jest.fn(),
+  registerFileDecorationProvider: jest.fn(),
   showErrorMessage: jest.fn(),
   showInformationMessage: jest.fn(),
   showInputBox: jest.fn(),
