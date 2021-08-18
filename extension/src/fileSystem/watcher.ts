@@ -1,7 +1,6 @@
 import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import chokidar from 'chokidar'
-import debounce from 'lodash.debounce'
 import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
@@ -46,36 +45,31 @@ export const getRepositoryWatcher =
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
 export const onReady = (
-  debouncedWatcher: (path: string) => void,
+  listener: (path: string) => void,
   path: string | string[],
   pathWatcher: chokidar.FSWatcher
 ) => {
-  pathWatcher.on('add', debouncedWatcher)
-  pathWatcher.on('addDir', debouncedWatcher)
-  pathWatcher.on('change', debouncedWatcher)
-  pathWatcher.on('unlink', debouncedWatcher)
-  pathWatcher.on('unlinkDir', debouncedWatcher)
+  pathWatcher.on('add', listener)
+  pathWatcher.on('addDir', listener)
+  pathWatcher.on('change', listener)
+  pathWatcher.on('unlink', listener)
+  pathWatcher.on('unlinkDir', listener)
 
   const pathToFire = Array.isArray(path) ? path[0] : path
-  debouncedWatcher(pathToFire)
+  listener(pathToFire)
 }
 
 export const onDidChangeFileSystem = (
   path: string,
-  watcher: (path: string) => void
+  listener: (path: string) => void
 ): FSWatcher => {
-  const debouncedWatcher = debounce(watcher, 500, {
-    leading: true,
-    trailing: false
-  })
-
   const pathWatcher = chokidar.watch(path, {
     ignored: ignoredDotDirectories
   })
 
   const isReady = new Promise<void>(resolve =>
     pathWatcher.on('ready', () => {
-      onReady(debouncedWatcher, path, pathWatcher)
+      onReady(listener, path, pathWatcher)
       resolve(undefined)
     })
   )
