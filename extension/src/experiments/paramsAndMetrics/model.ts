@@ -66,6 +66,10 @@ export class ParamsAndMetricsModel {
       })
   }
 
+  public getFiles() {
+    return this.files
+  }
+
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     this.status[path] = status
@@ -82,7 +86,7 @@ export class ParamsAndMetricsModel {
       .filter(paramOrMetric => paramOrMetric !== undefined)
   }
 
-  public transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
+  private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
     const paramsAndMetrics = collectParamsAndMetrics(data)
 
     paramsAndMetrics.forEach(paramOrMetric => {
@@ -94,15 +98,15 @@ export class ParamsAndMetricsModel {
     this.data = paramsAndMetrics
   }
 
-  public transformAndSetFiles(data: ExperimentsRepoJSONOutput) {
+  private transformAndSetFiles(data: ExperimentsRepoJSONOutput) {
     const files = collectFiles(data)
 
     if (sameContents(this.files, files)) {
       return
     }
 
-    this.paramsAndMetricsFilesChanged.fire()
     this.files = files
+    this.paramsAndMetricsFilesChanged.fire()
   }
 
   private setAreChildrenSelected(path: string, status: Status) {
