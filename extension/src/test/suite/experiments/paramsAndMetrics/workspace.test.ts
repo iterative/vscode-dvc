@@ -43,7 +43,7 @@ suite('Experiments Test Suite', () => {
       )
     })
 
-    it('should dispose of current watcher and instantiate a new one if the params files change', async () => {
+    it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       const mockUpdater = stub()
 
       const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
