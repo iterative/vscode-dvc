@@ -26,20 +26,12 @@ suite('Process Manager Test Suite', () => {
         new ProcessManager({ name: 'refresh', process: mockRefresh })
       )
 
-      mockRefresh
-        .onFirstCall()
-        .callsFake(async () => {
-          await delay(500)
-          return 'I always run.'
-        })
-        .onCall(4)
-        .resolves(
-          'I am the lucky one.' +
-            'After 200ms the next call will be sent to the queue ' +
-            'it will be executed after the first call finishes'
-        )
+      mockRefresh.onFirstCall().callsFake(async () => {
+        await delay(500)
+        return 'I always run.'
+      })
 
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= 3; i++) {
         mockRefresh
           .onCall(i)
           .resolves(
@@ -47,6 +39,15 @@ suite('Process Manager Test Suite', () => {
               'Any calls made within 200ms of the first call get debounced.'
           )
       }
+
+      mockRefresh
+        .onCall(4)
+        .resolves(
+          'I am the lucky one.' +
+            'After 200ms the next call will be sent to the queue ' +
+            'it will be executed after the first call finishes'
+        )
+
       for (let i = 5; i <= 6; i++) {
         mockRefresh
           .onCall(i)

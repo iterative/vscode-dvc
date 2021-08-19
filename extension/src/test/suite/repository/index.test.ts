@@ -133,6 +133,7 @@ suite('Repository Test Suite', () => {
 
       await repository.isReady()
       mockReset.restore()
+
       await Promise.all([
         repository.update(),
         repository.reset(),
