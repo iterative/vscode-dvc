@@ -40,10 +40,10 @@ export const createFileSystemWatcher = (
   glob: string,
   listener: (path: string) => void
 ): FileSystemWatcher => {
-  const pathWatcher = workspace.createFileSystemWatcher(glob)
-  pathWatcher.onDidCreate(uri => listener(uri.fsPath))
-  pathWatcher.onDidChange(uri => listener(uri.fsPath))
-  pathWatcher.onDidDelete(uri => listener(uri.fsPath))
+  const fileSystemWatcher = workspace.createFileSystemWatcher(glob)
+  fileSystemWatcher.onDidCreate(uri => listener(uri.fsPath))
+  fileSystemWatcher.onDidChange(uri => listener(uri.fsPath))
+  fileSystemWatcher.onDidDelete(uri => listener(uri.fsPath))
 
-  return pathWatcher
+  return fileSystemWatcher
 }
