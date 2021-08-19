@@ -36,9 +36,9 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const onDidChangeFileSystemSetupEvent = () =>
+    const createFileSystemWatcherSetupEvent = () =>
       new Promise(resolve =>
-        stub(Watcher, 'onDidChangeFileSystem').callsFake(() => {
+        stub(Watcher, 'createFileSystemWatcher').callsFake(() => {
           resolve(undefined)
           return { dispose: stub() } as unknown as FileSystemWatcher
         })
@@ -151,7 +151,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
+      const createFileSystemWatcherCalled = createFileSystemWatcherSetupEvent()
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -202,7 +202,7 @@ suite('Extension Test Suite', () => {
         mockPath
       )
 
-      await onDidChangeFileSystemCalled
+      await createFileSystemWatcherCalled
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
@@ -222,7 +222,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const onDidChangeFileSystemCalled = onDidChangeFileSystemSetupEvent()
+      const createFileSystemWatcherCalled = createFileSystemWatcherSetupEvent()
 
       const mockDisposer = spy(Disposer, 'reset')
 
@@ -239,7 +239,7 @@ suite('Extension Test Suite', () => {
 
       await selectDvcPathFromFilePicker()
 
-      await onDidChangeFileSystemCalled
+      await createFileSystemWatcherCalled
 
       expect(mockShowOpenDialog).to.be.calledOnce
       expect(mockShowOpenDialog).to.have.been.called

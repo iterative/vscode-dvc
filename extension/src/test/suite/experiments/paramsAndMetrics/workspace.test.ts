@@ -26,7 +26,7 @@ suite('Experiments Test Suite', () => {
   describe('WorkspaceParams', () => {
     it('should call the updater function on setup', async () => {
       const mockUpdater = stub()
-      const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
+      const createFileSystemWatcherSpy = spy(Watcher, 'createFileSystemWatcher')
 
       const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
@@ -36,9 +36,9 @@ suite('Experiments Test Suite', () => {
       )
 
       expect(mockUpdater).not.to.be.called
-      expect(onDidChangeFileSystemSpy).to.be.calledOnce
+      expect(createFileSystemWatcherSpy).to.be.calledOnce
 
-      expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 0)).to.equal(
+      expect(getFirstArgOfCall(createFileSystemWatcherSpy, 0)).to.equal(
         join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
       )
     })
@@ -59,8 +59,11 @@ suite('Experiments Test Suite', () => {
 
       const mockDispose = stub()
 
-      const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
-      mockOnDidChangeFileSystem.callsFake(() => {
+      const mockCreateFileSystemWatcher = stub(
+        Watcher,
+        'createFileSystemWatcher'
+      )
+      mockCreateFileSystemWatcher.callsFake(() => {
         return { dispose: mockDispose } as unknown as FileSystemWatcher
       })
 
@@ -96,12 +99,12 @@ suite('Experiments Test Suite', () => {
 
       await paramsAndMetricsUpdatedEvent
 
-      expect(mockOnDidChangeFileSystem).to.be.calledTwice
+      expect(mockCreateFileSystemWatcher).to.be.calledTwice
       expect(mockDispose).to.be.calledOnce
-      expect(getFirstArgOfCall(mockOnDidChangeFileSystem, 0)).to.equal(
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
         join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
       )
-      expect(getFirstArgOfCall(mockOnDidChangeFileSystem, 1)).to.equal(
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.equal(
         join(
           dvcDemoPath,
           '**',

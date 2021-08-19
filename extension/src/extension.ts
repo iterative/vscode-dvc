@@ -26,7 +26,7 @@ import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
 import { TrackedExplorerTree } from './fileSystem/tree'
 import {
   getRepositoryWatcher,
-  onDidChangeFileSystem
+  createFileSystemWatcher
 } from './fileSystem/watcher'
 import { IExtension } from './interfaces'
 import { Repository } from './repository'
@@ -265,7 +265,7 @@ export class Extension implements IExtension {
       )
 
       repository.dispose.track(
-        onDidChangeFileSystem(
+        createFileSystemWatcher(
           join(dvcRoot, '**'),
           getRepositoryWatcher(repository, this.trackedExplorerTree)
         )

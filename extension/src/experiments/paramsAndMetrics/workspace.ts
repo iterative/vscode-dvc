@@ -2,7 +2,7 @@ import { join } from 'path'
 import { FileSystemWatcher } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ParamsAndMetricsModel } from './model'
-import { onDidChangeFileSystem } from '../../fileSystem/watcher'
+import { createFileSystemWatcher } from '../../fileSystem/watcher'
 import { uniqueValues } from '../../util/array'
 
 type Updater = () => Promise<void>
@@ -37,7 +37,7 @@ export class WorkspaceParams {
   private watchParamsAndMetricsFiles(updater: Updater) {
     const files = this.paramsAndMetrics.getFiles()
     return this.dispose.track(
-      onDidChangeFileSystem(
+      createFileSystemWatcher(
         join(
           this.dvcRoot,
           '**',

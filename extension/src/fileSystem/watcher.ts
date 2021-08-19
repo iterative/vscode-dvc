@@ -36,7 +36,7 @@ export const getRepositoryWatcher =
     trackedExplorerTree.refresh(path)
   }
 
-export const onDidChangeFileSystem = (
+export const createFileSystemWatcher = (
   glob: string,
   listener: (path: string) => void
 ): FileSystemWatcher => {
