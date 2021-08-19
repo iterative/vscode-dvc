@@ -254,7 +254,7 @@ export const collectParamsAndMetrics = (
 
 export const collectFiles = (data: ExperimentsRepoJSONOutput): string[] => {
   const { workspace } = data
-  const workspaceBaseline = extractExperimentFields(workspace.baseline)
+  const workspaceBaseline = workspace.baseline?.data
 
   const files = new Set<string>()
 
