@@ -36,7 +36,7 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const createFileSystemWatcherSetupEvent = () =>
+    const createFileSystemWatcherEvent = () =>
       new Promise(resolve =>
         stub(Watcher, 'createFileSystemWatcher').callsFake(() => {
           resolve(undefined)
@@ -151,7 +151,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const createFileSystemWatcherCalled = createFileSystemWatcherSetupEvent()
+      const createFileSystemWatcherCalled = createFileSystemWatcherEvent()
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -222,7 +222,7 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const createFileSystemWatcherCalled = createFileSystemWatcherSetupEvent()
+      const createFileSystemWatcherCalled = createFileSystemWatcherEvent()
 
       const mockDisposer = spy(Disposer, 'reset')
 
