@@ -3,7 +3,7 @@ import { mocked } from 'ts-jest/utils'
 import { workspace } from 'vscode'
 import { TrackedExplorerTree } from './tree'
 import {
-  getRepositoryWatcher,
+  getRepositoryListener,
   ignoredDotDirectories,
   createFileSystemWatcher
 } from './watcher'
@@ -26,7 +26,7 @@ beforeEach(() => {
   })
 })
 
-describe('getRepositoryWatcher', () => {
+describe('getRepositoryListener', () => {
   const mockedResetState = jest.fn()
   const mockedUpdateState = jest.fn()
   const repository = {
@@ -42,9 +42,9 @@ describe('getRepositoryWatcher', () => {
   } as unknown as TrackedExplorerTree
 
   it('should return a function that does nothing if an empty path is provided', () => {
-    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+    const listener = getRepositoryListener(repository, trackedExplorerTree)
 
-    watcher('')
+    listener('')
 
     expect(mockedResetState).not.toBeCalled()
     expect(mockedUpdateState).not.toBeCalled()
@@ -53,9 +53,9 @@ describe('getRepositoryWatcher', () => {
   })
 
   it('should return a function that does nothing if an experiments git refs path is provided', () => {
-    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+    const listener = getRepositoryListener(repository, trackedExplorerTree)
 
-    watcher(join(__dirname, '.git', 'refs', 'exps', '0F'))
+    listener(join(__dirname, '.git', 'refs', 'exps', '0F'))
 
     expect(mockedResetState).not.toBeCalled()
     expect(mockedUpdateState).not.toBeCalled()
@@ -64,9 +64,9 @@ describe('getRepositoryWatcher', () => {
   })
 
   it('should return a function that calls reset if it is called with a .dvc data placeholder', () => {
-    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+    const listener = getRepositoryListener(repository, trackedExplorerTree)
 
-    watcher(join('some', 'dvc', 'repo', 'data', 'placeholder.dvc'))
+    listener(join('some', 'dvc', 'repo', 'data', 'placeholder.dvc'))
 
     expect(mockedResetState).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
@@ -76,9 +76,9 @@ describe('getRepositoryWatcher', () => {
   })
 
   it('should return a function that calls reset if it is called with a dvc.yml', () => {
-    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+    const listener = getRepositoryListener(repository, trackedExplorerTree)
 
-    watcher(join('some', 'dvc', 'repo', 'data', 'dvc.yaml'))
+    listener(join('some', 'dvc', 'repo', 'data', 'dvc.yaml'))
 
     expect(mockedResetState).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
@@ -88,9 +88,9 @@ describe('getRepositoryWatcher', () => {
   })
 
   it('should return a function that calls reset if it is called with a dvc.lock', () => {
-    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+    const listener = getRepositoryListener(repository, trackedExplorerTree)
 
-    watcher(join('some', 'dvc', 'repo', 'data', 'dvc.lock'))
+    listener(join('some', 'dvc', 'repo', 'data', 'dvc.lock'))
 
     expect(mockedResetState).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
@@ -100,9 +100,9 @@ describe('getRepositoryWatcher', () => {
   })
 
   it('should return a function that calls update if it is called with anything else', () => {
-    const watcher = getRepositoryWatcher(repository, trackedExplorerTree)
+    const listener = getRepositoryListener(repository, trackedExplorerTree)
 
-    watcher(__filename)
+    listener(__filename)
 
     expect(mockedResetState).not.toBeCalled()
     expect(mockedReset).not.toBeCalled()

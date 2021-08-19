@@ -17,7 +17,7 @@ export const isDvcLock = (path: string): boolean =>
 const requiresReset = (path: string) =>
   extname(path) === '.dvc' || isDvcLock(path) || basename(path) === 'dvc.yaml'
 
-export const getRepositoryWatcher =
+export const getRepositoryListener =
   (
     repository: Repository,
     trackedExplorerTree: TrackedExplorerTree
