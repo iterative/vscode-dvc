@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { FileSystemWatcher, window } from 'vscode'
 import { Disposable } from '../../../../extension'
-import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
+import { WorkspaceParamsAndMetrics } from '../../../../experiments/paramsAndMetrics/workspace'
 import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
@@ -26,19 +26,23 @@ suite('Experiments Test Suite', () => {
   describe('WorkspaceParams', () => {
     it('should call the updater function on setup', async () => {
       const mockUpdater = stub()
-      const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
+      const createFileSystemWatcherSpy = spy(Watcher, 'createFileSystemWatcher')
 
       const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       disposable.track(
-        new WorkspaceParams(dvcDemoPath, paramsAndMetrics, mockUpdater)
+        new WorkspaceParamsAndMetrics(
+          dvcDemoPath,
+          paramsAndMetrics,
+          mockUpdater
+        )
       )
 
       expect(mockUpdater).not.to.be.called
-      expect(onDidChangeFileSystemSpy).to.be.calledOnce
+      expect(createFileSystemWatcherSpy).to.be.calledOnce
 
-      expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 0)).to.equal(
+      expect(getFirstArgOfCall(createFileSystemWatcherSpy, 0)).to.equal(
         join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
       )
     })
@@ -59,13 +63,20 @@ suite('Experiments Test Suite', () => {
 
       const mockDispose = stub()
 
-      const mockOnDidChangeFileSystem = stub(Watcher, 'onDidChangeFileSystem')
-      mockOnDidChangeFileSystem.callsFake(() => {
+      const mockCreateFileSystemWatcher = stub(
+        Watcher,
+        'createFileSystemWatcher'
+      )
+      mockCreateFileSystemWatcher.callsFake(() => {
         return { dispose: mockDispose } as unknown as FileSystemWatcher
       })
 
       disposable.track(
-        new WorkspaceParams(dvcDemoPath, paramsAndMetrics, mockUpdater)
+        new WorkspaceParamsAndMetrics(
+          dvcDemoPath,
+          paramsAndMetrics,
+          mockUpdater
+        )
       )
 
       const updatedExperimentsOutput = Object.assign(
@@ -96,12 +107,12 @@ suite('Experiments Test Suite', () => {
 
       await paramsAndMetricsUpdatedEvent
 
-      expect(mockOnDidChangeFileSystem).to.be.calledTwice
+      expect(mockCreateFileSystemWatcher).to.be.calledTwice
       expect(mockDispose).to.be.calledOnce
-      expect(getFirstArgOfCall(mockOnDidChangeFileSystem, 0)).to.equal(
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
         join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
       )
-      expect(getFirstArgOfCall(mockOnDidChangeFileSystem, 1)).to.equal(
+      expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.equal(
         join(
           dvcDemoPath,
           '**',
