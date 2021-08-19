@@ -115,12 +115,14 @@ export class RepositoryModel
     return Object.values(filteredStatusOutput).reduce(statusReducer, new Set())
   }
 
-  private mapToAbsolutePaths(diff: PathOutput[] = []): string[] {
-    return diff.map(entry => this.getAbsolutePath(entry.path))
+  private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
+    return diff
+      .map(entry => this.getAbsolutePath(entry.path))
+      .filter(path => this.state.tracked.has(path))
   }
 
   private getStateFromDiff(diff?: PathOutput[]): Set<string> {
-    return new Set<string>(this.mapToAbsolutePaths(diff))
+    return new Set<string>(this.mapToTrackedPaths(diff))
   }
 
   private pathInSet = (path: string, set?: Set<string>): boolean =>
@@ -160,7 +162,7 @@ export class RepositoryModel
     statusOutput: StatusOutput
   ): void {
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
-    const modifiedAgainstHead = this.mapToAbsolutePaths(diffOutput.modified)
+    const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
 
     this.state.stageModified = this.splitModifiedAgainstHead(
       modifiedAgainstHead,
