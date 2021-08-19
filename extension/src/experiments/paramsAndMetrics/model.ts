@@ -1,7 +1,8 @@
+import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectParamsAndMetrics } from './collect'
+import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
-import { flatten } from '../../util/array'
+import { flatten, sameContents } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 export enum Status {
@@ -13,9 +14,18 @@ export enum Status {
 export class ParamsAndMetricsModel {
   public dispose = Disposable.fn()
 
+  public onDidChangeParamsAndMetricsFiles: Event<void>
+  private paramsAndMetricsFilesChanged = new EventEmitter<void>()
+
   private status: Record<string, Status> = {}
 
   private data: ParamOrMetric[] = []
+  private files: string[] = []
+
+  constructor() {
+    this.onDidChangeParamsAndMetricsFiles =
+      this.paramsAndMetricsFilesChanged.event
+  }
 
   public getSelected() {
     return (
@@ -26,15 +36,10 @@ export class ParamsAndMetricsModel {
   }
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
-    const paramsAndMetrics = collectParamsAndMetrics(data)
-
-    paramsAndMetrics.forEach(paramOrMetric => {
-      if (this.status[paramOrMetric.path] === undefined) {
-        this.status[paramOrMetric.path] = Status.selected
-      }
-    })
-
-    this.data = paramsAndMetrics
+    return Promise.all([
+      this.transformAndSetParamsAndMetrics(data),
+      this.transformAndSetFiles(data)
+    ])
   }
 
   public getParamsAndMetrics() {
@@ -61,6 +66,10 @@ export class ParamsAndMetricsModel {
       })
   }
 
+  public getFiles() {
+    return this.files
+  }
+
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     this.status[path] = status
@@ -75,6 +84,29 @@ export class ParamsAndMetricsModel {
     return terminalNodes
       .map(paramOrMetric => this.status[paramOrMetric.path])
       .filter(paramOrMetric => paramOrMetric !== undefined)
+  }
+
+  private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
+    const paramsAndMetrics = collectParamsAndMetrics(data)
+
+    paramsAndMetrics.forEach(paramOrMetric => {
+      if (this.status[paramOrMetric.path] === undefined) {
+        this.status[paramOrMetric.path] = Status.selected
+      }
+    })
+
+    this.data = paramsAndMetrics
+  }
+
+  private transformAndSetFiles(data: ExperimentsRepoJSONOutput) {
+    const files = collectFiles(data)
+
+    if (sameContents(this.files, files)) {
+      return
+    }
+
+    this.files = files
+    this.paramsAndMetricsFilesChanged.fire()
   }
 
   private setAreChildrenSelected(path: string, status: Status) {

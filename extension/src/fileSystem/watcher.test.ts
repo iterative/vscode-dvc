@@ -1,24 +1,29 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import debounce from 'lodash.debounce'
-import { FSWatcher, watch } from 'chokidar'
+import { workspace } from 'vscode'
 import { TrackedExplorerTree } from './tree'
 import {
   getRepositoryWatcher,
   ignoredDotDirectories,
-  onDidChangeFileSystem,
-  onReady
+  onDidChangeFileSystem
 } from './watcher'
 import { Repository } from '../repository'
 
-jest.mock('chokidar')
-jest.mock('lodash.debounce')
+jest.mock('vscode')
 
-const mockedWatch = mocked(watch)
-const mockedDebounce = mocked(debounce)
-
+const mockedWorkspace = mocked(workspace)
+const mockedCreateFileSystemWatcher = jest.fn()
+mockedWorkspace.createFileSystemWatcher = mockedCreateFileSystemWatcher
 beforeEach(() => {
   jest.resetAllMocks()
+
+  mockedCreateFileSystemWatcher.mockImplementationOnce(function () {
+    return {
+      onDidChange: jest.fn(),
+      onDidCreate: jest.fn(),
+      onDidDelete: jest.fn()
+    }
+  })
 })
 
 describe('getRepositoryWatcher', () => {
@@ -163,69 +168,24 @@ describe('ignoredDotDirectories', () => {
       false
     )
   })
-})
 
-describe('onReady', () => {
-  it('should add the callbacks after the scan is complete', () => {
-    const mockedPath = join('some', 'path')
-    const mockedDebounce = jest.fn()
-    const mockedWatcher = mocked(new FSWatcher())
-    onReady(mockedDebounce, join('some', 'path'), mockedWatcher)
-
-    expect(mockedDebounce).toBeCalledWith(mockedPath)
-    expect(mockedWatcher.on).toBeCalledWith('addDir', mockedDebounce)
-    expect(mockedWatcher.on).toBeCalledWith('change', mockedDebounce)
-    expect(mockedWatcher.on).toBeCalledWith('unlink', mockedDebounce)
-    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', mockedDebounce)
-  })
-
-  it('should work with multiple paths', () => {
-    const mockedPath = join('some', 'path')
-    const mockedOtherPath = join('some', 'other', 'path')
-    const mockedDebounce = jest.fn()
-    const mockedWatcher = mocked(new FSWatcher())
-    onReady(mockedDebounce, [mockedPath, mockedOtherPath], mockedWatcher)
-
-    expect(mockedDebounce).toBeCalledWith(mockedPath)
-    expect(mockedWatcher.on).toBeCalledWith('addDir', mockedDebounce)
-    expect(mockedWatcher.on).toBeCalledWith('change', mockedDebounce)
-    expect(mockedWatcher.on).toBeCalledWith('unlink', mockedDebounce)
-    expect(mockedWatcher.on).toBeCalledWith('unlinkDir', mockedDebounce)
+  it('should not match .dvc files', () => {
+    expect(
+      ignoredDotDirectories.test('/Users/robot/example-get-started/.vscode.dvc')
+    ).toBe(false)
+    expect(
+      ignoredDotDirectories.test('C:\\example-get-started\\.vscode.dvc')
+    ).toBe(false)
   })
 })
 
 describe('onDidChangeFileSystem', () => {
-  it('should call fs.watch with the correct parameters', () => {
+  it('should call createFileSystemWatcher with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
 
-    const mockedWatcher = mocked(new FSWatcher())
-    mockedWatch.mockReturnValueOnce(mockedWatcher)
+    onDidChangeFileSystem(file, func)
 
-    mockedDebounce.mockImplementationOnce(
-      (func: (...args: string[]) => void) =>
-        func as {
-          (...args: string[]): void
-          cancel(): void
-          flush(): void
-        }
-    )
-
-    const { dispose } = onDidChangeFileSystem(file, func)
-
-    expect(dispose).toBeDefined()
-
-    expect(mockedDebounce).toBeCalledTimes(1)
-    expect(mockedDebounce).toBeCalledWith(func, 500, {
-      leading: true,
-      trailing: false
-    })
-
-    expect(mockedWatch).toBeCalledWith(file, {
-      ignored: ignoredDotDirectories
-    })
-    expect(mockedWatch).toBeCalledTimes(1)
-
-    expect(mockedWatcher.on).toBeCalledTimes(1)
+    expect(mockedCreateFileSystemWatcher).toBeCalledWith(file)
   })
 })

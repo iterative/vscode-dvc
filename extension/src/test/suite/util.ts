@@ -49,7 +49,9 @@ export const experimentsUpdatedEvent = (
   experimentsRepository: ExperimentsRepository
 ) =>
   new Promise(resolve => {
-    experimentsRepository.onDidChangeExperiments(resolve)
+    experimentsRepository.dispose.track(
+      experimentsRepository.onDidChangeExperiments(resolve)
+    )
   })
 
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>

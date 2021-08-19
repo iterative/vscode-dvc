@@ -9,9 +9,12 @@ export const definedAndNonEmpty = (
 export const flatten = <T = string>(arrayOfArrays: T[][]): T[] =>
   ([] as T[]).concat(...arrayOfArrays)
 
-export const flattenUnique = <T = string>(arrayOfArrays: T[][]): T[] => [
-  ...new Set(flatten<T>(arrayOfArrays))
+export const uniqueValues = <T = string>(array: T[]): T[] => [
+  ...new Set<T>(array)
 ]
+
+export const flattenUnique = <T = string>(arrayOfArrays: T[][]): T[] =>
+  uniqueValues(flatten<T>(arrayOfArrays))
 
 export const joinTruthyItems = (array: (string | undefined)[], sep = ' ') =>
   array.filter(Boolean).join(sep)
