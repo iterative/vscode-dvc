@@ -1,30 +1,39 @@
 import { Disposable } from '@hediet/std/disposable'
+import { getCurrentEpoch } from './util/time'
 
 export class ProcessManager {
   public dispose = Disposable.fn()
 
-  private processes: Record<string, () => Promise<unknown>> = {}
+  private processes: Record<
+    string,
+    { process: () => Promise<unknown>; lastStarted?: number }
+  > = {}
+
   private queued = new Set<string>()
   private locked = new Set<string>()
 
   constructor(
     ...processes: { name: string; process: () => Promise<unknown> }[]
   ) {
-    processes.map(process => {
-      this.processes[process.name] = process.process
+    processes.map(({ name, process }) => {
+      this.processes[name] = { process }
     })
   }
 
   public async run(name: string): Promise<void> {
     this.checkCanRun(name)
-    const process = this.processes[name]
+    const { process, lastStarted } = this.processes[name]
+
+    if (this.shouldDebounce(lastStarted)) {
+      return
+    }
 
     if (this.anyOngoing()) {
       return this.queue(name)
     }
 
     this.lock(name)
-    await process()
+    await Promise.all([process(), this.setLastStarted(name)])
     this.unlock(name)
 
     return this.runQueued()
@@ -39,6 +48,14 @@ export class ProcessManager {
     return Promise.resolve()
   }
 
+  private shouldDebounce(lastStarted: number | undefined) {
+    return lastStarted && getCurrentEpoch() - lastStarted <= 200
+  }
+
+  private setLastStarted(name: string) {
+    this.processes[name].lastStarted = getCurrentEpoch()
+  }
+
   private anyOngoing(): boolean {
     return !!this.locked.size
   }
@@ -48,7 +65,7 @@ export class ProcessManager {
     if (!next) {
       return Promise.resolve()
     }
-    this.deQueue(next)
+    this.dequeue(next)
     return this.run(next)
   }
 
@@ -72,7 +89,7 @@ export class ProcessManager {
     return this.locked.delete(name)
   }
 
-  private deQueue(name: string): boolean {
+  private dequeue(name: string): boolean {
     return this.queued.delete(name)
   }
 
