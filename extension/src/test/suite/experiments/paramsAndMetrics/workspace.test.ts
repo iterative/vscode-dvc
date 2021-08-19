@@ -28,14 +28,12 @@ suite('Experiments Test Suite', () => {
       const mockUpdater = stub()
       const onDidChangeFileSystemSpy = spy(Watcher, 'onDidChangeFileSystem')
 
-      const paramsAndMetrics = new ParamsAndMetricsModel()
-      paramsAndMetrics.transformAndSet(complexExperimentsOutput)
+      const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
+      await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
-      const workspaceParams = disposable.track(
+      disposable.track(
         new WorkspaceParams(dvcDemoPath, paramsAndMetrics, mockUpdater)
       )
-
-      await workspaceParams.isReady()
 
       expect(mockUpdater).not.to.be.called
       expect(onDidChangeFileSystemSpy).to.be.calledOnce
@@ -52,12 +50,14 @@ suite('Experiments Test Suite', () => {
     it('should dispose of current watcher and instantiate a new one if the params files change', async () => {
       const mockUpdater = stub()
 
-      const paramsAndMetrics = new ParamsAndMetricsModel()
-      paramsAndMetrics.transformAndSet(complexExperimentsOutput)
+      const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
+      await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       const paramsAndMetricsUpdatedEvent = new Promise(resolve =>
-        paramsAndMetrics.onDidChangeParamsAndMetricsFiles(() =>
-          resolve(undefined)
+        disposable.track(
+          paramsAndMetrics.onDidChangeParamsAndMetricsFiles(() =>
+            resolve(undefined)
+          )
         )
       )
 
@@ -68,11 +68,9 @@ suite('Experiments Test Suite', () => {
         return { dispose: mockDispose } as unknown as FileSystemWatcher
       })
 
-      const workspaceParams = disposable.track(
+      disposable.track(
         new WorkspaceParams(dvcDemoPath, paramsAndMetrics, mockUpdater)
       )
-
-      await workspaceParams.isReady()
 
       const updatedExperimentsOutput = Object.assign(
         { ...complexExperimentsOutput },

@@ -40,12 +40,9 @@ export class ExperimentsRepository {
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
-  private workspaceParams: WorkspaceParams
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
-
-  private initialDataLoaded = false
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
@@ -74,14 +71,14 @@ export class ExperimentsRepository {
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
 
-    this.workspaceParams = this.dispose.track(
-      new WorkspaceParams(dvcRoot, this.paramsAndMetrics, () => this.refresh())
-    )
+    this.updateData().then(() => {
+      this.dispose.track(
+        new WorkspaceParams(dvcRoot, this.paramsAndMetrics, () =>
+          this.refresh()
+        )
+      )
 
-    this.updateData().then(async () => {
-      await this.workspaceParams.isReady()
       this.deferred.resolve()
-      this.initialDataLoaded = true
     })
   }
 
@@ -95,9 +92,6 @@ export class ExperimentsRepository {
   }
 
   public refresh() {
-    if (!this.initialDataLoaded) {
-      return Promise.resolve(undefined)
-    }
     return this.processManager.run('refresh')
   }
 

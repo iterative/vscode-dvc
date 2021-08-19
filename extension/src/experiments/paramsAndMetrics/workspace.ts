@@ -1,7 +1,6 @@
 import { join } from 'path'
 import { FileSystemWatcher } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { ParamsAndMetricsModel } from './model'
 import { onDidChangeFileSystem } from '../../fileSystem/watcher'
 
@@ -14,9 +13,6 @@ export class WorkspaceParams {
   private readonly paramsAndMetrics: ParamsAndMetricsModel
   private fileSystemWatcher: FileSystemWatcher
 
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
   constructor(
     dvcRoot: string,
     paramsAndMetrics: ParamsAndMetricsModel,
@@ -28,17 +24,13 @@ export class WorkspaceParams {
 
     this.fileSystemWatcher = this.watchParamsAndMetricsFiles(updater)
 
-    this.paramsAndMetrics.onDidChangeParamsAndMetricsFiles(() => {
-      const fileSystemWatcher = this.watchParamsAndMetricsFiles(updater)
-      this.fileSystemWatcher.dispose()
-      this.fileSystemWatcher = fileSystemWatcher
-    })
-
-    this.deferred.resolve()
-  }
-
-  public isReady() {
-    return this.initialized
+    this.dispose.track(
+      this.paramsAndMetrics.onDidChangeParamsAndMetricsFiles(() => {
+        const fileSystemWatcher = this.watchParamsAndMetricsFiles(updater)
+        this.fileSystemWatcher.dispose()
+        this.fileSystemWatcher = fileSystemWatcher
+      })
+    )
   }
 
   private watchParamsAndMetricsFiles(updater: Updater) {
