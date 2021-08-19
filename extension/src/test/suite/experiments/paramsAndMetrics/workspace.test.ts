@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { FileSystemWatcher, window } from 'vscode'
 import { Disposable } from '../../../../extension'
-import { WorkspaceParams } from '../../../../experiments/paramsAndMetrics/workspace'
+import { WorkspaceParamsAndMetrics } from '../../../../experiments/paramsAndMetrics/workspace'
 import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
@@ -32,7 +32,11 @@ suite('Experiments Test Suite', () => {
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       disposable.track(
-        new WorkspaceParams(dvcDemoPath, paramsAndMetrics, mockUpdater)
+        new WorkspaceParamsAndMetrics(
+          dvcDemoPath,
+          paramsAndMetrics,
+          mockUpdater
+        )
       )
 
       expect(mockUpdater).not.to.be.called
@@ -68,7 +72,11 @@ suite('Experiments Test Suite', () => {
       })
 
       disposable.track(
-        new WorkspaceParams(dvcDemoPath, paramsAndMetrics, mockUpdater)
+        new WorkspaceParamsAndMetrics(
+          dvcDemoPath,
+          paramsAndMetrics,
+          mockUpdater
+        )
       )
 
       const updatedExperimentsOutput = Object.assign(

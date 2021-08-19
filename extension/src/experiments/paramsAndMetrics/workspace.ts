@@ -7,7 +7,7 @@ import { uniqueValues } from '../../util/array'
 
 type Updater = () => Promise<void>
 
-export class WorkspaceParams {
+export class WorkspaceParamsAndMetrics {
   public readonly dispose = Disposable.fn()
 
   private readonly dvcRoot: string

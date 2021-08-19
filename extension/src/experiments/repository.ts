@@ -11,7 +11,7 @@ import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { SortDefinition } from './model/sortBy'
 import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
-import { WorkspaceParams } from './paramsAndMetrics/workspace'
+import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ResourceLocator } from '../resourceLocator'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -73,7 +73,7 @@ export class ExperimentsRepository {
 
     this.updateData().then(() => {
       this.dispose.track(
-        new WorkspaceParams(dvcRoot, this.paramsAndMetrics, () =>
+        new WorkspaceParamsAndMetrics(dvcRoot, this.paramsAndMetrics, () =>
           this.refresh()
         )
       )
