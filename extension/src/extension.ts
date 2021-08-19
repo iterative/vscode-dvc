@@ -1,3 +1,4 @@
+import { join } from 'path'
 import {
   commands,
   Event,
@@ -265,7 +266,7 @@ export class Extension implements IExtension {
 
       repository.dispose.track(
         onDidChangeFileSystem(
-          dvcRoot,
+          join(dvcRoot, '**'),
           getRepositoryWatcher(repository, this.trackedExplorerTree)
         )
       )

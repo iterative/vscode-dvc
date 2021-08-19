@@ -75,7 +75,7 @@ export class ExperimentsRepository {
     )
 
     this.workspaceParams = this.dispose.track(
-      new WorkspaceParams(dvcRoot, () => this.refresh())
+      new WorkspaceParams(dvcRoot, this.paramsAndMetrics, () => this.refresh())
     )
 
     this.updateData().then(async () => {

@@ -2,7 +2,7 @@ import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
-import { window, commands, workspace, Uri } from 'vscode'
+import { window, commands, workspace, Uri, FileSystemWatcher } from 'vscode'
 import {
   configurationChangeEvent,
   quickPickInitialized,
@@ -40,12 +40,7 @@ suite('Extension Test Suite', () => {
       new Promise(resolve =>
         stub(Watcher, 'onDidChangeFileSystem').callsFake(() => {
           resolve(undefined)
-          return {
-            dispose: () => undefined,
-            isReady: Promise.resolve(undefined),
-            on: stub(),
-            unwatch: stub()
-          }
+          return { dispose: stub() } as unknown as FileSystemWatcher
         })
       )
 

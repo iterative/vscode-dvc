@@ -1,8 +1,9 @@
 import { join } from 'path'
+import { FileSystemWatcher } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { ParamsAndMetricsModel } from './model'
-import { onDidChangeFileSystem, FSWatcher } from '../../fileSystem/watcher'
+import { onDidChangeFileSystem } from '../../fileSystem/watcher'
 
 type Updater = () => Promise<void>
 
@@ -11,7 +12,7 @@ export class WorkspaceParams {
 
   private readonly dvcRoot: string
   private readonly paramsAndMetrics: ParamsAndMetricsModel
-  private fsWatcher: FSWatcher
+  private fileSystemWatcher: FileSystemWatcher
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -25,11 +26,12 @@ export class WorkspaceParams {
 
     this.paramsAndMetrics = paramsAndMetrics
 
-    this.fsWatcher = this.watchParamsAndMetricsFiles(updater)
+    this.fileSystemWatcher = this.watchParamsAndMetricsFiles(updater)
 
     this.paramsAndMetrics.onDidChangeParamsAndMetricsFiles(() => {
-      this.fsWatcher.dispose()
-      this.fsWatcher = this.watchParamsAndMetricsFiles(updater)
+      const fileSystemWatcher = this.watchParamsAndMetricsFiles(updater)
+      this.fileSystemWatcher.dispose()
+      this.fileSystemWatcher = fileSystemWatcher
     })
 
     this.deferred.resolve()

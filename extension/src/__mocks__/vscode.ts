@@ -30,6 +30,7 @@ export const window = {
   showQuickPick: jest.fn()
 }
 export const workspace = {
+  createFileSystemWatcher: jest.fn(),
   workspaceFolders: [
     {
       uri: {
