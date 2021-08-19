@@ -5,7 +5,7 @@ import { TrackedExplorerTree } from './tree'
 import {
   getRepositoryWatcher,
   ignoredDotDirectories,
-  onDidChangeFileSystem
+  createFileSystemWatcher
 } from './watcher'
 import { Repository } from '../repository'
 
@@ -179,12 +179,12 @@ describe('ignoredDotDirectories', () => {
   })
 })
 
-describe('onDidChangeFileSystem', () => {
+describe('createFileSystemWatcher', () => {
   it('should call createFileSystemWatcher with the correct parameters', () => {
     const file = '/some/file.csv'
     const func = () => undefined
 
-    onDidChangeFileSystem(file, func)
+    createFileSystemWatcher(file, func)
 
     expect(mockedCreateFileSystemWatcher).toBeCalledWith(file)
   })
