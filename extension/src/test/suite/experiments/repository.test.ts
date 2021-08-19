@@ -36,7 +36,7 @@ suite('Experiments Repository Test Suite', () => {
   })
 
   describe('refresh', () => {
-    it('should queue another update and return early if an update is in progress', async () => {
+    it('should debounce all calls to refresh that are made within 200ms', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
@@ -47,7 +47,7 @@ suite('Experiments Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
-      const testTable = disposable.track(
+      const experimentsRepository = disposable.track(
         new ExperimentsRepository(
           dvcDemoPath,
           internalCommands,
@@ -55,19 +55,19 @@ suite('Experiments Repository Test Suite', () => {
           buildMockMemento()
         )
       )
-      await testTable.isReady()
+      await experimentsRepository.isReady()
       mockExperimentShow.resetHistory()
 
       await Promise.all([
-        testTable.refresh(),
-        testTable.refresh(),
-        testTable.refresh(),
-        testTable.refresh(),
-        testTable.refresh(),
-        testTable.refresh()
+        experimentsRepository.refresh(),
+        experimentsRepository.refresh(),
+        experimentsRepository.refresh(),
+        experimentsRepository.refresh(),
+        experimentsRepository.refresh(),
+        experimentsRepository.refresh()
       ])
 
-      expect(mockExperimentShow).to.be.calledTwice
+      expect(mockExperimentShow).to.be.calledOnce
     })
   })
 

@@ -23,7 +23,7 @@ suite('Repository Test Suite', () => {
   })
 
   describe('Repository', () => {
-    it('should queue a reset and return early if a reset is in progress', async () => {
+    it('should not queue a reset within 200ms of one starting', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
@@ -36,12 +36,9 @@ suite('Repository Test Suite', () => {
       const repository = disposable.track(
         new Repository(dvcDemoPath, internalCommands)
       )
-      await repository.isReady()
-      mockList.resetHistory()
-      mockDiff.resetHistory()
-      mockStatus.resetHistory()
 
       await Promise.all([
+        repository.isReady(),
         repository.reset(),
         repository.reset(),
         repository.reset(),
@@ -49,12 +46,12 @@ suite('Repository Test Suite', () => {
         repository.reset()
       ])
 
-      expect(mockList).to.be.calledTwice
-      expect(mockDiff).to.be.calledTwice
-      expect(mockStatus).to.be.calledTwice
+      expect(mockList).to.be.calledOnce
+      expect(mockDiff).to.be.calledOnce
+      expect(mockStatus).to.be.calledOnce
     })
 
-    it('should queue an update and return early if an update is in progress', async () => {
+    it('should not queue an update within 200ms of one starting', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
@@ -81,11 +78,11 @@ suite('Repository Test Suite', () => {
       ])
 
       expect(mockList).not.to.be.called
-      expect(mockDiff).to.be.calledTwice
-      expect(mockStatus).to.be.calledTwice
+      expect(mockDiff).to.be.calledOnce
+      expect(mockStatus).to.be.calledOnce
     })
 
-    it('should queue a reset and return early if a reset is in progress and any other calls are made', async () => {
+    it('should debounce all calls made within 200ms of a reset', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
@@ -95,13 +92,14 @@ suite('Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
+      const mockReset = stub(Repository.prototype, 'reset').resolves(undefined)
+
       const repository = disposable.track(
         new Repository(dvcDemoPath, internalCommands)
       )
+
       await repository.isReady()
-      mockList.resetHistory()
-      mockDiff.resetHistory()
-      mockStatus.resetHistory()
+      mockReset.restore()
 
       await Promise.all([
         repository.reset(),
@@ -112,9 +110,9 @@ suite('Repository Test Suite', () => {
         repository.update()
       ])
 
-      expect(mockList).to.be.calledTwice
-      expect(mockDiff).to.be.calledTwice
-      expect(mockStatus).to.be.calledTwice
+      expect(mockList).to.be.calledOnce
+      expect(mockDiff).to.be.calledOnce
+      expect(mockStatus).to.be.calledOnce
     })
 
     it('should run update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
@@ -127,13 +125,14 @@ suite('Repository Test Suite', () => {
         new InternalCommands(config, cliReader)
       )
 
+      const mockReset = stub(Repository.prototype, 'reset').resolves(undefined)
+
       const repository = disposable.track(
         new Repository(dvcDemoPath, internalCommands)
       )
+
       await repository.isReady()
-      mockList.resetHistory()
-      mockDiff.resetHistory()
-      mockStatus.resetHistory()
+      mockReset.restore()
 
       await Promise.all([
         repository.update(),
