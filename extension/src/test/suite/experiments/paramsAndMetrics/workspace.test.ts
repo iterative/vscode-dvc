@@ -39,11 +39,7 @@ suite('Experiments Test Suite', () => {
       expect(onDidChangeFileSystemSpy).to.be.calledOnce
 
       expect(getFirstArgOfCall(onDidChangeFileSystemSpy, 0)).to.equal(
-        join(
-          dvcDemoPath,
-          '**',
-          '{dvc.lock,dvc.yaml,params.yaml,params.yaml,summary.json}'
-        )
+        join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
       )
     })
 
@@ -103,17 +99,13 @@ suite('Experiments Test Suite', () => {
       expect(mockOnDidChangeFileSystem).to.be.calledTwice
       expect(mockDispose).to.be.calledOnce
       expect(getFirstArgOfCall(mockOnDidChangeFileSystem, 0)).to.equal(
-        join(
-          dvcDemoPath,
-          '**',
-          '{dvc.lock,dvc.yaml,params.yaml,params.yaml,summary.json}'
-        )
+        join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
       )
       expect(getFirstArgOfCall(mockOnDidChangeFileSystem, 1)).to.equal(
         join(
           dvcDemoPath,
           '**',
-          '{dvc.lock,dvc.yaml,params.yaml,new_params.yml,new_summary.json,params.yaml,summary.json}'
+          '{dvc.lock,dvc.yaml,params.yaml,new_params.yml,new_summary.json,summary.json}'
         )
       )
     })

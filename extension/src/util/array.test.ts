@@ -3,7 +3,8 @@ import {
   flatten,
   flattenUnique,
   joinTruthyItems,
-  sameContents
+  sameContents,
+  uniqueValues
 } from './array'
 
 describe('definedAndNonEmpty', () => {
@@ -61,6 +62,27 @@ describe('joinTruthyItems', () => {
     )
 
     expect(string).toEqual('a:b:c:d:e')
+  })
+})
+
+describe('uniqueValues', () => {
+  it('should return unique values from the given array', () => {
+    expect(
+      uniqueValues<number | string | undefined>([
+        1,
+        2,
+        2,
+        undefined,
+        2,
+        3,
+        4,
+        5,
+        6,
+        '5',
+        '5',
+        undefined
+      ])
+    ).toEqual([1, 2, undefined, 3, 4, 5, 6, '5'])
   })
 })
 

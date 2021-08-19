@@ -3,6 +3,7 @@ import { FileSystemWatcher } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ParamsAndMetricsModel } from './model'
 import { onDidChangeFileSystem } from '../../fileSystem/watcher'
+import { uniqueValues } from '../../util/array'
 
 type Updater = () => Promise<void>
 
@@ -40,7 +41,12 @@ export class WorkspaceParams {
         join(
           this.dvcRoot,
           '**',
-          `{${['dvc.lock', 'dvc.yaml', 'params.yaml', ...files].join(',')}}`
+          `{${uniqueValues([
+            'dvc.lock',
+            'dvc.yaml',
+            'params.yaml',
+            ...files
+          ]).join(',')}}`
         ),
         updater
       )

@@ -37,10 +37,10 @@ export const getRepositoryWatcher =
   }
 
 export const onDidChangeFileSystem = (
-  path: string,
+  glob: string,
   listener: (path: string) => void
 ): FileSystemWatcher => {
-  const pathWatcher = workspace.createFileSystemWatcher(path)
+  const pathWatcher = workspace.createFileSystemWatcher(glob)
   pathWatcher.onDidCreate(uri => listener(uri.fsPath))
   pathWatcher.onDidChange(uri => listener(uri.fsPath))
   pathWatcher.onDidDelete(uri => listener(uri.fsPath))
