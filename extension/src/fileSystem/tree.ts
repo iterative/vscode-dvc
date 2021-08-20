@@ -21,7 +21,7 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../internalCommands'
-import { getFirstWorkspaceFolderRoot } from '../vscode/workspace'
+import { getFirstWorkspaceFolderRoot } from '../vscode/workspaceFolders'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()

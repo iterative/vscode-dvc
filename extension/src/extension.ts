@@ -48,7 +48,7 @@ import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import {
   getFirstWorkspaceFolderRoot,
   getWorkspaceFolders
-} from './vscode/workspace'
+} from './vscode/workspaceFolders'
 
 export { Disposable, Disposer }
 

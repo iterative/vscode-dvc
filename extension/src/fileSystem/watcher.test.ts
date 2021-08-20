@@ -10,11 +10,11 @@ import {
   createNecessaryFileSystemWatcher
 } from './watcher'
 import { Repository } from '../repository'
-import { getWorkspaceFolders } from '../vscode/workspace'
+import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 jest.mock('vscode')
 jest.mock('chokidar')
-jest.mock('../vscode/workspace')
+jest.mock('../vscode/workspaceFolders')
 
 const mockedWorkspace = mocked(workspace)
 const mockedCreateFileSystemWatcher = jest.fn()

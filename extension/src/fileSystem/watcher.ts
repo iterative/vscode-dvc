@@ -7,7 +7,7 @@ import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 import { definedAndNonEmpty } from '../util/array'
-import { getWorkspaceFolders } from '../vscode/workspace'
+import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
