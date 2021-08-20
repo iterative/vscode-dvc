@@ -10,7 +10,6 @@ import {
   createNecessaryFileSystemWatcher
 } from './watcher'
 import { Repository } from '../repository'
-import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 import { getWorkspaceFolders } from '../vscode/workspace'
 
 jest.mock('vscode')
@@ -212,7 +211,9 @@ describe('createNecessaryFileSystemWatcher', () => {
     '..',
     '..',
     '..',
-    EXPERIMENTS_GIT_REFS
+    '.git',
+    'refs',
+    '**'
   )
 
   it('should create a chokidar watcher with the correct options when the path to watch is outside the workspace', () => {
@@ -232,7 +233,6 @@ describe('createNecessaryFileSystemWatcher', () => {
     })
 
     expect(mockedWatcherOn).toBeCalledTimes(1)
-    expect(mockedWatcherOn).toBeCalledWith('all', mockedListener)
     expect(mockedCreateFileSystemWatcher).not.toBeCalled()
   })
 
@@ -288,7 +288,7 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    const mockedInternalGitRefs = join(mockedSecondDir, EXPERIMENTS_GIT_REFS)
+    const mockedInternalGitRefs = join(mockedSecondDir, '.git', 'refs', '**')
 
     createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
 
@@ -306,7 +306,7 @@ describe('createNecessaryFileSystemWatcher', () => {
 
     const mockedListener = jest.fn()
 
-    const mockedInternalGitRefs = join(mockedRoot, EXPERIMENTS_GIT_REFS)
+    const mockedInternalGitRefs = join(mockedRoot, '.git', 'refs', '**')
 
     createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
 

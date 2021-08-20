@@ -54,24 +54,24 @@ export const createFileSystemWatcher = (
 }
 
 const createExternalToWorkspaceWatcher = (
-  path: string,
-  listener: () => void
+  glob: string,
+  listener: (path: string) => void
 ): Disposable => {
-  const fsWatcher = watch(path, { ignoreInitial: true })
-  fsWatcher.on('all', listener)
+  const fsWatcher = watch(glob, { ignoreInitial: true })
+  fsWatcher.on('all', (_, path) => listener(path))
   return { dispose: () => fsWatcher.close() }
 }
 
 export const createNecessaryFileSystemWatcher = (
-  path: string,
-  listener: () => void
+  glob: string,
+  listener: (glob: string) => void
 ): Disposable => {
   const isContained = getWorkspaceFolders()
-    .map(workspaceFolder => isSameOrChild(workspaceFolder.uri.fsPath, path))
+    .map(workspaceFolder => isSameOrChild(workspaceFolder.uri.fsPath, glob))
     .filter(Boolean)
 
   const canUseNative = definedAndNonEmpty(isContained)
   return canUseNative
-    ? createFileSystemWatcher(path, listener)
-    : createExternalToWorkspaceWatcher(path, listener)
+    ? createFileSystemWatcher(glob, listener)
+    : createExternalToWorkspaceWatcher(glob, listener)
 }
