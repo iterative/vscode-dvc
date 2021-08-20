@@ -13,7 +13,7 @@ import { SortDefinition } from './model/sortBy'
 import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ResourceLocator } from '../resourceLocator'
-import { createFileSystemWatcher } from '../fileSystem/watcher'
+import { createExternalToWorkspaceWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
@@ -88,7 +88,9 @@ export class ExperimentsRepository {
 
   public onDidChangeData(gitRoot: string): void {
     const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
-    this.dispose.track(createFileSystemWatcher(refsPath, () => this.refresh()))
+    this.dispose.track(
+      createExternalToWorkspaceWatcher(refsPath, () => this.refresh())
+    )
   }
 
   public refresh() {

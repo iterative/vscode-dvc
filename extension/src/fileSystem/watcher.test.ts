@@ -1,19 +1,31 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { workspace } from 'vscode'
+import { FSWatcher, watch } from 'chokidar'
 import { TrackedExplorerTree } from './tree'
 import {
   getRepositoryListener,
   ignoredDotDirectories,
-  createFileSystemWatcher
+  createFileSystemWatcher,
+  createExternalToWorkspaceWatcher
 } from './watcher'
 import { Repository } from '../repository'
+import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 
 jest.mock('vscode')
+jest.mock('chokidar')
 
 const mockedWorkspace = mocked(workspace)
 const mockedCreateFileSystemWatcher = jest.fn()
 mockedWorkspace.createFileSystemWatcher = mockedCreateFileSystemWatcher
+
+const mockedWatch = mocked(watch)
+const mockedWatcher = mocked(new FSWatcher())
+const mockedWatcherOn = jest.fn()
+const mockedWatcherClose = jest.fn()
+mockedWatcher.on = mockedWatcherOn
+mockedWatcher.close = mockedWatcherClose
+
 beforeEach(() => {
   jest.resetAllMocks()
 
@@ -187,5 +199,40 @@ describe('createFileSystemWatcher', () => {
     createFileSystemWatcher(file, func)
 
     expect(mockedCreateFileSystemWatcher).toBeCalledWith(file)
+  })
+})
+
+describe('createExternalToWorkspaceWatcher', () => {
+  it("should call chokidar's watch with the correct options", () => {
+    mockedWatch.mockReturnValue(mockedWatcher)
+
+    const mockedListener = jest.fn()
+
+    createExternalToWorkspaceWatcher(EXPERIMENTS_GIT_REFS, mockedListener)
+
+    expect(mockedWatch).toBeCalledTimes(1)
+    expect(mockedWatch).toBeCalledWith(EXPERIMENTS_GIT_REFS, {
+      ignoreInitial: true
+    })
+
+    expect(mockedWatcherOn).toBeCalledTimes(1)
+    expect(mockedWatcherOn).toBeCalledWith('all', mockedListener)
+  })
+
+  it('should return a dispose function that removes the listener', () => {
+    mockedWatch.mockReturnValue(mockedWatcher)
+
+    const mockedListener = jest.fn()
+
+    const { dispose } = createExternalToWorkspaceWatcher(
+      EXPERIMENTS_GIT_REFS,
+      mockedListener
+    )
+
+    expect(mockedWatcherClose).not.toBeCalled()
+
+    dispose()
+
+    expect(mockedWatcherClose).toBeCalledTimes(1)
   })
 })

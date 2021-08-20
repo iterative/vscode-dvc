@@ -1,5 +1,7 @@
 import { basename, extname } from 'path'
 import { FileSystemWatcher, workspace } from 'vscode'
+import { Disposable } from '@hediet/std/disposable'
+import { watch } from 'chokidar'
 import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
@@ -46,4 +48,13 @@ export const createFileSystemWatcher = (
   fileSystemWatcher.onDidDelete(uri => listener(uri.fsPath))
 
   return fileSystemWatcher
+}
+
+export const createExternalToWorkspaceWatcher = (
+  path: string,
+  listener: (event: string, path: string) => void
+): Disposable => {
+  const fsWatcher = watch(path, { ignoreInitial: true })
+  fsWatcher.on('all', listener)
+  return { dispose: () => fsWatcher.close() }
 }
