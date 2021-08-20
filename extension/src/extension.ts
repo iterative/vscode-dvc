@@ -46,7 +46,7 @@ import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import {
-  getFirstWorkspaceFolderRoot,
+  getFirstWorkspaceFolder,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
 
@@ -221,7 +221,7 @@ export class Extension implements IExtension {
     ])
   }
 
-  public hasWorkspaceFolder = () => !!getFirstWorkspaceFolderRoot()
+  public hasWorkspaceFolder = () => !!getFirstWorkspaceFolder()
 
   public reset = () => {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)

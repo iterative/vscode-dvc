@@ -81,7 +81,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       mockInit.resetHistory()
       mockSetup.resetHistory()
-      stub(WorkspaceFolders, 'getFirstWorkspaceFolderRoot').returns(undefined)
+      stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
 
       await commands.executeCommand('dvc.init')
 
