@@ -72,7 +72,7 @@ export const createNecessaryFileSystemWatcher = (
   listener: (glob: string) => void
 ): Disposable => {
   const isContained = getWorkspaceFolders()
-    .map(workspaceFolder => isSameOrChild(workspaceFolder.uri.fsPath, glob))
+    .map(workspaceFolder => isSameOrChild(workspaceFolder, glob))
     .filter(Boolean)
 
   const canUseNative = definedAndNonEmpty(isContained)

@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { Uri, workspace, WorkspaceFolder } from 'vscode'
+import { workspace } from 'vscode'
 import { FSWatcher, watch } from 'chokidar'
 import { TrackedExplorerTree } from './tree'
 import {
@@ -227,9 +227,7 @@ describe('createNecessaryFileSystemWatcher', () => {
   )
 
   it('should create a chokidar watcher with the correct options when the path to watch is outside the workspace', () => {
-    mockedGetWorkspaceFolders.mockReturnValueOnce([
-      { uri: Uri.file(__dirname) } as WorkspaceFolder
-    ])
+    mockedGetWorkspaceFolders.mockReturnValueOnce([__dirname])
 
     mockedWatch.mockReturnValue(mockedWatcher)
 
@@ -247,9 +245,7 @@ describe('createNecessaryFileSystemWatcher', () => {
   })
 
   it('should return a dispose function that removes the listener when the path to watch is outside the workspace', () => {
-    mockedGetWorkspaceFolders.mockReturnValueOnce([
-      { uri: Uri.file(__dirname) } as WorkspaceFolder
-    ])
+    mockedGetWorkspaceFolders.mockReturnValueOnce([__dirname])
 
     mockedWatch.mockReturnValue(mockedWatcher)
 
@@ -270,12 +266,12 @@ describe('createNecessaryFileSystemWatcher', () => {
 
   it('should create an instance of the chokidar watcher only if the path is outside of all the available workspace folders', () => {
     mockedGetWorkspaceFolders.mockReturnValueOnce([
-      { uri: Uri.file(join(__dirname, 'first')) },
-      { uri: Uri.file(join(__dirname, 'second')) },
-      { uri: Uri.file(join(__dirname, 'third')) },
-      { uri: Uri.file(join(__dirname, 'fourth')) },
-      { uri: Uri.file(join(__dirname, 'fifth')) }
-    ] as WorkspaceFolder[])
+      join(__dirname, 'first'),
+      join(__dirname, 'second'),
+      join(__dirname, 'third'),
+      join(__dirname, 'fourth'),
+      join(__dirname, 'fifth')
+    ])
 
     mockedWatch.mockReturnValue(mockedWatcher)
 
@@ -290,9 +286,9 @@ describe('createNecessaryFileSystemWatcher', () => {
   it("should create an instance of VS Code's watcher whenever the path is inside any of the workspace folders", () => {
     const mockedSecondDir = join(__dirname, 'second')
     mockedGetWorkspaceFolders.mockReturnValueOnce([
-      { uri: Uri.file(join(__dirname, 'first')) },
-      { uri: Uri.file(mockedSecondDir) }
-    ] as WorkspaceFolder[])
+      join(__dirname, 'first'),
+      mockedSecondDir
+    ])
 
     mockedWatch.mockReturnValue(mockedWatcher)
 
@@ -308,9 +304,7 @@ describe('createNecessaryFileSystemWatcher', () => {
 
   it("should create an instance of VS Code's watcher whenever the path is inside the only workspace folder", () => {
     const mockedRoot = __dirname
-    mockedGetWorkspaceFolders.mockReturnValueOnce([
-      { uri: Uri.file(mockedRoot) } as WorkspaceFolder
-    ])
+    mockedGetWorkspaceFolders.mockReturnValueOnce([mockedRoot])
 
     mockedWatch.mockReturnValue(mockedWatcher)
 

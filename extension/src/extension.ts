@@ -1,12 +1,5 @@
 import { join } from 'path'
-import {
-  commands,
-  Event,
-  EventEmitter,
-  ExtensionContext,
-  window,
-  WorkspaceFolder
-} from 'vscode'
+import { commands, Event, EventEmitter, ExtensionContext, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -315,9 +308,8 @@ export class Extension implements IExtension {
     return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
   }
 
-  private setupWorkspaceFolder = async (workspaceFolder: WorkspaceFolder) => {
-    const workspaceFolderRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await this.findDvcRoots(workspaceFolderRoot)
+  private setupWorkspaceFolder = async (workspaceFolder: string) => {
+    const dvcRoots = await this.findDvcRoots(workspaceFolder)
 
     if (definedAndNonEmpty(dvcRoots)) {
       this.initializeDecorationProvidersEarly(dvcRoots)
