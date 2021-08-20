@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join, relative, resolve } from 'path'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { definedAndNonEmpty } from '../util/array'
 
@@ -46,4 +46,9 @@ export const findAbsoluteDvcRootPath = async (
   const absoluteRoot = resolve(cwd, relativePath)
 
   return [absoluteRoot]
+}
+
+export const isSameOrChild = (root: string, path: string) => {
+  const rel = relative(root, path)
+  return !rel.startsWith('..')
 }

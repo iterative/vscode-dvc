@@ -13,14 +13,15 @@ import { SortDefinition } from './model/sortBy'
 import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ResourceLocator } from '../resourceLocator'
-import { createFileSystemWatcher } from '../fileSystem/watcher'
+import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { quickPickValue } from '../vscode/quickPick'
 
-export const EXPERIMENTS_GIT_REFS = join('.git', 'refs', 'exps')
+const GIT_REFS = join('.git', 'refs')
+export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
 export class ExperimentsRepository {
   public readonly dispose = Disposable.fn()
@@ -87,8 +88,17 @@ export class ExperimentsRepository {
   }
 
   public onDidChangeData(gitRoot: string): void {
-    const refsPath = resolve(gitRoot, EXPERIMENTS_GIT_REFS)
-    this.dispose.track(createFileSystemWatcher(refsPath, () => this.refresh()))
+    const refsGlob = resolve(gitRoot, GIT_REFS, '**')
+    this.dispose.track(
+      createNecessaryFileSystemWatcher(refsGlob, (path: string) => {
+        if (
+          path.includes(EXPERIMENTS_GIT_REFS) ||
+          path.includes(join(GIT_REFS, 'heads'))
+        ) {
+          return this.refresh()
+        }
+      })
+    )
   }
 
   public refresh() {

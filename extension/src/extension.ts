@@ -5,7 +5,6 @@ import {
   EventEmitter,
   ExtensionContext,
   window,
-  workspace,
   WorkspaceFolder
 } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
@@ -46,6 +45,7 @@ import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
+import { getWorkspaceFolders } from './vscode/workspace'
 
 export { Disposable, Disposer }
 
@@ -200,7 +200,7 @@ export class Extension implements IExtension {
 
   public initializePreCheck = async () => {
     const dvcRoots = await Promise.all(
-      (workspace.workspaceFolders || []).map(workspaceFolder =>
+      getWorkspaceFolders().map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
       )
     )

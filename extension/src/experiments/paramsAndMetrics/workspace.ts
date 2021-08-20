@@ -1,5 +1,4 @@
 import { join } from 'path'
-import { FileSystemWatcher } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ParamsAndMetricsModel } from './model'
 import { createFileSystemWatcher } from '../../fileSystem/watcher'
@@ -12,7 +11,7 @@ export class WorkspaceParamsAndMetrics {
 
   private readonly dvcRoot: string
   private readonly paramsAndMetrics: ParamsAndMetricsModel
-  private fileSystemWatcher: FileSystemWatcher
+  private fileSystemWatcher: Disposable
 
   constructor(
     dvcRoot: string,
