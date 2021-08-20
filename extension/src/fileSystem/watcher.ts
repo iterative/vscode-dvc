@@ -2,7 +2,7 @@ import { basename, extname } from 'path'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
-import { isSameOrChild } from '.'
+import { isDirectory, isSameOrChild } from '.'
 import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
@@ -45,6 +45,11 @@ export const createFileSystemWatcher = (
   glob: string,
   listener: (path: string) => void
 ): Disposable => {
+  if (isDirectory(glob)) {
+    throw new Error(
+      'FileSystemWatcher will not behave as expected under these circumstances.'
+    )
+  }
   const fileSystemWatcher = workspace.createFileSystemWatcher(glob)
   fileSystemWatcher.onDidCreate(uri => listener(uri.fsPath))
   fileSystemWatcher.onDidChange(uri => listener(uri.fsPath))
@@ -71,6 +76,7 @@ export const createNecessaryFileSystemWatcher = (
     .filter(Boolean)
 
   const canUseNative = definedAndNonEmpty(isContained)
+
   return canUseNative
     ? createFileSystemWatcher(glob, listener)
     : createExternalToWorkspaceWatcher(glob, listener)
