@@ -7,7 +7,7 @@ import {
   getRepositoryListener,
   ignoredDotDirectories,
   createFileSystemWatcher,
-  createExternalToWorkspaceWatcher
+  createNecessaryFileSystemWatcher
 } from './watcher'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
@@ -202,16 +202,24 @@ describe('createFileSystemWatcher', () => {
   })
 })
 
-describe('createExternalToWorkspaceWatcher', () => {
-  it("should call chokidar's watch with the correct options", () => {
+describe('createNecessaryFileSystemWatcher', () => {
+  const mockedExternalGitRefs = join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    EXPERIMENTS_GIT_REFS
+  )
+
+  it("should call chokidar's watch with the correct options when the path to watch is outside the workspace", () => {
     mockedWatch.mockReturnValue(mockedWatcher)
 
     const mockedListener = jest.fn()
 
-    createExternalToWorkspaceWatcher(EXPERIMENTS_GIT_REFS, mockedListener)
+    createNecessaryFileSystemWatcher(mockedExternalGitRefs, mockedListener)
 
     expect(mockedWatch).toBeCalledTimes(1)
-    expect(mockedWatch).toBeCalledWith(EXPERIMENTS_GIT_REFS, {
+    expect(mockedWatch).toBeCalledWith(mockedExternalGitRefs, {
       ignoreInitial: true
     })
 
@@ -219,13 +227,13 @@ describe('createExternalToWorkspaceWatcher', () => {
     expect(mockedWatcherOn).toBeCalledWith('all', mockedListener)
   })
 
-  it('should return a dispose function that removes the listener', () => {
+  it('should return a dispose function that removes the listener when the path to watch is outside the workspace', () => {
     mockedWatch.mockReturnValue(mockedWatcher)
 
     const mockedListener = jest.fn()
 
-    const { dispose } = createExternalToWorkspaceWatcher(
-      EXPERIMENTS_GIT_REFS,
+    const { dispose } = createNecessaryFileSystemWatcher(
+      mockedExternalGitRefs,
       mockedListener
     )
 

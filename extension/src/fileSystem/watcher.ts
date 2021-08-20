@@ -1,10 +1,12 @@
 import { basename, extname } from 'path'
-import { FileSystemWatcher, workspace } from 'vscode'
+import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
+import { isSameOrChild } from '.'
 import { TrackedExplorerTree } from './tree'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
+import { definedAndNonEmpty } from '../util/array'
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
@@ -41,7 +43,7 @@ export const getRepositoryListener =
 export const createFileSystemWatcher = (
   glob: string,
   listener: (path: string) => void
-): FileSystemWatcher => {
+): Disposable => {
   const fileSystemWatcher = workspace.createFileSystemWatcher(glob)
   fileSystemWatcher.onDidCreate(uri => listener(uri.fsPath))
   fileSystemWatcher.onDidChange(uri => listener(uri.fsPath))
@@ -50,11 +52,25 @@ export const createFileSystemWatcher = (
   return fileSystemWatcher
 }
 
-export const createExternalToWorkspaceWatcher = (
+const createExternalToWorkspaceWatcher = (
   path: string,
-  listener: (event: string, path: string) => void
+  listener: () => void
 ): Disposable => {
   const fsWatcher = watch(path, { ignoreInitial: true })
   fsWatcher.on('all', listener)
   return { dispose: () => fsWatcher.close() }
+}
+
+export const createNecessaryFileSystemWatcher = (
+  path: string,
+  listener: () => void
+) => {
+  const isContained = (workspace.workspaceFolders || [])
+    .map(workspaceFolder => isSameOrChild(workspaceFolder.uri.fsPath, path))
+    .filter(Boolean)
+
+  const canUseNative = definedAndNonEmpty(isContained)
+  return canUseNative
+    ? createFileSystemWatcher(path, listener)
+    : createExternalToWorkspaceWatcher(path, listener)
 }

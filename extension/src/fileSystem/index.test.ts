@@ -2,8 +2,13 @@ import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
 
-const { exists, findAbsoluteDvcRootPath, findDvcRootPaths, isDirectory } =
-  FileSystem
+const {
+  exists,
+  findAbsoluteDvcRootPath,
+  findDvcRootPaths,
+  isDirectory,
+  isSameOrChild
+} = FileSystem
 
 jest.mock('../cli/reader')
 
@@ -78,5 +83,29 @@ describe('isDirectory', () => {
   })
   it('should return false for an empty string', () => {
     expect(isDirectory('')).toBe(false)
+  })
+})
+
+describe('isSameOrChild', () => {
+  const mockedRoot = resolve('robot', 'files', 'are', 'fun')
+
+  it('should return true for a directory contained within the root', () => {
+    expect(isSameOrChild(mockedRoot, join(mockedRoot, 'too'))).toBe(true)
+  })
+
+  it('should return true for a file contained within the root', () => {
+    expect(isSameOrChild(mockedRoot, join(mockedRoot, 'javascript.js'))).toBe(
+      true
+    )
+  })
+
+  it('should return true for the path being the root', () => {
+    expect(isSameOrChild(mockedRoot, mockedRoot)).toBe(true)
+  })
+
+  it('should return false for a directory outside of the root', () => {
+    expect(isSameOrChild(mockedRoot, resolve(mockedRoot, '..', '..'))).toBe(
+      false
+    )
   })
 })
