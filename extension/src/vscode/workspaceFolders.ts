@@ -8,7 +8,5 @@ export const getWorkspaceFolders = (): string[] =>
 
 export const getFirstWorkspaceFolder = (): string | undefined => {
   const workspaceFolders = getWorkspaceFolders()
-  return definedAndNonEmpty(workspaceFolders as unknown[])
-    ? workspaceFolders[0]
-    : undefined
+  return definedAndNonEmpty(workspaceFolders) ? workspaceFolders[0] : undefined
 }
