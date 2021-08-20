@@ -21,6 +21,7 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../internalCommands'
+import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -229,9 +230,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
       commands.registerCommand('dvc.init', async () => {
-        const root = await this.internalCommands.executeCommand(
-          AvailableCommands.GET_FIRST_WORKSPACE_FOLDER_ROOT
-        )
+        const root = getFirstWorkspaceFolder()
         if (root) {
           await this.internalCommands.executeCommand(
             AvailableCommands.INIT,

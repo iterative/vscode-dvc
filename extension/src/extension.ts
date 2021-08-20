@@ -1,12 +1,5 @@
 import { join } from 'path'
-import {
-  commands,
-  Event,
-  EventEmitter,
-  ExtensionContext,
-  window,
-  WorkspaceFolder
-} from 'vscode'
+import { commands, Event, EventEmitter, ExtensionContext, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import {
   enableHotReload,
@@ -45,7 +38,10 @@ import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
-import { getWorkspaceFolders } from './vscode/workspace'
+import {
+  getFirstWorkspaceFolder,
+  getWorkspaceFolders
+} from './vscode/workspaceFolders'
 
 export { Disposable, Disposer }
 
@@ -218,7 +214,7 @@ export class Extension implements IExtension {
     ])
   }
 
-  public hasWorkspaceFolder = () => !!this.config.getFirstWorkspaceFolderRoot()
+  public hasWorkspaceFolder = () => !!getFirstWorkspaceFolder()
 
   public reset = () => {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)
@@ -312,9 +308,8 @@ export class Extension implements IExtension {
     return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
   }
 
-  private setupWorkspaceFolder = async (workspaceFolder: WorkspaceFolder) => {
-    const workspaceFolderRoot = workspaceFolder.uri.fsPath
-    const dvcRoots = await this.findDvcRoots(workspaceFolderRoot)
+  private setupWorkspaceFolder = async (workspaceFolder: string) => {
+    const dvcRoots = await this.findDvcRoots(workspaceFolder)
 
     if (definedAndNonEmpty(dvcRoots)) {
       this.initializeDecorationProvidersEarly(dvcRoots)
