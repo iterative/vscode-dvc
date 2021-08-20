@@ -65,7 +65,7 @@ const createExternalToWorkspaceWatcher = (
 export const createNecessaryFileSystemWatcher = (
   path: string,
   listener: () => void
-) => {
+): Disposable => {
   const isContained = getWorkspaceFolders()
     .map(workspaceFolder => isSameOrChild(workspaceFolder.uri.fsPath, path))
     .filter(Boolean)
