@@ -215,7 +215,7 @@ describe('createNecessaryFileSystemWatcher', () => {
     EXPERIMENTS_GIT_REFS
   )
 
-  it("should call chokidar's watch with the correct options when the path to watch is outside the workspace", () => {
+  it('should create a chokidar watcher with the correct options when the path to watch is outside the workspace', () => {
     mockedGetWorkspaceFolders.mockReturnValueOnce([
       { uri: Uri.file(__dirname) } as WorkspaceFolder
     ])
@@ -258,20 +258,55 @@ describe('createNecessaryFileSystemWatcher', () => {
     expect(mockedCreateFileSystemWatcher).not.toBeCalled()
   })
 
-  it("should call VS Code's watcher whenever the path is inside any of the workspace folders", () => {
-    const mockedFirstDir = join(__dirname, 'first')
-    const mockedSecondDir = join(__dirname, 'second')
-
+  it('should create an instance of the chokidar watcher only if the path is outside of all the available workspace folders', () => {
     mockedGetWorkspaceFolders.mockReturnValueOnce([
-      { uri: Uri.file(mockedFirstDir) } as WorkspaceFolder,
-      { uri: Uri.file(mockedSecondDir) } as WorkspaceFolder
-    ])
+      { uri: Uri.file(join(__dirname, 'first')) },
+      { uri: Uri.file(join(__dirname, 'second')) },
+      { uri: Uri.file(join(__dirname, 'third')) },
+      { uri: Uri.file(join(__dirname, 'fourth')) },
+      { uri: Uri.file(join(__dirname, 'fifth')) }
+    ] as WorkspaceFolder[])
+
+    mockedWatch.mockReturnValue(mockedWatcher)
+
+    const mockedListener = jest.fn()
+
+    createNecessaryFileSystemWatcher(mockedExternalGitRefs, mockedListener)
+
+    expect(mockedWatch).toBeCalledTimes(1)
+    expect(mockedCreateFileSystemWatcher).not.toBeCalled()
+  })
+
+  it("should create an instance of VS Code's watcher whenever the path is inside any of the workspace folders", () => {
+    const mockedSecondDir = join(__dirname, 'second')
+    mockedGetWorkspaceFolders.mockReturnValueOnce([
+      { uri: Uri.file(join(__dirname, 'first')) },
+      { uri: Uri.file(mockedSecondDir) }
+    ] as WorkspaceFolder[])
 
     mockedWatch.mockReturnValue(mockedWatcher)
 
     const mockedListener = jest.fn()
 
     const mockedInternalGitRefs = join(mockedSecondDir, EXPERIMENTS_GIT_REFS)
+
+    createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
+
+    expect(mockedWatch).not.toBeCalled()
+    expect(mockedCreateFileSystemWatcher).toBeCalledTimes(1)
+  })
+
+  it("should create an instance of VS Code's watcher whenever the path is inside the only workspace folder", () => {
+    const mockedRoot = __dirname
+    mockedGetWorkspaceFolders.mockReturnValueOnce([
+      { uri: Uri.file(mockedRoot) } as WorkspaceFolder
+    ])
+
+    mockedWatch.mockReturnValue(mockedWatcher)
+
+    const mockedListener = jest.fn()
+
+    const mockedInternalGitRefs = join(mockedRoot, EXPERIMENTS_GIT_REFS)
 
     createNecessaryFileSystemWatcher(mockedInternalGitRefs, mockedListener)
 
