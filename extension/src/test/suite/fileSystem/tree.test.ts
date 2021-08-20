@@ -11,7 +11,7 @@ import * as FileSystem from '../../../fileSystem'
 import { getConfigValue, setConfigValue } from '../../../vscode/config'
 import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
-import { Config } from '../../../config'
+import * as VSCodeWorkspace from '../../../vscode/workspace'
 import * as Setup from '../../../setup'
 import { dvcDemoPath } from '../util'
 
@@ -81,7 +81,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       mockInit.resetHistory()
       mockSetup.resetHistory()
-      stub(Config.prototype, 'getFirstWorkspaceFolderRoot').resolves(undefined)
+      stub(VSCodeWorkspace, 'getFirstWorkspaceFolderRoot').returns(undefined)
 
       await commands.executeCommand('dvc.init')
 

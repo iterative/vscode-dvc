@@ -45,7 +45,10 @@ import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
-import { getWorkspaceFolders } from './vscode/workspace'
+import {
+  getFirstWorkspaceFolderRoot,
+  getWorkspaceFolders
+} from './vscode/workspace'
 
 export { Disposable, Disposer }
 
@@ -218,7 +221,7 @@ export class Extension implements IExtension {
     ])
   }
 
-  public hasWorkspaceFolder = () => !!this.config.getFirstWorkspaceFolderRoot()
+  public hasWorkspaceFolder = () => !!getFirstWorkspaceFolderRoot()
 
   public reset = () => {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)

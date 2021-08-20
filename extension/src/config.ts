@@ -79,13 +79,6 @@ export class Config {
     return WebviewColorTheme.light
   }
 
-  public getFirstWorkspaceFolderRoot(): string | undefined {
-    const { workspaceFolders } = workspace
-    return workspaceFolders && workspaceFolders.length > 0
-      ? workspaceFolders[0].uri.fsPath
-      : undefined
-  }
-
   public getCliPath(): string {
     return getConfigValue(this.dvcPathOption)
   }
