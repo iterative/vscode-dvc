@@ -9,6 +9,7 @@ import complexExperimentsOutput from '../../../../experiments/webview/complex-ou
 import * as Watcher from '../../../../fileSystem/watcher'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 import { ParamsAndMetricsModel } from '../../../../experiments/paramsAndMetrics/model'
+import { buildMockMemento } from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments workspace params tests.')
@@ -28,7 +29,9 @@ suite('Experiments Test Suite', () => {
       const mockUpdater = stub()
       const createFileSystemWatcherSpy = spy(Watcher, 'createFileSystemWatcher')
 
-      const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
+      const paramsAndMetrics = disposable.track(
+        new ParamsAndMetricsModel('test', buildMockMemento())
+      )
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       disposable.track(
@@ -50,7 +53,9 @@ suite('Experiments Test Suite', () => {
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       const mockUpdater = stub()
 
-      const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
+      const paramsAndMetrics = disposable.track(
+        new ParamsAndMetricsModel('test', buildMockMemento())
+      )
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       const paramsAndMetricsUpdatedEvent = new Promise(resolve =>
