@@ -2,12 +2,11 @@ import { basename, extname } from 'path'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
-import { isDirectory, isSameOrChild } from '.'
+import { isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
+import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
-import { definedAndNonEmpty } from '../util/array'
-import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
@@ -71,11 +70,7 @@ export const createNecessaryFileSystemWatcher = (
   glob: string,
   listener: (glob: string) => void
 ): Disposable => {
-  const isContained = getWorkspaceFolders()
-    .map(workspaceFolder => isSameOrChild(workspaceFolder, glob))
-    .filter(Boolean)
-
-  const canUseNative = definedAndNonEmpty(isContained)
+  const canUseNative = isInWorkspace(glob)
 
   return canUseNative
     ? createFileSystemWatcher(glob, listener)
