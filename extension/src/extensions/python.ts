@@ -1,39 +1,35 @@
-import { Event, extensions, Extension, Uri } from 'vscode'
+import { Event, Uri } from 'vscode'
 import { executeProcess } from '../processExecution'
+import { getExtension } from '../vscode/extensions'
 
-export interface PythonExtensionAPI {
+interface Settings {
+  onDidChangeExecutionDetails: Event<Uri | undefined>
+  getExecutionDetails: () => {
+    execCommand: string[] | undefined
+  }
+}
+
+interface ExtensionAPI {
   ready: Thenable<void>
-  settings: {
-    onDidChangeExecutionDetails: Event<Uri | undefined>
-    getExecutionDetails: () => {
-      execCommand: string[] | undefined
+  settings: Settings
+}
+
+export const getReadyPythonExtension: () => Thenable<Settings | undefined> =
+  async () => {
+    const extension = getExtension<ExtensionAPI>('ms-python.python')
+    if (!extension) {
+      return extension
     }
+    if (!extension.isActive) {
+      await extension.activate()
+    }
+    await extension.exports.ready
+    return extension.exports.settings
   }
-}
-
-export type PythonExtension = Extension<PythonExtensionAPI>
-
-export const getPythonExtension: () => PythonExtension | undefined = () =>
-  extensions.getExtension('ms-python.python')
-
-export const getReadyPythonExtension: () => Thenable<
-  PythonExtension | undefined
-> = async () => {
-  const extension = getPythonExtension()
-  if (!extension) {
-    return extension
-  }
-  if (!extension.isActive) {
-    await extension.activate()
-  }
-  await extension.exports.ready
-  return extension
-}
 
 export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
   async () =>
-    (await getReadyPythonExtension())?.exports.settings.getExecutionDetails()
-      .execCommand
+    (await getReadyPythonExtension())?.getExecutionDetails().execCommand
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
@@ -48,5 +44,4 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
 }
 
 export const getOnDidChangePythonExecutionDetails = async () =>
-  (await getReadyPythonExtension())?.exports.settings
-    .onDidChangeExecutionDetails
+  (await getReadyPythonExtension())?.onDidChangeExecutionDetails
