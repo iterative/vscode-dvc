@@ -1,4 +1,5 @@
-import { Extension, extensions, Uri } from 'vscode'
+import { Uri } from 'vscode'
+import { getExtension } from '../vscode/extensions'
 
 interface Repository {
   readonly rootUri: Uri
@@ -12,12 +13,12 @@ interface VscodeGit {
   getAPI(version: number): Thenable<ExtensionAPI>
 }
 
-export const getGitRepositoryRoots = async () => {
-  const extension = extensions.getExtension(
-    'vscode.git'
-  ) as Extension<VscodeGit>
-  const activatedExtension = await extension.activate()
-  const api = await activatedExtension.getAPI(1)
+export const getGitRepositoryRoots = async (): Promise<string[]> => {
+  const extension = await getExtension<VscodeGit>('vscode.git')
+  if (!extension) {
+    return []
+  }
+  const api = await extension.getAPI(1)
 
   return api.repositories.map(repository => repository.rootUri.fsPath)
 }
