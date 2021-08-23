@@ -99,11 +99,13 @@ export class Extension implements IExtension {
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
-    this.internalCommands = new InternalCommands(
-      this.config,
-      this.cliExecutor,
-      this.cliReader,
-      this.cliRunner
+    this.internalCommands = this.dispose.track(
+      new InternalCommands(
+        this.config,
+        this.cliExecutor,
+        this.cliReader,
+        this.cliRunner
+      )
     )
 
     this.status = this.dispose.track(
@@ -158,10 +160,10 @@ export class Extension implements IExtension {
       })
     )
 
-    this.webviewSerializer = new WebviewSerializer(
-      this.internalCommands,
-      this.experiments
+    this.webviewSerializer = this.dispose.track(
+      new WebviewSerializer(this.internalCommands, this.experiments)
     )
+
     this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments)
