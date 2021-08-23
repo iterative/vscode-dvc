@@ -22,7 +22,10 @@ module.exports = {
     hot: true
   },
   devtool: 'source-map',
-  entry: [r('src/index.tsx')],
+  entry: {
+    main: { dependOn: 'react', import: r('src/index.tsx') },
+    react: ['react', 'react-dom']
+  },
   module: {
     rules: [
       {
@@ -92,6 +95,12 @@ module.exports = {
     ]
   })(),
   resolve: {
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+      'react-dom/test-utils': 'preact/test-utils', // Must be below test-utils
+      'react/jsx-runtime': 'preact/jsx-runtime'
+    },
     extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
     fallback: { fs: false }
   }
