@@ -10,6 +10,7 @@ jest.mock('vscode', () => ({
 
 describe('paramsAndMetrics', () => {
   describe('persistence', () => {
+    const exampleDvcRoot = 'test'
     const exampleData = {
       workspace: {
         baseline: {
@@ -26,8 +27,6 @@ describe('paramsAndMetrics', () => {
       }
     }
     it('Shows all items when given no persisted status', async () => {
-      const exampleDvcRoot = 'test'
-
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento()
@@ -54,8 +53,6 @@ describe('paramsAndMetrics', () => {
     })
 
     it('Maintains deselection from persisted status', async () => {
-      const exampleDvcRoot = 'test'
-
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
