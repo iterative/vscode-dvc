@@ -11,7 +11,7 @@ export enum Status {
   unselected = 0
 }
 
-const enum MementoPrefixes {
+export const enum MementoPrefixes {
   status = 'paramsAndMetricsStatus:'
 }
 
