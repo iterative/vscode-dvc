@@ -14,7 +14,7 @@ interface VscodePython {
   settings: Settings
 }
 
-export const getReadyPythonExtension: () => Thenable<Settings | undefined> =
+export const getPythonExtensionSettings: () => Thenable<Settings | undefined> =
   async () => {
     const extension = await getExtension<VscodePython>('ms-python.python')
     if (!extension) {
@@ -26,7 +26,7 @@ export const getReadyPythonExtension: () => Thenable<Settings | undefined> =
 
 export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
   async () =>
-    (await getReadyPythonExtension())?.getExecutionDetails().execCommand
+    (await getPythonExtensionSettings())?.getExecutionDetails().execCommand
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
@@ -41,4 +41,4 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
 }
 
 export const getOnDidChangePythonExecutionDetails = async () =>
-  (await getReadyPythonExtension())?.onDidChangeExecutionDetails
+  (await getPythonExtensionSettings())?.onDidChangeExecutionDetails
