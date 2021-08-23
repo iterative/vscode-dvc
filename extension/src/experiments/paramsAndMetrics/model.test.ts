@@ -10,6 +10,21 @@ jest.mock('vscode', () => ({
 
 describe('paramsAndMetrics', () => {
   describe('persistence', () => {
+    const exampleData = {
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {
+                data: {
+                  testparam: true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     it('Shows all items when given no persisted status', async () => {
       const exampleDvcRoot = 'test'
 
@@ -17,21 +32,7 @@ describe('paramsAndMetrics', () => {
         exampleDvcRoot,
         buildMockMemento()
       )
-      await model.transformAndSet({
-        workspace: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: {
-                    testparam: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      })
+      await model.transformAndSet(exampleData)
       expect(model.getSelected()).toEqual([
         {
           group: 'params',
@@ -59,25 +60,12 @@ describe('paramsAndMetrics', () => {
         exampleDvcRoot,
         buildMockMemento({
           [MementoPrefixes.status + exampleDvcRoot]: {
+            'params/params.yaml': Status.indeterminate,
             'params/params.yaml/testparam': Status.unselected
           }
         })
       )
-      await model.transformAndSet({
-        workspace: {
-          baseline: {
-            data: {
-              params: {
-                'params.yaml': {
-                  data: {
-                    testparam: true
-                  }
-                }
-              }
-            }
-          }
-        }
-      })
+      await model.transformAndSet(exampleData)
       expect(model.getSelected()).toEqual([
         {
           group: 'params',
