@@ -18,13 +18,12 @@ export const getReadyPythonExtension: () => Thenable<Settings | undefined> =
   async () => {
     const extension = getExtension<ExtensionAPI>('ms-python.python')
     if (!extension) {
-      return extension
+      return
     }
-    if (!extension.isActive) {
-      await extension.activate()
-    }
-    await extension.exports.ready
-    return extension.exports.settings
+    const { ready, settings } = await extension.activate()
+
+    await ready
+    return settings
   }
 
 export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
