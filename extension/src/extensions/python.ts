@@ -16,14 +16,12 @@ interface VscodePython {
 
 export const getReadyPythonExtension: () => Thenable<Settings | undefined> =
   async () => {
-    const extension = getExtension<VscodePython>('ms-python.python')
+    const extension = await getExtension<VscodePython>('ms-python.python')
     if (!extension) {
       return
     }
-    const { ready, settings } = await extension.activate()
-
-    await ready
-    return settings
+    await extension.ready
+    return extension.settings
   }
 
 export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
