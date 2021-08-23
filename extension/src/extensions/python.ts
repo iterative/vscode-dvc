@@ -9,14 +9,14 @@ interface Settings {
   }
 }
 
-interface ExtensionAPI {
+interface VscodePython {
   ready: Thenable<void>
   settings: Settings
 }
 
 export const getReadyPythonExtension: () => Thenable<Settings | undefined> =
   async () => {
-    const extension = getExtension<ExtensionAPI>('ms-python.python')
+    const extension = getExtension<VscodePython>('ms-python.python')
     if (!extension) {
       return
     }
