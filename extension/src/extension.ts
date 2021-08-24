@@ -42,6 +42,7 @@ import {
   getFirstWorkspaceFolder,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
+import { getTelemetryReporter } from './telemetry'
 
 export { Disposable, Disposer }
 
@@ -85,6 +86,8 @@ export class Extension implements IExtension {
       i.text = `reload${getReloadCount(module)}`
       i.show()
     }
+
+    this.dispose.track(getTelemetryReporter())
 
     this.setCommandsAvailability(false)
     this.setProjectAvailability(false)

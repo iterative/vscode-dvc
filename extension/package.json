@@ -658,7 +658,8 @@
     "fs-extra": "^10.0.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
-    "mobx": "^6.0.4"
+    "mobx": "^6.0.4",
+    "vscode-extension-telemetry": "^0.2.9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
