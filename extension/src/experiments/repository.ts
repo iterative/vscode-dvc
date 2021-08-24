@@ -20,7 +20,8 @@ import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { quickPickValue } from '../vscode/quickPick'
 
-const GIT_REFS = join('.git', 'refs')
+const DOT_GIT = '.git'
+const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
 export class ExperimentsRepository {
@@ -77,13 +78,13 @@ export class ExperimentsRepository {
     )
 
     this.updateData().then(() => {
+      this.deferred.resolve()
+
       this.dispose.track(
         new WorkspaceParamsAndMetrics(dvcRoot, this.paramsAndMetrics, () =>
           this.refresh()
         )
       )
-
-      this.deferred.resolve()
     })
   }
 
