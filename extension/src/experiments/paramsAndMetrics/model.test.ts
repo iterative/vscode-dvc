@@ -8,7 +8,7 @@ jest.mock('vscode', () => ({
   }
 }))
 
-describe('paramsAndMetrics', () => {
+describe('ParamsAndMetricsModel', () => {
   describe('persistence', () => {
     const exampleDvcRoot = 'test'
     const exampleData = {
