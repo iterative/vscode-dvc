@@ -13,14 +13,16 @@
       "env": {
         "HOT_RELOAD": "true",
         "PYTHONPATH": ".env/bin/python3",
-        "USE_DEV_UI": "true"
+        "USE_DEV_UI": "true",
+        "VSC_DEBUG": "true"
       },
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"],
       "windows": {
         "env": {
           "HOT_RELOAD": "true",
           "PYTHONPATH": ".env\\Scripts\\python.exe",
-          "USE_DEV_UI": "true"
+          "USE_DEV_UI": "true",
+          "VSC_DEBUG": "true"
         }
       }
     },
@@ -33,14 +35,16 @@
       "env": {
         "HOT_RELOAD": "true",
         "PYTHONPATH": ".env/bin/python3",
-        "USE_DEV_UI": "true"
+        "USE_DEV_UI": "true",
+        "VSC_DEBUG": "true"
       },
       "outFiles": ["${workspaceFolder}/extension/dist/**/*.js"],
       "windows": {
         "env": {
           "HOT_RELOAD": "true",
           "PYTHONPATH": ".env\\Scripts\\python.exe",
-          "USE_DEV_UI": "true"
+          "USE_DEV_UI": "true",
+          "VSC_DEBUG": "true"
         }
       }
     }
