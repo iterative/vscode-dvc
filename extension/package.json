@@ -6,7 +6,6 @@
   "publisher": "iterative",
   "icon": "docs/dvc.png",
   "version": "0.1.0",
-  "aiKey": "46e8e554-d50a-471a-a53b-4af2b1cd6594",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {

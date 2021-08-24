@@ -1,11 +1,12 @@
 import { mocked } from 'ts-jest/utils'
 import { extensions } from 'vscode'
 import TelemetryReporter from 'vscode-extension-telemetry'
+import { getTelemetryReporter, sendTelemetryEvent } from '.'
 import {
-  getTelemetryReporter,
-  IEventNamePropertyMapping,
-  sendTelemetryEvent
-} from '.'
+  APPLICATION_INSIGHTS_KEY,
+  EXTENSION_ID,
+  IEventNamePropertyMapping
+} from './constants'
 
 const mockedTelemetryReporter = mocked(TelemetryReporter)
 
@@ -13,8 +14,8 @@ const mockedExtensions = mocked(extensions)
 const mockedGetExtension = jest.fn()
 mockedExtensions.getExtension = mockedGetExtension
 const mockedPackageJSON = {
-  aiKey: 'mockApplicationInsightsKey',
-  id: 'iterative.dvc',
+  id: EXTENSION_ID,
+  name: 'dvc',
   version: '0.1.0'
 }
 const mockedSendTelemetryEvent = jest.fn()
@@ -45,9 +46,9 @@ describe('getTelemetryReporter', () => {
     expect(mockedGetExtension).toBeCalledWith('iterative.dvc')
     expect(mockedTelemetryReporter).toBeCalledTimes(1)
     expect(mockedTelemetryReporter).toBeCalledWith(
-      mockedPackageJSON.id,
+      EXTENSION_ID,
       mockedPackageJSON.version,
-      mockedPackageJSON.aiKey,
+      APPLICATION_INSIGHTS_KEY,
       true
     )
   })

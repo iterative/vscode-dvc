@@ -1,6 +1,11 @@
 import TelemetryReporter from 'vscode-extension-telemetry'
+import {
+  EXTENSION_ID,
+  APPLICATION_INSIGHTS_KEY,
+  IEventNamePropertyMapping
+} from './constants'
 import { Logger } from '../common/logger'
-import { getThisExtensionDetails } from '../vscode/extensions'
+import { getExtensionVersion } from '../vscode/extensions'
 
 const isTestExecution = (): boolean => !!process.env.VSC_TEST
 const isDebugSession = (): boolean => !!process.env.VSC_DEBUG
@@ -11,22 +16,15 @@ export const getTelemetryReporter = (): TelemetryReporter => {
     return telemetryReporter
   }
 
-  const { aiKey, id, version } = getThisExtensionDetails()
+  const version = getExtensionVersion(EXTENSION_ID) || 'unknown'
 
-  telemetryReporter = new TelemetryReporter(id, version, aiKey, true)
+  telemetryReporter = new TelemetryReporter(
+    EXTENSION_ID,
+    version,
+    APPLICATION_INSIGHTS_KEY,
+    true
+  )
   return telemetryReporter
-}
-
-// placeholder
-export enum EventName {
-  EXTENSION_LOAD = 'EXTENSION.LOAD'
-}
-
-// placeholder
-export interface IEventNamePropertyMapping {
-  [EventName.EXTENSION_LOAD]: {
-    workspaceFolderCount: number
-  }
 }
 
 const convertProperty = (prop: object | string | number | boolean): string => {

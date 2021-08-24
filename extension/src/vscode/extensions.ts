@@ -1,21 +1,17 @@
 import { Extension, extensions } from 'vscode'
 
 type ExtensionDetails = {
-  aiKey: string | undefined
   id: string
+  name: string
   version: string
 }
-
-type ThisExtensionDetails = ExtensionDetails & { aiKey: string }
 
 type PackageJSON = {
   packageJSON: ExtensionDetails
 }
 
-const getExtension = <T>(
-  name: string
-): Extension<T & PackageJSON> | undefined =>
-  extensions.getExtension<T & PackageJSON>(name)
+const getExtension = <T>(id: string): Extension<T & PackageJSON> | undefined =>
+  extensions.getExtension<T & PackageJSON>(id)
 
 export const getExtensionAPI = <T>(name: string): Thenable<T> | undefined => {
   const extension = getExtension<T>(name)
@@ -26,19 +22,12 @@ export const getExtensionAPI = <T>(name: string): Thenable<T> | undefined => {
   return extension.activate()
 }
 
-const getExtensionDetails = <T>(name: string): ExtensionDetails | undefined => {
-  const extension = getExtension<T>(name)
+export const getExtensionVersion = <T>(id: string): string | undefined => {
+  const extension = getExtension<T>(id)
 
   if (!extension) {
     return
   }
 
-  return {
-    aiKey: extension.packageJSON.aiKey,
-    id: extension.packageJSON.id,
-    version: extension.packageJSON.version
-  }
+  return extension.packageJSON.version
 }
-
-export const getThisExtensionDetails = (): ThisExtensionDetails =>
-  getExtensionDetails('iterative.dvc') as ThisExtensionDetails
