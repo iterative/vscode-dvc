@@ -77,7 +77,7 @@ export class ExperimentsRepository {
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
 
-    this.refresh().then(() => {
+    this.updateData().then(() => {
       this.dispose.track(
         new WorkspaceParamsAndMetrics(dvcRoot, this.paramsAndMetrics, () =>
           this.refresh()
@@ -147,11 +147,9 @@ export class ExperimentsRepository {
     return webview
   }
 
-  public setWebview = (view: ExperimentsWebview) => {
+  public setWebview(view: ExperimentsWebview) {
     this.webview = this.dispose.track(view)
-    view.isReady().then(() => {
-      this.sendData()
-    })
+    view.isReady().then(() => this.sendData())
 
     this.dispose.track(
       view.onDidDispose(() => {
@@ -284,7 +282,7 @@ export class ExperimentsRepository {
 
   private sendData() {
     if (this.webview) {
-      return this.webview.showExperiments({
+      this.webview.showExperiments({
         tableData: this.getTableData()
       })
     }

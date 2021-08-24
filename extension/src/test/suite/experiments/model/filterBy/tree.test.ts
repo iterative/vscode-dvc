@@ -66,7 +66,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experimentsRepository.isReady()
       const experimentsWebview = await experimentsRepository.showWebview()
-      await experimentsWebview.isReady()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const lossPath = 'metrics/summary.json/loss'
