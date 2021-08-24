@@ -40,7 +40,7 @@ export class ExperimentsRepository {
 
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
-  private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
+  private paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -66,6 +66,10 @@ export class ExperimentsRepository {
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
+    )
+
+    this.paramsAndMetrics = this.dispose.track(
+      new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
     this.processManager = this.dispose.track(

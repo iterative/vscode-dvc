@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
@@ -11,20 +11,30 @@ export enum Status {
   unselected = 0
 }
 
+export const enum MementoPrefixes {
+  status = 'paramsAndMetricsStatus:'
+}
+
 export class ParamsAndMetricsModel {
   public dispose = Disposable.fn()
 
   public onDidChangeParamsAndMetricsFiles: Event<void>
   private paramsAndMetricsFilesChanged = new EventEmitter<void>()
 
-  private status: Record<string, Status> = {}
+  private status: Record<string, Status>
 
   private data: ParamOrMetric[] = []
   private files: string[] = []
 
-  constructor() {
+  private dvcRoot: string
+  private workspaceState: Memento
+
+  constructor(dvcRoot: string, workspaceState: Memento) {
+    this.dvcRoot = dvcRoot
+    this.workspaceState = workspaceState
     this.onDidChangeParamsAndMetricsFiles =
       this.paramsAndMetricsFilesChanged.event
+    this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
   }
 
   public getSelected() {
@@ -75,6 +85,7 @@ export class ParamsAndMetricsModel {
     this.status[path] = status
     this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, status)
+    this.persistStatus()
 
     return this.status[path]
   }
@@ -174,5 +185,12 @@ export class ParamsAndMetricsModel {
       return Status.unselected
     }
     return Status.selected
+  }
+
+  private persistStatus() {
+    return this.workspaceState.update(
+      MementoPrefixes.status + this.dvcRoot,
+      this.status
+    )
   }
 }
