@@ -164,10 +164,11 @@ export class ExperimentsWebview {
     return this
   }
 
-  public showExperiments(payload: {
+  public async showExperiments(payload: {
     tableData: TableData
     errors?: Error[]
-  }): Thenable<boolean> {
+  }): Promise<boolean> {
+    await this.isReady()
     return this.sendMessage({
       type: MessageToWebviewType.showExperiments,
       ...payload

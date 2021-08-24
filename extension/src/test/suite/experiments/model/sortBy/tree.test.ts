@@ -133,7 +133,6 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       await experimentsRepository.isReady()
       const experimentsWebview = await experimentsRepository.showWebview()
-      await experimentsWebview.isReady()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const mockSortQuickPicks = (paramPath: string, descending: boolean) => {

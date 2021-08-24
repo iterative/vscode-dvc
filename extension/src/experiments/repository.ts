@@ -20,7 +20,8 @@ import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { quickPickValue } from '../vscode/quickPick'
 
-const GIT_REFS = join('.git', 'refs')
+const DOT_GIT = '.git'
+const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
 export class ExperimentsRepository {
@@ -82,7 +83,6 @@ export class ExperimentsRepository {
           this.refresh()
         )
       )
-
       this.deferred.resolve()
     })
   }
@@ -92,10 +92,11 @@ export class ExperimentsRepository {
   }
 
   public onDidChangeData(gitRoot: string): void {
-    const refsGlob = resolve(gitRoot, GIT_REFS, '**')
+    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
     this.dispose.track(
-      createNecessaryFileSystemWatcher(refsGlob, (path: string) => {
+      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
         if (
+          path.includes('HEAD') ||
           path.includes(EXPERIMENTS_GIT_REFS) ||
           path.includes(join(GIT_REFS, 'heads'))
         ) {
@@ -146,9 +147,10 @@ export class ExperimentsRepository {
     return webview
   }
 
-  public setWebview = (view: ExperimentsWebview) => {
+  public setWebview(view: ExperimentsWebview) {
     this.webview = this.dispose.track(view)
-    this.sendData()
+    view.isReady().then(() => this.sendData())
+
     this.dispose.track(
       view.onDidDispose(() => {
         this.resetWebview()
@@ -278,10 +280,9 @@ export class ExperimentsRepository {
     return this.sendData()
   }
 
-  private async sendData() {
+  private sendData() {
     if (this.webview) {
-      await this.webview.isReady()
-      return this.webview.showExperiments({
+      this.webview.showExperiments({
         tableData: this.getTableData()
       })
     }
