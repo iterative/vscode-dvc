@@ -149,6 +149,10 @@ export class ExperimentsRepository {
 
   public setWebview = (view: ExperimentsWebview) => {
     this.webview = this.dispose.track(view)
+    view.isReady().then(() => {
+      this.sendData()
+    })
+
     this.dispose.track(
       view.onDidDispose(() => {
         this.resetWebview()
@@ -159,7 +163,6 @@ export class ExperimentsRepository {
         this.isWebviewFocusedChanged.fire(dvcRoot)
       })
     )
-    this.sendData()
   }
 
   public addSort(sort: SortDefinition) {
@@ -279,9 +282,8 @@ export class ExperimentsRepository {
     return this.sendData()
   }
 
-  private async sendData() {
+  private sendData() {
     if (this.webview) {
-      await this.webview.isReady()
       return this.webview.showExperiments({
         tableData: this.getTableData()
       })
