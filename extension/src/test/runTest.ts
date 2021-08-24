@@ -4,6 +4,8 @@ import { Logger } from '../common/logger'
 
 async function main() {
   try {
+    process.env.VSC_TEST = 'true'
+
     const extensionDevelopmentPath = resolve(__dirname, '../../')
 
     const extensionTestsPath = resolve(__dirname, './suite/index')

@@ -6,6 +6,7 @@
   "publisher": "iterative",
   "icon": "docs/dvc.png",
   "version": "0.1.0",
+  "aiKey": "46e8e554-d50a-471a-a53b-4af2b1cd6594",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -658,7 +659,8 @@
     "fs-extra": "^10.0.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
-    "mobx": "^6.0.4"
+    "mobx": "^6.0.4",
+    "vscode-extension-telemetry": "^0.2.9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",

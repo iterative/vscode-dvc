@@ -1,6 +1,6 @@
 import { Event, Uri } from 'vscode'
 import { executeProcess } from '../processExecution'
-import { getExtension } from '../vscode/extensions'
+import { getExtensionAPI } from '../vscode/extensions'
 
 interface Settings {
   onDidChangeExecutionDetails: Event<Uri | undefined>
@@ -16,7 +16,7 @@ interface VscodePython {
 
 export const getPythonExtensionSettings: () => Thenable<Settings | undefined> =
   async () => {
-    const extension = await getExtension<VscodePython>('ms-python.python')
+    const extension = await getExtensionAPI<VscodePython>('ms-python.python')
     if (!extension) {
       return
     }
