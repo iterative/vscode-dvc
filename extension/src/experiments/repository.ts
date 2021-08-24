@@ -93,10 +93,11 @@ export class ExperimentsRepository {
   }
 
   public onDidChangeData(gitRoot: string): void {
-    const refsGlob = resolve(gitRoot, GIT_REFS, '**')
+    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
     this.dispose.track(
-      createNecessaryFileSystemWatcher(refsGlob, (path: string) => {
+      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
         if (
+          path.includes('HEAD') ||
           path.includes(EXPERIMENTS_GIT_REFS) ||
           path.includes(join(GIT_REFS, 'heads'))
         ) {
