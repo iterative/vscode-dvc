@@ -143,7 +143,7 @@ suite('Extension Test Suite', () => {
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
       const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
-      const mockPath = mockUri
+      const mockPath = mockUri.fsPath
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
         mockUri
       ])
