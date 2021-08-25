@@ -3,7 +3,7 @@ import { executeProcess } from './processExecution'
 describe('executeProcess', () => {
   it('should be able to run a process', async () => {
     const output = await executeProcess({
-      args: ['some', 'text'],
+      args: ['some text'],
       cwd: __dirname,
       executable: 'echo'
     })
