@@ -1,3 +1,4 @@
+import { delimiter } from 'path'
 import { EventEmitter } from 'vscode'
 import { mocked } from 'ts-jest/utils'
 import { Cli, CliResult, typeCheckCommands } from '.'
@@ -40,7 +41,10 @@ describe('typeCheckCommands', () => {
 
 describe('executeProcess', () => {
   it('should pass the correct details to the underlying process given no path to the cli or python binary path', async () => {
-    const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
+    const existingPath = [
+      '/Users/robot/some/path',
+      '/Users/robot/yarn/path'
+    ].join(delimiter)
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const cwd = __dirname
     const args = [Command.CHECKOUT]
@@ -74,7 +78,10 @@ describe('executeProcess', () => {
   })
 
   it('should handle an error produced by the underlying process', async () => {
-    const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
+    const existingPath = [
+      '/Users/robot/some/path',
+      '/Users/robot/yarn/path'
+    ].join(delimiter)
     const pythonBinPath = '/some/path/to/python'
     const SECRET_KEY = 'abc123'
     const processEnv = { PATH: existingPath, SECRET_KEY }
@@ -106,7 +113,7 @@ describe('executeProcess', () => {
       cwd,
       env: {
         DVC_NO_ANALYTICS: 'true',
-        PATH: `/some/path/to:${existingPath}`,
+        PATH: `/some/path/to${delimiter}${existingPath}`,
         SECRET_KEY
       },
       executable: '/some/path/to/dvc'
