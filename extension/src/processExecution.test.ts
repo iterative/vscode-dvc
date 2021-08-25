@@ -3,11 +3,11 @@ import { executeProcess } from './processExecution'
 describe('executeProcess', () => {
   it('should be able to run a process', async () => {
     const output = await executeProcess({
-      args: ['some text'],
+      args: ['some', 'text'],
       cwd: __dirname,
       executable: 'echo'
     })
-    expect(output).toEqual('some text')
+    expect(output).toMatch(/some.*text/)
   })
 
   it('should return the stderr if the process throws with stderr', async () => {
