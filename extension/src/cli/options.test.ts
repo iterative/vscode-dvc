@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { delimiter, join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { getOptions } from './options'
 import { Command, Flag } from './args'
@@ -42,7 +42,12 @@ describe('getOptions', () => {
       cwd,
       env: {
         DVC_NO_ANALYTICS: 'true',
-        PATH: `${join('path', 'to', 'python', '.venv')}:${mockedPATH}`
+        PATH: `${join(
+          'path',
+          'to',
+          'python',
+          '.venv'
+        )}${delimiter}${mockedPATH}`
       },
       executable: pythonBinPath
     })
@@ -58,7 +63,12 @@ describe('getOptions', () => {
       cwd,
       env: {
         DVC_NO_ANALYTICS: 'true',
-        PATH: `${join('path', 'to', 'python', '.venv')}:${mockedPATH}`
+        PATH: `${join(
+          'path',
+          'to',
+          'python',
+          '.venv'
+        )}${delimiter}${mockedPATH}`
       },
       executable: cliPath
     })

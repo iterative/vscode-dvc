@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { MementoPrefixes, ParamsAndMetricsModel, Status } from './model'
 import { buildMockMemento } from '../../test/util'
@@ -10,6 +11,8 @@ jest.mock('vscode', () => ({
 
 describe('ParamsAndMetricsModel', () => {
   describe('persistence', () => {
+    const paramsDotYamlPath = join('params', 'params.yaml')
+    const testParamPath = join(paramsDotYamlPath, 'testparam')
     const exampleDvcRoot = 'test'
     const exampleData = {
       workspace: {
@@ -38,8 +41,8 @@ describe('ParamsAndMetricsModel', () => {
           hasChildren: false,
           maxStringLength: 4,
           name: 'testparam',
-          parentPath: 'params/params.yaml',
-          path: 'params/params.yaml/testparam',
+          parentPath: paramsDotYamlPath,
+          path: testParamPath,
           types: ['boolean']
         },
         {
@@ -47,7 +50,7 @@ describe('ParamsAndMetricsModel', () => {
           hasChildren: true,
           name: 'params.yaml',
           parentPath: 'params',
-          path: 'params/params.yaml'
+          path: paramsDotYamlPath
         }
       ])
     })
@@ -57,8 +60,8 @@ describe('ParamsAndMetricsModel', () => {
         exampleDvcRoot,
         buildMockMemento({
           [MementoPrefixes.status + exampleDvcRoot]: {
-            'params/params.yaml': Status.indeterminate,
-            'params/params.yaml/testparam': Status.unselected
+            [paramsDotYamlPath]: Status.indeterminate,
+            [testParamPath]: Status.unselected
           }
         })
       )
@@ -69,7 +72,7 @@ describe('ParamsAndMetricsModel', () => {
           hasChildren: true,
           name: 'params.yaml',
           parentPath: 'params',
-          path: 'params/params.yaml'
+          path: paramsDotYamlPath
         }
       ])
     })

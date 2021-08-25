@@ -28,13 +28,13 @@ describe('pickFile', () => {
   })
 
   it('should return a path if a file is selected', async () => {
-    const mockedPath = resolve('mock', 'path', 'fun')
-    const mockedPickedUri = [Uri.file(mockedPath)]
+    const mockedUri = Uri.file(resolve('mock', 'path', 'fun'))
+    const mockedPickedUri = [mockedUri]
     const mockedTitle = 'this is a fun time'
     mockedShowOpenDialog.mockResolvedValueOnce(mockedPickedUri)
 
     const pickedFile = await pickFile(mockedTitle)
 
-    expect(pickedFile).toEqual(mockedPath)
+    expect(pickedFile).toEqual(mockedUri.path)
   })
 })
