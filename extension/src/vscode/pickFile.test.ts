@@ -35,6 +35,6 @@ describe('pickFile', () => {
 
     const pickedFile = await pickFile(mockedTitle)
 
-    expect(pickedFile).toEqual(mockedUri.path)
+    expect(pickedFile).toEqual(mockedUri.fsPath)
   })
 })
