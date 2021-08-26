@@ -51,16 +51,8 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
   }
 
-  public removeSorts(pathsToRemove: SortDefinition[]) {
-    return pathsToRemove.map(pathToRemove => this.removeSort(pathToRemove.path))
-  }
-
-  public removeSort(pathToRemove: string) {
-    const indexOfSortToRemove = this.findIndexByPath(pathToRemove)
-    if (indexOfSortToRemove >= 0) {
-      this.currentSorts.splice(indexOfSortToRemove, 1)
-    }
-    this.persistSorts()
+  public getSorts(): SortDefinition[] {
+    return this.currentSorts
   }
 
   public addSort(sort: SortDefinition) {
@@ -73,8 +65,16 @@ export class ExperimentsModel {
     this.persistSorts()
   }
 
-  public getSorts(): SortDefinition[] {
-    return this.currentSorts
+  public removeSorts(pathsToRemove: SortDefinition[]) {
+    return pathsToRemove.map(pathToRemove => this.removeSort(pathToRemove.path))
+  }
+
+  public removeSort(pathToRemove: string) {
+    const indexOfSortToRemove = this.findIndexByPath(pathToRemove)
+    if (indexOfSortToRemove >= 0) {
+      this.currentSorts.splice(indexOfSortToRemove, 1)
+    }
+    this.persistSorts()
   }
 
   public getFilters() {
