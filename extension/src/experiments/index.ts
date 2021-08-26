@@ -78,12 +78,12 @@ export class Experiments {
     return this.getRepository(dvcRoot).removeFilter(id)
   }
 
-  public async pickAndAddSort(dvcRoot?: string) {
+  public async addSort(dvcRoot?: string) {
     if (dvcRoot) {
-      return this.getRepository(dvcRoot).pickAndAddSort()
+      return this.getRepository(dvcRoot).addSort()
     }
     const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.pickAndAddSort()
+    return repository.addSort()
   }
 
   public removeSorts(dvcRoot?: string) {
