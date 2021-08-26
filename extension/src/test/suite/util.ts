@@ -4,9 +4,15 @@ import { commands, ConfigurationChangeEvent, Uri, workspace } from 'vscode'
 import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
 
-export const dvcDemoPath = Uri.file(
-  resolve(__dirname, '..', '..', '..', '..', 'demo')
-).fsPath
+export const resolvedDvcDemoPath = resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '..',
+  'demo'
+)
+export const dvcDemoPath = Uri.file(resolvedDvcDemoPath).fsPath
 export const resourcePath = Uri.file(
   resolve(__dirname, '..', '..', '..', 'resources')
 ).fsPath
