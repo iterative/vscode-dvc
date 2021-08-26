@@ -13,7 +13,7 @@ import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
-import { dvcDemoPath, resolvedDvcDemoPath } from '../util'
+import { dvcDemoPath } from '../util'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -41,14 +41,14 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   describe('TrackedExplorerTree', () => {
     it('should be able to run dvc.copyFilePath and copy a path to the clipboard', async () => {
-      await commands.executeCommand('dvc.copyFilePath', resolvedDvcDemoPath)
+      await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
       await commands.executeCommand('editor.action.clipboardPasteAction')
 
-      expect(window.activeTextEditor?.document.getText()).to.equal(
-        resolvedDvcDemoPath
-      )
+      expect(
+        Uri.file(window.activeTextEditor?.document.getText() as string).fsPath
+      ).to.equal(dvcDemoPath)
     })
 
     it('should be able to run dvc.copyRelativeFilePath and copy a path to the clipboard', async () => {
