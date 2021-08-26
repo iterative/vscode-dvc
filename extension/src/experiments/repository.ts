@@ -84,6 +84,7 @@ export class ExperimentsRepository {
         )
       )
       this.deferred.resolve()
+      this.notifyChanged()
     })
   }
 
