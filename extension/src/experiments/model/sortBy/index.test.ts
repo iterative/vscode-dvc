@@ -58,7 +58,7 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = ['params', 'params.yaml', 'sort'].join('/')
+    const testSortPath = join('params', 'params.yaml', 'sort')
     expect(
       (
         sortExperiments(
@@ -112,8 +112,8 @@ describe('sortExperiments', () => {
       }
     ]
 
-    const testSortPath = ['params', 'params.yaml', 'sort'].join('/')
-    const testSortPath2 = ['params', 'params.yaml', 'sort2'].join('/')
+    const testSortPath = join('params', 'params.yaml', 'sort')
+    const testSortPath2 = join('params', 'params.yaml', 'sort2')
     expect(
       (
         sortExperiments(
@@ -189,7 +189,7 @@ describe('sortExperiments', () => {
 
   describe('Should use multiple sort definitions', () => {
     const otherTestPathArray = ['params', 'params.yaml', 'othertest']
-    const otherTestPath = [...otherTestPathArray].join('/')
+    const otherTestPath = join(...otherTestPathArray)
     const testData = [
       {
         ...irrelevantExperimentData,
