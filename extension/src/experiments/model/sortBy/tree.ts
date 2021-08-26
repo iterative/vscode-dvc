@@ -41,6 +41,15 @@ export class ExperimentsSortByTree
       )
     )
 
+    this.dispose.track(
+      commands.registerCommand(
+        'dvc.views.experimentsSortByTree.removeAllSorts',
+        resource => {
+          this.removeAllSorts(resource)
+        }
+      )
+    )
+
     this.experiments = experiments
   }
 
@@ -99,5 +108,18 @@ export class ExperimentsSortByTree
     sortDefinitionTreeItem.contextValue = 'dvcSort'
 
     return sortDefinitionTreeItem
+  }
+
+  private async removeAllSorts(element: string | undefined) {
+    if (!element) {
+      const dvcRoots = this.experiments.getDvcRoots()
+      dvcRoots.map(dvcRoot => this.removeAllSorts(dvcRoot))
+      return
+    }
+
+    const sorts = (await this.getChildren(element)) as SortItem[]
+    sorts.map(({ dvcRoot, sort }) =>
+      this.experiments.removeSort(dvcRoot, sort.path)
+    )
   }
 }

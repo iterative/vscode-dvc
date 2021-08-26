@@ -2,23 +2,21 @@ import { join, resolve } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
+import { ExperimentsModel } from './model'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { ExperimentsWebview } from './webview'
-import { ExperimentsModel } from './model'
+import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { SortDefinition } from './model/sortBy'
-import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
+import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../internalCommands'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { quickPickValue } from '../vscode/quickPick'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -84,6 +82,7 @@ export class ExperimentsRepository {
         )
       )
       this.deferred.resolve()
+      this.notifyChanged()
     })
   }
 
@@ -163,53 +162,32 @@ export class ExperimentsRepository {
     )
   }
 
-  public addSort(sort: SortDefinition) {
-    this.experiments.addSort(sort)
-    return this.notifyChanged()
-  }
-
   public getSorts() {
     return this.experiments.getSorts()
   }
 
-  public async pickSort() {
+  public async addSort() {
     const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
-      title: 'Select a param or metric to sort by'
-    })
-    if (picked === undefined) {
+    const sortToAdd = await pickSortToAdd(paramsAndMetrics)
+    if (!sortToAdd) {
       return
     }
-    const descending = await quickPickValue<boolean>(
-      [
-        { label: 'Ascending', value: false },
-        { label: 'Descending', value: true }
-      ],
-      { title: 'Select a direction to sort in' }
-    )
-    if (descending === undefined) {
-      return
-    }
-    return {
-      descending,
-      path: picked.path
-    }
+    this.experiments.addSort(sortToAdd)
+    return this.notifyChanged()
   }
 
-  public removeSortByPath(pathToRemove: string) {
+  public removeSort(pathToRemove: string) {
     this.experiments.removeSort(pathToRemove)
     return this.notifyChanged()
   }
 
-  public async pickAndAddSort() {
-    const pickedSort = await this.pickSort()
-    if (pickedSort) {
-      this.addSort(pickedSort)
+  public async removeSorts() {
+    const sorts = this.experiments.getSorts()
+    const sortsToRemove = await pickSortsToRemove(sorts)
+    if (!sortsToRemove) {
+      return
     }
-  }
-
-  public removeSorts() {
-    this.experiments.removeSorts()
+    this.experiments.removeSorts(sortsToRemove)
     return this.notifyChanged()
   }
 
@@ -227,6 +205,12 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
+  public removeFilter(id: string) {
+    if (this.experiments.removeFilter(id)) {
+      return this.notifyChanged()
+    }
+  }
+
   public async removeFilters() {
     const filters = this.experiments.getFilters()
     const filtersToRemove = await pickFiltersToRemove(filters)
@@ -235,12 +219,6 @@ export class ExperimentsRepository {
     }
     this.experiments.removeFilters(filtersToRemove)
     return this.notifyChanged()
-  }
-
-  public removeFilter(id: string) {
-    if (this.experiments.removeFilter(id)) {
-      return this.notifyChanged()
-    }
   }
 
   public getExperiments() {

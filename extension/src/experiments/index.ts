@@ -61,7 +61,10 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public async addFilter() {
+  public async addFilter(dvcRoot?: string) {
+    if (dvcRoot) {
+      return this.getRepository(dvcRoot).addFilter()
+    }
     const repository = await this.getFocusedOrDefaultOrPickRepo()
     return repository.addFilter()
   }
@@ -75,25 +78,21 @@ export class Experiments {
     return this.getRepository(dvcRoot).removeFilter(id)
   }
 
-  public async pickAndAddSort(dvcRoot?: string) {
-    const repository = dvcRoot
-      ? this.getRepository(dvcRoot)
-      : await this.getFocusedOrDefaultOrPickRepo()
-    return repository.pickAndAddSort()
+  public async addSort(dvcRoot?: string) {
+    if (dvcRoot) {
+      return this.getRepository(dvcRoot).addSort()
+    }
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
+    return repository.addSort()
   }
 
-  public removeSorts(dvcRoot?: string) {
-    if (dvcRoot === undefined) {
-      this.getDvcRoots().forEach(dvcRoot => {
-        this.getRepository(dvcRoot).removeSorts()
-      })
-    } else {
-      this.getRepository(dvcRoot).removeSorts()
-    }
+  public async removeSorts() {
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
+    return repository.removeSorts()
   }
 
   public removeSort(dvcRoot: string, pathToRemove: string) {
-    this.getRepository(dvcRoot).removeSortByPath(pathToRemove)
+    this.getRepository(dvcRoot).removeSort(pathToRemove)
   }
 
   public getDvcRoots() {

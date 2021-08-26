@@ -20,6 +20,7 @@ import { buildMockMemento } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
+import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -317,7 +318,7 @@ suite('Experiments Repository Test Suite', () => {
 
     const tableChangePromise = experimentsUpdatedEvent(experimentsRepository)
 
-    const pickPromise = experimentsRepository.pickAndAddSort()
+    const pickPromise = experimentsRepository.addSort()
     await pickPromise
     await tableChangePromise
 
@@ -423,14 +424,18 @@ suite('Experiments Repository Test Suite', () => {
         []
       )
 
-      testRepository.addSort(firstSortDefinition)
+      const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
+
+      mockPickSort.onFirstCall().resolves(firstSortDefinition)
+      await testRepository.addSort()
 
       expect(
         mockMemento.get('sortBy:test'),
         'first sort is added to memento'
       ).to.deep.equal([firstSortDefinition])
 
-      testRepository.addSort(secondSortDefinition)
+      mockPickSort.onSecondCall().resolves(secondSortDefinition)
+      await testRepository.addSort()
 
       expect(
         mockMemento.get('sortBy:test'),
@@ -459,13 +464,16 @@ suite('Experiments Repository Test Suite', () => {
         'first filter should be removed from memento after removeFilter'
       ).to.deep.equal([secondFilterMapEntry])
 
-      testRepository.removeSortByPath(firstSortDefinition.path)
+      testRepository.removeSort(firstSortDefinition.path)
       expect(
         mockMemento.get('sortBy:test'),
         'first sort should be removed from memento after removeSortByPath'
       ).to.deep.equal([secondSortDefinition])
 
-      testRepository.removeSorts()
+      const mockRemoveSorts = stub(SortQuickPicks, 'pickSortsToRemove')
+
+      mockRemoveSorts.onFirstCall().resolves([secondSortDefinition])
+      await testRepository.removeSorts()
       expect(
         mockMemento.get('sortBy:test'),
         'all sorts should be removed from memento after removeSorts'
