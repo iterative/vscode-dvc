@@ -191,11 +191,6 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public removeAllSorts() {
-    this.experiments.removeAllSorts()
-    return this.notifyChanged()
-  }
-
   public getFilters() {
     return this.experiments.getFilters()
   }
