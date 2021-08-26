@@ -61,7 +61,10 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public async addFilter() {
+  public async addFilter(dvcRoot?: string) {
+    if (dvcRoot) {
+      return this.getRepository(dvcRoot).addFilter()
+    }
     const repository = await this.getFocusedOrDefaultOrPickRepo()
     return repository.addFilter()
   }
@@ -76,9 +79,10 @@ export class Experiments {
   }
 
   public async pickAndAddSort(dvcRoot?: string) {
-    const repository = dvcRoot
-      ? this.getRepository(dvcRoot)
-      : await this.getFocusedOrDefaultOrPickRepo()
+    if (dvcRoot) {
+      return this.getRepository(dvcRoot).pickAndAddSort()
+    }
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
     return repository.pickAndAddSort()
   }
 
