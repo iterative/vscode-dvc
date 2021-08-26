@@ -524,6 +524,11 @@
           "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
         },
         {
+          "command": "dvc.addExperimentsTableFilter",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcFilter"
