@@ -2,15 +2,15 @@ import { join, resolve } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
+import { ExperimentsModel } from './model'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
 import { pickSortToAdd } from './model/sortBy/quickPick'
-import { ExperimentsWebview } from './webview'
-import { ExperimentsModel } from './model'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
+import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
