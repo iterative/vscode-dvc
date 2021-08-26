@@ -7,7 +7,7 @@ import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { pickSortToAdd } from './model/sortBy/quickPick'
+import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ExperimentsWebview } from './webview'
@@ -181,8 +181,18 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
-  public removeSorts() {
-    this.experiments.removeSorts()
+  public async removeSorts() {
+    const sorts = this.experiments.getSorts()
+    const sortsToRemove = await pickSortsToRemove(sorts)
+    if (!sortsToRemove) {
+      return
+    }
+    this.experiments.removeSorts(sortsToRemove)
+    return this.notifyChanged()
+  }
+
+  public removeAllSorts() {
+    this.experiments.removeAllSorts()
     return this.notifyChanged()
   }
 

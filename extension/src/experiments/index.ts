@@ -86,13 +86,18 @@ export class Experiments {
     return repository.addSort()
   }
 
-  public removeSorts(dvcRoot?: string) {
+  public async removeSorts() {
+    const repository = await this.getFocusedOrDefaultOrPickRepo()
+    return repository.removeSorts()
+  }
+
+  public removeAllSorts(dvcRoot?: string) {
     if (dvcRoot === undefined) {
       this.getDvcRoots().forEach(dvcRoot => {
-        this.getRepository(dvcRoot).removeSorts()
+        this.getRepository(dvcRoot).removeAllSorts()
       })
     } else {
-      this.getRepository(dvcRoot).removeSorts()
+      this.getRepository(dvcRoot).removeAllSorts()
     }
   }
 

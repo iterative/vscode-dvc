@@ -470,7 +470,7 @@ suite('Experiments Repository Test Suite', () => {
         'first sort should be removed from memento after removeSortByPath'
       ).to.deep.equal([secondSortDefinition])
 
-      testRepository.removeSorts()
+      testRepository.removeSort(secondSortDefinition.path)
       expect(
         mockMemento.get('sortBy:test'),
         'all sorts should be removed from memento after removeSorts'

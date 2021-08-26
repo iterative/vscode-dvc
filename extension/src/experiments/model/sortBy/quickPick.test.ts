@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
-import { pickSortToAdd } from './quickPick'
+import { pickSortsToRemove, pickSortToAdd } from './quickPick'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 
 jest.mock('vscode')
@@ -101,5 +101,31 @@ describe('pickSortToAdd', () => {
       descending: false,
       path: paramsYamlPath
     })
+  })
+})
+
+describe('pickSortsToRemove', () => {
+  it('should return early if no sorts are available', async () => {
+    const sort = await pickSortsToRemove([])
+    expect(sort).toBeUndefined()
+  })
+
+  it('should return the selected sorts', async () => {
+    const selectedSorts = [
+      {
+        descending: true,
+        path: paramsYamlParam.path
+      }
+    ]
+    const allSorts = [
+      ...selectedSorts,
+      { descending: false, path: epochsParam.path }
+    ]
+    mockedShowQuickPick.mockResolvedValueOnce(
+      selectedSorts.map(sort => ({ value: sort }))
+    )
+
+    const sortsToRemove = await pickSortsToRemove(allSorts)
+    expect(sortsToRemove).toEqual(selectedSorts)
   })
 })

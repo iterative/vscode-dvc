@@ -201,7 +201,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       const tableSortRemoved = experimentsUpdatedEvent(experimentsRepository)
 
-      await commands.executeCommand('dvc.removeExperimentsTableSorts')
+      await commands.executeCommand('dvc.removeAllExperimentsTableSorts')
       await tableSortRemoved
       expect(
         getParamsArray(),
@@ -265,7 +265,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       ).to.deep.equal([2, 4, 1, 3])
 
       await commands.executeCommand(
-        'dvc.removeExperimentsTableSorts',
+        'dvc.removeAllExperimentsTableSorts',
         dvcDemoPath
       )
       expect(getParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2, 4])

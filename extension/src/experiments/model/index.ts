@@ -51,9 +51,13 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
   }
 
-  public removeSorts() {
+  public removeAllSorts() {
     this.currentSorts = []
     this.persistSorts()
+  }
+
+  public removeSorts(pathsToRemove: SortDefinition[]) {
+    return pathsToRemove.map(pathToRemove => this.removeSort(pathToRemove.path))
   }
 
   public removeSort(pathToRemove: string) {
@@ -89,7 +93,6 @@ export class ExperimentsModel {
 
   public removeFilters(filters: FilterDefinition[]) {
     filters.map(filter => this.removeFilter(getFilterId(filter)))
-    this.persistFilters()
   }
 
   public removeFilter(id: string) {
