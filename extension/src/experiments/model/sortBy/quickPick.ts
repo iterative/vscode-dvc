@@ -1,4 +1,7 @@
-import { quickPickValue } from '../../../vscode/quickPick'
+import { window } from 'vscode'
+import { SortDefinition } from '.'
+import { definedAndNonEmpty } from '../../../util/array'
+import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 import { pickFromParamsAndMetrics } from '../../paramsAndMetrics/quickPick'
 import { ParamOrMetric } from '../../webview/contract'
 
@@ -23,4 +26,24 @@ export const pickSortToAdd = async (paramsAndMetrics: ParamOrMetric[]) => {
     descending,
     path: picked.path
   }
+}
+
+export const pickSortsToRemove = (
+  sorts: SortDefinition[]
+): Thenable<SortDefinition[] | undefined> => {
+  if (!definedAndNonEmpty(sorts)) {
+    window.showErrorMessage('There are no sorts to remove.')
+    return Promise.resolve(undefined)
+  }
+
+  return quickPickManyValues<SortDefinition>(
+    sorts.map(sort => ({
+      description: sort.path,
+      label: sort.descending ? 'descending' : 'ascending',
+      value: sort
+    })),
+    {
+      title: 'Select sort(s) to remove'
+    }
+  )
 }

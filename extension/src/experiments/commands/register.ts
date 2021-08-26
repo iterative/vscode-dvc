@@ -69,9 +69,8 @@ const registerExperimentQuickPickCommands = (
   )
 
   experiments.dispose.track(
-    commands.registerCommand(
-      'dvc.removeExperimentsTableSorts',
-      (dvcRoot?: string) => experiments.removeSorts(dvcRoot)
+    commands.registerCommand('dvc.removeExperimentsTableSorts', () =>
+      experiments.removeSorts()
     )
   )
 }
