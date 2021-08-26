@@ -97,7 +97,7 @@ export class Experiments {
   }
 
   public removeSort(dvcRoot: string, pathToRemove: string) {
-    this.getRepository(dvcRoot).removeSortByPath(pathToRemove)
+    this.getRepository(dvcRoot).removeSort(pathToRemove)
   }
 
   public getDvcRoots() {

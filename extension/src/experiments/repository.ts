@@ -166,18 +166,19 @@ export class ExperimentsRepository {
     return this.experiments.getSorts()
   }
 
-  public removeSortByPath(pathToRemove: string) {
-    this.experiments.removeSort(pathToRemove)
+  public async addSort() {
+    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
+    const sortToAdd = await pickSortToAdd(paramsAndMetrics)
+    if (!sortToAdd) {
+      return
+    }
+    this.experiments.addSort(sortToAdd)
     return this.notifyChanged()
   }
 
-  public async addSort() {
-    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const pickedSort = await pickSortToAdd(paramsAndMetrics)
-    if (pickedSort) {
-      this.experiments.addSort(pickedSort)
-      return this.notifyChanged()
-    }
+  public removeSort(pathToRemove: string) {
+    this.experiments.removeSort(pathToRemove)
+    return this.notifyChanged()
   }
 
   public removeSorts() {
@@ -199,6 +200,12 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
+  public removeFilter(id: string) {
+    if (this.experiments.removeFilter(id)) {
+      return this.notifyChanged()
+    }
+  }
+
   public async removeFilters() {
     const filters = this.experiments.getFilters()
     const filtersToRemove = await pickFiltersToRemove(filters)
@@ -207,12 +214,6 @@ export class ExperimentsRepository {
     }
     this.experiments.removeFilters(filtersToRemove)
     return this.notifyChanged()
-  }
-
-  public removeFilter(id: string) {
-    if (this.experiments.removeFilter(id)) {
-      return this.notifyChanged()
-    }
   }
 
   public getExperiments() {
