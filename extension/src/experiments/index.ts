@@ -91,16 +91,6 @@ export class Experiments {
     return repository.removeSorts()
   }
 
-  public removeAllSorts(dvcRoot?: string) {
-    if (dvcRoot === undefined) {
-      this.getDvcRoots().forEach(dvcRoot => {
-        this.getRepository(dvcRoot).removeAllSorts()
-      })
-    } else {
-      this.getRepository(dvcRoot).removeAllSorts()
-    }
-  }
-
   public removeSort(dvcRoot: string, pathToRemove: string) {
     this.getRepository(dvcRoot).removeSort(pathToRemove)
   }
