@@ -251,4 +251,36 @@ suite('Experiments Filter By Tree Test Suite', () => {
       expect(mockShowInputBox).not.to.be.called
     })
   })
+
+  it('should handle the user exiting from the choose repository quick pick', async () => {
+    const mockShowQuickPick = stub(window, 'showQuickPick')
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    stub((Experiments as any).prototype, 'getDvcRoots').returns([
+      dvcDemoPath,
+      'mockRoot'
+    ])
+
+    const getRepositorySpy = spy(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (Experiments as any).prototype,
+      'getRepository'
+    )
+
+    mockShowQuickPick.resolves(undefined)
+
+    await commands.executeCommand('dvc.addExperimentsTableFilter')
+
+    expect(
+      getRepositorySpy,
+      'should not call get repository in addFilter without a root'
+    ).not.to.be.called
+
+    await commands.executeCommand('dvc.removeExperimentsTableFilters')
+
+    expect(
+      getRepositorySpy,
+      'should not call get repository in removeFilters without a root'
+    ).not.to.be.called
+  })
 })

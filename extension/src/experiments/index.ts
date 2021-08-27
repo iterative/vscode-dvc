@@ -61,38 +61,45 @@ export class Experiments {
     return this.experiments[this.focusedWebviewDvcRoot]
   }
 
-  public async addFilter(dvcRoot?: string) {
-    if (dvcRoot) {
-      return this.getRepository(dvcRoot).addFilter()
+  public async addFilter(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
     }
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.addFilter()
+    return this.getRepository(dvcRoot).addFilter()
   }
 
   public async removeFilters() {
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.removeFilters()
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+    return this.getRepository(dvcRoot).removeFilters()
   }
 
   public removeFilter(dvcRoot: string, id: string) {
     return this.getRepository(dvcRoot).removeFilter(id)
   }
 
-  public async addSort(dvcRoot?: string) {
-    if (dvcRoot) {
-      return this.getRepository(dvcRoot).addSort()
+  public async addSort(overrideRoot?: string) {
+    const dvcRoot = await this.getDvcRoot(overrideRoot)
+    if (!dvcRoot) {
+      return
     }
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.addSort()
+    return this.getRepository(dvcRoot).addSort()
   }
 
   public async removeSorts() {
-    const repository = await this.getFocusedOrDefaultOrPickRepo()
-    return repository.removeSorts()
+    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.getRepository(dvcRoot).removeSorts()
   }
 
   public removeSort(dvcRoot: string, pathToRemove: string) {
-    this.getRepository(dvcRoot).removeSort(pathToRemove)
+    return this.getRepository(dvcRoot).removeSort(pathToRemove)
   }
 
   public getDvcRoots() {
@@ -261,9 +268,8 @@ export class Experiments {
     experimentsRepository.setWebview(experimentsWebview)
   }
 
-  private async getFocusedOrDefaultOrPickRepo() {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
-    return this.getRepository(dvcRoot)
+  private async getDvcRoot(overrideRoot?: string) {
+    return overrideRoot || (await this.getFocusedOrDefaultOrPickProject())
   }
 
   private getRepository(dvcRoot: string) {
@@ -275,9 +281,9 @@ export class Experiments {
   }
 
   private getDefaultOrPickProject() {
-    return this.internalCommands.executeCommand(
+    return this.internalCommands.executeCommand<string | undefined>(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
-      ...Object.keys(this.experiments)
+      ...this.getDvcRoots()
     )
   }
 
