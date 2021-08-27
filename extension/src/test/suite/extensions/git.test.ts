@@ -44,7 +44,9 @@ suite('Git Extension Test Suite', () => {
     it('should return if the extension is initialized', async () => {
       mockGitExtensionAPi.state = APIState.INITIALIZED
       const onDidChangeStateSpy = spy(mockGitExtensionAPi, 'onDidChangeState')
+
       expect(mockGitExtensionAPi.state).to.equal(APIState.INITIALIZED)
+
       const resolved = await isReady(mockGitExtensionAPi)
 
       expect(onDidChangeStateSpy).to.be.calledOnce
