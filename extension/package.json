@@ -256,19 +256,28 @@
         "dvc.defaultProject": {
           "title": "%config.defaultProject.title%",
           "description": "%config.defaultProject.description%",
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null
         },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null
         },
         "dvc.pythonPath": {
           "title": "%config.pythonPath.title%",
           "description": "%config.pythonPath.description%",
-          "type": "string",
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null
         },
         "dvc.views.trackedExplorerTree.noOpenUnsupported": {
