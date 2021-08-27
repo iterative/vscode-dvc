@@ -1,5 +1,6 @@
 import { Args, Flag } from './args'
 import { Prompt } from './output'
+import { MaybeConsoleError } from './error'
 import { getWarningResponse, showGenericError } from '../vscode/modal'
 import { CommandId, InternalCommands } from '../internalCommands'
 
@@ -27,8 +28,8 @@ export const tryThenMaybeForce = async (
 ): Promise<string | undefined> => {
   try {
     return await internalCommands.executeCommand(commandId, ...args)
-  } catch (e) {
-    const stderr = e.stderr
+  } catch (e: unknown) {
+    const stderr = (e as MaybeConsoleError).stderr
 
     if (stderr?.includes(Prompt.TRY_FORCE)) {
       return offerToForce(stderr, internalCommands, commandId, ...args)

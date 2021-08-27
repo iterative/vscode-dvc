@@ -6,7 +6,10 @@ See something that should be changed? Want to request a new feature? Open
 # Development Setup
 
 Ensure [Yarn](https://yarnpkg.com/) and
-[Visual Studio Code](https://code.visualstudio.com) are installed.
+[Visual Studio Code Insiders](https://code.visualstudio.com/insiders) (since we
+are using
+[Proposed API](https://code.visualstudio.com/api/advanced-topics/using-proposed-api))
+are installed.
 
 It is recommended that you have a DVC project available to test the extension
 against. We have provided [the demo project](#the-demo-project) as part of this
