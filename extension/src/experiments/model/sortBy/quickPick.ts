@@ -38,8 +38,8 @@ export const pickSortsToRemove = (
 
   return quickPickManyValues<SortDefinition>(
     sorts.map(sort => ({
-      description: sort.path,
-      label: sort.descending ? 'descending' : 'ascending',
+      description: sort.descending ? 'descending' : 'ascending',
+      label: sort.path,
       value: sort
     })),
     {
