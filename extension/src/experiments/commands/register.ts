@@ -9,12 +9,12 @@ import { RegisteredCommands } from '../../externalCommands'
 const registerCommand = (
   experiments: Experiments,
   name: RegisteredCommands,
-  func: () => unknown
+  func: (arg?: string) => unknown
 ): void => {
   experiments.dispose.track(
-    commands.registerCommand(name, async () => {
+    commands.registerCommand(name, async arg => {
       const stopWatch = new StopWatch()
-      const res = await func()
+      const res = await func(arg)
       sendTelemetryEvent(name, undefined, {
         duration: stopWatch.getElapsedTime()
       })
@@ -49,39 +49,36 @@ const registerExperimentInputCommands = (experiments: Experiments): void =>
 const registerExperimentQuickPickCommands = (
   experiments: Experiments
 ): void => {
-  experiments.dispose.track(
-    commands.registerCommand('dvc.experimentGarbageCollect', () =>
+  registerCommand(
+    experiments,
+    RegisteredCommands.EXPERIMENT_GARBAGE_COLLECT,
+    () =>
       experiments.getCwdAndQuickPickThenRun(
         AvailableCommands.EXPERIMENT_GARBAGE_COLLECT,
         pickGarbageCollectionFlags
       )
-    )
   )
 
-  experiments.dispose.track(
-    commands.registerCommand(
-      'dvc.addExperimentsTableFilter',
-      (dvcRoot?: string) => experiments.addFilter(dvcRoot)
-    )
+  registerCommand(
+    experiments,
+    RegisteredCommands.EXPERIMENT_FILTER_ADD,
+    (dvcRoot?: string) => experiments.addFilter(dvcRoot)
   )
 
-  experiments.dispose.track(
-    commands.registerCommand('dvc.removeExperimentsTableFilters', () =>
-      experiments.removeFilters()
-    )
+  registerCommand(
+    experiments,
+    RegisteredCommands.EXPERIMENT_FILTERS_REMOVE,
+    () => experiments.removeFilters()
   )
 
-  experiments.dispose.track(
-    commands.registerCommand(
-      'dvc.addExperimentsTableSort',
-      (dvcRoot?: string) => experiments.addSort(dvcRoot)
-    )
+  registerCommand(
+    experiments,
+    RegisteredCommands.EXPERIMENT_SORT_ADD,
+    (dvcRoot?: string) => experiments.addSort(dvcRoot)
   )
 
-  experiments.dispose.track(
-    commands.registerCommand('dvc.removeExperimentsTableSorts', () =>
-      experiments.removeSorts()
-    )
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_SORTS_REMOVE, () =>
+    experiments.removeSorts()
   )
 }
 
