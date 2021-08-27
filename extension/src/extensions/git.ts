@@ -5,7 +5,7 @@ interface Repository {
   readonly rootUri: Uri
 }
 
-enum APIState {
+export enum APIState {
   INITIALIZED = 'initialized',
   UNINITIALIZED = 'uninitialized'
 }
@@ -20,7 +20,7 @@ interface VscodeGit {
   getAPI(version: number): Thenable<ExtensionAPI>
 }
 
-const isReady = (api: ExtensionAPI) =>
+export const isReady = (api: ExtensionAPI) =>
   new Promise(resolve => {
     const listener = api.onDidChangeState(state => {
       if (state === APIState.INITIALIZED) {
