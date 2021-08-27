@@ -72,7 +72,9 @@ export const sendTelemetryEvent = <
     return
   }
   const reporter = getTelemetryReporter()
-  const sanitizedProperties = sanitizeProperties(eventName, properties)
+  const sanitizedProperties = properties
+    ? sanitizeProperties(eventName, properties)
+    : undefined
   reporter.sendTelemetryEvent(
     eventName as string,
     sanitizedProperties,

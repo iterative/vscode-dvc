@@ -2,39 +2,49 @@ import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { Experiments } from '..'
 import { AvailableCommands } from '../../internalCommands'
+import { StopWatch } from '../../util/time'
+import { sendTelemetryEvent } from '../../telemetry'
+import { RegisteredCommands } from '../../externalCommands'
 
-const registerExperimentCwdCommands = (experiments: Experiments): void => {
+const registerCommand = (
+  experiments: Experiments,
+  name: RegisteredCommands,
+  func: () => unknown
+): void => {
   experiments.dispose.track(
-    commands.registerCommand('dvc.queueExperiment', () =>
-      experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
-    )
+    commands.registerCommand(name, async () => {
+      const stopWatch = new StopWatch()
+      const res = await func()
+      sendTelemetryEvent(name, undefined, {
+        duration: stopWatch.getElapsedTime()
+      })
+      return res
+    })
   )
 }
+
+const registerExperimentCwdCommands = (experiments: Experiments): void =>
+  registerCommand(experiments, RegisteredCommands.QUEUE_EXPERIMENT, () =>
+    experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
+  )
 
 const registerExperimentNameCommands = (experiments: Experiments): void => {
-  experiments.dispose.track(
-    commands.registerCommand('dvc.applyExperiment', () =>
-      experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
-    )
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_APPLY, () =>
+    experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_APPLY)
   )
 
-  experiments.dispose.track(
-    commands.registerCommand('dvc.removeExperiment', () =>
-      experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
-    )
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_REMOVE, () =>
+    experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 }
 
-const registerExperimentInputCommands = (experiments: Experiments): void => {
-  experiments.dispose.track(
-    commands.registerCommand('dvc.branchExperiment', () =>
-      experiments.getExpNameAndInputThenRun(
-        AvailableCommands.EXPERIMENT_BRANCH,
-        'Name the new branch'
-      )
+const registerExperimentInputCommands = (experiments: Experiments): void =>
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_BRANCH, () =>
+    experiments.getExpNameAndInputThenRun(
+      AvailableCommands.EXPERIMENT_BRANCH,
+      'Name the new branch'
     )
   )
-}
 
 const registerExperimentQuickPickCommands = (
   experiments: Experiments
