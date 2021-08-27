@@ -1,4 +1,4 @@
-import path from 'path'
+import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -165,8 +165,8 @@ suite('Experiments Sort By Tree Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = path.join(...testParamPathArray)
-      const otherTestParamPath = path.join(...otherTestParamPathArray)
+      const testParamPath = join(...testParamPathArray)
+      const otherTestParamPath = join(...otherTestParamPathArray)
 
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy
@@ -271,6 +271,38 @@ suite('Experiments Sort By Tree Test Suite', () => {
         dvcDemoPath
       )
       expect(getParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2, 4])
+    })
+
+    it('should handle the user exiting from the choose repository quick pick', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDvcRoots').returns([
+        dvcDemoPath,
+        'mockRoot'
+      ])
+
+      const getRepositorySpy = spy(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (Experiments as any).prototype,
+        'getRepository'
+      )
+
+      mockShowQuickPick.resolves(undefined)
+
+      await commands.executeCommand('dvc.addExperimentsTableSort')
+
+      expect(
+        getRepositorySpy,
+        'should not call get repository in addSort without a root'
+      ).not.to.be.called
+
+      await commands.executeCommand('dvc.removeExperimentsTableSorts')
+
+      expect(
+        getRepositorySpy,
+        'should not call get repository in removeSorts without a root'
+      ).not.to.be.called
     })
   })
 })
