@@ -12,7 +12,7 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
 import complexRowData from 'dvc/src/experiments/webview/complex-row-example.json'
-import complexColumnData from 'dvc/src/experiments/webview/complex-column-example.json'
+import complexColumnData from 'dvc/src/experiments/webview/complex-column-example'
 import {
   MessageFromWebviewType,
   MessageToWebviewType,
