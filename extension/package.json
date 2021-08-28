@@ -699,7 +699,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "typescript": "^4.4.2",
+    "typescript": "4.3.4",
     "vsce": "^1.96.1",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",

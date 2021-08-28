@@ -7,7 +7,7 @@ const reportErrorMessage = (error: MaybeConsoleError) =>
 export const report = async (stdout: Promise<string>) => {
   try {
     window.showInformationMessage((await stdout) || 'Operation successful.')
-  } catch (e: unknown) {
+  } catch (e) {
     reportErrorMessage(e as MaybeConsoleError)
   }
 }

@@ -28,7 +28,7 @@ export const tryThenMaybeForce = async (
 ): Promise<string | undefined> => {
   try {
     return await internalCommands.executeCommand(commandId, ...args)
-  } catch (e: unknown) {
+  } catch (e) {
     const stderr = (e as MaybeConsoleError).stderr
 
     if (stderr?.includes(Prompt.TRY_FORCE)) {
