@@ -17,6 +17,10 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
+  [EventName.EXPERIMENT_RUN]: undefined
+  [EventName.EXPERIMENT_RUN_QUEUED]: undefined
+  [EventName.EXPERIMENT_RUN_RESET]: undefined
+  [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
   [EventName.EXTENSION_LOAD]: { workspaceFolderCount: number }

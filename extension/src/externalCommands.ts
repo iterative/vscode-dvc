@@ -5,6 +5,10 @@ export enum RegisteredCommands {
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
   EXPERIMENT_GARBAGE_COLLECT = 'dvc.experimentGarbageCollect',
   EXPERIMENT_REMOVE = 'dvc.removeExperiment',
+  EXPERIMENT_RUN = 'dvc.runExperiment',
+  EXPERIMENT_RUN_QUEUED = 'dvc.runQueuedExperiments',
+  EXPERIMENT_RUN_RESET = 'dvc.runResetExperiment',
+  EXPERIMENT_SHOW = 'dvc.showExperiments',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   QUEUE_EXPERIMENT = 'dvc.queueExperiment'

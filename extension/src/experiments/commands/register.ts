@@ -83,32 +83,24 @@ const registerExperimentQuickPickCommands = (
 }
 
 const registerExperimentRunCommands = (experiments: Experiments): void => {
-  experiments.dispose.track(
-    commands.registerCommand('dvc.runExperiment', () =>
-      experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_RUN, () =>
+    experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
+  )
+
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_RUN_RESET, () =>
+    experiments.showExperimentsTableThenRun(
+      AvailableCommands.EXPERIMENT_RUN_RESET
     )
   )
 
-  experiments.dispose.track(
-    commands.registerCommand('dvc.runResetExperiment', () =>
-      experiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN_RESET
-      )
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_RUN_QUEUED, () =>
+    experiments.showExperimentsTableThenRun(
+      AvailableCommands.EXPERIMENT_RUN_QUEUED
     )
   )
 
-  experiments.dispose.track(
-    commands.registerCommand('dvc.runQueuedExperiments', () =>
-      experiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN_QUEUED
-      )
-    )
-  )
-
-  experiments.dispose.track(
-    commands.registerCommand('dvc.showExperiments', () =>
-      experiments.showExperimentsTable()
-    )
+  registerCommand(experiments, RegisteredCommands.EXPERIMENT_SHOW, () =>
+    experiments.showExperimentsTable()
   )
 }
 
