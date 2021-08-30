@@ -32,6 +32,14 @@ export interface IEventNamePropertyMapping {
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
+  [EventName.REPOSITORY_ADD_TARGET]: undefined
+  [EventName.REPOSITORY_CHECKOUT_TARGET]: undefined
+  [EventName.REPOSITORY_CHECKOUT]: undefined
+  [EventName.REPOSITORY_COMMIT_TARGET]: undefined
+  [EventName.REPOSITORY_COMMIT]: undefined
+  [EventName.REPOSITORY_PULL]: undefined
+  [EventName.REPOSITORY_PUSH]: undefined
+
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }

@@ -24,6 +24,14 @@ export enum RegisteredCommands {
   QUEUE_EXPERIMENT = 'dvc.queueExperiment',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
+  REPOSITORY_ADD_TARGET = 'dvc.addTarget',
+  REPOSITORY_CHECKOUT = 'dvc.checkout',
+  REPOSITORY_CHECKOUT_TARGET = 'dvc.checkoutTarget',
+  REPOSITORY_COMMIT = 'dvc.commit',
+  REPOSITORY_COMMIT_TARGET = 'dvc.commitTarget',
+  REPOSITORY_PULL = 'dvc.pull',
+  REPOSITORY_PUSH = 'dvc.push',
+
   EXTENSION_DESELECT_DEFAULT_PROJECT = 'dvc.deselectDefaultProject',
   EXTENSION_SELECT_DEFAULT_PROJECT = 'dvc.selectDefaultProject',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace'
