@@ -5,7 +5,7 @@ import { mocked } from 'ts-jest/utils'
 import { exists } from '.'
 import { TrackedExplorerTree } from './tree'
 import { Config } from '../config'
-import { InternalCommands } from '../internalCommands'
+import { InternalCommands } from '../commands/internal'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()

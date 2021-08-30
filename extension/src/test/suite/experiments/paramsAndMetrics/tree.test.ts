@@ -11,7 +11,7 @@ import { Status } from '../../../../experiments/paramsAndMetrics/model'
 import { ResourceLocator } from '../../../../resourceLocator'
 import { Config } from '../../../../config'
 import { CliReader } from '../../../../cli/reader'
-import { InternalCommands } from '../../../../internalCommands'
+import { InternalCommands } from '../../../../commands/internal'
 import { dvcDemoPath, resourcePath } from '../../util'
 import { buildMockMemento } from '../../../util'
 

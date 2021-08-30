@@ -7,7 +7,7 @@ import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { retryUntilAllResolved } from '../util/promise'
-import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 export class Repository {
   @observable

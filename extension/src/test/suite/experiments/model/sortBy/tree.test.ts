@@ -11,7 +11,7 @@ import { ExperimentsRepository } from '../../../../../experiments/repository'
 import { Config } from '../../../../../config'
 import { ResourceLocator } from '../../../../../resourceLocator'
 import { CliRunner } from '../../../../../cli/runner'
-import { InternalCommands } from '../../../../../internalCommands'
+import { InternalCommands } from '../../../../../commands/internal'
 import {
   Experiment,
   ParamOrMetric

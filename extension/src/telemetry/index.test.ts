@@ -72,13 +72,24 @@ describe('sendTelemetryEvent', () => {
       g: undefined,
       h: 'some string'
     } as unknown as IEventNamePropertyMapping[keyof IEventNamePropertyMapping]
+    const mockedMeasurements = {
+      duration: 1000
+    }
 
-    sendTelemetryEvent(mockedEventName, mockedEventProperties)
+    sendTelemetryEvent(
+      mockedEventName,
+      mockedEventProperties,
+      mockedMeasurements
+    )
 
-    expect(mockedSendTelemetryEvent).toBeCalledWith(mockedEventName, {
-      a: '1',
-      b: '{"c":2,"d":{"e":"3"}}',
-      h: 'some string'
-    })
+    expect(mockedSendTelemetryEvent).toBeCalledWith(
+      mockedEventName,
+      {
+        a: '1',
+        b: '{"c":2,"d":{"e":"3"}}',
+        h: 'some string'
+      },
+      mockedMeasurements
+    )
   })
 })

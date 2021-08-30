@@ -1,11 +1,11 @@
 import { Disposable } from '@hediet/std/disposable'
-import { ICli } from './cli'
-import { Args } from './cli/args'
-import { Config } from './config'
-import { quickPickOne } from './vscode/quickPick'
-import { autoRegisteredCommands as CliExecutorCommands } from './cli/executor'
-import { autoRegisteredCommands as CliReaderCommands } from './cli/reader'
-import { autoRegisteredCommands as CliRunnerCommands } from './cli/runner'
+import { ICli } from '../cli'
+import { Args } from '../cli/args'
+import { Config } from '../config'
+import { quickPickOne } from '../vscode/quickPick'
+import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
+import { autoRegisteredCommands as CliReaderCommands } from '../cli/reader'
+import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 

@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse, showGenericError } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
-import { CommandId, InternalCommands } from '../../internalCommands'
+import { CommandId, InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
 
 const mockedFunc = jest.fn()
