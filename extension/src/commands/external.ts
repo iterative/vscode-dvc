@@ -11,6 +11,7 @@ export enum RegisteredCommands {
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
   EXPERIMENT_FILTERS_REMOVE_ALL = 'dvc.views.experimentsFilterByTree.removeAllFilters',
   EXPERIMENT_GARBAGE_COLLECT = 'dvc.experimentGarbageCollect',
+  EXPERIMENT_PARAMS_AND_METRICS_TOGGLE = 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
   EXPERIMENT_REMOVE = 'dvc.removeExperiment',
   EXPERIMENT_RUN = 'dvc.runExperiment',
   EXPERIMENT_RUN_QUEUED = 'dvc.runQueuedExperiments',
