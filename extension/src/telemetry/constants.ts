@@ -14,15 +14,20 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
+  [EventName.EXPERIMENT_FILTER_REMOVE]: undefined
   [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined
+  [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: undefined
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
+  [EventName.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
   [EventName.EXPERIMENT_RUN_RESET]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
+  [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
+  [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
   [EventName.EXTENSION_LOAD]: { workspaceFolderCount: number }
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
