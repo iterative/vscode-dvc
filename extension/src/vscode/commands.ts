@@ -1,16 +1,22 @@
 import { Disposer } from '@hediet/std/disposable'
 import { commands, Uri } from 'vscode'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../commands/external'
 
 export const reRegisterVsCodeCommands = (disposer: Disposer) => {
   disposer.track(
-    commands.registerCommand('dvc.copyFilePath', path =>
-      commands.executeCommand('copyFilePath', Uri.file(path))
+    registerInstrumentedCommand<string>(
+      RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
+      path => commands.executeCommand('copyFilePath', Uri.file(path))
     )
   )
 
   disposer.track(
-    commands.registerCommand('dvc.copyRelativeFilePath', path =>
-      commands.executeCommand('copyRelativeFilePath', Uri.file(path))
+    registerInstrumentedCommand<string>(
+      RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
+      path => commands.executeCommand('copyRelativeFilePath', Uri.file(path))
     )
   )
 }
