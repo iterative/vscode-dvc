@@ -25,4 +25,9 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
   [EventName.EXTENSION_LOAD]: { workspaceFolderCount: number }
   [EventName.QUEUE_EXPERIMENT]: undefined
+  [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
+
+  [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
+  [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
+  [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
 }
