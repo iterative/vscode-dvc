@@ -1,7 +1,7 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { CommandId, InternalCommands } from '../../internalCommands'
+import { CommandId, InternalCommands } from '../../commands/internal'
 import { showGenericError } from '../../vscode/modal'
 
 export type ResourceCommand = ({

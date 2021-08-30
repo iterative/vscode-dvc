@@ -24,7 +24,7 @@ import {
 import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
-import { AvailableCommands, InternalCommands } from '../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'

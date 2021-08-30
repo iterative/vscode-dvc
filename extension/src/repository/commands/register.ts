@@ -6,7 +6,7 @@ import {
   ResourceCommand,
   RootCommand
 } from '.'
-import { AvailableCommands, InternalCommands } from '../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
   commands.registerCommand(name, func)

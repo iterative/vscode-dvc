@@ -5,7 +5,7 @@ import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import { Config } from '../../../config'
-import { InternalCommands } from '../../../internalCommands'
+import { InternalCommands } from '../../../commands/internal'
 import { Repository } from '../../../repository'
 import { dvcDemoPath } from '../util'
 

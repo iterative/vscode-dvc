@@ -20,7 +20,7 @@ import {
   CommandId,
   AvailableCommands,
   InternalCommands
-} from '../internalCommands'
+} from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {

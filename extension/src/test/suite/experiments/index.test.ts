@@ -13,11 +13,11 @@ import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
-import { AvailableCommands, InternalCommands } from '../../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
-import { RegisteredCommands } from '../../../externalCommands'
+import { RegisteredCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 
 suite('Experiments Test Suite', () => {
