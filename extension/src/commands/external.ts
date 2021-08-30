@@ -41,7 +41,9 @@ export enum RegisteredCommands {
   EXTENSION_SELECT_DEFAULT_PROJECT = 'dvc.selectDefaultProject',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',
 
-  TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile'
+  TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile',
+  TRACKED_EXPLORER_COPY_FILE_PATH = 'dvc.copyFilePath',
+  TRACKED_EXPLORER_COPY_REL_FILE_PATH = 'dvc.copyRelativeFilePath'
 }
 
 export const registerInstrumentedCommand = <T = string | undefined>(
