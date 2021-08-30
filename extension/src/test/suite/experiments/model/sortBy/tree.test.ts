@@ -23,6 +23,7 @@ import {
   resourcePath
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
+import { RegisteredCommands } from '../../../../../commands/external'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
@@ -154,7 +155,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           experimentsRepository
         )
 
-        await commands.executeCommand('dvc.addExperimentsTableSort')
+        await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORT_ADD)
         await tableChangedPromise
         mockShowQuickPick.reset()
       }
@@ -192,7 +193,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
       mockSortQuickPicks(testParamPath, false)
       const tableChangedPromise = experimentsUpdatedEvent(experimentsRepository)
 
-      await commands.executeCommand('dvc.addExperimentsTableSort', dvcDemoPath)
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_SORT_ADD,
+        dvcDemoPath
+      )
       await tableChangedPromise
       mockShowQuickPick.reset()
       expect(getParamsArray(), 'single sort with table command').to.deep.equal([
@@ -290,14 +294,14 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       mockShowQuickPick.resolves(undefined)
 
-      await commands.executeCommand('dvc.addExperimentsTableSort')
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORT_ADD)
 
       expect(
         getRepositorySpy,
         'should not call get repository in addSort without a root'
       ).not.to.be.called
 
-      await commands.executeCommand('dvc.removeExperimentsTableSorts')
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORTS_REMOVE)
 
       expect(
         getRepositorySpy,
