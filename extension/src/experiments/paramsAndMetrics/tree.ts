@@ -78,7 +78,7 @@ export class ExperimentsParamsAndMetricsTree
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
-      command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+      command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
       title: 'toggle'
     }
 
