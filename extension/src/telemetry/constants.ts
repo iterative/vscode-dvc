@@ -24,7 +24,9 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_RUN_RESET]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
+  [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
+  [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
   [EventName.EXTENSION_LOAD]: { workspaceFolderCount: number }
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }

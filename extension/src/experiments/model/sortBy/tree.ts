@@ -5,16 +5,19 @@ import {
   TreeDataProvider,
   TreeItem,
   TreeItemCollapsibleState,
-  Uri,
-  commands
+  Uri
 } from 'vscode'
 import { SortDefinition } from './'
 import { Experiments } from '../..'
 import { createTreeView } from '../../../vscode/tree'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../../commands/external'
 
 export type SortItem = {
-  sort: SortDefinition
   dvcRoot: string
+  sort: SortDefinition
 }
 
 export class ExperimentsSortByTree
@@ -34,16 +37,21 @@ export class ExperimentsSortByTree
     )
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsSortByTree.removeSort',
-        ({ dvcRoot, sort: { path } }: SortItem) =>
+      registerInstrumentedCommand<SortItem>(
+        RegisteredCommands.EXPERIMENT_SORT_REMOVE,
+        sortItem => {
+          const {
+            dvcRoot,
+            sort: { path }
+          } = sortItem as SortItem
           this.experiments.removeSort(dvcRoot, path)
+        }
       )
     )
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsSortByTree.removeAllSorts',
+      registerInstrumentedCommand(
+        RegisteredCommands.EXPERIMENT_SORTS_REMOVE_ALL,
         resource => {
           this.removeAllSorts(resource)
         }
