@@ -39,13 +39,8 @@ export class ExperimentsSortByTree
     this.dispose.track(
       registerInstrumentedCommand<SortItem>(
         RegisteredCommands.EXPERIMENT_SORT_REMOVE,
-        sortItem => {
-          const {
-            dvcRoot,
-            sort: { path }
-          } = sortItem as SortItem
+        ({ dvcRoot, sort: { path } }: SortItem) =>
           this.experiments.removeSort(dvcRoot, path)
-        }
       )
     )
 

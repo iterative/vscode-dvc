@@ -55,10 +55,8 @@ export class ExperimentsParamsAndMetricsTree
     this.dispose.track(
       registerInstrumentedCommand<ParamsAndMetricsItem>(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
-        resource => {
-          const { dvcRoot, path } = resource as ParamsAndMetricsItem
-          return this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
-        }
+        ({ dvcRoot, path }) =>
+          this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
       )
     )
 

@@ -44,7 +44,7 @@ export class ExperimentsFilterByTree
     this.dispose.track(
       registerInstrumentedCommand<FilterItem>(
         RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
-        resource => this.removeFilter(resource as FilterItem)
+        resource => this.removeFilter(resource)
       )
     )
 

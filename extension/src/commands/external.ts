@@ -29,9 +29,9 @@ export enum RegisteredCommands {
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace'
 }
 
-export const registerInstrumentedCommand = <T = string>(
+export const registerInstrumentedCommand = <T = string | undefined>(
   name: RegisteredCommands,
-  func: (arg?: T) => unknown
+  func: (arg: T) => unknown
 ): Disposable =>
   commands.registerCommand(name, async arg => {
     const stopWatch = new StopWatch()
