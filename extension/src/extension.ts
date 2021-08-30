@@ -42,7 +42,12 @@ import {
   getFirstWorkspaceFolder,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
-import { getTelemetryReporter } from './telemetry'
+import { getTelemetryReporter, sendTelemetryEvent } from './telemetry'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from './commands/external'
+import { StopWatch } from './util/time'
 
 export { Disposable, Disposer }
 
@@ -171,9 +176,19 @@ export class Extension implements IExtension {
 
     registerExperimentCommands(this.experiments)
     this.dispose.track(
-      commands.registerCommand('dvc.stopRunningExperiment', () =>
-        this.cliRunner.stop()
-      )
+      commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
+        const stopWatch = new StopWatch()
+        const wasRunning = this.cliRunner.isRunning()
+        const stopped = await this.cliRunner.stop()
+        sendTelemetryEvent(
+          RegisteredCommands.STOP_EXPERIMENT,
+          { stopped, wasRunning },
+          {
+            duration: stopWatch.getElapsedTime()
+          }
+        )
+        return stopped
+      })
     )
 
     registerRepositoryCommands(this.internalCommands)
@@ -183,7 +198,21 @@ export class Extension implements IExtension {
     reRegisterVsCodeCommands(this.dispose)
 
     this.dispose.track(
-      commands.registerCommand('dvc.setupWorkspace', () => setupWorkspace())
+      commands.registerCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        async () => {
+          const stopWatch = new StopWatch()
+          const completed = await setupWorkspace()
+          sendTelemetryEvent(
+            RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+            { completed },
+            {
+              duration: stopWatch.getElapsedTime()
+            }
+          )
+          return completed
+        }
+      )
     )
   }
 
@@ -243,14 +272,16 @@ export class Extension implements IExtension {
 
   private registerConfigCommands() {
     this.dispose.track(
-      commands.registerCommand('dvc.deselectDefaultProject', () =>
-        this.config.deselectDefaultProject()
+      registerInstrumentedCommand(
+        RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
+        () => this.config.deselectDefaultProject()
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.selectDefaultProject', () =>
-        this.config.selectDefaultProject()
+      registerInstrumentedCommand(
+        RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
+        () => this.config.selectDefaultProject()
       )
     )
   }

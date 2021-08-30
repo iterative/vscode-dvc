@@ -1,26 +1,17 @@
-import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { Experiments } from '..'
 import { AvailableCommands } from '../../commands/internal'
-import { StopWatch } from '../../util/time'
-import { sendTelemetryEvent } from '../../telemetry'
-import { RegisteredCommands } from '../../commands/external'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../commands/external'
 
 const registerCommand = (
   experiments: Experiments,
   name: RegisteredCommands,
   func: (arg?: string) => unknown
 ): void => {
-  experiments.dispose.track(
-    commands.registerCommand(name, async arg => {
-      const stopWatch = new StopWatch()
-      const res = await func(arg)
-      sendTelemetryEvent(name, undefined, {
-        duration: stopWatch.getElapsedTime()
-      })
-      return res
-    })
-  )
+  experiments.dispose.track(registerInstrumentedCommand(name, func))
 }
 
 const registerExperimentCwdCommands = (experiments: Experiments): void =>
