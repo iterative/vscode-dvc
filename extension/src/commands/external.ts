@@ -11,5 +11,10 @@ export enum RegisteredCommands {
   EXPERIMENT_SHOW = 'dvc.showExperiments',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
-  QUEUE_EXPERIMENT = 'dvc.queueExperiment'
+  QUEUE_EXPERIMENT = 'dvc.queueExperiment',
+  STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
+
+  EXTENSION_DESELECT_DEFAULT_PROJECT = 'dvc.deselectDefaultProject',
+  EXTENSION_SELECT_DEFAULT_PROJECT = 'dvc.selectDefaultProject',
+  EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace'
 }
