@@ -7,7 +7,9 @@ export enum RegisteredCommands {
   EXPERIMENT_APPLY = 'dvc.applyExperiment',
   EXPERIMENT_BRANCH = 'dvc.branchExperiment',
   EXPERIMENT_FILTER_ADD = 'dvc.addExperimentsTableFilter',
+  EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
+  EXPERIMENT_FILTERS_REMOVE_ALL = 'dvc.views.experimentsFilterByTree.removeAllFilters',
   EXPERIMENT_GARBAGE_COLLECT = 'dvc.experimentGarbageCollect',
   EXPERIMENT_REMOVE = 'dvc.removeExperiment',
   EXPERIMENT_RUN = 'dvc.runExperiment',
@@ -24,9 +26,9 @@ export enum RegisteredCommands {
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace'
 }
 
-export const registerInstrumentedCommand = (
+export const registerInstrumentedCommand = <T = string>(
   name: RegisteredCommands,
-  func: (arg?: string) => unknown
+  func: (arg?: T) => unknown
 ): Disposable =>
   commands.registerCommand(name, async arg => {
     const stopWatch = new StopWatch()

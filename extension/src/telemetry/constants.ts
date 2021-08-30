@@ -14,7 +14,9 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
+  [EventName.EXPERIMENT_FILTER_REMOVE]: undefined
   [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined
+  [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: undefined
   [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined
   [EventName.EXPERIMENT_REMOVE]: undefined
   [EventName.EXPERIMENT_RUN]: undefined
