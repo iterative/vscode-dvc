@@ -29,12 +29,19 @@ export enum RegisteredCommands {
   CHECKOUT_TARGET = 'dvc.checkoutTarget',
   COMMIT = 'dvc.commit',
   COMMIT_TARGET = 'dvc.commitTarget',
+  INIT = 'dvc.init',
   PULL = 'dvc.pull',
+  PULL_TARGET = 'dvc.pullTarget',
   PUSH = 'dvc.push',
+  PUSH_TARGET = 'dvc.pushTarget',
+  DELETE_TARGET = 'dvc.deleteTarget',
+  REMOVE_TARGET = 'dvc.removeTarget',
 
   EXTENSION_DESELECT_DEFAULT_PROJECT = 'dvc.deselectDefaultProject',
   EXTENSION_SELECT_DEFAULT_PROJECT = 'dvc.selectDefaultProject',
-  EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace'
+  EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',
+
+  TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile'
 }
 
 export const registerInstrumentedCommand = <T = string | undefined>(
