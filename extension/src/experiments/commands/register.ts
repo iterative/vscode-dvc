@@ -4,7 +4,7 @@ import { Experiments } from '..'
 import { AvailableCommands } from '../../commands/internal'
 import { StopWatch } from '../../util/time'
 import { sendTelemetryEvent } from '../../telemetry'
-import { RegisteredCommands } from '../../externalCommands'
+import { RegisteredCommands } from '../../commands/external'
 
 const registerCommand = (
   experiments: Experiments,

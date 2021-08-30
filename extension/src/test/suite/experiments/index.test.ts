@@ -17,7 +17,7 @@ import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
-import { RegisteredCommands } from '../../../externalCommands'
+import { RegisteredCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 
 suite('Experiments Test Suite', () => {
