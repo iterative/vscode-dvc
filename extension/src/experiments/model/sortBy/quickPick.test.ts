@@ -1,8 +1,8 @@
-import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
 import { pickSortsToRemove, pickSortToAdd } from './quickPick'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import { joinColumnPath } from '../../../util/paths'
 
 jest.mock('vscode')
 
@@ -25,8 +25,8 @@ beforeEach(() => {
 
 const params = 'params'
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = join(params, paramsYaml)
-const epochsParamPath = join(paramsYamlPath, 'epochs')
+const paramsYamlPath = joinColumnPath(params, paramsYaml)
+const epochsParamPath = joinColumnPath(paramsYamlPath, 'epochs')
 const epochsParam = {
   group: params,
   hasChildren: false,

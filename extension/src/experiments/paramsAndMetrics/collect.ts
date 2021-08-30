@@ -1,5 +1,5 @@
-import { join } from 'path'
 import { reduceParamsAndMetrics } from './reduce'
+import { joinColumnPath } from '../../util/paths'
 import {
   ParamOrMetric,
   ParamOrMetricAggregateData,
@@ -48,8 +48,8 @@ const getEntryOrDefault = (
   originalMap.get(propertyKey) || {
     group: ancestors[0],
     hasChildren: false,
-    parentPath: join(...ancestors),
-    path: join(...ancestors, propertyKey),
+    parentPath: joinColumnPath(...ancestors),
+    path: joinColumnPath(...ancestors, propertyKey),
     types: new Set<string>()
   }
 

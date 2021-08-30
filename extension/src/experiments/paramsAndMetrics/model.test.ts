@@ -1,7 +1,7 @@
-import { join } from 'path'
 import { EventEmitter } from 'vscode'
 import { MementoPrefixes, ParamsAndMetricsModel, Status } from './model'
 import { buildMockMemento } from '../../test/util'
+import { joinColumnPath } from '../../util/paths'
 
 jest.mock('vscode', () => ({
   EventEmitter: function (this: EventEmitter<void>) {
@@ -11,8 +11,8 @@ jest.mock('vscode', () => ({
 
 describe('ParamsAndMetricsModel', () => {
   describe('persistence', () => {
-    const paramsDotYamlPath = join('params', 'params.yaml')
-    const testParamPath = join(paramsDotYamlPath, 'testparam')
+    const paramsDotYamlPath = joinColumnPath('params', 'params.yaml')
+    const testParamPath = joinColumnPath(paramsDotYamlPath, 'testparam')
     const exampleDvcRoot = 'test'
     const exampleData = {
       workspace: {
