@@ -5,18 +5,21 @@ import {
   registerInstrumentedCommand
 } from '../commands/external'
 
+const executeCommand = (name: string, path: string) =>
+  commands.executeCommand(name, Uri.file(path))
+
 export const reRegisterVsCodeCommands = (disposer: Disposer) => {
   disposer.track(
     registerInstrumentedCommand<string>(
       RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
-      path => commands.executeCommand('copyFilePath', Uri.file(path))
+      path => executeCommand('copyFilePath', path)
     )
   )
 
   disposer.track(
     registerInstrumentedCommand<string>(
       RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
-      path => commands.executeCommand('copyRelativeFilePath', Uri.file(path))
+      path => executeCommand('copyRelativeFilePath', path)
     )
   )
 }
