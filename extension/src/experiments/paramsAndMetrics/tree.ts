@@ -1,7 +1,6 @@
 import { join } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
-  commands,
   Event,
   TreeDataProvider,
   TreeItem,
@@ -14,6 +13,10 @@ import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../commands/external'
 
 type ParamsAndMetricsItem = {
   description: string | undefined
@@ -50,12 +53,10 @@ export class ExperimentsParamsAndMetricsTree
     this.experiments = experiments
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
-        resource => {
-          const { dvcRoot, path } = resource
-          return this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
-        }
+      registerInstrumentedCommand<ParamsAndMetricsItem>(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        ({ dvcRoot, path }) =>
+          this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
       )
     )
 
@@ -77,7 +78,7 @@ export class ExperimentsParamsAndMetricsTree
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
-      command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+      command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
       title: 'toggle'
     }
 

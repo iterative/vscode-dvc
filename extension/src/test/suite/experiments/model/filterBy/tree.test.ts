@@ -24,6 +24,7 @@ import {
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
 import { joinColumnPath } from '../../../../../util/paths'
+import { RegisteredCommands } from '../../../../../commands/external'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
@@ -100,8 +101,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
 
-      // eslint-disable-next-line sonarjs/no-duplicate-string
-      await commands.executeCommand('dvc.addExperimentsTableFilter')
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
       await tableFilterAdded
 
@@ -134,7 +134,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       messageSpy.resetHistory()
 
       await commands.executeCommand(
-        'dvc.views.experimentsFilterByTree.removeFilter',
+        RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
         {
           description: lossPath,
           dvcRoot: dvcDemoPath,
@@ -203,7 +203,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrDefaultOrPickProject'
       ).returns(dvcDemoPath)
 
-      await commands.executeCommand('dvc.addExperimentsTableFilter')
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
       mockShowQuickPick.resetHistory()
       mockShowQuickPick
@@ -214,12 +214,14 @@ suite('Experiments Filter By Tree Test Suite', () => {
         .resolves({ value: '>' } as unknown as QuickPickItem)
       mockShowInputBox.resolves('0')
 
-      await commands.executeCommand('dvc.addExperimentsTableFilter')
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
       mockShowQuickPick.resetHistory()
       mockShowQuickPick.onFirstCall().resolves(undefined)
 
-      await commands.executeCommand('dvc.removeExperimentsTableFilters')
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE
+      )
 
       expect(mockShowQuickPick).to.be.calledWith(
         [
@@ -244,10 +246,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
       stub(Experiments.prototype, 'isReady').resolves(undefined)
 
       await commands.executeCommand(
-        'dvc.views.experimentsFilterByTree.removeAllFilters'
+        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL
       )
 
-      await commands.executeCommand('dvc.removeExperimentsTableFilters')
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE
+      )
 
       expect(mockShowInputBox).not.to.be.called
     })
@@ -270,14 +274,14 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
     mockShowQuickPick.resolves(undefined)
 
-    await commands.executeCommand('dvc.addExperimentsTableFilter')
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
     expect(
       getRepositorySpy,
       'should not call get repository in addFilter without a root'
     ).not.to.be.called
 
-    await commands.executeCommand('dvc.removeExperimentsTableFilters')
+    await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTERS_REMOVE)
 
     expect(
       getRepositorySpy,
