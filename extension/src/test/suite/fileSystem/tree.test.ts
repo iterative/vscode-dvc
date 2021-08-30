@@ -14,6 +14,7 @@ import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
 import { dvcDemoPath } from '../util'
+import { RegisteredCommands } from '../../../commands/external'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -22,7 +23,6 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   const disposable = Disposable.fn()
 
-  const openFileCommand = 'dvc.views.trackedExplorerTree.openFile'
   const noOpenUnsupportedOption =
     'dvc.views.trackedExplorerTree.noOpenUnsupported'
   const noPromptPullMissingOption =
@@ -102,7 +102,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       } as unknown as TextEditor)
 
       const textEditor = (await commands.executeCommand(
-        openFileCommand,
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
         uri
       )) as TextEditor
 
@@ -125,7 +125,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
       mockShowInformationMessage.resolves(undefined)
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
@@ -134,13 +137,19 @@ suite('Tracked Explorer Tree Test Suite', () => {
         "Don't Show Again" as unknown as MessageItem
       )
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
       mockShowInformationMessage.resetHistory()
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).not.to.be.called
       expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
@@ -159,7 +168,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'M       non-existent.txt\n1 file modified'
       )
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPull).not.to.be.called
@@ -167,7 +179,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves('Pull File' as unknown as MessageItem)
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPull).to.be.calledOnce
@@ -178,14 +193,20 @@ suite('Tracked Explorer Tree Test Suite', () => {
         "Don't Show Again" as unknown as MessageItem
       )
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPull).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
 
-      await commands.executeCommand(openFileCommand, uri)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
 
       expect(mockShowInformationMessage).not.to.be.called
       expect(mockPull).not.to.be.called

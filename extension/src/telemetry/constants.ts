@@ -37,8 +37,15 @@ export interface IEventNamePropertyMapping {
   [EventName.CHECKOUT]: undefined
   [EventName.COMMIT_TARGET]: undefined
   [EventName.COMMIT]: undefined
+  [EventName.DELETE_TARGET]: undefined
+  [EventName.INIT]: undefined
+  [EventName.PULL_TARGET]: undefined
   [EventName.PULL]: undefined
+  [EventName.PUSH_TARGET]: undefined
   [EventName.PUSH]: undefined
+  [EventName.REMOVE_TARGET]: undefined
+
+  [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined
 
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
