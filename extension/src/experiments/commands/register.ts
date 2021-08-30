@@ -1,7 +1,7 @@
 import { commands } from 'vscode'
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { Experiments } from '..'
-import { AvailableCommands } from '../../internalCommands'
+import { AvailableCommands } from '../../commands/internal'
 import { StopWatch } from '../../util/time'
 import { sendTelemetryEvent } from '../../telemetry'
 import { RegisteredCommands } from '../../externalCommands'

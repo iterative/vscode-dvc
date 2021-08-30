@@ -8,7 +8,7 @@ import { RepositoryModel } from './model'
 import { DiffOutput, ListOutput, Status, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { delay } from '../util/time'
-import { InternalCommands } from '../internalCommands'
+import { InternalCommands } from '../commands/internal'
 import { Config } from '../config'
 
 jest.mock('@hediet/std/disposable')
