@@ -41,7 +41,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   describe('TrackedExplorerTree', () => {
     it('should be able to run dvc.copyFilePath and copy a path to the clipboard', async () => {
-      await commands.executeCommand('dvc.copyFilePath', dvcDemoPath)
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
+        dvcDemoPath
+      )
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
       await commands.executeCommand('editor.action.clipboardPasteAction')
@@ -52,7 +55,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
     it('should be able to run dvc.copyRelativeFilePath and copy a path to the clipboard', async () => {
       const relPath = 'logs'
       await commands.executeCommand(
-        'dvc.copyRelativeFilePath',
+        RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
         join(dvcDemoPath, relPath)
       )
 
@@ -67,7 +70,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       ensureFileSync(path)
       expect(exists(path)).to.be.true
 
-      await commands.executeCommand('dvc.deleteTarget', path)
+      await commands.executeCommand(RegisteredCommands.DELETE_TARGET, path)
       expect(exists(path)).to.be.false
     })
 
@@ -75,7 +78,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
       const mockSetup = stub(Setup, 'setup').resolves()
 
-      await commands.executeCommand('dvc.init')
+      await commands.executeCommand(RegisteredCommands.INIT)
       expect(mockInit).to.be.calledOnce
       expect(mockSetup).to.be.calledOnce
 
@@ -83,7 +86,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       mockSetup.resetHistory()
       stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
 
-      await commands.executeCommand('dvc.init')
+      await commands.executeCommand(RegisteredCommands.INIT)
 
       expect(mockInit).not.to.be.called
       expect(mockSetup).not.to.be.called
@@ -221,7 +224,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target destroyed!'
       )
 
-      await commands.executeCommand('dvc.removeTarget', absPath)
+      await commands.executeCommand(RegisteredCommands.REMOVE_TARGET, absPath)
       expect(mockDeleteTarget).to.be.calledOnce
       expect(mockRemove).to.be.calledOnce
     })
@@ -234,7 +237,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pulled'
       )
 
-      await commands.executeCommand('dvc.pullTarget', absPath)
+      await commands.executeCommand(RegisteredCommands.PULL_TARGET, absPath)
 
       expect(mockPull).to.be.calledOnce
     })
@@ -256,7 +259,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand('dvc.pullTarget', absPath)
+      await commands.executeCommand(RegisteredCommands.PULL_TARGET, absPath)
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
@@ -272,7 +275,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pushed'
       )
 
-      await commands.executeCommand('dvc.pushTarget', absPath)
+      await commands.executeCommand(RegisteredCommands.PUSH_TARGET, absPath)
 
       expect(mockPush).to.be.calledOnce
     })
@@ -294,7 +297,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand('dvc.pushTarget', absPath)
+      await commands.executeCommand(RegisteredCommands.PUSH_TARGET, absPath)
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPush).to.be.calledTwice

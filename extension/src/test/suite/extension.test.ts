@@ -52,7 +52,9 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
       await venvQuickPickActive
 
       const selectNoVenv = selectQuickPickItem(3)
@@ -84,7 +86,9 @@ suite('Extension Test Suite', () => {
         1
       )
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
       await venvQuickPickActive
 
       const selectVenvAndUseExtension = selectQuickPickItem(1)
@@ -116,7 +120,9 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
 
       await venvQuickPickActive
 
