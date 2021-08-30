@@ -43,7 +43,10 @@ import {
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
 import { getTelemetryReporter, sendTelemetryEvent } from './telemetry'
-import { RegisteredCommands } from './commands/external'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from './commands/external'
 import { StopWatch } from './util/time'
 
 export { Disposable, Disposer }
@@ -269,36 +272,16 @@ export class Extension implements IExtension {
 
   private registerConfigCommands() {
     this.dispose.track(
-      commands.registerCommand(
+      registerInstrumentedCommand(
         RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
-        async () => {
-          const stopWatch = new StopWatch()
-          await this.config.deselectDefaultProject()
-          return sendTelemetryEvent(
-            RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
-            undefined,
-            {
-              duration: stopWatch.getElapsedTime()
-            }
-          )
-        }
+        () => this.config.deselectDefaultProject()
       )
     )
 
     this.dispose.track(
-      commands.registerCommand(
+      registerInstrumentedCommand(
         RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
-        async () => {
-          const stopWatch = new StopWatch()
-          await this.config.selectDefaultProject()
-          return sendTelemetryEvent(
-            RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
-            undefined,
-            {
-              duration: stopWatch.getElapsedTime()
-            }
-          )
-        }
+        () => this.config.selectDefaultProject()
       )
     )
   }
