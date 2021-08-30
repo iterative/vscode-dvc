@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore } from 'sinon'
+import { stub, spy, restore, useFakeTimers } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -17,6 +17,8 @@ import { AvailableCommands, InternalCommands } from '../../../internalCommands'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
+import { RegisteredCommands } from '../../../externalCommands'
+import * as Telemetry from '../../../telemetry'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -268,10 +270,37 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      await commands.executeCommand('dvc.queueExperiment')
+      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
 
       expect(mockExperimentRunQueue).to.be.calledOnce
       expect(mockExperimentRunQueue).to.be.calledWith(dvcDemoPath)
+    })
+
+    it('should send a telemetry event containing a duration when an experiment is queued', async () => {
+      const clock = useFakeTimers()
+      const duration = 54321
+
+      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
+        clock.tick(duration)
+        return Promise.resolve('true')
+      })
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+        dvcDemoPath
+      )
+
+      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        RegisteredCommands.QUEUE_EXPERIMENT,
+        undefined,
+        { duration }
+      )
+
+      clock.restore()
     })
   })
 })
