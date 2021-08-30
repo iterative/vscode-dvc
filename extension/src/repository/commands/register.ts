@@ -14,21 +14,21 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.dispose.track(
     registerInstrumentedCommand<Resource>(
-      RegisteredCommands.REPOSITORY_ADD_TARGET,
+      RegisteredCommands.ADD_TARGET,
       getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
     )
   )
 
   internalCommands.dispose.track(
     registerInstrumentedCommand<Resource>(
-      RegisteredCommands.REPOSITORY_CHECKOUT_TARGET,
+      RegisteredCommands.CHECKOUT_TARGET,
       getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
     )
   )
 
   internalCommands.dispose.track(
     registerInstrumentedCommand<Resource>(
-      RegisteredCommands.REPOSITORY_COMMIT_TARGET,
+      RegisteredCommands.COMMIT_TARGET,
       getResourceCommand(internalCommands, AvailableCommands.COMMIT)
     )
   )
@@ -37,28 +37,28 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
 const registerRootCommands = (internalCommands: InternalCommands) => {
   internalCommands.dispose.track(
     registerInstrumentedCommand<Root>(
-      RegisteredCommands.REPOSITORY_CHECKOUT,
+      RegisteredCommands.CHECKOUT,
       getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
     )
   )
 
   internalCommands.dispose.track(
     registerInstrumentedCommand<Root>(
-      RegisteredCommands.REPOSITORY_COMMIT,
+      RegisteredCommands.COMMIT,
       getRootCommand(internalCommands, AvailableCommands.COMMIT)
     )
   )
 
   internalCommands.dispose.track(
     registerInstrumentedCommand<Root>(
-      RegisteredCommands.REPOSITORY_PULL,
+      RegisteredCommands.PULL,
       getRootCommand(internalCommands, AvailableCommands.PULL)
     )
   )
 
   internalCommands.dispose.track(
     registerInstrumentedCommand<Root>(
-      RegisteredCommands.REPOSITORY_PUSH,
+      RegisteredCommands.PUSH,
       getRootCommand(internalCommands, AvailableCommands.PUSH)
     )
   )
