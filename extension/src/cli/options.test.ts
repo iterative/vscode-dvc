@@ -1,8 +1,9 @@
-import { delimiter, join } from 'path'
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { getOptions } from './options'
 import { Command, Flag } from './args'
 import { getProcessEnv } from '../env'
+import { joinEnvPath } from '../util/paths'
 
 jest.mock('../env')
 
@@ -42,12 +43,7 @@ describe('getOptions', () => {
       cwd,
       env: {
         DVC_NO_ANALYTICS: 'true',
-        PATH: `${join(
-          'path',
-          'to',
-          'python',
-          '.venv'
-        )}${delimiter}${mockedPATH}`
+        PATH: joinEnvPath(join('path', 'to', 'python', '.venv'), mockedPATH)
       },
       executable: pythonBinPath
     })
@@ -63,12 +59,7 @@ describe('getOptions', () => {
       cwd,
       env: {
         DVC_NO_ANALYTICS: 'true',
-        PATH: `${join(
-          'path',
-          'to',
-          'python',
-          '.venv'
-        )}${delimiter}${mockedPATH}`
+        PATH: joinEnvPath(join('path', 'to', 'python', '.venv'), mockedPATH)
       },
       executable: cliPath
     })
