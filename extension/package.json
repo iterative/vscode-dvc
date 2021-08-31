@@ -215,7 +215,7 @@
         "icon": "$(close-all)"
       },
       {
-        "title": "%command.views.experimentsSortByTree.removeAllSorts",
+        "title": "%command.views.experimentsSortByTree.removeAllSorts%",
         "command": "dvc.views.experimentsSortByTree.removeAllSorts",
         "category": "DVC",
         "icon": "$(close-all)"

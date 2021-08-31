@@ -64,29 +64,35 @@ describe('pickGarbageCollectionFlags', () => {
     expect(mockedShowQuickPick).toBeCalledWith(
       [
         {
-          detail: 'Preserve Experiments derived from all Git branches',
+          detail: 'Preserve experiments derived from the current workspace',
+          label: 'Workspace',
+          picked: true,
+          value: '--workspace'
+        },
+        {
+          detail: 'Preserve experiments derived from all Git branches',
           label: 'All Branches',
           value: '--all-branches'
         },
         {
-          detail: 'Preserve Experiments derived from all Git tags',
+          detail: 'Preserve experiments derived from all Git tags',
           label: 'All Tags',
           value: '--all-tags'
         },
         {
-          detail: 'Preserve Experiments derived from all Git commits',
+          detail: 'Preserve experiments derived from all Git commits',
           label: 'All Commits',
           value: '--all-commits'
         },
         {
-          detail: 'Preserve all queued Experiments',
+          detail: 'Preserve all queued experiments',
           label: 'Queued Experiments',
           value: '--queued'
         }
       ],
       {
         canPickMany: true,
-        placeHolder: 'Select which Experiments to preserve'
+        placeHolder: 'Select which experiments to preserve'
       }
     )
   })

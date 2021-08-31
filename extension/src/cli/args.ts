@@ -35,15 +35,15 @@ export enum ExperimentFlag {
   NAMES_ONLY = '--names-only',
   QUEUE = '--queue',
   RESET = '--reset',
-  RUN_ALL = '--run-all',
-  WORKSPACE = '-w'
+  RUN_ALL = '--run-all'
 }
 
 export enum GcPreserveFlag {
   ALL_BRANCHES = '--all-branches',
   ALL_TAGS = '--all-tags',
   ALL_COMMITS = '--all-commits',
-  QUEUED = '--queued'
+  QUEUED = '--queued',
+  WORKSPACE = '--workspace'
 }
 
 export enum ListFlag {
