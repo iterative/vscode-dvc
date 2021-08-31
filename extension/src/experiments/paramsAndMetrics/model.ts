@@ -60,7 +60,7 @@ export class ParamsAndMetricsModel {
     return this.data.filter(paramOrMetric => !paramOrMetric.hasChildren)
   }
 
-  public getChildren(path: string) {
+  public getChildren(path?: string) {
     return this.data
       ?.filter(paramOrMetric =>
         path
@@ -83,8 +83,8 @@ export class ParamsAndMetricsModel {
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     this.status[path] = status
-    this.setAreParentsSelected(path)
     this.setAreChildrenSelected(path, status)
+    this.setAreParentsSelected(path)
     this.persistStatus()
 
     return this.status[path]
