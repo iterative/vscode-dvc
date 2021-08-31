@@ -14,13 +14,13 @@ import { InternalCommands } from '../../../../commands/internal'
 import { dvcDemoPath, resourcePath } from '../../util'
 import { buildMockMemento } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../util/paths'
+import { RegisteredCommands } from '../../../../commands/external'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   window.showInformationMessage(
     'Start all experiments params and metrics tree tests.'
   )
 
-  const toggleCommand = 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus'
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 
@@ -64,24 +64,33 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         experimentsRepository
       )
 
-      const isUnselected = await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path
-      })
+      const isUnselected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path
+        }
+      )
 
       expect(isUnselected).to.equal(Status.unselected)
 
-      const isSelected = await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path
-      })
+      const isSelected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path
+        }
+      )
 
       expect(isSelected).to.equal(Status.selected)
 
-      const isUnselectedAgain = await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path
-      })
+      const isUnselectedAgain = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path
+        }
+      )
 
       expect(isUnselectedAgain).to.equal(Status.unselected)
     })
@@ -135,10 +144,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         expect(paramOrMetric.status).to.equal(Status.selected)
       )
 
-      const isUnselected = await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path
-      })
+      const isUnselected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path
+        }
+      )
 
       expect(isUnselected).to.equal(Status.unselected)
 
@@ -192,10 +204,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         experimentsRepository
       )
 
-      await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path: grandParentPath
-      })
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: grandParentPath
+        }
+      )
 
       const unselectedChildren =
         experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
@@ -213,10 +228,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       const [firstGrandChild] = unselectedGrandChildren
 
-      const isSelected = await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path: firstGrandChild.path
-      })
+      const isSelected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: firstGrandChild.path
+        }
+      )
 
       expect(isSelected).to.equal(Status.selected)
 
@@ -278,10 +296,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         experimentsRepository.getChildParamsOrMetrics(parentPath) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
-      await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path: grandParentPath
-      })
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: grandParentPath
+        }
+      )
 
       expect(selectedGrandChildren).to.have.lengthOf(2)
 
@@ -291,10 +312,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         expect(paramOrMetric.status).to.equal(Status.selected)
       )
 
-      await commands.executeCommand(toggleCommand, {
-        dvcRoot: dvcDemoPath,
-        path: firstGrandChild.path
-      })
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: firstGrandChild.path
+        }
+      )
 
       const indeterminateGrandChildren =
         experimentsRepository.getChildParamsOrMetrics(parentPath) || []
@@ -305,7 +329,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       ).to.deep.equal([Status.selected, Status.unselected])
 
       const lastSelectedIsUnselected = await commands.executeCommand(
-        toggleCommand,
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
         {
           dvcRoot: dvcDemoPath,
           path: firstGrandChild.path
@@ -327,6 +351,104 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       unselectedParents.map(paramOrMetric =>
         expect(paramOrMetric.status).to.equal(Status.unselected)
       )
+    })
+
+    it("should be able to unselect the last selected child and set it's children and ancestors to unselected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
+      const grandParentPath = joinParamOrMetricPath('params', paramsFile)
+      const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
+
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+
+      const internalCommands = disposable.track(
+        new InternalCommands(config, cliReader)
+      )
+
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
+      )
+      const experimentsRepository = disposable.track(
+        new ExperimentsRepository(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator,
+          buildMockMemento()
+        )
+      )
+
+      await experimentsRepository.isReady()
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getRepository').returns(
+        experimentsRepository
+      )
+
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: grandParentPath
+        }
+      )
+
+      const selected = experimentsRepository
+        .getChildParamsOrMetrics(grandParentPath)
+        .filter(paramOrMetric =>
+          paramOrMetric.descendantStatuses.includes(Status.selected)
+        )
+
+      expect(selected, 'all of the entries are unselected').to.have.lengthOf(0)
+
+      const selectedParent = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: parentPath
+        }
+      )
+
+      expect(selectedParent, 'the parent is now selected').to.equal(
+        Status.selected
+      )
+
+      const selectedGrandChildren =
+        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+      expect(
+        selectedGrandChildren,
+        'the grandchildren under process are now selected'
+      ).to.have.lengthOf.greaterThan(1)
+
+      const unselectedParent = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          path: parentPath
+        }
+      )
+
+      expect(unselectedParent, 'the parent is now unselected').to.equal(
+        Status.unselected
+      )
+
+      const unselectedChildren =
+        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+
+      unselectedChildren.map(paramOrMetric =>
+        expect(
+          paramOrMetric.status,
+          "each of it's children are now unselected"
+        ).to.equal(Status.unselected)
+      )
+
+      const unselectedGrandParent = experimentsRepository
+        .getChildParamsOrMetrics()
+        .find(paramOrMetric => paramOrMetric.path === grandParentPath)
+
+      expect(
+        unselectedGrandParent?.status,
+        'the grandparent is now unselected'
+      ).to.equal(Status.unselected)
     })
   })
 })

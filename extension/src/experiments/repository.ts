@@ -109,7 +109,7 @@ export class ExperimentsRepository {
     return this.processManager.run('refresh')
   }
 
-  public getChildParamsOrMetrics(path: string) {
+  public getChildParamsOrMetrics(path?: string) {
     return this.paramsAndMetrics.getChildren(path)
   }
 
