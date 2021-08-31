@@ -319,8 +319,8 @@ suite('Experiments Test Suite', () => {
       stub(window, 'showQuickPick').resolves(
         mockExperiment as unknown as QuickPickItem
       )
-
       const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
+
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY)
 
       expect(mockExperimentApply).to.be.calledWith(dvcDemoPath, mockExperiment)
@@ -344,7 +344,6 @@ suite('Experiments Test Suite', () => {
       stub(window, 'showQuickPick').resolves(
         mockExperiment as unknown as QuickPickItem
       )
-
       const mockExperimentRemove = stub(
         CliExecutor.prototype,
         'experimentRemove'
