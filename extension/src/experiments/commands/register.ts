@@ -21,11 +21,11 @@ const registerExperimentCwdCommands = (experiments: Experiments): void =>
 
 const registerExperimentNameCommands = (experiments: Experiments): void => {
   registerCommand(experiments, RegisteredCommands.EXPERIMENT_APPLY, () =>
-    experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_APPLY)
+    experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
   )
 
   registerCommand(experiments, RegisteredCommands.EXPERIMENT_REMOVE, () =>
-    experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+    experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 }
 

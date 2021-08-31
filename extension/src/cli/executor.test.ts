@@ -275,12 +275,13 @@ describe('CliExecutor', () => {
 
       const output = await cliExecutor.experimentGarbageCollect(
         cwd,
+        GcPreserveFlag.WORKSPACE,
         GcPreserveFlag.QUEUED
       )
       expect(output).toEqual(stdout)
 
       expect(mockedExecuteProcess).toBeCalledWith({
-        args: ['exp', 'gc', '-f', '-w', '--queued'],
+        args: ['exp', 'gc', '-f', '--workspace', '--queued'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
