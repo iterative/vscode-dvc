@@ -70,7 +70,6 @@ export class CliExecutor extends Cli {
       cwd,
       ExperimentSubCommand.GARBAGE_COLLECT,
       Flag.FORCE,
-      ExperimentFlag.WORKSPACE,
       ...preserveFlags
     )
   }
