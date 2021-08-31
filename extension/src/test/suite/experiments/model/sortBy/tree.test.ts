@@ -22,7 +22,7 @@ import {
   resourcePath
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
-import { joinColumnPath } from '../../../../../util/paths'
+import { joinParamOrMetricPath } from '../../../../../util/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 
 suite('Experiments Sort By Tree Test Suite', () => {
@@ -166,8 +166,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = joinColumnPath(...testParamPathArray)
-      const otherTestParamPath = joinColumnPath(...otherTestParamPathArray)
+      const testParamPath = joinParamOrMetricPath(...testParamPathArray)
+      const otherTestParamPath = joinParamOrMetricPath(
+        ...otherTestParamPathArray
+      )
 
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy

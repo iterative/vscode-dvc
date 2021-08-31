@@ -4,7 +4,7 @@ import { FilterDefinition, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { joinColumnPath } from '../../../util/paths'
+import { joinParamOrMetricPath } from '../../../util/paths'
 
 jest.mock('vscode')
 jest.mock('../../../vscode/inputBox')
@@ -29,8 +29,8 @@ beforeEach(() => {
 
 const params = 'params'
 const paramsYaml = 'params.yaml'
-const paramsYamlPath = joinColumnPath(params, paramsYaml)
-const epochsParamPath = joinColumnPath(paramsYamlPath, 'epochs')
+const paramsYamlPath = joinParamOrMetricPath(params, paramsYaml)
+const epochsParamPath = joinParamOrMetricPath(paramsYamlPath, 'epochs')
 const epochsParam = {
   group: params,
   hasChildren: false,
@@ -50,7 +50,7 @@ const boolParam = {
   minNumber: 0,
   name: 'bool',
   parentPath: paramsYamlPath,
-  path: joinColumnPath(paramsYamlPath, 'bool'),
+  path: joinParamOrMetricPath(paramsYamlPath, 'bool'),
   types: ['boolean']
 }
 const mixedParam = {
@@ -61,7 +61,7 @@ const mixedParam = {
   minNumber: 2,
   name: 'mixed',
   parentPath: paramsYamlPath,
-  path: joinColumnPath(paramsYamlPath, 'mixed'),
+  path: joinParamOrMetricPath(paramsYamlPath, 'mixed'),
   types: ['number', 'string', 'boolean']
 }
 

@@ -13,7 +13,7 @@ import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../commands/internal'
 import { dvcDemoPath, resourcePath } from '../../util'
 import { buildMockMemento } from '../../../util'
-import { joinColumnPath } from '../../../../util/paths'
+import { joinParamOrMetricPath } from '../../../../util/paths'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   window.showInformationMessage(
@@ -35,7 +35,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsParamsAndMetricsTree', () => {
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
-      const path = joinColumnPath('params', paramsFile, 'learning_rate')
+      const path = joinParamOrMetricPath('params', paramsFile, 'learning_rate')
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -87,7 +87,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     })
 
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
-      const path = joinColumnPath('params', paramsFile)
+      const path = joinParamOrMetricPath('params', paramsFile)
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -122,7 +122,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       const selectedGrandChildren =
         experimentsRepository.getChildParamsOrMetrics(
-          joinColumnPath(path, 'process')
+          joinParamOrMetricPath(path, 'process')
         ) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
@@ -148,7 +148,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       const unselectedGrandChildren =
         experimentsRepository.getChildParamsOrMetrics(
-          joinColumnPath(path, 'process')
+          joinParamOrMetricPath(path, 'process')
         ) || []
 
       const allUnselectedChildren = [
@@ -162,8 +162,8 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     })
 
     it("should be able to select a child and set all of the ancestors' statuses to indeterminate with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
-      const grandParentPath = joinColumnPath('params', paramsFile)
-      const parentPath = joinColumnPath(grandParentPath, 'process')
+      const grandParentPath = joinParamOrMetricPath('params', paramsFile)
+      const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -244,8 +244,8 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     })
 
     it("should be able to unselect the last remaining selected child and set it's ancestors to unselected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus", async () => {
-      const grandParentPath = joinColumnPath('params', paramsFile)
-      const parentPath = joinColumnPath(grandParentPath, 'process')
+      const grandParentPath = joinParamOrMetricPath('params', paramsFile)
+      const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))

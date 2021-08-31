@@ -2,7 +2,7 @@ import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import complexExperimentsOutput from '../webview/complex-output-example.json'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import { joinColumnPath } from '../../util/paths'
+import { joinParamOrMetricPath } from '../../util/paths'
 
 describe('collectParamsAndMetrics', () => {
   it('should output both params and metrics when both are present', () => {
@@ -117,7 +117,8 @@ describe('collectParamsAndMetrics', () => {
 
   const exampleMixedParam = paramsAndMetrics.find(
     paramOrMetric =>
-      paramOrMetric.parentPath === joinColumnPath('params', 'params.yaml')
+      paramOrMetric.parentPath ===
+      joinParamOrMetricPath('params', 'params.yaml')
   ) as ParamOrMetric
 
   it('should correctly identify mixed type params', () => {
@@ -185,7 +186,7 @@ describe('collectParamsAndMetrics', () => {
     const mixedParam = paramsAndMetrics.find(
       paramOrMetric =>
         paramOrMetric.path ===
-        joinColumnPath('params', 'params.yaml', 'mixedNumber')
+        joinParamOrMetricPath('params', 'params.yaml', 'mixedNumber')
     ) as ParamOrMetric
 
     expect(mixedParam.minNumber).toEqual(-1)
@@ -296,7 +297,8 @@ describe('collectParamsAndMetrics', () => {
 
     const params = paramsAndMetrics.filter(
       paramOrMetric =>
-        paramOrMetric.parentPath === joinColumnPath('params', 'params.yaml')
+        paramOrMetric.parentPath ===
+        joinParamOrMetricPath('params', 'params.yaml')
     ) as ParamOrMetric[]
 
     expect(params?.map(({ name }) => name)).toEqual([
@@ -328,7 +330,8 @@ describe('collectParamsAndMetrics', () => {
 
     const objectParam = paramsAndMetrics.find(
       paramOrMetric =>
-        paramOrMetric.parentPath === joinColumnPath('params', 'params.yaml')
+        paramOrMetric.parentPath ===
+        joinParamOrMetricPath('params', 'params.yaml')
     ) as ParamOrMetric
 
     expect(objectParam.name).toEqual('onlyHasChild')
@@ -337,7 +340,7 @@ describe('collectParamsAndMetrics', () => {
     const primitiveParam = paramsAndMetrics.find(
       paramOrMetric =>
         paramOrMetric.parentPath ===
-        joinColumnPath('params', 'params.yaml', 'onlyHasChild')
+        joinParamOrMetricPath('params', 'params.yaml', 'onlyHasChild')
     ) as ParamOrMetric
 
     expect(primitiveParam.name).toEqual('onlyHasPrimitive')
@@ -346,7 +349,7 @@ describe('collectParamsAndMetrics', () => {
     const onlyHasPrimitiveChild = paramsAndMetrics.find(
       paramOrMetric =>
         paramOrMetric.parentPath ===
-        joinColumnPath(
+        joinParamOrMetricPath(
           'params',
           'params.yaml',
           'onlyHasChild',
