@@ -70,7 +70,7 @@ export class ParamsAndMetricsModel {
       .map(paramOrMetric => {
         return {
           ...paramOrMetric,
-          descendantStatuses: this.getDescendantsStatuses(paramOrMetric.path),
+          descendantStatuses: this.getTerminalNodeStatuses(paramOrMetric.path),
           status: this.status[paramOrMetric.path]
         }
       })
@@ -90,11 +90,17 @@ export class ParamsAndMetricsModel {
     return this.status[path]
   }
 
-  public getTerminalNodeStatuses() {
-    const terminalNodes = this.getTerminalNodes()
-    return terminalNodes
-      .map(paramOrMetric => this.status[paramOrMetric.path])
-      .filter(paramOrMetric => paramOrMetric !== undefined)
+  public getTerminalNodeStatuses(parentPath?: string): Status[] {
+    const nestedStatuses = (this.getChildren(parentPath) || []).map(
+      paramOrMetric => {
+        const terminalStatuses = paramOrMetric.hasChildren
+          ? this.getTerminalNodeStatuses(paramOrMetric.path)
+          : [this.status[paramOrMetric.path]]
+        return [...terminalStatuses]
+      }
+    )
+
+    return flatten<Status>(nestedStatuses)
   }
 
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
@@ -150,7 +156,7 @@ export class ParamsAndMetricsModel {
   }
 
   private getStatus(parentPath: string) {
-    const statuses = this.getDescendantsStatuses(parentPath)
+    const statuses = this.getTerminalNodeStatuses(parentPath)
 
     const isAnyChildSelected = statuses.includes(Status.selected)
     const isAnyChildUnselected = statuses.includes(Status.unselected)
@@ -164,19 +170,6 @@ export class ParamsAndMetricsModel {
     }
 
     return Status.unselected
-  }
-
-  private getDescendantsStatuses(parentPath: string): Status[] {
-    const nestedStatuses = (this.getChildren(parentPath) || []).map(
-      paramOrMetric => {
-        const descendantsStatuses = paramOrMetric.hasChildren
-          ? this.getDescendantsStatuses(paramOrMetric.path)
-          : []
-        return [this.status[paramOrMetric.path], ...descendantsStatuses]
-      }
-    )
-
-    return flatten<Status>(nestedStatuses)
   }
 
   private getNextStatus(path: string) {
