@@ -1,3 +1,4 @@
-import { join, sep } from 'path'
-export const joinColumnPath = join
-export const splitColumnPath = (path: string) => path.split(sep)
+const SEPARATOR = '/'
+export const joinColumnPath = (...pathArray: string[]) =>
+  pathArray.join(SEPARATOR)
+export const splitColumnPath = (path: string) => path.split(SEPARATOR)
