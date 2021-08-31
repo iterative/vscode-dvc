@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -21,6 +21,7 @@ import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
+import { joinColumnPath } from '../../../util/paths'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -307,7 +308,7 @@ suite('Experiments Repository Test Suite', () => {
     mockShowQuickPick.onFirstCall().resolves({
       label: 'test',
       value: {
-        path: join('params', 'params.yaml', 'test')
+        path: joinColumnPath('params', 'params.yaml', 'test')
       }
     } as QuickPickItemWithValue<ParamOrMetric>)
 
@@ -356,27 +357,31 @@ suite('Experiments Repository Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: join('params', 'params.yaml', 'test')
+      path: joinColumnPath('params', 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: join('params', 'params.yaml', 'other')
+      path: joinColumnPath('params', 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = join('params', 'params.yaml', 'test==1')
+    const firstFilterId = joinColumnPath('params', 'params.yaml', 'test==1')
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: join('params', 'params.yaml', 'test'),
+      path: joinColumnPath('params', 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = join('params', 'params.yaml', 'other∈testcontains')
+    const secondFilterId = joinColumnPath(
+      'params',
+      'params.yaml',
+      'other∈testcontains'
+    )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: join('params', 'params.yaml', 'other'),
+      path: joinColumnPath('params', 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [
