@@ -124,7 +124,7 @@ export class CliRunner implements ICli {
 
   public async stop() {
     try {
-      this.currentProcess?.kill('SIGINT')
+      this.currentProcess?.dispose()
       await this.currentProcess
       return false
     } catch (e) {

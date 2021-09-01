@@ -40,7 +40,7 @@ export const createProcess = ({
 
   Object.assign(process, {
     dispose: () => {
-      process.kill('SIGINT')
+      process.kill('SIGINT', { forceKillAfterTimeout: false })
     }
   })
 
