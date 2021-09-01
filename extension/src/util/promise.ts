@@ -1,13 +1,14 @@
 import { delay } from './time'
+import { joinTruthyItems } from './array'
 import { Logger } from '../common/logger'
 
-const promiseOrPromiseAll = (
+const getPromises = (
   promiseOrPromises: Promise<unknown> | Promise<unknown>[]
-): Promise<unknown> | Promise<unknown[]> => {
+): Promise<unknown>[] => {
   if (!Array.isArray(promiseOrPromises)) {
-    return promiseOrPromises
+    return [promiseOrPromises]
   }
-  return Promise.all(promiseOrPromises)
+  return promiseOrPromises
 }
 
 export const retryUntilAllResolved = async <T>(
@@ -15,12 +16,17 @@ export const retryUntilAllResolved = async <T>(
   type: string,
   waitBeforeRetry = 500
 ): Promise<T> => {
-  try {
-    const promiseOrPromises = getNewPromiseOrPromises()
-    const data = await promiseOrPromiseAll(promiseOrPromises)
-    return data as unknown as T
-  } catch (e) {
-    Logger.error(`${type} failed with ${e} retrying...`)
+  const promiseOrPromises = getNewPromiseOrPromises()
+  const input = getPromises(promiseOrPromises)
+  const allSettled = await Promise.allSettled(input)
+  const rejections = joinTruthyItems(
+    allSettled
+      .filter(settled => settled.status === 'rejected')
+      .map(settled => (settled as PromiseRejectedResult).reason),
+    ' & '
+  )
+  if (rejections) {
+    Logger.error(`${type} failed with ${rejections} retrying...`)
     await delay(waitBeforeRetry)
     return retryUntilAllResolved(
       getNewPromiseOrPromises,
@@ -28,4 +34,14 @@ export const retryUntilAllResolved = async <T>(
       waitBeforeRetry * 2
     )
   }
+
+  const allFulfilled = (allSettled as PromiseFulfilledResult<T>[]).map(
+    settled => settled.value
+  )
+
+  if (allFulfilled.length === 1) {
+    return allFulfilled[0]
+  }
+
+  return allFulfilled as unknown as T
 }
