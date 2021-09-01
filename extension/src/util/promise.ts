@@ -2,13 +2,33 @@ import { delay } from './time'
 import { joinTruthyItems } from './array'
 import { Logger } from '../common/logger'
 
-const getPromises = (
+const ensurePromiseArray = <T>(
   promiseOrPromises: Promise<unknown> | Promise<unknown>[]
-): Promise<unknown>[] => {
+): Promise<T>[] => {
   if (!Array.isArray(promiseOrPromises)) {
-    return [promiseOrPromises]
+    return [promiseOrPromises] as Promise<T>[]
   }
-  return promiseOrPromises
+  return promiseOrPromises as Promise<T>[]
+}
+
+const getRejections = <T>(allSettled: PromiseSettledResult<T>[]) =>
+  joinTruthyItems(
+    allSettled
+      .filter(settled => settled.status === 'rejected')
+      .map(settled => (settled as PromiseRejectedResult).reason),
+    ' & '
+  )
+
+const processAllFulfilled = <T>(allSettled: PromiseSettledResult<T>[]) => {
+  const allFulfilled = (allSettled as PromiseFulfilledResult<T>[]).map(
+    settled => settled.value
+  )
+
+  if (allFulfilled.length === 1) {
+    return allFulfilled[0]
+  }
+
+  return allFulfilled as unknown as T
 }
 
 export const retryUntilAllResolved = async <T>(
@@ -17,14 +37,9 @@ export const retryUntilAllResolved = async <T>(
   waitBeforeRetry = 500
 ): Promise<T> => {
   const promiseOrPromises = getNewPromiseOrPromises()
-  const input = getPromises(promiseOrPromises)
-  const allSettled = await Promise.allSettled(input)
-  const rejections = joinTruthyItems(
-    allSettled
-      .filter(settled => settled.status === 'rejected')
-      .map(settled => (settled as PromiseRejectedResult).reason),
-    ' & '
-  )
+  const promiseArray = ensurePromiseArray<T>(promiseOrPromises)
+  const allSettled = await Promise.allSettled<Promise<T>>(promiseArray)
+  const rejections = getRejections<T>(allSettled)
   if (rejections) {
     Logger.error(`${type} failed with ${rejections} retrying...`)
     await delay(waitBeforeRetry)
@@ -35,13 +50,5 @@ export const retryUntilAllResolved = async <T>(
     )
   }
 
-  const allFulfilled = (allSettled as PromiseFulfilledResult<T>[]).map(
-    settled => settled.value
-  )
-
-  if (allFulfilled.length === 1) {
-    return allFulfilled[0]
-  }
-
-  return allFulfilled as unknown as T
+  return processAllFulfilled<T>(allSettled)
 }
