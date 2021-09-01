@@ -1,12 +1,6 @@
 import { join } from 'path'
-import { commands, Event, EventEmitter, ExtensionContext, window } from 'vscode'
+import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import {
-  enableHotReload,
-  hotRequireExportedFn,
-  registerUpdateReconciler,
-  getReloadCount
-} from '@hediet/node-reload'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
@@ -51,12 +45,6 @@ import { StopWatch } from './util/time'
 
 export { Disposable, Disposer }
 
-if (process.env.HOT_RELOAD) {
-  enableHotReload({ entryModule: module, loggingEnabled: true })
-}
-
-registerUpdateReconciler(module)
-
 type Repositories = Record<string, Repository>
 type DecorationProviders = Record<string, DecorationProvider>
 
@@ -86,12 +74,6 @@ export class Extension implements IExtension {
     this.workspaceChanged.event
 
   constructor(context: ExtensionContext) {
-    if (getReloadCount(module) > 0) {
-      const i = this.dispose.track(window.createStatusBarItem())
-      i.text = `reload${getReloadCount(module)}`
-      i.show()
-    }
-
     this.dispose.track(getTelemetryReporter())
 
     this.setCommandsAvailability(false)
@@ -175,6 +157,7 @@ export class Extension implements IExtension {
     this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments)
+
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
         const stopWatch = new StopWatch()
@@ -356,14 +339,14 @@ export class Extension implements IExtension {
   }
 }
 
+let extension: undefined | Extension
 export function activate(context: ExtensionContext): void {
-  context.subscriptions.push(
-    hotRequireExportedFn(
-      module,
-      Extension,
-      HotExtension => new HotExtension(context)
-    )
-  )
+  extension = new Extension(context)
+  context.subscriptions.push(extension)
 }
 
-// export function deactivate(): void {}
+export function deactivate(): void {
+  if (extension) {
+    extension.dispose()
+  }
+}
