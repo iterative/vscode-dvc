@@ -1,19 +1,23 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { CliResult } from '.'
 import { CliReader } from './reader'
-import { executeProcess } from '../processExecution'
+import { createProcess, Process } from '../processExecution'
 import { getProcessEnv } from '../env'
 import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
 import { Config } from '../config'
 
 jest.mock('vscode')
+jest.mock('@hediet/std/disposable')
 jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
 
-const mockedExecuteProcess = mocked(executeProcess)
+const mockedDisposable = mocked(Disposable)
+
+const mockedCreateProcess = mocked(createProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   DVC_NO_ANALYTICS: 'true',
@@ -27,6 +31,15 @@ beforeEach(() => {
 })
 
 describe('CliReader', () => {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
+      return disposable
+    },
+    untrack: function <T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown as (() => void) & Disposer)
+
   const cliReader = new CliReader(
     {
       getCliPath: () => undefined,
@@ -48,11 +61,13 @@ describe('CliReader', () => {
     it('should call the cli with the correct parameters to list all current experiments', async () => {
       const cwd = __dirname
       const experimentNames = ['exp-0180a', 'exp-c5444', 'exp-054c1']
-      mockedExecuteProcess.mockResolvedValueOnce(experimentNames.join('\n'))
+      mockedCreateProcess.mockResolvedValueOnce({
+        stdout: experimentNames.join('\n')
+      } as unknown as Process)
 
       const experimentList = await cliReader.experimentListCurrent(cwd)
       expect(experimentList).toEqual(experimentNames)
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'list', '--names-only'],
         cwd,
         env: mockedEnv,
@@ -64,13 +79,13 @@ describe('CliReader', () => {
   describe('experimentShow', () => {
     it('should match the expected output', async () => {
       const cwd = __dirname
-      mockedExecuteProcess.mockResolvedValueOnce(
-        JSON.stringify(complexExperimentsOutput)
-      )
+      mockedCreateProcess.mockResolvedValueOnce({
+        stdout: JSON.stringify(complexExperimentsOutput)
+      } as unknown as Process)
 
       const experiments = await cliReader.experimentShow(cwd)
       expect(experiments).toEqual(complexExperimentsOutput)
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,
         env: mockedEnv,
@@ -96,12 +111,14 @@ describe('CliReader', () => {
         renamed: []
       }
       const cwd = __dirname
-      mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+      mockedCreateProcess.mockResolvedValueOnce({
+        stdout: JSON.stringify(cliOutput)
+      } as unknown as Process)
       const statusOutput = await cliReader.diff(cwd)
 
       expect(statusOutput).toEqual(cliOutput)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['diff', SHOW_JSON],
         cwd,
         env: mockedEnv,
@@ -156,11 +173,13 @@ describe('CliReader', () => {
 			experiments (exp)
 							Commands to run and compare experiments.
 			check-ignore     Check whether files or directories are excluded due to \`.dvcignore\`.`
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockResolvedValueOnce({
+        stdout
+      } as unknown as Process)
       const output = await cliReader.help(cwd)
 
       expect(output).toEqual(stdout)
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['-h'],
         cwd,
         env: mockedEnv,
@@ -177,12 +196,14 @@ describe('CliReader', () => {
         { isdir: false, isexec: false, isout: false, path: 'acc.tsv' },
         { isdir: false, isexec: false, isout: false, path: 'loss.tsv' }
       ]
-      mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
+      mockedCreateProcess.mockResolvedValueOnce({
+        stdout: JSON.stringify(listOutput)
+      } as unknown as Process)
       const tracked = await cliReader.listDvcOnly(cwd, path)
 
       expect(tracked).toEqual(listOutput)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['list', '.', path, '--dvc-only', '--show-json'],
         cwd,
         env: mockedEnv,
@@ -246,12 +267,14 @@ describe('CliReader', () => {
           { isdir: false, isexec: false, isout: false, path: 'logs/loss.tsv' },
           { isdir: false, isexec: false, isout: true, path: 'model.pt' }
         ]
-        mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(listOutput))
+        mockedCreateProcess.mockResolvedValueOnce({
+          stdout: JSON.stringify(listOutput)
+        } as unknown as Process)
         const tracked = await cliReader.listDvcOnlyRecursive(cwd)
 
         expect(tracked).toEqual(listOutput)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
+        expect(mockedCreateProcess).toBeCalledWith({
           args: ['list', '.', '--dvc-only', '-R', SHOW_JSON],
           cwd,
           env: mockedEnv,
@@ -263,10 +286,12 @@ describe('CliReader', () => {
         it('should return the root relative to the cwd', async () => {
           const stdout = join('..', '..')
           const cwd = __dirname
-          mockedExecuteProcess.mockResolvedValueOnce(stdout)
+          mockedCreateProcess.mockResolvedValueOnce({
+            stdout
+          } as unknown as Process)
           const relativeRoot = await cliReader.root(cwd)
           expect(relativeRoot).toEqual(stdout)
-          expect(mockedExecuteProcess).toBeCalledWith({
+          expect(mockedCreateProcess).toBeCalledWith({
             args: ['root'],
             cwd,
             env: mockedEnv,
@@ -276,13 +301,13 @@ describe('CliReader', () => {
 
         it('should return undefined when run outside of a project', async () => {
           const cwd = __dirname
-          mockedExecuteProcess.mockRejectedValueOnce({
+          mockedCreateProcess.mockRejectedValueOnce({
             stderr:
               "ERROR: you are not inside of a DVC repository (checked up to mount point '/' )"
           })
           const relativeRoot = await cliReader.root(cwd)
           expect(relativeRoot).toBeUndefined()
-          expect(mockedExecuteProcess).toBeCalledWith({
+          expect(mockedCreateProcess).toBeCalledWith({
             args: ['root'],
             cwd,
             env: mockedEnv,
@@ -305,12 +330,14 @@ describe('CliReader', () => {
           ]
         }
         const cwd = __dirname
-        mockedExecuteProcess.mockResolvedValueOnce(JSON.stringify(cliOutput))
+        mockedCreateProcess.mockResolvedValueOnce({
+          stdout: JSON.stringify(cliOutput)
+        } as unknown as Process)
         const diffOutput = await cliReader.status(cwd)
 
         expect(diffOutput).toEqual(cliOutput)
 
-        expect(mockedExecuteProcess).toBeCalledWith({
+        expect(mockedCreateProcess).toBeCalledWith({
           args: ['status', SHOW_JSON],
           cwd,
           env: mockedEnv,
