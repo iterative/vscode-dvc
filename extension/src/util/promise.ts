@@ -19,7 +19,7 @@ const getRejections = <T>(allSettled: PromiseSettledResult<T>[]) =>
     ' & '
   )
 
-const processAllFulfilled = <T>(allSettled: PromiseSettledResult<T>[]) => {
+const processAllFulfilled = <T>(allSettled: PromiseSettledResult<T>[]): T => {
   const allFulfilled = (allSettled as PromiseFulfilledResult<T>[]).map(
     settled => settled.value
   )
@@ -39,6 +39,7 @@ export const retryUntilAllResolved = async <T>(
   const promiseOrPromises = getNewPromiseOrPromises()
   const promiseArray = ensurePromiseArray<T>(promiseOrPromises)
   const allSettled = await Promise.allSettled<Promise<T>>(promiseArray)
+
   const rejections = getRejections<T>(allSettled)
   if (rejections) {
     Logger.error(`${type} failed with ${rejections} retrying...`)

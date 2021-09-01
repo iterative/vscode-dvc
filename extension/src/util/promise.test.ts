@@ -1,6 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { delay } from './time'
 import { retryUntilAllResolved } from './promise'
+import { Logger } from '../common/logger'
 
 const mockedDelay = mocked(delay)
 
@@ -167,5 +168,34 @@ describe('retryUntilAllResolved', () => {
     expect(isFastPromise).toBeCalledTimes(2)
 
     jest.useRealTimers()
+  })
+
+  it('should join and log multiple rejection messages', async () => {
+    const loggerSpy = jest.spyOn(Logger, 'error')
+
+    const rejectsFirstPromise = jest
+      .fn()
+      .mockRejectedValueOnce('I did not work')
+      .mockResolvedValueOnce('I just needed a kick')
+
+    const rejectsSecondPromise = jest
+      .fn()
+      .mockRejectedValueOnce('I also did not work')
+      .mockResolvedValueOnce('me too')
+
+    mockedDelay.mockResolvedValue()
+
+    const promiseRefresher = jest
+      .fn()
+      .mockImplementation(() => [rejectsFirstPromise(), rejectsSecondPromise()])
+
+    await retryUntilAllResolved<[string, string]>(
+      promiseRefresher,
+      'Data update'
+    )
+
+    expect(loggerSpy).toBeCalledWith(
+      'Data update failed with I did not work & I also did not work retrying...'
+    )
   })
 })
