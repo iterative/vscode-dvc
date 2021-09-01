@@ -8,6 +8,10 @@ stages:
     - seed
     - lr
     - weight_decay
+    - otherparams.yaml:
+        - test
+    - nested/otherparams.yaml:
+        - test
     outs:
     - model.pt:
         checkpoint: true
