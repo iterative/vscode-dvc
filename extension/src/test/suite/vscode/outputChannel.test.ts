@@ -36,7 +36,7 @@ suite('Output Channel Test Suite', () => {
       } as unknown as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], version, 'The Success Channel'))
-      processCompleted.fire({ command: 'some command', cwd })
+      processCompleted.fire({ command: 'some command', cwd, pid: 3000 })
 
       expect(mockOutputChannel).to.be.called
       expect(mockAppend).to.be.calledWithMatch(/\[.*?\] > some command \n/)
@@ -57,6 +57,7 @@ suite('Output Channel Test Suite', () => {
       processCompleted.fire({
         command: 'some command',
         cwd,
+        pid: 12345,
         stderr:
           'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
       })

@@ -6,7 +6,12 @@ import { CliError, MaybeConsoleError } from './error'
 import { createProcess } from '../processExecution'
 import { Config } from '../config'
 
-export type CliResult = { stderr?: string; command: string; cwd: string }
+export type CliResult = {
+  stderr?: string
+  pid: number | undefined
+  command: string
+  cwd: string
+}
 
 export interface ICli {
   autoRegisteredCommands: string[]
@@ -71,22 +76,24 @@ export class Cli implements ICli {
       cwd,
       ...args
     )
+    let pid
     try {
       this.processStarted.fire()
       const process = this.dispose.track(createProcess(options))
+      pid = process.pid
 
       const { stdout } = await process
 
       this.dispose.untrack(process)
 
-      this.processCompleted.fire({ command, cwd })
+      this.processCompleted.fire({ command, cwd, pid })
       return stdout
     } catch (error) {
       const cliError = new CliError({
         baseError: error as MaybeConsoleError,
         options
       })
-      this.processCompleted.fire({ command, cwd, stderr: cliError.stderr })
+      this.processCompleted.fire({ command, cwd, pid, stderr: cliError.stderr })
       throw cliError
     }
   }

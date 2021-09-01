@@ -14,21 +14,25 @@ export class OutputChannel {
     cliInteractors.forEach(cli => {
       this.dispose.track(
         cli.onDidCompleteProcess(result => {
-          const { command, stderr } = result
+          const { command, stderr, pid } = result
           if (stderr) {
             return this.outputChannel.append(
-              `${this.getVersionAndISOString()} > ${command} failed. ${stderr}\n`
+              `${this.getPrefix(pid)} > ${command} failed. ${stderr}\n`
             )
           }
           return this.outputChannel.append(
-            `${this.getVersionAndISOString()} > ${command} \n`
+            `${this.getPrefix(pid)} > ${command} \n`
           )
         })
       )
     })
   }
 
+  private getPrefix(pid: number | undefined) {
+    return `[${this.getVersionAndISOString()}, pid: ${pid}]`
+  }
+
   private getVersionAndISOString() {
-    return `[version: ${this.version}, ${new Date().toISOString()}]`
+    return `version: ${this.version}, ${new Date().toISOString()}`
   }
 }

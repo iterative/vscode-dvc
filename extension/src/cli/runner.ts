@@ -159,6 +159,7 @@ export class CliRunner implements ICli {
       ...args
     )
     const process = createProcess(options)
+    const { pid } = process
 
     this.processStarted.fire()
 
@@ -174,7 +175,8 @@ export class CliRunner implements ICli {
     process.on('close', () =>
       this.processCompleted.fire({
         command,
-        cwd
+        cwd,
+        pid
       })
     )
 

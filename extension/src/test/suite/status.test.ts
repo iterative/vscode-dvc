@@ -68,11 +68,11 @@ suite('Status Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({ command: 'one is still running', cwd })
+      processCompleted.fire({ command: 'one is still running', cwd, pid: 2 })
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({ command: 'all stopped', cwd })
+      processCompleted.fire({ command: 'all stopped', cwd, pid: 1 })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
 
@@ -97,7 +97,8 @@ suite('Status Test Suite', () => {
 
       const mockCliResult = {
         command: 'there is nothing currently running',
-        cwd: __dirname
+        cwd: __dirname,
+        pid: 200
       }
 
       status.setAvailability(true)
