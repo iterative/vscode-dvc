@@ -161,7 +161,7 @@ export class CliRunner implements ICli {
       ...args
     )
     const stopWatch = new StopWatch()
-    const process = createProcess(options)
+    const process = this.dispose.track(createProcess(options))
     const baseEvent = { command, cwd, pid: process.pid }
 
     this.processStarted.fire(baseEvent)
@@ -176,6 +176,7 @@ export class CliRunner implements ICli {
     )
 
     process.on('close', exitCode => {
+      this.dispose.untrack(process)
       this.processCompleted.fire({
         ...baseEvent,
         duration: stopWatch.getElapsedTime(),
