@@ -1,7 +1,7 @@
 import { dirname } from 'path'
 import { Args } from './args'
 import { getProcessEnv } from '../env'
-import { joinEnvPath } from '../util/paths'
+import { joinEnvPath } from '../util/env'
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   const python = pythonBinPath ? dirname(pythonBinPath) : ''

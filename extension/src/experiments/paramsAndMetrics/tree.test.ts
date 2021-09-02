@@ -322,7 +322,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     )
 
     const relParamsPath = joinParamOrMetricPath('params', 'params.yml')
-    const paramsPath = joinParamOrMetricPath(mockedDvcRoot, relParamsPath)
+    const paramsPath = join(mockedDvcRoot, relParamsPath)
 
     const paramsAndMetricsItem = {
       collapsibleState: TreeItemCollapsibleState.Collapsed,
@@ -361,7 +361,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     )
 
     const relParamsPath = joinParamOrMetricPath('params', 'params.yml')
-    const paramsPath = joinParamOrMetricPath(mockedDvcRoot, relParamsPath)
+    const paramsPath = join(mockedDvcRoot, relParamsPath)
 
     const paramsAndMetricsItem = {
       collapsibleState: TreeItemCollapsibleState.None,

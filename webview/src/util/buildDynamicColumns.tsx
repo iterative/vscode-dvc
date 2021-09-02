@@ -3,6 +3,7 @@ import get from 'lodash/get'
 import { Column, Accessor } from 'react-table'
 import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
+import { splitParamOrMetricPath } from '../../../extension/src/util/paths'
 
 type Value = string | number
 
@@ -21,11 +22,6 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
 
 const getCellComponent = (): React.FC<{ value: Value }> => Cell
 
-const getPathArray = (path: string): string[] => {
-  const sep = path.includes('/') ? '/' : '\\'
-  return path.split(sep)
-}
-
 const buildAccessor: (valuePath: string[]) => Accessor<Experiment> =
   pathArray => originalRow =>
     get(originalRow, pathArray)
@@ -41,7 +37,7 @@ const buildDynamicColumns = (
       const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
 
-      const pathArray = getPathArray(path)
+      const pathArray = splitParamOrMetricPath(path)
 
       const column: Column<Experiment> & {
         columns?: Column<Experiment>[]

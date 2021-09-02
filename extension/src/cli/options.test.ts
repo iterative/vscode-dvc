@@ -3,7 +3,7 @@ import { mocked } from 'ts-jest/utils'
 import { getOptions } from './options'
 import { Command, Flag } from './args'
 import { getProcessEnv } from '../env'
-import { joinEnvPath } from '../util/paths'
+import { joinEnvPath } from '../util/env'
 
 jest.mock('../env')
 
