@@ -89,9 +89,11 @@ export class Cli implements ICli {
       baseEvent.pid = process.pid
       this.processStarted.fire(baseEvent)
 
-      const { stdout, exitCode } = await process
+      process.on('close', () => {
+        this.dispose.untrack(process)
+      })
 
-      this.dispose.untrack(process)
+      const { stdout, exitCode } = await process
 
       this.processCompleted.fire({
         ...baseEvent,

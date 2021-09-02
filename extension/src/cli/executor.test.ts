@@ -5,9 +5,10 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { CliResult, CliStarted } from '.'
 import { Flag, GcPreserveFlag } from './args'
 import { CliExecutor } from './executor'
+import { createProcess } from '../processExecution'
+import { getMockedProcess } from '../test/util'
 import { getProcessEnv } from '../env'
 import { Config } from '../config'
-import { createProcess, Process } from '../processExecution'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -70,9 +71,7 @@ describe('CliExecutor', () => {
         `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
         `\n\rgit add ${relPath} .gitignore`
 
-      mockedCreateProcess.mockResolvedValue({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.add(cwd, relPath)
       expect(output).toEqual(stdout)
@@ -90,9 +89,7 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(fsPath)
       expect(output).toEqual(stdout)
@@ -108,9 +105,7 @@ describe('CliExecutor', () => {
     it('should be able to call executeProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(fsPath, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -129,9 +124,7 @@ describe('CliExecutor', () => {
 
       const stdout = 'M       ./'
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(cwd, relPath)
       expect(output).toEqual(stdout)
@@ -150,9 +143,7 @@ describe('CliExecutor', () => {
 
       const stdout = 'M       ./'
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -170,9 +161,7 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd)
       expect(output).toEqual(stdout)
@@ -188,9 +177,7 @@ describe('CliExecutor', () => {
     it('should be able to call executeProcess with the correct parameters to force commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -212,9 +199,7 @@ describe('CliExecutor', () => {
         't10k-images-idx3-ubyte.gz'
       )
       const stdout = updatingLockFile
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd, relPath)
       expect(output).toEqual(stdout)
@@ -236,9 +221,7 @@ describe('CliExecutor', () => {
         't10k-images-idx3-ubyte.gz'
       )
       const stdout = updatingLockFile
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -256,9 +239,7 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
       const cwd = ''
       const stdout = 'Test output that will be passed along'
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentApply(cwd, 'exp-test')
       expect(output).toEqual(stdout)
@@ -279,9 +260,7 @@ describe('CliExecutor', () => {
         `Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n` +
         `To switch to the new branch run:\n\n` +
         `\t\tgit checkout some-branch`
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentBranch(
         cwd,
@@ -306,9 +285,7 @@ describe('CliExecutor', () => {
         `WARNING: This will remove all experiments except those derived from the workspace of the current repo. ` +
         `Run queued experiments will be preserved. Run queued experiments will be removed.\n` +
         `Removed 45 experiments. To remove unused cache files use 'dvc gc'. `
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentGarbageCollect(
         cwd,
@@ -330,9 +307,7 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
       const cwd = __dirname
       const stdout = ''
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentRemove(cwd, 'exp-dfd12')
       expect(output).toEqual(stdout)
@@ -350,9 +325,7 @@ describe('CliExecutor', () => {
     it('should call executeProcess with the correct parameters to queue an experiment for later execution', async () => {
       const cwd = __dirname
       const stdout = "Queued experiment 'bbf5c01' for future execution."
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentRunQueue(cwd)
       expect(output).toEqual(stdout)
@@ -387,9 +360,7 @@ describe('CliExecutor', () => {
 		- Get help and share ideas: <https://dvc.org/chat>
 		- Star us on GitHub: <https://github.com/iterative/dvc>`
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.init(fsPath)
       expect(output).toEqual(stdout)
@@ -408,9 +379,7 @@ describe('CliExecutor', () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd)
       expect(output).toEqual(stdout)
@@ -427,9 +396,7 @@ describe('CliExecutor', () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -447,9 +414,7 @@ describe('CliExecutor', () => {
       const relPath = join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
       const stdout = 'M       logs/\n1 file modified'
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd, relPath)
       expect(output).toEqual(stdout)
@@ -467,9 +432,7 @@ describe('CliExecutor', () => {
       const stdout = everythingUpToDate
       const relPath = join('logs', 'acc.tsv')
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -488,9 +451,7 @@ describe('CliExecutor', () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd)
       expect(output).toEqual(stdout)
@@ -506,9 +467,7 @@ describe('CliExecutor', () => {
     it('should be able to call executeProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -526,9 +485,7 @@ describe('CliExecutor', () => {
       const relPath = join('data', 'MNIST')
       const stdout = everythingUpToDate
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd, relPath)
       expect(output).toEqual(stdout)
@@ -546,9 +503,7 @@ describe('CliExecutor', () => {
       const stdout = everythingUpToDate
       const relPath = join('logs', 'loss.tsv')
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
@@ -569,9 +524,7 @@ describe('CliExecutor', () => {
 
       const stdout = ''
 
-      mockedCreateProcess.mockResolvedValueOnce({
-        stdout
-      } as unknown as Process)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.remove(cwd, relPath)
       expect(output).toEqual(stdout)

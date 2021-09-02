@@ -4,7 +4,8 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
 import { Command } from './args'
 import { getProcessEnv } from '../env'
-import { createProcess, Process } from '../processExecution'
+import { createProcess } from '../processExecution'
+import { getFailingMockedProcess, getMockedProcess } from '../test/util'
 import { Config } from '../config'
 
 jest.mock('vscode')
@@ -57,9 +58,7 @@ describe('executeProcess', () => {
     const cwd = __dirname
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
-    mockedCreateProcess.mockResolvedValueOnce({
-      stdout: 'done'
-    } as unknown as Process)
+    mockedCreateProcess.mockReturnValueOnce(getMockedProcess('done'))
     const cli = new Cli(
       {
         getCliPath: () => undefined,
@@ -95,7 +94,7 @@ describe('executeProcess', () => {
     const cwd = __dirname
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
-    mockedCreateProcess.mockRejectedValueOnce({ stderr: 'I DEED' })
+    mockedCreateProcess.mockReturnValueOnce(getFailingMockedProcess('I DEED'))
     const cli = new Cli(
       {
         getCliPath: () => '/some/path/to/dvc',
