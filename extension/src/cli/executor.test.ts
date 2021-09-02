@@ -60,7 +60,7 @@ describe('CliExecutor', () => {
   const updatingLockFile = "Updating lock file 'dvc.lock'"
 
   describe('add', () => {
-    it('should be able to call executeProcess with the correct parameters to add a file', async () => {
+    it('should call createProcess with the correct parameters to add a file', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw')
       const stdout =
@@ -86,7 +86,7 @@ describe('CliExecutor', () => {
   })
 
   describe('checkout', () => {
-    it('should call executeProcess with the correct parameters to checkout a repository', async () => {
+    it('should call createProcess with the correct parameters to checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -102,7 +102,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force checkout a repository', async () => {
+    it('should call createProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -118,7 +118,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to checkout a file', async () => {
+    it('should call createProcess with the correct parameters to checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
@@ -137,7 +137,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force checkout a file', async () => {
+    it('should call createProcess with the correct parameters to force checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
@@ -158,7 +158,7 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call executeProcess with the correct parameters to commit a repository', async () => {
+    it('should call createProcess with the correct parameters to commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -174,7 +174,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force commit a repository', async () => {
+    it('should call createProcess with the correct parameters to force commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -190,7 +190,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to commit a target', async () => {
+    it('should call createProcess with the correct parameters to commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -212,7 +212,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force commit a target', async () => {
+    it('should call createProcess with the correct parameters to force commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -236,7 +236,7 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentApply', () => {
-    it('should call executeProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
+    it('should call createProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
       const cwd = ''
       const stdout = 'Test output that will be passed along'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -254,7 +254,7 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentBranch', () => {
-    it('should call executeProcess with the correct parameters to create a new branch from an existing experiment', async () => {
+    it('should call createProcess with the correct parameters to create a new branch from an existing experiment', async () => {
       const cwd = __dirname
       const stdout =
         `Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n` +
@@ -279,7 +279,7 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentGarbageCollect', () => {
-    it('should call executeProcess with the correct parameters to garbage collect experiments', async () => {
+    it('should call createProcess with the correct parameters to garbage collect experiments', async () => {
       const cwd = __dirname
       const stdout =
         `WARNING: This will remove all experiments except those derived from the workspace of the current repo. ` +
@@ -304,7 +304,7 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentRemove', () => {
-    it('should call executeProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
+    it('should call createProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
       const cwd = __dirname
       const stdout = ''
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -322,7 +322,7 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentRunQueue', () => {
-    it('should call executeProcess with the correct parameters to queue an experiment for later execution', async () => {
+    it('should call createProcess with the correct parameters to queue an experiment for later execution', async () => {
       const cwd = __dirname
       const stdout = "Queued experiment 'bbf5c01' for future execution."
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -340,7 +340,7 @@ describe('CliExecutor', () => {
   })
 
   describe('init', () => {
-    it('should call executeProcess with the correct parameters to initialize a project', async () => {
+    it('should call createProcess with the correct parameters to initialize a project', async () => {
       const fsPath = __dirname
       const stdout = `
 		Initialized DVC repository.
@@ -375,7 +375,7 @@ describe('CliExecutor', () => {
   })
 
   describe('pull', () => {
-    it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
+    it('should call createProcess with the correct parameters to pull the entire repository', async () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
@@ -392,7 +392,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force pull the entire repository', async () => {
+    it('should call createProcess with the correct parameters to force pull the entire repository', async () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
@@ -409,7 +409,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to pull the target', async () => {
+    it('should call createProcess with the correct parameters to pull the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
       const stdout = 'M       logs/\n1 file modified'
@@ -427,7 +427,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force pull a target', async () => {
+    it('should call createProcess with the correct parameters to force pull a target', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       const relPath = join('logs', 'acc.tsv')
@@ -447,7 +447,7 @@ describe('CliExecutor', () => {
   })
 
   describe('push', () => {
-    it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+    it('should call createProcess with the correct parameters to push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
 
@@ -464,7 +464,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force push the entire repository', async () => {
+    it('should call createProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -480,7 +480,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to push the target', async () => {
+    it('should call createProcess with the correct parameters to push the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST')
       const stdout = everythingUpToDate
@@ -498,7 +498,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force push a target', async () => {
+    it('should call createProcess with the correct parameters to force push a target', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       const relPath = join('logs', 'loss.tsv')
@@ -518,7 +518,7 @@ describe('CliExecutor', () => {
   })
 
   describe('remove', () => {
-    it('should be able to call executeProcess with the correct parameters to remove a .dvc file', async () => {
+    it('should call createProcess with the correct parameters to remove a .dvc file', async () => {
       const cwd = __dirname
       const relPath = 'data.dvc'
 
