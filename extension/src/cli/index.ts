@@ -1,7 +1,7 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
-import { getOptions } from './options'
+import { ExecutionOptions, getOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
 import { createProcess } from '../processExecution'
 import { Config } from '../config'
@@ -102,17 +102,12 @@ export class Cli implements ICli {
       })
       return stdout
     } catch (error) {
-      const cliError = new CliError({
-        baseError: error as MaybeConsoleError,
-        options
-      })
-      this.processCompleted.fire({
-        ...baseEvent,
-        duration: stopWatch.getElapsedTime(),
-        exitCode: cliError.exitCode,
-        stderr: cliError.stderr
-      })
-      throw cliError
+      throw this.processCliError(
+        error as MaybeConsoleError,
+        options,
+        baseEvent,
+        stopWatch.getElapsedTime()
+      )
     }
   }
 
@@ -123,5 +118,24 @@ export class Cli implements ICli {
       cwd,
       ...args
     )
+  }
+
+  private processCliError(
+    error: MaybeConsoleError,
+    options: ExecutionOptions,
+    baseEvent: CliEvent,
+    duration: number
+  ) {
+    const cliError = new CliError({
+      baseError: error as MaybeConsoleError,
+      options
+    })
+    this.processCompleted.fire({
+      ...baseEvent,
+      duration,
+      exitCode: cliError.exitCode,
+      stderr: cliError.stderr
+    })
+    return cliError
   }
 }
