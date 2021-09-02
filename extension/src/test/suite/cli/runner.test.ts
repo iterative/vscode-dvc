@@ -5,7 +5,7 @@ import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../config'
 import { CliRunner } from '../../../cli/runner'
-import { CliResult } from '../../../cli'
+import { CliResult, CliStarted } from '../../../cli'
 
 suite('CLI Runner Test Suite', () => {
   window.showInformationMessage('Start all cli runner tests.')
@@ -73,7 +73,7 @@ suite('CLI Runner Test Suite', () => {
 
       const processCompleted = disposable.track(new EventEmitter<CliResult>())
       const processOutput = disposable.track(new EventEmitter<string>())
-      const processStarted = disposable.track(new EventEmitter<void>())
+      const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
       const onDidOutputProcess = (
         text: string,
@@ -92,7 +92,7 @@ suite('CLI Runner Test Suite', () => {
         })
       }
       const onDidStartOrCompleteProcess = (
-        event: Event<CliResult | void>
+        event: Event<CliResult | CliStarted>
       ): Promise<void> => {
         return new Promise(resolve => {
           const listener: Disposable = event(() => {

@@ -1,7 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { Cli, CliResult, typeCheckCommands } from '.'
+import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
 import { Command } from './args'
 import { getProcessEnv } from '../env'
 import { createProcess, Process } from '../processExecution'
@@ -73,7 +73,7 @@ describe('executeProcess', () => {
         processStarted: {
           event: jest.fn(),
           fire: jest.fn()
-        } as unknown as EventEmitter<void>
+        } as unknown as EventEmitter<CliStarted>
       }
     )
 
@@ -109,7 +109,7 @@ describe('executeProcess', () => {
         processStarted: {
           event: jest.fn(),
           fire: jest.fn()
-        } as unknown as EventEmitter<void>
+        } as unknown as EventEmitter<CliStarted>
       }
     )
 

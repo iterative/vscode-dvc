@@ -2,6 +2,12 @@ import { Disposable } from '@hediet/std/disposable'
 import { OutputChannel as VSOutputChannel, window } from 'vscode'
 import { ICli } from '../cli'
 
+enum ProcessStatus {
+  INITIALIZED = 'INITIALIZED',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED'
+}
+
 export class OutputChannel {
   public dispose = Disposable.fn()
   private readonly outputChannel: VSOutputChannel
@@ -12,24 +18,49 @@ export class OutputChannel {
     this.version = version
 
     cliInteractors.forEach(cli => {
-      this.dispose.track(
-        cli.onDidCompleteProcess(result => {
-          const { command, stderr, pid } = result
-          if (stderr) {
-            return this.outputChannel.append(
-              `${this.getPrefix(pid)} > ${command} failed. ${stderr}\n`
-            )
-          }
-          return this.outputChannel.append(
-            `${this.getPrefix(pid)} > ${command} \n`
-          )
-        })
-      )
+      this.onDidStartProcess(cli)
+
+      this.onDidCompleteProcess(cli)
     })
   }
 
-  private getPrefix(pid: number | undefined) {
-    return `[${this.getVersionAndISOString()}, pid: ${pid}]`
+  private onDidStartProcess(cli: ICli) {
+    this.dispose.track(
+      cli.onDidStartProcess(({ command, pid }) => {
+        this.outputChannel.append(
+          `[${this.getVersionAndISOString()}, pid: ${pid}] > ${command} - ${
+            ProcessStatus.INITIALIZED
+          }\n`
+        )
+      })
+    )
+  }
+
+  private onDidCompleteProcess(cli: ICli) {
+    this.dispose.track(
+      cli.onDidCompleteProcess(
+        ({ command, duration, exitCode, pid, stderr }) => {
+          const processStatus = stderr
+            ? ProcessStatus.FAILED
+            : ProcessStatus.COMPLETED
+
+          let prefix = `[${this.getVersionAndISOString()}, pid: ${pid}] > ${command} - ${processStatus}`
+
+          if (exitCode) {
+            prefix += ` with code ${exitCode}`
+          }
+
+          prefix += ` (${duration}ms)`
+
+          if (stderr) {
+            prefix += `\n${stderr}`
+          }
+          prefix += `\n`
+
+          return this.outputChannel.append(prefix)
+        }
+      )
+    )
   }
 
   private getVersionAndISOString() {

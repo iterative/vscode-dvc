@@ -5,12 +5,20 @@ import { getOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
 import { createProcess } from '../processExecution'
 import { Config } from '../config'
+import { StopWatch } from '../util/time'
 
 export type CliResult = {
   stderr?: string
   pid: number | undefined
+  duration: number
+  exitCode: number | null
   command: string
   cwd: string
+}
+
+export type CliStarted = {
+  pid: number | undefined
+  command: string
 }
 
 export interface ICli {
@@ -19,8 +27,8 @@ export interface ICli {
   processCompleted: EventEmitter<CliResult>
   onDidCompleteProcess: Event<CliResult>
 
-  processStarted: EventEmitter<void>
-  onDidStartProcess: Event<void>
+  processStarted: EventEmitter<CliStarted>
+  onDidStartProcess: Event<CliStarted>
 }
 
 export const typeCheckCommands = (
@@ -45,15 +53,15 @@ export class Cli implements ICli {
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
 
-  public readonly processStarted: EventEmitter<void>
-  public readonly onDidStartProcess: Event<void>
+  public readonly processStarted: EventEmitter<CliStarted>
+  public readonly onDidStartProcess: Event<CliStarted>
 
   protected config: Config
 
   constructor(
     config: Config,
     emitters?: {
-      processStarted: EventEmitter<void>
+      processStarted: EventEmitter<CliStarted>
       processCompleted: EventEmitter<CliResult>
     }
   ) {
@@ -65,7 +73,8 @@ export class Cli implements ICli {
     this.onDidCompleteProcess = this.processCompleted.event
 
     this.processStarted =
-      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+      emitters?.processStarted ||
+      this.dispose.track(new EventEmitter<CliStarted>())
     this.onDidStartProcess = this.processStarted.event
   }
 
@@ -77,23 +86,37 @@ export class Cli implements ICli {
       ...args
     )
     let pid
+    const stopWatch = new StopWatch()
     try {
-      this.processStarted.fire()
       const process = this.dispose.track(createProcess(options))
       pid = process.pid
+      this.processStarted.fire({ command, pid })
 
-      const { stdout } = await process
+      const { stdout, exitCode } = await process
 
       this.dispose.untrack(process)
 
-      this.processCompleted.fire({ command, cwd, pid })
+      this.processCompleted.fire({
+        command,
+        cwd,
+        duration: stopWatch.getElapsedTime(),
+        exitCode,
+        pid
+      })
       return stdout
     } catch (error) {
       const cliError = new CliError({
         baseError: error as MaybeConsoleError,
         options
       })
-      this.processCompleted.fire({ command, cwd, pid, stderr: cliError.stderr })
+      this.processCompleted.fire({
+        command,
+        cwd,
+        duration: stopWatch.getElapsedTime(),
+        exitCode: cliError.exitCode,
+        pid,
+        stderr: cliError.stderr
+      })
       throw cliError
     }
   }

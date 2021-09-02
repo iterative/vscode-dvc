@@ -4,7 +4,7 @@ import { EventEmitter, window, OutputChannel as VSOutputChannel } from 'vscode'
 import { restore, stub, fake } from 'sinon'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { Disposable } from '../../../extension'
-import { Cli, CliResult } from '../../../cli'
+import { Cli, CliResult, CliStarted } from '../../../cli'
 import { Config } from '../../../config'
 
 suite('Output Channel Test Suite', () => {
@@ -26,7 +26,7 @@ suite('Output Channel Test Suite', () => {
 
     it('should handle a process completing without error', () => {
       const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<void>()
+      const processStarted = new EventEmitter<CliStarted>()
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockAppend = fake()
@@ -36,15 +36,23 @@ suite('Output Channel Test Suite', () => {
       } as unknown as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], version, 'The Success Channel'))
-      processCompleted.fire({ command: 'some command', cwd, pid: 3000 })
+      processCompleted.fire({
+        command: 'some command',
+        cwd,
+        duration: 500,
+        exitCode: 0,
+        pid: 3000
+      })
 
       expect(mockOutputChannel).to.be.called
-      expect(mockAppend).to.be.calledWithMatch(/\[.*?\] > some command \n/)
+      expect(mockAppend).to.be.calledWithMatch(
+        /\[.*?\] > some command - COMPLETED \(500ms\)\n/
+      )
     })
 
     it('should handle a process throwing an error', () => {
       const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<void>()
+      const processStarted = new EventEmitter<CliStarted>()
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockAppend = fake()
@@ -57,6 +65,8 @@ suite('Output Channel Test Suite', () => {
       processCompleted.fire({
         command: 'some command',
         cwd,
+        duration: 20,
+        exitCode: -9,
         pid: 12345,
         stderr:
           'THIS IS AN IMPOSSIBLE ERROR. THIS ERROR CANNOT OCCUR. IF THIS ERROR OCCURS, SEE YOUR IBM REPRESENTATIVE.'
@@ -64,7 +74,7 @@ suite('Output Channel Test Suite', () => {
 
       expect(mockOutputChannel).to.be.called
       expect(mockAppend).to.be.calledWithMatch(
-        /\[.*?\] > some command failed..*?\n/
+        /\[.*?\] > some command - FAILED with code -9 \(20ms\).*?/
       )
     })
   })

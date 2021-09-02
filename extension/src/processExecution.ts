@@ -8,7 +8,7 @@ interface RunningProcess extends ChildProcess {
 }
 interface ProcessResult {
   command: string
-  exitCode: number
+  exitCode: number | null
   stdout: string
   stderr: string
   killed: boolean
@@ -40,7 +40,7 @@ export const createProcess = ({
 
   Object.assign(process, {
     dispose: () => {
-      process.kill('SIGINT', { forceKillAfterTimeout: false })
+      process.kill('SIGINT')
     }
   })
 

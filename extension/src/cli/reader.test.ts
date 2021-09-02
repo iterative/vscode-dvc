@@ -2,7 +2,7 @@ import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import { CliResult } from '.'
+import { CliResult, CliStarted } from '.'
 import { CliReader } from './reader'
 import { createProcess, Process } from '../processExecution'
 import { getProcessEnv } from '../env'
@@ -53,7 +53,7 @@ describe('CliReader', () => {
       processStarted: {
         event: jest.fn(),
         fire: jest.fn()
-      } as unknown as EventEmitter<void>
+      } as unknown as EventEmitter<CliStarted>
     }
   )
 
