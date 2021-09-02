@@ -1,12 +1,13 @@
 import { EventEmitter, Event, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { CliResult, ICli, typeCheckCommands } from '.'
+import { CliResult, CliStarted, ICli, typeCheckCommands } from '.'
 import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
 import { getOptions } from './options'
 import { Config } from '../config'
 import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
+import { StopWatch } from '../util/time'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
@@ -25,8 +26,8 @@ export class CliRunner implements ICli {
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
 
-  public readonly processStarted: EventEmitter<void>
-  public readonly onDidStartProcess: Event<void>
+  public readonly processStarted: EventEmitter<CliStarted>
+  public readonly onDidStartProcess: Event<CliStarted>
 
   private readonly processOutput: EventEmitter<string>
 
@@ -45,7 +46,7 @@ export class CliRunner implements ICli {
     emitters?: {
       processCompleted: EventEmitter<CliResult>
       processOutput: EventEmitter<string>
-      processStarted: EventEmitter<void>
+      processStarted: EventEmitter<CliStarted>
       processTerminated?: EventEmitter<void>
     }
   ) {
@@ -72,7 +73,8 @@ export class CliRunner implements ICli {
       emitters?.processOutput || this.dispose.track(new EventEmitter<string>())
 
     this.processStarted =
-      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+      emitters?.processStarted ||
+      this.dispose.track(new EventEmitter<CliStarted>())
     this.onDidStartProcess = this.processStarted.event
 
     this.processTerminated =
@@ -124,11 +126,11 @@ export class CliRunner implements ICli {
 
   public async stop() {
     try {
-      this.currentProcess?.kill('SIGINT')
+      this.currentProcess?.dispose()
       await this.currentProcess
       return false
     } catch (e) {
-      const stopped = this.currentProcess?.killed || !this.currentProcess
+      const stopped = !this.currentProcess || this.currentProcess.killed
       if (stopped) {
         this.pseudoTerminal.close()
       }
@@ -152,15 +154,12 @@ export class CliRunner implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const { command, ...options } = getOptions(
-      this.config.pythonBinPath,
-      this.getOverrideOrCliPath(),
-      cwd,
-      ...args
-    )
-    const process = createProcess(options)
+    const { command, ...options } = this.getOptions(cwd, args)
+    const stopWatch = new StopWatch()
+    const process = this.dispose.track(createProcess(options))
+    const baseEvent = { command, cwd, pid: process.pid }
 
-    this.processStarted.fire()
+    this.processStarted.fire(baseEvent)
 
     process.all?.on('data', chunk =>
       this.processOutput.fire(
@@ -171,14 +170,25 @@ export class CliRunner implements ICli {
       )
     )
 
-    process.on('close', () =>
+    process.on('close', exitCode => {
+      this.dispose.untrack(process)
       this.processCompleted.fire({
-        command,
-        cwd
+        ...baseEvent,
+        duration: stopWatch.getElapsedTime(),
+        exitCode
       })
-    )
+    })
 
     return process
+  }
+
+  private getOptions(cwd: string, args: Args) {
+    return getOptions(
+      this.config.pythonBinPath,
+      this.getOverrideOrCliPath(),
+      cwd,
+      ...args
+    )
   }
 
   private startProcess(cwd: string, args: Args) {

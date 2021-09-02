@@ -1,6 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { delay } from './time'
 import { retryUntilAllResolved } from './promise'
+import { Logger } from '../common/logger'
 
 const mockedDelay = mocked(delay)
 
@@ -114,5 +115,87 @@ describe('retryUntilAllResolved', () => {
     expect(mockedDelay).toBeCalledTimes(2)
     expect(mockedDelay).toBeCalledWith(500)
     expect(mockedDelay).toBeCalledWith(1000)
+  })
+
+  it('should not retry any promise until all have been resolved', async () => {
+    jest.useFakeTimers()
+
+    const takesAWhilePromise = jest
+      .fn()
+      .mockImplementationOnce(async () => {
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        throw new Error('dead')
+      })
+      .mockResolvedValueOnce('Worked fast this time')
+
+    const isFastPromise = jest
+      .fn()
+      .mockResolvedValueOnce('I worked')
+      .mockResolvedValueOnce('I worked again, FAST')
+
+    mockedDelay.mockResolvedValue()
+
+    const promiseRefresher = jest
+      .fn()
+      .mockImplementation(() => [takesAWhilePromise(), isFastPromise()])
+
+    const allFulfilled = retryUntilAllResolved<[string, string]>(
+      promiseRefresher,
+      'Data update'
+    )
+
+    expect(promiseRefresher).toBeCalledTimes(1)
+    expect(takesAWhilePromise).toBeCalledTimes(1)
+    expect(isFastPromise).toBeCalledTimes(1)
+    expect(mockedDelay).toBeCalledTimes(0)
+
+    jest.advanceTimersByTime(5000)
+
+    expect(promiseRefresher).toBeCalledTimes(1)
+    expect(takesAWhilePromise).toBeCalledTimes(1)
+    expect(isFastPromise).toBeCalledTimes(1)
+    expect(mockedDelay).toBeCalledTimes(0)
+
+    jest.advanceTimersByTime(100)
+
+    await allFulfilled
+
+    expect(mockedDelay).toBeCalledTimes(1)
+    expect(mockedDelay).toBeCalledWith(500)
+
+    expect(promiseRefresher).toBeCalledTimes(2)
+    expect(takesAWhilePromise).toBeCalledTimes(2)
+    expect(isFastPromise).toBeCalledTimes(2)
+
+    jest.useRealTimers()
+  })
+
+  it('should join and log multiple rejection messages', async () => {
+    const loggerSpy = jest.spyOn(Logger, 'error')
+
+    const rejectsFirstPromise = jest
+      .fn()
+      .mockRejectedValueOnce('I did not work')
+      .mockResolvedValueOnce('I just needed a kick')
+
+    const rejectsSecondPromise = jest
+      .fn()
+      .mockRejectedValueOnce('I also did not work')
+      .mockResolvedValueOnce('me too')
+
+    mockedDelay.mockResolvedValue()
+
+    const promiseRefresher = jest
+      .fn()
+      .mockImplementation(() => [rejectsFirstPromise(), rejectsSecondPromise()])
+
+    await retryUntilAllResolved<[string, string]>(
+      promiseRefresher,
+      'Data update'
+    )
+
+    expect(loggerSpy).toBeCalledWith(
+      'Data update failed with I did not work & I also did not work retrying...'
+    )
   })
 })
