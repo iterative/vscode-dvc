@@ -154,12 +154,7 @@ export class CliRunner implements ICli {
   }
 
   private createProcess({ cwd, args }: { cwd: string; args: Args }): Process {
-    const { command, ...options } = getOptions(
-      this.config.pythonBinPath,
-      this.getOverrideOrCliPath(),
-      cwd,
-      ...args
-    )
+    const { command, ...options } = this.getOptions(cwd, args)
     const stopWatch = new StopWatch()
     const process = this.dispose.track(createProcess(options))
     const baseEvent = { command, cwd, pid: process.pid }
@@ -185,6 +180,15 @@ export class CliRunner implements ICli {
     })
 
     return process
+  }
+
+  private getOptions(cwd: string, args: Args) {
+    return getOptions(
+      this.config.pythonBinPath,
+      this.getOverrideOrCliPath(),
+      cwd,
+      ...args
+    )
   }
 
   private startProcess(cwd: string, args: Args) {
