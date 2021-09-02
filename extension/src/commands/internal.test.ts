@@ -1,10 +1,6 @@
-import {
-  AvailableCommands,
-  CommandId,
-  InternalCommands
-} from './internalCommands'
-import { ICli } from './cli'
-import { Config } from './config'
+import { AvailableCommands, CommandId, InternalCommands } from './internal'
+import { ICli } from '../cli'
+import { Config } from '../config'
 
 const mockedConfig = {
   getDefaultProject: jest.fn()

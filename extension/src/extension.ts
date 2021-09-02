@@ -1,12 +1,6 @@
 import { join } from 'path'
-import { commands, Event, EventEmitter, ExtensionContext, window } from 'vscode'
+import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
-import {
-  enableHotReload,
-  hotRequireExportedFn,
-  registerUpdateReconciler,
-  getReloadCount
-} from '@hediet/node-reload'
 import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
@@ -33,7 +27,7 @@ import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
-import { InternalCommands } from './internalCommands'
+import { InternalCommands } from './commands/internal'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
@@ -42,15 +36,14 @@ import {
   getFirstWorkspaceFolder,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
-import { getTelemetryReporter } from './telemetry'
+import { getTelemetryReporter, sendTelemetryEvent } from './telemetry'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from './commands/external'
+import { StopWatch } from './util/time'
 
 export { Disposable, Disposer }
-
-if (process.env.HOT_RELOAD) {
-  enableHotReload({ entryModule: module, loggingEnabled: true })
-}
-
-registerUpdateReconciler(module)
 
 type Repositories = Record<string, Repository>
 type DecorationProviders = Record<string, DecorationProvider>
@@ -81,12 +74,6 @@ export class Extension implements IExtension {
     this.workspaceChanged.event
 
   constructor(context: ExtensionContext) {
-    if (getReloadCount(module) > 0) {
-      const i = this.dispose.track(window.createStatusBarItem())
-      i.text = `reload${getReloadCount(module)}`
-      i.show()
-    }
-
     this.dispose.track(getTelemetryReporter())
 
     this.setCommandsAvailability(false)
@@ -170,10 +157,21 @@ export class Extension implements IExtension {
     this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments)
+
     this.dispose.track(
-      commands.registerCommand('dvc.stopRunningExperiment', () =>
-        this.cliRunner.stop()
-      )
+      commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
+        const stopWatch = new StopWatch()
+        const wasRunning = this.cliRunner.isRunning()
+        const stopped = await this.cliRunner.stop()
+        sendTelemetryEvent(
+          RegisteredCommands.STOP_EXPERIMENT,
+          { stopped, wasRunning },
+          {
+            duration: stopWatch.getElapsedTime()
+          }
+        )
+        return stopped
+      })
     )
 
     registerRepositoryCommands(this.internalCommands)
@@ -183,7 +181,21 @@ export class Extension implements IExtension {
     reRegisterVsCodeCommands(this.dispose)
 
     this.dispose.track(
-      commands.registerCommand('dvc.setupWorkspace', () => setupWorkspace())
+      commands.registerCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        async () => {
+          const stopWatch = new StopWatch()
+          const completed = await setupWorkspace()
+          sendTelemetryEvent(
+            RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+            { completed },
+            {
+              duration: stopWatch.getElapsedTime()
+            }
+          )
+          return completed
+        }
+      )
     )
   }
 
@@ -243,14 +255,16 @@ export class Extension implements IExtension {
 
   private registerConfigCommands() {
     this.dispose.track(
-      commands.registerCommand('dvc.deselectDefaultProject', () =>
-        this.config.deselectDefaultProject()
+      registerInstrumentedCommand(
+        RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
+        () => this.config.deselectDefaultProject()
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.selectDefaultProject', () =>
-        this.config.selectDefaultProject()
+      registerInstrumentedCommand(
+        RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
+        () => this.config.selectDefaultProject()
       )
     )
   }
@@ -325,14 +339,14 @@ export class Extension implements IExtension {
   }
 }
 
+let extension: undefined | Extension
 export function activate(context: ExtensionContext): void {
-  context.subscriptions.push(
-    hotRequireExportedFn(
-      module,
-      Extension,
-      HotExtension => new HotExtension(context)
-    )
-  )
+  extension = new Extension(context)
+  context.subscriptions.push(extension)
 }
 
-// export function deactivate(): void {}
+export function deactivate(): void {
+  if (extension) {
+    extension.dispose()
+  }
+}

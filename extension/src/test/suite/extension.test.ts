@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy } from 'sinon'
+import { stub, restore, spy, useFakeTimers } from 'sinon'
 import { window, commands, workspace, Uri, FileSystemWatcher } from 'vscode'
 import {
   configurationChangeEvent,
@@ -13,6 +13,8 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
+import * as Telemetry from '../../telemetry'
+import { RegisteredCommands } from '../../commands/external'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -50,7 +52,9 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
       await venvQuickPickActive
 
       const selectNoVenv = selectQuickPickItem(3)
@@ -82,7 +86,9 @@ suite('Extension Test Suite', () => {
         1
       )
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
       await venvQuickPickActive
 
       const selectVenvAndUseExtension = selectQuickPickItem(1)
@@ -114,7 +120,9 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
 
       await venvQuickPickActive
 
@@ -275,6 +283,31 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
+    })
+  })
+
+  describe('dvc.stopRunningExperiment', () => {
+    it('should send a telemetry event containing properties relating to the event', async () => {
+      const clock = useFakeTimers()
+      const duration = 1234
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      const stop = commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
+      clock.tick(duration)
+      await stop
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        RegisteredCommands.STOP_EXPERIMENT,
+        {
+          stopped: false,
+          wasRunning: false
+        },
+        {
+          duration
+        }
+      )
+
+      clock.restore()
     })
   })
 })

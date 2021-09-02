@@ -1,34 +1,34 @@
-import { commands } from 'vscode'
 import {
   getResourceCommand,
   getRootCommand,
   getSimpleResourceCommand,
-  ResourceCommand,
-  RootCommand
+  Resource,
+  Root
 } from '.'
-import { AvailableCommands, InternalCommands } from '../../internalCommands'
-
-const registerCommand = (name: string, func: ResourceCommand | RootCommand) =>
-  commands.registerCommand(name, func)
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../commands/external'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.addTarget',
+    registerInstrumentedCommand<Resource>(
+      RegisteredCommands.ADD_TARGET,
       getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
     )
   )
 
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.checkoutTarget',
+    registerInstrumentedCommand<Resource>(
+      RegisteredCommands.CHECKOUT_TARGET,
       getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
     )
   )
 
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.commitTarget',
+    registerInstrumentedCommand<Resource>(
+      RegisteredCommands.COMMIT_TARGET,
       getResourceCommand(internalCommands, AvailableCommands.COMMIT)
     )
   )
@@ -36,29 +36,29 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
 
 const registerRootCommands = (internalCommands: InternalCommands) => {
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.checkout',
+    registerInstrumentedCommand<Root>(
+      RegisteredCommands.CHECKOUT,
       getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
     )
   )
 
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.commit',
+    registerInstrumentedCommand<Root>(
+      RegisteredCommands.COMMIT,
       getRootCommand(internalCommands, AvailableCommands.COMMIT)
     )
   )
 
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.pull',
+    registerInstrumentedCommand<Root>(
+      RegisteredCommands.PULL,
       getRootCommand(internalCommands, AvailableCommands.PULL)
     )
   )
 
   internalCommands.dispose.track(
-    registerCommand(
-      'dvc.push',
+    registerInstrumentedCommand<Root>(
+      RegisteredCommands.PUSH,
       getRootCommand(internalCommands, AvailableCommands.PUSH)
     )
   )

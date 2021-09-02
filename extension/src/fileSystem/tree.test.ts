@@ -5,7 +5,8 @@ import { mocked } from 'ts-jest/utils'
 import { exists } from '.'
 import { TrackedExplorerTree } from './tree'
 import { Config } from '../config'
-import { InternalCommands } from '../internalCommands'
+import { InternalCommands } from '../commands/internal'
+import { RegisteredCommands } from '../commands/external'
 
 const mockedWorkspaceChanged = mocked(new EventEmitter<void>())
 const mockedWorkspaceChangedFire = jest.fn()
@@ -177,7 +178,7 @@ describe('TrackedTreeView', () => {
         ...mockedItem,
         command: {
           arguments: [mockedUri],
-          command: 'dvc.views.trackedExplorerTree.openFile',
+          command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
           title: 'Open File'
         },
         contextValue: 'dvcTrackedHasRemote'

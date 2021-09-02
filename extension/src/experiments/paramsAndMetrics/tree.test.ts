@@ -14,6 +14,7 @@ import complexColumnData from '../webview/complex-column-example.json'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { Status } from '../paramsAndMetrics/model'
+import { RegisteredCommands } from '../../commands/external'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -334,7 +335,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       collapsibleState: 1,
       command: {
         arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
-        command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+        command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
         title: 'toggle'
       },
       description: '3/4',
@@ -373,7 +374,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       collapsibleState: 0,
       command: {
         arguments: [{ dvcRoot: mockedDvcRoot, path: relParamsPath }],
-        command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+        command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,

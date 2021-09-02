@@ -14,7 +14,7 @@ import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
-import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
@@ -109,7 +109,7 @@ export class ExperimentsRepository {
     return this.processManager.run('refresh')
   }
 
-  public getChildParamsOrMetrics(path: string) {
+  public getChildParamsOrMetrics(path?: string) {
     return this.paramsAndMetrics.getChildren(path)
   }
 

@@ -11,7 +11,7 @@ import complexColumnData from '../../../experiments/webview/complex-column-examp
 import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import { AvailableCommands, InternalCommands } from '../../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'

@@ -9,7 +9,7 @@ import {
   CommandId,
   AvailableCommands,
   InternalCommands
-} from '../internalCommands'
+} from '../commands/internal'
 import { getInput } from '../vscode/inputBox'
 import { buildMockMemento } from '../test/util'
 

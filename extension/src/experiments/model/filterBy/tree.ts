@@ -1,6 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
-  commands,
   Event,
   ThemeIcon,
   TreeDataProvider,
@@ -10,6 +9,10 @@ import {
 } from 'vscode'
 import { getFilterId } from '.'
 import { Experiments } from '../..'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../../commands/external'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
 import { createTreeView } from '../../../vscode/tree'
 
@@ -39,15 +42,15 @@ export class ExperimentsFilterByTree
     this.experiments = experiments
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsFilterByTree.removeFilter',
-        resource => this.removeFilter(resource as FilterItem)
+      registerInstrumentedCommand<FilterItem>(
+        RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
+        resource => this.removeFilter(resource)
       )
     )
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsFilterByTree.removeAllFilters',
+      registerInstrumentedCommand(
+        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL,
         resource => this.removeAllFilters(resource)
       )
     )

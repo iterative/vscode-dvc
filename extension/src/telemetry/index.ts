@@ -65,12 +65,19 @@ export const sendTelemetryEvent = <
   E extends keyof P
 >(
   eventName: E,
-  properties: P[E]
+  properties: P[E],
+  measurements: { [key: string]: number }
 ) => {
   if (isTestExecution() || isDebugSession()) {
     return
   }
   const reporter = getTelemetryReporter()
-  const sanitizedProperties = sanitizeProperties(eventName, properties)
-  reporter.sendTelemetryEvent(eventName as string, sanitizedProperties)
+  const sanitizedProperties = properties
+    ? sanitizeProperties(eventName, properties)
+    : undefined
+  reporter.sendTelemetryEvent(
+    eventName as string,
+    sanitizedProperties,
+    measurements
+  )
 }

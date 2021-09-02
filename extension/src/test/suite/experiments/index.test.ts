@@ -1,8 +1,8 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore } from 'sinon'
-import { window, commands, workspace, Uri } from 'vscode'
+import { stub, spy, restore, useFakeTimers } from 'sinon'
+import { window, commands, workspace, Uri, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
@@ -13,10 +13,12 @@ import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
-import { AvailableCommands, InternalCommands } from '../../../internalCommands'
+import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
+import { RegisteredCommands } from '../../../commands/external'
+import * as Telemetry from '../../../telemetry'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -268,10 +270,88 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      await commands.executeCommand('dvc.queueExperiment')
+      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
 
       expect(mockExperimentRunQueue).to.be.calledOnce
       expect(mockExperimentRunQueue).to.be.calledWith(dvcDemoPath)
+    })
+
+    it('should send a telemetry event containing a duration when an experiment is queued', async () => {
+      const clock = useFakeTimers()
+      const duration = 54321
+
+      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
+        clock.tick(duration)
+        return Promise.resolve('true')
+      })
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+        dvcDemoPath
+      )
+
+      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        RegisteredCommands.QUEUE_EXPERIMENT,
+        undefined,
+        { duration }
+      )
+
+      clock.restore()
+    })
+  })
+
+  describe('dvc.applyExperiment', () => {
+    it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
+      const mockExperiment = 'exp-to-apply'
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+        dvcDemoPath
+      )
+      stub(CliReader.prototype, 'experimentListCurrent').resolves([
+        mockExperiment
+      ])
+
+      stub(window, 'showQuickPick').resolves(
+        mockExperiment as unknown as QuickPickItem
+      )
+      const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY)
+
+      expect(mockExperimentApply).to.be.calledWith(dvcDemoPath, mockExperiment)
+    })
+  })
+
+  describe('dvc.removeExperiment', () => {
+    it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
+      const mockExperiment = 'exp-to-remove'
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+        dvcDemoPath
+      )
+      stub(CliReader.prototype, 'experimentListCurrent').resolves([
+        'exp-afc12',
+        mockExperiment,
+        'exp-bcde2',
+        'exp-ghi1k'
+      ])
+      stub(window, 'showQuickPick').resolves(
+        mockExperiment as unknown as QuickPickItem
+      )
+      const mockExperimentRemove = stub(
+        CliExecutor.prototype,
+        'experimentRemove'
+      )
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_REMOVE)
+
+      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
   })
 })

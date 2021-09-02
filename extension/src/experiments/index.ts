@@ -15,7 +15,7 @@ import {
   CommandId,
   AvailableCommands,
   InternalCommands
-} from '../internalCommands'
+} from '../commands/internal'
 
 type ExperimentsRepositories = Record<string, ExperimentsRepository>
 
