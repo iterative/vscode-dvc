@@ -7,19 +7,19 @@ import { createProcess } from '../processExecution'
 import { Config } from '../config'
 import { StopWatch } from '../util/time'
 
-export type CliResult = {
-  stderr?: string
-  pid: number | undefined
-  duration: number
-  exitCode: number | null
+type CliEvent = {
   command: string
   cwd: string
+  pid: number | undefined
 }
 
-export type CliStarted = {
-  pid: number | undefined
-  command: string
+export type CliResult = CliEvent & {
+  stderr?: string
+  duration: number
+  exitCode: number | null
 }
+
+export type CliStarted = CliEvent
 
 export interface ICli {
   autoRegisteredCommands: string[]
@@ -79,29 +79,24 @@ export class Cli implements ICli {
   }
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
-    const { command, ...options } = getOptions(
-      this.config.pythonBinPath,
-      this.config.getCliPath(),
-      cwd,
-      ...args
-    )
-    let pid
+    const { command, ...options } = this.getOptions(cwd, ...args)
+
+    const baseEvent: CliEvent = { command, cwd, pid: undefined }
     const stopWatch = new StopWatch()
     try {
       const process = this.dispose.track(createProcess(options))
-      pid = process.pid
-      this.processStarted.fire({ command, pid })
+
+      baseEvent.pid = process.pid
+      this.processStarted.fire(baseEvent)
 
       const { stdout, exitCode } = await process
 
       this.dispose.untrack(process)
 
       this.processCompleted.fire({
-        command,
-        cwd,
+        ...baseEvent,
         duration: stopWatch.getElapsedTime(),
-        exitCode,
-        pid
+        exitCode
       })
       return stdout
     } catch (error) {
@@ -110,14 +105,21 @@ export class Cli implements ICli {
         options
       })
       this.processCompleted.fire({
-        command,
-        cwd,
+        ...baseEvent,
         duration: stopWatch.getElapsedTime(),
         exitCode: cliError.exitCode,
-        pid,
         stderr: cliError.stderr
       })
       throw cliError
     }
+  }
+
+  private getOptions(cwd: string, ...args: Args) {
+    return getOptions(
+      this.config.pythonBinPath,
+      this.config.getCliPath(),
+      cwd,
+      ...args
+    )
   }
 }

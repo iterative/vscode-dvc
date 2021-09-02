@@ -39,6 +39,7 @@ suite('Output Channel Test Suite', () => {
 
       processStarted.fire({
         command: 'some command',
+        cwd,
         pid: 3000
       })
 

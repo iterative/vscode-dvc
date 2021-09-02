@@ -53,8 +53,16 @@ suite('Status Test Suite', () => {
 
       const status = disposable.track(new Status([cli]))
 
-      const firstFinishedCommand = { command: 'one is still running', pid: 2 }
-      const secondFinishedCommand = { command: 'all stopped', pid: 23452345 }
+      const firstFinishedCommand = {
+        command: 'one is still running',
+        cwd,
+        pid: 2
+      }
+      const secondFinishedCommand = {
+        command: 'all stopped',
+        cwd,
+        pid: 23452345
+      }
 
       expect(mockCreateStatusBarItem).to.be.calledOnce
       expect(mockStatusBarItem.text).to.equal(disabledText)
@@ -98,6 +106,8 @@ suite('Status Test Suite', () => {
       const processCompleted = new EventEmitter<CliResult>()
       const processStarted = new EventEmitter<CliStarted>()
 
+      const cwd = __dirname
+
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockStatusBarItem = {
         dispose: fake(),
@@ -110,7 +120,7 @@ suite('Status Test Suite', () => {
 
       const mockCliResult = {
         command: 'there is nothing currently running',
-        cwd: __dirname,
+        cwd,
         duration: 2000,
         exitCode: 0,
         pid: 200
@@ -129,6 +139,7 @@ suite('Status Test Suite', () => {
 
       processStarted.fire({
         command: 'something is running now',
+        cwd,
         pid: 32213423
       })
       expect(mockStatusBarItem.text).to.equal(loadingText)
