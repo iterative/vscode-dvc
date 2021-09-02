@@ -19,7 +19,6 @@ export class OutputChannel {
 
     cliInteractors.forEach(cli => {
       this.onDidStartProcess(cli)
-
       this.onDidCompleteProcess(cli)
     })
   }
@@ -28,9 +27,7 @@ export class OutputChannel {
     this.dispose.track(
       cli.onDidStartProcess(({ command, pid }) => {
         this.outputChannel.append(
-          `[${this.getVersionAndISOString()}, pid: ${pid}] > ${command} - ${
-            ProcessStatus.INITIALIZED
-          }\n`
+          `${this.getBaseOutput(pid, command, ProcessStatus.INITIALIZED)}\n`
         )
       })
     )
@@ -44,26 +41,49 @@ export class OutputChannel {
             ? ProcessStatus.FAILED
             : ProcessStatus.COMPLETED
 
-          let prefix = `[${this.getVersionAndISOString()}, pid: ${pid}] > ${command} - ${processStatus}`
+          const baseOutput = this.getBaseOutput(pid, command, processStatus)
+          const completionOutput = this.getCompletionOutput(
+            exitCode,
+            duration,
+            stderr
+          )
 
-          if (exitCode) {
-            prefix += ` with code ${exitCode}`
-          }
-
-          prefix += ` (${duration}ms)`
-
-          if (stderr) {
-            prefix += `\n${stderr}`
-          }
-          prefix += `\n`
-
-          return this.outputChannel.append(prefix)
+          return this.outputChannel.append(`${baseOutput}${completionOutput}\n`)
         }
       )
     )
   }
 
-  private getVersionAndISOString() {
-    return `version: ${this.version}, ${new Date().toISOString()}`
+  private getBaseOutput(
+    pid: number | undefined,
+    command: string,
+    processStatus: ProcessStatus
+  ) {
+    return `${this.getPrefix(pid)} > ${command} - ${processStatus}`
+  }
+
+  private getPrefix(pid = 0) {
+    return `[version: ${
+      this.version
+    }, ${new Date().toISOString()}, pid: ${pid}]`
+  }
+
+  private getCompletionOutput(
+    exitCode: number | null,
+    duration: number,
+    stderr?: string
+  ) {
+    let completionOutput = ''
+    if (exitCode) {
+      completionOutput += ` with code ${exitCode}`
+    }
+
+    completionOutput += ` (${duration}ms)`
+
+    if (stderr) {
+      completionOutput += `\n${stderr}`
+    }
+
+    return completionOutput
   }
 }

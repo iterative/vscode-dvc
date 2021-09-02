@@ -36,6 +36,12 @@ suite('Output Channel Test Suite', () => {
       } as unknown as VSOutputChannel)
 
       disposable.track(new OutputChannel([cli], version, 'The Success Channel'))
+
+      processStarted.fire({
+        command: 'some command',
+        pid: 3000
+      })
+
       processCompleted.fire({
         command: 'some command',
         cwd,
@@ -45,6 +51,9 @@ suite('Output Channel Test Suite', () => {
       })
 
       expect(mockOutputChannel).to.be.called
+      expect(mockAppend).to.be.calledWithMatch(
+        /\[.*?\] > some command - INITIALIZED\n/
+      )
       expect(mockAppend).to.be.calledWithMatch(
         /\[.*?\] > some command - COMPLETED \(500ms\)\n/
       )
