@@ -38,13 +38,11 @@ export const createProcess = ({
     windowsHide: true
   })
 
-  Object.assign(process, {
+  return Object.assign(process, {
     dispose: () => {
       process.kill('SIGINT')
     }
   })
-
-  return process as unknown as Process
 }
 
 export const executeProcess = async (
