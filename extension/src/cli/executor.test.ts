@@ -1,18 +1,23 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
-import { CliResult } from '.'
+import { Disposable, Disposer } from '@hediet/std/disposable'
+import { CliResult, CliStarted } from '.'
 import { Flag, GcPreserveFlag } from './args'
 import { CliExecutor } from './executor'
+import { createProcess } from '../processExecution'
+import { getMockedProcess } from '../test/util'
 import { getProcessEnv } from '../env'
 import { Config } from '../config'
-import { executeProcess } from '../processExecution'
 
 jest.mock('vscode')
+jest.mock('@hediet/std/disposable')
 jest.mock('../processExecution')
 jest.mock('../env')
 
-const mockedExecuteProcess = mocked(executeProcess)
+const mockedDisposable = mocked(Disposable)
+
+const mockedCreateProcess = mocked(createProcess)
 const mockedGetProcessEnv = mocked(getProcessEnv)
 const mockedEnv = {
   DVC_NO_ANALYTICS: 'true',
@@ -25,6 +30,15 @@ beforeEach(() => {
 })
 
 describe('CliExecutor', () => {
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
+      return disposable
+    },
+    untrack: function <T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown as (() => void) & Disposer)
+
   const cliExecutor = new CliExecutor(
     {
       getCliPath: () => undefined,
@@ -38,7 +52,7 @@ describe('CliExecutor', () => {
       processStarted: {
         event: jest.fn(),
         fire: jest.fn()
-      } as unknown as EventEmitter<void>
+      } as unknown as EventEmitter<CliStarted>
     }
   )
 
@@ -46,7 +60,7 @@ describe('CliExecutor', () => {
   const updatingLockFile = "Updating lock file 'dvc.lock'"
 
   describe('add', () => {
-    it('should be able to call executeProcess with the correct parameters to add a file', async () => {
+    it('should call createProcess with the correct parameters to add a file', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw')
       const stdout =
@@ -57,12 +71,12 @@ describe('CliExecutor', () => {
         `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
         `\n\rgit add ${relPath} .gitignore`
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.add(cwd, relPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['add', relPath],
         cwd,
         env: mockedEnv,
@@ -72,15 +86,15 @@ describe('CliExecutor', () => {
   })
 
   describe('checkout', () => {
-    it('should call executeProcess with the correct parameters to checkout a repository', async () => {
+    it('should call createProcess with the correct parameters to checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(fsPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['checkout'],
         cwd: fsPath,
         env: mockedEnv,
@@ -88,15 +102,15 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force checkout a repository', async () => {
+    it('should call createProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
       const stdout = `M       model.pt\nM       logs/\n`
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(fsPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['checkout', '-f'],
         cwd: fsPath,
         env: mockedEnv,
@@ -104,18 +118,18 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to checkout a file', async () => {
+    it('should call createProcess with the correct parameters to checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
       const stdout = 'M       ./'
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(cwd, relPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['checkout', relPath],
         cwd,
         env: mockedEnv,
@@ -123,18 +137,18 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force checkout a file', async () => {
+    it('should call createProcess with the correct parameters to force checkout a file', async () => {
       const cwd = __dirname
       const relPath = join('logs', 'acc.tsv')
 
       const stdout = 'M       ./'
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['checkout', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -144,15 +158,15 @@ describe('CliExecutor', () => {
   })
 
   describe('commit', () => {
-    it('should call executeProcess with the correct parameters to commit a repository', async () => {
+    it('should call createProcess with the correct parameters to commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['commit'],
         cwd,
         env: mockedEnv,
@@ -160,15 +174,15 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force commit a repository', async () => {
+    it('should call createProcess with the correct parameters to force commit a repository', async () => {
       const cwd = __dirname
       const stdout = updatingLockFile
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['commit', '-f'],
         cwd,
         env: mockedEnv,
@@ -176,7 +190,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to commit a target', async () => {
+    it('should call createProcess with the correct parameters to commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -185,12 +199,12 @@ describe('CliExecutor', () => {
         't10k-images-idx3-ubyte.gz'
       )
       const stdout = updatingLockFile
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd, relPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['commit', relPath],
         cwd,
         env: mockedEnv,
@@ -198,7 +212,7 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force commit a target', async () => {
+    it('should call createProcess with the correct parameters to force commit a target', async () => {
       const cwd = __dirname
       const relPath = join(
         'data',
@@ -207,12 +221,12 @@ describe('CliExecutor', () => {
         't10k-images-idx3-ubyte.gz'
       )
       const stdout = updatingLockFile
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.commit(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['commit', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -222,15 +236,15 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentApply', () => {
-    it('should call executeProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
+    it('should call createProcess with the correct parameters to apply an existing experiment to the workspace', async () => {
       const cwd = ''
       const stdout = 'Test output that will be passed along'
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentApply(cwd, 'exp-test')
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'apply', 'exp-test'],
         cwd,
         env: mockedEnv,
@@ -240,13 +254,13 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentBranch', () => {
-    it('should call executeProcess with the correct parameters to create a new branch from an existing experiment', async () => {
+    it('should call createProcess with the correct parameters to create a new branch from an existing experiment', async () => {
       const cwd = __dirname
       const stdout =
         `Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n` +
         `To switch to the new branch run:\n\n` +
         `\t\tgit checkout some-branch`
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentBranch(
         cwd,
@@ -255,7 +269,7 @@ describe('CliExecutor', () => {
       )
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'branch', 'exp-0898f', 'some-branch'],
         cwd,
         env: mockedEnv,
@@ -265,13 +279,13 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentGarbageCollect', () => {
-    it('should call executeProcess with the correct parameters to garbage collect experiments', async () => {
+    it('should call createProcess with the correct parameters to garbage collect experiments', async () => {
       const cwd = __dirname
       const stdout =
         `WARNING: This will remove all experiments except those derived from the workspace of the current repo. ` +
         `Run queued experiments will be preserved. Run queued experiments will be removed.\n` +
         `Removed 45 experiments. To remove unused cache files use 'dvc gc'. `
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentGarbageCollect(
         cwd,
@@ -280,7 +294,7 @@ describe('CliExecutor', () => {
       )
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'gc', '-f', '--workspace', '--queued'],
         cwd,
         env: mockedEnv,
@@ -290,15 +304,15 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentRemove', () => {
-    it('should call executeProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
+    it('should call createProcess with the correct parameters to remove an existing experiment from the workspace', async () => {
       const cwd = __dirname
       const stdout = ''
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentRemove(cwd, 'exp-dfd12')
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'remove', 'exp-dfd12'],
         cwd,
         env: mockedEnv,
@@ -308,15 +322,15 @@ describe('CliExecutor', () => {
   })
 
   describe('experimentRunQueue', () => {
-    it('should call executeProcess with the correct parameters to queue an experiment for later execution', async () => {
+    it('should call createProcess with the correct parameters to queue an experiment for later execution', async () => {
       const cwd = __dirname
       const stdout = "Queued experiment 'bbf5c01' for future execution."
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentRunQueue(cwd)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'run', '--queue'],
         cwd,
         env: mockedEnv,
@@ -326,7 +340,7 @@ describe('CliExecutor', () => {
   })
 
   describe('init', () => {
-    it('should call executeProcess with the correct parameters to initialize a project', async () => {
+    it('should call createProcess with the correct parameters to initialize a project', async () => {
       const fsPath = __dirname
       const stdout = `
 		Initialized DVC repository.
@@ -346,12 +360,12 @@ describe('CliExecutor', () => {
 		- Get help and share ideas: <https://dvc.org/chat>
 		- Star us on GitHub: <https://github.com/iterative/dvc>`
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.init(fsPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['init', '--subdir'],
         cwd: fsPath,
         env: mockedEnv,
@@ -361,16 +375,16 @@ describe('CliExecutor', () => {
   })
 
   describe('pull', () => {
-    it('should call executeProcess with the correct parameters to pull the entire repository', async () => {
+    it('should call createProcess with the correct parameters to pull the entire repository', async () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['pull'],
         cwd,
         env: mockedEnv,
@@ -378,16 +392,16 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force pull the entire repository', async () => {
+    it('should call createProcess with the correct parameters to force pull the entire repository', async () => {
       const cwd = __dirname
       const stdout = 'M       data/MNIST/raw/\n1 file modified'
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['pull', '-f'],
         cwd,
         env: mockedEnv,
@@ -395,17 +409,17 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to pull the target', async () => {
+    it('should call createProcess with the correct parameters to pull the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw', 'train-images-idx3-ubyte')
       const stdout = 'M       logs/\n1 file modified'
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd, relPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['pull', relPath],
         cwd,
         env: mockedEnv,
@@ -413,17 +427,17 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force pull a target', async () => {
+    it('should call createProcess with the correct parameters to force pull a target', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       const relPath = join('logs', 'acc.tsv')
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.pull(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['pull', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -433,16 +447,16 @@ describe('CliExecutor', () => {
   })
 
   describe('push', () => {
-    it('should call executeProcess with the correct parameters to push the entire repository', async () => {
+    it('should call createProcess with the correct parameters to push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['push'],
         cwd,
         env: mockedEnv,
@@ -450,15 +464,15 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force push the entire repository', async () => {
+    it('should call createProcess with the correct parameters to force push the entire repository', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['push', '-f'],
         cwd,
         env: mockedEnv,
@@ -466,17 +480,17 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to push the target', async () => {
+    it('should call createProcess with the correct parameters to push the target', async () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST')
       const stdout = everythingUpToDate
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd, relPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['push', relPath],
         cwd,
         env: mockedEnv,
@@ -484,17 +498,17 @@ describe('CliExecutor', () => {
       })
     })
 
-    it('should be able to call executeProcess with the correct parameters to force push a target', async () => {
+    it('should call createProcess with the correct parameters to force push a target', async () => {
       const cwd = __dirname
       const stdout = everythingUpToDate
       const relPath = join('logs', 'loss.tsv')
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.push(cwd, relPath, Flag.FORCE)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['push', relPath, '-f'],
         cwd,
         env: mockedEnv,
@@ -504,18 +518,18 @@ describe('CliExecutor', () => {
   })
 
   describe('remove', () => {
-    it('should be able to call executeProcess with the correct parameters to remove a .dvc file', async () => {
+    it('should call createProcess with the correct parameters to remove a .dvc file', async () => {
       const cwd = __dirname
       const relPath = 'data.dvc'
 
       const stdout = ''
 
-      mockedExecuteProcess.mockResolvedValueOnce(stdout)
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.remove(cwd, relPath)
       expect(output).toEqual(stdout)
 
-      expect(mockedExecuteProcess).toBeCalledWith({
+      expect(mockedCreateProcess).toBeCalledWith({
         args: ['remove', relPath],
         cwd,
         env: mockedEnv,

@@ -1,20 +1,33 @@
-import { EventEmitter } from 'vscode'
 import { mocked } from 'ts-jest/utils'
-import { Cli, CliResult, typeCheckCommands } from '.'
+import { EventEmitter } from 'vscode'
+import { Disposable, Disposer } from '@hediet/std/disposable'
+import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
 import { Command } from './args'
 import { getProcessEnv } from '../env'
-import { executeProcess } from '../processExecution'
+import { createProcess } from '../processExecution'
+import { getFailingMockedProcess, getMockedProcess } from '../test/util'
 import { Config } from '../config'
 
 jest.mock('vscode')
+jest.mock('@hediet/std/disposable')
 jest.mock('../env')
 jest.mock('../processExecution')
 
+const mockedDisposable = mocked(Disposable)
+
 const mockedGetEnv = mocked(getProcessEnv)
-const mockedExecuteProcess = mocked(executeProcess)
+const mockedCreateProcess = mocked(createProcess)
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedDisposable.fn.mockReturnValueOnce({
+    track: function <T>(disposable: T): T {
+      return disposable
+    },
+    untrack: function <T>(disposable: T): T {
+      return disposable
+    }
+  } as unknown as (() => void) & Disposer)
 })
 
 describe('typeCheckCommands', () => {
@@ -45,7 +58,7 @@ describe('executeProcess', () => {
     const cwd = __dirname
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
-    mockedExecuteProcess.mockResolvedValueOnce('done')
+    mockedCreateProcess.mockReturnValueOnce(getMockedProcess('done'))
     const cli = new Cli(
       {
         getCliPath: () => undefined,
@@ -59,13 +72,13 @@ describe('executeProcess', () => {
         processStarted: {
           event: jest.fn(),
           fire: jest.fn()
-        } as unknown as EventEmitter<void>
+        } as unknown as EventEmitter<CliStarted>
       }
     )
 
     await cli.executeProcess(cwd, ...args)
 
-    expect(mockedExecuteProcess).toBeCalledWith({
+    expect(mockedCreateProcess).toBeCalledWith({
       args,
       cwd,
       env: { ...processEnv, DVC_NO_ANALYTICS: 'true' },
@@ -81,7 +94,7 @@ describe('executeProcess', () => {
     const cwd = __dirname
     const args = [Command.CHECKOUT]
     mockedGetEnv.mockReturnValueOnce(processEnv)
-    mockedExecuteProcess.mockRejectedValueOnce({ stderr: 'I DEED' })
+    mockedCreateProcess.mockReturnValueOnce(getFailingMockedProcess('I DEED'))
     const cli = new Cli(
       {
         getCliPath: () => '/some/path/to/dvc',
@@ -95,13 +108,13 @@ describe('executeProcess', () => {
         processStarted: {
           event: jest.fn(),
           fire: jest.fn()
-        } as unknown as EventEmitter<void>
+        } as unknown as EventEmitter<CliStarted>
       }
     )
 
     await expect(cli.executeProcess(cwd, ...args)).rejects.toThrow()
 
-    expect(mockedExecuteProcess).toBeCalledWith({
+    expect(mockedCreateProcess).toBeCalledWith({
       args,
       cwd,
       env: {

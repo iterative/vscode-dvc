@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { Disposable } from '../../extension'
 import { Status } from '../../status'
-import { Cli, CliResult } from '../../cli'
+import { Cli, CliResult, CliStarted } from '../../cli'
 import { Config } from '../../config'
 
 suite('Status Test Suite', () => {
@@ -38,7 +38,7 @@ suite('Status Test Suite', () => {
     it('should show the correct status of the cli', () => {
       const cwd = __dirname
       const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<void>()
+      const processStarted = new EventEmitter<CliStarted>()
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockStatusBarItem = {
@@ -53,6 +53,17 @@ suite('Status Test Suite', () => {
 
       const status = disposable.track(new Status([cli]))
 
+      const firstFinishedCommand = {
+        command: 'one is still running',
+        cwd,
+        pid: 2
+      }
+      const secondFinishedCommand = {
+        command: 'all stopped',
+        cwd,
+        pid: 23452345
+      }
+
       expect(mockCreateStatusBarItem).to.be.calledOnce
       expect(mockStatusBarItem.text).to.equal(disabledText)
 
@@ -60,19 +71,29 @@ suite('Status Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
 
-      processStarted.fire()
+      processStarted.fire(firstFinishedCommand)
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processStarted.fire()
+      processStarted.fire(secondFinishedCommand)
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({ command: 'one is still running', cwd })
+      processCompleted.fire({
+        ...firstFinishedCommand,
+        cwd,
+        duration: 100,
+        exitCode: 0
+      })
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
 
-      processCompleted.fire({ command: 'all stopped', cwd })
+      processCompleted.fire({
+        ...secondFinishedCommand,
+        cwd,
+        duration: 150,
+        exitCode: 0
+      })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
 
@@ -83,7 +104,9 @@ suite('Status Test Suite', () => {
 
     it('should floor the number of workers at 0', () => {
       const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<void>()
+      const processStarted = new EventEmitter<CliStarted>()
+
+      const cwd = __dirname
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockStatusBarItem = {
@@ -97,7 +120,10 @@ suite('Status Test Suite', () => {
 
       const mockCliResult = {
         command: 'there is nothing currently running',
-        cwd: __dirname
+        cwd,
+        duration: 2000,
+        exitCode: 0,
+        pid: 200
       }
 
       status.setAvailability(true)
@@ -111,7 +137,11 @@ suite('Status Test Suite', () => {
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
 
-      processStarted.fire()
+      processStarted.fire({
+        command: 'something is running now',
+        cwd,
+        pid: 32213423
+      })
       expect(mockStatusBarItem.text).to.equal(loadingText)
     })
   })
