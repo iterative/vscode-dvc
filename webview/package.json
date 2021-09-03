@@ -14,7 +14,8 @@
   },
   "main": "./index.js",
   "peerDependencies": {
-    "dvc": ">=0.0.1"
+    "dvc": ">=0.0.1",
+    "typescript": "*"
   },
   "dependencies": {
     "@hediet/std": "^0.6.0",
