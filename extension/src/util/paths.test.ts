@@ -37,6 +37,20 @@ describe('splitParamOrMetricPath', () => {
     ).toEqual(['params', 'params.yaml', 'parent', 'subparent', 'child'])
   })
 
+  it('should properly split params with a path that has a posix nested file segment', () => {
+    expect(splitParamOrMetricPath('params:nested/params.yaml:parent')).toEqual([
+      'params',
+      'nested/params.yaml',
+      'parent'
+    ])
+  })
+
+  it('should properly split params with a path that has a windows nested file segment', () => {
+    expect(splitParamOrMetricPath('params:nested\\params.yaml:parent')).toEqual(
+      ['params', 'nested\\params.yaml', 'parent']
+    )
+  })
+
   it('should properly split params with a non-nested path', () => {
     expect(splitParamOrMetricPath('params:params.yaml:parent')).toEqual([
       'params',
