@@ -1,7 +1,7 @@
 import { joinParamOrMetricPath, splitParamOrMetricPath } from './paths'
 
 describe('joinParamOrMetricPath', () => {
-  it('should properly join params with a nested path', () => {
+  it('should properly join params with a nested param path', () => {
     expect(
       joinParamOrMetricPath(
         'params',
@@ -13,7 +13,7 @@ describe('joinParamOrMetricPath', () => {
     ).toEqual('params:params.yaml:parent.subparent.child')
   })
 
-  it('should properly join params with a non-nested path', () => {
+  it('should properly join params with a non-nested param path', () => {
     expect(joinParamOrMetricPath('params', 'params.yaml', 'parent')).toEqual(
       'params:params.yaml:parent'
     )
@@ -31,7 +31,7 @@ describe('joinParamOrMetricPath', () => {
 })
 
 describe('splitParamOrMetricPath', () => {
-  it('should properly split params with a nested path', () => {
+  it('should properly split params with a nested param path', () => {
     expect(
       splitParamOrMetricPath('params:params.yaml:parent.subparent.child')
     ).toEqual(['params', 'params.yaml', 'parent', 'subparent', 'child'])
@@ -51,7 +51,7 @@ describe('splitParamOrMetricPath', () => {
     )
   })
 
-  it('should properly split params with a non-nested path', () => {
+  it('should properly split params with a non-nested param path', () => {
     expect(splitParamOrMetricPath('params:params.yaml:parent')).toEqual([
       'params',
       'params.yaml',
@@ -59,7 +59,7 @@ describe('splitParamOrMetricPath', () => {
     ])
   })
 
-  it('should properly split a path to a file with no params', () => {
+  it('should properly split a path to a file with no param path', () => {
     expect(splitParamOrMetricPath('params:params.yaml')).toEqual([
       'params',
       'params.yaml'
@@ -70,7 +70,7 @@ describe('splitParamOrMetricPath', () => {
     expect(splitParamOrMetricPath('params')).toEqual(['params'])
   })
 
-  it('should be able to split a path with a param containing a colon', () => {
+  it('should be able to split a path with the param segment containing a colon', () => {
     expect(
       splitParamOrMetricPath('params:params.yaml:parent.child:param')
     ).toEqual(['params', 'params.yaml', 'parent', 'child:param'])
