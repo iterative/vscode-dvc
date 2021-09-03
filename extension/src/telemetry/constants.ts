@@ -5,12 +5,18 @@ export const EXTENSION_ID = 'iterative.dvc'
 
 export const EventName = Object.assign(
   {
-    EXTENSION_LOAD: 'EXTENSION.LOAD'
+    EXTENSION_LOAD: 'extension.load'
   } as const,
   RegisteredCommands
 )
 
 export interface IEventNamePropertyMapping {
+  [EventName.EXTENSION_LOAD]: {
+    cliAccessible: boolean
+    workspaceFolderCount: number
+    dvcRootCount: number
+  }
+
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
@@ -28,7 +34,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
-  [EventName.EXTENSION_LOAD]: { workspaceFolderCount: number }
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
