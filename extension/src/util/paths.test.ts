@@ -1,0 +1,64 @@
+import { joinParamOrMetricPath, splitParamOrMetricPath } from './paths'
+
+describe('joinParamOrMetricPath', () => {
+  it('should properly join params with a nested path', () => {
+    expect(
+      joinParamOrMetricPath(
+        'params',
+        'params.yaml',
+        'parent',
+        'subparent',
+        'child'
+      )
+    ).toEqual('params:params.yaml:parent.subparent.child')
+  })
+
+  it('should properly join params with a non-nested path', () => {
+    expect(joinParamOrMetricPath('params', 'params.yaml', 'parent')).toEqual(
+      'params:params.yaml:parent'
+    )
+  })
+
+  it('should properly join a path to a file with no params', () => {
+    expect(joinParamOrMetricPath('params', 'params.yaml')).toEqual(
+      'params:params.yaml'
+    )
+  })
+
+  it('should properly join a path to a file with no file or params', () => {
+    expect(joinParamOrMetricPath('params')).toEqual('params')
+  })
+})
+
+describe('splitParamOrMetricPath', () => {
+  it('should properly split params with a nested path', () => {
+    expect(
+      splitParamOrMetricPath('params:params.yaml:parent.subparent.child')
+    ).toEqual(['params', 'params.yaml', 'parent', 'subparent', 'child'])
+  })
+
+  it('should properly split params with a non-nested path', () => {
+    expect(splitParamOrMetricPath('params:params.yaml:parent')).toEqual([
+      'params',
+      'params.yaml',
+      'parent'
+    ])
+  })
+
+  it('should properly split a path to a file with no params', () => {
+    expect(splitParamOrMetricPath('params:params.yaml')).toEqual([
+      'params',
+      'params.yaml'
+    ])
+  })
+
+  it('should properly split a path to a file with no file or params', () => {
+    expect(splitParamOrMetricPath('params')).toEqual(['params'])
+  })
+
+  it('should be able to split a path with a param containing a colon', () => {
+    expect(
+      splitParamOrMetricPath('params:params.yaml:parent.child:param')
+    ).toEqual(['params', 'params.yaml', 'parent', 'child:param'])
+  })
+})
