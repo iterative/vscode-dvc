@@ -5,10 +5,19 @@ export const EXTENSION_ID = 'iterative.dvc'
 
 export const EventName = Object.assign(
   {
-    EXTENSION_LOAD: 'EXTENSION.LOAD'
+    EXTENSION_LOAD: 'EXTENSION.LOAD',
+    VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
+      'views.experimentsFilterByTree.opened',
+    VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED:
+      'views.experimentsParamsAndMetricsTree.opened',
+    VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
+    VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
+    VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
   } as const,
   RegisteredCommands
 )
+
+type DvcRootCount = { dvcRootCount: number }
 
 export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_APPLY]: undefined
@@ -52,4 +61,11 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
+
+  [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED]: DvcRootCount
 }

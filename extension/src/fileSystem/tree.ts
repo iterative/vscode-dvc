@@ -25,6 +25,8 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../commands/external'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -47,6 +49,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private noPromptPullMissingOption =
     'dvc.views.trackedExplorerTree.noPromptPullMissing'
+
+  private viewed = false
 
   constructor(
     internalCommands: InternalCommands,
@@ -150,6 +154,15 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private async getRootElements() {
+    if (!this.viewed) {
+      sendTelemetryEvent(
+        EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
+        { dvcRootCount: this.dvcRoots.length },
+        undefined
+      )
+      this.viewed = true
+    }
+
     const rootElements = await Promise.all(
       this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
     )
