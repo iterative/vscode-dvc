@@ -14,7 +14,7 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../../../commands/external'
-import { sendTelemetryEvent } from '../../../telemetry'
+import { sendTreeOpenedEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 
 export type SortItem = {
@@ -81,10 +81,9 @@ export class ExperimentsSortByTree
     const dvcRoots = this.experiments.getDvcRoots()
 
     if (!this.viewed) {
-      sendTelemetryEvent(
+      sendTreeOpenedEvent(
         EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED,
-        { dvcRootCount: dvcRoots.length },
-        undefined
+        dvcRoots.length
       )
       this.viewed = true
     }

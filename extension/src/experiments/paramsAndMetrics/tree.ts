@@ -17,7 +17,7 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../../commands/external'
-import { sendTelemetryEvent } from '../../telemetry'
+import { sendTreeOpenedEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
 type ParamsAndMetricsItem = {
@@ -122,10 +122,9 @@ export class ExperimentsParamsAndMetricsTree
     const dvcRoots = this.experiments.getDvcRoots()
 
     if (!this.viewed) {
-      sendTelemetryEvent(
+      sendTreeOpenedEvent(
         EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED,
-        { dvcRootCount: dvcRoots.length },
-        undefined
+        dvcRoots.length
       )
       this.viewed = true
     }

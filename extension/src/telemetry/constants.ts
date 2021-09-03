@@ -3,17 +3,24 @@ import { RegisteredCommands } from '../commands/external'
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 export const EXTENSION_ID = 'iterative.dvc'
 
+const TreeOpenedEvent = {
+  VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
+    'views.experimentsFilterByTree.opened',
+  VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED:
+    'views.experimentsParamsAndMetricsTree.opened',
+  VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
+  VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
+  VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
+} as const
+
+export type TreeOpenedEventName =
+  typeof TreeOpenedEvent[keyof typeof TreeOpenedEvent]
+
 export const EventName = Object.assign(
   {
-    EXTENSION_LOAD: 'EXTENSION.LOAD',
-    VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
-      'views.experimentsFilterByTree.opened',
-    VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED:
-      'views.experimentsParamsAndMetricsTree.opened',
-    VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
-    VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
-    VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
+    EXTENSION_LOAD: 'EXTENSION.LOAD'
   } as const,
+  TreeOpenedEvent,
   RegisteredCommands
 )
 

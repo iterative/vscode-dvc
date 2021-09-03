@@ -2,7 +2,8 @@ import TelemetryReporter from 'vscode-extension-telemetry'
 import {
   EXTENSION_ID,
   APPLICATION_INSIGHTS_KEY,
-  IEventNamePropertyMapping
+  IEventNamePropertyMapping,
+  TreeOpenedEventName
 } from './constants'
 import { Logger } from '../common/logger'
 import { getExtensionVersion } from '../vscode/extensions'
@@ -82,3 +83,8 @@ export const sendTelemetryEvent = <
     measurements
   )
 }
+
+export const sendTreeOpenedEvent = (
+  eventName: TreeOpenedEventName,
+  dvcRootCount: number
+) => sendTelemetryEvent(eventName, { dvcRootCount }, undefined)
