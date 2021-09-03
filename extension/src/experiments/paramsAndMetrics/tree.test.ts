@@ -270,14 +270,24 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(processPath, 'threshold')
+          path: joinParamOrMetricPath(
+            'params',
+            'params.yaml',
+            'process',
+            'threshold'
+          )
         },
         {
           collapsibleState: 0,
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: joinParamOrMetricPath(processPath, 'test_arg')
+          path: joinParamOrMetricPath(
+            'params',
+            'params.yaml',
+            'process',
+            'test_arg'
+          )
         }
       ])
     })
