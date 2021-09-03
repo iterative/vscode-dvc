@@ -706,5 +706,8 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
+  },
+  "peerDependencies": {
+    "typescript": "*"
   }
 }

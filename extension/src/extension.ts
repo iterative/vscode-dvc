@@ -19,24 +19,26 @@ import { Repository } from './repository'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { DecorationProvider } from './repository/decorationProvider'
 import { ResourceLocator } from './resourceLocator'
+import { definedAndNonEmpty, flatten } from './util/array'
 import { reset } from './util/disposable'
 import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
-import { definedAndNonEmpty, flatten } from './util/array'
-import { setContextValue } from './vscode/context'
-import { OutputChannel } from './vscode/outputChannel'
-import { WebviewSerializer } from './vscode/webviewSerializer'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
+import { setContextValue } from './vscode/context'
+import { OutputChannel } from './vscode/outputChannel'
+import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
   getFirstWorkspaceFolder,
+  getWorkspaceFolderCount,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
 import { getTelemetryReporter, sendTelemetryEvent } from './telemetry'
+import { EventName } from './telemetry/constants'
 import {
   RegisteredCommands,
   registerInstrumentedCommand
@@ -65,6 +67,7 @@ export class Extension implements IExtension {
   private readonly cliReader: CliReader
   private readonly cliRunner: CliRunner
   private readonly status: Status
+  private cliAccessible = false
 
   private readonly workspaceChanged: EventEmitter<void> = this.dispose.track(
     new EventEmitter()
@@ -74,6 +77,8 @@ export class Extension implements IExtension {
     this.workspaceChanged.event
 
   constructor(context: ExtensionContext) {
+    const stopWatch = new StopWatch()
+
     this.dispose.track(getTelemetryReporter())
 
     this.setCommandsAvailability(false)
@@ -136,7 +141,22 @@ export class Extension implements IExtension {
       new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
     )
 
-    setup(this)
+    setup(this).then(async () => {
+      await Promise.all([
+        ...Object.values(this.repositories).map(repo => repo.isReady()),
+        this.experiments.isReady()
+      ])
+
+      sendTelemetryEvent(
+        EventName.EXTENSION_LOAD,
+        {
+          cliAccessible: this.cliAccessible,
+          dvcRootCount: this.dvcRoots.length,
+          workspaceFolderCount: getWorkspaceFolderCount()
+        },
+        { duration: stopWatch.getElapsedTime() }
+      )
+    })
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
@@ -205,7 +225,8 @@ export class Extension implements IExtension {
     try {
       await this.config.isReady()
       const [root] = this.dvcRoots
-      return !!(await this.cliReader.help(root))
+      this.cliAccessible = !!(await this.cliReader.help(root))
+      return this.cliAccessible
     } catch (e) {
       return false
     }
