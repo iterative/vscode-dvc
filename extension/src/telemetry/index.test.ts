@@ -23,7 +23,10 @@ const mockedSendTelemetryEvent = jest.fn()
 jest.mock('vscode-extension-telemetry')
 jest.mock('vscode')
 
+const NODE_ENV = process.env.NODE_ENV
+
 beforeEach(() => {
+  process.env.NODE_ENV = 'telemetry-test'
   jest.resetAllMocks()
   mockedTelemetryReporter.mockImplementation(function () {
     return {
@@ -32,8 +35,11 @@ beforeEach(() => {
   })
 })
 
+afterEach(() => {
+  process.env.NODE_ENV = NODE_ENV
+})
+
 describe('getTelemetryReporter', () => {
-  process.env.NODE_ENV = 'prod'
   let telemetryReporter: TelemetryReporter | undefined
 
   it('should create a reporter on the first call', () => {
@@ -52,23 +58,19 @@ describe('getTelemetryReporter', () => {
       APPLICATION_INSIGHTS_KEY,
       true
     )
-    process.env.NODE_ENV = 'test'
   })
 
   it('should return the reporter on all subsequent calls', () => {
-    process.env.NODE_ENV = 'prod'
     const sameTelemetryReporter = getTelemetryReporter()
 
     expect(telemetryReporter).toEqual(sameTelemetryReporter)
     expect(mockedTelemetryReporter).not.toBeCalled()
     expect(mockedGetExtension).not.toBeCalled()
-    process.env.NODE_ENV = 'test'
   })
 })
 
 describe('sendTelemetryEvent', () => {
   it('should call the reporter with the correct event name and sanitized parameters', () => {
-    process.env.NODE_ENV = 'prod'
     const mockedEventName = 'mockedEvent' as keyof IEventNamePropertyMapping
     const mockedEventProperties = {
       a: 1,
@@ -98,6 +100,5 @@ describe('sendTelemetryEvent', () => {
       },
       mockedMeasurements
     )
-    process.env.NODE_ENV = 'test'
   })
 })
