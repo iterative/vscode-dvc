@@ -1,6 +1,9 @@
 import { workspace } from 'vscode'
 import { definedAndNonEmpty } from '../util/array'
 
+export const getWorkspaceFolderCount = () =>
+  (workspace.workspaceFolders || []).length
+
 export const getWorkspaceFolders = (): string[] =>
   (workspace.workspaceFolders || []).map(
     workspaceFolder => workspaceFolder.uri.fsPath
