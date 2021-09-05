@@ -52,8 +52,6 @@ const mockedExperiments = {
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
-jest.mock('../../../vscode/extensions')
-jest.mock('vscode-extension-telemetry')
 
 beforeEach(() => {
   jest.resetAllMocks()
