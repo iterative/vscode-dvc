@@ -3,7 +3,7 @@ import { RegisteredCommands } from '../commands/external'
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 export const EXTENSION_ID = 'iterative.dvc'
 
-const TreeOpenedEvent = {
+const ViewOpenedEvent = {
   VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
     'views.experimentsFilterByTree.opened',
   VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED:
@@ -13,14 +13,14 @@ const TreeOpenedEvent = {
   VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
 } as const
 
-export type TreeOpenedEventName =
-  typeof TreeOpenedEvent[keyof typeof TreeOpenedEvent]
+export type ViewOpenedEventName =
+  typeof ViewOpenedEvent[keyof typeof ViewOpenedEvent]
 
 export const EventName = Object.assign(
   {
     EXTENSION_LOAD: 'extension.load'
   } as const,
-  TreeOpenedEvent,
+  ViewOpenedEvent,
   RegisteredCommands
 )
 

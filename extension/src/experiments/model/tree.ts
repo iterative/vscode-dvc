@@ -9,7 +9,7 @@ import {
   Uri
 } from 'vscode'
 import { Experiments } from '..'
-import { sendTreeOpenedEvent } from '../../telemetry'
+import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
@@ -82,7 +82,7 @@ export class ExperimentsTree
     const dvcRoots = this.experiments.getDvcRoots()
 
     if (!this.viewed) {
-      sendTreeOpenedEvent(
+      sendViewOpenedTelemetryEvent(
         EventName.VIEWS_EXPERIMENTS_TREE_OPENED,
         dvcRoots.length
       )

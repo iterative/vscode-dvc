@@ -3,7 +3,7 @@ import {
   EXTENSION_ID,
   APPLICATION_INSIGHTS_KEY,
   IEventNamePropertyMapping,
-  TreeOpenedEventName
+  ViewOpenedEventName
 } from './constants'
 import { Logger } from '../common/logger'
 import { getExtensionVersion } from '../vscode/extensions'
@@ -84,7 +84,7 @@ export const sendTelemetryEvent = <
   )
 }
 
-export const sendTreeOpenedEvent = (
-  eventName: TreeOpenedEventName,
+export const sendViewOpenedTelemetryEvent = (
+  eventName: ViewOpenedEventName,
   dvcRootCount: number
 ) => sendTelemetryEvent(eventName, { dvcRootCount }, undefined)

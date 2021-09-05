@@ -13,7 +13,7 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../../../commands/external'
-import { sendTreeOpenedEvent } from '../../../telemetry'
+import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
 import { createTreeView } from '../../../vscode/tree'
@@ -98,7 +98,7 @@ export class ExperimentsFilterByTree
     const dvcRoots = this.getDvcRoots()
 
     if (!this.viewed) {
-      sendTreeOpenedEvent(
+      sendViewOpenedTelemetryEvent(
         EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED,
         dvcRoots.length
       )

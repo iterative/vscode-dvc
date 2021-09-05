@@ -25,7 +25,7 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../commands/external'
-import { sendTreeOpenedEvent } from '../telemetry'
+import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
@@ -155,7 +155,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private async getRootElements() {
     if (!this.viewed) {
-      sendTreeOpenedEvent(
+      sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
         this.dvcRoots.length
       )
