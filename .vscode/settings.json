@@ -6,13 +6,7 @@
   "editor.formatOnSave": true,
   "prettier.configPath": ".prettierrc.json",
   "editor.tabSize": 2,
-  "plantuml.diagramsRoot": "docs",
-  "plantuml.exportFormat": "png",
-  "plantuml.exportOutDir": "docs/exported",
   "typescript.updateImportsOnFileMove.enabled": "prompt",
-  "mochaExplorer.files": "./data-extraction/test/**/*.test.ts",
-  "mochaExplorer.require": ["ts-node/register", "source-map-support/register"],
-  "tasksStatusbar.taskLabelFilter": "dev",
   "cSpell.words": [
     "DVCPATH",
     "Interactors",
