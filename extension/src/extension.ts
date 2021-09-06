@@ -39,7 +39,7 @@ import {
 } from './vscode/workspaceFolders'
 import {
   getTelemetryReporter,
-  sendErrorTelemetryEvent,
+  sendTelemetryEventAndThrow,
   sendTelemetryEvent
 } from './telemetry'
 import { EventName } from './telemetry/constants'
@@ -194,12 +194,10 @@ export class Extension implements IExtension {
           )
           return stopped
         } catch (e: unknown) {
-          sendErrorTelemetryEvent(
+          sendTelemetryEventAndThrow(
             RegisteredCommands.STOP_EXPERIMENT,
             e as Error,
-            {
-              duration: stopWatch.getElapsedTime()
-            }
+            stopWatch.getElapsedTime()
           )
         }
       })
@@ -227,14 +225,11 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            sendErrorTelemetryEvent(
+            sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
-              {
-                duration: stopWatch.getElapsedTime()
-              }
+              stopWatch.getElapsedTime()
             )
-            throw e
           }
         }
       )

@@ -82,12 +82,13 @@ export const sendTelemetryEvent = <
   )
 }
 
-export const sendErrorTelemetryEvent = <
+export const sendTelemetryEventAndThrow = <
   E extends keyof IEventNamePropertyMapping
 >(
   eventName: E,
   e: Error,
-  measurements: { duration: number }
+  duration: number
 ) => {
-  sendTelemetryEvent(eventName, { error: e.message }, measurements)
+  sendTelemetryEvent(eventName, { error: e.message }, { duration })
+  throw e
 }
