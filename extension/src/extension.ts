@@ -226,7 +226,7 @@ export class Extension implements IExtension {
               }
             )
             return completed
-          } catch (e) {
+          } catch (e: unknown) {
             sendErrorTelemetryEvent(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
