@@ -89,6 +89,5 @@ export interface IEventNamePropertyMapping {
     viewColumn: ViewColumn | undefined
     visible: boolean
   }
-
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
 }
