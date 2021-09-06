@@ -66,7 +66,7 @@ export const sendTelemetryEvent = <
 >(
   eventName: E,
   properties: P[E],
-  measurements: { [key: string]: number }
+  measurements: { [key: string]: number } | undefined
 ) => {
   if (isTestExecution() || isDebugSession()) {
     return

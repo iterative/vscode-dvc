@@ -5,7 +5,10 @@ export const EXTENSION_ID = 'iterative.dvc'
 
 export const EventName = Object.assign(
   {
-    EXTENSION_LOAD: 'extension.load'
+    EXTENSION_LOAD: 'extension.load',
+    VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
+    VIEWS_TERMINAL_CREATED: 'views.terminal.created',
+    VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged'
   } as const,
   RegisteredCommands
 )
@@ -57,4 +60,8 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
+
+  [EventName.VIEWS_TERMINAL_CLOSED]: undefined
+  [EventName.VIEWS_TERMINAL_FOCUS_CHANGED]: { active: boolean }
+  [EventName.VIEWS_TERMINAL_CREATED]: undefined
 }
