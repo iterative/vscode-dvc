@@ -21,6 +21,8 @@ export class PseudoTerminal {
     this.processOutput = processOutput
     this.processTerminated = processTerminated
     this.blocked = false
+
+    this.deleteReferenceOnClose()
   }
 
   public isBlocked() {
@@ -33,7 +35,7 @@ export class PseudoTerminal {
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
     if (!this.instance) {
-      await this.initializeInstance()
+      await this.createInstance()
     }
     this.instance?.show(true)
     return this.instance
@@ -43,13 +45,7 @@ export class PseudoTerminal {
     const currentTerminal = this.instance
     if (currentTerminal) {
       currentTerminal.dispose()
-      this.instance = undefined
     }
-  }
-
-  private initializeInstance = (): Promise<void> => {
-    this.deleteReferenceOnClose()
-    return this.createInstance()
   }
 
   private deleteReferenceOnClose = (): void => {
