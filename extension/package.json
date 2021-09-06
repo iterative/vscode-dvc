@@ -677,6 +677,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
+    "@types/chai-as-promised": "^7.1.4",
     "@types/chokidar": "^2.1.3",
     "@types/copy-webpack-plugin": "^8.0.0",
     "@types/fs-extra": "^9.0.7",
@@ -688,6 +689,7 @@
     "@types/sinon-chai": "^3.2.5",
     "@types/vscode": "^1.59.0",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^9.0.1",
     "jest": "^27.0.5",

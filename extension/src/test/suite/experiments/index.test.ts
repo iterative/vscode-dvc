@@ -302,6 +302,37 @@ suite('Experiments Test Suite', () => {
 
       clock.restore()
     })
+
+    it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
+      const clock = useFakeTimers()
+      const duration = 77777
+      const mockErrorMessage =
+        'ERROR: unexpected error - [Errno 2] No such file or directory'
+
+      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
+        clock.tick(duration)
+        throw new Error(mockErrorMessage)
+      })
+
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+        dvcDemoPath
+      )
+
+      await expect(
+        commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
+      ).to.eventually.be.rejectedWith(Error)
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        RegisteredCommands.QUEUE_EXPERIMENT,
+        { error: mockErrorMessage },
+        { duration }
+      )
+
+      clock.restore()
+    })
   })
 
   describe('dvc.applyExperiment', () => {

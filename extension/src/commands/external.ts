@@ -52,9 +52,18 @@ export const registerInstrumentedCommand = <T = string | undefined>(
 ): Disposable =>
   commands.registerCommand(name, async arg => {
     const stopWatch = new StopWatch()
-    const res = await func(arg)
-    sendTelemetryEvent(name, undefined, {
-      duration: stopWatch.getElapsedTime()
-    })
-    return res
+    try {
+      const res = await func(arg)
+      sendTelemetryEvent(name, undefined, {
+        duration: stopWatch.getElapsedTime()
+      })
+      return res
+    } catch (e: unknown) {
+      sendTelemetryEvent(
+        name,
+        { error: (e as Error).message },
+        { duration: stopWatch.getElapsedTime() }
+      )
+      throw e
+    }
   })
