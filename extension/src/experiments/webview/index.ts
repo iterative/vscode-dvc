@@ -88,6 +88,12 @@ export class ExperimentsWebview {
 
     this.notifyActiveStatus(webviewPanel)
 
+    sendTelemetryEvent(
+      EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
+      undefined,
+      undefined
+    )
+
     this.disposer.track({
       dispose: autorun(async () => {
         await this.isReady() // Read all mobx dependencies before await
