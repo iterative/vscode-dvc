@@ -66,8 +66,14 @@ export class ExperimentsWebview {
 
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
+      sendTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
+        undefined,
+        undefined
+      )
       this.disposer.dispose()
     })
+
     webviewPanel.webview.onDidReceiveMessage(arg => {
       this.handleMessage(arg as MessageFromWebview)
     })

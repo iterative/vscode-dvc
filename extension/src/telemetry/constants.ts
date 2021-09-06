@@ -20,6 +20,7 @@ export type ViewOpenedEventName =
 export const EventName = Object.assign(
   {
     EXTENSION_LOAD: 'extension.load',
+    VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED: 'views.experimentsTable.focusChanged'
   } as const,
   ViewOpenedEvent,
@@ -88,4 +89,6 @@ export interface IEventNamePropertyMapping {
     viewColumn: ViewColumn | undefined
     visible: boolean
   }
+
+  [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
 }
