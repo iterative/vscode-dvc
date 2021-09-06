@@ -1,3 +1,4 @@
+import { ViewColumn } from 'vscode'
 import { RegisteredCommands } from '../commands/external'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
@@ -18,7 +19,8 @@ export type ViewOpenedEventName =
 
 export const EventName = Object.assign(
   {
-    EXTENSION_LOAD: 'extension.load'
+    EXTENSION_LOAD: 'extension.load',
+    VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED: 'views.experimentsTable.focusChanged'
   } as const,
   ViewOpenedEvent,
   RegisteredCommands
@@ -80,4 +82,10 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED]: DvcRootCount
+
+  [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: {
+    active: boolean
+    viewColumn: ViewColumn | undefined
+    visible: boolean
+  }
 }
