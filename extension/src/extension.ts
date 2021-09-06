@@ -152,28 +152,12 @@ export class Extension implements IExtension {
           this.experiments.isReady()
         ])
 
-        sendTelemetryEvent(
-          EventName.EXTENSION_LOAD,
-          {
-            cliAccessible: this.cliAccessible,
-            dvcRootCount: this.dvcRoots.length,
-            workspaceFolderCount: getWorkspaceFolderCount()
-          },
-          { duration: stopWatch.getElapsedTime() }
-        )
+        this.sendLoadedTelemetryEvent(stopWatch)
       })
-      .catch(e =>
-        sendTelemetryEvent(
-          EventName.EXTENSION_LOAD,
-          {
-            cliAccessible: this.cliAccessible,
-            dvcRootCount: this.dvcRoots.length,
-            error: e,
-            workspaceFolderCount: getWorkspaceFolderCount()
-          },
-          { duration: stopWatch.getElapsedTime() }
-        )
-      )
+      .catch(e => {
+        this.sendLoadedTelemetryEvent(stopWatch, e)
+        throw e
+      })
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
@@ -395,6 +379,19 @@ export class Extension implements IExtension {
     }
 
     return dvcRoots
+  }
+
+  private sendLoadedTelemetryEvent(stopWatch: StopWatch, e?: Error) {
+    return sendTelemetryEvent(
+      EventName.EXTENSION_LOAD,
+      {
+        cliAccessible: this.cliAccessible,
+        dvcRootCount: this.dvcRoots.length,
+        error: e?.message,
+        workspaceFolderCount: getWorkspaceFolderCount()
+      },
+      { duration: stopWatch.getElapsedTime() }
+    )
   }
 }
 
