@@ -152,10 +152,10 @@ export class Extension implements IExtension {
           this.experiments.isReady()
         ])
 
-        this.sendLoadedTelemetryEvent(stopWatch)
+        this.sendLoadedTelemetryEvent(stopWatch.getElapsedTime())
       })
       .catch(e => {
-        this.sendLoadedTelemetryEvent(stopWatch, e)
+        this.sendLoadedTelemetryEvent(stopWatch.getElapsedTime(), e)
         throw e
       })
 
@@ -376,7 +376,7 @@ export class Extension implements IExtension {
     return dvcRoots
   }
 
-  private sendLoadedTelemetryEvent(stopWatch: StopWatch, e?: Error) {
+  private sendLoadedTelemetryEvent(duration: number, e?: Error) {
     return sendTelemetryEvent(
       EventName.EXTENSION_LOAD,
       {
@@ -385,7 +385,7 @@ export class Extension implements IExtension {
         error: e?.message,
         workspaceFolderCount: getWorkspaceFolderCount()
       },
-      { duration: stopWatch.getElapsedTime() }
+      { duration }
     )
   }
 }
