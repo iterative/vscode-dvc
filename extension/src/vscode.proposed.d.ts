@@ -197,13 +197,8 @@ declare module 'vscode' {
     export function getSession(
       providerId: string,
       scopes: readonly string[],
-      options: AuthenticationGetSessionOptions & { forceNewSession: true }
-    ): Thenable<AuthenticationSession>
-    export function getSession(
-      providerId: string,
-      scopes: readonly string[],
       options: AuthenticationGetSessionOptions & {
-        forceNewSession: { detail: string }
+        forceNewSession: true | { detail: string }
       }
     ): Thenable<AuthenticationSession>
   }
@@ -806,6 +801,11 @@ declare module 'vscode' {
        */
       simple?: boolean
     }
+
+    /**
+     * When true, a save will not be triggered for open editors when starting a debug session, regardless of the value of the `debug.saveBeforeStart` setting.
+     */
+    suppressSaveBeforeStart?: boolean
   }
 
   //#endregion
@@ -1122,7 +1122,7 @@ declare module 'vscode' {
      * The type for tree elements is text/treeitem.
      * For example, you can reconstruct the your tree elements:
      * ```ts
-     * JSON.parse(await (items.get('text/treeitems')!.asString()))
+     * JSON.parse(await (items.get('text/treeitem')!.asString()))
      * ```
      */
     items: { get: (mimeType: string) => TreeDataTransferItem | undefined }
@@ -1130,6 +1130,21 @@ declare module 'vscode' {
 
   export interface DragAndDropController<T> extends Disposable {
     readonly supportedTypes: string[]
+
+    /**
+     * todo@API maybe
+     *
+     * When the user drops an item from this DragAndDropController on **another tree item** in **the same tree**,
+     * `onWillDrop` will be called with the dropped tree item. This is the DragAndDropController's opportunity to
+     * package the data from the dropped tree item into whatever format they want the target tree item to receive.
+     *
+     * The returned `TreeDataTransfer` will be merged with the original`TreeDataTransfer` for the operation.
+     *
+     * Note for implementation later: This means that the `text/treeItem` mime type will go away.
+     *
+     * @param source
+     */
+    // onWillDrop?(source: T): Thenable<TreeDataTransfer>;
 
     /**
      * Extensions should fire `TreeDataProvider.onDidChangeTreeData` for any elements that need to be refreshed.
@@ -1147,6 +1162,11 @@ declare module 'vscode' {
      * Controls whether the task is executed in a specific terminal group using split panes.
      */
     group?: string
+
+    /**
+     * Controls whether the terminal is closed after executing the task.
+     */
+    close?: boolean
   }
   //#endregion
 
@@ -1184,6 +1204,11 @@ declare module 'vscode' {
      * An optional flag to sort the final results by index of first query match in label. Defaults to true.
      */
     sortByLabel: boolean
+
+    /*
+     * An optional flag that can be set to true to maintain the scroll position of the quick pick when the quick pick items are updated. Defaults to false.
+     */
+    keepScrollPosition?: boolean
   }
 
   //#endregion
@@ -2045,23 +2070,16 @@ declare module 'vscode' {
    */
   export class TestTag {
     /**
-     * Unique ID of the test tag.
+     * ID of the test tag. `TestTag` instances with the same ID are considered
+     * to be identical.
      */
     readonly id: string
 
     /**
-     * Human-readable name of the tag. If present, the tag will be visible as
-     * a filter option in the UI.
-     */
-    readonly label?: string
-
-    /**
      * Creates a new TestTag instance.
-     * @param id Unique ID of the test tag.
-     * @param label Human-readable name of the tag.  If present, the tag will
-     * be visible as a filter option in the UI.
+     * @param id ID of the test tag.
      */
-    constructor(id: string, label?: string)
+    constructor(id: string)
   }
 
   export interface TestRunProfile {
@@ -2465,18 +2483,67 @@ declare module 'vscode' {
 
   //#region https://github.com/Microsoft/vscode/issues/15178
 
-  // TODO@API must be a class
-  export interface OpenEditorInfo {
-    name: string
-    resource: Uri
-    isActive: boolean
+  /**
+   * Represents a tab within the window
+   */
+  export interface Tab {
+    /**
+     * The text displayed on the tab
+     */
+    readonly label: string
+
+    /**
+     * The position of the tab
+     */
+    readonly viewColumn: ViewColumn
+
+    /**
+     * The resource represented by the tab if availble.
+     * If the tab contains more than one resource then primary will represent the left resource, and secondary the right one.
+     * Note: Not all editor types have a resource associated with them
+     */
+    readonly resource?: Uri | { primary?: Uri; secondary?: Uri }
+
+    /**
+     * The identifier of the editor which the tab should contain, because
+     * not all tabs represent editors this may be undefined.
+     * This is equivalent to `viewType` for custom editors and notebooks.
+     * The built-in text editor has an id of 'default' for all configurations.
+     * Note: Tabs are not guaranteed to contain editors but this id represents what editor the tab will resolve if available
+     */
+    readonly editorId?: string
+
+    /**
+     * Whether or not the tab is currently active
+     * Dictated by being the selected tab in the active group
+     */
+    readonly isActive: boolean
   }
 
   export namespace window {
-    export const openEditors: ReadonlyArray<OpenEditorInfo>
+    /**
+     * A list of all opened tabs
+     * Ordered from left to right
+     */
+    export const tabs: readonly Tab[]
 
-    // todo@API proper event type
-    export const onDidChangeOpenEditors: Event<void>
+    /**
+     * The currently active tab
+     * Undefined if no tabs are currently opened
+     */
+    export const activeTab: Tab | undefined
+
+    /**
+     * An {@link Event} which fires when the array of {@link window.tabs tabs}
+     * has changed.
+     */
+    export const onDidChangeTabs: Event<readonly Tab[]>
+
+    /**
+     * An {@link Event} which fires when the {@link window.activeTab activeTab}
+     * has changed.
+     */
+    export const onDidChangeActiveTab: Event<Tab | undefined>
   }
 
   //#endregion
@@ -2718,34 +2785,6 @@ declare module 'vscode' {
     T extends InlineCompletionItem
   > {
     completionItem: T
-  }
-
-  //#endregion
-
-  //#region FileSystemProvider stat readonly - https://github.com/microsoft/vscode/issues/73122
-
-  export enum FilePermission {
-    /**
-     * The file is readonly.
-     *
-     * *Note:* All `FileStat` from a `FileSystemProvider` that is registered  with
-     * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
-     * is set. As a consequence, it is not possible to have a readonly file system provider
-     * registered where some `FileStat` are not readonly.
-     */
-    Readonly = 1
-  }
-
-  /**
-   * The `FileStat`-type represents metadata about a file
-   */
-  export interface FileStat {
-    /**
-     * The permissions of the file, e.g. whether the file is readonly.
-     *
-     * *Note:* This value might be a bitmask, e.g. `FilePermission.Readonly | FilePermission.Other`.
-     */
-    permissions?: FilePermission
   }
 
   //#endregion
@@ -3055,14 +3094,14 @@ declare module 'vscode' {
      * @param document The document in which the command was invoked.
      * @param position The position at which the command was invoked.
      * @param token A cancellation token.
-     * @returns A type hierarchy item or a thenable that resolves to such. The lack of a result can be
-     * signaled by returning `undefined` or `null`.
+     * @returns One or multiple type hierarchy items or a thenable that resolves to such. The lack of a result can be
+     * signaled by returning `undefined`, `null`, or an empty array.
      */
     prepareTypeHierarchy(
       document: TextDocument,
       position: Position,
       token: CancellationToken
-    ): ProviderResult<TypeHierarchyItem[]>
+    ): ProviderResult<TypeHierarchyItem | TypeHierarchyItem[]>
 
     /**
      * Provide all supertypes for an item, e.g all types from which a type is derived/inherited. In graph terms this describes directed
@@ -3119,15 +3158,21 @@ declare module 'vscode' {
   }
 
   interface LanguageStatusItem {
+    readonly id: string
     selector: DocumentSelector
-    text: string
-    detail: string | MarkdownString
+    // todo@jrieken replace with boolean ala needsAttention
     severity: LanguageStatusSeverity
+    name: string | undefined
+    text: string
+    detail?: string
+    command: Command | undefined
+    accessibilityInformation?: AccessibilityInformation
     dispose(): void
   }
 
   namespace languages {
     export function createLanguageStatusItem(
+      id: string,
       selector: DocumentSelector
     ): LanguageStatusItem
   }
@@ -3144,6 +3189,23 @@ declare module 'vscode' {
   export interface QuickPickItemButtonEvent<T extends QuickPickItem> {
     button: QuickInputButton
     item: T
+  }
+
+  //#endregion
+
+  //#region @mjbvz https://github.com/microsoft/vscode/issues/40607
+  export interface MarkdownString {
+    /**
+     * Indicates that this markdown string can contain raw html tags. Default to false.
+     *
+     * When `supportHtml` is false, the markdown renderer will strip out any raw html tags
+     * that appear in the markdown text. This means you can only use markdown syntax for rendering.
+     *
+     * When `supportHtml` is true, the markdown render will also allow a safe subset of html tags
+     * and attributes to be rendered. See https://github.com/microsoft/vscode/blob/6d2920473c6f13759c978dd89104c4270a83422d/src/vs/base/browser/markdownRenderer.ts#L296
+     * for a list of all supported tags and attributes.
+     */
+    supportHtml?: boolean
   }
 
   //#endregion
