@@ -15,6 +15,7 @@ import complexExperimentsOutput from '../../experiments/webview/complex-output-e
 import * as Disposer from '../../util/disposable'
 import * as Telemetry from '../../telemetry'
 import { RegisteredCommands } from '../../commands/external'
+import * as Setup from '../../setup'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -283,6 +284,25 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
+    })
+
+    it('should send an error telemetry event when setupWorkspace fails', async () => {
+      const clock = useFakeTimers()
+      const mockErrorMessage = 'NOPE'
+      stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      await expect(
+        commands.executeCommand(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
+      ).to.be.eventually.rejectedWith(Error)
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        { error: mockErrorMessage },
+        { duration: 0 }
+      )
+
+      clock.restore()
     })
   })
 
