@@ -10,53 +10,60 @@ export const EventName = Object.assign(
   RegisteredCommands
 )
 
+type UndefinedOrError = undefined | { error: string }
+
 export interface IEventNamePropertyMapping {
-  [EventName.EXTENSION_LOAD]: {
-    cliAccessible: boolean
-    workspaceFolderCount: number
-    dvcRootCount: number
-  }
-
-  [EventName.EXPERIMENT_APPLY]: undefined | { error: string }
-  [EventName.EXPERIMENT_BRANCH]: undefined | { error: string }
-  [EventName.EXPERIMENT_FILTER_ADD]: undefined | { error: string }
-  [EventName.EXPERIMENT_FILTER_REMOVE]: undefined | { error: string }
-  [EventName.EXPERIMENT_FILTERS_REMOVE]: undefined | { error: string }
-  [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: undefined | { error: string }
-  [EventName.EXPERIMENT_GARBAGE_COLLECT]: undefined | { error: string }
-  [EventName.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE]:
-    | undefined
+  [EventName.EXTENSION_LOAD]:
+    | {
+        cliAccessible: boolean
+        dvcRootCount: number
+        error?: string
+        workspaceFolderCount: number
+      }
     | { error: string }
-  [EventName.EXPERIMENT_REMOVE]: undefined | { error: string }
-  [EventName.EXPERIMENT_RUN]: undefined | { error: string }
-  [EventName.EXPERIMENT_RUN_QUEUED]: undefined | { error: string }
-  [EventName.EXPERIMENT_RUN_RESET]: undefined | { error: string }
-  [EventName.EXPERIMENT_SHOW]: undefined | { error: string }
-  [EventName.EXPERIMENT_SORT_ADD]: undefined | { error: string }
-  [EventName.EXPERIMENT_SORT_REMOVE]: undefined | { error: string }
-  [EventName.EXPERIMENT_SORTS_REMOVE]: undefined | { error: string }
-  [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined | { error: string }
-  [EventName.QUEUE_EXPERIMENT]: undefined | { error: string }
-  [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
-  [EventName.ADD_TARGET]: undefined | { error: string }
-  [EventName.CHECKOUT_TARGET]: undefined | { error: string }
-  [EventName.CHECKOUT]: undefined | { error: string }
-  [EventName.COMMIT_TARGET]: undefined | { error: string }
-  [EventName.COMMIT]: undefined | { error: string }
-  [EventName.DELETE_TARGET]: undefined | { error: string }
-  [EventName.INIT]: undefined | { error: string }
-  [EventName.PULL_TARGET]: undefined | { error: string }
-  [EventName.PULL]: undefined | { error: string }
-  [EventName.PUSH_TARGET]: undefined | { error: string }
-  [EventName.PUSH]: undefined | { error: string }
-  [EventName.REMOVE_TARGET]: undefined | { error: string }
+  [EventName.EXPERIMENT_APPLY]: UndefinedOrError
+  [EventName.EXPERIMENT_BRANCH]: UndefinedOrError
+  [EventName.EXPERIMENT_FILTER_ADD]: UndefinedOrError
+  [EventName.EXPERIMENT_FILTER_REMOVE]: UndefinedOrError
+  [EventName.EXPERIMENT_FILTERS_REMOVE]: UndefinedOrError
+  [EventName.EXPERIMENT_FILTERS_REMOVE_ALL]: UndefinedOrError
+  [EventName.EXPERIMENT_GARBAGE_COLLECT]: UndefinedOrError
+  [EventName.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE]: UndefinedOrError
+  [EventName.EXPERIMENT_REMOVE]: UndefinedOrError
+  [EventName.EXPERIMENT_RUN]: UndefinedOrError
+  [EventName.EXPERIMENT_RUN_QUEUED]: UndefinedOrError
+  [EventName.EXPERIMENT_RUN_RESET]: UndefinedOrError
+  [EventName.EXPERIMENT_SHOW]: UndefinedOrError
+  [EventName.EXPERIMENT_SORT_ADD]: UndefinedOrError
+  [EventName.EXPERIMENT_SORT_REMOVE]: UndefinedOrError
+  [EventName.EXPERIMENT_SORTS_REMOVE]: UndefinedOrError
+  [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: UndefinedOrError
+  [EventName.QUEUE_EXPERIMENT]: UndefinedOrError
+  [EventName.STOP_EXPERIMENT]:
+    | { stopped: boolean; wasRunning: boolean }
+    | { error: string }
 
-  [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined | { error: string }
-  [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined | { error: string }
-  [EventName.TRACKED_EXPLORER_COPY_REL_FILE_PATH]: undefined | { error: string }
+  [EventName.ADD_TARGET]: UndefinedOrError
+  [EventName.CHECKOUT_TARGET]: UndefinedOrError
+  [EventName.CHECKOUT]: UndefinedOrError
+  [EventName.COMMIT_TARGET]: UndefinedOrError
+  [EventName.COMMIT]: UndefinedOrError
+  [EventName.DELETE_TARGET]: UndefinedOrError
+  [EventName.INIT]: UndefinedOrError
+  [EventName.PULL_TARGET]: UndefinedOrError
+  [EventName.PULL]: UndefinedOrError
+  [EventName.PUSH_TARGET]: UndefinedOrError
+  [EventName.PUSH]: UndefinedOrError
+  [EventName.REMOVE_TARGET]: UndefinedOrError
 
-  [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined | { error: string }
-  [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined | { error: string }
-  [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
+  [EventName.TRACKED_EXPLORER_OPEN_FILE]: UndefinedOrError
+  [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: UndefinedOrError
+  [EventName.TRACKED_EXPLORER_COPY_REL_FILE_PATH]: UndefinedOrError
+
+  [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: UndefinedOrError
+  [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: UndefinedOrError
+  [EventName.EXTENSION_SETUP_WORKSPACE]:
+    | { completed: boolean }
+    | { error: string }
 }
