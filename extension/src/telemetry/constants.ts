@@ -1,16 +1,42 @@
+import { ViewColumn } from 'vscode'
 import { RegisteredCommands } from '../commands/external'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 export const EXTENSION_ID = 'iterative.dvc'
 
+const ViewOpenedEvent = {
+  VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED:
+    'views.experimentsFilterByTree.opened',
+  VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED:
+    'views.experimentsParamsAndMetricsTree.opened',
+  VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED: 'views.experimentsSortByTree.opened',
+  VIEWS_EXPERIMENTS_TREE_OPENED: 'views.experimentsTree.opened',
+  VIEWS_TRACKED_EXPLORER_TREE_OPENED: 'views.trackedExplorerTree.opened'
+} as const
+
+export type ViewOpenedEventName =
+  typeof ViewOpenedEvent[keyof typeof ViewOpenedEvent]
+
 export const EventName = Object.assign(
   {
-    EXTENSION_LOAD: 'extension.load'
+    EXTENSION_LOAD: 'extension.load',
+
+    VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
+    VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
+    VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
+      'views.experimentsTable.focusChanged',
+
+    VIEWS_TERMINAL_CLOSED: 'views.terminal.closed',
+    VIEWS_TERMINAL_CREATED: 'views.terminal.created',
+    VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged'
   } as const,
+  ViewOpenedEvent,
   RegisteredCommands
 )
 
 type UndefinedOrError = undefined | { error: string }
+
+type DvcRootCount = { dvcRootCount: number }
 
 export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_LOAD]:
@@ -65,5 +91,36 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: UndefinedOrError
   [EventName.EXTENSION_SETUP_WORKSPACE]:
     | { completed: boolean }
+    | { error: string }
+
+  [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount | { error: string }
+  [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]:
+    | DvcRootCount
+    | { error: string }
+  [EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED]:
+    | DvcRootCount
+    | { error: string }
+  [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]:
+    | DvcRootCount
+    | { error: string }
+  [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount | { error: string }
+  [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: UndefinedOrError
+  [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: UndefinedOrError
+  [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]:
+    | {
+        active: boolean
+        viewColumn: ViewColumn | undefined
+        visible: boolean
+      }
+    | { error: string }
+
+  [EventName.VIEWS_TERMINAL_CLOSED]: UndefinedOrError
+  [EventName.VIEWS_TERMINAL_FOCUS_CHANGED]:
+    | { active: boolean }
+    | { error: string }
+  [EventName.VIEWS_TERMINAL_CREATED]: UndefinedOrError
+
+  [EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED]:
+    | DvcRootCount
     | { error: string }
 }

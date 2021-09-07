@@ -102,7 +102,7 @@ suite('Experiments Test Suite', () => {
       expect(focusedExperimentsRepository).to.equal(experimentsRepository)
       expect(mockQuickPickOne).not.to.be.called
       expect(configSpy).to.be.calledOnce
-    })
+    }).timeout(5000)
 
     it('should prompt to pick a project even if a webview is focused (if no default)', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
@@ -153,7 +153,7 @@ suite('Experiments Test Suite', () => {
 
       expect(focusedExperimentsRepository).to.equal(experimentsRepository)
       expect(mockQuickPickOne).to.be.calledOnce
-    })
+    }).timeout(5000)
 
     it('should not prompt to pick a project if there is only one project', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(

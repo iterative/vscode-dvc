@@ -2,12 +2,14 @@ import TelemetryReporter from 'vscode-extension-telemetry'
 import {
   EXTENSION_ID,
   APPLICATION_INSIGHTS_KEY,
-  IEventNamePropertyMapping
+  IEventNamePropertyMapping,
+  ViewOpenedEventName
 } from './constants'
 import { Logger } from '../common/logger'
 import { getExtensionVersion } from '../vscode/extensions'
 
-const isTestExecution = (): boolean => !!process.env.VSC_TEST
+const isTestExecution = (): boolean =>
+  !!process.env.VSC_TEST || process.env.NODE_ENV === 'test'
 const isDebugSession = (): boolean => !!process.env.VSC_DEBUG
 
 let telemetryReporter: TelemetryReporter | undefined
@@ -66,7 +68,7 @@ export const sendTelemetryEvent = <
 >(
   eventName: E,
   properties: P[E],
-  measurements: { [key: string]: number }
+  measurements: { [key: string]: number } | undefined
 ) => {
   if (isTestExecution() || isDebugSession()) {
     return
@@ -92,3 +94,8 @@ export const sendTelemetryEventAndThrow = <
   sendTelemetryEvent(eventName, { error: e.message }, { duration })
   throw e
 }
+
+export const sendViewOpenedTelemetryEvent = (
+  eventName: ViewOpenedEventName,
+  dvcRootCount: number
+) => sendTelemetryEvent(eventName, { dvcRootCount }, undefined)

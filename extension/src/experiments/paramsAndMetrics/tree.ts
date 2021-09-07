@@ -17,6 +17,8 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../../commands/external'
+import { sendViewOpenedTelemetryEvent } from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
 
 type ParamsAndMetricsItem = {
   description: string | undefined
@@ -37,6 +39,7 @@ export class ExperimentsParamsAndMetricsTree
   private readonly resourceLocator: ResourceLocator
 
   private view: TreeView<string | ParamsAndMetricsItem>
+  private viewed = false
 
   constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
     this.resourceLocator = resourceLocator
@@ -117,6 +120,14 @@ export class ExperimentsParamsAndMetricsTree
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
+
+    if (!this.viewed) {
+      sendViewOpenedTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED,
+        dvcRoots.length
+      )
+      this.viewed = true
+    }
 
     if (dvcRoots.length === 1) {
       const [onlyRepo] = dvcRoots
