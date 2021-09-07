@@ -11,7 +11,7 @@ import {
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
-import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
+import complexExperimentsOutput from '../../experiments/webview/complex-output-example'
 import * as Disposer from '../../util/disposable'
 import * as Telemetry from '../../telemetry'
 import { RegisteredCommands } from '../../commands/external'
