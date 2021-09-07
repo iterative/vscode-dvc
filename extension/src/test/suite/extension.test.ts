@@ -13,9 +13,10 @@ import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
 import * as Disposer from '../../util/disposable'
-import * as Telemetry from '../../telemetry'
 import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup'
+import * as Telemetry from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -148,6 +149,17 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const secondTelemetryEventSent = new Promise(resolve =>
+        mockSendTelemetryEvent
+          .onFirstCall()
+          .returns(undefined)
+          .onSecondCall()
+          .callsFake(() => {
+            resolve(undefined)
+            return undefined
+          })
+      )
       const mockPath = resolve('file', 'picked', 'path', 'to', 'dvc')
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
         Uri.file(mockPath)
@@ -212,11 +224,32 @@ suite('Extension Test Suite', () => {
       )
 
       await createFileSystemWatcherCalled
+      await secondTelemetryEventSent
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
+
+      const [eventName, customProperties] =
+        mockSendTelemetryEvent.getCall(1).args
+
+      expect(
+        eventName,
+        'the correct execution details changed event should be sent'
+      ).to.equal(EventName.EXTENSION_EXECUTION_DETAILS_CHANGED)
+      expect(
+        customProperties,
+        'the correct custom properties should be sent with the event'
+      ).to.deep.equal({
+        cliAccessible: true,
+        dvcPathUsed: true,
+        dvcRootCount: 1,
+        msPythonInstalled: false,
+        msPythonUsed: false,
+        pythonPathUsed: false,
+        workspaceFolderCount: 1
+      })
     })
 
     it('should dispose of the current repositories and experiments before creating new ones', async () => {

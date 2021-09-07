@@ -6,6 +6,7 @@ import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { getGitRepositoryRoots } from './extensions/git'
+import { isPythonExtensionInstalled } from './extensions/python'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
@@ -146,32 +147,19 @@ export class Extension implements IExtension {
     )
 
     setup(this)
-      .then(async () => {
-        await Promise.all([
-          ...Object.values(this.repositories).map(repo => repo.isReady()),
-          this.experiments.isReady()
-        ])
-
-        return sendTelemetryEvent(
+      .then(() =>
+        sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
-          {
-            cliAccessible: this.cliAccessible,
-            dvcRootCount: this.dvcRoots.length,
-            workspaceFolderCount: getWorkspaceFolderCount()
-          },
+          this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
-      })
+      )
       .catch(e =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           e,
           stopWatch.getElapsedTime(),
-          {
-            cliAccessible: this.cliAccessible,
-            dvcRootCount: this.dvcRoots.length,
-            workspaceFolderCount: getWorkspaceFolderCount()
-          }
+          this.getEventProperties()
         )
       )
 
@@ -182,8 +170,24 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(() => {
-        setup(this)
+      this.config.onDidChangeExecutionDetails(async () => {
+        const stopWatch = new StopWatch()
+        try {
+          await setup(this)
+
+          return sendTelemetryEvent(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            this.getEventProperties(),
+            { duration: stopWatch.getElapsedTime() }
+          )
+        } catch (e) {
+          return sendTelemetryEventAndThrow(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            e as Error,
+            stopWatch.getElapsedTime(),
+            this.getEventProperties()
+          )
+        }
       })
     )
 
@@ -276,12 +280,16 @@ export class Extension implements IExtension {
     this.config.setDvcRoots(this.dvcRoots)
   }
 
-  public initialize = () => {
-    Promise.all([
+  public async initialize() {
+    await Promise.all([
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
       this.initializeExperiments(),
       this.setAvailable(true)
+    ])
+    return Promise.all([
+      ...Object.values(this.repositories).map(repo => repo.isReady()),
+      this.experiments.isReady()
     ])
   }
 
@@ -390,6 +398,18 @@ export class Extension implements IExtension {
     }
 
     return dvcRoots
+  }
+
+  private getEventProperties() {
+    return {
+      cliAccessible: this.cliAccessible,
+      dvcPathUsed: !!this.config.getCliPath(),
+      dvcRootCount: this.dvcRoots.length,
+      msPythonInstalled: isPythonExtensionInstalled(),
+      msPythonUsed: this.config.isPythonExtensionUsed(),
+      pythonPathUsed: !!this.config.pythonBinPath,
+      workspaceFolderCount: getWorkspaceFolderCount()
+    }
   }
 }
 

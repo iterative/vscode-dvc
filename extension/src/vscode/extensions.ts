@@ -31,3 +31,6 @@ export const getExtensionVersion = <T>(id: string): string | undefined => {
 
   return extension.packageJSON.version
 }
+
+export const isInstalled = (id: string): boolean =>
+  !!extensions.all.find(extension => extension.id === id)
