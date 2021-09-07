@@ -6,6 +6,7 @@ import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { getGitRepositoryRoots } from './extensions/git'
+import { isPythonExtensionInstalled } from './extensions/python'
 import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
@@ -154,11 +155,7 @@ export class Extension implements IExtension {
 
         return sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
-          {
-            cliAccessible: this.cliAccessible,
-            dvcRootCount: this.dvcRoots.length,
-            workspaceFolderCount: getWorkspaceFolderCount()
-          },
+          this.getLoadProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
       })
@@ -167,11 +164,7 @@ export class Extension implements IExtension {
           EventName.EXTENSION_LOAD,
           e,
           stopWatch.getElapsedTime(),
-          {
-            cliAccessible: this.cliAccessible,
-            dvcRootCount: this.dvcRoots.length,
-            workspaceFolderCount: getWorkspaceFolderCount()
-          }
+          this.getLoadProperties()
         )
       )
 
@@ -390,6 +383,16 @@ export class Extension implements IExtension {
     }
 
     return dvcRoots
+  }
+
+  private getLoadProperties() {
+    return {
+      cliAccessible: this.cliAccessible,
+      dvcRootCount: this.dvcRoots.length,
+      msPythonInstalled: isPythonExtensionInstalled(),
+      msPythonUsed: this.config.isPythonExtensionUsed(),
+      workspaceFolderCount: getWorkspaceFolderCount()
+    }
   }
 }
 

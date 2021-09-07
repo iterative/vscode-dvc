@@ -40,6 +40,8 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_LOAD]: {
     cliAccessible: boolean
     dvcRootCount: number
+    msPythonInstalled: boolean
+    msPythonUsed: boolean
     workspaceFolderCount: number
   }
 

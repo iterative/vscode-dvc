@@ -97,6 +97,10 @@ export class Config {
     }
   }
 
+  public isPythonExtensionUsed() {
+    return !getConfigValue(this.pythonPathOption) && !!this.pythonBinPath
+  }
+
   private async getPythonBinPath() {
     return getConfigValue('dvc.pythonPath') || (await getPythonBinPath())
   }
