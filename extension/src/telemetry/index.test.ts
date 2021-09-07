@@ -23,13 +23,20 @@ const mockedSendTelemetryEvent = jest.fn()
 jest.mock('vscode-extension-telemetry')
 jest.mock('vscode')
 
+const NODE_ENV = process.env.NODE_ENV
+
 beforeEach(() => {
+  process.env.NODE_ENV = 'telemetry-test'
   jest.resetAllMocks()
   mockedTelemetryReporter.mockImplementation(function () {
     return {
       sendTelemetryEvent: mockedSendTelemetryEvent
     } as unknown as TelemetryReporter
   })
+})
+
+afterEach(() => {
+  process.env.NODE_ENV = NODE_ENV
 })
 
 describe('getTelemetryReporter', () => {
