@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { join } from 'path'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 const data: ExperimentsRepoJSONOutput = {
@@ -15,6 +16,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -48,6 +54,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -79,6 +90,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -113,6 +129,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -144,6 +165,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -178,6 +204,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.124,
               process: { threshold: 0.85 }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -209,6 +240,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.15,
               process: { threshold: 0.86, test_arg: 3 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -243,6 +279,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.15,
               process: { threshold: 0.86, test_arg: 3 }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -275,6 +316,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.15,
               process: { threshold: 0.86, test_arg: 3 }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -306,6 +352,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -340,6 +391,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -372,6 +428,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.122,
               process: { threshold: 0.86, test_arg: 'string' }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -403,6 +464,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.124,
               process: { threshold: 0.85 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -437,6 +503,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.124,
               process: { threshold: 0.85 }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -468,6 +539,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.124,
               process: { threshold: 0.85 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -501,6 +577,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.124,
               process: { threshold: 0.85 }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -532,6 +613,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.124,
               process: { threshold: 0.85 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },
@@ -565,6 +651,11 @@ const data: ExperimentsRepoJSONOutput = {
               dropout: 0.124,
               process: { threshold: 0.85 }
             }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
+            }
           }
         },
         queued: false,
@@ -595,6 +686,11 @@ const data: ExperimentsRepoJSONOutput = {
               log_file: 'logs.csv',
               dropout: 0.124,
               process: { threshold: 0.85 }
+            }
+          },
+          [join('nested', 'params.yaml')]: {
+            data: {
+              test: true
             }
           }
         },

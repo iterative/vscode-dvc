@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import complexExperimentsOutput from '../webview/complex-output-example'
@@ -365,6 +366,7 @@ describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
     expect(collectFiles(complexExperimentsOutput)).toEqual([
       'params.yaml',
+      join('nested', 'params.yaml'),
       'summary.json'
     ])
   })
