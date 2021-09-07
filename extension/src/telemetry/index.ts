@@ -90,11 +90,12 @@ export const sendTelemetryEventAndThrow = <
 >(
   eventName: E,
   e: Error,
-  duration: number
+  duration: number,
+  properties = {} as P[E]
 ) => {
   sendTelemetryEvent(
     `errors.${eventName}` as E,
-    { error: e.message } as unknown as P[E],
+    { ...properties, error: e.message } as P[E],
     {
       duration
     }
