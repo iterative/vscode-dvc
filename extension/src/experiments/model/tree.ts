@@ -9,6 +9,8 @@ import {
   Uri
 } from 'vscode'
 import { Experiments } from '..'
+import { sendViewOpenedTelemetryEvent } from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
 
@@ -35,6 +37,7 @@ export class ExperimentsTree
   private readonly experiments: Experiments
 
   private view: TreeView<string | ExperimentItem>
+  private viewed = false
 
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
@@ -77,6 +80,15 @@ export class ExperimentsTree
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
+
+    if (!this.viewed) {
+      sendViewOpenedTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_TREE_OPENED,
+        dvcRoots.length
+      )
+      this.viewed = true
+    }
+
     const experimentNames = flatten(
       dvcRoots.map(dvcRoot => this.experiments.getExperiments(dvcRoot))
     )

@@ -14,6 +14,8 @@ import {
   RegisteredCommands,
   registerInstrumentedCommand
 } from '../../../commands/external'
+import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
+import { EventName } from '../../../telemetry/constants'
 
 export type SortItem = {
   dvcRoot: string
@@ -28,6 +30,7 @@ export class ExperimentsSortByTree
   public readonly onDidChangeTreeData: Event<void>
 
   private readonly experiments: Experiments
+  private viewed = false
 
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
@@ -75,15 +78,26 @@ export class ExperimentsSortByTree
 
   private async getRootItems() {
     await this.experiments.isReady()
-    const roots = this.experiments.getDvcRoots()
-    if (roots.length === 0) {
+    const dvcRoots = this.experiments.getDvcRoots()
+
+    if (!this.viewed) {
+      sendViewOpenedTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED,
+        dvcRoots.length
+      )
+      this.viewed = true
+    }
+
+    if (dvcRoots.length === 0) {
       return []
     }
-    if (roots.length === 1) {
-      return this.getChildren(roots[0])
+    if (dvcRoots.length === 1) {
+      return this.getChildren(dvcRoots[0])
     }
-    if (roots.find(dvcRoot => this.experiments.getSorts(dvcRoot).length > 0)) {
-      return roots.sort((a, b) => a.localeCompare(b))
+    if (
+      dvcRoots.find(dvcRoot => this.experiments.getSorts(dvcRoot).length > 0)
+    ) {
+      return dvcRoots.sort((a, b) => a.localeCompare(b))
     } else {
       return []
     }
