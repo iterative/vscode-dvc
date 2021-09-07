@@ -147,24 +147,19 @@ export class Extension implements IExtension {
     )
 
     setup(this)
-      .then(async () => {
-        await Promise.all([
-          ...Object.values(this.repositories).map(repo => repo.isReady()),
-          this.experiments.isReady()
-        ])
-
-        return sendTelemetryEvent(
+      .then(() =>
+        sendTelemetryEvent(
           EventName.EXTENSION_LOAD,
-          this.getLoadProperties(),
+          this.getEventProperties(),
           { duration: stopWatch.getElapsedTime() }
         )
-      })
+      )
       .catch(e =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           e,
           stopWatch.getElapsedTime(),
-          this.getLoadProperties()
+          this.getEventProperties()
         )
       )
 
@@ -175,8 +170,24 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      this.config.onDidChangeExecutionDetails(() => {
-        setup(this)
+      this.config.onDidChangeExecutionDetails(async () => {
+        const stopWatch = new StopWatch()
+        try {
+          await setup(this)
+
+          return sendTelemetryEvent(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            this.getEventProperties(),
+            { duration: stopWatch.getElapsedTime() }
+          )
+        } catch (e) {
+          return sendTelemetryEventAndThrow(
+            EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+            e as Error,
+            stopWatch.getElapsedTime(),
+            this.getEventProperties()
+          )
+        }
       })
     )
 
@@ -269,12 +280,16 @@ export class Extension implements IExtension {
     this.config.setDvcRoots(this.dvcRoots)
   }
 
-  public initialize = () => {
-    Promise.all([
+  public async initialize() {
+    await Promise.all([
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
       this.initializeExperiments(),
       this.setAvailable(true)
+    ])
+    return Promise.all([
+      ...Object.values(this.repositories).map(repo => repo.isReady()),
+      this.experiments.isReady()
     ])
   }
 
@@ -385,12 +400,14 @@ export class Extension implements IExtension {
     return dvcRoots
   }
 
-  private getLoadProperties() {
+  private getEventProperties() {
     return {
       cliAccessible: this.cliAccessible,
+      dvcPathUsed: !!this.config.getCliPath(),
       dvcRootCount: this.dvcRoots.length,
       msPythonInstalled: isPythonExtensionInstalled(),
       msPythonUsed: this.config.isPythonExtensionUsed(),
+      pythonPathUsed: !!this.config.pythonBinPath,
       workspaceFolderCount: getWorkspaceFolderCount()
     }
   }

@@ -19,6 +19,7 @@ export type ViewOpenedEventName =
 
 export const EventName = Object.assign(
   {
+    EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.execution.details.changed',
     EXTENSION_LOAD: 'extension.load',
 
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
@@ -36,14 +37,18 @@ export const EventName = Object.assign(
 
 type DvcRootCount = { dvcRootCount: number }
 
+type ExtensionProperties = {
+  cliAccessible: boolean
+  dvcPathUsed: boolean
+  pythonPathUsed: boolean
+  msPythonInstalled: boolean
+  msPythonUsed: boolean
+  workspaceFolderCount: number
+} & DvcRootCount
+
 export interface IEventNamePropertyMapping {
-  [EventName.EXTENSION_LOAD]: {
-    cliAccessible: boolean
-    dvcRootCount: number
-    msPythonInstalled: boolean
-    msPythonUsed: boolean
-    workspaceFolderCount: number
-  }
+  [EventName.EXTENSION_EXECUTION_DETAILS_CHANGED]: ExtensionProperties
+  [EventName.EXTENSION_LOAD]: ExtensionProperties
 
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
