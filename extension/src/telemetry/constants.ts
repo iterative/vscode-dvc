@@ -39,8 +39,8 @@ type DvcRootCount = { dvcRootCount: number }
 export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_LOAD]: {
     cliAccessible: boolean
-    workspaceFolderCount: number
     dvcRootCount: number
+    workspaceFolderCount: number
   }
 
   [EventName.EXPERIMENT_APPLY]: undefined
