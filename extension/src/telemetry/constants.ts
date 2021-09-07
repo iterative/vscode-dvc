@@ -40,7 +40,6 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_LOAD]: {
     cliAccessible: boolean
     dvcRootCount: number
-    error?: string
     workspaceFolderCount: number
   }
 
@@ -88,9 +87,7 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED]: DvcRootCount
-  [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]:
-    | DvcRootCount
-    | { error: string }
+  [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
