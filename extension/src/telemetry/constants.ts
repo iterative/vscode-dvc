@@ -19,7 +19,7 @@ export type ViewOpenedEventName =
 
 export const EventName = Object.assign(
   {
-    EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.execution.details.changed',
+    EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
