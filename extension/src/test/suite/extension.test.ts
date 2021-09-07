@@ -297,7 +297,7 @@ suite('Extension Test Suite', () => {
       ).to.be.eventually.rejectedWith(Error)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
-        RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        `errors.${RegisteredCommands.EXTENSION_SETUP_WORKSPACE}`,
         { error: mockErrorMessage },
         { duration: 0 }
       )

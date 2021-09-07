@@ -326,7 +326,7 @@ suite('Experiments Test Suite', () => {
       ).to.eventually.be.rejectedWith(Error)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
-        RegisteredCommands.QUEUE_EXPERIMENT,
+        `errors.${RegisteredCommands.QUEUE_EXPERIMENT}`,
         { error: mockErrorMessage },
         { duration }
       )
