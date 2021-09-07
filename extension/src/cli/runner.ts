@@ -8,6 +8,8 @@ import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 import { StopWatch } from '../util/time'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
@@ -170,13 +172,25 @@ export class CliRunner implements ICli {
       )
     )
 
+    let stderr = ''
+    process.stderr?.on('data', chunk => (stderr += chunk.toString()))
+
     process.on('close', exitCode => {
       this.dispose.untrack(process)
       this.processCompleted.fire({
         ...baseEvent,
         duration: stopWatch.getElapsedTime(),
-        exitCode
+        exitCode,
+        stderr: stderr.replace(/\n+/g, '\n')
       })
+
+      if (exitCode && stderr) {
+        sendTelemetryEvent(
+          EventName.EXPERIMENTS_RUNNER_FAILED,
+          { command, error: stderr, exitCode },
+          { duration: stopWatch.getElapsedTime() }
+        )
+      }
     })
 
     return process
@@ -199,5 +213,6 @@ export class CliRunner implements ICli {
       args,
       cwd
     })
+    // return this.currentProcess
   }
 }
