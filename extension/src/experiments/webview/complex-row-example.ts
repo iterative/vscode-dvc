@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { join } from 'path'
 import { RowData } from './contract'
 
 const data: RowData[] = [
@@ -12,6 +13,9 @@ const data: RowData[] = [
         log_file: 'logs.csv',
         dropout: 0.122,
         process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
       }
     },
     queued: false,
@@ -39,6 +43,9 @@ const data: RowData[] = [
         log_file: 'logs.csv',
         dropout: 0.122,
         process: { threshold: 0.86, test_arg: 'string' }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
       }
     },
     queued: false,
@@ -66,6 +73,9 @@ const data: RowData[] = [
             log_file: 'logs.csv',
             dropout: 0.122,
             process: { threshold: 0.86, test_arg: 'string' }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
           }
         },
         queued: false,
@@ -95,6 +105,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.122,
                 process: { threshold: 0.86, test_arg: 'string' }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -123,6 +136,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.122,
                 process: { threshold: 0.86, test_arg: 'string' }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -155,6 +171,9 @@ const data: RowData[] = [
         log_file: 'logs.csv',
         dropout: 0.124,
         process: { threshold: 0.85 }
+      },
+      [join('nested', 'params.yaml')]: {
+        test: true
       }
     },
     queued: false,
@@ -182,6 +201,9 @@ const data: RowData[] = [
             log_file: 'logs.csv',
             dropout: 0.15,
             process: { threshold: 0.86, test_arg: 3 }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
           }
         },
         queued: false,
@@ -211,6 +233,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.15,
                 process: { threshold: 0.86, test_arg: 3 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -239,6 +264,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.15,
                 process: { threshold: 0.86, test_arg: 3 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -269,6 +297,9 @@ const data: RowData[] = [
             log_file: 'logs.csv',
             dropout: 0.122,
             process: { threshold: 0.86, test_arg: 'string' }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
           }
         },
         queued: false,
@@ -298,6 +329,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.122,
                 process: { threshold: 0.86, test_arg: 'string' }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -326,6 +360,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.122,
                 process: { threshold: 0.86, test_arg: 'string' }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -356,6 +393,9 @@ const data: RowData[] = [
             log_file: 'logs.csv',
             dropout: 0.124,
             process: { threshold: 0.85 }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
           }
         },
         queued: false,
@@ -385,6 +425,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.124,
                 process: { threshold: 0.85 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -413,6 +456,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.124,
                 process: { threshold: 0.85 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -441,6 +487,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.124,
                 process: { threshold: 0.85 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -469,6 +518,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.124,
                 process: { threshold: 0.85 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -497,6 +549,9 @@ const data: RowData[] = [
                 log_file: 'logs.csv',
                 dropout: 0.124,
                 process: { threshold: 0.85 }
+              },
+              [join('nested', 'params.yaml')]: {
+                test: true
               }
             },
             queued: false,
@@ -526,6 +581,9 @@ const data: RowData[] = [
             log_file: 'logs.csv',
             dropout: 0.124,
             process: { threshold: 0.85 }
+          },
+          [join('nested', 'params.yaml')]: {
+            test: true
           }
         },
         queued: true,

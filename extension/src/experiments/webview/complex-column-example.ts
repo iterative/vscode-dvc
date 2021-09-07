@@ -1,5 +1,8 @@
 /* eslint-disable */
 import { ParamOrMetric } from './contract'
+import { sep } from 'path'
+
+const testSep = sep || '/'
 
 const data: ParamOrMetric[] = [
   {
@@ -90,13 +93,29 @@ const data: ParamOrMetric[] = [
     path: 'params:params.yaml'
   },
   {
+    group: 'params',
+    hasChildren: false,
+    name: 'test',
+    parentPath: `params:nested${testSep}params.yaml`,
+    path: `params:nested${testSep}params.yaml:test`,
+    maxStringLength: 4,
+    types: ['boolean']
+  },
+  {
+    group: 'params',
+    hasChildren: true,
+    name: `nested${testSep}params.yaml`,
+    parentPath: 'params',
+    path: `params:nested${testSep}params.yaml`
+  },
+  {
     group: 'metrics',
     hasChildren: false,
     name: 'loss',
     parentPath: 'metrics:summary.json',
     path: 'metrics:summary.json:loss',
     maxStringLength: 18,
-    minNumber: 1.6168506622314453,
+    minNumber: 1.6168506622314454,
     maxNumber: 2.048856019973755,
     types: ['number']
   },
