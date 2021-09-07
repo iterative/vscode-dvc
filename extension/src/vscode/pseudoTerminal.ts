@@ -1,5 +1,7 @@
 import { EventEmitter, Pseudoterminal, Terminal, window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export class PseudoTerminal {
   public dispose = Disposable.fn()
@@ -12,6 +14,8 @@ export class PseudoTerminal {
   private readonly processOutput: EventEmitter<string>
   private readonly processTerminated: EventEmitter<void>
 
+  private isActive = false
+
   constructor(
     processOutput: EventEmitter<string>,
     processTerminated: EventEmitter<void>,
@@ -21,6 +25,10 @@ export class PseudoTerminal {
     this.processOutput = processOutput
     this.processTerminated = processTerminated
     this.blocked = false
+
+    this.deleteReferenceOnClose()
+
+    this.notifyActiveStatus()
   }
 
   public isBlocked() {
@@ -33,7 +41,7 @@ export class PseudoTerminal {
 
   public openCurrentInstance = async (): Promise<Terminal | undefined> => {
     if (!this.instance) {
-      await this.initializeInstance()
+      await this.createInstance()
     }
     this.instance?.show(true)
     return this.instance
@@ -43,13 +51,7 @@ export class PseudoTerminal {
     const currentTerminal = this.instance
     if (currentTerminal) {
       currentTerminal.dispose()
-      this.instance = undefined
     }
-  }
-
-  private initializeInstance = (): Promise<void> => {
-    this.deleteReferenceOnClose()
-    return this.createInstance()
   }
 
   private deleteReferenceOnClose = (): void => {
@@ -58,6 +60,12 @@ export class PseudoTerminal {
         if (this.instance && event.name === this.termName) {
           this.dispose.untrack(this.instance)
           this.instance = undefined
+
+          sendTelemetryEvent(
+            EventName.VIEWS_TERMINAL_CLOSED,
+            undefined,
+            undefined
+          )
         }
       })
     )
@@ -78,6 +86,13 @@ export class PseudoTerminal {
         onDidWrite: this.processOutput.event,
         open: () => {
           this.processOutput.fire('>>>> DVC Terminal >>>>\r\n\n')
+
+          sendTelemetryEvent(
+            EventName.VIEWS_TERMINAL_CREATED,
+            undefined,
+            undefined
+          )
+
           resolve()
         }
       }
@@ -89,4 +104,29 @@ export class PseudoTerminal {
         })
       )
     })
+
+  private notifyActiveStatus() {
+    this.dispose.track(
+      window.onDidChangeActiveTerminal(term => {
+        if (this.isActive && term?.name !== this.termName) {
+          this.isActive = false
+          return this.sendFocusChangedTelemetryEvent()
+        }
+        if (term && !this.isActive && term.name === this.termName) {
+          this.isActive = true
+          return this.sendFocusChangedTelemetryEvent()
+        }
+      })
+    )
+  }
+
+  private sendFocusChangedTelemetryEvent() {
+    return sendTelemetryEvent(
+      EventName.VIEWS_TERMINAL_FOCUS_CHANGED,
+      {
+        active: this.isActive
+      },
+      undefined
+    )
+  }
 }
