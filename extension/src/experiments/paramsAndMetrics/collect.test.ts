@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, sep } from 'path'
 import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import complexExperimentsOutput from '../webview/complex-output-example'
@@ -359,6 +359,29 @@ describe('collectParamsAndMetrics', () => {
     ) as ParamOrMetric
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
+  })
+
+  it('should collect all params and metrics from the test fixture', () => {
+    expect(
+      collectParamsAndMetrics(complexExperimentsOutput).map(({ path }) => path)
+    ).toEqual([
+      'params:params.yaml:epochs',
+      'params:params.yaml:learning_rate',
+      'params:params.yaml:dvc_logs_dir',
+      'params:params.yaml:log_file',
+      'params:params.yaml:dropout',
+      'params:params.yaml:process.threshold',
+      'params:params.yaml:process.test_arg',
+      'params:params.yaml:process',
+      'params:params.yaml',
+      `params:nested${sep}params.yaml:test`,
+      `params:nested${sep}params.yaml`,
+      'metrics:summary.json:loss',
+      'metrics:summary.json:accuracy',
+      'metrics:summary.json:val_loss',
+      'metrics:summary.json:val_accuracy',
+      'metrics:summary.json'
+    ])
   })
 })
 
