@@ -236,7 +236,7 @@ export class CliRunner implements ICli {
 
     return sendTelemetryEvent(
       EventName.EXPERIMENTS_RUNNER_COMPLETED,
-      { command },
+      { command, wasStopped: killed },
       { duration }
     )
   }
