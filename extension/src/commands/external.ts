@@ -1,6 +1,6 @@
 import { commands } from 'vscode'
 import { Disposable } from '../extension'
-import { sendTelemetryEvent } from '../telemetry'
+import { sendTelemetryEventAndThrow, sendTelemetryEvent } from '../telemetry'
 import { StopWatch } from '../util/time'
 
 export enum RegisteredCommands {
@@ -52,9 +52,13 @@ export const registerInstrumentedCommand = <T = string | undefined>(
 ): Disposable =>
   commands.registerCommand(name, async arg => {
     const stopWatch = new StopWatch()
-    const res = await func(arg)
-    sendTelemetryEvent(name, undefined, {
-      duration: stopWatch.getElapsedTime()
-    })
-    return res
+    try {
+      const res = await func(arg)
+      sendTelemetryEvent(name, undefined, {
+        duration: stopWatch.getElapsedTime()
+      })
+      return res
+    } catch (e: unknown) {
+      sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
+    }
   })

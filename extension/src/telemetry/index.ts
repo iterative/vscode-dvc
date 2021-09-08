@@ -84,6 +84,25 @@ export const sendTelemetryEvent = <
   )
 }
 
+export const sendTelemetryEventAndThrow = <
+  P extends IEventNamePropertyMapping,
+  E extends keyof P
+>(
+  eventName: E,
+  e: Error,
+  duration: number,
+  properties = {} as P[E]
+) => {
+  sendTelemetryEvent(
+    `errors.${eventName}` as E,
+    { ...properties, error: e.message } as P[E],
+    {
+      duration
+    }
+  )
+  throw e
+}
+
 export const sendViewOpenedTelemetryEvent = (
   eventName: ViewOpenedEventName,
   dvcRootCount: number
