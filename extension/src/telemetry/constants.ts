@@ -54,7 +54,7 @@ export interface IEventNamePropertyMapping {
 
   [EventName.EXPERIMENTS_RUNNER_COMPLETED]: {
     command: string
-    exitCode?: number
+    exitCode: number | null
     wasStopped?: boolean
   }
 

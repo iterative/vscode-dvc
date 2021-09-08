@@ -248,18 +248,20 @@ export class CliRunner implements ICli {
     duration: number
     killed: boolean
   }) {
+    const properties = { command, exitCode }
+
     if (!killed && exitCode && stderr) {
       return sendErrorTelemetryEvent(
         EventName.EXPERIMENTS_RUNNER_COMPLETED,
         new Error(stderr),
         duration,
-        { command, exitCode }
+        properties
       )
     }
 
     return sendTelemetryEvent(
       EventName.EXPERIMENTS_RUNNER_COMPLETED,
-      { command, wasStopped: killed },
+      { ...properties, wasStopped: killed },
       { duration }
     )
   }
