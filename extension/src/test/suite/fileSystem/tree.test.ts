@@ -229,6 +229,27 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(mockRemove).to.be.calledOnce
     })
 
+    it('should be able to run dvc.renameTarget without error', async () => {
+      const relPath = join('mock', 'data', 'MNIST', 'raw')
+      const absPath = join(dvcDemoPath, relPath)
+      stub(path, 'relative').returns(relPath)
+      const mockMove = stub(CliExecutor.prototype, 'move').resolves(
+        'target moved to new destination'
+      )
+
+      const mockInputBox = stub(window, 'showInputBox').resolves(
+        relPath + 'est'
+      )
+
+      await commands.executeCommand(RegisteredCommands.RENAME_TARGET, absPath)
+      expect(mockMove).to.be.calledOnce
+      expect(mockInputBox).to.be.calledOnce
+      expect(mockInputBox).to.be.calledWith({
+        prompt: 'enter a destination relative to the root',
+        value: relPath
+      })
+    })
+
     it('should be able to run dvc.pullTarget without error', async () => {
       const relPath = 'data'
       const absPath = join(dvcDemoPath, relPath)

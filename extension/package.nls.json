@@ -21,6 +21,7 @@
   "command.push": "Push",
   "command.pushTarget": "Push",
   "command.removeTarget": "Remove",
+  "command.renameTarget": "Rename",
   "command.views.experimentsFilterByTree.removeFilter": "Remove Filter From Experiments Table",
   "command.views.experimentsFilterByTree.removeAllFilters": "Remove All Filters From Experiments Table",
   "command.views.experimentsSortByTree.removeSort": "Remove Sort From Experiments Table",

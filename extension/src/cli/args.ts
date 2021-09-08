@@ -6,6 +6,7 @@ export enum Command {
   EXPERIMENT = 'exp',
   INITIALIZE = 'init',
   LIST = 'list',
+  MOVE = 'move',
   PULL = 'pull',
   PUSH = 'push',
   REMOVE = 'remove',
