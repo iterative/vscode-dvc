@@ -249,6 +249,10 @@ suite('Experiments Test Suite', () => {
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'
 
+      const mockGenericError = stub(window, 'showErrorMessage').resolves(
+        undefined
+      )
+
       stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
         clock.tick(duration)
         throw new Error(mockErrorMessage)
@@ -270,6 +274,8 @@ suite('Experiments Test Suite', () => {
         { error: mockErrorMessage },
         { duration }
       )
+      expect(mockGenericError, 'the generic error modal should be shown').to.be
+        .calledOnce
 
       clock.restore()
     })

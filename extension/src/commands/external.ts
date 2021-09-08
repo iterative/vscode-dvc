@@ -2,6 +2,7 @@ import { commands } from 'vscode'
 import { Disposable } from '../extension'
 import { sendTelemetryEventAndThrow, sendTelemetryEvent } from '../telemetry'
 import { StopWatch } from '../util/time'
+import { showGenericError } from '../vscode/modal'
 
 export enum RegisteredCommands {
   EXPERIMENT_APPLY = 'dvc.applyExperiment',
@@ -60,6 +61,7 @@ export const registerInstrumentedCommand = <T = string | undefined>(
       })
       return res
     } catch (e: unknown) {
+      showGenericError()
       sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
     }
   })

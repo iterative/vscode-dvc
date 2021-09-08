@@ -46,7 +46,9 @@ suite('Source Control Management Test Suite', () => {
         '' as unknown as MessageItem
       )
 
-      await commands.executeCommand(RegisteredCommands.CHECKOUT, { rootUri })
+      await expect(
+        commands.executeCommand(RegisteredCommands.CHECKOUT, { rootUri })
+      ).to.be.eventually.rejectedWith(Error)
 
       expect(mockCheckout).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
@@ -160,7 +162,9 @@ suite('Source Control Management Test Suite', () => {
         '' as unknown as MessageItem
       )
 
-      await commands.executeCommand(RegisteredCommands.PULL, { rootUri })
+      await expect(
+        commands.executeCommand(RegisteredCommands.PULL, { rootUri })
+      ).to.be.eventually.rejectedWith(Error)
 
       expect(mockPull).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
@@ -174,7 +178,9 @@ suite('Source Control Management Test Suite', () => {
         '' as unknown as MessageItem
       )
 
-      await commands.executeCommand(RegisteredCommands.PUSH, { rootUri })
+      await expect(
+        commands.executeCommand(RegisteredCommands.PUSH, { rootUri })
+      ).to.be.eventually.rejectedWith(Error)
 
       expect(mockPush).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
