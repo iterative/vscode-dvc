@@ -171,23 +171,18 @@ export class CliRunner implements ICli {
           .join('\r')
       )
     )
-
     let stderr = ''
     process.stderr?.on('data', chunk => (stderr += chunk.toString()))
 
     process.on('close', exitCode => {
       this.dispose.untrack(process)
-      const duration = stopWatch.getElapsedTime()
-      const killed = process.killed
-
-      this.processCompleted.fire({
+      this.notifyCompletion({
         ...baseEvent,
-        duration,
+        duration: stopWatch.getElapsedTime(),
         exitCode,
-        stderr: stderr.replace(/\n+/g, '\n')
+        killed: process.killed,
+        stderr
       })
-
-      this.sendTelemetryEvent({ command, duration, exitCode, killed, stderr })
     })
 
     return process
@@ -212,6 +207,29 @@ export class CliRunner implements ICli {
     })
   }
 
+  private notifyCompletion({
+    command,
+    pid,
+    cwd,
+    duration,
+    exitCode,
+    killed,
+    stderr
+  }: CliResult & {
+    killed: boolean
+  }) {
+    this.processCompleted.fire({
+      command,
+      cwd,
+      duration,
+      exitCode,
+      pid,
+      stderr: stderr?.replace(/\n+/g, '\n')
+    })
+
+    this.sendTelemetryEvent({ command, duration, exitCode, killed, stderr })
+  }
+
   private sendTelemetryEvent({
     command,
     exitCode,
@@ -221,7 +239,7 @@ export class CliRunner implements ICli {
   }: {
     command: string
     exitCode: number | null
-    stderr: string
+    stderr?: string
     duration: number
     killed: boolean
   }) {
