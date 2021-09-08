@@ -1,5 +1,5 @@
 import { filterExperiments, Operator } from '.'
-import { joinParamOrMetricPath } from '../../../util/paths'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { Experiment } from '../../webview/contract'
 
 describe('filterExperiments', () => {

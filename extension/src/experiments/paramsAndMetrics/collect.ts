@@ -1,5 +1,5 @@
 import { reduceParamsAndMetrics } from './reduce'
-import { joinParamOrMetricPath } from '../../util/paths'
+import { joinParamOrMetricPath } from './paths'
 import {
   ParamOrMetric,
   ParamOrMetricAggregateData,

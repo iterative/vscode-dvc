@@ -1,7 +1,7 @@
 import get from 'lodash.get'
 import { Experiment } from '../../webview/contract'
 import { definedAndNonEmpty } from '../../../util/array'
-import { splitParamOrMetricPath } from '../../../util/paths'
+import { splitParamOrMetricPath } from '../../paramsAndMetrics/paths'
 
 export enum Operator {
   EQUAL = '==',

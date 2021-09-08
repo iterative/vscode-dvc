@@ -1,9 +1,9 @@
 import React from 'react'
 import get from 'lodash/get'
 import { Column, Accessor } from 'react-table'
+import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
 import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
-import { splitParamOrMetricPath } from '../../../extension/src/util/paths'
 
 type Value = string | number
 

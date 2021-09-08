@@ -8,6 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { Status } from './model'
+import { splitParamOrMetricPath } from './paths'
 import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -18,7 +19,6 @@ import {
 } from '../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import { splitParamOrMetricPath } from '../../util/paths'
 
 type ParamsAndMetricsItem = {
   description: string | undefined

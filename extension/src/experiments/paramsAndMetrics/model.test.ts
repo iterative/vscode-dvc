@@ -1,7 +1,7 @@
 import { EventEmitter } from 'vscode'
 import { MementoPrefixes, ParamsAndMetricsModel, Status } from './model'
+import { joinParamOrMetricPath } from './paths'
 import { buildMockMemento } from '../../test/util'
-import { joinParamOrMetricPath } from '../../util/paths'
 
 jest.mock('vscode', () => ({
   EventEmitter: function (this: EventEmitter<void>) {

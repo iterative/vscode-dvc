@@ -13,8 +13,8 @@ import {
 } from 'vscode'
 import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { Experiments } from '../..'
-import { joinParamOrMetricPath } from '../../../util/paths'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,

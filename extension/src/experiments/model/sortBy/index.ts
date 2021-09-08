@@ -1,6 +1,6 @@
 import get from 'lodash.get'
+import { splitParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { Experiment } from '../../webview/contract'
-import { splitParamOrMetricPath } from '../../../util/paths'
 
 export interface SortDefinition {
   descending: boolean
