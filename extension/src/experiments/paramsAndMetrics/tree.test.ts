@@ -6,7 +6,6 @@ import {
   EventEmitter,
   TreeItem,
   TreeItemCollapsibleState,
-  Uri,
   window
 } from 'vscode'
 import { ExperimentsParamsAndMetricsTree } from './tree'
@@ -345,8 +344,8 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       mockedResourceLocator
     )
 
-    const relParamsPath = joinParamOrMetricPath('params', 'params.yml')
-    const paramsPath = join(mockedDvcRoot, relParamsPath)
+    const filename = 'params.yml'
+    const relParamsPath = joinParamOrMetricPath('params', filename)
 
     const paramsAndMetricsItem = {
       collapsibleState: TreeItemCollapsibleState.Collapsed,
@@ -369,7 +368,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       },
       description: '3/4',
       iconPath: mockedSelectedCheckbox,
-      uri: Uri.file(paramsPath)
+      uri: filename
     })
   })
 
@@ -384,8 +383,8 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       mockedResourceLocator
     )
 
-    const relParamsPath = joinParamOrMetricPath('params', 'params.yml')
-    const paramsPath = join(mockedDvcRoot, relParamsPath)
+    const filename = 'params.yml'
+    const relParamsPath = joinParamOrMetricPath('params', filename)
 
     const paramsAndMetricsItem = {
       collapsibleState: TreeItemCollapsibleState.None,
@@ -407,7 +406,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,
-      uri: Uri.file(paramsPath)
+      uri: filename
     })
   })
 })
