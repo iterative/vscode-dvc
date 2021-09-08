@@ -1,7 +1,7 @@
-import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
 import { pickFromParamsAndMetrics } from './quickPick'
+import { joinParamOrMetricPath } from './paths'
 import { QuickPickItemWithValue } from '../../vscode/quickPick'
 
 const mockedShowQuickPick = mocked<
@@ -24,8 +24,8 @@ beforeEach(() => {
 describe('pickFromParamsAndMetrics', () => {
   const params = 'params'
   const paramsYaml = 'params.yaml'
-  const paramsYamlPath = join(params, paramsYaml)
-  const epochsParamPath = join(paramsYamlPath, 'epochs')
+  const paramsYamlPath = joinParamOrMetricPath(params, paramsYaml)
+  const epochsParamPath = joinParamOrMetricPath(paramsYamlPath, 'epochs')
   const epochsParam = {
     group: params,
     hasChildren: false,

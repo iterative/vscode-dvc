@@ -4,9 +4,9 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands, Uri, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import { CliReader } from '../../../../../cli/reader'
-import complexExperimentsOutput from '../../../../../experiments/webview/complex-output-example.json'
-import complexColumnData from '../../../../../experiments/webview/complex-column-example.json'
-import complexRowData from '../../../../../experiments/webview/complex-row-example.json'
+import complexExperimentsOutput from '../../../../fixtures/complex-output-example'
+import complexColumnData from '../../../../fixtures/complex-column-example'
+import complexRowData from '../../../../fixtures/complex-row-example'
 import { Experiments } from '../../../../../experiments'
 import { ExperimentsRepository } from '../../../../../experiments/repository'
 import { Config } from '../../../../../config'
@@ -23,6 +23,7 @@ import {
   resourcePath
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
+import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 
 suite('Experiments Filter By Tree Test Suite', () => {
@@ -69,7 +70,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const experimentsWebview = await experimentsRepository.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const lossPath = 'metrics/summary.json/loss'
+      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
 
       const lossFilter = {
         operator: Operator.LESS_THAN_OR_EQUAL,
@@ -179,7 +180,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experimentsRepository.isReady()
 
-      const lossPath = 'metrics/summary.json/loss'
+      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
 
       const loss = complexColumnData.find(
         paramOrMetric => paramOrMetric.path === lossPath

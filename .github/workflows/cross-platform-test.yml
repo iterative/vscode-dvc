@@ -1,0 +1,44 @@
+name: Cross-Platform Test
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  suite:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macOS-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.4
+
+      - name: Get Yarn cache path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v2
+        name: Restore Yarn cache
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: yarn-${{ hashFiles('**/yarn.lock') }}-${{matrix.os}}
+          restore-keys: yarn
+
+      - uses: actions/cache@v2
+        name: Restore .vscode-test cache
+        id: vscode-cache
+        with:
+          path: extension/.vscode-test
+          key: vscode-test-${{matrix.os}}
+
+      - run: yarn install
+
+      - run: yarn run test

@@ -7,6 +7,7 @@ import { getProcessEnv } from '../env'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util'
 import { Config } from '../config'
+import { joinEnvPath } from '../util/env'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -53,7 +54,10 @@ describe('typeCheckCommands', () => {
 
 describe('executeProcess', () => {
   it('should pass the correct details to the underlying process given no path to the cli or python binary path', async () => {
-    const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
+    const existingPath = joinEnvPath(
+      '/Users/robot/some/path',
+      '/Users/robot/yarn/path'
+    )
     const processEnv = { PATH: existingPath, SECRET_KEY: 'abc123' }
     const cwd = __dirname
     const args = [Command.CHECKOUT]
@@ -87,7 +91,10 @@ describe('executeProcess', () => {
   })
 
   it('should handle an error produced by the underlying process', async () => {
-    const existingPath = '/Users/robot/some/path:/Users/robot/yarn/path'
+    const existingPath = joinEnvPath(
+      '/Users/robot/some/path',
+      '/Users/robot/yarn/path'
+    )
     const pythonBinPath = '/some/path/to/python'
     const SECRET_KEY = 'abc123'
     const processEnv = { PATH: existingPath, SECRET_KEY }
@@ -119,7 +126,7 @@ describe('executeProcess', () => {
       cwd,
       env: {
         DVC_NO_ANALYTICS: 'true',
-        PATH: `/some/path/to:${existingPath}`,
+        PATH: joinEnvPath('/some/path/to', existingPath),
         SECRET_KEY
       },
       executable: '/some/path/to/dvc'

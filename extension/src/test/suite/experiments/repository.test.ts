@@ -5,9 +5,9 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
-import complexExperimentsOutput from '../../../experiments/webview/complex-output-example.json'
-import complexRowData from '../../../experiments/webview/complex-row-example.json'
-import complexColumnData from '../../../experiments/webview/complex-column-example.json'
+import complexExperimentsOutput from '../../fixtures/complex-output-example'
+import complexRowData from '../../fixtures/complex-row-example'
+import complexColumnData from '../../fixtures/complex-column-example'
 import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -21,6 +21,7 @@ import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
+import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -307,7 +308,7 @@ suite('Experiments Repository Test Suite', () => {
     mockShowQuickPick.onFirstCall().resolves({
       label: 'test',
       value: {
-        path: 'params/params.yaml/test'
+        path: joinParamOrMetricPath('params', 'params.yaml', 'test')
       }
     } as QuickPickItemWithValue<ParamOrMetric>)
 
@@ -356,27 +357,35 @@ suite('Experiments Repository Test Suite', () => {
   describe('persisted state', () => {
     const firstSortDefinition = {
       descending: false,
-      path: 'params/params.yaml/test'
+      path: joinParamOrMetricPath('params', 'params.yaml', 'test')
     }
     const secondSortDefinition = {
       descending: true,
-      path: 'params/params.yaml/other'
+      path: joinParamOrMetricPath('params', 'params.yaml', 'other')
     }
     const sortDefinitions: SortDefinition[] = [
       firstSortDefinition,
       secondSortDefinition
     ]
 
-    const firstFilterId = 'params/params.yaml/test==1'
+    const firstFilterId = joinParamOrMetricPath(
+      'params',
+      'params.yaml',
+      'test==1'
+    )
     const firstFilterDefinition = {
       operator: Operator.EQUAL,
-      path: 'params/params.yaml/test',
+      path: joinParamOrMetricPath('params', 'params.yaml', 'test'),
       value: 1
     }
-    const secondFilterId = 'params/params.yaml/other∈testcontains'
+    const secondFilterId = joinParamOrMetricPath(
+      'params',
+      'params.yaml',
+      'other∈testcontains'
+    )
     const secondFilterDefinition = {
       operator: Operator.CONTAINS,
-      path: 'params/params.yaml/other',
+      path: joinParamOrMetricPath('params', 'params.yaml', 'other'),
       value: 'testcontains'
     }
     const firstFilterMapEntry: [string, FilterDefinition] = [

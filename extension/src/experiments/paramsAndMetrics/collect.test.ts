@@ -1,7 +1,8 @@
-import { join } from 'path'
+import { join, sep } from 'path'
 import { collectFiles, collectParamsAndMetrics } from './collect'
+import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
-import complexExperimentsOutput from '../webview/complex-output-example.json'
+import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 describe('collectParamsAndMetrics', () => {
@@ -116,7 +117,9 @@ describe('collectParamsAndMetrics', () => {
   })
 
   const exampleMixedParam = paramsAndMetrics.find(
-    paramOrMetric => paramOrMetric.parentPath === join('params', 'params.yaml')
+    paramOrMetric =>
+      paramOrMetric.parentPath ===
+      joinParamOrMetricPath('params', 'params.yaml')
   ) as ParamOrMetric
 
   it('should correctly identify mixed type params', () => {
@@ -183,7 +186,8 @@ describe('collectParamsAndMetrics', () => {
     })
     const mixedParam = paramsAndMetrics.find(
       paramOrMetric =>
-        paramOrMetric.path === join('params', 'params.yaml', 'mixedNumber')
+        paramOrMetric.path ===
+        joinParamOrMetricPath('params', 'params.yaml', 'mixedNumber')
     ) as ParamOrMetric
 
     expect(mixedParam.minNumber).toEqual(-1)
@@ -294,7 +298,8 @@ describe('collectParamsAndMetrics', () => {
 
     const params = paramsAndMetrics.filter(
       paramOrMetric =>
-        paramOrMetric.parentPath === join('params', 'params.yaml')
+        paramOrMetric.parentPath ===
+        joinParamOrMetricPath('params', 'params.yaml')
     ) as ParamOrMetric[]
 
     expect(params?.map(({ name }) => name)).toEqual([
@@ -326,7 +331,8 @@ describe('collectParamsAndMetrics', () => {
 
     const objectParam = paramsAndMetrics.find(
       paramOrMetric =>
-        paramOrMetric.parentPath === join('params', 'params.yaml')
+        paramOrMetric.parentPath ===
+        joinParamOrMetricPath('params', 'params.yaml')
     ) as ParamOrMetric
 
     expect(objectParam.name).toEqual('onlyHasChild')
@@ -335,7 +341,7 @@ describe('collectParamsAndMetrics', () => {
     const primitiveParam = paramsAndMetrics.find(
       paramOrMetric =>
         paramOrMetric.parentPath ===
-        join('params', 'params.yaml', 'onlyHasChild')
+        joinParamOrMetricPath('params', 'params.yaml', 'onlyHasChild')
     ) as ParamOrMetric
 
     expect(primitiveParam.name).toEqual('onlyHasPrimitive')
@@ -344,10 +350,38 @@ describe('collectParamsAndMetrics', () => {
     const onlyHasPrimitiveChild = paramsAndMetrics.find(
       paramOrMetric =>
         paramOrMetric.parentPath ===
-        join('params', 'params.yaml', 'onlyHasChild', 'onlyHasPrimitive')
+        joinParamOrMetricPath(
+          'params',
+          'params.yaml',
+          'onlyHasChild',
+          'onlyHasPrimitive'
+        )
     ) as ParamOrMetric
 
     expect(onlyHasPrimitiveChild).toBeUndefined()
+  })
+
+  it('should collect all params and metrics from the test fixture', () => {
+    expect(
+      collectParamsAndMetrics(complexExperimentsOutput).map(({ path }) => path)
+    ).toEqual([
+      'params:params.yaml:epochs',
+      'params:params.yaml:learning_rate',
+      'params:params.yaml:dvc_logs_dir',
+      'params:params.yaml:log_file',
+      'params:params.yaml:dropout',
+      'params:params.yaml:process.threshold',
+      'params:params.yaml:process.test_arg',
+      'params:params.yaml:process',
+      'params:params.yaml',
+      `params:nested${sep}params.yaml:test`,
+      `params:nested${sep}params.yaml`,
+      'metrics:summary.json:loss',
+      'metrics:summary.json:accuracy',
+      'metrics:summary.json:val_loss',
+      'metrics:summary.json:val_accuracy',
+      'metrics:summary.json'
+    ])
   })
 })
 
@@ -355,6 +389,7 @@ describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
     expect(collectFiles(complexExperimentsOutput)).toEqual([
       'params.yaml',
+      join('nested', 'params.yaml'),
       'summary.json'
     ])
   })

@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
@@ -9,6 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { Status } from './model'
+import { splitParamOrMetricPath } from './paths'
 import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -74,10 +74,9 @@ export class ExperimentsParamsAndMetricsTree
 
     const { dvcRoot, path, collapsibleState, description, iconPath } = element
 
-    const treeItem = new TreeItem(
-      Uri.file(join(dvcRoot, path)),
-      collapsibleState
-    )
+    const splitPath = splitParamOrMetricPath(path)
+    const finalPathSegment = splitPath[splitPath.length - 1]
+    const treeItem = new TreeItem(finalPathSegment, collapsibleState)
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],

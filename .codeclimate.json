@@ -1,0 +1,10 @@
+{
+  "version": "2",
+  "exclude_patterns": [
+    "**/*.test.ts",
+    "extension/src/test/fixtures",
+    "extension/src/test/suite",
+    "extension/src/vscode.proposed.d.ts",
+    "webview/src/react-table-config.d.ts"
+  ]
+}

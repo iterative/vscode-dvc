@@ -1,9 +1,8 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
-
-import complexRowData from 'dvc/src/experiments/webview/complex-row-example.json'
-import complexColumnData from 'dvc/src/experiments/webview/complex-column-example.json'
+import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
+import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
 import Experiments from '../components/Experiments'
 
 import './test-vscode-styles.scss'

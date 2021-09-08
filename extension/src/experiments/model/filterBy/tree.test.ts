@@ -1,10 +1,10 @@
-import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { Operator } from '.'
 import { ExperimentsFilterByTree } from './tree'
 import { Experiments } from '../..'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -72,7 +72,7 @@ describe('ExperimentsFilterByTree', () => {
     const mockedFilters = [
       {
         operator: Operator.EQUAL,
-        path: join('params', 'params.yaml', 'param'),
+        path: joinParamOrMetricPath('params', 'params.yaml', 'param'),
         value: '90000'
       }
     ]
@@ -86,8 +86,8 @@ describe('ExperimentsFilterByTree', () => {
       {
         description: '== 90000',
         dvcRoot: 'demo',
-        id: join('params', 'params.yaml', 'param==90000'),
-        label: join('params', 'params.yaml', 'param')
+        id: joinParamOrMetricPath('params', 'params.yaml', 'param==90000'),
+        label: joinParamOrMetricPath('params', 'params.yaml', 'param')
       }
     ])
   })
@@ -101,7 +101,7 @@ describe('ExperimentsFilterByTree', () => {
     mockedGetFilters.mockReturnValueOnce([
       {
         operator: Operator.EQUAL,
-        path: join('params', 'params.yaml', 'param'),
+        path: joinParamOrMetricPath('params', 'params.yaml', 'param'),
         value: '90000'
       }
     ])
@@ -114,12 +114,12 @@ describe('ExperimentsFilterByTree', () => {
     const mockedFilters = [
       {
         operator: '==',
-        path: join('params', 'params.yml', 'param'),
+        path: joinParamOrMetricPath('params', 'params.yml', 'param'),
         value: 90000
       },
       {
         operator: '<',
-        path: join('metrics', 'logs.json', 'metric'),
+        path: joinParamOrMetricPath('metrics', 'logs.json', 'metric'),
         value: '1'
       }
     ]
@@ -141,14 +141,14 @@ describe('ExperimentsFilterByTree', () => {
       {
         description: '== 90000',
         dvcRoot: 'demo',
-        id: join('params', 'params.yml', 'param==90000'),
-        label: join('params', 'params.yml', 'param')
+        id: joinParamOrMetricPath('params', 'params.yml', 'param==90000'),
+        label: joinParamOrMetricPath('params', 'params.yml', 'param')
       },
       {
         description: '< 1',
         dvcRoot: 'demo',
-        id: join('metrics', 'logs.json', 'metric<1'),
-        label: join('metrics', 'logs.json', 'metric')
+        id: joinParamOrMetricPath('metrics', 'logs.json', 'metric<1'),
+        label: joinParamOrMetricPath('metrics', 'logs.json', 'metric')
       }
     ])
   })
@@ -176,7 +176,11 @@ describe('ExperimentsFilterByTree', () => {
     it('should return a tree item for a filter', async () => {
       const mockedFilter = {
         operator: '>=',
-        path: join('metrics', 'summary.json', 'success_metric'),
+        path: joinParamOrMetricPath(
+          'metrics',
+          'summary.json',
+          'success_metric'
+        ),
         value: '100'
       }
       let mockedItem = {}
@@ -202,8 +206,16 @@ describe('ExperimentsFilterByTree', () => {
       const item = experimentsFilterByTree.getTreeItem({
         description: '>= 100',
         dvcRoot,
-        id: join('metrics', 'summary.json', 'success_metric>=100'),
-        label: join('metrics', 'summary.json', 'success_metric')
+        id: joinParamOrMetricPath(
+          'metrics',
+          'summary.json',
+          'success_metric>=100'
+        ),
+        label: joinParamOrMetricPath(
+          'metrics',
+          'summary.json',
+          'success_metric'
+        )
       })
 
       expect(item).toEqual({

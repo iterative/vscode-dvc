@@ -7,7 +7,7 @@ import { CliReader } from './reader'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util'
 import { getProcessEnv } from '../env'
-import complexExperimentsOutput from '../experiments/webview/complex-output-example.json'
+import complexExperimentsOutput from '../test/fixtures/complex-output-example'
 import { Config } from '../config'
 
 jest.mock('vscode')

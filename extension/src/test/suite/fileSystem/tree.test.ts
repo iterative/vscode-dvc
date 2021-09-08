@@ -49,7 +49,9 @@ suite('Tracked Explorer Tree Test Suite', () => {
       await commands.executeCommand('workbench.action.files.newUntitledFile')
       await commands.executeCommand('editor.action.clipboardPasteAction')
 
-      expect(window.activeTextEditor?.document.getText()).to.equal(dvcDemoPath)
+      expect(
+        Uri.file(window.activeTextEditor?.document.getText() as string).fsPath
+      ).to.equal(dvcDemoPath)
     })
 
     it('should be able to run dvc.copyRelativeFilePath and copy a path to the clipboard', async () => {

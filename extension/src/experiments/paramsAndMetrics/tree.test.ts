@@ -6,11 +6,11 @@ import {
   EventEmitter,
   TreeItem,
   TreeItemCollapsibleState,
-  Uri,
   window
 } from 'vscode'
 import { ExperimentsParamsAndMetricsTree } from './tree'
-import complexColumnData from '../webview/complex-column-example.json'
+import { joinParamOrMetricPath } from './paths'
+import complexColumnData from '../../test/fixtures/complex-column-example'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { Status } from '../paramsAndMetrics/model'
@@ -120,14 +120,21 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join('params', 'params.yaml')
+          path: joinParamOrMetricPath('params', 'params.yaml')
         },
         {
           collapsibleState: 1,
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join('metrics', 'summary.json')
+          path: joinParamOrMetricPath('params', join('nested', 'params.yaml'))
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          path: joinParamOrMetricPath('metrics', 'summary.json')
         }
       ])
     })
@@ -152,8 +159,12 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         mockedDvcRoot
       )
 
-      const paramsPath = join('params', 'params.yaml')
-      const processPath = join(paramsPath, 'process')
+      const paramsPath = joinParamOrMetricPath('params', 'params.yaml')
+      const processPath = joinParamOrMetricPath(
+        'params',
+        'params.yaml',
+        'process'
+      )
 
       expect(children).toEqual([
         {
@@ -168,7 +179,14 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join('metrics', 'summary.json')
+          path: joinParamOrMetricPath('params', join('nested', 'params.yaml'))
+        },
+        {
+          collapsibleState: 1,
+          description: undefined,
+          dvcRoot: mockedDvcRoot,
+          iconPath: mockedSelectedCheckbox,
+          path: joinParamOrMetricPath('metrics', 'summary.json')
         }
       ])
 
@@ -205,31 +223,31 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(paramsPath, 'epochs')
+          path: joinParamOrMetricPath(paramsPath, 'epochs')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(paramsPath, 'learning_rate')
+          path: joinParamOrMetricPath(paramsPath, 'learning_rate')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(paramsPath, 'dvc_logs_dir')
+          path: joinParamOrMetricPath(paramsPath, 'dvc_logs_dir')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(paramsPath, 'log_file')
+          path: joinParamOrMetricPath(paramsPath, 'log_file')
         },
         {
           collapsibleState: 0,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(paramsPath, 'dropout')
+          path: joinParamOrMetricPath(paramsPath, 'dropout')
         },
         {
           collapsibleState: 1,
@@ -265,14 +283,24 @@ describe('ExperimentsParamsAndMetricsTree', () => {
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(processPath, 'threshold')
+          path: joinParamOrMetricPath(
+            'params',
+            'params.yaml',
+            'process',
+            'threshold'
+          )
         },
         {
           collapsibleState: 0,
           description: undefined,
           dvcRoot: mockedDvcRoot,
           iconPath: mockedSelectedCheckbox,
-          path: join(processPath, 'test_arg')
+          path: joinParamOrMetricPath(
+            'params',
+            'params.yaml',
+            'process',
+            'test_arg'
+          )
         }
       ])
     })
@@ -316,8 +344,8 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       mockedResourceLocator
     )
 
-    const relParamsPath = join('params', 'params.yml')
-    const paramsPath = join(mockedDvcRoot, relParamsPath)
+    const filename = 'params.yml'
+    const relParamsPath = joinParamOrMetricPath('params', filename)
 
     const paramsAndMetricsItem = {
       collapsibleState: TreeItemCollapsibleState.Collapsed,
@@ -340,7 +368,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       },
       description: '3/4',
       iconPath: mockedSelectedCheckbox,
-      uri: Uri.file(paramsPath)
+      uri: filename
     })
   })
 
@@ -355,8 +383,8 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       mockedResourceLocator
     )
 
-    const relParamsPath = join('params', 'params.yml')
-    const paramsPath = join(mockedDvcRoot, relParamsPath)
+    const filename = 'params.yml'
+    const relParamsPath = joinParamOrMetricPath('params', filename)
 
     const paramsAndMetricsItem = {
       collapsibleState: TreeItemCollapsibleState.None,
@@ -378,7 +406,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         title: 'toggle'
       },
       iconPath: mockedEmptyCheckbox,
-      uri: Uri.file(paramsPath)
+      uri: filename
     })
   })
 })
