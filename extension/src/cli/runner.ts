@@ -170,7 +170,7 @@ export class CliRunner implements ICli {
 
     process.on('close', exitCode => {
       this.dispose.untrack(process)
-      this.notifyCompletion({
+      this.notifyCompleted({
         ...baseEvent,
         duration: stopWatch.getElapsedTime(),
         exitCode,
@@ -212,7 +212,7 @@ export class CliRunner implements ICli {
     )
   }
 
-  private notifyCompletion({
+  private notifyCompleted({
     command,
     pid,
     cwd,
