@@ -1,0 +1,4 @@
+{
+  "version": "2",
+  "exclude_patterns": ["extension/src/test/fixtures/"]
+}

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { join } from '../util/path'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
