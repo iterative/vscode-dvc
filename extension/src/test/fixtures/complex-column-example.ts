@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { sep } from '../../test/util/path'
 import { ParamOrMetric } from '../../experiments/webview/contract'
 
