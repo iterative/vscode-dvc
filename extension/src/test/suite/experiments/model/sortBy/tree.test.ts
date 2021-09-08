@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
@@ -23,6 +22,7 @@ import {
   resourcePath
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
+import { joinParamOrMetricPath } from '../../../../../util/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 
 suite('Experiments Sort By Tree Test Suite', () => {
@@ -166,8 +166,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = join(...testParamPathArray)
-      const otherTestParamPath = join(...otherTestParamPathArray)
+      const testParamPath = joinParamOrMetricPath(...testParamPathArray)
+      const otherTestParamPath = joinParamOrMetricPath(
+        ...otherTestParamPathArray
+      )
 
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy

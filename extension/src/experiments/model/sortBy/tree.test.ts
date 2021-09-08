@@ -14,6 +14,7 @@ import {
 import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
 import { Experiments } from '../..'
+import { joinParamOrMetricPath } from '../../../util/paths'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,
@@ -64,7 +65,7 @@ beforeEach(() => {
 
 describe('ExperimentsSortByTree', () => {
   const dvcRoot = 'demo'
-  const examplePath = join('params', 'test')
+  const examplePath = joinParamOrMetricPath('params', 'test')
   const exampleSortDefinition: SortDefinition = {
     descending: true,
     path: examplePath

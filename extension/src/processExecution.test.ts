@@ -7,7 +7,7 @@ describe('executeProcess', () => {
       cwd: __dirname,
       executable: 'echo'
     })
-    expect(output).toEqual('some text')
+    expect(output).toMatch(/some.*text/)
   })
 
   it('should return the stderr if the process throws with stderr', async () => {
