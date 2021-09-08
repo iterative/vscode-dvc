@@ -203,6 +203,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.renameTarget%",
+        "command": "dvc.renameTarget",
+        "category": "DVC"
+      },
+      {
         "title": "%command.addExperimentsTableSort%",
         "command": "dvc.addExperimentsTableSort",
         "category": "DVC",
@@ -384,6 +389,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.renameTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "when": "false"
         },
@@ -489,23 +498,13 @@
       ],
       "view/item/context": [
         {
-          "command": "dvc.deleteTarget",
-          "group": "DVC",
-          "when": "viewItem =~ /^dvcTracked/"
-        },
-        {
-          "command": "dvc.removeTarget",
-          "when": "viewItem == dvcTrackedData",
-          "group": "DVC"
-        },
-        {
-          "command": "dvc.pushTarget",
-          "group": "DVC",
+          "command": "dvc.pullTarget",
+          "group": "1_DVC@1",
           "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
         },
         {
-          "command": "dvc.pullTarget",
-          "group": "DVC",
+          "command": "dvc.pushTarget",
+          "group": "1_DVC@2",
           "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
         },
         {
@@ -517,6 +516,21 @@
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
           "when": "viewItem =~ /^dvcTracked/"
+        },
+        {
+          "command": "dvc.renameTarget",
+          "group": "7_modification@1",
+          "when": "viewItem == dvcTrackedData"
+        },
+        {
+          "command": "dvc.deleteTarget",
+          "group": "7_modification@2",
+          "when": "viewItem =~ /^dvcTracked/"
+        },
+        {
+          "command": "dvc.removeTarget",
+          "when": "viewItem == dvcTrackedData",
+          "group": "7_modification@2"
         },
         {
           "command": "dvc.addExperimentsTableSort",

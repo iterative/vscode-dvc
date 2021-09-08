@@ -374,6 +374,30 @@ describe('CliExecutor', () => {
     })
   })
 
+  describe('move', () => {
+    it('should call createProcess with the correct parameters to move a DVC tracked target', async () => {
+      const cwd = __dirname
+      const target = 'data/data.xml.dvc'
+      const destination = 'data/data1.xml.dvc'
+      const stdout = `                                                                      
+			To track the changes with git, run:
+			
+							git add ${destination} data/.gitignore`
+
+      mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
+
+      const output = await cliExecutor.move(cwd, target, destination)
+      expect(output).toEqual(stdout)
+
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['move', target, destination],
+        cwd: cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('pull', () => {
     it('should call createProcess with the correct parameters to pull the entire repository', async () => {
       const cwd = __dirname

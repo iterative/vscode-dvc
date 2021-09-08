@@ -90,6 +90,7 @@ export interface IEventNamePropertyMapping {
   [EventName.PUSH_TARGET]: undefined
   [EventName.PUSH]: undefined
   [EventName.REMOVE_TARGET]: undefined
+  [EventName.RENAME_TARGET]: undefined
 
   [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined
   [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined
