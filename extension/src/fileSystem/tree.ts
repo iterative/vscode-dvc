@@ -27,6 +27,7 @@ import {
 } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { getInput } from '../vscode/inputBox'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -282,6 +283,30 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
             AvailableCommands.REMOVE,
             dvcRoot,
             relPath
+          )
+        }
+      )
+    )
+
+    this.dispose.track(
+      registerInstrumentedCommand<string>(
+        RegisteredCommands.RENAME_TARGET,
+        async path => {
+          const dvcRoot = this.pathRoots[path]
+          const relPath = relative(dvcRoot, path)
+          const relDestination = await getInput(
+            'enter a destination relative to the root',
+            relPath
+          )
+          if (!relDestination || relDestination === relPath) {
+            return
+          }
+
+          return this.internalCommands.executeCommand(
+            AvailableCommands.MOVE,
+            dvcRoot,
+            relPath,
+            relDestination
           )
         }
       )

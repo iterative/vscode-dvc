@@ -19,6 +19,8 @@ export type ViewOpenedEventName =
 
 export const EventName = Object.assign(
   {
+    EXPERIMENTS_RUNNER_COMPLETED: 'experiments.runner.completed',
+
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
@@ -49,6 +51,12 @@ type ExtensionProperties = {
 export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_EXECUTION_DETAILS_CHANGED]: ExtensionProperties
   [EventName.EXTENSION_LOAD]: ExtensionProperties
+
+  [EventName.EXPERIMENTS_RUNNER_COMPLETED]: {
+    command: string
+    exitCode: number | null
+    wasStopped?: boolean
+  }
 
   [EventName.EXPERIMENT_APPLY]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
@@ -82,6 +90,7 @@ export interface IEventNamePropertyMapping {
   [EventName.PUSH_TARGET]: undefined
   [EventName.PUSH]: undefined
   [EventName.REMOVE_TARGET]: undefined
+  [EventName.RENAME_TARGET]: undefined
 
   [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined
   [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined

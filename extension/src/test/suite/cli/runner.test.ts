@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { restore, spy } from 'sinon'
+import { restore, spy, stub } from 'sinon'
 import { window, commands, Event, EventEmitter } from 'vscode'
 import { Disposable, Disposer } from '../../../extension'
 import { Config } from '../../../config'
 import { CliRunner } from '../../../cli/runner'
 import { CliResult, CliStarted } from '../../../cli'
+import * as Telemetry from '../../../telemetry'
+import { EventName } from '../../../telemetry/constants'
 
 suite('CLI Runner Test Suite', () => {
   window.showInformationMessage('Start all cli runner tests.')
@@ -125,5 +127,37 @@ suite('CLI Runner Test Suite', () => {
       expect((await eventStream).includes(text)).to.be.true
       return completed
     }).timeout(12000)
+
+    it('should send an error event if the command fails with an exit code and stderr', async () => {
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendErrorTelemetryEvent')
+
+      const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
+
+      const cwd = __dirname
+
+      await cliRunner.run(cwd, '1', '&&', 'then', 'die')
+      const process = cliRunner.getRunningProcess()
+
+      const processCompleted = new Promise(resolve =>
+        process?.on('close', () => resolve(undefined))
+      )
+
+      await expect(process).to.eventually.be.rejectedWith(Error)
+
+      await processCompleted
+
+      const [eventName, error, , properties] =
+        mockSendTelemetryEvent.getCall(0).args
+
+      const { command, exitCode } = properties as {
+        command: string
+        exitCode?: number | undefined
+      }
+
+      expect(eventName).to.equal(EventName.EXPERIMENTS_RUNNER_COMPLETED)
+      expect(error.message).to.have.length.greaterThan(0)
+      expect(command).to.equal('sleep 1 && then die')
+      expect(exitCode).to.be.greaterThan(0)
+    }).timeout(4000)
   })
 })
