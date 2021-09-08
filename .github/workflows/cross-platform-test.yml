@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  run-suite:
+  suite:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
