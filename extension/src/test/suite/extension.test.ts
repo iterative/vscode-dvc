@@ -112,8 +112,11 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'help').rejects('still do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockPath = resolve('file', 'picked', 'path', 'to', 'python')
-      stub(window, 'showOpenDialog').resolves([Uri.file(mockPath)])
+      const mockUri = Uri.file(
+        resolve('file', 'picked', 'path', 'to', 'python')
+      )
+      const mockPath = mockUri.fsPath
+      stub(window, 'showOpenDialog').resolves([mockUri])
       const pythonChanged = configurationChangeEvent(
         pythonPathOption,
         disposable
@@ -160,9 +163,10 @@ suite('Extension Test Suite', () => {
             return undefined
           })
       )
-      const mockPath = resolve('file', 'picked', 'path', 'to', 'dvc')
+      const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
+      const mockPath = mockUri.fsPath
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
-        Uri.file(mockPath)
+        mockUri
       ])
       const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I WORK NOW'
