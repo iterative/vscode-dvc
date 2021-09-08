@@ -3,7 +3,7 @@ export interface IExtension {
   hasRoots: () => boolean
   canRunCli: () => Promise<boolean>
 
-  initialize: () => void
+  initialize: () => Promise<void[]>
   initializePreCheck: () => Promise<void>
   reset: () => void
 }

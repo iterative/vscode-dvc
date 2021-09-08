@@ -3,6 +3,7 @@ import { join, resolve as resolvePath } from 'path'
 import Mocha from 'mocha'
 import glob from 'glob'
 import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
 import sinonChai from 'sinon-chai'
 import { Logger } from '../../common/logger'
 
@@ -40,6 +41,7 @@ export async function run() {
   })
 
   chai.use(sinonChai)
+  chai.use(chaiAsPromised)
 
   const testsRoot = resolvePath(__dirname, '..')
 
