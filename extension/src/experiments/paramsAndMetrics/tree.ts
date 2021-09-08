@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
   Event,
@@ -19,6 +18,7 @@ import {
 } from '../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
+import { splitParamOrMetricPath } from '../../util/paths'
 
 type ParamsAndMetricsItem = {
   description: string | undefined
@@ -74,10 +74,9 @@ export class ExperimentsParamsAndMetricsTree
 
     const { dvcRoot, path, collapsibleState, description, iconPath } = element
 
-    const treeItem = new TreeItem(
-      Uri.file(join(dvcRoot, path)),
-      collapsibleState
-    )
+    const splitPath = splitParamOrMetricPath(path)
+    const finalPathSegment = splitPath[splitPath.length - 1]
+    const treeItem = new TreeItem(finalPathSegment, collapsibleState)
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
