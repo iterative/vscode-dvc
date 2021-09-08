@@ -11,8 +11,8 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
-import complexRowData from 'dvc/src/experiments/webview/complex-row-example'
-import complexColumnData from 'dvc/src/experiments/webview/complex-column-example'
+import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
+import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
 import {
   MessageFromWebviewType,
   MessageToWebviewType,

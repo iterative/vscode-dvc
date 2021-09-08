@@ -1,7 +1,7 @@
 import { join, sep } from 'path'
 import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
-import complexExperimentsOutput from '../webview/complex-output-example'
+import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 import { joinParamOrMetricPath } from '../../util/paths'
 

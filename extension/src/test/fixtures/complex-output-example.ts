@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { join } from '../../test/util/path'
+import { join } from '../util/path'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 const data: ExperimentsRepoJSONOutput = {

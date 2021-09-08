@@ -1,6 +1,6 @@
 /* eslint-disable */
-import { join } from '../../test/util/path'
-import { RowData } from './contract'
+import { join } from '../util/path'
+import { RowData } from '../../experiments/webview/contract'
 
 const data: RowData[] = [
   {

@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { sep } from '../../test/util/path'
-import { ParamOrMetric } from './contract'
+import { ParamOrMetric } from '../../experiments/webview/contract'
 
 const data: ParamOrMetric[] = [
   {

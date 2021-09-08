@@ -10,7 +10,7 @@ import {
   window
 } from 'vscode'
 import { ExperimentsParamsAndMetricsTree } from './tree'
-import complexColumnData from '../webview/complex-column-example'
+import complexColumnData from '../../test/fixtures/complex-column-example'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { Status } from '../paramsAndMetrics/model'
