@@ -163,14 +163,8 @@ export class CliRunner implements ICli {
 
     this.processStarted.fire(baseEvent)
 
-    process.all?.on('data', chunk =>
-      this.processOutput.fire(
-        chunk
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
-      )
-    )
+    this.notifyOutput(process)
+
     let stderr = ''
     process.stderr?.on('data', chunk => (stderr += chunk.toString()))
 
@@ -205,6 +199,17 @@ export class CliRunner implements ICli {
       args,
       cwd
     })
+  }
+
+  private notifyOutput(process: Process) {
+    process.all?.on('data', chunk =>
+      this.processOutput.fire(
+        chunk
+          .toString()
+          .split(/(\r?\n)/g)
+          .join('\r')
+      )
+    )
   }
 
   private notifyCompletion({
