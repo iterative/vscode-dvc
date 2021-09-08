@@ -1,4 +1,4 @@
-import { join, sep } from 'path'
+import { join } from 'path'
 import { collectFiles, collectParamsAndMetrics } from './collect'
 import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
@@ -365,22 +365,22 @@ describe('collectParamsAndMetrics', () => {
     expect(
       collectParamsAndMetrics(complexExperimentsOutput).map(({ path }) => path)
     ).toEqual([
-      'params:params.yaml:epochs',
-      'params:params.yaml:learning_rate',
-      'params:params.yaml:dvc_logs_dir',
-      'params:params.yaml:log_file',
-      'params:params.yaml:dropout',
-      'params:params.yaml:process.threshold',
-      'params:params.yaml:process.test_arg',
-      'params:params.yaml:process',
-      'params:params.yaml',
-      `params:nested${sep}params.yaml:test`,
-      `params:nested${sep}params.yaml`,
-      'metrics:summary.json:loss',
-      'metrics:summary.json:accuracy',
-      'metrics:summary.json:val_loss',
-      'metrics:summary.json:val_accuracy',
-      'metrics:summary.json'
+      joinParamOrMetricPath('params', 'params.yaml', 'epochs'),
+      joinParamOrMetricPath('params', 'params.yaml', 'learning_rate'),
+      joinParamOrMetricPath('params', 'params.yaml', 'dvc_logs_dir'),
+      joinParamOrMetricPath('params', 'params.yaml', 'log_file'),
+      joinParamOrMetricPath('params', 'params.yaml', 'dropout'),
+      joinParamOrMetricPath('params', 'params.yaml', 'process', 'threshold'),
+      joinParamOrMetricPath('params', 'params.yaml', 'process', 'test_arg'),
+      joinParamOrMetricPath('params', 'params.yaml', 'process'),
+      joinParamOrMetricPath('params', 'params.yaml'),
+      joinParamOrMetricPath('params', join('nested', 'params.yaml'), 'test'),
+      joinParamOrMetricPath('params', join('nested', 'params.yaml')),
+      joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
+      joinParamOrMetricPath('metrics', 'summary.json', 'accuracy'),
+      joinParamOrMetricPath('metrics', 'summary.json', 'val_loss'),
+      joinParamOrMetricPath('metrics', 'summary.json', 'val_accuracy'),
+      joinParamOrMetricPath('metrics', 'summary.json')
     ])
   })
 })
