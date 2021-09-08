@@ -1,6 +1,8 @@
 import { Event, Uri } from 'vscode'
 import { executeProcess } from '../processExecution'
-import { getExtensionAPI } from '../vscode/extensions'
+import { getExtensionAPI, isInstalled } from '../vscode/extensions'
+
+const PYTHON_EXTENSION_ID = 'ms-python.python'
 
 interface Settings {
   onDidChangeExecutionDetails: Event<Uri | undefined>
@@ -16,7 +18,7 @@ interface VscodePython {
 
 export const getPythonExtensionSettings: () => Thenable<Settings | undefined> =
   async () => {
-    const api = await getExtensionAPI<VscodePython>('ms-python.python')
+    const api = await getExtensionAPI<VscodePython>(PYTHON_EXTENSION_ID)
     if (!api) {
       return
     }
@@ -42,3 +44,5 @@ export const getPythonBinPath = async (): Promise<string | undefined> => {
 
 export const getOnDidChangePythonExecutionDetails = async () =>
   (await getPythonExtensionSettings())?.onDidChangeExecutionDetails
+
+export const isPythonExtensionInstalled = () => isInstalled(PYTHON_EXTENSION_ID)
