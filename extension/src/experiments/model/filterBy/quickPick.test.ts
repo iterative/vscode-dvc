@@ -4,7 +4,7 @@ import { FilterDefinition, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { joinParamOrMetricPath } from '../../../util/paths'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 
 jest.mock('vscode')
 jest.mock('../../../vscode/inputBox')

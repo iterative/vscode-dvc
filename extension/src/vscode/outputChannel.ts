@@ -37,9 +37,8 @@ export class OutputChannel {
     this.dispose.track(
       cli.onDidCompleteProcess(
         ({ command, duration, exitCode, pid, stderr }) => {
-          const processStatus = stderr
-            ? ProcessStatus.FAILED
-            : ProcessStatus.COMPLETED
+          const processStatus =
+            exitCode && stderr ? ProcessStatus.FAILED : ProcessStatus.COMPLETED
 
           const baseOutput = this.getBaseOutput(pid, command, processStatus)
           const completionOutput = this.getCompletionOutput(
@@ -80,7 +79,7 @@ export class OutputChannel {
 
     completionOutput += ` (${duration}ms)`
 
-    if (stderr) {
+    if (exitCode && stderr) {
       completionOutput += `\n${stderr}`
     }
 

@@ -1,8 +1,8 @@
 import { mocked } from 'ts-jest/utils'
 import { QuickPickOptions, window } from 'vscode'
 import { pickSortsToRemove, pickSortToAdd } from './quickPick'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { joinParamOrMetricPath } from '../../../util/paths'
 
 jest.mock('vscode')
 

@@ -1,9 +1,9 @@
 import { join, sep } from 'path'
 import { collectFiles, collectParamsAndMetrics } from './collect'
+import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
 import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import { joinParamOrMetricPath } from '../../util/paths'
 
 describe('collectParamsAndMetrics', () => {
   it('should output both params and metrics when both are present', () => {

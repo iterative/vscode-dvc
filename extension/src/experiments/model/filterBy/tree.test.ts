@@ -4,7 +4,7 @@ import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
 import { Operator } from '.'
 import { ExperimentsFilterByTree } from './tree'
 import { Experiments } from '../..'
-import { joinParamOrMetricPath } from '../../../util/paths'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()

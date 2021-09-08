@@ -22,7 +22,7 @@ import {
   resourcePath
 } from '../../../util'
 import { buildMockMemento } from '../../../../util'
-import { joinParamOrMetricPath } from '../../../../../util/paths'
+import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 
 suite('Experiments Sort By Tree Test Suite', () => {
