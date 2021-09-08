@@ -138,13 +138,13 @@ suite('CLI Runner Test Suite', () => {
       await cliRunner.run(cwd, '1', '&&', 'then', 'die')
       const process = cliRunner.getRunningProcess()
 
-      const processExited = new Promise(resolve =>
+      const processCompleted = new Promise(resolve =>
         process?.on('close', () => resolve(undefined))
       )
 
       await expect(process).to.eventually.be.rejectedWith(Error)
 
-      await processExited
+      await processCompleted
 
       const [eventName, error, , properties] =
         mockSendTelemetryEvent.getCall(0).args
@@ -155,7 +155,7 @@ suite('CLI Runner Test Suite', () => {
       }
 
       expect(eventName).to.equal(EventName.EXPERIMENTS_RUNNER_COMPLETED)
-      expect(error.message).to.equal('usage: sleep seconds\n')
+      expect(error.message).to.have.length.greaterThan(0)
       expect(command).to.equal('sleep 1 && then die')
       expect(exitCode).to.be.greaterThan(0)
     }).timeout(4000)
