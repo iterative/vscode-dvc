@@ -21,7 +21,7 @@ import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
-import { joinParamOrMetricPath } from '../../../util/paths'
+import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')

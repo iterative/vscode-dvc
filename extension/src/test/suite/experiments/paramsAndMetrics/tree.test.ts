@@ -13,8 +13,9 @@ import { CliReader } from '../../../../cli/reader'
 import { InternalCommands } from '../../../../commands/internal'
 import { dvcDemoPath, resourcePath } from '../../util'
 import { buildMockMemento } from '../../../util'
-import { joinParamOrMetricPath } from '../../../../util/paths'
+
 import { RegisteredCommands } from '../../../../commands/external'
+import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   window.showInformationMessage(

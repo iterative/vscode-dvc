@@ -1,6 +1,6 @@
 import get from 'lodash.get'
 import { sortExperiments } from '.'
-import { joinParamOrMetricPath } from '../../../util/paths'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { Experiment } from '../../webview/contract'
 
 describe('sortExperiments', () => {
