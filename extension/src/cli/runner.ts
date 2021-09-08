@@ -8,6 +8,8 @@ import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 import { StopWatch } from '../util/time'
+import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
@@ -161,21 +163,19 @@ export class CliRunner implements ICli {
 
     this.processStarted.fire(baseEvent)
 
-    process.all?.on('data', chunk =>
-      this.processOutput.fire(
-        chunk
-          .toString()
-          .split(/(\r?\n)/g)
-          .join('\r')
-      )
-    )
+    this.notifyOutput(process)
+
+    let stderr = ''
+    process.stderr?.on('data', chunk => (stderr += chunk.toString()))
 
     process.on('close', exitCode => {
       this.dispose.untrack(process)
-      this.processCompleted.fire({
+      this.notifyCompleted({
         ...baseEvent,
         duration: stopWatch.getElapsedTime(),
-        exitCode
+        exitCode,
+        killed: process.killed,
+        stderr
       })
     })
 
@@ -199,5 +199,70 @@ export class CliRunner implements ICli {
       args,
       cwd
     })
+  }
+
+  private notifyOutput(process: Process) {
+    process.all?.on('data', chunk =>
+      this.processOutput.fire(
+        chunk
+          .toString()
+          .split(/(\r?\n)/g)
+          .join('\r')
+      )
+    )
+  }
+
+  private notifyCompleted({
+    command,
+    pid,
+    cwd,
+    duration,
+    exitCode,
+    killed,
+    stderr
+  }: CliResult & {
+    killed: boolean
+  }) {
+    this.processCompleted.fire({
+      command,
+      cwd,
+      duration,
+      exitCode,
+      pid,
+      stderr: stderr?.replace(/\n+/g, '\n')
+    })
+
+    this.sendTelemetryEvent({ command, duration, exitCode, killed, stderr })
+  }
+
+  private sendTelemetryEvent({
+    command,
+    exitCode,
+    stderr,
+    duration,
+    killed
+  }: {
+    command: string
+    exitCode: number | null
+    stderr?: string
+    duration: number
+    killed: boolean
+  }) {
+    const properties = { command, exitCode }
+
+    if (!killed && exitCode && stderr) {
+      return sendErrorTelemetryEvent(
+        EventName.EXPERIMENTS_RUNNER_COMPLETED,
+        new Error(stderr),
+        duration,
+        properties
+      )
+    }
+
+    return sendTelemetryEvent(
+      EventName.EXPERIMENTS_RUNNER_COMPLETED,
+      { ...properties, wasStopped: killed },
+      { duration }
+    )
   }
 }
