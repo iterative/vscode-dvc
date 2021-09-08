@@ -8,7 +8,7 @@ import { PseudoTerminal } from '../vscode/pseudoTerminal'
 import { createProcess, Process } from '../processExecution'
 import { setContextValue } from '../vscode/context'
 import { StopWatch } from '../util/time'
-import { sendTelemetryEvent } from '../telemetry'
+import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 
 export const autoRegisteredCommands = {
@@ -177,20 +177,17 @@ export class CliRunner implements ICli {
 
     process.on('close', exitCode => {
       this.dispose.untrack(process)
+      const duration = stopWatch.getElapsedTime()
+      const killed = process.killed
+
       this.processCompleted.fire({
         ...baseEvent,
-        duration: stopWatch.getElapsedTime(),
+        duration,
         exitCode,
         stderr: stderr.replace(/\n+/g, '\n')
       })
 
-      if (exitCode && stderr) {
-        sendTelemetryEvent(
-          EventName.EXPERIMENTS_RUNNER_FAILED,
-          { command, error: stderr, exitCode },
-          { duration: stopWatch.getElapsedTime() }
-        )
-      }
+      this.sendTelemetryEvent({ command, duration, exitCode, killed, stderr })
     })
 
     return process
@@ -213,6 +210,34 @@ export class CliRunner implements ICli {
       args,
       cwd
     })
-    // return this.currentProcess
+  }
+
+  private sendTelemetryEvent({
+    command,
+    exitCode,
+    stderr,
+    duration,
+    killed
+  }: {
+    command: string
+    exitCode: number | null
+    stderr: string
+    duration: number
+    killed: boolean
+  }) {
+    if (!killed && exitCode && stderr) {
+      return sendErrorTelemetryEvent(
+        EventName.EXPERIMENTS_RUNNER_COMPLETED,
+        new Error(stderr),
+        duration,
+        { command, exitCode }
+      )
+    }
+
+    return sendTelemetryEvent(
+      EventName.EXPERIMENTS_RUNNER_COMPLETED,
+      { command },
+      { duration }
+    )
   }
 }

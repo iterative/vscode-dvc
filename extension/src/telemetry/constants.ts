@@ -19,7 +19,7 @@ export type ViewOpenedEventName =
 
 export const EventName = Object.assign(
   {
-    EXPERIMENTS_RUNNER_FAILED: 'experiments.runner.failed',
+    EXPERIMENTS_RUNNER_COMPLETED: 'experiments.runner.completed',
 
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
@@ -52,10 +52,9 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_EXECUTION_DETAILS_CHANGED]: ExtensionProperties
   [EventName.EXTENSION_LOAD]: ExtensionProperties
 
-  [EventName.EXPERIMENTS_RUNNER_FAILED]: {
+  [EventName.EXPERIMENTS_RUNNER_COMPLETED]: {
     command: string
-    error: string
-    exitCode: number
+    exitCode?: number
   }
 
   [EventName.EXPERIMENT_APPLY]: undefined
