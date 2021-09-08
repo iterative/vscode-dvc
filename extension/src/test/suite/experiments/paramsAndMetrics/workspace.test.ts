@@ -5,7 +5,7 @@ import { stub, spy, restore } from 'sinon'
 import { FileSystemWatcher, window } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParamsAndMetrics } from '../../../../experiments/paramsAndMetrics/workspace'
-import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
+import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 import { ParamsAndMetricsModel } from '../../../../experiments/paramsAndMetrics/model'
@@ -91,13 +91,15 @@ suite('Experiments Test Suite', () => {
             baseline: {
               data: {
                 metrics: {
-                  ...complexExperimentsOutput.workspace.baseline.data.metrics,
+                  ...(complexExperimentsOutput.workspace.baseline.data
+                    ?.metrics || {}),
                   'new_summary.json': {
                     data: { auc: 0, loss: 1 }
                   }
                 },
                 params: {
-                  ...complexExperimentsOutput.workspace.baseline.data.params,
+                  ...(complexExperimentsOutput.workspace.baseline.data
+                    ?.params || {}),
                   'new_params.yml': {
                     data: { new_seed: 10000, new_weight_decay: 0 }
                   }
