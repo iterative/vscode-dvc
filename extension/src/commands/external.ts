@@ -36,6 +36,7 @@ export enum RegisteredCommands {
   PUSH_TARGET = 'dvc.pushTarget',
   DELETE_TARGET = 'dvc.deleteTarget',
   REMOVE_TARGET = 'dvc.removeTarget',
+  RENAME_TARGET = 'dvc.renameTarget',
 
   EXTENSION_DESELECT_DEFAULT_PROJECT = 'dvc.deselectDefaultProject',
   EXTENSION_SELECT_DEFAULT_PROJECT = 'dvc.selectDefaultProject',

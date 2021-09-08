@@ -80,7 +80,6 @@ export class Cli implements ICli {
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
     const { command, ...options } = this.getOptions(cwd, ...args)
-
     const baseEvent: CliEvent = { command, cwd, pid: undefined }
     const stopWatch = new StopWatch()
     try {
