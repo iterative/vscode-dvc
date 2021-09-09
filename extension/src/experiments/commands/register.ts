@@ -4,8 +4,8 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { RegisteredCommands } from '../../commands/external'
 
 const registerExperimentCwdCommands = (
-  internalCommands: InternalCommands,
-  experiments: Experiments
+  experiments: Experiments,
+  internalCommands: InternalCommands
 ): void =>
   internalCommands.registerExternalCommand(
     RegisteredCommands.QUEUE_EXPERIMENT,
@@ -13,8 +13,8 @@ const registerExperimentCwdCommands = (
   )
 
 const registerExperimentNameCommands = (
-  internalCommands: InternalCommands,
-  experiments: Experiments
+  experiments: Experiments,
+  internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_APPLY,
@@ -28,8 +28,8 @@ const registerExperimentNameCommands = (
 }
 
 const registerExperimentInputCommands = (
-  internalCommands: InternalCommands,
-  experiments: Experiments
+  experiments: Experiments,
+  internalCommands: InternalCommands
 ): void =>
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_BRANCH,
@@ -41,8 +41,8 @@ const registerExperimentInputCommands = (
   )
 
 const registerExperimentQuickPickCommands = (
-  internalCommands: InternalCommands,
-  experiments: Experiments
+  experiments: Experiments,
+  internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_GARBAGE_COLLECT,
@@ -75,8 +75,8 @@ const registerExperimentQuickPickCommands = (
 }
 
 const registerExperimentRunCommands = (
-  internalCommands: InternalCommands,
-  experiments: Experiments
+  experiments: Experiments,
+  internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_RUN,
@@ -107,12 +107,12 @@ const registerExperimentRunCommands = (
 }
 
 export const registerExperimentCommands = (
-  internalCommands: InternalCommands,
-  experiments: Experiments
+  experiments: Experiments,
+  internalCommands: InternalCommands
 ) => {
-  registerExperimentCwdCommands(internalCommands, experiments)
-  registerExperimentNameCommands(internalCommands, experiments)
-  registerExperimentInputCommands(internalCommands, experiments)
-  registerExperimentQuickPickCommands(internalCommands, experiments)
-  registerExperimentRunCommands(internalCommands, experiments)
+  registerExperimentCwdCommands(experiments, internalCommands)
+  registerExperimentNameCommands(experiments, internalCommands)
+  registerExperimentInputCommands(experiments, internalCommands)
+  registerExperimentQuickPickCommands(experiments, internalCommands)
+  registerExperimentRunCommands(experiments, internalCommands)
 }
