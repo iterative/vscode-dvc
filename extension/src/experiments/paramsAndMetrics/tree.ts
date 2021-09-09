@@ -13,12 +13,10 @@ import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from '../../commands/external'
+import { RegisteredCommands } from '../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
+import { InternalCommands } from '../../commands/internal'
 
 type ParamsAndMetricsItem = {
   description: string | undefined
@@ -41,7 +39,11 @@ export class ExperimentsParamsAndMetricsTree
   private view: TreeView<string | ParamsAndMetricsItem>
   private viewed = false
 
-  constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
+  constructor(
+    experiments: Experiments,
+    internalCommands: InternalCommands,
+    resourceLocator: ResourceLocator
+  ) {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeTreeData = experiments.paramsOrMetricsChanged.event
@@ -55,12 +57,10 @@ export class ExperimentsParamsAndMetricsTree
 
     this.experiments = experiments
 
-    this.dispose.track(
-      registerInstrumentedCommand<ParamsAndMetricsItem>(
-        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
-        ({ dvcRoot, path }) =>
-          this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
-      )
+    internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
+      RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+      ({ dvcRoot, path }) =>
+        this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
     )
 
     this.updateDescriptionOnChange()

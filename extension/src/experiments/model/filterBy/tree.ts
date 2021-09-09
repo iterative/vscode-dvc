@@ -9,10 +9,8 @@ import {
 } from 'vscode'
 import { getFilterId } from '.'
 import { Experiments } from '../..'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from '../../../commands/external'
+import { RegisteredCommands } from '../../../commands/external'
+import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
@@ -35,7 +33,7 @@ export class ExperimentsFilterByTree
   private readonly experiments: Experiments
   private viewed = false
 
-  constructor(experiments: Experiments) {
+  constructor(experiments: Experiments, internalCommands: InternalCommands) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
@@ -44,18 +42,14 @@ export class ExperimentsFilterByTree
 
     this.experiments = experiments
 
-    this.dispose.track(
-      registerInstrumentedCommand<FilterItem>(
-        RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
-        resource => this.removeFilter(resource)
-      )
+    internalCommands.registerExternalCommand<FilterItem>(
+      RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
+      resource => this.removeFilter(resource)
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand(
-        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL,
-        resource => this.removeAllFilters(resource)
-      )
+    internalCommands.registerExternalCommand(
+      RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL,
+      resource => this.removeAllFilters(resource)
     )
   }
 

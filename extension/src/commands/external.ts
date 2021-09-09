@@ -1,9 +1,3 @@
-import { commands } from 'vscode'
-import { Disposable } from '../extension'
-import { sendTelemetryEventAndThrow, sendTelemetryEvent } from '../telemetry'
-import { StopWatch } from '../util/time'
-import { showGenericError } from '../vscode/modal'
-
 export enum RegisteredCommands {
   EXPERIMENT_APPLY = 'dvc.applyExperiment',
   EXPERIMENT_BRANCH = 'dvc.branchExperiment',
@@ -47,21 +41,3 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_COPY_FILE_PATH = 'dvc.copyFilePath',
   TRACKED_EXPLORER_COPY_REL_FILE_PATH = 'dvc.copyRelativeFilePath'
 }
-
-export const registerInstrumentedCommand = <T = string | undefined>(
-  name: RegisteredCommands,
-  func: (arg: T) => unknown
-): Disposable =>
-  commands.registerCommand(name, async arg => {
-    const stopWatch = new StopWatch()
-    try {
-      const res = await func(arg)
-      sendTelemetryEvent(name, undefined, {
-        duration: stopWatch.getElapsedTime()
-      })
-      return res
-    } catch (e: unknown) {
-      showGenericError()
-      sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
-    }
-  })

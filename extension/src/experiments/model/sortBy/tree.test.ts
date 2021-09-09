@@ -15,6 +15,7 @@ import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { Experiments } from '../..'
+import { InternalCommands } from '../../../commands/internal'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,
@@ -50,6 +51,9 @@ const mockedExperiments = {
   getSorts: mockedGetSorts,
   isReady: () => true
 } as unknown as Experiments
+const mockedInternalCommands = {
+  registerExternalCommand: jest.fn()
+} as unknown as InternalCommands
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -80,7 +84,10 @@ describe('ExperimentsSortByTree', () => {
   describe('getChildren', () => {
     it('should return an empty array if no roots are defined', async () => {
       mockedGetDvcRoots.mockReturnValueOnce([])
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       const rootElements = await experimentsSortByTree.getChildren(undefined)
       expect(rootElements).toEqual([])
     })
@@ -88,7 +95,10 @@ describe('ExperimentsSortByTree', () => {
     it('should return an empty array if there are roots but no sorts', async () => {
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])
       mockedGetSorts.mockReturnValue([])
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       const rootElements = await experimentsSortByTree.getChildren(undefined)
       expect(rootElements).toEqual([])
     })
@@ -96,7 +106,10 @@ describe('ExperimentsSortByTree', () => {
     it('should display sorts at the top level when only one project exists', async () => {
       mockedGetSorts.mockReturnValue(singleSortDefinitionArray)
       mockedGetDvcRoots.mockReturnValue([dvcRoot])
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       expect(await experimentsSortByTree.getChildren(undefined)).toEqual(
         singleSortDefinitionWithParentArray
       )
@@ -105,7 +118,10 @@ describe('ExperimentsSortByTree', () => {
     it('should display projects at the top level when more than one exists', async () => {
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot, 'demo2'])
       mockedGetSorts.mockReturnValue(singleSortDefinitionArray)
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       expect(await experimentsSortByTree.getChildren(undefined)).toEqual([
         dvcRoot,
         'demo2'
@@ -114,7 +130,10 @@ describe('ExperimentsSortByTree', () => {
 
     it('should be able to display sort items under a top-level project', async () => {
       mockedGetSorts.mockReturnValueOnce(singleSortDefinitionArray)
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       expect(await experimentsSortByTree.getChildren(dvcRoot)).toEqual(
         singleSortDefinitionWithParentArray
       )
@@ -124,7 +143,10 @@ describe('ExperimentsSortByTree', () => {
   describe('getTreeItem', () => {
     it('should be able to make a TreeItem from a dvcRoot string', () => {
       mockedTreeItem.mockImplementation(buildMockedTreeItem)
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       expect(experimentsSortByTree.getTreeItem(dvcRoot)).toEqual({
         collapsibleState: TreeItemCollapsibleState.Expanded,
         contextValue: 'dvcSortRoot',
@@ -135,7 +157,10 @@ describe('ExperimentsSortByTree', () => {
 
     it('should be able to make a TreeItem from a descending SortDefinition', () => {
       mockedTreeItem.mockImplementation(buildMockedTreeItem)
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       expect(
         experimentsSortByTree.getTreeItem(exampleSortDefinitionWithParent)
       ).toEqual({
@@ -148,7 +173,10 @@ describe('ExperimentsSortByTree', () => {
 
     it('should be able to make a TreeItem from an ascending SortDefinition', () => {
       mockedTreeItem.mockImplementation(buildMockedTreeItem)
-      const experimentsSortByTree = new ExperimentsSortByTree(mockedExperiments)
+      const experimentsSortByTree = new ExperimentsSortByTree(
+        mockedExperiments,
+        mockedInternalCommands
+      )
       const otherPath = join('other', dvcRoot, 'path')
       expect(
         experimentsSortByTree.getTreeItem({

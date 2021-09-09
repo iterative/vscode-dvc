@@ -1,47 +1,50 @@
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { Experiments } from '..'
-import { AvailableCommands } from '../../commands/internal'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from '../../commands/external'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { RegisteredCommands } from '../../commands/external'
 
-const registerCommand = (
-  experiments: Experiments,
-  name: RegisteredCommands,
-  func: (arg?: string) => unknown
+const registerExperimentCwdCommands = (
+  internalCommands: InternalCommands,
+  experiments: Experiments
+): void =>
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.QUEUE_EXPERIMENT,
+    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
+  )
+
+const registerExperimentNameCommands = (
+  internalCommands: InternalCommands,
+  experiments: Experiments
 ): void => {
-  experiments.dispose.track(registerInstrumentedCommand(name, func))
-}
-
-const registerExperimentCwdCommands = (experiments: Experiments): void =>
-  registerCommand(experiments, RegisteredCommands.QUEUE_EXPERIMENT, () =>
-    experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_APPLY,
+    () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
   )
 
-const registerExperimentNameCommands = (experiments: Experiments): void => {
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_APPLY, () =>
-    experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
-  )
-
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_REMOVE, () =>
-    experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_REMOVE,
+    () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 }
 
-const registerExperimentInputCommands = (experiments: Experiments): void =>
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_BRANCH, () =>
-    experiments.getExpNameAndInputThenRun(
-      AvailableCommands.EXPERIMENT_BRANCH,
-      'Name the new branch'
-    )
+const registerExperimentInputCommands = (
+  internalCommands: InternalCommands,
+  experiments: Experiments
+): void =>
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_BRANCH,
+    () =>
+      experiments.getExpNameAndInputThenRun(
+        AvailableCommands.EXPERIMENT_BRANCH,
+        'Name the new branch'
+      )
   )
 
 const registerExperimentQuickPickCommands = (
+  internalCommands: InternalCommands,
   experiments: Experiments
 ): void => {
-  registerCommand(
-    experiments,
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_GARBAGE_COLLECT,
     () =>
       experiments.getCwdAndQuickPickThenRun(
@@ -50,55 +53,66 @@ const registerExperimentQuickPickCommands = (
       )
   )
 
-  registerCommand(
-    experiments,
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTER_ADD,
     (dvcRoot?: string) => experiments.addFilter(dvcRoot)
   )
 
-  registerCommand(
-    experiments,
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_FILTERS_REMOVE,
     () => experiments.removeFilters()
   )
 
-  registerCommand(
-    experiments,
+  internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SORT_ADD,
     (dvcRoot?: string) => experiments.addSort(dvcRoot)
   )
 
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_SORTS_REMOVE, () =>
-    experiments.removeSorts()
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_SORTS_REMOVE,
+    () => experiments.removeSorts()
   )
 }
 
-const registerExperimentRunCommands = (experiments: Experiments): void => {
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_RUN, () =>
-    experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
+const registerExperimentRunCommands = (
+  internalCommands: InternalCommands,
+  experiments: Experiments
+): void => {
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_RUN,
+    () =>
+      experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
   )
 
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_RUN_RESET, () =>
-    experiments.showExperimentsTableThenRun(
-      AvailableCommands.EXPERIMENT_RUN_RESET
-    )
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_RUN_RESET,
+    () =>
+      experiments.showExperimentsTableThenRun(
+        AvailableCommands.EXPERIMENT_RUN_RESET
+      )
   )
 
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_RUN_QUEUED, () =>
-    experiments.showExperimentsTableThenRun(
-      AvailableCommands.EXPERIMENT_RUN_QUEUED
-    )
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_RUN_QUEUED,
+    () =>
+      experiments.showExperimentsTableThenRun(
+        AvailableCommands.EXPERIMENT_RUN_QUEUED
+      )
   )
 
-  registerCommand(experiments, RegisteredCommands.EXPERIMENT_SHOW, () =>
-    experiments.showExperimentsTable()
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_SHOW,
+    () => experiments.showExperimentsTable()
   )
 }
 
-export const registerExperimentCommands = (experiments: Experiments) => {
-  registerExperimentCwdCommands(experiments)
-  registerExperimentNameCommands(experiments)
-  registerExperimentInputCommands(experiments)
-  registerExperimentQuickPickCommands(experiments)
-  registerExperimentRunCommands(experiments)
+export const registerExperimentCommands = (
+  internalCommands: InternalCommands,
+  experiments: Experiments
+) => {
+  registerExperimentCwdCommands(internalCommands, experiments)
+  registerExperimentNameCommands(internalCommands, experiments)
+  registerExperimentInputCommands(internalCommands, experiments)
+  registerExperimentQuickPickCommands(internalCommands, experiments)
+  registerExperimentRunCommands(internalCommands, experiments)
 }

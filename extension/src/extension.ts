@@ -124,13 +124,18 @@ export class Extension implements IExtension {
     this.dispose.track(
       new ExperimentsParamsAndMetricsTree(
         this.experiments,
+        this.internalCommands,
         this.resourceLocator
       )
     )
 
-    this.dispose.track(new ExperimentsSortByTree(this.experiments))
+    this.dispose.track(
+      new ExperimentsSortByTree(this.experiments, this.internalCommands)
+    )
 
-    this.dispose.track(new ExperimentsFilterByTree(this.experiments))
+    this.dispose.track(
+      new ExperimentsFilterByTree(this.experiments, this.internalCommands)
+    )
 
     this.dispose.track(new ExperimentsTree(this.experiments))
 
@@ -195,7 +200,7 @@ export class Extension implements IExtension {
 
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(this.experiments)
+    registerExperimentCommands(this.internalCommands, this.experiments)
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
