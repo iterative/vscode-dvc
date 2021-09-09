@@ -12,10 +12,9 @@ import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
 
-export const buildExperimentsRepository = (
+const buildDependencies = (
   disposer: Disposer,
-  experimentShowData = complexExperimentsOutput,
-  dvcRoot = dvcDemoPath
+  experimentShowData = complexExperimentsOutput
 ) => {
   const config = disposer.track(new Config())
   const cliReader = disposer.track(new CliReader(config))
@@ -32,6 +31,17 @@ export const buildExperimentsRepository = (
   const internalCommands = disposer.track(
     new InternalCommands(config, outputChannel, cliReader)
   )
+
+  return { config, internalCommands, mockExperimentShow, resourceLocator }
+}
+
+export const buildExperimentsRepository = (
+  disposer: Disposer,
+  experimentShowData = complexExperimentsOutput,
+  dvcRoot = dvcDemoPath
+) => {
+  const { config, internalCommands, mockExperimentShow, resourceLocator } =
+    buildDependencies(disposer, experimentShowData)
 
   const experimentsRepository = disposer.track(
     new ExperimentsRepository(
@@ -77,21 +87,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
-  const config = disposer.track(new Config())
-  const cliReader = disposer.track(new CliReader(config))
-  stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-  const outputChannel = disposer.track(
-    new OutputChannel([cliReader], '4', 'experiments test suite')
-  )
-
-  const internalCommands = disposer.track(
-    new InternalCommands(config, outputChannel, cliReader)
-  )
-
-  const resourceLocator = disposer.track(
-    new ResourceLocator(Uri.file(resourcePath))
-  )
+  const { internalCommands, resourceLocator } = buildDependencies(disposer)
 
   const experiments = disposer.track(
     new Experiments(internalCommands, buildMockMemento())
