@@ -44,10 +44,7 @@ import {
   sendTelemetryEvent
 } from './telemetry'
 import { EventName } from './telemetry/constants'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from './commands/external'
+import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
 
 export { Disposable, Disposer }
@@ -318,14 +315,14 @@ export class Extension implements IExtension {
 
   private registerConfigCommands() {
     this.dispose.track(
-      registerInstrumentedCommand(
+      this.internalCommands.registerExternalCommand(
         RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
         () => this.config.deselectDefaultProject()
       )
     )
 
     this.dispose.track(
-      registerInstrumentedCommand(
+      this.internalCommands.registerExternalCommand(
         RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
         () => this.config.selectDefaultProject()
       )

@@ -1,4 +1,6 @@
+import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { RegisteredCommands } from './external'
 import { ICli } from '../cli'
 import { Args } from '../cli/args'
 import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
@@ -7,6 +9,9 @@ import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
 import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
 import { quickPickOne } from '../vscode/quickPick'
+import { StopWatch } from '../util/time'
+import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
+import { showGenericError } from '../vscode/modal'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -14,7 +19,7 @@ export const AvailableCommands = Object.assign(
   {
     GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
     GET_THEME: 'getTheme',
-    SHOW_OUTPUT_CHANNEL: 'showOutputChannel'
+    REGISTER_EXTERNAL_COMMAND: 'registerExternalCommand'
   } as const,
   CliExecutorCommands,
   CliReaderCommands,
@@ -26,6 +31,7 @@ export class InternalCommands {
   public dispose = Disposable.fn()
 
   private readonly commands = new Map<string, Command>()
+  private readonly outputChannel: OutputChannel
 
   constructor(
     config: Config,
@@ -33,6 +39,7 @@ export class InternalCommands {
     ...cliInteractors: ICli[]
   ) {
     cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
+    this.outputChannel = outputChannel
 
     this.registerCommand(
       AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
@@ -49,10 +56,6 @@ export class InternalCommands {
     )
 
     this.registerCommand(AvailableCommands.GET_THEME, () => config.getTheme())
-
-    this.registerCommand(AvailableCommands.SHOW_OUTPUT_CHANNEL, () =>
-      outputChannel.show()
-    )
   }
 
   public executeCommand<T = string>(
@@ -73,6 +76,26 @@ export class InternalCommands {
     }
 
     this.commands.set(commandId, command)
+  }
+
+  public registerExternalCommand<T = string | undefined>(
+    name: RegisteredCommands,
+    func: (arg: T) => unknown
+  ): Disposable {
+    return commands.registerCommand(name, async arg => {
+      const stopWatch = new StopWatch()
+      try {
+        const res = await func(arg)
+        sendTelemetryEvent(name, undefined, {
+          duration: stopWatch.getElapsedTime()
+        })
+        return res
+      } catch (e: unknown) {
+        showGenericError()
+        this.outputChannel.show()
+        sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
+      }
+    })
   }
 
   private autoRegisterCommands(cli: ICli) {
