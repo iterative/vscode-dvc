@@ -272,7 +272,7 @@ suite('Experiments Test Suite', () => {
         { error: mockErrorMessage },
         { duration }
       )
-      expect(mockGenericError, 'the generic error modal should be shown').to.be
+      expect(mockGenericError, 'the generic error should be shown').to.be
         .calledOnce
 
       clock.restore()
