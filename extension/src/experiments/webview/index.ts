@@ -28,7 +28,7 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
-export class ExperimentsWebview {
+export class ExperimentsTableWebview {
   public static viewKey = 'dvc-experiments'
 
   public readonly onDidDispose: Event<void>
@@ -65,7 +65,7 @@ export class ExperimentsWebview {
     this.dvcRoot = state.dvcRoot
 
     webviewPanel.onDidDispose(() => {
-      ExperimentsWebview.setPanelActiveContext(false)
+      ExperimentsTableWebview.setPanelActiveContext(false)
       sendTelemetryEvent(
         EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
         undefined,
@@ -124,10 +124,12 @@ export class ExperimentsWebview {
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
-  ): Promise<ExperimentsWebview> {
+  ): Promise<ExperimentsTableWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(webviewPanel, internalCommands, state))
+        resolve(
+          new ExperimentsTableWebview(webviewPanel, internalCommands, state)
+        )
       } catch (e) {
         reject(e)
       }
@@ -138,9 +140,9 @@ export class ExperimentsWebview {
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator
-  ): Promise<ExperimentsWebview> {
+  ): Promise<ExperimentsTableWebview> {
     const webviewPanel = window.createWebviewPanel(
-      ExperimentsWebview.viewKey,
+      ExperimentsTableWebview.viewKey,
       Experiments,
       ViewColumn.Active,
       {
@@ -152,7 +154,11 @@ export class ExperimentsWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIcon
 
-    const view = new ExperimentsWebview(webviewPanel, internalCommands, state)
+    const view = new ExperimentsTableWebview(
+      webviewPanel,
+      internalCommands,
+      state
+    )
     await view.isReady()
     return view
   }
@@ -190,7 +196,7 @@ export class ExperimentsWebview {
   }
 
   private notifyActiveStatus(webviewPanel: WebviewPanel) {
-    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
+    ExperimentsTableWebview.setPanelActiveContext(webviewPanel.active)
 
     const active = webviewPanel.active ? this.dvcRoot : undefined
     this.isFocusedChanged.fire(active)

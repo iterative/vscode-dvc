@@ -13,7 +13,7 @@ import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
-import { ExperimentsWebview } from '../../../experiments/webview'
+import { ExperimentsTableWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
 import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
@@ -106,7 +106,10 @@ suite('Experiments Repository Test Suite', () => {
     it('should be able to make the experiment webview visible', async () => {
       const { experimentsRepository } = buildExperimentsRepository(disposable)
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+      const messageSpy = spy(
+        ExperimentsTableWebview.prototype,
+        'showExperiments'
+      )
 
       const webview = await experimentsRepository.showWebview()
       expect(messageSpy).to.be.calledWith({
@@ -177,7 +180,7 @@ suite('Experiments Repository Test Suite', () => {
       }
     })
 
-    const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+    const messageSpy = spy(ExperimentsTableWebview.prototype, 'showExperiments')
 
     const internalCommands = disposable.track(
       new InternalCommands(config, outputChannel, cliReader)

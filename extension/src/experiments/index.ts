@@ -2,7 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { ExperimentsWebview } from './webview'
+import { ExperimentsTableWebview } from './webview'
 import { FilterDefinition } from './model/filterBy'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
@@ -259,7 +259,10 @@ export class Experiments {
     experimentsRepository?.refresh()
   }
 
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
+  public setWebview(
+    dvcRoot: string,
+    experimentsWebview: ExperimentsTableWebview
+  ) {
     const experimentsRepository = this.getRepository(dvcRoot)
     if (!experimentsRepository) {
       experimentsWebview.dispose()
