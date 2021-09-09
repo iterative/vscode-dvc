@@ -25,6 +25,13 @@ const mockedDisposable = mocked(Disposable)
 const mockedGetDefaultProject = jest.fn()
 
 const mockedListDvcOnly = jest.fn()
+
+const mockedDisposer = {
+  track: function <T>(disposable: T): T {
+    return disposable
+  }
+} as unknown as (() => void) & Disposer
+mockedDisposable.fn.mockReturnValueOnce(mockedDisposer)
 const mockedInternalCommands = new InternalCommands(
   {
     getDefaultProject: mockedGetDefaultProject
@@ -48,11 +55,7 @@ jest.mock('../cli/reader')
 beforeEach(() => {
   jest.resetAllMocks()
 
-  mockedDisposable.fn.mockReturnValueOnce({
-    track: function <T>(disposable: T): T {
-      return disposable
-    }
-  } as unknown as (() => void) & Disposer)
+  mockedDisposable.fn.mockReturnValueOnce(mockedDisposer)
 })
 
 describe('TrackedTreeView', () => {

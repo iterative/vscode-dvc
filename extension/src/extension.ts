@@ -225,7 +225,7 @@ export class Extension implements IExtension {
 
     this.registerConfigCommands()
 
-    reRegisterVsCodeCommands(this.dispose)
+    reRegisterVsCodeCommands(this.internalCommands)
 
     this.dispose.track(
       commands.registerCommand(
@@ -314,18 +314,14 @@ export class Extension implements IExtension {
   }
 
   private registerConfigCommands() {
-    this.dispose.track(
-      this.internalCommands.registerExternalCommand(
-        RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
-        () => this.config.deselectDefaultProject()
-      )
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
+      () => this.config.deselectDefaultProject()
     )
 
-    this.dispose.track(
-      this.internalCommands.registerExternalCommand(
-        RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
-        () => this.config.selectDefaultProject()
-      )
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
+      () => this.config.selectDefaultProject()
     )
   }
 

@@ -9,55 +9,41 @@ import { RegisteredCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Resource>(
-      RegisteredCommands.ADD_TARGET,
-      getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
-    )
+  internalCommands.registerExternalCommand<Resource>(
+    RegisteredCommands.ADD_TARGET,
+    getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
   )
 
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Resource>(
-      RegisteredCommands.CHECKOUT_TARGET,
-      getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
-    )
+  internalCommands.registerExternalCommand<Resource>(
+    RegisteredCommands.CHECKOUT_TARGET,
+    getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Resource>(
-      RegisteredCommands.COMMIT_TARGET,
-      getResourceCommand(internalCommands, AvailableCommands.COMMIT)
-    )
+  internalCommands.registerExternalCommand<Resource>(
+    RegisteredCommands.COMMIT_TARGET,
+    getResourceCommand(internalCommands, AvailableCommands.COMMIT)
   )
 }
 
 const registerRootCommands = (internalCommands: InternalCommands) => {
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Root>(
-      RegisteredCommands.CHECKOUT,
-      getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
-    )
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.CHECKOUT,
+    getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Root>(
-      RegisteredCommands.COMMIT,
-      getRootCommand(internalCommands, AvailableCommands.COMMIT)
-    )
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.COMMIT,
+    getRootCommand(internalCommands, AvailableCommands.COMMIT)
   )
 
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Root>(
-      RegisteredCommands.PULL,
-      getRootCommand(internalCommands, AvailableCommands.PULL)
-    )
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.PULL,
+    getRootCommand(internalCommands, AvailableCommands.PULL)
   )
 
-  internalCommands.dispose.track(
-    internalCommands.registerExternalCommand<Root>(
-      RegisteredCommands.PUSH,
-      getRootCommand(internalCommands, AvailableCommands.PUSH)
-    )
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.PUSH,
+    getRootCommand(internalCommands, AvailableCommands.PUSH)
   )
 }
 

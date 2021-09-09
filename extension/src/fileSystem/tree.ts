@@ -21,10 +21,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from '../commands/external'
+import { RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
@@ -244,8 +241,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
-    this.dispose.track(
-      registerInstrumentedCommand(RegisteredCommands.INIT, async () => {
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.INIT,
+      async () => {
         const root = getFirstWorkspaceFolder()
         if (root) {
           await this.internalCommands.executeCommand(
@@ -254,76 +252,64 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
           )
           workspaceChanged.fire()
         }
-      })
+      }
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand<Uri>(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        resource => this.openResource(resource)
-      )
+    this.internalCommands.registerExternalCommand<Uri>(
+      RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+      resource => this.openResource(resource)
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand<string>(
-        RegisteredCommands.DELETE_TARGET,
-        path => deleteTarget(path)
-      )
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.DELETE_TARGET,
+      path => deleteTarget(path)
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand<string>(
-        RegisteredCommands.REMOVE_TARGET,
-        path => {
-          deleteTarget(path)
-          this.treeDataChanged.fire()
-          const dvcRoot = this.pathRoots[path]
-          const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-          return this.internalCommands.executeCommand(
-            AvailableCommands.REMOVE,
-            dvcRoot,
-            relPath
-          )
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.REMOVE_TARGET,
+      path => {
+        deleteTarget(path)
+        this.treeDataChanged.fire()
+        const dvcRoot = this.pathRoots[path]
+        const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
+        return this.internalCommands.executeCommand(
+          AvailableCommands.REMOVE,
+          dvcRoot,
+          relPath
+        )
+      }
+    )
+
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.RENAME_TARGET,
+      async path => {
+        const dvcRoot = this.pathRoots[path]
+        const relPath = relative(dvcRoot, path)
+        const relDestination = await getInput(
+          'enter a destination relative to the root',
+          relPath
+        )
+        if (!relDestination || relDestination === relPath) {
+          return
         }
-      )
+
+        return this.internalCommands.executeCommand(
+          AvailableCommands.MOVE,
+          dvcRoot,
+          relPath,
+          relDestination
+        )
+      }
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand<string>(
-        RegisteredCommands.RENAME_TARGET,
-        async path => {
-          const dvcRoot = this.pathRoots[path]
-          const relPath = relative(dvcRoot, path)
-          const relDestination = await getInput(
-            'enter a destination relative to the root',
-            relPath
-          )
-          if (!relDestination || relDestination === relPath) {
-            return
-          }
-
-          return this.internalCommands.executeCommand(
-            AvailableCommands.MOVE,
-            dvcRoot,
-            relPath,
-            relDestination
-          )
-        }
-      )
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.PULL_TARGET,
+      path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand<string>(
-        RegisteredCommands.PULL_TARGET,
-        path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
-      )
-    )
-
-    this.dispose.track(
-      registerInstrumentedCommand<string>(
-        RegisteredCommands.PUSH_TARGET,
-        path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
-      )
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.PUSH_TARGET,
+      path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
     )
   }
 

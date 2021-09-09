@@ -81,21 +81,27 @@ export class InternalCommands {
   public registerExternalCommand<T = string | undefined>(
     name: RegisteredCommands,
     func: (arg: T) => unknown
-  ): Disposable {
-    return commands.registerCommand(name, async arg => {
-      const stopWatch = new StopWatch()
-      try {
-        const res = await func(arg)
-        sendTelemetryEvent(name, undefined, {
-          duration: stopWatch.getElapsedTime()
-        })
-        return res
-      } catch (e: unknown) {
-        showGenericError()
-        this.outputChannel.show()
-        sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
-      }
-    })
+  ): void {
+    this.dispose.track(
+      commands.registerCommand(name, async arg => {
+        const stopWatch = new StopWatch()
+        try {
+          const res = await func(arg)
+          sendTelemetryEvent(name, undefined, {
+            duration: stopWatch.getElapsedTime()
+          })
+          return res
+        } catch (e: unknown) {
+          showGenericError()
+          this.outputChannel.show()
+          sendTelemetryEventAndThrow(
+            name,
+            e as Error,
+            stopWatch.getElapsedTime()
+          )
+        }
+      })
+    )
   }
 
   private autoRegisterCommands(cli: ICli) {
