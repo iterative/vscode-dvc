@@ -32,7 +32,6 @@ import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
-import { reportCommandFailed } from './vscode/reporting'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
   getFirstWorkspaceFolder,
@@ -219,7 +218,6 @@ export class Extension implements IExtension {
           )
           return stopped
         } catch (e: unknown) {
-          reportCommandFailed(RegisteredCommands.STOP_EXPERIMENT)
           sendTelemetryEventAndThrow(
             RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
             e as Error,
@@ -251,7 +249,6 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            reportCommandFailed(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
             sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,

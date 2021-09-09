@@ -11,7 +11,6 @@ import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
 import { quickPickOne } from '../vscode/quickPick'
-import { reportCommandFailed } from '../vscode/reporting'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -97,14 +96,9 @@ export class InternalCommands {
     func: (arg: T) => unknown
   ): void {
     this.dispose.track(
-      commands.registerCommand(name, async (arg: T) => {
-        try {
-          return await this.runAndSendTelemetry<T>(name, func, arg)
-        } catch (e: unknown) {
-          reportCommandFailed(name)
-          throw e
-        }
-      })
+      commands.registerCommand(name, (arg: T) =>
+        this.runAndSendTelemetry<T>(name, func, arg)
+      )
     )
   }
 
