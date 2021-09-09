@@ -10,8 +10,8 @@ import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
 import { quickPickOne } from '../vscode/quickPick'
 import { StopWatch } from '../util/time'
-import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
-import { showGenericError } from '../vscode/modal'
+import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
+import { showGenericError } from '../vscode/errorMessage'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -92,13 +92,8 @@ export class InternalCommands {
           })
           return res
         } catch (e: unknown) {
-          showGenericError()
-          this.outputChannel.show()
-          sendTelemetryEventAndThrow(
-            name,
-            e as Error,
-            stopWatch.getElapsedTime()
-          )
+          showGenericError(() => this.outputChannel.show())
+          sendErrorTelemetryEvent(name, e as Error, stopWatch.getElapsedTime())
         }
       })
     )

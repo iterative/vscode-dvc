@@ -41,11 +41,13 @@ import {
 import {
   getTelemetryReporter,
   sendTelemetryEventAndThrow,
-  sendTelemetryEvent
+  sendTelemetryEvent,
+  sendErrorTelemetryEvent
 } from './telemetry'
 import { EventName } from './telemetry/constants'
 import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
+import { showGenericError } from './vscode/errorMessage'
 
 export { Disposable, Disposer }
 
@@ -217,7 +219,8 @@ export class Extension implements IExtension {
           )
           return stopped
         } catch (e: unknown) {
-          sendTelemetryEventAndThrow(
+          showGenericError(() => outputChannel.show())
+          sendErrorTelemetryEvent(
             RegisteredCommands.STOP_EXPERIMENT,
             e as Error,
             stopWatch.getElapsedTime()
@@ -248,7 +251,8 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            sendTelemetryEventAndThrow(
+            showGenericError(() => outputChannel.show())
+            sendErrorTelemetryEvent(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
               stopWatch.getElapsedTime()
