@@ -7,18 +7,18 @@ import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
 import { autoRegisteredCommands as CliReaderCommands } from '../cli/reader'
 import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
 import { Config } from '../config'
+import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
+import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
 import { quickPickOne } from '../vscode/quickPick'
-import { StopWatch } from '../util/time'
-import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
+import { reportCommandFailed } from '../vscode/reporting'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
   {
     GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
-    GET_THEME: 'getTheme',
-    REGISTER_EXTERNAL_COMMAND: 'registerExternalCommand'
+    GET_THEME: 'getTheme'
   } as const,
   CliExecutorCommands,
   CliReaderCommands,
@@ -82,17 +82,11 @@ export class InternalCommands {
     func: (arg: T) => unknown
   ): void {
     this.dispose.track(
-      commands.registerCommand(name, async arg => {
-        const stopWatch = new StopWatch()
+      commands.registerCommand(name, async (arg: T) => {
         try {
-          const res = await func(arg)
-          sendTelemetryEvent(name, undefined, {
-            duration: stopWatch.getElapsedTime()
-          })
-          return res
+          return await this.runAndSendTelemetry<T>(name, func, arg)
         } catch (e: unknown) {
           this.outputChannel.offerToShowError()
-          sendErrorTelemetryEvent(name, e as Error, stopWatch.getElapsedTime())
         }
       })
     )
@@ -103,20 +97,32 @@ export class InternalCommands {
     func: (arg: T) => unknown
   ): void {
     this.dispose.track(
-      commands.registerCommand(name, async arg => {
-        const stopWatch = new StopWatch()
+      commands.registerCommand(name, async (arg: T) => {
         try {
-          const res = await func(arg)
-          sendTelemetryEvent(name, undefined, {
-            duration: stopWatch.getElapsedTime()
-          })
-          return res
+          return await this.runAndSendTelemetry<T>(name, func, arg)
         } catch (e: unknown) {
-          this.outputChannel.handleError(e as Error)
-          sendErrorTelemetryEvent(name, e as Error, stopWatch.getElapsedTime())
+          reportCommandFailed(name)
+          throw e
         }
       })
     )
+  }
+
+  private async runAndSendTelemetry<T>(
+    name: RegisteredCommands,
+    func: (arg: T) => unknown,
+    arg: T
+  ) {
+    const stopWatch = new StopWatch()
+    try {
+      const res = await func(arg)
+      sendTelemetryEvent(name, undefined, {
+        duration: stopWatch.getElapsedTime()
+      })
+      return res
+    } catch (e: unknown) {
+      sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
+    }
   }
 
   private autoRegisterCommands(cli: ICli) {

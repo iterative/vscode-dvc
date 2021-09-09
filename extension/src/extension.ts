@@ -32,6 +32,7 @@ import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
+import { reportCommandFailed } from './vscode/reporting'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
   getFirstWorkspaceFolder,
@@ -41,7 +42,8 @@ import {
 import {
   getTelemetryReporter,
   sendTelemetryEvent,
-  sendErrorTelemetryEvent
+  sendErrorTelemetryEvent,
+  sendTelemetryEventAndThrow
 } from './telemetry'
 import { EventName } from './telemetry/constants'
 import { RegisteredCommands } from './commands/external'
@@ -158,8 +160,7 @@ export class Extension implements IExtension {
         )
       )
       .catch(e => {
-        outputChannel.handleError(e as Error)
-        sendErrorTelemetryEvent(
+        sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           e,
           stopWatch.getElapsedTime(),
@@ -185,7 +186,6 @@ export class Extension implements IExtension {
             { duration: stopWatch.getElapsedTime() }
           )
         } catch (e: unknown) {
-          outputChannel.handleError(e as Error)
           return sendErrorTelemetryEvent(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
             e as Error,
@@ -219,8 +219,8 @@ export class Extension implements IExtension {
           )
           return stopped
         } catch (e: unknown) {
-          outputChannel.handleError(e as Error)
-          sendErrorTelemetryEvent(
+          reportCommandFailed(RegisteredCommands.STOP_EXPERIMENT)
+          sendTelemetryEventAndThrow(
             RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
             e as Error,
             stopWatch.getElapsedTime()
@@ -251,8 +251,8 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            outputChannel.handleError(e as Error)
-            sendErrorTelemetryEvent(
+            reportCommandFailed(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
+            sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
               stopWatch.getElapsedTime()
