@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
+import { buildExperimentsRepository } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -22,6 +23,7 @@ import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
+import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Experiments Repository Test Suite', () => {
   window.showInformationMessage('Start all experiment repository tests.')
@@ -39,24 +41,9 @@ suite('Experiments Repository Test Suite', () => {
 
   describe('refresh', () => {
     it('should debounce all calls to refresh that are made within 200ms', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
+      const { experimentsRepository, mockExperimentShow } =
+        buildExperimentsRepository(disposable)
 
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          {} as ResourceLocator,
-          buildMockMemento()
-        )
-      )
       await experimentsRepository.isReady()
       mockExperimentShow.resetHistory()
 
@@ -75,22 +62,8 @@ suite('Experiments Repository Test Suite', () => {
 
   describe('getExperiments', () => {
     it('should return all existing experiments', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          {} as ResourceLocator,
-          buildMockMemento()
-        )
-      )
       await experimentsRepository.isReady()
 
       const experiments = experimentsRepository.getExperiments()
@@ -110,22 +83,8 @@ suite('Experiments Repository Test Suite', () => {
 
   describe('getCheckpoints', () => {
     it("should return the correct checkpoints for an experiment's id", async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          {} as ResourceLocator,
-          buildMockMemento()
-        )
-      )
       await experimentsRepository.isReady()
 
       const notAnExperimentId = ':cartwheel:'
@@ -145,26 +104,7 @@ suite('Experiments Repository Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
@@ -181,27 +121,8 @@ suite('Experiments Repository Test Suite', () => {
     })
 
     it('should only be able to open a single experiments webview', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository, mockExperimentShow } =
+        buildExperimentsRepository(disposable)
 
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
@@ -234,6 +155,9 @@ suite('Experiments Repository Test Suite', () => {
   it('should be able to sort', async () => {
     const config = disposable.track(new Config())
     const cliReader = disposable.track(new CliReader(config))
+    const outputChannel = disposable.track(
+      new OutputChannel([cliReader], '3', 'sort test')
+    )
     const buildTestExperiment = (testParam: number) => ({
       params: {
         'params.yaml': {
@@ -256,7 +180,7 @@ suite('Experiments Repository Test Suite', () => {
     const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
     const internalCommands = disposable.track(
-      new InternalCommands(config, cliReader)
+      new InternalCommands(config, outputChannel, cliReader)
     )
     const resourceLocator = disposable.track(
       new ResourceLocator(Uri.file(resourcePath))
@@ -398,9 +322,12 @@ suite('Experiments Repository Test Suite', () => {
     ]
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
-    const mockedInternalCommands = new InternalCommands({
-      getDefaultProject: stub()
-    } as unknown as Config)
+    const mockedInternalCommands = new InternalCommands(
+      {
+        getDefaultProject: stub()
+      } as unknown as Config,
+      {} as unknown as OutputChannel
+    )
     mockedInternalCommands.registerCommand(
       AvailableCommands.EXPERIMENT_SHOW,
       () => Promise.resolve(complexExperimentsOutput)

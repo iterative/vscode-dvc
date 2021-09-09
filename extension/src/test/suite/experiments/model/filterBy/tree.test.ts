@@ -1,30 +1,19 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, Uri, QuickPickItem } from 'vscode'
+import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
-import { CliReader } from '../../../../../cli/reader'
-import complexExperimentsOutput from '../../../../fixtures/complex-output-example'
 import complexColumnData from '../../../../fixtures/complex-column-example'
 import complexRowData from '../../../../fixtures/complex-row-example'
 import { Experiments } from '../../../../../experiments'
-import { ExperimentsRepository } from '../../../../../experiments/repository'
-import { Config } from '../../../../../config'
-import { ResourceLocator } from '../../../../../resourceLocator'
-import { CliRunner } from '../../../../../cli/runner'
-import { InternalCommands } from '../../../../../commands/internal'
 import {
   getFilterId,
   Operator
 } from '../../../../../experiments/model/filterBy'
-import {
-  dvcDemoPath,
-  experimentsUpdatedEvent,
-  resourcePath
-} from '../../../util'
-import { buildMockMemento } from '../../../../util'
+import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
+import { buildExperimentsRepository } from '../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments filter by tree tests.')
@@ -44,27 +33,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const cliRunner = disposable.track(new CliRunner(config))
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
       const experimentsWebview = await experimentsRepository.showWebview()
@@ -156,27 +125,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const cliRunner = disposable.track(new CliRunner(config))
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
 

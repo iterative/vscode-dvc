@@ -1,17 +1,25 @@
 import { AvailableCommands, CommandId, InternalCommands } from './internal'
 import { ICli } from '../cli'
 import { Config } from '../config'
+import { OutputChannel } from '../vscode/outputChannel'
 
 const mockedConfig = {
   getDefaultProject: jest.fn()
 } as unknown as Config
+
+const mockedOutputChannel = {
+  show: jest.fn()
+} as unknown as OutputChannel
 
 beforeEach(() => {
   jest.resetAllMocks()
 })
 
 describe('InternalCommands', () => {
-  const internalCommands = new InternalCommands(mockedConfig)
+  const internalCommands = new InternalCommands(
+    mockedConfig,
+    mockedOutputChannel
+  )
 
   describe('executeCommand', () => {
     it('should throw an error if we try to run a non-registered command', () => {
@@ -39,7 +47,9 @@ describe('InternalCommands', () => {
         func: jest.fn()
       } as unknown as ICli
 
-      expect(() => new InternalCommands(mockedConfig, mockedCli)).toThrow()
+      expect(
+        () => new InternalCommands(mockedConfig, mockedOutputChannel, mockedCli)
+      ).toThrow()
     })
   })
 })

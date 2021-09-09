@@ -1,8 +1,9 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore, useFakeTimers } from 'sinon'
+import { stub, restore, useFakeTimers } from 'sinon'
 import { window, commands, workspace, Uri, QuickPickItem } from 'vscode'
+import { buildMultiRepoExperiments, buildSingleRepoExperiments } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -19,6 +20,7 @@ import { dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
 import { RegisteredCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
+import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments tests.')
@@ -54,33 +56,8 @@ suite('Experiments Test Suite', () => {
 
       await setConfigValue('dvc.defaultProject', dvcDemoPath)
 
-      const config = disposable.track(new Config())
-      const configSpy = spy(config, 'getDefaultProject')
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const mockExperimentsRepository = {
-        'other/dvc/root': {} as ExperimentsRepository
-      } as Record<string, ExperimentsRepository>
-
-      const experiments = disposable.track(
-        new Experiments(
-          internalCommands,
-          buildMockMemento(),
-          mockExperimentsRepository
-        )
-      )
-      const [experimentsRepository] = experiments.create(
-        [dvcDemoPath],
-        resourceLocator
-      )
+      const { configSpy, experiments, experimentsRepository } =
+        buildMultiRepoExperiments(disposable)
 
       await experiments.isReady()
 
@@ -109,32 +86,8 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const mockExperimentsRepository = {
-        'other/dvc/root': {} as ExperimentsRepository
-      } as Record<string, ExperimentsRepository>
-
-      const experiments = disposable.track(
-        new Experiments(
-          internalCommands,
-          buildMockMemento(),
-          mockExperimentsRepository
-        )
-      )
-      const [experimentsRepository] = experiments.create(
-        [dvcDemoPath],
-        resourceLocator
-      )
+      const { experiments, experimentsRepository } =
+        buildMultiRepoExperiments(disposable)
 
       await experiments.isReady()
 
@@ -160,23 +113,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experiments = disposable.track(
-        new Experiments(internalCommands, buildMockMemento())
-      )
-      experiments.create([dvcDemoPath], resourceLocator)
-
+      const { experiments } = buildSingleRepoExperiments(disposable)
       await experiments.isReady()
 
       await experiments.showExperimentsTable()
@@ -196,9 +133,12 @@ suite('Experiments Test Suite', () => {
       stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
       const cliRunner = disposable.track(new CliRunner(config))
       const mockRun = stub(cliRunner, 'run').resolves()
+      const outputChannel = disposable.track(
+        new OutputChannel([cliReader], '5', 'experiments runner test')
+      )
 
       const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
+        new InternalCommands(config, outputChannel, cliReader, cliRunner)
       )
 
       const resourceLocator = disposable.track(
