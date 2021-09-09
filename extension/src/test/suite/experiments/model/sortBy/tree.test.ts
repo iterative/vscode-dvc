@@ -1,29 +1,20 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, Uri } from 'vscode'
+import { window, commands } from 'vscode'
 import get from 'lodash.get'
 import { Disposable } from '../../../../../extension'
-import { CliReader, ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 import { Experiments } from '../../../../../experiments'
-import { ExperimentsRepository } from '../../../../../experiments/repository'
-import { Config } from '../../../../../config'
-import { ResourceLocator } from '../../../../../resourceLocator'
-import { CliRunner } from '../../../../../cli/runner'
-import { InternalCommands } from '../../../../../commands/internal'
 import {
   Experiment,
   ParamOrMetric
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import {
-  dvcDemoPath,
-  experimentsUpdatedEvent,
-  resourcePath
-} from '../../../util'
-import { buildMockMemento } from '../../../../util'
+import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
+import { buildExperimentsRepository } from '../../util'
+import { ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
@@ -90,7 +81,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         }
       }
     }
-  }
+  } as unknown as ExperimentsRepoJSONOutput
 
   const disposable = Disposable.fn()
 
@@ -108,28 +99,9 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(
-        testData as unknown as ExperimentsRepoJSONOutput
-      )
-      const cliRunner = disposable.track(new CliRunner(config))
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
+      const { experimentsRepository } = buildExperimentsRepository(
+        disposable,
+        testData
       )
 
       await experimentsRepository.isReady()

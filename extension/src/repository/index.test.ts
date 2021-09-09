@@ -10,6 +10,7 @@ import { getAllUntracked } from '../git'
 import { delay } from '../util/time'
 import { InternalCommands } from '../commands/internal'
 import { Config } from '../config'
+import { OutputChannel } from '../vscode/outputChannel'
 
 jest.mock('@hediet/std/disposable')
 jest.mock('./sourceControlManagement')
@@ -35,9 +36,14 @@ const mockedDisposable = mocked(Disposable)
 
 const mockedDelay = mocked(delay)
 
-const mockedInternalCommands = new InternalCommands({
-  getDefaultProject: jest.fn()
-} as unknown as Config)
+const mockedInternalCommands = new InternalCommands(
+  {
+    getDefaultProject: jest.fn()
+  } as unknown as Config,
+  {
+    show: jest.fn()
+  } as unknown as OutputChannel
+)
 mockedInternalCommands.registerCommand('diff', (...args) => mockedDiff(...args))
 mockedInternalCommands.registerCommand('listDvcOnlyRecursive', (...args) =>
   mockedListDvcOnlyRecursive(...args)

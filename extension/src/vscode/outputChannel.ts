@@ -23,6 +23,10 @@ export class OutputChannel {
     })
   }
 
+  public show() {
+    return this.outputChannel.show(true)
+  }
+
   private onDidStartProcess(cli: ICli) {
     this.dispose.track(
       cli.onDidStartProcess(({ command, pid }) => {

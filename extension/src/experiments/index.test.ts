@@ -12,6 +12,7 @@ import {
 } from '../commands/internal'
 import { getInput } from '../vscode/inputBox'
 import { buildMockMemento } from '../test/util'
+import { OutputChannel } from '../vscode/outputChannel'
 
 const mockedShowWebview = jest.fn()
 const mockedDisposable = mocked(Disposable)
@@ -39,9 +40,14 @@ beforeEach(() => {
 })
 
 describe('Experiments', () => {
-  const mockedInternalCommands = new InternalCommands({
-    getDefaultProject: mockedGetDefaultProject
-  } as unknown as Config)
+  const mockedInternalCommands = new InternalCommands(
+    {
+      getDefaultProject: mockedGetDefaultProject
+    } as unknown as Config,
+    {
+      show: jest.fn()
+    } as unknown as OutputChannel
+  )
 
   const mockedCommandId = 'mockedExpFunc' as CommandId
   mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>

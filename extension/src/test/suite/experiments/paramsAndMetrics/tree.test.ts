@@ -1,21 +1,14 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
-import { window, commands, Uri } from 'vscode'
+import { window, commands } from 'vscode'
 import { Disposable } from '../../../../extension'
-import complexExperimentsOutput from '../../../fixtures/complex-output-example'
 import { Experiments } from '../../../../experiments'
-import { ExperimentsRepository } from '../../../../experiments/repository'
 import { Status } from '../../../../experiments/paramsAndMetrics/model'
-import { ResourceLocator } from '../../../../resourceLocator'
-import { Config } from '../../../../config'
-import { CliReader } from '../../../../cli/reader'
-import { InternalCommands } from '../../../../commands/internal'
-import { dvcDemoPath, resourcePath } from '../../util'
-import { buildMockMemento } from '../../../util'
-
+import { dvcDemoPath } from '../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
+import { buildExperimentsRepository } from '../util'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   window.showInformationMessage(
@@ -38,25 +31,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = joinParamOrMetricPath('params', paramsFile, 'learning_rate')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
 
@@ -99,25 +74,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = joinParamOrMetricPath('params', paramsFile)
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
 
@@ -178,25 +135,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const grandParentPath = joinParamOrMetricPath('params', paramsFile)
       const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
 
@@ -266,25 +205,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const grandParentPath = joinParamOrMetricPath('params', paramsFile)
       const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
 
@@ -358,25 +279,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const grandParentPath = joinParamOrMetricPath('params', paramsFile)
       const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
-      )
+      const { experimentsRepository } = buildExperimentsRepository(disposable)
 
       await experimentsRepository.isReady()
 

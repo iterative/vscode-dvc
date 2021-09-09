@@ -99,9 +99,17 @@ export class Extension implements IExtension {
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
+    const outputChannel = this.dispose.track(
+      new OutputChannel(
+        [this.cliExecutor, this.cliReader, this.cliRunner],
+        context.extension.packageJSON.version
+      )
+    )
+
     this.internalCommands = this.dispose.track(
       new InternalCommands(
         this.config,
+        outputChannel,
         this.cliExecutor,
         this.cliReader,
         this.cliRunner
@@ -133,13 +141,6 @@ export class Extension implements IExtension {
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
         this.experiments.refreshData(cwd)
       })
-    )
-
-    this.dispose.track(
-      new OutputChannel(
-        [this.cliExecutor, this.cliReader, this.cliRunner],
-        context.extension.packageJSON.version
-      )
     )
 
     this.trackedExplorerTree = this.dispose.track(

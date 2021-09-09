@@ -1,18 +1,20 @@
 import { Disposable } from '@hediet/std/disposable'
 import { ICli } from '../cli'
 import { Args } from '../cli/args'
-import { Config } from '../config'
-import { quickPickOne } from '../vscode/quickPick'
 import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
 import { autoRegisteredCommands as CliReaderCommands } from '../cli/reader'
 import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
+import { Config } from '../config'
+import { OutputChannel } from '../vscode/outputChannel'
+import { quickPickOne } from '../vscode/quickPick'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
   {
     GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
-    GET_THEME: 'getTheme'
+    GET_THEME: 'getTheme',
+    SHOW_OUTPUT_CHANNEL: 'showOutputChannel'
   } as const,
   CliExecutorCommands,
   CliReaderCommands,
@@ -25,7 +27,11 @@ export class InternalCommands {
 
   private readonly commands = new Map<string, Command>()
 
-  constructor(config: Config, ...cliInteractors: ICli[]) {
+  constructor(
+    config: Config,
+    outputChannel: OutputChannel,
+    ...cliInteractors: ICli[]
+  ) {
     cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
 
     this.registerCommand(
@@ -43,6 +49,10 @@ export class InternalCommands {
     )
 
     this.registerCommand(AvailableCommands.GET_THEME, () => config.getTheme())
+
+    this.registerCommand(AvailableCommands.SHOW_OUTPUT_CHANNEL, () =>
+      outputChannel.show()
+    )
   }
 
   public executeCommand<T = string>(
