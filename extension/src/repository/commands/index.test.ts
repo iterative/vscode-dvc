@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
-import { getWarningResponse, showGenericError } from '../../vscode/modal'
+import { getWarningResponse } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
@@ -10,7 +10,6 @@ import { OutputChannel } from '../../vscode/outputChannel'
 
 const mockedFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
-const mockedShowGenericError = mocked(showGenericError)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
@@ -56,9 +55,7 @@ describe('getResourceCommand', () => {
 
   it('should return a function that throws if the first function fails without a force prompt', async () => {
     const stderr = 'I deed'
-    const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
-    mockedShowGenericError.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
@@ -202,9 +199,7 @@ describe('getRootCommand', () => {
 
   it('should return a function that throws an error if the underlying function fails without a force prompt', async () => {
     const stderr = 'I deed'
-    const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
-    mockedShowGenericError.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getRootCommand(
       mockedInternalCommands,
