@@ -1,6 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
 import {
-  commands,
   Event,
   ThemeIcon,
   TreeDataProvider,
@@ -10,6 +9,12 @@ import {
 } from 'vscode'
 import { getFilterId } from '.'
 import { Experiments } from '../..'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../../commands/external'
+import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
+import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
 import { createTreeView } from '../../../vscode/tree'
 
@@ -28,6 +33,7 @@ export class ExperimentsFilterByTree
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: Experiments
+  private viewed = false
 
   constructor(experiments: Experiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
@@ -39,15 +45,15 @@ export class ExperimentsFilterByTree
     this.experiments = experiments
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsFilterByTree.removeFilter',
-        resource => this.removeFilter(resource as FilterItem)
+      registerInstrumentedCommand<FilterItem>(
+        RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
+        resource => this.removeFilter(resource)
       )
     )
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsFilterByTree.removeAllFilters',
+      registerInstrumentedCommand(
+        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL,
         resource => this.removeAllFilters(resource)
       )
     )
@@ -90,6 +96,15 @@ export class ExperimentsFilterByTree
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.getDvcRoots()
+
+    if (!this.viewed) {
+      sendViewOpenedTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED,
+        dvcRoots.length
+      )
+      this.viewed = true
+    }
+
     const filters = flatten(
       dvcRoots.map(dvcRoot => this.experiments.getFilters(dvcRoot))
     )

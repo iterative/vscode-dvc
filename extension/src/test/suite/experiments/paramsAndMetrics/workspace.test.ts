@@ -1,14 +1,15 @@
-import { join } from 'path'
+import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { FileSystemWatcher, window } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParamsAndMetrics } from '../../../../experiments/paramsAndMetrics/workspace'
-import complexExperimentsOutput from '../../../../experiments/webview/complex-output-example.json'
+import complexExperimentsOutput from '../../../fixtures/complex-output-example'
 import * as Watcher from '../../../../fileSystem/watcher'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 import { ParamsAndMetricsModel } from '../../../../experiments/paramsAndMetrics/model'
+import { buildMockMemento } from '../../../util'
 
 suite('Experiments Test Suite', () => {
   window.showInformationMessage('Start all experiments workspace params tests.')
@@ -28,7 +29,9 @@ suite('Experiments Test Suite', () => {
       const mockUpdater = stub()
       const createFileSystemWatcherSpy = spy(Watcher, 'createFileSystemWatcher')
 
-      const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
+      const paramsAndMetrics = disposable.track(
+        new ParamsAndMetricsModel('test', buildMockMemento())
+      )
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       disposable.track(
@@ -43,14 +46,20 @@ suite('Experiments Test Suite', () => {
       expect(createFileSystemWatcherSpy).to.be.calledOnce
 
       expect(getFirstArgOfCall(createFileSystemWatcherSpy, 0)).to.equal(
-        join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
+        join(
+          dvcDemoPath,
+          '**',
+          `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,summary.json}`
+        )
       )
     })
 
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       const mockUpdater = stub()
 
-      const paramsAndMetrics = disposable.track(new ParamsAndMetricsModel())
+      const paramsAndMetrics = disposable.track(
+        new ParamsAndMetricsModel('test', buildMockMemento())
+      )
       await paramsAndMetrics.transformAndSet(complexExperimentsOutput)
 
       const paramsAndMetricsUpdatedEvent = new Promise(resolve =>
@@ -86,13 +95,15 @@ suite('Experiments Test Suite', () => {
             baseline: {
               data: {
                 metrics: {
-                  ...complexExperimentsOutput.workspace.baseline.data.metrics,
+                  ...(complexExperimentsOutput.workspace.baseline.data
+                    ?.metrics || {}),
                   'new_summary.json': {
                     data: { auc: 0, loss: 1 }
                   }
                 },
                 params: {
-                  ...complexExperimentsOutput.workspace.baseline.data.params,
+                  ...(complexExperimentsOutput.workspace.baseline.data
+                    ?.params || {}),
                   'new_params.yml': {
                     data: { new_seed: 10000, new_weight_decay: 0 }
                   }
@@ -110,13 +121,17 @@ suite('Experiments Test Suite', () => {
       expect(mockCreateFileSystemWatcher).to.be.calledTwice
       expect(mockDispose).to.be.calledOnce
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
-        join(dvcDemoPath, '**', '{dvc.lock,dvc.yaml,params.yaml,summary.json}')
+        join(
+          dvcDemoPath,
+          `**`,
+          `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,summary.json}`
+        )
       )
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 1)).to.equal(
         join(
           dvcDemoPath,
           '**',
-          '{dvc.lock,dvc.yaml,params.yaml,new_params.yml,new_summary.json,summary.json}'
+          `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
         )
       )
     })

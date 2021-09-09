@@ -1,7 +1,5 @@
-import { join } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import {
-  commands,
   Event,
   TreeDataProvider,
   TreeItem,
@@ -10,10 +8,17 @@ import {
   Uri
 } from 'vscode'
 import { Status } from './model'
+import { splitParamOrMetricPath } from './paths'
 import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../../commands/external'
+import { sendViewOpenedTelemetryEvent } from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
 
 type ParamsAndMetricsItem = {
   description: string | undefined
@@ -34,6 +39,7 @@ export class ExperimentsParamsAndMetricsTree
   private readonly resourceLocator: ResourceLocator
 
   private view: TreeView<string | ParamsAndMetricsItem>
+  private viewed = false
 
   constructor(experiments: Experiments, resourceLocator: ResourceLocator) {
     this.resourceLocator = resourceLocator
@@ -50,12 +56,10 @@ export class ExperimentsParamsAndMetricsTree
     this.experiments = experiments
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
-        resource => {
-          const { dvcRoot, path } = resource
-          return this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
-        }
+      registerInstrumentedCommand<ParamsAndMetricsItem>(
+        RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
+        ({ dvcRoot, path }) =>
+          this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
       )
     )
 
@@ -70,14 +74,13 @@ export class ExperimentsParamsAndMetricsTree
 
     const { dvcRoot, path, collapsibleState, description, iconPath } = element
 
-    const treeItem = new TreeItem(
-      Uri.file(join(dvcRoot, path)),
-      collapsibleState
-    )
+    const splitPath = splitParamOrMetricPath(path)
+    const finalPathSegment = splitPath[splitPath.length - 1]
+    const treeItem = new TreeItem(finalPathSegment, collapsibleState)
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
-      command: 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+      command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
       title: 'toggle'
     }
 
@@ -116,6 +119,14 @@ export class ExperimentsParamsAndMetricsTree
   private async getRootElements() {
     await this.experiments.isReady()
     const dvcRoots = this.experiments.getDvcRoots()
+
+    if (!this.viewed) {
+      sendViewOpenedTelemetryEvent(
+        EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED,
+        dvcRoots.length
+      )
+      this.viewed = true
+    }
 
     if (dvcRoots.length === 1) {
       const [onlyRepo] = dvcRoots

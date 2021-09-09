@@ -71,6 +71,13 @@ view, to manage file actions like checkout, pull, push, and add.
 
 ![SCM view screenshot](https://user-images.githubusercontent.com/9111807/118057076-19b9cb80-b359-11eb-91bc-9c73a85a83a8.png)
 
+### Debugging
+
+Due to the way DVC pipelines run scripts of any language from the command line,
+users must debug pipeline scripts (e.g. `train.py`) standalone in whatever way
+debuggers are run on the base language- this is standard for debugging DVC
+pipelines, and most scripts are capable of running outside of DVC.
+
 ## Contributing
 
 See development docs and contributing guidelines in

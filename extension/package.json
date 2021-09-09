@@ -30,7 +30,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.58.1-insiders",
+    "vscode": "^1.60.0-insiders",
     "node": ">=10.2.0"
   },
   "activationEvents": [
@@ -203,6 +203,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.renameTarget%",
+        "command": "dvc.renameTarget",
+        "category": "DVC"
+      },
+      {
         "title": "%command.addExperimentsTableSort%",
         "command": "dvc.addExperimentsTableSort",
         "category": "DVC",
@@ -211,6 +216,12 @@
       {
         "title": "%command.removeExperimentsTableSorts%",
         "command": "dvc.removeExperimentsTableSorts",
+        "category": "DVC",
+        "icon": "$(close-all)"
+      },
+      {
+        "title": "%command.views.experimentsSortByTree.removeAllSorts%",
+        "command": "dvc.views.experimentsSortByTree.removeAllSorts",
         "category": "DVC",
         "icon": "$(close-all)"
       },
@@ -378,11 +389,19 @@
           "when": "false"
         },
         {
-          "command": "dvc.views.experimentsFilterByTree.removeFilter",
+          "command": "dvc.renameTarget",
           "when": "false"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeFilter",
+          "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "when": "false"
         },
         {
@@ -479,23 +498,13 @@
       ],
       "view/item/context": [
         {
-          "command": "dvc.deleteTarget",
-          "group": "DVC",
-          "when": "viewItem =~ /^dvcTracked/"
-        },
-        {
-          "command": "dvc.removeTarget",
-          "when": "viewItem == dvcTrackedData",
-          "group": "DVC"
-        },
-        {
-          "command": "dvc.pushTarget",
-          "group": "DVC",
+          "command": "dvc.pullTarget",
+          "group": "1_DVC@1",
           "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
         },
         {
-          "command": "dvc.pullTarget",
-          "group": "DVC",
+          "command": "dvc.pushTarget",
+          "group": "1_DVC@2",
           "when": "viewItem == dvcTrackedData || viewItem == dvcTrackedHasRemote"
         },
         {
@@ -509,6 +518,21 @@
           "when": "viewItem =~ /^dvcTracked/"
         },
         {
+          "command": "dvc.renameTarget",
+          "group": "7_modification@1",
+          "when": "viewItem == dvcTrackedData"
+        },
+        {
+          "command": "dvc.deleteTarget",
+          "group": "7_modification@2",
+          "when": "viewItem =~ /^dvcTracked/"
+        },
+        {
+          "command": "dvc.removeTarget",
+          "when": "viewItem == dvcTrackedData",
+          "group": "7_modification@2"
+        },
+        {
           "command": "dvc.addExperimentsTableSort",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
@@ -519,9 +543,14 @@
           "when": "dvc.commands.available == true && viewItem == dvcSort"
         },
         {
-          "command": "dvc.removeExperimentsTableSorts",
+          "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "group": "inline",
           "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+        },
+        {
+          "command": "dvc.addExperimentsTableFilter",
+          "group": "inline",
+          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
@@ -566,7 +595,7 @@
           "group": "navigation@1"
         },
         {
-          "command": "dvc.removeExperimentsTableSorts",
+          "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@2"
         }
@@ -643,7 +672,7 @@
     "build-webpack": "webpack --mode production",
     "package": "vsce package --yarn",
     "pub": "vsce publish --yarn --baseImagesUrl https://github.com/iterative/vscode-dvc/raw/master/extension --baseContentUrl https://github.com/iterative/vscode-dvc/raw/master/extension",
-    "test-vscode-build": "tsc -p './'",
+    "test-vscode-build": "tsc -p .",
     "test-vscode-run": "node ./dist/test/runTest.js",
     "test-staged": "lint-staged",
     "test": "jest",
@@ -651,17 +680,18 @@
     "vscode:prepublish": ""
   },
   "dependencies": {
-    "@hediet/node-reload": "^0.7.3",
     "@hediet/std": "^0.6.0",
     "chokidar": "^3.5.2",
     "execa": "^5.1.1",
     "fs-extra": "^10.0.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
-    "mobx": "^6.0.4"
+    "mobx": "^6.0.4",
+    "vscode-extension-telemetry": "^0.2.9"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
+    "@types/chai-as-promised": "^7.1.4",
     "@types/chokidar": "^2.1.3",
     "@types/copy-webpack-plugin": "^8.0.0",
     "@types/fs-extra": "^9.0.7",
@@ -671,8 +701,9 @@
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
     "@types/sinon-chai": "^3.2.5",
-    "@types/vscode": "^1.58.1",
+    "@types/vscode": "^1.60.0",
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^9.0.1",
     "jest": "^27.0.5",
@@ -683,7 +714,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "vsce": "^1.96.1",
+    "vsce": "^1.96.3",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.40.0",
@@ -691,5 +722,8 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
+  },
+  "peerDependencies": {
+    "typescript": "*"
   }
 }

@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy } from 'sinon'
+import { stub, restore, spy, useFakeTimers } from 'sinon'
 import { window, commands, workspace, Uri, FileSystemWatcher } from 'vscode'
 import {
   configurationChangeEvent,
@@ -11,8 +11,12 @@ import {
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
-import complexExperimentsOutput from '../../experiments/webview/complex-output-example.json'
+import complexExperimentsOutput from '../fixtures/complex-output-example'
 import * as Disposer from '../../util/disposable'
+import { RegisteredCommands } from '../../commands/external'
+import * as Setup from '../../setup'
+import * as Telemetry from '../../telemetry'
+import { EventName } from '../../telemetry/constants'
 
 suite('Extension Test Suite', () => {
   window.showInformationMessage('Start all extension tests.')
@@ -50,7 +54,9 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
       await venvQuickPickActive
 
       const selectNoVenv = selectQuickPickItem(3)
@@ -82,7 +88,9 @@ suite('Extension Test Suite', () => {
         1
       )
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
       await venvQuickPickActive
 
       const selectVenvAndUseExtension = selectQuickPickItem(1)
@@ -104,8 +112,11 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'help').rejects('still do not run setup')
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
-      const mockPath = resolve('file', 'picked', 'path', 'to', 'python')
-      stub(window, 'showOpenDialog').resolves([Uri.file(mockPath)])
+      const mockUri = Uri.file(
+        resolve('file', 'picked', 'path', 'to', 'python')
+      )
+      const mockPath = mockUri.fsPath
+      stub(window, 'showOpenDialog').resolves([mockUri])
       const pythonChanged = configurationChangeEvent(
         pythonPathOption,
         disposable
@@ -114,7 +125,9 @@ suite('Extension Test Suite', () => {
       const venvQuickPickActive = quickPickInitialized(mockShowQuickPick, 0)
       const globalQuickPickActive = quickPickInitialized(mockShowQuickPick, 1)
 
-      const setupWorkspaceWizard = commands.executeCommand('dvc.setupWorkspace')
+      const setupWorkspaceWizard = commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
 
       await venvQuickPickActive
 
@@ -139,9 +152,21 @@ suite('Extension Test Suite', () => {
     })
 
     it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
-      const mockPath = resolve('file', 'picked', 'path', 'to', 'dvc')
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const secondTelemetryEventSent = new Promise(resolve =>
+        mockSendTelemetryEvent
+          .onFirstCall()
+          .returns(undefined)
+          .onSecondCall()
+          .callsFake(() => {
+            resolve(undefined)
+            return undefined
+          })
+      )
+      const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
+      const mockPath = mockUri.fsPath
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
-        Uri.file(mockPath)
+        mockUri
       ])
       const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
         'I WORK NOW'
@@ -203,11 +228,32 @@ suite('Extension Test Suite', () => {
       )
 
       await createFileSystemWatcherCalled
+      await secondTelemetryEventSent
 
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
+
+      const [eventName, customProperties] =
+        mockSendTelemetryEvent.getCall(1).args
+
+      expect(
+        eventName,
+        'the correct execution details changed event should be sent'
+      ).to.equal(EventName.EXTENSION_EXECUTION_DETAILS_CHANGED)
+      expect(
+        customProperties,
+        'the correct custom properties should be sent with the event'
+      ).to.deep.equal({
+        cliAccessible: true,
+        dvcPathUsed: true,
+        dvcRootCount: 1,
+        msPythonInstalled: false,
+        msPythonUsed: false,
+        pythonPathUsed: false,
+        workspaceFolderCount: 1
+      })
     })
 
     it('should dispose of the current repositories and experiments before creating new ones', async () => {
@@ -275,6 +321,50 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
+    })
+
+    it('should send an error telemetry event when setupWorkspace fails', async () => {
+      const clock = useFakeTimers()
+      const mockErrorMessage = 'NOPE'
+      stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      await expect(
+        commands.executeCommand(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
+      ).to.be.eventually.rejectedWith(Error)
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        `errors.${RegisteredCommands.EXTENSION_SETUP_WORKSPACE}`,
+        { error: mockErrorMessage },
+        { duration: 0 }
+      )
+
+      clock.restore()
+    })
+  })
+
+  describe('dvc.stopRunningExperiment', () => {
+    it('should send a telemetry event containing properties relating to the event', async () => {
+      const clock = useFakeTimers()
+      const duration = 1234
+      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+
+      const stop = commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
+      clock.tick(duration)
+      await stop
+
+      expect(mockSendTelemetryEvent).to.be.calledWith(
+        RegisteredCommands.STOP_EXPERIMENT,
+        {
+          stopped: false,
+          wasRunning: false
+        },
+        {
+          duration
+        }
+      )
+
+      clock.restore()
     })
   })
 })

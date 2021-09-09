@@ -7,6 +7,7 @@ import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import { dvcDemoPath } from '../util'
+import { RegisteredCommands } from '../../../commands/external'
 
 suite('Source Control Management Test Suite', () => {
   window.showInformationMessage('Start all source control management tests.')
@@ -29,7 +30,7 @@ suite('Source Control Management Test Suite', () => {
     it('should be able to run dvc.addTarget without error', async () => {
       const mockAdd = stub(CliExecutor.prototype, 'add').resolves('')
 
-      await commands.executeCommand('dvc.addTarget', {
+      await commands.executeCommand(RegisteredCommands.ADD_TARGET, {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
@@ -45,7 +46,7 @@ suite('Source Control Management Test Suite', () => {
         '' as unknown as MessageItem
       )
 
-      await commands.executeCommand('dvc.checkout', { rootUri })
+      await commands.executeCommand(RegisteredCommands.CHECKOUT, { rootUri })
 
       expect(mockCheckout).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
@@ -55,7 +56,7 @@ suite('Source Control Management Test Suite', () => {
     it('should be able to run dvc.checkoutTarget without error', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
 
-      await commands.executeCommand('dvc.checkoutTarget', {
+      await commands.executeCommand(RegisteredCommands.CHECKOUT_TARGET, {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
@@ -76,7 +77,7 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand('dvc.checkoutTarget', {
+      await commands.executeCommand(RegisteredCommands.CHECKOUT_TARGET, {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
@@ -90,7 +91,7 @@ suite('Source Control Management Test Suite', () => {
     it('should be able to run dvc.commit without error', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
 
-      await commands.executeCommand('dvc.commit', { rootUri })
+      await commands.executeCommand(RegisteredCommands.COMMIT, { rootUri })
 
       expect(mockCommit).to.be.calledOnce
     })
@@ -108,7 +109,7 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand('dvc.commit', { rootUri })
+      await commands.executeCommand(RegisteredCommands.COMMIT, { rootUri })
 
       expect(mockCommit).to.be.calledTwice
       expect(mockShowInformationMessage).to.be.calledOnce
@@ -119,7 +120,7 @@ suite('Source Control Management Test Suite', () => {
     it('should be able to run dvc.commitTarget without error', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
 
-      await commands.executeCommand('dvc.commitTarget', {
+      await commands.executeCommand(RegisteredCommands.COMMIT_TARGET, {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
@@ -140,7 +141,7 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand('dvc.commitTarget', {
+      await commands.executeCommand(RegisteredCommands.COMMIT_TARGET, {
         dvcRoot: dvcDemoPath,
         resourceUri
       })
@@ -159,7 +160,7 @@ suite('Source Control Management Test Suite', () => {
         '' as unknown as MessageItem
       )
 
-      await commands.executeCommand('dvc.pull', { rootUri })
+      await commands.executeCommand(RegisteredCommands.PULL, { rootUri })
 
       expect(mockPull).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
@@ -173,7 +174,7 @@ suite('Source Control Management Test Suite', () => {
         '' as unknown as MessageItem
       )
 
-      await commands.executeCommand('dvc.push', { rootUri })
+      await commands.executeCommand(RegisteredCommands.PUSH, { rootUri })
 
       expect(mockPush).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce

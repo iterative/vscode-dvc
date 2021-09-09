@@ -2,25 +2,24 @@ import { join, resolve } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
+import { ExperimentsModel } from './model'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
 } from './model/filterBy/quickPick'
-import { ExperimentsWebview } from './webview'
-import { ExperimentsModel } from './model'
+import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { SortDefinition } from './model/sortBy'
-import { pickFromParamsAndMetrics } from './paramsAndMetrics/quickPick'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
+import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
-import { AvailableCommands, InternalCommands } from '../internalCommands'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { quickPickValue } from '../vscode/quickPick'
 
-const GIT_REFS = join('.git', 'refs')
+const DOT_GIT = '.git'
+const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
 export class ExperimentsRepository {
@@ -40,7 +39,7 @@ export class ExperimentsRepository {
 
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
-  private paramsAndMetrics = this.dispose.track(new ParamsAndMetricsModel())
+  private paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -68,6 +67,10 @@ export class ExperimentsRepository {
       new ExperimentsModel(dvcRoot, workspaceState)
     )
 
+    this.paramsAndMetrics = this.dispose.track(
+      new ParamsAndMetricsModel(dvcRoot, workspaceState)
+    )
+
     this.processManager = this.dispose.track(
       new ProcessManager({ name: 'refresh', process: () => this.updateData() })
     )
@@ -78,8 +81,8 @@ export class ExperimentsRepository {
           this.refresh()
         )
       )
-
       this.deferred.resolve()
+      this.notifyChanged()
     })
   }
 
@@ -88,10 +91,11 @@ export class ExperimentsRepository {
   }
 
   public onDidChangeData(gitRoot: string): void {
-    const refsGlob = resolve(gitRoot, GIT_REFS, '**')
+    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
     this.dispose.track(
-      createNecessaryFileSystemWatcher(refsGlob, (path: string) => {
+      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
         if (
+          path.includes('HEAD') ||
           path.includes(EXPERIMENTS_GIT_REFS) ||
           path.includes(join(GIT_REFS, 'heads'))
         ) {
@@ -105,7 +109,7 @@ export class ExperimentsRepository {
     return this.processManager.run('refresh')
   }
 
-  public getChildParamsOrMetrics(path: string) {
+  public getChildParamsOrMetrics(path?: string) {
     return this.paramsAndMetrics.getChildren(path)
   }
 
@@ -142,9 +146,10 @@ export class ExperimentsRepository {
     return webview
   }
 
-  public setWebview = (view: ExperimentsWebview) => {
+  public setWebview(view: ExperimentsWebview) {
     this.webview = this.dispose.track(view)
-    this.sendData()
+    view.isReady().then(() => this.sendData())
+
     this.dispose.track(
       view.onDidDispose(() => {
         this.resetWebview()
@@ -157,53 +162,32 @@ export class ExperimentsRepository {
     )
   }
 
-  public addSort(sort: SortDefinition) {
-    this.experiments.addSort(sort)
-    return this.notifyChanged()
-  }
-
   public getSorts() {
     return this.experiments.getSorts()
   }
 
-  public async pickSort() {
+  public async addSort() {
     const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
-    const picked = await pickFromParamsAndMetrics(paramsAndMetrics, {
-      title: 'Select a param or metric to sort by'
-    })
-    if (picked === undefined) {
+    const sortToAdd = await pickSortToAdd(paramsAndMetrics)
+    if (!sortToAdd) {
       return
     }
-    const descending = await quickPickValue<boolean>(
-      [
-        { label: 'Ascending', value: false },
-        { label: 'Descending', value: true }
-      ],
-      { title: 'Select a direction to sort in' }
-    )
-    if (descending === undefined) {
-      return
-    }
-    return {
-      descending,
-      path: picked.path
-    }
+    this.experiments.addSort(sortToAdd)
+    return this.notifyChanged()
   }
 
-  public removeSortByPath(pathToRemove: string) {
+  public removeSort(pathToRemove: string) {
     this.experiments.removeSort(pathToRemove)
     return this.notifyChanged()
   }
 
-  public async pickAndAddSort() {
-    const pickedSort = await this.pickSort()
-    if (pickedSort) {
-      this.addSort(pickedSort)
+  public async removeSorts() {
+    const sorts = this.experiments.getSorts()
+    const sortsToRemove = await pickSortsToRemove(sorts)
+    if (!sortsToRemove) {
+      return
     }
-  }
-
-  public removeSorts() {
-    this.experiments.removeSorts()
+    this.experiments.removeSorts(sortsToRemove)
     return this.notifyChanged()
   }
 
@@ -221,6 +205,12 @@ export class ExperimentsRepository {
     return this.notifyChanged()
   }
 
+  public removeFilter(id: string) {
+    if (this.experiments.removeFilter(id)) {
+      return this.notifyChanged()
+    }
+  }
+
   public async removeFilters() {
     const filters = this.experiments.getFilters()
     const filtersToRemove = await pickFiltersToRemove(filters)
@@ -229,12 +219,6 @@ export class ExperimentsRepository {
     }
     this.experiments.removeFilters(filtersToRemove)
     return this.notifyChanged()
-  }
-
-  public removeFilter(id: string) {
-    if (this.experiments.removeFilter(id)) {
-      return this.notifyChanged()
-    }
   }
 
   public getExperiments() {
@@ -274,10 +258,9 @@ export class ExperimentsRepository {
     return this.sendData()
   }
 
-  private async sendData() {
+  private sendData() {
     if (this.webview) {
-      await this.webview.isReady()
-      return this.webview.showExperiments({
+      this.webview.showExperiments({
         tableData: this.getTableData()
       })
     }

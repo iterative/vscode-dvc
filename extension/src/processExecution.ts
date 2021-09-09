@@ -1,5 +1,6 @@
 import { ChildProcess } from 'child_process'
 import { Readable } from 'stream'
+import { Disposable } from '@hediet/std/disposable'
 import execa from 'execa'
 
 interface RunningProcess extends ChildProcess {
@@ -7,14 +8,14 @@ interface RunningProcess extends ChildProcess {
 }
 interface ProcessResult {
   command: string
-  exitCode: number
+  exitCode: number | null
   stdout: string
   stderr: string
   killed: boolean
   signal?: string
 }
 
-export type Process = RunningProcess & Promise<ProcessResult>
+export type Process = RunningProcess & Promise<ProcessResult> & Disposable
 
 export interface ProcessOptions {
   executable: string
@@ -29,12 +30,18 @@ export const createProcess = ({
   cwd,
   env
 }: ProcessOptions): Process => {
-  return execa(executable, args, {
+  const process = execa(executable, args, {
     all: true,
     cwd,
     env,
     extendEnv: true,
     windowsHide: true
+  })
+
+  return Object.assign(process, {
+    dispose: () => {
+      process.kill('SIGINT')
+    }
   })
 }
 

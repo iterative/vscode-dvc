@@ -1,7 +1,7 @@
 import { Args, Flag } from './args'
 import { Prompt } from './output'
 import { getWarningResponse, showGenericError } from '../vscode/modal'
-import { CommandId, InternalCommands } from '../internalCommands'
+import { CommandId, InternalCommands } from '../commands/internal'
 
 const offerToForce = async (
   stderr: string,

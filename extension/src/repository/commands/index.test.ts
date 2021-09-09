@@ -4,8 +4,9 @@ import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse, showGenericError } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
-import { CommandId, InternalCommands } from '../../internalCommands'
+import { CommandId, InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
+import { OutputChannel } from '../../vscode/outputChannel'
 
 const mockedFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
@@ -14,9 +15,12 @@ const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
 const mockedGetDefaultProject = jest.fn()
-const mockedInternalCommands = new InternalCommands({
-  getDefaultProject: mockedGetDefaultProject
-} as unknown as Config)
+const mockedInternalCommands = new InternalCommands(
+  {
+    getDefaultProject: mockedGetDefaultProject
+  } as unknown as Config,
+  { show: jest.fn() } as unknown as OutputChannel
+)
 
 const mockedCommandId = 'mockedFunc' as CommandId
 mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>

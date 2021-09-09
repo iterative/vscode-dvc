@@ -1,11 +1,20 @@
-import { delimiter, dirname } from 'path'
+import { dirname } from 'path'
 import { Args } from './args'
 import { getProcessEnv } from '../env'
-import { joinTruthyItems } from '../util/array'
+import { joinEnvPath } from '../util/env'
+
+export type ExecutionOptions = {
+  executable: string
+  args: Args
+  cwd: string
+  env: NodeJS.ProcessEnv
+}
+
+export type ExecutionDetails = ExecutionOptions & { command: string }
 
 const getPATH = (existingPath: string, pythonBinPath?: string): string => {
   const python = pythonBinPath ? dirname(pythonBinPath) : ''
-  return joinTruthyItems([python, existingPath], delimiter)
+  return joinEnvPath(python, existingPath)
 }
 
 const getEnv = (pythonBinPath?: string): NodeJS.ProcessEnv => {
@@ -32,13 +41,7 @@ export const getOptions = (
   cliPath: string,
   cwd: string,
   ...originalArgs: Args
-): {
-  args: Args
-  command: string
-  cwd: string
-  env: NodeJS.ProcessEnv
-  executable: string
-} => {
+): ExecutionDetails => {
   const executable = getExecutable(pythonBinPath, cliPath)
   const args = getArgs(pythonBinPath, cliPath, ...originalArgs)
   const command = [executable, ...args].join(' ')

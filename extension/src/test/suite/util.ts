@@ -1,11 +1,15 @@
 import { resolve } from 'path'
 import { SinonSpy, SinonStub } from 'sinon'
-import { commands, ConfigurationChangeEvent, workspace } from 'vscode'
+import { commands, ConfigurationChangeEvent, Uri, workspace } from 'vscode'
 import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
 
-export const dvcDemoPath = resolve(__dirname, '..', '..', '..', '..', 'demo')
-export const resourcePath = resolve(__dirname, '..', '..', '..', 'resources')
+export const dvcDemoPath = Uri.file(
+  resolve(__dirname, '..', '..', '..', '..', 'demo')
+).fsPath
+export const resourcePath = Uri.file(
+  resolve(__dirname, '..', '..', '..', 'resources')
+).fsPath
 
 export const configurationChangeEvent = (
   option: string,

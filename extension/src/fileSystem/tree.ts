@@ -1,6 +1,5 @@
 import { dirname, join, relative } from 'path'
 import {
-  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -20,8 +19,15 @@ import {
   CommandId,
   AvailableCommands,
   InternalCommands
-} from '../internalCommands'
+} from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
+import {
+  RegisteredCommands,
+  registerInstrumentedCommand
+} from '../commands/external'
+import { sendViewOpenedTelemetryEvent } from '../telemetry'
+import { EventName } from '../telemetry/constants'
+import { getInput } from '../vscode/inputBox'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -44,6 +50,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private noPromptPullMissingOption =
     'dvc.views.trackedExplorerTree.noPromptPullMissing'
+
+  private viewed = false
 
   constructor(
     internalCommands: InternalCommands,
@@ -104,7 +112,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     if (!elementIsDirectory) {
       treeItem.command = {
         arguments: [resourceUri],
-        command: 'dvc.views.trackedExplorerTree.openFile',
+        command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
         title: 'Open File'
       }
     }
@@ -147,6 +155,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private async getRootElements() {
+    if (!this.viewed) {
+      sendViewOpenedTelemetryEvent(
+        EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
+        this.dvcRoots.length
+      )
+      this.viewed = true
+    }
+
     const rootElements = await Promise.all(
       this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
     )
@@ -229,7 +245,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.dispose.track(
-      commands.registerCommand('dvc.init', async () => {
+      registerInstrumentedCommand(RegisteredCommands.INIT, async () => {
         const root = getFirstWorkspaceFolder()
         if (root) {
           await this.internalCommands.executeCommand(
@@ -242,39 +258,71 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.dispose.track(
-      commands.registerCommand(
-        'dvc.views.trackedExplorerTree.openFile',
+      registerInstrumentedCommand<Uri>(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
         resource => this.openResource(resource)
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.deleteTarget', path => deleteTarget(path))
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.removeTarget', path => {
-        deleteTarget(path)
-        this.treeDataChanged.fire()
-        const dvcRoot = this.pathRoots[path]
-        const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
-        return this.internalCommands.executeCommand(
-          AvailableCommands.REMOVE,
-          dvcRoot,
-          relPath
-        )
-      })
-    )
-
-    this.dispose.track(
-      commands.registerCommand('dvc.pullTarget', path =>
-        this.tryThenMaybeForce(AvailableCommands.PULL, path)
+      registerInstrumentedCommand<string>(
+        RegisteredCommands.DELETE_TARGET,
+        path => deleteTarget(path)
       )
     )
 
     this.dispose.track(
-      commands.registerCommand('dvc.pushTarget', path =>
-        this.tryThenMaybeForce(AvailableCommands.PUSH, path)
+      registerInstrumentedCommand<string>(
+        RegisteredCommands.REMOVE_TARGET,
+        path => {
+          deleteTarget(path)
+          this.treeDataChanged.fire()
+          const dvcRoot = this.pathRoots[path]
+          const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
+          return this.internalCommands.executeCommand(
+            AvailableCommands.REMOVE,
+            dvcRoot,
+            relPath
+          )
+        }
+      )
+    )
+
+    this.dispose.track(
+      registerInstrumentedCommand<string>(
+        RegisteredCommands.RENAME_TARGET,
+        async path => {
+          const dvcRoot = this.pathRoots[path]
+          const relPath = relative(dvcRoot, path)
+          const relDestination = await getInput(
+            'enter a destination relative to the root',
+            relPath
+          )
+          if (!relDestination || relDestination === relPath) {
+            return
+          }
+
+          return this.internalCommands.executeCommand(
+            AvailableCommands.MOVE,
+            dvcRoot,
+            relPath,
+            relDestination
+          )
+        }
+      )
+    )
+
+    this.dispose.track(
+      registerInstrumentedCommand<string>(
+        RegisteredCommands.PULL_TARGET,
+        path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
+      )
+    )
+
+    this.dispose.track(
+      registerInstrumentedCommand<string>(
+        RegisteredCommands.PUSH_TARGET,
+        path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
       )
     )
   }

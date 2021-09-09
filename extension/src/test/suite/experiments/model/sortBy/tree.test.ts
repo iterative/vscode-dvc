@@ -1,28 +1,20 @@
-import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, Uri } from 'vscode'
+import { window, commands } from 'vscode'
 import get from 'lodash.get'
 import { Disposable } from '../../../../../extension'
-import { CliReader, ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 import { Experiments } from '../../../../../experiments'
-import { ExperimentsRepository } from '../../../../../experiments/repository'
-import { Config } from '../../../../../config'
-import { ResourceLocator } from '../../../../../resourceLocator'
-import { CliRunner } from '../../../../../cli/runner'
-import { InternalCommands } from '../../../../../internalCommands'
 import {
   Experiment,
   ParamOrMetric
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import {
-  dvcDemoPath,
-  experimentsUpdatedEvent,
-  resourcePath
-} from '../../../util'
-import { buildMockMemento } from '../../../../util'
+import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
+import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
+import { RegisteredCommands } from '../../../../../commands/external'
+import { buildExperimentsRepository } from '../../util'
+import { ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   window.showInformationMessage('Start all experiments sort by tree tests.')
@@ -89,7 +81,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         }
       }
     }
-  }
+  } as unknown as ExperimentsRepoJSONOutput
 
   const disposable = Disposable.fn()
 
@@ -107,33 +99,13 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(
-        testData as unknown as ExperimentsRepoJSONOutput
-      )
-      const cliRunner = disposable.track(new CliRunner(config))
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-
-      const experimentsRepository = disposable.track(
-        new ExperimentsRepository(
-          dvcDemoPath,
-          internalCommands,
-          resourceLocator,
-          buildMockMemento()
-        )
+      const { experimentsRepository } = buildExperimentsRepository(
+        disposable,
+        testData
       )
 
       await experimentsRepository.isReady()
       const experimentsWebview = await experimentsRepository.showWebview()
-      await experimentsWebview.isReady()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const mockSortQuickPicks = (paramPath: string, descending: boolean) => {
@@ -155,7 +127,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
           experimentsRepository
         )
 
-        await commands.executeCommand('dvc.addExperimentsTableSort')
+        await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORT_ADD)
         await tableChangedPromise
         mockShowQuickPick.reset()
       }
@@ -166,8 +138,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
         ...testParamParentPathArray,
         'testparam2'
       ]
-      const testParamPath = path.join(...testParamPathArray)
-      const otherTestParamPath = path.join(...otherTestParamPathArray)
+      const testParamPath = joinParamOrMetricPath(...testParamPathArray)
+      const otherTestParamPath = joinParamOrMetricPath(
+        ...otherTestParamPathArray
+      )
 
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy
@@ -193,7 +167,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
       mockSortQuickPicks(testParamPath, false)
       const tableChangedPromise = experimentsUpdatedEvent(experimentsRepository)
 
-      await commands.executeCommand('dvc.addExperimentsTableSort', dvcDemoPath)
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_SORT_ADD,
+        dvcDemoPath
+      )
       await tableChangedPromise
       mockShowQuickPick.reset()
       expect(getParamsArray(), 'single sort with table command').to.deep.equal([
@@ -202,7 +179,9 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       const tableSortRemoved = experimentsUpdatedEvent(experimentsRepository)
 
-      await commands.executeCommand('dvc.removeExperimentsTableSorts')
+      await commands.executeCommand(
+        'dvc.views.experimentsSortByTree.removeAllSorts'
+      )
       await tableSortRemoved
       expect(
         getParamsArray(),
@@ -266,10 +245,42 @@ suite('Experiments Sort By Tree Test Suite', () => {
       ).to.deep.equal([2, 4, 1, 3])
 
       await commands.executeCommand(
-        'dvc.removeExperimentsTableSorts',
+        'dvc.views.experimentsSortByTree.removeAllSorts',
         dvcDemoPath
       )
       expect(getParamsArray(), 'final sort clear').to.deep.equal([1, 3, 2, 4])
+    })
+
+    it('should handle the user exiting from the choose repository quick pick', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((Experiments as any).prototype, 'getDvcRoots').returns([
+        dvcDemoPath,
+        'mockRoot'
+      ])
+
+      const getRepositorySpy = spy(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (Experiments as any).prototype,
+        'getRepository'
+      )
+
+      mockShowQuickPick.resolves(undefined)
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORT_ADD)
+
+      expect(
+        getRepositorySpy,
+        'should not call get repository in addSort without a root'
+      ).not.to.be.called
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORTS_REMOVE)
+
+      expect(
+        getRepositorySpy,
+        'should not call get repository in removeSorts without a root'
+      ).not.to.be.called
     })
   })
 })

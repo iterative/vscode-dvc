@@ -1,16 +1,18 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { CommandId, InternalCommands } from '../../internalCommands'
+import { CommandId, InternalCommands } from '../../commands/internal'
 import { showGenericError } from '../../vscode/modal'
 
-export type ResourceCommand = ({
-  dvcRoot,
-  resourceUri
-}: {
+export type Resource = {
   dvcRoot: string
   resourceUri: Uri
-}) => Promise<string | undefined>
+}
+
+type ResourceCommand = ({
+  dvcRoot,
+  resourceUri
+}: Resource) => Promise<string | undefined>
 
 export const getResourceCommand =
   (internalCommands: InternalCommands, commandId: CommandId): ResourceCommand =>
@@ -31,11 +33,9 @@ export const getSimpleResourceCommand =
     }
   }
 
-export type RootCommand = ({
-  rootUri
-}: {
-  rootUri: Uri
-}) => Promise<string | undefined>
+export type Root = { rootUri: Uri }
+
+type RootCommand = ({ rootUri }: Root) => Promise<string | undefined>
 
 export const getRootCommand =
   (internalCommands: InternalCommands, commandId: CommandId): RootCommand =>

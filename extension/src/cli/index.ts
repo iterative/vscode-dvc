@@ -1,12 +1,25 @@
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Args } from './args'
-import { getOptions } from './options'
+import { ExecutionOptions, getOptions } from './options'
 import { CliError, MaybeConsoleError } from './error'
-import { executeProcess } from '../processExecution'
+import { createProcess } from '../processExecution'
 import { Config } from '../config'
+import { StopWatch } from '../util/time'
 
-export type CliResult = { stderr?: string; command: string; cwd: string }
+type CliEvent = {
+  command: string
+  cwd: string
+  pid: number | undefined
+}
+
+export type CliResult = CliEvent & {
+  stderr?: string
+  duration: number
+  exitCode: number | null
+}
+
+export type CliStarted = CliEvent
 
 export interface ICli {
   autoRegisteredCommands: string[]
@@ -14,8 +27,8 @@ export interface ICli {
   processCompleted: EventEmitter<CliResult>
   onDidCompleteProcess: Event<CliResult>
 
-  processStarted: EventEmitter<void>
-  onDidStartProcess: Event<void>
+  processStarted: EventEmitter<CliStarted>
+  onDidStartProcess: Event<CliStarted>
 }
 
 export const typeCheckCommands = (
@@ -40,15 +53,15 @@ export class Cli implements ICli {
   public readonly processCompleted: EventEmitter<CliResult>
   public readonly onDidCompleteProcess: Event<CliResult>
 
-  public readonly processStarted: EventEmitter<void>
-  public readonly onDidStartProcess: Event<void>
+  public readonly processStarted: EventEmitter<CliStarted>
+  public readonly onDidStartProcess: Event<CliStarted>
 
   protected config: Config
 
   constructor(
     config: Config,
     emitters?: {
-      processStarted: EventEmitter<void>
+      processStarted: EventEmitter<CliStarted>
       processCompleted: EventEmitter<CliResult>
     }
   ) {
@@ -60,29 +73,68 @@ export class Cli implements ICli {
     this.onDidCompleteProcess = this.processCompleted.event
 
     this.processStarted =
-      emitters?.processStarted || this.dispose.track(new EventEmitter<void>())
+      emitters?.processStarted ||
+      this.dispose.track(new EventEmitter<CliStarted>())
     this.onDidStartProcess = this.processStarted.event
   }
 
   public async executeProcess(cwd: string, ...args: Args): Promise<string> {
-    const { command, ...options } = getOptions(
+    const { command, ...options } = this.getOptions(cwd, ...args)
+    const baseEvent: CliEvent = { command, cwd, pid: undefined }
+    const stopWatch = new StopWatch()
+    try {
+      const process = this.dispose.track(createProcess(options))
+
+      baseEvent.pid = process.pid
+      this.processStarted.fire(baseEvent)
+
+      process.on('close', () => {
+        this.dispose.untrack(process)
+      })
+
+      const { stdout, exitCode } = await process
+
+      this.processCompleted.fire({
+        ...baseEvent,
+        duration: stopWatch.getElapsedTime(),
+        exitCode
+      })
+      return stdout
+    } catch (error) {
+      throw this.processCliError(
+        error as MaybeConsoleError,
+        options,
+        baseEvent,
+        stopWatch.getElapsedTime()
+      )
+    }
+  }
+
+  private getOptions(cwd: string, ...args: Args) {
+    return getOptions(
       this.config.pythonBinPath,
       this.config.getCliPath(),
       cwd,
       ...args
     )
-    try {
-      this.processStarted.fire()
-      const stdout = await executeProcess(options)
-      this.processCompleted.fire({ command, cwd })
-      return stdout
-    } catch (error) {
-      const cliError = new CliError({
-        baseError: error as MaybeConsoleError,
-        options
-      })
-      this.processCompleted.fire({ command, cwd, stderr: cliError.stderr })
-      throw cliError
-    }
+  }
+
+  private processCliError(
+    error: MaybeConsoleError,
+    options: ExecutionOptions,
+    baseEvent: CliEvent,
+    duration: number
+  ) {
+    const cliError = new CliError({
+      baseError: error as MaybeConsoleError,
+      options
+    })
+    this.processCompleted.fire({
+      ...baseEvent,
+      duration,
+      exitCode: cliError.exitCode,
+      stderr: cliError.stderr
+    })
+    return cliError
   }
 }
