@@ -265,9 +265,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      await expect(
-        commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
-      ).to.eventually.be.rejectedWith(Error)
+      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
         `errors.${RegisteredCommands.QUEUE_EXPERIMENT}`,

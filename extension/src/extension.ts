@@ -251,8 +251,7 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            showGenericError(() => outputChannel.show())
-            sendErrorTelemetryEvent(
+            sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
               stopWatch.getElapsedTime()
