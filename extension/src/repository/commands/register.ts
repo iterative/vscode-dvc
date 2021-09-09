@@ -9,39 +9,39 @@ import { RegisteredCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
-  internalCommands.registerExternalCommand<Resource>(
+  internalCommands.registerExternalCliCommand<Resource>(
     RegisteredCommands.ADD_TARGET,
     getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
   )
 
-  internalCommands.registerExternalCommand<Resource>(
+  internalCommands.registerExternalCliCommand<Resource>(
     RegisteredCommands.CHECKOUT_TARGET,
     getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
-  internalCommands.registerExternalCommand<Resource>(
+  internalCommands.registerExternalCliCommand<Resource>(
     RegisteredCommands.COMMIT_TARGET,
     getResourceCommand(internalCommands, AvailableCommands.COMMIT)
   )
 }
 
 const registerRootCommands = (internalCommands: InternalCommands) => {
-  internalCommands.registerExternalCommand<Root>(
+  internalCommands.registerExternalCliCommand<Root>(
     RegisteredCommands.CHECKOUT,
     getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
-  internalCommands.registerExternalCommand<Root>(
+  internalCommands.registerExternalCliCommand<Root>(
     RegisteredCommands.COMMIT,
     getRootCommand(internalCommands, AvailableCommands.COMMIT)
   )
 
-  internalCommands.registerExternalCommand<Root>(
+  internalCommands.registerExternalCliCommand<Root>(
     RegisteredCommands.PULL,
     getRootCommand(internalCommands, AvailableCommands.PULL)
   )
 
-  internalCommands.registerExternalCommand<Root>(
+  internalCommands.registerExternalCliCommand<Root>(
     RegisteredCommands.PUSH,
     getRootCommand(internalCommands, AvailableCommands.PUSH)
   )

@@ -329,9 +329,9 @@ suite('Extension Test Suite', () => {
       stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      await expect(
-        commands.executeCommand(RegisteredCommands.EXTENSION_SETUP_WORKSPACE)
-      ).to.be.eventually.rejectedWith(Error)
+      await commands.executeCommand(
+        RegisteredCommands.EXTENSION_SETUP_WORKSPACE
+      )
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
         `errors.${RegisteredCommands.EXTENSION_SETUP_WORKSPACE}`,

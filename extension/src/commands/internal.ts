@@ -11,7 +11,6 @@ import { OutputChannel } from '../vscode/outputChannel'
 import { quickPickOne } from '../vscode/quickPick'
 import { StopWatch } from '../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
-import { showGenericError } from '../vscode/errorMessage'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -78,6 +77,27 @@ export class InternalCommands {
     this.commands.set(commandId, command)
   }
 
+  public registerExternalCliCommand<T = string | undefined>(
+    name: RegisteredCommands,
+    func: (arg: T) => unknown
+  ): void {
+    this.dispose.track(
+      commands.registerCommand(name, async arg => {
+        const stopWatch = new StopWatch()
+        try {
+          const res = await func(arg)
+          sendTelemetryEvent(name, undefined, {
+            duration: stopWatch.getElapsedTime()
+          })
+          return res
+        } catch (e: unknown) {
+          this.outputChannel.offerToShowError()
+          sendErrorTelemetryEvent(name, e as Error, stopWatch.getElapsedTime())
+        }
+      })
+    )
+  }
+
   public registerExternalCommand<T = string | undefined>(
     name: RegisteredCommands,
     func: (arg: T) => unknown
@@ -92,7 +112,7 @@ export class InternalCommands {
           })
           return res
         } catch (e: unknown) {
-          showGenericError(() => this.outputChannel.show())
+          this.outputChannel.handleError(e as Error)
           sendErrorTelemetryEvent(name, e as Error, stopWatch.getElapsedTime())
         }
       })

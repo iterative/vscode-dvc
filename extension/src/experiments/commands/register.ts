@@ -7,7 +7,7 @@ const registerExperimentCwdCommands = (
   experiments: Experiments,
   internalCommands: InternalCommands
 ): void =>
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.QUEUE_EXPERIMENT,
     () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
   )
@@ -16,12 +16,12 @@ const registerExperimentNameCommands = (
   experiments: Experiments,
   internalCommands: InternalCommands
 ): void => {
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_APPLY,
     () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
   )
 
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_REMOVE,
     () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
@@ -31,7 +31,7 @@ const registerExperimentInputCommands = (
   experiments: Experiments,
   internalCommands: InternalCommands
 ): void =>
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_BRANCH,
     () =>
       experiments.getExpNameAndInputThenRun(
@@ -44,7 +44,7 @@ const registerExperimentQuickPickCommands = (
   experiments: Experiments,
   internalCommands: InternalCommands
 ): void => {
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_GARBAGE_COLLECT,
     () =>
       experiments.getCwdAndQuickPickThenRun(
@@ -78,13 +78,13 @@ const registerExperimentRunCommands = (
   experiments: Experiments,
   internalCommands: InternalCommands
 ): void => {
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_RUN,
     () =>
       experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
   )
 
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_RUN_RESET,
     () =>
       experiments.showExperimentsTableThenRun(
@@ -92,7 +92,7 @@ const registerExperimentRunCommands = (
       )
   )
 
-  internalCommands.registerExternalCommand(
+  internalCommands.registerExternalCliCommand(
     RegisteredCommands.EXPERIMENT_RUN_QUEUED,
     () =>
       experiments.showExperimentsTableThenRun(

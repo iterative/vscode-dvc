@@ -241,7 +241,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
-    this.internalCommands.registerExternalCommand(
+    this.internalCommands.registerExternalCliCommand(
       RegisteredCommands.INIT,
       async () => {
         const root = getFirstWorkspaceFolder()
@@ -265,7 +265,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       path => deleteTarget(path)
     )
 
-    this.internalCommands.registerExternalCommand<string>(
+    this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCommands.REMOVE_TARGET,
       path => {
         deleteTarget(path)
@@ -280,7 +280,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     )
 
-    this.internalCommands.registerExternalCommand<string>(
+    this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCommands.RENAME_TARGET,
       async path => {
         const dvcRoot = this.pathRoots[path]
@@ -302,12 +302,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     )
 
-    this.internalCommands.registerExternalCommand<string>(
+    this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCommands.PULL_TARGET,
       path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
     )
 
-    this.internalCommands.registerExternalCommand<string>(
+    this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCommands.PUSH_TARGET,
       path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
     )

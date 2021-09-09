@@ -23,6 +23,22 @@ export class OutputChannel {
     })
   }
 
+  public handleError(e: Error) {
+    this.outputChannel.append(e.message)
+    return this.offerToShowError()
+  }
+
+  public async offerToShowError() {
+    const option = await window.showErrorMessage(
+      'Something went wrong, please see the DVC output channel for more details.',
+      'Show',
+      'Close'
+    )
+    if (option === 'Show') {
+      return this.outputChannel.show()
+    }
+  }
+
   public show() {
     return this.outputChannel.show(true)
   }
