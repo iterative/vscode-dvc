@@ -41,7 +41,6 @@ import {
 import {
   getTelemetryReporter,
   sendTelemetryEvent,
-  sendErrorTelemetryEvent,
   sendTelemetryEventAndThrow
 } from './telemetry'
 import { EventName } from './telemetry/constants'
@@ -185,7 +184,7 @@ export class Extension implements IExtension {
             { duration: stopWatch.getElapsedTime() }
           )
         } catch (e: unknown) {
-          return sendErrorTelemetryEvent(
+          return sendTelemetryEventAndThrow(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
             e as Error,
             stopWatch.getElapsedTime(),
