@@ -93,6 +93,10 @@ const registerExperimentRunCommands = (experiments: Experiments): void => {
   registerCommand(experiments, RegisteredCommands.EXPERIMENT_SHOW, () =>
     experiments.showExperimentsTable()
   )
+
+  registerCommand(experiments, RegisteredCommands.PLOTS_SHOW, () =>
+    experiments.showPlots()
+  )
 }
 
 export const registerExperimentCommands = (experiments: Experiments) => {

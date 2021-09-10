@@ -210,6 +210,15 @@ export class Experiments {
     return this.showExperimentsWebview(dvcRoot)
   }
 
+  public async showPlots() {
+    const dvcRoot = await this.getDefaultOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.showPlotsWebview(dvcRoot)
+  }
+
   public showExperimentsTableThenRun = async (commandId: CommandId) => {
     const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
     if (!dvcRoot) {
@@ -304,6 +313,14 @@ export class Experiments {
   ): Promise<ExperimentsRepository> {
     const experimentsRepository = this.getRepository(dvcRoot)
     await experimentsRepository.showWebview()
+    return experimentsRepository
+  }
+
+  private async showPlotsWebview(
+    dvcRoot: string
+  ): Promise<ExperimentsRepository> {
+    const experimentsRepository = this.getRepository(dvcRoot)
+    await experimentsRepository.showPlotsWebview()
     return experimentsRepository
   }
 

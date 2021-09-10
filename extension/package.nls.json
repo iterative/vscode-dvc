@@ -38,6 +38,7 @@
   "command.selectDefaultProject": "Select Default Project",
   "command.setupWorkspace": "Setup The Workspace",
   "command.showExperiments": "Show Experiments",
+  "command.showPlots": "Show Plots",
   "config.dvcPath.description": "Call DVC from this path. Follows Python extension when blank.",
   "config.dvcPath.title": "DVC CLI Path",
   "config.pythonPath.description": "Required virtual environment's Python interpreter path. Overrides any other extension's settings for the DVC CLI.",

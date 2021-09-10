@@ -71,6 +71,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
   [EventName.EXPERIMENT_RUN_RESET]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
+  [EventName.PLOTS_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
   [EventName.EXPERIMENT_SORT_REMOVE]: undefined
   [EventName.EXPERIMENT_SORTS_REMOVE]: undefined

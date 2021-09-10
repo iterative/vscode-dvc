@@ -17,6 +17,7 @@ export enum RegisteredCommands {
   EXPERIMENT_RUN_QUEUED = 'dvc.runQueuedExperiments',
   EXPERIMENT_RUN_RESET = 'dvc.runResetExperiment',
   EXPERIMENT_SHOW = 'dvc.showExperiments',
+  PLOTS_SHOW = 'dvc.showPlots',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',
   EXPERIMENT_SORT_REMOVE = 'dvc.views.experimentsSortByTree.removeSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',

@@ -11,6 +11,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ExperimentsTableWebview } from './webview'
+import { PlotsWebview } from './plotsWebview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilAllResolved } from '../util/promise'
@@ -29,6 +30,10 @@ export class ExperimentsRepository {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
 
+  protected readonly isPlotsWebviewFocusedChanged: EventEmitter<
+    string | undefined
+  > = this.dispose.track(new EventEmitter())
+
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
 
@@ -38,6 +43,7 @@ export class ExperimentsRepository {
   private readonly resourceLocator: ResourceLocator
 
   private webview?: ExperimentsTableWebview
+  private plotsWebview?: PlotsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -146,6 +152,27 @@ export class ExperimentsRepository {
     return webview
   }
 
+  public showPlotsWebview = async () => {
+    if (this.plotsWebview) {
+      return this.plotsWebview.reveal()
+    }
+
+    const plotsWebview = await PlotsWebview.create(
+      this.internalCommands,
+      {
+        dvcRoot: this.dvcRoot,
+        tableData: this.getTableData()
+      },
+      this.resourceLocator
+    )
+
+    this.setPlotsWebview(plotsWebview)
+
+    this.isWebviewFocusedChanged.fire(this.dvcRoot)
+
+    return plotsWebview
+  }
+
   public setWebview(view: ExperimentsTableWebview) {
     this.webview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
@@ -158,6 +185,22 @@ export class ExperimentsRepository {
     this.dispose.track(
       view.onDidChangeIsFocused(dvcRoot => {
         this.isWebviewFocusedChanged.fire(dvcRoot)
+      })
+    )
+  }
+
+  public setPlotsWebview(view: PlotsWebview) {
+    this.plotsWebview = this.dispose.track(view)
+    view.isReady().then(() => this.sendData())
+
+    this.dispose.track(
+      view.onDidDispose(() => {
+        this.resetPlotsWebview()
+      })
+    )
+    this.dispose.track(
+      view.onDidChangeIsFocused(dvcRoot => {
+        this.isPlotsWebviewFocusedChanged.fire(dvcRoot)
       })
     )
   }
@@ -277,5 +320,11 @@ export class ExperimentsRepository {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.webview)
     this.webview = undefined
+  }
+
+  private resetPlotsWebview = () => {
+    this.isPlotsWebviewFocusedChanged.fire(undefined)
+    this.dispose.untrack(this.plotsWebview)
+    this.plotsWebview = undefined
   }
 }
