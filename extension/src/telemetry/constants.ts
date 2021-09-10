@@ -1,5 +1,5 @@
 import { ViewColumn } from 'vscode'
-import { RegisteredCommands } from '../commands/external'
+import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 
 export const APPLICATION_INSIGHTS_KEY = '46e8e554-d50a-471a-a53b-4af2b1cd6594'
 export const EXTENSION_ID = 'iterative.dvc'
@@ -34,6 +34,7 @@ export const EventName = Object.assign(
     VIEWS_TERMINAL_FOCUS_CHANGED: 'views.terminal.focusChanged'
   } as const,
   ViewOpenedEvent,
+  RegisteredCliCommands,
   RegisteredCommands
 )
 

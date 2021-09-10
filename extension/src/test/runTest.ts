@@ -20,7 +20,7 @@ async function main() {
       launchArgs: ['--disable-extensions', workspacePath],
       vscodeExecutablePath
     })
-  } catch (err) {
+  } catch {
     Logger.error('Failed to run tests')
     process.exit(1)
   }

@@ -1,10 +1,12 @@
 import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
-import { report } from './reporting'
+import { reportErrorWithOptions, reportOutput } from './reporting'
 
 jest.mock('vscode')
 
-const mockedShowErrorMessage = mocked(window.showErrorMessage)
+const mockedShowErrorMessage = mocked<
+  (message: string, ...items: string[]) => Thenable<string | undefined>
+>(window.showErrorMessage)
 const mockedShowInformationMessage = mocked(window.showInformationMessage)
 
 beforeEach(() => {
@@ -14,13 +16,28 @@ beforeEach(() => {
 const defaultPath = '/home/user/project'
 const exampleExpName = 'exp-2021'
 
-describe('report', () => {
+describe('reportErrorWithOptions', () => {
+  it('should call window showErrorMessage with the correct details', async () => {
+    const message = 'what do you want to do?'
+    const option1 = 'go on'
+    const option2 = 'give up'
+
+    mockedShowErrorMessage.mockResolvedValueOnce(option1)
+
+    await reportErrorWithOptions(message, option1, option2)
+
+    expect(mockedShowErrorMessage).toBeCalledTimes(1)
+    expect(mockedShowErrorMessage).toBeCalledWith(message, option1, option2)
+  })
+})
+
+describe('reportOutput', () => {
   it('reports the output of the given command', async () => {
     const mockedExperimentApply = jest.fn()
     const mockedStdOut = 'I applied your experiment boss'
     mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
 
-    await report(mockedExperimentApply(defaultPath, exampleExpName))
+    await reportOutput(mockedExperimentApply(defaultPath, exampleExpName))
 
     expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
 
@@ -33,22 +50,11 @@ describe('report', () => {
     const mockedStdOut = ''
     mockedExperimentApply.mockResolvedValueOnce(mockedStdOut)
 
-    await report(mockedExperimentApply(defaultPath, exampleExpName))
+    await reportOutput(mockedExperimentApply(defaultPath, exampleExpName))
 
     expect(mockedExperimentApply).toBeCalledWith(defaultPath, exampleExpName)
 
     expect(mockedShowInformationMessage).toBeCalledTimes(1)
     expect(mockedShowInformationMessage).toBeCalledWith('Operation successful.')
-  })
-
-  it('reports the error when execute process throws with stderr', async () => {
-    const mockedExperimentApply = jest.fn()
-    mockedExperimentApply.mockRejectedValueOnce({
-      stderr: 'something went very wrong'
-    })
-
-    await report(mockedExperimentApply(defaultPath, exampleExpName))
-
-    expect(mockedShowErrorMessage).toBeCalledTimes(1)
   })
 })

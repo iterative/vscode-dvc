@@ -14,7 +14,10 @@ import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
 import { dvcDemoPath } from '../util'
-import { RegisteredCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -80,7 +83,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
       const mockSetup = stub(Setup, 'setup').resolves()
 
-      await commands.executeCommand(RegisteredCommands.INIT)
+      await commands.executeCommand(RegisteredCliCommands.INIT)
       expect(mockInit).to.be.calledOnce
       expect(mockSetup).to.be.calledOnce
 
@@ -88,7 +91,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       mockSetup.resetHistory()
       stub(WorkspaceFolders, 'getFirstWorkspaceFolder').returns(undefined)
 
-      await commands.executeCommand(RegisteredCommands.INIT)
+      await commands.executeCommand(RegisteredCliCommands.INIT)
 
       expect(mockInit).not.to.be.called
       expect(mockSetup).not.to.be.called
@@ -226,7 +229,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target destroyed!'
       )
 
-      await commands.executeCommand(RegisteredCommands.REMOVE_TARGET, absPath)
+      await commands.executeCommand(
+        RegisteredCliCommands.REMOVE_TARGET,
+        absPath
+      )
       expect(mockDeleteTarget).to.be.calledOnce
       expect(mockRemove).to.be.calledOnce
     })
@@ -243,7 +249,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         relPath + 'est'
       )
 
-      await commands.executeCommand(RegisteredCommands.RENAME_TARGET, absPath)
+      await commands.executeCommand(
+        RegisteredCliCommands.RENAME_TARGET,
+        absPath
+      )
       expect(mockMove).to.be.calledOnce
       expect(mockInputBox).to.be.calledOnce
       expect(mockInputBox).to.be.calledWith({
@@ -260,7 +269,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pulled'
       )
 
-      await commands.executeCommand(RegisteredCommands.PULL_TARGET, absPath)
+      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET, absPath)
 
       expect(mockPull).to.be.calledOnce
     })
@@ -282,7 +291,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand(RegisteredCommands.PULL_TARGET, absPath)
+      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET, absPath)
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
@@ -298,7 +307,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'target pushed'
       )
 
-      await commands.executeCommand(RegisteredCommands.PUSH_TARGET, absPath)
+      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET, absPath)
 
       expect(mockPush).to.be.calledOnce
     })
@@ -320,7 +329,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand(RegisteredCommands.PUSH_TARGET, absPath)
+      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET, absPath)
 
       expect(mockShowInformationMessage).to.be.calledOnce
       expect(mockPush).to.be.calledTwice

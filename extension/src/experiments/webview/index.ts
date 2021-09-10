@@ -130,7 +130,7 @@ export class ExperimentsTableWebview {
         resolve(
           new ExperimentsTableWebview(webviewPanel, internalCommands, state)
         )
-      } catch (e) {
+      } catch (e: unknown) {
         reject(e)
       }
     })
