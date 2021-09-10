@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
-import { getWarningResponse, showGenericError } from '../../vscode/modal'
+import { getWarningResponse } from '../../vscode/modal'
 import { Prompt } from '../../cli/output'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
@@ -10,7 +10,6 @@ import { OutputChannel } from '../../vscode/outputChannel'
 
 const mockedFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
-const mockedShowGenericError = mocked(showGenericError)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
@@ -54,23 +53,22 @@ describe('getResourceCommand', () => {
     expect(mockedFunc).toBeCalledTimes(1)
   })
 
-  it('should return a function that calls showGenericError if the first function fails without a force prompt', async () => {
+  it('should return a function that throws if the first function fails without a force prompt', async () => {
     const stderr = 'I deed'
-    const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
-    mockedShowGenericError.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getResourceCommand(
       mockedInternalCommands,
       mockedCommandId
     )
 
-    const undef = await commandToRegister({
-      dvcRoot: mockedDvcRoot,
-      resourceUri: { fsPath: mockedTarget } as Uri
-    })
+    await expect(
+      commandToRegister({
+        dvcRoot: mockedDvcRoot,
+        resourceUri: { fsPath: mockedTarget } as Uri
+      })
+    ).rejects.toBeTruthy()
 
-    expect(undef).toEqual(userCancelled)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -124,12 +122,13 @@ describe('getResourceCommand', () => {
       mockedCommandId
     )
 
-    const undef = await commandToRegister({
-      dvcRoot: mockedDvcRoot,
-      resourceUri: { fsPath: mockedTarget } as Uri
-    })
+    await expect(
+      commandToRegister({
+        dvcRoot: mockedDvcRoot,
+        resourceUri: { fsPath: mockedTarget } as Uri
+      })
+    ).rejects.toBeTruthy()
 
-    expect(undef).toEqual(undefined)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -177,25 +176,6 @@ describe('getSimpleResourceCommand', () => {
     expect(output).toEqual(stdout)
     expect(mockedFunc).toHaveBeenCalledWith(mockedDvcRoot, mockedRelPath)
   })
-
-  it('should return a function that calls showGenericError if the provided function fails', async () => {
-    const stderr = 'I deed'
-    const noResponsePossible = undefined
-    mockedFunc.mockRejectedValueOnce({ stderr })
-    mockedShowGenericError.mockResolvedValueOnce(noResponsePossible)
-
-    const commandToRegister = getSimpleResourceCommand(
-      mockedInternalCommands,
-      mockedCommandId
-    )
-
-    const undef = await commandToRegister({
-      dvcRoot: mockedDvcRoot,
-      resourceUri: { fsPath: mockedDvcRoot } as Uri
-    })
-
-    expect(undef).toEqual(noResponsePossible)
-  })
 })
 
 describe('getRootCommand', () => {
@@ -217,22 +197,21 @@ describe('getRootCommand', () => {
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
-  it('should return a function that calls showGenericError if the first function fails without a force prompt', async () => {
+  it('should return a function that throws an error if the underlying function fails without a force prompt', async () => {
     const stderr = 'I deed'
-    const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
-    mockedShowGenericError.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getRootCommand(
       mockedInternalCommands,
       mockedCommandId
     )
 
-    const undef = await commandToRegister({
-      rootUri: { fsPath: mockedDvcRoot } as Uri
-    })
+    await expect(
+      commandToRegister({
+        rootUri: { fsPath: mockedDvcRoot } as Uri
+      })
+    ).rejects.toBeTruthy()
 
-    expect(undef).toEqual(userCancelled)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
@@ -274,7 +253,7 @@ describe('getRootCommand', () => {
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 
-  it('should return a function that does not call the force func if no stderr is return in the underlying error', async () => {
+  it('should return a function that does not call the force func if no stderr is returned in the underlying error', async () => {
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({})
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -284,11 +263,12 @@ describe('getRootCommand', () => {
       mockedCommandId
     )
 
-    const undef = await commandToRegister({
-      rootUri: { fsPath: mockedDvcRoot } as Uri
-    })
+    await expect(
+      commandToRegister({
+        rootUri: { fsPath: mockedDvcRoot } as Uri
+      })
+    ).rejects.toBeTruthy()
 
-    expect(undef).toEqual(undefined)
     expect(mockedFunc).toHaveBeenCalledTimes(1)
   })
 

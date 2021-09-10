@@ -15,6 +15,7 @@ import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Experiments } from '..'
 import { Status } from '../paramsAndMetrics/model'
 import { RegisteredCommands } from '../../commands/external'
+import { InternalCommands } from '../../commands/internal'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -39,6 +40,9 @@ const mockedExperiments = {
   isReady: () => true,
   paramsOrMetricsChanged: mockedParamsOrMetricsChanged
 } as unknown as Experiments
+const mockedInternalCommands = {
+  registerExternalCommand: jest.fn()
+} as unknown as InternalCommands
 
 const mockedSelectedCheckbox = {
   dark: join('path', 'to', 'checkbox-c.svg'),
@@ -87,6 +91,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          mockedInternalCommands,
           mockedResourceLocator
         )
       const mockedDvcRoots = [
@@ -105,6 +110,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          mockedInternalCommands,
           mockedResourceLocator
         )
       const mockedDvcRoot = join('path', 'to', 'only', 'root')
@@ -143,6 +149,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          mockedInternalCommands,
           mockedResourceLocator
         )
 
@@ -318,6 +325,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          mockedInternalCommands,
           mockedResourceLocator
         )
 
@@ -341,6 +349,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
     const experimentsParamsAndMetricsTree = new ExperimentsParamsAndMetricsTree(
       mockedExperiments,
+      mockedInternalCommands,
       mockedResourceLocator
     )
 
@@ -380,6 +389,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
     const experimentsParamsAndMetricsTree = new ExperimentsParamsAndMetricsTree(
       mockedExperiments,
+      mockedInternalCommands,
       mockedResourceLocator
     )
 

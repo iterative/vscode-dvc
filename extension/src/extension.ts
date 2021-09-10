@@ -40,14 +40,11 @@ import {
 } from './vscode/workspaceFolders'
 import {
   getTelemetryReporter,
-  sendTelemetryEventAndThrow,
-  sendTelemetryEvent
+  sendTelemetryEvent,
+  sendTelemetryEventAndThrow
 } from './telemetry'
 import { EventName } from './telemetry/constants'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from './commands/external'
+import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
 
 export { Disposable, Disposer }
@@ -127,13 +124,18 @@ export class Extension implements IExtension {
     this.dispose.track(
       new ExperimentsParamsAndMetricsTree(
         this.experiments,
+        this.internalCommands,
         this.resourceLocator
       )
     )
 
-    this.dispose.track(new ExperimentsSortByTree(this.experiments))
+    this.dispose.track(
+      new ExperimentsSortByTree(this.experiments, this.internalCommands)
+    )
 
-    this.dispose.track(new ExperimentsFilterByTree(this.experiments))
+    this.dispose.track(
+      new ExperimentsFilterByTree(this.experiments, this.internalCommands)
+    )
 
     this.dispose.track(new ExperimentsTree(this.experiments))
 
@@ -181,7 +183,7 @@ export class Extension implements IExtension {
             this.getEventProperties(),
             { duration: stopWatch.getElapsedTime() }
           )
-        } catch (e) {
+        } catch (e: unknown) {
           return sendTelemetryEventAndThrow(
             EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
             e as Error,
@@ -198,7 +200,7 @@ export class Extension implements IExtension {
 
     this.dispose.track(this.webviewSerializer)
 
-    registerExperimentCommands(this.experiments)
+    registerExperimentCommands(this.experiments, this.internalCommands)
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
@@ -215,7 +217,7 @@ export class Extension implements IExtension {
           )
           return stopped
         } catch (e: unknown) {
-          sendTelemetryEventAndThrow(
+          return sendTelemetryEventAndThrow(
             RegisteredCommands.STOP_EXPERIMENT,
             e as Error,
             stopWatch.getElapsedTime()
@@ -228,7 +230,7 @@ export class Extension implements IExtension {
 
     this.registerConfigCommands()
 
-    reRegisterVsCodeCommands(this.dispose)
+    reRegisterVsCodeCommands(this.internalCommands)
 
     this.dispose.track(
       commands.registerCommand(
@@ -246,7 +248,7 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            sendTelemetryEventAndThrow(
+            return sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
               stopWatch.getElapsedTime()
@@ -317,18 +319,14 @@ export class Extension implements IExtension {
   }
 
   private registerConfigCommands() {
-    this.dispose.track(
-      registerInstrumentedCommand(
-        RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
-        () => this.config.deselectDefaultProject()
-      )
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
+      () => this.config.deselectDefaultProject()
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand(
-        RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
-        () => this.config.selectDefaultProject()
-      )
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
+      () => this.config.selectDefaultProject()
     )
   }
 

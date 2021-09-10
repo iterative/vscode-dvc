@@ -10,12 +10,10 @@ import {
 import { SortDefinition } from './'
 import { Experiments } from '../..'
 import { createTreeView } from '../../../vscode/tree'
-import {
-  RegisteredCommands,
-  registerInstrumentedCommand
-} from '../../../commands/external'
+import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
+import { InternalCommands } from '../../../commands/internal'
 
 export type SortItem = {
   dvcRoot: string
@@ -32,28 +30,24 @@ export class ExperimentsSortByTree
   private readonly experiments: Experiments
   private viewed = false
 
-  constructor(experiments: Experiments) {
+  constructor(experiments: Experiments, internalCommands: InternalCommands) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(
       createTreeView<string | SortItem>('dvc.views.experimentsSortByTree', this)
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand<SortItem>(
-        RegisteredCommands.EXPERIMENT_SORT_REMOVE,
-        ({ dvcRoot, sort: { path } }: SortItem) =>
-          this.experiments.removeSort(dvcRoot, path)
-      )
+    internalCommands.registerExternalCommand<SortItem>(
+      RegisteredCommands.EXPERIMENT_SORT_REMOVE,
+      ({ dvcRoot, sort: { path } }: SortItem) =>
+        this.experiments.removeSort(dvcRoot, path)
     )
 
-    this.dispose.track(
-      registerInstrumentedCommand(
-        RegisteredCommands.EXPERIMENT_SORTS_REMOVE_ALL,
-        resource => {
-          this.removeAllSorts(resource)
-        }
-      )
+    internalCommands.registerExternalCommand(
+      RegisteredCommands.EXPERIMENT_SORTS_REMOVE_ALL,
+      resource => {
+        this.removeAllSorts(resource)
+      }
     )
 
     this.experiments = experiments

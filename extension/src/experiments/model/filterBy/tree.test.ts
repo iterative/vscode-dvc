@@ -5,6 +5,7 @@ import { Operator } from '.'
 import { ExperimentsFilterByTree } from './tree'
 import { Experiments } from '../..'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { InternalCommands } from '../../../commands/internal'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -29,6 +30,9 @@ const mockedExperiments = {
   getFilters: mockedGetFilters,
   isReady: () => true
 } as unknown as Experiments
+const mockedInternalCommands = {
+  registerExternalCommand: jest.fn()
+} as unknown as InternalCommands
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -47,7 +51,8 @@ describe('ExperimentsFilterByTree', () => {
   describe('getChildren', () => {
     it('should return an empty array if no root elements are found', async () => {
       const experimentsFilterByTree = new ExperimentsFilterByTree(
-        mockedExperiments
+        mockedExperiments,
+        mockedInternalCommands
       )
       mockedGetDvcRoots.mockReturnValueOnce([])
       const rootElements = await experimentsFilterByTree.getChildren()
@@ -57,7 +62,8 @@ describe('ExperimentsFilterByTree', () => {
 
   it('should return an empty array if no filters are found under the root elements', async () => {
     const experimentsFilterByTree = new ExperimentsFilterByTree(
-      mockedExperiments
+      mockedExperiments,
+      mockedInternalCommands
     )
     mockedGetDvcRoots.mockReturnValueOnce(['demo'])
     mockedGetFilters.mockReturnValueOnce([])
@@ -67,7 +73,8 @@ describe('ExperimentsFilterByTree', () => {
 
   it("should return the repository's filters if there is only one repository", async () => {
     const experimentsFilterByTree = new ExperimentsFilterByTree(
-      mockedExperiments
+      mockedExperiments,
+      mockedInternalCommands
     )
     const mockedFilters = [
       {
@@ -94,7 +101,8 @@ describe('ExperimentsFilterByTree', () => {
 
   it('should return an array of dvcRoots if one has a filter applied', async () => {
     const experimentsFilterByTree = new ExperimentsFilterByTree(
-      mockedExperiments
+      mockedExperiments,
+      mockedInternalCommands
     )
     const dvcRoots = ['demo', 'other']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
@@ -125,7 +133,8 @@ describe('ExperimentsFilterByTree', () => {
     ]
 
     const experimentsFilterByTree = new ExperimentsFilterByTree(
-      mockedExperiments
+      mockedExperiments,
+      mockedInternalCommands
     )
     const dvcRoots = ['demo', 'and', 'another']
     mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
@@ -162,7 +171,8 @@ describe('ExperimentsFilterByTree', () => {
         return mockedItem
       })
       const experimentsFilterByTree = new ExperimentsFilterByTree(
-        mockedExperiments
+        mockedExperiments,
+        mockedInternalCommands
       )
       const dvcRoot = 'other'
       mockedGetFilters.mockReturnValueOnce([])
@@ -194,7 +204,8 @@ describe('ExperimentsFilterByTree', () => {
       })
 
       const experimentsFilterByTree = new ExperimentsFilterByTree(
-        mockedExperiments
+        mockedExperiments,
+        mockedInternalCommands
       )
       const dvcRoot = 'other'
       mockedGetDvcRoots.mockReturnValueOnce([dvcRoot])

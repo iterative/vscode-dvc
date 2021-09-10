@@ -1,6 +1,6 @@
 import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
-import { getWarningResponse, showGenericError } from './modal'
+import { getWarningResponse } from './modal'
 
 const mockedWindow = mocked(window)
 const mockedShowWarningMessage = jest.fn()
@@ -37,18 +37,5 @@ describe('getWarningResponse', () => {
 
     expect(response).toEqual(modalCancelled)
     expect(mockedShowWarningMessage).toBeCalledTimes(1)
-  })
-})
-
-describe('showGenericError', () => {
-  it('should call showErrorMessage with the correct details', async () => {
-    mockedShowErrorMessage.mockResolvedValueOnce(undefined)
-
-    await showGenericError()
-
-    expect(mockedShowErrorMessage).toBeCalledWith(
-      'Something went wrong, please see the DVC output channel for more details.',
-      { modal: true }
-    )
   })
 })
