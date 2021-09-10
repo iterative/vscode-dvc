@@ -128,7 +128,7 @@ export class ExperimentsWebview {
     return new Promise((resolve, reject) => {
       try {
         resolve(new ExperimentsWebview(webviewPanel, internalCommands, state))
-      } catch (e) {
+      } catch (e: unknown) {
         reject(e)
       }
     })

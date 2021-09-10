@@ -100,9 +100,9 @@ export class Cli implements ICli {
         exitCode
       })
       return stdout
-    } catch (error) {
+    } catch (e: unknown) {
       throw this.processCliError(
-        error as MaybeConsoleError,
+        e as MaybeConsoleError,
         options,
         baseEvent,
         stopWatch.getElapsedTime()

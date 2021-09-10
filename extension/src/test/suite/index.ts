@@ -64,9 +64,9 @@ export async function run() {
               resolve()
             }
           })
-        } catch (e) {
-          Logger.error(e)
-          e(e)
+        } catch (e: unknown) {
+          Logger.error((e as Error).toString())
+          throw e
         }
       })
     })

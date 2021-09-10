@@ -55,7 +55,7 @@ const sanitizeProperties = <
       // If there are any errors in serializing one property, ignore that and move on.
       // Else nothing will be sent.
       sanitizedProperties[key] = convertProperty(value)
-    } catch (e) {
+    } catch (e: unknown) {
       Logger.error(`Failed to serialize ${key} for ${eventName}: ${e}`)
     }
   })

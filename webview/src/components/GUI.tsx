@@ -19,7 +19,7 @@ export const GUI: React.FC<{ model: Model }> = observer(({ model }) => {
         <ExperimentsGUI tableData={tableData} vsCodeApi={vsCodeApi} />
       </>
     )
-  } catch (e) {
-    return <p>{e.toString()}</p>
+  } catch (e: unknown) {
+    return <p>{(e as Error).toString()}</p>
   }
 })

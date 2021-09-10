@@ -159,7 +159,7 @@ export class CliReader extends Cli {
   public async root(cwd: string): Promise<string | undefined> {
     try {
       return await this.executeProcess(cwd, Command.ROOT)
-    } catch (error) {}
+    } catch {}
   }
 
   public status(cwd: string): Promise<StatusOutput> {

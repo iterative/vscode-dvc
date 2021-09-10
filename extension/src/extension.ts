@@ -267,7 +267,7 @@ export class Extension implements IExtension {
       const [root] = this.dvcRoots
       this.cliAccessible = !!(await this.cliReader.help(root))
       return this.cliAccessible
-    } catch (e) {
+    } catch {
       return false
     }
   }
