@@ -1,6 +1,6 @@
 # VSCode DVC: Insider Preview
 
-[![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/build.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/build.yml)
+[![Continuous Integration](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
