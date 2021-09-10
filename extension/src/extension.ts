@@ -218,7 +218,7 @@ export class Extension implements IExtension {
           return stopped
         } catch (e: unknown) {
           return sendTelemetryEventAndThrow(
-            RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+            RegisteredCommands.STOP_EXPERIMENT,
             e as Error,
             stopWatch.getElapsedTime()
           )
