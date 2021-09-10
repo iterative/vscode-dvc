@@ -158,14 +158,14 @@ export class Extension implements IExtension {
           { duration: stopWatch.getElapsedTime() }
         )
       )
-      .catch(e => {
+      .catch(e =>
         sendTelemetryEventAndThrow(
           EventName.EXTENSION_LOAD,
           e,
           stopWatch.getElapsedTime(),
           this.getEventProperties()
         )
-      })
+      )
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
