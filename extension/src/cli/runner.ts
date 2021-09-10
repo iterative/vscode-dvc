@@ -131,7 +131,7 @@ export class CliRunner implements ICli {
       this.currentProcess?.dispose()
       await this.currentProcess
       return false
-    } catch (e) {
+    } catch {
       const stopped = !this.currentProcess || this.currentProcess.killed
       if (stopped) {
         this.pseudoTerminal.close()
