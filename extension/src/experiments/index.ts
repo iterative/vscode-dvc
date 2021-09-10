@@ -7,6 +7,7 @@ import { FilterDefinition } from './model/filterBy'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
+import { PlotsWebview } from './plotsWebview'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -280,6 +281,15 @@ export class Experiments {
     }
 
     experimentsRepository.setWebview(experimentsWebview)
+  }
+
+  public setPlotsWebview(dvcRoot: string, plotsWebview: PlotsWebview) {
+    const experimentsRepository = this.getRepository(dvcRoot)
+    if (!experimentsRepository) {
+      plotsWebview.dispose()
+    }
+
+    experimentsRepository.setPlotsWebview(plotsWebview)
   }
 
   private async getDvcRoot(overrideRoot?: string) {

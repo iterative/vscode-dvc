@@ -30,7 +30,7 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   types?: string[]
 }
 
-export const WebviewType = 'Experiments'
+export const WebviewType = 'Plots'
 
 export interface WindowWithWebviewData {
   webviewData: {

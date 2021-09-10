@@ -307,6 +307,11 @@ export class ExperimentsRepository {
         tableData: this.getTableData()
       })
     }
+    if (this.plotsWebview) {
+      this.plotsWebview.showExperiments({
+        tableData: this.getTableData()
+      })
+    }
   }
 
   private getTableData() {

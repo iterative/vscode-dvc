@@ -1,5 +1,8 @@
-import { MessageFromWebviewType } from 'dvc/src/experiments/webview/contract'
-import React, { useEffect } from 'react'
+import {
+  MessageFromWebviewType,
+  MessageToWebviewType
+} from 'dvc/src/experiments/webview/contract'
+import React, { useEffect, useState } from 'react'
 import * as ReactDOM from 'react-dom'
 import './style.scss'
 
@@ -16,13 +19,35 @@ interface InternalVsCodeApi {
 const vsCodeApi = acquireVsCodeApi()
 
 const App = () => {
+  const [tableData, setTableData] = useState()
+  const [dvcRoot, setDvcRoot] = useState()
   useEffect(() => {
     vsCodeApi.postMessage({ type: MessageFromWebviewType.initialized })
-    vsCodeApi.setState({
-      state: true
+    window.addEventListener('message', e => {
+      const { data } = e
+      switch (data.type) {
+        case MessageToWebviewType.showExperiments: {
+          setTableData(data.tableData)
+          return
+        }
+        case MessageToWebviewType.setDvcRoot: {
+          setDvcRoot(data.dvcRoot)
+        }
+      }
     })
   }, [])
-  return <div>Plots!</div>
+  useEffect(() => {
+    vsCodeApi.setState({
+      dvcRoot,
+      tableData
+    })
+  }, [tableData, dvcRoot])
+  return (
+    <>
+      <div>Plots!</div>
+      <pre>{JSON.stringify(tableData, undefined, 2)}</pre>
+    </>
+  )
 }
 
 const elem = document.createElement('div')
