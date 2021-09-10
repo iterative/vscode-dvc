@@ -8,7 +8,7 @@ import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
-import { report } from '../vscode/reporting'
+import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { reset } from '../util/disposable'
 import {
@@ -140,7 +140,7 @@ export class Experiments {
       return
     }
 
-    report(this.internalCommands.executeCommand(commandId, cwd))
+    return reportOutput(this.internalCommands.executeCommand(commandId, cwd))
   }
 
   public getExpNameThenRun = async (commandId: CommandId) => {
@@ -154,7 +154,7 @@ export class Experiments {
     if (!experimentName) {
       return
     }
-    return report(
+    return reportOutput(
       this.internalCommands.executeCommand(commandId, cwd, experimentName)
     )
   }
@@ -170,7 +170,9 @@ export class Experiments {
     const result = await quickPick()
 
     if (result) {
-      report(this.internalCommands.executeCommand(commandId, cwd, ...result))
+      return reportOutput(
+        this.internalCommands.executeCommand(commandId, cwd, ...result)
+      )
     }
   }
 
@@ -190,7 +192,7 @@ export class Experiments {
     }
     const input = await getInput(prompt)
     if (input) {
-      report(
+      return reportOutput(
         this.internalCommands.executeCommand(
           commandId,
           cwd,

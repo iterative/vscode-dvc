@@ -218,7 +218,7 @@ export class Extension implements IExtension {
           )
           return stopped
         } catch (e: unknown) {
-          sendTelemetryEventAndThrow(
+          return sendTelemetryEventAndThrow(
             RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
             e as Error,
             stopWatch.getElapsedTime()
@@ -249,7 +249,7 @@ export class Extension implements IExtension {
             )
             return completed
           } catch (e: unknown) {
-            sendTelemetryEventAndThrow(
+            return sendTelemetryEventAndThrow(
               RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
               e as Error,
               stopWatch.getElapsedTime()

@@ -115,7 +115,11 @@ export class InternalCommands {
       })
       return res
     } catch (e: unknown) {
-      sendTelemetryEventAndThrow(name, e as Error, stopWatch.getElapsedTime())
+      return sendTelemetryEventAndThrow(
+        name,
+        e as Error,
+        stopWatch.getElapsedTime()
+      )
     }
   }
 
