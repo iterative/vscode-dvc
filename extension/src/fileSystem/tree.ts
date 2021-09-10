@@ -21,7 +21,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
-import { RegisteredCommands } from '../commands/external'
+import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
@@ -242,7 +242,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
     this.internalCommands.registerExternalCliCommand(
-      RegisteredCommands.INIT,
+      RegisteredCliCommands.INIT,
       async () => {
         const root = getFirstWorkspaceFolder()
         if (root) {
@@ -266,7 +266,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.internalCommands.registerExternalCliCommand<string>(
-      RegisteredCommands.REMOVE_TARGET,
+      RegisteredCliCommands.REMOVE_TARGET,
       path => {
         deleteTarget(path)
         this.treeDataChanged.fire()
@@ -281,7 +281,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.internalCommands.registerExternalCliCommand<string>(
-      RegisteredCommands.RENAME_TARGET,
+      RegisteredCliCommands.RENAME_TARGET,
       async path => {
         const dvcRoot = this.pathRoots[path]
         const relPath = relative(dvcRoot, path)
@@ -303,12 +303,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     )
 
     this.internalCommands.registerExternalCliCommand<string>(
-      RegisteredCommands.PULL_TARGET,
+      RegisteredCliCommands.PULL_TARGET,
       path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
     )
 
     this.internalCommands.registerExternalCliCommand<string>(
-      RegisteredCommands.PUSH_TARGET,
+      RegisteredCliCommands.PUSH_TARGET,
       path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
     )
   }

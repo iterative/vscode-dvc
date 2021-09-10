@@ -1,14 +1,17 @@
 import { pickGarbageCollectionFlags } from '../quickPick'
 import { Experiments } from '..'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { RegisteredCommands } from '../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 
 const registerExperimentCwdCommands = (
   experiments: Experiments,
   internalCommands: InternalCommands
 ): void =>
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.QUEUE_EXPERIMENT,
+    RegisteredCliCommands.QUEUE_EXPERIMENT,
     () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
   )
 
@@ -17,12 +20,12 @@ const registerExperimentNameCommands = (
   internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_APPLY,
+    RegisteredCliCommands.EXPERIMENT_APPLY,
     () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_APPLY)
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_REMOVE,
+    RegisteredCliCommands.EXPERIMENT_REMOVE,
     () => experiments.getExpNameThenRun(AvailableCommands.EXPERIMENT_REMOVE)
   )
 }
@@ -32,7 +35,7 @@ const registerExperimentInputCommands = (
   internalCommands: InternalCommands
 ): void =>
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_BRANCH,
+    RegisteredCliCommands.EXPERIMENT_BRANCH,
     () =>
       experiments.getExpNameAndInputThenRun(
         AvailableCommands.EXPERIMENT_BRANCH,
@@ -45,7 +48,7 @@ const registerExperimentQuickPickCommands = (
   internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_GARBAGE_COLLECT,
+    RegisteredCliCommands.EXPERIMENT_GARBAGE_COLLECT,
     () =>
       experiments.getCwdAndQuickPickThenRun(
         AvailableCommands.EXPERIMENT_GARBAGE_COLLECT,
@@ -79,13 +82,13 @@ const registerExperimentRunCommands = (
   internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_RUN,
+    RegisteredCliCommands.EXPERIMENT_RUN,
     () =>
       experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_RUN_RESET,
+    RegisteredCliCommands.EXPERIMENT_RUN_RESET,
     () =>
       experiments.showExperimentsTableThenRun(
         AvailableCommands.EXPERIMENT_RUN_RESET
@@ -93,7 +96,7 @@ const registerExperimentRunCommands = (
   )
 
   internalCommands.registerExternalCliCommand(
-    RegisteredCommands.EXPERIMENT_RUN_QUEUED,
+    RegisteredCliCommands.EXPERIMENT_RUN_QUEUED,
     () =>
       experiments.showExperimentsTableThenRun(
         AvailableCommands.EXPERIMENT_RUN_QUEUED

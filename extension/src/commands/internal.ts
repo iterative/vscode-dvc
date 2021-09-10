@@ -1,6 +1,6 @@
 import { commands } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { RegisteredCommands } from './external'
+import { RegisteredCliCommands, RegisteredCommands } from './external'
 import { ICli } from '../cli'
 import { Args } from '../cli/args'
 import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
@@ -77,7 +77,7 @@ export class InternalCommands {
   }
 
   public registerExternalCliCommand<T = string | undefined>(
-    name: RegisteredCommands,
+    name: RegisteredCliCommands,
     func: (arg: T) => unknown
   ): void {
     this.dispose.track(
@@ -103,7 +103,7 @@ export class InternalCommands {
   }
 
   private async runAndSendTelemetry<T>(
-    name: RegisteredCommands,
+    name: RegisteredCommands | RegisteredCliCommands,
     func: (arg: T) => unknown,
     arg: T
   ) {

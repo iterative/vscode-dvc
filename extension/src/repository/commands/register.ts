@@ -5,44 +5,44 @@ import {
   Resource,
   Root
 } from '.'
-import { RegisteredCommands } from '../../commands/external'
+import { RegisteredCliCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.registerExternalCliCommand<Resource>(
-    RegisteredCommands.ADD_TARGET,
+    RegisteredCliCommands.ADD_TARGET,
     getSimpleResourceCommand(internalCommands, AvailableCommands.ADD)
   )
 
   internalCommands.registerExternalCliCommand<Resource>(
-    RegisteredCommands.CHECKOUT_TARGET,
+    RegisteredCliCommands.CHECKOUT_TARGET,
     getResourceCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
   internalCommands.registerExternalCliCommand<Resource>(
-    RegisteredCommands.COMMIT_TARGET,
+    RegisteredCliCommands.COMMIT_TARGET,
     getResourceCommand(internalCommands, AvailableCommands.COMMIT)
   )
 }
 
 const registerRootCommands = (internalCommands: InternalCommands) => {
   internalCommands.registerExternalCliCommand<Root>(
-    RegisteredCommands.CHECKOUT,
+    RegisteredCliCommands.CHECKOUT,
     getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
-    RegisteredCommands.COMMIT,
+    RegisteredCliCommands.COMMIT,
     getRootCommand(internalCommands, AvailableCommands.COMMIT)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
-    RegisteredCommands.PULL,
+    RegisteredCliCommands.PULL,
     getRootCommand(internalCommands, AvailableCommands.PULL)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
-    RegisteredCommands.PUSH,
+    RegisteredCliCommands.PUSH,
     getRootCommand(internalCommands, AvailableCommands.PUSH)
   )
 }

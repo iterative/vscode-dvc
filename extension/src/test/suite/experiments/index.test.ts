@@ -18,7 +18,7 @@ import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
-import { RegisteredCommands } from '../../../commands/external'
+import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
@@ -210,7 +210,7 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
       expect(mockExperimentRunQueue).to.be.calledOnce
       expect(mockExperimentRunQueue).to.be.calledWith(dvcDemoPath)
@@ -232,10 +232,10 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
-        RegisteredCommands.QUEUE_EXPERIMENT,
+        RegisteredCliCommands.QUEUE_EXPERIMENT,
         undefined,
         { duration }
       )
@@ -265,10 +265,10 @@ suite('Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      await commands.executeCommand(RegisteredCommands.QUEUE_EXPERIMENT)
+      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
-        `errors.${RegisteredCommands.QUEUE_EXPERIMENT}`,
+        `errors.${RegisteredCliCommands.QUEUE_EXPERIMENT}`,
         { error: mockErrorMessage },
         { duration }
       )
@@ -296,7 +296,7 @@ suite('Experiments Test Suite', () => {
       )
       const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY)
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
 
       expect(mockExperimentApply).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
@@ -324,7 +324,7 @@ suite('Experiments Test Suite', () => {
         'experimentRemove'
       )
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_REMOVE)
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
 
       expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
