@@ -68,7 +68,7 @@ suite('CLI Runner Test Suite', () => {
         'dvc.runner.running',
         false
       )
-    })
+    }).timeout(6000)
 
     it('should be able to execute a command and provide the correct events in the correct order', async () => {
       const text = ':weeeee:'
