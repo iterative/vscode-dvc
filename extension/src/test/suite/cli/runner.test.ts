@@ -33,7 +33,7 @@ suite('CLI Runner Test Suite', () => {
       await cliRunner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
-    }).timeout(6000)
+    })
 
     it('should be able to stop a started command', async () => {
       const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))
@@ -126,7 +126,7 @@ suite('CLI Runner Test Suite', () => {
       await started
       expect((await eventStream).includes(text)).to.be.true
       return completed
-    }).timeout(12000)
+    })
 
     it('should send an error event if the command fails with an exit code and stderr', async () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendErrorTelemetryEvent')
@@ -158,6 +158,6 @@ suite('CLI Runner Test Suite', () => {
       expect(error.message).to.have.length.greaterThan(0)
       expect(command).to.equal('sleep 1 && then die')
       expect(exitCode).to.be.greaterThan(0)
-    }).timeout(4000)
+    })
   })
 })
