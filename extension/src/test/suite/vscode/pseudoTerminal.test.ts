@@ -58,7 +58,7 @@ suite('Pseudo Terminal Test Suite', () => {
       pseudoTerminal.dispose()
 
       return closeTerminalEvent()
-    }).timeout(12000)
+    })
 
     it('should be able to handle multiple output events', async () => {
       const disposable = Disposable.fn()
@@ -108,6 +108,6 @@ suite('Pseudo Terminal Test Suite', () => {
       pseudoTerminal.dispose()
 
       return closeTerminalEvent()
-    }).timeout(12000)
+    })
   })
 })
