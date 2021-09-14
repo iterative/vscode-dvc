@@ -190,7 +190,7 @@ describe('TrackedTreeView', () => {
           command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
           title: 'Open File'
         },
-        contextValue: 'dvcTrackedHasRemote'
+        contextValue: 'dvcTrackedHasRemoteFile'
       })
     })
   })

@@ -211,13 +211,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private getContextValue(path: string): string {
+    const fileSuffix = this.pathIsDirectory[path] ? '' : 'File'
+
     if (this.hasDataPlaceholder(path)) {
-      return 'dvcTrackedData'
+      return 'dvcTrackedData' + fileSuffix
     }
     if (this.hasRemote(path)) {
-      return 'dvcTrackedHasRemote'
+      return 'dvcTrackedHasRemote' + fileSuffix
     }
-    return 'dvcTracked'
+
+    return 'dvcTracked' + fileSuffix
   }
 
   private async readDirectory(root: string, path: string): Promise<string[]> {
