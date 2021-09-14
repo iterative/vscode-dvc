@@ -1,6 +1,13 @@
 import { resolve } from 'path'
 import { SinonSpy, SinonStub } from 'sinon'
-import { commands, ConfigurationChangeEvent, Uri, workspace } from 'vscode'
+import {
+  commands,
+  ConfigurationChangeEvent,
+  TextEditor,
+  Uri,
+  window,
+  workspace
+} from 'vscode'
 import { ExperimentsRepository } from '../../experiments/repository'
 import { Disposable, Disposer } from '../../extension'
 
@@ -60,3 +67,13 @@ export const experimentsUpdatedEvent = (
 
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
   spy.getCall(call).args[0]
+
+export const activeTextEditorChangedEvent = (): Promise<
+  TextEditor | undefined
+> =>
+  new Promise(resolve =>
+    window.onDidChangeActiveTextEditor(editor => resolve(editor))
+  )
+
+export const getActiveTextEditorFilename = (): string | undefined =>
+  window.activeTextEditor?.document.fileName

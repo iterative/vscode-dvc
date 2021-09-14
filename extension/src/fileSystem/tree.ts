@@ -25,6 +25,7 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
+import { openFile } from '../vscode/commands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -41,9 +42,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private pathIsOut: Record<string, boolean> = {}
 
   private doNotShowAgainText = "Don't Show Again"
-
-  private noOpenUnsupportedOption =
-    'dvc.views.trackedExplorerTree.noOpenUnsupported'
 
   private noPromptPullMissingOption =
     'dvc.views.trackedExplorerTree.noPromptPullMissing'
@@ -118,20 +116,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return treeItem
   }
 
-  private handleOpenUnsupportedError = async (relPath: string) => {
-    if (getConfigValue(this.noOpenUnsupportedOption)) {
-      return
-    }
-    const response = await window.showInformationMessage(
-      `Cannot open ${relPath}. File is unsupported and cannot be opened as text.`,
-      this.doNotShowAgainText
-    )
-
-    if (response) {
-      return setConfigValue(this.noOpenUnsupportedOption, true)
-    }
-  }
-
   private openPullPrompt = async (path: string) => {
     if (getConfigValue(this.noPromptPullMissingOption)) {
       return
@@ -176,26 +160,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private openResource = (resource: Uri) => {
     const path = resource.fsPath
-    const dvcRoot = this.pathRoots[path]
-    const relPath = relative(dvcRoot, path)
 
     if (!exists(path)) {
       return this.openPullPrompt(path)
     }
 
-    return window.showTextDocument(resource).then(
-      textEditor => textEditor,
-      error => {
-        if (
-          error.message.includes(
-            'File seems to be binary and cannot be opened as text'
-          )
-        ) {
-          return this.handleOpenUnsupportedError(relPath)
-        }
-        return window.showInformationMessage(error.message)
-      }
-    )
+    return openFile(resource)
   }
 
   private getDataPlaceholder(path: string): string {
