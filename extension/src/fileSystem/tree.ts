@@ -1,5 +1,6 @@
 import { dirname, join, relative } from 'path'
 import {
+  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -25,7 +26,6 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
-import { openFile } from '../vscode/commands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -158,14 +158,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       })
   }
 
-  private openResource = (resource: Uri) => {
+  private openResource = (resource: Uri, name: string) => {
     const path = resource.fsPath
 
     if (!exists(path)) {
       return this.openPullPrompt(path)
     }
 
-    return openFile(resource)
+    return commands.executeCommand(name, resource)
   }
 
   private getDataPlaceholder(path: string): string {
@@ -232,7 +232,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     this.internalCommands.registerExternalCommand<Uri>(
       RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-      resource => this.openResource(resource)
+      resource => this.openResource(resource, 'vscode.open')
+    )
+
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+      path => this.openResource(Uri.file(path), 'explorer.openToSide')
     )
 
     this.internalCommands.registerExternalCommand<string>(
