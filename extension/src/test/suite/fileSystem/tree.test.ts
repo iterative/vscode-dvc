@@ -20,6 +20,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
+import { setConfigValue } from '../../../vscode/config'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -34,6 +35,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
+    setConfigValue(
+      'dvc.views.trackedExplorerTree.noPromptPullMissing',
+      undefined
+    )
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -122,7 +127,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
-    it('should be able to pull a file after trying to open it and it does not exist on disk and the no missing errors option is unset', async () => {
+    it('should be able to pull a file after trying to open it when it does not exist on disk', async () => {
       const missingFile = 'non-existent.txt'
       const absPath = join(dvcDemoPath, missingFile)
       const uri = Uri.file(absPath)
@@ -140,8 +145,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPull).not.to.be.called
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(mockPull, 'should not call pull if the prompt is dismissed').not.to
+        .be.called
 
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves('Pull File' as unknown as MessageItem)
@@ -151,8 +160,11 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPull).to.be.calledOnce
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(mockPull, 'should pull the file if prompted').to.be.calledOnce
 
       mockPull.resetHistory()
       mockShowInformationMessage.resetHistory()
@@ -165,8 +177,14 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPull).not.to.be.called
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(
+        mockPull,
+        'should not pull the file if the user chooses do not show again'
+      ).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
 
@@ -175,8 +193,11 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).not.to.be.called
-      expect(mockPull).not.to.be.called
+      expect(
+        mockShowInformationMessage,
+        'should not show the information prompt if the appropriate config option is set'
+      ).not.to.be.called
+      expect(mockPull, 'should not pull the file').not.to.be.called
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
