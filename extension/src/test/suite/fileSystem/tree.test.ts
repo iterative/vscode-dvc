@@ -3,21 +3,24 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
-import { window, commands, Uri, TextEditor, MessageItem } from 'vscode'
+import { window, commands, Uri, MessageItem, ViewColumn } from 'vscode'
 import { Disposable } from '../../../extension'
 import { exists } from '../../../fileSystem'
 import * as Workspace from '../../../fileSystem/workspace'
-import * as FileSystem from '../../../fileSystem'
-import { getConfigValue, setConfigValue } from '../../../vscode/config'
 import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
-import { dvcDemoPath } from '../util'
+import {
+  activeTextEditorChangedEvent,
+  dvcDemoPath,
+  getActiveTextEditorFilename
+} from '../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
+import { setConfigValue } from '../../../vscode/config'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -26,19 +29,16 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   const disposable = Disposable.fn()
 
-  const noOpenUnsupportedOption =
-    'dvc.views.trackedExplorerTree.noOpenUnsupported'
-  const noPromptPullMissingOption =
-    'dvc.views.trackedExplorerTree.noPromptPullMissing'
-
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
     disposable.dispose()
-    setConfigValue(noOpenUnsupportedOption, undefined)
-    setConfigValue(noPromptPullMissingOption, undefined)
+    setConfigValue(
+      'dvc.views.trackedExplorerTree.noPromptPullMissing',
+      undefined
+    )
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -97,73 +97,52 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(mockSetup).not.to.be.called
     })
 
-    it('should be able to open a non-binary file', async () => {
-      const relPath = join('logs', 'acc.tsv')
-      const absPath = join(dvcDemoPath, relPath)
-      stub(path, 'relative').returns(relPath)
-      stub(FileSystem, 'exists').returns(true)
+    it('should be able to open a file', async () => {
+      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
+      const uri = Uri.file(__filename)
 
-      const uri = Uri.file(absPath)
-
-      const mockShowTextDocument = stub(window, 'showTextDocument').resolves({
-        document: { fileName: absPath }
-      } as unknown as TextEditor)
-
-      const textEditor = (await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        uri
-      )) as TextEditor
-
-      expect(textEditor.document.fileName).to.equal(absPath)
-      expect(mockShowTextDocument).to.be.calledWith(uri)
-    })
-
-    it('should only call showInformationMessage when trying to open a binary file without the no binary errors option set', async () => {
-      const relPath = 'model.pt'
-      const absPath = join(dvcDemoPath, relPath)
-      const uri = Uri.file(absPath)
-      stub(path, 'relative').returns(relPath)
-      stub(FileSystem, 'exists').returns(true)
-      stub(window, 'showTextDocument').rejects(
-        new Error('File seems to be binary and cannot be opened as text')
-      )
-
-      const mockShowInformationMessage = stub(window, 'showInformationMessage')
-
-      expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
-      mockShowInformationMessage.resolves(undefined)
+      const activeEditorChanged = activeTextEditorChangedEvent()
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
         uri
+      )
+      await activeEditorChanged
+
+      expect(getActiveTextEditorFilename()).to.equal(__filename)
+    })
+
+    it('should be able to open a file to the side', async () => {
+      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
+
+      const activeEditorChanged = activeTextEditorChangedEvent()
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+        __filename
+      )
+      await activeEditorChanged
+
+      expect(getActiveTextEditorFilename()).to.equal(__filename)
+      expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
+    })
+
+    it('should not fail to open a file to the side if it is not on disk', async () => {
+      const missingFile = 'missing.txt'
+      const mockShowInformationMessage = stub(
+        window,
+        'showInformationMessage'
+      ).resolves(undefined)
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+        missingFile
       )
 
       expect(mockShowInformationMessage).to.be.calledOnce
-      expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
-      mockShowInformationMessage.resetHistory()
-      mockShowInformationMessage.resolves(
-        "Don't Show Again" as unknown as MessageItem
-      )
-
-      await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        uri
-      )
-
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
-      mockShowInformationMessage.resetHistory()
-
-      await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        uri
-      )
-
-      expect(mockShowInformationMessage).not.to.be.called
-      expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
     })
 
-    it('should be able to pull a file after trying to open it and it does not exist on disk and the no missing errors option is unset', async () => {
+    it('should be able to pull a file after trying to open it when it does not exist on disk', async () => {
       const missingFile = 'non-existent.txt'
       const absPath = join(dvcDemoPath, missingFile)
       const uri = Uri.file(absPath)
@@ -181,8 +160,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPull).not.to.be.called
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(mockPull, 'should not call pull if the prompt is dismissed').not.to
+        .be.called
 
       mockShowInformationMessage.resetHistory()
       mockShowInformationMessage.resolves('Pull File' as unknown as MessageItem)
@@ -192,8 +175,11 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPull).to.be.calledOnce
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(mockPull, 'should pull the file if prompted').to.be.calledOnce
 
       mockPull.resetHistory()
       mockShowInformationMessage.resetHistory()
@@ -206,8 +192,14 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(mockPull).not.to.be.called
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(
+        mockPull,
+        'should not pull the file if the user chooses do not show again'
+      ).not.to.be.called
 
       mockShowInformationMessage.resetHistory()
 
@@ -216,8 +208,11 @@ suite('Tracked Explorer Tree Test Suite', () => {
         uri
       )
 
-      expect(mockShowInformationMessage).not.to.be.called
-      expect(mockPull).not.to.be.called
+      expect(
+        mockShowInformationMessage,
+        'should not show the information prompt if the appropriate config option is set'
+      ).not.to.be.called
+      expect(mockPull, 'should not pull the file').not.to.be.called
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {

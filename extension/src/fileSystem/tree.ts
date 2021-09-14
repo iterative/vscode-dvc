@@ -1,5 +1,6 @@
 import { dirname, join, relative } from 'path'
 import {
+  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -41,9 +42,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private pathIsOut: Record<string, boolean> = {}
 
   private doNotShowAgainText = "Don't Show Again"
-
-  private noOpenUnsupportedOption =
-    'dvc.views.trackedExplorerTree.noOpenUnsupported'
 
   private noPromptPullMissingOption =
     'dvc.views.trackedExplorerTree.noPromptPullMissing'
@@ -118,20 +116,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return treeItem
   }
 
-  private handleOpenUnsupportedError = async (relPath: string) => {
-    if (getConfigValue(this.noOpenUnsupportedOption)) {
-      return
-    }
-    const response = await window.showInformationMessage(
-      `Cannot open ${relPath}. File is unsupported and cannot be opened as text.`,
-      this.doNotShowAgainText
-    )
-
-    if (response) {
-      return setConfigValue(this.noOpenUnsupportedOption, true)
-    }
-  }
-
   private openPullPrompt = async (path: string) => {
     if (getConfigValue(this.noPromptPullMissingOption)) {
       return
@@ -174,28 +158,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       })
   }
 
-  private openResource = (resource: Uri) => {
+  private openResource = (resource: Uri, commandId: string) => {
     const path = resource.fsPath
-    const dvcRoot = this.pathRoots[path]
-    const relPath = relative(dvcRoot, path)
 
     if (!exists(path)) {
       return this.openPullPrompt(path)
     }
 
-    return window.showTextDocument(resource).then(
-      textEditor => textEditor,
-      error => {
-        if (
-          error.message.includes(
-            'File seems to be binary and cannot be opened as text'
-          )
-        ) {
-          return this.handleOpenUnsupportedError(relPath)
-        }
-        return window.showInformationMessage(error.message)
-      }
-    )
+    return commands.executeCommand(commandId, resource)
   }
 
   private getDataPlaceholder(path: string): string {
@@ -211,13 +181,18 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private getContextValue(path: string): string {
+    const baseContext = this.pathIsDirectory[path]
+      ? 'dvcTracked'
+      : 'dvcTrackedFile'
+
     if (this.hasDataPlaceholder(path)) {
-      return 'dvcTrackedData'
+      return baseContext + 'Data'
     }
     if (this.hasRemote(path)) {
-      return 'dvcTrackedHasRemote'
+      return baseContext + 'HasRemote'
     }
-    return 'dvcTracked'
+
+    return baseContext
   }
 
   private async readDirectory(root: string, path: string): Promise<string[]> {
@@ -257,7 +232,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     this.internalCommands.registerExternalCommand<Uri>(
       RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-      resource => this.openResource(resource)
+      resource => this.openResource(resource, 'vscode.open')
+    )
+
+    this.internalCommands.registerExternalCommand<string>(
+      RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+      path => this.openResource(Uri.file(path), 'explorer.openToSide')
     )
 
     this.internalCommands.registerExternalCommand<string>(
