@@ -96,6 +96,7 @@ export interface IEventNamePropertyMapping {
   [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined
   [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined
   [EventName.TRACKED_EXPLORER_COPY_REL_FILE_PATH]: undefined
+  [EventName.TRACKED_EXPLORER_OPEN_TO_THE_SIDE]: undefined
 
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
