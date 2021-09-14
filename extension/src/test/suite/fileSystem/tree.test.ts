@@ -127,6 +127,21 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
+    it('should not fail to open a file to the side if it is not on disk', async () => {
+      const missingFile = 'missing.txt'
+      const mockShowInformationMessage = stub(
+        window,
+        'showInformationMessage'
+      ).resolves(undefined)
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+        missingFile
+      )
+
+      expect(mockShowInformationMessage).to.be.calledOnce
+    })
+
     it('should be able to pull a file after trying to open it when it does not exist on disk', async () => {
       const missingFile = 'non-existent.txt'
       const absPath = join(dvcDemoPath, missingFile)
