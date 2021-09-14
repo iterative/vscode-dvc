@@ -118,6 +118,23 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(mockShowTextDocument).to.be.calledWith(uri)
     })
 
+    it('should be able to open a file to the side', async () => {
+      expect(window.activeTextEditor?.document.fileName).not.to.equal(
+        __filename
+      )
+
+      const activeEditorChanged = new Promise(resolve =>
+        window.onDidChangeActiveTextEditor(editor => resolve(editor))
+      )
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+        __filename
+      )
+      await activeEditorChanged
+
+      expect(window.activeTextEditor?.document.fileName).to.equal(__filename)
+    })
+
     it('should only call showInformationMessage when trying to open a binary file without the no binary errors option set', async () => {
       const relPath = 'model.pt'
       const absPath = join(dvcDemoPath, relPath)
