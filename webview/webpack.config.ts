@@ -23,8 +23,8 @@ module.exports = {
   },
   devtool: 'source-map',
   entry: {
-    main: { dependOn: 'react', import: r('src/index.tsx') },
-    plots: { dependOn: 'react', import: r('src/plots.tsx') },
+    main: { dependOn: 'react', import: r('src/table/index.tsx') },
+    plots: { dependOn: 'react', import: r('src/plots/index.tsx') },
     react: ['react', 'react-dom']
   },
   module: {
