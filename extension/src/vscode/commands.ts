@@ -23,3 +23,6 @@ export const reRegisterVsCodeCommands = (
     path => executeCommand('explorer.openToSide', path)
   )
 }
+
+export const openFile = (uri: Uri) =>
+  commands.executeCommand('vscode.open', uri)

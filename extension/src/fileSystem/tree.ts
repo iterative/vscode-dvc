@@ -1,6 +1,5 @@
 import { dirname, join, relative } from 'path'
 import {
-  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -26,6 +25,7 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
+import { openFile } from '../vscode/commands'
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -165,7 +165,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return this.openPullPrompt(path)
     }
 
-    return commands.executeCommand('vscode.open', resource)
+    return openFile(resource)
   }
 
   private getDataPlaceholder(path: string): string {
