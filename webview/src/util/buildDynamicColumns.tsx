@@ -94,7 +94,7 @@ const fixColumnsNesting = (
       const newDepth = depth + 1
       const nextColumns = column.columns || [{ ...column }]
 
-      if (needsPlaceholder) {
+      if (!column.columns) {
         column = {
           Header: '',
           id: `${column.id}_previous_placeholder`,
