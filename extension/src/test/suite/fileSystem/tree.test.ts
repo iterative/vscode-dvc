@@ -11,7 +11,11 @@ import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
-import { dvcDemoPath } from '../util'
+import {
+  activeTextEditorChangedEvent,
+  dvcDemoPath,
+  getActiveTextEditorFilename
+} from '../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -89,14 +93,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should be able to open a file', async () => {
-      expect(window.activeTextEditor?.document.fileName).not.to.equal(
-        __filename
-      )
+      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
       const uri = Uri.file(__filename)
 
-      const activeEditorChanged = new Promise(resolve =>
-        window.onDidChangeActiveTextEditor(editor => resolve(editor))
-      )
+      const activeEditorChanged = activeTextEditorChangedEvent()
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
@@ -104,24 +104,21 @@ suite('Tracked Explorer Tree Test Suite', () => {
       )
       await activeEditorChanged
 
-      expect(window.activeTextEditor?.document.fileName).to.equal(__filename)
+      expect(getActiveTextEditorFilename()).to.equal(__filename)
     })
 
     it('should be able to open a file to the side', async () => {
-      expect(window.activeTextEditor?.document.fileName).not.to.equal(
-        __filename
-      )
+      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
 
-      const activeEditorChanged = new Promise(resolve =>
-        window.onDidChangeActiveTextEditor(editor => resolve(editor))
-      )
+      const activeEditorChanged = activeTextEditorChangedEvent()
+
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
         __filename
       )
       await activeEditorChanged
 
-      expect(window.activeTextEditor?.document.fileName).to.equal(__filename)
+      expect(getActiveTextEditorFilename()).to.equal(__filename)
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
