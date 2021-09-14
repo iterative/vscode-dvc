@@ -3,12 +3,10 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
-import { window, commands, Uri, TextEditor, MessageItem } from 'vscode'
+import { window, commands, Uri, MessageItem, ViewColumn } from 'vscode'
 import { Disposable } from '../../../extension'
 import { exists } from '../../../fileSystem'
 import * as Workspace from '../../../fileSystem/workspace'
-import * as FileSystem from '../../../fileSystem'
-import { getConfigValue, setConfigValue } from '../../../vscode/config'
 import { CliExecutor } from '../../../cli/executor'
 import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
@@ -26,19 +24,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   const disposable = Disposable.fn()
 
-  const noOpenUnsupportedOption =
-    'dvc.views.trackedExplorerTree.noOpenUnsupported'
-  const noPromptPullMissingOption =
-    'dvc.views.trackedExplorerTree.noPromptPullMissing'
-
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
     disposable.dispose()
-    setConfigValue(noOpenUnsupportedOption, undefined)
-    setConfigValue(noPromptPullMissingOption, undefined)
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -97,25 +88,23 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(mockSetup).not.to.be.called
     })
 
-    it('should be able to open a non-binary file', async () => {
-      const relPath = join('logs', 'acc.tsv')
-      const absPath = join(dvcDemoPath, relPath)
-      stub(path, 'relative').returns(relPath)
-      stub(FileSystem, 'exists').returns(true)
+    it('should be able to open a file', async () => {
+      expect(window.activeTextEditor?.document.fileName).not.to.equal(
+        __filename
+      )
+      const uri = Uri.file(__filename)
 
-      const uri = Uri.file(absPath)
+      const activeEditorChanged = new Promise(resolve =>
+        window.onDidChangeActiveTextEditor(editor => resolve(editor))
+      )
 
-      const mockShowTextDocument = stub(window, 'showTextDocument').resolves({
-        document: { fileName: absPath }
-      } as unknown as TextEditor)
-
-      const textEditor = (await commands.executeCommand(
+      await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
         uri
-      )) as TextEditor
+      )
+      await activeEditorChanged
 
-      expect(textEditor.document.fileName).to.equal(absPath)
-      expect(mockShowTextDocument).to.be.calledWith(uri)
+      expect(window.activeTextEditor?.document.fileName).to.equal(__filename)
     })
 
     it('should be able to open a file to the side', async () => {
@@ -133,51 +122,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       await activeEditorChanged
 
       expect(window.activeTextEditor?.document.fileName).to.equal(__filename)
-    })
-
-    it('should only call showInformationMessage when trying to open a binary file without the no binary errors option set', async () => {
-      const relPath = 'model.pt'
-      const absPath = join(dvcDemoPath, relPath)
-      const uri = Uri.file(absPath)
-      stub(path, 'relative').returns(relPath)
-      stub(FileSystem, 'exists').returns(true)
-      stub(window, 'showTextDocument').rejects(
-        new Error('File seems to be binary and cannot be opened as text')
-      )
-
-      const mockShowInformationMessage = stub(window, 'showInformationMessage')
-
-      expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
-      mockShowInformationMessage.resolves(undefined)
-
-      await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        uri
-      )
-
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(!!getConfigValue(noOpenUnsupportedOption)).to.be.false
-      mockShowInformationMessage.resetHistory()
-      mockShowInformationMessage.resolves(
-        "Don't Show Again" as unknown as MessageItem
-      )
-
-      await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        uri
-      )
-
-      expect(mockShowInformationMessage).to.be.calledOnce
-      expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
-      mockShowInformationMessage.resetHistory()
-
-      await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-        uri
-      )
-
-      expect(mockShowInformationMessage).not.to.be.called
-      expect(getConfigValue(noOpenUnsupportedOption)).to.be.true
+      expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
     it('should be able to pull a file after trying to open it and it does not exist on disk and the no missing errors option is unset', async () => {
