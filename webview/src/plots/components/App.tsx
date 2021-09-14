@@ -1,10 +1,9 @@
+import React, { useEffect, useState } from 'react'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/experiments/webview/contract'
-import React, { useEffect, useState } from 'react'
-import * as ReactDOM from 'react-dom'
-import './style.scss'
+import Plots from './Plots'
 
 declare global {
   function acquireVsCodeApi(): InternalVsCodeApi
@@ -42,15 +41,7 @@ const App = () => {
       tableData
     })
   }, [tableData, dvcRoot])
-  return (
-    <>
-      <div>Plots!</div>
-      <pre>{JSON.stringify(tableData, undefined, 2)}</pre>
-    </>
-  )
+  return <Plots tableData={tableData} />
 }
 
-const elem = document.createElement('div')
-elem.className = 'react-root'
-document.body.append(elem)
-ReactDOM.render(<App />, elem)
+export default App
