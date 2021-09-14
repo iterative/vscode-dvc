@@ -1,29 +1,18 @@
 import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import {
-  commands,
-  EventEmitter,
-  TreeItem,
-  TreeItemCollapsibleState,
-  window
-} from 'vscode'
+import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsParamsAndMetricsTree } from './tree'
 import { joinParamOrMetricPath } from './paths'
 import complexColumnData from '../../test/fixtures/complex-column-example'
 import { Resource, ResourceLocator } from '../../resourceLocator'
-import { Experiments } from '..'
 import { Status } from '../paramsAndMetrics/model'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
+import { buildMockedExperiments } from '../../test/util'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedParamsOrMetricsChanged = mocked(new EventEmitter<void>())
-const mockedParamsOrMetricsChangedFire = jest.fn()
-const mockedParamsOrMetricsChangedEvent = jest.fn()
-mockedParamsOrMetricsChanged.fire = mockedParamsOrMetricsChangedFire
-mockedParamsOrMetricsChanged.event = mockedParamsOrMetricsChangedEvent
 
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
@@ -32,14 +21,9 @@ const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetChildParamsOrMetrics = jest.fn()
-const mockedGetDvcRoots = jest.fn()
-const mockedExperiments = {
-  getChildParamsOrMetrics: mockedGetChildParamsOrMetrics,
-  getDvcRoots: mockedGetDvcRoots,
-  isReady: () => true,
-  paramsOrMetricsChanged: mockedParamsOrMetricsChanged
-} as unknown as Experiments
+const { mockedExperiments, mockedGetChildParamsOrMetrics, mockedGetDvcRoots } =
+  buildMockedExperiments()
+
 const mockedInternalCommands = {
   registerExternalCommand: jest.fn()
 } as unknown as InternalCommands
