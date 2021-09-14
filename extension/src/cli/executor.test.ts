@@ -6,7 +6,7 @@ import { CliResult, CliStarted } from '.'
 import { Flag, GcPreserveFlag } from './args'
 import { CliExecutor } from './executor'
 import { createProcess } from '../processExecution'
-import { getMockedProcess } from '../test/util'
+import { getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
 import { Config } from '../config'
 

@@ -2,7 +2,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsTree } from './tree'
-import { buildMockedExperiments } from '../../test/util'
+import { buildMockedExperiments } from '../../test/util/jest'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()

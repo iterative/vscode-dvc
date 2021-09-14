@@ -9,7 +9,7 @@ import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Status } from '../paramsAndMetrics/model'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
-import { buildMockedExperiments } from '../../test/util'
+import { buildMockedExperiments } from '../../test/util/jest'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()

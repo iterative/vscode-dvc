@@ -14,7 +14,7 @@ import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { InternalCommands } from '../../../commands/internal'
-import { buildMockedExperiments } from '../../../test/util'
+import { buildMockedExperiments } from '../../../test/util/jest'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,

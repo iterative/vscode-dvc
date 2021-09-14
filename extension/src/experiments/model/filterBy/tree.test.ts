@@ -5,7 +5,7 @@ import { Operator } from '.'
 import { ExperimentsFilterByTree } from './tree'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { InternalCommands } from '../../../commands/internal'
-import { buildMockedExperiments } from '../../../test/util'
+import { buildMockedExperiments } from '../../../test/util/jest'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
