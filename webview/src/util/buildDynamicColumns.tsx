@@ -74,6 +74,12 @@ const findMaxDepth = (columns: FullColumn[], depth = 1): number =>
     1
   )
 
+const findDeepest = (
+  depth: number,
+  columns: Column<Experiment>[] | undefined,
+  maxDepth: number
+) => (!depth && columns ? findMaxDepth(columns) : maxDepth)
+
 const fixColumnsNesting = (
   columns: FullColumn[],
   parent?: Column<Experiment>,
@@ -81,26 +87,25 @@ const fixColumnsNesting = (
   maxDepth = 0
 ) =>
   columns.map((column: FullColumn) => {
-    const deepest =
-      !depth && column.columns ? findMaxDepth(column.columns) : maxDepth
-    const newDepth = depth + 1
-    if (column.columns) {
-      column.columns = fixColumnsNesting(
-        column.columns,
-        column,
-        newDepth,
-        deepest
-      )
-    } else if (deepest > depth) {
-      const nextCol = { ...column }
-      column = {
-        Header: '',
-        id: column.id + '_previous_placeholder',
-        parent,
-        placeholderOf: column
+    const deepest = findDeepest(depth, column.columns, maxDepth)
+    const needsPlaceholder = deepest > depth
+
+    if (column.columns || needsPlaceholder) {
+      const newDepth = depth + 1
+      const nextColumns = column.columns || [{ ...column }]
+
+      if (needsPlaceholder) {
+        column = {
+          Header: '',
+          id: `${column.id}_previous_placeholder`,
+          parent,
+          placeholderOf: column
+        }
       }
-      column.columns = fixColumnsNesting([nextCol], column, newDepth, deepest)
+
+      column.columns = fixColumnsNesting(nextColumns, column, newDepth, deepest)
     }
+
     return column
   })
 
