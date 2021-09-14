@@ -158,14 +158,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       })
   }
 
-  private openResource = (resource: Uri, name: string) => {
+  private openResource = (resource: Uri, commandId: string) => {
     const path = resource.fsPath
 
     if (!exists(path)) {
       return this.openPullPrompt(path)
     }
 
-    return commands.executeCommand(name, resource)
+    return commands.executeCommand(commandId, resource)
   }
 
   private getDataPlaceholder(path: string): string {
