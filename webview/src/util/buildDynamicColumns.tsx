@@ -6,6 +6,13 @@ import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
 
 type Value = string | number
+type FullColumn = Column<Experiment> & {
+  columns?: Column<Experiment>[]
+  sortType?: string
+  type?: string[]
+  parent?: Column<Experiment>
+  placeholderOf?: Column<Experiment>
+}
 
 const UndefinedCell = <>-</>
 
@@ -34,16 +41,13 @@ const buildDynamicColumns = (
     .filter(column => column.parentPath === parentPath)
     .map(data => {
       const { path } = data
+
       const Cell = getCellComponent()
       const childColumns = buildDynamicColumns(properties, path)
 
       const pathArray = splitParamOrMetricPath(path)
 
-      const column: Column<Experiment> & {
-        columns?: Column<Experiment>[]
-        sortType?: string
-        type?: string[]
-      } = {
+      const column: FullColumn = {
         Cell,
         Header: data.name,
         accessor: buildAccessor(pathArray),
@@ -61,4 +65,51 @@ const buildDynamicColumns = (
       return column
     })
 
-export default buildDynamicColumns
+const findMaxDepth = (columns: FullColumn[], depth = 1): number =>
+  columns.reduce(
+    (prev: number, curr: FullColumn) =>
+      curr.columns
+        ? Math.max(prev, findMaxDepth(curr.columns, depth + 1))
+        : depth,
+    1
+  )
+
+const findDeepest = (
+  depth: number,
+  columns: Column<Experiment>[] | undefined,
+  maxDepth: number
+) => (!depth && columns ? findMaxDepth(columns) : maxDepth)
+
+const fixColumnsNesting = (
+  columns: FullColumn[],
+  parent?: Column<Experiment>,
+  depth = 0,
+  maxDepth = 0
+) =>
+  columns.map((column: FullColumn) => {
+    const deepest = findDeepest(depth, column.columns, maxDepth)
+    const needsPlaceholder = deepest > depth
+
+    if (column.columns || needsPlaceholder) {
+      const newDepth = depth + 1
+      const nextColumns = column.columns || [{ ...column }]
+
+      if (!column.columns) {
+        column = {
+          Header: '',
+          id: `${column.id}_previous_placeholder`,
+          parent,
+          placeholderOf: column
+        }
+      }
+
+      column.columns = fixColumnsNesting(nextColumns, column, newDepth, deepest)
+    }
+
+    return column
+  })
+
+const buildColumns = (properties: ParamOrMetric[], parentPath: string) =>
+  fixColumnsNesting(buildDynamicColumns(properties, parentPath))
+
+export default buildColumns
