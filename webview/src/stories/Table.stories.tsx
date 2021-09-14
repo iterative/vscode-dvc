@@ -6,7 +6,7 @@ import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
 import Experiments from '../table/components/Experiments'
 
 import './test-vscode-styles.scss'
-import '../style.scss'
+import '../table/style.scss'
 
 const dummyVsCodeApi = {
   postMessage: action('postMessage')
@@ -25,9 +25,13 @@ export default {
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,
-  title: 'Experiments/Table'
+  title: 'Table'
 } as Meta
 
-export const ComplexTable: Story = ({ tableData, vsCodeApi }) => {
+export const WithData: Story = ({ tableData, vsCodeApi }) => {
   return <Experiments tableData={tableData} vsCodeApi={vsCodeApi} />
+}
+
+export const WithoutData: Story = ({ vsCodeApi }) => {
+  return <Experiments tableData={undefined} vsCodeApi={vsCodeApi} />
 }
