@@ -90,8 +90,10 @@ suite('Repository Test Suite', () => {
       await repository.isReady()
       mockReset.restore()
 
+      const firstPromise = repository.reset()
+
       await Promise.all([
-        repository.reset(),
+        firstPromise,
         repository.update(),
         repository.reset(),
         repository.update(),
