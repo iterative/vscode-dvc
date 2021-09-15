@@ -6,13 +6,12 @@ export const retryUntilResolved = async <T>(
   type: string,
   waitBeforeRetry = 500
 ): Promise<T> => {
-  const [settled] = await Promise.allSettled([getNewPromise()])
+  try {
+    return await getNewPromise()
+  } catch (e: unknown) {
+    Logger.error(`${type} failed with ${(e as Error).message} retrying...`)
 
-  if (settled.status === 'rejected') {
-    Logger.error(`${type} failed with ${settled.reason} retrying...`)
     await delay(waitBeforeRetry)
     return retryUntilResolved(getNewPromise, type, waitBeforeRetry * 2)
   }
-
-  return settled.value
 }
