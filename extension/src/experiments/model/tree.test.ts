@@ -1,16 +1,10 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { commands, EventEmitter, ThemeIcon, TreeItem, window } from 'vscode'
+import { commands, ThemeIcon, TreeItem, window } from 'vscode'
 import { ExperimentsTree } from './tree'
-import { Experiments } from '..'
+import { buildMockedExperiments } from '../../test/util/jest'
 
 const mockedCommands = mocked(commands)
-mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsChanged = mocked(new EventEmitter<string | void>())
-const mockedExperimentDataChangedFire = jest.fn()
-mockedExperimentsChanged.fire = mockedExperimentDataChangedFire
-const mockedExperimentDataChangedEvent = jest.fn()
-mockedExperimentsChanged.event = mockedExperimentDataChangedEvent
 mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
@@ -19,16 +13,12 @@ const mockedThemeIcon = mocked(ThemeIcon)
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetDvcRoots = jest.fn()
-const mockedGetCheckpoints = jest.fn()
-const mockedGetExperiments = jest.fn()
-const mockedExperiments = {
-  experimentsChanged: mockedExperimentsChanged,
-  getCheckpoints: mockedGetCheckpoints,
-  getDvcRoots: mockedGetDvcRoots,
-  getExperiments: mockedGetExperiments,
-  isReady: () => true
-} as unknown as Experiments
+const {
+  mockedExperiments,
+  mockedGetDvcRoots,
+  mockedGetExperiments,
+  mockedGetCheckpoints
+} = buildMockedExperiments()
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
