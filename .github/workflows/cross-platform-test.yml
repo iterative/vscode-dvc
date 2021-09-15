@@ -29,7 +29,7 @@ jobs:
         id: yarn-cache
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ hashFiles('**/yarn.lock') }}-${{matrix.os}}
+          key: yarn-${{ hashFiles('**/yarn.lock') }}-${{ matrix.os }}
           restore-keys: yarn
 
       - uses: actions/cache@v2
@@ -37,7 +37,7 @@ jobs:
         id: vscode-cache
         with:
           path: extension/.vscode-test
-          key: vscode-test-${{matrix.os}}
+          key: vscode-test-${{ matrix.os }}
 
       - run: yarn install
 
