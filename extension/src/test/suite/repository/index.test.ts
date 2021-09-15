@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, useFakeTimers } from 'sinon'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -83,7 +83,10 @@ suite('Repository Test Suite', () => {
     })
 
     it('should debounce all calls made within 200ms of a reset', async () => {
+      const clock = useFakeTimers(new Date())
+
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
+      clock.tick(50)
 
       await Promise.all([
         repository.isReady(),
@@ -97,6 +100,8 @@ suite('Repository Test Suite', () => {
       expect(mockList).to.be.calledOnce
       expect(mockDiff).to.be.calledOnce
       expect(mockStatus).to.be.calledOnce
+
+      clock.restore()
     })
 
     it('should run update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
