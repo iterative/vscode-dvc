@@ -5,7 +5,7 @@ import { Cli, CliResult, CliStarted, typeCheckCommands } from '.'
 import { Command } from './args'
 import { getProcessEnv } from '../env'
 import { createProcess } from '../processExecution'
-import { getFailingMockedProcess, getMockedProcess } from '../test/util'
+import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
 import { Config } from '../config'
 import { joinEnvPath } from '../util/env'
 
