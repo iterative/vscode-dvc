@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, useFakeTimers } from 'sinon'
+import { stub, restore, useFakeTimers, SinonFakeTimers } from 'sinon'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -14,13 +14,16 @@ suite('Repository Test Suite', () => {
   window.showInformationMessage('Start all repository tests.')
 
   const disposable = Disposable.fn()
+  let clock: SinonFakeTimers
 
   beforeEach(() => {
     restore()
+    clock = useFakeTimers(new Date())
   })
 
   afterEach(() => {
     disposable.dispose()
+    clock.restore()
   })
 
   const buildRepository = () => {
@@ -45,7 +48,6 @@ suite('Repository Test Suite', () => {
 
   describe('Repository', () => {
     it('should not queue a reset within 200ms of one starting', async () => {
-      const clock = useFakeTimers(new Date())
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
       clock.tick(50)
@@ -62,11 +64,9 @@ suite('Repository Test Suite', () => {
       expect(mockList).to.be.calledOnce
       expect(mockDiff).to.be.calledOnce
       expect(mockStatus).to.be.calledOnce
-      clock.restore()
     })
 
     it('should not queue an update within 200ms of one starting', async () => {
-      const clock = useFakeTimers(new Date())
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
       await repository.isReady()
@@ -89,12 +89,9 @@ suite('Repository Test Suite', () => {
       expect(mockList).not.to.be.called
       expect(mockDiff).to.be.calledOnce
       expect(mockStatus).to.be.calledOnce
-      clock.restore()
     })
 
     it('should debounce all calls made within 200ms of a reset', async () => {
-      const clock = useFakeTimers(new Date())
-
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
       clock.tick(50)
 
@@ -110,12 +107,9 @@ suite('Repository Test Suite', () => {
       expect(mockList).to.be.calledOnce
       expect(mockDiff).to.be.calledOnce
       expect(mockStatus).to.be.calledOnce
-
-      clock.restore()
     })
 
     it('should run update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
-      const clock = useFakeTimers(new Date())
       const mockReset = stub(Repository.prototype, 'reset').resolves(undefined)
 
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
