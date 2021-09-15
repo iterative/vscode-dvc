@@ -91,7 +91,7 @@ export class Repository {
   > {
     const statusOutput = await retryUntilAllResolved<StatusOutput>(
       () =>
-        this.internalCommands.executeCommand<DiffOutput>(
+        this.internalCommands.executeCommand<StatusOutput>(
           AvailableCommands.STATUS,
           this.dvcRoot
         ),
