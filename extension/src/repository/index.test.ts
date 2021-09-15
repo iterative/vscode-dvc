@@ -357,7 +357,7 @@ describe('Repository', () => {
       expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
     })
 
-    it("should retry command's on an individual basis (currently synchronous)", async () => {
+    it('should retry commands on an individual basis (currently synchronous)', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
@@ -451,7 +451,7 @@ describe('Repository', () => {
   })
 
   describe('update', () => {
-    it("should retry command's on an individual basis (currently synchronous)", async () => {
+    it('should retry commands on an individual basis (currently synchronous)', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: dataDir },
