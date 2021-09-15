@@ -45,7 +45,10 @@ suite('Repository Test Suite', () => {
 
   describe('Repository', () => {
     it('should not queue a reset within 200ms of one starting', async () => {
+      const clock = useFakeTimers(new Date())
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
+
+      clock.tick(50)
 
       await Promise.all([
         repository.isReady(),
@@ -59,18 +62,24 @@ suite('Repository Test Suite', () => {
       expect(mockList).to.be.calledOnce
       expect(mockDiff).to.be.calledOnce
       expect(mockStatus).to.be.calledOnce
+      clock.restore()
     })
 
     it('should not queue an update within 200ms of one starting', async () => {
+      const clock = useFakeTimers(new Date())
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
       await repository.isReady()
+      clock.tick(200)
       mockList.resetHistory()
       mockDiff.resetHistory()
       mockStatus.resetHistory()
 
+      const firstUpdate = repository.update()
+      clock.tick(50)
+
       await Promise.all([
-        repository.update(),
+        firstUpdate,
         repository.update(),
         repository.update(),
         repository.update(),
@@ -80,6 +89,7 @@ suite('Repository Test Suite', () => {
       expect(mockList).not.to.be.called
       expect(mockDiff).to.be.calledOnce
       expect(mockStatus).to.be.calledOnce
+      clock.restore()
     })
 
     it('should debounce all calls made within 200ms of a reset', async () => {
@@ -105,16 +115,22 @@ suite('Repository Test Suite', () => {
     })
 
     it('should run update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
+      const clock = useFakeTimers(new Date())
       const mockReset = stub(Repository.prototype, 'reset').resolves(undefined)
 
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
       await repository.isReady()
       mockReset.restore()
+      clock.tick(200)
+
+      const firstUpdate = repository.update()
+      const firstReset = repository.reset()
+      clock.tick(50)
 
       await Promise.all([
-        repository.update(),
-        repository.reset(),
+        firstUpdate,
+        firstReset,
         repository.update(),
         repository.reset(),
         repository.update(),
