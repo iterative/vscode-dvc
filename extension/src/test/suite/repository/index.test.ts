@@ -83,17 +83,10 @@ suite('Repository Test Suite', () => {
     })
 
     it('should debounce all calls made within 200ms of a reset', async () => {
-      const mockReset = stub(Repository.prototype, 'reset').resolves(undefined)
-
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
-      await repository.isReady()
-      mockReset.restore()
-
-      const firstPromise = repository.reset()
-
       await Promise.all([
-        firstPromise,
+        repository.isReady(),
         repository.update(),
         repository.reset(),
         repository.update(),
