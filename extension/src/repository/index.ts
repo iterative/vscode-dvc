@@ -86,43 +86,47 @@ export class Repository {
     this.setState()
   }
 
-  private getBaseData = (): [
-    Promise<DiffOutput>,
-    Promise<StatusOutput>,
-    Promise<Set<string>>
-  ] => [
-    this.internalCommands.executeCommand<DiffOutput>(
-      AvailableCommands.DIFF,
-      this.dvcRoot
-    ),
-    this.internalCommands.executeCommand<StatusOutput>(
-      AvailableCommands.STATUS,
-      this.dvcRoot
-    ),
-    getAllUntracked(this.dvcRoot)
-  ]
-
-  private getUpdateData = (): Promise<
+  private async getUpdateData(): Promise<
     [DiffOutput, StatusOutput, Set<string>]
-  > =>
-    retryUntilAllResolved<[DiffOutput, StatusOutput, Set<string>]>(
-      this.getBaseData,
-      'Repository data update'
+  > {
+    const statusOutput = await retryUntilAllResolved<StatusOutput>(
+      () =>
+        this.internalCommands.executeCommand<DiffOutput>(
+          AvailableCommands.STATUS,
+          this.dvcRoot
+        ),
+      'Repository status update'
     )
 
-  private getResetData = (): Promise<
+    const diffOutput = await retryUntilAllResolved<DiffOutput>(
+      () =>
+        this.internalCommands.executeCommand<DiffOutput>(
+          AvailableCommands.DIFF,
+          this.dvcRoot
+        ),
+      'Repository diff update'
+    )
+
+    const gitOutput = await getAllUntracked(this.dvcRoot)
+
+    return [diffOutput, statusOutput, gitOutput]
+  }
+
+  private async getResetData(): Promise<
     [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
-  > => {
-    const getNewPromises = () => [
-      ...this.getBaseData(),
-      this.internalCommands.executeCommand<ListOutput[]>(
-        AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
-        this.dvcRoot
-      )
-    ]
-    return retryUntilAllResolved<
-      [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
-    >(getNewPromises, 'Repository data update')
+  > {
+    const [diffOutput, statusOutput, gitOutput] = await this.getUpdateData()
+
+    const listOutput = await retryUntilAllResolved<ListOutput[]>(
+      () =>
+        this.internalCommands.executeCommand<ListOutput[]>(
+          AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
+          this.dvcRoot
+        ),
+      'Repository list update'
+    )
+
+    return [diffOutput, statusOutput, gitOutput, listOutput]
   }
 
   private setState() {
