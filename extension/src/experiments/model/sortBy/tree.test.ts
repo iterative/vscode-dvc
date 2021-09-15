@@ -3,7 +3,6 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import {
   commands,
-  EventEmitter,
   ThemeIcon,
   TreeItem,
   TreeItemCollapsibleState,
@@ -14,8 +13,8 @@ import {
 import { SortDefinition } from '.'
 import { ExperimentsSortByTree, SortItem } from './tree'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
-import { Experiments } from '../..'
 import { InternalCommands } from '../../../commands/internal'
+import { buildMockedExperiments } from '../../../test/util/jest'
 
 function buildMockedTreeItem(
   arg1: string | TreeItemLabel | Uri,
@@ -34,23 +33,14 @@ const mockedTreeItem = mocked(TreeItem)
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
-const mockedExperimentsChanged = mocked(new EventEmitter<string | void>())
-const mockedExperimentDataChangedFire = jest.fn()
-mockedExperimentsChanged.fire = mockedExperimentDataChangedFire
-mockedCommands.registerCommand = jest.fn()
 const mockedWindow = mocked(window)
 mockedWindow.registerTreeDataProvider = jest.fn()
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedGetSorts = jest.fn()
-const mockedGetDvcRoots = jest.fn()
-const mockedExperiments = {
-  experimentsChanged: mockedExperimentsChanged,
-  getDvcRoots: mockedGetDvcRoots,
-  getSorts: mockedGetSorts,
-  isReady: () => true
-} as unknown as Experiments
+const { mockedExperiments, mockedGetSorts, mockedGetDvcRoots } =
+  buildMockedExperiments()
+
 const mockedInternalCommands = {
   registerExternalCommand: jest.fn()
 } as unknown as InternalCommands
