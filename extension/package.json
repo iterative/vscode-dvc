@@ -280,12 +280,6 @@
           "description": "%config.pythonPath.description%",
           "type": "string",
           "default": null
-        },
-        "dvc.views.trackedExplorerTree.noPromptPullMissing": {
-          "title": "%config.noPromptPullMissing.title%",
-          "description": "%config.noPromptPullMissing.description%",
-          "type": "boolean",
-          "default": false
         }
       }
     },
