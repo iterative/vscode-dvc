@@ -20,7 +20,6 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
-import { setConfigValue } from '../../../vscode/config'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -35,10 +34,6 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    setConfigValue(
-      'dvc.views.trackedExplorerTree.noPromptPullMissing',
-      undefined
-    )
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
