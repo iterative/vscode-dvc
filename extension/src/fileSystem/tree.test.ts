@@ -108,13 +108,14 @@ describe('TrackedTreeView', () => {
   })
 
   describe('getTreeItem', () => {
-    it('should return the correct tree item for a directory', async () => {
+    it('should return the correct tree item for a virtual directory', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(1)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
+      mockedExists.mockReturnValueOnce(false)
 
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
@@ -131,7 +132,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'dvcTracked'
+        contextValue: 'virtualDvcTracked'
       })
     })
 
@@ -150,7 +151,7 @@ describe('TrackedTreeView', () => {
         mockedTreeDataChanged
       )
       trackedTreeView.initialize([dvcDemoPath])
-      mockedExists.mockReturnValueOnce(true)
+      mockedExists.mockReturnValueOnce(true).mockReturnValueOnce(true)
 
       await trackedTreeView.getChildren()
 
@@ -179,6 +180,7 @@ describe('TrackedTreeView', () => {
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
+      mockedExists.mockReturnValueOnce(true)
 
       const treeItem = trackedTreeView.getTreeItem(log)
 

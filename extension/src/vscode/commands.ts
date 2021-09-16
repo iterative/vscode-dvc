@@ -17,4 +17,14 @@ export const reRegisterVsCodeCommands = (
     RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
     path => executeCommand('copyRelativeFilePath', path)
   )
+
+  internalCommands.registerExternalCommand<Uri>(
+    RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+    resource => commands.executeCommand('vscode.open', resource)
+  )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+    path => executeCommand('explorer.openToSide', path)
+  )
 }

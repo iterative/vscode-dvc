@@ -1,6 +1,5 @@
 import { dirname, join, relative } from 'path'
 import {
-  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -14,7 +13,6 @@ import { exists } from '.'
 import { deleteTarget } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
-import { getConfigValue, setConfigValue } from '../vscode/config'
 import { tryThenMaybeForce } from '../cli/actions'
 import {
   CommandId,
@@ -40,11 +38,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   private pathRoots: Record<string, string> = {}
   private pathIsDirectory: Record<string, boolean> = {}
   private pathIsOut: Record<string, boolean> = {}
-
-  private doNotShowAgainText = "Don't Show Again"
-
-  private noPromptPullMissingOption =
-    'dvc.views.trackedExplorerTree.noPromptPullMissing'
 
   private viewed = false
 
@@ -116,25 +109,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return treeItem
   }
 
-  private openPullPrompt = async (path: string) => {
-    if (getConfigValue(this.noPromptPullMissingOption)) {
-      return
-    }
-    const response = await window.showInformationMessage(
-      `${path} does not exist at the specified path.`,
-      'Pull File',
-      this.doNotShowAgainText
-    )
-
-    if (response === 'Pull File') {
-      return this.tryThenMaybeForce(AvailableCommands.PULL, path)
-    }
-
-    if (response === this.doNotShowAgainText) {
-      return setConfigValue(this.noPromptPullMissingOption, true)
-    }
-  }
-
   private async getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
@@ -158,16 +132,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       })
   }
 
-  private openResource = (resource: Uri, commandId: string) => {
-    const path = resource.fsPath
-
-    if (!exists(path)) {
-      return this.openPullPrompt(path)
-    }
-
-    return commands.executeCommand(commandId, resource)
-  }
-
   private getDataPlaceholder(path: string): string {
     return path.trim() + '.dvc'
   }
@@ -181,6 +145,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private getContextValue(path: string): string {
+    if (!exists(path)) {
+      return 'virtualDvcTracked'
+    }
+
     const baseContext = this.pathIsDirectory[path]
       ? 'dvcTracked'
       : 'dvcTrackedFile'
@@ -228,16 +196,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
           workspaceChanged.fire()
         }
       }
-    )
-
-    this.internalCommands.registerExternalCommand<Uri>(
-      RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-      resource => this.openResource(resource, 'vscode.open')
-    )
-
-    this.internalCommands.registerExternalCommand<string>(
-      RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
-      path => this.openResource(Uri.file(path), 'explorer.openToSide')
     )
 
     this.internalCommands.registerExternalCommand<string>(
