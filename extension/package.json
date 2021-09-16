@@ -208,6 +208,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.findInFolder%",
+        "command": "dvc.findInFolder",
+        "category": "DVC"
+      },
+      {
         "title": "%command.renameTarget%",
         "command": "dvc.renameTarget",
         "category": "DVC"
@@ -386,6 +391,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.findInFolder",
+          "when": "false"
+        },
+        {
           "command": "dvc.renameTarget",
           "when": "false"
         },
@@ -518,6 +527,11 @@
           "command": "dvc.openToTheSide",
           "group": "navigation",
           "when": "viewItem =~ /^dvcTrackedFile/"
+        },
+        {
+          "command": "dvc.findInFolder",
+          "group": "navigation",
+          "when": "viewItem =~ /^dvcTrackedDir/"
         },
         {
           "command": "dvc.renameTarget",

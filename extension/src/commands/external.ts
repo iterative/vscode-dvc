@@ -44,5 +44,6 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile',
   TRACKED_EXPLORER_COPY_FILE_PATH = 'dvc.copyFilePath',
   TRACKED_EXPLORER_COPY_REL_FILE_PATH = 'dvc.copyRelativeFilePath',
+  TRACKED_EXPLORER_FIND_IN_FOLDER = 'dvc.findInFolder',
   TRACKED_EXPLORER_OPEN_TO_THE_SIDE = 'dvc.openToTheSide'
 }
