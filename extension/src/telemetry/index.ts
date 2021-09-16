@@ -14,7 +14,7 @@ const isDebugSession = (): boolean => !!process.env.VSC_DEBUG
 
 let telemetryReporter: TelemetryReporter | undefined
 export const getTelemetryReporter = (): TelemetryReporter => {
-  if (!isTestExecution() && !isDebugSession() && telemetryReporter) {
+  if (!isTestExecution() && telemetryReporter) {
     return telemetryReporter
   }
 
