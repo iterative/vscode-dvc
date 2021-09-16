@@ -503,22 +503,22 @@
         {
           "command": "dvc.pullTarget",
           "group": "1_DVC@1",
-          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /HasRemote$|Data$/"
+          "when": "viewItem =~ /^virtualDvcTracked|^dvcTracked.*[HasRemote|Data]$/"
         },
         {
           "command": "dvc.pushTarget",
           "group": "1_DVC@2",
-          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /HasRemote$|Data$/"
+          "when": "viewItem =~ /^dvcTracked.*[HasRemote|Data]$/"
         },
         {
           "command": "dvc.copyFilePath",
           "group": "6_copypath@1",
-          "when": "viewItem =~ /^dvcTracked/"
+          "when": "viewItem =~ /[d|D]vcTracked/"
         },
         {
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
-          "when": "viewItem =~ /^dvcTracked/"
+          "when": "viewItem =~ /[d|D]vcTracked/"
         },
         {
           "command": "dvc.openToTheSide",
@@ -528,7 +528,7 @@
         {
           "command": "dvc.renameTarget",
           "group": "7_modification@1",
-          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /Data$/"
+          "when": "viewItem =~ /^dvcTracked.*Data$/"
         },
         {
           "command": "dvc.deleteTarget",
@@ -538,7 +538,7 @@
         {
           "command": "dvc.removeTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /Data$/"
+          "when": "viewItem =~ /^dvcTracked.*Data$/"
         },
         {
           "command": "dvc.addExperimentsTableSort",

@@ -181,6 +181,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private getContextValue(path: string): string {
+    if (!exists(path)) {
+      return 'virtualDvcTracked'
+    }
+
     const baseContext = this.pathIsDirectory[path]
       ? 'dvcTracked'
       : 'dvcTrackedFile'
