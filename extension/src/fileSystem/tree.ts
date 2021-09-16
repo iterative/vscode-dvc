@@ -1,6 +1,5 @@
 import { dirname, join, relative } from 'path'
 import {
-  commands,
   Event,
   EventEmitter,
   TreeDataProvider,
@@ -197,16 +196,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
           workspaceChanged.fire()
         }
       }
-    )
-
-    this.internalCommands.registerExternalCommand<Uri>(
-      RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-      resource => commands.executeCommand('vscode.open', resource)
-    )
-
-    this.internalCommands.registerExternalCommand<string>(
-      RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
-      path => commands.executeCommand('explorer.openToSide', Uri.file(path))
     )
 
     this.internalCommands.registerExternalCommand<string>(
