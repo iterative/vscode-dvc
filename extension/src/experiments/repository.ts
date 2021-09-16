@@ -14,7 +14,7 @@ import { ExperimentsTableWebview } from './webview'
 import { PlotsWebview } from './plotsWebview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
-import { retryUntilAllResolved } from '../util/promise'
+import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
@@ -278,7 +278,7 @@ export class ExperimentsRepository {
         AvailableCommands.EXPERIMENT_SHOW,
         this.dvcRoot
       )
-    const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
+    const data = await retryUntilResolved<ExperimentsRepoJSONOutput>(
       getNewPromise,
       'Experiments table update'
     )

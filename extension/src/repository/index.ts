@@ -6,7 +6,7 @@ import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { retryUntilAllResolved } from '../util/promise'
+import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 export class Repository {
@@ -86,43 +86,50 @@ export class Repository {
     this.setState()
   }
 
-  private getBaseData = (): [
-    Promise<DiffOutput>,
-    Promise<StatusOutput>,
-    Promise<Set<string>>
-  ] => [
-    this.internalCommands.executeCommand<DiffOutput>(
-      AvailableCommands.DIFF,
-      this.dvcRoot
-    ),
-    this.internalCommands.executeCommand<StatusOutput>(
-      AvailableCommands.STATUS,
-      this.dvcRoot
-    ),
-    getAllUntracked(this.dvcRoot)
-  ]
-
-  private getUpdateData = (): Promise<
+  private async getUpdateData(): Promise<
     [DiffOutput, StatusOutput, Set<string>]
-  > =>
-    retryUntilAllResolved<[DiffOutput, StatusOutput, Set<string>]>(
-      this.getBaseData,
-      'Repository data update'
-    )
-
-  private getResetData = (): Promise<
-    [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
-  > => {
-    const getNewPromises = () => [
-      ...this.getBaseData(),
-      this.internalCommands.executeCommand<ListOutput[]>(
-        AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
+  > {
+    const getStatusPromise = () =>
+      this.internalCommands.executeCommand<StatusOutput>(
+        AvailableCommands.STATUS,
         this.dvcRoot
       )
-    ]
-    return retryUntilAllResolved<
-      [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
-    >(getNewPromises, 'Repository data update')
+    const statusOutput = await retryUntilResolved<StatusOutput>(
+      getStatusPromise,
+      'Repository status update'
+    )
+
+    const getDiffPromise = () =>
+      this.internalCommands.executeCommand<DiffOutput>(
+        AvailableCommands.DIFF,
+        this.dvcRoot
+      )
+
+    const diffOutput = await retryUntilResolved<DiffOutput>(
+      getDiffPromise,
+      'Repository diff update'
+    )
+
+    const gitOutput = await getAllUntracked(this.dvcRoot)
+
+    return [diffOutput, statusOutput, gitOutput]
+  }
+
+  private async getResetData(): Promise<
+    [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
+  > {
+    const [diffOutput, statusOutput, gitOutput] = await this.getUpdateData()
+
+    const listOutput = await retryUntilResolved<ListOutput[]>(
+      () =>
+        this.internalCommands.executeCommand<ListOutput[]>(
+          AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
+          this.dvcRoot
+        ),
+      'Repository list update'
+    )
+
+    return [diffOutput, statusOutput, gitOutput, listOutput]
   }
 
   private setState() {
