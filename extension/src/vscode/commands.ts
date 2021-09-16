@@ -27,4 +27,9 @@ export const reRegisterVsCodeCommands = (
     RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
     path => executeCommand('explorer.openToSide', path)
   )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
+    path => executeCommand('filesExplorer.findInFolder', path)
+  )
 }

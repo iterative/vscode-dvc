@@ -208,6 +208,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.findInFolder%",
+        "command": "dvc.findInFolder",
+        "category": "DVC"
+      },
+      {
         "title": "%command.renameTarget%",
         "command": "dvc.renameTarget",
         "category": "DVC"
@@ -386,6 +391,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.findInFolder",
+          "when": "false"
+        },
+        {
           "command": "dvc.renameTarget",
           "when": "false"
         },
@@ -497,7 +506,7 @@
         {
           "command": "dvc.pullTarget",
           "group": "1_DVC@1",
-          "when": "viewItem =~ /^virtualDvcTracked|^dvcTracked.*[HasRemote|Data]$/"
+          "when": "viewItem =~ /^dvcTrackedVirtual|^dvcTracked.*[HasRemote|Data]$/"
         },
         {
           "command": "dvc.pushTarget",
@@ -507,17 +516,22 @@
         {
           "command": "dvc.copyFilePath",
           "group": "6_copypath@1",
-          "when": "viewItem =~ /[d|D]vcTracked/"
+          "when": "viewItem =~ /dvcTracked/"
         },
         {
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
-          "when": "viewItem =~ /[d|D]vcTracked/"
+          "when": "viewItem =~ /dvcTracked/"
         },
         {
           "command": "dvc.openToTheSide",
           "group": "navigation",
           "when": "viewItem =~ /^dvcTrackedFile/"
+        },
+        {
+          "command": "dvc.findInFolder",
+          "group": "4_search",
+          "when": "viewItem =~ /^dvcTrackedDir/"
         },
         {
           "command": "dvc.renameTarget",
