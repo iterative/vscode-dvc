@@ -12,7 +12,6 @@
       ],
       "env": {
         "HOT_RELOAD": "true",
-        "PYTHONPATH": ".env/bin/python3",
         "USE_DEV_UI": "true",
         "VSC_DEBUG": "true"
       },
@@ -20,7 +19,6 @@
       "windows": {
         "env": {
           "HOT_RELOAD": "true",
-          "PYTHONPATH": ".env\\Scripts\\python.exe",
           "USE_DEV_UI": "true",
           "VSC_DEBUG": "true"
         }
@@ -34,7 +32,6 @@
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/extension"],
       "env": {
         "HOT_RELOAD": "true",
-        "PYTHONPATH": ".env/bin/python3",
         "USE_DEV_UI": "true",
         "VSC_DEBUG": "true"
       },
@@ -42,7 +39,6 @@
       "windows": {
         "env": {
           "HOT_RELOAD": "true",
-          "PYTHONPATH": ".env\\Scripts\\python.exe",
           "USE_DEV_UI": "true",
           "VSC_DEBUG": "true"
         }
