@@ -1,4 +1,4 @@
-import TelemetryReporter from 'vscode-extension-telemetry'
+import TelemetryReporter from 'vscode-extension-telemetry/lib/telemetryReporter'
 import {
   EXTENSION_ID,
   APPLICATION_INSIGHTS_KEY,
@@ -20,7 +20,10 @@ export const getTelemetryReporter = (): TelemetryReporter => {
 
   const version = getExtensionVersion(EXTENSION_ID) || 'unknown'
 
-  telemetryReporter = new TelemetryReporter(
+  const Reporter = require('vscode-extension-telemetry')
+    .default as typeof TelemetryReporter
+
+  telemetryReporter = new Reporter(
     EXTENSION_ID,
     version,
     APPLICATION_INSIGHTS_KEY,

@@ -81,8 +81,6 @@ export class Extension implements IExtension {
   constructor(context: ExtensionContext) {
     const stopWatch = new StopWatch()
 
-    this.dispose.track(getTelemetryReporter())
-
     this.setCommandsAvailability(false)
     this.setProjectAvailability(false)
 
@@ -96,29 +94,44 @@ export class Extension implements IExtension {
     this.cliReader = this.dispose.track(new CliReader(this.config))
     this.cliRunner = this.dispose.track(new CliRunner(this.config))
 
-    const outputChannel = this.dispose.track(
-      new OutputChannel(
-        [this.cliExecutor, this.cliReader, this.cliRunner],
-        context.extension.packageJSON.version
-      )
-    )
-
     this.internalCommands = this.dispose.track(
       new InternalCommands(
         this.config,
-        outputChannel,
+        this.dispose.track(
+          new OutputChannel(
+            [this.cliExecutor, this.cliReader, this.cliRunner],
+            context.extension.packageJSON.version
+          )
+        ),
         this.cliExecutor,
         this.cliReader,
         this.cliRunner
       )
     )
 
-    this.status = this.dispose.track(
-      new Status([this.cliExecutor, this.cliReader, this.cliRunner])
-    )
-
     this.experiments = this.dispose.track(
       new Experiments(this.internalCommands, context.workspaceState)
+    )
+
+    setup(this)
+      .then(() =>
+        sendTelemetryEvent(
+          EventName.EXTENSION_LOAD,
+          this.getEventProperties(),
+          { duration: stopWatch.getElapsedTime() }
+        )
+      )
+      .catch(e =>
+        sendTelemetryEventAndThrow(
+          EventName.EXTENSION_LOAD,
+          e,
+          stopWatch.getElapsedTime(),
+          this.getEventProperties()
+        )
+      )
+
+    this.status = this.dispose.track(
+      new Status([this.cliExecutor, this.cliReader, this.cliRunner])
     )
 
     this.dispose.track(
@@ -148,23 +161,6 @@ export class Extension implements IExtension {
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
     )
-
-    setup(this)
-      .then(() =>
-        sendTelemetryEvent(
-          EventName.EXTENSION_LOAD,
-          this.getEventProperties(),
-          { duration: stopWatch.getElapsedTime() }
-        )
-      )
-      .catch(e =>
-        sendTelemetryEventAndThrow(
-          EventName.EXTENSION_LOAD,
-          e,
-          stopWatch.getElapsedTime(),
-          this.getEventProperties()
-        )
-      )
 
     this.dispose.track(
       this.onDidChangeWorkspace(() => {
@@ -257,6 +253,8 @@ export class Extension implements IExtension {
         }
       )
     )
+
+    this.dispose.track(getTelemetryReporter())
   }
 
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
