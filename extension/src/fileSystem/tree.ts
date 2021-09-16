@@ -146,11 +146,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private getContextValue(path: string): string {
     if (!exists(path)) {
-      return 'virtualDvcTracked'
+      return 'dvcTrackedVirtual'
     }
 
     const baseContext = this.pathIsDirectory[path]
-      ? 'dvcTracked'
+      ? 'dvcTrackedDir'
       : 'dvcTrackedFile'
 
     if (this.hasDataPlaceholder(path)) {

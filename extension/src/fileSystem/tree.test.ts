@@ -132,7 +132,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'virtualDvcTracked'
+        contextValue: 'dvcTrackedVirtual'
       })
     })
 
@@ -160,7 +160,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'dvcTrackedData'
+        contextValue: 'dvcTrackedDirData'
       })
     })
 
