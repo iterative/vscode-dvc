@@ -21,18 +21,6 @@ jobs:
           field: version
           value: '{{ original }}-${{ github.sha }}'
 
-      - name: Get Yarn cache path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v2
-        name: Restore Yarn cache
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn
-
       - name: Setup Node.js environment
         uses: actions/setup-node@v2
         with:
