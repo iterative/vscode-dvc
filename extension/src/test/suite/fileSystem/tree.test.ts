@@ -1,7 +1,7 @@
 import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
 import { window, commands, Uri, MessageItem, ViewColumn } from 'vscode'
 import { Disposable } from '../../../extension'
@@ -120,6 +120,21 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       expect(getActiveTextEditorFilename()).to.equal(__filename)
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
+    })
+
+    it('should be able to search in a folder', async () => {
+      const searchDir = __dirname
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
+        searchDir
+      )
+
+      expect(executeCommandSpy).to.be.calledWith(
+        'filesExplorer.findInFolder',
+        Uri.file(searchDir)
+      )
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
