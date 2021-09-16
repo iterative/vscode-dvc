@@ -17,9 +17,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.4
-
       - name: Get Yarn cache path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -31,6 +28,12 @@ jobs:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: yarn-${{ hashFiles('**/yarn.lock') }}-${{ matrix.os }}
           restore-keys: yarn
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: yarn
 
       - uses: actions/cache@v2
         name: Restore .vscode-test cache
