@@ -208,11 +208,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.findInFolder%",
-        "command": "dvc.findInFolder",
-        "category": "DVC"
-      },
-      {
         "title": "%command.renameTarget%",
         "command": "dvc.renameTarget",
         "category": "DVC"
@@ -285,6 +280,12 @@
           "description": "%config.pythonPath.description%",
           "type": "string",
           "default": null
+        },
+        "dvc.views.trackedExplorerTree.noPromptPullMissing": {
+          "title": "%config.noPromptPullMissing.title%",
+          "description": "%config.noPromptPullMissing.description%",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -388,10 +389,6 @@
         },
         {
           "command": "dvc.openToTheSide",
-          "when": "false"
-        },
-        {
-          "command": "dvc.findInFolder",
           "when": "false"
         },
         {
@@ -506,22 +503,22 @@
         {
           "command": "dvc.pullTarget",
           "group": "1_DVC@1",
-          "when": "viewItem =~ /^dvcTrackedVirtual|^dvcTracked.*[HasRemote|Data]$/"
+          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /HasRemote$|Data$/"
         },
         {
           "command": "dvc.pushTarget",
           "group": "1_DVC@2",
-          "when": "viewItem =~ /^dvcTracked.*[HasRemote|Data]$/"
+          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /HasRemote$|Data$/"
         },
         {
           "command": "dvc.copyFilePath",
           "group": "6_copypath@1",
-          "when": "viewItem =~ /dvcTracked/"
+          "when": "viewItem =~ /^dvcTracked/"
         },
         {
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
-          "when": "viewItem =~ /dvcTracked/"
+          "when": "viewItem =~ /^dvcTracked/"
         },
         {
           "command": "dvc.openToTheSide",
@@ -529,14 +526,9 @@
           "when": "viewItem =~ /^dvcTrackedFile/"
         },
         {
-          "command": "dvc.findInFolder",
-          "group": "4_search",
-          "when": "viewItem =~ /^dvcTrackedDir/"
-        },
-        {
           "command": "dvc.renameTarget",
           "group": "7_modification@1",
-          "when": "viewItem =~ /^dvcTracked.*Data$/"
+          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /Data$/"
         },
         {
           "command": "dvc.deleteTarget",
@@ -546,7 +538,7 @@
         {
           "command": "dvc.removeTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked.*Data$/"
+          "when": "viewItem =~ /^dvcTracked/ && viewItem =~ /Data$/"
         },
         {
           "command": "dvc.addExperimentsTableSort",

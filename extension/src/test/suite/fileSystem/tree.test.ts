@@ -1,7 +1,7 @@
 import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy } from 'sinon'
+import { stub, restore } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
 import { window, commands, Uri, MessageItem, ViewColumn } from 'vscode'
 import { Disposable } from '../../../extension'
@@ -20,6 +20,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
+import { setConfigValue } from '../../../vscode/config'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -34,6 +35,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
+    setConfigValue(
+      'dvc.views.trackedExplorerTree.noPromptPullMissing',
+      undefined
+    )
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
@@ -122,19 +127,92 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
-    it('should be able to search in a folder', async () => {
-      const searchDir = __dirname
-      const executeCommandSpy = spy(commands, 'executeCommand')
+    it('should not fail to open a file to the side if it is not on disk', async () => {
+      const missingFile = 'missing.txt'
+      const mockShowInformationMessage = stub(
+        window,
+        'showInformationMessage'
+      ).resolves(undefined)
 
       await commands.executeCommand(
-        RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
-        searchDir
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
+        missingFile
       )
 
-      expect(executeCommandSpy).to.be.calledWith(
-        'filesExplorer.findInFolder',
-        Uri.file(searchDir)
+      expect(mockShowInformationMessage).to.be.calledOnce
+    })
+
+    it('should be able to pull a file after trying to open it when it does not exist on disk', async () => {
+      const missingFile = 'non-existent.txt'
+      const absPath = join(dvcDemoPath, missingFile)
+      const uri = Uri.file(absPath)
+      stub(path, 'relative').returns(missingFile)
+
+      const mockShowInformationMessage = stub(window, 'showInformationMessage')
+
+      mockShowInformationMessage.resolves(undefined)
+      const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
+        'M       non-existent.txt\n1 file modified'
       )
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
+
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(mockPull, 'should not call pull if the prompt is dismissed').not.to
+        .be.called
+
+      mockShowInformationMessage.resetHistory()
+      mockShowInformationMessage.resolves('Pull File' as unknown as MessageItem)
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
+
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(mockPull, 'should pull the file if prompted').to.be.calledOnce
+
+      mockPull.resetHistory()
+      mockShowInformationMessage.resetHistory()
+      mockShowInformationMessage.resolves(
+        "Don't Show Again" as unknown as MessageItem
+      )
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
+
+      expect(
+        mockShowInformationMessage,
+        'should show the user an information prompt'
+      ).to.be.calledOnce
+      expect(
+        mockPull,
+        'should not pull the file if the user chooses do not show again'
+      ).not.to.be.called
+
+      mockShowInformationMessage.resetHistory()
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+        uri
+      )
+
+      expect(
+        mockShowInformationMessage,
+        'should not show the information prompt if the appropriate config option is set'
+      ).not.to.be.called
+      expect(mockPull, 'should not pull the file').not.to.be.called
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {

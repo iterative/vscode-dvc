@@ -13,7 +13,7 @@ import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
-import { retryUntilResolved } from '../util/promise'
+import { retryUntilAllResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
@@ -235,7 +235,7 @@ export class ExperimentsRepository {
         AvailableCommands.EXPERIMENT_SHOW,
         this.dvcRoot
       )
-    const data = await retryUntilResolved<ExperimentsRepoJSONOutput>(
+    const data = await retryUntilAllResolved<ExperimentsRepoJSONOutput>(
       getNewPromise,
       'Experiments table update'
     )
