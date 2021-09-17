@@ -2,57 +2,48 @@ import { commands, Uri } from 'vscode'
 import { RegisteredCommands } from '../commands/external'
 import { InternalCommands } from '../commands/internal'
 
-const executeCommand = (name: string, path: string) =>
-  commands.executeCommand(name, Uri.file(path))
+export const reRegisterVsCodeCommands = (
+  internalCommands: InternalCommands
+) => {
+  const registerExternalCommand = (
+    commandId: RegisteredCommands,
+    builtInCommandId: string
+  ) =>
+    internalCommands.registerExternalCommand<string>(commandId, path =>
+      commands.executeCommand(builtInCommandId, Uri.file(path))
+    )
 
-const registerNavigationCommands = (internalCommands: InternalCommands) => {
   internalCommands.registerExternalCommand<Uri>(
     RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
     resource => commands.executeCommand('vscode.open', resource)
   )
 
-  internalCommands.registerExternalCommand<string>(
+  registerExternalCommand(
     RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
-    path => executeCommand('explorer.openToSide', path)
+    'explorer.openToSide'
   )
-}
 
-const registerCompareCommands = (internalCommands: InternalCommands) => {
-  internalCommands.registerExternalCommand<string>(
+  registerExternalCommand(
     RegisteredCommands.TRACKED_EXPLORER_SELECT_FOR_COMPARE,
-    path => executeCommand('selectForCompare', path)
+    'selectForCompare'
   )
 
-  internalCommands.registerExternalCommand<string>(
+  registerExternalCommand(
     RegisteredCommands.TRACKED_EXPLORER_COMPARE_SELECTED,
-    path => executeCommand('compareFiles', path)
+    'compareFiles'
   )
-}
 
-const registerSearchCommands = (internalCommands: InternalCommands) => {
-  internalCommands.registerExternalCommand<string>(
+  registerExternalCommand(
     RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
-    path => executeCommand('filesExplorer.findInFolder', path)
+    'filesExplorer.findInFolder'
   )
-}
-
-const registerCutCopyPasteCommands = (internalCommands: InternalCommands) => {
-  internalCommands.registerExternalCommand<string>(
+  registerExternalCommand(
     RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
-    path => executeCommand('copyFilePath', path)
+    'copyFilePath'
   )
 
-  internalCommands.registerExternalCommand<string>(
+  registerExternalCommand(
     RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
-    path => executeCommand('copyRelativeFilePath', path)
+    'copyRelativeFilePath'
   )
-}
-
-export const reRegisterVsCodeCommands = (
-  internalCommands: InternalCommands
-) => {
-  registerNavigationCommands(internalCommands)
-  registerCompareCommands(internalCommands)
-  registerSearchCommands(internalCommands)
-  registerCutCopyPasteCommands(internalCommands)
 }
