@@ -7,14 +7,7 @@ const getCommand =
   path =>
     commands.executeCommand(name, Uri.file(path))
 
-export const reRegisterVsCodeCommands = (
-  internalCommands: InternalCommands
-) => {
-  internalCommands.registerExternalCommand<Uri>(
-    RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
-    resource => commands.executeCommand('vscode.open', resource)
-  )
-
+const registerPathCommands = (internalCommands: InternalCommands) => {
   internalCommands.registerExternalCommand<string>(
     RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
     getCommand('explorer.openToSide')
@@ -44,4 +37,15 @@ export const reRegisterVsCodeCommands = (
     RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
     getCommand('copyRelativeFilePath')
   )
+}
+
+export const reRegisterVsCodeCommands = (
+  internalCommands: InternalCommands
+) => {
+  internalCommands.registerExternalCommand<Uri>(
+    RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
+    resource => commands.executeCommand('vscode.open', resource)
+  )
+
+  registerPathCommands(internalCommands)
 }
