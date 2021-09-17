@@ -193,6 +193,11 @@
         "icon": "$(trash)"
       },
       {
+        "title": "%command.compareSelected%",
+        "command": "dvc.compareSelected",
+        "category": "DVC"
+      },
+      {
         "title": "%command.copyFilePath%",
         "command": "dvc.copyFilePath",
         "category": "DVC"
@@ -210,6 +215,11 @@
       {
         "title": "%command.findInFolder%",
         "command": "dvc.findInFolder",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.selectForCompare%",
+        "command": "dvc.selectForCompare",
         "category": "DVC"
       },
       {
@@ -379,6 +389,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.compareSelected",
+          "when": "false"
+        },
+        {
+          "command": "dvc.selectForCompare",
+          "when": "false"
+        },
+        {
           "command": "dvc.copyFilePath",
           "when": "false"
         },
@@ -504,6 +522,11 @@
       ],
       "view/item/context": [
         {
+          "command": "dvc.openToTheSide",
+          "group": "navigation",
+          "when": "viewItem =~ /^dvcTrackedFile/"
+        },
+        {
           "command": "dvc.pullTarget",
           "group": "1_DVC@1",
           "when": "viewItem =~ /^dvcTrackedVirtual|^dvcTracked.*[HasRemote|Data]$/"
@@ -514,6 +537,21 @@
           "when": "viewItem =~ /^dvcTracked.*[HasRemote|Data]$/"
         },
         {
+          "command": "dvc.compareSelected",
+          "group": "3_compare@1",
+          "when": "viewItem =~ /^dvcTrackedFile/ && resourceSelectedForCompare"
+        },
+        {
+          "command": "dvc.selectForCompare",
+          "group": "3_compare@2",
+          "when": "viewItem =~ /^dvcTrackedFile/"
+        },
+        {
+          "command": "dvc.findInFolder",
+          "group": "4_search",
+          "when": "viewItem =~ /^dvcTrackedDir/"
+        },
+        {
           "command": "dvc.copyFilePath",
           "group": "6_copypath@1",
           "when": "viewItem =~ /dvcTracked/"
@@ -522,16 +560,6 @@
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
           "when": "viewItem =~ /dvcTracked/"
-        },
-        {
-          "command": "dvc.openToTheSide",
-          "group": "navigation",
-          "when": "viewItem =~ /^dvcTrackedFile/"
-        },
-        {
-          "command": "dvc.findInFolder",
-          "group": "4_search",
-          "when": "viewItem =~ /^dvcTrackedDir/"
         },
         {
           "command": "dvc.renameTarget",
