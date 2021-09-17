@@ -1,5 +1,3 @@
-import { Extension, extensions } from 'vscode'
-
 type ExtensionDetails = {
   id: string
   name: string
@@ -10,8 +8,10 @@ type PackageJSON = {
   packageJSON: ExtensionDetails
 }
 
-const getExtension = <T>(id: string): Extension<T & PackageJSON> | undefined =>
-  extensions.getExtension<T & PackageJSON>(id)
+const getExtension = <T>(id: string) => {
+  const { extensions } = require('vscode') as typeof import('vscode')
+  return extensions.getExtension<T & PackageJSON>(id)
+}
 
 export const getExtensionAPI = <T>(name: string): Thenable<T> | undefined => {
   const extension = getExtension<T>(name)
@@ -32,5 +32,4 @@ export const getExtensionVersion = <T>(id: string): string | undefined => {
   return extension.packageJSON.version
 }
 
-export const isInstalled = (id: string): boolean =>
-  !!extensions.all.find(extension => extension.id === id)
+export const isInstalled = (id: string): boolean => !!getExtension(id)
