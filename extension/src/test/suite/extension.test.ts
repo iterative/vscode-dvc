@@ -272,16 +272,13 @@ suite('Extension Test Suite', () => {
 
       const mockDisposer = spy(Disposer, 'reset')
 
-      const mockListDvcOnlyRecursive = stub(
-        CliReader.prototype,
-        'listDvcOnlyRecursive'
-      ).resolves([])
+      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([])
 
-      const mockDiff = stub(CliReader.prototype, 'diff').resolves({})
+      stub(CliReader.prototype, 'diff').resolves({})
 
-      const mockStatus = stub(CliReader.prototype, 'status').resolves({})
+      stub(CliReader.prototype, 'status').resolves({})
 
       await selectDvcPathFromFilePicker()
 
@@ -291,9 +288,6 @@ suite('Extension Test Suite', () => {
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
-      expect(mockListDvcOnlyRecursive).to.have.been.called
-      expect(mockDiff).to.have.been.called
-      expect(mockStatus).to.have.been.called
     })
 
     it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
