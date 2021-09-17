@@ -8,16 +8,6 @@ const executeCommand = (name: string, path: string) =>
 export const reRegisterVsCodeCommands = (
   internalCommands: InternalCommands
 ) => {
-  internalCommands.registerExternalCommand<string>(
-    RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
-    path => executeCommand('copyFilePath', path)
-  )
-
-  internalCommands.registerExternalCommand<string>(
-    RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
-    path => executeCommand('copyRelativeFilePath', path)
-  )
-
   internalCommands.registerExternalCommand<Uri>(
     RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
     resource => commands.executeCommand('vscode.open', resource)
@@ -29,11 +19,6 @@ export const reRegisterVsCodeCommands = (
   )
 
   internalCommands.registerExternalCommand<string>(
-    RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
-    path => executeCommand('filesExplorer.findInFolder', path)
-  )
-
-  internalCommands.registerExternalCommand<string>(
     RegisteredCommands.TRACKED_EXPLORER_SELECT_FOR_COMPARE,
     path => executeCommand('selectForCompare', path)
   )
@@ -41,5 +26,20 @@ export const reRegisterVsCodeCommands = (
   internalCommands.registerExternalCommand<string>(
     RegisteredCommands.TRACKED_EXPLORER_COMPARE_SELECTED,
     path => executeCommand('compareFiles', path)
+  )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
+    path => executeCommand('filesExplorer.findInFolder', path)
+  )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
+    path => executeCommand('copyFilePath', path)
+  )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
+    path => executeCommand('copyRelativeFilePath', path)
   )
 }
