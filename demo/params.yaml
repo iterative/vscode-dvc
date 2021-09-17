@@ -2,4 +2,5 @@ seed: 473987
 lr: 0.0005
 weight_decay: 0
 one:
-  one
+  one_a: 23
+  one_b: 342
