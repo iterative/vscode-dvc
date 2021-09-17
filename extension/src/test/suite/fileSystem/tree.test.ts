@@ -139,7 +139,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to compare two files', async () => {
       const baseline = __filename
-      const comparison = resolve(__filename, '..', '..', '..', 'extension')
+      const comparison = resolve(__dirname, '..', '..', '..', 'extension')
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
@@ -149,7 +149,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       expect(
         executeCommandSpy,
-        'should call executeCommand with the correct command to select a file to compare against'
+        'should call executeCommand with the args required to select a file to compare against'
       ).to.be.calledWith('selectForCompare', Uri.file(baseline))
       executeCommandSpy.resetHistory()
 
@@ -160,7 +160,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       expect(
         executeCommandSpy,
-        'should call executeCommand with the correct command to compare the files'
+        'should call executeCommand with the args required to compare the files'
       ).to.be.calledWith('compareFiles', Uri.file(comparison))
     })
 
