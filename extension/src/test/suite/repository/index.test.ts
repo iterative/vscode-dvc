@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, useFakeTimers, SinonFakeTimers } from 'sinon'
 import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -14,13 +14,16 @@ suite('Repository Test Suite', () => {
   window.showInformationMessage('Start all repository tests.')
 
   const disposable = Disposable.fn()
+  let clock: SinonFakeTimers
 
   beforeEach(() => {
     restore()
+    clock = useFakeTimers(new Date())
   })
 
   afterEach(() => {
     disposable.dispose()
+    clock.restore()
   })
 
   const buildRepository = () => {
@@ -47,6 +50,8 @@ suite('Repository Test Suite', () => {
     it('should not queue a reset within 200ms of one starting', async () => {
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
+      clock.tick(50)
+
       await Promise.all([
         repository.isReady(),
         repository.reset(),
@@ -65,12 +70,16 @@ suite('Repository Test Suite', () => {
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
 
       await repository.isReady()
+      clock.tick(200)
       mockList.resetHistory()
       mockDiff.resetHistory()
       mockStatus.resetHistory()
 
+      const firstUpdate = repository.update()
+      clock.tick(50)
+
       await Promise.all([
-        repository.update(),
+        firstUpdate,
         repository.update(),
         repository.update(),
         repository.update(),
@@ -83,15 +92,11 @@ suite('Repository Test Suite', () => {
     })
 
     it('should debounce all calls made within 200ms of a reset', async () => {
-      const mockReset = stub(Repository.prototype, 'reset').resolves(undefined)
-
       const { mockDiff, mockList, mockStatus, repository } = buildRepository()
-
-      await repository.isReady()
-      mockReset.restore()
+      clock.tick(50)
 
       await Promise.all([
-        repository.reset(),
+        repository.isReady(),
         repository.update(),
         repository.reset(),
         repository.update(),
@@ -111,10 +116,15 @@ suite('Repository Test Suite', () => {
 
       await repository.isReady()
       mockReset.restore()
+      clock.tick(200)
+
+      const firstUpdate = repository.update()
+      const firstReset = repository.reset()
+      clock.tick(50)
 
       await Promise.all([
-        repository.update(),
-        repository.reset(),
+        firstUpdate,
+        firstReset,
         repository.update(),
         repository.reset(),
         repository.update(),

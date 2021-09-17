@@ -357,7 +357,7 @@ describe('Repository', () => {
       expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
     })
 
-    it('should retry if one of the underlying commands fails', async () => {
+    it('should retry commands on an individual basis (currently synchronous)', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
@@ -375,7 +375,6 @@ describe('Repository', () => {
       mockedDiff
         .mockReset()
         .mockRejectedValueOnce("I tried but I just couldn't do it")
-        .mockResolvedValueOnce({})
         .mockResolvedValueOnce({
           added: [],
           deleted: [{ path: model }, { path: dataDir }],
@@ -385,8 +384,6 @@ describe('Repository', () => {
 
       mockedStatus
         .mockReset()
-        .mockResolvedValueOnce({})
-        .mockRejectedValueOnce('I failed on the second attempt')
         .mockResolvedValueOnce({
           'data/MNIST/raw.dvc': [
             { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
@@ -401,17 +398,12 @@ describe('Repository', () => {
             { 'changed outs': { 'model.pt': 'deleted' } }
           ]
         } as unknown as StatusOutput)
+        .mockRejectedValueOnce('I would have failed on the second attempt')
 
-      mockedGetAllUntracked
-        .mockReset()
-        .mockResolvedValueOnce(emptySet)
-        .mockResolvedValueOnce(emptySet)
-        .mockResolvedValueOnce(emptySet)
+      mockedGetAllUntracked.mockReset().mockResolvedValueOnce(emptySet)
 
       mockedListDvcOnlyRecursive
         .mockReset()
-        .mockResolvedValueOnce([])
-        .mockResolvedValueOnce([])
         .mockResolvedValueOnce([
           { path: compressedDataset },
           { path: dataset },
@@ -425,9 +417,8 @@ describe('Repository', () => {
 
       await repository.reset()
 
-      expect(mockedDelay).toBeCalledTimes(2)
+      expect(mockedDelay).toBeCalledTimes(1)
       expect(mockedDelay).toBeCalledWith(500)
-      expect(mockedDelay).toBeCalledWith(1000)
 
       const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
 
@@ -441,10 +432,10 @@ describe('Repository', () => {
         resolve(dvcRoot, logDir)
       ])
 
-      expect(mockedDiff).toBeCalledTimes(3)
-      expect(mockedStatus).toBeCalledTimes(3)
-      expect(mockedGetAllUntracked).toBeCalledTimes(3)
-      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(3)
+      expect(mockedDiff).toBeCalledTimes(2)
+      expect(mockedStatus).toBeCalledTimes(1)
+      expect(mockedGetAllUntracked).toBeCalledTimes(1)
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
 
       expect(repository.getState()).toEqual({
         added: emptySet,
@@ -460,7 +451,7 @@ describe('Repository', () => {
   })
 
   describe('update', () => {
-    it('should retry if one of the underlying commands fails', async () => {
+    it('should retry commands on an individual basis (currently synchronous)', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([
         { path: dataDir },
@@ -482,7 +473,7 @@ describe('Repository', () => {
       mockedDiff
         .mockReset()
         .mockRejectedValueOnce("I also tried but I just couldn't do it")
-        .mockResolvedValueOnce({})
+        .mockRejectedValueOnce("I still couldn't do it")
         .mockResolvedValueOnce({
           added: [],
           deleted: [{ path: model }],
@@ -493,15 +484,9 @@ describe('Repository', () => {
       mockedStatus
         .mockReset()
         .mockResolvedValueOnce({})
-        .mockRejectedValueOnce('I also failed on the second attempt')
-        .mockResolvedValueOnce({})
+        .mockRejectedValueOnce('I would have failed on the second attempt')
 
-      mockedGetAllUntracked
-        .mockReset()
-        .mockResolvedValueOnce(emptySet)
-        .mockResolvedValueOnce(emptySet)
-        .mockResolvedValueOnce(emptySet)
-
+      mockedGetAllUntracked.mockReset().mockResolvedValueOnce(emptySet)
       mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
 
       await repository.update()
@@ -521,8 +506,8 @@ describe('Repository', () => {
       ])
 
       expect(mockedDiff).toBeCalledTimes(3)
-      expect(mockedStatus).toBeCalledTimes(3)
-      expect(mockedGetAllUntracked).toBeCalledTimes(3)
+      expect(mockedStatus).toBeCalledTimes(1)
+      expect(mockedGetAllUntracked).toBeCalledTimes(1)
       expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
 
       expect(repository.getState()).toEqual({
