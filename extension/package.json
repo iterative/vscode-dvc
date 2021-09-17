@@ -624,16 +624,6 @@
           "group": "navigation@3"
         },
         {
-          "command": "dvc.addExperimentsTableFilter",
-          "when": "view == dvc.views.experimentsFilterByTree",
-          "group": "navigation@1"
-        },
-        {
-          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
-          "when": "view == dvc.views.experimentsFilterByTree",
-          "group": "navigation@2"
-        },
-        {
           "command": "dvc.addExperimentsTableSort",
           "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@1"
@@ -641,6 +631,16 @@
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "when": "view == dvc.views.experimentsSortByTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.addExperimentsTableFilter",
+          "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
+          "when": "view == dvc.views.experimentsFilterByTree",
           "group": "navigation@2"
         }
       ]
