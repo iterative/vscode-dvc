@@ -18,7 +18,7 @@ export const MergedHeaderGroup: React.FC<{
   return (
     <div
       {...headerGroup.getHeaderGroupProps({
-        className: cx(styles.tr)
+        className: cx(styles.tr, styles.headerRow)
       })}
     >
       {headerGroup.headers.map(column => (
@@ -28,7 +28,12 @@ export const MergedHeaderGroup: React.FC<{
               styles.th,
               column.placeholderOf
                 ? styles.placeholderHeaderCell
-                : styles.headerCell
+                : styles.headerCell,
+              {
+                [styles.paramHeaderCell]: column.id.includes('params'),
+                [styles.metricHeaderCell]: column.id.includes('metric'),
+                [styles.firstLevelHeader]: column.id.split(':').length - 1 === 1
+              }
             )
           })}
           key={column.id}
@@ -106,7 +111,12 @@ const getCells = (cells: Cell<Experiment, unknown>[]) =>
             styles.td,
             cell.isPlaceholder && styles.groupPlaceholder,
             cell.column.isGrouped && styles.groupedColumnCell,
-            cell.isGrouped && styles.groupedCell
+            cell.isGrouped && styles.groupedCell,
+            {
+              [styles.metaCell]: ['timestamp', 'epochs'].includes(
+                cell.column.id.split(':').reverse()[0]
+              )
+            }
           )
         })}
         key={`${cell.column.id}___${cell.row.id}`}
