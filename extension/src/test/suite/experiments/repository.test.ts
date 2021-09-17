@@ -112,7 +112,8 @@ suite('Experiments Repository Test Suite', () => {
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
-          rows: complexRowData
+          rows: complexRowData,
+          sorts: []
         }
       })
 
