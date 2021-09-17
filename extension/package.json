@@ -301,52 +301,16 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "dvc.addTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.applyExperiment",
           "when": "dvc.commands.available == true"
         },
         {
           "command": "dvc.branchExperiment",
           "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.init",
-          "when": "false"
-        },
-        {
-          "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.removeExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.runExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.runQueuedExperiments",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.runResetExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.showExperiments",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.stopRunningExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.addTarget",
-          "when": "false"
         },
         {
           "command": "dvc.checkout",
@@ -365,7 +329,35 @@
           "when": "false"
         },
         {
+          "command": "dvc.compareSelected",
+          "when": "false"
+        },
+        {
+          "command": "dvc.copyFilePath",
+          "when": "false"
+        },
+        {
+          "command": "dvc.copyRelativeFilePath",
+          "when": "false"
+        },
+        {
           "command": "dvc.deleteTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.experimentGarbageCollect",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.findInFolder",
+          "when": "false"
+        },
+        {
+          "command": "dvc.init",
+          "when": "false"
+        },
+        {
+          "command": "dvc.openToTheSide",
           "when": "false"
         },
         {
@@ -385,36 +377,44 @@
           "when": "false"
         },
         {
+          "command": "dvc.queueExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.removeExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
         {
-          "command": "dvc.compareSelected",
+          "command": "dvc.renameTarget",
           "when": "false"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runResetExperiment",
+          "when": "dvc.commands.available == true"
         },
         {
           "command": "dvc.selectForCompare",
           "when": "false"
         },
         {
-          "command": "dvc.copyFilePath",
-          "when": "false"
+          "command": "dvc.showExperiments",
+          "when": "dvc.commands.available == true"
         },
         {
-          "command": "dvc.copyRelativeFilePath",
-          "when": "false"
-        },
-        {
-          "command": "dvc.openToTheSide",
-          "when": "false"
-        },
-        {
-          "command": "dvc.findInFolder",
-          "when": "false"
-        },
-        {
-          "command": "dvc.renameTarget",
-          "when": "false"
+          "command": "dvc.stopRunningExperiment",
+          "when": "dvc.commands.available == true"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
