@@ -318,6 +318,14 @@ $border-color: grey;
     padding: 0.31rem;
   }
 
+  .sortingHeaderCellAsc {
+    border-top: 1px solid white;
+  }
+
+  .sortingHeaderCellDesc {
+    border-bottom: 1px solid white;
+  }
+
   .metaCell {
     color: $meta-cell-color;
     text-align: center;

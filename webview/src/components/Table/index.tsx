@@ -2,10 +2,15 @@ import React from 'react'
 import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
+import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
 
 export interface InstanceProp {
   instance: TableInstance<Experiment>
+}
+
+export interface TableProps extends InstanceProp {
+  sorts: SortDefinition[]
 }
 
 export interface RowProp {
@@ -14,7 +19,8 @@ export interface RowProp {
 
 export const MergedHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
-}> = ({ headerGroup }) => {
+  sorts: SortDefinition[]
+}> = ({ headerGroup, sorts }) => {
   return (
     <div
       {...headerGroup.getHeaderGroupProps({
@@ -32,7 +38,14 @@ export const MergedHeaderGroup: React.FC<{
               {
                 [styles.paramHeaderCell]: column.id.includes('params'),
                 [styles.metricHeaderCell]: column.id.includes('metric'),
-                [styles.firstLevelHeader]: column.id.split(':').length - 1 === 1
+                [styles.firstLevelHeader]:
+                  column.id.split(':').length - 1 === 1,
+                [styles.sortingHeaderCellAsc]: sorts.filter(
+                  sort => !sort.descending && sort.path === column.id
+                ).length,
+                [styles.sortingHeaderCellDesc]: sorts.filter(
+                  sort => sort.descending && sort.path === column.id
+                ).length
               }
             )
           })}
@@ -222,14 +235,16 @@ export const TableBody: React.FC<RowProp & InstanceProp> = ({
   )
 }
 
-export const TableHead: React.FC<InstanceProp> = ({
-  instance: { headerGroups }
+export const TableHead: React.FC<TableProps> = ({
+  instance: { headerGroups },
+  sorts
 }) => {
   return (
     <div className={styles.thead}>
       {headerGroups.map((headerGroup, i) => (
         <MergedHeaderGroup
           headerGroup={headerGroup}
+          sorts={sorts}
           key={`header-group-${i}`}
         />
       ))}
@@ -237,13 +252,13 @@ export const TableHead: React.FC<InstanceProp> = ({
   )
 }
 
-export const Table: React.FC<InstanceProp> = ({ instance }) => {
+export const Table: React.FC<TableProps> = ({ instance, sorts }) => {
   const { getTableProps, rows } = instance
 
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
-        <TableHead instance={instance} />
+        <TableHead instance={instance} sorts={sorts} />
         {rows.map(row => (
           <TableBody row={row} instance={instance} key={row.id} />
         ))}
