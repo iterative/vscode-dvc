@@ -2,6 +2,13 @@
 
 $row-bg-color: var(--vscode-editor-background);
 $row-bg-alt-color: rgba(60, 60, 60, 0.7);
+$bg-color: var(--vscode-editor-background);
+$header-bg-color: #303031;
+$header-fg-color: #C6C6C6;
+$meta-cell-color: #A0A0A0;
+$metrics-color: #FBD38D;
+$params-color: #90CDF4;
+$border-color: grey;
 
 // Extendable Silent Rules
 
@@ -39,6 +46,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   flex: 0 0 24px;
   text-align: center;
   position: relative;
+
   &::before {
     display: inline-block;
     margin: 0 5px;
@@ -47,6 +55,7 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     border-radius: 99px;
     width: 6px;
     height: 6px;
+    z-index: 2;
     .normalExperiment & {
       line-height: 0;
       background: rgb(127, 127, 127);
@@ -62,14 +71,15 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
       border: 1px solid #ffffff;
     }
     .runningExperiment & {
-      width: 8px;
-      height: 8px;
+      width: 4px;
+      height: 4px;
       vertical-align: middle;
       border: 1.5px solid $row-bg-color;
       border-radius: 100%;
       border-right: 1.5px solid rgb(255, 255, 255);
       border-top: 1.5px solid rgb(255, 255, 255);
       animation: spin 1s ease-in-out infinite;
+      background-color: $bg-color;
     }
     .runningExperiment.oddRow > .firstCell & {
       border-left: 1.5px solid $row-bg-alt-color;
@@ -189,8 +199,38 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     width: 1rem;
   }
 
+  .thead {
+    border-bottom: 1px solid $border-color;
+  }
+
   .tr {
     position: relative;
+  }
+
+  .headerRow {
+    font-size: 0.7rem;
+    
+    .headerCell div {
+      opacity: 0.6;
+    }
+
+    &:last-child, .firstLevelHeader {
+      .paramHeaderCell, &.paramHeaderCell {
+        color: $params-color;
+      }
+
+      .metricHeaderCell, &.metricHeaderCell {
+        color: $metrics-color;
+      }
+    }
+
+    &:last-child {
+      font-size: 0.9rem;
+
+      .headerCell div {
+        opacity: 1;
+      }
+    }
   }
 
   .rowGroup {
@@ -205,8 +245,43 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
   }
   .workspaceRowGroup {
     border: none;
+
     .tr .td {
       background-color: none;
+      border-top: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
+
+      &.firstCell {
+        border-left: 1px solid $border-color;
+        margin-left: 0;
+        position: relative;
+
+        &::before {
+          content: '';
+          background-color: $bg-color;
+          height: calc(100% + 2px);
+          position: absolute;
+          top: -1px;
+          left: -1px;
+          width: calc(0.7rem + 1px);
+          border-right: 1px solid $border-color;
+        }
+      }
+  
+      &:last-child {
+        border-right: 1px solid $border-color;
+
+        &::after {
+          content: '';
+          background-color: $bg-color;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: calc(0.7rem + 1px);
+          border-left: 1px solid $border-color;
+        }
+      }
     }
   }
   .td,
@@ -225,25 +300,31 @@ $row-bg-alt-color: rgba(60, 60, 60, 0.7);
     text-align: left;
     padding-left: 0.7rem;
   }
-  .groupedCell,
-  .thead {
+  .groupedCell {
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-left: 1px solid rgba(255, 255, 255, 0.5);
   }
 
   .placeholderHeaderCell {
-    background-color: inherit;
-    border-right: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: $header-bg-color;
+    border-right: 2px solid $bg-color;
   }
 
   .headerCell {
     @extend .placeholderHeaderCell;
+    color: $header-fg-color;
     text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
-    font-family: 'monospace';
-    font-size: 0.9rem;
+    border-bottom: 2px solid $bg-color;
+    padding: 0.31rem;
+  }
+
+  .metaCell {
+    color: $meta-cell-color;
+    text-align: center;
+    font-size: 0.75rem;
   }
 }
+
 .webviewHeader {
   display: flex;
   justify-content: space-between;
