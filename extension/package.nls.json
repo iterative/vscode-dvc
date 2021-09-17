@@ -16,6 +16,7 @@
   "command.deselectDefaultProject": "Deselect Default Project",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
+  "command.findInFolder": "Find in Folder...",
   "command.openToTheSide": "Open to the Side",
   "command.pull": "Pull",
   "command.pullTarget": "Pull",
