@@ -1,4 +1,4 @@
-import path from 'path'
+import path, { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
@@ -135,6 +135,33 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'filesExplorer.findInFolder',
         Uri.file(searchDir)
       )
+    })
+
+    it('should be able to compare two files', async () => {
+      const baseline = __filename
+      const comparison = resolve(__dirname, '..', '..', '..', 'extension')
+      const executeCommandSpy = spy(commands, 'executeCommand')
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_SELECT_FOR_COMPARE,
+        baseline
+      )
+
+      expect(
+        executeCommandSpy,
+        'should call executeCommand with the args required to select a file to compare against'
+      ).to.be.calledWith('selectForCompare', Uri.file(baseline))
+      executeCommandSpy.resetHistory()
+
+      await commands.executeCommand(
+        RegisteredCommands.TRACKED_EXPLORER_COMPARE_SELECTED,
+        comparison
+      )
+
+      expect(
+        executeCommandSpy,
+        'should call executeCommand with the args required to compare the files'
+      ).to.be.calledWith('compareFiles', Uri.file(comparison))
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
