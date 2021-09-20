@@ -94,7 +94,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
-          rows: filteredRows
+          rows: filteredRows,
+          sorts: []
         }
       })
 
@@ -116,7 +117,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
-          rows: complexRowData
+          rows: complexRowData,
+          sorts: []
         }
       })
     })

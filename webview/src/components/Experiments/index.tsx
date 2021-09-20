@@ -114,7 +114,7 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <>
-      <Table instance={instance} />
+      <Table instance={instance} sorts={tableData.sorts} />
     </>
   )
 }
