@@ -32,4 +32,14 @@ export const reRegisterVsCodeCommands = (
     RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
     path => executeCommand('filesExplorer.findInFolder', path)
   )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_SELECT_FOR_COMPARE,
+    path => executeCommand('selectForCompare', path)
+  )
+
+  internalCommands.registerExternalCommand<string>(
+    RegisteredCommands.TRACKED_EXPLORER_COMPARE_SELECTED,
+    path => executeCommand('compareFiles', path)
+  )
 }
