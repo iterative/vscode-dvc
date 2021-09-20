@@ -269,7 +269,8 @@ export class ExperimentsRepository {
   private getTableData() {
     return {
       columns: this.paramsAndMetrics.getSelected(),
-      rows: this.experiments.getRowData()
+      rows: this.experiments.getRowData(),
+      sorts: this.experiments.getSorts()
     }
   }
 
