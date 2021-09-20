@@ -14989,10 +14989,10 @@ vsce@^1.99.0:
     yauzl "^2.3.1"
     yazl "^2.2.2"
 
-vscode-extension-telemetry@^0.2.9:
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/vscode-extension-telemetry/-/vscode-extension-telemetry-0.2.9.tgz#5aa18b41f1612003a3e3e929a6fbe2ac55c359c2"
-  integrity sha512-JUHHikEG47iLF4bc5lTFHHO1l+e1RLlU5/mtwRifd2qgWz9Vc8eBA9/xbxMudO2skSICVE16VTyi/9KEFQ3vxw==
+vscode-extension-telemetry@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/vscode-extension-telemetry/-/vscode-extension-telemetry-0.4.0.tgz#5dd434d2f07460497ce2cd40d2e3416090867d8b"
+  integrity sha512-9/vCfLuEWlDPqtgPo4jXUJsOCyjbVD72fSXsXY1TpJ4htiTAUoBa7fDAi7hxHOLDvIQI3BMFUlOxsV5jILq2ig==
 
 vscode-test@^1.6.1:
   version "1.6.1"

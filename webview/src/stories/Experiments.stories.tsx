@@ -21,7 +21,7 @@ export default {
     }
   },
   args: {
-    tableData: { columns: complexColumnData, rows: complexRowData },
+    tableData: { columns: complexColumnData, rows: complexRowData, sorts: [] },
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,

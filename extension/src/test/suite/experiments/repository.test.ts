@@ -112,7 +112,8 @@ suite('Experiments Repository Test Suite', () => {
       expect(messageSpy).to.be.calledWith({
         tableData: {
           columns: complexColumnData,
-          rows: complexRowData
+          rows: complexRowData,
+          sorts: []
         }
       })
 
@@ -227,12 +228,15 @@ suite('Experiments Repository Test Suite', () => {
       }
     ])
 
+    expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
+
     const mockShowQuickPick = stub(window, 'showQuickPick')
+    const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
 
     mockShowQuickPick.onFirstCall().resolves({
       label: 'test',
       value: {
-        path: joinParamOrMetricPath('params', 'params.yaml', 'test')
+        path: sortPath
       }
     } as QuickPickItemWithValue<ParamOrMetric>)
 
@@ -275,6 +279,10 @@ suite('Experiments Repository Test Suite', () => {
           }
         ]
       }
+    ])
+
+    expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
+      { descending: false, path: sortPath }
     ])
   })
 

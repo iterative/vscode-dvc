@@ -1,4 +1,5 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
+import { SortDefinition } from '../model/sortBy'
 
 export interface ParamsOrMetrics {
   [filename: string]: ValueTree
@@ -78,6 +79,7 @@ export enum MessageToWebviewType {
 export interface TableData {
   rows: RowData[]
   columns: ParamOrMetric[]
+  sorts: SortDefinition[]
 }
 
 export interface ExperimentsWebviewState {
