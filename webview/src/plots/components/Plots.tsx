@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  RowData,
-  ParamOrMetric,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
+import { PlotsData, PlotItem } from './App'
 
 const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
   return {
-    data: { name: 'table' },
+    data: { name: 'items' },
     encoding: {
+      color: {
+        field: 'experimentDisplayName',
+        title: 'Experiment'
+      },
       x: {
-        field: 'i',
+        field: 'iteration',
         title: 'Iteration',
         type: 'nominal'
       },
@@ -20,6 +21,9 @@ const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
         field: splitParamOrMetricPath(path)
           .map(segment => segment.replace(/\./g, '\\$&'))
           .join('.'),
+        scale: {
+          zero: false
+        },
         sort: 'ascending',
         title: name,
         type: 'quantitative'
@@ -32,10 +36,10 @@ const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
 }
 
 const AllPlots = ({
-  rows,
+  items,
   yMetric
 }: {
-  rows: RowData[]
+  items: PlotItem[]
   yMetric: ParamOrMetric
 }) => {
   if (!yMetric) {
@@ -43,80 +47,54 @@ const AllPlots = ({
   }
   const spec = createSpec(yMetric)
 
-  return (
-    <div>
-      {rows.map(branch =>
-        branch.subRows?.map((row, i) => {
-          return (
-            row.subRows && (
-              <div key={`table-${i}`}>
-                <h2>{row.displayName}</h2>
-                <VegaLite
-                  spec={spec}
-                  data={{
-                    table: row.subRows.map(({ params, metrics }, i) => ({
-                      i: i + 1,
-                      metrics,
-                      params
-                    }))
-                  }}
-                />
-              </div>
-            )
-          )
-        })
-      )}
-    </div>
-  )
+  return <VegaLite spec={spec} data={{ items }} />
 }
 
 const collectLeafMetrics = (
-  tableData: TableData,
-  leafMetrics: ParamOrMetric[],
-  leafMetricsByPath: Record<string, ParamOrMetric>
-) => {
-  const { columns } = tableData
-  for (const column of columns) {
+  columns?: ParamOrMetric[]
+): [ParamOrMetric[], Record<string, ParamOrMetric>] => {
+  const leafMetrics: ParamOrMetric[] = []
+  const leafMetricsByPath: Record<string, ParamOrMetric> = {}
+  columns?.forEach(column => {
     if (column.group === 'metrics' && !column.hasChildren) {
       leafMetrics.push(column)
       leafMetricsByPath[column.path] = column
     }
-  }
+  })
+  return [leafMetrics, leafMetricsByPath]
 }
 
-const Plots = ({ tableData }: { tableData?: TableData }) => {
-  const [leafMetrics, leafMetricsByPath] = useMemo(() => {
-    const leafMetrics: ParamOrMetric[] = []
-    const leafMetricsByPath: Record<string, ParamOrMetric> = {}
-
-    if (tableData) {
-      collectLeafMetrics(tableData, leafMetrics, leafMetricsByPath)
-    }
-
-    return [leafMetrics, leafMetricsByPath]
-  }, [tableData])
+const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
+  const [leafMetrics, leafMetricsByPath] = useMemo(
+    () => collectLeafMetrics(plotsData?.columns),
+    [plotsData]
+  )
 
   const [yMetricPath, setYMetricPath] = useState<string>()
 
   useEffect(() => {
-    if (!yMetricPath && leafMetrics.length > 0) {
+    if (
+      (!yMetricPath || !leafMetricsByPath[yMetricPath]) &&
+      leafMetrics.length > 0
+    ) {
       setYMetricPath(leafMetrics[0]?.path)
     }
-  }, [yMetricPath, leafMetrics])
+  }, [yMetricPath, leafMetrics, leafMetricsByPath])
 
-  if (!tableData || !yMetricPath) {
+  if (!plotsData || !yMetricPath) {
     return null
   }
 
   const yMetric = leafMetricsByPath[yMetricPath]
 
-  const { rows } = tableData
+  const { items } = plotsData
 
   return (
     <>
       <div>
         <select
-          onBlur={e => {
+          value={yMetricPath}
+          onChange={e => {
             setYMetricPath(e.target.value)
           }}
         >
@@ -129,7 +107,7 @@ const Plots = ({ tableData }: { tableData?: TableData }) => {
           })}
         </select>
       </div>
-      {yMetricPath && <AllPlots rows={rows} yMetric={yMetric} />}
+      {yMetricPath && <AllPlots items={items} yMetric={yMetric} />}
     </>
   )
 }

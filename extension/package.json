@@ -242,6 +242,7 @@
         "category": "DVC"
       },
       {
+        "title": "%command.showPlots%",
         "command": "dvc.showPlots",
         "when": "dvc.commands.available == true"
       },

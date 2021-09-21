@@ -5,6 +5,7 @@ import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
 import Plots from '../plots/components/Plots'
 
 import './test-vscode-styles.scss'
+import { parseTableData } from '../plots/components/App'
 
 export default {
   argTypes: {
@@ -22,9 +23,9 @@ export default {
 } as Meta
 
 export const WithData: Story = ({ tableData }) => {
-  return <Plots tableData={tableData} />
+  return <Plots plotsData={parseTableData(tableData)} />
 }
 
 export const WithoutData: Story = () => {
-  return <Plots tableData={undefined} />
+  return <Plots plotsData={undefined} />
 }
