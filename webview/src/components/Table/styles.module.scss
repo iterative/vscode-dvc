@@ -15,6 +15,16 @@ $spinner-color: rgb(255, 255, 255);
 $metrics-color: #FBD38D;
 $params-color: #90CDF4;
 
+// Light theme
+
+$row-bg-alt-color-light: rgba(195, 195, 195, 0.7);
+$header-bg-color-light: #e1e1e1;
+$border-color-light: #7F7F7F;
+$metrics-color-light: #ce9f4c;
+$params-color-light: #76add1;
+$toggle-color-light: rgba(0, 0, 0, 0.21);
+$spinner-color-light: #000;
+
 // Extendable Silent Rules
 
 %fullwidth {
@@ -32,6 +42,10 @@ $params-color: #90CDF4;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
+
+  :global(.vscode-light) & {
+    border-color: $toggle-color-light;
+  }
 }
 
 // Concrete selectors
@@ -74,6 +88,18 @@ $params-color: #90CDF4;
         rgba(255, 255, 255, 0) 360deg
       );
       border: 1px solid $spinner-color;
+
+      @at-root {
+        :global(.vscode-light) & {
+          background: conic-gradient(
+          from 180deg at 50% 50%,
+          rgba($spinner-color-light, 0.5) 0deg,
+          rgba($spinner-color-light, 0) 180.31deg,
+          rgba($spinner-color-light, 0) 360deg
+        );
+        border-color: $spinner-color-light;
+        }
+      }
     }
     .runningExperiment & {
       width: 4px;
@@ -85,6 +111,13 @@ $params-color: #90CDF4;
       border-top: 1.5px solid $spinner-color;
       animation: spin 1s ease-in-out infinite;
       background-color: $bg-color;
+
+      @at-root {
+        :global(.vscode-light) & {
+          border-right-color: $spinner-color-light;
+          border-top-color: $spinner-color-light;
+        }
+      }
     }
     .runningExperiment.oddRow > .firstCell & {
       border-left: 1.5px solid $row-bg-alt-color;
@@ -209,10 +242,18 @@ $params-color: #90CDF4;
     &:last-child, .firstLevelHeader {
       .paramHeaderCell, &.paramHeaderCell {
         color: $params-color;
+
+        :global(.vscode-light) & {
+          color: $params-color-light;
+        }
       }
 
       .metricHeaderCell, &.metricHeaderCell {
         color: $metrics-color;
+
+        :global(.vscode-light) & {
+          color: $metrics-color-light;
+        }
       }
     }
 
@@ -233,6 +274,10 @@ $params-color: #90CDF4;
     border: 1px solid $border-color;
     .oddRow {
       background-color: $row-bg-alt-color;
+
+      :global(.vscode-light) & {
+        background-color: $row-bg-alt-color-light;
+      }
     }
   }
   .workspaceRowGroup {
@@ -300,6 +345,10 @@ $params-color: #90CDF4;
   .placeholderHeaderCell {
     background-color: $header-bg-color;
     border-right: 2px solid $bg-color;
+
+    :global(.vscode-light) & {
+      background-color: $header-bg-color-light;
+    }
   }
 
   .headerCell {
@@ -329,63 +378,4 @@ $params-color: #90CDF4;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-// Light theme
-$row-bg-alt-color-light: rgba(195, 195, 195, 0.7);
-$header-bg-color-light: #e1e1e1;
-$border-color-light: #7F7F7F;
-$metrics-color-light: #ce9f4c;
-$params-color-light: #76add1;
-$toggle-color-light: rgba(0, 0, 0, 0.21);
-$spinner-color-light: #000;
-
-:global(.vscode-light) {
-  .bullet .runningExperiment.oddRow > .firstCell & {
-    border-color: $row-bg-alt-color-light;
-  }
-  .queuedExperiment .bullet {
-    &::before {
-        background: conic-gradient(
-          from 180deg at 50% 50%,
-          rgba($spinner-color-light, 0.5) 0deg,
-          rgba($spinner-color-light, 0) 180.31deg,
-          rgba($spinner-color-light, 0) 360deg
-        );
-        border-color: $spinner-color-light;
-    }
-  }
-
-  .runningExperiment .bullet {
-    &::before {
-      border-right-color: $spinner-color-light;
-      border-top-color: $spinner-color-light;
-    }
-  }
-
-  .experiments {
-    .normalRowGroup .oddRow {
-      background-color: $row-bg-alt-color-light;
-    }
-  
-    .placeholderHeaderCell {
-      background-color: $header-bg-color-light;
-    }
-
-    .headerRow {
-      &:last-child, .firstLevelHeader {
-        .paramHeaderCell, &.paramHeaderCell {
-          color: $params-color-light;
-        }
-  
-        .metricHeaderCell, &.metricHeaderCell {
-          color: $metrics-color-light;
-        }
-      }
-    }
-  }
-
-  %expandableRowArrow {
-    border-color: $toggle-color-light;
-  }
 }
