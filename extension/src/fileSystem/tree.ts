@@ -110,6 +110,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private async getRootElements() {
+    const rootElements = await Promise.all(
+      this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
+    )
+
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
@@ -118,9 +122,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       this.viewed = true
     }
 
-    const rootElements = await Promise.all(
-      this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
-    )
     return rootElements
       .reduce((a, b) => a.concat(b), [])
       .sort((a, b) => {

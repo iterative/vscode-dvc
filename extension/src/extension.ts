@@ -45,7 +45,7 @@ import {
 } from './telemetry'
 import { EventName } from './telemetry/constants'
 import { RegisteredCommands } from './commands/external'
-import { StopWatch } from './util/time'
+import { delay, StopWatch } from './util/time'
 
 export { Disposable, Disposer }
 
@@ -254,7 +254,7 @@ export class Extension implements IExtension {
       )
     )
 
-    this.dispose.track(getTelemetryReporter())
+    delay(500).then(() => this.dispose.track(getTelemetryReporter()))
   }
 
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)

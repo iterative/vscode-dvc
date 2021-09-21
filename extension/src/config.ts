@@ -49,9 +49,10 @@ export class Config {
     this.executionDetailsChanged = this.dispose.track(new EventEmitter())
     this.onDidChangeExecutionDetails = this.executionDetailsChanged.event
 
-    this.setPythonBinPath()
-
-    this.onDidChangePythonExecutionDetails()
+    this.setPythonBinPath().then(() => {
+      this.onDidChangePythonExecutionDetails()
+      this.onDidConfigurationChange()
+    })
 
     this.vsCodeTheme = window.activeColorTheme
 
@@ -60,8 +61,6 @@ export class Config {
         this.vsCodeTheme = window.activeColorTheme
       })
     )
-
-    this.onDidConfigurationChange()
   }
 
   public setDvcRoots(dvcRoots: string[]): void {
