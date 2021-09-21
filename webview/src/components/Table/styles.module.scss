@@ -1,14 +1,29 @@
 // Variables
 
-$row-bg-color: var(--vscode-editor-background);
-$row-bg-alt-color: rgba(60, 60, 60, 0.7);
 $bg-color: var(--vscode-editor-background);
+$row-bg-color: $bg-color;
+$header-fg-color: var(--vscode-editor-foreground);
+$border-color: grey;
+
+// Dark Theme
+
+$row-bg-alt-color: rgba(60, 60, 60, 0.7);
 $header-bg-color: #303031;
-$header-fg-color: #C6C6C6;
 $meta-cell-color: #A0A0A0;
+$toggle-color: rgba(255, 255, 255, 0.21);
+$spinner-color: rgb(255, 255, 255);
 $metrics-color: #FBD38D;
 $params-color: #90CDF4;
-$border-color: grey;
+
+// Light theme
+
+$row-bg-alt-color-light: rgba(195, 195, 195, 0.7);
+$header-bg-color-light: #e1e1e1;
+$border-color-light: #7F7F7F;
+$metrics-color-light: #ce9f4c;
+$params-color-light: #76add1;
+$toggle-color-light: rgba(0, 0, 0, 0.21);
+$spinner-color-light: #000;
 
 // Extendable Silent Rules
 
@@ -23,10 +38,14 @@ $border-color: grey;
   left: 0;
   display: inline-block;
   position: absolute;
-  border: 2px solid rgba(255, 255, 255, 0.21);
+  border: 2px solid $toggle-color;
   border-top: unset;
   border-left: unset;
   transition: transform 0.2s, right 0.2s, bottom 0.2s;
+
+  :global(.vscode-light) & {
+    border-color: $toggle-color-light;
+  }
 }
 
 // Concrete selectors
@@ -68,7 +87,19 @@ $border-color: grey;
         rgba(255, 255, 255, 0) 180.31deg,
         rgba(255, 255, 255, 0) 360deg
       );
-      border: 1px solid #ffffff;
+      border: 1px solid $spinner-color;
+
+      @at-root {
+        :global(.vscode-light) & {
+          background: conic-gradient(
+          from 180deg at 50% 50%,
+          rgba($spinner-color-light, 0.5) 0deg,
+          rgba($spinner-color-light, 0) 180.31deg,
+          rgba($spinner-color-light, 0) 360deg
+        );
+        border-color: $spinner-color-light;
+        }
+      }
     }
     .runningExperiment & {
       width: 4px;
@@ -76,10 +107,17 @@ $border-color: grey;
       vertical-align: middle;
       border: 1.5px solid $row-bg-color;
       border-radius: 100%;
-      border-right: 1.5px solid rgb(255, 255, 255);
-      border-top: 1.5px solid rgb(255, 255, 255);
+      border-right: 1.5px solid $spinner-color;
+      border-top: 1.5px solid $spinner-color;
       animation: spin 1s ease-in-out infinite;
       background-color: $bg-color;
+
+      @at-root {
+        :global(.vscode-light) & {
+          border-right-color: $spinner-color-light;
+          border-top-color: $spinner-color-light;
+        }
+      }
     }
     .runningExperiment.oddRow > .firstCell & {
       border-left: 1.5px solid $row-bg-alt-color;
@@ -122,20 +160,7 @@ $border-color: grey;
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
-  .experimentsButton {
-    width: fit-content;
-    background-color: #4f4f4f;
-    align-self: flex-start;
-    display: inline-block;
-    cursor: pointer;
-    color: #e8e8e8;
-    font-size: 0.9rem;
-    font-weight: bold;
-    padding: 0.3rem 0.7rem;
-    margin: 0.5rem 1rem;
-    text-decoration: none;
-    outline: none;
-  }
+
   .firstCell {
     display: flex;
     flex-flow: row nowrap;
@@ -217,10 +242,18 @@ $border-color: grey;
     &:last-child, .firstLevelHeader {
       .paramHeaderCell, &.paramHeaderCell {
         color: $params-color;
+
+        :global(.vscode-light) & {
+          color: $params-color-light;
+        }
       }
 
       .metricHeaderCell, &.metricHeaderCell {
         color: $metrics-color;
+
+        :global(.vscode-light) & {
+          color: $metrics-color-light;
+        }
       }
     }
 
@@ -238,9 +271,13 @@ $border-color: grey;
     margin: 0.5rem 0;
   }
   .normalRowGroup {
-    border: 1px solid gray;
+    border: 1px solid $border-color;
     .oddRow {
       background-color: $row-bg-alt-color;
+
+      :global(.vscode-light) & {
+        background-color: $row-bg-alt-color-light;
+      }
     }
   }
   .workspaceRowGroup {
@@ -308,6 +345,10 @@ $border-color: grey;
   .placeholderHeaderCell {
     background-color: $header-bg-color;
     border-right: 2px solid $bg-color;
+
+    :global(.vscode-light) & {
+      background-color: $header-bg-color-light;
+    }
   }
 
   .headerCell {
@@ -337,12 +378,4 @@ $border-color: grey;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.experimentsButton:hover {
-  background-color: #414141;
-}
-.experimentsButton:active {
-  position: relative;
-  top: 1px;
 }
