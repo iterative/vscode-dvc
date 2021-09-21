@@ -21,7 +21,14 @@ export default {
     }
   },
   args: {
-    tableData: { columns: complexColumnData, rows: complexRowData, sorts: [] },
+    tableData: {
+      columns: complexColumnData,
+      rows: complexRowData,
+      sorts: [
+        { descending: true, path: 'params:params.yaml:epochs' },
+        { descending: false, path: 'params:params.yaml:log_file' }
+      ]
+    },
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,
