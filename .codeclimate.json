@@ -1,7 +1,7 @@
 {
   "version": "2",
   "exclude_patterns": [
-    "**/*.test.ts",
+    "**/*.test.*",
     "extension/src/test/fixtures",
     "extension/src/test/suite",
     "extension/src/test/util",
