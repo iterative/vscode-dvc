@@ -94,10 +94,13 @@ export interface IEventNamePropertyMapping {
   [EventName.REMOVE_TARGET]: undefined
   [EventName.RENAME_TARGET]: undefined
 
-  [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined
+  [EventName.TRACKED_EXPLORER_COMPARE_SELECTED]: undefined
   [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined
   [EventName.TRACKED_EXPLORER_COPY_REL_FILE_PATH]: undefined
+  [EventName.TRACKED_EXPLORER_FIND_IN_FOLDER]: undefined
+  [EventName.TRACKED_EXPLORER_OPEN_FILE]: undefined
   [EventName.TRACKED_EXPLORER_OPEN_TO_THE_SIDE]: undefined
+  [EventName.TRACKED_EXPLORER_SELECT_FOR_COMPARE]: undefined
 
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined

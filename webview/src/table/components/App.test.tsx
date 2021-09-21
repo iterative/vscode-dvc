@@ -77,7 +77,8 @@ describe('App', () => {
       data: {
         tableData: {
           columns: complexColumnData,
-          rows: complexRowData
+          rows: complexRowData,
+          sorts: []
         },
         type: MessageToWebviewType.showExperiments
       }
