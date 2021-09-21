@@ -40,56 +40,22 @@
   "contributes": {
     "commands": [
       {
-        "title": "%command.showExperiments%",
-        "command": "dvc.showExperiments",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.runExperiment%",
-        "command": "dvc.runExperiment",
+        "title": "%command.addExperimentsTableFilter%",
+        "command": "dvc.addExperimentsTableFilter",
         "category": "DVC",
-        "icon": {
-          "light": "resources/light/run-experiment.svg",
-          "dark": "resources/dark/run-experiment.svg"
-        }
+        "icon": "$(add)"
       },
       {
-        "title": "%command.runResetExperiment%",
-        "command": "dvc.runResetExperiment",
+        "title": "%command.addExperimentsTableSort%",
+        "command": "dvc.addExperimentsTableSort",
         "category": "DVC",
-        "icon": "$(notebook-revert)"
+        "icon": "$(add)"
       },
       {
-        "title": "%command.queueExperiment%",
-        "command": "dvc.queueExperiment",
+        "title": "%command.addTarget%",
+        "command": "dvc.addTarget",
         "category": "DVC",
-        "icon": {
-          "dark": "resources/dark/queue-experiment.svg",
-          "light": "resources/light/queue-experiment.svg"
-        }
-      },
-      {
-        "title": "%command.runQueuedExperiments%",
-        "command": "dvc.runQueuedExperiments",
-        "category": "DVC",
-        "icon": {
-          "dark": "resources/dark/run-all.svg",
-          "light": "resources/light/run-all.svg"
-        }
-      },
-      {
-        "title": "%command.stopRunningExperiment%",
-        "command": "dvc.stopRunningExperiment",
-        "category": "DVC",
-        "icon": {
-          "light": "resources/light/stop-experiment.svg",
-          "dark": "resources/dark/stop-experiment.svg"
-        }
-      },
-      {
-        "title": "%command.experimentGarbageCollect%",
-        "command": "dvc.experimentGarbageCollect",
-        "category": "DVC"
+        "icon": "$(add)"
       },
       {
         "title": "%command.applyExperiment%",
@@ -100,37 +66,6 @@
         "title": "%command.branchExperiment%",
         "command": "dvc.branchExperiment",
         "category": "DVC"
-      },
-      {
-        "title": "%command.removeExperiment%",
-        "command": "dvc.removeExperiment",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.deselectDefaultProject%",
-        "command": "dvc.deselectDefaultProject",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.selectDefaultProject%",
-        "command": "dvc.selectDefaultProject",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.setupWorkspace%",
-        "command": "dvc.setupWorkspace",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.init%",
-        "command": "dvc.init",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.addTarget%",
-        "command": "dvc.addTarget",
-        "category": "DVC",
-        "icon": "$(add)"
       },
       {
         "title": "%command.checkout%",
@@ -157,10 +92,50 @@
         "icon": "$(check)"
       },
       {
+        "title": "%command.compareSelected%",
+        "command": "dvc.compareSelected",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.copyFilePath%",
+        "command": "dvc.copyFilePath",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.copyRelativeFilePath%",
+        "command": "dvc.copyRelativeFilePath",
+        "category": "DVC"
+      },
+      {
         "title": "%command.deleteTarget%",
         "command": "dvc.deleteTarget",
         "category": "DVC",
         "icon": "$(trash)"
+      },
+      {
+        "title": "%command.deselectDefaultProject%",
+        "command": "dvc.deselectDefaultProject",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.experimentGarbageCollect%",
+        "command": "dvc.experimentGarbageCollect",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.findInFolder%",
+        "command": "dvc.findInFolder",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.init%",
+        "command": "dvc.init",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.openToTheSide%",
+        "command": "dvc.openToTheSide",
+        "category": "DVC"
       },
       {
         "title": "%command.pull%",
@@ -187,51 +162,23 @@
         "icon": "$(cloud-upload)"
       },
       {
-        "title": "%command.removeTarget%",
-        "command": "dvc.removeTarget",
+        "title": "%command.queueExperiment%",
+        "command": "dvc.queueExperiment",
         "category": "DVC",
-        "icon": "$(trash)"
+        "icon": {
+          "dark": "resources/dark/queue-experiment.svg",
+          "light": "resources/light/queue-experiment.svg"
+        }
       },
       {
-        "title": "%command.compareSelected%",
-        "command": "dvc.compareSelected",
+        "title": "%command.removeExperiment%",
+        "command": "dvc.removeExperiment",
         "category": "DVC"
       },
       {
-        "title": "%command.copyFilePath%",
-        "command": "dvc.copyFilePath",
+        "title": "%command.removeExperimentsTableFilters%",
+        "command": "dvc.removeExperimentsTableFilters",
         "category": "DVC"
-      },
-      {
-        "title": "%command.copyRelativeFilePath%",
-        "command": "dvc.copyRelativeFilePath",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.openToTheSide%",
-        "command": "dvc.openToTheSide",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.findInFolder%",
-        "command": "dvc.findInFolder",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.selectForCompare%",
-        "command": "dvc.selectForCompare",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.renameTarget%",
-        "command": "dvc.renameTarget",
-        "category": "DVC"
-      },
-      {
-        "title": "%command.addExperimentsTableSort%",
-        "command": "dvc.addExperimentsTableSort",
-        "category": "DVC",
-        "icon": "$(add)"
       },
       {
         "title": "%command.removeExperimentsTableSorts%",
@@ -240,27 +187,68 @@
         "icon": "$(close-all)"
       },
       {
-        "title": "%command.views.experimentsSortByTree.removeAllSorts%",
-        "command": "dvc.views.experimentsSortByTree.removeAllSorts",
+        "title": "%command.removeTarget%",
+        "command": "dvc.removeTarget",
         "category": "DVC",
-        "icon": "$(close-all)"
+        "icon": "$(trash)"
       },
       {
-        "title": "%command.views.experimentsSortByTree.removeSort%",
-        "command": "dvc.views.experimentsSortByTree.removeSort",
-        "category": "DVC",
-        "icon": "$(close)"
-      },
-      {
-        "title": "%command.addExperimentsTableFilter%",
-        "command": "dvc.addExperimentsTableFilter",
-        "category": "DVC",
-        "icon": "$(add)"
-      },
-      {
-        "title": "%command.removeExperimentsTableFilters%",
-        "command": "dvc.removeExperimentsTableFilters",
+        "title": "%command.renameTarget%",
+        "command": "dvc.renameTarget",
         "category": "DVC"
+      },
+      {
+        "title": "%command.runExperiment%",
+        "command": "dvc.runExperiment",
+        "category": "DVC",
+        "icon": {
+          "light": "resources/light/run-experiment.svg",
+          "dark": "resources/dark/run-experiment.svg"
+        }
+      },
+      {
+        "title": "%command.runQueuedExperiments%",
+        "command": "dvc.runQueuedExperiments",
+        "category": "DVC",
+        "icon": {
+          "dark": "resources/dark/run-all.svg",
+          "light": "resources/light/run-all.svg"
+        }
+      },
+      {
+        "title": "%command.runResetExperiment%",
+        "command": "dvc.runResetExperiment",
+        "category": "DVC",
+        "icon": "$(notebook-revert)"
+      },
+      {
+        "title": "%command.selectDefaultProject%",
+        "command": "dvc.selectDefaultProject",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.selectForCompare%",
+        "command": "dvc.selectForCompare",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.setupWorkspace%",
+        "command": "dvc.setupWorkspace",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.showExperiments%",
+        "command": "dvc.showExperiments",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.stopRunningExperiment%",
+        "command": "dvc.stopRunningExperiment",
+        "category": "DVC",
+        "icon": {
+          "light": "resources/light/stop-experiment.svg",
+          "dark": "resources/dark/stop-experiment.svg"
+        }
       },
       {
         "title": "%command.views.experimentsFilterByTree.removeAllFilters%",
@@ -271,6 +259,18 @@
       {
         "title": "%command.views.experimentsFilterByTree.removeFilter%",
         "command": "dvc.views.experimentsFilterByTree.removeFilter",
+        "category": "DVC",
+        "icon": "$(close)"
+      },
+      {
+        "title": "%command.views.experimentsSortByTree.removeAllSorts%",
+        "command": "dvc.views.experimentsSortByTree.removeAllSorts",
+        "category": "DVC",
+        "icon": "$(close-all)"
+      },
+      {
+        "title": "%command.views.experimentsSortByTree.removeSort%",
+        "command": "dvc.views.experimentsSortByTree.removeSort",
         "category": "DVC",
         "icon": "$(close)"
       }
@@ -301,52 +301,16 @@
     "menus": {
       "commandPalette": [
         {
+          "command": "dvc.addTarget",
+          "when": "false"
+        },
+        {
           "command": "dvc.applyExperiment",
           "when": "dvc.commands.available == true"
         },
         {
           "command": "dvc.branchExperiment",
           "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.init",
-          "when": "false"
-        },
-        {
-          "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.removeExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.runExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.runQueuedExperiments",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.runResetExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.showExperiments",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.stopRunningExperiment",
-          "when": "dvc.commands.available == true"
-        },
-        {
-          "command": "dvc.addTarget",
-          "when": "false"
         },
         {
           "command": "dvc.checkout",
@@ -365,7 +329,35 @@
           "when": "false"
         },
         {
+          "command": "dvc.compareSelected",
+          "when": "false"
+        },
+        {
+          "command": "dvc.copyFilePath",
+          "when": "false"
+        },
+        {
+          "command": "dvc.copyRelativeFilePath",
+          "when": "false"
+        },
+        {
           "command": "dvc.deleteTarget",
+          "when": "false"
+        },
+        {
+          "command": "dvc.experimentGarbageCollect",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.findInFolder",
+          "when": "false"
+        },
+        {
+          "command": "dvc.init",
+          "when": "false"
+        },
+        {
+          "command": "dvc.openToTheSide",
           "when": "false"
         },
         {
@@ -385,36 +377,44 @@
           "when": "false"
         },
         {
+          "command": "dvc.queueExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.removeExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
         {
-          "command": "dvc.compareSelected",
+          "command": "dvc.renameTarget",
           "when": "false"
+        },
+        {
+          "command": "dvc.runExperiment",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runQueuedExperiments",
+          "when": "dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.runResetExperiment",
+          "when": "dvc.commands.available == true"
         },
         {
           "command": "dvc.selectForCompare",
           "when": "false"
         },
         {
-          "command": "dvc.copyFilePath",
-          "when": "false"
+          "command": "dvc.showExperiments",
+          "when": "dvc.commands.available == true"
         },
         {
-          "command": "dvc.copyRelativeFilePath",
-          "when": "false"
-        },
-        {
-          "command": "dvc.openToTheSide",
-          "when": "false"
-        },
-        {
-          "command": "dvc.findInFolder",
-          "when": "false"
-        },
-        {
-          "command": "dvc.renameTarget",
-          "when": "false"
+          "command": "dvc.stopRunningExperiment",
+          "when": "dvc.commands.available == true"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
@@ -624,16 +624,6 @@
           "group": "navigation@3"
         },
         {
-          "command": "dvc.addExperimentsTableFilter",
-          "when": "view == dvc.views.experimentsFilterByTree",
-          "group": "navigation@1"
-        },
-        {
-          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
-          "when": "view == dvc.views.experimentsFilterByTree",
-          "group": "navigation@2"
-        },
-        {
           "command": "dvc.addExperimentsTableSort",
           "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@1"
@@ -641,6 +631,16 @@
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "when": "view == dvc.views.experimentsSortByTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "dvc.addExperimentsTableFilter",
+          "when": "view == dvc.views.experimentsFilterByTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
+          "when": "view == dvc.views.experimentsFilterByTree",
           "group": "navigation@2"
         }
       ]
@@ -758,7 +758,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "vsce": "^1.96.3",
+    "vsce": "^1.99.0",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.40.0",
