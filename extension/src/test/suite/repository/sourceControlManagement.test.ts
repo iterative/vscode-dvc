@@ -71,7 +71,7 @@ suite('Source Control Management Test Suite', () => {
         })
         .onSecondCall()
         .resolves('')
-      const mockShowInformationMessage = stub(
+      const mockShowWarningMessage = stub(
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
@@ -82,7 +82,7 @@ suite('Source Control Management Test Suite', () => {
       })
 
       expect(mockCheckout).to.be.calledTwice
-      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledWith(dvcDemoPath, relPath)
       expect(mockCheckout).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
@@ -103,7 +103,7 @@ suite('Source Control Management Test Suite', () => {
         })
         .onSecondCall()
         .resolves('')
-      const mockShowInformationMessage = stub(
+      const mockShowWarningMessage = stub(
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
@@ -111,7 +111,7 @@ suite('Source Control Management Test Suite', () => {
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
       expect(mockCommit).to.be.calledTwice
-      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCommit).to.be.calledWith(dvcDemoPath)
       expect(mockCommit).to.be.calledWith(dvcDemoPath, '-f')
     })
@@ -135,7 +135,7 @@ suite('Source Control Management Test Suite', () => {
         })
         .onSecondCall()
         .resolves('')
-      const mockShowInformationMessage = stub(
+      const mockShowWarningMessage = stub(
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
@@ -146,7 +146,7 @@ suite('Source Control Management Test Suite', () => {
       })
 
       expect(mockCommit).to.be.calledTwice
-      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCommit).to.be.calledWith(dvcDemoPath, relPath)
       expect(mockCommit).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
