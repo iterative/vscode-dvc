@@ -90,7 +90,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public getTreeItem(path: string): TreeItem {
     const resourceUri = Uri.file(path)
-    const { isDirectory } = this.getPathItem(path)
+    const isDirectory = this.isDirectory(path)
     const treeItem = new TreeItem(
       resourceUri,
       isDirectory
@@ -114,6 +114,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return this.pathItems[path]
   }
 
+  private isDirectory(path: string) {
+    const { isDirectory } = this.getPathItem(path)
+    return isDirectory
+  }
+
   private async getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
@@ -129,8 +134,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return rootElements
       .reduce((a, b) => a.concat(b), [])
       .sort((a, b) => {
-        const aIsDirectory = this.getPathItem(a).isDirectory
-        if (aIsDirectory === this.getPathItem(b).isDirectory) {
+        const aIsDirectory = this.isDirectory(a)
+        if (aIsDirectory === this.isDirectory(b)) {
           return a.localeCompare(b)
         }
         return aIsDirectory ? -1 : 1
@@ -155,7 +160,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return 'dvcTrackedVirtual'
     }
 
-    const baseContext = this.getPathItem(path).isDirectory
+    const baseContext = this.isDirectory(path)
       ? 'dvcTrackedDir'
       : 'dvcTrackedFile'
 
