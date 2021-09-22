@@ -31,7 +31,7 @@ export const tryThenMaybeForce = async (
   } catch (e: unknown) {
     const stderr = (e as MaybeConsoleError).stderr
 
-    if (stderr?.includes(Prompt.TRY_FORCE)) {
+    if (stderr && Prompt.TRY_FORCE.test(stderr)) {
       return offerToForce(stderr, internalCommands, commandId, ...args)
     }
 
