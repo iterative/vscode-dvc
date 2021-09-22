@@ -5,7 +5,6 @@ import { stub, restore } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
-import { Prompt } from '../../../cli/output'
 import { dvcDemoPath } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 
@@ -68,7 +67,7 @@ suite('Source Control Management Test Suite', () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout')
         .onFirstCall()
         .rejects({
-          stderr: Prompt.TRY_FORCE
+          stderr: 'Use `-f` to force.'
         })
         .onSecondCall()
         .resolves('')
@@ -100,7 +99,7 @@ suite('Source Control Management Test Suite', () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit')
         .onFirstCall()
         .rejects({
-          stderr: Prompt.TRY_FORCE
+          stderr: 'Use `-f` to force.'
         })
         .onSecondCall()
         .resolves('')
@@ -132,7 +131,7 @@ suite('Source Control Management Test Suite', () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit')
         .onFirstCall()
         .rejects({
-          stderr: Prompt.TRY_FORCE
+          stderr: 'Use `-f` to force.'
         })
         .onSecondCall()
         .resolves('')

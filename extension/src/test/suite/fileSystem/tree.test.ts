@@ -8,7 +8,6 @@ import { Disposable } from '../../../extension'
 import { exists } from '../../../fileSystem'
 import * as Workspace from '../../../fileSystem/workspace'
 import { CliExecutor } from '../../../cli/executor'
-import { Prompt } from '../../../cli/output'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
 import {
@@ -226,7 +225,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPull = stub(CliExecutor.prototype, 'pull')
         .onFirstCall()
         .rejects({
-          stderr: Prompt.TRY_FORCE
+          stderr: "Use '-f' to force."
         })
         .onSecondCall()
         .resolves('')
@@ -264,7 +263,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPush = stub(CliExecutor.prototype, 'push')
         .onFirstCall()
         .rejects({
-          stderr: Prompt.TRY_FORCE
+          stderr: "Use '-f' to force."
         })
         .onSecondCall()
         .resolves('')
