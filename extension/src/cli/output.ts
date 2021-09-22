@@ -1,3 +1,3 @@
-export enum Prompt {
-  TRY_FORCE = 'Use `-f|--force` to force.'
-}
+export const Prompt = {
+  TRY_FORCE: /Use\s[`']-f.*?[`']\sto\sforce\./
+} as const
