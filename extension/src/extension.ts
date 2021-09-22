@@ -256,7 +256,7 @@ export class Extension implements IExtension {
     )
   }
 
-  public canRunCli = async () => {
+  public async canRunCli() {
     try {
       await this.config.isReady()
       const [root] = this.dvcRoots
@@ -267,31 +267,45 @@ export class Extension implements IExtension {
     }
   }
 
-  public async initialize() {
-    const dvcRoots = await Promise.all(
-      getWorkspaceFolders().map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
+  public async setRoots() {
+    this.dvcRoots = flatten(
+      await Promise.all(
+        getWorkspaceFolders().map(workspaceFolder =>
+          this.findDvcRoots(workspaceFolder)
+        )
       )
-    )
+    ).sort()
+    if (this.hasRoots()) {
+      return this.setProjectAvailability(true)
+    }
+    this.setProjectAvailability(false)
+  }
 
-    this.dvcRoots = flatten(dvcRoots).sort()
-    this.config.setDvcRoots(this.dvcRoots)
-
+  public async initialize() {
     await Promise.all([
+      this.config.setDvcRoots(this.dvcRoots),
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
       this.initializeExperiments(),
       this.setAvailable(true)
     ])
+
     return Promise.all([
       ...Object.values(this.repositories).map(repo => repo.isReady()),
       this.experiments.isReady()
     ])
   }
 
-  public hasWorkspaceFolder = () => !!getFirstWorkspaceFolder()
+  public hasRoots() {
+    return definedAndNonEmpty(this.dvcRoots)
+  }
 
-  public reset = () => {
+  public hasWorkspaceFolder() {
+    return !!getFirstWorkspaceFolder()
+  }
+
+  public reset() {
+    this.config.setDvcRoots([])
     this.repositories = reset<Repositories>(this.repositories, this.dispose)
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
@@ -365,16 +379,6 @@ export class Extension implements IExtension {
 
     await this.config.isReady()
     return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
-  }
-
-  private setupWorkspaceFolder = async (workspaceFolder: string) => {
-    const dvcRoots = await this.findDvcRoots(workspaceFolder)
-
-    if (definedAndNonEmpty(dvcRoots)) {
-      this.setProjectAvailability(true)
-    }
-
-    return dvcRoots
   }
 
   private getEventProperties() {
