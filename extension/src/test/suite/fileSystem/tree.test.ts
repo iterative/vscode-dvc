@@ -229,14 +229,14 @@ suite('Tracked Explorer Tree Test Suite', () => {
         })
         .onSecondCall()
         .resolves('')
-      const mockShowInformationMessage = stub(
+      const mockShowWarningMessage = stub(
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand(RegisteredCliCommands.PULL_TARGET, absPath)
 
-      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
       expect(mockPull).to.be.calledWith(undefined, relPath)
       expect(mockPull).to.be.calledWith(undefined, relPath, '-f')
@@ -263,18 +263,22 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const mockPush = stub(CliExecutor.prototype, 'push')
         .onFirstCall()
         .rejects({
-          stderr: "Use '-f' to force."
+          stderr: "I AM AN ERROR. Use '-f' to force."
         })
         .onSecondCall()
         .resolves('')
-      const mockShowInformationMessage = stub(
+      const mockShowWarningMessage = stub(
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
       await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET, absPath)
 
-      expect(mockShowInformationMessage).to.be.calledOnce
+      expect(mockShowWarningMessage).to.be.calledWith(
+        'I AM AN ERROR. \n\nWould you like to force this action?',
+        { modal: true },
+        'Force'
+      )
       expect(mockPush).to.be.calledTwice
       expect(mockPush).to.be.calledWith(undefined, relPath)
       expect(mockPush).to.be.calledWith(undefined, relPath, '-f')
