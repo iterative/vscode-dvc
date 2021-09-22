@@ -17,7 +17,6 @@ const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
 const mockedHasWorkspaceFolder = jest.fn()
 const mockedInitialize = jest.fn()
-const mockedInitializePreCheck = jest.fn()
 const mockedReset = jest.fn()
 
 const mockedQuickPickYesOrNo = mocked(quickPickYesOrNo)
@@ -171,7 +170,6 @@ describe('setup', () => {
     hasRoots: mockedHasRoots,
     hasWorkspaceFolder: mockedHasWorkspaceFolder,
     initialize: mockedInitialize,
-    initializePreCheck: mockedInitializePreCheck,
     reset: mockedReset
   }
 
@@ -180,28 +178,7 @@ describe('setup', () => {
 
     await setup(extension)
 
-    expect(mockedInitializePreCheck).not.toBeCalled()
     expect(mockedCanRunCli).not.toBeCalled()
-    expect(mockedInitialize).not.toBeCalled()
-  })
-
-  it('should run the pre check initialization even if the cli cannot be used', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
-    mockedCanRunCli.mockResolvedValueOnce(false)
-
-    await setup(extension)
-
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
-  })
-
-  it('should not run initialization if roots have not been found but the cli can be run', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
-    mockedHasRoots.mockReturnValueOnce(false)
-    mockedCanRunCli.mockResolvedValueOnce(true)
-
-    await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
-    expect(mockedReset).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
 
@@ -211,7 +188,6 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
     expect(mockedReset).not.toBeCalled()
     expect(mockedInitialize).toBeCalledTimes(1)
   })
@@ -222,7 +198,6 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })

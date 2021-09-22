@@ -18,7 +18,6 @@ import {
 import { IExtension } from './interfaces'
 import { Repository } from './repository'
 import { registerRepositoryCommands } from './repository/commands/register'
-import { DecorationProvider } from './repository/decorationProvider'
 import { ResourceLocator } from './resourceLocator'
 import { definedAndNonEmpty, flatten } from './util/array'
 import { reset } from './util/disposable'
@@ -50,7 +49,6 @@ import { StopWatch } from './util/time'
 export { Disposable, Disposer }
 
 type Repositories = Record<string, Repository>
-type DecorationProviders = Record<string, DecorationProvider>
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
@@ -61,7 +59,6 @@ export class Extension implements IExtension {
   private readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
-  private decorationProviders: DecorationProviders = {}
   private repositories: Repositories = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
@@ -259,8 +256,6 @@ export class Extension implements IExtension {
     )
   }
 
-  public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
-
   public canRunCli = async () => {
     try {
       await this.config.isReady()
@@ -272,7 +267,7 @@ export class Extension implements IExtension {
     }
   }
 
-  public initializePreCheck = async () => {
+  public async initialize() {
     const dvcRoots = await Promise.all(
       getWorkspaceFolders().map(workspaceFolder =>
         this.setupWorkspaceFolder(workspaceFolder)
@@ -281,9 +276,7 @@ export class Extension implements IExtension {
 
     this.dvcRoots = flatten(dvcRoots).sort()
     this.config.setDvcRoots(this.dvcRoots)
-  }
 
-  public async initialize() {
     await Promise.all([
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
@@ -334,11 +327,7 @@ export class Extension implements IExtension {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)
 
     this.dvcRoots.forEach(dvcRoot => {
-      const repository = new Repository(
-        dvcRoot,
-        this.internalCommands,
-        this.decorationProviders[dvcRoot]
-      )
+      const repository = new Repository(dvcRoot, this.internalCommands)
 
       repository.dispose.track(
         createFileSystemWatcher(
@@ -368,16 +357,6 @@ export class Extension implements IExtension {
     })
   }
 
-  private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>
-    dvcRoots
-      .filter(dvcRoot => !this.dvcRoots.includes(dvcRoot))
-      .forEach(
-        dvcRoot =>
-          (this.decorationProviders[dvcRoot] = this.dispose.track(
-            new DecorationProvider()
-          ))
-      )
-
   private findDvcRoots = async (cwd: string): Promise<string[]> => {
     const dvcRoots = await findDvcRootPaths(cwd)
     if (definedAndNonEmpty(dvcRoots)) {
@@ -392,7 +371,6 @@ export class Extension implements IExtension {
     const dvcRoots = await this.findDvcRoots(workspaceFolder)
 
     if (definedAndNonEmpty(dvcRoots)) {
-      this.initializeDecorationProvidersEarly(dvcRoots)
       this.setProjectAvailability(true)
     }
 

@@ -147,10 +147,7 @@ export const setup = async (extension: IExtension) => {
     return
   }
 
-  await extension.initializePreCheck()
-
-  const canRunCli = await extension.canRunCli()
-  if (extension.hasRoots() && canRunCli) {
+  if (await extension.canRunCli()) {
     return extension.initialize()
   }
 

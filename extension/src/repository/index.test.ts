@@ -29,8 +29,9 @@ const mockedGetAllUntracked = mocked(getAllUntracked)
 const mockedSourceControlManagement = mocked(SourceControlManagement)
 const mockedSetScmState = jest.fn()
 
-const mockedDecorationProvider = mocked(DecorationProvider)
+const mockedDecorationProvider = mocked(new DecorationProvider())
 const mockedSetDecorationState = jest.fn()
+mockedDecorationProvider.setState = mockedSetDecorationState
 
 const mockedDisposable = mocked(Disposable)
 
@@ -59,12 +60,6 @@ beforeEach(() => {
     return {
       setState: mockedSetScmState
     } as unknown as SourceControlManagement
-  })
-
-  mockedDecorationProvider.mockImplementationOnce(function () {
-    return {
-      setState: mockedSetDecorationState
-    } as unknown as DecorationProvider
   })
 
   mockedDisposable.fn.mockReturnValueOnce({
@@ -127,12 +122,10 @@ describe('Repository', () => {
       ])
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
-      const decorationProvider = new DecorationProvider()
-
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        decorationProvider
+        mockedDecorationProvider
       )
       await repository.isReady()
 
@@ -173,12 +166,10 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const decorationProvider = new DecorationProvider()
-
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        decorationProvider
+        mockedDecorationProvider
       )
       await repository.isReady()
 
@@ -251,12 +242,10 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const decorationProvider = new DecorationProvider()
-
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        decorationProvider
+        mockedDecorationProvider
       )
       await repository.isReady()
 
@@ -363,12 +352,10 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const decorationProvider = new DecorationProvider()
-
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        decorationProvider
+        mockedDecorationProvider
       )
       await repository.isReady()
 
@@ -461,12 +448,10 @@ describe('Repository', () => {
       mockedStatus.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
-      const decorationProvider = new DecorationProvider()
-
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        decorationProvider
+        mockedDecorationProvider
       )
       await repository.isReady()
 
