@@ -25,6 +25,8 @@ import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
 
+type PathItem = { dvcRoot: string; isDirectory: boolean; isOut: boolean }
+
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
 
@@ -35,9 +37,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private dvcRoots: string[] = []
 
-  private pathRoots: Record<string, string> = {}
-  private pathIsDirectory: Record<string, boolean> = {}
-  private pathIsOut: Record<string, boolean> = {}
+  private pathItems: Record<string, PathItem> = {}
 
   private viewed = false
 
@@ -75,9 +75,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.reset()
   }
 
-  public getChildren(element?: string): Promise<string[]> {
-    if (element) {
-      return this.readDirectory(this.pathRoots[element], element)
+  public getChildren(path?: string): Promise<string[]> {
+    if (path) {
+      const { dvcRoot } = this.getPathItem(path)
+      return this.readDirectory(dvcRoot, path)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
@@ -87,17 +88,17 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return Promise.resolve([])
   }
 
-  public getTreeItem(element: string): TreeItem {
-    const resourceUri = Uri.file(element)
-    const elementIsDirectory = this.pathIsDirectory[element]
+  public getTreeItem(path: string): TreeItem {
+    const resourceUri = Uri.file(path)
+    const { isDirectory } = this.getPathItem(path)
     const treeItem = new TreeItem(
       resourceUri,
-      elementIsDirectory
+      isDirectory
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
 
-    if (!elementIsDirectory) {
+    if (!isDirectory) {
       treeItem.command = {
         arguments: [resourceUri],
         command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
@@ -105,8 +106,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     }
 
-    treeItem.contextValue = this.getContextValue(element)
+    treeItem.contextValue = this.getContextValue(path)
     return treeItem
+  }
+
+  private getPathItem(path: string) {
+    return this.pathItems[path]
   }
 
   private async getRootElements() {
@@ -124,8 +129,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return rootElements
       .reduce((a, b) => a.concat(b), [])
       .sort((a, b) => {
-        const aIsDirectory = this.pathIsDirectory[a]
-        if (aIsDirectory === this.pathIsDirectory[b]) {
+        const aIsDirectory = this.getPathItem(a).isDirectory
+        if (aIsDirectory === this.getPathItem(b).isDirectory) {
           return a.localeCompare(b)
         }
         return aIsDirectory ? -1 : 1
@@ -141,7 +146,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private hasRemote(path: string): boolean {
-    return this.pathIsOut[path] || !this.pathIsDirectory[path]
+    const { isOut, isDirectory } = this.getPathItem(path)
+    return isOut || !isDirectory
   }
 
   private getContextValue(path: string): string {
@@ -149,7 +155,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       return 'dvcTrackedVirtual'
     }
 
-    const baseContext = this.pathIsDirectory[path]
+    const baseContext = this.getPathItem(path).isDirectory
       ? 'dvcTrackedDir'
       : 'dvcTrackedFile'
 
@@ -176,9 +182,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     return listOutput.map(relative => {
       const absolutePath = join(path, relative.path)
-      this.pathRoots[absolutePath] = root
-      this.pathIsDirectory[absolutePath] = relative.isdir
-      this.pathIsOut[absolutePath] = relative.isout
+      this.pathItems[absolutePath] = {
+        dvcRoot: root,
+        isDirectory: relative.isdir,
+        isOut: relative.isout
+      }
       return absolutePath
     })
   }
@@ -208,7 +216,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       path => {
         deleteTarget(path)
         this.treeDataChanged.fire()
-        const dvcRoot = this.pathRoots[path]
+        const { dvcRoot } = this.getPathItem(path)
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
@@ -221,7 +229,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCliCommands.RENAME_TARGET,
       async path => {
-        const dvcRoot = this.pathRoots[path]
+        const { dvcRoot } = this.getPathItem(path)
         const relPath = relative(dvcRoot, path)
         const relDestination = await getInput(
           'enter a destination relative to the root',
@@ -252,7 +260,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private tryThenMaybeForce(commandId: CommandId, path: string) {
-    const dvcRoot = this.pathRoots[path]
+    const { dvcRoot } = this.getPathItem(path)
     return tryThenMaybeForce(
       this.internalCommands,
       commandId,
