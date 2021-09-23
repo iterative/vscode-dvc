@@ -81,6 +81,22 @@ describe('TrackedTreeView', () => {
   })
 
   describe('getChildren', () => {
+    it('should return the roots if no path is provided and there is more than one', async () => {
+      const mockedDvcRoots = [dvcDemoPath, join('some', 'other', 'root')]
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedInternalCommands,
+        mockedWorkspaceChanged,
+        mockedTreeDataChanged
+      )
+      trackedTreeView.initialize(mockedDvcRoots)
+
+      const rootElements = await trackedTreeView.getChildren()
+
+      expect(rootElements).toEqual(mockedDvcRoots)
+      expect(mockedListDvcOnly).not.toBeCalled()
+    })
+
     it('should get the children for the provided element', async () => {
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
 
