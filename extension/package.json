@@ -569,7 +569,7 @@
         {
           "command": "dvc.deleteTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked/"
+          "when": "viewItem =~ /^dvcTracked/ && viewItem != dvcTrackedVirtual"
         },
         {
           "command": "dvc.removeTarget",
