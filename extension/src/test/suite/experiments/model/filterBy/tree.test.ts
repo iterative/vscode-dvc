@@ -29,6 +29,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
   })
 
   describe('ExperimentsFilterByTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand('dvc.views.experimentsFilterByTree.focus')
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to update the table data by adding and removing a filter', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')

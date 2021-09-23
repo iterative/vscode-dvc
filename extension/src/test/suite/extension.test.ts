@@ -361,4 +361,12 @@ suite('Extension Test Suite', () => {
       clock.restore()
     })
   })
+
+  describe('view container', () => {
+    it('should be able to focus the experiments view container', async () => {
+      await expect(
+        commands.executeCommand('workbench.view.extension.dvc-views')
+      ).to.be.eventually.equal(undefined)
+    })
+  })
 })
