@@ -38,6 +38,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
   })
 
   describe('TrackedExplorerTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand('dvc.views.trackedExplorerTree.focus')
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to run dvc.copyFilePath and copy a path to the clipboard', async () => {
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,

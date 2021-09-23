@@ -94,6 +94,12 @@ suite('Experiments Sort By Tree Test Suite', () => {
   })
 
   describe('ExperimentsSortByTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand('dvc.views.experimentsSortByTree.focus')
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       // setup
 

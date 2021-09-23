@@ -28,6 +28,14 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsParamsAndMetricsTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand(
+          'dvc.views.experimentsParamsAndMetricsTree.focus'
+        )
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = joinParamOrMetricPath('params', paramsFile, 'learning_rate')
 
