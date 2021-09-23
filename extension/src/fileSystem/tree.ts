@@ -79,9 +79,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.reset()
   }
 
-  public getChildren(path?: string): string[] | Promise<string[]> {
+  public async getChildren(path?: string): Promise<string[]> {
     if (path) {
-      return this.readDirectory(path)
+      const contents = await this.readDirectory(path)
+      return this.sortDirectory(contents)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
@@ -181,23 +182,25 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       relative(dvcRoot, path)
     )
 
-    return listOutput
-      .map(relative => {
-        const absolutePath = join(path, relative.path)
-        this.pathItems[absolutePath] = {
-          dvcRoot,
-          isDirectory: relative.isdir,
-          isOut: relative.isout
-        }
-        return absolutePath
-      })
-      .sort((a, b) => {
-        const aIsDirectory = this.isDirectory(a)
-        if (aIsDirectory === this.isDirectory(b)) {
-          return a.localeCompare(b)
-        }
-        return aIsDirectory ? -1 : 1
-      })
+    return listOutput.map(relative => {
+      const absolutePath = join(path, relative.path)
+      this.pathItems[absolutePath] = {
+        dvcRoot,
+        isDirectory: relative.isdir,
+        isOut: relative.isout
+      }
+      return absolutePath
+    })
+  }
+
+  private sortDirectory(contents: string[]) {
+    return contents.sort((a, b) => {
+      const aIsDirectory = this.isDirectory(a)
+      if (aIsDirectory === this.isDirectory(b)) {
+        return a.localeCompare(b)
+      }
+      return aIsDirectory ? -1 : 1
+    })
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
