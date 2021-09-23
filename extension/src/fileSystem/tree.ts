@@ -72,20 +72,24 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public initialize(dvcRoots: string[]) {
     this.dvcRoots = dvcRoots
+    dvcRoots.forEach(
+      dvcRoot =>
+        (this.pathItems[dvcRoot] = { dvcRoot, isDirectory: true, isOut: false })
+    )
     this.reset()
   }
 
-  public getChildren(path?: string): Promise<string[]> {
+  public async getChildren(path?: string): Promise<string[]> {
     if (path) {
-      const { dvcRoot } = this.getPathItem(path)
-      return this.readDirectory(dvcRoot, path)
+      const contents = await this.readDirectory(path)
+      return this.sortDirectory(contents)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
       return this.getRootElements()
     }
 
-    return Promise.resolve([])
+    return []
   }
 
   public getTreeItem(path: string): TreeItem {
@@ -119,7 +123,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return isDirectory
   }
 
-  private async getRootElements() {
+  private getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
@@ -128,18 +132,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       this.viewed = true
     }
 
-    const rootElements = await Promise.all(
-      this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
-    )
-    return rootElements
-      .reduce((a, b) => a.concat(b), [])
-      .sort((a, b) => {
-        const aIsDirectory = this.isDirectory(a)
-        if (aIsDirectory === this.isDirectory(b)) {
-          return a.localeCompare(b)
-        }
-        return aIsDirectory ? -1 : 1
-      })
+    if (this.dvcRoots.length === 1) {
+      const [onlyRoot] = this.dvcRoots
+      return this.getChildren(onlyRoot)
+    }
+
+    return this.dvcRoots
   }
 
   private getDataPlaceholder(path: string): string {
@@ -172,25 +170,36 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return baseContext
   }
 
-  private async readDirectory(root: string, path: string): Promise<string[]> {
-    if (!root) {
+  private async readDirectory(path: string): Promise<string[]> {
+    const { dvcRoot } = this.getPathItem(path)
+    if (!dvcRoot) {
       return []
     }
 
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY,
-      root,
-      relative(root, path)
+      dvcRoot,
+      relative(dvcRoot, path)
     )
 
     return listOutput.map(relative => {
       const absolutePath = join(path, relative.path)
       this.pathItems[absolutePath] = {
-        dvcRoot: root,
+        dvcRoot,
         isDirectory: relative.isdir,
         isOut: relative.isout
       }
       return absolutePath
+    })
+  }
+
+  private sortDirectory(contents: string[]) {
+    return contents.sort((a, b) => {
+      const aIsDirectory = this.isDirectory(a)
+      if (aIsDirectory === this.isDirectory(b)) {
+        return a.localeCompare(b)
+      }
+      return aIsDirectory ? -1 : 1
     })
   }
 
