@@ -132,7 +132,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'dvcTrackedVirtual'
+        contextValue: 'virtual'
       })
     })
 
@@ -160,7 +160,7 @@ describe('TrackedTreeView', () => {
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
         ...mockedItem,
-        contextValue: 'dvcTrackedDirData'
+        contextValue: 'dirData'
       })
     })
 
@@ -201,7 +201,7 @@ describe('TrackedTreeView', () => {
           command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
           title: 'Open File'
         },
-        contextValue: 'dvcTrackedFileHasRemote'
+        contextValue: 'fileHasRemote'
       })
     })
   })
