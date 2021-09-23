@@ -594,17 +594,17 @@
         {
           "command": "dvc.addExperimentsTableFilter",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilter"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
         }
       ],
       "view/title": [
