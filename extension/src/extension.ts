@@ -279,7 +279,7 @@ export class Extension implements IExtension {
       )
     )
 
-    this.dvcRoots = flatten(dvcRoots)
+    this.dvcRoots = flatten(dvcRoots).sort()
     this.config.setDvcRoots(this.dvcRoots)
   }
 
