@@ -524,87 +524,87 @@
         {
           "command": "dvc.openToTheSide",
           "group": "navigation",
-          "when": "viewItem =~ /^dvcTrackedFile/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/"
         },
         {
           "command": "dvc.pullTarget",
           "group": "1_DVC@1",
-          "when": "viewItem =~ /^dvcTrackedVirtual|^dvcTracked.*[HasRemote|Data]$/"
+          "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.pushTarget",
           "group": "1_DVC@2",
-          "when": "viewItem =~ /^dvcTracked.*[HasRemote|Data]$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
         },
         {
           "command": "dvc.compareSelected",
           "group": "3_compare@1",
-          "when": "viewItem =~ /^dvcTrackedFile/ && resourceSelectedForCompare"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/ && resourceSelectedForCompare"
         },
         {
           "command": "dvc.selectForCompare",
           "group": "3_compare@2",
-          "when": "viewItem =~ /^dvcTrackedFile/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/"
         },
         {
           "command": "dvc.findInFolder",
           "group": "4_search",
-          "when": "viewItem =~ /^dvcTrackedDir/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^dir/"
         },
         {
           "command": "dvc.copyFilePath",
           "group": "6_copypath@1",
-          "when": "viewItem =~ /dvcTracked/"
+          "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
-          "when": "viewItem =~ /dvcTracked/"
+          "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.renameTarget",
           "group": "7_modification@1",
-          "when": "viewItem =~ /^dvcTracked.*Data$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
         },
         {
           "command": "dvc.deleteTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked/ && viewItem != dvcTrackedVirtual"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
         },
         {
           "command": "dvc.removeTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked.*Data$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
         },
         {
           "command": "dvc.addExperimentsTableSort",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcSort"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.addExperimentsTableFilter",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilter"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
         }
       ],
       "view/title": [

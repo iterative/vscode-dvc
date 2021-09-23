@@ -57,9 +57,9 @@ export class ExperimentsFilterByTree
     if (this.isRoot(element)) {
       const item = new TreeItem(
         Uri.file(element),
-        TreeItemCollapsibleState.Collapsed
+        TreeItemCollapsibleState.Expanded
       )
-      item.contextValue = 'dvcFilterRoot'
+      item.contextValue = 'dvcRoot'
       return item
     }
 
@@ -67,7 +67,6 @@ export class ExperimentsFilterByTree
 
     item.iconPath = new ThemeIcon('filter')
     item.description = element.description
-    item.contextValue = 'dvcFilter'
 
     return item
   }
