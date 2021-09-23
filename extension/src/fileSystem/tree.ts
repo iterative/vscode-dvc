@@ -81,15 +81,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public getChildren(path?: string): string[] | Promise<string[]> {
     if (path) {
-      const { dvcRoot } = this.getPathItem(path)
-      return this.readDirectory(dvcRoot, path)
+      return this.readDirectory(path)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
       return this.getRootElements()
     }
 
-    return Promise.resolve([])
+    return []
   }
 
   public getTreeItem(path: string): TreeItem {
@@ -170,22 +169,23 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return baseContext
   }
 
-  private async readDirectory(root: string, path: string): Promise<string[]> {
-    if (!root) {
+  private async readDirectory(path: string): Promise<string[]> {
+    const { dvcRoot } = this.getPathItem(path)
+    if (!dvcRoot) {
       return []
     }
 
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY,
-      root,
-      relative(root, path)
+      dvcRoot,
+      relative(dvcRoot, path)
     )
 
     return listOutput
       .map(relative => {
         const absolutePath = join(path, relative.path)
         this.pathItems[absolutePath] = {
-          dvcRoot: root,
+          dvcRoot,
           isDirectory: relative.isdir,
           isOut: relative.isout
         }
