@@ -181,10 +181,19 @@ describe('TrackedTreeView', () => {
         mockedTreeDataChanged
       )
       mockedExists.mockReturnValueOnce(true)
+      const getPathItemSpy = jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(trackedTreeView as any, 'getPathItem')
+        .mockReturnValue({
+          dvcRoot: dvcDemoPath,
+          isDirectory: false,
+          isOut: false
+        })
 
       const treeItem = trackedTreeView.getTreeItem(log)
 
       expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(getPathItemSpy).toBeCalledWith(log)
       expect(treeItem).toEqual({
         ...mockedItem,
         command: {

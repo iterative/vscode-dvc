@@ -19,6 +19,7 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
+import { TrackedExplorerTree } from '../../../fileSystem/tree'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   window.showInformationMessage('Start all tracked explorer tree tests.')
@@ -173,6 +174,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
+        dvcRoot: dvcDemoPath
+      })
+
       const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
       const mockRemove = stub(CliExecutor.prototype, 'remove').resolves(
         'target destroyed!'
@@ -190,6 +197,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
+        dvcRoot: dvcDemoPath
+      })
+
       const mockMove = stub(CliExecutor.prototype, 'move').resolves(
         'target moved to new destination'
       )
@@ -214,6 +227,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = 'data'
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
+        dvcRoot: dvcDemoPath
+      })
+
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
@@ -226,8 +245,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
     it('should prompt to force if dvc.pullTarget fails', async () => {
       const relPath = join('data', 'MNIST')
       const absPath = join(dvcDemoPath, relPath)
-
       stub(path, 'relative').returns(relPath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
+        dvcRoot: dvcDemoPath
+      })
+
       const mockPull = stub(CliExecutor.prototype, 'pull')
         .onFirstCall()
         .rejects({
@@ -244,14 +268,20 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
-      expect(mockPull).to.be.calledWith(undefined, relPath)
-      expect(mockPull).to.be.calledWith(undefined, relPath, '-f')
+      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath)
+      expect(mockPull).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
     it('should be able to run dvc.pushTarget without error', async () => {
       const relPath = join('data', 'MNIST')
       const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
+        dvcRoot: dvcDemoPath
+      })
+
       const mockPush = stub(CliExecutor.prototype, 'push').resolves(
         'target pushed'
       )
@@ -264,8 +294,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
     it('should prompt to force if dvc.pushTarget fails', async () => {
       const relPath = join('data', 'MNIST')
       const absPath = join(dvcDemoPath, relPath)
-
       stub(path, 'relative').returns(relPath)
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
+        dvcRoot: dvcDemoPath
+      })
+
       const mockPush = stub(CliExecutor.prototype, 'push')
         .onFirstCall()
         .rejects({
@@ -286,8 +321,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'Force'
       )
       expect(mockPush).to.be.calledTwice
-      expect(mockPush).to.be.calledWith(undefined, relPath)
-      expect(mockPush).to.be.calledWith(undefined, relPath, '-f')
+      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath)
+      expect(mockPush).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
   })
 })
