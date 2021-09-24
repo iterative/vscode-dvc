@@ -102,7 +102,9 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         : TreeItemCollapsibleState.None
     )
 
-    if (!isDirectory) {
+    treeItem.contextValue = this.getContextValue(path)
+
+    if (!isDirectory && treeItem.contextValue !== 'virtual') {
       treeItem.command = {
         arguments: [resourceUri],
         command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
@@ -110,7 +112,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     }
 
-    treeItem.contextValue = this.getContextValue(path)
     return treeItem
   }
 
