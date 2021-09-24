@@ -152,6 +152,39 @@ describe('TrackedTreeView', () => {
       })
     })
 
+    it('should return the correct tree item for a virtual file', () => {
+      let mockedItem = {}
+      const log = join(dvcDemoPath, 'logs', 'acc.tsv')
+      mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
+        mockedItem = { collapsibleState, uri }
+        return mockedItem
+      })
+
+      const trackedTreeView = new TrackedExplorerTree(
+        mockedInternalCommands,
+        mockedWorkspaceChanged,
+        mockedTreeDataChanged
+      )
+      mockedExists.mockReturnValueOnce(false)
+      const getPathItemSpy = jest
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .spyOn(trackedTreeView as any, 'getPathItem')
+        .mockReturnValue({
+          dvcRoot: dvcDemoPath,
+          isDirectory: false,
+          isOut: false
+        })
+
+      const treeItem = trackedTreeView.getTreeItem(log)
+
+      expect(mockedTreeItem).toBeCalledTimes(1)
+      expect(getPathItemSpy).toBeCalledWith(log)
+      expect(treeItem).toEqual({
+        ...mockedItem,
+        contextValue: 'virtual'
+      })
+    })
+
     it('should return the correct tree item for a directory which is tracked by DVC', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
