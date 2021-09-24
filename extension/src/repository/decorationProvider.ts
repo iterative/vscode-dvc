@@ -48,7 +48,7 @@ export class DecorationProvider implements FileDecorationProvider {
 
   private static DecorationNotInCache: FileDecoration = {
     badge: 'NC',
-    color: new ThemeColor('gitDecoration.renamedResourceForeground'),
+    color: new ThemeColor('gitDecoration.ignoredResourceForeground'),
     tooltip: 'DVC not in cache'
   }
 
