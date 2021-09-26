@@ -259,8 +259,11 @@ export class Extension implements IExtension {
   public async canRunCli() {
     try {
       await this.config.isReady()
-      const [root] = this.dvcRoots
-      this.cliAccessible = !!(await this.cliReader.help(root))
+      const cwd = getFirstWorkspaceFolder()
+      if (!cwd) {
+        return false
+      }
+      this.cliAccessible = !!(await this.cliReader.help(cwd))
       return this.cliAccessible
     } catch {
       return false
