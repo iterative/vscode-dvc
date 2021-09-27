@@ -20,6 +20,7 @@
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
   "command.openToTheSide": "Open to the Side",
+  "command.moveTargets": "Add Data",
   "command.pull": "Pull",
   "command.pullTarget": "Pull",
   "command.push": "Push",

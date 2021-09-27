@@ -3,7 +3,14 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { ensureFileSync } from 'fs-extra'
-import { window, commands, Uri, MessageItem, ViewColumn } from 'vscode'
+import {
+  window,
+  commands,
+  Uri,
+  MessageItem,
+  ViewColumn,
+  WorkspaceEdit
+} from 'vscode'
 import { Disposable } from '../../../extension'
 import { exists } from '../../../fileSystem'
 import * as Workspace from '../../../fileSystem/workspace'
@@ -78,6 +85,70 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       await commands.executeCommand(RegisteredCommands.DELETE_TARGET, path)
       expect(exists(path)).to.be.false
+    })
+
+    it('should be able to add data to a tracked data directory (.dvc)', async () => {
+      const mockData = [
+        'extra-data.txt',
+        'more-extra-data.txt',
+        'even-more-extra-data.txt'
+      ]
+      const mockDestination = join(dvcDemoPath, 'data', 'MNIST', 'raw')
+      ensureFileSync(mockDestination + '.dvc')
+
+      const expectedTargets = mockData.map(file => join(dvcDemoPath, file))
+      const expectedDestinations = mockData.map(file =>
+        join(mockDestination, file)
+      )
+
+      const mockUris = expectedTargets.map(file => Uri.file(file))
+
+      const mockResourcePicker = stub(window, 'showOpenDialog').resolves(
+        mockUris
+      )
+
+      const mockRename = stub(WorkspaceEdit.prototype, 'renameFile').resolves(
+        undefined
+      )
+
+      stub(window, 'showWarningMessage').resolves(
+        'Move' as unknown as MessageItem
+      )
+
+      await commands.executeCommand('dvc.moveTargets', mockDestination)
+
+      expect(mockResourcePicker).to.be.calledOnce
+      expect(mockRename).to.be.calledThrice
+
+      for (let i = 0; i <= 2; i++) {
+        const [target, dest] = mockRename.getCall(i).args
+        expect(target.fsPath).to.equal(expectedTargets[i])
+        expect(dest.fsPath).to.equal(expectedDestinations[i])
+      }
+    })
+
+    it('should not add data to a tracked data directory if the user changes their mind', async () => {
+      const mockData = ['data-i-will-not-move.txt']
+      const mockDestination = join(dvcDemoPath, 'data', 'MNIST', 'raw')
+
+      const mockUris = mockData.map(file => Uri.file(join(dvcDemoPath, file)))
+
+      const mockResourcePicker = stub(window, 'showOpenDialog').resolves(
+        mockUris
+      )
+
+      const mockRename = stub(WorkspaceEdit.prototype, 'renameFile').resolves(
+        undefined
+      )
+
+      stub(window, 'showWarningMessage').resolves(
+        'Cancel' as unknown as MessageItem
+      )
+
+      await commands.executeCommand('dvc.moveTargets', mockDestination)
+
+      expect(mockResourcePicker).to.be.calledOnce
+      expect(mockRename).not.to.be.called
     })
 
     it('should be able to run dvc.init without error', async () => {
