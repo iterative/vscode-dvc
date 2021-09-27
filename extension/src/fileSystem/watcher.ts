@@ -1,4 +1,5 @@
 import { basename, extname } from 'path'
+import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
@@ -7,6 +8,11 @@ import { TrackedExplorerTree } from './tree'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
+
+export const fireWatcher = (path: string): Promise<void> => {
+  const now = new Date().getTime()
+  return utimes(path, now, now)
+}
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 

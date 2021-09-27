@@ -9,8 +9,8 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { utimesSync } from 'fs-extra'
 import { exists, isDirectory } from '.'
+import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
@@ -237,8 +237,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         )
         if (paths) {
           await moveTargets(paths, destination)
-          const now = new Date().getTime()
-          utimesSync(this.getDataPlaceholder(destination), now, now)
+          return fireWatcher(this.getDataPlaceholder(destination))
         }
       }
     )
