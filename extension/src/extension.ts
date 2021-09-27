@@ -226,6 +226,13 @@ export class Extension implements IExtension {
       })
     )
 
+    this.dispose.track(
+      this.internalCommands.registerExternalCommand(
+        RegisteredCommands.EXTENSION_SHOW_COMMANDS,
+        () => commands.executeCommand('workbench.action.quickOpen', '> DVC')
+      )
+    )
+
     registerRepositoryCommands(this.internalCommands)
 
     this.registerConfigCommands()

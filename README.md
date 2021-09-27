@@ -47,10 +47,8 @@ container or "Setup The Workspace" in the command palette.
 
 ## How to Use
 
-This extension, especially in this early state, makes extensive use of the
-[Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
-Every feature should be available from the Command Palette, and from there
-additional GUI elements are added for convenience.
+**See walkthrough** - `Welcome: Open Walkthrough...` > `Get Started With DVC`
+from the command palette.
 
 ### Experiments
 

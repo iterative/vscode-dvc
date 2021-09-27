@@ -237,6 +237,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.showCommands",
+        "command": "dvc.showCommands",
+        "category": "DVC"
+      },
+      {
         "title": "%command.showExperiments%",
         "command": "dvc.showExperiments",
         "category": "DVC"
@@ -406,6 +411,10 @@
         },
         {
           "command": "dvc.selectForCompare",
+          "when": "false"
+        },
+        {
+          "command": "dvc.showCommands",
           "when": "false"
         },
         {
@@ -724,6 +733,18 @@
             "completionEvents": [
               "onCommand:dvc.setupWorkspace"
             ]
+          },
+          {
+            "id": "dvc.showCommands",
+            "title": "Available commands",
+            "description": "View all of the available commands.\n[View commands](command:dvc.showCommands)",
+            "media": {
+              "markdown": "resources/commandPalette.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showCommands"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
           },
           {
             "id": "dvc.scm",
