@@ -37,10 +37,9 @@ Once you have downloaded and extracted the `vsix` file, you can install it
 following the
 [official documentation](https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix).
 
-## How to Use
-
-**See walkthrough** - `Welcome: Open Walkthrough...` > `Get Started With DVC`
-from the command palette.
+For a list of features see the walkthrough after installation. This can be
+accessed via `Welcome: Open Walkthrough...` > `Get Started With DVC` from the
+command palette.
 
 ### Debugging
 
