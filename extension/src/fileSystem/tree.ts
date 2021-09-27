@@ -241,10 +241,17 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
             'Are you sure you want to move the selected data into this dataset?',
             'Move'
           )
-          if (response === 'Move') {
-            await moveTargets(paths, destination)
-            return fireWatcher(this.getDataPlaceholder(destination))
+          if (response !== 'Move') {
+            return
           }
+
+          await moveTargets(paths, destination)
+          const dataPlaceHolder = this.getDataPlaceholder(destination)
+
+          if (!exists(dataPlaceHolder)) {
+            return
+          }
+          return fireWatcher(dataPlaceHolder)
         }
       }
     )
