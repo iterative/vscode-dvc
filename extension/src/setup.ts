@@ -5,7 +5,7 @@ import {
   quickPickYesOrNo
 } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
-import { pickFile } from './vscode/pickFile'
+import { pickFile } from './vscode/resourcePicker'
 
 const setConfigPath = async (
   option: string,

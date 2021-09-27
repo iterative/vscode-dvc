@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { Uri, window } from 'vscode'
-import { pickFile, pickResources } from './pickFile'
+import { pickFile, pickResources } from './resourcePicker'
 
 jest.mock('vscode')
 
