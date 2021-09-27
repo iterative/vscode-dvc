@@ -2,7 +2,7 @@ import { join } from 'path'
 import { commands, EventEmitter, TreeItem, Uri, window } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { exists } from '.'
+import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
 import { Config } from '../config'
 import { InternalCommands } from '../commands/internal'
@@ -46,6 +46,7 @@ mockedInternalCommands.registerCommand('listDvcOnly', (...args) =>
 )
 
 const mockedExists = mocked(exists)
+const mockedIsDirectory = mocked(isDirectory)
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -199,8 +200,16 @@ describe('TrackedTreeView', () => {
         mockedWorkspaceChanged,
         mockedTreeDataChanged
       )
+      mockedExists
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(true)
+        .mockReturnValueOnce(true)
+
+      mockedIsDirectory.mockReturnValueOnce(true)
+
       trackedTreeView.initialize([dvcDemoPath])
-      mockedExists.mockReturnValueOnce(true).mockReturnValueOnce(true)
 
       await trackedTreeView.getChildren()
 

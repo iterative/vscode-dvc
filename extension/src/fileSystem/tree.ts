@@ -9,7 +9,7 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { exists } from '.'
+import { exists, isDirectory } from '.'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
@@ -188,7 +188,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       const absolutePath = join(path, relative.path)
       this.pathItems[absolutePath] = {
         dvcRoot,
-        isDirectory: relative.isdir,
+        // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
+        isDirectory: exists(absolutePath)
+          ? isDirectory(absolutePath)
+          : relative.isdir,
         isOut: relative.isout
       }
       return absolutePath
