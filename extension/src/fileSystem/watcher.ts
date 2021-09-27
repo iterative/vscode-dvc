@@ -10,7 +10,7 @@ import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
 
 export const fireWatcher = (path: string): Promise<void> => {
-  const now = new Date().getTime()
+  const now = new Date().getTime() / 1000
   return utimes(path, now, now)
 }
 

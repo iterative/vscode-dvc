@@ -246,12 +246,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
           }
 
           await moveTargets(paths, destination)
-          const dataPlaceHolder = this.getDataPlaceholder(destination)
-
-          if (!exists(dataPlaceHolder)) {
-            return
-          }
-          return fireWatcher(dataPlaceHolder)
+          return fireWatcher(this.getDataPlaceholder(destination))
         }
       }
     )
