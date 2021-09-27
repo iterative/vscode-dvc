@@ -9,6 +9,7 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
+import { utimesSync } from 'fs-extra'
 import { exists, isDirectory } from '.'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
@@ -209,18 +210,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.MOVE_TARGETS,
-      async (destination: string) => {
-        const paths = await pickResources(
-          'pick resources to add to the dataset'
-        )
-        if (paths) {
-          await moveTargets(paths, destination)
-        }
-      }
-    )
-
     this.internalCommands.registerExternalCliCommand(
       RegisteredCliCommands.INIT,
       async () => {
@@ -238,6 +227,20 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.internalCommands.registerExternalCommand<string>(
       RegisteredCommands.DELETE_TARGET,
       path => deleteTarget(path)
+    )
+
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.MOVE_TARGETS,
+      async (destination: string) => {
+        const paths = await pickResources(
+          'pick resources to add to the dataset'
+        )
+        if (paths) {
+          await moveTargets(paths, destination)
+          const now = new Date().getTime()
+          utimesSync(this.getDataPlaceholder(destination), now, now)
+        }
+      }
     )
 
     this.internalCommands.registerExternalCliCommand<string>(
