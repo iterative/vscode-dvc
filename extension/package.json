@@ -728,7 +728,7 @@
             "title": "Setup the workspace",
             "description": "Setup the workspace for the dvc extension.\n[Setup the workspace](command:dvc.setupWorkspace)",
             "media": {
-              "markdown": "resources/setupWorkspace.md"
+              "markdown": "resources/walkthrough/setupWorkspace.md"
             },
             "completionEvents": [
               "onCommand:dvc.setupWorkspace"
@@ -739,7 +739,7 @@
             "title": "Available commands",
             "description": "View all of the available commands.\n[View commands](command:dvc.showCommands)",
             "media": {
-              "markdown": "resources/commandPalette.md"
+              "markdown": "resources/walkthrough/commandPalette.md"
             },
             "completionEvents": [
               "onCommand:dvc.showCommands"
@@ -751,7 +751,7 @@
             "title": "Source control management",
             "description": "Open the DVC scm view.\n[Show scm](command:workbench.view.scm)",
             "media": {
-              "markdown": "resources/sourceControlManagement.md"
+              "markdown": "resources/walkthrough/sourceControlManagement.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.scm"
@@ -763,7 +763,7 @@
             "title": "Tracked resources",
             "description": "Open the DVC tracked view.\n[Show tracked](command:dvc.views.trackedExplorerTree.focus)",
             "media": {
-              "markdown": "resources/trackedExplorer.md"
+              "markdown": "resources/walkthrough/trackedExplorer.md"
             },
             "completionEvents": [
               "onCommand:dvc.views.trackedExplorerTree.focus"
@@ -775,7 +775,7 @@
             "title": "Experiments views container",
             "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
             "media": {
-              "markdown": "resources/experimentsViews.md"
+              "markdown": "resources/walkthrough/experimentsViews.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
@@ -787,7 +787,7 @@
             "title": "Experiments table",
             "description": "Open the experiments table.\n[Show table](command:dvc.showExperiments)",
             "media": {
-              "markdown": "resources/experimentsTable.md"
+              "markdown": "resources/walkthrough/experimentsTable.md"
             },
             "completionEvents": [
               "onCommand:dvc.showExperiments"
