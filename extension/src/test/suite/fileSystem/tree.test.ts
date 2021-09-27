@@ -94,6 +94,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'even-more-extra-data.txt'
       ]
       const mockDestination = join(dvcDemoPath, 'data', 'MNIST', 'raw')
+      ensureFileSync(mockDestination + '.dvc')
 
       const expectedTargets = mockData.map(file => join(dvcDemoPath, file))
       const expectedDestinations = mockData.map(file =>
