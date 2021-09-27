@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { exists } from '.'
-import { deleteTarget } from './workspace'
+import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
 import { tryThenMaybeForce } from '../cli/actions'
@@ -24,6 +24,7 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
+import { pickResources } from '../vscode/pickFile'
 
 type PathItem = { dvcRoot: string; isDirectory: boolean; isOut: boolean }
 
@@ -205,6 +206,18 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.MOVE_TARGETS,
+      async (destination: string) => {
+        const paths = await pickResources(
+          'pick resources to add to the dataset'
+        )
+        if (paths) {
+          await moveTargets(paths, destination)
+        }
+      }
+    )
+
     this.internalCommands.registerExternalCliCommand(
       RegisteredCliCommands.INIT,
       async () => {

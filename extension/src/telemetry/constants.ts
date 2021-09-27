@@ -86,6 +86,7 @@ export interface IEventNamePropertyMapping {
   [EventName.COMMIT]: undefined
   [EventName.DELETE_TARGET]: undefined
   [EventName.INIT]: undefined
+  [EventName.MOVE_TARGETS]: undefined
   [EventName.PULL_TARGET]: undefined
   [EventName.PULL]: undefined
   [EventName.PUSH_TARGET]: undefined

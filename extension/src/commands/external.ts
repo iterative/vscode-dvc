@@ -40,6 +40,7 @@ export enum RegisteredCommands {
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',
 
   DELETE_TARGET = 'dvc.deleteTarget',
+  MOVE_TARGETS = 'dvc.moveTargets',
 
   TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile',
   TRACKED_EXPLORER_COMPARE_SELECTED = 'dvc.compareSelected',

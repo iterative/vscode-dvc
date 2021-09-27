@@ -133,6 +133,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.moveTargets%",
+        "command": "dvc.moveTargets",
+        "category": "DVC"
+      },
+      {
         "title": "%command.openToTheSide%",
         "command": "dvc.openToTheSide",
         "category": "DVC"
@@ -357,6 +362,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.moveTargets",
+          "when": "false"
+        },
+        {
           "command": "dvc.openToTheSide",
           "when": "false"
         },
@@ -527,13 +536,18 @@
           "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/"
         },
         {
-          "command": "dvc.pullTarget",
+          "command": "dvc.moveTargets",
           "group": "1_DVC@1",
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^dirData$/"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "group": "1_DVC@2",
           "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.pushTarget",
-          "group": "1_DVC@2",
+          "group": "1_DVC@3",
           "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
         },
         {
