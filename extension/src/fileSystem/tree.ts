@@ -26,6 +26,7 @@ import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
 import { pickResources } from '../vscode/resourcePicker'
+import { getWarningResponse } from '../vscode/modal'
 
 type PathItem = { dvcRoot: string; isDirectory: boolean; isOut: boolean }
 
@@ -236,8 +237,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
           'pick resources to add to the dataset'
         )
         if (paths) {
-          await moveTargets(paths, destination)
-          return fireWatcher(this.getDataPlaceholder(destination))
+          const response = await getWarningResponse(
+            'Are you sure you want to move the selected data into this dataset?',
+            'Move'
+          )
+          if (response === 'Move') {
+            await moveTargets(paths, destination)
+            return fireWatcher(this.getDataPlaceholder(destination))
+          }
         }
       }
     )

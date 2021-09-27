@@ -110,6 +110,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         undefined
       )
 
+      stub(window, 'showWarningMessage').resolves(
+        'Move' as unknown as MessageItem
+      )
+
       await commands.executeCommand('dvc.moveTargets', mockDestination)
 
       expect(mockResourcePicker).to.be.calledOnce
@@ -120,6 +124,30 @@ suite('Tracked Explorer Tree Test Suite', () => {
         expect(target.fsPath).to.equal(expectedTargets[i])
         expect(dest.fsPath).to.equal(expectedDestinations[i])
       }
+    })
+
+    it('should not add data to a tracked data directory if the user changes their mind', async () => {
+      const mockData = ['data-i-will-not-move.txt']
+      const mockDestination = join(dvcDemoPath, 'data', 'MNIST', 'raw')
+
+      const mockUris = mockData.map(file => Uri.file(join(dvcDemoPath, file)))
+
+      const mockResourcePicker = stub(window, 'showOpenDialog').resolves(
+        mockUris
+      )
+
+      const mockRename = stub(WorkspaceEdit.prototype, 'renameFile').resolves(
+        undefined
+      )
+
+      stub(window, 'showWarningMessage').resolves(
+        'Cancel' as unknown as MessageItem
+      )
+
+      await commands.executeCommand('dvc.moveTargets', mockDestination)
+
+      expect(mockResourcePicker).to.be.calledOnce
+      expect(mockRename).not.to.be.called
     })
 
     it('should be able to run dvc.init without error', async () => {
