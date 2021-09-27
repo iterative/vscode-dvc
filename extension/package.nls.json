@@ -36,6 +36,7 @@
   "command.selectDefaultProject": "Select Default Project",
   "command.selectForCompare": "Select for Compare",
   "command.setupWorkspace": "Setup The Workspace",
+  "command.showCommands": "Show Commands",
   "command.showExperiments": "Show Experiments",
   "command.stopRunningExperiment": "Stop Running Experiment",
   "command.views.experimentsFilterByTree.removeAllFilters": "Remove All Filters From Experiments Table",

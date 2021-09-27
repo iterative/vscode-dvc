@@ -237,6 +237,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.showCommands",
+        "command": "dvc.showCommands",
+        "category": "DVC"
+      },
+      {
         "title": "%command.showExperiments%",
         "command": "dvc.showExperiments",
         "category": "DVC"
@@ -406,6 +411,10 @@
         },
         {
           "command": "dvc.selectForCompare",
+          "when": "false"
+        },
+        {
+          "command": "dvc.showCommands",
           "when": "false"
         },
         {
@@ -706,6 +715,86 @@
       {
         "view": "dvc.views.experimentsFilterByTree",
         "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "dvcWelcome",
+        "title": "Get started with DVC",
+        "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
+        "steps": [
+          {
+            "id": "dvc.setup",
+            "title": "Setup the workspace",
+            "description": "Setup the workspace for the dvc extension.\n[Setup the workspace](command:dvc.setupWorkspace)",
+            "media": {
+              "markdown": "resources/walkthrough/setupWorkspace.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.setupWorkspace"
+            ]
+          },
+          {
+            "id": "dvc.showCommands",
+            "title": "Available commands",
+            "description": "View all of the available commands.\n[View commands](command:dvc.showCommands)",
+            "media": {
+              "markdown": "resources/walkthrough/commandPalette.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showCommands"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.scm",
+            "title": "Source control management",
+            "description": "Open the DVC scm view.\n[Show scm](command:workbench.view.scm)",
+            "media": {
+              "markdown": "resources/walkthrough/sourceControlManagement.md"
+            },
+            "completionEvents": [
+              "onCommand:workbench.view.scm"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.tracked",
+            "title": "Tracked resources",
+            "description": "Open the DVC tracked view.\n[Show tracked](command:dvc.views.trackedExplorerTree.focus)",
+            "media": {
+              "markdown": "resources/walkthrough/trackedExplorer.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.views.trackedExplorerTree.focus"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.viewContainer",
+            "title": "Experiments views container",
+            "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
+            "media": {
+              "markdown": "resources/walkthrough/experimentsViews.md"
+            },
+            "completionEvents": [
+              "onCommand:workbench.view.extension.dvc-views"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.experimentsTable",
+            "title": "Experiments table",
+            "description": "Open the experiments table.\n[Show table](command:dvc.showExperiments)",
+            "media": {
+              "markdown": "resources/walkthrough/experimentsTable.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showExperiments"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          }
+        ]
       }
     ]
   },
