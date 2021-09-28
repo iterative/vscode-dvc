@@ -14,7 +14,7 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
-import { QuickPickItemWithValue } from './vscode/quickPick'
+import { QuickPickItemWithValue, quickPickValue } from './vscode/quickPick'
 import { getConfigValue, setConfigValue } from './vscode/config'
 import { definedAndNonEmpty } from './util/array'
 
@@ -170,20 +170,19 @@ export class Config {
 
   private async pickDefaultProject(): Promise<string | undefined> {
     if (definedAndNonEmpty(this.dvcRoots)) {
-      const selected = await window.showQuickPick(
+      const selected = await quickPickValue(
         this.getDefaultProjectOptions(this.dvcRoots),
         {
-          canPickMany: false,
           placeHolder: 'Select a default project to run all commands against'
         }
       )
 
-      if (selected?.value === 'remove-default') {
+      if (selected === 'remove-default') {
         this.deselectDefaultProject()
         return
       }
 
-      return selected?.value
+      return selected
     }
   }
 
