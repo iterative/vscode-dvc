@@ -26,8 +26,6 @@ import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/pat
 import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Experiments Repository Test Suite', () => {
-  window.showInformationMessage('Start all experiment repository tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

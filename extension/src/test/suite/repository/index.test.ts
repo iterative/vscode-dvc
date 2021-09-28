@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, useFakeTimers, SinonFakeTimers } from 'sinon'
-import { window } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import { Config } from '../../../config'
@@ -11,8 +10,6 @@ import { dvcDemoPath } from '../util'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Repository Test Suite', () => {
-  window.showInformationMessage('Start all repository tests.')
-
   const disposable = Disposable.fn()
   let clock: SinonFakeTimers
 

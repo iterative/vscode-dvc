@@ -15,8 +15,6 @@ import { Config } from '../../config'
 import { RegisteredCommands } from '../../commands/external'
 
 suite('Status Test Suite', () => {
-  window.showInformationMessage('Start all status tests.')
-
   const dvcPathOption = 'dvc.dvcPath'
 
   const disposable = Disposable.fn()
