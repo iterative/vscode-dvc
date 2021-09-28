@@ -23,8 +23,6 @@ import * as Telemetry from '../../../telemetry'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Experiments Test Suite', () => {
-  window.showInformationMessage('Start all experiments tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

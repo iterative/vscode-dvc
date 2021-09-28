@@ -19,8 +19,6 @@ import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
 suite('Extension Test Suite', () => {
-  window.showInformationMessage('Start all extension tests.')
-
   const dvcPathOption = 'dvc.dvcPath'
   const pythonPathOption = 'dvc.pythonPath'
 
