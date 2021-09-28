@@ -8,8 +8,6 @@ import { Cli, CliResult, CliStarted } from '../../../cli'
 import { Config } from '../../../config'
 
 suite('Output Channel Test Suite', () => {
-  window.showInformationMessage('Start all output channel tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

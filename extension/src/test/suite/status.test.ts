@@ -14,8 +14,6 @@ import { Cli, CliResult, CliStarted } from '../../cli'
 import { Config } from '../../config'
 
 suite('Status Test Suite', () => {
-  window.showInformationMessage('Start all status tests.')
-
   const dvcPathOption = 'dvc.dvcPath'
 
   const disposable = Disposable.fn()

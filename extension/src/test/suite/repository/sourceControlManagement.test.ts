@@ -9,8 +9,6 @@ import { dvcDemoPath } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 
 suite('Source Control Management Test Suite', () => {
-  window.showInformationMessage('Start all source control management tests.')
-
   const disposable = Disposable.fn()
   const rootUri = Uri.file(dvcDemoPath)
   const relPath = join('data', 'MNIST')

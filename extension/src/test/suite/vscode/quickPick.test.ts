@@ -1,12 +1,9 @@
 import { describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { window } from 'vscode'
 import { quickPickOneOrInput } from '../../../vscode/quickPick'
 import { selectQuickPickItem } from '../util'
 
 suite('Quick Pick Test Suite', () => {
-  window.showInformationMessage('Start all quick pick tests.')
-
   describe('quickPickOneOrInput', () => {
     it('should return the currently selected value', async () => {
       const expectedSelection = 'b'
