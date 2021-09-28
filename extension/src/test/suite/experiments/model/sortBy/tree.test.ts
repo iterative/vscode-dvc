@@ -17,8 +17,6 @@ import { buildExperimentsRepository } from '../../util'
 import { ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {
-  window.showInformationMessage('Start all experiments sort by tree tests.')
-
   const testData = {
     testBranch: {
       baseline: {

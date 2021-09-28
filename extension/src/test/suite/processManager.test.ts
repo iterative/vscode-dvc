@@ -1,14 +1,11 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore, stub } from 'sinon'
-import { window } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ProcessManager } from '../../processManager'
 import { delay } from '../../util/time'
 
 suite('Process Manager Test Suite', () => {
-  window.showInformationMessage('Start all experiment repository tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

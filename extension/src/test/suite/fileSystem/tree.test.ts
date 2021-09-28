@@ -29,8 +29,6 @@ import {
 import { TrackedExplorerTree } from '../../../fileSystem/tree'
 
 suite('Tracked Explorer Tree Test Suite', () => {
-  window.showInformationMessage('Start all tracked explorer tree tests.')
-
   const { join } = path
 
   const disposable = Disposable.fn()

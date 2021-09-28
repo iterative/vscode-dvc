@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { EventEmitter, window } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { restore, spy } from 'sinon'
 import { Disposable } from '../../../extension'
 import {
@@ -11,8 +11,6 @@ import {
 } from '../../../extensions/git'
 
 suite('Git Extension Test Suite', () => {
-  window.showInformationMessage('Start all git extension tests.')
-
   const workspacePath = resolve(__dirname, '..', '..', '..', '..', '..')
 
   const disposable = Disposable.fn()

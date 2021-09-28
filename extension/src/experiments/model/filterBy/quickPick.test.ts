@@ -1,27 +1,16 @@
 import { mocked } from 'ts-jest/utils'
-import { QuickPickOptions, window } from 'vscode'
 import { FilterDefinition, Operator } from '.'
 import { operators, pickFiltersToRemove, pickFilterToAdd } from './quickPick'
 import { getInput } from '../../../vscode/inputBox'
-import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 
-jest.mock('vscode')
 jest.mock('../../../vscode/inputBox')
+jest.mock('../../../vscode/quickPick')
 
-const mockedShowQuickPick = mocked<
-  (
-    items: QuickPickItemWithValue[],
-    options: QuickPickOptions
-  ) => Thenable<
-    | QuickPickItemWithValue[]
-    | QuickPickItemWithValue
-    | string
-    | undefined
-    | unknown
-  >
->(window.showQuickPick)
 const mockedGetInput = mocked(getInput)
+const mockedQuickPickManyValues = mocked(quickPickManyValues)
+const mockedQuickPickValue = mocked(quickPickValue)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -68,41 +57,33 @@ const mixedParam = {
 describe('pickFilterToAdd', () => {
   it('should return early if no param or metric is picked', async () => {
     const params = [epochsParam]
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
     const filter = await pickFilterToAdd(params)
     expect(filter).toBeUndefined()
   })
 
   it('should return early if no operator is picked', async () => {
     const params = [epochsParam]
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: epochsParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
     const filter = await pickFilterToAdd(params)
     expect(filter).toBeUndefined()
   })
 
   it('should call showQuickPick with the correct operators for a mixed type param', async () => {
     const params = [mixedParam]
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: mixedParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    mockedQuickPickValue.mockResolvedValueOnce(mixedParam)
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
     await pickFilterToAdd(params)
-    expect(mockedShowQuickPick).toBeCalledWith(operators, {
+    expect(mockedQuickPickValue).toBeCalledWith(operators, {
       title: 'Select an operator'
     })
   })
 
   it('should return early if no value is provided', async () => {
     const params = [epochsParam]
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: epochsParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: '=='
-    } as unknown)
+    mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
+    mockedQuickPickValue.mockResolvedValueOnce('==')
     mockedGetInput.mockResolvedValueOnce(undefined)
     const filter = await pickFilterToAdd(params)
     expect(filter).toBeUndefined()
@@ -110,19 +91,15 @@ describe('pickFilterToAdd', () => {
 
   it('should return without asking for a value when a boolean param is selected', async () => {
     const params = [boolParam]
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: boolParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: Operator.IS_TRUE
-    } as unknown)
+    mockedQuickPickValue.mockResolvedValueOnce(boolParam)
+    mockedQuickPickValue.mockResolvedValueOnce(Operator.IS_TRUE)
     const filter = await pickFilterToAdd(params)
     expect(filter).toEqual({
       operator: Operator.IS_TRUE,
       path: boolParam.path,
       value: undefined
     })
-    expect(mockedShowQuickPick).toBeCalledWith(
+    expect(mockedQuickPickValue).toBeCalledWith(
       operators.filter(operator => operator.types.includes('boolean')),
       {
         title: 'Select an operator'
@@ -133,12 +110,8 @@ describe('pickFilterToAdd', () => {
 
   it('should return a filter definition if all of the steps are completed', async () => {
     const params = [epochsParam]
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: epochsParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: '=='
-    } as unknown)
+    mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
+    mockedQuickPickValue.mockResolvedValueOnce('==')
     mockedGetInput.mockResolvedValueOnce('5')
     const filter = await pickFilterToAdd(params)
     expect(filter).toEqual({
@@ -146,7 +119,7 @@ describe('pickFilterToAdd', () => {
       path: epochsParam.path,
       value: '5'
     })
-    expect(mockedShowQuickPick).toBeCalledWith(
+    expect(mockedQuickPickValue).toBeCalledWith(
       operators.filter(operator => operator.types.includes('number')),
       {
         title: 'Select an operator'
@@ -179,9 +152,7 @@ describe('pickFiltersToRemove', () => {
       ...selectedFilters,
       { operator: Operator.EQUAL, path: epochsParam.path, value: '4' }
     ]
-    mockedShowQuickPick.mockResolvedValueOnce(
-      selectedFilters.map(filter => ({ value: filter }))
-    )
+    mockedQuickPickManyValues.mockResolvedValueOnce(selectedFilters)
 
     const filtersToRemove = await pickFiltersToRemove(allFilters)
     expect(filtersToRemove).toEqual(selectedFilters)

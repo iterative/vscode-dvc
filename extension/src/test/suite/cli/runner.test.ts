@@ -10,8 +10,6 @@ import * as Telemetry from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 
 suite('CLI Runner Test Suite', () => {
-  window.showInformationMessage('Start all cli runner tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

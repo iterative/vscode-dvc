@@ -1,4 +1,4 @@
-### Tracked resources
+# Tracked resources
 
 Resources tracked by DVC can be viewed and managed via the tracked explorer
 view.
