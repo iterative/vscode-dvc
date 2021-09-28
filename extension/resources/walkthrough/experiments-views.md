@@ -1,4 +1,4 @@
-### Experiments views
+# Experiments views
 
 The experiments views provide supplementary information and control over the
 project's experiments.
