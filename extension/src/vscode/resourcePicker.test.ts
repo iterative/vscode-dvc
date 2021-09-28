@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { Uri, window } from 'vscode'
-import { pickFile } from './pickFile'
+import { pickFile, pickResources } from './resourcePicker'
 
 jest.mock('vscode')
 
@@ -36,5 +36,33 @@ describe('pickFile', () => {
     const pickedFile = await pickFile(mockedTitle)
 
     expect(pickedFile).toEqual(mockedUri.fsPath)
+  })
+})
+
+describe('pickResources', () => {
+  it('should called window.showOpenDialog with the correct options', async () => {
+    const mockedTitle = 'I decided to not decide'
+    mockedShowOpenDialog.mockResolvedValueOnce(undefined)
+
+    await pickResources(mockedTitle)
+
+    expect(mockedShowOpenDialog).toBeCalledWith({
+      canSelectFiles: true,
+      canSelectFolders: true,
+      canSelectMany: true,
+      openLabel: 'Select',
+      title: mockedTitle
+    })
+  })
+
+  it('should return an array of paths if any are selected', async () => {
+    const mockedUri = Uri.file(resolve('mock', 'multiple', 'resource', 'fun'))
+    const mockedPickedUri = [mockedUri]
+    const mockedTitle = 'this is even more fun'
+    mockedShowOpenDialog.mockResolvedValueOnce(mockedPickedUri)
+
+    const pickedResources = await pickResources(mockedTitle)
+
+    expect(pickedResources).toEqual([mockedUri.fsPath])
   })
 })

@@ -1,12 +1,13 @@
 import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { workspace, WorkspaceEdit } from 'vscode'
-import { deleteTarget } from './workspace'
+import { Uri, workspace, WorkspaceEdit } from 'vscode'
+import { deleteTarget, moveTargets } from './workspace'
 
 const mockedWorkspace = mocked(workspace)
 const mockedApplyEdit = jest.fn()
 const mockedWorkspaceEdit = mocked(WorkspaceEdit)
 const mockedDeleteFile = jest.fn()
+const mockedRenameFile = jest.fn()
 
 jest.mock('vscode')
 jest.mock('.')
@@ -30,5 +31,29 @@ describe('deleteTarget', () => {
     expect(mockedWorkspaceEdit).toBeCalledTimes(1)
     expect(mockedApplyEdit).toBeCalledWith({ deleteFile: mockedDeleteFile })
     expect(deleted).toBe(true)
+  })
+})
+
+describe('moveTargets', () => {
+  it('should call WorkspaceEdit renameFile with the provided uri', async () => {
+    mockedWorkspaceEdit.mockImplementationOnce(function () {
+      return {
+        renameFile: mockedRenameFile
+      } as unknown as WorkspaceEdit
+    })
+    mockedWorkspace.applyEdit = mockedApplyEdit.mockResolvedValueOnce(true)
+
+    const filename = 'fun.txt'
+    const path = join('test', filename)
+    const destination = join('other', 'folder')
+    const moved = await moveTargets([path], destination)
+
+    expect(mockedWorkspaceEdit).toBeCalledTimes(1)
+    expect(mockedRenameFile).toBeCalledWith(
+      Uri.file(path),
+      Uri.file(join(destination, filename))
+    )
+    expect(mockedApplyEdit).toBeCalledWith({ renameFile: mockedRenameFile })
+    expect(moved).toBe(true)
   })
 })

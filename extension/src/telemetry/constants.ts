@@ -86,6 +86,7 @@ export interface IEventNamePropertyMapping {
   [EventName.COMMIT]: undefined
   [EventName.DELETE_TARGET]: undefined
   [EventName.INIT]: undefined
+  [EventName.MOVE_TARGETS]: undefined
   [EventName.PULL_TARGET]: undefined
   [EventName.PULL]: undefined
   [EventName.PUSH_TARGET]: undefined
@@ -104,6 +105,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
+  [EventName.EXTENSION_SHOW_COMMANDS]: undefined
 
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount

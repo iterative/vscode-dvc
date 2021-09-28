@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { setup, setupWorkspace } from './setup'
 import { setConfigValue } from './vscode/config'
-import { pickFile } from './vscode/pickFile'
+import { pickFile } from './vscode/resourcePicker'
 import {
   quickPickOneOrInput,
   quickPickValue,
@@ -10,7 +10,7 @@ import {
 } from './vscode/quickPick'
 
 jest.mock('./vscode/config')
-jest.mock('./vscode/pickFile')
+jest.mock('./vscode/resourcePicker')
 jest.mock('./vscode/quickPick')
 
 const mockedCanRunCli = jest.fn()

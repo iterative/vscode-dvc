@@ -362,6 +362,14 @@ suite('Extension Test Suite', () => {
     })
   })
 
+  describe('dvc.showCommands', () => {
+    it('should show all of the dvc commands without error', async () => {
+      await expect(
+        commands.executeCommand('dvc.showCommands')
+      ).to.be.eventually.equal(undefined)
+    })
+  })
+
   describe('view container', () => {
     it('should be able to focus the experiments view container', async () => {
       await expect(
