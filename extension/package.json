@@ -742,7 +742,7 @@
             "title": "Install DVC",
             "description": "The DVC Extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
             "media": {
-              "markdown": "resources/walkthrough/installDvc.md"
+              "markdown": "resources/walkthrough/install-dvc.md"
             },
             "completionEvents": [
               "onLink:https://dvc.org",
@@ -754,7 +754,7 @@
             "title": "Setup the workspace",
             "description": "Setup the workspace for the dvc extension.\n[Setup the workspace](command:dvc.setupWorkspace)",
             "media": {
-              "markdown": "resources/walkthrough/setupWorkspace.md"
+              "markdown": "resources/walkthrough/setup-workspace.md"
             },
             "completionEvents": [
               "onCommand:dvc.setupWorkspace"
@@ -765,7 +765,7 @@
             "title": "Available commands",
             "description": "View all of the available commands.\n[View commands](command:dvc.showCommands)",
             "media": {
-              "markdown": "resources/walkthrough/commandPalette.md"
+              "markdown": "resources/walkthrough/command-palette.md"
             },
             "completionEvents": [
               "onCommand:dvc.showCommands"
@@ -777,7 +777,7 @@
             "title": "Source control management",
             "description": "Open the DVC scm view.\n[Show scm](command:workbench.view.scm)",
             "media": {
-              "markdown": "resources/walkthrough/sourceControlManagement.md"
+              "markdown": "resources/walkthrough/source-control-management.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.scm"
@@ -789,7 +789,7 @@
             "title": "Tracked resources",
             "description": "Open the DVC tracked view.\n[Show tracked](command:dvc.views.trackedExplorerTree.focus)",
             "media": {
-              "markdown": "resources/walkthrough/trackedExplorer.md"
+              "markdown": "resources/walkthrough/tracked-explorer.md"
             },
             "completionEvents": [
               "onCommand:dvc.views.trackedExplorerTree.focus"
@@ -801,7 +801,7 @@
             "title": "Experiments views container",
             "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
             "media": {
-              "markdown": "resources/walkthrough/experimentsViews.md"
+              "markdown": "resources/walkthrough/experiments-views.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
@@ -813,7 +813,7 @@
             "title": "Experiments table",
             "description": "Open the experiments table.\n[Show table](command:dvc.showExperiments)",
             "media": {
-              "markdown": "resources/walkthrough/experimentsTable.md"
+              "markdown": "resources/walkthrough/experiments-table.md"
             },
             "completionEvents": [
               "onCommand:dvc.showExperiments"
@@ -825,7 +825,7 @@
             "title": "Explore more resources",
             "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn more](https://dvc.org/doc)",
             "media": {
-              "markdown": "resources/walkthrough/dvcLearnMore.md"
+              "markdown": "resources/walkthrough/dvc-learn-more.md"
             },
             "completionEvents": [
               "onLink:https://dvc.org/doc"
