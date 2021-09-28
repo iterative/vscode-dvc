@@ -1,6 +1,6 @@
 import { window } from 'vscode'
 import { GcPreserveFlag } from '../cli/args'
-import { quickPickManyValues } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickOne } from '../vscode/quickPick'
 
 export const pickExperimentName = async (
   experimentNamesPromise: Promise<string[]>
@@ -9,7 +9,7 @@ export const pickExperimentName = async (
   if (experimentNames.length === 0) {
     window.showErrorMessage('There are no experiments to select.')
   } else {
-    return window.showQuickPick(experimentNames)
+    return quickPickOne(experimentNames, 'Select an experiment')
   }
 }
 

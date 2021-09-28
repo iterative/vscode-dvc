@@ -1,21 +1,11 @@
 import { mocked } from 'ts-jest/utils'
-import { QuickPickOptions, window } from 'vscode'
 import { pickFromParamsAndMetrics } from './quickPick'
 import { joinParamOrMetricPath } from './paths'
-import { QuickPickItemWithValue } from '../../vscode/quickPick'
+import { quickPickValue } from '../../vscode/quickPick'
 
-const mockedShowQuickPick = mocked<
-  (
-    items: QuickPickItemWithValue[],
-    options: QuickPickOptions
-  ) => Thenable<
-    | QuickPickItemWithValue[]
-    | QuickPickItemWithValue
-    | string
-    | undefined
-    | unknown
-  >
->(window.showQuickPick)
+jest.mock('../../vscode/quickPick')
+
+const mockedQuickPickValue = mocked(quickPickValue)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -52,12 +42,13 @@ describe('pickFromParamsAndMetrics', () => {
       title: "can't pick from no params or metrics"
     })
     expect(picked).toBeUndefined()
+    expect(mockedQuickPickValue).not.toBeCalled()
   })
 
   it('should invoke a QuickPick with the correct options', async () => {
     const title = 'Test title'
     await pickFromParamsAndMetrics(exampleParamsAndMetrics, { title })
-    expect(mockedShowQuickPick).toBeCalledWith(
+    expect(mockedQuickPickValue).toBeCalledWith(
       [
         {
           description: epochsParamPath,
