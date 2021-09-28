@@ -8,7 +8,7 @@ export const quickPickValue: <T = string>(
   items: QuickPickItemWithValue<T>[],
   options: Omit<QuickPickOptions, 'canPickMany'>
 ) => Thenable<T | undefined> = async (items, options) =>
-  (await window.showQuickPick(items, options))?.value
+  (await window.showQuickPick(items, { canPickMany: false, ...options }))?.value
 
 export const quickPickManyValues: <T = string>(
   items: QuickPickItemWithValue<T>[],
