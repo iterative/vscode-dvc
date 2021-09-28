@@ -21,6 +21,14 @@ const buildDependencies = (
   const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
     experimentShowData
   )
+  const mockDiffParams = stub(cliReader, 'diffParams').resolves({
+    'params.yaml': {}
+  })
+
+  const mockDiffMetrics = stub(cliReader, 'diffMetrics').resolves({
+    metrics: {}
+  })
+
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '2', 'experiments test suite')
   )
@@ -32,7 +40,14 @@ const buildDependencies = (
     new InternalCommands(config, outputChannel, cliReader)
   )
 
-  return { config, internalCommands, mockExperimentShow, resourceLocator }
+  return {
+    config,
+    internalCommands,
+    mockDiffMetrics,
+    mockDiffParams,
+    mockExperimentShow,
+    resourceLocator
+  }
 }
 
 export const buildExperimentsRepository = (

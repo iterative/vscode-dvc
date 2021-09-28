@@ -16,7 +16,11 @@ import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import {
+  DiffMetricsOutput,
+  DiffParamsOutput,
+  ExperimentsRepoJSONOutput
+} from '../cli/reader'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -40,6 +44,8 @@ export class ExperimentsRepository {
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
+  private paramsDiff: DiffParamsOutput
+  private metricsDiff: DiffMetricsOutput
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -242,10 +248,25 @@ export class ExperimentsRepository {
 
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),
-      this.experiments.transformAndSet(data)
+      this.experiments.transformAndSet(data),
+      this.performParamsAndMetricsDiff()
     ])
 
     return this.notifyChanged()
+  }
+
+  private async performParamsAndMetricsDiff() {
+    this.paramsDiff =
+      await this.internalCommands.executeCommand<DiffParamsOutput>(
+        AvailableCommands.PARAMS_DIFF,
+        this.dvcRoot
+      )
+
+    this.metricsDiff =
+      await this.internalCommands.executeCommand<DiffMetricsOutput>(
+        AvailableCommands.METRICS_DIFF,
+        this.dvcRoot
+      )
   }
 
   private notifyChanged() {
@@ -266,8 +287,17 @@ export class ExperimentsRepository {
     }
   }
 
+  private getModifiedParams(): string[] {
+    return Object.keys(this.paramsDiff?.['params.yaml'] || [])
+  }
+
+  private getModifiedMetrics(): string[] {
+    return Object.keys(this.metricsDiff?.metrics || [])
+  }
+
   private getTableData() {
     return {
+      changes: [...this.getModifiedParams(), ...this.getModifiedMetrics()],
       columns: this.paramsAndMetrics.getSelected(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
