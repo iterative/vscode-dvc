@@ -8,4 +8,4 @@
 
 - View all [available commands](https://dvc.org/doc/command-reference).
 
-- Check out the open source [code](https://github.com/iterative/dvc).
+- Check out the [github repository](https://github.com/iterative/dvc).
