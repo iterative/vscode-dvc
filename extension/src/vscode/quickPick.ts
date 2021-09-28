@@ -32,15 +32,15 @@ export const quickPickOne = (
 
 export const quickPickOneOrInput = (
   items: QuickPickItemWithValue[],
-  placeholder: string,
-  defaultValue: string
+  options: { placeholder: string; defaultValue: string; title: string }
 ): Promise<string | undefined> =>
   new Promise(resolve => {
     const quickPick = window.createQuickPick<QuickPickItemWithValue>()
 
-    quickPick.placeholder = placeholder
+    quickPick.placeholder = options.placeholder
     quickPick.canSelectMany = false
     quickPick.items = items
+    quickPick.title = options.title
 
     let selected: string | undefined
     quickPick.onDidChangeValue((text: string) => {
@@ -49,7 +49,7 @@ export const quickPickOneOrInput = (
 
     quickPick.onDidAccept(() => {
       const result =
-        quickPick.activeItems?.[0]?.value || selected || defaultValue
+        quickPick.activeItems?.[0]?.value || selected || options.defaultValue
       resolve(result)
       quickPick.dispose()
     })
@@ -63,9 +63,9 @@ export const quickPickOneOrInput = (
   })
 
 export const quickPickYesOrNo = (
-  placeHolder: string,
   descriptionYes: string,
-  descriptionNo: string
+  descriptionNo: string,
+  options: { title: string; placeHolder: string }
 ) =>
   quickPickValue<boolean>(
     [
@@ -80,5 +80,5 @@ export const quickPickYesOrNo = (
         value: false
       }
     ],
-    { placeHolder }
+    options
   )

@@ -12,6 +12,7 @@ import { Disposable } from '../../extension'
 import { Status } from '../../status'
 import { Cli, CliResult, CliStarted } from '../../cli'
 import { Config } from '../../config'
+import { RegisteredCommands } from '../../commands/external'
 
 suite('Status Test Suite', () => {
   window.showInformationMessage('Start all status tests.')
@@ -42,6 +43,7 @@ suite('Status Test Suite', () => {
 
       const cli = new Cli({} as Config, { processCompleted, processStarted })
       const mockStatusBarItem = {
+        command: undefined,
         dispose: fake(),
         show: fake(),
         text: ''
@@ -66,18 +68,22 @@ suite('Status Test Suite', () => {
 
       expect(mockCreateStatusBarItem).to.be.calledOnce
       expect(mockStatusBarItem.text).to.equal(disabledText)
+      expect(mockStatusBarItem.command).to.equal(undefined)
 
       status.setAvailability(true)
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
+      expect(mockStatusBarItem.command).to.equal(undefined)
 
       processStarted.fire(firstFinishedCommand)
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
+      expect(mockStatusBarItem.command).to.equal(undefined)
 
       processStarted.fire(secondFinishedCommand)
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
+      expect(mockStatusBarItem.command).to.equal(undefined)
 
       processCompleted.fire({
         ...firstFinishedCommand,
@@ -87,6 +93,7 @@ suite('Status Test Suite', () => {
       })
 
       expect(mockStatusBarItem.text).to.equal(loadingText)
+      expect(mockStatusBarItem.command).to.equal(undefined)
 
       processCompleted.fire({
         ...secondFinishedCommand,
@@ -96,10 +103,15 @@ suite('Status Test Suite', () => {
       })
 
       expect(mockStatusBarItem.text).to.equal(waitingText)
+      expect(mockStatusBarItem.command).to.equal(undefined)
 
       status.setAvailability(false)
 
       expect(mockStatusBarItem.text).to.equal(disabledText)
+      expect(mockStatusBarItem.command).to.deep.equal({
+        command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+        title: 'Setup the workspace'
+      })
     })
 
     it('should floor the number of workers at 0', () => {

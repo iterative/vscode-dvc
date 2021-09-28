@@ -19,11 +19,11 @@ suite('Quick Pick Test Suite', () => {
         }
       ]
 
-      const resultPromise = quickPickOneOrInput(
-        items,
-        'pick the second item',
-        'do not want this value'
-      )
+      const resultPromise = quickPickOneOrInput(items, {
+        defaultValue: 'do not want this value',
+        placeholder: 'pick the second item',
+        title: 'just pick it'
+      })
 
       await selectQuickPickItem(2)
 
@@ -35,11 +35,11 @@ suite('Quick Pick Test Suite', () => {
     it('should return the default when no items are selected and no text is entered', async () => {
       const expectedDefault = 'want this value'
 
-      const resultPromise = quickPickOneOrInput(
-        [],
-        'no items to pick from (get the default)',
-        expectedDefault
-      )
+      const resultPromise = quickPickOneOrInput([], {
+        defaultValue: expectedDefault,
+        placeholder: 'no items to pick from (get the default)',
+        title: 'this is fun'
+      })
 
       await selectQuickPickItem(1)
 
