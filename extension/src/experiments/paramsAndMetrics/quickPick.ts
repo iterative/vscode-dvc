@@ -1,14 +1,15 @@
-import { QuickPickOptions, window } from 'vscode'
+import { QuickPickOptions } from 'vscode'
+import { definedAndNonEmpty } from '../../util/array'
 import { quickPickValue } from '../../vscode/quickPick'
+import { reportError } from '../../vscode/reporting'
 import { ParamOrMetric } from '../webview/contract'
 
 export const pickFromParamsAndMetrics = (
   paramsAndMetrics: ParamOrMetric[] | undefined,
   quickPickOptions: QuickPickOptions
 ) => {
-  if (!paramsAndMetrics || paramsAndMetrics.length === 0) {
-    window.showErrorMessage('There are no params or metrics to select from')
-    return
+  if (!definedAndNonEmpty(paramsAndMetrics)) {
+    return reportError('There are no params or metrics to select from')
   }
   return quickPickValue<ParamOrMetric>(
     paramsAndMetrics.map(paramOrMetric => ({
