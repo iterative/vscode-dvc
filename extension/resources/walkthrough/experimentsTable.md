@@ -1,4 +1,4 @@
-### Experiments table
+# Experiments table
 
 This is the extension's equivalent of `dvc exp show`.
 

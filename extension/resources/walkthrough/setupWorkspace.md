@@ -1,4 +1,4 @@
-### Installing and Integrating With DVC CLI
+# Installing and Integrating With DVC CLI
 
 As you probably already know there are quite a few options for installing DVC.
 

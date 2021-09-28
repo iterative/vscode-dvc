@@ -738,6 +738,18 @@
         "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
         "steps": [
           {
+            "id": "dvc.installDVC",
+            "title": "Install DVC",
+            "description": "The DVC Extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "media": {
+              "markdown": "resources/walkthrough/installDvc.md"
+            },
+            "completionEvents": [
+              "onLink:https://dvc.org",
+              "onLink:https://dvc.org/doc/install"
+            ]
+          },
+          {
             "id": "dvc.setup",
             "title": "Setup the workspace",
             "description": "Setup the workspace for the dvc extension.\n[Setup the workspace](command:dvc.setupWorkspace)",
@@ -807,6 +819,17 @@
               "onCommand:dvc.showExperiments"
             ],
             "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.learnMore",
+            "title": "Explore more resources",
+            "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn more](https://dvc.org/doc)",
+            "media": {
+              "markdown": "resources/walkthrough/dvcLearnMore.md"
+            },
+            "completionEvents": [
+              "onLink:https://dvc.org/doc"
+            ]
           }
         ]
       }
