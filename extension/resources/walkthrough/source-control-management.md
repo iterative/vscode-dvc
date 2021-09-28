@@ -1,4 +1,4 @@
-### Source control management
+# Source control management
 
 Resources tracked by DVC can be managed through VS Code's builtin SCM view.
 
