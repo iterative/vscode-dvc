@@ -324,7 +324,7 @@ $spinner-color-light: #000;
     }
   }
 
-  .workspaceWithChanges {
+  .workspaceWithChanges:not(.runningExperiment) {
     .bullet::before {
       background-color: $metrics-color;
 
