@@ -19,7 +19,7 @@ suite('Walkthrough Test Suite', () => {
   })
 
   describe('showWalkthroughOnFirstUse', () => {
-    it('should only call the command on the first call', () => {
+    it('should only show the walkthrough once', () => {
       const mockGlobalState = buildMockMemento()
 
       const mockExecuteCommand = stub(commands, 'executeCommand').resolves(
