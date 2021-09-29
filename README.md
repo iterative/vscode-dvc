@@ -47,17 +47,26 @@ following the
 any reason you need to revisit the walkthrough it can be accessed via
 `DVC: Get Started` from the command palette.
 
-## Contributing
+## Features
 
-See development docs and contributing guidelines in
-[CONTRIBUTING.md](CONTRIBUTING.md)
+- [Command Palette](extension/resources/walkthrough/command-palette.md)
+- [Source Control Management](extension/resources/walkthrough/source-control-management.md)
+- [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
+- [Experiments Table](extension/resources/walkthrough/experiments-table.md)
+- [Experiments Views](extension/resources/walkthrough/experiments-views.md)
+- Plots
 
 ### Debugging
 
 Due to the way DVC pipelines run scripts of any language from the command line,
 users must debug pipeline scripts (e.g. `train.py`) standalone in whatever way
-debuggers are run on the base language- this is standard for debugging DVC
+debuggers are run on the base language - this is standard for debugging DVC
 pipelines, and most scripts are capable of running outside of DVC.
+
+## Contributing
+
+See development docs and contributing guidelines in
+[CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Data and telemetry
 
