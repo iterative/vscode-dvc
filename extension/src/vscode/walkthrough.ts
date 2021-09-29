@@ -1,16 +1,19 @@
 import { commands, Memento } from 'vscode'
 import { RegisteredCommands } from '../commands/external'
 import { InternalCommands } from '../commands/internal'
+import { joinTruthyItems } from '../util/array'
 
 export const registerWalkthroughCommands = (
-  internalCommands: InternalCommands
+  internalCommands: InternalCommands,
+  extensionId: string,
+  walkthroughId: string
 ) => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXTENSION_GET_STARTED,
     () =>
       commands.executeCommand(
         'workbench.action.openWalkthrough',
-        'iterative.dvc#welcome'
+        joinTruthyItems([extensionId, walkthroughId], '#')
       )
   )
 
