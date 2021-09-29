@@ -1,23 +1,14 @@
 import { mocked } from 'ts-jest/utils'
-import { QuickPickOptions, window } from 'vscode'
 import { pickGarbageCollectionFlags, pickExperimentName } from './quickPick'
-import { QuickPickItemWithValue } from '../vscode/quickPick'
+import { quickPickManyValues, quickPickOne } from '../vscode/quickPick'
+import { reportError } from '../vscode/reporting'
 
-jest.mock('vscode')
+jest.mock('../vscode/quickPick')
+jest.mock('../vscode/reporting')
 
-const mockedShowErrorMessage = mocked(window.showErrorMessage)
-const mockedShowQuickPick = mocked<
-  (
-    items: QuickPickItemWithValue[],
-    options: QuickPickOptions
-  ) => Thenable<
-    | QuickPickItemWithValue[]
-    | QuickPickItemWithValue
-    | string
-    | undefined
-    | unknown
-  >
->(window.showQuickPick)
+const mockedReportError = mocked(reportError)
+const mockedQuickPickOne = mocked(quickPickOne)
+const mockedQuickPickManyValues = mocked(quickPickManyValues)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -41,27 +32,27 @@ const mockedExpName = 'exp-2021'
 
 describe('pickExperimentName', () => {
   it('should return the name of the chosen experiment if one is selected by the user', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(mockedExpName)
+    mockedQuickPickOne.mockResolvedValueOnce(mockedExpName)
     const name = await pickExperimentName(Promise.resolve(mockedExpList))
     expect(name).toEqual(mockedExpName)
   })
 
   it('should return undefined if the user cancels the popup dialog', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    mockedQuickPickOne.mockResolvedValueOnce(undefined)
     const undef = await pickExperimentName(Promise.resolve(mockedExpList))
     expect(undef).toBeUndefined()
   })
 
   it('should call showErrorMessage when no experiment names are provided', async () => {
     await pickExperimentName(Promise.resolve([]))
-    expect(mockedShowErrorMessage).toHaveBeenCalledTimes(1)
+    expect(mockedReportError).toHaveBeenCalledTimes(1)
   })
 })
 
 describe('pickGarbageCollectionFlags', () => {
   it('should invoke a QuickPick with the correct options', async () => {
     await pickGarbageCollectionFlags()
-    expect(mockedShowQuickPick).toBeCalledWith(
+    expect(mockedQuickPickManyValues).toBeCalledWith(
       [
         {
           detail: 'Preserve experiments derived from the current workspace',
@@ -91,7 +82,6 @@ describe('pickGarbageCollectionFlags', () => {
         }
       ],
       {
-        canPickMany: true,
         placeHolder: 'Select which experiments to preserve'
       }
     )

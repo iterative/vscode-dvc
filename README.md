@@ -37,40 +37,9 @@ Once you have downloaded and extracted the `vsix` file, you can install it
 following the
 [official documentation](https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix).
 
-### Installing and Integrating With DVC CLI
-
-As you probably already know there are quite a few options for installing DVC.
-This extension can integrate with a few different setups. Use the workspace
-setup wizard to set the required config options. This can be done via the
-welcome view underneath the DVC Tracked view in the side bar's explorer view
-container or "Setup The Workspace" in the command palette.
-
-## How to Use
-
-This extension, especially in this early state, makes extensive use of the
-[Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
-Every feature should be available from the Command Palette, and from there
-additional GUI elements are added for convenience.
-
-### Experiments
-
-To open up the Experiments table view for a DVC repo, use the "Show Experiments"
-command from the Command Palette.
-
-To run experiments, use the "Run Experiment" command or use the UI elements
-available when the table is visible.
-
-There are experiments related views available in the DVC view container which
-can be selected through the DVC icon in the activity bar.
-
-![Experiment GUI Buttons](https://user-images.githubusercontent.com/9111807/118054967-40760300-b355-11eb-8ee6-38a344bdaced.png)
-
-### SCM
-
-The extension also provides a view in the SCM view container, next to the Git
-view, to manage file actions like checkout, pull, push, and add.
-
-![SCM view screenshot](https://user-images.githubusercontent.com/9111807/118057076-19b9cb80-b359-11eb-91bc-9c73a85a83a8.png)
+Our walkthrough will automatically be shown after installation. If for any
+reason you need to revisit the walkthrough it can be accessed via
+`DVC: Get Started` from the command palette.
 
 ### Debugging
 

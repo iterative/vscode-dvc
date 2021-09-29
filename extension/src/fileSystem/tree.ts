@@ -9,8 +9,9 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { exists } from '.'
-import { deleteTarget } from './workspace'
+import { exists, isDirectory } from '.'
+import { fireWatcher } from './watcher'
+import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
 import { tryThenMaybeForce } from '../cli/actions'
@@ -24,6 +25,8 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
+import { pickResources } from '../vscode/resourcePicker'
+import { getWarningResponse } from '../vscode/modal'
 
 type PathItem = { dvcRoot: string; isDirectory: boolean; isOut: boolean }
 
@@ -187,7 +190,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       const absolutePath = join(path, relative.path)
       this.pathItems[absolutePath] = {
         dvcRoot,
-        isDirectory: relative.isdir,
+        // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
+        isDirectory: exists(absolutePath)
+          ? isDirectory(absolutePath)
+          : relative.isdir,
         isOut: relative.isout
       }
       return absolutePath
@@ -222,6 +228,27 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.internalCommands.registerExternalCommand<string>(
       RegisteredCommands.DELETE_TARGET,
       path => deleteTarget(path)
+    )
+
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.MOVE_TARGETS,
+      async (destination: string) => {
+        const paths = await pickResources(
+          'pick resources to add to the dataset'
+        )
+        if (paths) {
+          const response = await getWarningResponse(
+            'Are you sure you want to move the selected data into this dataset?',
+            'Move'
+          )
+          if (response !== 'Move') {
+            return
+          }
+
+          await moveTargets(paths, destination)
+          return fireWatcher(this.getDataPlaceholder(destination))
+        }
+      }
     )
 
     this.internalCommands.registerExternalCliCommand<string>(

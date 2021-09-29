@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
-import { window, commands } from 'vscode'
+import { commands } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { Experiments } from '../../../../experiments'
 import { Status } from '../../../../experiments/paramsAndMetrics/model'
@@ -11,10 +11,6 @@ import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/
 import { buildExperimentsRepository } from '../util'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
-  window.showInformationMessage(
-    'Start all experiments params and metrics tree tests.'
-  )
-
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 

@@ -5,7 +5,9 @@ import {
   quickPickYesOrNo
 } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
-import { pickFile } from './vscode/pickFile'
+import { pickFile } from './vscode/resourcePicker'
+
+const setupTitle = 'Setup the workspace'
 
 const setConfigPath = async (
   option: string,
@@ -30,8 +32,11 @@ const enterPathOrFind = (text: string): Promise<string | undefined> =>
         value: 'pick'
       }
     ],
-    `Enter path to a ${text}`,
-    'pick'
+    {
+      defaultValue: 'pick',
+      placeholder: `Enter path to a ${text}`,
+      title: setupTitle
+    }
   )
 
 const findPath = async (option: string, text: string) => {
@@ -58,9 +63,9 @@ const enterPathOrPickFile = async (option: string, description: string) => {
 
 const pickCliPath = async () => {
   const isGlobal = await quickPickYesOrNo(
-    'Is DVC available globally?',
     "DVC can be located via the system's PATH environment variable",
-    'I need to specify a path'
+    'I need to specify a path',
+    { placeHolder: 'Is DVC available globally?', title: setupTitle }
   )
 
   if (isGlobal === undefined) {
@@ -76,9 +81,12 @@ const pickCliPath = async () => {
 
 const pickVenvOptions = async () => {
   const dvcInVenv = await quickPickYesOrNo(
-    'Is DVC installed within the environment?',
     "all of the project's requirements are in the virtual environment",
-    'this project needs access to a DVC CLI outside of the virtual environment'
+    'this project needs access to a DVC CLI outside of the virtual environment',
+    {
+      placeHolder: 'Is DVC installed within the environment?',
+      title: setupTitle
+    }
   )
   if (dvcInVenv === undefined) {
     return false
@@ -112,7 +120,10 @@ const quickPickVenvOption = () =>
         value: 0
       }
     ],
-    { placeHolder: 'Does your project use a Python virtual environment?' }
+    {
+      placeHolder: 'Does your project use a Python virtual environment?',
+      title: setupTitle
+    }
   )
 
 const quickPickOrUnsetPythonInterpreter = (usesVenv: number) => {

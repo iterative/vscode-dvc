@@ -6,8 +6,6 @@ import { Disposable, Disposer } from '../../../extension'
 import { PseudoTerminal } from '../../../vscode/pseudoTerminal'
 
 suite('Pseudo Terminal Test Suite', () => {
-  window.showInformationMessage('Start all pseudo terminal tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

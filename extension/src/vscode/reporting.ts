@@ -1,9 +1,16 @@
 import { window } from 'vscode'
 
-export const reportErrorWithOptions = (message: string, ...items: string[]) =>
-  window.showErrorMessage(message, ...items)
+export const reportErrorWithOptions = (
+  message: string,
+  ...items: string[]
+): Thenable<string | undefined> => window.showErrorMessage(message, ...items)
 
-export const reportOutput = async (stdout: Promise<string>) => {
+export const reportError = (message: string): Promise<undefined> => {
+  window.showErrorMessage(message)
+  return Promise.resolve(undefined)
+}
+
+export const reportOutput = async (stdout: Promise<string>): Promise<void> => {
   const output = (await stdout) || 'Operation successful.'
   window.showInformationMessage(output)
 }

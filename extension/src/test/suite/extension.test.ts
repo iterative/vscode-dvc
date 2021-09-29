@@ -19,8 +19,6 @@ import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
 suite('Extension Test Suite', () => {
-  window.showInformationMessage('Start all extension tests.')
-
   const dvcPathOption = 'dvc.dvcPath'
   const pythonPathOption = 'dvc.pythonPath'
 
@@ -359,6 +357,14 @@ suite('Extension Test Suite', () => {
       )
 
       clock.restore()
+    })
+  })
+
+  describe('dvc.showCommands', () => {
+    it('should show all of the dvc commands without error', async () => {
+      await expect(
+        commands.executeCommand('dvc.showCommands')
+      ).to.be.eventually.equal(undefined)
     })
   })
 

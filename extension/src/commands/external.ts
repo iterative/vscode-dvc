@@ -36,10 +36,13 @@ export enum RegisteredCommands {
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   EXTENSION_DESELECT_DEFAULT_PROJECT = 'dvc.deselectDefaultProject',
+  EXTENSION_GET_STARTED = 'dvc.getStarted',
   EXTENSION_SELECT_DEFAULT_PROJECT = 'dvc.selectDefaultProject',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',
+  EXTENSION_SHOW_COMMANDS = 'dvc.showCommands',
 
   DELETE_TARGET = 'dvc.deleteTarget',
+  MOVE_TARGETS = 'dvc.moveTargets',
 
   TRACKED_EXPLORER_OPEN_FILE = 'dvc.views.trackedExplorerTree.openFile',
   TRACKED_EXPLORER_COMPARE_SELECTED = 'dvc.compareSelected',

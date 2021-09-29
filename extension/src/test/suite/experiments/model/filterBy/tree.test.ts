@@ -16,8 +16,6 @@ import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperimentsRepository } from '../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
-  window.showInformationMessage('Start all experiments filter by tree tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

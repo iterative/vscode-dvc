@@ -1,23 +1,12 @@
 import { mocked } from 'ts-jest/utils'
-import { QuickPickOptions, window } from 'vscode'
 import { pickSortsToRemove, pickSortToAdd } from './quickPick'
 import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
-import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import { quickPickManyValues, quickPickValue } from '../../../vscode/quickPick'
 
-jest.mock('vscode')
+jest.mock('../../../vscode/quickPick')
 
-const mockedShowQuickPick = mocked<
-  (
-    items: QuickPickItemWithValue[],
-    options: QuickPickOptions
-  ) => Thenable<
-    | QuickPickItemWithValue[]
-    | QuickPickItemWithValue
-    | string
-    | undefined
-    | unknown
-  >
->(window.showQuickPick)
+const mockedQuickPickManyValues = mocked(quickPickManyValues)
+const mockedQuickPickValue = mocked(quickPickValue)
 
 beforeEach(() => {
   jest.resetAllMocks()
@@ -51,33 +40,29 @@ const exampleParamsAndMetrics = [epochsParam, paramsYamlParam]
 describe('pickSortToAdd', () => {
   it('should not invoke a quickPick if an empty array', async () => {
     const resolvedPromise = await pickSortToAdd([])
-    expect(mockedShowQuickPick).not.toBeCalled()
+    expect(mockedQuickPickValue).not.toBeCalled()
     expect(resolvedPromise).toBe(undefined)
   })
 
   it('should resolve with no value if canceled at param or metric select', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
     expect(await pickSortToAdd(exampleParamsAndMetrics)).toBe(undefined)
-    expect(mockedShowQuickPick).toBeCalledTimes(1)
+    expect(mockedQuickPickValue).toBeCalledTimes(1)
   })
 
   it('should resolve with no value if canceled at order select', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: epochsParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce(undefined)
+    mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
+    mockedQuickPickValue.mockResolvedValueOnce(undefined)
     expect(await pickSortToAdd(exampleParamsAndMetrics)).toBe(undefined)
-    expect(mockedShowQuickPick).toBeCalledTimes(2)
+    expect(mockedQuickPickValue).toBeCalledTimes(2)
   })
 
   it('should invoke a descending sort with the expected quickPick calls', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: epochsParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
+    mockedQuickPickValue.mockResolvedValueOnce(epochsParam)
+    mockedQuickPickValue.mockResolvedValueOnce(false)
     const resolvedPromise = await pickSortToAdd(exampleParamsAndMetrics)
-    expect(mockedShowQuickPick).toBeCalledTimes(2)
-    expect(mockedShowQuickPick).toBeCalledWith(
+    expect(mockedQuickPickValue).toBeCalledTimes(2)
+    expect(mockedQuickPickValue).toBeCalledWith(
       [
         { label: 'Ascending', value: false },
         { label: 'Descending', value: true }
@@ -91,12 +76,10 @@ describe('pickSortToAdd', () => {
   })
 
   it('should invoke an ascending sort with the expected quickPick calls', async () => {
-    mockedShowQuickPick.mockResolvedValueOnce({
-      value: paramsYamlParam
-    } as unknown)
-    mockedShowQuickPick.mockResolvedValueOnce({ value: false } as unknown)
+    mockedQuickPickValue.mockResolvedValueOnce(paramsYamlParam)
+    mockedQuickPickValue.mockResolvedValueOnce(false)
     const resolvedPromise = await pickSortToAdd(exampleParamsAndMetrics)
-    expect(mockedShowQuickPick).toBeCalledTimes(2)
+    expect(mockedQuickPickValue).toBeCalledTimes(2)
     expect(resolvedPromise).toEqual({
       descending: false,
       path: paramsYamlPath
@@ -121,9 +104,7 @@ describe('pickSortsToRemove', () => {
       ...selectedSorts,
       { descending: false, path: epochsParam.path }
     ]
-    mockedShowQuickPick.mockResolvedValueOnce(
-      selectedSorts.map(sort => ({ value: sort }))
-    )
+    mockedQuickPickManyValues.mockResolvedValueOnce(selectedSorts)
 
     const sortsToRemove = await pickSortsToRemove(allSorts)
     expect(sortsToRemove).toEqual(selectedSorts)

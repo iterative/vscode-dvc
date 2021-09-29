@@ -1,6 +1,7 @@
 import { Disposable } from '@hediet/std/disposable'
 import { StatusBarItem, window } from 'vscode'
 import { ICli } from './cli'
+import { RegisteredCommands } from './commands/external'
 
 export class Status {
   public dispose = Disposable.fn()
@@ -34,7 +35,7 @@ export class Status {
 
   public setAvailability = (available: boolean) => {
     this.available = available
-    this.setStatusText(!!this.workers)
+    this.setState(!!this.workers)
   }
 
   private getText = (isWorking: boolean) => {
@@ -47,19 +48,30 @@ export class Status {
     return '$(circle-large-outline) DVC'
   }
 
-  private setStatusText = (isWorking: boolean) => {
+  private setState = (isWorking: boolean) => {
     this.statusBarItem.text = this.getText(isWorking)
+    this.statusBarItem.command = this.getCommand()
   }
 
   private addWorker = () => {
     this.workers = this.workers + 1
-    this.setStatusText(true)
+    this.setState(true)
   }
 
   private removeWorker = () => {
     this.workers = Math.max(this.workers - 1, 0)
     if (!this.workers) {
-      this.setStatusText(false)
+      this.setState(false)
+    }
+  }
+
+  private getCommand() {
+    if (this.available) {
+      return
+    }
+    return {
+      command: RegisteredCommands.EXTENSION_SETUP_WORKSPACE,
+      title: 'Setup the workspace'
     }
   }
 }
