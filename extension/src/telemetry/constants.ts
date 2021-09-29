@@ -103,6 +103,7 @@ export interface IEventNamePropertyMapping {
   [EventName.TRACKED_EXPLORER_SELECT_FOR_COMPARE]: undefined
 
   [EventName.EXTENSION_DESELECT_DEFAULT_PROJECT]: undefined
+  [EventName.EXTENSION_GET_STARTED]: undefined
   [EventName.EXTENSION_SELECT_DEFAULT_PROJECT]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
