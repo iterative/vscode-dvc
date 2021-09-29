@@ -1,6 +1,7 @@
 import { commands, Memento } from 'vscode'
 import { RegisteredCommands } from '../commands/external'
 import { InternalCommands } from '../commands/internal'
+import { joinTruthyItems } from '../util/array'
 
 export const registerWalkthroughCommands = (
   internalCommands: InternalCommands,
@@ -12,7 +13,7 @@ export const registerWalkthroughCommands = (
     () =>
       commands.executeCommand(
         'workbench.action.openWalkthrough',
-        [extensionId, walkthroughId].join('#')
+        joinTruthyItems([extensionId, walkthroughId], '#')
       )
   )
 
