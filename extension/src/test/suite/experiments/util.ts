@@ -131,12 +131,6 @@ export const mockInternalCommands = () => {
     AvailableCommands.EXPERIMENT_SHOW,
     () => Promise.resolve(complexExperimentsOutput)
   )
-  mockedInternalCommands.registerCommand(AvailableCommands.PARAMS_DIFF, () =>
-    Promise.resolve({ 'params.yaml': {} })
-  )
-  mockedInternalCommands.registerCommand(AvailableCommands.METRICS_DIFF, () =>
-    Promise.resolve({ metrics: {} })
-  )
 
   return mockedInternalCommands
 }
