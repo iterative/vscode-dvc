@@ -5,41 +5,52 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-A Visual Studio Code Extension that aims to allow users of all technical
-backgrounds to effectively use [DVC](https://dvc.org/), particularly the new
-[Experiments](https://dvc.org/doc/start/experiments) feature.
+A [Visual Studio Code](https://code.visualstudio.com/)
+[extension](https://marketplace.visualstudio.com/VSCode) that aims to allow
+users of all technical backgrounds to effectively use [DVC](https://dvc.org/).
 
-This project is in a developmental state, and constantly evolving.
+## Installing the Extension
 
-## Setup
+This project is currently in closed alpha testing, and constantly evolving.
+After we conclude alpha and beta testing the repository will become public and
+we will be publishing the extension to the marketplace.
 
-### Installing the Extension
+### In the meantime...
 
-This repo is set up with a
+This repository is set up with a
 [GitHub Action](https://github.com/iterative/vscode-dvc/actions) that uploads an
 installable vsix build of the extension for every commit, complete with the Git
 SHA appended to the extension version.
 
-You can find the download link in the Artifacts list of any run of the
-Continuous Integration workflow.
+You can find the download link in the artifacts list of any run of the
+[Continuous Integration workflow](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml?query=branch%3Amaster+is%3Acompleted).
+Click on the desired run and the artifact will be displayed as in the following
+screenshot:
 
 ![Screenshot of artifacts menu](https://user-images.githubusercontent.com/9111807/118053924-64d0e000-b353-11eb-8d3d-7e202d741f54.png)
 
-The easiest way to get to the build for any particular branch is to use the
-GitHub Checks UI to get to the details of the "Continuous Integration" run: next
-to any commit, its CI status will show up as an icon next to it. From there, you
-can get to that commit's vsix in a few clicks through the Continuous Integration
-check's details and to the summary of the Check run:
-
-![Guide to get from Checks status to Artifacts](https://user-images.githubusercontent.com/9111807/118057990-19bacb00-b35b-11eb-9030-558e802668f1.png)
+It is recommended that you take the artifact from the most recent run.
 
 Once you have downloaded and extracted the `vsix` file, you can install it
 following the
 [official documentation](https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix).
 
-Our walkthrough will automatically be shown after installation. If for any
-reason you need to revisit the walkthrough it can be accessed via
+## Quick start
+
+- **Step 1.**
+  [Install a supported version of DVC on your system](https://dvc.org/doc/install)
+- **Step 2.**
+  [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
+- **Step 3.** See walkthrough.
+
+**Note:** Our walkthrough will automatically be shown after installation. If for
+any reason you need to revisit the walkthrough it can be accessed via
 `DVC: Get Started` from the command palette.
+
+## Contributing
+
+See development docs and contributing guidelines in
+[CONTRIBUTING.md](CONTRIBUTING.md)
 
 ### Debugging
 
@@ -48,7 +59,9 @@ users must debug pipeline scripts (e.g. `train.py`) standalone in whatever way
 debuggers are run on the base language- this is standard for debugging DVC
 pipelines, and most scripts are capable of running outside of DVC.
 
-## Contributing
+## Data and telemetry
 
-See development docs and contributing guidelines in
-[CONTRIBUTING.md](CONTRIBUTING.md)
+The DVC Extension for Visual Studio Code collects usage data and sends it to
+Azure to help improve our products and services. This extension respects the
+`telemetry.enableTelemetry` setting which you can learn more about at
+https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting.
