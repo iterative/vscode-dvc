@@ -20,6 +20,11 @@ const includeDependency = (location: string) => {
   })
 }
 
+const includeREADME = () =>
+  new CopyWebpackPlugin({
+    patterns: [{ from: r('../README.md'), to: r('README.md') }]
+  })
+
 module.exports = {
   devtool: 'source-map',
   entry: r('./src/extension'),
@@ -50,7 +55,11 @@ module.exports = {
     libraryTarget: 'commonjs2',
     path: r('./dist')
   },
-  plugins: [new CleanWebpackPlugin(), includeDependency(r('../webview/'))],
+  plugins: [
+    new CleanWebpackPlugin(),
+    includeDependency(r('../webview/')),
+    includeREADME()
+  ],
   resolve: {
     extensions: ['.ts', '.js'],
     modules: ['node_modules'],
