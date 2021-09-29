@@ -1,7 +1,7 @@
-import { describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { commands } from 'vscode'
-import { stub } from 'sinon'
+import { restore, stub } from 'sinon'
 import { RegisteredCommands } from '../../../commands/external'
 import { buildMockMemento } from '../../util'
 import {
@@ -10,6 +10,14 @@ import {
 } from '../../../vscode/walkthrough'
 
 suite('Walkthrough Test Suite', () => {
+  beforeEach(() => {
+    restore()
+  })
+
+  afterEach(() => {
+    return commands.executeCommand('workbench.action.closeAllEditors')
+  })
+
   describe('dvc.getStarted', () => {
     it('should be able to show the walkthrough', async () => {
       await expect(
