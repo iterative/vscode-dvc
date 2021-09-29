@@ -255,17 +255,21 @@ export class ExperimentsRepository {
   }
 
   private async performParamsAndMetricsDiff() {
-    this.paramsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-        AvailableCommands.PARAMS_DIFF,
-        this.dvcRoot
-      )
+    try {
+      this.paramsDiff =
+        await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+          AvailableCommands.PARAMS_DIFF,
+          this.dvcRoot
+        )
 
-    this.metricsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-        AvailableCommands.METRICS_DIFF,
-        this.dvcRoot
-      )
+      this.metricsDiff =
+        await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+          AvailableCommands.METRICS_DIFF,
+          this.dvcRoot
+        )
+    } catch {
+      // Do nothing
+    }
   }
 
   private notifyChanged() {
