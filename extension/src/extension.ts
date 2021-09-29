@@ -235,7 +235,11 @@ export class Extension implements IExtension {
     this.registerConfigCommands()
 
     reRegisterVsCodeCommands(this.internalCommands)
-    registerWalkthroughCommands(this.internalCommands)
+    registerWalkthroughCommands(
+      this.internalCommands,
+      context.extension.packageJSON.id,
+      context.extension.packageJSON.contributes.walkthroughs[0].id
+    )
 
     this.dispose.track(
       commands.registerCommand(
