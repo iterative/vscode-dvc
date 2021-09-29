@@ -165,6 +165,9 @@ suite('Experiments Repository Test Suite', () => {
         }
       }
     })
+    stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
+
+    stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
     stub(cliReader, 'experimentShow').resolves({
       testBranch: {
         baseline: { data: buildTestExperiment(10) },
