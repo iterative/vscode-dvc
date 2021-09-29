@@ -4,7 +4,7 @@ import { InternalCommands } from '../commands/internal'
 
 export const registerWalkthroughCommands = (
   internalCommands: InternalCommands
-) =>
+) => {
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXTENSION_GET_STARTED,
     () =>
@@ -13,6 +13,12 @@ export const registerWalkthroughCommands = (
         'iterative.dvc#welcome'
       )
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXTENSION_SHOW_COMMANDS,
+    () => commands.executeCommand('workbench.action.quickOpen', '> DVC')
+  )
+}
 
 export const MementoKey = 'walkthroughShownAfterInstall'
 
