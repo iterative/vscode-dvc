@@ -19,18 +19,10 @@ export type DiffOutput = {
   'not in cache'?: PathOutput[]
 }
 
-export type DiffParamsOutput =
+export type DiffParamsOrMetricsOutput =
   | {
-      'params.yaml': {
-        [key: string]: number
-      }
-    }
-  | undefined
-
-export type DiffMetricsOutput =
-  | {
-      metrics: {
-        [key: string]: number
+      [key: string]: {
+        [key: string]: { old: number; new: number }
       }
     }
   | undefined
@@ -150,11 +142,11 @@ export class CliReader extends Cli {
     return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
   }
 
-  public diffParams(cwd: string): Promise<DiffParamsOutput> {
+  public diffParams(cwd: string): Promise<DiffParamsOrMetricsOutput> {
     return this.readProcessJson(cwd, Command.PARAMS, ExperimentSubCommand.DIFF)
   }
 
-  public diffMetrics(cwd: string): Promise<DiffMetricsOutput> {
+  public diffMetrics(cwd: string): Promise<DiffParamsOrMetricsOutput> {
     return this.readProcessJson(cwd, Command.METRICS, ExperimentSubCommand.DIFF)
   }
 

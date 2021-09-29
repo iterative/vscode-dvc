@@ -1,7 +1,7 @@
 import { spy, stub } from 'sinon'
 import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
-import { InternalCommands } from '../../../commands/internal'
+import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
 import { Experiments } from '../../../experiments'
 import { ExperimentsRepository } from '../../../experiments/repository'
@@ -55,8 +55,14 @@ export const buildExperimentsRepository = (
   experimentShowData = complexExperimentsOutput,
   dvcRoot = dvcDemoPath
 ) => {
-  const { config, internalCommands, mockExperimentShow, resourceLocator } =
-    buildDependencies(disposer, experimentShowData)
+  const {
+    config,
+    internalCommands,
+    mockExperimentShow,
+    resourceLocator,
+    mockDiffMetrics,
+    mockDiffParams
+  } = buildDependencies(disposer, experimentShowData)
 
   const experimentsRepository = disposer.track(
     new ExperimentsRepository(
@@ -70,6 +76,8 @@ export const buildExperimentsRepository = (
     config,
     experimentsRepository,
     internalCommands,
+    mockDiffMetrics,
+    mockDiffParams,
     mockExperimentShow,
     resourceLocator
   }
@@ -110,4 +118,25 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   experiments.create([dvcDemoPath], resourceLocator)
 
   return { experiments }
+}
+
+export const mockInternalCommands = () => {
+  const mockedInternalCommands = new InternalCommands(
+    {
+      getDefaultProject: stub()
+    } as unknown as Config,
+    {} as unknown as OutputChannel
+  )
+  mockedInternalCommands.registerCommand(
+    AvailableCommands.EXPERIMENT_SHOW,
+    () => Promise.resolve(complexExperimentsOutput)
+  )
+  mockedInternalCommands.registerCommand(AvailableCommands.PARAMS_DIFF, () =>
+    Promise.resolve({ 'params.yaml': {} })
+  )
+  mockedInternalCommands.registerCommand(AvailableCommands.METRICS_DIFF, () =>
+    Promise.resolve({ metrics: {} })
+  )
+
+  return mockedInternalCommands
 }

@@ -35,7 +35,7 @@ export const MergedHeaderGroup: React.FC<{
     >
       {headerGroup.headers.map(column => {
         const hasPlaceholder = getPlaceholder(column, columns)
-        const isSorted = (sort: SortDefinition) =>
+        const isSortedWithPlaceholder = (sort: SortDefinition) =>
           sort.path === column.placeholderOf?.id ||
           (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
         return (
@@ -52,15 +52,16 @@ export const MergedHeaderGroup: React.FC<{
                   [styles.firstLevelHeader]:
                     column.id.split(':').length - 1 === 1,
                   [styles.sortingHeaderCellAsc]: sorts.filter(
-                    sort => !sort.descending && isSorted(sort)
+                    sort => !sort.descending && isSortedWithPlaceholder(sort)
                   ).length,
                   [styles.sortingHeaderCellDesc]: sorts.filter(
-                    sort => sort.descending && isSorted(sort)
+                    sort => sort.descending && sort.path === column.id
                   ).length
                 }
               )
             })}
             key={column.id}
+            data-testid={`header-${column.id}`}
           >
             <div>{column.render('Header')}</div>
           </div>
@@ -147,6 +148,7 @@ const getCells = (cells: Cell<Experiment, unknown>[], changes?: string[]) =>
         )
       })}
       key={`${cell.column.id}___${cell.row.id}`}
+      data-testid={`${cell.column.id}___${cell.row.id}`}
     >
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
@@ -189,6 +191,7 @@ export const RowContent: React.FC<
           isWorkspace && changes?.length && styles.workspaceWithChanges
         )
       })}
+      data-testid={isWorkspace && 'workspace-row'}
     >
       <FirstCell cell={firstCell} />
       {getCells(cells, isWorkspace ? changes : undefined)}

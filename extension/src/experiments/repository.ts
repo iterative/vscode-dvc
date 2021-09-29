@@ -17,8 +17,7 @@ import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import {
-  DiffMetricsOutput,
-  DiffParamsOutput,
+  DiffParamsOrMetricsOutput,
   ExperimentsRepoJSONOutput
 } from '../cli/reader'
 
@@ -44,8 +43,8 @@ export class ExperimentsRepository {
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
-  private paramsDiff: DiffParamsOutput
-  private metricsDiff: DiffMetricsOutput
+  private paramsDiff: DiffParamsOrMetricsOutput
+  private metricsDiff: DiffParamsOrMetricsOutput
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -257,13 +256,13 @@ export class ExperimentsRepository {
 
   private async performParamsAndMetricsDiff() {
     this.paramsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOutput>(
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
         AvailableCommands.PARAMS_DIFF,
         this.dvcRoot
       )
 
     this.metricsDiff =
-      await this.internalCommands.executeCommand<DiffMetricsOutput>(
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
         AvailableCommands.METRICS_DIFF,
         this.dvcRoot
       )
@@ -287,12 +286,22 @@ export class ExperimentsRepository {
     }
   }
 
+  private getModifiedParamsOrMetrics(
+    diff?: DiffParamsOrMetricsOutput
+  ): string[] {
+    const changes: string[] = []
+    const files = Object.keys(diff || [])
+    files.forEach(file => changes.push(...Object.keys(diff?.[file] || [])))
+
+    return changes
+  }
+
   private getModifiedParams(): string[] {
-    return Object.keys(this.paramsDiff?.['params.yaml'] || [])
+    return this.getModifiedParamsOrMetrics(this.paramsDiff)
   }
 
   private getModifiedMetrics(): string[] {
-    return Object.keys(this.metricsDiff?.metrics || [])
+    return this.getModifiedParamsOrMetrics(this.metricsDiff)
   }
 
   private getTableData() {
