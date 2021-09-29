@@ -46,6 +46,10 @@ import {
 import { EventName } from './telemetry/constants'
 import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
+import {
+  registerWalkthroughCommands,
+  showWalkthroughOnFirstUse
+} from './vscode/walkthrough'
 
 export { Disposable, Disposer }
 
@@ -238,6 +242,7 @@ export class Extension implements IExtension {
     this.registerConfigCommands()
 
     reRegisterVsCodeCommands(this.internalCommands)
+    registerWalkthroughCommands(this.internalCommands)
 
     this.dispose.track(
       commands.registerCommand(
@@ -264,6 +269,8 @@ export class Extension implements IExtension {
         }
       )
     )
+
+    showWalkthroughOnFirstUse(context.globalState)
   }
 
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
