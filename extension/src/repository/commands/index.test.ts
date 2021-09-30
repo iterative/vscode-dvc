@@ -12,11 +12,8 @@ const mockedGetWarningResponse = mocked(getWarningResponse)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
-const mockedGetDefaultProject = jest.fn()
 const mockedInternalCommands = new InternalCommands(
-  {
-    getDefaultProject: mockedGetDefaultProject
-  } as unknown as Config,
+  {} as Config,
   { show: jest.fn() } as unknown as OutputChannel
 )
 

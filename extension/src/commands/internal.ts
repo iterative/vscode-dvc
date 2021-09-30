@@ -16,7 +16,7 @@ type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
   {
-    GET_DEFAULT_OR_PICK_PROJECT: 'getDefaultOrPickProject',
+    GET_ONLY_OR_PICK_PROJECT: 'getOnlyOrPickProject',
     GET_THEME: 'getTheme'
   } as const,
   CliExecutorCommands,
@@ -40,15 +40,15 @@ export class InternalCommands {
     this.outputChannel = outputChannel
 
     this.registerCommand(
-      AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
+      AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
       (...dvcRoots: string[]) => {
         if (dvcRoots.length === 1) {
           return dvcRoots[0]
         }
 
-        return (
-          config.getDefaultProject() ||
-          quickPickOne(dvcRoots, 'Select which project to run command against')
+        return quickPickOne(
+          dvcRoots,
+          'Select which project to run command against'
         )
       }
     )
