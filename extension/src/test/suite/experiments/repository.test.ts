@@ -329,9 +329,7 @@ suite('Experiments Repository Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     const mockedInternalCommands = new InternalCommands(
-      {
-        getDefaultProject: stub()
-      } as unknown as Config,
+      {} as Config,
       {} as unknown as OutputChannel
     )
     mockedInternalCommands.registerCommand(

@@ -12,7 +12,6 @@ import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
-import { setConfigValue } from '../../../vscode/config'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
@@ -27,7 +26,6 @@ suite('Experiments Test Suite', () => {
 
   beforeEach(() => {
     restore()
-    return setConfigValue('dvc.defaultProject', undefined)
   })
 
   afterEach(() => {
@@ -49,37 +47,7 @@ suite('Experiments Test Suite', () => {
     })
 
   describe('showExperimentsTable', () => {
-    it("should take the config's default even if an experiments webview is focused", async () => {
-      const mockQuickPickOne = stub(QuickPick, 'quickPickOne')
-
-      await setConfigValue('dvc.defaultProject', dvcDemoPath)
-
-      const { configSpy, experiments, experimentsRepository } =
-        buildMultiRepoExperiments(disposable)
-
-      await experiments.isReady()
-
-      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
-
-      await experiments.showExperimentsTable()
-
-      expect(await focused).to.equal(dvcDemoPath)
-      expect(configSpy).to.be.calledOnce
-      expect(mockQuickPickOne).not.to.be.called
-      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
-
-      configSpy.resetHistory()
-      mockQuickPickOne.resetHistory()
-
-      const focusedExperimentsRepository =
-        await experiments.showExperimentsTable()
-
-      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
-      expect(mockQuickPickOne).not.to.be.called
-      expect(configSpy).to.be.calledOnce
-    }).timeout(5000)
-
-    it('should prompt to pick a project even if a webview is focused (if no default)', async () => {
+    it('should prompt to pick a project even if a webview is focused', async () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
@@ -204,7 +172,7 @@ suite('Experiments Test Suite', () => {
       ).resolves('true')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
         dvcDemoPath
       )
 
@@ -226,7 +194,7 @@ suite('Experiments Test Suite', () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
         dvcDemoPath
       )
 
@@ -259,7 +227,7 @@ suite('Experiments Test Suite', () => {
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
         dvcDemoPath
       )
 
@@ -282,7 +250,7 @@ suite('Experiments Test Suite', () => {
       const mockExperiment = 'exp-to-apply'
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
         dvcDemoPath
       )
       stub(CliReader.prototype, 'experimentListCurrent').resolves([
@@ -305,7 +273,7 @@ suite('Experiments Test Suite', () => {
       const mockExperiment = 'exp-to-remove'
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDefaultOrPickProject').returns(
+      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
         dvcDemoPath
       )
       stub(CliReader.prototype, 'experimentListCurrent').resolves([
