@@ -1,4 +1,4 @@
-import { spy, stub } from 'sinon'
+import { stub } from 'sinon'
 import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
@@ -85,7 +85,6 @@ export const buildExperimentsRepository = (
 
 export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
-    config,
     internalCommands,
     experimentsRepository: mockExperimentsRepository,
     resourceLocator
@@ -94,8 +93,6 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     complexExperimentsOutput,
     'other/dvc/root'
   )
-
-  const configSpy = spy(config, 'getDefaultProject')
 
   const experiments = disposer.track(
     new Experiments(internalCommands, buildMockMemento(), {
@@ -106,7 +103,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     [dvcDemoPath],
     resourceLocator
   )
-  return { configSpy, experiments, experimentsRepository }
+  return { experiments, experimentsRepository }
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {

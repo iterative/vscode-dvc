@@ -163,7 +163,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
+        'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
       // Setup done, perform the test
