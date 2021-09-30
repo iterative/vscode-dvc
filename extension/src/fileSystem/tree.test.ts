@@ -22,7 +22,6 @@ mockedWindow.registerTreeDataProvider = jest.fn()
 const mockedTreeItem = mocked(TreeItem)
 
 const mockedDisposable = mocked(Disposable)
-const mockedGetDefaultProject = jest.fn()
 
 const mockedListDvcOnly = jest.fn()
 
@@ -33,9 +32,7 @@ const mockedDisposer = {
 } as unknown as (() => void) & Disposer
 mockedDisposable.fn.mockReturnValueOnce(mockedDisposer)
 const mockedInternalCommands = new InternalCommands(
-  {
-    getDefaultProject: mockedGetDefaultProject
-  } as unknown as Config,
+  {} as Config,
   {
     show: jest.fn()
   } as unknown as OutputChannel

@@ -113,11 +113,6 @@
         "icon": "$(trash)"
       },
       {
-        "title": "%command.deselectDefaultProject%",
-        "command": "dvc.deselectDefaultProject",
-        "category": "DVC"
-      },
-      {
         "title": "%command.experimentGarbageCollect%",
         "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
@@ -232,11 +227,6 @@
         "icon": "$(notebook-revert)"
       },
       {
-        "title": "%command.selectDefaultProject%",
-        "command": "dvc.selectDefaultProject",
-        "category": "DVC"
-      },
-      {
         "title": "%command.selectForCompare%",
         "command": "dvc.selectForCompare",
         "category": "DVC"
@@ -293,12 +283,6 @@
     "configuration": {
       "title": "DVC",
       "properties": {
-        "dvc.defaultProject": {
-          "title": "%config.defaultProject.title%",
-          "description": "%config.defaultProject.description%",
-          "type": "string",
-          "default": null
-        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",

@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
@@ -85,12 +85,15 @@ suite('Source Control Management Test Suite', () => {
       expect(mockCheckout).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
-    it('should be able to run dvc.commit without error', async () => {
+    it('should focus the git commit text input box after running dvc commit', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
       expect(mockCommit).to.be.calledOnce
+      expect(executeCommandSpy).to.be.calledTwice
+      expect(executeCommandSpy).to.be.calledWith('workbench.scm.focus')
     })
 
     it('should prompt to force if dvc.commit fails', async () => {

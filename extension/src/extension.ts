@@ -232,8 +232,6 @@ export class Extension implements IExtension {
 
     registerRepositoryCommands(this.internalCommands)
 
-    this.registerConfigCommands()
-
     reRegisterVsCodeCommands(this.internalCommands)
     registerWalkthroughCommands(
       this.internalCommands,
@@ -291,7 +289,6 @@ export class Extension implements IExtension {
     )
 
     this.dvcRoots = flatten(dvcRoots).sort()
-    this.config.setDvcRoots(this.dvcRoots)
   }
 
   public async initialize() {
@@ -327,18 +324,6 @@ export class Extension implements IExtension {
 
   private setProjectAvailability(available: boolean) {
     setContextValue('dvc.project.available', available)
-  }
-
-  private registerConfigCommands() {
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
-      () => this.config.deselectDefaultProject()
-    )
-
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
-      () => this.config.selectDefaultProject()
-    )
   }
 
   private initializeRepositories = () => {
