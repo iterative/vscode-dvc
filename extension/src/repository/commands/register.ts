@@ -1,18 +1,16 @@
 import {
+  getResetRootCommand,
   getResourceCommand,
   getRootCommand,
   getSimpleResourceCommand,
   Resource,
   Root
 } from '.'
-import { getWarningResponse } from '../../vscode/modal'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { gitResetWorkspace } from '../../git'
-import { Flag } from '../../cli/args'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.registerExternalCliCommand<Resource>(
@@ -39,28 +37,7 @@ const registerRootCommands = (internalCommands: InternalCommands) => {
 
   internalCommands.registerExternalCommand<Root>(
     RegisteredCommands.RESET_WORKSPACE,
-    async ({ rootUri }) => {
-      const cwd = rootUri.fsPath
-
-      const response = await getWarningResponse(
-        'Are you sure you want to discard ALL workspace changes?\n' +
-          'This is IRREVERSIBLE!\n' +
-          'Your current working set will be FOREVER LOST if you proceed.',
-        'Discard Changes'
-      )
-
-      if (response !== 'Discard Changes') {
-        return
-      }
-
-      await gitResetWorkspace(cwd)
-
-      return internalCommands.executeCommand(
-        AvailableCommands.CHECKOUT,
-        cwd,
-        Flag.FORCE
-      )
-    }
+    getResetRootCommand(internalCommands)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
