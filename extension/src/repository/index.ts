@@ -20,7 +20,7 @@ export class Repository {
 
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
-  private decorationProvider?: DecorationProvider
+  private decorationProvider: DecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
 
   private processManager: ProcessManager
@@ -28,11 +28,11 @@ export class Repository {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    decorationProvider?: DecorationProvider
+    decorationProvider = new DecorationProvider()
   ) {
     makeObservable(this)
     this.internalCommands = internalCommands
-    this.decorationProvider = decorationProvider
+    this.decorationProvider = this.dispose.track(decorationProvider)
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
 
@@ -134,7 +134,7 @@ export class Repository {
 
   private setState() {
     this.sourceControlManagement.setState(this.getState())
-    this.decorationProvider?.setState(this.getState())
+    this.decorationProvider.setState(this.getState())
   }
 
   private async setup() {

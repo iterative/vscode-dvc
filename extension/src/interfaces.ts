@@ -1,9 +1,9 @@
 export interface IExtension {
   hasWorkspaceFolder: () => boolean
-  hasRoots: () => boolean
   canRunCli: () => Promise<boolean>
+  hasRoots: () => boolean
 
+  setRoots: () => Promise<void>
   initialize: () => Promise<void[]>
-  initializePreCheck: () => Promise<void>
   reset: () => void
 }

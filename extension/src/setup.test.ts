@@ -17,8 +17,8 @@ const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
 const mockedHasWorkspaceFolder = jest.fn()
 const mockedInitialize = jest.fn()
-const mockedInitializePreCheck = jest.fn()
 const mockedReset = jest.fn()
+const mockedSetRoots = jest.fn()
 
 const mockedQuickPickYesOrNo = mocked(quickPickYesOrNo)
 const mockedQuickPickValue = mocked(quickPickValue)
@@ -171,8 +171,8 @@ describe('setup', () => {
     hasRoots: mockedHasRoots,
     hasWorkspaceFolder: mockedHasWorkspaceFolder,
     initialize: mockedInitialize,
-    initializePreCheck: mockedInitializePreCheck,
-    reset: mockedReset
+    reset: mockedReset,
+    setRoots: mockedSetRoots
   }
 
   it('should do nothing if there is no workspace folder', async () => {
@@ -180,18 +180,17 @@ describe('setup', () => {
 
     await setup(extension)
 
-    expect(mockedInitializePreCheck).not.toBeCalled()
     expect(mockedCanRunCli).not.toBeCalled()
     expect(mockedInitialize).not.toBeCalled()
   })
 
-  it('should run the pre check initialization even if the cli cannot be used', async () => {
+  it('should set the DVC roots even if the cli cannot be used', async () => {
     mockedHasWorkspaceFolder.mockReturnValueOnce(true)
     mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
 
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
+    expect(mockedSetRoots).toBeCalledTimes(1)
   })
 
   it('should not run initialization if roots have not been found but the cli can be run', async () => {
@@ -200,7 +199,7 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
+    expect(mockedSetRoots).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })
@@ -211,7 +210,6 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(true)
 
     await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
     expect(mockedReset).not.toBeCalled()
     expect(mockedInitialize).toBeCalledTimes(1)
   })
@@ -222,7 +220,6 @@ describe('setup', () => {
     mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
-    expect(mockedInitializePreCheck).toBeCalledTimes(1)
     expect(mockedReset).toBeCalledTimes(1)
     expect(mockedInitialize).not.toBeCalled()
   })

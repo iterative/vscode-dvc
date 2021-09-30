@@ -18,7 +18,6 @@ import {
 import { IExtension } from './interfaces'
 import { Repository } from './repository'
 import { registerRepositoryCommands } from './repository/commands/register'
-import { DecorationProvider } from './repository/decorationProvider'
 import { ResourceLocator } from './resourceLocator'
 import { definedAndNonEmpty, flatten } from './util/array'
 import { reset } from './util/disposable'
@@ -54,7 +53,6 @@ import {
 export { Disposable, Disposer }
 
 type Repositories = Record<string, Repository>
-type DecorationProviders = Record<string, DecorationProvider>
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
@@ -65,7 +63,6 @@ export class Extension implements IExtension {
   private readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
-  private decorationProviders: DecorationProviders = {}
   private repositories: Repositories = {}
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
@@ -268,27 +265,32 @@ export class Extension implements IExtension {
     showWalkthroughOnFirstUse(context.globalState)
   }
 
-  public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
-
-  public canRunCli = async () => {
+  public async canRunCli() {
     try {
       await this.config.isReady()
-      const [root] = this.dvcRoots
-      this.cliAccessible = !!(await this.cliReader.help(root))
+      const cwd = getFirstWorkspaceFolder()
+      if (!cwd) {
+        return false
+      }
+      this.cliAccessible = !!(await this.cliReader.help(cwd))
       return this.cliAccessible
     } catch {
       return false
     }
   }
 
-  public initializePreCheck = async () => {
-    const dvcRoots = await Promise.all(
-      getWorkspaceFolders().map(workspaceFolder =>
-        this.setupWorkspaceFolder(workspaceFolder)
+  public async setRoots() {
+    this.dvcRoots = flatten(
+      await Promise.all(
+        getWorkspaceFolders().map(workspaceFolder =>
+          this.findDvcRoots(workspaceFolder)
+        )
       )
-    )
-
-    this.dvcRoots = flatten(dvcRoots).sort()
+    ).sort()
+    if (this.hasRoots()) {
+      return this.setProjectAvailability(true)
+    }
+    this.setProjectAvailability(false)
   }
 
   public async initialize() {
@@ -298,15 +300,22 @@ export class Extension implements IExtension {
       this.initializeExperiments(),
       this.setAvailable(true)
     ])
+
     return Promise.all([
       ...Object.values(this.repositories).map(repo => repo.isReady()),
       this.experiments.isReady()
     ])
   }
 
-  public hasWorkspaceFolder = () => !!getFirstWorkspaceFolder()
+  public hasRoots() {
+    return definedAndNonEmpty(this.dvcRoots)
+  }
 
-  public reset = () => {
+  public hasWorkspaceFolder() {
+    return !!getFirstWorkspaceFolder()
+  }
+
+  public reset() {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
@@ -330,11 +339,7 @@ export class Extension implements IExtension {
     this.repositories = reset<Repositories>(this.repositories, this.dispose)
 
     this.dvcRoots.forEach(dvcRoot => {
-      const repository = new Repository(
-        dvcRoot,
-        this.internalCommands,
-        this.decorationProviders[dvcRoot]
-      )
+      const repository = new Repository(dvcRoot, this.internalCommands)
 
       repository.dispose.track(
         createFileSystemWatcher(
@@ -364,16 +369,6 @@ export class Extension implements IExtension {
     })
   }
 
-  private initializeDecorationProvidersEarly = (dvcRoots: string[]) =>
-    dvcRoots
-      .filter(dvcRoot => !this.dvcRoots.includes(dvcRoot))
-      .forEach(
-        dvcRoot =>
-          (this.decorationProviders[dvcRoot] = this.dispose.track(
-            new DecorationProvider()
-          ))
-      )
-
   private findDvcRoots = async (cwd: string): Promise<string[]> => {
     const dvcRoots = await findDvcRootPaths(cwd)
     if (definedAndNonEmpty(dvcRoots)) {
@@ -382,17 +377,6 @@ export class Extension implements IExtension {
 
     await this.config.isReady()
     return findAbsoluteDvcRootPath(cwd, this.cliReader.root(cwd))
-  }
-
-  private setupWorkspaceFolder = async (workspaceFolder: string) => {
-    const dvcRoots = await this.findDvcRoots(workspaceFolder)
-
-    if (definedAndNonEmpty(dvcRoots)) {
-      this.initializeDecorationProvidersEarly(dvcRoots)
-      this.setProjectAvailability(true)
-    }
-
-    return dvcRoots
   }
 
   private getEventProperties() {
