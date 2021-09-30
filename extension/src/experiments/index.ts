@@ -8,7 +8,6 @@ import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
-import { reset } from '../util/disposable'
 import {
   CommandId,
   AvailableCommands,
@@ -227,10 +226,6 @@ export class Experiments
     })
 
     return experiments
-  }
-
-  public reset(): void {
-    this.contents = reset<ExperimentsRepository>(this.contents, this.dispose)
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
