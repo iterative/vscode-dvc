@@ -6,7 +6,11 @@ import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath } from '../util'
-import { RegisteredCliCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
+import * as ProcessExecution from '../../../processExecution'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()
@@ -178,6 +182,52 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockPush).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
+    })
+
+    it('should not reset the workspace if the user does not confirm', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+
+      const mockShowWarningMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves('' as unknown as MessageItem)
+
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
+
+      expect(mockShowWarningMessage).to.be.calledOnce
+      expect(mockCheckout).not.to.be.called
+      expect(mockGitReset).not.to.be.called
+    })
+
+    it('should reset the workspace if the user confirms they want to', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+
+      const mockShowWarningMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves('Discard Changes' as unknown as MessageItem)
+
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
+
+      expect(mockShowWarningMessage).to.be.calledOnce
+      expect(mockCheckout).to.be.calledOnce
+      expect(mockGitReset).to.be.calledTwice
+      expect(mockGitReset).to.be.calledWith({
+        args: ['reset', '--hard', 'HEAD'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
+      expect(mockGitReset).to.be.calledWith({
+        args: ['clean', '-f', '-d', '-q'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
     })
   })
 })
