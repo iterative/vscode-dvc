@@ -5,9 +5,6 @@ import { Disposables } from '../util/disposable'
 
 export interface IContainer<T, U> {
   create: (dvcRoots: string[], arg: U) => T[]
-  dispose: Disposable
-  isReady: () => Promise<void>
-  getDvcRoots: () => string[]
   reset: () => void
 }
 
@@ -42,5 +39,9 @@ export class BaseContainer<T> {
 
   protected getRepository(dvcRoot: string) {
     return this.contents[dvcRoot]
+  }
+
+  protected setRepository(dvcRoot: string, repository: T) {
+    this.contents[dvcRoot] = repository
   }
 }
