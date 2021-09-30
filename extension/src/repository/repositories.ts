@@ -5,7 +5,6 @@ import {
   createFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
-import { reset } from '../util/disposable'
 import { BaseContainer, IContainer } from '../container'
 
 export class Repositories
@@ -25,10 +24,6 @@ export class Repositories
     )
 
     return repositories
-  }
-
-  public reset(): void {
-    this.contents = reset<Repository>(this.contents, this.dispose)
   }
 
   private createRepository(

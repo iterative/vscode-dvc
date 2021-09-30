@@ -1,14 +1,13 @@
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { Disposables } from '../util/disposable'
+import { Disposables, reset } from '../util/disposable'
 
 export interface IContainer<T, U> {
   create: (dvcRoots: string[], arg: U) => T[]
-  reset: () => void
 }
 
-export class BaseContainer<T> {
+export class BaseContainer<T extends Disposable> {
   public dispose = Disposable.fn()
 
   protected contents: Disposables<T> = {}
@@ -28,6 +27,10 @@ export class BaseContainer<T> {
 
   public getDvcRoots() {
     return Object.keys(this.contents)
+  }
+
+  public reset(): void {
+    this.contents = reset<T>(this.contents, this.dispose)
   }
 
   protected getOnlyOrPickProject() {
