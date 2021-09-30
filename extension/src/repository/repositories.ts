@@ -46,7 +46,7 @@ export class Repositories
       )
     )
 
-    this.contents[dvcRoot] = repository
+    this.setRepository(dvcRoot, repository)
     return repository
   }
 }

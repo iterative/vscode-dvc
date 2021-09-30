@@ -47,7 +47,7 @@ export class Experiments
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
-    return this.contents[this.focusedWebviewDvcRoot]
+    return this.getRepository(this.focusedWebviewDvcRoot)
   }
 
   public async addFilter(overrideRoot?: string) {
@@ -290,7 +290,7 @@ export class Experiments
       )
     )
 
-    this.contents[dvcRoot] = experimentsRepository
+    this.setRepository(dvcRoot, experimentsRepository)
 
     experimentsRepository.dispose.track(
       experimentsRepository.onDidChangeIsWebviewFocused(
