@@ -5,8 +5,11 @@ import {
   Resource,
   Root
 } from '.'
+import { getWarningResponse } from '../../vscode/modal'
 import { RegisteredCliCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { gitResetWorkspace } from '../../git'
+import { Flag } from '../../cli/args'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.registerExternalCliCommand<Resource>(
@@ -28,7 +31,26 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
 const registerRootCommands = (internalCommands: InternalCommands) => {
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.CHECKOUT,
-    getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
+    async ({ rootUri }) => {
+      const cwd = rootUri.fsPath
+
+      const response = await getWarningResponse(
+        'Are you sure you want to discard all of the changes in your workspace?',
+        'Discard Changes'
+      )
+
+      if (response !== 'Discard Changes') {
+        return
+      }
+
+      await gitResetWorkspace(cwd)
+
+      return internalCommands.executeCommand(
+        AvailableCommands.CHECKOUT,
+        cwd,
+        Flag.FORCE
+      )
+    }
   )
 
   internalCommands.registerExternalCliCommand<Root>(
