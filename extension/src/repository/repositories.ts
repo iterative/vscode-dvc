@@ -1,34 +1,17 @@
 import { join } from 'path'
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { Repository } from '.'
-import { InternalCommands } from '../commands/internal'
 import { TrackedExplorerTree } from '../fileSystem/tree'
 import {
   createFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
 import { reset } from '../util/disposable'
+import { BaseContainer, IContainer } from '../container'
 
-type Children = Record<string, Repository>
-
-export class Repositories {
-  public dispose = Disposable.fn()
-
-  private repositories: Children = {}
-  private internalCommands: InternalCommands
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-
-  constructor(internalCommands: InternalCommands) {
-    this.internalCommands = internalCommands
-  }
-
-  public isReady() {
-    return this.initialized
-  }
-
+export class Repositories
+  extends BaseContainer<Repository>
+  implements IContainer<Repository, TrackedExplorerTree>
+{
   public create(
     dvcRoots: string[],
     trackedExplorerTree: TrackedExplorerTree
@@ -37,15 +20,15 @@ export class Repositories {
       this.createRepository(dvcRoot, trackedExplorerTree)
     )
 
-    Promise.all(
-      Object.values(this.repositories).map(repo => repo.isReady())
-    ).then(() => this.deferred.resolve())
+    Promise.all(Object.values(this.contents).map(repo => repo.isReady())).then(
+      () => this.deferred.resolve()
+    )
 
     return repositories
   }
 
   public reset(): void {
-    this.repositories = reset<Children>(this.repositories, this.dispose)
+    this.contents = reset<Repository>(this.contents, this.dispose)
   }
 
   private createRepository(
@@ -63,7 +46,7 @@ export class Repositories {
       )
     )
 
-    this.repositories[dvcRoot] = repository
+    this.contents[dvcRoot] = repository
     return repository
   }
 }
