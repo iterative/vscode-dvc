@@ -87,9 +87,14 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledOnce
-      expect(mockGitReset).to.be.calledOnce
+      expect(mockGitReset).to.be.calledTwice
       expect(mockGitReset).to.be.calledWith({
         args: ['reset', '--hard', 'HEAD'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
+      expect(mockGitReset).to.be.calledWith({
+        args: ['clean', '-f', '-d', '-q'],
         cwd: dvcDemoPath,
         executable: 'git'
       })
