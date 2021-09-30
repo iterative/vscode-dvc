@@ -17,7 +17,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 
-type ExperimentsRepositories = Record<string, ExperimentsRepository>
+type Children = Record<string, ExperimentsRepository>
 
 export class Experiments {
   @observable
@@ -27,7 +27,7 @@ export class Experiments {
   public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
-  private experiments: ExperimentsRepositories = {}
+  private experiments: Children = {}
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -245,10 +245,7 @@ export class Experiments {
   }
 
   public reset(): void {
-    this.experiments = reset<ExperimentsRepositories>(
-      this.experiments,
-      this.dispose
-    )
+    this.experiments = reset<Children>(this.experiments, this.dispose)
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
