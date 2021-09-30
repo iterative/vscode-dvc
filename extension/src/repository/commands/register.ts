@@ -32,6 +32,11 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
 }
 
 const registerRootCommands = (internalCommands: InternalCommands) => {
+  internalCommands.registerExternalCliCommand<Root>(
+    RegisteredCliCommands.CHECKOUT,
+    getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
+  )
+
   internalCommands.registerExternalCommand<Root>(
     RegisteredCommands.RESET_WORKSPACE,
     async ({ rootUri }) => {

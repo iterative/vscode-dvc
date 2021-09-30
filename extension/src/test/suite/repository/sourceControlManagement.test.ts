@@ -6,7 +6,10 @@ import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
 import { dvcDemoPath } from '../util'
-import { RegisteredCliCommands } from '../../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../../commands/external'
 import * as ProcessExecution from '../../../processExecution'
 
 suite('Source Control Management Test Suite', () => {
@@ -45,11 +48,28 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('' as unknown as MessageItem)
 
-      await commands.executeCommand(RegisteredCliCommands.CHECKOUT, { rootUri })
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).not.to.be.called
       expect(mockGitReset).not.to.be.called
+    })
+
+    it('should not prompt to force if dvc.checkout fails without a prompt error', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').rejects(
+        'This is not a error that we would ask the user if they want to try and force'
+      )
+      const mockShowErrorMessage = stub(window, 'showErrorMessage').resolves(
+        '' as unknown as MessageItem
+      )
+
+      await commands.executeCommand(RegisteredCliCommands.CHECKOUT, { rootUri })
+
+      expect(mockCheckout).to.be.calledOnce
+      expect(mockShowErrorMessage).to.be.calledOnce
+      expect(mockCheckout).to.be.calledWith(rootUri.fsPath)
     })
 
     it('should reset the workspace if the user confirms they want to', async () => {
@@ -61,7 +81,9 @@ suite('Source Control Management Test Suite', () => {
         'showWarningMessage'
       ).resolves('Discard Changes' as unknown as MessageItem)
 
-      await commands.executeCommand(RegisteredCliCommands.CHECKOUT, { rootUri })
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledOnce
