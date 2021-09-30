@@ -45,6 +45,10 @@ import {
 import { EventName } from './telemetry/constants'
 import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
+import {
+  registerWalkthroughCommands,
+  showWalkthroughOnFirstUse
+} from './vscode/walkthrough'
 
 export { Disposable, Disposer }
 
@@ -223,18 +227,16 @@ export class Extension implements IExtension {
       })
     )
 
-    this.dispose.track(
-      this.internalCommands.registerExternalCommand(
-        RegisteredCommands.EXTENSION_SHOW_COMMANDS,
-        () => commands.executeCommand('workbench.action.quickOpen', '> DVC')
-      )
-    )
-
     registerRepositoryCommands(this.internalCommands)
 
     this.registerConfigCommands()
 
     reRegisterVsCodeCommands(this.internalCommands)
+    registerWalkthroughCommands(
+      this.internalCommands,
+      context.extension.packageJSON.id,
+      context.extension.packageJSON.contributes.walkthroughs[0].id
+    )
 
     this.dispose.track(
       commands.registerCommand(
@@ -261,6 +263,8 @@ export class Extension implements IExtension {
         }
       )
     )
+
+    showWalkthroughOnFirstUse(context.globalState)
   }
 
   public async canRunCli() {

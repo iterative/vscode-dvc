@@ -131,6 +131,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.getStarted%",
+        "command": "dvc.getStarted",
+        "category": "DVC"
+      },
+      {
         "title": "%command.init%",
         "command": "dvc.init",
         "category": "DVC"
@@ -736,7 +741,7 @@
     ],
     "walkthroughs": [
       {
-        "id": "dvcWelcome",
+        "id": "welcome",
         "title": "Get started with DVC",
         "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
         "steps": [
