@@ -3,9 +3,7 @@ import { ICli } from '../cli'
 import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
 
-const mockedConfig = {
-  getDefaultProject: jest.fn()
-} as unknown as Config
+const mockedConfig = {} as Config
 
 const mockedOutputChannel = {
   show: jest.fn()
@@ -33,7 +31,7 @@ describe('InternalCommands', () => {
     it('should throw an error if we try to re-register an existing command', () => {
       expect(() =>
         internalCommands.registerCommand(
-          AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
+          AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
           jest.fn()
         )
       ).toThrow()
