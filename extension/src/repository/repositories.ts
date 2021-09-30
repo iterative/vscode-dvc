@@ -19,8 +19,8 @@ export class Repositories
       this.createRepository(dvcRoot, trackedExplorerTree)
     )
 
-    Promise.all(Object.values(this.contents).map(repo => repo.isReady())).then(
-      () => this.deferred.resolve()
+    Promise.all(repositories.map(repository => repository.isReady())).then(() =>
+      this.deferred.resolve()
     )
 
     return repositories
