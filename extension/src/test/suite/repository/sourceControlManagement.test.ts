@@ -39,24 +39,6 @@ suite('Source Control Management Test Suite', () => {
       expect(mockAdd).to.be.calledOnce
     })
 
-    it('should not reset the workspace if the user does not confirm', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
-      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
-
-      const mockShowWarningMessage = stub(
-        window,
-        'showWarningMessage'
-      ).resolves('' as unknown as MessageItem)
-
-      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
-        rootUri
-      })
-
-      expect(mockShowWarningMessage).to.be.calledOnce
-      expect(mockCheckout).not.to.be.called
-      expect(mockGitReset).not.to.be.called
-    })
-
     it('should not prompt to force if dvc.checkout fails without a prompt error', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').rejects(
         'This is not a error that we would ask the user if they want to try and force'
@@ -70,34 +52,6 @@ suite('Source Control Management Test Suite', () => {
       expect(mockCheckout).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
       expect(mockCheckout).to.be.calledWith(rootUri.fsPath)
-    })
-
-    it('should reset the workspace if the user confirms they want to', async () => {
-      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
-      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
-
-      const mockShowWarningMessage = stub(
-        window,
-        'showWarningMessage'
-      ).resolves('Discard Changes' as unknown as MessageItem)
-
-      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
-        rootUri
-      })
-
-      expect(mockShowWarningMessage).to.be.calledOnce
-      expect(mockCheckout).to.be.calledOnce
-      expect(mockGitReset).to.be.calledTwice
-      expect(mockGitReset).to.be.calledWith({
-        args: ['reset', '--hard', 'HEAD'],
-        cwd: dvcDemoPath,
-        executable: 'git'
-      })
-      expect(mockGitReset).to.be.calledWith({
-        args: ['clean', '-f', '-d', '-q'],
-        cwd: dvcDemoPath,
-        executable: 'git'
-      })
     })
 
     it('should be able to run dvc.checkoutTarget without error', async () => {
@@ -225,6 +179,52 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockPush).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
+    })
+
+    it('should not reset the workspace if the user does not confirm', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+
+      const mockShowWarningMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves('' as unknown as MessageItem)
+
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
+
+      expect(mockShowWarningMessage).to.be.calledOnce
+      expect(mockCheckout).not.to.be.called
+      expect(mockGitReset).not.to.be.called
+    })
+
+    it('should reset the workspace if the user confirms they want to', async () => {
+      const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+      const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+
+      const mockShowWarningMessage = stub(
+        window,
+        'showWarningMessage'
+      ).resolves('Discard Changes' as unknown as MessageItem)
+
+      await commands.executeCommand(RegisteredCommands.RESET_WORKSPACE, {
+        rootUri
+      })
+
+      expect(mockShowWarningMessage).to.be.calledOnce
+      expect(mockCheckout).to.be.calledOnce
+      expect(mockGitReset).to.be.calledTwice
+      expect(mockGitReset).to.be.calledWith({
+        args: ['reset', '--hard', 'HEAD'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
+      expect(mockGitReset).to.be.calledWith({
+        args: ['clean', '-f', '-d', '-q'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
     })
   })
 })

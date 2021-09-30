@@ -35,11 +35,6 @@ const registerRootCommands = (internalCommands: InternalCommands) => {
     getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
   )
 
-  internalCommands.registerExternalCommand<Root>(
-    RegisteredCommands.RESET_WORKSPACE,
-    getResetRootCommand(internalCommands)
-  )
-
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.COMMIT,
     getRootCommand(internalCommands, AvailableCommands.COMMIT)
@@ -53,6 +48,11 @@ const registerRootCommands = (internalCommands: InternalCommands) => {
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.PUSH,
     getRootCommand(internalCommands, AvailableCommands.PUSH)
+  )
+
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.RESET_WORKSPACE,
+    getResetRootCommand(internalCommands)
   )
 }
 
