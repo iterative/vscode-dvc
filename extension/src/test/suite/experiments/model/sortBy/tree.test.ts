@@ -17,8 +17,6 @@ import { buildExperimentsRepository } from '../../util'
 import { ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {
-  window.showInformationMessage('Start all experiments sort by tree tests.')
-
   const testData = {
     testBranch: {
       baseline: {
@@ -94,6 +92,12 @@ suite('Experiments Sort By Tree Test Suite', () => {
   })
 
   describe('ExperimentsSortByTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand('dvc.views.experimentsSortByTree.focus')
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to properly add and remove sorts with a variety of commands', async () => {
       // setup
 
@@ -159,7 +163,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
+        'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
       // Setup done, perform the test

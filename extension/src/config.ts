@@ -14,9 +14,7 @@ import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
 } from './extensions/python'
-import { QuickPickItemWithValue } from './vscode/quickPick'
-import { getConfigValue, setConfigValue } from './vscode/config'
-import { definedAndNonEmpty } from './util/array'
+import { getConfigValue } from './vscode/config'
 
 export class Config {
   @observable
@@ -34,14 +32,11 @@ export class Config {
 
   private readonly executionDetailsChanged: EventEmitter<void>
 
-  private dvcRoots: string[] = []
-
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
   private dvcPathOption = 'dvc.dvcPath'
   private pythonPathOption = 'dvc.pythonPath'
-  private defaultProjectOption = 'dvc.defaultProject'
 
   constructor() {
     makeObservable(this)
@@ -64,10 +59,6 @@ export class Config {
     this.onDidConfigurationChange()
   }
 
-  public setDvcRoots(dvcRoots: string[]): void {
-    this.dvcRoots = dvcRoots
-  }
-
   public isReady() {
     return this.initialized
   }
@@ -81,20 +72,6 @@ export class Config {
 
   public getCliPath(): string {
     return getConfigValue(this.dvcPathOption)
-  }
-
-  public getDefaultProject(): string {
-    return getConfigValue(this.defaultProjectOption)
-  }
-
-  public deselectDefaultProject = (): Thenable<void> =>
-    this.setDefaultProject(undefined)
-
-  public selectDefaultProject = async (): Promise<void> => {
-    const dvcRoot = await this.pickDefaultProject()
-    if (dvcRoot) {
-      this.setDefaultProject(dvcRoot)
-    }
   }
 
   public isPythonExtensionUsed() {
@@ -148,46 +125,5 @@ export class Config {
     if (oldPath !== newPath) {
       this.executionDetailsChanged.fire()
     }
-  }
-
-  private getDefaultProjectOptions(
-    dvcRoots: string[]
-  ): QuickPickItemWithValue[] {
-    return [
-      {
-        description: 'Choose project each time a command is run',
-        label: 'Always prompt',
-        picked: true,
-        value: 'remove-default'
-      },
-      ...dvcRoots.map(dvcRoot => ({
-        description: dvcRoot,
-        label: 'Project',
-        value: dvcRoot
-      }))
-    ]
-  }
-
-  private async pickDefaultProject(): Promise<string | undefined> {
-    if (definedAndNonEmpty(this.dvcRoots)) {
-      const selected = await window.showQuickPick(
-        this.getDefaultProjectOptions(this.dvcRoots),
-        {
-          canPickMany: false,
-          placeHolder: 'Select a default project to run all commands against'
-        }
-      )
-
-      if (selected?.value === 'remove-default') {
-        this.deselectDefaultProject()
-        return
-      }
-
-      return selected?.value
-    }
-  }
-
-  private setDefaultProject(path?: string): Thenable<void> {
-    return setConfigValue(this.defaultProjectOption, path)
   }
 }

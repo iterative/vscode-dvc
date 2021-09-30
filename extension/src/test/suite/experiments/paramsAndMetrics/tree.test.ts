@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
-import { window, commands } from 'vscode'
+import { commands } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { Experiments } from '../../../../experiments'
 import { Status } from '../../../../experiments/paramsAndMetrics/model'
@@ -11,10 +11,6 @@ import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/
 import { buildExperimentsRepository } from '../util'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
-  window.showInformationMessage(
-    'Start all experiments params and metrics tree tests.'
-  )
-
   const paramsFile = 'params.yaml'
   const disposable = Disposable.fn()
 
@@ -28,6 +24,14 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
   describe('ExperimentsParamsAndMetricsTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand(
+          'dvc.views.experimentsParamsAndMetricsTree.focus'
+        )
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = joinParamOrMetricPath('params', paramsFile, 'learning_rate')
 

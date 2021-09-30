@@ -71,7 +71,7 @@ export class Experiments {
   }
 
   public async removeFilters() {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
     if (!dvcRoot) {
       return
     }
@@ -91,7 +91,7 @@ export class Experiments {
   }
 
   public async removeSorts() {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
     if (!dvcRoot) {
       return
     }
@@ -136,7 +136,7 @@ export class Experiments {
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
-    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
@@ -145,7 +145,7 @@ export class Experiments {
   }
 
   public getExpNameThenRun = async (commandId: CommandId) => {
-    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
@@ -164,7 +164,7 @@ export class Experiments {
     commandId: CommandId,
     quickPick: () => Thenable<string[] | undefined>
   ) => {
-    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
@@ -181,7 +181,7 @@ export class Experiments {
     commandId: CommandId,
     prompt: string
   ) => {
-    const cwd = await this.getFocusedOrDefaultOrPickProject()
+    const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
@@ -205,7 +205,7 @@ export class Experiments {
   }
 
   public async showExperimentsTable() {
-    const dvcRoot = await this.getDefaultOrPickProject()
+    const dvcRoot = await this.getOnlyOrPickProject()
     if (!dvcRoot) {
       return
     }
@@ -223,7 +223,7 @@ export class Experiments {
   }
 
   public showExperimentsTableThenRun = async (commandId: CommandId) => {
-    const dvcRoot = await this.getFocusedOrDefaultOrPickProject()
+    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
     if (!dvcRoot) {
       return
     }
@@ -293,20 +293,20 @@ export class Experiments {
   }
 
   private async getDvcRoot(overrideRoot?: string) {
-    return overrideRoot || (await this.getFocusedOrDefaultOrPickProject())
+    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
   }
 
   private getRepository(dvcRoot: string) {
     return this.experiments[dvcRoot]
   }
 
-  private getFocusedOrDefaultOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getDefaultOrPickProject()
+  private getFocusedOrOnlyOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
   }
 
-  private getDefaultOrPickProject() {
+  private getOnlyOrPickProject() {
     return this.internalCommands.executeCommand<string | undefined>(
-      AvailableCommands.GET_DEFAULT_OR_PICK_PROJECT,
+      AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
       ...this.getDvcRoots()
     )
   }

@@ -46,6 +46,10 @@ import {
 import { EventName } from './telemetry/constants'
 import { RegisteredCommands } from './commands/external'
 import { StopWatch } from './util/time'
+import {
+  registerWalkthroughCommands,
+  showWalkthroughOnFirstUse
+} from './vscode/walkthrough'
 
 export { Disposable, Disposer }
 
@@ -228,9 +232,12 @@ export class Extension implements IExtension {
 
     registerRepositoryCommands(this.internalCommands)
 
-    this.registerConfigCommands()
-
     reRegisterVsCodeCommands(this.internalCommands)
+    registerWalkthroughCommands(
+      this.internalCommands,
+      context.extension.packageJSON.id,
+      context.extension.packageJSON.contributes.walkthroughs[0].id
+    )
 
     this.dispose.track(
       commands.registerCommand(
@@ -257,6 +264,8 @@ export class Extension implements IExtension {
         }
       )
     )
+
+    showWalkthroughOnFirstUse(context.globalState)
   }
 
   public hasRoots = () => definedAndNonEmpty(this.dvcRoots)
@@ -279,8 +288,7 @@ export class Extension implements IExtension {
       )
     )
 
-    this.dvcRoots = flatten(dvcRoots)
-    this.config.setDvcRoots(this.dvcRoots)
+    this.dvcRoots = flatten(dvcRoots).sort()
   }
 
   public async initialize() {
@@ -316,18 +324,6 @@ export class Extension implements IExtension {
 
   private setProjectAvailability(available: boolean) {
     setContextValue('dvc.project.available', available)
-  }
-
-  private registerConfigCommands() {
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.EXTENSION_DESELECT_DEFAULT_PROJECT,
-      () => this.config.deselectDefaultProject()
-    )
-
-    this.internalCommands.registerExternalCommand(
-      RegisteredCommands.EXTENSION_SELECT_DEFAULT_PROJECT,
-      () => this.config.selectDefaultProject()
-    )
   }
 
   private initializeRepositories = () => {

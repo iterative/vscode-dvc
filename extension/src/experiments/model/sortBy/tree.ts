@@ -104,7 +104,7 @@ export class ExperimentsSortByTree
     )
 
     projectTreeItem.id = rootPath
-    projectTreeItem.contextValue = 'dvcSortRoot'
+    projectTreeItem.contextValue = 'dvcRoot'
 
     return projectTreeItem
   }
@@ -116,7 +116,6 @@ export class ExperimentsSortByTree
     sortDefinitionTreeItem.iconPath = new ThemeIcon(
       sort.descending ? 'arrow-down' : 'arrow-up'
     )
-    sortDefinitionTreeItem.contextValue = 'dvcSort'
 
     return sortDefinitionTreeItem
   }

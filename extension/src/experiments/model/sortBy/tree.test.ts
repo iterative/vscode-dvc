@@ -139,7 +139,7 @@ describe('ExperimentsSortByTree', () => {
       )
       expect(experimentsSortByTree.getTreeItem(dvcRoot)).toEqual({
         collapsibleState: TreeItemCollapsibleState.Expanded,
-        contextValue: 'dvcSortRoot',
+        contextValue: 'dvcRoot',
         id: dvcRoot,
         resourceUri: Uri.file(dvcRoot)
       })
@@ -155,7 +155,6 @@ describe('ExperimentsSortByTree', () => {
         experimentsSortByTree.getTreeItem(exampleSortDefinitionWithParent)
       ).toEqual({
         collapsibleState: TreeItemCollapsibleState.None,
-        contextValue: 'dvcSort',
         iconPath: new ThemeIcon('arrow-down'),
         label: examplePath
       })
@@ -178,7 +177,6 @@ describe('ExperimentsSortByTree', () => {
         })
       ).toEqual({
         collapsibleState: TreeItemCollapsibleState.None,
-        contextValue: 'dvcSort',
         iconPath: new ThemeIcon('arrow-down'),
         label: otherPath
       })

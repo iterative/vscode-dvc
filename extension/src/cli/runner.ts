@@ -1,4 +1,4 @@
-import { EventEmitter, Event, window } from 'vscode'
+import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { CliResult, CliStarted, ICli, typeCheckCommands } from '.'
 import { Args, Command, ExperimentFlag, ExperimentSubCommand } from './args'
@@ -10,6 +10,7 @@ import { setContextValue } from '../vscode/context'
 import { StopWatch } from '../util/time'
 import { sendErrorTelemetryEvent, sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
+import { reportError } from '../vscode/reporting'
 
 export const autoRegisteredCommands = {
   EXPERIMENT_RUN: 'runExperiment',
@@ -119,7 +120,7 @@ export class CliRunner implements ICli {
     if (!this.pseudoTerminal.isBlocked()) {
       return this.startProcess(cwd, args)
     }
-    window.showErrorMessage(
+    reportError(
       `Cannot start dvc ${args.join(
         ' '
       )} as the output terminal is already occupied.`

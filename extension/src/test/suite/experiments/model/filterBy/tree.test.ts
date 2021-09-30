@@ -16,8 +16,6 @@ import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperimentsRepository } from '../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
-  window.showInformationMessage('Start all experiments filter by tree tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -29,6 +27,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
   })
 
   describe('ExperimentsFilterByTree', () => {
+    it('should appear in the UI', async () => {
+      await expect(
+        commands.executeCommand('dvc.views.experimentsFilterByTree.focus')
+      ).to.be.eventually.equal(undefined)
+    })
+
     it('should be able to update the table data by adding and removing a filter', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
@@ -65,7 +69,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
+        'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
       const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
@@ -151,7 +155,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
+        'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)

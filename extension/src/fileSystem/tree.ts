@@ -9,8 +9,9 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { exists } from '.'
-import { deleteTarget } from './workspace'
+import { exists, isDirectory } from '.'
+import { fireWatcher } from './watcher'
+import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
 import { tryThenMaybeForce } from '../cli/actions'
@@ -24,6 +25,10 @@ import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 import { getInput } from '../vscode/inputBox'
+import { pickResources } from '../vscode/resourcePicker'
+import { getWarningResponse } from '../vscode/modal'
+
+type PathItem = { dvcRoot: string; isDirectory: boolean; isOut: boolean }
 
 export class TrackedExplorerTree implements TreeDataProvider<string> {
   public dispose = Disposable.fn()
@@ -35,9 +40,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   private dvcRoots: string[] = []
 
-  private pathRoots: Record<string, string> = {}
-  private pathIsDirectory: Record<string, boolean> = {}
-  private pathIsOut: Record<string, boolean> = {}
+  private pathItems: Record<string, PathItem> = {}
 
   private viewed = false
 
@@ -72,32 +75,39 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public initialize(dvcRoots: string[]) {
     this.dvcRoots = dvcRoots
+    dvcRoots.forEach(
+      dvcRoot =>
+        (this.pathItems[dvcRoot] = { dvcRoot, isDirectory: true, isOut: false })
+    )
     this.reset()
   }
 
-  public getChildren(element?: string): Promise<string[]> {
-    if (element) {
-      return this.readDirectory(this.pathRoots[element], element)
+  public async getChildren(path?: string): Promise<string[]> {
+    if (path) {
+      const contents = await this.readDirectory(path)
+      return this.sortDirectory(contents)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
       return this.getRootElements()
     }
 
-    return Promise.resolve([])
+    return []
   }
 
-  public getTreeItem(element: string): TreeItem {
-    const resourceUri = Uri.file(element)
-    const elementIsDirectory = this.pathIsDirectory[element]
+  public getTreeItem(path: string): TreeItem {
+    const resourceUri = Uri.file(path)
+    const isDirectory = this.isDirectory(path)
     const treeItem = new TreeItem(
       resourceUri,
-      elementIsDirectory
+      isDirectory
         ? TreeItemCollapsibleState.Collapsed
         : TreeItemCollapsibleState.None
     )
 
-    if (!elementIsDirectory) {
+    treeItem.contextValue = this.getContextValue(path)
+
+    if (!isDirectory && treeItem.contextValue !== 'virtual') {
       treeItem.command = {
         arguments: [resourceUri],
         command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
@@ -105,11 +115,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     }
 
-    treeItem.contextValue = this.getContextValue(element)
     return treeItem
   }
 
-  private async getRootElements() {
+  private getPathItem(path: string) {
+    return this.pathItems[path]
+  }
+
+  private isDirectory(path: string) {
+    const { isDirectory } = this.getPathItem(path)
+    return isDirectory
+  }
+
+  private getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
@@ -118,18 +136,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       this.viewed = true
     }
 
-    const rootElements = await Promise.all(
-      this.dvcRoots.map(dvcRoot => this.readDirectory(dvcRoot, dvcRoot))
-    )
-    return rootElements
-      .reduce((a, b) => a.concat(b), [])
-      .sort((a, b) => {
-        const aIsDirectory = this.pathIsDirectory[a]
-        if (aIsDirectory === this.pathIsDirectory[b]) {
-          return a.localeCompare(b)
-        }
-        return aIsDirectory ? -1 : 1
-      })
+    if (this.dvcRoots.length === 1) {
+      const [onlyRoot] = this.dvcRoots
+      return this.getChildren(onlyRoot)
+    }
+
+    return this.dvcRoots
   }
 
   private getDataPlaceholder(path: string): string {
@@ -141,17 +153,16 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private hasRemote(path: string): boolean {
-    return this.pathIsOut[path] || !this.pathIsDirectory[path]
+    const { isOut, isDirectory } = this.getPathItem(path)
+    return isOut || !isDirectory
   }
 
   private getContextValue(path: string): string {
     if (!exists(path)) {
-      return 'dvcTrackedVirtual'
+      return 'virtual'
     }
 
-    const baseContext = this.pathIsDirectory[path]
-      ? 'dvcTrackedDir'
-      : 'dvcTrackedFile'
+    const baseContext = this.isDirectory(path) ? 'dir' : 'file'
 
     if (this.hasDataPlaceholder(path)) {
       return baseContext + 'Data'
@@ -163,23 +174,39 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return baseContext
   }
 
-  private async readDirectory(root: string, path: string): Promise<string[]> {
-    if (!root) {
+  private async readDirectory(path: string): Promise<string[]> {
+    const { dvcRoot } = this.getPathItem(path)
+    if (!dvcRoot) {
       return []
     }
 
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY,
-      root,
-      relative(root, path)
+      dvcRoot,
+      relative(dvcRoot, path)
     )
 
     return listOutput.map(relative => {
       const absolutePath = join(path, relative.path)
-      this.pathRoots[absolutePath] = root
-      this.pathIsDirectory[absolutePath] = relative.isdir
-      this.pathIsOut[absolutePath] = relative.isout
+      this.pathItems[absolutePath] = {
+        dvcRoot,
+        // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
+        isDirectory: exists(absolutePath)
+          ? isDirectory(absolutePath)
+          : relative.isdir,
+        isOut: relative.isout
+      }
       return absolutePath
+    })
+  }
+
+  private sortDirectory(contents: string[]) {
+    return contents.sort((a, b) => {
+      const aIsDirectory = this.isDirectory(a)
+      if (aIsDirectory === this.isDirectory(b)) {
+        return a.localeCompare(b)
+      }
+      return aIsDirectory ? -1 : 1
     })
   }
 
@@ -203,12 +230,33 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       path => deleteTarget(path)
     )
 
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.MOVE_TARGETS,
+      async (destination: string) => {
+        const paths = await pickResources(
+          'pick resources to add to the dataset'
+        )
+        if (paths) {
+          const response = await getWarningResponse(
+            'Are you sure you want to move the selected data into this dataset?',
+            'Move'
+          )
+          if (response !== 'Move') {
+            return
+          }
+
+          await moveTargets(paths, destination)
+          return fireWatcher(this.getDataPlaceholder(destination))
+        }
+      }
+    )
+
     this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCliCommands.REMOVE_TARGET,
       path => {
         deleteTarget(path)
         this.treeDataChanged.fire()
-        const dvcRoot = this.pathRoots[path]
+        const { dvcRoot } = this.getPathItem(path)
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
@@ -221,7 +269,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.internalCommands.registerExternalCliCommand<string>(
       RegisteredCliCommands.RENAME_TARGET,
       async path => {
-        const dvcRoot = this.pathRoots[path]
+        const { dvcRoot } = this.getPathItem(path)
         const relPath = relative(dvcRoot, path)
         const relDestination = await getInput(
           'enter a destination relative to the root',
@@ -252,7 +300,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   }
 
   private tryThenMaybeForce(commandId: CommandId, path: string) {
-    const dvcRoot = this.pathRoots[path]
+    const { dvcRoot } = this.getPathItem(path)
     return tryThenMaybeForce(
       this.internalCommands,
       commandId,

@@ -2,7 +2,7 @@ import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { FileSystemWatcher, window } from 'vscode'
+import { FileSystemWatcher } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceParamsAndMetrics } from '../../../../experiments/paramsAndMetrics/workspace'
 import complexExperimentsOutput from '../../../fixtures/complex-output-example'
@@ -12,8 +12,6 @@ import { ParamsAndMetricsModel } from '../../../../experiments/paramsAndMetrics/
 import { buildMockMemento } from '../../../util'
 
 suite('Experiments Test Suite', () => {
-  window.showInformationMessage('Start all experiments workspace params tests.')
-
   const disposable = Disposable.fn()
 
   beforeEach(() => {

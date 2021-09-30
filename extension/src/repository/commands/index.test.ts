@@ -3,7 +3,6 @@ import { Uri } from 'vscode'
 import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse } from '../../vscode/modal'
-import { Prompt } from '../../cli/output'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
 import { OutputChannel } from '../../vscode/outputChannel'
@@ -13,11 +12,8 @@ const mockedGetWarningResponse = mocked(getWarningResponse)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
-const mockedGetDefaultProject = jest.fn()
 const mockedInternalCommands = new InternalCommands(
-  {
-    getDefaultProject: mockedGetDefaultProject
-  } as unknown as Config,
+  {} as Config,
   { show: jest.fn() } as unknown as OutputChannel
 )
 
@@ -25,6 +21,8 @@ const mockedCommandId = 'mockedFunc' as CommandId
 mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
   mockedFunc(...args)
 )
+
+const TRY_FORCE = 'Use `-f|--force` to force.'
 
 jest.mock('vscode')
 jest.mock('../../vscode/modal')
@@ -73,7 +71,7 @@ describe('getResourceCommand', () => {
   })
 
   it('should return a function that calls getWarningResponse if the first function fails with a force prompt', async () => {
-    const stderr = `I deed, but ${Prompt.TRY_FORCE}`
+    const stderr = `I deed, but ${TRY_FORCE}`
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -93,7 +91,7 @@ describe('getResourceCommand', () => {
   })
 
   it('should return a function that does not call the func with a force flag if the user selects cancel', async () => {
-    const stderr = `You don't have to do this, but ${Prompt.TRY_FORCE}`
+    const stderr = `You don't have to do this, but ${TRY_FORCE}`
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -133,7 +131,7 @@ describe('getResourceCommand', () => {
   })
 
   it('should return a function that calls the function with the force flag if the first function fails with a force prompt and the user responds with force', async () => {
-    const stderr = `I can fix this... maybe, but ${Prompt.TRY_FORCE}`
+    const stderr = `I can fix this... maybe, but ${TRY_FORCE}`
     const forcedStdout = 'ok, nw I forced it'
     const userApproves = 'Force'
     mockedFunc
@@ -216,7 +214,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that calls getWarningResponse if the first function fails with a force prompt', async () => {
-    const stderr = `I deed, but ${Prompt.TRY_FORCE}`
+    const stderr = `I deed, but ${TRY_FORCE}`
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -235,7 +233,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that does not call the force func if the user selects cancel', async () => {
-    const stderr = `You don't have to do this, but ${Prompt.TRY_FORCE}`
+    const stderr = `You don't have to do this, but ${TRY_FORCE}`
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({ stderr })
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -273,7 +271,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that calls the force function if the first function fails with a force prompt and the user responds with force', async () => {
-    const stderr = `I can fix this... maybe, but ${Prompt.TRY_FORCE}`
+    const stderr = `I can fix this... maybe, but ${TRY_FORCE}`
     const forcedStdout = 'ok, nw I forced it'
     const userApproves = 'Force'
     mockedFunc

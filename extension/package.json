@@ -113,11 +113,6 @@
         "icon": "$(trash)"
       },
       {
-        "title": "%command.deselectDefaultProject%",
-        "command": "dvc.deselectDefaultProject",
-        "category": "DVC"
-      },
-      {
         "title": "%command.experimentGarbageCollect%",
         "command": "dvc.experimentGarbageCollect",
         "category": "DVC"
@@ -128,8 +123,18 @@
         "category": "DVC"
       },
       {
+        "title": "%command.getStarted%",
+        "command": "dvc.getStarted",
+        "category": "DVC"
+      },
+      {
         "title": "%command.init%",
         "command": "dvc.init",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.moveTargets%",
+        "command": "dvc.moveTargets",
         "category": "DVC"
       },
       {
@@ -222,11 +227,6 @@
         "icon": "$(notebook-revert)"
       },
       {
-        "title": "%command.selectDefaultProject%",
-        "command": "dvc.selectDefaultProject",
-        "category": "DVC"
-      },
-      {
         "title": "%command.selectForCompare%",
         "command": "dvc.selectForCompare",
         "category": "DVC"
@@ -234,6 +234,11 @@
       {
         "title": "%command.setupWorkspace%",
         "command": "dvc.setupWorkspace",
+        "category": "DVC"
+      },
+      {
+        "title": "%command.showCommands",
+        "command": "dvc.showCommands",
         "category": "DVC"
       },
       {
@@ -283,12 +288,6 @@
     "configuration": {
       "title": "DVC",
       "properties": {
-        "dvc.defaultProject": {
-          "title": "%config.defaultProject.title%",
-          "description": "%config.defaultProject.description%",
-          "type": "string",
-          "default": null
-        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",
@@ -362,6 +361,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.moveTargets",
+          "when": "false"
+        },
+        {
           "command": "dvc.openToTheSide",
           "when": "false"
         },
@@ -411,6 +414,10 @@
         },
         {
           "command": "dvc.selectForCompare",
+          "when": "false"
+        },
+        {
+          "command": "dvc.showCommands",
           "when": "false"
         },
         {
@@ -529,87 +536,92 @@
         {
           "command": "dvc.openToTheSide",
           "group": "navigation",
-          "when": "viewItem =~ /^dvcTrackedFile/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/"
+        },
+        {
+          "command": "dvc.moveTargets",
+          "group": "1_DVC@1",
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^dirData$/"
         },
         {
           "command": "dvc.pullTarget",
-          "group": "1_DVC@1",
-          "when": "viewItem =~ /^dvcTrackedVirtual|^dvcTracked.*[HasRemote|Data]$/"
+          "group": "1_DVC@2",
+          "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.pushTarget",
-          "group": "1_DVC@2",
-          "when": "viewItem =~ /^dvcTracked.*[HasRemote|Data]$/"
+          "group": "1_DVC@3",
+          "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
         },
         {
           "command": "dvc.compareSelected",
           "group": "3_compare@1",
-          "when": "viewItem =~ /^dvcTrackedFile/ && resourceSelectedForCompare"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/ && resourceSelectedForCompare"
         },
         {
           "command": "dvc.selectForCompare",
           "group": "3_compare@2",
-          "when": "viewItem =~ /^dvcTrackedFile/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^file/"
         },
         {
           "command": "dvc.findInFolder",
           "group": "4_search",
-          "when": "viewItem =~ /^dvcTrackedDir/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^dir/"
         },
         {
           "command": "dvc.copyFilePath",
           "group": "6_copypath@1",
-          "when": "viewItem =~ /dvcTracked/"
+          "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.copyRelativeFilePath",
           "group": "6_copypath@2",
-          "when": "viewItem =~ /dvcTracked/"
+          "when": "view == dvc.views.trackedExplorerTree"
         },
         {
           "command": "dvc.renameTarget",
           "group": "7_modification@1",
-          "when": "viewItem =~ /^dvcTracked.*Data$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
         },
         {
           "command": "dvc.deleteTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem != virtual"
         },
         {
           "command": "dvc.removeTarget",
           "group": "7_modification@2",
-          "when": "viewItem =~ /^dvcTracked.*Data$/"
+          "when": "view == dvc.views.trackedExplorerTree && viewItem =~ /^.*Data$/"
         },
         {
           "command": "dvc.addExperimentsTableSort",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcSort"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcSortRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.addExperimentsTableFilter",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilter"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
-          "when": "dvc.commands.available == true && viewItem == dvcFilterRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -711,6 +723,109 @@
       {
         "view": "dvc.views.experimentsFilterByTree",
         "contents": "No filters applied. \n[Add Filter](command:dvc.addExperimentsTableFilter)\n"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "welcome",
+        "title": "Get started with DVC",
+        "description": "Your first steps to set up a DVC project with all the powerful tools and features that the DVC extension has to offer!",
+        "steps": [
+          {
+            "id": "dvc.installDVC",
+            "title": "Install DVC",
+            "description": "The DVC Extension requires DVC to be installed. To install follow the guide shown on [dvc.org](https://dvc.org).\n\n[Install DVC](https://dvc.org/doc/install)\n",
+            "media": {
+              "markdown": "resources/walkthrough/install-dvc.md"
+            },
+            "completionEvents": [
+              "onLink:https://dvc.org",
+              "onLink:https://dvc.org/doc/install"
+            ]
+          },
+          {
+            "id": "dvc.setup",
+            "title": "Setup the workspace",
+            "description": "Setup the workspace for the dvc extension.\n[Setup the workspace](command:dvc.setupWorkspace)",
+            "media": {
+              "markdown": "resources/walkthrough/setup-workspace.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.setupWorkspace"
+            ]
+          },
+          {
+            "id": "dvc.showCommands",
+            "title": "Available commands",
+            "description": "View all of the available commands.\n[View commands](command:dvc.showCommands)",
+            "media": {
+              "markdown": "resources/walkthrough/command-palette.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showCommands"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.scm",
+            "title": "Source control management",
+            "description": "Open the DVC scm view.\n[Show scm](command:workbench.view.scm)",
+            "media": {
+              "markdown": "resources/walkthrough/source-control-management.md"
+            },
+            "completionEvents": [
+              "onCommand:workbench.view.scm"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.tracked",
+            "title": "Tracked resources",
+            "description": "Open the DVC tracked view.\n[Show tracked](command:dvc.views.trackedExplorerTree.focus)",
+            "media": {
+              "markdown": "resources/walkthrough/tracked-explorer.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.views.trackedExplorerTree.focus"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.viewContainer",
+            "title": "Experiments views container",
+            "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
+            "media": {
+              "markdown": "resources/walkthrough/experiments-views.md"
+            },
+            "completionEvents": [
+              "onCommand:workbench.view.extension.dvc-views"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.experimentsTable",
+            "title": "Experiments table",
+            "description": "Open the experiments table.\n[Show table](command:dvc.showExperiments)",
+            "media": {
+              "markdown": "resources/walkthrough/experiments-table.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showExperiments"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
+            "id": "dvc.learnMore",
+            "title": "Explore more resources",
+            "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn more](https://dvc.org/doc)",
+            "media": {
+              "markdown": "resources/walkthrough/dvc-learn-more.md"
+            },
+            "completionEvents": [
+              "onLink:https://dvc.org/doc"
+            ]
+          }
+        ]
       }
     ]
   },

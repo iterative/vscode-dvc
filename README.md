@@ -5,81 +5,72 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/maintainability)](https://codeclimate.com/repos/608b5886f52398018b00264c/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/fb243c31ea059c0038b2/test_coverage)](https://codeclimate.com/repos/608b5886f52398018b00264c/test_coverage)
 
-A Visual Studio Code Extension that aims to allow users of all technical
-backgrounds to effectively use [DVC](https://dvc.org/), particularly the new
-[Experiments](https://dvc.org/doc/start/experiments) feature.
+A [Visual Studio Code](https://code.visualstudio.com/)
+[extension](https://marketplace.visualstudio.com/VSCode) that aims to allow
+users of all technical backgrounds to effectively use [DVC](https://dvc.org/).
 
-This project is in a developmental state, and constantly evolving.
+## Installing the Extension
 
-## Setup
+This project is currently in closed alpha testing, and constantly evolving.
+After we conclude alpha and beta testing the repository will become public and
+we will be publishing the extension to the marketplace.
 
-### Installing the Extension
+### In the meantime...
 
-This repo is set up with a
+This repository is set up with a
 [GitHub Action](https://github.com/iterative/vscode-dvc/actions) that uploads an
 installable vsix build of the extension for every commit, complete with the Git
 SHA appended to the extension version.
 
-You can find the download link in the Artifacts list of any run of the
-Continuous Integration workflow.
+You can find the download link in the artifacts list of any run of the
+[Continuous Integration workflow](https://github.com/iterative/vscode-dvc/actions/workflows/continuous-integration.yml?query=branch%3Amaster+is%3Acompleted).
+Click on the desired run and the artifact will be displayed as in the following
+screenshot:
 
 ![Screenshot of artifacts menu](https://user-images.githubusercontent.com/9111807/118053924-64d0e000-b353-11eb-8d3d-7e202d741f54.png)
 
-The easiest way to get to the build for any particular branch is to use the
-GitHub Checks UI to get to the details of the "Continuous Integration" run: next
-to any commit, its CI status will show up as an icon next to it. From there, you
-can get to that commit's vsix in a few clicks through the Continuous Integration
-check's details and to the summary of the Check run:
-
-![Guide to get from Checks status to Artifacts](https://user-images.githubusercontent.com/9111807/118057990-19bacb00-b35b-11eb-9030-558e802668f1.png)
+It is recommended that you take the artifact from the most recent run.
 
 Once you have downloaded and extracted the `vsix` file, you can install it
 following the
 [official documentation](https://code.visualstudio.com/docs/editor/extension-marketplace#_install-from-a-vsix).
 
-### Installing and Integrating With DVC CLI
+## Quick start
 
-As you probably already know there are quite a few options for installing DVC.
-This extension can integrate with a few different setups. Use the workspace
-setup wizard to set the required config options. This can be done via the
-welcome view underneath the DVC Tracked view in the side bar's explorer view
-container or "Setup The Workspace" in the command palette.
+- **Step 1.**
+  [Install a supported version of DVC on your system](https://dvc.org/doc/install)
+- **Step 2.**
+  [Install the DVC extension for Visual Studio Code](https://code.visualstudio.com/docs/editor/extension-gallery).
+- **Step 3.** See walkthrough.
 
-## How to Use
+**Note:** Our walkthrough will automatically be shown after installation. If for
+any reason you need to revisit the walkthrough it can be accessed via
+`DVC: Get Started` from the command palette.
 
-This extension, especially in this early state, makes extensive use of the
-[Command Palette](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
-Every feature should be available from the Command Palette, and from there
-additional GUI elements are added for convenience.
+## Features
 
-### Experiments
-
-To open up the Experiments table view for a DVC repo, use the "Show Experiments"
-command from the Command Palette.
-
-To run experiments, use the "Run Experiment" command or use the UI elements
-available when the table is visible.
-
-There are experiments related views available in the DVC view container which
-can be selected through the DVC icon in the activity bar.
-
-![Experiment GUI Buttons](https://user-images.githubusercontent.com/9111807/118054967-40760300-b355-11eb-8ee6-38a344bdaced.png)
-
-### SCM
-
-The extension also provides a view in the SCM view container, next to the Git
-view, to manage file actions like checkout, pull, push, and add.
-
-![SCM view screenshot](https://user-images.githubusercontent.com/9111807/118057076-19b9cb80-b359-11eb-91bc-9c73a85a83a8.png)
+- [Command Palette](extension/resources/walkthrough/command-palette.md)
+- [Source Control Management](extension/resources/walkthrough/source-control-management.md)
+- [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
+- [Experiments Table](extension/resources/walkthrough/experiments-table.md)
+- [Experiments Views](extension/resources/walkthrough/experiments-views.md)
+- Plots
 
 ### Debugging
 
 Due to the way DVC pipelines run scripts of any language from the command line,
 users must debug pipeline scripts (e.g. `train.py`) standalone in whatever way
-debuggers are run on the base language- this is standard for debugging DVC
+debuggers are run on the base language - this is standard for debugging DVC
 pipelines, and most scripts are capable of running outside of DVC.
 
 ## Contributing
 
 See development docs and contributing guidelines in
 [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Data and telemetry
+
+The DVC Extension for Visual Studio Code collects usage data and sends it to
+Azure to help improve our products and services. This extension respects the
+`telemetry.enableTelemetry` setting which you can learn more about at
+https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting.

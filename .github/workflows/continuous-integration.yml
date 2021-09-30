@@ -68,6 +68,7 @@ jobs:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           storybookBuildDir: 'webview/storybook-static'
           exitOnceUploaded: true
+          autoAcceptChanges: 'master'
 
       - name: Upload
         uses: actions/upload-artifact@v2
