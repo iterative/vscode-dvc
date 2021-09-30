@@ -1,3 +1,4 @@
+import { commands } from 'vscode'
 import {
   getResourceCommand,
   getRootCommand,
@@ -5,6 +6,7 @@ import {
   Resource,
   Root
 } from '.'
+import { tryThenMaybeForce } from '../../cli/actions'
 import { RegisteredCliCommands } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
@@ -33,7 +35,12 @@ const registerRootCommands = (internalCommands: InternalCommands) => {
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.COMMIT,
-    getRootCommand(internalCommands, AvailableCommands.COMMIT)
+    async ({ rootUri }) => {
+      const cwd = rootUri.fsPath
+
+      await tryThenMaybeForce(internalCommands, AvailableCommands.COMMIT, cwd)
+      return commands.executeCommand('workbench.scm.focus')
+    }
   )
 
   internalCommands.registerExternalCliCommand<Root>(
