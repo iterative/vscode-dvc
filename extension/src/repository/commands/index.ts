@@ -48,8 +48,7 @@ export const getRootCommand =
     commandId: CommandId
   ): RootCommand =>
   async context => {
-    const cwd =
-      context?.rootUri?.fsPath || (await repositories.getOnlyOrPickProject())
+    const cwd = await repositories.getCwd(context?.rootUri)
 
     if (!cwd) {
       return
@@ -64,8 +63,7 @@ export const getResetRootCommand =
     internalCommands: InternalCommands
   ): RootCommand =>
   async context => {
-    const cwd =
-      context?.rootUri?.fsPath || (await repositories.getOnlyOrPickProject())
+    const cwd = await repositories.getCwd(context?.rootUri)
 
     if (!cwd) {
       return

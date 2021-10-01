@@ -1,7 +1,8 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
+import { InternalCommands } from '../commands/internal'
 import { Disposables, reset } from '../util/disposable'
+import { quickPickOne } from '../vscode/quickPick'
 
 export interface IWorkspace<T, U> {
   create: (dvcRoots: string[], arg: U) => T[]
@@ -38,10 +39,16 @@ export class BaseWorkspace<T extends Disposable> {
     this.repositories = reset<T>(this.repositories, this.dispose)
   }
 
-  public getOnlyOrPickProject() {
-    return this.internalCommands.executeCommand<string | undefined>(
-      AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
-      ...this.getDvcRoots()
+  public async getOnlyOrPickProject() {
+    const dvcRoots = this.getDvcRoots()
+
+    if (dvcRoots.length === 1) {
+      return dvcRoots[0]
+    }
+
+    return await quickPickOne(
+      dvcRoots,
+      'Select which project to run command against'
     )
   }
 
