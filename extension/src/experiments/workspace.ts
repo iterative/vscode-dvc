@@ -1,6 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { ExperimentsRepository } from '.'
+import { Experiments } from '.'
 import { ExperimentsWebview } from './webview'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
@@ -16,8 +16,8 @@ import {
 import { BaseWorkspace, IWorkspace } from '../workspace'
 
 export class WorkspaceExperiments
-  extends BaseWorkspace<ExperimentsRepository>
-  implements IWorkspace<ExperimentsRepository, ResourceLocator>
+  extends BaseWorkspace<Experiments>
+  implements IWorkspace<Experiments, ResourceLocator>
 {
   @observable
   private focusedWebviewDvcRoot: string | undefined
@@ -30,7 +30,7 @@ export class WorkspaceExperiments
   constructor(
     internalCommands: InternalCommands,
     workspaceState: Memento,
-    experiments?: Record<string, ExperimentsRepository>
+    experiments?: Record<string, Experiments>
   ) {
     super(internalCommands)
     makeObservable(this)
@@ -42,7 +42,7 @@ export class WorkspaceExperiments
     }
   }
 
-  public getFocusedTable(): ExperimentsRepository | undefined {
+  public getFocusedTable(): Experiments | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
@@ -214,7 +214,7 @@ export class WorkspaceExperiments
   public create(
     dvcRoots: string[],
     resourceLocator: ResourceLocator
-  ): ExperimentsRepository[] {
+  ): Experiments[] {
     const experiments = dvcRoots.map(dvcRoot =>
       this.createExperimentsRepository(dvcRoot, resourceLocator)
     )
@@ -264,9 +264,7 @@ export class WorkspaceExperiments
     )
   }
 
-  private async showExperimentsWebview(
-    dvcRoot: string
-  ): Promise<ExperimentsRepository> {
+  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
     const experimentsRepository = this.getRepository(dvcRoot)
     await experimentsRepository.showWebview()
     return experimentsRepository
@@ -277,7 +275,7 @@ export class WorkspaceExperiments
     resourceLocator: ResourceLocator
   ) {
     const experimentsRepository = this.dispose.track(
-      new ExperimentsRepository(
+      new Experiments(
         dvcRoot,
         this.internalCommands,
         resourceLocator,

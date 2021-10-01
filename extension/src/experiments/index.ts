@@ -25,7 +25,7 @@ const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
-export class ExperimentsRepository {
+export class Experiments {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
