@@ -13,7 +13,7 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { BaseContainer, IContainer } from '../container'
+import { BaseContainer, IContainer } from '../workspace'
 
 export class Experiments
   extends BaseContainer<ExperimentsRepository>

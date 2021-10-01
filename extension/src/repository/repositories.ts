@@ -5,7 +5,7 @@ import {
   createFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
-import { BaseContainer, IContainer } from '../container'
+import { BaseContainer, IContainer } from '../workspace'
 
 export class Repositories
   extends BaseContainer<Repository>
