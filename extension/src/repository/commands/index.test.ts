@@ -35,7 +35,6 @@ jest.mock('../../vscode/modal')
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
 })
 
 describe('getResourceCommand', () => {
@@ -185,7 +184,8 @@ describe('getSimpleResourceCommand', () => {
 
 describe('getRootCommand', () => {
   it('should return a function that returns early if a cwd is not provided', async () => {
-    const stdout = 'all went well, congrats'
+    mockedGetCwd.mockResolvedValueOnce(undefined)
+    const stdout = 'I cannot run without a cwd'
     mockedFunc.mockResolvedValueOnce(stdout)
 
     const commandToRegister = getRootCommand(
@@ -194,15 +194,14 @@ describe('getRootCommand', () => {
       mockedCommandId
     )
 
-    const output = await commandToRegister({
-      rootUri: { fsPath: '' } as Uri
-    })
+    const output = await commandToRegister({})
 
     expect(output).toEqual(undefined)
     expect(mockedFunc).not.toHaveBeenCalled()
   })
 
   it('should return a function that only calls the first function if it succeeds', async () => {
+    mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)
 
@@ -222,6 +221,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that throws an error if the underlying function fails without a force prompt', async () => {
+    mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const stderr = 'I deed'
     mockedFunc.mockRejectedValueOnce({ stderr })
 
@@ -241,6 +241,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that calls getWarningResponse if the first function fails with a force prompt', async () => {
+    mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const stderr = `I deed, but ${TRY_FORCE}`
     const userCancelled = undefined
     mockedFunc.mockRejectedValueOnce({ stderr })
@@ -261,6 +262,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that does not call the force func if the user selects cancel', async () => {
+    mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const stderr = `You don't have to do this, but ${TRY_FORCE}`
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({ stderr })
@@ -281,6 +283,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that does not call the force func if no stderr is returned in the underlying error', async () => {
+    mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const userCancelled = 'Cancel'
     mockedFunc.mockRejectedValueOnce({})
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
@@ -301,6 +304,7 @@ describe('getRootCommand', () => {
   })
 
   it('should return a function that calls the force function if the first function fails with a force prompt and the user responds with force', async () => {
+    mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
     const stderr = `I can fix this... maybe, but ${TRY_FORCE}`
     const forcedStdout = 'ok, nw I forced it'
     const userApproves = 'Force'
