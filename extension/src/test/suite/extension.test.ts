@@ -274,6 +274,10 @@ suite('Extension Test Suite', () => {
 
       const mockDisposer = spy(Disposer, 'reset')
 
+      stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
+
+      stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
+
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([])

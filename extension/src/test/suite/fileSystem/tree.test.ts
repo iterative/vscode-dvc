@@ -215,7 +215,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to compare two files', async () => {
       const baseline = __filename
-      const comparison = resolve(__dirname, '..', '..', '..', 'extension')
+      const comparison = resolve(__dirname, '..', '..', '..', 'extension.js')
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
