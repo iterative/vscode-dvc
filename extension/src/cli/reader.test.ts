@@ -128,6 +128,55 @@ describe('CliReader', () => {
     })
   })
 
+  describe('diffParams', () => {
+    it('should call the cli with the correct parameters', async () => {
+      const cliOutput = {
+        'params.yaml': {
+          param1: { new: 23, old: 22 },
+          param5: { new: 42, old: 27 }
+        }
+      }
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify(cliOutput))
+      )
+      const statusOutput = await cliReader.diffParams(cwd)
+
+      expect(statusOutput).toEqual(cliOutput)
+
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['params', 'diff', SHOW_JSON],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
+  describe('diffMetrics', () => {
+    it('should call the cli with the correct parameters', async () => {
+      const cliOutput = {
+        metrics: {
+          something: { new: 3, old: 33 }
+        }
+      }
+      const cwd = __dirname
+      mockedCreateProcess.mockReturnValueOnce(
+        getMockedProcess(JSON.stringify(cliOutput))
+      )
+      const statusOutput = await cliReader.diffMetrics(cwd)
+
+      expect(statusOutput).toEqual(cliOutput)
+
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['metrics', 'diff', SHOW_JSON],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+  })
+
   describe('help', () => {
     it('should call execute process with the correct parameters', async () => {
       const cwd = __dirname
