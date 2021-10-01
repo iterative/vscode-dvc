@@ -8,7 +8,7 @@ import {
   window,
   workspace
 } from 'vscode'
-import { ExperimentsRepository } from '../../experiments'
+import { Experiments } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
 
 export const dvcDemoPath = Uri.file(
@@ -56,9 +56,7 @@ export const selectQuickPickItem = async (number: number) => {
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }
 
-export const experimentsUpdatedEvent = (
-  experimentsRepository: ExperimentsRepository
-) =>
+export const experimentsUpdatedEvent = (experimentsRepository: Experiments) =>
   new Promise(resolve => {
     experimentsRepository.dispose.track(
       experimentsRepository.onDidChangeExperiments(resolve)

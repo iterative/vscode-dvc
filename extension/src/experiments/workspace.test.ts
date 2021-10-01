@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { ExperimentsRepository } from '.'
+import { Experiments } from '.'
 import { WorkspaceExperiments } from './workspace'
 import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
@@ -68,11 +68,11 @@ describe('Experiments', () => {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
         showWebview: mockedShowWebview
-      } as unknown as ExperimentsRepository,
+      } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
         showWebview: jest.fn()
-      } as unknown as ExperimentsRepository
+      } as unknown as Experiments
     }
   )
 

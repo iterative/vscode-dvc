@@ -4,7 +4,7 @@ import { CliReader } from '../../../cli/reader'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { ExperimentsRepository } from '../../../experiments'
+import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import { ResourceLocator } from '../../../resourceLocator'
 import { OutputChannel } from '../../../vscode/outputChannel'
@@ -65,7 +65,7 @@ export const buildExperimentsRepository = (
   } = buildDependencies(disposer, experimentShowData)
 
   const experimentsRepository = disposer.track(
-    new ExperimentsRepository(
+    new Experiments(
       dvcRoot,
       internalCommands,
       resourceLocator,

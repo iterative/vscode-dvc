@@ -9,7 +9,7 @@ import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import complexRowData from '../../fixtures/complex-row-example'
 import complexColumnData from '../../fixtures/complex-column-example'
-import { ExperimentsRepository } from '../../../experiments'
+import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
@@ -25,7 +25,7 @@ import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
-suite('Experiments Repository Test Suite', () => {
+suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -190,7 +190,7 @@ suite('Experiments Repository Test Suite', () => {
     )
 
     const experimentsRepository = disposable.track(
-      new ExperimentsRepository(
+      new Experiments(
         dvcDemoPath,
         internalCommands,
         resourceLocator,
@@ -350,7 +350,7 @@ suite('Experiments Repository Test Suite', () => {
     it('should initialize given no persisted state and update persistence given any change', async () => {
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
-      const testRepository = new ExperimentsRepository(
+      const testRepository = new Experiments(
         'test',
         mockedInternalCommands,
         {} as ResourceLocator,
@@ -455,7 +455,7 @@ suite('Experiments Repository Test Suite', () => {
       })
 
       const mementoSpy = spy(mockMemento, 'get')
-      const testRepository = new ExperimentsRepository(
+      const testRepository = new Experiments(
         'test',
         mockedInternalCommands,
         {} as ResourceLocator,

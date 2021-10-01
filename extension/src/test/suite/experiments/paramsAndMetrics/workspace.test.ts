@@ -11,7 +11,7 @@ import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 import { ParamsAndMetricsModel } from '../../../../experiments/paramsAndMetrics/model'
 import { buildMockMemento } from '../../../util'
 
-suite('Experiments Test Suite', () => {
+suite('Experiments Params And Metrics Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {

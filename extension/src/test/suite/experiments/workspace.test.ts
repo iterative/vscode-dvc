@@ -8,7 +8,7 @@ import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
-import { ExperimentsRepository } from '../../../experiments'
+import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
@@ -21,7 +21,7 @@ import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
-suite('Experiments Test Suite', () => {
+suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ suite('Experiments Test Suite', () => {
   })
 
   const onDidChangeIsWebviewFocused = (
-    experimentsRepository: ExperimentsRepository
+    experimentsRepository: Experiments
   ): Promise<string | undefined> =>
     new Promise(resolve => {
       const listener: Disposable =
@@ -115,8 +115,8 @@ suite('Experiments Test Suite', () => {
         new ResourceLocator(Uri.file(resourcePath))
       )
       const mockExperimentsRepository = {
-        'other/dvc/root': { cliReader } as unknown as ExperimentsRepository
-      } as Record<string, ExperimentsRepository>
+        'other/dvc/root': { cliReader } as unknown as Experiments
+      } as Record<string, Experiments>
 
       const experiments = disposable.track(
         new WorkspaceExperiments(
