@@ -48,4 +48,38 @@ suite('Workspace Repositories Test Suite', () => {
       ).to.be.calledWith('workbench.scm.focus')
     })
   })
+
+  it('should be able to run checkout from the command palette with multiple roots in the workspace', async () => {
+    const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
+
+    stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
+      dvcDemoPath,
+      resolve(dvcDemoPath, '..', 'other', 'root')
+    ])
+
+    const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
+      dvcDemoPath
+    )
+
+    await commands.executeCommand(RegisteredCliCommands.CHECKOUT)
+
+    expect(mockCheckout).to.be.calledOnce
+    expect(mockQuickPickOne).to.be.calledOnce
+  })
+
+  it('should not run pull from the command palette if the user fails to select from multiple roots in the workspace', async () => {
+    const mockPull = stub(CliExecutor.prototype, 'pull').resolves('')
+
+    stub(WorkspaceRepositories.prototype, 'getDvcRoots').returns([
+      dvcDemoPath,
+      resolve(dvcDemoPath, '..', 'other', 'root')
+    ])
+
+    const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(undefined)
+
+    await commands.executeCommand(RegisteredCliCommands.PULL)
+
+    expect(mockPull).not.to.be.called
+    expect(mockQuickPickOne).to.be.calledOnce
+  })
 })
