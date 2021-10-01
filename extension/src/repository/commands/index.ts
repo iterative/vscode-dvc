@@ -1,5 +1,5 @@
 import { relative } from 'path'
-import { Uri } from 'vscode'
+import { commands, Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
 import { Flag } from '../../cli/args'
 import {
@@ -37,9 +37,9 @@ export const getSimpleResourceCommand =
     return internalCommands.executeCommand(commandId, dvcRoot, relPath)
   }
 
-export type Root = { rootUri?: Uri }
+export type Root = { rootUri: Uri }
 
-type RootCommand = (context: Root) => Promise<string | undefined>
+type RootCommand = (context?: Root) => Promise<string | undefined>
 
 export const getRootCommand =
   (
@@ -55,6 +55,22 @@ export const getRootCommand =
     }
 
     return tryThenMaybeForce(internalCommands, commandId, cwd)
+  }
+
+export const getCommitRootCommand =
+  (
+    repositories: WorkspaceRepositories,
+    internalCommands: InternalCommands
+  ): RootCommand =>
+  async context => {
+    const cwd = await repositories.getCwd(context?.rootUri)
+
+    if (!cwd) {
+      return
+    }
+
+    await tryThenMaybeForce(internalCommands, AvailableCommands.COMMIT, cwd)
+    return commands.executeCommand('workbench.scm.focus')
   }
 
 export const getResetRootCommand =
