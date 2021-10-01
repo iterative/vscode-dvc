@@ -170,6 +170,10 @@ suite('Extension Test Suite', () => {
         'I WORK NOW'
       )
 
+      stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
+
+      stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
+
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )

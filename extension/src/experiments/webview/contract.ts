@@ -80,6 +80,7 @@ export interface TableData {
   rows: RowData[]
   columns: ParamOrMetric[]
   sorts: SortDefinition[]
+  changes: string[]
 }
 
 export interface ExperimentsWebviewState {
