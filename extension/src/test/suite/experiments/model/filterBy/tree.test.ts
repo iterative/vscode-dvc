@@ -5,7 +5,7 @@ import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import complexColumnData from '../../../../fixtures/complex-column-example'
 import complexRowData from '../../../../fixtures/complex-row-example'
-import { Experiments } from '../../../../../experiments'
+import { Experiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
   Operator
