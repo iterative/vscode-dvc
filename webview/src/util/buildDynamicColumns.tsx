@@ -14,7 +14,7 @@ type FullColumn = Column<Experiment> & {
   placeholderOf?: Column<Experiment>
 }
 
-const UndefinedCell = <>-</>
+const UndefinedCell = <>. . .</>
 
 const Cell: React.FC<{ value: Value }> = ({ value }) => {
   if (value === undefined) {

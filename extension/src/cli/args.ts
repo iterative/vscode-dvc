@@ -11,7 +11,9 @@ export enum Command {
   PUSH = 'push',
   REMOVE = 'remove',
   ROOT = 'root',
-  STATUS = 'status'
+  STATUS = 'status',
+  PARAMS = 'params',
+  METRICS = 'metrics'
 }
 
 export enum Flag {
@@ -29,7 +31,8 @@ export enum ExperimentSubCommand {
   LIST = 'list',
   SHOW = 'show',
   REMOVE = 'remove',
-  RUN = 'run'
+  RUN = 'run',
+  DIFF = 'diff'
 }
 
 export enum ExperimentFlag {
