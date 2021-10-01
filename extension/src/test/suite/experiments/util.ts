@@ -1,7 +1,7 @@
-import { spy, stub } from 'sinon'
+import { stub } from 'sinon'
 import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
-import { InternalCommands } from '../../../commands/internal'
+import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
 import { Experiments } from '../../../experiments'
 import { ExperimentsRepository } from '../../../experiments/repository'
@@ -21,6 +21,14 @@ const buildDependencies = (
   const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
     experimentShowData
   )
+  const mockDiffParams = stub(cliReader, 'diffParams').resolves({
+    'params.yaml': {}
+  })
+
+  const mockDiffMetrics = stub(cliReader, 'diffMetrics').resolves({
+    metrics: {}
+  })
+
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '2', 'experiments test suite')
   )
@@ -32,7 +40,14 @@ const buildDependencies = (
     new InternalCommands(config, outputChannel, cliReader)
   )
 
-  return { config, internalCommands, mockExperimentShow, resourceLocator }
+  return {
+    config,
+    internalCommands,
+    mockDiffMetrics,
+    mockDiffParams,
+    mockExperimentShow,
+    resourceLocator
+  }
 }
 
 export const buildExperimentsRepository = (
@@ -40,8 +55,14 @@ export const buildExperimentsRepository = (
   experimentShowData = complexExperimentsOutput,
   dvcRoot = dvcDemoPath
 ) => {
-  const { config, internalCommands, mockExperimentShow, resourceLocator } =
-    buildDependencies(disposer, experimentShowData)
+  const {
+    config,
+    internalCommands,
+    mockExperimentShow,
+    resourceLocator,
+    mockDiffMetrics,
+    mockDiffParams
+  } = buildDependencies(disposer, experimentShowData)
 
   const experimentsRepository = disposer.track(
     new ExperimentsRepository(
@@ -55,6 +76,8 @@ export const buildExperimentsRepository = (
     config,
     experimentsRepository,
     internalCommands,
+    mockDiffMetrics,
+    mockDiffParams,
     mockExperimentShow,
     resourceLocator
   }
@@ -62,7 +85,6 @@ export const buildExperimentsRepository = (
 
 export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
-    config,
     internalCommands,
     experimentsRepository: mockExperimentsRepository,
     resourceLocator
@@ -71,8 +93,6 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     complexExperimentsOutput,
     'other/dvc/root'
   )
-
-  const configSpy = spy(config, 'getDefaultProject')
 
   const experiments = disposer.track(
     new Experiments(internalCommands, buildMockMemento(), {
@@ -83,7 +103,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     [dvcDemoPath],
     resourceLocator
   )
-  return { configSpy, experiments, experimentsRepository }
+  return { experiments, experimentsRepository }
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
@@ -95,4 +115,19 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   experiments.create([dvcDemoPath], resourceLocator)
 
   return { experiments }
+}
+
+export const mockInternalCommands = () => {
+  const mockedInternalCommands = new InternalCommands(
+    {
+      getDefaultProject: stub()
+    } as unknown as Config,
+    {} as unknown as OutputChannel
+  )
+  mockedInternalCommands.registerCommand(
+    AvailableCommands.EXPERIMENT_SHOW,
+    () => Promise.resolve(complexExperimentsOutput)
+  )
+
+  return mockedInternalCommands
 }

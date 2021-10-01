@@ -38,9 +38,7 @@ const mockedDisposable = mocked(Disposable)
 const mockedDelay = mocked(delay)
 
 const mockedInternalCommands = new InternalCommands(
-  {
-    getDefaultProject: jest.fn()
-  } as unknown as Config,
+  {} as Config,
   {
     show: jest.fn()
   } as unknown as OutputChannel

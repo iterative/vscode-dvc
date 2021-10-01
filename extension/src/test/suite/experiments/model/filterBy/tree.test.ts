@@ -69,7 +69,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
+        'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
       const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
@@ -97,6 +97,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
+          changes: [],
           columns: complexColumnData,
           rows: filteredRows,
           sorts: []
@@ -120,6 +121,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
+          changes: [],
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
@@ -155,7 +157,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (Experiments as any).prototype,
-        'getFocusedOrDefaultOrPickProject'
+        'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
