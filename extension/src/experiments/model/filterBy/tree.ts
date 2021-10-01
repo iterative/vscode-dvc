@@ -8,7 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { getFilterId } from '.'
-import { Experiments } from '../../workspace'
+import { WorkspaceExperiments } from '../../workspace'
 import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
@@ -30,10 +30,13 @@ export class ExperimentsFilterByTree
 
   public readonly onDidChangeTreeData: Event<string | void>
 
-  private readonly experiments: Experiments
+  private readonly experiments: WorkspaceExperiments
   private viewed = false
 
-  constructor(experiments: Experiments, internalCommands: InternalCommands) {
+  constructor(
+    experiments: WorkspaceExperiments,
+    internalCommands: InternalCommands
+  ) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(

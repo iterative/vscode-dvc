@@ -1,5 +1,5 @@
 import { pickGarbageCollectionFlags } from '../quickPick'
-import { Experiments } from '../workspace'
+import { WorkspaceExperiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
   RegisteredCliCommands,
@@ -7,7 +7,7 @@ import {
 } from '../../commands/external'
 
 const registerExperimentCwdCommands = (
-  experiments: Experiments,
+  experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void =>
   internalCommands.registerExternalCliCommand(
@@ -16,7 +16,7 @@ const registerExperimentCwdCommands = (
   )
 
 const registerExperimentNameCommands = (
-  experiments: Experiments,
+  experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
@@ -31,7 +31,7 @@ const registerExperimentNameCommands = (
 }
 
 const registerExperimentInputCommands = (
-  experiments: Experiments,
+  experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void =>
   internalCommands.registerExternalCliCommand(
@@ -44,7 +44,7 @@ const registerExperimentInputCommands = (
   )
 
 const registerExperimentQuickPickCommands = (
-  experiments: Experiments,
+  experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
@@ -78,7 +78,7 @@ const registerExperimentQuickPickCommands = (
 }
 
 const registerExperimentRunCommands = (
-  experiments: Experiments,
+  experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ): void => {
   internalCommands.registerExternalCliCommand(
@@ -110,7 +110,7 @@ const registerExperimentRunCommands = (
 }
 
 export const registerExperimentCommands = (
-  experiments: Experiments,
+  experiments: WorkspaceExperiments,
   internalCommands: InternalCommands
 ) => {
   registerExperimentCwdCommands(experiments, internalCommands)

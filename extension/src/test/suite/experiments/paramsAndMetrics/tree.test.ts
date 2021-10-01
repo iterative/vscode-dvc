@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { commands } from 'vscode'
 import { Disposable } from '../../../../extension'
-import { Experiments } from '../../../../experiments/workspace'
+import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { Status } from '../../../../experiments/paramsAndMetrics/model'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCommands } from '../../../../commands/external'
@@ -40,7 +40,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
 
@@ -83,7 +83,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
 
@@ -144,7 +144,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
 
@@ -214,7 +214,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
 
@@ -288,7 +288,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       await experimentsRepository.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
 
