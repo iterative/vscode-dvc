@@ -1,7 +1,14 @@
 import { relative } from 'path'
 import { Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { CommandId, InternalCommands } from '../../commands/internal'
+import { Flag } from '../../cli/args'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../../commands/internal'
+import { gitResetWorkspace } from '../../git'
+import { getWarningResponse } from '../../vscode/modal'
 
 export type Resource = {
   dvcRoot: string
@@ -39,4 +46,29 @@ export const getRootCommand =
     const cwd = rootUri.fsPath
 
     return tryThenMaybeForce(internalCommands, commandId, cwd)
+  }
+
+export const getResetRootCommand =
+  (internalCommands: InternalCommands): RootCommand =>
+  async ({ rootUri }) => {
+    const cwd = rootUri.fsPath
+
+    const response = await getWarningResponse(
+      'Are you sure you want to discard ALL workspace changes?\n' +
+        'This is IRREVERSIBLE!\n' +
+        'Your current working set will be FOREVER LOST if you proceed.',
+      'Discard Changes'
+    )
+
+    if (response !== 'Discard Changes') {
+      return
+    }
+
+    await gitResetWorkspace(cwd)
+
+    return internalCommands.executeCommand(
+      AvailableCommands.CHECKOUT,
+      cwd,
+      Flag.FORCE
+    )
   }

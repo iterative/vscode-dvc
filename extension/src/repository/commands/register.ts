@@ -1,5 +1,6 @@
 import { commands } from 'vscode'
 import {
+  getResetRootCommand,
   getResourceCommand,
   getRootCommand,
   getSimpleResourceCommand,
@@ -7,7 +8,10 @@ import {
   Root
 } from '.'
 import { tryThenMaybeForce } from '../../cli/actions'
-import { RegisteredCliCommands } from '../../commands/external'
+import {
+  RegisteredCliCommands,
+  RegisteredCommands
+} from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
@@ -51,6 +55,11 @@ const registerRootCommands = (internalCommands: InternalCommands) => {
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.PUSH,
     getRootCommand(internalCommands, AvailableCommands.PUSH)
+  )
+
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.RESET_WORKSPACE,
+    getResetRootCommand(internalCommands)
   )
 }
 
