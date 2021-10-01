@@ -9,10 +9,10 @@ import {
   Uri,
   MessageItem,
   ViewColumn,
-  WorkspaceEdit
+  WorkspaceEdit,
+  workspace
 } from 'vscode'
 import { Disposable } from '../../../extension'
-import { exists } from '../../../fileSystem'
 import * as Workspace from '../../../fileSystem/workspace'
 import { CliExecutor } from '../../../cli/executor'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
@@ -78,11 +78,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.deleteTarget without error', async () => {
       const path = join(dvcDemoPath, 'deletable.txt')
-      ensureFileSync(path)
-      expect(exists(path)).to.be.true
+
+      const mockApplyEdit = stub(workspace, 'applyEdit').resolves(undefined)
 
       await commands.executeCommand(RegisteredCommands.DELETE_TARGET, path)
-      expect(exists(path)).to.be.false
+
+      expect(mockApplyEdit).to.be.calledOnce
     })
 
     it('should be able to add data to a tracked data directory (.dvc)', async () => {
