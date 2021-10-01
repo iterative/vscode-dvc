@@ -7,7 +7,7 @@ import { isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
-import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
+import { EXPERIMENTS_GIT_REFS } from '../experiments'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000

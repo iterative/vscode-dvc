@@ -1,7 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
+import { ExperimentsRepository } from '.'
 import { WorkspaceExperiments } from './workspace'
-import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
 import { Config } from '../config'

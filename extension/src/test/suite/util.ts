@@ -8,7 +8,7 @@ import {
   window,
   workspace
 } from 'vscode'
-import { ExperimentsRepository } from '../../experiments/repository'
+import { ExperimentsRepository } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
 
 export const dvcDemoPath = Uri.file(
