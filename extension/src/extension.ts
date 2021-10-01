@@ -42,7 +42,7 @@ import {
   registerWalkthroughCommands,
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
-import { Repositories } from './repository/repositories'
+import { WorkspaceRepositories } from './repository/repositories'
 
 export { Disposable, Disposer }
 
@@ -55,7 +55,7 @@ export class Extension implements IExtension {
   private readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
-  private repositories: Repositories
+  private repositories: WorkspaceRepositories
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
@@ -115,7 +115,7 @@ export class Extension implements IExtension {
     )
 
     this.repositories = this.dispose.track(
-      new Repositories(this.internalCommands)
+      new WorkspaceRepositories(this.internalCommands)
     )
 
     this.dispose.track(

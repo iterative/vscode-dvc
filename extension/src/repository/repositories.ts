@@ -5,11 +5,11 @@ import {
   createFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
-import { BaseContainer, IContainer } from '../workspace'
+import { BaseWorkspace, IWorkspace } from '../workspace'
 
-export class Repositories
-  extends BaseContainer<Repository>
-  implements IContainer<Repository, TrackedExplorerTree>
+export class WorkspaceRepositories
+  extends BaseWorkspace<Repository>
+  implements IWorkspace<Repository, TrackedExplorerTree>
 {
   public create(
     dvcRoots: string[],

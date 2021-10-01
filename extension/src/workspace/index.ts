@@ -1,16 +1,20 @@
-import { Disposable } from '@hediet/std/disposable'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { Disposables, reset } from '../util/disposable'
 
-export interface IContainer<T, U> {
+export interface IWorkspace<T, U> {
   create: (dvcRoots: string[], arg: U) => T[]
+  dispose: (() => void) & Disposer
+  getDvcRoots: () => string[]
+  isReady: () => Promise<void>
+  reset: () => void
 }
 
-export class BaseContainer<T extends Disposable> {
+export class BaseWorkspace<T extends Disposable> {
   public dispose = Disposable.fn()
 
-  protected contents: Disposables<T> = {}
+  protected repositories: Disposables<T> = {}
   protected dvcRoots = []
   protected internalCommands: InternalCommands
 
@@ -26,11 +30,11 @@ export class BaseContainer<T extends Disposable> {
   }
 
   public getDvcRoots() {
-    return Object.keys(this.contents)
+    return Object.keys(this.repositories)
   }
 
   public reset(): void {
-    this.contents = reset<T>(this.contents, this.dispose)
+    this.repositories = reset<T>(this.repositories, this.dispose)
   }
 
   protected getOnlyOrPickProject() {
@@ -41,10 +45,10 @@ export class BaseContainer<T extends Disposable> {
   }
 
   protected getRepository(dvcRoot: string) {
-    return this.contents[dvcRoot]
+    return this.repositories[dvcRoot]
   }
 
   protected setRepository(dvcRoot: string, repository: T) {
-    this.contents[dvcRoot] = repository
+    this.repositories[dvcRoot] = repository
   }
 }

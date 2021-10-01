@@ -13,11 +13,11 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { BaseContainer, IContainer } from '../workspace'
+import { BaseWorkspace, IWorkspace } from '../workspace'
 
 export class Experiments
-  extends BaseContainer<ExperimentsRepository>
-  implements IContainer<ExperimentsRepository, ResourceLocator>
+  extends BaseWorkspace<ExperimentsRepository>
+  implements IWorkspace<ExperimentsRepository, ResourceLocator>
 {
   @observable
   private focusedWebviewDvcRoot: string | undefined
@@ -38,7 +38,7 @@ export class Experiments
     this.workspaceState = workspaceState
 
     if (experiments) {
-      this.contents = experiments
+      this.repositories = experiments
     }
   }
 
