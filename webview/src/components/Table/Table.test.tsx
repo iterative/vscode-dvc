@@ -200,7 +200,7 @@ describe('Table', () => {
       expect(row?.className.includes(styles.workspaceWithChanges)).toBe(false)
     })
 
-    it('should have the workspaceWithChanges class on a row if there are no workspace changes', () => {
+    it('should have the workspaceWithChanges class on a row if there are workspace changes', () => {
       renderTable(undefined, undefined, ['something_changed'])
 
       const row = screen.getByTestId('workspace-row')
