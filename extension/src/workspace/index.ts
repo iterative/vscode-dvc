@@ -7,6 +7,7 @@ export interface IWorkspace<T, U> {
   create: (dvcRoots: string[], arg: U) => T[]
   dispose: (() => void) & Disposer
   getDvcRoots: () => string[]
+  getOnlyOrPickProject: () => Promise<string | undefined>
   isReady: () => Promise<void>
   reset: () => void
 }
@@ -37,7 +38,7 @@ export class BaseWorkspace<T extends Disposable> {
     this.repositories = reset<T>(this.repositories, this.dispose)
   }
 
-  protected getOnlyOrPickProject() {
+  public getOnlyOrPickProject() {
     return this.internalCommands.executeCommand<string | undefined>(
       AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
       ...this.getDvcRoots()

@@ -13,6 +13,7 @@ import {
   RegisteredCommands
 } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { WorkspaceRepositories } from '../workspace'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.registerExternalCliCommand<Resource>(
@@ -31,16 +32,23 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
   )
 }
 
-const registerRootCommands = (internalCommands: InternalCommands) => {
+const registerRootCommands = (
+  repositories: WorkspaceRepositories,
+  internalCommands: InternalCommands
+) => {
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.CHECKOUT,
-    getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
+    getRootCommand(repositories, internalCommands, AvailableCommands.CHECKOUT)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.COMMIT,
-    async ({ rootUri }) => {
-      const cwd = rootUri.fsPath
+    async context => {
+      const cwd =
+        context?.rootUri?.fsPath || (await repositories.getOnlyOrPickProject())
+      if (!cwd) {
+        return
+      }
 
       await tryThenMaybeForce(internalCommands, AvailableCommands.COMMIT, cwd)
       return commands.executeCommand('workbench.scm.focus')
@@ -49,23 +57,24 @@ const registerRootCommands = (internalCommands: InternalCommands) => {
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.PULL,
-    getRootCommand(internalCommands, AvailableCommands.PULL)
+    getRootCommand(repositories, internalCommands, AvailableCommands.PULL)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.PUSH,
-    getRootCommand(internalCommands, AvailableCommands.PUSH)
+    getRootCommand(repositories, internalCommands, AvailableCommands.PUSH)
   )
 
   internalCommands.registerExternalCommand<Root>(
     RegisteredCommands.RESET_WORKSPACE,
-    getResetRootCommand(internalCommands)
+    getResetRootCommand(repositories, internalCommands)
   )
 }
 
 export const registerRepositoryCommands = (
+  repositories: WorkspaceRepositories,
   internalCommands: InternalCommands
 ): void => {
   registerResourceCommands(internalCommands)
-  registerRootCommands(internalCommands)
+  registerRootCommands(repositories, internalCommands)
 }

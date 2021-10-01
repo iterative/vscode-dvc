@@ -223,7 +223,7 @@ export class Extension implements IExtension {
       })
     )
 
-    registerRepositoryCommands(this.internalCommands)
+    registerRepositoryCommands(this.repositories, this.internalCommands)
 
     reRegisterVsCodeCommands(this.internalCommands)
     registerWalkthroughCommands(
