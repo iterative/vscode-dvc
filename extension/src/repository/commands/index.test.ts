@@ -17,7 +17,11 @@ const mockedInternalCommands = new InternalCommands(
   {} as Config,
   { show: jest.fn() } as unknown as OutputChannel
 )
-const mockedRepositories = {} as WorkspaceRepositories
+
+const mockedGetCwd = jest.fn()
+const mockedRepositories = {
+  getCwd: mockedGetCwd
+} as unknown as WorkspaceRepositories
 
 const mockedCommandId = 'mockedFunc' as CommandId
 mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
@@ -31,6 +35,7 @@ jest.mock('../../vscode/modal')
 
 beforeEach(() => {
   jest.resetAllMocks()
+  mockedGetCwd.mockImplementationOnce(uri => uri?.fsPath)
 })
 
 describe('getResourceCommand', () => {
@@ -179,6 +184,24 @@ describe('getSimpleResourceCommand', () => {
 })
 
 describe('getRootCommand', () => {
+  it('should return a function that returns early if a cwd is not provided', async () => {
+    const stdout = 'all went well, congrats'
+    mockedFunc.mockResolvedValueOnce(stdout)
+
+    const commandToRegister = getRootCommand(
+      mockedRepositories,
+      mockedInternalCommands,
+      mockedCommandId
+    )
+
+    const output = await commandToRegister({
+      rootUri: { fsPath: '' } as Uri
+    })
+
+    expect(output).toEqual(undefined)
+    expect(mockedFunc).not.toHaveBeenCalled()
+  })
+
   it('should return a function that only calls the first function if it succeeds', async () => {
     const stdout = 'all went well, congrats'
     mockedFunc.mockResolvedValueOnce(stdout)

@@ -44,8 +44,8 @@ const registerRootCommands = (
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.COMMIT,
     async context => {
-      const cwd =
-        context?.rootUri?.fsPath || (await repositories.getOnlyOrPickProject())
+      const cwd = await repositories.getCwd(context?.rootUri)
+
       if (!cwd) {
         return
       }
