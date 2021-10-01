@@ -42,7 +42,7 @@ import {
   registerWalkthroughCommands,
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
-import { WorkspaceRepositories } from './repository/repositories'
+import { WorkspaceRepositories } from './repository/workspace'
 
 export { Disposable, Disposer }
 
