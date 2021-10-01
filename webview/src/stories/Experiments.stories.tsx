@@ -22,6 +22,7 @@ export default {
   },
   args: {
     tableData: {
+      changes: ['learning_rate', 'loss'],
       columns: complexColumnData,
       rows: complexRowData,
       sorts: [
