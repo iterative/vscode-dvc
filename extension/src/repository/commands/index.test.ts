@@ -194,7 +194,7 @@ describe('getRootCommand', () => {
       mockedCommandId
     )
 
-    const output = await commandToRegister({})
+    const output = await commandToRegister()
 
     expect(output).toEqual(undefined)
     expect(mockedFunc).not.toHaveBeenCalled()
