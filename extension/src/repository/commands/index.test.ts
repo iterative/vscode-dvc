@@ -6,6 +6,7 @@ import { getWarningResponse } from '../../vscode/modal'
 import { CommandId, InternalCommands } from '../../commands/internal'
 import { Config } from '../../config'
 import { OutputChannel } from '../../vscode/outputChannel'
+import { WorkspaceRepositories } from '../workspace'
 
 const mockedFunc = jest.fn()
 const mockedGetWarningResponse = mocked(getWarningResponse)
@@ -16,6 +17,7 @@ const mockedInternalCommands = new InternalCommands(
   {} as Config,
   { show: jest.fn() } as unknown as OutputChannel
 )
+const mockedRepositories = {} as WorkspaceRepositories
 
 const mockedCommandId = 'mockedFunc' as CommandId
 mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>
@@ -182,6 +184,7 @@ describe('getRootCommand', () => {
     mockedFunc.mockResolvedValueOnce(stdout)
 
     const commandToRegister = getRootCommand(
+      mockedRepositories,
       mockedInternalCommands,
       mockedCommandId
     )
@@ -200,6 +203,7 @@ describe('getRootCommand', () => {
     mockedFunc.mockRejectedValueOnce({ stderr })
 
     const commandToRegister = getRootCommand(
+      mockedRepositories,
       mockedInternalCommands,
       mockedCommandId
     )
@@ -220,6 +224,7 @@ describe('getRootCommand', () => {
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getRootCommand(
+      mockedRepositories,
       mockedInternalCommands,
       mockedCommandId
     )
@@ -239,6 +244,7 @@ describe('getRootCommand', () => {
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getRootCommand(
+      mockedRepositories,
       mockedInternalCommands,
       mockedCommandId
     )
@@ -257,6 +263,7 @@ describe('getRootCommand', () => {
     mockedGetWarningResponse.mockResolvedValueOnce(userCancelled)
 
     const commandToRegister = getRootCommand(
+      mockedRepositories,
       mockedInternalCommands,
       mockedCommandId
     )
@@ -280,6 +287,7 @@ describe('getRootCommand', () => {
     mockedGetWarningResponse.mockResolvedValueOnce(userApproves)
 
     const commandToRegister = getRootCommand(
+      mockedRepositories,
       mockedInternalCommands,
       mockedCommandId
     )
