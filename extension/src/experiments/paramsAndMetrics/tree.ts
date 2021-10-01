@@ -9,7 +9,7 @@ import {
 } from 'vscode'
 import { Status } from './model'
 import { splitParamOrMetricPath } from './paths'
-import { Experiments } from '..'
+import { Experiments } from '../workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'

@@ -8,7 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { SortDefinition } from './'
-import { Experiments } from '../..'
+import { Experiments } from '../../workspace'
 import { createTreeView } from '../../../vscode/tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'

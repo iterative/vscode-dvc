@@ -8,7 +8,7 @@ import {
   TreeView,
   Uri
 } from 'vscode'
-import { Experiments } from '..'
+import { Experiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'

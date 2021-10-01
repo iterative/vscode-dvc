@@ -1,5 +1,5 @@
 import { pickGarbageCollectionFlags } from '../quickPick'
-import { Experiments } from '..'
+import { Experiments } from '../workspace'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import {
   RegisteredCliCommands,

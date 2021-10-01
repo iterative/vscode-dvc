@@ -4,7 +4,7 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands } from 'vscode'
 import get from 'lodash.get'
 import { Disposable } from '../../../../../extension'
-import { Experiments } from '../../../../../experiments'
+import { Experiments } from '../../../../../experiments/workspace'
 import {
   Experiment,
   ParamOrMetric

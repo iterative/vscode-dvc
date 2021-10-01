@@ -8,7 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { getFilterId } from '.'
-import { Experiments } from '../..'
+import { Experiments } from '../../workspace'
 import { RegisteredCommands } from '../../../commands/external'
 import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
