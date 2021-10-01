@@ -15,7 +15,7 @@ import {
 } from '../commands/internal'
 import { BaseWorkspace, IWorkspace } from '../workspace'
 
-export class Experiments
+export class WorkspaceExperiments
   extends BaseWorkspace<ExperimentsRepository>
   implements IWorkspace<ExperimentsRepository, ResourceLocator>
 {

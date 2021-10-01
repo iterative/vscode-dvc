@@ -7,7 +7,7 @@ import { buildMultiRepoExperiments, buildSingleRepoExperiments } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
-import { Experiments } from '../../../experiments/workspace'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -119,7 +119,7 @@ suite('Experiments Test Suite', () => {
       } as Record<string, ExperimentsRepository>
 
       const experiments = disposable.track(
-        new Experiments(
+        new WorkspaceExperiments(
           internalCommands,
           buildMockMemento(),
           mockExperimentsRepository
@@ -175,10 +175,11 @@ suite('Experiments Test Suite', () => {
         'experimentRunQueue'
       ).resolves('true')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -197,10 +198,11 @@ suite('Experiments Test Suite', () => {
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -230,10 +232,11 @@ suite('Experiments Test Suite', () => {
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
 
       await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
 
@@ -253,10 +256,11 @@ suite('Experiments Test Suite', () => {
     it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
       const mockExperiment = 'exp-to-apply'
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
       stub(CliReader.prototype, 'experimentListCurrent').resolves([
         mockExperiment
       ])
@@ -276,10 +280,11 @@ suite('Experiments Test Suite', () => {
     it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
       const mockExperiment = 'exp-to-remove'
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
       stub(CliReader.prototype, 'experimentListCurrent').resolves([
         'exp-afc12',
         mockExperiment,

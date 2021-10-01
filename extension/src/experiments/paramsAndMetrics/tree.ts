@@ -9,7 +9,7 @@ import {
 } from 'vscode'
 import { Status } from './model'
 import { splitParamOrMetricPath } from './paths'
-import { Experiments } from '../workspace'
+import { WorkspaceExperiments } from '../workspace'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
@@ -33,14 +33,14 @@ export class ExperimentsParamsAndMetricsTree
 
   public readonly onDidChangeTreeData: Event<string | void>
 
-  private readonly experiments: Experiments
+  private readonly experiments: WorkspaceExperiments
   private readonly resourceLocator: ResourceLocator
 
   private view: TreeView<string | ParamsAndMetricsItem>
   private viewed = false
 
   constructor(
-    experiments: Experiments,
+    experiments: WorkspaceExperiments,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {

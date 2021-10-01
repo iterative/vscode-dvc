@@ -1,6 +1,6 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
-import { Experiments } from './workspace'
+import { WorkspaceExperiments } from './workspace'
 import { ExperimentsRepository } from './repository'
 import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
@@ -61,7 +61,7 @@ describe('Experiments', () => {
     (...args) => mockedRun(...args)
   )
 
-  const experiments = new Experiments(
+  const experiments = new WorkspaceExperiments(
     mockedInternalCommands,
     buildMockMemento(),
     {

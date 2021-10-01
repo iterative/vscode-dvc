@@ -4,7 +4,7 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands } from 'vscode'
 import get from 'lodash.get'
 import { Disposable } from '../../../../../extension'
-import { Experiments } from '../../../../../experiments/workspace'
+import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   Experiment,
   ParamOrMetric
@@ -155,14 +155,16 @@ suite('Experiments Sort By Tree Test Suite', () => {
           )
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDvcRoots').returns([dvcDemoPath])
+      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+        dvcDemoPath
+      ])
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
         experimentsRepository
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
+        (WorkspaceExperiments as any).prototype,
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
@@ -259,14 +261,14 @@ suite('Experiments Sort By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDvcRoots').returns([
+      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
         dvcDemoPath,
         'mockRoot'
       ])
 
       const getRepositorySpy = spy(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
+        (WorkspaceExperiments as any).prototype,
         'getRepository'
       )
 

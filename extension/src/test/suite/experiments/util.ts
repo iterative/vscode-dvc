@@ -3,7 +3,7 @@ import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
-import { Experiments } from '../../../experiments/workspace'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { ExperimentsRepository } from '../../../experiments/repository'
 import { Disposer } from '../../../extension'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -95,7 +95,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
   )
 
   const experiments = disposer.track(
-    new Experiments(internalCommands, buildMockMemento(), {
+    new WorkspaceExperiments(internalCommands, buildMockMemento(), {
       'other/dvc/root': mockExperimentsRepository
     })
   )
@@ -110,7 +110,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   const { internalCommands, resourceLocator } = buildDependencies(disposer)
 
   const experiments = disposer.track(
-    new Experiments(internalCommands, buildMockMemento())
+    new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
   experiments.create([dvcDemoPath], resourceLocator)
 

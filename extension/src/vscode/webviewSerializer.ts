@@ -1,14 +1,17 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsWebview } from '../experiments/webview'
-import { Experiments } from '../experiments/workspace'
+import { WorkspaceExperiments } from '../experiments/workspace'
 import { ExperimentsWebviewState } from '../experiments/webview/contract'
 import { InternalCommands } from '../commands/internal'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
 
-  constructor(internalCommands: InternalCommands, experiments: Experiments) {
+  constructor(
+    internalCommands: InternalCommands,
+    experiments: WorkspaceExperiments
+  ) {
     this.dispose.track(
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (

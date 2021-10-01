@@ -6,7 +6,7 @@ import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
 import { getGitRepositoryRoots } from './extensions/git'
 import { isPythonExtensionInstalled } from './extensions/python'
-import { Experiments } from './experiments/workspace'
+import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
 import { TrackedExplorerTree } from './fileSystem/tree'
@@ -56,7 +56,7 @@ export class Extension implements IExtension {
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private repositories: WorkspaceRepositories
-  private readonly experiments: Experiments
+  private readonly experiments: WorkspaceExperiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
@@ -111,7 +111,7 @@ export class Extension implements IExtension {
     )
 
     this.experiments = this.dispose.track(
-      new Experiments(this.internalCommands, context.workspaceState)
+      new WorkspaceExperiments(this.internalCommands, context.workspaceState)
     )
 
     this.repositories = this.dispose.track(
