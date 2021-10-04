@@ -3,8 +3,8 @@ import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
-import { ExperimentsRepository } from '../../../experiments/repository'
 import { Disposer } from '../../../extension'
 import { ResourceLocator } from '../../../resourceLocator'
 import { OutputChannel } from '../../../vscode/outputChannel'
@@ -50,7 +50,7 @@ const buildDependencies = (
   }
 }
 
-export const buildExperimentsRepository = (
+export const buildExperiments = (
   disposer: Disposer,
   experimentShowData = complexExperimentsOutput,
   dvcRoot = dvcDemoPath
@@ -64,8 +64,8 @@ export const buildExperimentsRepository = (
     mockDiffParams
   } = buildDependencies(disposer, experimentShowData)
 
-  const experimentsRepository = disposer.track(
-    new ExperimentsRepository(
+  const experiments = disposer.track(
+    new Experiments(
       dvcRoot,
       internalCommands,
       resourceLocator,
@@ -74,7 +74,7 @@ export const buildExperimentsRepository = (
   )
   return {
     config,
-    experimentsRepository,
+    experiments,
     internalCommands,
     mockDiffMetrics,
     mockDiffParams,
@@ -86,35 +86,31 @@ export const buildExperimentsRepository = (
 export const buildMultiRepoExperiments = (disposer: Disposer) => {
   const {
     internalCommands,
-    experimentsRepository: mockExperimentsRepository,
+    experiments: mockExperiments,
     resourceLocator
-  } = buildExperimentsRepository(
-    disposer,
-    complexExperimentsOutput,
-    'other/dvc/root'
-  )
+  } = buildExperiments(disposer, complexExperimentsOutput, 'other/dvc/root')
 
-  const experiments = disposer.track(
-    new Experiments(internalCommands, buildMockMemento(), {
-      'other/dvc/root': mockExperimentsRepository
+  const workspaceExperiments = disposer.track(
+    new WorkspaceExperiments(internalCommands, buildMockMemento(), {
+      'other/dvc/root': mockExperiments
     })
   )
-  const [experimentsRepository] = experiments.create(
+  const [experiments] = workspaceExperiments.create(
     [dvcDemoPath],
     resourceLocator
   )
-  return { experiments, experimentsRepository }
+  return { experiments, workspaceExperiments }
 }
 
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
   const { internalCommands, resourceLocator } = buildDependencies(disposer)
 
-  const experiments = disposer.track(
-    new Experiments(internalCommands, buildMockMemento())
+  const workspaceExperiments = disposer.track(
+    new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
-  experiments.create([dvcDemoPath], resourceLocator)
+  workspaceExperiments.create([dvcDemoPath], resourceLocator)
 
-  return { experiments }
+  return { workspaceExperiments }
 }
 
 export const mockInternalCommands = () => {

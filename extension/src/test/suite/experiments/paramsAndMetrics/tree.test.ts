@@ -3,12 +3,12 @@ import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { commands } from 'vscode'
 import { Disposable } from '../../../../extension'
-import { Experiments } from '../../../../experiments'
+import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { Status } from '../../../../experiments/paramsAndMetrics/model'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
-import { buildExperimentsRepository } from '../util'
+import { buildExperiments } from '../util'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   const paramsFile = 'params.yaml'
@@ -35,13 +35,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     it('should be able to toggle whether an experiments param or metric is selected with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = joinParamOrMetricPath('params', paramsFile, 'learning_rate')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
 
       const isUnselected = await commands.executeCommand(
@@ -78,21 +78,20 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
       const path = joinParamOrMetricPath('params', paramsFile)
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
 
-      const selectedChildren =
-        experimentsRepository.getChildParamsOrMetrics(path) || []
+      const selectedChildren = experiments.getChildParamsOrMetrics(path) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
       const selectedGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(
+        experiments.getChildParamsOrMetrics(
           joinParamOrMetricPath(path, 'process')
         ) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
@@ -116,12 +115,11 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       expect(isUnselected).to.equal(Status.unselected)
 
-      const unselectedChildren =
-        experimentsRepository.getChildParamsOrMetrics(path) || []
+      const unselectedChildren = experiments.getChildParamsOrMetrics(path) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
 
       const unselectedGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(
+        experiments.getChildParamsOrMetrics(
           joinParamOrMetricPath(path, 'process')
         ) || []
 
@@ -139,13 +137,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const grandParentPath = joinParamOrMetricPath('params', paramsFile)
       const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
 
       await commands.executeCommand(
@@ -157,11 +155,11 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       )
 
       const unselectedChildren =
-        experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
+        experiments.getChildParamsOrMetrics(grandParentPath) || []
       expect(unselectedChildren).to.have.lengthOf.greaterThan(1)
 
       const unselectedGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
       expect(unselectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
       const allUnselected = [...unselectedChildren, ...unselectedGrandChildren]
@@ -183,14 +181,14 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       expect(isSelected).to.equal(Status.selected)
 
       const indeterminateChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
 
       expect(
         indeterminateChildren.map(paramOrMetric => paramOrMetric.status)
       ).to.deep.equal([Status.selected, Status.unselected])
 
       const unselectedOrIndeterminateParams =
-        experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
+        experiments.getChildParamsOrMetrics(grandParentPath) || []
 
       expect(
         unselectedOrIndeterminateParams.find(
@@ -209,17 +207,17 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const grandParentPath = joinParamOrMetricPath('params', paramsFile)
       const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
 
       const selectedGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
       await commands.executeCommand(
@@ -247,7 +245,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       )
 
       const indeterminateGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
       expect(selectedGrandChildren).to.have.lengthOf.greaterThan(1)
 
       expect(
@@ -265,14 +263,14 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       expect(lastSelectedIsUnselected).to.equal(Status.unselected)
 
       const unselectedChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
 
       unselectedChildren.map(paramOrMetric =>
         expect(paramOrMetric.status).to.equal(Status.unselected)
       )
 
       const unselectedParents =
-        experimentsRepository.getChildParamsOrMetrics(grandParentPath) || []
+        experiments.getChildParamsOrMetrics(grandParentPath) || []
 
       unselectedParents.map(paramOrMetric =>
         expect(paramOrMetric.status).to.equal(Status.unselected)
@@ -283,13 +281,13 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const grandParentPath = joinParamOrMetricPath('params', paramsFile)
       const parentPath = joinParamOrMetricPath(grandParentPath, 'process')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
 
       await commands.executeCommand(
@@ -300,7 +298,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      const selected = experimentsRepository
+      const selected = experiments
         .getChildParamsOrMetrics(grandParentPath)
         .filter(paramOrMetric =>
           paramOrMetric.descendantStatuses.includes(Status.selected)
@@ -321,7 +319,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       )
 
       const selectedGrandChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
       expect(
         selectedGrandChildren,
         'the grandchildren under process are now selected'
@@ -340,7 +338,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       )
 
       const unselectedChildren =
-        experimentsRepository.getChildParamsOrMetrics(parentPath) || []
+        experiments.getChildParamsOrMetrics(parentPath) || []
 
       unselectedChildren.map(paramOrMetric =>
         expect(
@@ -349,7 +347,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         ).to.equal(Status.unselected)
       )
 
-      const unselectedGrandParent = experimentsRepository
+      const unselectedGrandParent = experiments
         .getChildParamsOrMetrics()
         .find(paramOrMetric => paramOrMetric.path === grandParentPath)
 

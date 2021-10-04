@@ -5,7 +5,7 @@ import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import complexColumnData from '../../../../fixtures/complex-column-example'
 import complexRowData from '../../../../fixtures/complex-row-example'
-import { Experiments } from '../../../../../experiments'
+import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
   Operator
@@ -13,7 +13,7 @@ import {
 import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperimentsRepository } from '../../util'
+import { buildExperiments } from '../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -37,10 +37,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
-      const experimentsWebview = await experimentsRepository.showWebview()
+      await experiments.isReady()
+      const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
@@ -63,16 +63,16 @@ suite('Experiments Filter By Tree Test Suite', () => {
       mockShowInputBox.resolves(lossFilter.value)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
+        (WorkspaceExperiments as any).prototype,
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
+      const tableFilterAdded = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
@@ -104,7 +104,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         }
       })
 
-      const tableFilterRemoved = experimentsUpdatedEvent(experimentsRepository)
+      const tableFilterRemoved = experimentsUpdatedEvent(experiments)
 
       messageSpy.resetHistory()
 
@@ -133,9 +133,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
 
@@ -151,12 +151,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
       mockShowInputBox.resolves('2')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
+        (WorkspaceExperiments as any).prototype,
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
@@ -199,8 +199,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       mockShowInputBox.resetHistory()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDvcRoots').returns([dvcDemoPath])
-      stub(Experiments.prototype, 'isReady').resolves(undefined)
+      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+        dvcDemoPath
+      ])
+      stub(WorkspaceExperiments.prototype, 'isReady').resolves(undefined)
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL
@@ -218,14 +220,14 @@ suite('Experiments Filter By Tree Test Suite', () => {
     const mockShowQuickPick = stub(window, 'showQuickPick')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((Experiments as any).prototype, 'getDvcRoots').returns([
+    stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
       dvcDemoPath,
       'mockRoot'
     ])
 
     const getRepositorySpy = spy(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (Experiments as any).prototype,
+      (WorkspaceExperiments as any).prototype,
       'getRepository'
     )
 

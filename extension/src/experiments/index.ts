@@ -1,308 +1,305 @@
-import { EventEmitter, Memento } from 'vscode'
-import { makeObservable, observable } from 'mobx'
-import { ExperimentsWebview } from './webview'
-import { FilterDefinition } from './model/filterBy'
-import { ExperimentsRepository } from './repository'
-import { pickExperimentName } from './quickPick'
-import { SortDefinition } from './model/sortBy'
-import { ResourceLocator } from '../resourceLocator'
-import { reportOutput } from '../vscode/reporting'
-import { getInput } from '../vscode/inputBox'
+import { join, resolve } from 'path'
+import { Event, EventEmitter, Memento } from 'vscode'
+import { Deferred } from '@hediet/std/synchronization'
+import { Disposable } from '@hediet/std/disposable'
+import { ExperimentsModel } from './model'
 import {
-  CommandId,
-  AvailableCommands,
-  InternalCommands
-} from '../commands/internal'
-import { BaseWorkspace, IWorkspace } from '../workspace'
+  pickFilterToAdd,
+  pickFiltersToRemove
+} from './model/filterBy/quickPick'
+import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
+import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
+import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
+import { ExperimentsWebview } from './webview'
+import { ResourceLocator } from '../resourceLocator'
+import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
+import { retryUntilResolved } from '../util/promise'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
+import { ProcessManager } from '../processManager'
+import {
+  DiffParamsOrMetricsOutput,
+  ExperimentsRepoJSONOutput
+} from '../cli/reader'
 
-export class Experiments
-  extends BaseWorkspace<ExperimentsRepository>
-  implements IWorkspace<ExperimentsRepository, ResourceLocator>
-{
-  @observable
-  private focusedWebviewDvcRoot: string | undefined
+const DOT_GIT = '.git'
+const GIT_REFS = join(DOT_GIT, 'refs')
+export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
-  public readonly experimentsChanged = new EventEmitter<void>()
-  public readonly paramsOrMetricsChanged = new EventEmitter<void>()
+export class Experiments {
+  public readonly dispose = Disposable.fn()
 
-  private readonly workspaceState: Memento
+  public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
+  public readonly onDidChangeExperiments: Event<void>
+  public readonly onDidChangeParamsOrMetrics: Event<void>
+
+  protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
+    this.dispose.track(new EventEmitter())
+
+  private readonly dvcRoot: string
+
+  private readonly internalCommands: InternalCommands
+  private readonly resourceLocator: ResourceLocator
+
+  private webview?: ExperimentsWebview
+  private experiments: ExperimentsModel
+  private paramsAndMetrics: ParamsAndMetricsModel
+
+  private readonly deferred = new Deferred()
+  private readonly initialized = this.deferred.promise
+
+  private readonly experimentsChanged = new EventEmitter<void>()
+  private readonly paramsOrMetricsChanged = new EventEmitter<void>()
+
+  private processManager: ProcessManager
 
   constructor(
+    dvcRoot: string,
     internalCommands: InternalCommands,
-    workspaceState: Memento,
-    experiments?: Record<string, ExperimentsRepository>
+    resourceLocator: ResourceLocator,
+    workspaceState: Memento
   ) {
-    super(internalCommands)
-    makeObservable(this)
+    this.dvcRoot = dvcRoot
+    this.internalCommands = internalCommands
+    this.resourceLocator = resourceLocator
 
-    this.workspaceState = workspaceState
+    this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
+    this.onDidChangeExperiments = this.experimentsChanged.event
+    this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
 
-    if (experiments) {
-      this.repositories = experiments
-    }
+    this.experiments = this.dispose.track(
+      new ExperimentsModel(dvcRoot, workspaceState)
+    )
+
+    this.paramsAndMetrics = this.dispose.track(
+      new ParamsAndMetricsModel(dvcRoot, workspaceState)
+    )
+
+    this.processManager = this.dispose.track(
+      new ProcessManager({ name: 'refresh', process: () => this.updateData() })
+    )
+
+    this.updateData().then(() => {
+      this.dispose.track(
+        new WorkspaceParamsAndMetrics(dvcRoot, this.paramsAndMetrics, () =>
+          this.refresh()
+        )
+      )
+      this.deferred.resolve()
+      this.notifyChanged()
+    })
   }
 
-  public getFocusedTable(): ExperimentsRepository | undefined {
-    if (!this.focusedWebviewDvcRoot) {
-      return undefined
-    }
-    return this.getRepository(this.focusedWebviewDvcRoot)
+  public isReady() {
+    return this.initialized
   }
 
-  public async addFilter(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
+  public onDidChangeData(gitRoot: string): void {
+    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
+    this.dispose.track(
+      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
+        if (
+          path.includes('HEAD') ||
+          path.includes(EXPERIMENTS_GIT_REFS) ||
+          path.includes(join(GIT_REFS, 'heads'))
+        ) {
+          return this.refresh()
+        }
+      })
+    )
+  }
+
+  public refresh() {
+    return this.processManager.run('refresh')
+  }
+
+  public getChildParamsOrMetrics(path?: string) {
+    return this.paramsAndMetrics.getChildren(path)
+  }
+
+  public toggleParamOrMetricStatus(path: string) {
+    const status = this.paramsAndMetrics.toggleStatus(path)
+
+    this.notifyParamsOrMetricsChanged()
+
+    return status
+  }
+
+  public getParamsAndMetricsStatuses() {
+    return this.paramsAndMetrics.getTerminalNodeStatuses()
+  }
+
+  public showWebview = async () => {
+    if (this.webview) {
+      return this.webview.reveal()
+    }
+
+    const webview = await ExperimentsWebview.create(
+      this.internalCommands,
+      {
+        dvcRoot: this.dvcRoot,
+        tableData: this.getTableData()
+      },
+      this.resourceLocator
+    )
+
+    this.setWebview(webview)
+
+    this.isWebviewFocusedChanged.fire(this.dvcRoot)
+
+    return webview
+  }
+
+  public setWebview(view: ExperimentsWebview) {
+    this.webview = this.dispose.track(view)
+    view.isReady().then(() => this.sendData())
+
+    this.dispose.track(
+      view.onDidDispose(() => {
+        this.resetWebview()
+      })
+    )
+    this.dispose.track(
+      view.onDidChangeIsFocused(dvcRoot => {
+        this.isWebviewFocusedChanged.fire(dvcRoot)
+      })
+    )
+  }
+
+  public getSorts() {
+    return this.experiments.getSorts()
+  }
+
+  public async addSort() {
+    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
+    const sortToAdd = await pickSortToAdd(paramsAndMetrics)
+    if (!sortToAdd) {
       return
     }
-    return this.getRepository(dvcRoot).addFilter()
+    this.experiments.addSort(sortToAdd)
+    return this.notifyChanged()
   }
 
-  public async removeFilters() {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).removeFilters()
-  }
-
-  public removeFilter(dvcRoot: string, id: string) {
-    return this.getRepository(dvcRoot).removeFilter(id)
-  }
-
-  public async addSort(overrideRoot?: string) {
-    const dvcRoot = await this.getDvcRoot(overrideRoot)
-    if (!dvcRoot) {
-      return
-    }
-    return this.getRepository(dvcRoot).addSort()
+  public removeSort(pathToRemove: string) {
+    this.experiments.removeSort(pathToRemove)
+    return this.notifyChanged()
   }
 
   public async removeSorts() {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
+    const sorts = this.experiments.getSorts()
+    const sortsToRemove = await pickSortsToRemove(sorts)
+    if (!sortsToRemove) {
       return
     }
-
-    return this.getRepository(dvcRoot).removeSorts()
+    this.experiments.removeSorts(sortsToRemove)
+    return this.notifyChanged()
   }
 
-  public removeSort(dvcRoot: string, pathToRemove: string) {
-    return this.getRepository(dvcRoot).removeSort(pathToRemove)
+  public getFilters() {
+    return this.experiments.getFilters()
   }
 
-  public getChildParamsOrMetrics(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getChildParamsOrMetrics(path)
-  }
-
-  public toggleParamOrMetricStatus(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
-  }
-
-  public getParamsAndMetricsStatuses(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
-  }
-
-  public getSorts(dvcRoot: string): SortDefinition[] {
-    return this.getRepository(dvcRoot).getSorts()
-  }
-
-  public getFilters(dvcRoot: string): FilterDefinition[] {
-    return this.getRepository(dvcRoot).getFilters()
-  }
-
-  public getExperiments(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getExperiments()
-  }
-
-  public getCheckpoints(dvcRoot: string, experimentId: string) {
-    return this.getRepository(dvcRoot).getCheckpoints(experimentId)
-  }
-
-  public getCwdThenRun = async (commandId: CommandId) => {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
+  public async addFilter() {
+    const paramsAndMetrics = this.paramsAndMetrics.getTerminalNodes()
+    const filterToAdd = await pickFilterToAdd(paramsAndMetrics)
+    if (!filterToAdd) {
       return
     }
-
-    return reportOutput(this.internalCommands.executeCommand(commandId, cwd))
+    this.experiments.addFilter(filterToAdd)
+    return this.notifyChanged()
   }
 
-  public getExpNameThenRun = async (commandId: CommandId) => {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
+  public removeFilter(id: string) {
+    if (this.experiments.removeFilter(id)) {
+      return this.notifyChanged()
     }
-
-    const experimentName = await this.pickExperimentName(cwd)
-
-    if (!experimentName) {
-      return
-    }
-    return reportOutput(
-      this.internalCommands.executeCommand(commandId, cwd, experimentName)
-    )
   }
 
-  public getCwdAndQuickPickThenRun = async (
-    commandId: CommandId,
-    quickPick: () => Thenable<string[] | undefined>
-  ) => {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
+  public async removeFilters() {
+    const filters = this.experiments.getFilters()
+    const filtersToRemove = await pickFiltersToRemove(filters)
+    if (!filtersToRemove) {
       return
     }
-    const result = await quickPick()
+    this.experiments.removeFilters(filtersToRemove)
+    return this.notifyChanged()
+  }
 
-    if (result) {
-      return reportOutput(
-        this.internalCommands.executeCommand(commandId, cwd, ...result)
+  public getExperiments() {
+    return this.experiments.getExperiments()
+  }
+
+  public getCheckpoints(experimentId: string) {
+    return this.experiments.getCheckpoints(experimentId)
+  }
+
+  private async updateData(): Promise<void> {
+    const getNewPromise = () =>
+      this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
+        AvailableCommands.EXPERIMENT_SHOW,
+        this.dvcRoot
       )
-    }
-  }
-
-  public getExpNameAndInputThenRun = async (
-    commandId: CommandId,
-    prompt: string
-  ) => {
-    const cwd = await this.getFocusedOrOnlyOrPickProject()
-    if (!cwd) {
-      return
-    }
-
-    const experimentName = await this.pickExperimentName(cwd)
-
-    if (!experimentName) {
-      return
-    }
-    const input = await getInput(prompt)
-    if (input) {
-      return reportOutput(
-        this.internalCommands.executeCommand(
-          commandId,
-          cwd,
-          experimentName,
-          input
-        )
-      )
-    }
-  }
-
-  public async showExperimentsTable() {
-    const dvcRoot = await this.getOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
-  public showExperimentsTableThenRun = async (commandId: CommandId) => {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    const experimentsRepository = await this.showExperimentsWebview(dvcRoot)
-    if (!experimentsRepository) {
-      return
-    }
-
-    this.internalCommands.executeCommand(commandId, dvcRoot)
-    return experimentsRepository
-  }
-
-  public create(
-    dvcRoots: string[],
-    resourceLocator: ResourceLocator
-  ): ExperimentsRepository[] {
-    const experiments = dvcRoots.map(dvcRoot =>
-      this.createExperimentsRepository(dvcRoot, resourceLocator)
+    const data = await retryUntilResolved<ExperimentsRepoJSONOutput>(
+      getNewPromise,
+      'Experiments table update'
     )
 
-    Promise.all(
-      experiments.map(experimentsRepository => experimentsRepository.isReady())
-    ).then(() => {
-      this.deferred.resolve()
-    })
+    await Promise.all([
+      this.paramsAndMetrics.transformAndSet(data),
+      this.experiments.transformAndSet(data),
+      this.performParamsAndMetricsDiff()
+    ])
 
-    return experiments
+    return this.notifyChanged()
   }
 
-  public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    experimentsRepository.onDidChangeData(gitRoot)
+  private async performParamsAndMetricsDiff() {
+    this.paramsAndMetrics.resetChanges()
+
+    const paramsDiff =
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+        AvailableCommands.PARAMS_DIFF,
+        this.dvcRoot
+      )
+    this.paramsAndMetrics.addChanges(paramsDiff)
+
+    const metricsDiff =
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+        AvailableCommands.METRICS_DIFF,
+        this.dvcRoot
+      )
+    this.paramsAndMetrics.addChanges(metricsDiff)
   }
 
-  public refreshData(dvcRoot: string) {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    experimentsRepository?.refresh()
+  private notifyChanged() {
+    this.experimentsChanged.fire()
+    this.notifyParamsOrMetricsChanged()
   }
 
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    if (!experimentsRepository) {
-      experimentsWebview.dispose()
+  private notifyParamsOrMetricsChanged() {
+    this.paramsOrMetricsChanged.fire()
+    return this.sendData()
+  }
+
+  private sendData() {
+    if (this.webview) {
+      this.webview.showExperiments({
+        tableData: this.getTableData()
+      })
     }
-
-    experimentsRepository.setWebview(experimentsWebview)
   }
 
-  private async getDvcRoot(overrideRoot?: string) {
-    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
+  private getTableData() {
+    return {
+      changes: this.paramsAndMetrics.getChanges(),
+      columns: this.paramsAndMetrics.getSelected(),
+      rows: this.experiments.getRowData(),
+      sorts: this.experiments.getSorts()
+    }
   }
 
-  private getFocusedOrOnlyOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
-  }
-
-  private pickExperimentName(cwd: string) {
-    return pickExperimentName(
-      this.internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_LIST_CURRENT,
-        cwd
-      )
-    )
-  }
-
-  private async showExperimentsWebview(
-    dvcRoot: string
-  ): Promise<ExperimentsRepository> {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    await experimentsRepository.showWebview()
-    return experimentsRepository
-  }
-
-  private createExperimentsRepository(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ) {
-    const experimentsRepository = this.dispose.track(
-      new ExperimentsRepository(
-        dvcRoot,
-        this.internalCommands,
-        resourceLocator,
-        this.workspaceState
-      )
-    )
-
-    this.setRepository(dvcRoot, experimentsRepository)
-
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeIsWebviewFocused(
-        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
-      )
-    )
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperiments(() =>
-        this.experimentsChanged.fire()
-      )
-    )
-
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeParamsOrMetrics(() =>
-        this.paramsOrMetricsChanged.fire()
-      )
-    )
-    return experimentsRepository
+  private resetWebview = () => {
+    this.isWebviewFocusedChanged.fire(undefined)
+    this.dispose.untrack(this.webview)
+    this.webview = undefined
   }
 }

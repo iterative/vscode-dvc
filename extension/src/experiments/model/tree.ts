@@ -8,7 +8,7 @@ import {
   TreeView,
   Uri
 } from 'vscode'
-import { Experiments } from '..'
+import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
@@ -34,12 +34,12 @@ export class ExperimentsTree
 
   public readonly onDidChangeTreeData: Event<string | void>
 
-  private readonly experiments: Experiments
+  private readonly experiments: WorkspaceExperiments
 
   private view: TreeView<string | ExperimentItem>
   private viewed = false
 
-  constructor(experiments: Experiments) {
+  constructor(experiments: WorkspaceExperiments) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
