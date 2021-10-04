@@ -24,9 +24,9 @@ describe('reset', () => {
     const disposer = Disposable.fn()
     const bDisposable = disposer.track(Disposable.fn())
     const aDisposable = disposer.track(Disposable.fn())
-    let disposables = { aDisposable, bDisposable }
+    let disposables: Record<string, Disposer> = { aDisposable, bDisposable }
 
-    disposables = reset(disposables, disposer)
+    disposables = reset<Disposer>(disposables, disposer)
 
     expect(disposables).toEqual({})
   })

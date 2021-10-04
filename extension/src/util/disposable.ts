@@ -1,10 +1,15 @@
-import { Disposer } from '@hediet/std/disposable'
+import { Disposable, Disposer } from '@hediet/std/disposable'
 
-export const reset = <T>(disposables: T, disposer: Disposer): T => {
+export type Disposables<T> = Record<string, T>
+
+export const reset = <T extends Disposable>(
+  disposables: Disposables<T>,
+  disposer: Disposer
+): Disposables<T> => {
   Object.values(disposables).forEach(disposable => {
     disposer.untrack(disposable)
     disposable.dispose()
   })
-  disposables = {} as T
+  disposables = {} as Disposables<T>
   return disposables
 }

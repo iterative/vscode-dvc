@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { commands, Event, EventEmitter, ExtensionContext } from 'vscode'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { Config } from './config'
@@ -11,16 +10,10 @@ import { Experiments } from './experiments'
 import { registerExperimentCommands } from './experiments/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
 import { TrackedExplorerTree } from './fileSystem/tree'
-import {
-  createFileSystemWatcher,
-  getRepositoryListener
-} from './fileSystem/watcher'
 import { IExtension } from './interfaces'
-import { Repository } from './repository'
 import { registerRepositoryCommands } from './repository/commands/register'
 import { ResourceLocator } from './resourceLocator'
 import { definedAndNonEmpty, flatten } from './util/array'
-import { reset } from './util/disposable'
 import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
@@ -49,10 +42,9 @@ import {
   registerWalkthroughCommands,
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
+import { WorkspaceRepositories } from './repository/workspace'
 
 export { Disposable, Disposer }
-
-type Repositories = Record<string, Repository>
 
 export class Extension implements IExtension {
   public readonly dispose = Disposable.fn()
@@ -63,7 +55,7 @@ export class Extension implements IExtension {
   private readonly config: Config
   private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
-  private repositories: Repositories = {}
+  private repositories: WorkspaceRepositories
   private readonly experiments: Experiments
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
@@ -120,6 +112,10 @@ export class Extension implements IExtension {
 
     this.experiments = this.dispose.track(
       new Experiments(this.internalCommands, context.workspaceState)
+    )
+
+    this.repositories = this.dispose.track(
+      new WorkspaceRepositories(this.internalCommands)
     )
 
     this.dispose.track(
@@ -302,7 +298,7 @@ export class Extension implements IExtension {
     ])
 
     return Promise.all([
-      ...Object.values(this.repositories).map(repo => repo.isReady()),
+      this.repositories.isReady(),
       this.experiments.isReady()
     ])
   }
@@ -316,7 +312,7 @@ export class Extension implements IExtension {
   }
 
   public reset() {
-    this.repositories = reset<Repositories>(this.repositories, this.dispose)
+    this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
     return this.setAvailable(false)
@@ -336,20 +332,8 @@ export class Extension implements IExtension {
   }
 
   private initializeRepositories = () => {
-    this.repositories = reset<Repositories>(this.repositories, this.dispose)
-
-    this.dvcRoots.forEach(dvcRoot => {
-      const repository = new Repository(dvcRoot, this.internalCommands)
-
-      repository.dispose.track(
-        createFileSystemWatcher(
-          join(dvcRoot, '**'),
-          getRepositoryListener(repository, this.trackedExplorerTree)
-        )
-      )
-
-      this.repositories[dvcRoot] = repository
-    })
+    this.repositories.reset()
+    this.repositories.create(this.dvcRoots, this.trackedExplorerTree)
   }
 
   private initializeExperiments = async () => {

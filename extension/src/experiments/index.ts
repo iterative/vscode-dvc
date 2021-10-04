@@ -1,5 +1,3 @@
-import { Disposable } from '@hediet/std/disposable'
-import { Deferred } from '@hediet/std/synchronization'
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { ExperimentsWebview } from './webview'
@@ -10,28 +8,22 @@ import { SortDefinition } from './model/sortBy'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
-import { reset } from '../util/disposable'
 import {
   CommandId,
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
+import { BaseWorkspace, IWorkspace } from '../workspace'
 
-type ExperimentsRepositories = Record<string, ExperimentsRepository>
-
-export class Experiments {
+export class Experiments
+  extends BaseWorkspace<ExperimentsRepository>
+  implements IWorkspace<ExperimentsRepository, ResourceLocator>
+{
   @observable
   private focusedWebviewDvcRoot: string | undefined
 
-  public dispose = Disposable.fn()
   public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
-
-  private experiments: ExperimentsRepositories = {}
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
-  private readonly internalCommands: InternalCommands
 
   private readonly workspaceState: Memento
 
@@ -40,25 +32,21 @@ export class Experiments {
     workspaceState: Memento,
     experiments?: Record<string, ExperimentsRepository>
   ) {
+    super(internalCommands)
     makeObservable(this)
 
     this.workspaceState = workspaceState
 
-    this.internalCommands = internalCommands
     if (experiments) {
-      this.experiments = experiments
+      this.repositories = experiments
     }
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public getFocusedTable(): ExperimentsRepository | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
-    return this.experiments[this.focusedWebviewDvcRoot]
+    return this.getRepository(this.focusedWebviewDvcRoot)
   }
 
   public async addFilter(overrideRoot?: string) {
@@ -100,10 +88,6 @@ export class Experiments {
 
   public removeSort(dvcRoot: string, pathToRemove: string) {
     return this.getRepository(dvcRoot).removeSort(pathToRemove)
-  }
-
-  public getDvcRoots() {
-    return Object.keys(this.experiments)
   }
 
   public getChildParamsOrMetrics(dvcRoot: string, path: string) {
@@ -244,13 +228,6 @@ export class Experiments {
     return experiments
   }
 
-  public reset(): void {
-    this.experiments = reset<ExperimentsRepositories>(
-      this.experiments,
-      this.dispose
-    )
-  }
-
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
     const experimentsRepository = this.getRepository(dvcRoot)
     experimentsRepository.onDidChangeData(gitRoot)
@@ -274,19 +251,8 @@ export class Experiments {
     return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
   }
 
-  private getRepository(dvcRoot: string) {
-    return this.experiments[dvcRoot]
-  }
-
   private getFocusedOrOnlyOrPickProject() {
     return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
-  }
-
-  private getOnlyOrPickProject() {
-    return this.internalCommands.executeCommand<string | undefined>(
-      AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
-      ...this.getDvcRoots()
-    )
   }
 
   private pickExperimentName(cwd: string) {
@@ -319,7 +285,7 @@ export class Experiments {
       )
     )
 
-    this.experiments[dvcRoot] = experimentsRepository
+    this.setRepository(dvcRoot, experimentsRepository)
 
     experimentsRepository.dispose.track(
       experimentsRepository.onDidChangeIsWebviewFocused(
