@@ -1,11 +1,10 @@
 import React from 'react'
-import { Cell, HeaderGroup, TableInstance, Row } from 'react-table'
+import { Cell, TableInstance, Row } from 'react-table'
 import cx from 'classnames'
 import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
-import { getPlaceholder } from '../../util/columns'
-
+import { TableHead } from './TableHead'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -20,55 +19,6 @@ export interface WithChanges {
 
 export interface RowProp {
   row: Row<Experiment>
-}
-
-export const MergedHeaderGroup: React.FC<{
-  headerGroup: HeaderGroup<Experiment>
-  columns: HeaderGroup<Experiment>[]
-  sorts: SortDefinition[]
-}> = ({ headerGroup, columns, sorts }) => {
-  return (
-    <div
-      {...headerGroup.getHeaderGroupProps({
-        className: cx(styles.tr, styles.headerRow)
-      })}
-    >
-      {headerGroup.headers.map(column => {
-        const hasPlaceholder = getPlaceholder(column, columns)
-        const isSortedWithPlaceholder = (sort: SortDefinition) =>
-          sort.path === column.placeholderOf?.id ||
-          (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
-        return (
-          <div
-            {...column.getHeaderProps({
-              className: cx(
-                styles.th,
-                column.placeholderOf
-                  ? styles.placeholderHeaderCell
-                  : styles.headerCell,
-                {
-                  [styles.paramHeaderCell]: column.id.includes('params'),
-                  [styles.metricHeaderCell]: column.id.includes('metric'),
-                  [styles.firstLevelHeader]:
-                    column.id.split(':').length - 1 === 1,
-                  [styles.sortingHeaderCellAsc]: sorts.filter(
-                    sort => !sort.descending && isSortedWithPlaceholder(sort)
-                  ).length,
-                  [styles.sortingHeaderCellDesc]: sorts.filter(
-                    sort => sort.descending && sort.path === column.id
-                  ).length
-                }
-              )
-            })}
-            key={column.id}
-            data-testid={`header-${column.id}`}
-          >
-            <div>{column.render('Header')}</div>
-          </div>
-        )
-      })}
-    </div>
-  )
 }
 
 const getFirstCellProps = (
@@ -255,26 +205,6 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
             key={subRow.values.id}
           />
         ))}
-    </div>
-  )
-}
-
-export const TableHead: React.FC<TableProps> = ({
-  instance: { headerGroups },
-  sorts
-}) => {
-  const allHeaders: HeaderGroup<Experiment>[] = []
-  headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
-  return (
-    <div className={styles.thead}>
-      {headerGroups.map((headerGroup, i) => (
-        <MergedHeaderGroup
-          headerGroup={headerGroup}
-          columns={allHeaders}
-          sorts={sorts}
-          key={`header-group-${i}`}
-        />
-      ))}
     </div>
   )
 }
