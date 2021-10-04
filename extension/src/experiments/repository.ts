@@ -43,8 +43,6 @@ export class ExperimentsRepository {
   private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
-  private paramsDiff: DiffParamsOrMetricsOutput
-  private metricsDiff: DiffParamsOrMetricsOutput
 
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
@@ -255,17 +253,21 @@ export class ExperimentsRepository {
   }
 
   private async performParamsAndMetricsDiff() {
-    this.paramsDiff =
+    this.paramsAndMetrics.resetChanges()
+
+    const paramsDiff =
       await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
         AvailableCommands.PARAMS_DIFF,
         this.dvcRoot
       )
+    this.paramsAndMetrics.addChanges(paramsDiff)
 
-    this.metricsDiff =
+    const metricsDiff =
       await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
         AvailableCommands.METRICS_DIFF,
         this.dvcRoot
       )
+    this.paramsAndMetrics.addChanges(metricsDiff)
   }
 
   private notifyChanged() {
@@ -286,27 +288,9 @@ export class ExperimentsRepository {
     }
   }
 
-  private getModifiedParamsOrMetrics(
-    diff?: DiffParamsOrMetricsOutput
-  ): string[] {
-    const changes: string[] = []
-    const files = Object.keys(diff || [])
-    files.forEach(file => changes.push(...Object.keys(diff?.[file] || [])))
-
-    return changes
-  }
-
-  private getModifiedParams(): string[] {
-    return this.getModifiedParamsOrMetrics(this.paramsDiff)
-  }
-
-  private getModifiedMetrics(): string[] {
-    return this.getModifiedParamsOrMetrics(this.metricsDiff)
-  }
-
   private getTableData() {
     return {
-      changes: [...this.getModifiedParams(), ...this.getModifiedMetrics()],
+      changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()

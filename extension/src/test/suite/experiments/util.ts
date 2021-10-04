@@ -119,9 +119,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
 export const mockInternalCommands = () => {
   const mockedInternalCommands = new InternalCommands(
-    {
-      getDefaultProject: stub()
-    } as unknown as Config,
+    {} as unknown as Config,
     {} as unknown as OutputChannel
   )
   mockedInternalCommands.registerCommand(

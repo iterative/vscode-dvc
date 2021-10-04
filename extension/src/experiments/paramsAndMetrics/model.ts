@@ -3,7 +3,10 @@ import { Disposable } from '@hediet/std/disposable'
 import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import {
+  DiffParamsOrMetricsOutput,
+  ExperimentsRepoJSONOutput
+} from '../../cli/reader'
 
 export enum Status {
   selected = 2,
@@ -28,6 +31,8 @@ export class ParamsAndMetricsModel {
 
   private dvcRoot: string
   private workspaceState: Memento
+
+  private paramsAndMetricsChanges: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
@@ -80,6 +85,10 @@ export class ParamsAndMetricsModel {
     return this.files
   }
 
+  public getChanges() {
+    return this.paramsAndMetricsChanges
+  }
+
   public toggleStatus(path: string) {
     const status = this.getNextStatus(path)
     this.status[path] = status
@@ -101,6 +110,18 @@ export class ParamsAndMetricsModel {
     )
 
     return flatten<Status>(nestedStatuses)
+  }
+
+  public addChanges(diff: DiffParamsOrMetricsOutput) {
+    const changes: string[] = []
+    const files = Object.keys(diff || [])
+    files.forEach(file => changes.push(...Object.keys(diff?.[file] || [])))
+
+    this.paramsAndMetricsChanges.push(...changes)
+  }
+
+  public resetChanges() {
+    this.paramsAndMetricsChanges = []
   }
 
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
