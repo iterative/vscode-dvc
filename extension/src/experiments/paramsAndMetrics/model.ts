@@ -115,7 +115,13 @@ export class ParamsAndMetricsModel {
   public addChanges(diff: DiffParamsOrMetricsOutput) {
     const changes: string[] = []
     const files = Object.keys(diff || [])
-    files.forEach(file => changes.push(...Object.keys(diff?.[file] || [])))
+    files.forEach(file =>
+      changes.push(
+        ...Object.keys(diff?.[file] || []).map(
+          diff => diff.split('.').slice(-1)[0]
+        )
+      )
+    )
 
     this.paramsAndMetricsChanges.push(...changes)
   }
