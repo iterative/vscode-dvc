@@ -5,6 +5,9 @@
   "description": "%description%",
   "publisher": "iterative",
   "icon": "docs/dvc.png",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
   "version": "0.1.0",
   "license": "Apache-2.0",
   "readme": "./README.md",
