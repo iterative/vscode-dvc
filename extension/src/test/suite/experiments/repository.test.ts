@@ -112,6 +112,7 @@ suite('Experiments Repository Test Suite', () => {
       const webview = await experimentsRepository.showWebview()
       expect(messageSpy).to.be.calledWith({
         tableData: {
+          changes: [],
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
@@ -167,6 +168,9 @@ suite('Experiments Repository Test Suite', () => {
         }
       }
     })
+    stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
+
+    stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
     stub(cliReader, 'experimentShow').resolves({
       testBranch: {
         baseline: { data: buildTestExperiment(10) },
@@ -338,6 +342,12 @@ suite('Experiments Repository Test Suite', () => {
     mockedInternalCommands.registerCommand(
       AvailableCommands.EXPERIMENT_SHOW,
       () => Promise.resolve(complexExperimentsOutput)
+    )
+    mockedInternalCommands.registerCommand(AvailableCommands.PARAMS_DIFF, () =>
+      Promise.resolve({ 'params.yaml': {} })
+    )
+    mockedInternalCommands.registerCommand(AvailableCommands.METRICS_DIFF, () =>
+      Promise.resolve({ metrics: {} })
     )
 
     it('should initialize given no persisted state and update persistence given any change', async () => {

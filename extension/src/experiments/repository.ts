@@ -17,7 +17,10 @@ import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import {
+  DiffParamsOrMetricsOutput,
+  ExperimentsRepoJSONOutput
+} from '../cli/reader'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -285,10 +288,29 @@ export class ExperimentsRepository {
 
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),
-      this.experiments.transformAndSet(data)
+      this.experiments.transformAndSet(data),
+      this.performParamsAndMetricsDiff()
     ])
 
     return this.notifyChanged()
+  }
+
+  private async performParamsAndMetricsDiff() {
+    this.paramsAndMetrics.resetChanges()
+
+    const paramsDiff =
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+        AvailableCommands.PARAMS_DIFF,
+        this.dvcRoot
+      )
+    this.paramsAndMetrics.addChanges(paramsDiff)
+
+    const metricsDiff =
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+        AvailableCommands.METRICS_DIFF,
+        this.dvcRoot
+      )
+    this.paramsAndMetrics.addChanges(metricsDiff)
   }
 
   private notifyChanged() {
@@ -316,6 +338,7 @@ export class ExperimentsRepository {
 
   private getTableData() {
     return {
+      changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()

@@ -31,6 +31,7 @@
   "command.removeExperimentsTableSorts": "Remove Sort(s) From Experiments Table",
   "command.removeTarget": "Remove",
   "command.renameTarget": "Rename",
+  "command.resetWorkspace": "Reset the Workspace",
   "command.runExperiment": "Run Experiment",
   "command.runQueuedExperiments": "Run All Queued Experiments",
   "command.runResetExperiment": "Run and Reset Experiment",

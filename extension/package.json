@@ -203,6 +203,12 @@
         "category": "DVC"
       },
       {
+        "title": "%command.resetWorkspace%",
+        "command": "dvc.resetWorkspace",
+        "category": "DVC",
+        "icon": "$(discard)"
+      },
+      {
         "title": "%command.runExperiment%",
         "command": "dvc.runExperiment",
         "category": "DVC",
@@ -401,6 +407,10 @@
           "when": "false"
         },
         {
+          "command": "dvc.resetWorkspace",
+          "when": "false"
+        },
+        {
           "command": "dvc.runExperiment",
           "when": "dvc.commands.available == true"
         },
@@ -447,23 +457,28 @@
       ],
       "scm/title": [
         {
-          "command": "dvc.checkout",
-          "group": "navigation",
+          "command": "dvc.resetWorkspace",
+          "group": "navigation@1",
           "when": "scmProvider == dvc && dvc.commands.available == true"
         },
         {
           "command": "dvc.commit",
-          "group": "navigation",
+          "group": "navigation@2",
           "when": "scmProvider == dvc && dvc.commands.available == true"
         },
         {
           "command": "dvc.pull",
-          "group": "navigation",
+          "group": "navigation@3",
           "when": "scmProvider == dvc && dvc.commands.available == true"
         },
         {
           "command": "dvc.push",
-          "group": "navigation",
+          "group": "navigation@4",
+          "when": "scmProvider == dvc && dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.checkout",
+          "group": "DVC",
           "when": "scmProvider == dvc && dvc.commands.available == true"
         }
       ],

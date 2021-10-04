@@ -75,9 +75,10 @@ $spinner-color-light: #000;
     width: 6px;
     height: 6px;
     z-index: 2;
+
     .normalExperiment & {
       line-height: 0;
-      background: rgb(127, 127, 127);
+      background: var(--vscode-editor-foreground);
       border-radius: 100%;
     }
     .queuedExperiment & {
@@ -119,6 +120,16 @@ $spinner-color-light: #000;
         }
       }
     }
+    .workspaceWithChanges.runningExperiment & {
+      border-right-color: $metrics-color;
+      border-top-color: $metrics-color;
+      @at-root {
+        :global(.vscode-light) & {
+          border-right-color: $metrics-color-light;
+          border-top-color: $metrics-color-light;
+        }
+      }
+    }
     .runningExperiment.oddRow > .firstCell & {
       border-left: 1.5px solid $row-bg-alt-color;
       border-bottom: 1.5px solid $row-bg-alt-color;
@@ -140,6 +151,7 @@ $spinner-color-light: #000;
   transform: rotate(45deg);
   right: 1px;
   bottom: 2px;
+  border-color: var(--vscode-editor-foreground);
 }
 
 .contractedRowArrow {
@@ -179,7 +191,7 @@ $spinner-color-light: #000;
           top: 0;
           right: 50%;
           position: absolute;
-          border-right: 1px solid rgb(127, 127, 127);
+          border-right: 1px dotted rgb(127, 127, 127);
         }
       }
       &:first-of-type {
@@ -321,6 +333,25 @@ $spinner-color-light: #000;
       }
     }
   }
+
+  .workspaceWithChanges:not(.runningExperiment) {
+    .bullet::before {
+      background-color: $metrics-color;
+
+      :global(.vscode-light) & {
+        background-color: $metrics-color-light;
+      }
+    }
+  }
+
+  .workspaceChange {
+    color: $metrics-color;
+
+    :global(.vscode-light) & {
+      color: $metrics-color-light;
+    }
+  }
+
   .td,
   .th {
     white-space: nowrap;
