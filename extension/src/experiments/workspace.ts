@@ -202,13 +202,13 @@ export class WorkspaceExperiments
       return
     }
 
-    const experimentsRepository = await this.showExperimentsWebview(dvcRoot)
-    if (!experimentsRepository) {
+    const experiments = await this.showExperimentsWebview(dvcRoot)
+    if (!experiments) {
       return
     }
 
     this.internalCommands.executeCommand(commandId, dvcRoot)
-    return experimentsRepository
+    return experiments
   }
 
   public create(
@@ -216,35 +216,35 @@ export class WorkspaceExperiments
     resourceLocator: ResourceLocator
   ): Experiments[] {
     const experiments = dvcRoots.map(dvcRoot =>
-      this.createExperimentsRepository(dvcRoot, resourceLocator)
+      this.createExperiments(dvcRoot, resourceLocator)
     )
 
-    Promise.all(
-      experiments.map(experimentsRepository => experimentsRepository.isReady())
-    ).then(() => {
-      this.deferred.resolve()
-    })
+    Promise.all(experiments.map(experiments => experiments.isReady())).then(
+      () => {
+        this.deferred.resolve()
+      }
+    )
 
     return experiments
   }
 
   public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    experimentsRepository.onDidChangeData(gitRoot)
+    const experiments = this.getRepository(dvcRoot)
+    experiments.onDidChangeData(gitRoot)
   }
 
   public refreshData(dvcRoot: string) {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    experimentsRepository?.refresh()
+    const experiments = this.getRepository(dvcRoot)
+    experiments?.refresh()
   }
 
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    if (!experimentsRepository) {
+    const experiments = this.getRepository(dvcRoot)
+    if (!experiments) {
       experimentsWebview.dispose()
     }
 
-    experimentsRepository.setWebview(experimentsWebview)
+    experiments.setWebview(experimentsWebview)
   }
 
   private async getDvcRoot(overrideRoot?: string) {
@@ -265,16 +265,13 @@ export class WorkspaceExperiments
   }
 
   private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
-    const experimentsRepository = this.getRepository(dvcRoot)
-    await experimentsRepository.showWebview()
-    return experimentsRepository
+    const experiments = this.getRepository(dvcRoot)
+    await experiments.showWebview()
+    return experiments
   }
 
-  private createExperimentsRepository(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ) {
-    const experimentsRepository = this.dispose.track(
+  private createExperiments(dvcRoot: string, resourceLocator: ResourceLocator) {
+    const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
         this.internalCommands,
@@ -283,24 +280,22 @@ export class WorkspaceExperiments
       )
     )
 
-    this.setRepository(dvcRoot, experimentsRepository)
+    this.setRepository(dvcRoot, experiments)
 
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeIsWebviewFocused(
+    experiments.dispose.track(
+      experiments.onDidChangeIsWebviewFocused(
         dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
       )
     )
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperiments(() =>
-        this.experimentsChanged.fire()
-      )
+    experiments.dispose.track(
+      experiments.onDidChangeExperiments(() => this.experimentsChanged.fire())
     )
 
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeParamsOrMetrics(() =>
+    experiments.dispose.track(
+      experiments.onDidChangeParamsOrMetrics(() =>
         this.paramsOrMetricsChanged.fire()
       )
     )
-    return experimentsRepository
+    return experiments
   }
 }

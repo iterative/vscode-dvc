@@ -13,7 +13,7 @@ import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
 import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperimentsRepository } from '../../util'
+import { buildExperiments } from '../../util'
 import { ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {
@@ -103,13 +103,10 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
-      const { experimentsRepository } = buildExperimentsRepository(
-        disposable,
-        testData
-      )
+      const { experiments } = buildExperiments(disposable, testData)
 
-      await experimentsRepository.isReady()
-      const experimentsWebview = await experimentsRepository.showWebview()
+      await experiments.isReady()
+      const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const mockSortQuickPicks = (paramPath: string, descending: boolean) => {
@@ -127,9 +124,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         descending: boolean
       ) => {
         mockSortQuickPicks(paramPath, descending)
-        const tableChangedPromise = experimentsUpdatedEvent(
-          experimentsRepository
-        )
+        const tableChangedPromise = experimentsUpdatedEvent(experiments)
 
         await commands.executeCommand(RegisteredCommands.EXPERIMENT_SORT_ADD)
         await tableChangedPromise
@@ -160,7 +155,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       ])
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -171,7 +166,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       // Setup done, perform the test
 
       mockSortQuickPicks(testParamPath, false)
-      const tableChangedPromise = experimentsUpdatedEvent(experimentsRepository)
+      const tableChangedPromise = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_SORT_ADD,
@@ -183,7 +178,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         1, 2, 3, 4
       ])
 
-      const tableSortRemoved = experimentsUpdatedEvent(experimentsRepository)
+      const tableSortRemoved = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(
         'dvc.views.experimentsSortByTree.removeAllSorts'
@@ -202,7 +197,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       await addSortWithMocks(testParamPath, true)
       expect(
-        experimentsRepository.getSorts(),
+        experiments.getSorts(),
         'two sort definitions are applied'
       ).to.deep.equal([
         {
@@ -221,7 +216,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       await addSortWithMocks(otherTestParamPath, true)
       expect(
-        experimentsRepository.getSorts(),
+        experiments.getSorts(),
         'the direction of the first sort definition is switched'
       ).to.deep.equal([
         {

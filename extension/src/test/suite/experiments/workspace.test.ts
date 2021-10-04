@@ -34,16 +34,15 @@ suite('Workspace Experiments Test Suite', () => {
   })
 
   const onDidChangeIsWebviewFocused = (
-    experimentsRepository: Experiments
+    experiments: Experiments
   ): Promise<string | undefined> =>
     new Promise(resolve => {
-      const listener: Disposable =
-        experimentsRepository.onDidChangeIsWebviewFocused(
-          (event: string | undefined) => {
-            listener.dispose()
-            return resolve(event)
-          }
-        )
+      const listener: Disposable = experiments.onDidChangeIsWebviewFocused(
+        (event: string | undefined) => {
+          listener.dispose()
+          return resolve(event)
+        }
+      )
     })
 
   describe('showExperimentsTable', () => {
@@ -52,25 +51,25 @@ suite('Workspace Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      const { experiments, experimentsRepository } =
+      const { workspaceExperiments, experiments } =
         buildMultiRepoExperiments(disposable)
 
-      await experiments.isReady()
+      await workspaceExperiments.isReady()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
+      const focused = onDidChangeIsWebviewFocused(experiments)
 
-      await experiments.showExperimentsTable()
+      await workspaceExperiments.showExperimentsTable()
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
-      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
+      expect(workspaceExperiments.getFocusedTable()).to.equal(experiments)
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsRepository =
-        await experiments.showExperimentsTable()
+      const focusedExperiments =
+        await workspaceExperiments.showExperimentsTable()
 
-      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
+      expect(focusedExperiments).to.equal(experiments)
       expect(mockQuickPickOne).to.be.calledOnce
     }).timeout(5000)
 
@@ -79,10 +78,10 @@ suite('Workspace Experiments Test Suite', () => {
         dvcDemoPath
       )
 
-      const { experiments } = buildSingleRepoExperiments(disposable)
-      await experiments.isReady()
+      const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
+      await workspaceExperiments.isReady()
 
-      await experiments.showExperimentsTable()
+      await workspaceExperiments.showExperimentsTable()
 
       expect(mockQuickPickOne).to.not.be.called
     })
@@ -114,55 +113,55 @@ suite('Workspace Experiments Test Suite', () => {
       const resourceLocator = disposable.track(
         new ResourceLocator(Uri.file(resourcePath))
       )
-      const mockExperimentsRepository = {
+      const mockExperiments = {
         'other/dvc/root': { cliReader } as unknown as Experiments
       } as Record<string, Experiments>
 
-      const experiments = disposable.track(
+      const workspaceExperiments = disposable.track(
         new WorkspaceExperiments(
           internalCommands,
           buildMockMemento(),
-          mockExperimentsRepository
+          mockExperiments
         )
       )
-      const [experimentsRepository] = experiments.create(
+      const [experiments] = workspaceExperiments.create(
         [dvcDemoPath],
         resourceLocator
       )
 
-      await experiments.isReady()
+      await workspaceExperiments.isReady()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
+      const focused = onDidChangeIsWebviewFocused(experiments)
 
-      await experiments.showExperimentsTableThenRun(
+      await workspaceExperiments.showExperimentsTableThenRun(
         AvailableCommands.EXPERIMENT_RUN_QUEUED
       )
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
       expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
-      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
+      expect(workspaceExperiments.getFocusedTable()).to.equal(experiments)
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperimentsRepository =
-        await experiments.showExperimentsTableThenRun(
+      const focusedExperiments =
+        await workspaceExperiments.showExperimentsTableThenRun(
           AvailableCommands.EXPERIMENT_RUN_QUEUED
         )
 
-      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
+      expect(focusedExperiments).to.equal(experiments)
       expect(mockQuickPickOne).not.to.be.called
 
-      const unfocused = onDidChangeIsWebviewFocused(experimentsRepository)
+      const unfocused = onDidChangeIsWebviewFocused(experiments)
       const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
 
       expect(await unfocused).to.be.undefined
-      expect(experiments.getFocusedTable()).to.be.undefined
+      expect(workspaceExperiments.getFocusedTable()).to.be.undefined
 
-      const focusedAgain = onDidChangeIsWebviewFocused(experimentsRepository)
+      const focusedAgain = onDidChangeIsWebviewFocused(experiments)
       await commands.executeCommand('workbench.action.previousEditor')
       expect(await focusedAgain).to.equal(dvcDemoPath)
     })

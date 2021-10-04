@@ -13,7 +13,7 @@ import {
 import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperimentsRepository } from '../../util'
+import { buildExperiments } from '../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -37,10 +37,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
-      const experimentsWebview = await experimentsRepository.showWebview()
+      await experiments.isReady()
+      const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
       const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
@@ -64,7 +64,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +72,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
+      const tableFilterAdded = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
@@ -104,7 +104,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         }
       })
 
-      const tableFilterRemoved = experimentsUpdatedEvent(experimentsRepository)
+      const tableFilterRemoved = experimentsUpdatedEvent(experiments)
 
       messageSpy.resetHistory()
 
@@ -133,9 +133,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
 
@@ -152,7 +152,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

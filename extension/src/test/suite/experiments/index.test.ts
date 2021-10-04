@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
-import { buildExperimentsRepository } from './util'
+import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -39,19 +39,18 @@ suite('Experiments Test Suite', () => {
 
   describe('refresh', () => {
     it('should debounce all calls to refresh that are made within 200ms', async () => {
-      const { experimentsRepository, mockExperimentShow } =
-        buildExperimentsRepository(disposable)
+      const { experiments, mockExperimentShow } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
       mockExperimentShow.resetHistory()
 
       await Promise.all([
-        experimentsRepository.refresh(),
-        experimentsRepository.refresh(),
-        experimentsRepository.refresh(),
-        experimentsRepository.refresh(),
-        experimentsRepository.refresh(),
-        experimentsRepository.refresh()
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh()
       ])
 
       expect(mockExperimentShow).to.be.calledOnce
@@ -60,15 +59,13 @@ suite('Experiments Test Suite', () => {
 
   describe('getExperiments', () => {
     it('should return all existing experiments', async () => {
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
-      const experiments = experimentsRepository.getExperiments()
+      const runs = experiments.getExperiments()
 
-      expect(
-        experiments.map(experiment => experiment.displayName)
-      ).to.deep.equal([
+      expect(runs.map(experiment => experiment.displayName)).to.deep.equal([
         'workspace',
         'exp-05694',
         'exp-e7a67',
@@ -81,16 +78,15 @@ suite('Experiments Test Suite', () => {
 
   describe('getCheckpoints', () => {
     it("should return the correct checkpoints for an experiment's id", async () => {
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       const notAnExperimentId = ':cartwheel:'
-      const notCheckpoints =
-        experimentsRepository.getCheckpoints(notAnExperimentId)
+      const notCheckpoints = experiments.getCheckpoints(notAnExperimentId)
       expect(notCheckpoints).to.be.undefined
 
-      const checkpoints = experimentsRepository.getCheckpoints(
+      const checkpoints = experiments.getCheckpoints(
         'd3f4a0d3661c5977540d2205d819470cf0d2145a'
       )
 
@@ -102,11 +98,11 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
-      const webview = await experimentsRepository.showWebview()
+      const webview = await experiments.showWebview()
       expect(messageSpy).to.be.calledWith({
         tableData: {
           changes: [],
@@ -121,8 +117,7 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should only be able to open a single experiments webview', async () => {
-      const { experimentsRepository, mockExperimentShow } =
-        buildExperimentsRepository(disposable)
+      const { experiments, mockExperimentShow } = buildExperiments(disposable)
 
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
@@ -132,7 +127,7 @@ suite('Experiments Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const webview = await experimentsRepository.showWebview()
+      const webview = await experiments.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockExperimentShow).to.have.been.calledOnce
@@ -143,7 +138,7 @@ suite('Experiments Test Suite', () => {
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await experimentsRepository.showWebview()
+      const sameWebview = await experiments.showWebview()
 
       expect(webview === sameWebview).to.be.true
 
@@ -189,7 +184,7 @@ suite('Experiments Test Suite', () => {
       new ResourceLocator(Uri.file(resourcePath))
     )
 
-    const experimentsRepository = disposable.track(
+    const experiments = disposable.track(
       new Experiments(
         dvcDemoPath,
         internalCommands,
@@ -197,8 +192,8 @@ suite('Experiments Test Suite', () => {
         buildMockMemento()
       )
     )
-    await experimentsRepository.isReady()
-    await experimentsRepository.showWebview()
+    await experiments.isReady()
+    await experiments.showWebview()
 
     expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
       {
@@ -247,9 +242,9 @@ suite('Experiments Test Suite', () => {
       value: false
     } as QuickPickItemWithValue<boolean>)
 
-    const tableChangePromise = experimentsUpdatedEvent(experimentsRepository)
+    const tableChangePromise = experimentsUpdatedEvent(experiments)
 
-    const pickPromise = experimentsRepository.addSort()
+    const pickPromise = experiments.addSort()
     await pickPromise
     await tableChangePromise
 
@@ -368,7 +363,7 @@ suite('Experiments Test Suite', () => {
 
       expect(
         testRepository.getSorts(),
-        'ExperimentsRepository starts with no sorts'
+        'Experiments starts with no sorts'
       ).to.deep.equal([])
       expect(mockMemento.keys(), 'Memento starts with no keys').to.deep.equal(
         []

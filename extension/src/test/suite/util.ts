@@ -56,11 +56,9 @@ export const selectQuickPickItem = async (number: number) => {
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }
 
-export const experimentsUpdatedEvent = (experimentsRepository: Experiments) =>
+export const experimentsUpdatedEvent = (experiments: Experiments) =>
   new Promise(resolve => {
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperiments(resolve)
-    )
+    experiments.dispose.track(experiments.onDidChangeExperiments(resolve))
   })
 
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
