@@ -224,8 +224,8 @@ describe('Table', () => {
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
 
-    it('should have the workspaceChange class on a cell if there are changes matching the header of this column', () => {
-      renderTable(undefined, undefined, ['Timestamp'])
+    it('should have the workspaceChange class on a cell if there are changes matching the column id', () => {
+      renderTable(undefined, undefined, ['timestamp'])
 
       const row = screen.getByTestId('timestamp___workspace')
 

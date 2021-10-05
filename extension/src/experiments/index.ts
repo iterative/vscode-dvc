@@ -260,14 +260,14 @@ export class Experiments {
         AvailableCommands.PARAMS_DIFF,
         this.dvcRoot
       )
-    this.paramsAndMetrics.addChanges(paramsDiff)
+    this.paramsAndMetrics.addChanges('params', paramsDiff)
 
     const metricsDiff =
       await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
         AvailableCommands.METRICS_DIFF,
         this.dvcRoot
       )
-    this.paramsAndMetrics.addChanges(metricsDiff)
+    this.paramsAndMetrics.addChanges('metrics', metricsDiff)
   }
 
   private notifyChanged() {
