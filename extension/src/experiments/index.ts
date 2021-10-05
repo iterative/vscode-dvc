@@ -255,18 +255,26 @@ export class Experiments {
   private async performParamsAndMetricsDiff() {
     this.paramsAndMetrics.resetChanges()
 
-    const paramsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-        AvailableCommands.PARAMS_DIFF,
-        this.dvcRoot
-      )
+    const paramsDiff = await retryUntilResolved<DiffParamsOrMetricsOutput>(
+      () =>
+        this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+          AvailableCommands.PARAMS_DIFF,
+          this.dvcRoot
+        ),
+      'Params diff update'
+    )
+
     this.paramsAndMetrics.addChanges('params', paramsDiff)
 
-    const metricsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-        AvailableCommands.METRICS_DIFF,
-        this.dvcRoot
-      )
+    const metricsDiff = await retryUntilResolved<DiffParamsOrMetricsOutput>(
+      () =>
+        this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+          AvailableCommands.METRICS_DIFF,
+          this.dvcRoot
+        ),
+      'Metrics diff update'
+    )
+
     this.paramsAndMetrics.addChanges('metrics', metricsDiff)
   }
 
