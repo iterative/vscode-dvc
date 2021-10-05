@@ -22,7 +22,10 @@ export default {
   },
   args: {
     tableData: {
-      changes: ['learning_rate', 'loss'],
+      changes: [
+        'params:params.yaml:learning_rate',
+        'metrics:summary.json:loss'
+      ],
       columns: complexColumnData,
       rows: complexRowData,
       sorts: [

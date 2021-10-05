@@ -1,6 +1,7 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { collectFiles, collectParamsAndMetrics } from './collect'
+import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
 import {
@@ -112,10 +113,19 @@ export class ParamsAndMetricsModel {
     return flatten<Status>(nestedStatuses)
   }
 
-  public addChanges(diff: DiffParamsOrMetricsOutput) {
+  public addChanges(
+    type: 'params' | 'metrics',
+    diff: DiffParamsOrMetricsOutput
+  ) {
     const changes: string[] = []
     const files = Object.keys(diff || [])
-    files.forEach(file => changes.push(...Object.keys(diff?.[file] || [])))
+    files.forEach(file =>
+      changes.push(
+        ...Object.keys(diff?.[file] || []).map(diff =>
+          joinParamOrMetricPath(type, file, diff)
+        )
+      )
+    )
 
     this.paramsAndMetricsChanges.push(...changes)
   }
