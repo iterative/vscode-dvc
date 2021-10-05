@@ -14,20 +14,20 @@ import { dvcDemoPath, resourcePath } from '../util'
 
 const buildDependencies = (
   disposer: Disposer,
-  experimentShowData = complexExperimentsOutput
+  experimentShowData = complexExperimentsOutput,
+  diffParamsData = {},
+  diffMetricsData = {}
 ) => {
   const config = disposer.track(new Config())
   const cliReader = disposer.track(new CliReader(config))
   const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
     experimentShowData
   )
-  const mockDiffParams = stub(cliReader, 'diffParams').resolves({
-    'params.yaml': {}
-  })
+  const mockDiffParams = stub(cliReader, 'diffParams').resolves(diffParamsData)
 
-  const mockDiffMetrics = stub(cliReader, 'diffMetrics').resolves({
-    metrics: {}
-  })
+  const mockDiffMetrics = stub(cliReader, 'diffMetrics').resolves(
+    diffMetricsData
+  )
 
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '2', 'experiments test suite')
@@ -53,6 +53,8 @@ const buildDependencies = (
 export const buildExperiments = (
   disposer: Disposer,
   experimentShowData = complexExperimentsOutput,
+  diffParamsData = {},
+  diffMetricsData = {},
   dvcRoot = dvcDemoPath
 ) => {
   const {
@@ -62,7 +64,12 @@ export const buildExperiments = (
     resourceLocator,
     mockDiffMetrics,
     mockDiffParams
-  } = buildDependencies(disposer, experimentShowData)
+  } = buildDependencies(
+    disposer,
+    experimentShowData,
+    diffParamsData,
+    diffMetricsData
+  )
 
   const experiments = disposer.track(
     new Experiments(
@@ -88,7 +95,13 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     internalCommands,
     experiments: mockExperiments,
     resourceLocator
-  } = buildExperiments(disposer, complexExperimentsOutput, 'other/dvc/root')
+  } = buildExperiments(
+    disposer,
+    complexExperimentsOutput,
+    {},
+    {},
+    'other/dvc/root'
+  )
 
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento(), {

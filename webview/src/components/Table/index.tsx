@@ -141,9 +141,7 @@ const getCells = (cells: Cell<Experiment, unknown>[], changes?: string[]) =>
             [styles.metaCell]: ['timestamp', 'epochs'].includes(
               cell.column.id.split(':').reverse()[0]
             ),
-            [styles.workspaceChange]:
-              cell.column.Header &&
-              changes?.includes(cell.column.Header.toString())
+            [styles.workspaceChange]: changes?.includes(cell.column.id)
           }
         )
       })}
