@@ -214,7 +214,7 @@ export class Experiments {
   }
 
   public async showPlots() {
-    const dvcRoot = await this.getDefaultOrPickProject()
+    const dvcRoot = await this.getOnlyOrPickProject()
     if (!dvcRoot) {
       return
     }
