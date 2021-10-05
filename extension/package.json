@@ -321,15 +321,7 @@
           "when": "dvc.commands.available == true"
         },
         {
-          "command": "dvc.checkout",
-          "when": "false"
-        },
-        {
           "command": "dvc.checkoutTarget",
-          "when": "false"
-        },
-        {
-          "command": "dvc.commit",
           "when": "false"
         },
         {
@@ -373,15 +365,7 @@
           "when": "false"
         },
         {
-          "command": "dvc.pull",
-          "when": "false"
-        },
-        {
           "command": "dvc.pullTarget",
-          "when": "false"
-        },
-        {
-          "command": "dvc.push",
           "when": "false"
         },
         {
@@ -402,10 +386,6 @@
         },
         {
           "command": "dvc.renameTarget",
-          "when": "false"
-        },
-        {
-          "command": "dvc.resetWorkspace",
           "when": "false"
         },
         {

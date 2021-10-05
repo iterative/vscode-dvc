@@ -1,4 +1,5 @@
 import { join } from 'path'
+import { Uri } from 'vscode'
 import { Repository } from '.'
 import { TrackedExplorerTree } from '../fileSystem/tree'
 import {
@@ -11,6 +12,10 @@ export class WorkspaceRepositories
   extends BaseWorkspace<Repository>
   implements IWorkspace<Repository, TrackedExplorerTree>
 {
+  public getCwd(overrideUri?: Uri): string | Promise<string | undefined> {
+    return overrideUri?.fsPath || this.getOnlyOrPickProject()
+  }
+
   public create(
     dvcRoots: string[],
     trackedExplorerTree: TrackedExplorerTree

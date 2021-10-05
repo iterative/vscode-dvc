@@ -1,5 +1,5 @@
 import { relative } from 'path'
-import { Uri } from 'vscode'
+import { commands, Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
 import { Flag } from '../../cli/args'
 import {
@@ -9,6 +9,7 @@ import {
 } from '../../commands/internal'
 import { gitResetWorkspace } from '../../git'
 import { getWarningResponse } from '../../vscode/modal'
+import { WorkspaceRepositories } from '../workspace'
 
 export type Resource = {
   dvcRoot: string
@@ -38,20 +39,51 @@ export const getSimpleResourceCommand =
 
 export type Root = { rootUri: Uri }
 
-type RootCommand = ({ rootUri }: Root) => Promise<string | undefined>
+type RootCommand = (context?: Root) => Promise<string | undefined>
 
 export const getRootCommand =
-  (internalCommands: InternalCommands, commandId: CommandId): RootCommand =>
-  ({ rootUri }) => {
-    const cwd = rootUri.fsPath
+  (
+    repositories: WorkspaceRepositories,
+    internalCommands: InternalCommands,
+    commandId: CommandId
+  ): RootCommand =>
+  async context => {
+    const cwd = await repositories.getCwd(context?.rootUri)
+
+    if (!cwd) {
+      return
+    }
 
     return tryThenMaybeForce(internalCommands, commandId, cwd)
   }
 
+export const getCommitRootCommand =
+  (
+    repositories: WorkspaceRepositories,
+    internalCommands: InternalCommands
+  ): RootCommand =>
+  async context => {
+    const cwd = await repositories.getCwd(context?.rootUri)
+
+    if (!cwd) {
+      return
+    }
+
+    await tryThenMaybeForce(internalCommands, AvailableCommands.COMMIT, cwd)
+    return commands.executeCommand('workbench.scm.focus')
+  }
+
 export const getResetRootCommand =
-  (internalCommands: InternalCommands): RootCommand =>
-  async ({ rootUri }) => {
-    const cwd = rootUri.fsPath
+  (
+    repositories: WorkspaceRepositories,
+    internalCommands: InternalCommands
+  ): RootCommand =>
+  async context => {
+    const cwd = await repositories.getCwd(context?.rootUri)
+
+    if (!cwd) {
+      return
+    }
 
     const response = await getWarningResponse(
       'Are you sure you want to discard ALL workspace changes?\n' +
