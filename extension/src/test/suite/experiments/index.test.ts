@@ -98,14 +98,26 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { experiments } = buildExperiments(disposable)
+      const { experiments } = buildExperiments(
+        disposable,
+        complexExperimentsOutput,
+        {
+          'params.yaml': { learning_rate: { new: 2.2e-7, old: 2.2e-12 } }
+        },
+        {
+          'summary.json': { loss: { new: 1.9293, old: 1.8169 } }
+        }
+      )
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const webview = await experiments.showWebview()
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          changes: [],
+          changes: [
+            'params:params.yaml:learning_rate',
+            'metrics:summary.json:loss'
+          ],
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
