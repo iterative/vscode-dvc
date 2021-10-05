@@ -14,7 +14,11 @@ import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { retryUntilResolved } from '../util/promise'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
+import {
+  AvailableCommands,
+  CommandId,
+  InternalCommands
+} from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import {
   DiffParamsOrMetricsOutput,
@@ -233,13 +237,8 @@ export class Experiments {
   }
 
   private async updateData(): Promise<void> {
-    const getNewPromise = () =>
-      this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
-        AvailableCommands.EXPERIMENT_SHOW,
-        this.dvcRoot
-      )
-    const data = await retryUntilResolved<ExperimentsRepoJSONOutput>(
-      getNewPromise,
+    const data = await this.retryUntilResolved<ExperimentsRepoJSONOutput>(
+      AvailableCommands.EXPERIMENT_SHOW,
       'Experiments table update'
     )
 
@@ -255,27 +254,28 @@ export class Experiments {
   private async performParamsAndMetricsDiff() {
     this.paramsAndMetrics.resetChanges()
 
-    const paramsDiff = await retryUntilResolved<DiffParamsOrMetricsOutput>(
-      () =>
-        this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-          AvailableCommands.PARAMS_DIFF,
-          this.dvcRoot
-        ),
+    const paramsDiff = await this.retryUntilResolved<DiffParamsOrMetricsOutput>(
+      AvailableCommands.PARAMS_DIFF,
       'Params diff update'
     )
 
-    this.paramsAndMetrics.addChanges('params', paramsDiff)
+    const metricsDiff =
+      await this.retryUntilResolved<DiffParamsOrMetricsOutput>(
+        AvailableCommands.METRICS_DIFF,
+        'Metrics diff update'
+      )
 
-    const metricsDiff = await retryUntilResolved<DiffParamsOrMetricsOutput>(
-      () =>
-        this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-          AvailableCommands.METRICS_DIFF,
-          this.dvcRoot
-        ),
-      'Metrics diff update'
+    this.paramsAndMetrics.setChanges({
+      metrics: metricsDiff,
+      params: paramsDiff
+    })
+  }
+
+  private retryUntilResolved<T>(command: CommandId, retryMessage: string) {
+    return retryUntilResolved<T>(
+      () => this.internalCommands.executeCommand<T>(command, this.dvcRoot),
+      retryMessage
     )
-
-    this.paramsAndMetrics.addChanges('metrics', metricsDiff)
   }
 
   private notifyChanged() {

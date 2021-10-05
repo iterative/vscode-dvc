@@ -113,26 +113,27 @@ export class ParamsAndMetricsModel {
     return flatten<Status>(nestedStatuses)
   }
 
-  public addChanges(
-    type: 'params' | 'metrics',
-    diff: DiffParamsOrMetricsOutput
-  ) {
-    const changes: string[] = []
-    const files = Object.keys(diff || [])
-    files.forEach(file =>
-      changes.push(
-        ...Object.keys(diff?.[file] || []).map(diff =>
-          joinParamOrMetricPath(type, file, diff)
+  public setChanges(changesData: {
+    params: DiffParamsOrMetricsOutput
+    metrics: DiffParamsOrMetricsOutput
+  }) {
+    this.paramsAndMetricsChanges = Object.entries(changesData).reduce(
+      (acc: string[], [key, diff]: [string, DiffParamsOrMetricsOutput]) => {
+        const files = Object.keys(diff || [])
+        files.forEach(file =>
+          acc.push(
+            ...Object.keys(diff?.[file] || []).map(diff =>
+              joinParamOrMetricPath(key, file, diff)
+            )
+          )
         )
-      )
+        return acc
+      },
+      []
     )
-
-    this.paramsAndMetricsChanges.push(...changes)
   }
 
-  public resetChanges() {
-    this.paramsAndMetricsChanges = []
-  }
+  public resetChanges() {}
 
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
     const paramsAndMetrics = collectParamsAndMetrics(data)

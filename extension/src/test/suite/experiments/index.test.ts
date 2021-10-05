@@ -115,8 +115,8 @@ suite('Experiments Test Suite', () => {
       expect(messageSpy).to.be.calledWith({
         tableData: {
           changes: [
-            'params:params.yaml:learning_rate',
-            'metrics:summary.json:loss'
+            'metrics:summary.json:loss',
+            'params:params.yaml:learning_rate'
           ],
           columns: complexColumnData,
           rows: complexRowData,
