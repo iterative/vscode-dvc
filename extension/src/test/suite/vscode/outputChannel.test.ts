@@ -85,5 +85,34 @@ suite('Output Channel Test Suite', () => {
         /\[.*?\] > some command - FAILED with code -9 \(20ms\).*?/
       )
     })
+
+    it('should handle a process throwing a lock error', () => {
+      const processCompleted = new EventEmitter<CliResult>()
+      const processStarted = new EventEmitter<CliStarted>()
+
+      const cli = new Cli({} as Config, { processCompleted, processStarted })
+      const mockAppend = fake()
+      const mockOutputChannel = stub(window, 'createOutputChannel').returns({
+        append: mockAppend,
+        dispose: fake()
+      } as unknown as VSOutputChannel)
+
+      disposable.track(new OutputChannel([cli], version, 'The LOCKED Channel'))
+      processCompleted.fire({
+        command: 'non-lockless',
+        cwd,
+        duration: 240,
+        exitCode: 1,
+        pid: 200,
+        stderr:
+          'ERROR: Unable to acquire lock. Most likely another DVC process is running or was terminated abruptly. ' +
+          'Check the page <https://dvc.org/doc/user-guide/troubleshooting#lock-issue> for other possible reasons and to learn how to resolve this.'
+      })
+
+      expect(mockOutputChannel).to.be.called
+      expect(mockAppend).to.be.calledWithMatch(
+        /\[.*?\] > non-lockless - FAILED on LOCK \(240ms\).*?/
+      )
+    })
   })
 })

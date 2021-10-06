@@ -86,13 +86,15 @@ export class OutputChannel {
     stderr?: string
   ) {
     let completionOutput = ''
-    if (exitCode) {
+    if (stderr?.includes('lock')) {
+      completionOutput += ` on LOCK`
+    } else if (exitCode) {
       completionOutput += ` with code ${exitCode}`
     }
 
     completionOutput += ` (${duration}ms)`
 
-    if (exitCode && stderr) {
+    if (exitCode && stderr && !stderr.includes('lock')) {
       completionOutput += `\n${stderr}`
     }
 
