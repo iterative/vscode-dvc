@@ -236,11 +236,9 @@ export class Experiments {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  private updateData(): Promise<void[]> {
-    return Promise.all([
-      this.updateExperimentsData(),
-      this.updateParamsAndMetricsDiffData()
-    ])
+  private async updateData(): Promise<void> {
+    await this.updateExperimentsData()
+    return this.updateParamsAndMetricsDiffData()
   }
 
   private async updateExperimentsData(): Promise<void> {
