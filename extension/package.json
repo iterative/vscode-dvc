@@ -256,6 +256,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.showOutput%",
+        "command": "dvc.showOutput",
+        "category": "DVC"
+      },
+      {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
         "category": "DVC",
@@ -456,8 +461,13 @@
         },
         {
           "command": "dvc.checkout",
-          "group": "DVC",
+          "group": "1_DVC",
           "when": "scmProvider == dvc && dvc.commands.available == true"
+        },
+        {
+          "command": "dvc.showOutput",
+          "group": "3_footer",
+          "when": "scmProvider == dvc"
         }
       ],
       "scm/resourceState/context": [
