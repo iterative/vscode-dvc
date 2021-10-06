@@ -118,11 +118,10 @@ export class ParamsAndMetricsModel {
     metrics: DiffParamsOrMetricsOutput
   }) {
     this.paramsAndMetricsChanges = Object.entries(changesData).reduce(
-      (acc: string[], [type, data]: [string, DiffParamsOrMetricsOutput]) => {
-        const files = Object.keys(data || [])
-        files.forEach(file =>
+      (acc: string[], [type, diff]: [string, DiffParamsOrMetricsOutput]) => {
+        Object.entries(diff || {}).forEach(([file, changes]) =>
           acc.push(
-            ...Object.keys(data?.[file] || []).map(paramOrMetric =>
+            ...Object.keys(changes || []).map(paramOrMetric =>
               joinParamOrMetricPath(type, file, paramOrMetric)
             )
           )

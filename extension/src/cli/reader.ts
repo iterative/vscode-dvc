@@ -21,8 +21,8 @@ export type DiffOutput = {
 
 export type DiffParamsOrMetricsOutput =
   | {
-      [key: string]: {
-        [key: string]: { old: number; new: number }
+      [filename: string]: {
+        [paramOrMetric: string]: { old: number; new: number }
       }
     }
   | undefined
