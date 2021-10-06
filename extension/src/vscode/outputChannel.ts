@@ -14,6 +14,8 @@ export class OutputChannel {
   private readonly outputChannel: VSOutputChannel
   private readonly version: string
 
+  private shownLockError = false
+
   constructor(cliInteractors: ICli[], version: string, name = 'DVC') {
     this.outputChannel = this.dispose.track(window.createOutputChannel(name))
     this.version = version
@@ -85,19 +87,42 @@ export class OutputChannel {
     duration: number,
     stderr?: string
   ) {
-    let completionOutput = ''
-    if (stderr?.includes('lock')) {
-      completionOutput += ` on LOCK`
-    } else if (exitCode) {
-      completionOutput += ` with code ${exitCode}`
+    return (
+      this.getFailureDetails(exitCode, stderr) +
+      ` (${duration}ms)` +
+      this.getErrorMessage(exitCode, stderr)
+    )
+  }
+
+  private getFailureDetails(exitCode: number | null, stderr?: string): string {
+    if (this.isLockError(stderr)) {
+      return ` on LOCK`
     }
 
-    completionOutput += ` (${duration}ms)`
-
-    if (exitCode && stderr && !stderr.includes('lock')) {
-      completionOutput += `\n${stderr}`
+    if (exitCode) {
+      return ` with code ${exitCode}`
     }
 
-    return completionOutput
+    return ''
+  }
+
+  private getErrorMessage(exitCode: number | null, stderr?: string): string {
+    if (
+      !exitCode ||
+      !stderr ||
+      (this.isLockError(stderr) && this.shownLockError)
+    ) {
+      return ''
+    }
+
+    if (this.isLockError(stderr)) {
+      this.shownLockError = true
+    }
+
+    return `\n${stderr}`
+  }
+
+  private isLockError(stderr?: string) {
+    return stderr?.includes('lock')
   }
 }
