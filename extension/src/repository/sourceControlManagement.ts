@@ -75,7 +75,7 @@ export class SourceControlManagement {
     return this.changedResourceGroup.resourceStates
   }
 
-  private getResourceStatesReducer(statuses: Status[]) {
+  private getResourceStatesReducer(validStatuses: Status[]) {
     return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
@@ -83,19 +83,17 @@ export class SourceControlManagement {
       const [status, resources] = entry as [Status, Set<string>]
       return [
         ...resourceStates,
-        ...this.getResourceStates(status, resources, statuses)
+        ...(validStatuses.includes(status)
+          ? this.getResourceStates(status, resources)
+          : [])
       ]
     }
   }
 
   private getResourceStates(
     contextValue: Status,
-    paths: Set<string>,
-    statuses: Status[]
+    paths: Set<string>
   ): ResourceState[] {
-    if (!statuses.includes(contextValue)) {
-      return []
-    }
     return [...paths]
       .filter(
         path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
