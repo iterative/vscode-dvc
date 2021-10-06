@@ -23,7 +23,6 @@ enum Status {
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
   RENAMED = 'renamed',
-  STAGE_MODIFIED = 'stageModified',
   TRACKED = 'tracked'
 }
 
@@ -58,12 +57,6 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC renamed'
   }
 
-  private static DecorationStageModified: FileDecoration = {
-    badge: 'M',
-    color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
-    tooltip: 'DVC staged modified'
-  }
-
   private static DecorationTracked: FileDecoration = {
     tooltip: 'DVC tracked'
   }
@@ -82,8 +75,7 @@ export class DecorationProvider implements FileDecorationProvider {
       deleted: DecorationProvider.DecorationDeleted,
       modified: DecorationProvider.DecorationModified,
       notInCache: DecorationProvider.DecorationNotInCache,
-      renamed: DecorationProvider.DecorationRenamed,
-      stageModified: DecorationProvider.DecorationStageModified
+      renamed: DecorationProvider.DecorationRenamed
     }
 
   constructor(decorationsChanged?: EventEmitter<Uri[]>) {

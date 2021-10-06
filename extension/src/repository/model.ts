@@ -34,7 +34,6 @@ export class RepositoryModel
     modified: new Set<string>(),
     notInCache: new Set<string>(),
     renamed: new Set<string>(),
-    stageModified: new Set<string>(),
     tracked: new Set<string>(),
     untracked: new Set<string>()
   }
@@ -163,11 +162,6 @@ export class RepositoryModel
   ): void {
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
-
-    this.state.stageModified = this.splitModifiedAgainstHead(
-      modifiedAgainstHead,
-      path => this.pathNotInSet(path, modifiedAgainstCache)
-    )
 
     this.state.modified = this.getAllModifiedAgainstCache(
       modifiedAgainstHead,

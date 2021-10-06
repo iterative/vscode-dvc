@@ -88,7 +88,6 @@ describe('RepositoryState', () => {
         ]),
         notInCache: emptySet,
         renamed: new Set([join(dvcRoot, renamed)]),
-        stageModified: new Set([join(dvcRoot, output)]),
         tracked: new Set([
           ...list.map(entry => join(dvcRoot, entry.path)),
           join(dvcRoot, rawDataDir),
@@ -124,10 +123,6 @@ describe('RepositoryState', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: new Set([
-          join(dvcRoot, rawDataDir),
-          join(dvcRoot, data)
-        ]),
         tracked: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
         untracked: emptySet
       })
@@ -161,7 +156,6 @@ describe('RepositoryState', () => {
         modified: new Set([join(dvcRoot, rawDataDir)]),
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
         untracked: emptySet
       })
@@ -191,7 +185,6 @@ describe('RepositoryState', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked: emptySet,
         untracked: emptySet
       })

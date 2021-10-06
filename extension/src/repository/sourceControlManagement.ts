@@ -16,7 +16,6 @@ enum Status {
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
   RENAMED = 'renamed',
-  STAGE_MODIFIED = 'stageModified',
   UNTRACKED = 'untracked'
 }
 

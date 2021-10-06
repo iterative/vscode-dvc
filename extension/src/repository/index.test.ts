@@ -149,7 +149,6 @@ describe('Repository', () => {
           modified,
           notInCache: emptySet,
           renamed: emptySet,
-          stageModified: emptySet,
           tracked,
           untracked
         })
@@ -228,7 +227,6 @@ describe('Repository', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -333,7 +331,6 @@ describe('Repository', () => {
         modified,
         notInCache,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked,
         untracked
       })
@@ -428,7 +425,6 @@ describe('Repository', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -479,7 +475,6 @@ describe('Repository', () => {
       expect(mockedDelay).toBeCalledWith(1000)
 
       const deleted = new Set([join(dvcRoot, model)])
-      const stageModified = new Set([join(dvcRoot, dataDir)])
 
       const tracked = new Set([
         resolve(dvcRoot, model),
@@ -499,7 +494,6 @@ describe('Repository', () => {
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified,
         tracked,
         untracked: emptySet
       })

@@ -103,7 +103,6 @@ describe('DecorationProvider', () => {
       modified,
       notInCache: emptySet,
       renamed: emptySet,
-      stageModified: emptySet,
       tracked: emptySet
     }
 
@@ -113,14 +112,12 @@ describe('DecorationProvider', () => {
       modified: emptySet,
       notInCache,
       renamed: emptySet,
-      stageModified: emptySet,
       tracked
     }
 
     expect(initialState.added).toEqual(updatedState.added)
     expect(initialState.deleted).toEqual(updatedState.deleted)
     expect(initialState.renamed).toEqual(updatedState.renamed)
-    expect(initialState.stageModified).toEqual(updatedState.stageModified)
 
     expect(initialState.modified).not.toEqual(updatedState.modified)
     expect(initialState.notInCache).not.toEqual(updatedState.notInCache)
