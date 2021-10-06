@@ -236,7 +236,14 @@ export class Experiments {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  private async updateData(): Promise<void> {
+  private updateData(): Promise<void[]> {
+    return Promise.all([
+      this.updateExperimentsData(),
+      this.updateParamsAndMetricsDiffData()
+    ])
+  }
+
+  private async updateExperimentsData(): Promise<void> {
     const data = await this.retryUntilResolved<ExperimentsRepoJSONOutput>(
       AvailableCommands.EXPERIMENT_SHOW,
       'Experiments table update'
@@ -244,16 +251,13 @@ export class Experiments {
 
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),
-      this.experiments.transformAndSet(data),
-      this.performParamsAndMetricsDiff()
+      this.experiments.transformAndSet(data)
     ])
 
     return this.notifyChanged()
   }
 
-  private async performParamsAndMetricsDiff() {
-    this.paramsAndMetrics.resetChanges()
-
+  private async updateParamsAndMetricsDiffData() {
     const paramsDiff = await this.retryUntilResolved<DiffParamsOrMetricsOutput>(
       AvailableCommands.PARAMS_DIFF,
       'Params diff update'
@@ -269,6 +273,8 @@ export class Experiments {
       metrics: metricsDiff,
       params: paramsDiff
     })
+
+    return this.notifyChanged()
   }
 
   private retryUntilResolved<T>(command: CommandId, retryMessage: string) {

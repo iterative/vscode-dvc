@@ -133,8 +133,6 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  public resetChanges() {}
-
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
     const paramsAndMetrics = collectParamsAndMetrics(data)
 
