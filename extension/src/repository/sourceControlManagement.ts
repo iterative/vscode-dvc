@@ -2,7 +2,6 @@ import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import { scm, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { isStringInEnum } from '../util'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
@@ -26,6 +25,9 @@ export class SourceControlManagement {
   @observable
   private changedResourceGroup: SourceControlResourceGroup
 
+  @observable
+  private indexResourceGroup: SourceControlResourceGroup
+
   public readonly dispose = Disposable.fn()
 
   private readonly dvcRoot: string
@@ -42,15 +44,29 @@ export class SourceControlManagement {
     scmView.inputBox.visible = false
 
     this.changedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('group1', 'Changes')
+      scmView.createResourceGroup('workingTree', 'Changes')
     )
+
+    this.indexResourceGroup = this.dispose.track(
+      scmView.createResourceGroup('index', 'Staged Changes')
+    )
+
+    this.changedResourceGroup.hideWhenEmpty = true
+    this.indexResourceGroup.hideWhenEmpty = true
 
     this.setState(state)
   }
 
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer(),
+      this.getResourceStatesReducer(
+        Object.values(Status).filter(status => status !== Status.STAGE_MODIFIED)
+      ),
+      []
+    )
+
+    this.indexResourceGroup.resourceStates = Object.entries(state).reduce(
+      this.getResourceStatesReducer([Status.STAGE_MODIFIED]),
       []
     )
   }
@@ -59,35 +75,37 @@ export class SourceControlManagement {
     return this.changedResourceGroup.resourceStates
   }
 
-  private getResourceStatesReducer() {
+  private getResourceStatesReducer(statuses: Status[]) {
     return (
       resourceStates: ResourceState[],
       entry: [string, Set<string>]
     ): ResourceState[] => {
       const [status, resources] = entry as [Status, Set<string>]
-      return [...resourceStates, ...this.getResourceStates(status, resources)]
+      return [
+        ...resourceStates,
+        ...this.getResourceStates(status, resources, statuses)
+      ]
     }
-  }
-
-  private isValidStatus(status: string): boolean {
-    return isStringInEnum(status, Status)
   }
 
   private getResourceStates(
     contextValue: Status,
-    paths: Set<string>
+    paths: Set<string>,
+    statuses: Status[]
   ): ResourceState[] {
-    if (!this.isValidStatus(contextValue)) {
+    if (!statuses.includes(contextValue)) {
       return []
     }
     return [...paths]
       .filter(
         path => extname(path) !== '.dvc' && basename(path) !== '.gitignore'
       )
-      .map(path => ({
-        contextValue,
-        dvcRoot: this.dvcRoot,
-        resourceUri: Uri.file(path)
-      }))
+      .map(path => {
+        return {
+          contextValue,
+          dvcRoot: this.dvcRoot,
+          resourceUri: Uri.file(path)
+        }
+      })
   }
 }
