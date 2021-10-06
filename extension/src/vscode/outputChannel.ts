@@ -2,6 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { OutputChannel as VSOutputChannel, window } from 'vscode'
 import { reportErrorWithOptions } from './reporting'
 import { ICli } from '../cli'
+import { joinTruthyItems } from '../util/array'
 
 enum ProcessStatus {
   INITIALIZED = 'INITIALIZED',
@@ -62,7 +63,9 @@ export class OutputChannel {
             stderr
           )
 
-          return this.outputChannel.append(`${baseOutput}${completionOutput}\n`)
+          return this.outputChannel.append(
+            `${baseOutput} ${completionOutput}\n`
+          )
         }
       )
     )
@@ -87,20 +90,20 @@ export class OutputChannel {
     duration: number,
     stderr?: string
   ) {
-    return (
-      this.getFailureDetails(exitCode, stderr) +
-      ` (${duration}ms)` +
+    return joinTruthyItems([
+      this.getFailureDetails(exitCode, stderr),
+      `(${duration}ms)`,
       this.getErrorMessage(exitCode, stderr)
-    )
+    ])
   }
 
   private getFailureDetails(exitCode: number | null, stderr?: string): string {
     if (this.isLockError(stderr)) {
-      return ` on LOCK`
+      return `on LOCK`
     }
 
     if (exitCode) {
-      return ` with code ${exitCode}`
+      return `with code ${exitCode}`
     }
 
     return ''
