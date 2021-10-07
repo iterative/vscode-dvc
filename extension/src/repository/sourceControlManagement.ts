@@ -15,7 +15,7 @@ enum Status {
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
   RENAMED = 'renamed',
-  STAGE_MODIFIED = 'stageModified',
+  GIT_MODIFIED = 'gitModified',
   UNTRACKED = 'untracked'
 }
 
@@ -26,7 +26,7 @@ export class SourceControlManagement {
   private changedResourceGroup: SourceControlResourceGroup
 
   @observable
-  private indexResourceGroup: SourceControlResourceGroup
+  private gitModifiedResourceGroup: SourceControlResourceGroup
 
   public readonly dispose = Disposable.fn()
 
@@ -44,15 +44,15 @@ export class SourceControlManagement {
     scmView.inputBox.visible = false
 
     this.changedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('workingTree', 'Changes')
+      scmView.createResourceGroup('changes', 'Changes')
     )
 
-    this.indexResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('index', 'Staged Changes')
+    this.gitModifiedResourceGroup = this.dispose.track(
+      scmView.createResourceGroup('gitModified', 'Need Git Commit')
     )
 
     this.changedResourceGroup.hideWhenEmpty = true
-    this.indexResourceGroup.hideWhenEmpty = true
+    this.gitModifiedResourceGroup.hideWhenEmpty = true
 
     this.setState(state)
   }
@@ -60,13 +60,13 @@ export class SourceControlManagement {
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
       this.getResourceStatesReducer(
-        Object.values(Status).filter(status => status !== Status.STAGE_MODIFIED)
+        Object.values(Status).filter(status => status !== Status.GIT_MODIFIED)
       ),
       []
     )
 
-    this.indexResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer([Status.STAGE_MODIFIED]),
+    this.gitModifiedResourceGroup.resourceStates = Object.entries(state).reduce(
+      this.getResourceStatesReducer([Status.GIT_MODIFIED]),
       []
     )
   }

@@ -31,10 +31,10 @@ export class RepositoryModel
   private state = {
     added: new Set<string>(),
     deleted: new Set<string>(),
+    gitModified: new Set<string>(),
     modified: new Set<string>(),
     notInCache: new Set<string>(),
     renamed: new Set<string>(),
-    stageModified: new Set<string>(),
     tracked: new Set<string>(),
     untracked: new Set<string>()
   }
@@ -164,7 +164,7 @@ export class RepositoryModel
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
 
-    this.state.stageModified = this.splitModifiedAgainstHead(
+    this.state.gitModified = this.splitModifiedAgainstHead(
       modifiedAgainstHead,
       path => this.pathNotInSet(path, modifiedAgainstCache)
     )
