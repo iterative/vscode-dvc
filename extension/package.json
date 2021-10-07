@@ -256,6 +256,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.showOutput%",
+        "command": "dvc.showOutput",
+        "category": "DVC"
+      },
+      {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
         "category": "DVC",
@@ -476,8 +481,13 @@
         },
         {
           "command": "dvc.checkout",
-          "group": "DVC",
+          "group": "1_DVC",
           "when": "scmProvider == dvc && dvc.commands.available"
+        },
+        {
+          "command": "dvc.showOutput",
+          "group": "3_footer",
+          "when": "scmProvider == dvc"
         }
       ],
       "scm/resourceState/context": [
@@ -489,12 +499,12 @@
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
+          "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
         }
       ],
       "editor/title": [
@@ -778,6 +788,18 @@
               "onCommand:dvc.showCommands"
             ],
             "when": "dvc.commands.available && dvc.project.available"
+          },
+          {
+            "id": "dvc.showOutput",
+            "title": "Output channel",
+            "description": "View the DVC output channel.\n[View output](command:dvc.showOutput)",
+            "media": {
+              "markdown": "resources/walkthrough/output-channel.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showOutput"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
           },
           {
             "id": "dvc.scm",
