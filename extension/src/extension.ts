@@ -77,7 +77,7 @@ export class Extension implements IExtension {
     this.dispose.track(getTelemetryReporter())
 
     this.setCommandsAvailability(false)
-    this.setProjectAvailability(false)
+    this.setProjectAvailability()
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)
@@ -283,10 +283,8 @@ export class Extension implements IExtension {
         )
       )
     ).sort()
-    if (this.hasRoots()) {
-      return this.setProjectAvailability(true)
-    }
-    this.setProjectAvailability(false)
+
+    return this.setProjectAvailability()
   }
 
   public async initialize() {
@@ -327,7 +325,8 @@ export class Extension implements IExtension {
     setContextValue('dvc.commands.available', available)
   }
 
-  private setProjectAvailability(available: boolean) {
+  private setProjectAvailability() {
+    const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
   }
 

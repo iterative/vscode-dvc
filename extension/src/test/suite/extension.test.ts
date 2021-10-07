@@ -8,7 +8,7 @@ import {
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
-import { Disposable, Extension } from '../../extension'
+import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
 import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../fixtures/complex-output-example'
@@ -17,7 +17,6 @@ import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
-import * as Context from '../../vscode/context'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -73,38 +72,6 @@ suite('Extension Test Suite', () => {
 
       return setupWorkspaceWizard
     }
-
-    it('should set dvc.commands.available to false if there is not a folder in the workspace (no cwd)', async () => {
-      stub(workspace, 'workspaceFolders').returns(undefined)
-
-      const initializeSpy = spy(Extension.prototype, 'initialize')
-      const mockCanRunCliSpy = stub(Extension.prototype, 'canRunCli')
-      const mockSetContextValue = stub(Context, 'setContextValue')
-      const contextValueSet = new Promise(resolve =>
-        mockSetContextValue
-          .onFirstCall()
-          .resolves(undefined)
-          .onSecondCall()
-          .callsFake(() => {
-            resolve(undefined)
-            return Promise.resolve(false)
-          })
-      )
-
-      await workspace.getConfiguration().update(dvcPathOption, 'dvc')
-      await contextValueSet
-
-      expect(initializeSpy).not.to.be.called
-      expect(mockCanRunCliSpy).to.have.been.calledOnce
-      expect(mockSetContextValue).to.have.been.calledTwice
-      expect(mockSetContextValue).to.have.been.calledWith(
-        'dvc.commands.available',
-        false
-      )
-      expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
-        'dvc'
-      )
-    })
 
     it('should set dvc.dvcPath to the default when dvc is installed in a virtual environment', async () => {
       stub(CliReader.prototype, 'help').rejects('do not run setup')
