@@ -33,7 +33,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.60.0-insiders",
+    "vscode": "^1.61.0-insiders",
     "node": ">=10.2.0"
   },
   "activationEvents": [
@@ -886,7 +886,7 @@
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "mobx": "^6.0.4",
-    "vscode-extension-telemetry": "^0.4.0"
+    "vscode-extension-telemetry": "^0.4.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
@@ -900,7 +900,7 @@
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
     "@types/sinon-chai": "^3.2.5",
-    "@types/vscode": "^1.60.0",
+    "@types/vscode": "^1.61.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^3.0.0",
@@ -913,7 +913,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "vsce": "^1.99.0",
+    "vsce": "^1.100.1",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.40.0",
