@@ -314,15 +314,15 @@
         },
         {
           "command": "dvc.applyExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.branchExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.checkout",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.checkoutTarget",
@@ -330,7 +330,7 @@
         },
         {
           "command": "dvc.commit",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.commitTarget",
@@ -354,7 +354,7 @@
         },
         {
           "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.findInFolder",
@@ -374,7 +374,7 @@
         },
         {
           "command": "dvc.pull",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.pullTarget",
@@ -382,7 +382,7 @@
         },
         {
           "command": "dvc.push",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.pushTarget",
@@ -390,11 +390,11 @@
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.removeExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.removeTarget",
@@ -406,19 +406,19 @@
         },
         {
           "command": "dvc.resetWorkspace",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runQueuedExperiments",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runResetExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.selectForCompare",
@@ -430,11 +430,11 @@
         },
         {
           "command": "dvc.showExperiments",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.stopRunningExperiment",
-          "when": "dvc.commands.available == true && dvc.project.available == true && dvc.runner.running"
+          "when": "dvc.commands.available && dvc.project.available && dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
@@ -457,44 +457,44 @@
         {
           "command": "dvc.resetWorkspace",
           "group": "navigation@1",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.commit",
           "group": "navigation@2",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.pull",
           "group": "navigation@3",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.push",
           "group": "navigation@4",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.checkout",
           "group": "DVC",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         }
       ],
       "scm/resourceState/context": [
         {
           "command": "dvc.addTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState == untracked && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceState == untracked && dvc.commands.available"
         },
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
         }
       ],
       "editor/title": [
@@ -502,47 +502,47 @@
           "command": "dvc.runExperiment",
           "alt": "dvc.runResetExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.stopRunningExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "navigation@2",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runExperiment",
           "group": "1_run@0",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.stopRunningExperiment",
           "group": "1_run@0",
-          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "1_run@1",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "1_run@2",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runResetExperiment",
           "group": "1_run@3",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         }
       ],
       "view/item/context": [
@@ -609,32 +609,32 @@
         {
           "command": "dvc.addExperimentsTableSort",
           "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem != dvcRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.addExperimentsTableFilter",
           "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem != dvcRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -695,22 +695,22 @@
         {
           "id": "dvc.views.experimentsParamsAndMetricsTree",
           "name": "Params & Metrics",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsTree",
           "name": "Experiments",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsSortByTree",
           "name": "Sort By",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsFilterByTree",
           "name": "Filter By",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ]
     },
@@ -718,12 +718,12 @@
       {
         "view": "dvc.views.trackedExplorerTree",
         "contents": "DVC is currently unavailable, [learn more](https://www.dvc.org/).\n[Setup the workspace](command:dvc.setupWorkspace)",
-        "when": "dvc.commands.available != true"
+        "when": "!dvc.commands.available"
       },
       {
         "view": "dvc.views.trackedExplorerTree",
         "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC and this extension please read [our docs](https://dvc.org/doc).",
-        "when": "dvc.commands.available == true && dvc.project.available == false"
+        "when": "dvc.commands.available && !dvc.project.available"
       },
       {
         "view": "dvc.views.experimentsTree",
@@ -777,7 +777,7 @@
             "completionEvents": [
               "onCommand:dvc.showCommands"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.scm",
@@ -789,7 +789,7 @@
             "completionEvents": [
               "onCommand:workbench.view.scm"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.tracked",
@@ -801,7 +801,7 @@
             "completionEvents": [
               "onCommand:dvc.views.trackedExplorerTree.focus"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.viewContainer",
@@ -813,7 +813,7 @@
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.experimentsTable",
@@ -825,7 +825,7 @@
             "completionEvents": [
               "onCommand:dvc.showExperiments"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.learnMore",
