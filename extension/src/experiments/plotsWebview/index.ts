@@ -158,7 +158,7 @@ export class PlotsWebview {
   }
 
   private static setPanelActiveContext(state: boolean) {
-    setContextValue('dvc.experiments.plotsWebviewActive', state)
+    setContextValue('dvc.experiments.webviewActive', state)
   }
 
   public dispose(): void {

@@ -35,38 +35,42 @@ export interface PlotItem {
 
 export const parseRows = (rows: RowData[]): PlotItem[] => {
   const items: PlotItem[] = []
-  rows.forEach(
-    ({
-      displayName: branchDisplayName,
-      id: branchId,
-      subRows: experiments
-    }) => {
-      experiments?.forEach(
-        ({
-          subRows: checkpoints,
-          id: experimentId,
-          displayName: experimentDisplayName
-        }) => {
-          if (checkpoints && checkpoints.length > 0) {
-            checkpoints
-              .reverse()
-              .forEach(({ params, metrics, displayName }, i) => {
-                items.push({
-                  branchDisplayName,
-                  branchId,
-                  displayName,
-                  experimentDisplayName,
-                  experimentId,
-                  iteration: checkpoints.length - i,
-                  metrics,
-                  params
-                })
-              })
-          }
-        }
-      )
-    }
-  )
+  rows
+    .reverse()
+    .forEach(
+      ({
+        displayName: branchDisplayName,
+        id: branchId,
+        subRows: experiments
+      }) => {
+        experiments
+          ?.reverse()
+          .forEach(
+            ({
+              subRows: checkpoints,
+              id: experimentId,
+              displayName: experimentDisplayName
+            }) => {
+              if (checkpoints && checkpoints.length > 0) {
+                checkpoints
+                  .reverse()
+                  .forEach(({ params, metrics, displayName }, i) => {
+                    items.push({
+                      branchDisplayName,
+                      branchId,
+                      displayName,
+                      experimentDisplayName,
+                      experimentId,
+                      iteration: checkpoints.length - i,
+                      metrics,
+                      params
+                    })
+                  })
+              }
+            }
+          )
+      }
+    )
   return items
 }
 
