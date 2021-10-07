@@ -317,7 +317,7 @@ export class Extension implements IExtension {
     return this.setAvailable(false)
   }
 
-  private setAvailable = (available: boolean) => {
+  private setAvailable(available: boolean) {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
     return available
