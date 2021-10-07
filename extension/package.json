@@ -479,12 +479,12 @@
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
         }
       ],
       "editor/title": [

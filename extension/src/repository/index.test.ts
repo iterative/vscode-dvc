@@ -146,10 +146,10 @@ describe('Repository', () => {
         expect.objectContaining({
           added: emptySet,
           deleted: emptySet,
+          gitModified: emptySet,
           modified,
           notInCache: emptySet,
           renamed: emptySet,
-          stageModified: emptySet,
           tracked,
           untracked
         })
@@ -225,10 +225,10 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual({
         added: emptySet,
         deleted,
+        gitModified: emptySet,
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -330,10 +330,10 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual({
         added: emptySet,
         deleted,
+        gitModified: emptySet,
         modified,
         notInCache,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked,
         untracked
       })
@@ -425,10 +425,10 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual({
         added: emptySet,
         deleted,
+        gitModified: emptySet,
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified: emptySet,
         tracked,
         untracked: emptySet
       })
@@ -479,7 +479,7 @@ describe('Repository', () => {
       expect(mockedDelay).toBeCalledWith(1000)
 
       const deleted = new Set([join(dvcRoot, model)])
-      const stageModified = new Set([join(dvcRoot, dataDir)])
+      const gitModified = new Set([join(dvcRoot, dataDir)])
 
       const tracked = new Set([
         resolve(dvcRoot, model),
@@ -496,10 +496,10 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual({
         added: emptySet,
         deleted,
+        gitModified,
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        stageModified,
         tracked,
         untracked: emptySet
       })
