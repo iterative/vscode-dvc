@@ -26,7 +26,6 @@ import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
-  getFirstWorkspaceFolder,
   getWorkspaceFolderCount,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
@@ -261,13 +260,9 @@ export class Extension implements IExtension {
     showWalkthroughOnFirstUse(context.globalState)
   }
 
-  public async canRunCli() {
+  public async canRunCli(cwd: string) {
     try {
       await this.config.isReady()
-      const cwd = getFirstWorkspaceFolder()
-      if (!cwd) {
-        return this.setAvailable(false)
-      }
       return this.setAvailable(!!(await this.cliReader.help(cwd)))
     } catch {
       return this.setAvailable(false)
@@ -301,10 +296,6 @@ export class Extension implements IExtension {
 
   public hasRoots() {
     return definedAndNonEmpty(this.dvcRoots)
-  }
-
-  public hasWorkspaceFolder() {
-    return !!getFirstWorkspaceFolder()
   }
 
   public reset() {

@@ -8,14 +8,17 @@ import {
   quickPickValue,
   quickPickYesOrNo
 } from './vscode/quickPick'
+import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 
 jest.mock('./vscode/config')
 jest.mock('./vscode/resourcePicker')
 jest.mock('./vscode/quickPick')
+jest.mock('./vscode/workspaceFolders')
 
 const mockedCanRunCli = jest.fn()
 const mockedHasRoots = jest.fn()
-const mockedHasWorkspaceFolder = jest.fn()
+const mockedGetFirstWorkspaceFolder = mocked(getFirstWorkspaceFolder)
+const mockedCwd = __dirname
 const mockedInitialize = jest.fn()
 const mockedReset = jest.fn()
 const mockedSetRoots = jest.fn()
@@ -169,14 +172,13 @@ describe('setup', () => {
   const extension = {
     canRunCli: mockedCanRunCli,
     hasRoots: mockedHasRoots,
-    hasWorkspaceFolder: mockedHasWorkspaceFolder,
     initialize: mockedInitialize,
     reset: mockedReset,
     setRoots: mockedSetRoots
   }
 
   it('should do nothing if there is no workspace folder', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(false)
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(undefined)
 
     await setup(extension)
 
@@ -185,7 +187,7 @@ describe('setup', () => {
   })
 
   it('should set the DVC roots even if the cli cannot be used', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedCanRunCli.mockResolvedValueOnce(false)
 
     await setup(extension)
@@ -194,7 +196,7 @@ describe('setup', () => {
   })
 
   it('should not run initialization if roots have not been found but the cli can be run', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(false)
     mockedCanRunCli.mockResolvedValueOnce(true)
 
@@ -205,7 +207,7 @@ describe('setup', () => {
   })
 
   it('should run initialization if roots have been found and the cli can be run', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedCanRunCli.mockResolvedValueOnce(true)
 
@@ -215,7 +217,7 @@ describe('setup', () => {
   })
 
   it('should run reset if the cli cannot be run and there is a workspace folder open', async () => {
-    mockedHasWorkspaceFolder.mockReturnValueOnce(true)
+    mockedGetFirstWorkspaceFolder.mockReturnValueOnce(mockedCwd)
     mockedHasRoots.mockReturnValueOnce(true)
     mockedCanRunCli.mockResolvedValueOnce(false)
 

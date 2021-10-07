@@ -6,6 +6,7 @@ import {
 } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
+import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
 
 const setupTitle = 'Setup the workspace'
 
@@ -153,13 +154,13 @@ export const setupWorkspace = async (): Promise<boolean> => {
 }
 
 export const setup = async (extension: IExtension) => {
-  const hasWorkspaceFolder = extension.hasWorkspaceFolder()
-  if (!hasWorkspaceFolder) {
+  const cwd = getFirstWorkspaceFolder()
+  if (!cwd) {
     return
   }
 
   const [canRunCli] = await Promise.all([
-    extension.canRunCli(),
+    extension.canRunCli(cwd),
     extension.setRoots()
   ])
 
