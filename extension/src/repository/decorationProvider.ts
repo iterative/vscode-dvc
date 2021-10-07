@@ -61,7 +61,7 @@ export class DecorationProvider implements FileDecorationProvider {
   private static DecorationGitModified: FileDecoration = {
     badge: 'M',
     color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
-    tooltip: 'DVC staged modified'
+    tooltip: 'DVC tracked'
   }
 
   private static DecorationTracked: FileDecoration = {
