@@ -106,6 +106,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_GET_STARTED]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
+  [EventName.EXTENSION_SHOW_OUTPUT]: undefined
 
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount

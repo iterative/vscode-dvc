@@ -39,6 +39,7 @@
   "command.setupWorkspace": "Setup The Workspace",
   "command.showCommands": "Show Commands",
   "command.showExperiments": "Show Experiments",
+  "command.showOutput": "Show DVC Output",
   "command.stopRunningExperiment": "Stop Running Experiment",
   "command.views.experimentsFilterByTree.removeAllFilters": "Remove All Filters From Experiments Table",
   "command.views.experimentsFilterByTree.removeFilter": "Remove Filter From Experiments Table",

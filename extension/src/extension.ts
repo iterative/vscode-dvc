@@ -223,6 +223,11 @@ export class Extension implements IExtension {
       })
     )
 
+    this.internalCommands.registerExternalCommand(
+      RegisteredCommands.EXTENSION_SHOW_OUTPUT,
+      () => outputChannel.show()
+    )
+
     registerRepositoryCommands(this.repositories, this.internalCommands)
 
     reRegisterVsCodeCommands(this.internalCommands)

@@ -38,6 +38,7 @@ export enum RegisteredCommands {
   EXTENSION_GET_STARTED = 'dvc.getStarted',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',
   EXTENSION_SHOW_COMMANDS = 'dvc.showCommands',
+  EXTENSION_SHOW_OUTPUT = 'dvc.showOutput',
 
   DELETE_TARGET = 'dvc.deleteTarget',
   MOVE_TARGETS = 'dvc.moveTargets',
