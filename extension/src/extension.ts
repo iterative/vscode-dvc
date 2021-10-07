@@ -266,12 +266,12 @@ export class Extension implements IExtension {
       await this.config.isReady()
       const cwd = getFirstWorkspaceFolder()
       if (!cwd) {
-        return false
+        return this.setAvailable(false)
       }
       this.cliAccessible = !!(await this.cliReader.help(cwd))
-      return this.cliAccessible
+      return this.setAvailable(this.cliAccessible)
     } catch {
-      return false
+      return this.setAvailable(false)
     }
   }
 
@@ -293,8 +293,7 @@ export class Extension implements IExtension {
     await Promise.all([
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.initializeExperiments(),
-      this.setAvailable(true)
+      this.initializeExperiments()
     ])
 
     return Promise.all([
@@ -320,7 +319,8 @@ export class Extension implements IExtension {
 
   private setAvailable = (available: boolean) => {
     this.status.setAvailability(available)
-    return this.setCommandsAvailability(available)
+    this.setCommandsAvailability(available)
+    return available
   }
 
   private setCommandsAvailability(available: boolean) {

@@ -314,15 +314,23 @@
         },
         {
           "command": "dvc.applyExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.branchExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
+          "command": "dvc.checkout",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.checkoutTarget",
           "when": "false"
+        },
+        {
+          "command": "dvc.commit",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.commitTarget",
@@ -346,7 +354,7 @@
         },
         {
           "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.findInFolder",
@@ -365,8 +373,16 @@
           "when": "false"
         },
         {
+          "command": "dvc.pull",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
           "command": "dvc.pullTarget",
           "when": "false"
+        },
+        {
+          "command": "dvc.push",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.pushTarget",
@@ -374,11 +390,11 @@
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.removeExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.removeTarget",
@@ -389,16 +405,20 @@
           "when": "false"
         },
         {
+          "command": "dvc.resetWorkspace",
+          "when": "dvc.commands.available == true && dvc.project.available == true"
+        },
+        {
           "command": "dvc.runExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.runQueuedExperiments",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.runResetExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.selectForCompare",
@@ -410,11 +430,11 @@
         },
         {
           "command": "dvc.showExperiments",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true"
         },
         {
           "command": "dvc.stopRunningExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available == true && dvc.project.available == true && dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
