@@ -268,8 +268,7 @@ export class Extension implements IExtension {
       if (!cwd) {
         return this.setAvailable(false)
       }
-      this.cliAccessible = !!(await this.cliReader.help(cwd))
-      return this.setAvailable(this.cliAccessible)
+      return this.setAvailable(!!(await this.cliReader.help(cwd)))
     } catch {
       return this.setAvailable(false)
     }
@@ -318,6 +317,7 @@ export class Extension implements IExtension {
   private setAvailable(available: boolean) {
     this.status.setAvailability(available)
     this.setCommandsAvailability(available)
+    this.cliAccessible = available
     return available
   }
 
