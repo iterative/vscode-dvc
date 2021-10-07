@@ -58,7 +58,7 @@ export class DecorationProvider implements FileDecorationProvider {
     tooltip: 'DVC renamed'
   }
 
-  private static DecorationStageModified: FileDecoration = {
+  private static DecorationGitModified: FileDecoration = {
     badge: 'M',
     color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
     tooltip: 'DVC staged modified'
@@ -80,7 +80,7 @@ export class DecorationProvider implements FileDecorationProvider {
     {
       added: DecorationProvider.DecorationAdded,
       deleted: DecorationProvider.DecorationDeleted,
-      gitModified: DecorationProvider.DecorationStageModified,
+      gitModified: DecorationProvider.DecorationGitModified,
       modified: DecorationProvider.DecorationModified,
       notInCache: DecorationProvider.DecorationNotInCache,
       renamed: DecorationProvider.DecorationRenamed
