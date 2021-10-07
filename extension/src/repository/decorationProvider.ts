@@ -60,7 +60,7 @@ export class DecorationProvider implements FileDecorationProvider {
 
   private static DecorationStageModified: FileDecoration = {
     badge: 'M',
-    color: new ThemeColor('gitDecoration.gitModifiedResourceForeground'),
+    color: new ThemeColor('gitDecoration.stageModifiedResourceForeground'),
     tooltip: 'DVC staged modified'
   }
 
