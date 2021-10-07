@@ -26,7 +26,6 @@ import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
 import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
-  getFirstWorkspaceFolder,
   getWorkspaceFolderCount,
   getWorkspaceFolders
 } from './vscode/workspaceFolders'
@@ -77,7 +76,7 @@ export class Extension implements IExtension {
     this.dispose.track(getTelemetryReporter())
 
     this.setCommandsAvailability(false)
-    this.setProjectAvailability(false)
+    this.setProjectAvailability()
 
     this.resourceLocator = this.dispose.track(
       new ResourceLocator(context.extensionUri)
@@ -266,17 +265,12 @@ export class Extension implements IExtension {
     showWalkthroughOnFirstUse(context.globalState)
   }
 
-  public async canRunCli() {
+  public async canRunCli(cwd: string) {
     try {
       await this.config.isReady()
-      const cwd = getFirstWorkspaceFolder()
-      if (!cwd) {
-        return false
-      }
-      this.cliAccessible = !!(await this.cliReader.help(cwd))
-      return this.cliAccessible
+      return this.setAvailable(!!(await this.cliReader.help(cwd)))
     } catch {
-      return false
+      return this.setAvailable(false)
     }
   }
 
@@ -288,18 +282,15 @@ export class Extension implements IExtension {
         )
       )
     ).sort()
-    if (this.hasRoots()) {
-      return this.setProjectAvailability(true)
-    }
-    this.setProjectAvailability(false)
+
+    return this.setProjectAvailability()
   }
 
   public async initialize() {
     await Promise.all([
       this.initializeRepositories(),
       this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.initializeExperiments(),
-      this.setAvailable(true)
+      this.initializeExperiments()
     ])
 
     return Promise.all([
@@ -312,10 +303,6 @@ export class Extension implements IExtension {
     return definedAndNonEmpty(this.dvcRoots)
   }
 
-  public hasWorkspaceFolder() {
-    return !!getFirstWorkspaceFolder()
-  }
-
   public reset() {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
@@ -323,16 +310,19 @@ export class Extension implements IExtension {
     return this.setAvailable(false)
   }
 
-  private setAvailable = (available: boolean) => {
+  private setAvailable(available: boolean) {
     this.status.setAvailability(available)
-    return this.setCommandsAvailability(available)
+    this.setCommandsAvailability(available)
+    this.cliAccessible = available
+    return available
   }
 
   private setCommandsAvailability(available: boolean) {
     setContextValue('dvc.commands.available', available)
   }
 
-  private setProjectAvailability(available: boolean) {
+  private setProjectAvailability() {
+    const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
   }
 
