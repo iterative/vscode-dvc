@@ -770,6 +770,18 @@
             "when": "dvc.commands.available == true && dvc.project.available == true"
           },
           {
+            "id": "dvc.showOutput",
+            "title": "Output channel",
+            "description": "View the DVC output channel.\n[View output](command:dvc.showOutput)",
+            "media": {
+              "markdown": "resources/walkthrough/output-channel.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showOutput"
+            ],
+            "when": "dvc.commands.available == true && dvc.project.available == true"
+          },
+          {
             "id": "dvc.scm",
             "title": "Source control management",
             "description": "Open the DVC scm view.\n[Show scm](command:workbench.view.scm)",
