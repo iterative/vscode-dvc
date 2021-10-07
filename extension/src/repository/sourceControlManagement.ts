@@ -48,7 +48,7 @@ export class SourceControlManagement {
     )
 
     this.gitModifiedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('gitModified', 'Need Git Commit')
+      scmView.createResourceGroup('gitModified', 'Ready For Git Commit')
     )
 
     this.changedResourceGroup.hideWhenEmpty = true
