@@ -33,6 +33,7 @@
     "uniqwith",
     "unprotect",
     "unshallow",
+    "unstage",
     "untrack",
     "untracked",
     "venv",

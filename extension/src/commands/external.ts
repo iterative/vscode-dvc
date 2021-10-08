@@ -51,5 +51,8 @@ export enum RegisteredCommands {
   TRACKED_EXPLORER_COPY_REL_FILE_PATH = 'dvc.copyRelativeFilePath',
   TRACKED_EXPLORER_FIND_IN_FOLDER = 'dvc.findInFolder',
   TRACKED_EXPLORER_OPEN_TO_THE_SIDE = 'dvc.openToTheSide',
-  TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare'
+  TRACKED_EXPLORER_SELECT_FOR_COMPARE = 'dvc.selectForCompare',
+
+  GIT_STAGE_ALL = 'dvc.gitStageAll',
+  GIT_UNSTAGE_ALL = 'dvc.gitUnstageAll'
 }

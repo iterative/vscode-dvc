@@ -95,6 +95,9 @@ export interface IEventNamePropertyMapping {
   [EventName.RENAME_TARGET]: undefined
   [EventName.RESET_WORKSPACE]: undefined
 
+  [EventName.GIT_STAGE_ALL]: undefined
+  [EventName.GIT_UNSTAGE_ALL]: undefined
+
   [EventName.TRACKED_EXPLORER_COMPARE_SELECTED]: undefined
   [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined
   [EventName.TRACKED_EXPLORER_COPY_REL_FILE_PATH]: undefined

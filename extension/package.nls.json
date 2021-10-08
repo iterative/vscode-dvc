@@ -17,6 +17,8 @@
   "command.experimentGarbageCollect": "Garbage Collect Experiments",
   "command.findInFolder": "Find in Folder...",
   "command.getStarted": "Get Started",
+  "command.gitStageAll": "Stage All Git Tracked",
+  "command.gitUnstageAll": "Unstage All Git Tracked",
   "command.init": "Init DVC",
   "command.initNoScm": "Init DVC --no-scm",
   "command.openToTheSide": "Open to the Side",

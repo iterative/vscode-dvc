@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
@@ -182,6 +182,46 @@ suite('Source Control Management Test Suite', () => {
 
       expect(mockPush).to.be.calledOnce
       expect(mockShowErrorMessage).to.be.calledOnce
+    })
+
+    it('should stage all git tracked files', async () => {
+      const gitRoot = resolve(dvcDemoPath, '..')
+      const mockGit = stub(ProcessExecution, 'executeProcess')
+        .onFirstCall()
+        .resolves(gitRoot)
+        .onSecondCall()
+        .resolves('')
+
+      await commands.executeCommand(RegisteredCommands.GIT_STAGE_ALL, {
+        rootUri
+      })
+
+      expect(mockGit).to.be.calledTwice
+      expect(mockGit).to.be.calledWith({
+        args: ['rev-parse', '--show-toplevel'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
+      expect(mockGit).to.be.calledWith({
+        args: ['add', '.'],
+        cwd: gitRoot,
+        executable: 'git'
+      })
+    })
+
+    it('should unstage all git tracked files', async () => {
+      const mockGit = stub(ProcessExecution, 'executeProcess').resolves('')
+
+      await commands.executeCommand(RegisteredCommands.GIT_UNSTAGE_ALL, {
+        rootUri
+      })
+
+      expect(mockGit).to.be.calledOnce
+      expect(mockGit).to.be.calledWith({
+        args: ['reset'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
     })
 
     it('should not reset the workspace if the user does not confirm', async () => {
