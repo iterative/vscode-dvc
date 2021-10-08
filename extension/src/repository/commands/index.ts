@@ -7,7 +7,7 @@ import {
   CommandId,
   InternalCommands
 } from '../../commands/internal'
-import { gitResetWorkspace, gitStageAll, gitUnstageAll } from '../../git'
+import { gitReset, gitResetWorkspace, gitStageAll } from '../../git'
 import { getWarningResponse } from '../../vscode/modal'
 import { WorkspaceRepositories } from '../workspace'
 
@@ -79,7 +79,7 @@ export const getUnstageAllCommand =
       return
     }
 
-    return gitUnstageAll(cwd)
+    return gitReset(cwd)
   }
 
 export const getCommitRootCommand =
