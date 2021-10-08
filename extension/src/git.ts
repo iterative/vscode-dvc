@@ -44,17 +44,36 @@ export const getAllUntracked = async (
   return new Set([...files, ...dirs])
 }
 
-export const gitResetWorkspace = async (
-  repositoryRoot: string
-): Promise<void> => {
+export const gitResetWorkspace = async (cwd: string): Promise<void> => {
   await executeProcess({
     args: ['reset', '--hard', 'HEAD'],
-    cwd: repositoryRoot,
+    cwd,
     executable: 'git'
   })
   await executeProcess({
     args: ['clean', '-f', '-d', '-q'],
+    cwd,
+    executable: 'git'
+  })
+}
+
+export const gitStageAll = async (cwd: string) => {
+  const repositoryRoot = await executeProcess({
+    args: ['rev-parse', '--show-toplevel'],
+    cwd,
+    executable: 'git'
+  })
+
+  return executeProcess({
+    args: ['add', '.'],
     cwd: repositoryRoot,
     executable: 'git'
   })
 }
+
+export const gitUnstageAll = (cwd: string) =>
+  executeProcess({
+    args: ['reset'],
+    cwd,
+    executable: 'git'
+  })
