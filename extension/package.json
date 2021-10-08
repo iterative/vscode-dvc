@@ -522,6 +522,11 @@
           "command": "git.stageAll",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == gitModified"
+        },
+        {
+          "command": "git.unstageAll",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == gitModified"
         }
       ],
       "editor/title": [
