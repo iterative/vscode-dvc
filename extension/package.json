@@ -131,6 +131,18 @@
         "category": "DVC"
       },
       {
+        "title": "dvc.gitStageAll",
+        "command": "dvc.gitStageAll",
+        "category": "DVC",
+        "icon": "$(add)"
+      },
+      {
+        "title": "dvc.gitUnstageAll",
+        "command": "dvc.gitUnstageAll",
+        "category": "DVC",
+        "icon": "$(remove)"
+      },
+      {
         "title": "%command.init%",
         "command": "dvc.init",
         "category": "DVC"
@@ -366,6 +378,14 @@
           "when": "false"
         },
         {
+          "command": "dvc.gitStageAll",
+          "when": "false"
+        },
+        {
+          "command": "dvc.gitUnstageAll",
+          "when": "false"
+        },
+        {
           "command": "dvc.init",
           "when": "false"
         },
@@ -519,12 +539,12 @@
           "when": "scmProvider == dvc && scmResourceGroup == changes"
         },
         {
-          "command": "git.stageAll",
+          "command": "dvc.gitStageAll",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == gitModified"
         },
         {
-          "command": "git.unstageAll",
+          "command": "dvc.gitUnstageAll",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == gitModified"
         }

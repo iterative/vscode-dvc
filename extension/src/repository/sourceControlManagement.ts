@@ -54,6 +54,9 @@ export class SourceControlManagement {
     this.changedResourceGroup.hideWhenEmpty = true
     this.gitModifiedResourceGroup.hideWhenEmpty = true
 
+    Object.assign(this.changedResourceGroup, { rootUri: Uri.file(dvcRoot) })
+    Object.assign(this.gitModifiedResourceGroup, { rootUri: Uri.file(dvcRoot) })
+
     this.setState(state)
   }
 

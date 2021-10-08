@@ -7,7 +7,7 @@ import {
   CommandId,
   InternalCommands
 } from '../../commands/internal'
-import { gitResetWorkspace } from '../../git'
+import { gitResetWorkspace, gitStageAll, gitUnstageAll } from '../../git'
 import { getWarningResponse } from '../../vscode/modal'
 import { WorkspaceRepositories } from '../workspace'
 
@@ -55,6 +55,31 @@ export const getRootCommand =
     }
 
     return tryThenMaybeForce(internalCommands, commandId, cwd)
+  }
+
+export const getStageAllCommand =
+  (repositories: WorkspaceRepositories): RootCommand =>
+  async context => {
+    const cwd = await repositories.getCwd(context?.rootUri)
+
+    if (!cwd) {
+      return
+    }
+
+    await gitStageAll(cwd)
+    return commands.executeCommand('workbench.scm.focus')
+  }
+
+export const getUnstageAllCommand =
+  (repositories: WorkspaceRepositories): RootCommand =>
+  async context => {
+    const cwd = await repositories.getCwd(context?.rootUri)
+
+    if (!cwd) {
+      return
+    }
+
+    return gitUnstageAll(cwd)
   }
 
 export const getCommitRootCommand =

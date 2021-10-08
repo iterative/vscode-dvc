@@ -4,6 +4,8 @@ import {
   getResourceCommand,
   getRootCommand,
   getSimpleResourceCommand,
+  getStageAllCommand,
+  getUnstageAllCommand,
   Resource,
   Root
 } from '.'
@@ -28,6 +30,21 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.registerExternalCliCommand<Resource>(
     RegisteredCliCommands.COMMIT_TARGET,
     getResourceCommand(internalCommands, AvailableCommands.COMMIT)
+  )
+}
+
+const registerResourceGroupCommands = (
+  repositories: WorkspaceRepositories,
+  internalCommands: InternalCommands
+) => {
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.GIT_STAGE_ALL,
+    getStageAllCommand(repositories)
+  )
+
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.GIT_UNSTAGE_ALL,
+    getUnstageAllCommand(repositories)
   )
 }
 
@@ -66,5 +83,6 @@ export const registerRepositoryCommands = (
   internalCommands: InternalCommands
 ): void => {
   registerResourceCommands(internalCommands)
+  registerResourceGroupCommands(repositories, internalCommands)
   registerRootCommands(repositories, internalCommands)
 }
