@@ -131,13 +131,13 @@
         "category": "DVC"
       },
       {
-        "title": "dvc.gitStageAll",
+        "title": "%command.gitStageAll%",
         "command": "dvc.gitStageAll",
         "category": "DVC",
         "icon": "$(add)"
       },
       {
-        "title": "dvc.gitUnstageAll",
+        "title": "%command.gitUnstageAll%",
         "command": "dvc.gitUnstageAll",
         "category": "DVC",
         "icon": "$(remove)"
