@@ -507,6 +507,18 @@
           "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
         }
       ],
+      "scm/resourceGroup/context": [
+        {
+          "command": "dvc.checkout",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == changes"
+        },
+        {
+          "command": "dvc.commit",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == changes"
+        }
+      ],
       "editor/title": [
         {
           "command": "dvc.runExperiment",
