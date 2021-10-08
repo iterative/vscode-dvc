@@ -517,6 +517,11 @@
           "command": "dvc.commit",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == changes"
+        },
+        {
+          "command": "git.stageAll",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == gitModified"
         }
       ],
       "editor/title": [
