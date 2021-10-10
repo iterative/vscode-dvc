@@ -1,10 +1,10 @@
 import { mocked } from 'ts-jest/utils'
-import { delay } from './time'
-import { retryUntilResolved } from './promise'
+import { retryUntilResolved } from './retry'
+import { delay } from '../util/time'
 
 const mockedDelay = mocked(delay)
 
-jest.mock('./time')
+jest.mock('../util/time')
 jest.mock('../common/logger')
 
 beforeEach(() => {

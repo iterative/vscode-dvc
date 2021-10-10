@@ -7,8 +7,8 @@ import {
   Flag,
   ListFlag
 } from './args'
+import { retryUntilResolved } from './retry'
 import { trimAndSplit } from '../util/stdout'
-import { retryUntilResolved } from '../util/promise'
 
 export type PathOutput = { path: string }
 
