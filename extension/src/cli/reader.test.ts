@@ -128,7 +128,7 @@ describe('CliReader', () => {
       })
     })
 
-    it('should retry until the command returns a result', async () => {
+    it('should retry the command returns a lock error', async () => {
       const cliOutput = ''
       const cwd = __dirname
       mockedCreateProcess
