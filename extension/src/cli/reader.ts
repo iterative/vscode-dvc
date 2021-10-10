@@ -7,7 +7,7 @@ import {
   Flag,
   ListFlag
 } from './args'
-import { retryUntilResolved } from './retry'
+import { retryIfLocked } from './retry'
 import { trimAndSplit } from '../util/stdout'
 
 export type PathOutput = { path: string }
@@ -190,7 +190,7 @@ export class CliReader extends Cli {
     formatter: typeof trimAndSplit | typeof JSON.parse,
     ...args: Args
   ): Promise<T> {
-    const output = await retryUntilResolved(
+    const output = await retryIfLocked(
       () => this.executeProcess(cwd, ...args),
       args.join(' ')
     )

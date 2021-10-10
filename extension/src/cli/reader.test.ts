@@ -133,7 +133,7 @@ describe('CliReader', () => {
       const cwd = __dirname
       mockedCreateProcess
         .mockImplementationOnce(() => {
-          throw new Error('I tried but I could not do it')
+          throw new Error('I failed wit a lock error')
         })
         .mockReturnValueOnce(getMockedProcess(JSON.stringify(cliOutput)))
       const statusOutput = await cliReader.diff(cwd)

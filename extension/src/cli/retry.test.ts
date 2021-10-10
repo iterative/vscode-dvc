@@ -1,5 +1,5 @@
 import { mocked } from 'ts-jest/utils'
-import { retryUntilResolved } from './retry'
+import { retryIfLocked } from './retry'
 import { delay } from '../util/time'
 
 const mockedDelay = mocked(delay)
@@ -11,14 +11,14 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('retryUntilResolved', () => {
+describe('retryIfLocked', () => {
   it('should resolve a single promise and return the output', async () => {
     const returnValue = 'I DID IT! WEEEEE'
     const promise = jest.fn().mockResolvedValueOnce(returnValue)
 
     const promiseRefresher = jest.fn().mockImplementation(() => promise())
 
-    const output = await retryUntilResolved<string>(
+    const output = await retryIfLocked<string>(
       promiseRefresher,
       'Definitely did not'
     )
@@ -29,12 +29,18 @@ describe('retryUntilResolved', () => {
     expect(mockedDelay).not.toBeCalled()
   })
 
-  it('should retry each time a promise rejects', async () => {
+  it('should retry each time a promise rejects with a lock message', async () => {
     const unreliablePromise = jest
       .fn()
-      .mockRejectedValueOnce('I dead')
-      .mockRejectedValueOnce('I dead again')
-      .mockRejectedValueOnce('I dead AGAIN!')
+      .mockRejectedValueOnce(new Error('I dead because the repo is locked'))
+      .mockRejectedValueOnce(
+        new Error(
+          'I dead again. Check the page <https://dvc.org/doc/user-guide/troubleshooting#lock-issue>'
+        )
+      )
+      .mockRejectedValueOnce(
+        new Error('I dead AGAIN! Try deleting .dvc/tmp/rwlock')
+      )
       .mockResolvedValueOnce("he's ok")
 
     mockedDelay.mockResolvedValue()
@@ -43,12 +49,32 @@ describe('retryUntilResolved', () => {
       .fn()
       .mockImplementation(() => unreliablePromise())
 
-    await retryUntilResolved<string>(promiseRefresher, 'Data update')
+    await retryIfLocked<string>(promiseRefresher, 'Data update')
 
     expect(promiseRefresher).toBeCalledTimes(4)
     expect(mockedDelay).toBeCalledTimes(3)
     expect(mockedDelay).toBeCalledWith(500)
     expect(mockedDelay).toBeCalledWith(1000)
     expect(mockedDelay).toBeCalledWith(2000)
+  })
+
+  it('should not retry if a promise rejects without a lock message', async () => {
+    const unreliablePromise = jest
+      .fn()
+      .mockRejectedValueOnce(new Error('I dead!'))
+      .mockResolvedValueOnce("he's ok")
+
+    mockedDelay.mockResolvedValue()
+
+    const promiseRefresher = jest
+      .fn()
+      .mockImplementation(() => unreliablePromise())
+
+    await expect(
+      retryIfLocked<string>(promiseRefresher, 'Data update')
+    ).rejects.toThrow()
+
+    expect(promiseRefresher).toBeCalledTimes(1)
+    expect(mockedDelay).toBeCalledTimes(0)
   })
 })
