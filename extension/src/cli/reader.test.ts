@@ -15,6 +15,7 @@ jest.mock('@hediet/std/disposable')
 jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
+jest.mock('../common/logger')
 
 const mockedDisposable = mocked(Disposable)
 
@@ -119,6 +120,27 @@ describe('CliReader', () => {
 
       expect(statusOutput).toEqual(cliOutput)
 
+      expect(mockedCreateProcess).toBeCalledWith({
+        args: ['diff', SHOW_JSON],
+        cwd,
+        env: mockedEnv,
+        executable: 'dvc'
+      })
+    })
+
+    it('should retry until the command returns a result', async () => {
+      const cliOutput = ''
+      const cwd = __dirname
+      mockedCreateProcess
+        .mockImplementationOnce(() => {
+          throw new Error('I tried but I could not do it')
+        })
+        .mockReturnValueOnce(getMockedProcess(JSON.stringify(cliOutput)))
+      const statusOutput = await cliReader.diff(cwd)
+
+      expect(statusOutput).toEqual(cliOutput)
+
+      expect(mockedCreateProcess).toBeCalledTimes(2)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['diff', SHOW_JSON],
         cwd,

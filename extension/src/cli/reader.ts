@@ -8,6 +8,7 @@ import {
   ListFlag
 } from './args'
 import { trimAndSplit } from '../util/stdout'
+import { retryUntilResolved } from '../util/promise'
 
 export type PathOutput = { path: string }
 
@@ -189,7 +190,10 @@ export class CliReader extends Cli {
     formatter: typeof trimAndSplit | typeof JSON.parse,
     ...args: Args
   ): Promise<T> {
-    const output = await this.executeProcess(cwd, ...args)
+    const output = await retryUntilResolved(
+      () => this.executeProcess(cwd, ...args),
+      args.join(' ')
+    )
     if (!formatter) {
       return output as unknown as T
     }
