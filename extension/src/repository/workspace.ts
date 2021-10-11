@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Uri, window } from 'vscode'
+import { Uri } from 'vscode'
 import { Repository } from '.'
 import { TrackedExplorerTree } from '../fileSystem/tree'
 import {
@@ -16,7 +16,7 @@ export class WorkspaceRepositories
     return overrideUri?.fsPath || this.getOnlyOrPickProject()
   }
 
-  public async getCwdWithChanges(message: string, overrideUri?: Uri) {
+  public async getCwdWithChanges(overrideUri?: Uri) {
     const cwd = await this.getCwd(overrideUri)
     if (!cwd) {
       return
@@ -24,7 +24,6 @@ export class WorkspaceRepositories
     const changes = this.hasChanges(cwd)
 
     if (!changes) {
-      window.showInformationMessage(message, "Don't Show Again")
       return
     }
 

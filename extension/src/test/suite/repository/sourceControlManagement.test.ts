@@ -90,6 +90,18 @@ suite('Source Control Management Test Suite', () => {
       expect(mockCheckout).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
+    it('should not run dvc commit if there are no changes in the repository', async () => {
+      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(false)
+
+      await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
+
+      expect(mockCommit).not.to.be.called
+      expect(executeCommandSpy).to.be.calledOnce
+    })
+
     it('should focus the git commit text input box after running dvc commit', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
