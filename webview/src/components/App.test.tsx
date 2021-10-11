@@ -76,6 +76,7 @@ describe('App', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
         tableData: {
+          changes: [],
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
