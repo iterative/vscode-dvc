@@ -6,7 +6,6 @@ import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 export class Repository {
@@ -93,25 +92,15 @@ export class Repository {
   private async getUpdateData(): Promise<
     [DiffOutput, StatusOutput, Set<string>]
   > {
-    const getStatusPromise = () =>
-      this.internalCommands.executeCommand<StatusOutput>(
+    const statusOutput =
+      await this.internalCommands.executeCommand<StatusOutput>(
         AvailableCommands.STATUS,
         this.dvcRoot
       )
-    const statusOutput = await retryUntilResolved<StatusOutput>(
-      getStatusPromise,
-      'Repository status update'
-    )
 
-    const getDiffPromise = () =>
-      this.internalCommands.executeCommand<DiffOutput>(
-        AvailableCommands.DIFF,
-        this.dvcRoot
-      )
-
-    const diffOutput = await retryUntilResolved<DiffOutput>(
-      getDiffPromise,
-      'Repository diff update'
+    const diffOutput = await this.internalCommands.executeCommand<DiffOutput>(
+      AvailableCommands.DIFF,
+      this.dvcRoot
     )
 
     const gitOutput = await getAllUntracked(this.dvcRoot)
@@ -124,13 +113,9 @@ export class Repository {
   > {
     const [diffOutput, statusOutput, gitOutput] = await this.getUpdateData()
 
-    const listOutput = await retryUntilResolved<ListOutput[]>(
-      () =>
-        this.internalCommands.executeCommand<ListOutput[]>(
-          AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
-          this.dvcRoot
-        ),
-      'Repository list update'
+    const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
+      AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
+      this.dvcRoot
     )
 
     return [diffOutput, statusOutput, gitOutput, listOutput]

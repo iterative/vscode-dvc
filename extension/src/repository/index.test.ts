@@ -7,7 +7,6 @@ import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { DiffOutput, ListOutput, Status, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { delay } from '../util/time'
 import { InternalCommands } from '../commands/internal'
 import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
@@ -34,8 +33,6 @@ const mockedSetDecorationState = jest.fn()
 mockedDecorationProvider.setState = mockedSetDecorationState
 
 const mockedDisposable = mocked(Disposable)
-
-const mockedDelay = mocked(delay)
 
 const mockedInternalCommands = new InternalCommands(
   {} as Config,
@@ -346,169 +343,6 @@ describe('Repository', () => {
       )
       expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
       expect(repository.hasChanges()).toEqual(true)
-    })
-
-    it('should retry commands on an individual basis (currently synchronous)', async () => {
-      mockedDiff.mockResolvedValueOnce({})
-      mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
-      mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
-
-      const repository = new Repository(
-        dvcRoot,
-        mockedInternalCommands,
-        mockedDecorationProvider
-      )
-      await repository.isReady()
-
-      mockedDiff
-        .mockReset()
-        .mockRejectedValueOnce("I tried but I just couldn't do it")
-        .mockResolvedValueOnce({
-          added: [],
-          deleted: [{ path: model }, { path: dataDir }],
-          modified: [],
-          'not in cache': []
-        } as unknown as DiffOutput)
-
-      mockedStatus
-        .mockReset()
-        .mockResolvedValueOnce({
-          'data/MNIST/raw.dvc': [
-            { 'changed outs': { 'data/MNIST/raw': 'deleted' } }
-          ],
-          train: [
-            {
-              'changed deps': {
-                'data/MNIST': 'modified',
-                'train.py': 'modified'
-              }
-            },
-            { 'changed outs': { 'model.pt': 'deleted' } }
-          ]
-        } as unknown as StatusOutput)
-        .mockRejectedValueOnce('I would have failed on the second attempt')
-
-      mockedGetAllUntracked.mockReset().mockResolvedValueOnce(emptySet)
-
-      mockedListDvcOnlyRecursive
-        .mockReset()
-        .mockResolvedValueOnce([
-          { path: compressedDataset },
-          { path: dataset },
-          { path: logAcc },
-          { path: logLoss },
-          { path: model }
-        ] as ListOutput[])
-
-      expect(repository.getState()).toEqual(emptyState)
-      expect(repository.hasChanges()).toEqual(false)
-      mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
-
-      await repository.reset()
-
-      expect(mockedDelay).toBeCalledTimes(1)
-      expect(mockedDelay).toBeCalledWith(500)
-
-      const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
-
-      const tracked = new Set([
-        resolve(dvcRoot, compressedDataset),
-        resolve(dvcRoot, dataset),
-        resolve(dvcRoot, logAcc),
-        resolve(dvcRoot, logLoss),
-        resolve(dvcRoot, model),
-        resolve(dvcRoot, dataDir),
-        resolve(dvcRoot, logDir)
-      ])
-
-      expect(mockedDiff).toBeCalledTimes(2)
-      expect(mockedStatus).toBeCalledTimes(1)
-      expect(mockedGetAllUntracked).toBeCalledTimes(1)
-      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
-
-      expect(repository.getState()).toEqual({
-        added: emptySet,
-        deleted,
-        gitModified: emptySet,
-        modified: emptySet,
-        notInCache: emptySet,
-        renamed: emptySet,
-        tracked,
-        untracked: emptySet
-      })
-      expect(repository.hasChanges()).toEqual(true)
-    })
-  })
-
-  describe('update', () => {
-    it('should retry commands on an individual basis (currently synchronous)', async () => {
-      mockedDiff.mockResolvedValueOnce({})
-      mockedListDvcOnlyRecursive.mockResolvedValueOnce([
-        { path: dataDir },
-        { path: logDir },
-        { path: model }
-      ] as ListOutput[])
-      mockedStatus.mockResolvedValueOnce({})
-      mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
-
-      const repository = new Repository(
-        dvcRoot,
-        mockedInternalCommands,
-        mockedDecorationProvider
-      )
-      await repository.isReady()
-
-      mockedDiff
-        .mockReset()
-        .mockRejectedValueOnce("I also tried but I just couldn't do it")
-        .mockRejectedValueOnce("I still couldn't do it")
-        .mockResolvedValueOnce({
-          added: [],
-          deleted: [{ path: model }],
-          modified: [{ path: dataDir }],
-          'not in cache': []
-        } as unknown as DiffOutput)
-
-      mockedStatus
-        .mockReset()
-        .mockResolvedValueOnce({})
-        .mockRejectedValueOnce('I would have failed on the second attempt')
-
-      mockedGetAllUntracked.mockReset().mockResolvedValueOnce(emptySet)
-      mockedDelay.mockResolvedValueOnce().mockResolvedValueOnce()
-
-      await repository.update()
-
-      expect(mockedDelay).toBeCalledTimes(2)
-      expect(mockedDelay).toBeCalledWith(500)
-      expect(mockedDelay).toBeCalledWith(1000)
-
-      const deleted = new Set([join(dvcRoot, model)])
-      const gitModified = new Set([join(dvcRoot, dataDir)])
-
-      const tracked = new Set([
-        resolve(dvcRoot, model),
-        resolve(dvcRoot, MNISTDir),
-        resolve(dvcRoot, dataDir),
-        resolve(dvcRoot, logDir)
-      ])
-
-      expect(mockedDiff).toBeCalledTimes(3)
-      expect(mockedStatus).toBeCalledTimes(1)
-      expect(mockedGetAllUntracked).toBeCalledTimes(1)
-      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
-
-      expect(repository.getState()).toEqual({
-        added: emptySet,
-        deleted,
-        gitModified,
-        modified: emptySet,
-        notInCache: emptySet,
-        renamed: emptySet,
-        tracked,
-        untracked: emptySet
-      })
     })
   })
 })
