@@ -65,8 +65,9 @@ describe('App', () => {
 
       it('Then the empty state should be displayed', async () => {
         render(<App />)
-        const emptyState = screen.getByText('Loading experiments...')
-        await waitFor(() => emptyState)
+        const emptyState = await waitFor(() =>
+          screen.getByText('Loading experiments...')
+        )
         expect(emptyState).toBeInTheDocument()
       })
     })
@@ -76,7 +77,6 @@ describe('App', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
         tableData: {
-          changes: [],
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
@@ -90,8 +90,7 @@ describe('App', () => {
         render(<App />)
         fireEvent(customWindow, messageToChangeState)
 
-        const experimentText = screen.queryAllByText('Experiment')
-        await waitFor(() => experimentText)
+        await waitFor(() => screen.queryAllByText('Experiment'))
         const emptyState = screen.queryByText('Loading experiments...')
         expect(emptyState).not.toBeInTheDocument()
       })
