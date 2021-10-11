@@ -199,6 +199,7 @@ describe('Repository', () => {
       ] as ListOutput[])
 
       expect(repository.getState()).toEqual(emptyState)
+      expect(repository.hasChanges()).toEqual(false)
 
       await repository.reset()
 
@@ -229,6 +230,7 @@ describe('Repository', () => {
         tracked,
         untracked: emptySet
       })
+      expect(repository.hasChanges()).toEqual(true)
     })
 
     it("should update the classes state and call it's dependents", async () => {
@@ -300,6 +302,7 @@ describe('Repository', () => {
       mockedGetAllUntracked.mockResolvedValueOnce(untracked)
 
       expect(repository.getState()).toEqual(emptyState)
+      expect(repository.hasChanges()).toEqual(false)
 
       await repository.reset()
 
@@ -339,6 +342,7 @@ describe('Repository', () => {
         repository.getState()
       )
       expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
+      expect(repository.hasChanges()).toEqual(true)
     })
   })
 })

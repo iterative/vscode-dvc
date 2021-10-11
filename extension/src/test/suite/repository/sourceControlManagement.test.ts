@@ -11,6 +11,7 @@ import {
   RegisteredCommands
 } from '../../../commands/external'
 import * as ProcessExecution from '../../../processExecution'
+import { WorkspaceRepositories } from '../../../repository/workspace'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()
@@ -89,9 +90,23 @@ suite('Source Control Management Test Suite', () => {
       expect(mockCheckout).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
+    it('should not run dvc commit if there are no changes in the repository', async () => {
+      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(false)
+
+      await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
+
+      expect(mockCommit).not.to.be.called
+      expect(executeCommandSpy).to.be.calledOnce
+    })
+
     it('should focus the git commit text input box after running dvc commit', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -112,6 +127,8 @@ suite('Source Control Management Test Suite', () => {
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -227,6 +244,8 @@ suite('Source Control Management Test Suite', () => {
     it('should not reset the workspace if the user does not confirm', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
       const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       const mockShowWarningMessage = stub(
         window,
@@ -245,6 +264,8 @@ suite('Source Control Management Test Suite', () => {
     it('should reset the workspace if the user confirms they want to', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
       const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       const mockShowWarningMessage = stub(
         window,

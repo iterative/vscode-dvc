@@ -16,6 +16,20 @@ export class WorkspaceRepositories
     return overrideUri?.fsPath || this.getOnlyOrPickProject()
   }
 
+  public async getCwdWithChanges(overrideUri?: Uri) {
+    const cwd = await this.getCwd(overrideUri)
+    if (!cwd) {
+      return
+    }
+    const changes = this.hasChanges(cwd)
+
+    if (!changes) {
+      return
+    }
+
+    return cwd
+  }
+
   public create(
     dvcRoots: string[],
     trackedExplorerTree: TrackedExplorerTree
@@ -48,5 +62,9 @@ export class WorkspaceRepositories
 
     this.setRepository(dvcRoot, repository)
     return repository
+  }
+
+  private hasChanges(cwd: string) {
+    return this.getRepository(cwd).hasChanges()
   }
 }

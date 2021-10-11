@@ -60,6 +60,16 @@ export class RepositoryModel
     this.updateUntracked(untracked)
   }
 
+  public hasChanges(): boolean {
+    return !!(
+      this.state.added.size ||
+      this.state.deleted.size ||
+      this.state.gitModified.size ||
+      this.state.modified.size ||
+      this.state.renamed.size
+    )
+  }
+
   private filterRootDir(dirs: string[] = []) {
     return dirs.filter(dir => dir !== this.dvcRoot)
   }

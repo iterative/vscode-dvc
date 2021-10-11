@@ -9,6 +9,7 @@ import { RegisteredCliCommands } from '../../../commands/external'
 import { WorkspaceRepositories } from '../../../repository/workspace'
 import * as QuickPick from '../../../vscode/quickPick'
 import { dvcDemoPath } from '../util'
+import { Repository } from '../../../repository'
 
 suite('Workspace Repositories Test Suite', () => {
   const disposable = Disposable.fn()
@@ -35,6 +36,11 @@ suite('Workspace Repositories Test Suite', () => {
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'getRepository').returns({
+        hasChanges: () => true
+      } as Repository)
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT)
 
