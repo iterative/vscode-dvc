@@ -70,6 +70,10 @@ export class Repository {
     return this.processManager.run('update')
   }
 
+  public hasChanges(): boolean {
+    return this.model.hasChanges()
+  }
+
   private async resetState() {
     const [diffFromHead, diffFromCache, untracked, tracked] =
       await this.getResetData()

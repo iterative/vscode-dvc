@@ -88,7 +88,10 @@ export const getCommitRootCommand =
     internalCommands: InternalCommands
   ): RootCommand =>
   async context => {
-    const cwd = await repositories.getCwd(context?.rootUri)
+    const cwd = await repositories.getCwdWithChanges(
+      'There are no changes to commit',
+      context?.rootUri
+    )
 
     if (!cwd) {
       return
@@ -104,7 +107,10 @@ export const getResetRootCommand =
     internalCommands: InternalCommands
   ): RootCommand =>
   async context => {
-    const cwd = await repositories.getCwd(context?.rootUri)
+    const cwd = await repositories.getCwdWithChanges(
+      'There are no changes to reset',
+      context?.rootUri
+    )
 
     if (!cwd) {
       return

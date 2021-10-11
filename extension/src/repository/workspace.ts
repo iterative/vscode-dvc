@@ -1,5 +1,5 @@
 import { join } from 'path'
-import { Uri } from 'vscode'
+import { Uri, window } from 'vscode'
 import { Repository } from '.'
 import { TrackedExplorerTree } from '../fileSystem/tree'
 import {
@@ -14,6 +14,21 @@ export class WorkspaceRepositories
 {
   public getCwd(overrideUri?: Uri): string | Promise<string | undefined> {
     return overrideUri?.fsPath || this.getOnlyOrPickProject()
+  }
+
+  public async getCwdWithChanges(message: string, overrideUri?: Uri) {
+    const cwd = await this.getCwd(overrideUri)
+    if (!cwd) {
+      return
+    }
+    const changes = this.hasChanges(cwd)
+
+    if (!changes) {
+      window.showInformationMessage(message, "Don't Show Again")
+      return
+    }
+
+    return cwd
   }
 
   public create(
@@ -48,5 +63,9 @@ export class WorkspaceRepositories
 
     this.setRepository(dvcRoot, repository)
     return repository
+  }
+
+  private hasChanges(cwd: string) {
+    return this.getRepository(cwd).hasChanges()
   }
 }
