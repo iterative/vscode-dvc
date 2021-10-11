@@ -22,7 +22,7 @@ const addFileAssociations = () => {
 
 export const askUserToAssociateYaml = async () => {
   const response = await getYesOrNoOrNever(
-    'Would you like to associate files with the ".dvc" extension and "dvc.lock" files with yaml'
+    'Would you like to have "dvc.lock" and ".dvc" files recognized as YAML?'
   )
 
   if (response === Response.yes) {
