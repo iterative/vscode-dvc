@@ -13,12 +13,7 @@ import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
-import { retryUntilResolved } from '../util/promise'
-import {
-  AvailableCommands,
-  CommandId,
-  InternalCommands
-} from '../commands/internal'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import {
   DiffParamsOrMetricsOutput,
@@ -242,10 +237,11 @@ export class Experiments {
   }
 
   private async updateExperimentsData(): Promise<void> {
-    const data = await this.retryUntilResolved<ExperimentsRepoJSONOutput>(
-      AvailableCommands.EXPERIMENT_SHOW,
-      'Experiments table update'
-    )
+    const data =
+      await this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
+        AvailableCommands.EXPERIMENT_SHOW,
+        this.dvcRoot
+      )
 
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),
@@ -256,15 +252,16 @@ export class Experiments {
   }
 
   private async updateParamsAndMetricsDiffData() {
-    const paramsDiff = await this.retryUntilResolved<DiffParamsOrMetricsOutput>(
-      AvailableCommands.PARAMS_DIFF,
-      'Params diff update'
-    )
+    const paramsDiff =
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
+        AvailableCommands.PARAMS_DIFF,
+        this.dvcRoot
+      )
 
     const metricsDiff =
-      await this.retryUntilResolved<DiffParamsOrMetricsOutput>(
+      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
         AvailableCommands.METRICS_DIFF,
-        'Metrics diff update'
+        this.dvcRoot
       )
 
     this.paramsAndMetrics.setChanges({
@@ -273,13 +270,6 @@ export class Experiments {
     })
 
     return this.notifyChanged()
-  }
-
-  private retryUntilResolved<T>(command: CommandId, retryMessage: string) {
-    return retryUntilResolved<T>(
-      () => this.internalCommands.executeCommand<T>(command, this.dvcRoot),
-      retryMessage
-    )
   }
 
   private notifyChanged() {
