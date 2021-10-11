@@ -2,6 +2,8 @@ import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import { window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
+import { getYesOrNoOrNever } from './toast'
+import { Response } from './response'
 
 const fileAssociationsKey = 'files.associations'
 const doNotAssociateYaml = 'dvc.doNotAssociateYaml'
@@ -19,18 +21,15 @@ const addFileAssociations = () => {
 }
 
 export const askUserToAssociateYaml = async () => {
-  const response = await window.showInformationMessage(
-    'Would you like to associate files with the ".dvc" extension and "dvc.lock" files with yaml',
-    'Yes',
-    'No',
-    "Don't Show Again"
+  const response = await getYesOrNoOrNever(
+    'Would you like to associate files with the ".dvc" extension and "dvc.lock" files with yaml'
   )
 
-  if (response === 'Yes') {
+  if (response === Response.yes) {
     return addFileAssociations()
   }
 
-  if (response === "Don't Show Again") {
+  if (response === Response.never) {
     return setUserConfigValue(doNotAssociateYaml, true)
   }
 }

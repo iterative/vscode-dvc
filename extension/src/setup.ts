@@ -7,6 +7,7 @@ import {
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
 import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
+import { Response } from './vscode/response'
 
 const setupTitle = 'Setup the workspace'
 
@@ -105,12 +106,12 @@ const quickPickVenvOption = () =>
     [
       {
         description: 'use the interpreter selected by the ms-python extension',
-        label: 'Yes',
+        label: Response.yes,
         value: 2
       },
       {
         description: 'and I want to select the python interpreter',
-        label: 'Yes',
+        label: Response.yes,
         value: 1
       },
 
