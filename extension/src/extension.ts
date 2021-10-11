@@ -42,6 +42,7 @@ import {
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
+import { tryAssociateYamlOnce } from './vscode/languageAssociation'
 
 export { Disposable, Disposer }
 
@@ -263,6 +264,7 @@ export class Extension implements IExtension {
     )
 
     showWalkthroughOnFirstUse(context.globalState)
+    this.dispose.track(tryAssociateYamlOnce())
   }
 
   public async canRunCli(cwd: string) {
