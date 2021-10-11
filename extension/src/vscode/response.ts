@@ -1,5 +1,10 @@
 export enum Response {
-  yes = 'Yes',
-  no = 'No',
-  never = "Don't Show Again"
+  YES = 'Yes',
+  NO = 'No',
+  NEVER = "Don't Show Again",
+  DISCARD = 'Discard Changes',
+  FORCE = 'Force',
+  MOVE = 'Move',
+  SHOW = 'Show',
+  CLOSE = 'Close'
 }
