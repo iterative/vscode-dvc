@@ -49,16 +49,14 @@ const alreadyAssociated = (): boolean => {
 }
 
 export const tryAssociateYamlOnce = (): Disposable => {
-  const singleUseListener = window.onDidChangeActiveTextEditor(async editor => {
-    const fileName = editor?.document.fileName
+  const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
+    if (alreadyAssociated() || getConfigValue(doNotAssociateYaml)) {
+      return singleUseListener.dispose()
+    }
 
-    if (isFileType(fileName)) {
-      if (alreadyAssociated() || getConfigValue(doNotAssociateYaml)) {
-        return
-      }
-
-      await askUserToAssociateYaml()
-      singleUseListener.dispose()
+    if (isFileType(editor?.document.fileName)) {
+      askUserToAssociateYaml()
+      return singleUseListener.dispose()
     }
   })
   return singleUseListener
