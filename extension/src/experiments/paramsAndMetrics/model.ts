@@ -161,14 +161,7 @@ export class ParamsAndMetricsModel {
   }
 
   private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {
-    const changes = collectChanges(data)
-
-    if (sameContents(this.paramsAndMetricsChanges, changes)) {
-      return
-    }
-
-    this.paramsAndMetricsChanges = changes
-    this.paramsAndMetricsFilesChanged.fire()
+    this.paramsAndMetricsChanges = collectChanges(data)
   }
 
   private setAreChildrenSelected(path: string, status: Status) {

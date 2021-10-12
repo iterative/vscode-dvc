@@ -14,6 +14,7 @@ import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
+import { ParamsAndMetricsModel } from '../../../../../experiments/paramsAndMetrics/model'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -34,6 +35,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
+      // remove in next PR
+      stub(ParamsAndMetricsModel.prototype, 'getChanges').returns([])
+
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 

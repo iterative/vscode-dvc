@@ -24,6 +24,7 @@ import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
+import { ParamsAndMetricsModel } from '../../../experiments/paramsAndMetrics/model'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -98,6 +99,12 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
+      // remove in next PR
+      stub(ParamsAndMetricsModel.prototype, 'getChanges').returns([
+        'metrics:summary.json:loss',
+        'params:params.yaml:learning_rate'
+      ])
+
       const { experiments } = buildExperiments(
         disposable,
         complexExperimentsOutput,
