@@ -1,6 +1,10 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectFiles, collectParamsAndMetrics } from './collect'
+import {
+  collectChanges,
+  collectFiles,
+  collectParamsAndMetrics
+} from './collect'
 import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
@@ -54,7 +58,8 @@ export class ParamsAndMetricsModel {
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     return Promise.all([
       this.transformAndSetParamsAndMetrics(data),
-      this.transformAndSetFiles(data)
+      this.transformAndSetFiles(data),
+      this.transformAndSetChanges(data)
     ])
   }
 
@@ -152,6 +157,17 @@ export class ParamsAndMetricsModel {
     }
 
     this.files = files
+    this.paramsAndMetricsFilesChanged.fire()
+  }
+
+  private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {
+    const changes = collectChanges(data)
+
+    if (sameContents(this.paramsAndMetricsChanges, changes)) {
+      return
+    }
+
+    this.paramsAndMetricsChanges = changes
     this.paramsAndMetricsFilesChanged.fire()
   }
 

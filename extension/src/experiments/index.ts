@@ -15,10 +15,7 @@ import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
-import {
-  DiffParamsOrMetricsOutput,
-  ExperimentsRepoJSONOutput
-} from '../cli/reader'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -232,11 +229,6 @@ export class Experiments {
   }
 
   private async updateData(): Promise<void> {
-    await this.updateExperimentsData()
-    return this.updateParamsAndMetricsDiffData()
-  }
-
-  private async updateExperimentsData(): Promise<void> {
     const data =
       await this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
         AvailableCommands.EXPERIMENT_SHOW,
@@ -247,27 +239,6 @@ export class Experiments {
       this.paramsAndMetrics.transformAndSet(data),
       this.experiments.transformAndSet(data)
     ])
-
-    return this.notifyChanged()
-  }
-
-  private async updateParamsAndMetricsDiffData() {
-    const paramsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-        AvailableCommands.PARAMS_DIFF,
-        this.dvcRoot
-      )
-
-    const metricsDiff =
-      await this.internalCommands.executeCommand<DiffParamsOrMetricsOutput>(
-        AvailableCommands.METRICS_DIFF,
-        this.dvcRoot
-      )
-
-    this.paramsAndMetrics.setChanges({
-      metrics: metricsDiff,
-      params: paramsDiff
-    })
 
     return this.notifyChanged()
   }
