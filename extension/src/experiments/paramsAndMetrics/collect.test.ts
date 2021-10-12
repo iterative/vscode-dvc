@@ -1,5 +1,9 @@
 import { join } from 'path'
-import { collectFiles, collectParamsAndMetrics } from './collect'
+import {
+  collectChanges,
+  collectFiles,
+  collectParamsAndMetrics
+} from './collect'
 import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
 import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
@@ -421,6 +425,114 @@ describe('collectFiles', () => {
       'nested/params.yaml',
       'params.yaml',
       'summary.json'
+    ])
+  })
+})
+
+describe('collectChanges', () => {
+  const mockedBaseline = {
+    baseline: {
+      data: {
+        metrics: {
+          'logs.json': {
+            data: { acc: 0.752, loss: 1.1647908687591553, step: 9 }
+          }
+        },
+        params: {
+          'params.yaml': {
+            data: { lr: 0.0005, seed: 473987, weight_decay: 0 }
+          }
+        }
+      }
+    }
+  }
+
+  it('should return an empty array if there are no changes from the current commit and the workspace', () => {
+    const currentCommit = 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+    const data: ExperimentsRepoJSONOutput = {
+      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedBaseline,
+      workspace: mockedBaseline
+    }
+
+    expect(collectChanges(data, currentCommit)).toEqual([])
+  })
+
+  it('should collect the changes between the current commit and the workspace', () => {
+    const currentCommit = 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+    const data: ExperimentsRepoJSONOutput = {
+      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
+        baseline: {
+          data: {}
+        }
+      },
+      workspace: mockedBaseline
+    }
+
+    expect(collectChanges(data, currentCommit)).toEqual([
+      'metrics:logs.json:acc',
+      'metrics:logs.json:loss',
+      'metrics:logs.json:step',
+      'params:params.yaml:lr',
+      'params:params.yaml:seed',
+      'params:params.yaml:weight_decay'
+    ])
+  })
+
+  it('should collect the changes between the current commit and the workspace when the values are nested', () => {
+    const currentCommit = 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
+
+    const mockedCommitDropoutData = {
+      baseline: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: {
+                dropout: {
+                  lower: { p: { '0.025': 0.45, '0.05': 0.5 } },
+                  upper: { p: { '0.025': 0.9, '0.05': 0.85 } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const mockedWorkspaceDropoutData = {
+      baseline: {
+        data: {
+          params: {
+            'params.yaml': {
+              data: {
+                dropout: {
+                  lower: { p: { '0.025': 0.45, '0.05': 0.55 } },
+                  upper: { p: { '0.025': 0.7, '0.05': 0.85 } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const mockedCommitData = Object.assign(
+      { ...mockedBaseline },
+      { ...mockedCommitDropoutData }
+    )
+
+    const mockedWorkspaceData = Object.assign(
+      { ...mockedBaseline },
+      { ...mockedWorkspaceDropoutData }
+    )
+
+    const data: ExperimentsRepoJSONOutput = {
+      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedCommitData,
+      workspace: mockedWorkspaceData
+    }
+
+    expect(collectChanges(data, currentCommit)).toEqual([
+      'params:params.yaml:dropout.lower.p.0.05',
+      'params:params.yaml:dropout.upper.p.0.025'
     ])
   })
 })

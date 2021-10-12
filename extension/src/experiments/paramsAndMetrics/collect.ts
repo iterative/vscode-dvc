@@ -1,3 +1,4 @@
+import get from 'lodash/get'
 import { reduceParamsAndMetrics } from './reduce'
 import { joinParamOrMetricPath } from './paths'
 import {
@@ -10,7 +11,8 @@ import {
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
-  ValueTree
+  ValueTree,
+  ValueTreeRoot
 } from '../../cli/reader'
 
 interface PartialDescriptor extends ParamOrMetricAggregateData {
@@ -269,4 +271,74 @@ export const collectFiles = (data: ExperimentsRepoJSONOutput): string[] => {
     }
   }
   return [...files]
+}
+
+const collectChange = (
+  changes: string[],
+  type: 'params' | 'metrics',
+  file: string,
+  key: string,
+  value: Value | ValueTree,
+  commitData: ValueTreeRoot,
+  ancestors: string[] = []
+) => {
+  if (typeof value === 'object') {
+    Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
+      return collectChange(
+        changes,
+        type,
+        file,
+        childKey,
+        childValue,
+        commitData,
+        [...ancestors, key]
+      )
+    })
+    return
+  }
+
+  if (get(commitData, [file, 'data', ...ancestors, key]) !== value) {
+    changes.push(joinParamOrMetricPath(type, file, ...ancestors, key))
+  }
+}
+
+const collectParamsOrMetricsChanges = (
+  changes: string[],
+  type: 'params' | 'metrics',
+  workspaceData: ValueTreeRoot,
+  commitData: ValueTreeRoot
+) => {
+  Object.entries(workspaceData).forEach(([file, value]) => {
+    const data = value.data
+    if (!data) {
+      return
+    }
+
+    Object.entries(data).forEach(([key, value]) =>
+      collectChange(changes, type, file, key, value, commitData)
+    )
+  })
+}
+
+export const collectChanges = (
+  data: ExperimentsRepoJSONOutput,
+  currentCommit: string
+): string[] => {
+  const changes: string[] = []
+
+  collectParamsOrMetricsChanges(
+    changes,
+    'metrics',
+    data.workspace.baseline.data?.metrics || {},
+    data[currentCommit]?.baseline?.data?.metrics || {}
+  )
+
+  collectParamsOrMetricsChanges(
+    changes,
+    'params',
+    data.workspace.baseline.data?.params || {},
+    data[currentCommit]?.baseline?.data?.params || {}
+  )
+
+  return changes
 }
