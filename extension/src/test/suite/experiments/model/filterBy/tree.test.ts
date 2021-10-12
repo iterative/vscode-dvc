@@ -47,28 +47,28 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const lossPath = joinParamOrMetricPath(
+      const accuracyPath = joinParamOrMetricPath(
         'metrics',
         'summary.json',
         'accuracy'
       )
 
-      const lossFilter = {
+      const accuracyFilter = {
         operator: Operator.GREATER_THAN_OR_EQUAL,
-        path: lossPath,
+        path: accuracyPath,
         value: '0.45'
       }
 
-      const loss = complexColumnData.find(
-        paramOrMetric => paramOrMetric.path === lossPath
+      const accuracy = complexColumnData.find(
+        paramOrMetric => paramOrMetric.path === accuracyPath
       )
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: lossFilter.operator } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(lossFilter.value)
+        .resolves({ value: accuracy } as unknown as QuickPickItem)
+      mockShowQuickPick.onSecondCall().resolves({
+        value: accuracyFilter.operator
+      } as unknown as QuickPickItem)
+      mockShowInputBox.resolves(accuracyFilter.value)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
@@ -123,10 +123,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
         {
-          description: lossPath,
+          description: accuracyPath,
           dvcRoot: dvcDemoPath,
-          id: getFilterId(lossFilter),
-          label: [lossFilter.operator, lossFilter.value].join(' ')
+          id: getFilterId(accuracyFilter),
+          label: [accuracyFilter.operator, accuracyFilter.value].join(' ')
         }
       )
       await tableFilterRemoved
