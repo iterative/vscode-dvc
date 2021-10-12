@@ -448,17 +448,15 @@ describe('collectChanges', () => {
   }
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
-    const currentCommit = 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
     const data: ExperimentsRepoJSONOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedBaseline,
       workspace: mockedBaseline
     }
 
-    expect(collectChanges(data, currentCommit)).toEqual([])
+    expect(collectChanges(data)).toEqual([])
   })
 
   it('should collect the changes between the current commit and the workspace', () => {
-    const currentCommit = 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
     const data: ExperimentsRepoJSONOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
         baseline: {
@@ -468,7 +466,7 @@ describe('collectChanges', () => {
       workspace: mockedBaseline
     }
 
-    expect(collectChanges(data, currentCommit)).toEqual([
+    expect(collectChanges(data)).toEqual([
       'metrics:logs.json:acc',
       'metrics:logs.json:loss',
       'metrics:logs.json:step',
@@ -479,8 +477,6 @@ describe('collectChanges', () => {
   })
 
   it('should collect the changes between the current commit and the workspace when the values are nested', () => {
-    const currentCommit = 'f8a6ee1997b193ebc774837a284081ff9e8dc2d5'
-
     const mockedCommitDropoutData = {
       baseline: {
         data: {
@@ -530,7 +526,7 @@ describe('collectChanges', () => {
       workspace: mockedWorkspaceData
     }
 
-    expect(collectChanges(data, currentCommit)).toEqual([
+    expect(collectChanges(data)).toEqual([
       'params:params.yaml:dropout.lower.p.0.05',
       'params:params.yaml:dropout.upper.p.0.025'
     ])

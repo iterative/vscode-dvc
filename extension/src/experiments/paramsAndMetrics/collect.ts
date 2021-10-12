@@ -320,24 +320,40 @@ const collectParamsOrMetricsChanges = (
   })
 }
 
-export const collectChanges = (
-  data: ExperimentsRepoJSONOutput,
-  currentCommit: string
-): string[] => {
+const getParamsOrMetrics = (
+  type: 'params' | 'metrics',
+  value: {
+    baseline: ExperimentFieldsOrError
+  }
+) => value.baseline.data?.[type] || {}
+
+export const collectChanges = (data: ExperimentsRepoJSONOutput): string[] => {
   const changes: string[] = []
+
+  const { workspaceParams, workspaceMetrics, commitParams, commitMetrics } =
+    Object.entries(data).reduce((acc, [key, value]) => {
+      if (key === 'workspace') {
+        acc.workspaceParams = value.baseline.data?.params || {}
+        acc.workspaceMetrics = value.baseline.data?.metrics || {}
+        return acc
+      }
+      acc.commitParams = getParamsOrMetrics('params', value)
+      acc.commitMetrics = getParamsOrMetrics('metrics', value)
+      return acc
+    }, {} as Record<string, ValueTreeRoot>)
 
   collectParamsOrMetricsChanges(
     changes,
     'metrics',
-    data.workspace.baseline.data?.metrics || {},
-    data[currentCommit]?.baseline?.data?.metrics || {}
+    workspaceMetrics,
+    commitMetrics
   )
 
   collectParamsOrMetricsChanges(
     changes,
     'params',
-    data.workspace.baseline.data?.params || {},
-    data[currentCommit]?.baseline?.data?.params || {}
+    workspaceParams,
+    commitParams
   )
 
   return changes
