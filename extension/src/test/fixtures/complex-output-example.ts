@@ -50,8 +50,8 @@ const data: ExperimentsRepoJSONOutput = {
               learning_rate: 2.1e-7,
               dvc_logs_dir: 'dvc_logs',
               log_file: 'logs.csv',
-              dropout: 0.124,
-              process: { threshold: 0.85 }
+              dropout: 0.122,
+              process: { threshold: 0.86, test_arg: 'string' }
             }
           },
           [join('nested', 'params.yaml')]: {
