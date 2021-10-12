@@ -9,6 +9,7 @@ import {
 } from '../../commands/internal'
 import { gitReset, gitResetWorkspace, gitStageAll } from '../../git'
 import { getWarningResponse } from '../../vscode/modal'
+import { Response } from '../../vscode/response'
 import { WorkspaceRepositories } from '../workspace'
 
 export type Resource = {
@@ -114,10 +115,10 @@ export const getResetRootCommand =
       'Are you sure you want to discard ALL workspace changes?\n' +
         'This is IRREVERSIBLE!\n' +
         'Your current working set will be FOREVER LOST if you proceed.',
-      'Discard Changes'
+      Response.DISCARD
     )
 
-    if (response !== 'Discard Changes') {
+    if (response !== Response.DISCARD) {
       return
     }
 

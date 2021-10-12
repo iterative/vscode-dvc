@@ -72,12 +72,12 @@ export const quickPickYesOrNo = (
     [
       {
         description: descriptionYes,
-        label: Response.yes,
+        label: Response.YES,
         value: true
       },
       {
         description: descriptionNo,
-        label: Response.no,
+        label: Response.NO,
         value: false
       }
     ],

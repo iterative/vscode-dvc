@@ -6,7 +6,7 @@ export const getYesOrNoOrNever = (
 ): Thenable<string | undefined> =>
   window.showInformationMessage(
     message,
-    Response.yes,
-    Response.no,
-    Response.never
+    Response.YES,
+    Response.NO,
+    Response.NEVER
   )
