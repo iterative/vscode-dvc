@@ -1,6 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
 import { getWarningResponse } from './modal'
+import { Response } from './response'
 
 const mockedWindow = mocked(window)
 const mockedShowWarningMessage = jest.fn()
@@ -16,10 +17,10 @@ beforeEach(() => {
 
 describe('getWarningResponse', () => {
   it('should return the text of the response provided by the user', async () => {
-    const userSelection = 'yes'
-    const options = [userSelection, 'no', "don't ask again"]
+    const userSelection = Response.YES
+    const options = [userSelection, Response.NO, Response.NEVER]
 
-    mockedShowWarningMessage.mockResolvedValueOnce('yes')
+    mockedShowWarningMessage.mockResolvedValueOnce(Response.YES)
 
     const response = await getWarningResponse('WHAT DO I DO?', ...options)
 
@@ -29,7 +30,7 @@ describe('getWarningResponse', () => {
 
   it('should return undefined if the modal is cancelled', async () => {
     const modalCancelled = undefined
-    const options = ['yes', 'no', "don't ask again"]
+    const options = [Response.YES, Response.NO, Response.NEVER]
 
     mockedShowWarningMessage.mockResolvedValueOnce(modalCancelled)
 
