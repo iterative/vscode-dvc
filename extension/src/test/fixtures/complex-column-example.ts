@@ -115,7 +115,7 @@ const data: ParamOrMetric[] = [
     parentPath: 'metrics:summary.json',
     path: 'metrics:summary.json:loss',
     maxStringLength: 18,
-    minNumber: 1.6168506622314454,
+    minNumber: 1.775016188621521,
     maxNumber: 2.048856019973755,
     types: ['number']
   },

@@ -47,24 +47,28 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
+      const accuracyPath = joinParamOrMetricPath(
+        'metrics',
+        'summary.json',
+        'accuracy'
+      )
 
-      const lossFilter = {
-        operator: Operator.LESS_THAN_OR_EQUAL,
-        path: lossPath,
-        value: '1.6170'
+      const accuracyFilter = {
+        operator: Operator.GREATER_THAN_OR_EQUAL,
+        path: accuracyPath,
+        value: '0.45'
       }
 
-      const loss = complexColumnData.find(
-        paramOrMetric => paramOrMetric.path === lossPath
+      const accuracy = complexColumnData.find(
+        paramOrMetric => paramOrMetric.path === accuracyPath
       )
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: lossFilter.operator } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(lossFilter.value)
+        .resolves({ value: accuracy } as unknown as QuickPickItem)
+      mockShowQuickPick.onSecondCall().resolves({
+        value: accuracyFilter.operator
+      } as unknown as QuickPickItem)
+      mockShowInputBox.resolves(accuracyFilter.value)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
@@ -82,21 +86,25 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const [workspace, testBranch, master] = complexRowData
+      const [workspace, master] = complexRowData
 
       const filteredRows = [
         workspace,
         {
-          ...testBranch,
-          subRows: testBranch.subRows?.map(experiment => ({
-            ...experiment,
-            subRows: experiment.subRows?.filter(checkpoint => {
-              const loss = checkpoint.metrics?.['summary.json']?.loss
-              return loss && loss <= 1.617
+          ...master,
+          subRows: master.subRows
+            ?.filter(experiment => {
+              const accuracy = experiment.metrics?.['summary.json']?.accuracy
+              return accuracy && accuracy >= 0.45
             })
-          }))
-        },
-        { ...master, subRows: [] }
+            .map(experiment => ({
+              ...experiment,
+              subRows: experiment.subRows?.filter(checkpoint => {
+                const accuracy = checkpoint.metrics?.['summary.json']?.accuracy
+                return accuracy && accuracy >= 0.45
+              })
+            }))
+        }
       ]
 
       expect(messageSpy).to.be.calledWith({
@@ -115,10 +123,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
         {
-          description: lossPath,
+          description: accuracyPath,
           dvcRoot: dvcDemoPath,
-          id: getFilterId(lossFilter),
-          label: [lossFilter.operator, lossFilter.value].join(' ')
+          id: getFilterId(accuracyFilter),
+          label: [accuracyFilter.operator, accuracyFilter.value].join(' ')
         }
       )
       await tableFilterRemoved
