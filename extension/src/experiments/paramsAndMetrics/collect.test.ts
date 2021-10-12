@@ -430,7 +430,7 @@ describe('collectFiles', () => {
 })
 
 describe('collectChanges', () => {
-  const mockedBaseline = {
+  const mockedExperimentData = {
     baseline: {
       data: {
         metrics: {
@@ -449,8 +449,8 @@ describe('collectChanges', () => {
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
     const data: ExperimentsRepoJSONOutput = {
-      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedBaseline,
-      workspace: mockedBaseline
+      f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData,
+      workspace: mockedExperimentData
     }
 
     expect(collectChanges(data)).toEqual([])
@@ -463,7 +463,7 @@ describe('collectChanges', () => {
           data: {}
         }
       },
-      workspace: mockedBaseline
+      workspace: mockedExperimentData
     }
 
     expect(collectChanges(data)).toEqual([
@@ -512,12 +512,12 @@ describe('collectChanges', () => {
     }
 
     const mockedCommitData = Object.assign(
-      { ...mockedBaseline },
+      { ...mockedExperimentData },
       { ...mockedCommitDropoutData }
     )
 
     const mockedWorkspaceData = Object.assign(
-      { ...mockedBaseline },
+      { ...mockedExperimentData },
       { ...mockedWorkspaceDropoutData }
     )
 
