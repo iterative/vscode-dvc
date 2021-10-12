@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
@@ -116,9 +116,11 @@ describe('Table', () => {
       renderTable([{ descending, path: 'timestamp' }], newInstance)
     }
 
-    it('should not have any sorting classes if the sorts property is empty', () => {
+    it('should not have any sorting classes if the sorts property is empty', async () => {
       renderTable()
-      const column = screen.getByText('Timestamp')?.parentElement
+      const column = await waitFor(
+        () => screen.getByText('Timestamp')?.parentElement
+      )
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         false
@@ -128,10 +130,12 @@ describe('Table', () => {
       )
     })
 
-    it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', () => {
+    it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
       renderTable([{ descending: false, path: 'timestamp' }])
 
-      const column = screen.getByText('Timestamp')?.parentElement
+      const column = await waitFor(
+        () => screen.getByText('Timestamp')?.parentElement
+      )
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         false
@@ -139,10 +143,12 @@ describe('Table', () => {
       expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(true)
     })
 
-    it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', () => {
+    it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
       renderTable([{ descending: true, path: 'timestamp' }])
 
-      const column = screen.getByText('Timestamp')?.parentElement
+      const column = await waitFor(
+        () => screen.getByText('Timestamp')?.parentElement
+      )
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         true
@@ -152,38 +158,46 @@ describe('Table', () => {
       )
     })
 
-    it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', () => {
+    it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', async () => {
       renderTableWithPlaceholder(false)
 
-      const header = screen.getByTestId(`header-${placeholderId}`)
+      const header = await waitFor(() =>
+        screen.getByTestId(`header-${placeholderId}`)
+      )
 
       expect(header?.className.includes(styles.sortingHeaderCellAsc)).toBe(true)
     })
 
-    it('should not apply the sorting class if there is a placeholder above the column header when the sort is ascending', () => {
+    it('should not apply the sorting class if there is a placeholder above the column header when the sort is ascending', async () => {
       renderTableWithPlaceholder(false)
 
-      const column = screen.getByText('Timestamp')?.parentElement
+      const column = await waitFor(
+        () => screen.getByText('Timestamp')?.parentElement
+      )
 
       expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(
         false
       )
     })
 
-    it('should not apply the sorting class if the cell is a placeholder above the column header when the sort is descending', () => {
+    it('should not apply the sorting class if the cell is a placeholder above the column header when the sort is descending', async () => {
       renderTableWithPlaceholder(true)
 
-      const header = screen.getByTestId(`header-${placeholderId}`)
+      const header = await waitFor(() =>
+        screen.getByTestId(`header-${placeholderId}`)
+      )
 
       expect(header?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         false
       )
     })
 
-    it('should apply the sorting class if there is a placeholder above the column header when the sort is descending', () => {
+    it('should apply the sorting class if there is a placeholder above the column header when the sort is descending', async () => {
       renderTableWithPlaceholder(true)
 
-      const column = screen.getByText('Timestamp')?.parentElement
+      const column = await waitFor(
+        () => screen.getByText('Timestamp')?.parentElement
+      )
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         true
@@ -192,42 +206,48 @@ describe('Table', () => {
   })
 
   describe('Changes', () => {
-    it('should not have the workspaceWithChanges class on a row if there are no workspace changes', () => {
+    it('should not have the workspaceWithChanges class on a row if there are no workspace changes', async () => {
       renderTable()
 
-      const row = screen.getByTestId('workspace-row')
+      const row = await waitFor(() => screen.getByTestId('workspace-row'))
 
       expect(row?.className.includes(styles.workspaceWithChanges)).toBe(false)
     })
 
-    it('should have the workspaceWithChanges class on a row if there are workspace changes', () => {
+    it('should have the workspaceWithChanges class on a row if there are workspace changes', async () => {
       renderTable(undefined, undefined, ['something_changed'])
 
-      const row = screen.getByTestId('workspace-row')
+      const row = await waitFor(() => screen.getByTestId('workspace-row'))
 
       expect(row?.className.includes(styles.workspaceWithChanges)).toBe(true)
     })
 
-    it('should not have the workspaceChange class on a cell if there are no changes', () => {
+    it('should not have the workspaceChange class on a cell if there are no changes', async () => {
       renderTable()
 
-      const row = screen.getByTestId('timestamp___workspace')
+      const row = await waitFor(() =>
+        screen.getByTestId('timestamp___workspace')
+      )
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
 
-    it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', () => {
+    it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
       renderTable(undefined, undefined, ['a_change'])
 
-      const row = screen.getByTestId('timestamp___workspace')
+      const row = await waitFor(() =>
+        screen.getByTestId('timestamp___workspace')
+      )
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
 
-    it('should have the workspaceChange class on a cell if there are changes matching the column id', () => {
+    it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
       renderTable(undefined, undefined, ['timestamp'])
 
-      const row = screen.getByTestId('timestamp___workspace')
+      const row = await waitFor(() =>
+        screen.getByTestId('timestamp___workspace')
+      )
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(true)
     })
