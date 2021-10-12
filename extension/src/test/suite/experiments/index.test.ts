@@ -68,7 +68,6 @@ suite('Experiments Test Suite', () => {
 
       expect(runs.map(experiment => experiment.displayName)).to.deep.equal([
         'workspace',
-        'exp-05694',
         'exp-e7a67',
         'test-branch',
         'exp-83425',
@@ -88,12 +87,12 @@ suite('Experiments Test Suite', () => {
       expect(notCheckpoints).to.be.undefined
 
       const checkpoints = experiments.getCheckpoints(
-        'd3f4a0d3661c5977540d2205d819470cf0d2145a'
+        '4fb124aebddb2adf1545030907687fa9a4c80e70'
       )
 
       expect(
         checkpoints?.map(checkpoint => checkpoint.displayName)
-      ).to.deep.equal(['f0778b3', 'f81f1b5'])
+      ).to.deep.equal(['d1343a8', '1ee5f2e'])
     })
   })
 

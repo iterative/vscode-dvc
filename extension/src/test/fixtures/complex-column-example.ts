@@ -1,8 +1,4 @@
-import { join } from '../../test/util/path'
 import { ParamOrMetric } from '../../experiments/webview/contract'
-import { joinParamOrMetricPath } from '../../experiments/paramsAndMetrics/paths'
-
-const nestedParamsFile = join('nested', 'params.yaml')
 
 const data: ParamOrMetric[] = [
   {
@@ -96,17 +92,17 @@ const data: ParamOrMetric[] = [
     group: 'params',
     hasChildren: false,
     name: 'test',
-    parentPath: joinParamOrMetricPath('params', nestedParamsFile),
-    path: joinParamOrMetricPath('params', nestedParamsFile, 'test'),
+    parentPath: 'params:nested/params.yaml',
+    path: 'params:nested/params.yaml:test',
     maxStringLength: 4,
     types: ['boolean']
   },
   {
     group: 'params',
     hasChildren: true,
-    name: nestedParamsFile,
+    name: 'nested/params.yaml',
     parentPath: 'params',
-    path: joinParamOrMetricPath('params', nestedParamsFile)
+    path: 'params:nested/params.yaml'
   },
   {
     group: 'metrics',
@@ -115,7 +111,7 @@ const data: ParamOrMetric[] = [
     parentPath: 'metrics:summary.json',
     path: 'metrics:summary.json:loss',
     maxStringLength: 18,
-    minNumber: 1.6168506622314454,
+    minNumber: 1.775016188621521,
     maxNumber: 2.048856019973755,
     types: ['number']
   },

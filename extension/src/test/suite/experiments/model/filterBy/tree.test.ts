@@ -47,12 +47,16 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
+      const lossPath = joinParamOrMetricPath(
+        'metrics',
+        'summary.json',
+        'accuracy'
+      )
 
       const lossFilter = {
-        operator: Operator.LESS_THAN_OR_EQUAL,
+        operator: Operator.GREATER_THAN_OR_EQUAL,
         path: lossPath,
-        value: '1.6170'
+        value: '0.45'
       }
 
       const loss = complexColumnData.find(
@@ -82,21 +86,25 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const [workspace, testBranch, master] = complexRowData
+      const [workspace, master] = complexRowData
 
       const filteredRows = [
         workspace,
         {
-          ...testBranch,
-          subRows: testBranch.subRows?.map(experiment => ({
-            ...experiment,
-            subRows: experiment.subRows?.filter(checkpoint => {
-              const loss = checkpoint.metrics?.['summary.json']?.loss
-              return loss && loss <= 1.617
+          ...master,
+          subRows: master.subRows
+            ?.filter(experiment => {
+              const accuracy = experiment.metrics?.['summary.json']?.accuracy
+              return accuracy && accuracy >= 0.45
             })
-          }))
-        },
-        { ...master, subRows: [] }
+            .map(experiment => ({
+              ...experiment,
+              subRows: experiment.subRows?.filter(checkpoint => {
+                const accuracy = checkpoint.metrics?.['summary.json']?.accuracy
+                return accuracy && accuracy >= 0.45
+              })
+            }))
+        }
       ]
 
       expect(messageSpy).to.be.calledWith({
