@@ -20,14 +20,6 @@ export type DiffOutput = {
   'not in cache'?: PathOutput[]
 }
 
-export type DiffParamsOrMetricsOutput =
-  | {
-      [filename: string]: {
-        [paramOrMetric: string]: { old: number; new: number }
-      }
-    }
-  | undefined
-
 export type ListOutput = {
   isdir: boolean
   isexec: boolean
@@ -110,8 +102,6 @@ export const autoRegisteredCommands = {
   EXPERIMENT_SHOW: 'experimentShow',
   LIST_DVC_ONLY: 'listDvcOnly',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
-  METRICS_DIFF: 'diffMetrics',
-  PARAMS_DIFF: 'diffParams',
   STATUS: 'status'
 } as const
 
@@ -141,14 +131,6 @@ export class CliReader extends Cli {
 
   public diff(cwd: string): Promise<DiffOutput> {
     return this.readProcessJson<DiffOutput>(cwd, Command.DIFF)
-  }
-
-  public diffParams(cwd: string): Promise<DiffParamsOrMetricsOutput> {
-    return this.readProcessJson(cwd, Command.PARAMS, ExperimentSubCommand.DIFF)
-  }
-
-  public diffMetrics(cwd: string): Promise<DiffParamsOrMetricsOutput> {
-    return this.readProcessJson(cwd, Command.METRICS, ExperimentSubCommand.DIFF)
   }
 
   public help(cwd: string): Promise<string> {

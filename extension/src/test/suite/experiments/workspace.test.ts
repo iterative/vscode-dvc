@@ -89,10 +89,6 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('showExperimentsTableThenRun', () => {
     it('should run against an experiments table if webview is focused', async () => {
-      stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
-
-      stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
-
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
