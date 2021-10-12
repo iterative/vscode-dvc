@@ -11,6 +11,7 @@ import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
 import { reportErrorWithOptions } from '../vscode/reporting'
+import { Response } from '../vscode/response'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
@@ -129,13 +130,12 @@ export class InternalCommands {
   }
 
   private async offerToShowError() {
-    const show = 'Show'
     const response = await reportErrorWithOptions(
       'Something went wrong, please see the DVC output channel for more details.',
-      show,
-      'Close'
+      Response.SHOW,
+      Response.CLOSE
     )
-    if (response === show) {
+    if (response === Response.SHOW) {
       return this.outputChannel.show()
     }
   }

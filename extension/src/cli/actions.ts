@@ -3,6 +3,7 @@ import { Prompt } from './output'
 import { MaybeConsoleError } from './error'
 import { getWarningResponse } from '../vscode/modal'
 import { CommandId, InternalCommands } from '../commands/internal'
+import { Response } from '../vscode/response'
 
 const offerToForce = async (
   stderr: string,
@@ -14,8 +15,8 @@ const offerToForce = async (
     Prompt.TRY_FORCE,
     '\n\nWould you like to force this action?'
   )
-  const response = await getWarningResponse(text, 'Force')
-  if (response !== 'Force') {
+  const response = await getWarningResponse(text, Response.FORCE)
+  if (response !== Response.FORCE) {
     return
   }
   return internalCommands.executeCommand(commandId, ...args, Flag.FORCE)
