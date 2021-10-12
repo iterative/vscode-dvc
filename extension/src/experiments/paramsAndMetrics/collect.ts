@@ -7,12 +7,12 @@ import {
   ParamsOrMetrics
 } from '../webview/contract'
 import {
+  ExperimentFields,
   ExperimentFieldsOrError,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
-  ValueTree,
-  ValueTreeRoot
+  ValueTree
 } from '../../cli/reader'
 
 interface PartialDescriptor extends ParamOrMetricAggregateData {
@@ -279,7 +279,7 @@ const collectChange = (
   file: string,
   key: string,
   value: Value | ValueTree,
-  commitData: ValueTreeRoot,
+  commitData: ExperimentFields,
   ancestors: string[] = []
 ) => {
   if (typeof value === 'object') {
@@ -297,64 +297,48 @@ const collectChange = (
     return
   }
 
-  if (get(commitData, [file, 'data', ...ancestors, key]) !== value) {
+  if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
     changes.push(joinParamOrMetricPath(type, file, ...ancestors, key))
   }
 }
 
-const collectParamsOrMetricsChanges = (
+const collectParamsAndMetricsChanges = (
   changes: string[],
-  type: 'params' | 'metrics',
-  workspaceData: ValueTreeRoot,
-  commitData: ValueTreeRoot
-) => {
-  Object.entries(workspaceData).forEach(([file, value]) => {
-    const data = value.data
-    if (!data) {
-      return
-    }
+  workspaceData: ExperimentFields,
+  commitData: ExperimentFields
+) =>
+  (['params', 'metrics'] as ('params' | 'metrics')[]).forEach(type =>
+    Object.entries(workspaceData?.[type] || {}).forEach(([file, value]) => {
+      const data = value.data
+      if (!data) {
+        return
+      }
 
-    Object.entries(data).forEach(([key, value]) =>
-      collectChange(changes, type, file, key, value, commitData)
-    )
-  })
-}
+      Object.entries(data).forEach(([key, value]) =>
+        collectChange(changes, type, file, key, value, commitData)
+      )
+    })
+  )
 
-const getParamsOrMetrics = (
-  type: 'params' | 'metrics',
-  value: {
-    baseline: ExperimentFieldsOrError
-  }
-) => value.baseline.data?.[type] || {}
+const getData = (value: { baseline: ExperimentFieldsOrError }) =>
+  value.baseline.data || {}
 
 export const collectChanges = (data: ExperimentsRepoJSONOutput): string[] => {
   const changes: string[] = []
 
-  const { workspaceParams, workspaceMetrics, commitParams, commitMetrics } =
-    Object.entries(data).reduce((acc, [key, value]) => {
+  const { workspace, commit } = Object.entries(data).reduce(
+    (acc, [key, value]) => {
       if (key === 'workspace') {
-        acc.workspaceParams = value.baseline.data?.params || {}
-        acc.workspaceMetrics = value.baseline.data?.metrics || {}
+        acc.workspace = getData(value)
         return acc
       }
-      acc.commitParams = getParamsOrMetrics('params', value)
-      acc.commitMetrics = getParamsOrMetrics('metrics', value)
+      acc.commit = getData(value)
       return acc
-    }, {} as Record<string, ValueTreeRoot>)
-
-  collectParamsOrMetricsChanges(
-    changes,
-    'metrics',
-    workspaceMetrics,
-    commitMetrics
+    },
+    {} as Record<string, ExperimentFields>
   )
 
-  collectParamsOrMetricsChanges(
-    changes,
-    'params',
-    workspaceParams,
-    commitParams
-  )
+  collectParamsAndMetricsChanges(changes, workspace, commit)
 
-  return changes
+  return changes.sort()
 }
