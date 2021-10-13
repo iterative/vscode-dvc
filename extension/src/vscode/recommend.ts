@@ -7,9 +7,7 @@ import { Response } from './response'
 import { isAvailable, showExtension } from './extensions'
 
 const FILE_ASSOCIATION_ID = 'files.associations'
-const YAML_SCHEMAS_ID = 'yaml.schemas'
 const DO_NOT_ASSOCIATE_YAML = 'dvc.doNotAssociateYaml'
-const DO_NOT_ADD_DVC_YAML_SCHEMA = 'dvc.doNotAddDvcYamlSchema'
 const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHat'
 const RED_HAT_EXTENSION_ID = 'redhat.vscode-yaml'
 
@@ -66,72 +64,15 @@ export const recommendAssociateYamlOnce = (): Disposable => {
   return singleUseListener
 }
 
-const getCurrentYamlSchemas = () =>
-  getConfigValue<Record<string, string> | undefined>(YAML_SCHEMAS_ID) || {}
-
-const alreadyHasSchema = (): boolean => {
-  const yamlSchemas = getCurrentYamlSchemas()
-  return !!yamlSchemas[
-    'https://raw.githubusercontent.com/iterative/dvcyaml-schema/master/schema.json'
-  ]?.includes('dvc.yaml')
-}
-
-const addDvcYamlSchema = () => {
-  const yamlSchemas = Object.assign(getCurrentYamlSchemas(), {
-    'https://raw.githubusercontent.com/iterative/dvcyaml-schema/master/schema.json':
-      'dvc.yaml'
-  })
-
-  return setUserConfigValue(YAML_SCHEMAS_ID, yamlSchemas)
-}
-
-export const recommendAddDvcYamlSchema = async () => {
-  const response = await getYesOrNoOrNever(
-    'Would you like to add [DVC YAML schema validation](https://github.com/iterative/dvcyaml-schema)?'
-  )
-
-  if (response === Response.YES) {
-    return addDvcYamlSchema()
-  }
-
-  if (response === Response.NEVER) {
-    return setUserConfigValue(DO_NOT_ADD_DVC_YAML_SCHEMA, true)
-  }
-}
-
-const isDvcYaml = (fileName?: string): boolean =>
-  !!(fileName && basename(fileName) === 'dvc.yaml')
-
-export const recommendAddDvcYamlSchemaOnce = (): Disposable => {
-  const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
-    if (
-      (!isAvailable(RED_HAT_EXTENSION_ID) &&
-        getConfigValue(DO_NOT_RECOMMEND_RED_HAT)) ||
-      alreadyHasSchema() ||
-      getConfigValue(DO_NOT_ADD_DVC_YAML_SCHEMA)
-    ) {
-      return singleUseListener.dispose()
-    }
-
-    if (
-      isAvailable(RED_HAT_EXTENSION_ID) &&
-      isDvcYaml(editor?.document.fileName)
-    ) {
-      recommendAddDvcYamlSchema()
-      return singleUseListener.dispose()
-    }
-  })
-  return singleUseListener
-}
-
 const isAnyDvcYaml = (fileName?: string) =>
-  isDvcLockOrDotDvc(fileName) || isDvcYaml(fileName)
+  isDvcLockOrDotDvc(fileName) ||
+  !!(fileName && basename(fileName) === 'dvc.yaml')
 
 export const recommendRedHatExtension = async () => {
   const response = await getShowOrCloseOrNever(
     'It is recommended that you install the ' +
       '[Red Hat YAML](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) ' +
-      'extension for comprehensive YAML Language support.'
+      'extension for comprehensive YAML Language support and [DVC YAML schema validation](https://github.com/iterative/dvcyaml-schema).'
   )
 
   if (response === Response.SHOW) {

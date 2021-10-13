@@ -1,11 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { commands, window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
-import {
-  recommendAddDvcYamlSchema,
-  recommendAssociateYaml,
-  recommendRedHatExtension
-} from './recommend'
+import { recommendAssociateYaml, recommendRedHatExtension } from './recommend'
 import { Response } from './response'
 
 const mockedShowInformationMessage = jest.fn()
@@ -62,52 +58,6 @@ describe('recommendAssociateYaml', () => {
   it('should not set any options if the user cancels the dialog', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(undefined)
     await recommendAssociateYaml()
-
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-  })
-})
-
-describe('recommendAddDvcYamlSchema', () => {
-  it('should set a user config option if the user responds with do not show again', async () => {
-    mockedShowInformationMessage.mockResolvedValueOnce(Response.NEVER)
-    await recommendAddDvcYamlSchema()
-
-    expect(mockedSetUserConfigValue).toBeCalledTimes(1)
-    expect(mockedSetUserConfigValue).toBeCalledWith(
-      'dvc.doNotAddDvcYamlSchema',
-      true
-    )
-  })
-
-  it('should add dvc.yaml the schema if the user confirms', async () => {
-    const originalConfig = {
-      'https://github.com/OAI/OpenAPI-Specification/blob/main/schemas/v3.0/schema.yaml':
-        'openApi.yaml'
-    }
-
-    mockedShowInformationMessage.mockResolvedValueOnce(Response.YES)
-    mockedGetConfigValue.mockReturnValueOnce(originalConfig)
-    await recommendAddDvcYamlSchema()
-
-    expect(mockedSetUserConfigValue).toBeCalledTimes(1)
-    expect(mockedSetUserConfigValue).toBeCalledWith('yaml.schemas', {
-      'https://github.com/OAI/OpenAPI-Specification/blob/main/schemas/v3.0/schema.yaml':
-        'openApi.yaml',
-      'https://raw.githubusercontent.com/iterative/dvcyaml-schema/master/schema.json':
-        'dvc.yaml'
-    })
-  })
-
-  it('should not set any options if the user responds with no', async () => {
-    mockedShowInformationMessage.mockResolvedValueOnce(Response.NO)
-    await recommendAddDvcYamlSchema()
-
-    expect(mockedSetUserConfigValue).not.toBeCalled()
-  })
-
-  it('should not set any options if the user cancels the dialog', async () => {
-    mockedShowInformationMessage.mockResolvedValueOnce(undefined)
-    await recommendAddDvcYamlSchema()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })

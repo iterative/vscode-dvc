@@ -43,7 +43,6 @@ import {
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
 import {
-  recommendAddDvcYamlSchemaOnce,
   recommendAssociateYamlOnce,
   recommendRedHatExtensionOnce
 } from './vscode/recommend'
@@ -268,7 +267,6 @@ export class Extension implements IExtension {
     )
 
     showWalkthroughOnFirstUse(context.globalState)
-    this.dispose.track(recommendAddDvcYamlSchemaOnce())
     this.dispose.track(recommendAssociateYamlOnce())
     this.dispose.track(recommendRedHatExtensionOnce())
   }
