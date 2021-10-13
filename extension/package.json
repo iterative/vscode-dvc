@@ -335,6 +335,17 @@
         }
       }
     },
+    "languages": [
+      {
+        "id": "yaml",
+        "extensions": [
+          ".dvc"
+        ],
+        "filenames": [
+          "dvc.lock"
+        ]
+      }
+    ],
     "menus": {
       "commandPalette": [
         {
