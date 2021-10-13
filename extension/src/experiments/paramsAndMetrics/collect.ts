@@ -326,19 +326,19 @@ const getData = (value: { baseline: ExperimentFieldsOrError }) =>
 export const collectChanges = (data: ExperimentsRepoJSONOutput): string[] => {
   const changes: string[] = []
 
-  const { workspace, commit } = Object.entries(data).reduce(
+  const { workspace, currentCommit } = Object.entries(data).reduce(
     (acc, [key, value]) => {
       if (key === 'workspace') {
         acc.workspace = getData(value)
         return acc
       }
-      acc.commit = getData(value)
+      acc.currentCommit = getData(value)
       return acc
     },
     {} as Record<string, ExperimentFields>
   )
 
-  collectParamsAndMetricsChanges(changes, workspace, commit)
+  collectParamsAndMetricsChanges(changes, workspace, currentCommit)
 
   return changes.sort()
 }

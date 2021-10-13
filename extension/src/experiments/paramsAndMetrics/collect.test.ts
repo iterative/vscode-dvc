@@ -526,11 +526,9 @@ describe('collectChanges', () => {
       workspace: mockedWorkspaceData
     }
 
-    expect(collectChanges(data)).toEqual(
-      [
-        'params:params.yaml:dropout.lower.p.0.05',
-        'params:params.yaml:dropout.upper.p.0.025'
-      ].sort()
-    )
+    expect(collectChanges(data)).toEqual([
+      'params:params.yaml:dropout.lower.p.0.05',
+      'params:params.yaml:dropout.upper.p.0.025'
+    ])
   })
 })

@@ -25,11 +25,11 @@ export const askUserToAssociateYaml = async () => {
     'Would you like to have "dvc.lock" and ".dvc" files recognized as YAML?'
   )
 
-  if (response === Response.yes) {
+  if (response === Response.YES) {
     return addFileAssociations()
   }
 
-  if (response === Response.never) {
+  if (response === Response.NEVER) {
     return setUserConfigValue(doNotAssociateYaml, true)
   }
 }

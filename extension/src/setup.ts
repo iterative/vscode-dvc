@@ -106,12 +106,12 @@ const quickPickVenvOption = () =>
     [
       {
         description: 'use the interpreter selected by the ms-python extension',
-        label: Response.yes,
+        label: Response.YES,
         value: 2
       },
       {
         description: 'and I want to select the python interpreter',
-        label: Response.yes,
+        label: Response.YES,
         value: 1
       },
 

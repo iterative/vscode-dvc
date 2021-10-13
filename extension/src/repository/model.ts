@@ -57,7 +57,8 @@ export class RepositoryModel
       this.updateTracked(tracked)
     }
     this.updateStatus(diffFromHead, diffFromCache)
-    this.updateUntracked(untracked)
+
+    this.state.untracked = untracked
   }
 
   public hasChanges(): boolean {
@@ -70,10 +71,6 @@ export class RepositoryModel
     )
   }
 
-  private filterRootDir(dirs: string[] = []) {
-    return dirs.filter(dir => dir !== this.dvcRoot)
-  }
-
   private getAbsolutePath(path: string): string {
     return resolve(this.dvcRoot, path)
   }
@@ -83,9 +80,9 @@ export class RepositoryModel
   }
 
   private getAbsoluteParentPath(files: string[] = []): string[] {
-    return this.filterRootDir(
-      files.map(file => this.getAbsolutePath(dirname(file)))
-    )
+    return files
+      .map(file => this.getAbsolutePath(dirname(file)))
+      .filter(dir => dir !== this.dvcRoot)
   }
 
   private getChangedOutsStatuses(
@@ -206,9 +203,5 @@ export class RepositoryModel
       ...absoluteTrackedPaths,
       ...this.getAbsoluteParentPath(trackedPaths)
     ])
-  }
-
-  private updateUntracked(untracked: Set<string>): void {
-    this.state.untracked = untracked
   }
 }
