@@ -57,38 +57,36 @@ const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
   }
 }
 
-const createConfig = (): Config => {
-  const foregroundColor = `var(--vscode-foreground)`
-  const backgroundColor = 'var(--vscode-editor-background)'
-  return {
-    axis: {
-      domain: false,
-      gridOpacity: 0.25,
-      tickColor: foregroundColor,
-      titleColor: foregroundColor
+const foregroundColor = `var(--vscode-foreground)`
+const backgroundColor = 'var(--vscode-editor-background)'
+const config: Config = {
+  axis: {
+    domain: false,
+    gridOpacity: 0.25,
+    tickColor: foregroundColor,
+    titleColor: foregroundColor
+  },
+  background: backgroundColor,
+  padding: 10,
+  style: {
+    cell: {
+      stroke: foregroundColor
     },
-    background: backgroundColor,
-    padding: 10,
-    style: {
-      cell: {
-        stroke: foregroundColor
-      },
-      'group-title': {
-        fill: foregroundColor,
-        stroke: foregroundColor
-      },
-      'guide-label': {
-        fill: foregroundColor,
-        stroke: foregroundColor
-      },
-      'guide-title': {
-        fill: foregroundColor,
-        stroke: foregroundColor
-      },
-      rule: {
-        fill: foregroundColor,
-        stroke: foregroundColor
-      }
+    'group-title': {
+      fill: foregroundColor,
+      stroke: foregroundColor
+    },
+    'guide-label': {
+      fill: foregroundColor,
+      stroke: foregroundColor
+    },
+    'guide-title': {
+      fill: foregroundColor,
+      stroke: foregroundColor
+    },
+    rule: {
+      fill: foregroundColor,
+      stroke: foregroundColor
     }
   }
 }
@@ -103,7 +101,6 @@ const AllPlots = ({
   if (!yMetric) {
     return null
   }
-  const config = createConfig()
   const spec = createSpec(yMetric)
 
   return (
