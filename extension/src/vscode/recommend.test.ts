@@ -1,7 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
-import { askUserToAssociateYaml } from './recommend'
+import { recommendAssociateYaml } from './recommend'
 
 const mockedShowInformationMessage = jest.fn()
 const mockedWindow = mocked(window)
@@ -17,10 +17,10 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('askUserToAssociateYaml', () => {
+describe('recommendAssociateYaml', () => {
   it('should set a user config option if the user responds with do not show again', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce("Don't Show Again")
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith(
@@ -34,7 +34,7 @@ describe('askUserToAssociateYaml', () => {
     mockedGetConfigValue.mockReturnValueOnce({
       '*.wat': 'perl'
     })
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith('files.associations', {
@@ -46,14 +46,14 @@ describe('askUserToAssociateYaml', () => {
 
   it('should not set any options if the user responds with no', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce('No')
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })
 
   it('should not set any options if the user cancels the dialog', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(undefined)
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })
