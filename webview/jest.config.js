@@ -8,5 +8,6 @@ module.exports = {
     '\\.(scss|css|less)$': 'identity-obj-proxy'
   },
   preset: 'ts-jest',
-  testEnvironment: 'node'
+  testEnvironment: 'node',
+  testTimeout: 10000
 }
