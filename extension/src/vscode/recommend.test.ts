@@ -2,8 +2,8 @@ import { mocked } from 'ts-jest/utils'
 import { commands, window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
 import {
-  askUserToAddSchema,
-  askUserToAssociateYaml,
+  recommendAddDvcYamlSchema,
+  recommendAssociateYaml,
   recommendRedHatExtension
 } from './recommend'
 import { Response } from './response'
@@ -25,10 +25,10 @@ beforeEach(() => {
   jest.resetAllMocks()
 })
 
-describe('askUserToAssociateYaml', () => {
+describe('recommendAssociateYaml', () => {
   it('should set a user config option if the user responds with do not show again', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(Response.NEVER)
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith(
@@ -42,7 +42,7 @@ describe('askUserToAssociateYaml', () => {
     mockedGetConfigValue.mockReturnValueOnce({
       '*.wat': 'perl'
     })
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith('files.associations', {
@@ -54,23 +54,23 @@ describe('askUserToAssociateYaml', () => {
 
   it('should not set any options if the user responds with no', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(Response.NO)
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })
 
   it('should not set any options if the user cancels the dialog', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(undefined)
-    await askUserToAssociateYaml()
+    await recommendAssociateYaml()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })
 })
 
-describe('askUserToAddSchema', () => {
+describe('recommendAddDvcYamlSchema', () => {
   it('should set a user config option if the user responds with do not show again', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(Response.NEVER)
-    await askUserToAddSchema()
+    await recommendAddDvcYamlSchema()
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith(
@@ -87,7 +87,7 @@ describe('askUserToAddSchema', () => {
 
     mockedShowInformationMessage.mockResolvedValueOnce(Response.YES)
     mockedGetConfigValue.mockReturnValueOnce(originalConfig)
-    await askUserToAddSchema()
+    await recommendAddDvcYamlSchema()
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith('yaml.schemas', {
@@ -100,14 +100,14 @@ describe('askUserToAddSchema', () => {
 
   it('should not set any options if the user responds with no', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(Response.NO)
-    await askUserToAddSchema()
+    await recommendAddDvcYamlSchema()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })
 
   it('should not set any options if the user cancels the dialog', async () => {
     mockedShowInformationMessage.mockResolvedValueOnce(undefined)
-    await askUserToAddSchema()
+    await recommendAddDvcYamlSchema()
 
     expect(mockedSetUserConfigValue).not.toBeCalled()
   })

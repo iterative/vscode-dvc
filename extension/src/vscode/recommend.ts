@@ -10,7 +10,7 @@ const fileAssociationsKey = 'files.associations'
 const yamlSchemasKey = 'yaml.schemas'
 const doNotAssociateYaml = 'dvc.doNotAssociateYaml'
 const doNotAddDvcYamlSchema = 'dvc.doNotAddDvcYamlSchema'
-const doNotPromptRedHat = 'dvc.doNotRecommendRedHat'
+const doNotRecommendRedHat = 'dvc.doNotRecommendRedHat'
 
 const getCurrentFileAssociations = () =>
   getConfigValue<Record<string, string> | undefined>(fileAssociationsKey) || {}
@@ -24,7 +24,7 @@ const addFileAssociations = () => {
   return setUserConfigValue(fileAssociationsKey, fileAssociations)
 }
 
-export const askUserToAssociateYaml = async () => {
+export const recommendAssociateYaml = async () => {
   const response = await getYesOrNoOrNever(
     'Would you like to have "dvc.lock" and ".dvc" files recognized as YAML?'
   )
@@ -38,7 +38,7 @@ export const askUserToAssociateYaml = async () => {
   }
 }
 
-const isFileType = (fileName?: string): boolean =>
+const isDvcLockOrDotDvc = (fileName?: string): boolean =>
   !!(
     fileName &&
     (basename(fileName) === 'dvc.lock' || extname(fileName) === '.dvc')
@@ -51,14 +51,14 @@ const alreadyAssociated = (): boolean => {
   )
 }
 
-export const tryAssociateYamlOnce = (): Disposable => {
+export const recommendAssociateYamlOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
     if (alreadyAssociated() || getConfigValue(doNotAssociateYaml)) {
       return singleUseListener.dispose()
     }
 
-    if (isFileType(editor?.document.fileName)) {
-      askUserToAssociateYaml()
+    if (isDvcLockOrDotDvc(editor?.document.fileName)) {
+      recommendAssociateYaml()
       return singleUseListener.dispose()
     }
   })
@@ -75,7 +75,7 @@ const alreadyHasSchema = (): boolean => {
   ]?.includes('dvc.yaml')
 }
 
-const addSchema = () => {
+const addDvcYamlSchema = () => {
   const yamlSchemas = Object.assign(getCurrentFileAssociations(), {
     'https://raw.githubusercontent.com/iterative/dvcyaml-schema/master/schema.json':
       'dvc.yaml'
@@ -84,13 +84,13 @@ const addSchema = () => {
   return setUserConfigValue(yamlSchemasKey, yamlSchemas)
 }
 
-export const askUserToAddSchema = async () => {
+export const recommendAddDvcYamlSchema = async () => {
   const response = await getYesOrNoOrNever(
     'Would you like to add [DVC YAML schema validation](https://github.com/iterative/dvcyaml-schema)?'
   )
 
   if (response === Response.YES) {
-    return addSchema()
+    return addDvcYamlSchema()
   }
 
   if (response === Response.NEVER) {
@@ -101,14 +101,14 @@ export const askUserToAddSchema = async () => {
 const isDvcYaml = (fileName?: string): boolean =>
   !!(fileName && basename(fileName) === 'dvc.yaml')
 
-export const tryAddDvcYamlSchemaOnce = (): Disposable => {
+export const recommendAddDvcYamlSchemaOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
     if (alreadyHasSchema() || getConfigValue(doNotAddDvcYamlSchema)) {
       return singleUseListener.dispose()
     }
 
     if (isDvcYaml(editor?.document.fileName)) {
-      askUserToAddSchema()
+      recommendAddDvcYamlSchema()
       return singleUseListener.dispose()
     }
   })
@@ -116,9 +116,7 @@ export const tryAddDvcYamlSchemaOnce = (): Disposable => {
 }
 
 const isAnyDvcYaml = (fileName?: string) =>
-  isFileType(fileName) || isDvcYaml(fileName)
-
-const alreadyHasExtension = () => isAvailable('redhat.vscode-yaml')
+  isDvcLockOrDotDvc(fileName) || isDvcYaml(fileName)
 
 export const recommendRedHatExtension = async () => {
   const response = await getShowOrCloseOrNever(
@@ -135,14 +133,16 @@ export const recommendRedHatExtension = async () => {
   }
 
   if (response === Response.NEVER) {
-    return setUserConfigValue(doNotPromptRedHat, true)
+    return setUserConfigValue(doNotRecommendRedHat, true)
   }
 }
 
 export const recommendRedHatExtensionOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
-    isAvailable('redhat.vscode-yaml')
-    if (alreadyHasExtension() || getConfigValue(doNotPromptRedHat)) {
+    if (
+      isAvailable('redhat.vscode-yaml') ||
+      getConfigValue(doNotRecommendRedHat)
+    ) {
       return singleUseListener.dispose()
     }
 
