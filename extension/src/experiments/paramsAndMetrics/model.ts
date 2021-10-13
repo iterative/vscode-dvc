@@ -5,13 +5,9 @@ import {
   collectFiles,
   collectParamsAndMetrics
 } from './collect'
-import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
-import {
-  DiffParamsOrMetricsOutput,
-  ExperimentsRepoJSONOutput
-} from '../../cli/reader'
+import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 export enum Status {
   selected = 2,
@@ -116,25 +112,6 @@ export class ParamsAndMetricsModel {
     )
 
     return flatten<Status>(nestedStatuses)
-  }
-
-  public setChanges(changesData: {
-    params: DiffParamsOrMetricsOutput
-    metrics: DiffParamsOrMetricsOutput
-  }) {
-    this.paramsAndMetricsChanges = Object.entries(changesData).reduce(
-      (acc: string[], [type, diff]: [string, DiffParamsOrMetricsOutput]) => {
-        Object.entries(diff || {}).forEach(([file, changes]) =>
-          acc.push(
-            ...Object.keys(changes || []).map(paramOrMetric =>
-              joinParamOrMetricPath(type, file, paramOrMetric)
-            )
-          )
-        )
-        return acc
-      },
-      []
-    )
   }
 
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {

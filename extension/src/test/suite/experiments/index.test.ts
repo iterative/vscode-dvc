@@ -100,13 +100,7 @@ suite('Experiments Test Suite', () => {
     it('should be able to make the experiment webview visible', async () => {
       const { experiments } = buildExperiments(
         disposable,
-        complexExperimentsOutput,
-        {
-          'params.yaml': { learning_rate: { new: 2.2e-7, old: 2.2e-12 } }
-        },
-        {
-          'summary.json': { loss: { new: 1.9293, old: 1.8169 } }
-        }
+        complexExperimentsOutput
       )
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
@@ -170,9 +164,6 @@ suite('Experiments Test Suite', () => {
         }
       }
     })
-    stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
-
-    stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
     stub(cliReader, 'experimentShow').resolves({
       testBranch: {
         baseline: { data: buildTestExperiment(10) },
@@ -344,12 +335,6 @@ suite('Experiments Test Suite', () => {
     mockedInternalCommands.registerCommand(
       AvailableCommands.EXPERIMENT_SHOW,
       () => Promise.resolve(complexExperimentsOutput)
-    )
-    mockedInternalCommands.registerCommand(AvailableCommands.PARAMS_DIFF, () =>
-      Promise.resolve({ 'params.yaml': {} })
-    )
-    mockedInternalCommands.registerCommand(AvailableCommands.METRICS_DIFF, () =>
-      Promise.resolve({ metrics: {} })
     )
 
     it('should initialize given no persisted state and update persistence given any change', async () => {

@@ -14,19 +14,12 @@ import { dvcDemoPath, resourcePath } from '../util'
 
 const buildDependencies = (
   disposer: Disposer,
-  experimentShowData = complexExperimentsOutput,
-  diffParamsData = {},
-  diffMetricsData = {}
+  experimentShowData = complexExperimentsOutput
 ) => {
   const config = disposer.track(new Config())
   const cliReader = disposer.track(new CliReader(config))
   const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
     experimentShowData
-  )
-  const mockDiffParams = stub(cliReader, 'diffParams').resolves(diffParamsData)
-
-  const mockDiffMetrics = stub(cliReader, 'diffMetrics').resolves(
-    diffMetricsData
   )
 
   const outputChannel = disposer.track(
@@ -43,8 +36,6 @@ const buildDependencies = (
   return {
     config,
     internalCommands,
-    mockDiffMetrics,
-    mockDiffParams,
     mockExperimentShow,
     resourceLocator
   }
@@ -53,23 +44,10 @@ const buildDependencies = (
 export const buildExperiments = (
   disposer: Disposer,
   experimentShowData = complexExperimentsOutput,
-  diffParamsData = {},
-  diffMetricsData = {},
   dvcRoot = dvcDemoPath
 ) => {
-  const {
-    config,
-    internalCommands,
-    mockExperimentShow,
-    resourceLocator,
-    mockDiffMetrics,
-    mockDiffParams
-  } = buildDependencies(
-    disposer,
-    experimentShowData,
-    diffParamsData,
-    diffMetricsData
-  )
+  const { config, internalCommands, mockExperimentShow, resourceLocator } =
+    buildDependencies(disposer, experimentShowData)
 
   const experiments = disposer.track(
     new Experiments(
@@ -83,8 +61,6 @@ export const buildExperiments = (
     config,
     experiments,
     internalCommands,
-    mockDiffMetrics,
-    mockDiffParams,
     mockExperimentShow,
     resourceLocator
   }
@@ -95,13 +71,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     internalCommands,
     experiments: mockExperiments,
     resourceLocator
-  } = buildExperiments(
-    disposer,
-    complexExperimentsOutput,
-    {},
-    {},
-    'other/dvc/root'
-  )
+  } = buildExperiments(disposer, complexExperimentsOutput, 'other/dvc/root')
 
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento(), {
