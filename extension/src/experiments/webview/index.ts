@@ -210,13 +210,15 @@ export class ExperimentsWebview {
     let urls: {
       publicPath: string
       mainJsUrl: string
+      reactJsUrl: string
     }
 
     if (process.env.USE_DEV_UI === 'true') {
       const baseUrl = 'http://localhost:8080/'
       urls = {
         mainJsUrl: `${baseUrl}main.js`,
-        publicPath: baseUrl
+        publicPath: baseUrl,
+        reactJsUrl: `${baseUrl}react.js`
       }
     } else {
       urls = {
@@ -225,6 +227,9 @@ export class ExperimentsWebview {
           .toString(),
         publicPath: this.webviewPanel.webview
           .asWebviewUri(Uri.file(dvcVscodeWebview.distPath))
+          .toString(),
+        reactJsUrl: this.webviewPanel.webview
+          .asWebviewUri(Uri.file(dvcVscodeWebview.reactJsFilename))
           .toString()
       }
     }
@@ -256,6 +261,7 @@ export class ExperimentsWebview {
 					  <script>
 						  Object.assign(window, ${JSON.stringify(data)});
 					  </script>
+					  <script type="text/javascript" src="${urls.reactJsUrl}"></script>
 					  <script type="text/javascript" src="${urls.mainJsUrl}"></script>
 				  </body>
 			  </html>
