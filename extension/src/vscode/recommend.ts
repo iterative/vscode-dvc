@@ -1,21 +1,13 @@
-import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
 import { window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
 import { getShowOrCloseOrNever } from './toast'
 import { Response } from './response'
 import { isAvailable, showExtension } from './extensions'
+import { isAnyDvcYaml } from '../fileSystem'
 
 const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension'
 const RED_HAT_EXTENSION_ID = 'redhat.vscode-yaml'
-
-const isAnyDvcYaml = (fileName?: string) =>
-  !!(
-    fileName &&
-    (basename(fileName) === 'dvc.yaml' ||
-      basename(fileName) === 'dvc.lock' ||
-      extname(fileName) === '.dvc')
-  )
 
 export const recommendRedHatExtension = async () => {
   const response = await getShowOrCloseOrNever(
