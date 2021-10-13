@@ -10,7 +10,7 @@ suite('Language Association Test Suite', () => {
     restore()
   })
 
-  describe('tryAssociateYamlOnce', () => {
+  describe('recommendAssociateYamlOnce', () => {
     it('should only try and associate .dvc and dvc.lock files once per session', async () => {
       const getUri = (fileName: string) => Uri.file(join(dvcDemoPath, fileName))
 
