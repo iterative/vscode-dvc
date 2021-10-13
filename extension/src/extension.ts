@@ -42,7 +42,7 @@ import {
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
-import { tryAssociateYamlOnce } from './vscode/languageAssociation'
+import { tryAssociateYamlOnce } from './vscode/recommend'
 
 export { Disposable, Disposer }
 

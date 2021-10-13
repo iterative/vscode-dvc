@@ -1,7 +1,7 @@
 import { mocked } from 'ts-jest/utils'
 import { window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
-import { askUserToAssociateYaml } from './languageAssociation'
+import { askUserToAssociateYaml } from './recommend'
 
 const mockedShowInformationMessage = jest.fn()
 const mockedWindow = mocked(window)
