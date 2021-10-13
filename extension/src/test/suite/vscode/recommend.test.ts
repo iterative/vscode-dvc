@@ -48,39 +48,4 @@ suite('Language Association Test Suite', () => {
       ).not.to.be.called
     })
   })
-
-  describe('recommendAddDvcYamlSchemaOnce', () => {
-    it('should only try to add dvc.yaml schema validation once per session', async () => {
-      stub(Extensions, 'isAvailable').resolves(true)
-      const mockShowInformationMessage = stub(
-        window,
-        'showInformationMessage'
-      ).resolves('No' as unknown as MessageItem)
-
-      await openFileInEditor('.gitignore')
-
-      expect(
-        mockShowInformationMessage,
-        'should not ask the user if they want to add the dvc.yaml schema validation on a normal editor change'
-      ).not.to.be.called
-
-      await openFileInEditor('dvc.yaml')
-
-      expect(
-        mockShowInformationMessage,
-        'should ask the user if they want to add the dvc.yaml schema validation on the first call'
-      ).to.be.calledOnce
-
-      await commands.executeCommand('workbench.action.closeAllEditors')
-
-      mockShowInformationMessage.resetHistory()
-
-      await openFileInEditor('dvc.yaml')
-
-      expect(
-        mockShowInformationMessage,
-        'should not ask the user if they want to add the dvc.yaml schema validation on subsequent calls'
-      ).not.to.be.called
-    })
-  })
 })
