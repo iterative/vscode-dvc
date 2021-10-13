@@ -6,7 +6,7 @@ import { restore, stub } from 'sinon'
 import { dvcDemoPath } from '../util'
 import * as Extensions from '../../../vscode/extensions'
 
-suite('Language Association Test Suite', () => {
+suite('Recommend Test Suite', () => {
   beforeEach(() => {
     restore()
   })
@@ -14,38 +14,44 @@ suite('Language Association Test Suite', () => {
   const openFileInEditor = (fileName: string) =>
     window.showTextDocument(Uri.file(join(dvcDemoPath, fileName)))
 
-  describe('recommendAssociateYamlOnce', () => {
-    it('should only try and associate .dvc and dvc.lock files once per session', async () => {
-      stub(Extensions, 'isAvailable').resolves(true)
+  describe('recommendRedHatExtensionOnce', () => {
+    it('should only recommend the red hat yaml extension once per session', async () => {
+      const mockIsAvailable = stub(Extensions, 'isAvailable').returns(false)
       const mockShowInformationMessage = stub(
         window,
         'showInformationMessage'
-      ).resolves('No' as unknown as MessageItem)
+      ).resolves('Show' as unknown as MessageItem)
 
       await openFileInEditor('.gitignore')
 
       expect(
         mockShowInformationMessage,
-        'should not ask the user if they want to associate .dvc and dvc.lock files with yaml on a normal editor change'
+        'should not recommend to install the red hat yaml extension on a normal editor change'
       ).not.to.be.called
+      expect(mockIsAvailable).to.be.calledOnce
 
       await openFileInEditor('dvc.lock')
 
+      mockIsAvailable.resetHistory()
+
       expect(
         mockShowInformationMessage,
-        'should ask the user if they want to associate .dvc and dvc.lock files with yaml on the first call'
+        'should recommend to install the red hat yaml extension on the first call'
       ).to.be.calledOnce
+      expect(mockIsAvailable).not.to.be.calledOnce
 
       await commands.executeCommand('workbench.action.closeAllEditors')
 
       mockShowInformationMessage.resetHistory()
+      mockIsAvailable.resetHistory()
 
       await openFileInEditor('dvc.lock')
 
       expect(
         mockShowInformationMessage,
-        'should not ask the user if they want to associate .dvc and dvc.lock files with yaml on subsequent calls'
+        'should not recommend to install the red hat yaml extension on subsequent calls'
       ).not.to.be.called
+      expect(mockIsAvailable).not.to.be.called
     })
   })
 })
