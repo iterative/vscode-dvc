@@ -70,7 +70,7 @@ describe('recommendRedHatExtension', () => {
 
     expect(mockedSetUserConfigValue).toBeCalledTimes(1)
     expect(mockedSetUserConfigValue).toBeCalledWith(
-      'dvc.doNotRecommendRedHat',
+      'dvc.doNotRecommendRedHatExtension',
       true
     )
   })

@@ -8,7 +8,7 @@ import { isAvailable, showExtension } from './extensions'
 
 const FILE_ASSOCIATION_ID = 'files.associations'
 const DO_NOT_ASSOCIATE_YAML = 'dvc.doNotAssociateYaml'
-const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHat'
+const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension'
 const RED_HAT_EXTENSION_ID = 'redhat.vscode-yaml'
 
 const getCurrentFileAssociations = () =>
