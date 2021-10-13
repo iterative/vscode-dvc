@@ -16,7 +16,7 @@ suite('Recommend Test Suite', () => {
 
   describe('recommendRedHatExtensionOnce', () => {
     it('should only recommend the red hat yaml extension once per session', async () => {
-      const mockIsAvailable = stub(Extensions, 'isAvailable').returns(false)
+      stub(Extensions, 'isAvailable').returns(false)
       const mockShowInformationMessage = stub(
         window,
         'showInformationMessage'
@@ -28,22 +28,17 @@ suite('Recommend Test Suite', () => {
         mockShowInformationMessage,
         'should not recommend to install the red hat yaml extension on a normal editor change'
       ).not.to.be.called
-      expect(mockIsAvailable).to.be.calledOnce
 
       await openFileInEditor('dvc.lock')
-
-      mockIsAvailable.resetHistory()
 
       expect(
         mockShowInformationMessage,
         'should recommend to install the red hat yaml extension on the first call'
       ).to.be.calledOnce
-      expect(mockIsAvailable).not.to.be.calledOnce
 
       await commands.executeCommand('workbench.action.closeAllEditors')
 
       mockShowInformationMessage.resetHistory()
-      mockIsAvailable.resetHistory()
 
       await openFileInEditor('dvc.lock')
 
@@ -51,7 +46,6 @@ suite('Recommend Test Suite', () => {
         mockShowInformationMessage,
         'should not recommend to install the red hat yaml extension on subsequent calls'
       ).not.to.be.called
-      expect(mockIsAvailable).not.to.be.called
     })
   })
 })
