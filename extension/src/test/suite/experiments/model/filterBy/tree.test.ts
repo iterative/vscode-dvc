@@ -5,6 +5,7 @@ import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import complexColumnData from '../../../../fixtures/complex-column-example'
 import complexRowData from '../../../../fixtures/complex-row-example'
+import complexChangesData from '../../../../fixtures/complex-changes-example'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
@@ -14,7 +15,6 @@ import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
-import { ParamsAndMetricsModel } from '../../../../../experiments/paramsAndMetrics/model'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -35,9 +35,6 @@ suite('Experiments Filter By Tree Test Suite', () => {
     })
 
     it('should be able to update the table data by adding and removing a filter', async () => {
-      // remove in next PR
-      stub(ParamsAndMetricsModel.prototype, 'getChanges').returns([])
-
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
@@ -109,7 +106,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          changes: [],
+          changes: complexChangesData,
           columns: complexColumnData,
           rows: filteredRows,
           sorts: []
@@ -133,7 +130,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          changes: [],
+          changes: complexChangesData,
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []

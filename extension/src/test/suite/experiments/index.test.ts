@@ -9,6 +9,7 @@ import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import complexRowData from '../../fixtures/complex-row-example'
 import complexColumnData from '../../fixtures/complex-column-example'
+import complexChangesData from '../../fixtures/complex-changes-example'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -24,7 +25,6 @@ import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
-import { ParamsAndMetricsModel } from '../../../experiments/paramsAndMetrics/model'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -98,12 +98,6 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      // remove in next PR
-      stub(ParamsAndMetricsModel.prototype, 'getChanges').returns([
-        'metrics:summary.json:loss',
-        'params:params.yaml:learning_rate'
-      ])
-
       const { experiments } = buildExperiments(
         disposable,
         complexExperimentsOutput,
@@ -118,12 +112,10 @@ suite('Experiments Test Suite', () => {
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const webview = await experiments.showWebview()
+
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          changes: [
-            'metrics:summary.json:loss',
-            'params:params.yaml:learning_rate'
-          ],
+          changes: complexChangesData,
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []

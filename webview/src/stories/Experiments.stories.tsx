@@ -3,6 +3,7 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
 import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
+import complexChangesData from 'dvc/src/test/fixtures/complex-changes-example'
 import Experiments from '../components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -22,10 +23,7 @@ export default {
   },
   args: {
     tableData: {
-      changes: [
-        'params:params.yaml:learning_rate',
-        'metrics:summary.json:loss'
-      ],
+      changes: complexChangesData,
       columns: complexColumnData,
       rows: complexRowData,
       sorts: [
