@@ -34,3 +34,5 @@ export const getExtensionVersion = <T>(id: string): string | undefined => {
 
 export const isInstalled = (id: string): boolean =>
   !!extensions.all.find(extension => extension.id === id)
+
+export const isAvailable = (id: string): boolean => !!getExtension(id)?.isActive

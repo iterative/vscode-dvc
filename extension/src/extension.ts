@@ -42,7 +42,11 @@ import {
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
-import { tryAssociateYamlOnce } from './vscode/languageAssociation'
+import {
+  tryAddDvcYamlSchemaOnce,
+  tryAssociateYamlOnce,
+  recommendRedHatExtensionOnce
+} from './vscode/recommend'
 
 export { Disposable, Disposer }
 
@@ -264,7 +268,9 @@ export class Extension implements IExtension {
     )
 
     showWalkthroughOnFirstUse(context.globalState)
+    this.dispose.track(tryAddDvcYamlSchemaOnce())
     this.dispose.track(tryAssociateYamlOnce())
+    this.dispose.track(recommendRedHatExtensionOnce())
   }
 
   public async canRunCli(cwd: string) {
