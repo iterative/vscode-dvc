@@ -1,4 +1,4 @@
-import { Extension, extensions } from 'vscode'
+import { commands, Extension, extensions } from 'vscode'
 
 type ExtensionDetails = {
   id: string
@@ -36,3 +36,6 @@ export const isInstalled = (id: string): boolean =>
   !!extensions.all.find(extension => extension.id === id)
 
 export const isAvailable = (id: string): boolean => !!getExtension(id)?.isActive
+
+export const showExtension = (id: string) =>
+  commands.executeCommand('workbench.extensions.search', `@id:${id}`)

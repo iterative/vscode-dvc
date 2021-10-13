@@ -1,19 +1,20 @@
 import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
-import { commands, window } from 'vscode'
+import { window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
 import { getShowOrCloseOrNever, getYesOrNoOrNever } from './toast'
 import { Response } from './response'
-import { isAvailable } from './extensions'
+import { isAvailable, showExtension } from './extensions'
 
-const fileAssociationsKey = 'files.associations'
-const yamlSchemasKey = 'yaml.schemas'
-const doNotAssociateYaml = 'dvc.doNotAssociateYaml'
-const doNotAddDvcYamlSchema = 'dvc.doNotAddDvcYamlSchema'
-const doNotRecommendRedHat = 'dvc.doNotRecommendRedHat'
+const FILE_ASSOCIATION_ID = 'files.associations'
+const YAML_SCHEMAS_ID = 'yaml.schemas'
+const DO_NOT_ASSOCIATE_YAML = 'dvc.doNotAssociateYaml'
+const DO_NOT_ADD_DVC_YAML_SCHEMA = 'dvc.doNotAddDvcYamlSchema'
+const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHat'
+const RED_HAT_EXTENSION_ID = 'redhat.vscode-yaml'
 
 const getCurrentFileAssociations = () =>
-  getConfigValue<Record<string, string> | undefined>(fileAssociationsKey) || {}
+  getConfigValue<Record<string, string> | undefined>(FILE_ASSOCIATION_ID) || {}
 
 const addFileAssociations = () => {
   const fileAssociations = Object.assign(getCurrentFileAssociations(), {
@@ -21,7 +22,7 @@ const addFileAssociations = () => {
     'dvc.lock': 'yaml'
   })
 
-  return setUserConfigValue(fileAssociationsKey, fileAssociations)
+  return setUserConfigValue(FILE_ASSOCIATION_ID, fileAssociations)
 }
 
 export const recommendAssociateYaml = async () => {
@@ -34,7 +35,7 @@ export const recommendAssociateYaml = async () => {
   }
 
   if (response === Response.NEVER) {
-    return setUserConfigValue(doNotAssociateYaml, true)
+    return setUserConfigValue(DO_NOT_ASSOCIATE_YAML, true)
   }
 }
 
@@ -53,7 +54,7 @@ const alreadyAssociated = (): boolean => {
 
 export const recommendAssociateYamlOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
-    if (alreadyAssociated() || getConfigValue(doNotAssociateYaml)) {
+    if (alreadyAssociated() || getConfigValue(DO_NOT_ASSOCIATE_YAML)) {
       return singleUseListener.dispose()
     }
 
@@ -66,7 +67,7 @@ export const recommendAssociateYamlOnce = (): Disposable => {
 }
 
 const getCurrentYamlSchemas = () =>
-  getConfigValue<Record<string, string> | undefined>(yamlSchemasKey) || {}
+  getConfigValue<Record<string, string> | undefined>(YAML_SCHEMAS_ID) || {}
 
 const alreadyHasSchema = (): boolean => {
   const yamlSchemas = getCurrentYamlSchemas()
@@ -81,7 +82,7 @@ const addDvcYamlSchema = () => {
       'dvc.yaml'
   })
 
-  return setUserConfigValue(yamlSchemasKey, yamlSchemas)
+  return setUserConfigValue(YAML_SCHEMAS_ID, yamlSchemas)
 }
 
 export const recommendAddDvcYamlSchema = async () => {
@@ -94,7 +95,7 @@ export const recommendAddDvcYamlSchema = async () => {
   }
 
   if (response === Response.NEVER) {
-    return setUserConfigValue(doNotAddDvcYamlSchema, true)
+    return setUserConfigValue(DO_NOT_ADD_DVC_YAML_SCHEMA, true)
   }
 }
 
@@ -103,7 +104,7 @@ const isDvcYaml = (fileName?: string): boolean =>
 
 export const recommendAddDvcYamlSchemaOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
-    if (alreadyHasSchema() || getConfigValue(doNotAddDvcYamlSchema)) {
+    if (alreadyHasSchema() || getConfigValue(DO_NOT_ADD_DVC_YAML_SCHEMA)) {
       return singleUseListener.dispose()
     }
 
@@ -126,22 +127,19 @@ export const recommendRedHatExtension = async () => {
   )
 
   if (response === Response.SHOW) {
-    return commands.executeCommand(
-      'workbench.extensions.search',
-      '@id:redhat.vscode-yaml'
-    )
+    return showExtension(RED_HAT_EXTENSION_ID)
   }
 
   if (response === Response.NEVER) {
-    return setUserConfigValue(doNotRecommendRedHat, true)
+    return setUserConfigValue(DO_NOT_RECOMMEND_RED_HAT, true)
   }
 }
 
 export const recommendRedHatExtensionOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
     if (
-      isAvailable('redhat.vscode-yaml') ||
-      getConfigValue(doNotRecommendRedHat)
+      isAvailable(RED_HAT_EXTENSION_ID) ||
+      getConfigValue(DO_NOT_RECOMMEND_RED_HAT)
     ) {
       return singleUseListener.dispose()
     }
