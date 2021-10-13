@@ -149,139 +149,139 @@ suite('Experiments Test Suite', () => {
       expect(windowSpy).not.to.have.been.called
       expect(mockExperimentShow).not.to.have.been.called
     })
-  })
 
-  it('should be able to sort', async () => {
-    const config = disposable.track(new Config())
-    const cliReader = disposable.track(new CliReader(config))
-    const outputChannel = disposable.track(
-      new OutputChannel([cliReader], '3', 'sort test')
-    )
-    const buildTestExperiment = (testParam: number) => ({
-      params: {
-        'params.yaml': {
-          data: { test: testParam }
-        }
-      }
-    })
-    stub(cliReader, 'experimentShow').resolves({
-      testBranch: {
-        baseline: { data: buildTestExperiment(10) },
-        testExp1: { data: buildTestExperiment(2) },
-        testExp2: { data: buildTestExperiment(1) },
-        testExp3: { data: buildTestExperiment(3) }
-      },
-      workspace: {
-        baseline: { data: buildTestExperiment(10) }
-      }
-    })
-
-    const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
-
-    const internalCommands = disposable.track(
-      new InternalCommands(config, outputChannel, cliReader)
-    )
-    const resourceLocator = disposable.track(
-      new ResourceLocator(Uri.file(resourcePath))
-    )
-
-    const experiments = disposable.track(
-      new Experiments(
-        dvcDemoPath,
-        internalCommands,
-        resourceLocator,
-        buildMockMemento()
+    it('should be able to sort', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      const outputChannel = disposable.track(
+        new OutputChannel([cliReader], '3', 'sort test')
       )
-    )
-    await experiments.isReady()
-    await experiments.showWebview()
-
-    expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
-      {
-        displayName: 'workspace',
-        id: 'workspace',
-        params: { 'params.yaml': { test: 10 } }
-      },
-      {
-        displayName: 'testBra',
-        id: 'testBranch',
-        params: { 'params.yaml': { test: 10 } },
-        subRows: [
-          {
-            displayName: 'testExp',
-            id: 'testExp1',
-            params: { 'params.yaml': { test: 2 } }
-          },
-          {
-            displayName: 'testExp',
-            id: 'testExp2',
-            params: { 'params.yaml': { test: 1 } }
-          },
-          {
-            displayName: 'testExp',
-            id: 'testExp3',
-            params: { 'params.yaml': { test: 3 } }
+      const buildTestExperiment = (testParam: number) => ({
+        params: {
+          'params.yaml': {
+            data: { test: testParam }
           }
-        ]
-      }
-    ])
+        }
+      })
+      stub(cliReader, 'experimentShow').resolves({
+        testBranch: {
+          baseline: { data: buildTestExperiment(10) },
+          testExp1: { data: buildTestExperiment(2) },
+          testExp2: { data: buildTestExperiment(1) },
+          testExp3: { data: buildTestExperiment(3) }
+        },
+        workspace: {
+          baseline: { data: buildTestExperiment(10) }
+        }
+      })
 
-    expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
-    const mockShowQuickPick = stub(window, 'showQuickPick')
-    const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
+      const internalCommands = disposable.track(
+        new InternalCommands(config, outputChannel, cliReader)
+      )
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
+      )
 
-    mockShowQuickPick.onFirstCall().resolves({
-      label: 'test',
-      value: {
-        path: sortPath
-      }
-    } as QuickPickItemWithValue<ParamOrMetric>)
+      const experiments = disposable.track(
+        new Experiments(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator,
+          buildMockMemento()
+        )
+      )
+      await experiments.isReady()
+      await experiments.showWebview()
 
-    mockShowQuickPick.onSecondCall().resolves({
-      label: 'Ascending',
-      value: false
-    } as QuickPickItemWithValue<boolean>)
+      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+        {
+          displayName: 'workspace',
+          id: 'workspace',
+          params: { 'params.yaml': { test: 10 } }
+        },
+        {
+          displayName: 'testBra',
+          id: 'testBranch',
+          params: { 'params.yaml': { test: 10 } },
+          subRows: [
+            {
+              displayName: 'testExp',
+              id: 'testExp1',
+              params: { 'params.yaml': { test: 2 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp2',
+              params: { 'params.yaml': { test: 1 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp3',
+              params: { 'params.yaml': { test: 3 } }
+            }
+          ]
+        }
+      ])
 
-    const tableChangePromise = experimentsUpdatedEvent(experiments)
+      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
 
-    const pickPromise = experiments.addSort()
-    await pickPromise
-    await tableChangePromise
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+      const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
 
-    expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
-      {
-        displayName: 'workspace',
-        id: 'workspace',
-        params: { 'params.yaml': { test: 10 } }
-      },
-      {
-        displayName: 'testBra',
-        id: 'testBranch',
-        params: { 'params.yaml': { test: 10 } },
-        subRows: [
-          {
-            displayName: 'testExp',
-            id: 'testExp2',
-            params: { 'params.yaml': { test: 1 } }
-          },
-          {
-            displayName: 'testExp',
-            id: 'testExp1',
-            params: { 'params.yaml': { test: 2 } }
-          },
-          {
-            displayName: 'testExp',
-            id: 'testExp3',
-            params: { 'params.yaml': { test: 3 } }
-          }
-        ]
-      }
-    ])
+      mockShowQuickPick.onFirstCall().resolves({
+        label: 'test',
+        value: {
+          path: sortPath
+        }
+      } as QuickPickItemWithValue<ParamOrMetric>)
 
-    expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
-      { descending: false, path: sortPath }
-    ])
+      mockShowQuickPick.onSecondCall().resolves({
+        label: 'Ascending',
+        value: false
+      } as QuickPickItemWithValue<boolean>)
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      const pickPromise = experiments.addSort()
+      await pickPromise
+      await tableChangePromise
+
+      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+        {
+          displayName: 'workspace',
+          id: 'workspace',
+          params: { 'params.yaml': { test: 10 } }
+        },
+        {
+          displayName: 'testBra',
+          id: 'testBranch',
+          params: { 'params.yaml': { test: 10 } },
+          subRows: [
+            {
+              displayName: 'testExp',
+              id: 'testExp2',
+              params: { 'params.yaml': { test: 1 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp1',
+              params: { 'params.yaml': { test: 2 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp3',
+              params: { 'params.yaml': { test: 3 } }
+            }
+          ]
+        }
+      ])
+
+      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
+        { descending: false, path: sortPath }
+      ])
+    }).timeout(5000)
   })
 
   describe('persisted state', () => {
