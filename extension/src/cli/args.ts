@@ -31,8 +31,7 @@ export enum ExperimentSubCommand {
   LIST = 'list',
   SHOW = 'show',
   REMOVE = 'remove',
-  RUN = 'run',
-  DIFF = 'diff'
+  RUN = 'run'
 }
 
 export enum ExperimentFlag {

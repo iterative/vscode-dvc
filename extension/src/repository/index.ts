@@ -6,7 +6,6 @@ import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
 import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
-import { retryUntilResolved } from '../util/promise'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 export class Repository {
@@ -20,7 +19,7 @@ export class Repository {
 
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
-  private decorationProvider?: DecorationProvider
+  private decorationProvider: DecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
 
   private processManager: ProcessManager
@@ -28,11 +27,11 @@ export class Repository {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    decorationProvider?: DecorationProvider
+    decorationProvider = new DecorationProvider()
   ) {
     makeObservable(this)
     this.internalCommands = internalCommands
-    this.decorationProvider = decorationProvider
+    this.decorationProvider = this.dispose.track(decorationProvider)
     this.dvcRoot = dvcRoot
     this.model = this.dispose.track(new RepositoryModel(dvcRoot))
 
@@ -70,6 +69,10 @@ export class Repository {
     return this.processManager.run('update')
   }
 
+  public hasChanges(): boolean {
+    return this.model.hasChanges()
+  }
+
   private async resetState() {
     const [diffFromHead, diffFromCache, untracked, tracked] =
       await this.getResetData()
@@ -89,25 +92,15 @@ export class Repository {
   private async getUpdateData(): Promise<
     [DiffOutput, StatusOutput, Set<string>]
   > {
-    const getStatusPromise = () =>
-      this.internalCommands.executeCommand<StatusOutput>(
+    const statusOutput =
+      await this.internalCommands.executeCommand<StatusOutput>(
         AvailableCommands.STATUS,
         this.dvcRoot
       )
-    const statusOutput = await retryUntilResolved<StatusOutput>(
-      getStatusPromise,
-      'Repository status update'
-    )
 
-    const getDiffPromise = () =>
-      this.internalCommands.executeCommand<DiffOutput>(
-        AvailableCommands.DIFF,
-        this.dvcRoot
-      )
-
-    const diffOutput = await retryUntilResolved<DiffOutput>(
-      getDiffPromise,
-      'Repository diff update'
+    const diffOutput = await this.internalCommands.executeCommand<DiffOutput>(
+      AvailableCommands.DIFF,
+      this.dvcRoot
     )
 
     const gitOutput = await getAllUntracked(this.dvcRoot)
@@ -120,13 +113,9 @@ export class Repository {
   > {
     const [diffOutput, statusOutput, gitOutput] = await this.getUpdateData()
 
-    const listOutput = await retryUntilResolved<ListOutput[]>(
-      () =>
-        this.internalCommands.executeCommand<ListOutput[]>(
-          AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
-          this.dvcRoot
-        ),
-      'Repository list update'
+    const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
+      AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
+      this.dvcRoot
     )
 
     return [diffOutput, statusOutput, gitOutput, listOutput]
@@ -134,7 +123,7 @@ export class Repository {
 
   private setState() {
     this.sourceControlManagement.setState(this.getState())
-    this.decorationProvider?.setState(this.getState())
+    this.decorationProvider.setState(this.getState())
   }
 
   private async setup() {

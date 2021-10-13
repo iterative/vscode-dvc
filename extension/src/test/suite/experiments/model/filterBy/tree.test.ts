@@ -5,7 +5,8 @@ import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import complexColumnData from '../../../../fixtures/complex-column-example'
 import complexRowData from '../../../../fixtures/complex-row-example'
-import { Experiments } from '../../../../../experiments'
+import complexChangesData from '../../../../fixtures/complex-changes-example'
+import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
   Operator
@@ -13,7 +14,7 @@ import {
 import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperimentsRepository } from '../../util'
+import { buildExperiments } from '../../util'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -37,91 +38,99 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
-      const experimentsWebview = await experimentsRepository.showWebview()
+      await experiments.isReady()
+      const experimentsWebview = await experiments.showWebview()
       const messageSpy = spy(experimentsWebview, 'showExperiments')
 
-      const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
+      const accuracyPath = joinParamOrMetricPath(
+        'metrics',
+        'summary.json',
+        'accuracy'
+      )
 
-      const lossFilter = {
-        operator: Operator.LESS_THAN_OR_EQUAL,
-        path: lossPath,
-        value: '1.6170'
+      const accuracyFilter = {
+        operator: Operator.GREATER_THAN_OR_EQUAL,
+        path: accuracyPath,
+        value: '0.45'
       }
 
-      const loss = complexColumnData.find(
-        paramOrMetric => paramOrMetric.path === lossPath
+      const accuracy = complexColumnData.find(
+        paramOrMetric => paramOrMetric.path === accuracyPath
       )
       mockShowQuickPick
         .onFirstCall()
-        .resolves({ value: loss } as unknown as QuickPickItem)
-      mockShowQuickPick
-        .onSecondCall()
-        .resolves({ value: lossFilter.operator } as unknown as QuickPickItem)
-      mockShowInputBox.resolves(lossFilter.value)
+        .resolves({ value: accuracy } as unknown as QuickPickItem)
+      mockShowQuickPick.onSecondCall().resolves({
+        value: accuracyFilter.operator
+      } as unknown as QuickPickItem)
+      mockShowInputBox.resolves(accuracyFilter.value)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
+        (WorkspaceExperiments as any).prototype,
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      const tableFilterAdded = experimentsUpdatedEvent(experimentsRepository)
+      const tableFilterAdded = experimentsUpdatedEvent(experiments)
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
       await tableFilterAdded
 
-      const [workspace, testBranch, master] = complexRowData
+      const [workspace, master] = complexRowData
 
       const filteredRows = [
         workspace,
         {
-          ...testBranch,
-          subRows: testBranch.subRows?.map(experiment => ({
-            ...experiment,
-            subRows: experiment.subRows?.filter(checkpoint => {
-              const loss = checkpoint.metrics?.['summary.json']?.loss
-              return loss && loss <= 1.617
+          ...master,
+          subRows: master.subRows
+            ?.filter(experiment => {
+              const accuracy = experiment.metrics?.['summary.json']?.accuracy
+              return accuracy && accuracy >= 0.45
             })
-          }))
-        },
-        { ...master, subRows: [] }
+            .map(experiment => ({
+              ...experiment,
+              subRows: experiment.subRows?.filter(checkpoint => {
+                const accuracy = checkpoint.metrics?.['summary.json']?.accuracy
+                return accuracy && accuracy >= 0.45
+              })
+            }))
+        }
       ]
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          changes: [],
+          changes: complexChangesData,
           columns: complexColumnData,
           rows: filteredRows,
           sorts: []
         }
       })
 
-      const tableFilterRemoved = experimentsUpdatedEvent(experimentsRepository)
+      const tableFilterRemoved = experimentsUpdatedEvent(experiments)
 
       messageSpy.resetHistory()
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_FILTER_REMOVE,
         {
-          description: lossPath,
+          description: accuracyPath,
           dvcRoot: dvcDemoPath,
-          id: getFilterId(lossFilter),
-          label: [lossFilter.operator, lossFilter.value].join(' ')
+          id: getFilterId(accuracyFilter),
+          label: [accuracyFilter.operator, accuracyFilter.value].join(' ')
         }
       )
       await tableFilterRemoved
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
-          changes: [],
+          changes: complexChangesData,
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
@@ -133,9 +142,9 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
 
-      const { experimentsRepository } = buildExperimentsRepository(disposable)
+      const { experiments } = buildExperiments(disposable)
 
-      await experimentsRepository.isReady()
+      await experiments.isReady()
 
       const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
 
@@ -151,12 +160,12 @@ suite('Experiments Filter By Tree Test Suite', () => {
       mockShowInputBox.resolves('2')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getRepository').returns(
-        experimentsRepository
+      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
+        experiments
       )
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (Experiments as any).prototype,
+        (WorkspaceExperiments as any).prototype,
         'getFocusedOrOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
@@ -199,8 +208,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       mockShowInputBox.resetHistory()
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getDvcRoots').returns([dvcDemoPath])
-      stub(Experiments.prototype, 'isReady').resolves(undefined)
+      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+        dvcDemoPath
+      ])
+      stub(WorkspaceExperiments.prototype, 'isReady').resolves(undefined)
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_FILTERS_REMOVE_ALL
@@ -218,14 +229,14 @@ suite('Experiments Filter By Tree Test Suite', () => {
     const mockShowQuickPick = stub(window, 'showQuickPick')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((Experiments as any).prototype, 'getDvcRoots').returns([
+    stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
       dvcDemoPath,
       'mockRoot'
     ])
 
     const getRepositorySpy = spy(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (Experiments as any).prototype,
+      (WorkspaceExperiments as any).prototype,
       'getRepository'
     )
 

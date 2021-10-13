@@ -1,7 +1,7 @@
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { Experiments } from '.'
-import { ExperimentsRepository } from './repository'
+import { WorkspaceExperiments } from './workspace'
 import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
 import { Config } from '../config'
@@ -61,18 +61,18 @@ describe('Experiments', () => {
     (...args) => mockedRun(...args)
   )
 
-  const experiments = new Experiments(
+  const workspaceExperiments = new WorkspaceExperiments(
     mockedInternalCommands,
     buildMockMemento(),
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
         showWebview: mockedShowWebview
-      } as unknown as ExperimentsRepository,
+      } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
         showWebview: jest.fn()
-      } as unknown as ExperimentsRepository
+      } as unknown as Experiments
     }
   )
 
@@ -80,7 +80,7 @@ describe('Experiments', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await experiments.getCwdThenRun(mockedCommandId)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
@@ -90,7 +90,7 @@ describe('Experiments', () => {
     it('should not call the function if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await experiments.getCwdThenRun(mockedCommandId)
+      await workspaceExperiments.getCwdThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).not.toBeCalled()
@@ -102,7 +102,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
 
-      await experiments.getExpNameThenRun(mockedCommandId)
+      await workspaceExperiments.getExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedPickExperimentName).toBeCalledTimes(1)
@@ -113,7 +113,7 @@ describe('Experiments', () => {
     it('should not call the function if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await experiments.getExpNameThenRun(mockedCommandId)
+      await workspaceExperiments.getExpNameThenRun(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).not.toBeCalled()
@@ -128,7 +128,7 @@ describe('Experiments', () => {
       const mockedQuickPick = jest
         .fn()
         .mockResolvedValueOnce(mockedPickedOptions)
-      await experiments.getCwdAndQuickPickThenRun(
+      await workspaceExperiments.getCwdAndQuickPickThenRun(
         mockedCommandId,
         mockedQuickPick
       )
@@ -146,7 +146,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
       const mockedQuickPick = jest.fn()
 
-      await experiments.getCwdAndQuickPickThenRun(
+      await workspaceExperiments.getCwdAndQuickPickThenRun(
         mockedCommandId,
         mockedQuickPick
       )
@@ -160,7 +160,7 @@ describe('Experiments', () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
       const mockedQuickPick = jest.fn().mockResolvedValueOnce(undefined)
 
-      await experiments.getCwdAndQuickPickThenRun(
+      await workspaceExperiments.getCwdAndQuickPickThenRun(
         mockedCommandId,
         mockedQuickPick
       )
@@ -177,7 +177,7 @@ describe('Experiments', () => {
       mockedPickExperimentName.mockResolvedValueOnce('exp-123')
       mockedGetInput.mockResolvedValueOnce('abc123')
 
-      await experiments.getExpNameAndInputThenRun(
+      await workspaceExperiments.getExpNameAndInputThenRun(
         mockedCommandId,
         'enter your password please'
       )
@@ -191,7 +191,7 @@ describe('Experiments', () => {
     it('should not call the function or ask for input if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await experiments.getExpNameAndInputThenRun(
+      await workspaceExperiments.getExpNameAndInputThenRun(
         mockedCommandId,
         'please name the branch'
       )
@@ -206,7 +206,7 @@ describe('Experiments', () => {
       mockedPickExperimentName.mockResolvedValueOnce('exp-456')
       mockedGetInput.mockResolvedValueOnce(undefined)
 
-      await experiments.getExpNameAndInputThenRun(
+      await workspaceExperiments.getExpNameAndInputThenRun(
         mockedCommandId,
         'please enter your bank account number and sort code'
       )
@@ -221,7 +221,7 @@ describe('Experiments', () => {
     it('should call the runner with the correct args when run experiment is provided', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await experiments.showExperimentsTableThenRun(
+      await workspaceExperiments.showExperimentsTableThenRun(
         AvailableCommands.EXPERIMENT_RUN
       )
 

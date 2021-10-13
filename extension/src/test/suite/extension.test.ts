@@ -17,6 +17,7 @@ import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
+import { OutputChannel } from '../../vscode/outputChannel'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -170,10 +171,6 @@ suite('Extension Test Suite', () => {
         'I WORK NOW'
       )
 
-      stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
-
-      stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
-
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
@@ -274,10 +271,6 @@ suite('Extension Test Suite', () => {
 
       const mockDisposer = spy(Disposer, 'reset')
 
-      stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
-
-      stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
-
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
 
       stub(CliReader.prototype, 'listDvcOnly').resolves([])
@@ -371,8 +364,16 @@ suite('Extension Test Suite', () => {
   describe('dvc.showCommands', () => {
     it('should show all of the dvc commands without error', async () => {
       await expect(
-        commands.executeCommand('dvc.showCommands')
+        commands.executeCommand(RegisteredCommands.EXTENSION_SHOW_COMMANDS)
       ).to.be.eventually.equal(undefined)
+    })
+  })
+
+  describe('dvc.showOutput', () => {
+    it('should be able to show the output channel', async () => {
+      const showOutputSpy = spy(OutputChannel.prototype, 'show')
+      await commands.executeCommand(RegisteredCommands.EXTENSION_SHOW_OUTPUT)
+      expect(showOutputSpy).to.have.been.calledOnce
     })
   })
 

@@ -26,7 +26,10 @@ describe('SourceControlManagement', () => {
     it('should be able to set the state', () => {
       const dvcRoot = __dirname
       const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
-        createResourceGroup: jest.fn().mockReturnValueOnce({}),
+        createResourceGroup: jest
+          .fn()
+          .mockReturnValueOnce({})
+          .mockReturnValueOnce({}),
         inputBox: { visible: true }
       })
       mockedScm.createSourceControl = mockedCreateSourceControl

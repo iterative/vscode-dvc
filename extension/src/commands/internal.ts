@@ -10,13 +10,13 @@ import { Config } from '../config'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
-import { quickPickOne } from '../vscode/quickPick'
+import { reportErrorWithOptions } from '../vscode/reporting'
+import { Response } from '../vscode/response'
 
 type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
   {
-    GET_ONLY_OR_PICK_PROJECT: 'getOnlyOrPickProject',
     GET_THEME: 'getTheme'
   } as const,
   CliExecutorCommands,
@@ -38,20 +38,6 @@ export class InternalCommands {
   ) {
     cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
     this.outputChannel = outputChannel
-
-    this.registerCommand(
-      AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
-      (...dvcRoots: string[]) => {
-        if (dvcRoots.length === 1) {
-          return dvcRoots[0]
-        }
-
-        return quickPickOne(
-          dvcRoots,
-          'Select which project to run command against'
-        )
-      }
-    )
 
     this.registerCommand(AvailableCommands.GET_THEME, () => config.getTheme())
   }
@@ -85,7 +71,7 @@ export class InternalCommands {
         try {
           return await this.runAndSendTelemetry<T>(name, func, arg)
         } catch (e: unknown) {
-          this.outputChannel.offerToShowError()
+          this.offerToShowError()
         }
       })
     )
@@ -141,5 +127,16 @@ export class InternalCommands {
 
   private confirmedId(commandId: string): commandId is CommandId {
     return Object.values(AvailableCommands).includes(commandId as CommandId)
+  }
+
+  private async offerToShowError() {
+    const response = await reportErrorWithOptions(
+      'Something went wrong, please see the DVC output channel for more details.',
+      Response.SHOW,
+      Response.CLOSE
+    )
+    if (response === Response.SHOW) {
+      return this.outputChannel.show()
+    }
   }
 }

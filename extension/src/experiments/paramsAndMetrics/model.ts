@@ -1,12 +1,13 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectFiles, collectParamsAndMetrics } from './collect'
+import {
+  collectChanges,
+  collectFiles,
+  collectParamsAndMetrics
+} from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
-import {
-  DiffParamsOrMetricsOutput,
-  ExperimentsRepoJSONOutput
-} from '../../cli/reader'
+import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 export enum Status {
   selected = 2,
@@ -53,7 +54,8 @@ export class ParamsAndMetricsModel {
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     return Promise.all([
       this.transformAndSetParamsAndMetrics(data),
-      this.transformAndSetFiles(data)
+      this.transformAndSetFiles(data),
+      this.transformAndSetChanges(data)
     ])
   }
 
@@ -112,18 +114,6 @@ export class ParamsAndMetricsModel {
     return flatten<Status>(nestedStatuses)
   }
 
-  public addChanges(diff: DiffParamsOrMetricsOutput) {
-    const changes: string[] = []
-    const files = Object.keys(diff || [])
-    files.forEach(file => changes.push(...Object.keys(diff?.[file] || [])))
-
-    this.paramsAndMetricsChanges.push(...changes)
-  }
-
-  public resetChanges() {
-    this.paramsAndMetricsChanges = []
-  }
-
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
     const paramsAndMetrics = collectParamsAndMetrics(data)
 
@@ -145,6 +135,10 @@ export class ParamsAndMetricsModel {
 
     this.files = files
     this.paramsAndMetricsFilesChanged.fire()
+  }
+
+  private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {
+    this.paramsAndMetricsChanges = collectChanges(data)
   }
 
   private setAreChildrenSelected(path: string, status: Status) {

@@ -8,7 +8,7 @@ import {
   Uri
 } from 'vscode'
 import { SortDefinition } from './'
-import { Experiments } from '../..'
+import { WorkspaceExperiments } from '../../workspace'
 import { createTreeView } from '../../../vscode/tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
@@ -27,10 +27,13 @@ export class ExperimentsSortByTree
 
   public readonly onDidChangeTreeData: Event<void>
 
-  private readonly experiments: Experiments
+  private readonly experiments: WorkspaceExperiments
   private viewed = false
 
-  constructor(experiments: Experiments, internalCommands: InternalCommands) {
+  constructor(
+    experiments: WorkspaceExperiments,
+    internalCommands: InternalCommands
+  ) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.dispose.track(

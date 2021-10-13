@@ -7,6 +7,7 @@ import {
   quickPickValue,
   quickPickYesOrNo
 } from './quickPick'
+import { Response } from './response'
 
 jest.mock('vscode')
 
@@ -120,7 +121,11 @@ describe('quickPickYesOrNo', () => {
     const title = 'THIS IS THE MOST IMPORTANT DECISION OF YOUR LIFE'
     const placeHolder = 'you have 5 seconds'
     const yesDescription = 'help'
-    const yesItem = { description: yesDescription, label: 'Yes', value: true }
+    const yesItem = {
+      description: yesDescription,
+      label: Response.YES,
+      value: true
+    }
     const noDescription = 'me'
     mockedShowQuickPick.mockResolvedValueOnce(yesItem)
 
@@ -130,7 +135,10 @@ describe('quickPickYesOrNo', () => {
     })
 
     expect(mockedShowQuickPick).toBeCalledWith(
-      [yesItem, { description: noDescription, label: 'No', value: false }],
+      [
+        yesItem,
+        { description: noDescription, label: Response.NO, value: false }
+      ],
       {
         canPickMany: false,
         placeHolder,

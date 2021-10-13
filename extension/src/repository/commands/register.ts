@@ -1,18 +1,20 @@
-import { commands } from 'vscode'
 import {
+  getCommitRootCommand,
   getResetRootCommand,
   getResourceCommand,
   getRootCommand,
   getSimpleResourceCommand,
+  getStageAllCommand,
+  getUnstageAllCommand,
   Resource,
   Root
 } from '.'
-import { tryThenMaybeForce } from '../../cli/actions'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../commands/external'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { WorkspaceRepositories } from '../workspace'
 
 const registerResourceCommands = (internalCommands: InternalCommands): void => {
   internalCommands.registerExternalCliCommand<Resource>(
@@ -31,41 +33,56 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
   )
 }
 
-const registerRootCommands = (internalCommands: InternalCommands) => {
+const registerResourceGroupCommands = (
+  repositories: WorkspaceRepositories,
+  internalCommands: InternalCommands
+) => {
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.GIT_STAGE_ALL,
+    getStageAllCommand(repositories)
+  )
+
+  internalCommands.registerExternalCommand<Root>(
+    RegisteredCommands.GIT_UNSTAGE_ALL,
+    getUnstageAllCommand(repositories)
+  )
+}
+
+const registerRootCommands = (
+  repositories: WorkspaceRepositories,
+  internalCommands: InternalCommands
+) => {
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.CHECKOUT,
-    getRootCommand(internalCommands, AvailableCommands.CHECKOUT)
+    getRootCommand(repositories, internalCommands, AvailableCommands.CHECKOUT)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.COMMIT,
-    async ({ rootUri }) => {
-      const cwd = rootUri.fsPath
-
-      await tryThenMaybeForce(internalCommands, AvailableCommands.COMMIT, cwd)
-      return commands.executeCommand('workbench.scm.focus')
-    }
+    getCommitRootCommand(repositories, internalCommands)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.PULL,
-    getRootCommand(internalCommands, AvailableCommands.PULL)
+    getRootCommand(repositories, internalCommands, AvailableCommands.PULL)
   )
 
   internalCommands.registerExternalCliCommand<Root>(
     RegisteredCliCommands.PUSH,
-    getRootCommand(internalCommands, AvailableCommands.PUSH)
+    getRootCommand(repositories, internalCommands, AvailableCommands.PUSH)
   )
 
   internalCommands.registerExternalCommand<Root>(
     RegisteredCommands.RESET_WORKSPACE,
-    getResetRootCommand(internalCommands)
+    getResetRootCommand(repositories, internalCommands)
   )
 }
 
 export const registerRepositoryCommands = (
+  repositories: WorkspaceRepositories,
   internalCommands: InternalCommands
 ): void => {
   registerResourceCommands(internalCommands)
-  registerRootCommands(internalCommands)
+  registerResourceGroupCommands(repositories, internalCommands)
+  registerRootCommands(repositories, internalCommands)
 }

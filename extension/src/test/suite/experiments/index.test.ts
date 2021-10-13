@@ -1,24 +1,29 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, useFakeTimers } from 'sinon'
-import { window, commands, workspace, Uri, QuickPickItem } from 'vscode'
-import { buildMultiRepoExperiments, buildSingleRepoExperiments } from './util'
+import { stub, spy, restore } from 'sinon'
+import { window, commands, workspace, Uri } from 'vscode'
+import { buildExperiments } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
+import complexRowData from '../../fixtures/complex-row-example'
+import complexColumnData from '../../fixtures/complex-column-example'
+import complexChangesData from '../../fixtures/complex-changes-example'
 import { Experiments } from '../../../experiments'
-import { ExperimentsRepository } from '../../../experiments/repository'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import * as QuickPick from '../../../vscode/quickPick'
-import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
-import { CliExecutor } from '../../../cli/executor'
-import { dvcDemoPath, resourcePath } from '../util'
+import { ExperimentsWebview } from '../../../experiments/webview'
+import { QuickPickItemWithValue } from '../../../vscode/quickPick'
+import { ParamOrMetric } from '../../../experiments/webview/contract'
+import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
-import { RegisteredCliCommands } from '../../../commands/external'
-import * as Telemetry from '../../../telemetry'
+import { SortDefinition } from '../../../experiments/model/sortBy'
+import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
+import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
+import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
+import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Experiments Test Suite', () => {
@@ -33,270 +38,427 @@ suite('Experiments Test Suite', () => {
     return commands.executeCommand('workbench.action.closeAllEditors')
   })
 
-  const onDidChangeIsWebviewFocused = (
-    experimentsRepository: ExperimentsRepository
-  ): Promise<string | undefined> =>
-    new Promise(resolve => {
-      const listener: Disposable =
-        experimentsRepository.onDidChangeIsWebviewFocused(
-          (event: string | undefined) => {
-            listener.dispose()
-            return resolve(event)
-          }
-        )
-    })
-
-  describe('showExperimentsTable', () => {
-    it('should prompt to pick a project even if a webview is focused', async () => {
-      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
-        dvcDemoPath
-      )
-
-      const { experiments, experimentsRepository } =
-        buildMultiRepoExperiments(disposable)
+  describe('refresh', () => {
+    it('should debounce all calls to refresh that are made within 200ms', async () => {
+      const { experiments, mockExperimentShow } = buildExperiments(disposable)
 
       await experiments.isReady()
+      mockExperimentShow.resetHistory()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
+      await Promise.all([
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh(),
+        experiments.refresh()
+      ])
 
-      await experiments.showExperimentsTable()
-
-      expect(await focused).to.equal(dvcDemoPath)
-      expect(mockQuickPickOne).to.be.calledOnce
-      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
-
-      mockQuickPickOne.resetHistory()
-
-      const focusedExperimentsRepository =
-        await experiments.showExperimentsTable()
-
-      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
-      expect(mockQuickPickOne).to.be.calledOnce
-    }).timeout(5000)
-
-    it('should not prompt to pick a project if there is only one project', async () => {
-      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
-        dvcDemoPath
-      )
-
-      const { experiments } = buildSingleRepoExperiments(disposable)
-      await experiments.isReady()
-
-      await experiments.showExperimentsTable()
-
-      expect(mockQuickPickOne).to.not.be.called
+      expect(mockExperimentShow).to.be.calledOnce
     })
   })
 
-  describe('showExperimentsTableThenRun', () => {
-    it('should run against an experiments table if webview is focused', async () => {
-      stub(CliReader.prototype, 'diffParams').resolves({ params: {} })
-
-      stub(CliReader.prototype, 'diffMetrics').resolves({ metrics: {} })
-
-      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
-        dvcDemoPath
-      )
-
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const cliRunner = disposable.track(new CliRunner(config))
-      const mockRun = stub(cliRunner, 'run').resolves()
-      const outputChannel = disposable.track(
-        new OutputChannel([cliReader], '5', 'experiments runner test')
-      )
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, outputChannel, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const mockExperimentsRepository = {
-        'other/dvc/root': { cliReader } as unknown as ExperimentsRepository
-      } as Record<string, ExperimentsRepository>
-
-      const experiments = disposable.track(
-        new Experiments(
-          internalCommands,
-          buildMockMemento(),
-          mockExperimentsRepository
-        )
-      )
-      const [experimentsRepository] = experiments.create(
-        [dvcDemoPath],
-        resourceLocator
-      )
+  describe('getExperiments', () => {
+    it('should return all existing experiments', async () => {
+      const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
 
-      const focused = onDidChangeIsWebviewFocused(experimentsRepository)
+      const runs = experiments.getExperiments()
 
-      await experiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN_QUEUED
+      expect(runs.map(experiment => experiment.displayName)).to.deep.equal([
+        'workspace',
+        'exp-e7a67',
+        'test-branch',
+        'exp-83425',
+        '90aea7f'
+      ])
+    })
+  })
+
+  describe('getCheckpoints', () => {
+    it("should return the correct checkpoints for an experiment's id", async () => {
+      const { experiments } = buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      const notAnExperimentId = ':cartwheel:'
+      const notCheckpoints = experiments.getCheckpoints(notAnExperimentId)
+      expect(notCheckpoints).to.be.undefined
+
+      const checkpoints = experiments.getCheckpoints(
+        '4fb124aebddb2adf1545030907687fa9a4c80e70'
       )
 
-      expect(await focused).to.equal(dvcDemoPath)
-      expect(mockQuickPickOne).to.be.calledOnce
-      expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
-      expect(experiments.getFocusedTable()).to.equal(experimentsRepository)
+      expect(
+        checkpoints?.map(checkpoint => checkpoint.displayName)
+      ).to.deep.equal(['d1343a8', '1ee5f2e'])
+    })
+  })
 
-      mockQuickPickOne.resetHistory()
+  describe('showWebview', () => {
+    it('should be able to make the experiment webview visible', async () => {
+      const { experiments } = buildExperiments(
+        disposable,
+        complexExperimentsOutput
+      )
 
-      const focusedExperimentsRepository =
-        await experiments.showExperimentsTableThenRun(
-          AvailableCommands.EXPERIMENT_RUN_QUEUED
-        )
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
-      expect(focusedExperimentsRepository).to.equal(experimentsRepository)
-      expect(mockQuickPickOne).not.to.be.called
+      const webview = await experiments.showWebview()
 
-      const unfocused = onDidChangeIsWebviewFocused(experimentsRepository)
-      const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
+      expect(messageSpy).to.be.calledWith({
+        tableData: {
+          changes: complexChangesData,
+          columns: complexColumnData,
+          rows: complexRowData,
+          sorts: []
+        }
+      })
+
+      expect(webview.isActive()).to.be.true
+      expect(webview.isVisible()).to.be.true
+    })
+
+    it('should only be able to open a single experiments webview', async () => {
+      const { experiments, mockExperimentShow } = buildExperiments(disposable)
+
+      const windowSpy = spy(window, 'createWebviewPanel')
+      const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
 
       const document = await workspace.openTextDocument(uri)
       await window.showTextDocument(document)
 
-      expect(await unfocused).to.be.undefined
-      expect(experiments.getFocusedTable()).to.be.undefined
+      expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const focusedAgain = onDidChangeIsWebviewFocused(experimentsRepository)
+      const webview = await experiments.showWebview()
+
+      expect(windowSpy).to.have.been.calledOnce
+      expect(mockExperimentShow).to.have.been.calledOnce
+
+      windowSpy.resetHistory()
+      mockExperimentShow.resetHistory()
+
       await commands.executeCommand('workbench.action.previousEditor')
-      expect(await focusedAgain).to.equal(dvcDemoPath)
+      expect(window.activeTextEditor?.document).to.deep.equal(document)
+
+      const sameWebview = await experiments.showWebview()
+
+      expect(webview === sameWebview).to.be.true
+
+      expect(windowSpy).not.to.have.been.called
+      expect(mockExperimentShow).not.to.have.been.called
     })
-  })
 
-  describe('dvc.queueExperiment', () => {
-    it('should be able to queue an experiment', async () => {
-      const mockExperimentRunQueue = stub(
-        CliExecutor.prototype,
-        'experimentRunQueue'
-      ).resolves('true')
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
+    it('should be able to sort', async () => {
+      const config = disposable.track(new Config())
+      const cliReader = disposable.track(new CliReader(config))
+      const outputChannel = disposable.track(
+        new OutputChannel([cliReader], '3', 'sort test')
       )
-
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
-
-      expect(mockExperimentRunQueue).to.be.calledOnce
-      expect(mockExperimentRunQueue).to.be.calledWith(dvcDemoPath)
-    })
-
-    it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const clock = useFakeTimers()
-      const duration = 54321
-
-      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
-        clock.tick(duration)
-        return Promise.resolve('true')
+      const buildTestExperiment = (testParam: number) => ({
+        params: {
+          'params.yaml': {
+            data: { test: testParam }
+          }
+        }
+      })
+      stub(cliReader, 'experimentShow').resolves({
+        testBranch: {
+          baseline: { data: buildTestExperiment(10) },
+          testExp1: { data: buildTestExperiment(2) },
+          testExp2: { data: buildTestExperiment(1) },
+          testExp3: { data: buildTestExperiment(3) }
+        },
+        workspace: {
+          baseline: { data: buildTestExperiment(10) }
+        }
       })
 
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
+      const internalCommands = disposable.track(
+        new InternalCommands(config, outputChannel, cliReader)
+      )
+      const resourceLocator = disposable.track(
+        new ResourceLocator(Uri.file(resourcePath))
       )
 
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
+      const experiments = disposable.track(
+        new Experiments(
+          dvcDemoPath,
+          internalCommands,
+          resourceLocator,
+          buildMockMemento()
+        )
+      )
+      await experiments.isReady()
+      await experiments.showWebview()
 
-      expect(mockSendTelemetryEvent).to.be.calledWith(
-        RegisteredCliCommands.QUEUE_EXPERIMENT,
-        undefined,
-        { duration }
+      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+        {
+          displayName: 'workspace',
+          id: 'workspace',
+          params: { 'params.yaml': { test: 10 } }
+        },
+        {
+          displayName: 'testBra',
+          id: 'testBranch',
+          params: { 'params.yaml': { test: 10 } },
+          subRows: [
+            {
+              displayName: 'testExp',
+              id: 'testExp1',
+              params: { 'params.yaml': { test: 2 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp2',
+              params: { 'params.yaml': { test: 1 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp3',
+              params: { 'params.yaml': { test: 3 } }
+            }
+          ]
+        }
+      ])
+
+      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
+
+      const mockShowQuickPick = stub(window, 'showQuickPick')
+      const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
+
+      mockShowQuickPick.onFirstCall().resolves({
+        label: 'test',
+        value: {
+          path: sortPath
+        }
+      } as QuickPickItemWithValue<ParamOrMetric>)
+
+      mockShowQuickPick.onSecondCall().resolves({
+        label: 'Ascending',
+        value: false
+      } as QuickPickItemWithValue<boolean>)
+
+      const tableChangePromise = experimentsUpdatedEvent(experiments)
+
+      const pickPromise = experiments.addSort()
+      await pickPromise
+      await tableChangePromise
+
+      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+        {
+          displayName: 'workspace',
+          id: 'workspace',
+          params: { 'params.yaml': { test: 10 } }
+        },
+        {
+          displayName: 'testBra',
+          id: 'testBranch',
+          params: { 'params.yaml': { test: 10 } },
+          subRows: [
+            {
+              displayName: 'testExp',
+              id: 'testExp2',
+              params: { 'params.yaml': { test: 1 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp1',
+              params: { 'params.yaml': { test: 2 } }
+            },
+            {
+              displayName: 'testExp',
+              id: 'testExp3',
+              params: { 'params.yaml': { test: 3 } }
+            }
+          ]
+        }
+      ])
+
+      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
+        { descending: false, path: sortPath }
+      ])
+    }).timeout(5000)
+  })
+
+  describe('persisted state', () => {
+    const firstSortDefinition = {
+      descending: false,
+      path: joinParamOrMetricPath('params', 'params.yaml', 'test')
+    }
+    const secondSortDefinition = {
+      descending: true,
+      path: joinParamOrMetricPath('params', 'params.yaml', 'other')
+    }
+    const sortDefinitions: SortDefinition[] = [
+      firstSortDefinition,
+      secondSortDefinition
+    ]
+
+    const firstFilterId = joinParamOrMetricPath(
+      'params',
+      'params.yaml',
+      'test==1'
+    )
+    const firstFilterDefinition = {
+      operator: Operator.EQUAL,
+      path: joinParamOrMetricPath('params', 'params.yaml', 'test'),
+      value: 1
+    }
+    const secondFilterId = joinParamOrMetricPath(
+      'params',
+      'params.yaml',
+      'other∈testcontains'
+    )
+    const secondFilterDefinition = {
+      operator: Operator.CONTAINS,
+      path: joinParamOrMetricPath('params', 'params.yaml', 'other'),
+      value: 'testcontains'
+    }
+    const firstFilterMapEntry: [string, FilterDefinition] = [
+      firstFilterId,
+      firstFilterDefinition
+    ]
+    const secondFilterMapEntry: [string, FilterDefinition] = [
+      secondFilterId,
+      secondFilterDefinition
+    ]
+    const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
+
+    const mockedInternalCommands = new InternalCommands(
+      {} as Config,
+      {} as unknown as OutputChannel
+    )
+    mockedInternalCommands.registerCommand(
+      AvailableCommands.EXPERIMENT_SHOW,
+      () => Promise.resolve(complexExperimentsOutput)
+    )
+
+    it('should initialize given no persisted state and update persistence given any change', async () => {
+      const mockMemento = buildMockMemento()
+      const mementoSpy = spy(mockMemento, 'get')
+      const testRepository = new Experiments(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        mockMemento
+      )
+      await testRepository.isReady()
+      expect(
+        mementoSpy,
+        'workspaceContext is called for sort initialization'
+      ).to.be.calledWith('sortBy:test', [])
+      expect(
+        mementoSpy,
+        'workspaceContext is called for filter initialization'
+      ).to.be.calledWith('filterBy:test', [])
+
+      expect(
+        testRepository.getSorts(),
+        'Experiments starts with no sorts'
+      ).to.deep.equal([])
+      expect(mockMemento.keys(), 'Memento starts with no keys').to.deep.equal(
+        []
       )
 
-      clock.restore()
+      const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
+
+      mockPickSort.onFirstCall().resolves(firstSortDefinition)
+      await testRepository.addSort()
+
+      expect(
+        mockMemento.get('sortBy:test'),
+        'first sort is added to memento'
+      ).to.deep.equal([firstSortDefinition])
+
+      mockPickSort.onSecondCall().resolves(secondSortDefinition)
+      await testRepository.addSort()
+
+      expect(
+        mockMemento.get('sortBy:test'),
+        'second sort is added to the memento'
+      ).to.deep.equal(sortDefinitions)
+
+      const mockPickFilter = stub(FilterQuickPicks, 'pickFilterToAdd')
+
+      mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
+      await testRepository.addFilter()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'first filter should be added to memento after addFilter'
+      ).to.deep.equal([firstFilterMapEntry])
+
+      mockPickFilter.onSecondCall().resolves(secondFilterDefinition)
+      await testRepository.addFilter()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'second filter should be added to memento after addFilter'
+      ).to.deep.equal(filterMapEntries)
+
+      testRepository.removeFilter(firstFilterId)
+      expect(
+        mockMemento.get('filterBy:test'),
+        'first filter should be removed from memento after removeFilter'
+      ).to.deep.equal([secondFilterMapEntry])
+
+      testRepository.removeSort(firstSortDefinition.path)
+      expect(
+        mockMemento.get('sortBy:test'),
+        'first sort should be removed from memento after removeSortByPath'
+      ).to.deep.equal([secondSortDefinition])
+
+      const mockRemoveSorts = stub(SortQuickPicks, 'pickSortsToRemove')
+
+      mockRemoveSorts.onFirstCall().resolves([secondSortDefinition])
+      await testRepository.removeSorts()
+      expect(
+        mockMemento.get('sortBy:test'),
+        'all sorts should be removed from memento after removeSorts'
+      ).to.deep.equal([])
+
+      mockPickFilter.reset()
+      mockPickFilter.onFirstCall().resolves(firstFilterDefinition)
+      await testRepository.addFilter()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'first filter should be re-added'
+      ).to.deep.equal([secondFilterMapEntry, firstFilterMapEntry])
+
+      const pickFiltersStub = stub(FilterQuickPicks, 'pickFiltersToRemove')
+      pickFiltersStub
+        .onFirstCall()
+        .resolves([firstFilterDefinition, secondFilterDefinition])
+      await testRepository.removeFilters()
+      expect(
+        mockMemento.get('filterBy:test'),
+        'both filters should be removed from memento after removeFilters is run against them'
+      ).to.deep.equal([])
     })
 
-    it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      const clock = useFakeTimers()
-      const duration = 77777
-      const mockErrorMessage =
-        'ERROR: unexpected error - [Errno 2] No such file or directory'
-
-      const mockGenericError = stub(window, 'showErrorMessage').resolves(
-        undefined
-      )
-
-      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
-        clock.tick(duration)
-        throw new Error(mockErrorMessage)
+    it('should initialize with state reflected from the given Memento', async () => {
+      const mockMemento = buildMockMemento({
+        'filterBy:test': filterMapEntries,
+        'sortBy:test': sortDefinitions
       })
 
-      const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
+      const mementoSpy = spy(mockMemento, 'get')
+      const testRepository = new Experiments(
+        'test',
+        mockedInternalCommands,
+        {} as ResourceLocator,
+        mockMemento
       )
-
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
-
-      expect(mockSendTelemetryEvent).to.be.calledWith(
-        `errors.${RegisteredCliCommands.QUEUE_EXPERIMENT}`,
-        { error: mockErrorMessage },
-        { duration }
-      )
-      expect(mockGenericError, 'the generic error should be shown').to.be
-        .calledOnce
-
-      clock.restore()
-    })
-  })
-
-  describe('dvc.applyExperiment', () => {
-    it('should ask the user to pick an experiment and then apply that experiment to the workspace', async () => {
-      const mockExperiment = 'exp-to-apply'
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
-      stub(CliReader.prototype, 'experimentListCurrent').resolves([
-        mockExperiment
+      await testRepository.isReady()
+      expect(mementoSpy).to.be.calledWith('sortBy:test', [])
+      expect(mementoSpy).to.be.calledWith('filterBy:test', [])
+      expect(testRepository.getSorts()).to.deep.equal(sortDefinitions)
+      expect(testRepository.getFilters()).to.deep.equal([
+        firstFilterDefinition,
+        secondFilterDefinition
       ])
-
-      stub(window, 'showQuickPick').resolves(
-        mockExperiment as unknown as QuickPickItem
-      )
-      const mockExperimentApply = stub(CliExecutor.prototype, 'experimentApply')
-
-      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_APPLY)
-
-      expect(mockExperimentApply).to.be.calledWith(dvcDemoPath, mockExperiment)
-    })
-  })
-
-  describe('dvc.removeExperiment', () => {
-    it('should ask the user to pick an experiment and then remove that experiment from the workspace', async () => {
-      const mockExperiment = 'exp-to-remove'
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((Experiments as any).prototype, 'getOnlyOrPickProject').returns(
-        dvcDemoPath
-      )
-      stub(CliReader.prototype, 'experimentListCurrent').resolves([
-        'exp-afc12',
-        mockExperiment,
-        'exp-bcde2',
-        'exp-ghi1k'
-      ])
-      stub(window, 'showQuickPick').resolves(
-        mockExperiment as unknown as QuickPickItem
-      )
-      const mockExperimentRemove = stub(
-        CliExecutor.prototype,
-        'experimentRemove'
-      )
-
-      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_REMOVE)
-
-      expect(mockExperimentRemove).to.be.calledWith(dvcDemoPath, mockExperiment)
     })
   })
 })

@@ -28,7 +28,7 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
-export class ExperimentsTableWebview {
+export class ExperimentsWebview {
   public static viewKey = 'dvc-experiments'
 
   public readonly onDidDispose: Event<void>
@@ -65,7 +65,7 @@ export class ExperimentsTableWebview {
     this.dvcRoot = state.dvcRoot
 
     webviewPanel.onDidDispose(() => {
-      ExperimentsTableWebview.setPanelActiveContext(false)
+      ExperimentsWebview.setPanelActiveContext(false)
       sendTelemetryEvent(
         EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
         undefined,
@@ -124,12 +124,10 @@ export class ExperimentsTableWebview {
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
-  ): Promise<ExperimentsTableWebview> {
+  ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(
-          new ExperimentsTableWebview(webviewPanel, internalCommands, state)
-        )
+        resolve(new ExperimentsWebview(webviewPanel, internalCommands, state))
       } catch (e: unknown) {
         reject(e)
       }
@@ -140,9 +138,9 @@ export class ExperimentsTableWebview {
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator
-  ): Promise<ExperimentsTableWebview> {
+  ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
-      ExperimentsTableWebview.viewKey,
+      ExperimentsWebview.viewKey,
       Experiments,
       ViewColumn.Active,
       {
@@ -154,11 +152,7 @@ export class ExperimentsTableWebview {
 
     webviewPanel.iconPath = resourceLocator.dvcIcon
 
-    const view = new ExperimentsTableWebview(
-      webviewPanel,
-      internalCommands,
-      state
-    )
+    const view = new ExperimentsWebview(webviewPanel, internalCommands, state)
     await view.isReady()
     return view
   }
@@ -196,7 +190,7 @@ export class ExperimentsTableWebview {
   }
 
   private notifyActiveStatus(webviewPanel: WebviewPanel) {
-    ExperimentsTableWebview.setPanelActiveContext(webviewPanel.active)
+    ExperimentsWebview.setPanelActiveContext(webviewPanel.active)
 
     const active = webviewPanel.active ? this.dvcRoot : undefined
     this.isFocusedChanged.fire(active)
@@ -216,15 +210,13 @@ export class ExperimentsTableWebview {
     let urls: {
       publicPath: string
       mainJsUrl: string
-      reactJsUrl: string
     }
 
     if (process.env.USE_DEV_UI === 'true') {
       const baseUrl = 'http://localhost:8080/'
       urls = {
         mainJsUrl: `${baseUrl}main.js`,
-        publicPath: baseUrl,
-        reactJsUrl: `${baseUrl}react.js`
+        publicPath: baseUrl
       }
     } else {
       urls = {
@@ -233,9 +225,6 @@ export class ExperimentsTableWebview {
           .toString(),
         publicPath: this.webviewPanel.webview
           .asWebviewUri(Uri.file(dvcVscodeWebview.distPath))
-          .toString(),
-        reactJsUrl: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.reactJsFilename))
           .toString()
       }
     }
@@ -267,7 +256,6 @@ export class ExperimentsTableWebview {
 					  <script>
 						  Object.assign(window, ${JSON.stringify(data)});
 					  </script>
-					  <script type="text/javascript" src="${urls.reactJsUrl}"></script>
 					  <script type="text/javascript" src="${urls.mainJsUrl}"></script>
 				  </body>
 			  </html>

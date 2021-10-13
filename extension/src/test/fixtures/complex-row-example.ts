@@ -32,134 +32,6 @@ const data: RowData[] = [
     id: 'workspace'
   },
   {
-    id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
-    timestamp: '2020-12-29T15:28:59',
-    params: {
-      'params.yaml': {
-        epochs: 2,
-        learning_rate: 2.2e-7,
-        dvc_logs_dir: 'dvc_logs',
-        log_file: 'logs.csv',
-        dropout: 0.122,
-        process: { threshold: 0.86, test_arg: 'string' }
-      },
-      [join('nested', 'params.yaml')]: {
-        test: true
-      }
-    },
-    queued: false,
-    running: false,
-    executor: null,
-    metrics: {
-      'summary.json': {
-        loss: 1.9293040037155151,
-        accuracy: 0.4668000042438507,
-        val_loss: 1.8770883083343506,
-        val_accuracy: 0.5608000159263611
-      }
-    },
-    name: 'test-branch',
-    displayName: 'test-branch',
-    subRows: [
-      {
-        checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
-        timestamp: '2021-01-14T10:58:00',
-        params: {
-          'params.yaml': {
-            epochs: 2,
-            learning_rate: 2.2e-7,
-            dvc_logs_dir: 'dvc_logs',
-            log_file: 'logs.csv',
-            dropout: 0.122,
-            process: { threshold: 0.86, test_arg: 'string' }
-          },
-          [join('nested', 'params.yaml')]: {
-            test: true
-          }
-        },
-        queued: false,
-        running: false,
-        executor: null,
-        metrics: {
-          'summary.json': {
-            loss: 1.8168506622314453,
-            accuracy: 0.5672000050544739,
-            val_loss: 1.7643483877182007,
-            val_accuracy: 0.6463000178337097
-          }
-        },
-        name: 'exp-05694',
-        checkpoint_parent: 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a',
-        displayName: 'exp-05694',
-        id: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
-        subRows: [
-          {
-            checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
-            timestamp: '2021-01-14T10:57:59',
-            params: {
-              'params.yaml': {
-                epochs: 2,
-                learning_rate: 2.2e-7,
-                dvc_logs_dir: 'dvc_logs',
-                log_file: 'logs.csv',
-                dropout: 0.122,
-                process: { threshold: 0.86, test_arg: 'string' }
-              },
-              [join('nested', 'params.yaml')]: {
-                test: true
-              }
-            },
-            queued: false,
-            running: false,
-            executor: null,
-            metrics: {
-              'summary.json': {
-                loss: 1.6168506622314453,
-                accuracy: 0.5672000050544739,
-                val_loss: 1.7643483877182007,
-                val_accuracy: 0.6463000178337097
-              }
-            },
-            checkpoint_parent: 'f81f1b5a1248b9d9f595fb53136298c69f908e66',
-            displayName: 'f0778b3',
-            id: 'f0778b3eb6a390d6f6731c735a2a4561d1792c3a'
-          },
-          {
-            checkpoint_tip: 'd3f4a0d3661c5977540d2205d819470cf0d2145a',
-            timestamp: '2021-01-14T10:57:53',
-            params: {
-              'params.yaml': {
-                epochs: 2,
-                learning_rate: 2.2e-7,
-                dvc_logs_dir: 'dvc_logs',
-                log_file: 'logs.csv',
-                dropout: 0.122,
-                process: { threshold: 0.86, test_arg: 'string' }
-              },
-              [join('nested', 'params.yaml')]: {
-                test: true
-              }
-            },
-            queued: false,
-            running: false,
-            executor: null,
-            metrics: {
-              'summary.json': {
-                loss: 1.8722929954528809,
-                accuracy: 0.5202666521072388,
-                val_loss: 1.8196595907211304,
-                val_accuracy: 0.6096000075340271
-              }
-            },
-            checkpoint_parent: '42b8736b08170529903cd203a1f40382a4b4a8cd',
-            displayName: 'f81f1b5',
-            id: 'f81f1b5a1248b9d9f595fb53136298c69f908e66'
-          }
-        ]
-      }
-    ]
-  },
-  {
     id: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
     timestamp: '2020-11-21T19:58:22',
     params: {
@@ -168,8 +40,8 @@ const data: RowData[] = [
         learning_rate: 2.1e-7,
         dvc_logs_dir: 'dvc_logs',
         log_file: 'logs.csv',
-        dropout: 0.124,
-        process: { threshold: 0.85 }
+        dropout: 0.122,
+        process: { threshold: 0.86, test_arg: 'string' }
       },
       [join('nested', 'params.yaml')]: {
         test: true

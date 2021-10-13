@@ -5,6 +5,9 @@
   "description": "%description%",
   "publisher": "iterative",
   "icon": "docs/dvc.png",
+  "extensionDependencies": [
+    "vscode.git"
+  ],
   "version": "0.1.0",
   "license": "Apache-2.0",
   "readme": "./README.md",
@@ -30,7 +33,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.60.0-insiders",
+    "vscode": "^1.61.0-insiders",
     "node": ">=10.2.0"
   },
   "activationEvents": [
@@ -126,6 +129,18 @@
         "title": "%command.getStarted%",
         "command": "dvc.getStarted",
         "category": "DVC"
+      },
+      {
+        "title": "%command.gitStageAll%",
+        "command": "dvc.gitStageAll",
+        "category": "DVC",
+        "icon": "$(add)"
+      },
+      {
+        "title": "%command.gitUnstageAll%",
+        "command": "dvc.gitUnstageAll",
+        "category": "DVC",
+        "icon": "$(remove)"
       },
       {
         "title": "%command.init%",
@@ -253,9 +268,9 @@
         "category": "DVC"
       },
       {
-        "title": "%command.showPlots%",
-        "command": "dvc.showPlots",
-        "when": "dvc.commands.available == true"
+        "title": "%command.showOutput%",
+        "command": "dvc.showOutput",
+        "category": "DVC"
       },
       {
         "title": "%command.stopRunningExperiment%",
@@ -294,6 +309,12 @@
     "configuration": {
       "title": "DVC",
       "properties": {
+        "dvc.doNotAssociateYaml": {
+          "title": "%config.doNotAssociateYaml.title%",
+          "description": "%config.doNotAssociateYaml.description%",
+          "type": "boolean",
+          "default": null
+        },
         "dvc.dvcPath": {
           "title": "%config.dvcPath.title%",
           "description": "%config.dvcPath.description%",
@@ -316,15 +337,15 @@
         },
         {
           "command": "dvc.applyExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.branchExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.checkout",
-          "when": "false"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.checkoutTarget",
@@ -332,7 +353,7 @@
         },
         {
           "command": "dvc.commit",
-          "when": "false"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.commitTarget",
@@ -356,10 +377,18 @@
         },
         {
           "command": "dvc.experimentGarbageCollect",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.findInFolder",
+          "when": "false"
+        },
+        {
+          "command": "dvc.gitStageAll",
+          "when": "false"
+        },
+        {
+          "command": "dvc.gitUnstageAll",
           "when": "false"
         },
         {
@@ -376,7 +405,7 @@
         },
         {
           "command": "dvc.pull",
-          "when": "false"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.pullTarget",
@@ -384,7 +413,7 @@
         },
         {
           "command": "dvc.push",
-          "when": "false"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.pushTarget",
@@ -392,11 +421,11 @@
         },
         {
           "command": "dvc.queueExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.removeExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.removeTarget",
@@ -408,19 +437,19 @@
         },
         {
           "command": "dvc.resetWorkspace",
-          "when": "false"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runQueuedExperiments",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.runResetExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.selectForCompare",
@@ -432,11 +461,11 @@
         },
         {
           "command": "dvc.showExperiments",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "command": "dvc.stopRunningExperiment",
-          "when": "dvc.commands.available == true"
+          "when": "dvc.commands.available && dvc.project.available && dvc.runner.running"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
@@ -459,44 +488,71 @@
         {
           "command": "dvc.resetWorkspace",
           "group": "navigation@1",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.commit",
           "group": "navigation@2",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.pull",
           "group": "navigation@3",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.push",
           "group": "navigation@4",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "when": "scmProvider == dvc && dvc.commands.available"
         },
         {
           "command": "dvc.checkout",
-          "group": "DVC",
-          "when": "scmProvider == dvc && dvc.commands.available == true"
+          "group": "1_DVC",
+          "when": "scmProvider == dvc && dvc.commands.available"
+        },
+        {
+          "command": "dvc.showOutput",
+          "group": "3_footer",
+          "when": "scmProvider == dvc"
         }
       ],
       "scm/resourceState/context": [
         {
           "command": "dvc.addTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState == untracked && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceState == untracked && dvc.commands.available"
         },
         {
           "command": "dvc.checkoutTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != notInCache && dvc.commands.available"
         },
         {
           "command": "dvc.commitTarget",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available == true"
+          "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
+        }
+      ],
+      "scm/resourceGroup/context": [
+        {
+          "command": "dvc.checkout",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == changes"
+        },
+        {
+          "command": "dvc.commit",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == changes"
+        },
+        {
+          "command": "dvc.gitStageAll",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == gitModified"
+        },
+        {
+          "command": "dvc.gitUnstageAll",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == gitModified"
         }
       ],
       "editor/title": [
@@ -504,47 +560,47 @@
           "command": "dvc.runExperiment",
           "alt": "dvc.runResetExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.stopRunningExperiment",
           "group": "navigation@0",
-          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "navigation@1",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "navigation@2",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runExperiment",
           "group": "1_run@0",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.stopRunningExperiment",
           "group": "1_run@0",
-          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.queueExperiment",
           "group": "1_run@1",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runQueuedExperiments",
           "group": "1_run@2",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         },
         {
           "command": "dvc.runResetExperiment",
           "group": "1_run@3",
-          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available == true"
+          "when": "dvc.experiments.webviewActive && !dvc.runner.running && dvc.commands.available"
         }
       ],
       "view/item/context": [
@@ -611,32 +667,32 @@
         {
           "command": "dvc.addExperimentsTableSort",
           "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem != dvcRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsSortByTree.removeAllSorts",
           "group": "inline",
-          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsSortByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.addExperimentsTableFilter",
           "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeFilter",
           "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem != dvcRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem != dvcRoot"
         },
         {
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
-          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available == true && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -697,22 +753,22 @@
         {
           "id": "dvc.views.experimentsParamsAndMetricsTree",
           "name": "Params & Metrics",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsTree",
           "name": "Experiments",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsSortByTree",
           "name": "Sort By",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         },
         {
           "id": "dvc.views.experimentsFilterByTree",
           "name": "Filter By",
-          "when": "dvc.commands.available == true && dvc.project.available == true"
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ]
     },
@@ -720,12 +776,12 @@
       {
         "view": "dvc.views.trackedExplorerTree",
         "contents": "DVC is currently unavailable, [learn more](https://www.dvc.org/).\n[Setup the workspace](command:dvc.setupWorkspace)",
-        "when": "dvc.commands.available != true"
+        "when": "!dvc.commands.available"
       },
       {
         "view": "dvc.views.trackedExplorerTree",
         "contents": "The currently open folder does not contain a DVC project. You can initialize a project which will enable features powered by DVC.\n[Initialize Project](command:dvc.init)\nTo learn more about how to use DVC and this extension please read [our docs](https://dvc.org/doc).",
-        "when": "dvc.commands.available == true && dvc.project.available == false"
+        "when": "dvc.commands.available && !dvc.project.available"
       },
       {
         "view": "dvc.views.experimentsTree",
@@ -779,6 +835,18 @@
             "completionEvents": [
               "onCommand:dvc.showCommands"
             ],
+            "when": "dvc.commands.available && dvc.project.available"
+          },
+          {
+            "id": "dvc.showOutput",
+            "title": "Output channel",
+            "description": "View the DVC output channel.\n[View output](command:dvc.showOutput)",
+            "media": {
+              "markdown": "resources/walkthrough/output-channel.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showOutput"
+            ],
             "when": "dvc.commands.available == true && dvc.project.available == true"
           },
           {
@@ -791,7 +859,7 @@
             "completionEvents": [
               "onCommand:workbench.view.scm"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.tracked",
@@ -803,7 +871,7 @@
             "completionEvents": [
               "onCommand:dvc.views.trackedExplorerTree.focus"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.viewContainer",
@@ -815,7 +883,7 @@
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.experimentsTable",
@@ -827,7 +895,7 @@
             "completionEvents": [
               "onCommand:dvc.showExperiments"
             ],
-            "when": "dvc.commands.available == true && dvc.project.available == true"
+            "when": "dvc.commands.available && dvc.project.available"
           },
           {
             "id": "dvc.learnMore",
@@ -866,7 +934,7 @@
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "mobx": "^6.0.4",
-    "vscode-extension-telemetry": "^0.4.0"
+    "vscode-extension-telemetry": "^0.4.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
@@ -880,7 +948,7 @@
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
     "@types/sinon-chai": "^3.2.5",
-    "@types/vscode": "^1.60.0",
+    "@types/vscode": "^1.61.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^3.0.0",
@@ -893,7 +961,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "vsce": "^1.99.0",
+    "vsce": "^1.100.1",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.40.0",
