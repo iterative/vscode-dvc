@@ -11,7 +11,8 @@ suite('Language Association Test Suite', () => {
     restore()
   })
 
-  const getUri = (fileName: string) => Uri.file(join(dvcDemoPath, fileName))
+  const openFileInEditor = (fileName: string) =>
+    window.showTextDocument(Uri.file(join(dvcDemoPath, fileName)))
 
   describe('recommendAssociateYamlOnce', () => {
     it('should only try and associate .dvc and dvc.lock files once per session', async () => {
@@ -21,16 +22,14 @@ suite('Language Association Test Suite', () => {
         'showInformationMessage'
       ).resolves('No' as unknown as MessageItem)
 
-      await window.showTextDocument(getUri('.gitignore'))
+      await openFileInEditor('.gitignore')
 
       expect(
         mockShowInformationMessage,
         'should not ask the user if they want to associate .dvc and dvc.lock files with yaml on a normal editor change'
       ).not.to.be.called
 
-      const getDvcLock = () => window.showTextDocument(getUri('dvc.lock'))
-
-      await getDvcLock()
+      await openFileInEditor('dvc.lock')
 
       expect(
         mockShowInformationMessage,
@@ -41,7 +40,7 @@ suite('Language Association Test Suite', () => {
 
       mockShowInformationMessage.resetHistory()
 
-      await getDvcLock()
+      await openFileInEditor('dvc.lock')
 
       expect(
         mockShowInformationMessage,
@@ -58,16 +57,14 @@ suite('Language Association Test Suite', () => {
         'showInformationMessage'
       ).resolves('No' as unknown as MessageItem)
 
-      await window.showTextDocument(getUri('.gitignore'))
+      await openFileInEditor('.gitignore')
 
       expect(
         mockShowInformationMessage,
         'should not ask the user if they want to add the dvc.yaml schema validation on a normal editor change'
       ).not.to.be.called
 
-      const getDvcYaml = () => window.showTextDocument(getUri('dvc.yaml'))
-
-      await getDvcYaml()
+      await openFileInEditor('dvc.yaml')
 
       expect(
         mockShowInformationMessage,
@@ -78,7 +75,7 @@ suite('Language Association Test Suite', () => {
 
       mockShowInformationMessage.resetHistory()
 
-      await getDvcYaml()
+      await openFileInEditor('dvc.yaml')
 
       expect(
         mockShowInformationMessage,
