@@ -77,7 +77,7 @@ const alreadyHasSchema = (): boolean => {
 }
 
 const addDvcYamlSchema = () => {
-  const yamlSchemas = Object.assign(getCurrentFileAssociations(), {
+  const yamlSchemas = Object.assign(getCurrentYamlSchemas(), {
     'https://raw.githubusercontent.com/iterative/dvcyaml-schema/master/schema.json':
       'dvc.yaml'
   })
@@ -104,11 +104,19 @@ const isDvcYaml = (fileName?: string): boolean =>
 
 export const recommendAddDvcYamlSchemaOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
-    if (alreadyHasSchema() || getConfigValue(DO_NOT_ADD_DVC_YAML_SCHEMA)) {
+    if (
+      (!isAvailable(RED_HAT_EXTENSION_ID) &&
+        getConfigValue(DO_NOT_RECOMMEND_RED_HAT)) ||
+      alreadyHasSchema() ||
+      getConfigValue(DO_NOT_ADD_DVC_YAML_SCHEMA)
+    ) {
       return singleUseListener.dispose()
     }
 
-    if (isDvcYaml(editor?.document.fileName)) {
+    if (
+      isAvailable(RED_HAT_EXTENSION_ID) &&
+      isDvcYaml(editor?.document.fileName)
+    ) {
       recommendAddDvcYamlSchema()
       return singleUseListener.dispose()
     }
