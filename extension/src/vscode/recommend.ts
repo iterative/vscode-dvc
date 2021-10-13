@@ -20,7 +20,7 @@ const addFileAssociations = () => {
   return setUserConfigValue('files.associations', fileAssociations)
 }
 
-export const askUserToAssociateYaml = async () => {
+export const recommendAssociateYaml = async () => {
   const response = await getYesOrNoOrNever(
     'Would you like to have "dvc.lock" and ".dvc" files recognized as YAML?'
   )
@@ -47,14 +47,14 @@ const alreadyAssociated = (): boolean => {
   )
 }
 
-export const tryAssociateYamlOnce = (): Disposable => {
+export const recommendAssociateYamlOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
     if (alreadyAssociated() || getConfigValue(doNotAssociateYaml)) {
       return singleUseListener.dispose()
     }
 
     if (isFileType(editor?.document.fileName)) {
-      askUserToAssociateYaml()
+      recommendAssociateYaml()
       return singleUseListener.dispose()
     }
   })
