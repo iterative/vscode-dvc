@@ -4,31 +4,32 @@ import { expect } from 'chai'
 import { commands, MessageItem, Uri, window } from 'vscode'
 import { restore, stub } from 'sinon'
 import { dvcDemoPath } from '../util'
+import * as Extensions from '../../../vscode/extensions'
 
 suite('Language Association Test Suite', () => {
   beforeEach(() => {
     restore()
   })
 
+  const openFileInEditor = (fileName: string) =>
+    window.showTextDocument(Uri.file(join(dvcDemoPath, fileName)))
+
   describe('recommendAssociateYamlOnce', () => {
     it('should only try and associate .dvc and dvc.lock files once per session', async () => {
-      const getUri = (fileName: string) => Uri.file(join(dvcDemoPath, fileName))
-
+      stub(Extensions, 'isAvailable').resolves(true)
       const mockShowInformationMessage = stub(
         window,
         'showInformationMessage'
       ).resolves('No' as unknown as MessageItem)
 
-      await window.showTextDocument(getUri('.gitignore'))
+      await openFileInEditor('.gitignore')
 
       expect(
         mockShowInformationMessage,
         'should not ask the user if they want to associate .dvc and dvc.lock files with yaml on a normal editor change'
       ).not.to.be.called
 
-      const getDvcLock = () => window.showTextDocument(getUri('dvc.lock'))
-
-      await getDvcLock()
+      await openFileInEditor('dvc.lock')
 
       expect(
         mockShowInformationMessage,
@@ -39,7 +40,7 @@ suite('Language Association Test Suite', () => {
 
       mockShowInformationMessage.resetHistory()
 
-      await getDvcLock()
+      await openFileInEditor('dvc.lock')
 
       expect(
         mockShowInformationMessage,
