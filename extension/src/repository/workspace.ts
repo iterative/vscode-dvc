@@ -45,6 +45,10 @@ export class WorkspaceRepositories
     return repositories
   }
 
+  public update(dvcRoot: string) {
+    this.getRepository(dvcRoot).update()
+  }
+
   private createRepository(
     dvcRoot: string,
     trackedExplorerTree: TrackedExplorerTree
@@ -64,7 +68,7 @@ export class WorkspaceRepositories
     return repository
   }
 
-  private hasChanges(cwd: string) {
-    return this.getRepository(cwd).hasChanges()
+  private hasChanges(dvcRoot: string) {
+    return this.getRepository(dvcRoot).hasChanges()
   }
 }
