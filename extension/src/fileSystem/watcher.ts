@@ -1,9 +1,8 @@
-import { basename, extname } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
-import { isDirectory } from '.'
+import { isAnyDvcYaml, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
@@ -21,12 +20,6 @@ const isExcluded = (path: string) =>
   path.includes(EXPERIMENTS_GIT_REFS) ||
   ignoredDotDirectories.test(path)
 
-export const isDvcLock = (path: string): boolean =>
-  basename(path) === 'dvc.lock'
-
-const requiresReset = (path: string) =>
-  extname(path) === '.dvc' || isDvcLock(path) || basename(path) === 'dvc.yaml'
-
 export const getRepositoryListener =
   (
     repository: Repository,
@@ -37,7 +30,7 @@ export const getRepositoryListener =
       return
     }
 
-    if (requiresReset(path)) {
+    if (isAnyDvcYaml(path)) {
       repository.reset()
       trackedExplorerTree.reset()
       return

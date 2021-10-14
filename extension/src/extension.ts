@@ -42,10 +42,7 @@ import {
   showWalkthroughOnFirstUse
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
-import {
-  recommendAssociateYamlOnce,
-  recommendRedHatExtensionOnce
-} from './vscode/recommend'
+import { recommendRedHatExtensionOnce } from './vscode/recommend'
 
 export { Disposable, Disposer }
 
@@ -267,7 +264,6 @@ export class Extension implements IExtension {
     )
 
     showWalkthroughOnFirstUse(context.globalState)
-    this.dispose.track(recommendAssociateYamlOnce())
     this.dispose.track(recommendRedHatExtensionOnce())
   }
 
