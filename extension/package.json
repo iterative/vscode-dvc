@@ -796,7 +796,7 @@
       },
       {
         "view": "dvc.views.experimentsTree",
-        "contents": "No running or queued experiments. \n[Run Experiment](command:dvc.runExperiment)\n"
+        "contents": "No experiments to display. \n[Run Experiment](command:dvc.runExperiment)\n"
       },
       {
         "view": "dvc.views.experimentsSortByTree",
