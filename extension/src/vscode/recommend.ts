@@ -3,7 +3,7 @@ import { window } from 'vscode'
 import { getConfigValue, setUserConfigValue } from './config'
 import { getShowOrCloseOrNever } from './toast'
 import { Response } from './response'
-import { isAvailable, showExtension } from './extensions'
+import { isInstalled, showExtension } from './extensions'
 import { isAnyDvcYaml } from '../fileSystem'
 
 const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension'
@@ -28,7 +28,7 @@ export const recommendRedHatExtension = async () => {
 export const recommendRedHatExtensionOnce = (): Disposable => {
   const singleUseListener = window.onDidChangeActiveTextEditor(editor => {
     if (
-      isAvailable(RED_HAT_EXTENSION_ID) ||
+      isInstalled(RED_HAT_EXTENSION_ID) ||
       getConfigValue(DO_NOT_RECOMMEND_RED_HAT)
     ) {
       return singleUseListener.dispose()
