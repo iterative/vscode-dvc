@@ -16,7 +16,7 @@ suite('Recommend Test Suite', () => {
 
   describe('recommendRedHatExtensionOnce', () => {
     it('should only recommend the red hat yaml extension once per session', async () => {
-      stub(Extensions, 'isAvailable').returns(false)
+      stub(Extensions, 'isInstalled').returns(false)
       const mockShowInformationMessage = stub(
         window,
         'showInformationMessage'
