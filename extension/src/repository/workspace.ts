@@ -45,6 +45,10 @@ export class WorkspaceRepositories
     return repositories
   }
 
+  public update(cwd: string) {
+    this.getRepository(cwd).update()
+  }
+
   private createRepository(
     dvcRoot: string,
     trackedExplorerTree: TrackedExplorerTree
