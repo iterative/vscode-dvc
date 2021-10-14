@@ -118,7 +118,7 @@ suite('Experiments Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    })
+    }).timeout(5000)
 
     it('should only be able to open a single experiments webview', async () => {
       const { experiments, mockExperimentShow } = buildExperiments(disposable)
@@ -148,7 +148,7 @@ suite('Experiments Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
       expect(mockExperimentShow).not.to.have.been.called
-    })
+    }).timeout(5000)
 
     it('should be able to sort', async () => {
       const config = disposable.track(new Config())
