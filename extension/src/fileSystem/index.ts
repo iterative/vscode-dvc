@@ -1,4 +1,4 @@
-import { join, relative, resolve } from 'path'
+import { basename, extname, join, relative, resolve } from 'path'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
 import { definedAndNonEmpty } from '../util/array'
 
@@ -52,3 +52,9 @@ export const isSameOrChild = (root: string, path: string) => {
   const rel = relative(root, path)
   return !rel.startsWith('..')
 }
+
+export const isAnyDvcYaml = (path?: string) =>
+  path &&
+  (extname(path) === '.dvc' ||
+    basename(path) === 'dvc.lock' ||
+    basename(path) === 'dvc.yaml')

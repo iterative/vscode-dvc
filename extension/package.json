@@ -309,12 +309,6 @@
     "configuration": {
       "title": "DVC",
       "properties": {
-        "dvc.doNotAssociateYaml": {
-          "title": "%config.doNotAssociateYaml.title%",
-          "description": "%config.doNotAssociateYaml.description%",
-          "type": "boolean",
-          "default": null
-        },
         "dvc.doNotRecommendRedHatExtension": {
           "title": "%config.doNotRecommendRedHatExtension.title%",
           "description": "%config.doNotRecommendRedHatExtension.description%",
@@ -335,6 +329,17 @@
         }
       }
     },
+    "languages": [
+      {
+        "id": "yaml",
+        "extensions": [
+          ".dvc"
+        ],
+        "filenames": [
+          "dvc.lock"
+        ]
+      }
+    ],
     "menus": {
       "commandPalette": [
         {

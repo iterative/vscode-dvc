@@ -5,7 +5,9 @@ import os
 import torch
 import torch.nn.functional as F
 import torchvision
-import dvclive
+from dvclive import Live
+
+live = Live()
 
 
 EPOCHS = 2
@@ -104,8 +106,8 @@ def main():
         # Evaluate and checkpoint.
         metrics = evaluate(model, x_test, y_test)
         for k, v in metrics.items():
-            dvclive.log(k, v)
-        dvclive.next_step()
+            live.log(k, v)
+        live.next_step()
 
 
 if __name__ == "__main__":
