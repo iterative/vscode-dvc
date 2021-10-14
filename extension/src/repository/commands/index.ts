@@ -81,7 +81,7 @@ export const getUnstageAllCommand =
       return
     }
 
-    const output = gitReset(cwd)
+    const output = await gitReset(cwd)
     repositories.update(cwd)
     return output
   }
