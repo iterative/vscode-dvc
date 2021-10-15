@@ -14,7 +14,7 @@ import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
-import { TableWebview } from '../../../experiments/webview/table'
+import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
 import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
@@ -103,7 +103,7 @@ suite('Experiments Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const messageSpy = spy(TableWebview.prototype, 'showExperiments')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const webview = await experiments.showWebview()
 
@@ -175,7 +175,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const messageSpy = spy(TableWebview.prototype, 'showExperiments')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
