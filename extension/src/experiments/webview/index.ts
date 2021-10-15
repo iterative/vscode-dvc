@@ -210,9 +210,6 @@ export class ExperimentsWebview {
     const urls = {
       mainJsUrl: this.webviewPanel.webview
         .asWebviewUri(Uri.file(dvcVscodeWebview.mainJsFilename))
-        .toString(),
-      publicPath: this.webviewPanel.webview
-        .asWebviewUri(Uri.file(dvcVscodeWebview.distPath))
         .toString()
     }
 
@@ -221,7 +218,6 @@ export class ExperimentsWebview {
     )
     const data: WindowWithWebviewData = {
       webviewData: {
-        publicPath: urls.publicPath,
         theme
       }
     }
