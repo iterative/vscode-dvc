@@ -209,12 +209,6 @@ suite('Source Control Management Test Suite', () => {
         .onSecondCall()
         .resolves('')
 
-      const mockUpdate = stub()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'getRepository').returns({
-        update: mockUpdate
-      })
-
       await commands.executeCommand(RegisteredCommands.GIT_STAGE_ALL, {
         rootUri
       })
@@ -230,16 +224,10 @@ suite('Source Control Management Test Suite', () => {
         cwd: gitRoot,
         executable: 'git'
       })
-      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should unstage all git tracked files', async () => {
       const mockGit = stub(ProcessExecution, 'executeProcess').resolves('')
-      const mockUpdate = stub()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'getRepository').returns({
-        update: mockUpdate
-      })
 
       await commands.executeCommand(RegisteredCommands.GIT_UNSTAGE_ALL, {
         rootUri
@@ -251,7 +239,6 @@ suite('Source Control Management Test Suite', () => {
         cwd: dvcDemoPath,
         executable: 'git'
       })
-      expect(mockUpdate).to.be.calledOnce
     })
 
     it('should not reset the workspace if the user does not confirm', async () => {

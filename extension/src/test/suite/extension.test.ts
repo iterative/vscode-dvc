@@ -5,6 +5,7 @@ import { stub, restore, spy, useFakeTimers } from 'sinon'
 import { window, commands, workspace, Uri, FileSystemWatcher } from 'vscode'
 import {
   configurationChangeEvent,
+  dvcDemoPath,
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
@@ -18,6 +19,7 @@ import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
+import * as Git from '../../git'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -41,7 +43,7 @@ suite('Extension Test Suite', () => {
   describe('dvc.setupWorkspace', () => {
     const createFileSystemWatcherEvent = () =>
       new Promise(resolve =>
-        stub(Watcher, 'createFileSystemWatcher').callsFake(() => {
+        stub(Watcher, 'createNecessaryFileSystemWatcher').callsFake(() => {
           resolve(undefined)
           return { dispose: stub() } as unknown as FileSystemWatcher
         })
@@ -162,6 +164,8 @@ suite('Extension Test Suite', () => {
             return undefined
           })
       )
+      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
+
       const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
       const mockPath = mockUri.fsPath
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
