@@ -28,9 +28,11 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
-export class ExperimentsWebview {
-  public static viewKey = 'dvc-experiments'
+export enum WebviewKeys {
+  TABLE = 'dvc-experiments'
+}
 
+export class ExperimentsWebview {
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
@@ -137,10 +139,11 @@ export class ExperimentsWebview {
   public static async create(
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
-    resourceLocator: ResourceLocator
+    resourceLocator: ResourceLocator,
+    viewKey: WebviewKeys
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
-      ExperimentsWebview.viewKey,
+      viewKey,
       Experiments,
       ViewColumn.Active,
       {

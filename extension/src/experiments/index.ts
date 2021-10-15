@@ -10,7 +10,7 @@ import {
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
-import { ExperimentsWebview } from './webview'
+import { ExperimentsWebview, WebviewKeys } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
@@ -135,7 +135,8 @@ export class Experiments {
         dvcRoot: this.dvcRoot,
         tableData: this.getTableData()
       },
-      this.resourceLocator
+      this.resourceLocator,
+      WebviewKeys.TABLE
     )
 
     this.setWebview(webview)
