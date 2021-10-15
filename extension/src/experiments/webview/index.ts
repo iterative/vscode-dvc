@@ -8,8 +8,8 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import * as dvcVscodeWebview from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
+import { main, distPath } from 'dvc-vscode-webview'
 import {
   WebviewType as Experiments,
   MessageFromWebview,
@@ -54,7 +54,8 @@ export class ExperimentsWebview {
   private constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
+    state: ExperimentsWebviewState,
+    scripts: string[] = []
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
@@ -80,7 +81,7 @@ export class ExperimentsWebview {
       this.handleMessage(arg as MessageFromWebview)
     })
 
-    this.getHtml().then(html => (webviewPanel.webview.html = html))
+    this.getHtml(scripts).then(html => (webviewPanel.webview.html = html))
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
@@ -125,11 +126,14 @@ export class ExperimentsWebview {
   public static restore(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
+    state: ExperimentsWebviewState,
+    scripts: string[]
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(webviewPanel, internalCommands, state))
+        resolve(
+          new ExperimentsWebview(webviewPanel, internalCommands, state, scripts)
+        )
       } catch (e: unknown) {
         reject(e)
       }
@@ -140,7 +144,8 @@ export class ExperimentsWebview {
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator,
-    viewKey: WebviewKeys
+    viewKey: WebviewKeys,
+    scripts: string[]
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
       viewKey,
@@ -148,14 +153,19 @@ export class ExperimentsWebview {
       ViewColumn.Active,
       {
         enableScripts: true,
-        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)],
+        localResourceRoots: [Uri.file(distPath)],
         retainContextWhenHidden: true
       }
     )
 
     webviewPanel.iconPath = resourceLocator.dvcIcon
 
-    const view = new ExperimentsWebview(webviewPanel, internalCommands, state)
+    const view = new ExperimentsWebview(
+      webviewPanel,
+      internalCommands,
+      state,
+      scripts
+    )
     await view.isReady()
     return view
   }
@@ -209,12 +219,15 @@ export class ExperimentsWebview {
     )
   }
 
-  private async getHtml(): Promise<string> {
-    const urls = {
-      mainJsUrl: this.webviewPanel.webview
-        .asWebviewUri(Uri.file(dvcVscodeWebview.mainJsFilename))
-        .toString()
-    }
+  private async getHtml(scripts: string[]): Promise<string> {
+    const webviewScriptTags = scripts
+      .map(
+        script =>
+          `<script type="text/javascript" src="${this.webviewPanel.webview
+            .asWebviewUri(Uri.file(script))
+            .toString()}"></script>`
+      )
+      .join('')
 
     const theme = await this.internalCommands.executeCommand<WebviewColorTheme>(
       AvailableCommands.GET_THEME
@@ -242,7 +255,7 @@ export class ExperimentsWebview {
 					  <script>
 						  Object.assign(window, ${JSON.stringify(data)});
 					  </script>
-					  <script type="text/javascript" src="${urls.mainJsUrl}"></script>
+					  ${webviewScriptTags}
 				  </body>
 			  </html>
 		  `
@@ -266,4 +279,28 @@ export class ExperimentsWebview {
       Logger.error(`Unexpected message: ${message}`)
     }
   }
+}
+
+export function createTableWebview(
+  internalCommands: InternalCommands,
+  state: ExperimentsWebviewState,
+  resourceLocator: ResourceLocator
+) {
+  return ExperimentsWebview.create(
+    internalCommands,
+    state,
+    resourceLocator,
+    WebviewKeys.TABLE,
+    [main]
+  )
+}
+
+export function restoreTableWebview(
+  webviewPanel: WebviewPanel,
+  internalCommands: InternalCommands,
+  state: ExperimentsWebviewState
+) {
+  return ExperimentsWebview.restore(webviewPanel, internalCommands, state, [
+    main
+  ])
 }

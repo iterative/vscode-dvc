@@ -1,6 +1,6 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { ExperimentsWebview, WebviewKeys } from '../experiments/webview'
+import { restoreTableWebview, WebviewKeys } from '../experiments/webview'
 import { WorkspaceExperiments } from '../experiments/workspace'
 import { ExperimentsWebviewState } from '../experiments/webview/contract'
 import { InternalCommands } from '../commands/internal'
@@ -19,7 +19,7 @@ export class WebviewSerializer {
           state: ExperimentsWebviewState
         ) => {
           const dvcRoot = state?.dvcRoot
-          const experimentsWebview = await ExperimentsWebview.restore(
+          const experimentsWebview = await restoreTableWebview(
             panel,
             internalCommands,
             state

@@ -10,7 +10,7 @@ import {
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
-import { ExperimentsWebview, WebviewKeys } from './webview'
+import { createTableWebview, ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
@@ -129,14 +129,13 @@ export class Experiments {
       return this.webview.reveal()
     }
 
-    const webview = await ExperimentsWebview.create(
+    const webview = await createTableWebview(
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
         tableData: this.getTableData()
       },
-      this.resourceLocator,
-      WebviewKeys.TABLE
+      this.resourceLocator
     )
 
     this.setWebview(webview)
