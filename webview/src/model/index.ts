@@ -83,6 +83,10 @@ export class Model {
     return Model.instance
   }
 
+  public sendMessage(message: MessageFromWebview): void {
+    this.vsCodeApi.postMessage(message)
+  }
+
   private getState(): PersistedModelState {
     return {
       dvcRoot: this.dvcRoot,
@@ -93,10 +97,6 @@ export class Model {
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
     this.tableData = state.tableData
-  }
-
-  private sendMessage(message: MessageFromWebview): void {
-    this.vsCodeApi.postMessage(message)
   }
 
   private handleMessage(message: MessageToWebview): void {
