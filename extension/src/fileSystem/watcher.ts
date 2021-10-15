@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
@@ -15,18 +16,20 @@ export const fireWatcher = (path: string): Promise<void> => {
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
-const isExcluded = (path: string) =>
+const isExcluded = (dvcRoot: string, path: string) =>
   !path ||
+  !(path.includes(dvcRoot) || path.includes(join('.git', 'index'))) ||
   path.includes(EXPERIMENTS_GIT_REFS) ||
   ignoredDotDirectories.test(path)
 
 export const getRepositoryListener =
   (
     repository: Repository,
-    trackedExplorerTree: TrackedExplorerTree
+    trackedExplorerTree: TrackedExplorerTree,
+    dvcRoot: string
   ): ((path: string) => void) =>
   (path: string) => {
-    if (isExcluded(path)) {
+    if (isExcluded(dvcRoot, path)) {
       return
     }
 
