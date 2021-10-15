@@ -9,7 +9,7 @@ import {
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
-import { main, distPath } from 'dvc-vscode-webview'
+import { distPath } from 'dvc-vscode-webview'
 import {
   WebviewType as Experiments,
   MessageFromWebview,
@@ -25,12 +25,6 @@ import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { sendTelemetryEvent } from '../../telemetry'
-import { EventName } from '../../telemetry/constants'
-
-export enum WebviewKeys {
-  TABLE = 'dvc-experiments'
-}
 
 export class ExperimentsWebview {
   public readonly onDidDispose: Event<void>
@@ -51,7 +45,7 @@ export class ExperimentsWebview {
   private readonly webviewPanel: WebviewPanel
   private readonly internalCommands: InternalCommands
 
-  private constructor(
+  protected constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
@@ -69,11 +63,6 @@ export class ExperimentsWebview {
 
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
-      sendTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
-        undefined,
-        undefined
-      )
       this.disposer.dispose()
     })
 
@@ -90,12 +79,6 @@ export class ExperimentsWebview {
     )
 
     this.notifyActiveStatus(webviewPanel)
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
-      undefined,
-      undefined
-    )
 
     this.disposer.track({
       dispose: autorun(async () => {
@@ -123,7 +106,7 @@ export class ExperimentsWebview {
     })
   }
 
-  public static restore(
+  protected static restore(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
@@ -140,11 +123,11 @@ export class ExperimentsWebview {
     })
   }
 
-  public static async create(
+  protected static async create(
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator,
-    viewKey: WebviewKeys,
+    viewKey: string,
     scripts: string[]
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
@@ -207,16 +190,6 @@ export class ExperimentsWebview {
 
     const active = webviewPanel.active ? this.dvcRoot : undefined
     this.isFocusedChanged.fire(active)
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED,
-      {
-        active: webviewPanel.active,
-        viewColumn: webviewPanel.viewColumn,
-        visible: webviewPanel.visible
-      },
-      undefined
-    )
   }
 
   private async getHtml(scripts: string[]): Promise<string> {
@@ -279,28 +252,4 @@ export class ExperimentsWebview {
       Logger.error(`Unexpected message: ${message}`)
     }
   }
-}
-
-export function createTableWebview(
-  internalCommands: InternalCommands,
-  state: ExperimentsWebviewState,
-  resourceLocator: ResourceLocator
-) {
-  return ExperimentsWebview.create(
-    internalCommands,
-    state,
-    resourceLocator,
-    WebviewKeys.TABLE,
-    [main]
-  )
-}
-
-export function restoreTableWebview(
-  webviewPanel: WebviewPanel,
-  internalCommands: InternalCommands,
-  state: ExperimentsWebviewState
-) {
-  return ExperimentsWebview.restore(webviewPanel, internalCommands, state, [
-    main
-  ])
 }
