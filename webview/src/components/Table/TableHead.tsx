@@ -1,10 +1,14 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  MessageFromWebviewType
+} from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { getPlaceholder } from '../../util/columns'
+import { useMessaging } from '../../util/useMessaging'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -106,6 +110,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
   const currentColOrder = React.useRef<string[]>([])
+  const sendMessage = useMessaging()
 
   const changeColumnOrder = (oldPosition: number, newPosition: number) => {
     const colOrder = [...currentColOrder.current]
@@ -113,6 +118,10 @@ export const TableHead: React.FC<TableHeadProps> = ({
     colOrder.splice(oldPosition, 1)
     colOrder.splice(newPosition, 0, itemId)
     setColumnOrder(colOrder)
+    sendMessage({
+      payload: colOrder,
+      type: MessageFromWebviewType.columnReordered
+    })
   }
   currentColOrder.current = allColumns?.map(o => o.id)
 

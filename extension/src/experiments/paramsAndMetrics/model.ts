@@ -4,6 +4,7 @@ import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { messenger, MessengerEvents } from '../../util/messaging'
 
 export enum Status {
   selected = 2,
@@ -29,12 +30,86 @@ export class ParamsAndMetricsModel {
   private dvcRoot: string
   private workspaceState: Memento
 
+  private columnState: ParamOrMetric[] = []
+
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
     this.onDidChangeParamsAndMetricsFiles =
       this.paramsAndMetricsFilesChanged.event
     this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
+
+    messenger.on(MessengerEvents.columnReordered, (columnOrder: string[]) => {
+      this.setColumnState(columnOrder)
+    })
+  }
+
+  public setColumnState(newState?: string[]) {
+    const orderedPaths: string[] =
+      newState || this.getTerminalNodes().map(node => node.path)
+    const pastGroups: string[] = []
+
+    let orderedData: ParamOrMetric[] = [...this.data]
+    let currentGroup: string = orderedData.length
+      ? orderedData[0].parentPath
+      : ''
+    let previousNodeIndex = 0
+
+    orderedPaths.forEach(path => {
+      const nodeIndex = orderedData.findIndex(column => column.path === path)
+
+      if (nodeIndex === -1) {
+        return
+      }
+
+      const node = orderedData[nodeIndex]
+
+      const { parentPath } = node
+
+      if (parentPath !== currentGroup) {
+        pastGroups.push(currentGroup)
+        currentGroup = parentPath
+
+        const seenInPreviousGroup = pastGroups.includes(parentPath)
+
+        if (seenInPreviousGroup) {
+          const pathParts = parentPath.split(':')
+          const newGroup = `${pathParts[0]}_1`
+
+          let currentParentPath = ''
+          let newParentPath = ''
+
+          pathParts.forEach(part => {
+            currentParentPath =
+              (currentParentPath ? `${currentParentPath}:` : '') + part
+
+            const parentNode = orderedData.find(
+              column => column.path === currentParentPath
+            )
+            const parentNodePath =
+              (newParentPath ? `${newParentPath}:` : '') + `${part}_1`
+            if (parentNode) {
+              const newParentNode = {
+                ...parentNode,
+                group: newGroup,
+                parentPath: newParentPath,
+                path: parentNodePath
+              }
+              orderedData = [
+                ...orderedData.slice(0, previousNodeIndex),
+                newParentNode,
+                ...orderedData.slice(previousNodeIndex)
+              ]
+            }
+            newParentPath = parentNodePath
+          })
+          node.parentPath = newParentPath
+          node.group = newGroup
+        }
+      }
+      previousNodeIndex = nodeIndex
+    })
+    this.columnState = orderedData
   }
 
   public getSelected() {
@@ -61,11 +136,12 @@ export class ParamsAndMetricsModel {
   }
 
   public getChildren(path?: string) {
-    return this.data
+    const groups = [...new Set(this.columnState.map(column => column.group))]
+    return this.columnState
       ?.filter(paramOrMetric =>
         path
           ? paramOrMetric.parentPath === path
-          : ['metrics', 'params'].includes(paramOrMetric.parentPath)
+          : groups.includes(paramOrMetric.parentPath)
       )
       .map(paramOrMetric => {
         return {
@@ -113,6 +189,7 @@ export class ParamsAndMetricsModel {
     })
 
     this.data = paramsAndMetrics
+    this.setColumnState()
   }
 
   private transformAndSetFiles(data: ExperimentsRepoJSONOutput) {

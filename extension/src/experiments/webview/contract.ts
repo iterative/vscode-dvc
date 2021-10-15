@@ -47,10 +47,12 @@ export enum WebviewColorTheme {
 
 export type MessageFromWebview = {
   type: MessageFromWebviewType
+  payload?: Object
 }
 
 export enum MessageFromWebviewType {
-  initialized = 'initialized'
+  initialized = 'initialized',
+  columnReordered = 'column-reordered'
 }
 
 export type MessageToWebview = {
