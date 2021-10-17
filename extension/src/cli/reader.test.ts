@@ -366,5 +366,25 @@ describe('CliReader', () => {
         })
       })
     })
+
+    describe('statusDefaultRemote', () => {
+      it('should call the cli with the correct parameters', async () => {
+        const cliOutput = {}
+        const cwd = __dirname
+        mockedCreateProcess.mockReturnValueOnce(
+          getMockedProcess(JSON.stringify(cliOutput))
+        )
+        const diffOutput = await cliReader.statusDefaultRemote(cwd)
+
+        expect(diffOutput).toEqual(cliOutput)
+
+        expect(mockedCreateProcess).toBeCalledWith({
+          args: ['status', '-c', SHOW_JSON],
+          cwd,
+          env: mockedEnv,
+          executable: 'dvc'
+        })
+      })
+    })
   })
 })

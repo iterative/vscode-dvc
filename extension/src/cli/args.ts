@@ -54,6 +54,10 @@ export enum ListFlag {
   DVC_ONLY = '--dvc-only'
 }
 
+export enum StatusFlag {
+  CLOUD = '-c'
+}
+
 type Target = string
 
 type Flags = Flag | ExperimentFlag | ListFlag | GcPreserveFlag

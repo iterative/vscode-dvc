@@ -5,7 +5,8 @@ import {
   ExperimentFlag,
   ExperimentSubCommand,
   Flag,
-  ListFlag
+  ListFlag,
+  StatusFlag
 } from './args'
 import { retryIfLocked } from './retry'
 import { trimAndSplit } from '../util/stdout'
@@ -102,7 +103,8 @@ export const autoRegisteredCommands = {
   EXPERIMENT_SHOW: 'experimentShow',
   LIST_DVC_ONLY: 'listDvcOnly',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
-  STATUS: 'status'
+  STATUS: 'status',
+  STATUS_DEFAULT_REMOTE: 'statusDefaultRemote'
 } as const
 
 export class CliReader extends Cli {
@@ -165,6 +167,14 @@ export class CliReader extends Cli {
 
   public status(cwd: string): Promise<StatusOutput> {
     return this.readProcessJson<StatusOutput>(cwd, Command.STATUS)
+  }
+
+  public statusDefaultRemote(cwd: string): Promise<StatusOutput> {
+    return this.readProcessJson<StatusOutput>(
+      cwd,
+      Command.STATUS,
+      StatusFlag.CLOUD
+    )
   }
 
   private async readProcess<T = string>(
