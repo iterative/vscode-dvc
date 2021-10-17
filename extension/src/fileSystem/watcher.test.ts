@@ -154,6 +154,38 @@ describe('getRepositoryListener', () => {
     expect(mockedUpdateState).toBeCalledTimes(1)
     expect(mockedRefresh).toBeCalledTimes(1)
   })
+
+  it('should return a function that calls update if it is called with a git index that is above of the dvc root', () => {
+    const listener = getRepositoryListener(
+      repository,
+      trackedExplorerTree,
+      __dirname
+    )
+
+    listener(resolve(__dirname, '..', '..', '.git', 'index'))
+
+    expect(mockedResetState).not.toBeCalled()
+    expect(mockedReset).not.toBeCalled()
+
+    expect(mockedUpdateState).toBeCalledTimes(1)
+    expect(mockedRefresh).toBeCalledTimes(1)
+  })
+
+  it('should return a function that returns early if called with a path that is above the dvc root that is not the git index', () => {
+    const listener = getRepositoryListener(
+      repository,
+      trackedExplorerTree,
+      __dirname
+    )
+
+    listener(resolve(__dirname, '..', '..', '.git', 'refs'))
+
+    expect(mockedResetState).not.toBeCalled()
+    expect(mockedReset).not.toBeCalled()
+
+    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedRefresh).not.toBeCalled()
+  })
 })
 
 describe('ignoredDotDirectories', () => {
