@@ -88,7 +88,7 @@ describe('getRepositoryListener', () => {
     expect(mockedReset).not.toBeCalled()
   })
 
-  it('should return a function that calls reset if it is called with a .dvc data placeholder', () => {
+  it("should return a function that calls reset if it is called with on of the repo's .dvc data placeholders", () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const listener = getRepositoryListener(
       repository,
@@ -105,7 +105,7 @@ describe('getRepositoryListener', () => {
     expect(mockedRefresh).not.toBeCalled()
   })
 
-  it('should return a function that calls reset if it is called with a dvc.yml', () => {
+  it("should return a function that calls reset if it is called with the repo's dvc.yaml", () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const listener = getRepositoryListener(
       repository,
@@ -122,7 +122,7 @@ describe('getRepositoryListener', () => {
     expect(mockedRefresh).not.toBeCalled()
   })
 
-  it('should return a function that calls reset if it is called with a dvc.lock', () => {
+  it("should return a function that calls reset if it is called with one of the repo's dvc.lock", () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const listener = getRepositoryListener(
       repository,
@@ -139,7 +139,7 @@ describe('getRepositoryListener', () => {
     expect(mockedRefresh).not.toBeCalled()
   })
 
-  it('should return a function that calls update if it is called with anything else', () => {
+  it('should return a function that calls update if it is called with anything other path from inside the repo', () => {
     const listener = getRepositoryListener(
       repository,
       trackedExplorerTree,
@@ -155,7 +155,7 @@ describe('getRepositoryListener', () => {
     expect(mockedRefresh).toBeCalledTimes(1)
   })
 
-  it('should return a function that calls update if it is called with a git index that is above of the dvc root', () => {
+  it('should return a function that calls update if it is called with a file in the .git folder that is above the dvc root', () => {
     const listener = getRepositoryListener(
       repository,
       trackedExplorerTree,
@@ -171,14 +171,14 @@ describe('getRepositoryListener', () => {
     expect(mockedRefresh).toBeCalledTimes(1)
   })
 
-  it('should return a function that returns early if called with a path that is above the dvc root that is not the git index', () => {
+  it('should return a function that returns early if called with a path that is above the dvc root that is not in the .git folder', () => {
     const listener = getRepositoryListener(
       repository,
       trackedExplorerTree,
       __dirname
     )
 
-    listener(resolve(__dirname, '..', '..', '.git', 'refs'))
+    listener(resolve(__dirname, '..', '..', 'other', 'refs'))
 
     expect(mockedResetState).not.toBeCalled()
     expect(mockedReset).not.toBeCalled()

@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
@@ -18,7 +17,7 @@ export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
 const isExcluded = (dvcRoot: string, path: string) =>
   !path ||
-  !(path.includes(dvcRoot) || path.includes(join('.git', 'index'))) ||
+  !(path.includes(dvcRoot) || path.includes('.git')) ||
   path.includes(EXPERIMENTS_GIT_REFS) ||
   ignoredDotDirectories.test(path)
 
