@@ -32,6 +32,10 @@ export class ParamsAndMetricsModel {
 
   private columnState: ParamOrMetric[] = []
 
+  static getCleanPath(path: string): string {
+    return path.split('/')[1]
+  }
+
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
@@ -47,67 +51,37 @@ export class ParamsAndMetricsModel {
   public setColumnState(newState?: string[]) {
     const orderedPaths: string[] =
       newState || this.getTerminalNodes().map(node => node.path)
-    const pastGroups: string[] = []
 
-    let orderedData: ParamOrMetric[] = [...this.data]
-    let currentGroup: string = orderedData.length
-      ? orderedData[0].parentPath
-      : ''
-    let previousNodeIndex = 0
+    const previousGroups: string[] = []
+    const orderedData = [
+      ...orderedPaths
+        .map(path => ({ ...this.data.find(column => column.path === path) }))
+        .filter(Boolean)
+    ] as ParamOrMetric[]
 
-    orderedPaths.forEach(path => {
-      const nodeIndex = orderedData.findIndex(column => column.path === path)
+    let previousGroup = orderedData[0].parentPath
 
-      if (nodeIndex === -1) {
-        return
+    orderedData.forEach(node => {
+      const { parentPath, path } = node
+
+      if (parentPath !== previousGroup) {
+        previousGroups.push(previousGroup)
+        previousGroup = parentPath
       }
 
-      const node = orderedData[nodeIndex]
+      const groupNumberPrefix = `${previousGroups.length}/`
 
-      const { parentPath } = node
+      node.path = groupNumberPrefix + path
+      node.parentPath = groupNumberPrefix + parentPath
 
-      if (parentPath !== currentGroup) {
-        pastGroups.push(currentGroup)
-        currentGroup = parentPath
+      const parentNode = {
+        ...this.data.find(column => column.path === parentPath)
+      } as ParamOrMetric
+      parentNode.path = groupNumberPrefix + parentPath
 
-        const seenInPreviousGroup = pastGroups.includes(parentPath)
-
-        if (seenInPreviousGroup) {
-          const pathParts = parentPath.split(':')
-          const newGroup = `${pathParts[0]}_1`
-
-          let currentParentPath = ''
-          let newParentPath = ''
-
-          pathParts.forEach(part => {
-            currentParentPath =
-              (currentParentPath ? `${currentParentPath}:` : '') + part
-
-            const parentNode = orderedData.find(
-              column => column.path === currentParentPath
-            )
-            const parentNodePath =
-              (newParentPath ? `${newParentPath}:` : '') + `${part}_1`
-            if (parentNode) {
-              const newParentNode = {
-                ...parentNode,
-                group: newGroup,
-                parentPath: newParentPath,
-                path: parentNodePath
-              }
-              orderedData = [
-                ...orderedData.slice(0, previousNodeIndex),
-                newParentNode,
-                ...orderedData.slice(previousNodeIndex)
-              ]
-            }
-            newParentPath = parentNodePath
-          })
-          node.parentPath = newParentPath
-          node.group = newGroup
-        }
+      if (!orderedData.find(column => column.path === parentNode.path)) {
+        orderedData.push(parentNode)
       }
-      previousNodeIndex = nodeIndex
     })
     this.columnState = orderedData
   }
@@ -144,10 +118,11 @@ export class ParamsAndMetricsModel {
           : groups.includes(paramOrMetric.parentPath)
       )
       .map(paramOrMetric => {
+        const path = ParamsAndMetricsModel.getCleanPath(paramOrMetric.path)
         return {
           ...paramOrMetric,
-          descendantStatuses: this.getTerminalNodeStatuses(paramOrMetric.path),
-          status: this.status[paramOrMetric.path]
+          descendantStatuses: this.getTerminalNodeStatuses(path),
+          status: this.status[path]
         }
       })
   }

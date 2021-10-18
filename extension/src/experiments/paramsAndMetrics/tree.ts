@@ -7,7 +7,7 @@ import {
   TreeView,
   Uri
 } from 'vscode'
-import { Status } from './model'
+import { ParamsAndMetricsModel, Status } from './model'
 import { splitParamOrMetricPath } from './paths'
 import { Experiments } from '..'
 import { Resource, ResourceLocator } from '../../resourceLocator'
@@ -23,6 +23,7 @@ type ParamsAndMetricsItem = {
   dvcRoot: string
   collapsibleState: TreeItemCollapsibleState
   path: string
+  statePath: string
   iconPath: Resource
 }
 
@@ -72,7 +73,7 @@ export class ExperimentsParamsAndMetricsTree
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const { dvcRoot, path, collapsibleState, description, iconPath } = element
+    const { dvcRoot, collapsibleState, description, iconPath, path } = element
 
     const splitPath = splitParamOrMetricPath(path)
     const finalPathSegment = splitPath[splitPath.length - 1]
@@ -143,20 +144,29 @@ export class ExperimentsParamsAndMetricsTree
       return []
     }
 
-    const [dvcRoot, path] = this.getDetails(element)
+    const [dvcRoot, statePath] = this.getDetails(element)
 
     return this.experiments
-      .getChildParamsOrMetrics(dvcRoot, path)
+      .getChildParamsOrMetrics(dvcRoot, statePath)
       .map(paramOrMetric => {
-        const { descendantStatuses, hasChildren, path, status } = paramOrMetric
+        const { descendantStatuses, hasChildren, status } = paramOrMetric
 
+        const statePath = paramOrMetric.path
+        const path = ParamsAndMetricsModel.getCleanPath(paramOrMetric.path)
         const description = this.getDescription(descendantStatuses, '/')
         const iconPath = this.getIconPath(status)
         const collapsibleState = hasChildren
           ? TreeItemCollapsibleState.Collapsed
           : TreeItemCollapsibleState.None
 
-        return { collapsibleState, description, dvcRoot, iconPath, path }
+        return {
+          collapsibleState,
+          description,
+          dvcRoot,
+          iconPath,
+          path,
+          statePath
+        }
       })
   }
 
@@ -164,8 +174,8 @@ export class ExperimentsParamsAndMetricsTree
     if (this.isRoot(element)) {
       return [element, '']
     }
-    const { dvcRoot, path } = element
-    return [dvcRoot, path]
+    const { dvcRoot, statePath } = element
+    return [dvcRoot, statePath]
   }
 
   private getIconPath(status?: Status) {
