@@ -222,6 +222,8 @@ suite('Extension Test Suite', () => {
         ]
       } as unknown as StatusOutput)
 
+      stub(CliReader.prototype, 'statusDefaultRemote').resolves({})
+
       await selectDvcPathFromFilePicker()
 
       expect(mockShowOpenDialog).to.be.calledOnce
@@ -282,6 +284,8 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'diff').resolves({})
 
       stub(CliReader.prototype, 'status').resolves({})
+
+      stub(CliReader.prototype, 'statusDefaultRemote').resolves({})
 
       await selectDvcPathFromFilePicker()
 

@@ -1,5 +1,6 @@
 import { dirname, resolve } from 'path'
 import { Disposable } from '@hediet/std/disposable'
+import isEmpty from 'lodash/isEmpty'
 import { SourceControlManagementModel } from './sourceControlManagement'
 import { DecorationModel } from './decorationProvider'
 import {
@@ -39,6 +40,8 @@ export class RepositoryModel
     untracked: new Set<string>()
   }
 
+  private remoteChanges = false
+
   constructor(dvcRoot: string) {
     this.dvcRoot = dvcRoot
   }
@@ -59,6 +62,14 @@ export class RepositoryModel
     this.updateStatus(diffFromHead, diffFromCache)
 
     this.state.untracked = untracked
+  }
+
+  public setRemoteChanges(diffFromCache: StatusOutput) {
+    this.remoteChanges = !isEmpty(diffFromCache)
+  }
+
+  public hasRemoteChanges() {
+    return this.remoteChanges
   }
 
   public hasChanges(): boolean {

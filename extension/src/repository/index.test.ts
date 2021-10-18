@@ -23,10 +23,12 @@ jest.mock('../common/logger')
 const mockedListDvcOnlyRecursive = jest.fn()
 const mockedDiff = jest.fn()
 const mockedStatus = jest.fn()
+const mockedStatusDefaultRemote = jest.fn()
 const mockedGetAllUntracked = mocked(getAllUntracked)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
 const mockedSetScmState = jest.fn()
+const mockedToggleActionButton = jest.fn()
 
 const mockedDecorationProvider = mocked(new DecorationProvider())
 const mockedSetDecorationState = jest.fn()
@@ -48,12 +50,17 @@ mockedInternalCommands.registerCommand('status', (...args) =>
   mockedStatus(...args)
 )
 
+mockedInternalCommands.registerCommand('statusDefaultRemote', (...args) =>
+  mockedStatusDefaultRemote(...args)
+)
+
 beforeEach(() => {
   jest.resetAllMocks()
 
   mockedSourceControlManagement.mockImplementationOnce(function () {
     return {
-      setState: mockedSetScmState
+      setState: mockedSetScmState,
+      toggleActionButton: mockedToggleActionButton
     } as unknown as SourceControlManagement
   })
 
@@ -97,6 +104,7 @@ describe('Repository', () => {
           'always changed'
         ]
       } as unknown as StatusOutput)
+      mockedStatusDefaultRemote.mockResolvedValueOnce({})
 
       mockedDiff.mockResolvedValueOnce({
         added: [],
@@ -159,6 +167,7 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
+      mockedStatusDefaultRemote.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const repository = new Repository(
@@ -187,6 +196,7 @@ describe('Repository', () => {
           'always changed'
         ]
       } as unknown as StatusOutput)
+      mockedStatusDefaultRemote.mockResolvedValueOnce({})
 
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
@@ -237,6 +247,7 @@ describe('Repository', () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
       mockedStatus.mockResolvedValueOnce({})
+      mockedStatusDefaultRemote.mockResolvedValueOnce({})
       mockedGetAllUntracked.mockResolvedValueOnce(emptySet)
 
       const repository = new Repository(
@@ -293,6 +304,7 @@ describe('Repository', () => {
           { 'changed outs': { 'model.pt': 'deleted' } }
         ]
       } as unknown as StatusOutput)
+      mockedStatusDefaultRemote.mockResolvedValueOnce({})
 
       const untracked = new Set([
         resolve(dvcRoot, 'some', 'untracked', 'python.py'),

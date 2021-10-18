@@ -74,15 +74,24 @@ export class Repository {
   }
 
   private async resetState() {
+    await this.resetStateLocal()
+    return this.updateRemoteState()
+  }
+
+  private async resetStateLocal() {
     const [diffFromHead, diffFromCache, untracked, tracked] =
       await this.getResetData()
 
     this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
-
     this.setState()
   }
 
   private async updateState() {
+    await this.updateLocalState()
+    return this.updateRemoteState()
+  }
+
+  private async updateLocalState() {
     const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
 
     this.model.setState({ diffFromCache, diffFromHead, untracked })
@@ -119,6 +128,19 @@ export class Repository {
     )
 
     return [diffOutput, statusOutput, gitOutput, listOutput]
+  }
+
+  private async updateRemoteState() {
+    const diffFromCache =
+      await this.internalCommands.executeCommand<StatusOutput>(
+        AvailableCommands.STATUS_DEFAULT_REMOTE,
+        this.dvcRoot
+      )
+
+    this.model.setRemoteChanges(diffFromCache)
+    this.sourceControlManagement.toggleActionButton(
+      this.model.hasRemoteChanges()
+    )
   }
 
   private setState() {

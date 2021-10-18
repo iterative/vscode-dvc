@@ -29,6 +29,10 @@ suite('Repository Test Suite', () => {
     const mockList = stub(cliReader, 'listDvcOnlyRecursive').resolves([])
     const mockDiff = stub(cliReader, 'diff').resolves({})
     const mockStatus = stub(cliReader, 'status').resolves({})
+    const mockStatusDefaultRemote = stub(
+      CliReader.prototype,
+      'statusDefaultRemote'
+    ).resolves({})
     const outputChannel = disposable.track(
       new OutputChannel([cliReader], '1', 'T1')
     )
@@ -40,7 +44,13 @@ suite('Repository Test Suite', () => {
       new Repository(dvcDemoPath, internalCommands)
     )
 
-    return { mockDiff, mockList, mockStatus, repository }
+    return {
+      mockDiff,
+      mockList,
+      mockStatus,
+      mockStatusDefaultRemote,
+      repository
+    }
   }
 
   describe('Repository', () => {

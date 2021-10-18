@@ -1,6 +1,6 @@
 import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
-import { scm, SourceControlResourceGroup, Uri } from 'vscode'
+import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
@@ -30,6 +30,8 @@ export class SourceControlManagement {
 
   public readonly dispose = Disposable.fn()
 
+  private scmView: SourceControl
+
   private readonly dvcRoot: string
 
   constructor(dvcRoot: string, state: SourceControlManagementState) {
@@ -37,18 +39,18 @@ export class SourceControlManagement {
 
     this.dvcRoot = dvcRoot
 
-    const scmView = this.dispose.track(
+    this.scmView = this.dispose.track(
       scm.createSourceControl('dvc', 'DVC', Uri.file(dvcRoot))
     )
 
-    scmView.inputBox.visible = false
+    this.scmView.inputBox.visible = false
 
     this.changedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('changes', 'Changes')
+      this.scmView.createResourceGroup('changes', 'Changes')
     )
 
     this.gitModifiedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('gitModified', 'Ready For Git Commit')
+      this.scmView.createResourceGroup('gitModified', 'Ready For Git Commit')
     )
 
     this.changedResourceGroup.hideWhenEmpty = true
@@ -76,6 +78,20 @@ export class SourceControlManagement {
 
   public getState() {
     return this.changedResourceGroup.resourceStates
+  }
+
+  public toggleActionButton(remoteChanges: boolean) {
+    // rough example of how not to do it
+    if (remoteChanges) {
+      this.scmView.actionButton = {
+        arguments: [{ RootUri: Uri.file(this.dvcRoot) }],
+        command: 'dvc.push',
+        title: '$(cloud-upload) Publish Changes',
+        tooltip: 'Publish Changes'
+      }
+    } else {
+      this.scmView.actionButton = undefined
+    }
   }
 
   private getResourceStatesReducer(validStatuses: Status[]) {
