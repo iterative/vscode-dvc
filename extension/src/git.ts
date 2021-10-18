@@ -61,12 +61,15 @@ export const gitResetWorkspace = async (cwd: string): Promise<void> => {
   })
 }
 
-export const gitStageAll = async (cwd: string) => {
-  const repositoryRoot = await executeProcess({
+export const getGitRepositoryRoot = (cwd: string): Promise<string> =>
+  executeProcess({
     args: ['rev-parse', '--show-toplevel'],
     cwd,
     executable: 'git'
   })
+
+export const gitStageAll = async (cwd: string) => {
+  const repositoryRoot = await getGitRepositoryRoot(cwd)
 
   return executeProcess({
     args: ['add', '.'],
