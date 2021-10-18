@@ -68,7 +68,6 @@ export const getStageAllCommand =
     }
 
     await gitStageAll(cwd)
-    repositories.update(cwd)
     return commands.executeCommand('workbench.scm.focus')
   }
 
@@ -81,9 +80,7 @@ export const getUnstageAllCommand =
       return
     }
 
-    const output = await gitReset(cwd)
-    repositories.update(cwd)
-    return output
+    return gitReset(cwd)
   }
 
 export const getCommitRootCommand =

@@ -3,9 +3,10 @@ import { Uri } from 'vscode'
 import { Repository } from '.'
 import { TrackedExplorerTree } from '../fileSystem/tree'
 import {
-  createFileSystemWatcher,
+  createNecessaryFileSystemWatcher,
   getRepositoryListener
 } from '../fileSystem/watcher'
+import { getGitRepositoryRoot } from '../git'
 import { BaseWorkspace, IWorkspace } from '../workspace'
 
 export class WorkspaceRepositories
@@ -45,10 +46,6 @@ export class WorkspaceRepositories
     return repositories
   }
 
-  public update(dvcRoot: string) {
-    this.getRepository(dvcRoot).update()
-  }
-
   private createRepository(
     dvcRoot: string,
     trackedExplorerTree: TrackedExplorerTree
@@ -56,11 +53,12 @@ export class WorkspaceRepositories
     const repository = this.dispose.track(
       new Repository(dvcRoot, this.internalCommands)
     )
-
-    repository.dispose.track(
-      createFileSystemWatcher(
-        join(dvcRoot, '**'),
-        getRepositoryListener(repository, trackedExplorerTree)
+    getGitRepositoryRoot(dvcRoot).then(gitRoot =>
+      repository.dispose.track(
+        createNecessaryFileSystemWatcher(
+          join(gitRoot, '**'),
+          getRepositoryListener(repository, trackedExplorerTree, dvcRoot)
+        )
       )
     )
 
