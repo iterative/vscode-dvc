@@ -30,7 +30,6 @@ const mockGetState = mocked(getState)
 
 interface CustomWindow extends Window {
   webviewData: {
-    publicPath: string
     theme: WebviewColorTheme
   }
 }
@@ -41,7 +40,6 @@ beforeEach(() => {
   mockGetState.mockReturnValueOnce({})
   customWindow = window as unknown as CustomWindow
   customWindow.webviewData = {
-    publicPath: '/some/path',
     theme: WebviewColorTheme.dark
   }
 })

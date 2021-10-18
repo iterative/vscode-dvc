@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "Apache-2.0",
   "scripts": {
-    "dev": "webpack serve --mode development",
+    "dev": "webpack watch --mode development",
     "build": "webpack --mode production",
     "test": "jest",
     "cover": "jest --collect-coverage",

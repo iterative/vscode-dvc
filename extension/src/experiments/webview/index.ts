@@ -8,7 +8,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import * as dvcVscodeWebview from 'dvc-vscode-webview'
+import { distPath } from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
 import {
   WebviewType as Experiments,
@@ -25,12 +25,8 @@ import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { sendTelemetryEvent } from '../../telemetry'
-import { EventName } from '../../telemetry/constants'
 
 export class ExperimentsWebview {
-  public static viewKey = 'dvc-experiments'
-
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
@@ -49,10 +45,11 @@ export class ExperimentsWebview {
   private readonly webviewPanel: WebviewPanel
   private readonly internalCommands: InternalCommands
 
-  private constructor(
+  protected constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
+    state: ExperimentsWebviewState,
+    scripts: string[] = []
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
@@ -66,11 +63,6 @@ export class ExperimentsWebview {
 
     webviewPanel.onDidDispose(() => {
       ExperimentsWebview.setPanelActiveContext(false)
-      sendTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
-        undefined,
-        undefined
-      )
       this.disposer.dispose()
     })
 
@@ -78,7 +70,7 @@ export class ExperimentsWebview {
       this.handleMessage(arg as MessageFromWebview)
     })
 
-    this.getHtml().then(html => (webviewPanel.webview.html = html))
+    this.getHtml(scripts).then(html => (webviewPanel.webview.html = html))
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
@@ -87,12 +79,6 @@ export class ExperimentsWebview {
     )
 
     this.notifyActiveStatus(webviewPanel)
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
-      undefined,
-      undefined
-    )
 
     this.disposer.track({
       dispose: autorun(async () => {
@@ -120,39 +106,49 @@ export class ExperimentsWebview {
     })
   }
 
-  public static restore(
+  protected static restore(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
+    state: ExperimentsWebviewState,
+    scripts: string[]
   ): Promise<ExperimentsWebview> {
     return new Promise((resolve, reject) => {
       try {
-        resolve(new ExperimentsWebview(webviewPanel, internalCommands, state))
+        resolve(
+          new ExperimentsWebview(webviewPanel, internalCommands, state, scripts)
+        )
       } catch (e: unknown) {
         reject(e)
       }
     })
   }
 
-  public static async create(
+  protected static async create(
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
-    resourceLocator: ResourceLocator
+    resourceLocator: ResourceLocator,
+    viewKey: string,
+    scripts: string[]
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
-      ExperimentsWebview.viewKey,
+      viewKey,
       Experiments,
       ViewColumn.Active,
       {
         enableScripts: true,
-        localResourceRoots: [Uri.file(dvcVscodeWebview.distPath)],
+        localResourceRoots: [Uri.file(distPath)],
         retainContextWhenHidden: true
       }
     )
 
     webviewPanel.iconPath = resourceLocator.dvcIcon
 
-    const view = new ExperimentsWebview(webviewPanel, internalCommands, state)
+    const view = new ExperimentsWebview(
+      webviewPanel,
+      internalCommands,
+      state,
+      scripts
+    )
     await view.isReady()
     return view
   }
@@ -194,52 +190,23 @@ export class ExperimentsWebview {
 
     const active = webviewPanel.active ? this.dvcRoot : undefined
     this.isFocusedChanged.fire(active)
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED,
-      {
-        active: webviewPanel.active,
-        viewColumn: webviewPanel.viewColumn,
-        visible: webviewPanel.visible
-      },
-      undefined
-    )
   }
 
-  private async getHtml(): Promise<string> {
-    let urls: {
-      publicPath: string
-      mainJsUrl: string
-      reactJsUrl: string
-    }
-
-    if (process.env.USE_DEV_UI === 'true') {
-      const baseUrl = 'http://localhost:8080/'
-      urls = {
-        mainJsUrl: `${baseUrl}main.js`,
-        publicPath: baseUrl,
-        reactJsUrl: `${baseUrl}react.js`
-      }
-    } else {
-      urls = {
-        mainJsUrl: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.mainJsFilename))
-          .toString(),
-        publicPath: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.distPath))
-          .toString(),
-        reactJsUrl: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.reactJsFilename))
-          .toString()
-      }
-    }
+  private async getHtml(scripts: string[]): Promise<string> {
+    const webviewScriptTags = scripts
+      .map(
+        script =>
+          `<script type="text/javascript" src="${this.webviewPanel.webview
+            .asWebviewUri(Uri.file(script))
+            .toString()}"></script>`
+      )
+      .join('')
 
     const theme = await this.internalCommands.executeCommand<WebviewColorTheme>(
       AvailableCommands.GET_THEME
     )
     const data: WindowWithWebviewData = {
       webviewData: {
-        publicPath: urls.publicPath,
         theme
       }
     }
@@ -261,8 +228,7 @@ export class ExperimentsWebview {
 					  <script>
 						  Object.assign(window, ${JSON.stringify(data)});
 					  </script>
-					  <script type="text/javascript" src="${urls.reactJsUrl}"></script>
-					  <script type="text/javascript" src="${urls.mainJsUrl}"></script>
+					  ${webviewScriptTags}
 				  </body>
 			  </html>
 		  `

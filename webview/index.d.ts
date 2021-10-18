@@ -1,4 +1,4 @@
 export const distPath: string
-export const mainJsFilename: string
-export const plotsJsFilename: string
-export const reactJsFilename: string
+export const main: string
+export const plots: string
+export const react: string

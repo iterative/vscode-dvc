@@ -6,6 +6,6 @@
 const path = require('path')
 
 module.exports.distPath = path.join(__dirname, 'dist')
-module.exports.mainJsFilename = path.join(__dirname, 'dist/main.js')
-module.exports.plotsJsFilename = path.join(__dirname, 'dist/plots.js')
-module.exports.reactJsFilename = path.join(__dirname, 'dist/react.js')
+module.exports.main = path.join(__dirname, 'dist/main.js')
+module.exports.plots = path.join(__dirname, 'dist/plots.js')
+module.exports.react = path.join(__dirname, 'dist/react.js')

@@ -181,7 +181,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       await activeEditorChanged
 
       expect(getActiveTextEditorFilename()).to.equal(__filename)
-    })
+    }).timeout(5000)
 
     it('should be able to open a file to the side', async () => {
       expect(getActiveTextEditorFilename()).not.to.equal(__filename)
