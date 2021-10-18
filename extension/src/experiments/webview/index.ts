@@ -8,8 +8,8 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { autorun } from 'mobx'
 import { distPath } from 'dvc-vscode-webview'
+import { autorun } from 'mobx'
 import {
   WebviewType as Experiments,
   MessageFromWebview,
