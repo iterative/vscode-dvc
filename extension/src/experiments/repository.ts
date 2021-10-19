@@ -73,7 +73,11 @@ export class ExperimentsRepository {
     )
 
     this.paramsAndMetrics = this.dispose.track(
-      new ParamsAndMetricsModel(dvcRoot, workspaceState)
+      new ParamsAndMetricsModel(
+        dvcRoot,
+        workspaceState,
+        this.paramsOrMetricsChanged
+      )
     )
 
     this.processManager = this.dispose.track(

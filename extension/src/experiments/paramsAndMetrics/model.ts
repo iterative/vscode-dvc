@@ -32,13 +32,20 @@ export class ParamsAndMetricsModel {
 
   private columnState: ParamOrMetric[] = []
 
+  private columnOrderChanged: EventEmitter<void>
+
   static getCleanPath(path: string): string {
     return path.split('/')[1]
   }
 
-  constructor(dvcRoot: string, workspaceState: Memento) {
+  constructor(
+    dvcRoot: string,
+    workspaceState: Memento,
+    columnOrderChanged: EventEmitter<void>
+  ) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
+    this.columnOrderChanged = columnOrderChanged
     this.onDidChangeParamsAndMetricsFiles =
       this.paramsAndMetricsFilesChanged.event
     this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
@@ -84,6 +91,7 @@ export class ParamsAndMetricsModel {
       }
     })
     this.columnState = orderedData
+    this.columnOrderChanged.fire()
   }
 
   public getSelected() {
@@ -132,21 +140,25 @@ export class ParamsAndMetricsModel {
   }
 
   public toggleStatus(path: string) {
-    const status = this.getNextStatus(path)
-    this.status[path] = status
+    const originalPath = ParamsAndMetricsModel.getCleanPath(path)
+    const status = this.getNextStatus(originalPath)
+    this.status[originalPath] = status
     this.setAreChildrenSelected(path, status)
     this.setAreParentsSelected(path)
     this.persistStatus()
 
-    return this.status[path]
+    return this.status[originalPath]
   }
 
   public getTerminalNodeStatuses(parentPath?: string): Status[] {
     const nestedStatuses = (this.getChildren(parentPath) || []).map(
       paramOrMetric => {
+        const originalPath = ParamsAndMetricsModel.getCleanPath(
+          paramOrMetric.path
+        )
         const terminalStatuses = paramOrMetric.hasChildren
           ? this.getTerminalNodeStatuses(paramOrMetric.path)
-          : [this.status[paramOrMetric.path]]
+          : [this.status[originalPath]]
         return [...terminalStatuses]
       }
     )
@@ -181,17 +193,19 @@ export class ParamsAndMetricsModel {
   private setAreChildrenSelected(path: string, status: Status) {
     return this.getChildren(path)?.map(paramOrMetric => {
       const path = paramOrMetric.path
-      this.status[path] = status
+      const originalPath = ParamsAndMetricsModel.getCleanPath(path)
+      this.status[originalPath] = status
       this.setAreChildrenSelected(path, status)
     })
   }
 
   private getParamOrMetric(path: string) {
-    return this.data?.find(paramOrMetric => paramOrMetric.path === path)
+    return this.columnState?.find(paramOrMetric => paramOrMetric.path === path)
   }
 
   private setAreParentsSelected(path: string) {
     const changed = this.getParamOrMetric(path)
+
     if (!changed) {
       return
     }
@@ -201,9 +215,9 @@ export class ParamsAndMetricsModel {
     }
 
     const parentPath = parent.path
-
+    const originalParentPath = ParamsAndMetricsModel.getCleanPath(parentPath)
     const status = this.getStatus(parentPath)
-    this.status[parentPath] = status
+    this.status[originalParentPath] = status
     this.setAreParentsSelected(parentPath)
   }
 

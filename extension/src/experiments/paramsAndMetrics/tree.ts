@@ -60,8 +60,8 @@ export class ExperimentsParamsAndMetricsTree
 
     internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
       RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
-      ({ dvcRoot, path }) =>
-        this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
+      ({ dvcRoot, statePath }) =>
+        this.experiments.toggleParamOrMetricStatus(dvcRoot, statePath)
     )
 
     this.updateDescriptionOnChange()
@@ -73,14 +73,21 @@ export class ExperimentsParamsAndMetricsTree
       return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
     }
 
-    const { dvcRoot, collapsibleState, description, iconPath, path } = element
+    const {
+      dvcRoot,
+      collapsibleState,
+      description,
+      iconPath,
+      path,
+      statePath
+    } = element
 
     const splitPath = splitParamOrMetricPath(path)
     const finalPathSegment = splitPath[splitPath.length - 1]
     const treeItem = new TreeItem(finalPathSegment, collapsibleState)
 
     treeItem.command = {
-      arguments: [{ dvcRoot, path }],
+      arguments: [{ dvcRoot, statePath }],
       command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
       title: 'toggle'
     }
