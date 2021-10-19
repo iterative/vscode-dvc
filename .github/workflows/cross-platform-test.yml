@@ -32,4 +32,6 @@ jobs:
 
       - run: yarn install
 
-      - run: yarn run test
+      - run: yarn run test:jest
+
+      - run: yarn run test:vscode
