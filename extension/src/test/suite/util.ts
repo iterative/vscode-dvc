@@ -10,6 +10,7 @@ import {
 } from 'vscode'
 import { Experiments } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
+import { definedAndNonEmpty } from '../../util/array'
 
 export const dvcDemoPath = Uri.file(
   resolve(__dirname, '..', '..', '..', '..', 'demo')
@@ -64,12 +65,20 @@ export const experimentsUpdatedEvent = (experiments: Experiments) =>
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
   spy.getCall(call).args[0]
 
-export const activeTextEditorChangedEvent = (): Promise<
-  TextEditor | undefined
-> =>
+export const activeTextEditorChangedEvent = (
+  disposable: Disposer
+): Promise<TextEditor | undefined> =>
   new Promise(resolve =>
-    window.onDidChangeActiveTextEditor(editor => resolve(editor))
+    disposable.track(
+      window.onDidChangeActiveTextEditor(editor => resolve(editor))
+    )
   )
 
 export const getActiveTextEditorFilename = (): string | undefined =>
   window.activeTextEditor?.document.fileName
+
+export const closeAllEditors = async () => {
+  if (definedAndNonEmpty(window.visibleTextEditors)) {
+    await commands.executeCommand('workbench.action.closeAllEditors')
+  }
+}
