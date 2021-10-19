@@ -1,7 +1,7 @@
 import { delay } from '../util/time'
 import { Logger } from '../common/logger'
 
-export const retryIfLocked = async <T>(
+export const retry = async <T>(
   getNewPromise: () => Promise<T>,
   args: string,
   waitBeforeRetry = 500
@@ -12,11 +12,7 @@ export const retryIfLocked = async <T>(
     const errorMessage = (e as Error).message
     Logger.error(`${args} failed with ${errorMessage} retrying...`)
 
-    if (errorMessage.includes('lock')) {
-      await delay(waitBeforeRetry)
-      return retryIfLocked(getNewPromise, args, waitBeforeRetry * 2)
-    }
-
-    throw e
+    await delay(waitBeforeRetry)
+    return retry(getNewPromise, args, waitBeforeRetry * 2)
   }
 }

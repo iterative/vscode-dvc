@@ -23,6 +23,7 @@
     "isout",
     "MNIST",
     "pseudoterminal",
+    "rwlock",
     "sonarjs",
     "stackframe",
     "subdir",
