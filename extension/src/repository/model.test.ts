@@ -53,7 +53,7 @@ describe('RepositoryState', () => {
           { path: predictions }
         ],
         'not in cache': [],
-        renamed: [{ path: renamed }]
+        renamed: [{ path: { new: renamed, old: 'does not matter' } }]
       }
 
       const status = {

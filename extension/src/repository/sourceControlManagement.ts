@@ -66,7 +66,10 @@ export class SourceControlManagement {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
       this.getResourceStatesReducer(
         Object.values(Status).filter(
-          status => ![Status.ADDED, Status.GIT_MODIFIED].includes(status)
+          status =>
+            ![Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED].includes(
+              status
+            )
         )
       ),
       []
@@ -75,7 +78,11 @@ export class SourceControlManagement {
     this.gitCommitReadyResourceGroup.resourceStates = Object.entries(
       state
     ).reduce(
-      this.getResourceStatesReducer([Status.ADDED, Status.GIT_MODIFIED]),
+      this.getResourceStatesReducer([
+        Status.ADDED,
+        Status.GIT_MODIFIED,
+        Status.RENAMED
+      ]),
       []
     )
   }
