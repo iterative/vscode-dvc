@@ -63,19 +63,24 @@ export class SourceControlManagement {
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
       this.getResourceStatesReducer(
-        Object.values(Status).filter(status => status !== Status.GIT_MODIFIED)
+        Object.values(Status).filter(
+          status => ![Status.ADDED, Status.GIT_MODIFIED].includes(status)
+        )
       ),
       []
     )
 
     this.gitModifiedResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer([Status.GIT_MODIFIED]),
+      this.getResourceStatesReducer([Status.ADDED, Status.GIT_MODIFIED]),
       []
     )
   }
 
   public getState() {
-    return this.changedResourceGroup.resourceStates
+    return {
+      changes: this.changedResourceGroup.resourceStates,
+      gitModified: this.gitModifiedResourceGroup.resourceStates
+    }
   }
 
   private getResourceStatesReducer(validStatuses: Status[]) {
