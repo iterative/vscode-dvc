@@ -188,7 +188,11 @@ export class RepositoryModel
   ): void {
     this.state.added = this.getStateFromDiff(diffOutput.added)
     this.state.deleted = this.getStateFromDiff(diffOutput.deleted)
-    this.state.renamed = this.getStateFromDiff(diffOutput.renamed)
+    this.state.renamed = new Set(
+      diffOutput.renamed
+        ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
+        .filter(path => this.state.tracked.has(path))
+    )
     this.state.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
 
     this.setModified(diffOutput, statusOutput)

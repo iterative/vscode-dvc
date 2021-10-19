@@ -16,7 +16,7 @@ export type DiffOutput = {
   added?: PathOutput[]
   deleted?: PathOutput[]
   modified?: PathOutput[]
-  renamed?: PathOutput[]
+  renamed?: { path: { old: string; new: string } }[]
   'not in cache'?: PathOutput[]
 }
 
