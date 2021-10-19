@@ -1,18 +1,16 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy, useFakeTimers } from 'sinon'
-import { window, commands, workspace, Uri, FileSystemWatcher } from 'vscode'
+import { stub, restore, spy, useFakeTimers, SinonStub, match } from 'sinon'
+import { window, commands, workspace, Uri } from 'vscode'
 import {
   closeAllEditors,
   configurationChangeEvent,
-  dvcDemoPath,
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
-import * as Watcher from '../../fileSystem/watcher'
 import complexExperimentsOutput from '../fixtures/complex-output-example'
 import * as Disposer from '../../util/disposable'
 import { RegisteredCommands } from '../../commands/external'
@@ -20,7 +18,9 @@ import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
-import * as Git from '../../git'
+import { WorkspaceRepositories } from '../../repository/workspace'
+import { WorkspaceExperiments } from '../../experiments/workspace'
+import { TrackedExplorerTree } from '../../fileSystem/tree'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -42,6 +42,14 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
+    const disposalEvent = (mockDisposer: SinonStub) =>
+      new Promise(resolve => {
+        mockDisposer.callsFake((...args) => {
+          resolve(undefined)
+          return mockDisposer.wrappedMethod(...args)
+        })
+      })
+
     const selectDvcPathFromFilePicker = async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
@@ -145,7 +153,31 @@ suite('Extension Test Suite', () => {
       )
     })
 
-    it('should invoke the file picker with the second option and initialize the extension when the cli is usable', async () => {
+    it('should initialize the extension when the cli is usable', async () => {
+      const mockWorkspaceExperimentsReady = stub(
+        WorkspaceExperiments.prototype,
+        'isReady'
+      )
+
+      const workspaceExperimentsAreReady = new Promise(resolve =>
+        mockWorkspaceExperimentsReady.callsFake(async () => {
+          await mockWorkspaceExperimentsReady.wrappedMethod()
+          resolve(undefined)
+        })
+      )
+
+      const mockWorkspaceRepositoriesReady = stub(
+        WorkspaceRepositories.prototype,
+        'isReady'
+      )
+
+      const workspaceRepositoriesAreReady = new Promise(resolve =>
+        mockWorkspaceRepositoriesReady.callsFake(async () => {
+          await mockWorkspaceRepositoriesReady.wrappedMethod()
+          resolve(undefined)
+        })
+      )
+
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const secondTelemetryEventSent = new Promise(resolve =>
         mockSendTelemetryEvent
@@ -222,70 +254,85 @@ suite('Extension Test Suite', () => {
 
       await secondTelemetryEventSent
 
-      expect(mockShowOpenDialog).to.have.been.called
-      expect(mockCanRunCli).to.have.been.called
+      expect(mockShowOpenDialog, 'should show the open dialog').to.have.been
+        .called
+      expect(
+        mockCanRunCli,
+        'should have checked to see if the cli could be run with the given execution details'
+      ).to.have.been.called
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
 
-      const [eventName, customProperties] =
-        mockSendTelemetryEvent.getCall(1).args
-
       expect(
-        eventName,
-        'the correct execution details changed event should be sent'
-      ).to.equal(EventName.EXTENSION_EXECUTION_DETAILS_CHANGED)
-      expect(
-        customProperties,
-        'the correct custom properties should be sent with the event'
-      ).to.deep.equal({
-        cliAccessible: true,
-        dvcPathUsed: true,
-        dvcRootCount: 1,
-        msPythonInstalled: false,
-        msPythonUsed: false,
-        pythonPathUsed: false,
-        workspaceFolderCount: 1
-      })
-    })
+        mockSendTelemetryEvent,
+        'should send the correct event details'
+      ).to.be.calledWith(
+        EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+        {
+          cliAccessible: true,
+          dvcPathUsed: true,
+          dvcRootCount: 1,
+          msPythonInstalled: false,
+          msPythonUsed: false,
+          pythonPathUsed: false,
+          workspaceFolderCount: 1
+        },
+        match.has('duration')
+      )
 
-    it('should dispose of the current repositories and experiments before creating new ones', async () => {
-      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
+      await Promise.all([
+        workspaceExperimentsAreReady,
+        workspaceRepositoriesAreReady
+      ])
+
+      mockShowOpenDialog.resolves([
         Uri.file(resolve('different', 'file', 'picked', 'path', 'to', 'dvc'))
       ])
-      const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
-        'I STILL WORK'
-      )
+      mockCanRunCli.resetHistory()
+      mockCanRunCli.resolves('I STILL WORK')
 
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
-
-      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
-      const createFileSystemWatcherCalled = new Promise(resolve =>
-        stub(Watcher, 'createNecessaryFileSystemWatcher').callsFake(() => {
+      const experimentsCreated = new Promise(resolve =>
+        stub(WorkspaceExperiments.prototype, 'create').callsFake(() => {
           resolve(undefined)
-          return { dispose: stub() } as unknown as FileSystemWatcher
+          return []
+        })
+      )
+      const repositoriesCreated = new Promise(resolve =>
+        stub(WorkspaceRepositories.prototype, 'create').callsFake(() => {
+          resolve(undefined)
+          return []
+        })
+      )
+      const trackedExplorerTreeInitialized = new Promise(resolve =>
+        stub(TrackedExplorerTree.prototype, 'initialize').callsFake(() => {
+          resolve(undefined)
+          return undefined
         })
       )
 
-      const mockDisposer = spy(Disposer, 'reset')
+      const mockDisposer = stub(Disposer, 'reset')
 
-      stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([])
-
-      stub(CliReader.prototype, 'listDvcOnly').resolves([])
-
-      stub(CliReader.prototype, 'diff').resolves({})
-
-      stub(CliReader.prototype, 'status').resolves({})
+      const disposal = disposalEvent(mockDisposer)
 
       await selectDvcPathFromFilePicker()
 
-      await createFileSystemWatcherCalled
+      await disposal
 
-      expect(mockShowOpenDialog).to.be.called
-      expect(mockCanRunCli).to.have.been.called
-      expect(mockDisposer).to.have.been.called
-    })
+      expect(
+        mockDisposer,
+        'should dispose of the current repositories and experiments before creating new ones'
+      ).to.have.been.called
+      expect(
+        mockCanRunCli,
+        'should have checked to see if the cli could still be run'
+      ).to.have.been.called
+
+      await Promise.all([
+        experimentsCreated,
+        repositoriesCreated,
+        trackedExplorerTreeInitialized
+      ])
+    }).timeout(10000)
 
     it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
@@ -296,19 +343,12 @@ suite('Extension Test Suite', () => {
       )
 
       const mockDisposer = stub(Disposer, 'reset')
-
-      const disposalEvent = new Promise(resolve => {
-        mockDisposer.callsFake((...args) => {
-          resolve(undefined)
-          return mockDisposer.wrappedMethod(...args)
-        })
-      })
+      const disposal = disposalEvent(mockDisposer)
 
       await selectDvcPathFromFilePicker()
 
-      await disposalEvent
+      await disposal
 
-      expect(mockShowOpenDialog).to.be.calledOnce
       expect(mockShowOpenDialog).to.have.been.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
