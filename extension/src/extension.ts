@@ -4,7 +4,6 @@ import { Config } from './config'
 import { CliExecutor } from './cli/executor'
 import { CliRunner } from './cli/runner'
 import { CliReader } from './cli/reader'
-import { getGitRepositoryRoots } from './extensions/git'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
@@ -333,21 +332,9 @@ export class Extension implements IExtension {
     this.repositories.create(this.dvcRoots, this.trackedExplorerTree)
   }
 
-  private initializeExperiments = async () => {
+  private initializeExperiments = () => {
     this.experiments.reset()
-
     this.experiments.create(this.dvcRoots, this.resourceLocator)
-    const [, gitRoots] = await Promise.all([
-      this.experiments.isReady(),
-      getGitRepositoryRoots()
-    ])
-    gitRoots.forEach(async gitRoot => {
-      const dvcRoots = await findDvcRootPaths(gitRoot)
-
-      dvcRoots.forEach(dvcRoot => {
-        this.experiments.onDidChangeData(dvcRoot, gitRoot)
-      })
-    })
   }
 
   private findDvcRoots = async (cwd: string): Promise<string[]> => {
