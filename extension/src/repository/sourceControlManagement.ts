@@ -12,12 +12,14 @@ export interface SourceControlManagementModel {
 enum Status {
   ADDED = 'added',
   DELETED = 'deleted',
+  GIT_MODIFIED = 'gitModified',
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
   RENAMED = 'renamed',
-  GIT_MODIFIED = 'gitModified',
   UNTRACKED = 'untracked'
 }
+
+const gitCommitReady = [Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED]
 
 type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
 
@@ -65,26 +67,14 @@ export class SourceControlManagement {
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
       this.getResourceStatesReducer(
-        Object.values(Status).filter(
-          status =>
-            ![Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED].includes(
-              status
-            )
-        )
+        Object.values(Status).filter(status => !gitCommitReady.includes(status))
       ),
       []
     )
 
     this.gitCommitReadyResourceGroup.resourceStates = Object.entries(
       state
-    ).reduce(
-      this.getResourceStatesReducer([
-        Status.ADDED,
-        Status.GIT_MODIFIED,
-        Status.RENAMED
-      ]),
-      []
-    )
+    ).reduce(this.getResourceStatesReducer(gitCommitReady), [])
   }
 
   public getState() {
