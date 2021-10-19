@@ -105,7 +105,7 @@ suite('Experiments Test Suite', () => {
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
-      const webview = await experiments.showWebview()
+      const webview = await experiments.showTableWebview()
 
       expect(messageSpy).to.be.calledWith({
         tableData: {
@@ -131,7 +131,7 @@ suite('Experiments Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const webview = await experiments.showWebview()
+      const webview = await experiments.showTableWebview()
 
       expect(windowSpy).to.have.been.calledOnce
       expect(mockExperimentShow).to.have.been.calledOnce
@@ -142,7 +142,7 @@ suite('Experiments Test Suite', () => {
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await experiments.showWebview()
+      const sameWebview = await experiments.showTableWebview()
 
       expect(webview === sameWebview).to.be.true
 
@@ -193,7 +193,7 @@ suite('Experiments Test Suite', () => {
         )
       )
       await experiments.isReady()
-      await experiments.showWebview()
+      await experiments.showTableWebview()
 
       expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
         {

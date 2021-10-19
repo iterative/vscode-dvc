@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
-import { Config } from 'vega'
+import { Config, LegendConfig } from 'vega'
 import { PlotsData, PlotItem } from './App'
 
 const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
@@ -67,6 +67,9 @@ const config: Config = {
     titleColor: foregroundColor
   },
   background: backgroundColor,
+  legend: {
+    disabled: true
+  } as LegendConfig,
   padding: 10,
   style: {
     cell: {
@@ -91,16 +94,13 @@ const config: Config = {
   }
 }
 
-const AllPlots = ({
+const Plot = ({
   items,
   yMetric
 }: {
   items: PlotItem[]
   yMetric: ParamOrMetric
 }) => {
-  if (!yMetric) {
-    return null
-  }
   const spec = createSpec(yMetric)
 
   return (
@@ -114,66 +114,38 @@ const AllPlots = ({
   )
 }
 
-const collectLeafMetrics = (
-  columns?: ParamOrMetric[]
-): [ParamOrMetric[], Record<string, ParamOrMetric>] => {
+const collectLeafMetrics = (columns?: ParamOrMetric[]): ParamOrMetric[] => {
   const leafMetrics: ParamOrMetric[] = []
-  const leafMetricsByPath: Record<string, ParamOrMetric> = {}
   columns?.forEach(column => {
     if (column.group === 'metrics' && !column.hasChildren) {
       leafMetrics.push(column)
-      leafMetricsByPath[column.path] = column
     }
   })
-  return [leafMetrics, leafMetricsByPath]
+  return leafMetrics
 }
 
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  const [leafMetrics, leafMetricsByPath] = useMemo(
+  const leafMetrics = useMemo(
     () => collectLeafMetrics(plotsData?.columns),
     [plotsData]
   )
 
-  const [yMetricPath, setYMetricPath] = useState<string>()
-
-  useEffect(() => {
-    if (
-      (!yMetricPath || !leafMetricsByPath[yMetricPath]) &&
-      leafMetrics.length > 0
-    ) {
-      setYMetricPath(leafMetrics[0]?.path)
-    }
-  }, [yMetricPath, leafMetrics, leafMetricsByPath])
-
-  if (!plotsData || !yMetricPath) {
+  if (!plotsData) {
     return null
   }
-
-  const yMetric = leafMetricsByPath[yMetricPath]
 
   const { items } = plotsData
 
   return (
     <>
-      <div>
-        <select
-          value={yMetricPath}
-          onChange={e => {
-            setYMetricPath(e.target.value)
-          }}
-        >
-          {leafMetrics.map((metric, i) => {
-            return (
-              <option key={`metric-${i}`} value={metric.path}>
-                {metric.path}
-              </option>
-            )
-          })}
-        </select>
-      </div>
-      {yMetricPath && <AllPlots items={items} yMetric={yMetric} />}
+      {leafMetrics.map(leafMetric => (
+        <Plot
+          items={items}
+          yMetric={leafMetric}
+          key={`plot-${leafMetric.path}`}
+        />
+      ))}
     </>
   )
 }
-
 export default Plots

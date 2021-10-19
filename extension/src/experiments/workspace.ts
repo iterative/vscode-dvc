@@ -5,6 +5,7 @@ import { TableWebview } from './webview/table'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
+import { PlotsWebview } from './webview/plots'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -193,7 +194,16 @@ export class WorkspaceExperiments
       return
     }
 
-    return this.showExperimentsWebview(dvcRoot)
+    return this.showTableWebview(dvcRoot)
+  }
+
+  public async showPlots() {
+    const dvcRoot = await this.getOnlyOrPickProject()
+    if (!dvcRoot) {
+      return
+    }
+
+    return this.showPlotsWebview(dvcRoot)
   }
 
   public showExperimentsTableThenRun = async (commandId: CommandId) => {
@@ -202,7 +212,7 @@ export class WorkspaceExperiments
       return
     }
 
-    const experiments = await this.showExperimentsWebview(dvcRoot)
+    const experiments = await this.showTableWebview(dvcRoot)
     if (!experiments) {
       return
     }
@@ -238,13 +248,22 @@ export class WorkspaceExperiments
     experiments?.refresh()
   }
 
-  public setWebview(dvcRoot: string, experimentsWebview: TableWebview) {
+  public setTableWebview(dvcRoot: string, experimentsWebview: TableWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
       experimentsWebview.dispose()
     }
 
-    experiments.setWebview(experimentsWebview)
+    experiments.setTableWebview(experimentsWebview)
+  }
+
+  public setPlotsWebview(dvcRoot: string, experimentsWebview: PlotsWebview) {
+    const experiments = this.getRepository(dvcRoot)
+    if (!experiments) {
+      experimentsWebview.dispose()
+    }
+
+    experiments.setPlotsWebview(experimentsWebview)
   }
 
   private async getDvcRoot(overrideRoot?: string) {
@@ -264,9 +283,15 @@ export class WorkspaceExperiments
     )
   }
 
-  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
+  private async showTableWebview(dvcRoot: string): Promise<Experiments> {
     const experiments = this.getRepository(dvcRoot)
-    await experiments.showWebview()
+    await experiments.showTableWebview()
+    return experiments
+  }
+
+  private async showPlotsWebview(dvcRoot: string): Promise<Experiments> {
+    const experiments = this.getRepository(dvcRoot)
+    await experiments.showPlotsWebview()
     return experiments
   }
 

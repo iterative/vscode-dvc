@@ -67,11 +67,11 @@ describe('Experiments', () => {
     {
       '/my/dvc/root': {
         getDvcRoot: () => mockedDvcRoot,
-        showWebview: mockedShowWebview
+        showTableWebview: mockedShowWebview
       } as unknown as Experiments,
       '/my/fun/dvc/root': {
         getDvcRoot: () => mockedOtherDvcRoot,
-        showWebview: jest.fn()
+        showTableWebview: jest.fn()
       } as unknown as Experiments
     }
   )

@@ -107,6 +107,10 @@ const registerExperimentRunCommands = (
     RegisteredCommands.EXPERIMENT_SHOW,
     () => experiments.showExperimentsTable()
   )
+
+  internalCommands.registerExternalCommand(RegisteredCommands.PLOTS_SHOW, () =>
+    experiments.showPlots()
+  )
 }
 
 export const registerExperimentCommands = (

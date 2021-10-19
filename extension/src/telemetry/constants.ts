@@ -24,6 +24,11 @@ export const EventName = Object.assign(
     EXTENSION_EXECUTION_DETAILS_CHANGED: 'extension.executionDetails.changed',
     EXTENSION_LOAD: 'extension.load',
 
+    VIEWS_EXPERIMENTS_PLOTS_CLOSED: 'views.experimentsPlots.closed',
+    VIEWS_EXPERIMENTS_PLOTS_CREATED: 'views.experimentsPlots.created',
+    VIEWS_EXPERIMENTS_PLOTS_FOCUS_CHANGED:
+      'views.experimentsPlots.focusChanged',
+
     VIEWS_EXPERIMENTS_TABLE_CLOSED: 'views.experimentsTable.closed',
     VIEWS_EXPERIMENTS_TABLE_CREATED: 'views.experimentsTable.created',
     VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED:
@@ -78,6 +83,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_SORTS_REMOVE_ALL]: undefined
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
+  [EventName.PLOTS_SHOW]: undefined
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined
@@ -116,6 +122,13 @@ export interface IEventNamePropertyMapping {
   [EventName.VIEWS_EXPERIMENTS_PARAMS_AND_METRICS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_SORT_BY_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
+  [EventName.VIEWS_EXPERIMENTS_PLOTS_CLOSED]: undefined
+  [EventName.VIEWS_EXPERIMENTS_PLOTS_CREATED]: undefined
+  [EventName.VIEWS_EXPERIMENTS_PLOTS_FOCUS_CHANGED]: {
+    active: boolean
+    viewColumn: ViewColumn | undefined
+    visible: boolean
+  }
   [EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_CREATED]: undefined
   [EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED]: {

@@ -11,6 +11,7 @@ import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { TableWebview } from './webview/table'
+import { PlotsWebview } from './webview/plots'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
@@ -36,7 +37,8 @@ export class Experiments {
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
 
-  private webview?: TableWebview
+  private tableWebview?: TableWebview
+  private plotsWebview?: PlotsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -124,9 +126,9 @@ export class Experiments {
     return this.paramsAndMetrics.getTerminalNodeStatuses()
   }
 
-  public showWebview = async () => {
-    if (this.webview) {
-      return this.webview.reveal()
+  public async showTableWebview() {
+    if (this.tableWebview) {
+      return this.tableWebview.reveal()
     }
 
     const webview = await TableWebview.create(
@@ -138,15 +140,52 @@ export class Experiments {
       this.resourceLocator
     )
 
-    this.setWebview(webview)
+    this.setTableWebview(webview)
 
     this.isWebviewFocusedChanged.fire(this.dvcRoot)
 
     return webview
   }
 
-  public setWebview(view: TableWebview) {
-    this.webview = this.dispose.track(view)
+  public async showPlotsWebview() {
+    if (this.plotsWebview) {
+      return this.plotsWebview.reveal()
+    }
+
+    const webview = await PlotsWebview.create(
+      this.internalCommands,
+      {
+        dvcRoot: this.dvcRoot,
+        tableData: this.getTableData()
+      },
+      this.resourceLocator
+    )
+
+    this.setPlotsWebview(webview)
+
+    this.isWebviewFocusedChanged.fire(this.dvcRoot)
+
+    return webview
+  }
+
+  public setTableWebview(view: TableWebview) {
+    this.tableWebview = this.dispose.track(view)
+    view.isReady().then(() => this.sendData())
+
+    this.dispose.track(
+      view.onDidDispose(() => {
+        this.resetWebview()
+      })
+    )
+    this.dispose.track(
+      view.onDidChangeIsFocused(dvcRoot => {
+        this.isWebviewFocusedChanged.fire(dvcRoot)
+      })
+    )
+  }
+
+  public setPlotsWebview(view: PlotsWebview) {
+    this.plotsWebview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
 
     this.dispose.track(
@@ -254,9 +293,15 @@ export class Experiments {
   }
 
   private sendData() {
-    if (this.webview) {
-      this.webview.showExperiments({
-        tableData: this.getTableData()
+    const tableData = this.getTableData()
+    if (this.tableWebview) {
+      this.tableWebview.showExperiments({
+        tableData
+      })
+    }
+    if (this.plotsWebview) {
+      this.plotsWebview.showExperiments({
+        tableData
       })
     }
   }
@@ -272,7 +317,7 @@ export class Experiments {
 
   private resetWebview = () => {
     this.isWebviewFocusedChanged.fire(undefined)
-    this.dispose.untrack(this.webview)
-    this.webview = undefined
+    this.dispose.untrack(this.tableWebview)
+    this.tableWebview = undefined
   }
 }
