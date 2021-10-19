@@ -312,8 +312,6 @@ suite('Extension Test Suite', () => {
       await selectDvcPathFromFilePicker()
 
       await disposal
-      await experimentsCreated
-      await repositoriesCreated
 
       expect(
         mockDisposer,
@@ -323,6 +321,8 @@ suite('Extension Test Suite', () => {
         mockCanRunCli,
         'should have checked to see if the cli could still be run'
       ).to.have.been.called
+
+      return Promise.all([experimentsCreated, repositoriesCreated])
     }).timeout(5000)
 
     it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
