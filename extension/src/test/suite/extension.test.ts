@@ -19,6 +19,7 @@ import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceRepositories } from '../../repository/workspace'
 import { WorkspaceExperiments } from '../../experiments/workspace'
+import { TrackedExplorerTree } from '../../fileSystem/tree'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -304,6 +305,12 @@ suite('Extension Test Suite', () => {
           return []
         })
       )
+      const trackedExplorerTreeInitialized = new Promise(resolve =>
+        stub(TrackedExplorerTree.prototype, 'initialize').callsFake(() => {
+          resolve(undefined)
+          return undefined
+        })
+      )
 
       const mockDisposer = stub(Disposer, 'reset')
 
@@ -322,8 +329,12 @@ suite('Extension Test Suite', () => {
         'should have checked to see if the cli could still be run'
       ).to.have.been.called
 
-      return Promise.all([experimentsCreated, repositoriesCreated])
-    }).timeout(5000)
+      return Promise.all([
+        experimentsCreated,
+        repositoriesCreated,
+        trackedExplorerTreeInitialized
+      ])
+    }).timeout(10000)
 
     it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
       const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
