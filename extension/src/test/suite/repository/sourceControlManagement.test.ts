@@ -5,7 +5,7 @@ import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
-import { dvcDemoPath } from '../util'
+import { closeAllEditors, dvcDemoPath } from '../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
@@ -25,7 +25,7 @@ suite('Source Control Management Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('SourceControlManagement', () => {
