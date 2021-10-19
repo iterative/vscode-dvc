@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { stub, restore, spy, useFakeTimers, SinonStub, match } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
 import {
+  closeAllEditors,
   configurationChangeEvent,
   quickPickInitialized,
   selectQuickPickItem
@@ -36,7 +37,7 @@ suite('Extension Test Suite', () => {
     return Promise.all([
       workspace.getConfiguration().update(dvcPathOption, undefined, false),
       workspace.getConfiguration().update(pythonPathOption, undefined, false),
-      commands.executeCommand('workbench.action.closeAllEditors')
+      closeAllEditors()
     ])
   })
 

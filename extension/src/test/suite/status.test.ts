@@ -1,13 +1,8 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { fake, restore, stub } from 'sinon'
-import {
-  window,
-  commands,
-  workspace,
-  EventEmitter,
-  StatusBarItem
-} from 'vscode'
+import { window, workspace, EventEmitter, StatusBarItem } from 'vscode'
+import { closeAllEditors } from './util'
 import { Disposable } from '../../extension'
 import { Status } from '../../status'
 import { Cli, CliResult, CliStarted } from '../../cli'
@@ -26,7 +21,7 @@ suite('Status Test Suite', () => {
   afterEach(async () => {
     disposable.dispose()
     await workspace.getConfiguration().update(dvcPathOption, undefined, false)
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('Status', () => {

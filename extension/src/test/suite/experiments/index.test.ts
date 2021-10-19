@@ -17,7 +17,12 @@ import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
-import { dvcDemoPath, experimentsUpdatedEvent, resourcePath } from '../util'
+import {
+  closeAllEditors,
+  dvcDemoPath,
+  experimentsUpdatedEvent,
+  resourcePath
+} from '../util'
 import { buildMockMemento } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
 import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
@@ -35,7 +40,7 @@ suite('Experiments Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('refresh', () => {
