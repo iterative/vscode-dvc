@@ -281,8 +281,7 @@ suite('Extension Test Suite', () => {
 
       await createFileSystemWatcherCalled
 
-      expect(mockShowOpenDialog).to.be.calledOnce
-      expect(mockShowOpenDialog).to.have.been.called
+      expect(mockShowOpenDialog).to.be.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
     })
