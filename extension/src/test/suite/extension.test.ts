@@ -42,14 +42,6 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const createFileSystemWatcherEvent = () =>
-      new Promise(resolve =>
-        stub(Watcher, 'createNecessaryFileSystemWatcher').callsFake(() => {
-          resolve(undefined)
-          return { dispose: stub() } as unknown as FileSystemWatcher
-        })
-      )
-
     const selectDvcPathFromFilePicker = async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
@@ -165,7 +157,6 @@ suite('Extension Test Suite', () => {
             return undefined
           })
       )
-      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
 
       const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
       const mockPath = mockUri.fsPath
@@ -179,8 +170,6 @@ suite('Extension Test Suite', () => {
       stub(CliReader.prototype, 'experimentShow').resolves(
         complexExperimentsOutput
       )
-
-      const createFileSystemWatcherCalled = createFileSystemWatcherEvent()
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -231,7 +220,6 @@ suite('Extension Test Suite', () => {
         mockPath
       )
 
-      await createFileSystemWatcherCalled
       await secondTelemetryEventSent
 
       expect(mockShowOpenDialog).to.have.been.called
@@ -272,7 +260,13 @@ suite('Extension Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const createFileSystemWatcherCalled = createFileSystemWatcherEvent()
+      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
+      const createFileSystemWatcherCalled = new Promise(resolve =>
+        stub(Watcher, 'createNecessaryFileSystemWatcher').callsFake(() => {
+          resolve(undefined)
+          return { dispose: stub() } as unknown as FileSystemWatcher
+        })
+      )
 
       const mockDisposer = spy(Disposer, 'reset')
 
@@ -288,8 +282,7 @@ suite('Extension Test Suite', () => {
 
       await createFileSystemWatcherCalled
 
-      expect(mockShowOpenDialog).to.be.calledOnce
-      expect(mockShowOpenDialog).to.have.been.called
+      expect(mockShowOpenDialog).to.be.called
       expect(mockCanRunCli).to.have.been.called
       expect(mockDisposer).to.have.been.called
     })
