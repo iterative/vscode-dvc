@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy, useFakeTimers, SinonStub } from 'sinon'
+import { stub, restore, spy, useFakeTimers, SinonStub, match } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
 import {
   configurationChangeEvent,
@@ -262,25 +262,22 @@ suite('Extension Test Suite', () => {
       expect(mockDiff).to.have.been.called
       expect(mockStatus).to.have.been.called
 
-      const [eventName, customProperties] =
-        mockSendTelemetryEvent.getCall(1).args
-
       expect(
-        eventName,
-        'should send the correct execution details changed event'
-      ).to.equal(EventName.EXTENSION_EXECUTION_DETAILS_CHANGED)
-      expect(
-        customProperties,
-        'should send the correct custom properties with the event'
-      ).to.deep.equal({
-        cliAccessible: true,
-        dvcPathUsed: true,
-        dvcRootCount: 1,
-        msPythonInstalled: false,
-        msPythonUsed: false,
-        pythonPathUsed: false,
-        workspaceFolderCount: 1
-      })
+        mockSendTelemetryEvent,
+        'should send the correct event details'
+      ).to.be.calledWith(
+        EventName.EXTENSION_EXECUTION_DETAILS_CHANGED,
+        {
+          cliAccessible: true,
+          dvcPathUsed: true,
+          dvcRootCount: 1,
+          msPythonInstalled: false,
+          msPythonUsed: false,
+          pythonPathUsed: false,
+          workspaceFolderCount: 1
+        },
+        match.has('duration')
+      )
 
       await Promise.all([
         workspaceExperimentsAreReady,
@@ -329,7 +326,7 @@ suite('Extension Test Suite', () => {
         'should have checked to see if the cli could still be run'
       ).to.have.been.called
 
-      return Promise.all([
+      await Promise.all([
         experimentsCreated,
         repositoriesCreated,
         trackedExplorerTreeInitialized
