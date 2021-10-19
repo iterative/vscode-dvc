@@ -567,12 +567,12 @@
         {
           "command": "dvc.gitStageAll",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == gitModified"
+          "when": "scmProvider == dvc && scmResourceGroup == gitCommitReady"
         },
         {
           "command": "dvc.gitUnstageAll",
           "group": "inline",
-          "when": "scmProvider == dvc && scmResourceGroup == gitModified"
+          "when": "scmProvider == dvc && scmResourceGroup == gitCommitReady"
         }
       ],
       "editor/title": [

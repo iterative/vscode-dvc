@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { commands } from 'vscode'
 import { restore, spy, stub } from 'sinon'
+import { closeAllEditors } from '../util'
 import { RegisteredCommands } from '../../../commands/external'
 import { buildMockMemento } from '../../util'
 import {
@@ -15,7 +16,7 @@ suite('Walkthrough Test Suite', () => {
   })
 
   afterEach(() => {
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('dvc.getStarted', () => {

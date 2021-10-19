@@ -14,6 +14,8 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
+import { getGitRepositoryRoots } from '../extensions/git'
+import { findDvcRootPaths } from '../fileSystem'
 import { BaseWorkspace, IWorkspace } from '../workspace'
 
 export class WorkspaceExperiments
@@ -230,17 +232,20 @@ export class WorkspaceExperiments
     )
 
     Promise.all(experiments.map(experiments => experiments.isReady())).then(
-      () => {
+      async () => {
         this.deferred.resolve()
+        const gitRoots = await getGitRepositoryRoots()
+        gitRoots.forEach(async gitRoot => {
+          const dvcRoots = await findDvcRootPaths(gitRoot)
+
+          dvcRoots.forEach(dvcRoot =>
+            this.getRepository(dvcRoot).onDidChangeData(gitRoot)
+          )
+        })
       }
     )
 
     return experiments
-  }
-
-  public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments.onDidChangeData(gitRoot)
   }
 
   public refreshData(dvcRoot: string) {

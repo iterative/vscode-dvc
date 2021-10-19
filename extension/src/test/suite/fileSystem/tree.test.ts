@@ -19,6 +19,7 @@ import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
 import {
   activeTextEditorChangedEvent,
+  closeAllEditors,
   dvcDemoPath,
   getActiveTextEditorFilename
 } from '../util'
@@ -32,14 +33,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
 
   const disposable = Disposable.fn()
-
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('TrackedExplorerTree', () => {
@@ -152,9 +152,16 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.init without error', async () => {
       const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
-      const mockSetup = stub(Setup, 'setup').resolves()
+      const mockSetup = stub(Setup, 'setup')
+      const mockSetupCalled = new Promise(resolve =>
+        mockSetup.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
 
       await commands.executeCommand(RegisteredCliCommands.INIT)
+      await mockSetupCalled
       expect(mockInit).to.be.calledOnce
       expect(mockSetup).to.be.calledOnce
 
@@ -172,7 +179,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(getActiveTextEditorFilename()).not.to.equal(__filename)
       const uri = Uri.file(__filename)
 
-      const activeEditorChanged = activeTextEditorChangedEvent()
+      const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
@@ -186,7 +193,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
     it('should be able to open a file to the side', async () => {
       expect(getActiveTextEditorFilename()).not.to.equal(__filename)
 
-      const activeEditorChanged = activeTextEditorChangedEvent()
+      const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,

@@ -1,14 +1,18 @@
 import { join } from 'path'
-import { beforeEach, describe, it, suite } from 'mocha'
+import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { commands, MessageItem, Uri, window } from 'vscode'
+import { MessageItem, Uri, window } from 'vscode'
 import { restore, stub } from 'sinon'
-import { dvcDemoPath } from '../util'
+import { closeAllEditors, dvcDemoPath } from '../util'
 import * as Extensions from '../../../vscode/extensions'
 
 suite('Recommend Test Suite', () => {
   beforeEach(() => {
     restore()
+  })
+
+  afterEach(() => {
+    return closeAllEditors()
   })
 
   const openFileInEditor = (fileName: string) =>
@@ -36,7 +40,7 @@ suite('Recommend Test Suite', () => {
         'should recommend to install the red hat yaml extension on the first call'
       ).to.be.calledOnce
 
-      await commands.executeCommand('workbench.action.closeAllEditors')
+      await closeAllEditors()
 
       mockShowInformationMessage.resetHistory()
 
