@@ -152,9 +152,16 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.init without error', async () => {
       const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
-      const mockSetup = stub(Setup, 'setup').resolves()
+      const mockSetup = stub(Setup, 'setup')
+      const mockSetupCalled = new Promise(resolve =>
+        mockSetup.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
 
       await commands.executeCommand(RegisteredCliCommands.INIT)
+      await mockSetupCalled
       expect(mockInit).to.be.calledOnce
       expect(mockSetup).to.be.calledOnce
 
