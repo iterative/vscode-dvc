@@ -96,8 +96,33 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('showWebview', () => {
-    it('should be able to make the experiment webview visible', async () => {
+  describe('showPlotsWebview', () => {
+    it('should be able to make the experiment plots webview visible', async () => {
+      const { experiments } = buildExperiments(
+        disposable,
+        complexExperimentsOutput
+      )
+
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+
+      const webview = await experiments.showPlotsWebview()
+
+      expect(messageSpy).to.be.calledWith({
+        tableData: {
+          changes: complexChangesData,
+          columns: complexColumnData,
+          rows: complexRowData,
+          sorts: []
+        }
+      })
+
+      expect(webview.isActive()).to.be.true
+      expect(webview.isVisible()).to.be.true
+    }).timeout(5000)
+  })
+
+  describe('showTableWebview', () => {
+    it('should be able to make the experiment table webview visible', async () => {
       const { experiments } = buildExperiments(
         disposable,
         complexExperimentsOutput
