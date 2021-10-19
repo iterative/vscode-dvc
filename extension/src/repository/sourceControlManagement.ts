@@ -26,7 +26,7 @@ export class SourceControlManagement {
   private changedResourceGroup: SourceControlResourceGroup
 
   @observable
-  private gitModifiedResourceGroup: SourceControlResourceGroup
+  private gitCommitReadyResourceGroup: SourceControlResourceGroup
 
   public readonly dispose = Disposable.fn()
 
@@ -47,15 +47,17 @@ export class SourceControlManagement {
       scmView.createResourceGroup('changes', 'Changes')
     )
 
-    this.gitModifiedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('gitModified', 'Ready For Git Commit')
+    this.gitCommitReadyResourceGroup = this.dispose.track(
+      scmView.createResourceGroup('gitCommitReady', 'Ready For Git Commit')
     )
 
     this.changedResourceGroup.hideWhenEmpty = true
-    this.gitModifiedResourceGroup.hideWhenEmpty = true
+    this.gitCommitReadyResourceGroup.hideWhenEmpty = true
 
     Object.assign(this.changedResourceGroup, { rootUri: Uri.file(dvcRoot) })
-    Object.assign(this.gitModifiedResourceGroup, { rootUri: Uri.file(dvcRoot) })
+    Object.assign(this.gitCommitReadyResourceGroup, {
+      rootUri: Uri.file(dvcRoot)
+    })
 
     this.setState(state)
   }
@@ -70,7 +72,9 @@ export class SourceControlManagement {
       []
     )
 
-    this.gitModifiedResourceGroup.resourceStates = Object.entries(state).reduce(
+    this.gitCommitReadyResourceGroup.resourceStates = Object.entries(
+      state
+    ).reduce(
       this.getResourceStatesReducer([Status.ADDED, Status.GIT_MODIFIED]),
       []
     )
@@ -79,7 +83,7 @@ export class SourceControlManagement {
   public getState() {
     return {
       changes: this.changedResourceGroup.resourceStates,
-      gitModified: this.gitModifiedResourceGroup.resourceStates
+      gitCommitReady: this.gitCommitReadyResourceGroup.resourceStates
     }
   }
 

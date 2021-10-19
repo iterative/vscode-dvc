@@ -42,7 +42,7 @@ describe('SourceControlManagement', () => {
       expect(mockedCreateSourceControl).toBeCalledTimes(1)
       expect(sourceControlManagement.getState()).toEqual({
         changes: [],
-        gitModified: []
+        gitCommitReady: []
       })
 
       const updatedState = {
@@ -67,7 +67,7 @@ describe('SourceControlManagement', () => {
             resourceUri: Uri.file('/some/other/deleted/path')
           }
         ],
-        gitModified: [
+        gitCommitReady: [
           {
             contextValue: 'added',
             dvcRoot,
@@ -79,7 +79,7 @@ describe('SourceControlManagement', () => {
       sourceControlManagement.setState(initialState)
       expect(sourceControlManagement.getState()).toEqual({
         changes: [],
-        gitModified: []
+        gitCommitReady: []
       })
     })
   })
