@@ -6,4 +6,4 @@
 const path = require('path')
 
 module.exports.distPath = path.join(__dirname, 'dist')
-module.exports.mainJsFilename = path.join(__dirname, 'dist/main.js')
+module.exports.main = path.join(__dirname, 'dist/main.js')

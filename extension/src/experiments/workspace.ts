@@ -1,7 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { Experiments } from '.'
-import { ExperimentsWebview } from './webview'
+import { TableWebview } from './webview/table'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
@@ -231,7 +231,7 @@ export class WorkspaceExperiments
     experiments?.refresh()
   }
 
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
+  public setWebview(dvcRoot: string, experimentsWebview: TableWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
       experimentsWebview.dispose()
