@@ -16,6 +16,7 @@ import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { getGitRepositoryRoot } from '../git'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -89,7 +90,8 @@ export class Experiments {
     return this.initialized
   }
 
-  public onDidChangeData(gitRoot: string): void {
+  public async onDidChangeData(): Promise<void> {
+    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
     const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
     this.dispose.track(
       createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {

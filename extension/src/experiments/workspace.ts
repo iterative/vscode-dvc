@@ -14,7 +14,6 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { BaseWorkspace, IWorkspace } from '../workspace'
-import { getGitRepositoryRoot } from '../git'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -276,9 +275,7 @@ export class WorkspaceExperiments
 
     this.setRepository(dvcRoot, experiments)
 
-    getGitRepositoryRoot(dvcRoot).then(gitRoot =>
-      experiments.onDidChangeData(gitRoot)
-    )
+    experiments.onDidChangeData()
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(
