@@ -174,7 +174,7 @@ export class Experiments {
 
     this.dispose.track(
       view.onDidDispose(() => {
-        this.resetWebview()
+        this.resetTableWebview()
       })
     )
     this.dispose.track(
@@ -190,7 +190,7 @@ export class Experiments {
 
     this.dispose.track(
       view.onDidDispose(() => {
-        this.resetWebview()
+        this.resetPlotsWebview()
       })
     )
     this.dispose.track(
@@ -315,9 +315,15 @@ export class Experiments {
     }
   }
 
-  private resetWebview = () => {
+  private resetTableWebview = () => {
     this.isWebviewFocusedChanged.fire(undefined)
     this.dispose.untrack(this.tableWebview)
     this.tableWebview = undefined
+  }
+
+  private resetPlotsWebview = () => {
+    this.isWebviewFocusedChanged.fire(undefined)
+    this.dispose.untrack(this.plotsWebview)
+    this.plotsWebview = undefined
   }
 }
