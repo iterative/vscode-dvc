@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
-import { Config, LegendConfig } from 'vega'
+import { Config } from 'vega'
 import { PlotsData, PlotItem } from './App'
 
 const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
@@ -19,7 +19,7 @@ const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
     layer: [
       {
         encoding: {
-          color: { field: colorField, type: 'nominal' },
+          color: { field: colorField, legend: null, type: 'nominal' },
           y: { field: yField, title: name, type: 'quantitative' }
         },
         layer: [
@@ -67,10 +67,6 @@ const config: Config = {
     titleColor: foregroundColor
   },
   background: backgroundColor,
-  legend: {
-    disabled: true,
-    title: null
-  } as LegendConfig,
   padding: 10,
   style: {
     cell: {
