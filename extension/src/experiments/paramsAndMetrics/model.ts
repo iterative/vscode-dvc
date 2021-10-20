@@ -1,4 +1,4 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
@@ -18,13 +18,9 @@ export const enum MementoPrefixes {
 export class ParamsAndMetricsModel {
   public dispose = Disposable.fn()
 
-  public onDidChangeParamsAndMetricsFiles: Event<void>
-  private paramsAndMetricsFilesChanged = new EventEmitter<void>()
-
   private status: Record<string, Status>
 
   private data: ParamOrMetric[] = []
-  private files: string[] = []
 
   private dvcRoot: string
   private workspaceState: Memento
@@ -34,8 +30,6 @@ export class ParamsAndMetricsModel {
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
-    this.onDidChangeParamsAndMetricsFiles =
-      this.paramsAndMetricsFilesChanged.event
     this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
   }
 
@@ -76,10 +70,6 @@ export class ParamsAndMetricsModel {
           status: this.status[paramOrMetric.path]
         }
       })
-  }
-
-  public getFiles() {
-    return this.files
   }
 
   public getChanges() {
