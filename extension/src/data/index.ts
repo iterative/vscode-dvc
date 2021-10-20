@@ -21,8 +21,6 @@ export class Data {
   public readonly dispose = Disposable.fn()
   public readonly onDidChangeExperimentsData: Event<ExperimentsRepoJSONOutput>
 
-  public onDidChangeParamsAndMetricsFiles: Event<void>
-
   private readonly dvcRoot: string
   private files: string[] = []
 
@@ -31,10 +29,13 @@ export class Data {
 
   private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
+
   private readonly experimentsDataChanged: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
-  private fileSystemWatcher?: Disposable
+  private readonly onDidChangeParamsAndMetricsFiles: Event<void>
+
+  private watcher?: Disposable
   private paramsAndMetricsFilesChanged = new EventEmitter<void>()
 
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
@@ -49,24 +50,8 @@ export class Data {
     this.onDidChangeParamsAndMetricsFiles =
       this.paramsAndMetricsFilesChanged.event
 
-    const initialDataUpdate = this.dispose.track(
-      this.onDidChangeExperimentsData(() => {
-        this.fileSystemWatcher = this.watchParamsAndMetricsFiles()
-
-        this.dispose.track(
-          this.onDidChangeParamsAndMetricsFiles(() => {
-            const watcher = this.watchParamsAndMetricsFiles()
-            this.dispose.untrack(this.fileSystemWatcher)
-            this.fileSystemWatcher?.dispose()
-            this.fileSystemWatcher = watcher
-          })
-        )
-        this.dispose.untrack(initialDataUpdate)
-        initialDataUpdate.dispose()
-        this.deferred.resolve()
-      })
-    )
-    this.refresh()
+    this.initialize()
+    this.watchExpGitRefs()
   }
 
   public isReady() {
@@ -77,7 +62,28 @@ export class Data {
     return this.processManager.run('refresh')
   }
 
-  public async onDidChangeData(): Promise<void> {
+  private initialize() {
+    const initialDataUpdate = this.dispose.track(
+      this.onDidChangeExperimentsData(() => {
+        this.watcher = this.watchParamsAndMetricsFiles()
+
+        this.dispose.track(
+          this.onDidChangeParamsAndMetricsFiles(() => {
+            const watcher = this.watchParamsAndMetricsFiles()
+            this.dispose.untrack(this.watcher)
+            this.watcher?.dispose()
+            this.watcher = watcher
+          })
+        )
+        this.dispose.untrack(initialDataUpdate)
+        initialDataUpdate.dispose()
+        this.deferred.resolve()
+      })
+    )
+    this.refresh()
+  }
+
+  private async watchExpGitRefs(): Promise<void> {
     const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
     const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
     this.dispose.track(

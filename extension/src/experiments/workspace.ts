@@ -276,8 +276,6 @@ export class WorkspaceExperiments
 
     this.setRepository(dvcRoot, experiments)
 
-    // experiments.onDidChangeData()
-
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(
         dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
