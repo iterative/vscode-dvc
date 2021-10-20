@@ -136,16 +136,6 @@ export class Extension implements IExtension {
 
     this.dispose.track(new ExperimentsTree(this.experiments))
 
-    const workspaceData = this.dispose.track(
-      new WorkspaceData(this.internalCommands, this.experiments)
-    )
-
-    this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        workspaceData.refreshData(cwd)
-      })
-    )
-
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
     )
@@ -298,6 +288,16 @@ export class Extension implements IExtension {
       this.trackedExplorerTree.initialize(this.dvcRoots),
       this.initializeExperiments()
     ])
+
+    const workspaceData = this.dispose.track(
+      new WorkspaceData(this.dvcRoots, this.internalCommands, this.experiments)
+    )
+
+    this.dispose.track(
+      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+        workspaceData.refreshData(cwd)
+      })
+    )
 
     return Promise.all([
       this.repositories.isReady(),

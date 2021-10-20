@@ -9,12 +9,13 @@ export class WorkspaceData {
   private data: Record<string, Data> = {}
 
   constructor(
+    dvcRoots: string[],
     internalCommands: InternalCommands,
     workspaceExperiments: WorkspaceExperiments
   ) {
     // and workspacePlots
 
-    workspaceExperiments.getDvcRoots().forEach(dvcRoot => {
+    dvcRoots.forEach(dvcRoot => {
       const data = this.dispose.track(new Data(dvcRoot, internalCommands))
       this.dispose.track(
         data.onDidChangeExperimentsData(data =>
