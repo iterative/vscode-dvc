@@ -68,7 +68,8 @@ const config: Config = {
   },
   background: backgroundColor,
   legend: {
-    disabled: true
+    disabled: true,
+    title: null
   } as LegendConfig,
   padding: 10,
   style: {
