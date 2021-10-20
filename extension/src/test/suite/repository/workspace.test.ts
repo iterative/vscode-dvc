@@ -8,7 +8,7 @@ import { CliExecutor } from '../../../cli/executor'
 import { RegisteredCliCommands } from '../../../commands/external'
 import { WorkspaceRepositories } from '../../../repository/workspace'
 import * as QuickPick from '../../../vscode/quickPick'
-import { dvcDemoPath } from '../util'
+import { closeAllEditors, dvcDemoPath } from '../util'
 import { Repository } from '../../../repository'
 
 suite('Workspace Repositories Test Suite', () => {
@@ -20,7 +20,7 @@ suite('Workspace Repositories Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('dvc.commit', () => {

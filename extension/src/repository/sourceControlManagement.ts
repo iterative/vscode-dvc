@@ -12,12 +12,14 @@ export interface SourceControlManagementModel {
 enum Status {
   ADDED = 'added',
   DELETED = 'deleted',
+  GIT_MODIFIED = 'gitModified',
   MODIFIED = 'modified',
   NOT_IN_CACHE = 'notInCache',
   RENAMED = 'renamed',
-  GIT_MODIFIED = 'gitModified',
   UNTRACKED = 'untracked'
 }
+
+const gitCommitReady = [Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED]
 
 type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
 
@@ -26,7 +28,7 @@ export class SourceControlManagement {
   private changedResourceGroup: SourceControlResourceGroup
 
   @observable
-  private gitModifiedResourceGroup: SourceControlResourceGroup
+  private gitCommitReadyResourceGroup: SourceControlResourceGroup
 
   public readonly dispose = Disposable.fn()
 
@@ -47,15 +49,17 @@ export class SourceControlManagement {
       scmView.createResourceGroup('changes', 'Changes')
     )
 
-    this.gitModifiedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('gitModified', 'Ready For Git Commit')
+    this.gitCommitReadyResourceGroup = this.dispose.track(
+      scmView.createResourceGroup('gitCommitReady', 'Ready For Git Commit')
     )
 
     this.changedResourceGroup.hideWhenEmpty = true
-    this.gitModifiedResourceGroup.hideWhenEmpty = true
+    this.gitCommitReadyResourceGroup.hideWhenEmpty = true
 
     Object.assign(this.changedResourceGroup, { rootUri: Uri.file(dvcRoot) })
-    Object.assign(this.gitModifiedResourceGroup, { rootUri: Uri.file(dvcRoot) })
+    Object.assign(this.gitCommitReadyResourceGroup, {
+      rootUri: Uri.file(dvcRoot)
+    })
 
     this.setState(state)
   }
@@ -63,19 +67,21 @@ export class SourceControlManagement {
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
       this.getResourceStatesReducer(
-        Object.values(Status).filter(status => status !== Status.GIT_MODIFIED)
+        Object.values(Status).filter(status => !gitCommitReady.includes(status))
       ),
       []
     )
 
-    this.gitModifiedResourceGroup.resourceStates = Object.entries(state).reduce(
-      this.getResourceStatesReducer([Status.GIT_MODIFIED]),
-      []
-    )
+    this.gitCommitReadyResourceGroup.resourceStates = Object.entries(
+      state
+    ).reduce(this.getResourceStatesReducer(gitCommitReady), [])
   }
 
   public getState() {
-    return this.changedResourceGroup.resourceStates
+    return {
+      changes: this.changedResourceGroup.resourceStates,
+      gitCommitReady: this.gitCommitReadyResourceGroup.resourceStates
+    }
   }
 
   private getResourceStatesReducer(validStatuses: Status[]) {

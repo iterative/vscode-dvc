@@ -6,6 +6,7 @@ import { Config } from '../../../config'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
+import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -73,6 +74,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     resourceLocator
   } = buildExperiments(disposer, complexExperimentsOutput, 'other/dvc/root')
 
+  stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento(), {
       'other/dvc/root': mockExperiments
@@ -88,6 +90,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
 export const buildSingleRepoExperiments = (disposer: Disposer) => {
   const { internalCommands, resourceLocator } = buildDependencies(disposer)
 
+  stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )

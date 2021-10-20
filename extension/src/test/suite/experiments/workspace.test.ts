@@ -10,12 +10,13 @@ import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
+import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
-import { dvcDemoPath, resourcePath } from '../util'
+import { closeAllEditors, dvcDemoPath, resourcePath } from '../util'
 import { buildMockMemento } from '../../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
@@ -30,7 +31,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   const onDidChangeIsWebviewFocused = (
@@ -89,6 +90,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('showExperimentsTableThenRun', () => {
     it('should run against an experiments table if webview is focused', async () => {
+      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )

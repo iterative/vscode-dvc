@@ -220,17 +220,10 @@ export class WorkspaceExperiments
     )
 
     Promise.all(experiments.map(experiments => experiments.isReady())).then(
-      () => {
-        this.deferred.resolve()
-      }
+      () => this.deferred.resolve()
     )
 
     return experiments
-  }
-
-  public onDidChangeData(dvcRoot: string, gitRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments.onDidChangeData(gitRoot)
   }
 
   public refreshData(dvcRoot: string) {
@@ -281,6 +274,8 @@ export class WorkspaceExperiments
     )
 
     this.setRepository(dvcRoot, experiments)
+
+    experiments.onDidChangeData()
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(
