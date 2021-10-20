@@ -33,10 +33,11 @@ export class Data {
   private readonly experimentsDataChanged: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
-  private readonly onDidChangeParamsAndMetricsFiles: Event<void>
+  private readonly paramsAndMetricsFilesChanged = new EventEmitter<void>()
+  private readonly onDidChangeParamsAndMetricsFiles: Event<void> =
+    this.paramsAndMetricsFilesChanged.event
 
   private watcher?: Disposable
-  private paramsAndMetricsFilesChanged = new EventEmitter<void>()
 
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     this.dvcRoot = dvcRoot
@@ -47,8 +48,6 @@ export class Data {
 
     this.internalCommands = internalCommands
     this.onDidChangeExperimentsData = this.experimentsDataChanged.event
-    this.onDidChangeParamsAndMetricsFiles =
-      this.paramsAndMetricsFilesChanged.event
 
     this.initialize()
     this.watchExpGitRefs()
