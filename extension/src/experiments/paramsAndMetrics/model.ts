@@ -1,12 +1,8 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import {
-  collectChanges,
-  collectFiles,
-  collectParamsAndMetrics
-} from './collect'
+import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
-import { flatten, sameContents } from '../../util/array'
+import { flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 export enum Status {
@@ -54,7 +50,6 @@ export class ParamsAndMetricsModel {
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     return Promise.all([
       this.transformAndSetParamsAndMetrics(data),
-      this.transformAndSetFiles(data),
       this.transformAndSetChanges(data)
     ])
   }
@@ -124,17 +119,6 @@ export class ParamsAndMetricsModel {
     })
 
     this.data = paramsAndMetrics
-  }
-
-  private transformAndSetFiles(data: ExperimentsRepoJSONOutput) {
-    const files = collectFiles(data)
-
-    if (sameContents(this.files, files)) {
-      return
-    }
-
-    this.files = files
-    this.paramsAndMetricsFilesChanged.fire()
   }
 
   private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {

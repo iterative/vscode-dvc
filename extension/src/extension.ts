@@ -17,6 +17,7 @@ import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
+import { WorkspaceData } from './data/workspace'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
@@ -135,9 +136,13 @@ export class Extension implements IExtension {
 
     this.dispose.track(new ExperimentsTree(this.experiments))
 
+    const workspaceData = this.dispose.track(
+      new WorkspaceData(this.internalCommands, this.experiments)
+    )
+
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        this.experiments.refreshData(cwd)
+        workspaceData.refreshData(cwd)
       })
     )
 

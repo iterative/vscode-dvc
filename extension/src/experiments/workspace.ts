@@ -14,6 +14,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { BaseWorkspace, IWorkspace } from '../workspace'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -40,6 +41,11 @@ export class WorkspaceExperiments
     if (experiments) {
       this.repositories = experiments
     }
+  }
+
+  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
+    const experiments = this.getRepository(dvcRoot)
+    experiments.setState(data)
   }
 
   public getFocusedTable(): Experiments | undefined {
@@ -226,11 +232,6 @@ export class WorkspaceExperiments
     return experiments
   }
 
-  public refreshData(dvcRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments?.refresh()
-  }
-
   public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
@@ -275,7 +276,7 @@ export class WorkspaceExperiments
 
     this.setRepository(dvcRoot, experiments)
 
-    experiments.onDidChangeData()
+    // experiments.onDidChangeData()
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(
