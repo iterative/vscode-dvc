@@ -13,9 +13,8 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { getGitRepositoryRoots } from '../extensions/git'
-import { findDvcRootPaths } from '../fileSystem'
 import { BaseWorkspace, IWorkspace } from '../workspace'
+import { getGitRepositoryRoot } from '../git'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -222,17 +221,7 @@ export class WorkspaceExperiments
     )
 
     Promise.all(experiments.map(experiments => experiments.isReady())).then(
-      async () => {
-        this.deferred.resolve()
-        const gitRoots = await getGitRepositoryRoots()
-        gitRoots.forEach(async gitRoot => {
-          const dvcRoots = await findDvcRootPaths(gitRoot)
-
-          dvcRoots.forEach(dvcRoot =>
-            this.getRepository(dvcRoot).onDidChangeData(gitRoot)
-          )
-        })
-      }
+      () => this.deferred.resolve()
     )
 
     return experiments
@@ -286,6 +275,10 @@ export class WorkspaceExperiments
     )
 
     this.setRepository(dvcRoot, experiments)
+
+    getGitRepositoryRoot(dvcRoot).then(gitRoot =>
+      experiments.onDidChangeData(gitRoot)
+    )
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(

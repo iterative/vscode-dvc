@@ -10,6 +10,7 @@ import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
+import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
 import { CliRunner } from '../../../cli/runner'
@@ -89,6 +90,7 @@ suite('Workspace Experiments Test Suite', () => {
 
   describe('showExperimentsTableThenRun', () => {
     it('should run against an experiments table if webview is focused', async () => {
+      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
       const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
         dvcDemoPath
       )
