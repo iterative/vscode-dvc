@@ -9,15 +9,10 @@ import {
 
 import { ValueTreeRoot } from 'dvc/src/cli/reader'
 import Plots from './Plots'
+import { InternalVsCodeApi } from '../../shared/api'
 
 declare global {
   function acquireVsCodeApi(): InternalVsCodeApi
-}
-
-export interface InternalVsCodeApi {
-  getState<T>(): T
-  setState<T>(state: T): void
-  postMessage<T>(message: T): void
 }
 
 const vsCodeApi = acquireVsCodeApi()

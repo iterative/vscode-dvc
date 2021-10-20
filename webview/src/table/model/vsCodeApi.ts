@@ -2,12 +2,7 @@
 
 import { Disposable } from '@hediet/std/disposable'
 import { addMessageHandler } from './window'
-
-interface InternalVsCodeApi {
-  getState<T>(): T
-  setState<T>(state: T): void
-  postMessage<T>(message: T): void
-}
+import { InternalVsCodeApi } from '../../shared/api'
 
 declare function acquireVsCodeApi(): InternalVsCodeApi
 
