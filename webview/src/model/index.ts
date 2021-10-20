@@ -53,8 +53,6 @@ export class Model {
   private constructor() {
     makeObservable(this)
     const data = window.webviewData
-    // this needs to be setup so that dynamic imports work
-    __webpack_public_path__ = data.publicPath
     this.theme = data.theme
 
     this.dispose.track(

@@ -1,16 +1,17 @@
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
-import { dvcDemoPath } from '../util'
+import { closeAllEditors, dvcDemoPath } from '../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
 import * as ProcessExecution from '../../../processExecution'
+import { WorkspaceRepositories } from '../../../repository/workspace'
 
 suite('Source Control Management Test Suite', () => {
   const disposable = Disposable.fn()
@@ -24,7 +25,7 @@ suite('Source Control Management Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('SourceControlManagement', () => {
@@ -89,9 +90,23 @@ suite('Source Control Management Test Suite', () => {
       expect(mockCheckout).to.be.calledWith(dvcDemoPath, relPath, '-f')
     })
 
+    it('should not run dvc commit if there are no changes in the repository', async () => {
+      const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
+      const executeCommandSpy = spy(commands, 'executeCommand')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(false)
+
+      await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
+
+      expect(mockCommit).not.to.be.called
+      expect(executeCommandSpy).to.be.calledOnce
+    })
+
     it('should focus the git commit text input box after running dvc commit', async () => {
       const mockCommit = stub(CliExecutor.prototype, 'commit').resolves('')
       const executeCommandSpy = spy(commands, 'executeCommand')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -112,6 +127,8 @@ suite('Source Control Management Test Suite', () => {
         window,
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       await commands.executeCommand(RegisteredCliCommands.COMMIT, { rootUri })
 
@@ -184,9 +201,51 @@ suite('Source Control Management Test Suite', () => {
       expect(mockShowErrorMessage).to.be.calledOnce
     })
 
+    it('should stage all git tracked files', async () => {
+      const gitRoot = resolve(dvcDemoPath, '..')
+      const mockGit = stub(ProcessExecution, 'executeProcess')
+        .onFirstCall()
+        .resolves(gitRoot)
+        .onSecondCall()
+        .resolves('')
+
+      await commands.executeCommand(RegisteredCommands.GIT_STAGE_ALL, {
+        rootUri
+      })
+
+      expect(mockGit).to.be.calledTwice
+      expect(mockGit).to.be.calledWith({
+        args: ['rev-parse', '--show-toplevel'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
+      expect(mockGit).to.be.calledWith({
+        args: ['add', '.'],
+        cwd: gitRoot,
+        executable: 'git'
+      })
+    })
+
+    it('should unstage all git tracked files', async () => {
+      const mockGit = stub(ProcessExecution, 'executeProcess').resolves('')
+
+      await commands.executeCommand(RegisteredCommands.GIT_UNSTAGE_ALL, {
+        rootUri
+      })
+
+      expect(mockGit).to.be.calledOnce
+      expect(mockGit).to.be.calledWith({
+        args: ['reset'],
+        cwd: dvcDemoPath,
+        executable: 'git'
+      })
+    })
+
     it('should not reset the workspace if the user does not confirm', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
       const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       const mockShowWarningMessage = stub(
         window,
@@ -205,6 +264,8 @@ suite('Source Control Management Test Suite', () => {
     it('should reset the workspace if the user confirms they want to', async () => {
       const mockCheckout = stub(CliExecutor.prototype, 'checkout').resolves('')
       const mockGitReset = stub(ProcessExecution, 'executeProcess').resolves('')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(WorkspaceRepositories.prototype as any, 'hasChanges').returns(true)
 
       const mockShowWarningMessage = stub(
         window,

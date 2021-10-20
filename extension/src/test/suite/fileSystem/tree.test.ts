@@ -9,16 +9,17 @@ import {
   Uri,
   MessageItem,
   ViewColumn,
-  WorkspaceEdit
+  WorkspaceEdit,
+  workspace
 } from 'vscode'
 import { Disposable } from '../../../extension'
-import { exists } from '../../../fileSystem'
 import * as Workspace from '../../../fileSystem/workspace'
 import { CliExecutor } from '../../../cli/executor'
 import * as WorkspaceFolders from '../../../vscode/workspaceFolders'
 import * as Setup from '../../../setup'
 import {
   activeTextEditorChangedEvent,
+  closeAllEditors,
   dvcDemoPath,
   getActiveTextEditorFilename
 } from '../util'
@@ -32,14 +33,13 @@ suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
 
   const disposable = Disposable.fn()
-
   beforeEach(() => {
     restore()
   })
 
   afterEach(() => {
     disposable.dispose()
-    return commands.executeCommand('workbench.action.closeAllEditors')
+    return closeAllEditors()
   })
 
   describe('TrackedExplorerTree', () => {
@@ -78,11 +78,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.deleteTarget without error', async () => {
       const path = join(dvcDemoPath, 'deletable.txt')
-      ensureFileSync(path)
-      expect(exists(path)).to.be.true
+
+      const mockApplyEdit = stub(workspace, 'applyEdit').resolves(undefined)
 
       await commands.executeCommand(RegisteredCommands.DELETE_TARGET, path)
-      expect(exists(path)).to.be.false
+
+      expect(mockApplyEdit).to.be.calledOnce
     })
 
     it('should be able to add data to a tracked data directory (.dvc)', async () => {
@@ -151,9 +152,16 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.init without error', async () => {
       const mockInit = stub(CliExecutor.prototype, 'init').resolves('')
-      const mockSetup = stub(Setup, 'setup').resolves()
+      const mockSetup = stub(Setup, 'setup')
+      const mockSetupCalled = new Promise(resolve =>
+        mockSetup.callsFake(() => {
+          resolve(undefined)
+          return Promise.resolve(undefined)
+        })
+      )
 
       await commands.executeCommand(RegisteredCliCommands.INIT)
+      await mockSetupCalled
       expect(mockInit).to.be.calledOnce
       expect(mockSetup).to.be.calledOnce
 
@@ -171,7 +179,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       expect(getActiveTextEditorFilename()).not.to.equal(__filename)
       const uri = Uri.file(__filename)
 
-      const activeEditorChanged = activeTextEditorChangedEvent()
+      const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
@@ -180,12 +188,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
       await activeEditorChanged
 
       expect(getActiveTextEditorFilename()).to.equal(__filename)
-    })
+    }).timeout(5000)
 
     it('should be able to open a file to the side', async () => {
       expect(getActiveTextEditorFilename()).not.to.equal(__filename)
 
-      const activeEditorChanged = activeTextEditorChangedEvent()
+      const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
@@ -214,7 +222,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to compare two files', async () => {
       const baseline = __filename
-      const comparison = resolve(__dirname, '..', '..', '..', 'extension')
+      const comparison = resolve(__dirname, '..', '..', '..', 'extension.js')
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(

@@ -95,6 +95,9 @@ export interface IEventNamePropertyMapping {
   [EventName.RENAME_TARGET]: undefined
   [EventName.RESET_WORKSPACE]: undefined
 
+  [EventName.GIT_STAGE_ALL]: undefined
+  [EventName.GIT_UNSTAGE_ALL]: undefined
+
   [EventName.TRACKED_EXPLORER_COMPARE_SELECTED]: undefined
   [EventName.TRACKED_EXPLORER_COPY_FILE_PATH]: undefined
   [EventName.TRACKED_EXPLORER_COPY_REL_FILE_PATH]: undefined
@@ -106,6 +109,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXTENSION_GET_STARTED]: undefined
   [EventName.EXTENSION_SETUP_WORKSPACE]: { completed: boolean }
   [EventName.EXTENSION_SHOW_COMMANDS]: undefined
+  [EventName.EXTENSION_SHOW_OUTPUT]: undefined
 
   [EventName.VIEWS_EXPERIMENTS_TREE_OPENED]: DvcRootCount
   [EventName.VIEWS_EXPERIMENTS_FILTER_BY_TREE_OPENED]: DvcRootCount

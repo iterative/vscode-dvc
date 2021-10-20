@@ -15,6 +15,7 @@ jest.mock('@hediet/std/disposable')
 jest.mock('fs')
 jest.mock('../processExecution')
 jest.mock('../env')
+jest.mock('../common/logger')
 
 const mockedDisposable = mocked(Disposable)
 
@@ -126,50 +127,22 @@ describe('CliReader', () => {
         executable: 'dvc'
       })
     })
-  })
 
-  describe('diffParams', () => {
-    it('should call the cli with the correct parameters', async () => {
-      const cliOutput = {
-        'params.yaml': {
-          param1: { new: 23, old: 22 },
-          param5: { new: 42, old: 27 }
-        }
-      }
+    it('should retry if the command returns a lock error', async () => {
+      const cliOutput = ''
       const cwd = __dirname
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(JSON.stringify(cliOutput))
-      )
-      const statusOutput = await cliReader.diffParams(cwd)
+      mockedCreateProcess
+        .mockImplementationOnce(() => {
+          throw new Error('I failed wit a lock error')
+        })
+        .mockReturnValueOnce(getMockedProcess(JSON.stringify(cliOutput)))
+      const statusOutput = await cliReader.diff(cwd)
 
       expect(statusOutput).toEqual(cliOutput)
 
+      expect(mockedCreateProcess).toBeCalledTimes(2)
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['params', 'diff', SHOW_JSON],
-        cwd,
-        env: mockedEnv,
-        executable: 'dvc'
-      })
-    })
-  })
-
-  describe('diffMetrics', () => {
-    it('should call the cli with the correct parameters', async () => {
-      const cliOutput = {
-        metrics: {
-          something: { new: 3, old: 33 }
-        }
-      }
-      const cwd = __dirname
-      mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(JSON.stringify(cliOutput))
-      )
-      const statusOutput = await cliReader.diffMetrics(cwd)
-
-      expect(statusOutput).toEqual(cliOutput)
-
-      expect(mockedCreateProcess).toBeCalledWith({
-        args: ['metrics', 'diff', SHOW_JSON],
+        args: ['diff', SHOW_JSON],
         cwd,
         env: mockedEnv,
         executable: 'dvc'

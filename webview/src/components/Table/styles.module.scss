@@ -120,6 +120,16 @@ $spinner-color-light: #000;
         }
       }
     }
+    .workspaceWithChanges.runningExperiment & {
+      border-right-color: $metrics-color;
+      border-top-color: $metrics-color;
+      @at-root {
+        :global(.vscode-light) & {
+          border-right-color: $metrics-color-light;
+          border-top-color: $metrics-color-light;
+        }
+      }
+    }
     .runningExperiment.oddRow > .firstCell & {
       border-left: 1.5px solid $row-bg-alt-color;
       border-bottom: 1.5px solid $row-bg-alt-color;

@@ -26,7 +26,10 @@ describe('SourceControlManagement', () => {
     it('should be able to set the state', () => {
       const dvcRoot = __dirname
       const mockedCreateSourceControl = jest.fn().mockReturnValueOnce({
-        createResourceGroup: jest.fn().mockReturnValueOnce({}),
+        createResourceGroup: jest
+          .fn()
+          .mockReturnValueOnce({})
+          .mockReturnValueOnce({}),
         inputBox: { visible: true }
       })
       mockedScm.createSourceControl = mockedCreateSourceControl
@@ -37,7 +40,10 @@ describe('SourceControlManagement', () => {
         initialState
       )
       expect(mockedCreateSourceControl).toBeCalledTimes(1)
-      expect(sourceControlManagement.getState()).toEqual([])
+      expect(sourceControlManagement.getState()).toEqual({
+        changes: [],
+        gitCommitReady: []
+      })
 
       const updatedState = {
         added: new Set(['/some/new/path']),
@@ -48,26 +54,33 @@ describe('SourceControlManagement', () => {
 
       sourceControlManagement.setState(updatedState)
 
-      expect(sourceControlManagement.getState()).toEqual([
-        {
-          contextValue: 'added',
-          dvcRoot,
-          resourceUri: Uri.file('/some/new/path')
-        },
-        {
-          contextValue: 'deleted',
-          dvcRoot,
-          resourceUri: Uri.file('/some/deleted/path')
-        },
-        {
-          contextValue: 'deleted',
-          dvcRoot,
-          resourceUri: Uri.file('/some/other/deleted/path')
-        }
-      ])
+      expect(sourceControlManagement.getState()).toEqual({
+        changes: [
+          {
+            contextValue: 'deleted',
+            dvcRoot,
+            resourceUri: Uri.file('/some/deleted/path')
+          },
+          {
+            contextValue: 'deleted',
+            dvcRoot,
+            resourceUri: Uri.file('/some/other/deleted/path')
+          }
+        ],
+        gitCommitReady: [
+          {
+            contextValue: 'added',
+            dvcRoot,
+            resourceUri: Uri.file('/some/new/path')
+          }
+        ]
+      })
 
       sourceControlManagement.setState(initialState)
-      expect(sourceControlManagement.getState()).toEqual([])
+      expect(sourceControlManagement.getState()).toEqual({
+        changes: [],
+        gitCommitReady: []
+      })
     })
   })
 })

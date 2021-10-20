@@ -30,10 +30,7 @@ describe('InternalCommands', () => {
   describe('registerCommand', () => {
     it('should throw an error if we try to re-register an existing command', () => {
       expect(() =>
-        internalCommands.registerCommand(
-          AvailableCommands.GET_ONLY_OR_PICK_PROJECT,
-          jest.fn()
-        )
+        internalCommands.registerCommand(AvailableCommands.GET_THEME, jest.fn())
       ).toThrow()
     })
   })

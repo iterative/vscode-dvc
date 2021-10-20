@@ -1,6 +1,6 @@
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter } from 'vscode'
-import { Experiments } from '../../../experiments'
+import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Process } from '../../../processExecution'
 
 export const getMockedProcess = (stdout: string): Process =>
@@ -46,7 +46,7 @@ export const buildMockedExperiments = () => {
     getSorts: mockedGetSorts,
     isReady: () => true,
     paramsOrMetricsChanged: mockedParamsOrMetricsChanged
-  } as unknown as Experiments
+  } as unknown as WorkspaceExperiments
 
   return {
     mockedExperiments,

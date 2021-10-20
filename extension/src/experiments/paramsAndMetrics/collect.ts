@@ -1,3 +1,4 @@
+import get from 'lodash/get'
 import { reduceParamsAndMetrics } from './reduce'
 import { joinParamOrMetricPath } from './paths'
 import {
@@ -6,6 +7,7 @@ import {
   ParamsOrMetrics
 } from '../webview/contract'
 import {
+  ExperimentFields,
   ExperimentFieldsOrError,
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
@@ -269,4 +271,74 @@ export const collectFiles = (data: ExperimentsRepoJSONOutput): string[] => {
     }
   }
   return [...files]
+}
+
+const collectChange = (
+  changes: string[],
+  type: 'params' | 'metrics',
+  file: string,
+  key: string,
+  value: Value | ValueTree,
+  commitData: ExperimentFields,
+  ancestors: string[] = []
+) => {
+  if (typeof value === 'object') {
+    Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
+      return collectChange(
+        changes,
+        type,
+        file,
+        childKey,
+        childValue,
+        commitData,
+        [...ancestors, key]
+      )
+    })
+    return
+  }
+
+  if (get(commitData?.[type], [file, 'data', ...ancestors, key]) !== value) {
+    changes.push(joinParamOrMetricPath(type, file, ...ancestors, key))
+  }
+}
+
+const collectParamsAndMetricsChanges = (
+  changes: string[],
+  workspaceData: ExperimentFields,
+  commitData: ExperimentFields
+) =>
+  (['params', 'metrics'] as ('params' | 'metrics')[]).forEach(type =>
+    Object.entries(workspaceData?.[type] || {}).forEach(([file, value]) => {
+      const data = value.data
+      if (!data) {
+        return
+      }
+
+      Object.entries(data).forEach(([key, value]) =>
+        collectChange(changes, type, file, key, value, commitData)
+      )
+    })
+  )
+
+const getData = (value: { baseline: ExperimentFieldsOrError }) =>
+  value.baseline.data || {}
+
+export const collectChanges = (data: ExperimentsRepoJSONOutput): string[] => {
+  const changes: string[] = []
+
+  const { workspace, currentCommit } = Object.entries(data).reduce(
+    (acc, [key, value]) => {
+      if (key === 'workspace') {
+        acc.workspace = getData(value)
+        return acc
+      }
+      acc.currentCommit = getData(value)
+      return acc
+    },
+    {} as Record<string, ExperimentFields>
+  )
+
+  collectParamsAndMetricsChanges(changes, workspace, currentCommit)
+
+  return changes.sort()
 }

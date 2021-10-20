@@ -100,27 +100,27 @@ describe('DecorationProvider', () => {
     const initialState = {
       added,
       deleted,
+      gitModified: emptySet,
       modified,
       notInCache: emptySet,
       renamed: emptySet,
-      stageModified: emptySet,
       tracked: emptySet
     }
 
     const updatedState = {
       added,
       deleted,
+      gitModified: emptySet,
       modified: emptySet,
       notInCache,
       renamed: emptySet,
-      stageModified: emptySet,
       tracked
     }
 
     expect(initialState.added).toEqual(updatedState.added)
     expect(initialState.deleted).toEqual(updatedState.deleted)
     expect(initialState.renamed).toEqual(updatedState.renamed)
-    expect(initialState.stageModified).toEqual(updatedState.stageModified)
+    expect(initialState.gitModified).toEqual(updatedState.gitModified)
 
     expect(initialState.modified).not.toEqual(updatedState.modified)
     expect(initialState.notInCache).not.toEqual(updatedState.notInCache)

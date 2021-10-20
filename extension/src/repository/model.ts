@@ -31,10 +31,10 @@ export class RepositoryModel
   private state = {
     added: new Set<string>(),
     deleted: new Set<string>(),
+    gitModified: new Set<string>(),
     modified: new Set<string>(),
     notInCache: new Set<string>(),
     renamed: new Set<string>(),
-    stageModified: new Set<string>(),
     tracked: new Set<string>(),
     untracked: new Set<string>()
   }
@@ -57,11 +57,18 @@ export class RepositoryModel
       this.updateTracked(tracked)
     }
     this.updateStatus(diffFromHead, diffFromCache)
-    this.updateUntracked(untracked)
+
+    this.state.untracked = untracked
   }
 
-  private filterRootDir(dirs: string[] = []) {
-    return dirs.filter(dir => dir !== this.dvcRoot)
+  public hasChanges(): boolean {
+    return !!(
+      this.state.added.size ||
+      this.state.deleted.size ||
+      this.state.gitModified.size ||
+      this.state.modified.size ||
+      this.state.renamed.size
+    )
   }
 
   private getAbsolutePath(path: string): string {
@@ -73,9 +80,9 @@ export class RepositoryModel
   }
 
   private getAbsoluteParentPath(files: string[] = []): string[] {
-    return this.filterRootDir(
-      files.map(file => this.getAbsolutePath(dirname(file)))
-    )
+    return files
+      .map(file => this.getAbsolutePath(dirname(file)))
+      .filter(dir => dir !== this.dvcRoot)
   }
 
   private getChangedOutsStatuses(
@@ -164,7 +171,7 @@ export class RepositoryModel
     const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
 
-    this.state.stageModified = this.splitModifiedAgainstHead(
+    this.state.gitModified = this.splitModifiedAgainstHead(
       modifiedAgainstHead,
       path => this.pathNotInSet(path, modifiedAgainstCache)
     )
@@ -181,7 +188,11 @@ export class RepositoryModel
   ): void {
     this.state.added = this.getStateFromDiff(diffOutput.added)
     this.state.deleted = this.getStateFromDiff(diffOutput.deleted)
-    this.state.renamed = this.getStateFromDiff(diffOutput.renamed)
+    this.state.renamed = new Set(
+      diffOutput.renamed
+        ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
+        .filter(path => this.state.tracked.has(path))
+    )
     this.state.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
 
     this.setModified(diffOutput, statusOutput)
@@ -196,9 +207,5 @@ export class RepositoryModel
       ...absoluteTrackedPaths,
       ...this.getAbsoluteParentPath(trackedPaths)
     ])
-  }
-
-  private updateUntracked(untracked: Set<string>): void {
-    this.state.untracked = untracked
   }
 }

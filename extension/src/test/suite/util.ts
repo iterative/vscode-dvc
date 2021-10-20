@@ -8,8 +8,9 @@ import {
   window,
   workspace
 } from 'vscode'
-import { ExperimentsRepository } from '../../experiments/repository'
+import { Experiments } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
+import { definedAndNonEmpty } from '../../util/array'
 
 export const dvcDemoPath = Uri.file(
   resolve(__dirname, '..', '..', '..', '..', 'demo')
@@ -56,24 +57,28 @@ export const selectQuickPickItem = async (number: number) => {
   return commands.executeCommand('workbench.action.acceptSelectedQuickOpenItem')
 }
 
-export const experimentsUpdatedEvent = (
-  experimentsRepository: ExperimentsRepository
-) =>
+export const experimentsUpdatedEvent = (experiments: Experiments) =>
   new Promise(resolve => {
-    experimentsRepository.dispose.track(
-      experimentsRepository.onDidChangeExperiments(resolve)
-    )
+    experiments.dispose.track(experiments.onDidChangeExperiments(resolve))
   })
 
 export const getFirstArgOfCall = (spy: SinonSpy, call: number) =>
   spy.getCall(call).args[0]
 
-export const activeTextEditorChangedEvent = (): Promise<
-  TextEditor | undefined
-> =>
+export const activeTextEditorChangedEvent = (
+  disposable: Disposer
+): Promise<TextEditor | undefined> =>
   new Promise(resolve =>
-    window.onDidChangeActiveTextEditor(editor => resolve(editor))
+    disposable.track(
+      window.onDidChangeActiveTextEditor(editor => resolve(editor))
+    )
   )
 
 export const getActiveTextEditorFilename = (): string | undefined =>
   window.activeTextEditor?.document.fileName
+
+export const closeAllEditors = async () => {
+  if (definedAndNonEmpty(window.visibleTextEditors)) {
+    await commands.executeCommand('workbench.action.closeAllEditors')
+  }
+}

@@ -1,13 +1,12 @@
-import { basename, extname } from 'path'
 import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
-import { isDirectory } from '.'
+import { isAnyDvcYaml, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
-import { EXPERIMENTS_GIT_REFS } from '../experiments/repository'
+import { EXPERIMENTS_GIT_REFS } from '../experiments'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000
@@ -16,28 +15,24 @@ export const fireWatcher = (path: string): Promise<void> => {
 
 export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
-const isExcluded = (path: string) =>
+const isExcluded = (dvcRoot: string, path: string) =>
   !path ||
+  !(path.includes(dvcRoot) || path.includes('.git')) ||
   path.includes(EXPERIMENTS_GIT_REFS) ||
   ignoredDotDirectories.test(path)
-
-export const isDvcLock = (path: string): boolean =>
-  basename(path) === 'dvc.lock'
-
-const requiresReset = (path: string) =>
-  extname(path) === '.dvc' || isDvcLock(path) || basename(path) === 'dvc.yaml'
 
 export const getRepositoryListener =
   (
     repository: Repository,
-    trackedExplorerTree: TrackedExplorerTree
+    trackedExplorerTree: TrackedExplorerTree,
+    dvcRoot: string
   ): ((path: string) => void) =>
   (path: string) => {
-    if (isExcluded(path)) {
+    if (isExcluded(dvcRoot, path)) {
       return
     }
 
-    if (requiresReset(path)) {
+    if (isAnyDvcYaml(path)) {
       repository.reset()
       trackedExplorerTree.reset()
       return

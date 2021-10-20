@@ -6,6 +6,8 @@ import {
 } from './vscode/quickPick'
 import { setConfigValue } from './vscode/config'
 import { pickFile } from './vscode/resourcePicker'
+import { getFirstWorkspaceFolder } from './vscode/workspaceFolders'
+import { Response } from './vscode/response'
 
 const setupTitle = 'Setup the workspace'
 
@@ -104,12 +106,12 @@ const quickPickVenvOption = () =>
     [
       {
         description: 'use the interpreter selected by the ms-python extension',
-        label: 'Yes',
+        label: Response.YES,
         value: 2
       },
       {
         description: 'and I want to select the python interpreter',
-        label: 'Yes',
+        label: Response.YES,
         value: 1
       },
 
@@ -153,14 +155,16 @@ export const setupWorkspace = async (): Promise<boolean> => {
 }
 
 export const setup = async (extension: IExtension) => {
-  const hasWorkspaceFolder = extension.hasWorkspaceFolder()
-  if (!hasWorkspaceFolder) {
+  const cwd = getFirstWorkspaceFolder()
+  if (!cwd) {
     return
   }
 
-  await extension.initializePreCheck()
+  const [canRunCli] = await Promise.all([
+    extension.canRunCli(cwd),
+    extension.setRoots()
+  ])
 
-  const canRunCli = await extension.canRunCli()
   if (extension.hasRoots() && canRunCli) {
     return extension.initialize()
   }

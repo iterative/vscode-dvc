@@ -1,6 +1,10 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { collectFiles, collectParamsAndMetrics } from './collect'
+import {
+  collectChanges,
+  collectFiles,
+  collectParamsAndMetrics
+} from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
@@ -19,7 +23,7 @@ export const enum MementoPrefixes {
 
 export class ParamsAndMetricsModel {
   public dispose = Disposable.fn()
-  public get columnsOrder() {
+  public get columnsOrder(): string[] {
     return this.columnsOrderState
   }
 
@@ -35,6 +39,7 @@ export class ParamsAndMetricsModel {
   private workspaceState: Memento
 
   private columnsOrderState: string[] = []
+  private paramsAndMetricsChanges: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
@@ -63,7 +68,8 @@ export class ParamsAndMetricsModel {
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     return Promise.all([
       this.transformAndSetParamsAndMetrics(data),
-      this.transformAndSetFiles(data)
+      this.transformAndSetFiles(data),
+      this.transformAndSetChanges(data)
     ])
   }
 
@@ -93,6 +99,10 @@ export class ParamsAndMetricsModel {
 
   public getFiles() {
     return this.files
+  }
+
+  public getChanges() {
+    return this.paramsAndMetricsChanges
   }
 
   public toggleStatus(path: string) {
@@ -139,6 +149,10 @@ export class ParamsAndMetricsModel {
 
     this.files = files
     this.paramsAndMetricsFilesChanged.fire()
+  }
+
+  private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {
+    this.paramsAndMetricsChanges = collectChanges(data)
   }
 
   private setAreChildrenSelected(path: string, status: Status) {

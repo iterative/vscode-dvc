@@ -1,4 +1,5 @@
 import { QuickPickOptions, QuickPickItem, window } from 'vscode'
+import { Response } from './response'
 
 export interface QuickPickItemWithValue<T = string> extends QuickPickItem {
   value: T
@@ -71,12 +72,12 @@ export const quickPickYesOrNo = (
     [
       {
         description: descriptionYes,
-        label: 'Yes',
+        label: Response.YES,
         value: true
       },
       {
         description: descriptionNo,
-        label: 'No',
+        label: Response.NO,
         value: false
       }
     ],

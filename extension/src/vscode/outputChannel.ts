@@ -1,6 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
 import { OutputChannel as VSOutputChannel, window } from 'vscode'
-import { reportErrorWithOptions } from './reporting'
 import { ICli } from '../cli'
 
 enum ProcessStatus {
@@ -24,16 +23,8 @@ export class OutputChannel {
     })
   }
 
-  public async offerToShowError() {
-    const show = 'Show'
-    const response = await reportErrorWithOptions(
-      'Something went wrong, please see the DVC output channel for more details.',
-      show,
-      'Close'
-    )
-    if (response === show) {
-      return this.outputChannel.show()
-    }
+  public show() {
+    return this.outputChannel.show()
   }
 
   private onDidStartProcess(cli: ICli) {

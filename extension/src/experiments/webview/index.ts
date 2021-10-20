@@ -208,26 +208,10 @@ export class ExperimentsWebview {
   }
 
   private async getHtml(): Promise<string> {
-    let urls: {
-      publicPath: string
-      mainJsUrl: string
-    }
-
-    if (process.env.USE_DEV_UI === 'true') {
-      const baseUrl = 'http://localhost:8080/'
-      urls = {
-        mainJsUrl: `${baseUrl}main.js`,
-        publicPath: baseUrl
-      }
-    } else {
-      urls = {
-        mainJsUrl: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.mainJsFilename))
-          .toString(),
-        publicPath: this.webviewPanel.webview
-          .asWebviewUri(Uri.file(dvcVscodeWebview.distPath))
-          .toString()
-      }
+    const urls = {
+      mainJsUrl: this.webviewPanel.webview
+        .asWebviewUri(Uri.file(dvcVscodeWebview.mainJsFilename))
+        .toString()
     }
 
     const theme = await this.internalCommands.executeCommand<WebviewColorTheme>(
@@ -235,7 +219,6 @@ export class ExperimentsWebview {
     )
     const data: WindowWithWebviewData = {
       webviewData: {
-        publicPath: urls.publicPath,
         theme
       }
     }
