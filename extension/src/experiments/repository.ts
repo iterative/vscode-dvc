@@ -308,6 +308,7 @@ export class ExperimentsRepository {
     return {
       changes: [...this.getModifiedParams(), ...this.getModifiedMetrics()],
       columns: this.paramsAndMetrics.getSelected(),
+      columnsOrder: this.paramsAndMetrics.columnsOrder,
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }

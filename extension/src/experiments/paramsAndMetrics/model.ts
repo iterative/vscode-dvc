@@ -4,6 +4,7 @@ import { collectFiles, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { messenger, MessengerEvents } from '../../util/messaging'
 
 export enum Status {
   selected = 2,
@@ -12,11 +13,15 @@ export enum Status {
 }
 
 export const enum MementoPrefixes {
-  status = 'paramsAndMetricsStatus:'
+  status = 'paramsAndMetricsStatus:',
+  columnsOrder = 'paramsAndMetricsColumnsOrder:'
 }
 
 export class ParamsAndMetricsModel {
   public dispose = Disposable.fn()
+  public get columnsOrder() {
+    return this.columnsOrderState
+  }
 
   public onDidChangeParamsAndMetricsFiles: Event<void>
   private paramsAndMetricsFilesChanged = new EventEmitter<void>()
@@ -29,12 +34,22 @@ export class ParamsAndMetricsModel {
   private dvcRoot: string
   private workspaceState: Memento
 
+  private columnsOrderState: string[] = []
+
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
     this.onDidChangeParamsAndMetricsFiles =
       this.paramsAndMetricsFilesChanged.event
     this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
+    this.columnsOrderState = workspaceState.get(
+      MementoPrefixes.columnsOrder + dvcRoot,
+      []
+    )
+
+    messenger.on(MessengerEvents.columnReordered, (columnsOrder: string[]) => {
+      this.setColumnsOrder(columnsOrder)
+    })
   }
 
   public getSelected() {
@@ -184,6 +199,14 @@ export class ParamsAndMetricsModel {
     return this.workspaceState.update(
       MementoPrefixes.status + this.dvcRoot,
       this.status
+    )
+  }
+
+  private setColumnsOrder(columnsOrder: string[]) {
+    this.columnsOrderState = columnsOrder
+    this.workspaceState.update(
+      MementoPrefixes.columnsOrder + this.dvcRoot,
+      this.columnsOrder
     )
   }
 }

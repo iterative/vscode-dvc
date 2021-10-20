@@ -9,6 +9,7 @@ import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
+import * as Messaging from '../../util/useMessaging'
 
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
@@ -75,14 +76,26 @@ describe('Table', () => {
           id: 'workspace'
         }
       } as unknown as Experiment
-    ]
+    ],
+    setColumnOrder: jest.fn
   } as unknown as TableInstance<Experiment>
   const renderTable = (
     sorts: SortDefinition[] = [],
     tableInstance = instance,
     changes: string[] = []
   ) =>
-    render(<Table instance={tableInstance} sorts={sorts} changes={changes} />)
+    render(
+      <Table
+        instance={tableInstance}
+        sorts={sorts}
+        changes={changes}
+        columnsOrder={[]}
+      />
+    )
+
+  beforeAll(() => {
+    jest.spyOn(Messaging, 'useMessaging').mockImplementation()
+  })
 
   afterEach(() => {
     cleanup()

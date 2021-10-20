@@ -1,14 +1,19 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import {
+  Experiment,
+  MessageFromWebviewType
+} from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { getPlaceholder } from '../../util/columns'
+import { useMessaging } from '../../util/useMessaging'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
   sorts: SortDefinition[]
+  columnsOrder: string[]
 }
 
 const HeaderButtons: React.FC<{
@@ -100,12 +105,18 @@ export const MergedHeaderGroup: React.FC<{
 
 export const TableHead: React.FC<TableHeadProps> = ({
   instance: { headerGroups, setColumnOrder, allColumns },
-  sorts
+  sorts,
+  columnsOrder
 }) => {
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
-  const currentColOrder = React.useRef<string[]>([])
+  const currentColOrder = React.useRef<string[]>(columnsOrder)
+  const sendMessage = useMessaging()
+
+  React.useEffect(() => {
+    setColumnOrder(columnsOrder)
+  }, [columnsOrder, setColumnOrder])
 
   const changeColumnOrder = (oldPosition: number, newPosition: number) => {
     const colOrder = [...currentColOrder.current]
@@ -113,7 +124,12 @@ export const TableHead: React.FC<TableHeadProps> = ({
     colOrder.splice(oldPosition, 1)
     colOrder.splice(newPosition, 0, itemId)
     setColumnOrder(colOrder)
+    sendMessage({
+      payload: colOrder,
+      type: MessageFromWebviewType.columnReordered
+    })
   }
+
   currentColOrder.current = allColumns?.map(o => o.id)
 
   return (

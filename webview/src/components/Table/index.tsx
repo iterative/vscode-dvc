@@ -11,6 +11,7 @@ export interface InstanceProp {
 
 export interface TableProps extends InstanceProp {
   sorts: SortDefinition[]
+  columnsOrder: string[]
 }
 
 export interface WithChanges {
@@ -212,13 +213,18 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
 export const Table: React.FC<TableProps & WithChanges> = ({
   instance,
   sorts,
-  changes
+  changes,
+  columnsOrder
 }) => {
   const { getTableProps, rows } = instance
   return (
     <div className={styles.tableContainer}>
       <div {...getTableProps({ className: styles.table })}>
-        <TableHead instance={instance} sorts={sorts} />
+        <TableHead
+          instance={instance}
+          sorts={sorts}
+          columnsOrder={columnsOrder}
+        />
         {rows.map(row => (
           <TableBody
             row={row}
