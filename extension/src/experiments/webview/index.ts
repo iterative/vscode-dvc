@@ -11,7 +11,6 @@ import { Deferred } from '@hediet/std/synchronization'
 import { distPath } from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
 import {
-  WebviewType as Experiments,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
@@ -127,12 +126,13 @@ export class ExperimentsWebview {
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState,
     resourceLocator: ResourceLocator,
+    title: string,
     viewKey: string,
     scripts: string[]
   ): Promise<ExperimentsWebview> {
     const webviewPanel = window.createWebviewPanel(
       viewKey,
-      Experiments,
+      title,
       ViewColumn.Active,
       {
         enableScripts: true,

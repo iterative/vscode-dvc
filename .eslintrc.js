@@ -113,14 +113,11 @@ module.exports = {
         controlComponents: ['Radio']
       }
     ],
-    'jsx-a11y/no-onchange': 'off',
     'no-console': 'error',
-
     'no-restricted-globals': ['error', 'name', 'length', 'event'],
     // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
     'no-use-before-define': 'off',
     'react-hooks/exhaustive-deps': 'error',
-
     'react-hooks/rules-of-hooks': 'error',
     // This project doesn't use prop types
     'react/prop-types': 'off',

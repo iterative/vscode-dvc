@@ -31,8 +31,6 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   types?: string[]
 }
 
-export const WebviewType = 'Experiments'
-
 export interface WindowWithWebviewData {
   webviewData: {
     theme: WebviewColorTheme

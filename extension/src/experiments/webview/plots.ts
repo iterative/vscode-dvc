@@ -55,6 +55,7 @@ export class PlotsWebview extends ExperimentsWebview {
       internalCommands,
       state,
       resourceLocator,
+      'Plots',
       PlotsWebview.viewKey,
       plotsScripts
     )

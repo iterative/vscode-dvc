@@ -1,8 +1,6 @@
 import { resolve } from 'path'
-import { WebviewType } from 'dvc/src/experiments/webview/contract'
 import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
@@ -87,13 +85,7 @@ module.exports = {
     path: r('dist')
   },
   plugins: (() => {
-    return [
-      new HtmlWebpackPlugin({
-        title: WebviewType
-      }),
-      new ForkTsCheckerWebpackPlugin(),
-      new CleanWebpackPlugin()
-    ]
+    return [new ForkTsCheckerWebpackPlugin(), new CleanWebpackPlugin()]
   })(),
   resolve: {
     extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],

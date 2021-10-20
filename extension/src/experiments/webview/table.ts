@@ -55,6 +55,7 @@ export class TableWebview extends ExperimentsWebview {
       internalCommands,
       state,
       resourceLocator,
+      'Experiments',
       TableWebview.viewKey,
       tableScripts
     )
