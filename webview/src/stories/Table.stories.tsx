@@ -1,9 +1,7 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
-import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
-import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
-import complexChangesData from 'dvc/src/test/fixtures/complex-changes-example'
+import complexTableData from './complex-table-data'
 import Experiments from '../table/components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -22,15 +20,7 @@ export default {
     }
   },
   args: {
-    tableData: {
-      changes: complexChangesData,
-      columns: complexColumnData,
-      rows: complexRowData,
-      sorts: [
-        { descending: true, path: 'params:params.yaml:epochs' },
-        { descending: false, path: 'params:params.yaml:log_file' }
-      ]
-    },
+    tableData: complexTableData,
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,

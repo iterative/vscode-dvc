@@ -1,29 +1,23 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
-import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
+import { TableData } from 'dvc/src/experiments/webview/contract'
+import complexTableData from './complex-table-data'
 import Plots from '../plots/components/Plots'
+import parseTableData from '../plots/parse-table-data'
 
 import './test-vscode-styles.scss'
-import { parseTableData } from '../plots/components/App'
 
 export default {
-  argTypes: {
-    vsCodeApi: {
-      table: {
-        disable: true
-      }
-    }
-  },
   args: {
-    tableData: { columns: complexColumnData, rows: complexRowData }
+    tableData: complexTableData
   },
   component: Plots,
   title: 'Plots'
 } as Meta
 
-export const WithData: Story = ({ tableData }) => {
-  return <Plots plotsData={parseTableData(tableData)} />
+export const WithData: Story<{ tableData: TableData }> = ({ tableData }) => {
+  const plotsData = parseTableData(tableData)
+  return <Plots plotsData={plotsData} />
 }
 
 export const WithoutData: Story = () => {
