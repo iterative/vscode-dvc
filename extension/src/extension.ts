@@ -292,7 +292,7 @@ export class Extension implements IExtension {
   }
 
   public async initialize() {
-    this.emptyContainers()
+    this.resetMembers()
 
     await Promise.all([
       this.repositories.create(this.dvcRoots, this.trackedExplorerTree),
@@ -313,11 +313,11 @@ export class Extension implements IExtension {
   }
 
   public reset() {
-    this.emptyContainers()
+    this.resetMembers()
     return this.setAvailable(false)
   }
 
-  private emptyContainers() {
+  private resetMembers() {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()

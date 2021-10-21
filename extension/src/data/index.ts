@@ -62,7 +62,7 @@ export class Data {
   }
 
   private initialize() {
-    const initialDataUpdate = this.dispose.track(
+    const waitForInitialData = this.dispose.track(
       this.onDidChangeExperimentsData(() => {
         this.watcher = this.watchParamsAndMetricsFiles()
 
@@ -74,8 +74,8 @@ export class Data {
             this.watcher = watcher
           })
         )
-        this.dispose.untrack(initialDataUpdate)
-        initialDataUpdate.dispose()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
         this.deferred.resolve()
       })
     )

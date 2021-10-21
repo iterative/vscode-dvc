@@ -65,11 +65,11 @@ export class Experiments {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    const initialDataUpdate = this.dispose.track(
+    const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
         this.deferred.resolve()
-        this.dispose.untrack(initialDataUpdate)
-        initialDataUpdate.dispose()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
       })
     )
   }
