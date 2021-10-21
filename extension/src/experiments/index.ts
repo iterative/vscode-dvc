@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
@@ -9,14 +9,10 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
 import { TableWebview } from './webview/table'
 import { ResourceLocator } from '../resourceLocator'
-import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ProcessManager } from '../processManager'
+import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { getGitRepositoryRoot } from '../git'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -47,8 +43,6 @@ export class Experiments {
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
-  private processManager: ProcessManager
-
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -71,43 +65,26 @@ export class Experiments {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    this.processManager = this.dispose.track(
-      new ProcessManager({ name: 'refresh', process: () => this.updateData() })
+    const waitForInitialData = this.dispose.track(
+      this.onDidChangeExperiments(() => {
+        this.deferred.resolve()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+      })
     )
-
-    this.updateData().then(() => {
-      this.dispose.track(
-        new WorkspaceParamsAndMetrics(dvcRoot, this.paramsAndMetrics, () =>
-          this.refresh()
-        )
-      )
-      this.deferred.resolve()
-      this.notifyChanged()
-    })
   }
 
   public isReady() {
     return this.initialized
   }
 
-  public async onDidChangeData(): Promise<void> {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
-    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
-    this.dispose.track(
-      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
-        if (
-          path.includes('HEAD') ||
-          path.includes(EXPERIMENTS_GIT_REFS) ||
-          path.includes(join(GIT_REFS, 'heads'))
-        ) {
-          return this.refresh()
-        }
-      })
-    )
-  }
+  public async setState(data: ExperimentsRepoJSONOutput) {
+    await Promise.all([
+      this.paramsAndMetrics.transformAndSet(data),
+      this.experiments.transformAndSet(data)
+    ])
 
-  public refresh() {
-    return this.processManager.run('refresh')
+    return this.notifyChanged()
   }
 
   public getChildParamsOrMetrics(path?: string) {
@@ -228,21 +205,6 @@ export class Experiments {
 
   public getCheckpoints(experimentId: string) {
     return this.experiments.getCheckpoints(experimentId)
-  }
-
-  private async updateData(): Promise<void> {
-    const data =
-      await this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
-        AvailableCommands.EXPERIMENT_SHOW,
-        this.dvcRoot
-      )
-
-    await Promise.all([
-      this.paramsAndMetrics.transformAndSet(data),
-      this.experiments.transformAndSet(data)
-    ])
-
-    return this.notifyChanged()
   }
 
   private notifyChanged() {

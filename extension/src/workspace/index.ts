@@ -17,7 +17,6 @@ export class BaseWorkspace<T extends Disposable> {
   public dispose = Disposable.fn()
 
   protected repositories: Disposables<T> = {}
-  protected dvcRoots = []
   protected internalCommands: InternalCommands
 
   protected readonly deferred = new Deferred()
