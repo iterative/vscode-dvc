@@ -296,7 +296,7 @@ suite('Extension Test Suite', () => {
         mockDisposer,
         'should dispose of the current repositories and experiments if the cli can no longer be found'
       ).to.have.been.called
-    }).timeout(10000)
+    }).timeout(12000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
       const clock = useFakeTimers()
