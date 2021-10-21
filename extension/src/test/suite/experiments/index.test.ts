@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
-import { buildExperiments } from './util'
+import { buildExperiments, getMockInternalCommands } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -13,7 +13,7 @@ import complexChangesData from '../../fixtures/complex-changes-example'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import { AvailableCommands, InternalCommands } from '../../../commands/internal'
+import { InternalCommands } from '../../../commands/internal'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric } from '../../../experiments/webview/contract'
@@ -41,26 +41,6 @@ suite('Experiments Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     return closeAllEditors()
-  })
-
-  describe('refresh', () => {
-    it('should debounce all calls to refresh that are made within 200ms', async () => {
-      const { experiments, mockExperimentShow } = buildExperiments(disposable)
-
-      await experiments.isReady()
-      mockExperimentShow.resetHistory()
-
-      await Promise.all([
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh()
-      ])
-
-      expect(mockExperimentShow).to.be.calledOnce
-    })
   })
 
   describe('getExperiments', () => {
@@ -126,7 +106,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(5000)
 
     it('should only be able to open a single experiments webview', async () => {
-      const { experiments, mockExperimentShow } = buildExperiments(disposable)
+      const { experiments } = buildExperiments(disposable)
 
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
@@ -139,10 +119,8 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
-      expect(mockExperimentShow).to.have.been.calledOnce
 
       windowSpy.resetHistory()
-      mockExperimentShow.resetHistory()
 
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
@@ -152,7 +130,6 @@ suite('Experiments Test Suite', () => {
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-      expect(mockExperimentShow).not.to.have.been.called
     }).timeout(5000)
 
     it('should be able to sort', async () => {
@@ -168,20 +145,8 @@ suite('Experiments Test Suite', () => {
           }
         }
       })
-      stub(cliReader, 'experimentShow').resolves({
-        testBranch: {
-          baseline: { data: buildTestExperiment(10) },
-          testExp1: { data: buildTestExperiment(2) },
-          testExp2: { data: buildTestExperiment(1) },
-          testExp3: { data: buildTestExperiment(3) }
-        },
-        workspace: {
-          baseline: { data: buildTestExperiment(10) }
-        }
-      })
 
       const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
-
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
@@ -197,6 +162,19 @@ suite('Experiments Test Suite', () => {
           buildMockMemento()
         )
       )
+
+      experiments.setState({
+        testBranch: {
+          baseline: { data: buildTestExperiment(10) },
+          testExp1: { data: buildTestExperiment(2) },
+          testExp2: { data: buildTestExperiment(1) },
+          testExp3: { data: buildTestExperiment(3) }
+        },
+        workspace: {
+          baseline: { data: buildTestExperiment(10) }
+        }
+      })
+
       await experiments.isReady()
       await experiments.showWebview()
 
@@ -333,24 +311,18 @@ suite('Experiments Test Suite', () => {
     ]
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
-    const mockedInternalCommands = new InternalCommands(
-      {} as Config,
-      {} as unknown as OutputChannel
-    )
-    mockedInternalCommands.registerCommand(
-      AvailableCommands.EXPERIMENT_SHOW,
-      () => Promise.resolve(complexExperimentsOutput)
-    )
-
     it('should initialize given no persisted state and update persistence given any change', async () => {
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
-      const testRepository = new Experiments(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
+      const testRepository = disposable.track(
+        new Experiments(
+          'test',
+          getMockInternalCommands(disposable),
+          {} as ResourceLocator,
+          mockMemento
+        )
       )
+      testRepository.setState(complexExperimentsOutput)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -450,12 +422,15 @@ suite('Experiments Test Suite', () => {
       })
 
       const mementoSpy = spy(mockMemento, 'get')
-      const testRepository = new Experiments(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
+      const testRepository = disposable.track(
+        new Experiments(
+          'test',
+          getMockInternalCommands(disposable),
+          {} as ResourceLocator,
+          mockMemento
+        )
       )
+      testRepository.setState(complexExperimentsOutput)
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])
