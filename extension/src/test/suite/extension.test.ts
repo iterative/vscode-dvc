@@ -18,9 +18,7 @@ import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
-import { WorkspaceRepositories } from '../../repository/workspace'
 import { WorkspaceExperiments } from '../../experiments/workspace'
-import { TrackedExplorerTree } from '../../fileSystem/tree'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -154,6 +152,9 @@ suite('Extension Test Suite', () => {
     })
 
     it('should initialize the extension when the cli is usable', async () => {
+      const mockDisposer = stub(Disposer, 'reset')
+      const disposal = disposalEvent(mockDisposer)
+
       const mockWorkspaceExperimentsReady = stub(
         WorkspaceExperiments.prototype,
         'isReady'
@@ -162,18 +163,6 @@ suite('Extension Test Suite', () => {
       const workspaceExperimentsAreReady = new Promise(resolve =>
         mockWorkspaceExperimentsReady.callsFake(async () => {
           await mockWorkspaceExperimentsReady.wrappedMethod()
-          resolve(undefined)
-        })
-      )
-
-      const mockWorkspaceRepositoriesReady = stub(
-        WorkspaceRepositories.prototype,
-        'isReady'
-      )
-
-      const workspaceRepositoriesAreReady = new Promise(resolve =>
-        mockWorkspaceRepositoriesReady.callsFake(async () => {
-          await mockWorkspaceRepositoriesReady.wrappedMethod()
           resolve(undefined)
         })
       )
@@ -252,7 +241,7 @@ suite('Extension Test Suite', () => {
         mockPath
       )
 
-      await secondTelemetryEventSent
+      await Promise.all([disposal, secondTelemetryEventSent])
 
       expect(mockShowOpenDialog, 'should show the open dialog').to.have.been
         .called
@@ -280,58 +269,12 @@ suite('Extension Test Suite', () => {
         match.has('duration')
       )
 
-      await Promise.all([
-        workspaceExperimentsAreReady,
-        workspaceRepositoriesAreReady
-      ])
-
-      mockShowOpenDialog.resolves([
-        Uri.file(resolve('different', 'file', 'picked', 'path', 'to', 'dvc'))
-      ])
-      mockCanRunCli.resetHistory()
-      mockCanRunCli.resolves('I STILL WORK')
-
-      const experimentsCreated = new Promise(resolve =>
-        stub(WorkspaceExperiments.prototype, 'create').callsFake(() => {
-          resolve(undefined)
-          return []
-        })
-      )
-      const repositoriesCreated = new Promise(resolve =>
-        stub(WorkspaceRepositories.prototype, 'create').callsFake(() => {
-          resolve(undefined)
-          return []
-        })
-      )
-      const trackedExplorerTreeInitialized = new Promise(resolve =>
-        stub(TrackedExplorerTree.prototype, 'initialize').callsFake(() => {
-          resolve(undefined)
-          return undefined
-        })
-      )
-
-      const mockDisposer = stub(Disposer, 'reset')
-
-      const disposal = disposalEvent(mockDisposer)
-
-      await selectDvcPathFromFilePicker()
-
-      await disposal
-
       expect(
         mockDisposer,
         'should dispose of the current repositories and experiments before creating new ones'
       ).to.have.been.called
-      expect(
-        mockCanRunCli,
-        'should have checked to see if the cli could still be run'
-      ).to.have.been.called
 
-      await Promise.all([
-        experimentsCreated,
-        repositoriesCreated,
-        trackedExplorerTreeInitialized
-      ])
+      return workspaceExperimentsAreReady
     }).timeout(10000)
 
     it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
