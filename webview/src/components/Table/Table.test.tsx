@@ -2,7 +2,13 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
@@ -10,6 +16,7 @@ import { HeaderGroup, TableInstance } from 'react-table'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import * as Messaging from '../../util/useMessaging'
+import { ExperimentsTable } from '../Experiments'
 
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
@@ -94,7 +101,7 @@ describe('Table', () => {
     )
 
   beforeAll(() => {
-    jest.spyOn(Messaging, 'useMessaging').mockImplementation()
+    jest.spyOn(Messaging, 'useMessaging').mockImplementation(() => () => {})
   })
 
   afterEach(() => {
@@ -263,6 +270,64 @@ describe('Table', () => {
       )
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(true)
+    })
+  })
+
+  describe('Columns order', () => {
+    it('should move a column from its current position to its new position', async () => {
+      const basicProps = {
+        group: 'params',
+        hasChildren: false,
+        parentPath: 'params'
+      }
+      const columns = [
+        {
+          ...basicProps,
+          id: 'A',
+          name: 'A',
+          path: 'params:A'
+        },
+        {
+          ...basicProps,
+          id: 'B',
+          name: 'B',
+          path: 'params:B'
+        },
+        {
+          ...basicProps,
+          id: 'C',
+          name: 'C',
+          path: 'params:C'
+        }
+      ]
+      const tableData = {
+        changes: [],
+        columns,
+        columnsOrder: [],
+        rows: [],
+        sorts: []
+      }
+      const defaultCols = ['Experiment', 'Timestamp']
+      render(<ExperimentsTable tableData={tableData} />)
+
+      let headers = await waitFor(() =>
+        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      )
+
+      expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
+
+      fireEvent(
+        screen.getByTestId('move-params:B-right'),
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true
+        })
+      )
+
+      headers = await waitFor(() =>
+        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      )
+      expect(headers).toEqual([...defaultCols, 'A', 'C', 'B'])
     })
   })
 })

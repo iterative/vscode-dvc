@@ -33,12 +33,20 @@ const HeaderButtons: React.FC<{
     (showButtons && (
       <div>
         {showLeftButton && (
-          <button className={styles.arrowLeft} onClick={moveColumnLeft}>
+          <button
+            className={styles.arrowLeft}
+            onClick={moveColumnLeft}
+            data-testid={`move-${column.id}-left`}
+          >
             ←
           </button>
         )}
         {showRightButton && (
-          <button className={styles.arrowRight} onClick={moveColumnRight}>
+          <button
+            className={styles.arrowRight}
+            onClick={moveColumnRight}
+            data-testid={`move-${column.id}-right`}
+          >
             →
           </button>
         )}
@@ -90,7 +98,7 @@ export const MergedHeaderGroup: React.FC<{
           key={column.id}
           data-testid={`header-${column.id}`}
         >
-          <div>{column.render('Header')}</div>
+          <div data-testid="rendered-header">{column.render('Header')}</div>
           <HeaderButtons
             column={column}
             nbColumns={headerGroup.headers.length}
