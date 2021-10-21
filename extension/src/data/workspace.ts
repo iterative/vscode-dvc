@@ -18,7 +18,7 @@ export class WorkspaceData extends BaseWorkspace<Data> {
     })
   }
 
-  public refresh(dvcRoot: string) {
-    this.getRepository(dvcRoot).refresh()
+  public update(dvcRoot: string) {
+    this.getRepository(dvcRoot).update()
   }
 }

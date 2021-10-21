@@ -42,7 +42,7 @@ export class Data {
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     this.dvcRoot = dvcRoot
     this.processManager = new ProcessManager({
-      name: 'refresh',
+      name: 'update',
       process: () => this.updateData()
     })
 
@@ -57,8 +57,8 @@ export class Data {
     return this.initialized
   }
 
-  public refresh() {
-    return this.processManager.run('refresh')
+  public update() {
+    return this.processManager.run('update')
   }
 
   private initialize() {
@@ -79,7 +79,7 @@ export class Data {
         this.deferred.resolve()
       })
     )
-    this.refresh()
+    this.update()
   }
 
   private async watchExpGitRefs(): Promise<void> {
@@ -92,7 +92,7 @@ export class Data {
           path.includes(EXPERIMENTS_GIT_REFS) ||
           path.includes(join(GIT_REFS, 'heads'))
         ) {
-          return this.refresh()
+          return this.update()
         }
       })
     )
@@ -138,7 +138,7 @@ export class Data {
             ...this.files
           ]).join(',')}}`
         ),
-        () => this.refresh()
+        () => this.update()
       )
     )
   }

@@ -25,7 +25,7 @@ suite('Data Test Suite', () => {
   })
 
   describe('Data', () => {
-    it('should debounce all calls to refresh that are made within 200ms', async () => {
+    it('should debounce all calls to update that are made within 200ms', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
@@ -43,12 +43,12 @@ suite('Data Test Suite', () => {
       const data = disposable.track(new Data(dvcDemoPath, internalCommands))
 
       await Promise.all([
-        data.refresh(),
-        data.refresh(),
-        data.refresh(),
-        data.refresh(),
-        data.refresh(),
-        data.refresh()
+        data.update(),
+        data.update(),
+        data.update(),
+        data.update(),
+        data.update(),
+        data.update()
       ])
 
       expect(mockExperimentShow).to.be.calledOnce
@@ -148,7 +148,7 @@ suite('Data Test Suite', () => {
         data.onDidChangeExperimentsData(data => resolve(data))
       )
 
-      data.refresh()
+      data.update()
 
       await dataUpdatedEvent
 

@@ -123,7 +123,7 @@ export class Extension implements IExtension {
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        this.data.refresh(cwd)
+        this.data.update(cwd)
       })
     )
 
