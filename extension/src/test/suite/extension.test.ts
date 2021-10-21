@@ -148,7 +148,7 @@ suite('Extension Test Suite', () => {
         .onFirstCall()
         .resolves('ok, initialize everything')
         .onSecondCall()
-        .rejects('CLI is gone,dispose of everything')
+        .rejects('CLI is gone, dispose of everything')
 
       const mockDisposer = stub(Disposer, 'reset')
 
@@ -163,18 +163,6 @@ suite('Extension Test Suite', () => {
         })
 
       const firstDisposal = disposalEvent()
-
-      const mockWorkspaceExperimentsReady = stub(
-        WorkspaceExperiments.prototype,
-        'isReady'
-      )
-
-      const workspaceExperimentsAreReady = new Promise(resolve =>
-        mockWorkspaceExperimentsReady.callsFake(async () => {
-          await mockWorkspaceExperimentsReady.wrappedMethod()
-          resolve(undefined)
-        })
-      )
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const secondTelemetryEventSent = new Promise(resolve =>
@@ -197,9 +185,10 @@ suite('Extension Test Suite', () => {
         .onSecondCall()
         .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
 
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
+      const mockExperimentShow = stub(
+        CliReader.prototype,
+        'experimentShow'
+      ).resolves(complexExperimentsOutput)
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -242,9 +231,19 @@ suite('Extension Test Suite', () => {
         ]
       } as unknown as StatusOutput)
 
-      await selectDvcPathFromFilePicker()
+      const mockWorkspaceExperimentsReady = stub(
+        WorkspaceExperiments.prototype,
+        'isReady'
+      )
 
-      expect(mockShowOpenDialog).to.be.calledOnce
+      const workspaceExperimentsAreReady = new Promise(resolve =>
+        mockWorkspaceExperimentsReady.callsFake(async () => {
+          await mockWorkspaceExperimentsReady.wrappedMethod()
+          resolve(undefined)
+        })
+      )
+
+      await selectDvcPathFromFilePicker()
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         mockPath
@@ -258,8 +257,11 @@ suite('Extension Test Suite', () => {
         mockCanRunCli,
         'should have checked to see if the cli could be run with the given execution details'
       ).to.have.been.called
-      expect(mockDiff).to.have.been.called
+      expect(mockDiff, 'should have updated the repository data').to.have.been
+        .called
       expect(mockStatus).to.have.been.called
+      expect(mockExperimentShow, 'should have update the experiments data').to
+        .have.been.called
 
       expect(
         mockSendTelemetryEvent,
