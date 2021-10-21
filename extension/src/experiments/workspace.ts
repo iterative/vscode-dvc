@@ -44,8 +44,8 @@ export class WorkspaceExperiments
   }
 
   public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
-    // stubby mcstub face
-    return [dvcRoot, data]
+    const experiments = this.getRepository(dvcRoot)
+    experiments.setState(data)
   }
 
   public getFocusedTable(): Experiments | undefined {
@@ -232,11 +232,6 @@ export class WorkspaceExperiments
     return experiments
   }
 
-  public refreshData(dvcRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments?.refresh()
-  }
-
   public setWebview(dvcRoot: string, experimentsWebview: TableWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
@@ -280,8 +275,6 @@ export class WorkspaceExperiments
     )
 
     this.setRepository(dvcRoot, experiments)
-
-    experiments.onDidChangeData()
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(

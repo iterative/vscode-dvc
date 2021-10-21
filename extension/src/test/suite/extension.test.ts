@@ -1,7 +1,7 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy, useFakeTimers, SinonStub, match } from 'sinon'
+import { stub, restore, spy, useFakeTimers, match } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
 import {
   closeAllEditors,
@@ -18,9 +18,7 @@ import * as Setup from '../../setup'
 import * as Telemetry from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { OutputChannel } from '../../vscode/outputChannel'
-import { WorkspaceRepositories } from '../../repository/workspace'
 import { WorkspaceExperiments } from '../../experiments/workspace'
-import { TrackedExplorerTree } from '../../fileSystem/tree'
 
 suite('Extension Test Suite', () => {
   const dvcPathOption = 'dvc.dvcPath'
@@ -42,14 +40,6 @@ suite('Extension Test Suite', () => {
   })
 
   describe('dvc.setupWorkspace', () => {
-    const disposalEvent = (mockDisposer: SinonStub) =>
-      new Promise(resolve => {
-        mockDisposer.callsFake((...args) => {
-          resolve(undefined)
-          return mockDisposer.wrappedMethod(...args)
-        })
-      })
-
     const selectDvcPathFromFilePicker = async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
 
@@ -154,29 +144,25 @@ suite('Extension Test Suite', () => {
     })
 
     it('should initialize the extension when the cli is usable', async () => {
-      const mockWorkspaceExperimentsReady = stub(
-        WorkspaceExperiments.prototype,
-        'isReady'
-      )
+      const mockCanRunCli = stub(CliReader.prototype, 'help')
+        .onFirstCall()
+        .resolves('ok, initialize everything')
+        .onSecondCall()
+        .rejects('CLI is gone, dispose of everything')
 
-      const workspaceExperimentsAreReady = new Promise(resolve =>
-        mockWorkspaceExperimentsReady.callsFake(async () => {
-          await mockWorkspaceExperimentsReady.wrappedMethod()
-          resolve(undefined)
+      const mockDisposer = stub(Disposer, 'reset')
+
+      const disposalEvent = () =>
+        new Promise(resolve => {
+          mockDisposer.resetBehavior()
+          mockDisposer.resetHistory()
+          mockDisposer.callsFake((...args) => {
+            resolve(undefined)
+            return mockDisposer.wrappedMethod(...args)
+          })
         })
-      )
 
-      const mockWorkspaceRepositoriesReady = stub(
-        WorkspaceRepositories.prototype,
-        'isReady'
-      )
-
-      const workspaceRepositoriesAreReady = new Promise(resolve =>
-        mockWorkspaceRepositoriesReady.callsFake(async () => {
-          await mockWorkspaceRepositoriesReady.wrappedMethod()
-          resolve(undefined)
-        })
-      )
+      const firstDisposal = disposalEvent()
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
       const secondTelemetryEventSent = new Promise(resolve =>
@@ -192,16 +178,17 @@ suite('Extension Test Suite', () => {
 
       const mockUri = Uri.file(resolve('file', 'picked', 'path', 'to', 'dvc'))
       const mockPath = mockUri.fsPath
-      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
-        mockUri
-      ])
-      const mockCanRunCli = stub(CliReader.prototype, 'help').resolves(
-        'I WORK NOW'
-      )
 
-      stub(CliReader.prototype, 'experimentShow').resolves(
-        complexExperimentsOutput
-      )
+      const mockShowOpenDialog = stub(window, 'showOpenDialog')
+        .onFirstCall()
+        .resolves([mockUri])
+        .onSecondCall()
+        .resolves([Uri.file(resolve('path', 'to', 'dvc'))])
+
+      const mockExperimentShow = stub(
+        CliReader.prototype,
+        'experimentShow'
+      ).resolves(complexExperimentsOutput)
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },
@@ -244,15 +231,25 @@ suite('Extension Test Suite', () => {
         ]
       } as unknown as StatusOutput)
 
-      await selectDvcPathFromFilePicker()
+      const mockWorkspaceExperimentsReady = stub(
+        WorkspaceExperiments.prototype,
+        'isReady'
+      )
 
-      expect(mockShowOpenDialog).to.be.calledOnce
+      const workspaceExperimentsAreReady = new Promise(resolve =>
+        mockWorkspaceExperimentsReady.callsFake(async () => {
+          await mockWorkspaceExperimentsReady.wrappedMethod()
+          resolve(undefined)
+        })
+      )
+
+      await selectDvcPathFromFilePicker()
 
       expect(await workspace.getConfiguration().get(dvcPathOption)).to.equal(
         mockPath
       )
 
-      await secondTelemetryEventSent
+      await Promise.all([firstDisposal, secondTelemetryEventSent])
 
       expect(mockShowOpenDialog, 'should show the open dialog').to.have.been
         .called
@@ -260,8 +257,11 @@ suite('Extension Test Suite', () => {
         mockCanRunCli,
         'should have checked to see if the cli could be run with the given execution details'
       ).to.have.been.called
-      expect(mockDiff).to.have.been.called
+      expect(mockDiff, 'should have updated the repository data').to.have.been
+        .called
       expect(mockStatus).to.have.been.called
+      expect(mockExperimentShow, 'should have update the experiments data').to
+        .have.been.called
 
       expect(
         mockSendTelemetryEvent,
@@ -280,79 +280,23 @@ suite('Extension Test Suite', () => {
         match.has('duration')
       )
 
-      await Promise.all([
-        workspaceExperimentsAreReady,
-        workspaceRepositoriesAreReady
-      ])
-
-      mockShowOpenDialog.resolves([
-        Uri.file(resolve('different', 'file', 'picked', 'path', 'to', 'dvc'))
-      ])
-      mockCanRunCli.resetHistory()
-      mockCanRunCli.resolves('I STILL WORK')
-
-      const experimentsCreated = new Promise(resolve =>
-        stub(WorkspaceExperiments.prototype, 'create').callsFake(() => {
-          resolve(undefined)
-          return []
-        })
-      )
-      const repositoriesCreated = new Promise(resolve =>
-        stub(WorkspaceRepositories.prototype, 'create').callsFake(() => {
-          resolve(undefined)
-          return []
-        })
-      )
-      const trackedExplorerTreeInitialized = new Promise(resolve =>
-        stub(TrackedExplorerTree.prototype, 'initialize').callsFake(() => {
-          resolve(undefined)
-          return undefined
-        })
-      )
-
-      const mockDisposer = stub(Disposer, 'reset')
-
-      const disposal = disposalEvent(mockDisposer)
-
-      await selectDvcPathFromFilePicker()
-
-      await disposal
-
       expect(
         mockDisposer,
         'should dispose of the current repositories and experiments before creating new ones'
       ).to.have.been.called
-      expect(
-        mockCanRunCli,
-        'should have checked to see if the cli could still be run'
-      ).to.have.been.called
 
-      await Promise.all([
-        experimentsCreated,
-        repositoriesCreated,
-        trackedExplorerTreeInitialized
-      ])
-    }).timeout(10000)
-
-    it('should dispose of the current repositories and experiments if the cli can no longer be found', async () => {
-      const mockShowOpenDialog = stub(window, 'showOpenDialog').resolves([
-        Uri.file(resolve('path', 'to', 'dvc'))
-      ])
-      const mockCanRunCli = stub(CliReader.prototype, 'help').rejects(
-        'GONE AGAIN'
-      )
-
-      const mockDisposer = stub(Disposer, 'reset')
-      const disposal = disposalEvent(mockDisposer)
+      await workspaceExperimentsAreReady
+      const secondDisposal = disposalEvent()
 
       await selectDvcPathFromFilePicker()
 
-      await disposal
+      await secondDisposal
 
-      expect(mockShowOpenDialog).to.have.been.called
-      expect(mockCanRunCli).to.have.been.called
-      expect(mockDisposer).to.have.been.called
-    })
+      expect(
+        mockDisposer,
+        'should dispose of the current repositories and experiments if the cli can no longer be found'
+      ).to.have.been.called
+    }).timeout(12000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
       const clock = useFakeTimers()

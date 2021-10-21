@@ -2,6 +2,7 @@ import { join, resolve } from 'path'
 import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
+import { collectFiles } from './collect'
 import {
   createFileSystemWatcher,
   createNecessaryFileSystemWatcher
@@ -11,7 +12,6 @@ import { ProcessManager } from '../processManager'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { sameContents, uniqueValues } from '../util/array'
-import { collectFiles } from '../experiments/paramsAndMetrics/collect'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')

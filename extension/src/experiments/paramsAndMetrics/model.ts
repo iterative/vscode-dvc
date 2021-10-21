@@ -1,12 +1,8 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import {
-  collectChanges,
-  collectFiles,
-  collectParamsAndMetrics
-} from './collect'
+import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
-import { flatten, sameContents } from '../../util/array'
+import { flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 import { messenger, MessengerEvents } from '../../util/messaging'
 
@@ -27,13 +23,9 @@ export class ParamsAndMetricsModel {
     return this.columnsOrderState
   }
 
-  public onDidChangeParamsAndMetricsFiles: Event<void>
-  private paramsAndMetricsFilesChanged = new EventEmitter<void>()
-
   private status: Record<string, Status>
 
   private data: ParamOrMetric[] = []
-  private files: string[] = []
 
   private dvcRoot: string
   private workspaceState: Memento
@@ -44,8 +36,6 @@ export class ParamsAndMetricsModel {
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
-    this.onDidChangeParamsAndMetricsFiles =
-      this.paramsAndMetricsFilesChanged.event
     this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
     this.columnsOrderState = workspaceState.get(
       MementoPrefixes.columnsOrder + dvcRoot,
@@ -68,7 +58,6 @@ export class ParamsAndMetricsModel {
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
     return Promise.all([
       this.transformAndSetParamsAndMetrics(data),
-      this.transformAndSetFiles(data),
       this.transformAndSetChanges(data)
     ])
   }
@@ -95,10 +84,6 @@ export class ParamsAndMetricsModel {
           status: this.status[paramOrMetric.path]
         }
       })
-  }
-
-  public getFiles() {
-    return this.files
   }
 
   public getChanges() {
@@ -138,17 +123,6 @@ export class ParamsAndMetricsModel {
     })
 
     this.data = paramsAndMetrics
-  }
-
-  private transformAndSetFiles(data: ExperimentsRepoJSONOutput) {
-    const files = collectFiles(data)
-
-    if (sameContents(this.files, files)) {
-      return
-    }
-
-    this.files = files
-    this.paramsAndMetricsFilesChanged.fire()
   }
 
   private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {
