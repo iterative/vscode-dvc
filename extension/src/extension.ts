@@ -57,6 +57,7 @@ export class Extension implements IExtension {
   private dvcRoots: string[] = []
   private repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
+  private readonly data: WorkspaceData
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
@@ -116,6 +117,14 @@ export class Extension implements IExtension {
 
     this.repositories = this.dispose.track(
       new WorkspaceRepositories(this.internalCommands)
+    )
+
+    this.data = this.dispose.track(new WorkspaceData(this.internalCommands))
+
+    this.dispose.track(
+      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+        this.data.refresh(cwd)
+      })
     )
 
     this.dispose.track(
@@ -283,21 +292,15 @@ export class Extension implements IExtension {
   }
 
   public async initialize() {
+    this.emptyContainers()
+
     await Promise.all([
-      this.initializeRepositories(),
+      this.repositories.create(this.dvcRoots, this.trackedExplorerTree),
       this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.initializeExperiments()
+      this.experiments.create(this.dvcRoots, this.resourceLocator)
     ])
 
-    const workspaceData = this.dispose.track(
-      new WorkspaceData(this.dvcRoots, this.internalCommands, this.experiments)
-    )
-
-    this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        workspaceData.refreshData(cwd)
-      })
-    )
+    this.data.create(this.dvcRoots, this.experiments)
 
     return Promise.all([
       this.repositories.isReady(),
@@ -310,10 +313,15 @@ export class Extension implements IExtension {
   }
 
   public reset() {
+    this.emptyContainers()
+    return this.setAvailable(false)
+  }
+
+  private emptyContainers() {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
-    return this.setAvailable(false)
+    this.data.reset()
   }
 
   private setAvailable(available: boolean) {
@@ -330,16 +338,6 @@ export class Extension implements IExtension {
   private setProjectAvailability() {
     const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
-  }
-
-  private initializeRepositories = () => {
-    this.repositories.reset()
-    this.repositories.create(this.dvcRoots, this.trackedExplorerTree)
-  }
-
-  private initializeExperiments = () => {
-    this.experiments.reset()
-    this.experiments.create(this.dvcRoots, this.resourceLocator)
   }
 
   private findDvcRoots = async (cwd: string): Promise<string[]> => {

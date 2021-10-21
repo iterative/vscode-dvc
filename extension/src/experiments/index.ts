@@ -68,6 +68,7 @@ export class Experiments {
     const initialDataUpdate = this.dispose.track(
       this.onDidChangeExperiments(() => {
         this.deferred.resolve()
+        this.dispose.untrack(initialDataUpdate)
         initialDataUpdate.dispose()
       })
     )
