@@ -1,13 +1,10 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import {
-  collectChanges,
-  collectFiles,
-  collectParamsAndMetrics
-} from './collect'
+import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten, sameContents } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { collectFiles } from '../../data/collect'
 
 export enum Status {
   selected = 2,
