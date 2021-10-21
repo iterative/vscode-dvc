@@ -1,20 +1,8 @@
-import { Disposable } from '@hediet/std/disposable'
 import { Data } from '.'
-import { InternalCommands } from '../commands/internal'
 import { WorkspaceExperiments } from '../experiments/workspace'
-import { reset } from '../util/disposable'
+import { BaseWorkspace } from '../workspace'
 
-export class WorkspaceData {
-  public readonly dispose = Disposable.fn()
-
-  private data: Record<string, Data> = {}
-
-  private internalCommands: InternalCommands
-
-  constructor(internalCommands: InternalCommands) {
-    this.internalCommands = internalCommands
-  }
-
+export class WorkspaceData extends BaseWorkspace<Data> {
   public create(
     dvcRoots: string[],
     workspaceExperiments: WorkspaceExperiments
@@ -26,15 +14,11 @@ export class WorkspaceData {
           workspaceExperiments.update(dvcRoot, data)
         )
       )
-      this.data[dvcRoot] = data
+      this.setRepository(dvcRoot, data)
     })
   }
 
-  public reset() {
-    this.data = reset<Data>(this.data, this.dispose)
-  }
-
   public refresh(dvcRoot: string) {
-    this.data[dvcRoot].refresh()
+    this.getRepository(dvcRoot).refresh()
   }
 }
