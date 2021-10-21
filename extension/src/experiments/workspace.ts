@@ -14,6 +14,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { BaseWorkspace, IWorkspace } from '../workspace'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -40,6 +41,11 @@ export class WorkspaceExperiments
     if (experiments) {
       this.repositories = experiments
     }
+  }
+
+  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
+    // stubby mcstub face
+    return [dvcRoot, data]
   }
 
   public getFocusedTable(): Experiments | undefined {
