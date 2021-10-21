@@ -12,6 +12,50 @@ describe('collectFiles', () => {
     ])
   })
 
+  it('should handle an error being returned', () => {
+    const workspace = {
+      workspace: {
+        baseline: {
+          error: { msg: 'bad things are happening', type: 'today' }
+        }
+      }
+    }
+
+    expect(collectFiles(workspace)).toEqual([])
+  })
+
+  it('should handle a missing params key', () => {
+    const workspace = {
+      workspace: {
+        baseline: {
+          data: {
+            metrics: {
+              'logs.json': {}
+            }
+          }
+        }
+      }
+    }
+
+    expect(collectFiles(workspace)).toEqual(['logs.json'])
+  })
+
+  it('should handle a missing metrics key', () => {
+    const workspace = {
+      workspace: {
+        baseline: {
+          data: {
+            params: {
+              'params.yaml': {}
+            }
+          }
+        }
+      }
+    }
+
+    expect(collectFiles(workspace)).toEqual(['params.yaml'])
+  })
+
   it('should collect all of the available files from a more complex example', () => {
     const workspace = {
       workspace: {
@@ -23,7 +67,7 @@ describe('collectFiles', () => {
               'summary.json': {}
             },
             params: {
-              'further/nested.params.yaml': {},
+              'further/nested/params.yaml': {},
               'nested/params.yaml': {},
               'params.yaml': {}
             }
@@ -33,7 +77,7 @@ describe('collectFiles', () => {
     } as ExperimentsRepoJSONOutput
 
     expect(collectFiles(workspace).sort()).toEqual([
-      'further/nested.params.yaml',
+      'further/nested/params.yaml',
       'logs.json',
       'metrics.json',
       'nested/params.yaml',
