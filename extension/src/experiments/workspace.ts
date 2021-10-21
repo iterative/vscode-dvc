@@ -1,7 +1,7 @@
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
 import { Experiments } from '.'
-import { ExperimentsWebview } from './webview'
+import { TableWebview } from './webview/table'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
@@ -13,9 +13,8 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { getGitRepositoryRoots } from '../extensions/git'
-import { findDvcRootPaths } from '../fileSystem'
 import { BaseWorkspace, IWorkspace } from '../workspace'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -42,6 +41,11 @@ export class WorkspaceExperiments
     if (experiments) {
       this.repositories = experiments
     }
+  }
+
+  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
+    // stubby mcstub face
+    return [dvcRoot, data]
   }
 
   public getFocusedTable(): Experiments | undefined {
@@ -222,17 +226,7 @@ export class WorkspaceExperiments
     )
 
     Promise.all(experiments.map(experiments => experiments.isReady())).then(
-      async () => {
-        this.deferred.resolve()
-        const gitRoots = await getGitRepositoryRoots()
-        gitRoots.forEach(async gitRoot => {
-          const dvcRoots = await findDvcRootPaths(gitRoot)
-
-          dvcRoots.forEach(dvcRoot =>
-            this.getRepository(dvcRoot).onDidChangeData(gitRoot)
-          )
-        })
-      }
+      () => this.deferred.resolve()
     )
 
     return experiments
@@ -243,7 +237,7 @@ export class WorkspaceExperiments
     experiments?.refresh()
   }
 
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
+  public setWebview(dvcRoot: string, experimentsWebview: TableWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
       experimentsWebview.dispose()
@@ -286,6 +280,8 @@ export class WorkspaceExperiments
     )
 
     this.setRepository(dvcRoot, experiments)
+
+    experiments.onDidChangeData()
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(

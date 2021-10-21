@@ -10,12 +10,13 @@ import {
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
 import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
-import { ExperimentsWebview } from './webview'
+import { TableWebview } from './webview/table'
 import { ResourceLocator } from '../resourceLocator'
 import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { getGitRepositoryRoot } from '../git'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -36,7 +37,7 @@ export class Experiments {
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
 
-  private webview?: ExperimentsWebview
+  private webview?: TableWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -89,7 +90,8 @@ export class Experiments {
     return this.initialized
   }
 
-  public onDidChangeData(gitRoot: string): void {
+  public async onDidChangeData(): Promise<void> {
+    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
     const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
     this.dispose.track(
       createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
@@ -129,7 +131,7 @@ export class Experiments {
       return this.webview.reveal()
     }
 
-    const webview = await ExperimentsWebview.create(
+    const webview = await TableWebview.create(
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
@@ -145,7 +147,7 @@ export class Experiments {
     return webview
   }
 
-  public setWebview(view: ExperimentsWebview) {
+  public setWebview(view: TableWebview) {
     this.webview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
 
