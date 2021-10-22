@@ -46,10 +46,12 @@ export enum WebviewColorTheme {
 
 export type MessageFromWebview = {
   type: MessageFromWebviewType
+  payload?: Object
 }
 
 export enum MessageFromWebviewType {
-  initialized = 'initialized'
+  initialized = 'initialized',
+  columnReordered = 'column-reordered'
 }
 
 export type MessageToWebview = {
@@ -80,6 +82,7 @@ export interface TableData {
   columns: ParamOrMetric[]
   sorts: SortDefinition[]
   changes: string[]
+  columnsOrder: string[]
 }
 
 export interface ExperimentsWebviewState {

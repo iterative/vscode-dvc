@@ -2,6 +2,7 @@ import { EventEmitter } from 'vscode'
 import { MementoPrefixes, ParamsAndMetricsModel, Status } from './model'
 import { joinParamOrMetricPath } from './paths'
 import { buildMockMemento } from '../../test/util'
+import { messenger, MessengerEvents } from '../../util/messaging'
 
 jest.mock('vscode', () => ({
   EventEmitter: function (this: EventEmitter<void>) {
@@ -10,10 +11,11 @@ jest.mock('vscode', () => ({
 }))
 
 describe('ParamsAndMetricsModel', () => {
+  const exampleDvcRoot = 'test'
+
   describe('persistence', () => {
     const paramsDotYamlPath = joinParamOrMetricPath('params', 'params.yaml')
     const testParamPath = joinParamOrMetricPath(paramsDotYamlPath, 'testparam')
-    const exampleDvcRoot = 'test'
     const exampleData = {
       workspace: {
         baseline: {
@@ -75,6 +77,31 @@ describe('ParamsAndMetricsModel', () => {
           path: paramsDotYamlPath
         }
       ])
+    })
+  })
+
+  describe('columns order', () => {
+    it('should return the columns order from the persisted state', () => {
+      const persistedState = ['A', 'C', 'B']
+      const model = new ParamsAndMetricsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
+        })
+      )
+      expect(model.getColumnsOrder()).toEqual(persistedState)
+    })
+
+    it('should re-order the columns after a columnReordered message is sent', () => {
+      const model = new ParamsAndMetricsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [MementoPrefixes.columnsOrder + exampleDvcRoot]: ['A', 'B', 'C']
+        })
+      )
+      const newState = ['C', 'B', 'A']
+      messenger.emit(MessengerEvents.columnReordered, newState)
+      expect(model.getColumnsOrder()).toEqual(newState)
     })
   })
 })

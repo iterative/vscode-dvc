@@ -16,6 +16,7 @@ import { setContextValue } from '../../vscode/context'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { sendTelemetryEvent } from '../../telemetry'
 import { IEventNamePropertyMapping } from '../../telemetry/constants'
+import { messenger, MessengerEvents } from '../../util/messaging'
 
 type EventName = keyof IEventNamePropertyMapping
 type EventNames = {
@@ -181,10 +182,15 @@ export class ExperimentsWebview {
   }
 
   private handleMessage(message: MessageFromWebview) {
-    if (message.type === MessageFromWebviewType.initialized) {
-      this.deferred.resolve()
-    } else {
-      Logger.error(`Unexpected message: ${message}`)
+    switch (message.type) {
+      case MessageFromWebviewType.initialized:
+        this.deferred.resolve()
+        break
+      case MessageFromWebviewType.columnReordered:
+        messenger.emit(MessengerEvents.columnReordered, message.payload)
+        break
+      default:
+        Logger.error(`Unexpected message: ${message}`)
     }
   }
 
