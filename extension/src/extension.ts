@@ -24,7 +24,6 @@ import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
-import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
   getWorkspaceFolderCount,
   getWorkspaceFolders
@@ -43,6 +42,7 @@ import {
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
+import { WebviewSerializer } from './webview/serializer'
 
 export { Disposable, Disposer }
 
