@@ -1,7 +1,7 @@
 import { distPath, main } from 'dvc-vscode-webview'
 import { WebviewPanel } from 'vscode'
 import { autorun } from 'mobx'
-import { BaseWebview } from '.'
+
 import {
   ExperimentsWebviewState,
   MessageToWebviewType,
@@ -9,6 +9,7 @@ import {
 } from './contract'
 import { InternalCommands } from '../../commands/internal'
 import { EventName } from '../../telemetry/constants'
+import { BaseWebview } from '../../webview'
 
 export class TableWebview extends BaseWebview {
   public static distPath = distPath
