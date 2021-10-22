@@ -89,7 +89,7 @@ describe('ParamsAndMetricsModel', () => {
           [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
         })
       )
-      expect(model.columnsOrder).toEqual(persistedState)
+      expect(model.getColumnsOrder()).toEqual(persistedState)
     })
 
     it('should re-order the columns after a columnReordered message is sent', () => {
@@ -101,7 +101,7 @@ describe('ParamsAndMetricsModel', () => {
       )
       const newState = ['C', 'B', 'A']
       messenger.emit(MessengerEvents.columnReordered, newState)
-      expect(model.columnsOrder).toEqual(newState)
+      expect(model.getColumnsOrder()).toEqual(newState)
     })
   })
 })

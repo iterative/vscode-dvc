@@ -19,9 +19,6 @@ export const enum MementoPrefixes {
 
 export class ParamsAndMetricsModel {
   public dispose = Disposable.fn()
-  public get columnsOrder(): string[] {
-    return this.columnsOrderState
-  }
 
   private status: Record<string, Status>
 
@@ -45,6 +42,10 @@ export class ParamsAndMetricsModel {
     messenger.on(MessengerEvents.columnReordered, (columnsOrder: string[]) => {
       this.setColumnsOrder(columnsOrder)
     })
+  }
+
+  public getColumnsOrder(): string[] {
+    return this.columnsOrderState
   }
 
   public getSelected() {
@@ -194,7 +195,7 @@ export class ParamsAndMetricsModel {
     this.columnsOrderState = columnsOrder
     this.workspaceState.update(
       MementoPrefixes.columnsOrder + this.dvcRoot,
-      this.columnsOrder
+      this.getColumnsOrder()
     )
   }
 }

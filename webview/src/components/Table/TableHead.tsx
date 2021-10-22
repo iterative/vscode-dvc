@@ -7,13 +7,32 @@ import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import cx from 'classnames'
 import styles from './styles.module.scss'
-import { getPlaceholder } from '../../util/columns'
+import { getPlaceholder, isFirstLevelHeader } from '../../util/columns'
 import { useMessaging } from '../../util/useMessaging'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
   sorts: SortDefinition[]
   columnsOrder: string[]
+}
+
+const HeaderButton: React.FC<{
+  columnId: string
+  onClick: () => void
+  isRight?: boolean
+}> = ({ columnId, onClick, isRight }) => {
+  const className = isRight ? styles.arrowRight : styles.arrowLeft
+  const direction = isRight ? 'right' : 'left'
+
+  return (
+    <button
+      className={className}
+      onClick={onClick}
+      data-testid={`move-${columnId}-${direction}`}
+    >
+      {isRight ? '→' : '←'}
+    </button>
+  )
 }
 
 const HeaderButtons: React.FC<{
@@ -33,22 +52,14 @@ const HeaderButtons: React.FC<{
     (showButtons && (
       <div>
         {showLeftButton && (
-          <button
-            className={styles.arrowLeft}
-            onClick={moveColumnLeft}
-            data-testid={`move-${column.id}-left`}
-          >
-            ←
-          </button>
+          <HeaderButton onClick={moveColumnLeft} columnId={column.id} />
         )}
         {showRightButton && (
-          <button
-            className={styles.arrowRight}
+          <HeaderButton
             onClick={moveColumnRight}
-            data-testid={`move-${column.id}-right`}
-          >
-            →
-          </button>
+            columnId={column.id}
+            isRight
+          />
         )}
       </div>
     )) ||
@@ -84,8 +95,7 @@ export const MergedHeaderGroup: React.FC<{
               {
                 [styles.paramHeaderCell]: column.id.includes('params'),
                 [styles.metricHeaderCell]: column.id.includes('metric'),
-                [styles.firstLevelHeader]:
-                  column.id.split(':').length - 1 === 1,
+                [styles.firstLevelHeader]: isFirstLevelHeader(column.id),
                 [styles.sortingHeaderCellAsc]: sorts.filter(
                   sort => !sort.descending && isSortedWithPlaceholder(sort)
                 ).length,
