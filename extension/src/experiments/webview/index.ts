@@ -25,7 +25,7 @@ type EventNames = {
   focusChangedEvent: EventName
 }
 
-export class ExperimentsWebview {
+export class BaseWebview {
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
