@@ -229,6 +229,7 @@ export class Experiments {
     return {
       changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
+      columnsOrder: this.paramsAndMetrics.getColumnsOrder(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
