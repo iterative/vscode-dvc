@@ -64,7 +64,7 @@ export type MessageToWebview = {
       theme: WebviewColorTheme
     }
   | {
-      type: MessageToWebviewType.showExperiments
+      type: MessageToWebviewType.setData
       data: TableData
     }
 )
@@ -72,7 +72,7 @@ export type MessageToWebview = {
 export enum MessageToWebviewType {
   setDvcRoot = 'setDvcRoot',
   setTheme = 'setTheme',
-  showExperiments = 'showExperiments'
+  setData = 'setData'
 }
 
 export interface TableData {

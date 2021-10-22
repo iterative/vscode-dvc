@@ -56,7 +56,7 @@ export class TableWebview extends ExperimentsWebview {
         if (data) {
           this.sendMessage({
             data,
-            type: MessageToWebviewType.showExperiments
+            type: MessageToWebviewType.setData
           })
         }
       })
@@ -77,7 +77,7 @@ export class TableWebview extends ExperimentsWebview {
   }): Promise<boolean> {
     await this.isReady()
     return this.sendMessage({
-      type: MessageToWebviewType.showExperiments,
+      type: MessageToWebviewType.setData,
       ...payload
     })
   }
