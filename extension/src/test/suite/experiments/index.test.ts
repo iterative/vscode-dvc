@@ -16,7 +16,7 @@ import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../commands/internal'
 import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { ParamOrMetric } from '../../../experiments/webview/contract'
+import { ParamOrMetric, TableData } from '../../../experiments/webview/contract'
 import {
   closeAllEditors,
   dvcDemoPath,
@@ -92,14 +92,15 @@ suite('Experiments Test Suite', () => {
 
       const webview = await experiments.showWebview()
 
-      expect(messageSpy).to.be.calledWith({
-        tableData: {
-          changes: complexChangesData,
-          columns: complexColumnData,
-          rows: complexRowData,
-          sorts: []
-        }
-      })
+      const expectedTableData: TableData = {
+        changes: complexChangesData,
+        columns: complexColumnData,
+        columnsOrder: [],
+        rows: complexRowData,
+        sorts: []
+      }
+
+      expect(messageSpy).to.be.calledWith({ tableData: expectedTableData })
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true

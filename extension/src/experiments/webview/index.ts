@@ -25,6 +25,7 @@ import { Logger } from '../../common/logger'
 import { ResourceLocator } from '../../resourceLocator'
 import { setContextValue } from '../../vscode/context'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { messenger, MessengerEvents } from '../../util/messaging'
 
 export class ExperimentsWebview {
   public readonly onDidDispose: Event<void>
@@ -246,10 +247,15 @@ export class ExperimentsWebview {
   }
 
   private handleMessage(message: MessageFromWebview) {
-    if (message.type === MessageFromWebviewType.initialized) {
-      this.deferred.resolve()
-    } else {
-      Logger.error(`Unexpected message: ${message}`)
+    switch (message.type) {
+      case MessageFromWebviewType.initialized:
+        this.deferred.resolve()
+        break
+      case MessageFromWebviewType.columnReordered:
+        messenger.emit(MessengerEvents.columnReordered, message.payload)
+        break
+      default:
+        Logger.error(`Unexpected message: ${message}`)
     }
   }
 }
