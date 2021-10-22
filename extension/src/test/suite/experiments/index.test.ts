@@ -93,7 +93,7 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
 
       expect(messageSpy).to.be.calledWith({
-        data: {
+        tableData: {
           changes: complexChangesData,
           columns: complexColumnData,
           rows: complexRowData,
@@ -178,7 +178,7 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
-      expect(messageSpy.lastCall.args[0].data.rows).deep.equals([
+      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
         {
           displayName: 'workspace',
           id: 'workspace',
@@ -208,7 +208,7 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      expect(messageSpy.lastCall.args[0].data.sorts).deep.equals([])
+      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
@@ -231,7 +231,7 @@ suite('Experiments Test Suite', () => {
       await pickPromise
       await tableChangePromise
 
-      expect(messageSpy.lastCall.args[0].data.rows).deep.equals([
+      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
         {
           displayName: 'workspace',
           id: 'workspace',
@@ -261,7 +261,7 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      expect(messageSpy.lastCall.args[0].data.sorts).deep.equals([
+      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
         { descending: false, path: sortPath }
       ])
     }).timeout(5000)

@@ -22,7 +22,7 @@ export default {
     }
   },
   args: {
-    data: {
+    tableData: {
       changes: complexChangesData,
       columns: complexColumnData,
       rows: complexRowData,
@@ -37,6 +37,6 @@ export default {
   title: 'Experiments/Table'
 } as Meta
 
-export const ComplexTable: Story = ({ data, vsCodeApi }) => {
-  return <Experiments data={data} vsCodeApi={vsCodeApi} />
+export const ComplexTable: Story = ({ tableData, vsCodeApi }) => {
+  return <Experiments tableData={tableData} vsCodeApi={vsCodeApi} />
 }

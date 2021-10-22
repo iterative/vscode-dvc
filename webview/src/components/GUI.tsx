@@ -6,7 +6,7 @@ import { Model } from '../model'
 
 export const GUI: React.FC<{ model: Model }> = observer(({ model }) => {
   try {
-    const { errors, data, vsCodeApi } = model as Model
+    const { errors, tableData, vsCodeApi } = model as Model
     return (
       <>
         {errors?.map(
@@ -16,7 +16,7 @@ export const GUI: React.FC<{ model: Model }> = observer(({ model }) => {
             </div>
           )
         )}
-        <ExperimentsGUI data={data} vsCodeApi={vsCodeApi} />
+        <ExperimentsGUI tableData={tableData} vsCodeApi={vsCodeApi} />
       </>
     )
   } catch (e: unknown) {

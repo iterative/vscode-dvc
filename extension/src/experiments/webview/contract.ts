@@ -65,7 +65,7 @@ export type MessageToWebview = {
     }
   | {
       type: MessageToWebviewType.setData
-      data: TableData
+      tableData: TableData
     }
 )
 
@@ -84,5 +84,5 @@ export interface TableData {
 
 export interface ExperimentsWebviewState {
   dvcRoot: string
-  data?: TableData
+  tableData?: TableData
 }

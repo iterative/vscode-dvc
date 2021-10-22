@@ -37,10 +37,10 @@ export class TableWebview extends ExperimentsWebview {
     this.disposer.track({
       dispose: autorun(async () => {
         await this.isReady() // Read all mobx dependencies before await
-        const data = state.data
-        if (data) {
+        const tableData = state.tableData
+        if (tableData) {
           this.sendMessage({
-            data,
+            tableData,
             type: MessageToWebviewType.setData
           })
         }
@@ -57,7 +57,7 @@ export class TableWebview extends ExperimentsWebview {
   }
 
   public async showExperiments(payload: {
-    data: TableData
+    tableData: TableData
     errors?: Error[]
   }): Promise<boolean> {
     await this.isReady()

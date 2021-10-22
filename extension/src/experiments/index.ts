@@ -113,8 +113,8 @@ export class Experiments {
       TableWebview,
       this.internalCommands,
       {
-        data: this.getTableData(),
-        dvcRoot: this.dvcRoot
+        dvcRoot: this.dvcRoot,
+        tableData: this.getTableData()
       },
       this.resourceLocator.dvcIcon
     )
@@ -222,7 +222,7 @@ export class Experiments {
   private sendData() {
     if (this.webview) {
       this.webview.showExperiments({
-        data: this.getTableData()
+        tableData: this.getTableData()
       })
     }
   }
