@@ -29,7 +29,7 @@ import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
-import { TableWebview } from '../../../experiments/webview'
+import { ExperimentsWebview } from '../../../experiments/webview'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -88,7 +88,7 @@ suite('Experiments Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const messageSpy = spy(TableWebview.prototype, 'showExperiments')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
 
       const webview = await experiments.showWebview()
 
@@ -147,7 +147,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const messageSpy = spy(TableWebview.prototype, 'showExperiments')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )

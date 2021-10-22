@@ -11,7 +11,7 @@ import { InternalCommands } from '../../commands/internal'
 import { EventName } from '../../telemetry/constants'
 import { BaseWebview } from '../../webview'
 
-export class TableWebview extends BaseWebview {
+export class ExperimentsWebview extends BaseWebview {
   public static distPath = distPath
   public static title = 'Experiments'
   public static viewKey = 'dvc-experiments'
@@ -31,7 +31,7 @@ export class TableWebview extends BaseWebview {
         createdEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
         focusChangedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED
       },
-      TableWebview.contextKey,
+      ExperimentsWebview.contextKey,
       [main]
     )
 
@@ -53,8 +53,8 @@ export class TableWebview extends BaseWebview {
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
-  ): TableWebview {
-    return new TableWebview(webviewPanel, internalCommands, state)
+  ): ExperimentsWebview {
+    return new ExperimentsWebview(webviewPanel, internalCommands, state)
   }
 
   public async showExperiments(payload: {
