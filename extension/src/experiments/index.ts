@@ -13,6 +13,7 @@ import { TableWebview } from './webview/table'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { create } from '../webview/factory'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -108,13 +109,14 @@ export class Experiments {
       return this.webview.reveal()
     }
 
-    const webview = await TableWebview.create(
+    const webview = await create(
+      TableWebview,
       this.internalCommands,
       {
-        dvcRoot: this.dvcRoot,
-        tableData: this.getTableData()
+        data: this.getTableData(),
+        dvcRoot: this.dvcRoot
       },
-      this.resourceLocator
+      this.resourceLocator.dvcIcon
     )
 
     this.setWebview(webview)
@@ -220,7 +222,7 @@ export class Experiments {
   private sendData() {
     if (this.webview) {
       this.webview.showExperiments({
-        tableData: this.getTableData()
+        data: this.getTableData()
       })
     }
   }

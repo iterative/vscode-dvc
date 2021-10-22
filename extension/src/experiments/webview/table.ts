@@ -1,16 +1,17 @@
-import { main } from 'dvc-vscode-webview'
+import { distPath, main } from 'dvc-vscode-webview'
 import { WebviewPanel } from 'vscode'
 import { ExperimentsWebview } from '.'
 import { ExperimentsWebviewState } from './contract'
 import { InternalCommands } from '../../commands/internal'
-import { ResourceLocator } from '../../resourceLocator'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
 export class TableWebview extends ExperimentsWebview {
+  public static distPath = distPath
+  public static title = 'Experiments'
   public static viewKey = 'dvc-experiments'
 
-  private constructor(
+  constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
@@ -45,24 +46,18 @@ export class TableWebview extends ExperimentsWebview {
   }
 
   public static create(
+    webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState,
-    resourceLocator: ResourceLocator
-  ) {
-    return ExperimentsWebview.create(
-      internalCommands,
-      state,
-      resourceLocator,
-      TableWebview.viewKey,
-      [main]
-    )
+    state: ExperimentsWebviewState
+  ): TableWebview {
+    return new TableWebview(webviewPanel, internalCommands, state)
   }
 
   public static restore(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
-  ) {
+  ): Promise<TableWebview> {
     return ExperimentsWebview.restore(webviewPanel, internalCommands, state, [
       main
     ])

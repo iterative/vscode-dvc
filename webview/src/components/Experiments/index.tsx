@@ -56,8 +56,8 @@ const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
   ] as Column<Experiment>[]
 
 export const ExperimentsTable: React.FC<{
-  tableData: TableData
-}> = ({ tableData }) => {
+  data: TableData
+}> = ({ data }) => {
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {
@@ -66,17 +66,17 @@ export const ExperimentsTable: React.FC<{
     return [initialState, defaultColumn]
   }, [])
 
-  const [data, columns] = React.useMemo(() => {
-    const data = tableData.rows
-    const columns = getColumns(tableData.columns)
-    return [data, columns]
-  }, [tableData])
+  const [rows, columns] = React.useMemo(() => {
+    const rows = data.rows
+    const columns = getColumns(data.columns)
+    return [rows, columns]
+  }, [data])
 
   const instance = useTable<Experiment>(
     {
       autoResetExpanded: false,
       columns,
-      data,
+      data: rows,
       defaultColumn,
       expandSubRows: false,
       initialState
@@ -114,26 +114,18 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <>
-      <Table
-        instance={instance}
-        sorts={tableData.sorts}
-        changes={tableData.changes}
-      />
+      <Table instance={instance} sorts={data.sorts} changes={data.changes} />
     </>
   )
 }
 
 const Experiments: React.FC<{
   vsCodeApi: VsCodeApi
-  tableData?: TableData | null
-}> = ({ tableData }) => {
+  data?: TableData | null
+}> = ({ data }) => {
   return (
     <div className={styles.experiments}>
-      {tableData ? (
-        <ExperimentsTable tableData={tableData} />
-      ) : (
-        <p>Loading experiments...</p>
-      )}
+      {data ? <ExperimentsTable data={data} /> : <p>Loading experiments...</p>}
     </div>
   )
 }

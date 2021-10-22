@@ -1,17 +1,8 @@
-import {
-  Event,
-  EventEmitter,
-  window,
-  ViewColumn,
-  WebviewPanel,
-  Uri
-} from 'vscode'
+import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { distPath } from 'dvc-vscode-webview'
 import { autorun } from 'mobx'
 import {
-  WebviewType as Experiments,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
@@ -22,7 +13,7 @@ import {
   TableData
 } from './contract'
 import { Logger } from '../../common/logger'
-import { ResourceLocator } from '../../resourceLocator'
+import { WebviewState } from '../../webview/factory'
 import { setContextValue } from '../../vscode/context'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
 
@@ -48,7 +39,7 @@ export class ExperimentsWebview {
   protected constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState,
+    state: WebviewState<TableData>,
     scripts: string[] = []
   ) {
     this.webviewPanel = webviewPanel
@@ -95,10 +86,10 @@ export class ExperimentsWebview {
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.setDvcRoot
         })
-        const tableData = state.tableData
-        if (tableData) {
+        const data = state.data
+        if (data) {
           this.sendMessage({
-            tableData: tableData,
+            data,
             type: MessageToWebviewType.showExperiments
           })
         }
@@ -123,36 +114,6 @@ export class ExperimentsWebview {
     })
   }
 
-  protected static async create(
-    internalCommands: InternalCommands,
-    state: ExperimentsWebviewState,
-    resourceLocator: ResourceLocator,
-    viewKey: string,
-    scripts: string[]
-  ): Promise<ExperimentsWebview> {
-    const webviewPanel = window.createWebviewPanel(
-      viewKey,
-      Experiments,
-      ViewColumn.Active,
-      {
-        enableScripts: true,
-        localResourceRoots: [Uri.file(distPath)],
-        retainContextWhenHidden: true
-      }
-    )
-
-    webviewPanel.iconPath = resourceLocator.dvcIcon
-
-    const view = new ExperimentsWebview(
-      webviewPanel,
-      internalCommands,
-      state,
-      scripts
-    )
-    await view.isReady()
-    return view
-  }
-
   private static setPanelActiveContext(state: boolean) {
     setContextValue('dvc.experiments.webviewActive', state)
   }
@@ -175,7 +136,7 @@ export class ExperimentsWebview {
   }
 
   public async showExperiments(payload: {
-    tableData: TableData
+    data: TableData
     errors?: Error[]
   }): Promise<boolean> {
     await this.isReady()

@@ -74,7 +74,7 @@ describe('App', () => {
   describe('Given a message to add experiments to the state', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
-        tableData: {
+        data: {
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
