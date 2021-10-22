@@ -29,7 +29,7 @@ import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
-import { TableWebview } from '../../../experiments/webview/table'
+import { TableWebview } from '../../../experiments/webview'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()

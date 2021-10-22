@@ -4,7 +4,7 @@ import {
   ExperimentsWebviewState,
   WebviewType
 } from '../experiments/webview/contract'
-import { TableWebview } from '../experiments/webview/table'
+import { TableWebview } from '../experiments/webview'
 import { Resource } from '../resourceLocator'
 
 export type WebviewState = ExperimentsWebviewState

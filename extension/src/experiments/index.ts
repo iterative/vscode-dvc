@@ -9,7 +9,7 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { TableWebview } from './webview/table'
+import { TableWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
