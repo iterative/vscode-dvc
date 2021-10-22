@@ -1,15 +1,17 @@
-import { Uri, ViewColumn, window } from 'vscode'
+import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
 import { InternalCommands } from '../commands/internal'
+import {
+  ExperimentsWebviewState,
+  WebviewType
+} from '../experiments/webview/contract'
 import { TableWebview } from '../experiments/webview/table'
 import { Resource } from '../resourceLocator'
 
-export interface WebviewState<T = Record<string, unknown>> {
-  dvcRoot: string
-  data?: T
-}
+export type WebviewState = ExperimentsWebviewState
+type WebviewType = typeof TableWebview
 
 export const create = async (
-  type: typeof TableWebview,
+  type: WebviewType,
   internalCommands: InternalCommands,
   state: WebviewState,
   iconPath: Resource
@@ -30,4 +32,19 @@ export const create = async (
   const view = type.create(webviewPanel, internalCommands, state)
   await view.isReady()
   return view
+}
+
+export const restore = (
+  type: typeof TableWebview,
+  webviewPanel: WebviewPanel,
+  internalCommands: InternalCommands,
+  state: WebviewState
+): Promise<TableWebview> => {
+  return new Promise((resolve, reject) => {
+    try {
+      resolve(type.create(webviewPanel, internalCommands, state))
+    } catch (e: unknown) {
+      reject(e)
+    }
+  })
 }

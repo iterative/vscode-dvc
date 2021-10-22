@@ -1,7 +1,12 @@
 import { distPath, main } from 'dvc-vscode-webview'
 import { WebviewPanel } from 'vscode'
+import { autorun } from 'mobx'
 import { ExperimentsWebview } from '.'
-import { ExperimentsWebviewState } from './contract'
+import {
+  ExperimentsWebviewState,
+  MessageToWebviewType,
+  TableData
+} from './contract'
 import { InternalCommands } from '../../commands/internal'
 import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
@@ -43,6 +48,19 @@ export class TableWebview extends ExperimentsWebview {
         undefined
       )
     })
+
+    this.disposer.track({
+      dispose: autorun(async () => {
+        await this.isReady() // Read all mobx dependencies before await
+        const data = state.data
+        if (data) {
+          this.sendMessage({
+            data,
+            type: MessageToWebviewType.showExperiments
+          })
+        }
+      })
+    })
   }
 
   public static create(
@@ -53,13 +71,14 @@ export class TableWebview extends ExperimentsWebview {
     return new TableWebview(webviewPanel, internalCommands, state)
   }
 
-  public static restore(
-    webviewPanel: WebviewPanel,
-    internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
-  ): Promise<TableWebview> {
-    return ExperimentsWebview.restore(webviewPanel, internalCommands, state, [
-      main
-    ])
+  public async showExperiments(payload: {
+    data: TableData
+    errors?: Error[]
+  }): Promise<boolean> {
+    await this.isReady()
+    return this.sendMessage({
+      type: MessageToWebviewType.showExperiments,
+      ...payload
+    })
   }
 }

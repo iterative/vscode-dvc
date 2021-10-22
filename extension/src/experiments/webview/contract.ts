@@ -84,5 +84,5 @@ export interface TableData {
 
 export interface ExperimentsWebviewState {
   dvcRoot: string
-  tableData?: TableData
+  data?: TableData
 }

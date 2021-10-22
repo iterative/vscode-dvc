@@ -8,9 +8,7 @@ import {
   MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData,
-  ExperimentsWebviewState,
-  WebviewColorTheme,
-  TableData
+  WebviewColorTheme
 } from './contract'
 import { Logger } from '../../common/logger'
 import { WebviewState } from '../../webview/factory'
@@ -23,9 +21,7 @@ export class ExperimentsWebview {
   public readonly onDidChangeIsFocused: Event<string | undefined>
 
   protected readonly initialized: Promise<void>
-
-  private readonly disposer = Disposable.fn()
-
+  protected readonly disposer = Disposable.fn()
   private readonly deferred = new Deferred()
 
   private dvcRoot: string
@@ -39,7 +35,7 @@ export class ExperimentsWebview {
   protected constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: WebviewState<TableData>,
+    state: WebviewState,
     scripts: string[] = []
   ) {
     this.webviewPanel = webviewPanel
@@ -86,31 +82,7 @@ export class ExperimentsWebview {
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.setDvcRoot
         })
-        const data = state.data
-        if (data) {
-          this.sendMessage({
-            data,
-            type: MessageToWebviewType.showExperiments
-          })
-        }
       })
-    })
-  }
-
-  protected static restore(
-    webviewPanel: WebviewPanel,
-    internalCommands: InternalCommands,
-    state: ExperimentsWebviewState,
-    scripts: string[]
-  ): Promise<ExperimentsWebview> {
-    return new Promise((resolve, reject) => {
-      try {
-        resolve(
-          new ExperimentsWebview(webviewPanel, internalCommands, state, scripts)
-        )
-      } catch (e: unknown) {
-        reject(e)
-      }
     })
   }
 
@@ -126,24 +98,26 @@ export class ExperimentsWebview {
     return this.initialized
   }
 
-  public isActive = () => this.webviewPanel.active
+  public isActive() {
+    return this.webviewPanel.active
+  }
 
-  public isVisible = () => this.webviewPanel.visible
+  public isVisible() {
+    return this.webviewPanel.visible
+  }
 
   public reveal = () => {
     this.webviewPanel.reveal()
     return this
   }
 
-  public async showExperiments(payload: {
-    data: TableData
-    errors?: Error[]
-  }): Promise<boolean> {
-    await this.isReady()
-    return this.sendMessage({
-      type: MessageToWebviewType.showExperiments,
-      ...payload
-    })
+  protected sendMessage(message: MessageToWebview) {
+    if (this.deferred.state !== 'resolved') {
+      throw new Error(
+        'Cannot send message when webview is not initialized yet!'
+      )
+    }
+    return this.webviewPanel.webview.postMessage(message)
   }
 
   private notifyActiveStatus(webviewPanel: WebviewPanel) {
@@ -193,17 +167,6 @@ export class ExperimentsWebview {
 				  </body>
 			  </html>
 		  `
-  }
-
-  // TODO: Implement Request/Response Semantic!
-
-  private sendMessage(message: MessageToWebview) {
-    if (this.deferred.state !== 'resolved') {
-      throw new Error(
-        'Cannot send message when webview is not initialized yet!'
-      )
-    }
-    return this.webviewPanel.webview.postMessage(message)
   }
 
   private handleMessage(message: MessageFromWebview) {
