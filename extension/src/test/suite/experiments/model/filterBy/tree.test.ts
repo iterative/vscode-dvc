@@ -108,6 +108,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         tableData: {
           changes: complexChangesData,
           columns: complexColumnData,
+          columnsOrder: [],
           rows: filteredRows,
           sorts: []
         }

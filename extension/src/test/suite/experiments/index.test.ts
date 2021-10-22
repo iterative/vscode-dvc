@@ -96,6 +96,7 @@ suite('Experiments Test Suite', () => {
         tableData: {
           changes: complexChangesData,
           columns: complexColumnData,
+          columnsOrder: [],
           rows: complexRowData,
           sorts: []
         }
