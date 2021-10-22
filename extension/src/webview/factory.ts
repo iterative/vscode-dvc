@@ -11,38 +11,38 @@ export type WebviewState = ExperimentsWebviewState
 type WebviewType = typeof TableWebview
 
 export const create = async (
-  type: WebviewType,
+  webviewType: WebviewType,
   internalCommands: InternalCommands,
   state: WebviewState,
   iconPath: Resource
 ): Promise<TableWebview> => {
   const webviewPanel = window.createWebviewPanel(
-    type.viewKey,
-    type.title,
+    webviewType.viewKey,
+    webviewType.title,
     ViewColumn.Active,
     {
       enableScripts: true,
-      localResourceRoots: [Uri.file(type.distPath)],
+      localResourceRoots: [Uri.file(webviewType.distPath)],
       retainContextWhenHidden: true
     }
   )
 
   webviewPanel.iconPath = iconPath
 
-  const view = type.create(webviewPanel, internalCommands, state)
+  const view = webviewType.create(webviewPanel, internalCommands, state)
   await view.isReady()
   return view
 }
 
 export const restore = (
-  type: typeof TableWebview,
+  webviewType: WebviewType,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
   state: WebviewState
 ): Promise<TableWebview> => {
   return new Promise((resolve, reject) => {
     try {
-      resolve(type.create(webviewPanel, internalCommands, state))
+      resolve(webviewType.create(webviewPanel, internalCommands, state))
     } catch (e: unknown) {
       reject(e)
     }
