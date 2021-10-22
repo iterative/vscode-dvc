@@ -4,7 +4,7 @@ import { TableWebview } from '../experiments/webview/table'
 import { WorkspaceExperiments } from '../experiments/workspace'
 import { ExperimentsWebviewState } from '../experiments/webview/contract'
 import { InternalCommands } from '../commands/internal'
-import { restore } from '../webview/factory'
+import { restoreWebview } from '../webview/factory'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
@@ -20,7 +20,7 @@ export class WebviewSerializer {
           state: ExperimentsWebviewState
         ) => {
           const dvcRoot = state?.dvcRoot
-          const experimentsWebview = await restore(
+          const experimentsWebview = await restoreWebview(
             TableWebview,
             panel,
             internalCommands,

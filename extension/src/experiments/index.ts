@@ -13,7 +13,7 @@ import { TableWebview } from './webview/table'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { create } from '../webview/factory'
+import { createWebview } from '../webview/factory'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -109,7 +109,7 @@ export class Experiments {
       return this.webview.reveal()
     }
 
-    const webview = await create(
+    const webview = await createWebview(
       TableWebview,
       this.internalCommands,
       {

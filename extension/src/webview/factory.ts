@@ -10,7 +10,7 @@ import { Resource } from '../resourceLocator'
 export type WebviewState = ExperimentsWebviewState
 type WebviewType = typeof TableWebview
 
-export const create = async (
+export const createWebview = async (
   webviewType: WebviewType,
   internalCommands: InternalCommands,
   state: WebviewState,
@@ -34,7 +34,7 @@ export const create = async (
   return view
 }
 
-export const restore = (
+export const restoreWebview = (
   webviewType: WebviewType,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
