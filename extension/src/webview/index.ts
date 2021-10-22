@@ -2,6 +2,7 @@ import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
+import { WebviewState } from './factory'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
@@ -9,13 +10,12 @@ import {
   MessageToWebviewType,
   WindowWithWebviewData,
   WebviewColorTheme
-} from './contract'
-import { Logger } from '../../common/logger'
-import { WebviewState } from '../../webview/factory'
-import { setContextValue } from '../../vscode/context'
-import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { sendTelemetryEvent } from '../../telemetry'
-import { IEventNamePropertyMapping } from '../../telemetry/constants'
+} from '../experiments/webview/contract'
+import { Logger } from '../common/logger'
+import { setContextValue } from '../vscode/context'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
+import { sendTelemetryEvent } from '../telemetry'
+import { IEventNamePropertyMapping } from '../telemetry/constants'
 
 type EventName = keyof IEventNamePropertyMapping
 type EventNames = {
