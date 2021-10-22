@@ -8,46 +8,31 @@ import {
   TableData
 } from './contract'
 import { InternalCommands } from '../../commands/internal'
-import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
 export class TableWebview extends ExperimentsWebview {
   public static distPath = distPath
   public static title = 'Experiments'
   public static viewKey = 'dvc-experiments'
+  public static contextKey = 'dvc.experiments.webviewActive'
 
   constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
   ) {
-    super(webviewPanel, internalCommands, state, [main])
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
-      undefined,
-      undefined
+    super(
+      webviewPanel,
+      internalCommands,
+      state,
+      {
+        closedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
+        createdEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
+        focusChangedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED
+      },
+      TableWebview.contextKey,
+      [main]
     )
-
-    this.onDidDispose(() => {
-      sendTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
-        undefined,
-        undefined
-      )
-    })
-
-    this.onDidChangeIsFocused(() => {
-      sendTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED,
-        {
-          active: webviewPanel.active,
-          viewColumn: webviewPanel.viewColumn,
-          visible: webviewPanel.visible
-        },
-        undefined
-      )
-    })
 
     this.disposer.track({
       dispose: autorun(async () => {
