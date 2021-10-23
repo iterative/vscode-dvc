@@ -1,70 +1,69 @@
-import { main } from 'dvc-vscode-webview'
+import { distPath, main } from 'dvc-vscode-webview'
 import { WebviewPanel } from 'vscode'
+import { autorun } from 'mobx'
 import { ExperimentsWebview } from '.'
-import { ExperimentsWebviewState } from './contract'
+import {
+  ExperimentsWebviewState,
+  MessageToWebviewType,
+  TableData
+} from './contract'
 import { InternalCommands } from '../../commands/internal'
-import { ResourceLocator } from '../../resourceLocator'
-import { sendTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 
 export class TableWebview extends ExperimentsWebview {
+  public static distPath = distPath
+  public static title = 'Experiments'
   public static viewKey = 'dvc-experiments'
+  public static contextKey = 'dvc.experiments.webviewActive'
 
-  private constructor(
+  constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
   ) {
-    super(webviewPanel, internalCommands, state, [main])
-
-    sendTelemetryEvent(
-      EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
-      undefined,
-      undefined
+    super(
+      webviewPanel,
+      internalCommands,
+      state,
+      {
+        closedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
+        createdEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
+        focusChangedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED
+      },
+      TableWebview.contextKey,
+      [main]
     )
 
-    this.onDidDispose(() => {
-      sendTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
-        undefined,
-        undefined
-      )
-    })
-
-    this.onDidChangeIsFocused(() => {
-      sendTelemetryEvent(
-        EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED,
-        {
-          active: webviewPanel.active,
-          viewColumn: webviewPanel.viewColumn,
-          visible: webviewPanel.visible
-        },
-        undefined
-      )
+    this.disposer.track({
+      dispose: autorun(async () => {
+        await this.isReady() // Read all mobx dependencies before await
+        const tableData = state.tableData
+        if (tableData) {
+          this.sendMessage({
+            tableData,
+            type: MessageToWebviewType.setData
+          })
+        }
+      })
     })
   }
 
   public static create(
-    internalCommands: InternalCommands,
-    state: ExperimentsWebviewState,
-    resourceLocator: ResourceLocator
-  ) {
-    return ExperimentsWebview.create(
-      internalCommands,
-      state,
-      resourceLocator,
-      TableWebview.viewKey,
-      [main]
-    )
-  }
-
-  public static restore(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: ExperimentsWebviewState
-  ) {
-    return ExperimentsWebview.restore(webviewPanel, internalCommands, state, [
-      main
-    ])
+  ): TableWebview {
+    return new TableWebview(webviewPanel, internalCommands, state)
+  }
+
+  public async showExperiments(payload: {
+    tableData: TableData
+    errors?: Error[]
+  }): Promise<boolean> {
+    await this.isReady()
+    return this.sendMessage({
+      type: MessageToWebviewType.setData,
+      ...payload
+    })
   }
 }

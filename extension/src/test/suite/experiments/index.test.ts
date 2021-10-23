@@ -14,7 +14,6 @@ import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
 import { InternalCommands } from '../../../commands/internal'
-import { ExperimentsWebview } from '../../../experiments/webview'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric, TableData } from '../../../experiments/webview/contract'
 import {
@@ -30,6 +29,7 @@ import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
+import { TableWebview } from '../../../experiments/webview/table'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -88,7 +88,7 @@ suite('Experiments Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+      const messageSpy = spy(TableWebview.prototype, 'showExperiments')
 
       const webview = await experiments.showWebview()
 
@@ -147,7 +147,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+      const messageSpy = spy(TableWebview.prototype, 'showExperiments')
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )

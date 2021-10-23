@@ -79,7 +79,7 @@ describe('App', () => {
           rows: complexRowData,
           sorts: []
         },
-        type: MessageToWebviewType.showExperiments
+        type: MessageToWebviewType.setData
       }
     })
 

@@ -105,7 +105,7 @@ export class Model {
           this.theme = message.theme
         })
         return
-      case MessageToWebviewType.showExperiments:
+      case MessageToWebviewType.setData:
         runInAction(() => {
           this.tableData = message.tableData
         })
