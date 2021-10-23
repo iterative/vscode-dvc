@@ -9,7 +9,7 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { TableWebview } from './webview/table'
+import { ExperimentsWebview } from './webview'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
@@ -34,7 +34,7 @@ export class Experiments {
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
 
-  private webview?: TableWebview
+  private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -110,7 +110,7 @@ export class Experiments {
     }
 
     const webview = await createWebview(
-      TableWebview,
+      ExperimentsWebview,
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
@@ -126,7 +126,7 @@ export class Experiments {
     return webview
   }
 
-  public setWebview(view: TableWebview) {
+  public setWebview(view: ExperimentsWebview) {
     this.webview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
 

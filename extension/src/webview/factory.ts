@@ -4,18 +4,18 @@ import {
   ExperimentsWebviewState,
   WebviewType
 } from '../experiments/webview/contract'
-import { TableWebview } from '../experiments/webview/table'
+import { ExperimentsWebview } from '../experiments/webview'
 import { Resource } from '../resourceLocator'
 
 export type WebviewState = ExperimentsWebviewState
-type WebviewType = typeof TableWebview
+type WebviewType = typeof ExperimentsWebview
 
 export const createWebview = async (
   webviewType: WebviewType,
   internalCommands: InternalCommands,
   state: WebviewState,
   iconPath: Resource
-): Promise<TableWebview> => {
+): Promise<ExperimentsWebview> => {
   const webviewPanel = window.createWebviewPanel(
     webviewType.viewKey,
     webviewType.title,
@@ -39,7 +39,7 @@ export const restoreWebview = (
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
   state: WebviewState
-): Promise<TableWebview> => {
+): Promise<ExperimentsWebview> => {
   return new Promise((resolve, reject) => {
     try {
       resolve(webviewType.create(webviewPanel, internalCommands, state))
