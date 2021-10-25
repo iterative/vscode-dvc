@@ -2,7 +2,7 @@ import {
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebviewType,
-  GenericMessageToWebview,
+  MessageToWebview as GenericMessageToWebview,
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webview/contract'

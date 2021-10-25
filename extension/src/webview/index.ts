@@ -3,15 +3,14 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
 import {
-  GenericMessageToWebview,
+  MessageToWebview,
   WebviewState,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebviewType,
   WebviewColorTheme,
   WebviewData,
-  WindowWithWebviewData,
-  GenericWebviewState
+  WindowWithWebviewData
 } from './contract'
 import { EventNames } from './factory'
 import { Logger } from '../common/logger'
@@ -38,10 +37,10 @@ export class BaseWebview<T extends WebviewData> {
   private readonly internalCommands: InternalCommands
   private readonly contextKey: string
 
-  protected constructor(
+  constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: GenericWebviewState<T>,
+    state: WebviewState<T>,
     eventsNames: EventNames,
     contextKey: string,
     scripts: string[] = []
@@ -105,24 +104,6 @@ export class BaseWebview<T extends WebviewData> {
     this.setupTelemetryEvents(webviewPanel, eventsNames)
   }
 
-  public static create(
-    webviewPanel: WebviewPanel,
-    internalCommands: InternalCommands,
-    state: WebviewState,
-    eventsNames: EventNames,
-    contextKey: string,
-    scripts: string[] = []
-  ) {
-    return new BaseWebview<WebviewData>(
-      webviewPanel,
-      internalCommands,
-      state,
-      eventsNames,
-      contextKey,
-      scripts
-    )
-  }
-
   public dispose(): void {
     this.webviewPanel.dispose()
   }
@@ -155,7 +136,7 @@ export class BaseWebview<T extends WebviewData> {
     return this
   }
 
-  protected sendMessage(message: GenericMessageToWebview<T>) {
+  protected sendMessage(message: MessageToWebview<T>) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'

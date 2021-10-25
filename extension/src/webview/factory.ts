@@ -1,7 +1,12 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
 import { distPath, main } from 'dvc-vscode-webview'
 import { BaseWebview } from '.'
-import { ViewKey, WebviewData, GenericWebviewState } from './contract'
+import {
+  WebviewState,
+  UnknownWebviewState,
+  ViewKey,
+  WebviewData
+} from './contract'
 import { InternalCommands } from '../commands/internal'
 import { Resource } from '../resourceLocator'
 import { TableData } from '../experiments/webview/contract'
@@ -48,24 +53,20 @@ const WebviewDetails: {
   }
 } as const
 
-const isExperimentsWebviewState = (
-  state: GenericWebviewState<unknown>
-): state is GenericWebviewState<TableData> => {
+const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
   const tableData = state.webviewData as TableData
   return !tableData || !!(tableData.rows && tableData.columns)
 }
 
-const isPlotsWebviewState = (
-  state: GenericWebviewState<unknown>
-): state is GenericWebviewState<PlotsData> => {
+const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const tableData = state.webviewData as PlotsData
   return !tableData || !!tableData.metrics
 }
 
 const isValidState = (
   viewKey: ViewKey,
-  state: GenericWebviewState<unknown>
-): state is GenericWebviewState<WebviewData> =>
+  state: UnknownWebviewState
+): state is WebviewState<WebviewData> =>
   (viewKey === ViewKey.EXPERIMENTS && isExperimentsWebviewState(state)) ||
   (viewKey === ViewKey.PLOTS && isPlotsWebviewState(state))
 
@@ -73,16 +74,15 @@ const create = (
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
-  state: GenericWebviewState<unknown>
+  state: UnknownWebviewState
 ) => {
-  const isValid = isValidState(viewKey, state)
-  if (!isValid) {
+  if (!isValidState(viewKey, state)) {
     throw new Error(`trying to set invalid state into ${viewKey}`)
   }
 
   const { contextKey, eventNames } = WebviewDetails[viewKey]
 
-  return BaseWebview.create(
+  return new BaseWebview(
     webviewPanel,
     internalCommands,
     state,
@@ -95,7 +95,7 @@ const create = (
 export const createWebview = async (
   viewKey: ViewKey,
   internalCommands: InternalCommands,
-  state: GenericWebviewState<unknown>,
+  state: UnknownWebviewState,
   iconPath: Resource
 ) => {
   const { title, distPath } = WebviewDetails[viewKey]
@@ -118,11 +118,11 @@ export const createWebview = async (
   return view
 }
 
-export const restoreWebview = <T extends TableData | PlotsData>(
+export const restoreWebview = <T extends WebviewData>(
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
-  state: GenericWebviewState<unknown>
+  state: UnknownWebviewState
 ): Promise<BaseWebview<T>> => {
   return new Promise((resolve, reject) => {
     try {

@@ -29,12 +29,12 @@ export enum WebviewColorTheme {
   dark = 'dark'
 }
 
-export interface setData<T> {
+export interface setData<T extends WebviewData> {
   type: MessageToWebviewType.setData
   webviewData: T
 }
 
-export type GenericMessageToWebview<T> = {
+export type MessageToWebview<T extends WebviewData> = {
   errors?: Error[]
 } & (
   | {
@@ -54,11 +54,9 @@ export enum MessageToWebviewType {
   setData = 'setData'
 }
 
-export interface GenericWebviewState<
-  T extends PlotsData | TableData | unknown
-> {
+export interface WebviewState<T extends WebviewData | unknown> {
   dvcRoot: string
   webviewData?: T
 }
 
-export type WebviewState = GenericWebviewState<WebviewData>
+export type UnknownWebviewState = WebviewState<unknown>

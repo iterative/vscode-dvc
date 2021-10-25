@@ -21,6 +21,8 @@ const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
+export type ExperimentsWebview = BaseWebview<TableData>
+
 export class Experiments {
   public readonly dispose = Disposable.fn()
 
@@ -36,7 +38,7 @@ export class Experiments {
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
 
-  private webview?: BaseWebview<TableData>
+  private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -119,7 +121,7 @@ export class Experiments {
         webviewData: this.getTableData()
       },
       this.resourceLocator.dvcIcon
-    )) as BaseWebview<TableData>
+    )) as ExperimentsWebview
 
     this.setWebview(webview)
 
@@ -128,7 +130,7 @@ export class Experiments {
     return webview
   }
 
-  public setWebview(view: BaseWebview<TableData>) {
+  public setWebview(view: ExperimentsWebview) {
     this.webview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
 

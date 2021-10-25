@@ -1,10 +1,9 @@
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { Experiments } from '.'
+import { Experiments, ExperimentsWebview } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
-import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -15,7 +14,6 @@ import {
 } from '../commands/internal'
 import { BaseWorkspace, IWorkspace } from '../workspace'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { BaseWebview } from '../webview'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -233,10 +231,7 @@ export class WorkspaceExperiments
     return experiments
   }
 
-  public setWebview(
-    dvcRoot: string,
-    experimentsWebview: BaseWebview<TableData>
-  ) {
+  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
       experimentsWebview.dispose()
