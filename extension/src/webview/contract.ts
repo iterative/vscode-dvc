@@ -1,6 +1,13 @@
 import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
 
+export type WebviewData = TableData | PlotsData
+
+export enum ViewKey {
+  EXPERIMENTS = 'dvc-experiments',
+  PLOTS = 'dvc-plots'
+}
+
 export type MessageFromWebview = {
   type: MessageFromWebviewType
   payload?: Object
@@ -27,7 +34,7 @@ export interface setData<T> {
   webviewData: T
 }
 
-export type MessageToWebview<T> = {
+export type GenericMessageToWebview<T> = {
   errors?: Error[]
 } & (
   | {
@@ -47,7 +54,11 @@ export enum MessageToWebviewType {
   setData = 'setData'
 }
 
-export interface WebviewState<T extends PlotsData | TableData | unknown> {
+export interface GenericWebviewState<
+  T extends PlotsData | TableData | unknown
+> {
   dvcRoot: string
   webviewData?: T
 }
+
+export type WebviewState = GenericWebviewState<WebviewData>

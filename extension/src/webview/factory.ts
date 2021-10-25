@@ -1,76 +1,132 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
-import { WebviewState } from './contract'
+import { distPath, main } from 'dvc-vscode-webview'
+import { BaseWebview } from '.'
+import { ViewKey, WebviewData, GenericWebviewState } from './contract'
 import { InternalCommands } from '../commands/internal'
-import {
-  ExperimentsWebview,
-  isExperimentsWebviewState
-} from '../experiments/webview'
 import { Resource } from '../resourceLocator'
-import { isPlotsWebviewState, PlotsWebview } from '../plots/webview'
+import { TableData } from '../experiments/webview/contract'
+import { PlotsData } from '../plots/webview/contract'
+import { EventName, IEventNamePropertyMapping } from '../telemetry/constants'
 
-type WebviewType = typeof ExperimentsWebview | typeof PlotsWebview
-
-const isExperimentsWebview = (
-  webviewType: typeof ExperimentsWebview | typeof PlotsWebview
-): webviewType is typeof ExperimentsWebview =>
-  typeof webviewType === typeof ExperimentsWebview
-
-const create = (
-  webviewType: WebviewType,
-  webviewPanel: WebviewPanel,
-  internalCommands: InternalCommands,
-  state: WebviewState<unknown>
-): ExperimentsWebview | PlotsWebview => {
-  if (isExperimentsWebview(webviewType)) {
-    if (!isExperimentsWebviewState(state)) {
-      throw new Error(
-        'trying to create an experiments webview with the wrong state'
-      )
-    }
-
-    return ExperimentsWebview.create(webviewPanel, internalCommands, state)
-  }
-
-  if (!isPlotsWebviewState(state)) {
-    throw new Error('trying to create a plots webview with the wrong state')
-  }
-
-  return PlotsWebview.create(webviewPanel, internalCommands, state)
+type Name = keyof IEventNamePropertyMapping
+export type EventNames = {
+  createdEvent: Name
+  closedEvent: Name
+  focusChangedEvent: Name
 }
 
-export const createWebview = async (
-  webviewType: WebviewType,
+const WebviewDetails: {
+  [key in ViewKey]: {
+    contextKey: string
+    distPath: string
+    eventNames: EventNames
+    title: string
+    viewKey: ViewKey
+  }
+} = {
+  'dvc-experiments': {
+    contextKey: 'dvc.experiments.webviewActive',
+    distPath,
+    eventNames: {
+      closedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
+      createdEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
+      focusChangedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED
+    },
+    title: 'Experiments',
+    viewKey: ViewKey.EXPERIMENTS
+  },
+  'dvc-plots': {
+    contextKey: 'dvc.plots.webviewActive',
+    distPath,
+    eventNames: {
+      closedEvent: EventName.VIEWS_PLOTS_CLOSED,
+      createdEvent: EventName.VIEWS_PLOTS_CREATED,
+      focusChangedEvent: EventName.VIEWS_PLOTS_FOCUS_CHANGED
+    },
+    title: 'Plots',
+    viewKey: ViewKey.PLOTS
+  }
+} as const
+
+const isExperimentsWebviewState = (
+  state: GenericWebviewState<unknown>
+): state is GenericWebviewState<TableData> => {
+  const tableData = state.webviewData as TableData
+  return !tableData || !!(tableData.rows && tableData.columns)
+}
+
+const isPlotsWebviewState = (
+  state: GenericWebviewState<unknown>
+): state is GenericWebviewState<PlotsData> => {
+  const tableData = state.webviewData as PlotsData
+  return !tableData || !!tableData.metrics
+}
+
+const isValidState = (
+  viewKey: ViewKey,
+  state: GenericWebviewState<unknown>
+): state is GenericWebviewState<WebviewData> =>
+  (viewKey === ViewKey.EXPERIMENTS && isExperimentsWebviewState(state)) ||
+  (viewKey === ViewKey.PLOTS && isPlotsWebviewState(state))
+
+const create = async (
+  viewKey: ViewKey,
+  webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
-  state: WebviewState<unknown>,
+  state: GenericWebviewState<unknown>
+) => {
+  const isValid = isValidState(viewKey, state)
+  if (!isValid) {
+    throw new Error(`trying to set invalid state into ${viewKey}`)
+  }
+
+  const { contextKey, eventNames } = WebviewDetails[viewKey]
+
+  const view = BaseWebview.create(
+    webviewPanel,
+    internalCommands,
+    state,
+    eventNames,
+    contextKey,
+    [main]
+  )
+  await view.isReady()
+  return view
+}
+
+export const createWebview = (
+  viewKey: ViewKey,
+  internalCommands: InternalCommands,
+  state: GenericWebviewState<unknown>,
   iconPath: Resource
-): Promise<ExperimentsWebview | PlotsWebview> => {
+) => {
+  const { title, distPath } = WebviewDetails[viewKey]
+
   const webviewPanel = window.createWebviewPanel(
-    webviewType.viewKey,
-    webviewType.title,
+    viewKey,
+    title,
     ViewColumn.Active,
     {
       enableScripts: true,
-      localResourceRoots: [Uri.file(webviewType.distPath)],
+      localResourceRoots: [Uri.file(distPath)],
       retainContextWhenHidden: true
     }
   )
 
   webviewPanel.iconPath = iconPath
 
-  const view = create(webviewType, webviewPanel, internalCommands, state)
-  await view.isReady()
-  return view
+  return create(viewKey, webviewPanel, internalCommands, state)
 }
 
-export const restoreWebview = <T extends WebviewType>(
-  webviewType: T,
+export const restoreWebview = <T extends TableData | PlotsData>(
+  viewKey: ViewKey,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
-  state: WebviewState<unknown>
-): Promise<PlotsWebview | ExperimentsWebview> => {
+  state: GenericWebviewState<unknown>
+): Promise<BaseWebview<T>> => {
   return new Promise((resolve, reject) => {
     try {
-      resolve(create(webviewType, webviewPanel, internalCommands, state))
+      resolve(create(viewKey, webviewPanel, internalCommands, state))
     } catch (e: unknown) {
       reject(e)
     }

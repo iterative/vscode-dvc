@@ -1,7 +1,7 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
 import {
-  MessageToWebview as GenericMessageToWebview,
-  WebviewState as GenericWebviewState
+  GenericMessageToWebview,
+  GenericWebviewState
 } from '../../webview/contract'
 import { SortDefinition } from '../model/sortBy'
 
@@ -34,8 +34,6 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   parentPath: string
   types?: string[]
 }
-
-export const WebviewType = 'Experiments'
 
 export interface TableData {
   rows: RowData[]

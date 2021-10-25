@@ -1,4 +1,4 @@
-import { WebviewState as GenericWebviewState } from '../../webview/contract'
+import { GenericWebviewState } from '../../webview/contract'
 import { ParamOrMetric } from '../../experiments/webview/contract'
 
 export interface PlotsData {

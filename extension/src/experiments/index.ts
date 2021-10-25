@@ -9,11 +9,13 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { ExperimentsWebview } from './webview'
+import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { createWebview } from '../webview/factory'
+import { BaseWebview } from '../webview'
+import { ViewKey } from '../webview/contract'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -34,7 +36,7 @@ export class Experiments {
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
 
-  private webview?: ExperimentsWebview
+  private webview?: BaseWebview<TableData>
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -110,14 +112,14 @@ export class Experiments {
     }
 
     const webview = (await createWebview(
-      ExperimentsWebview,
+      ViewKey.EXPERIMENTS,
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
         webviewData: this.getTableData()
       },
       this.resourceLocator.dvcIcon
-    )) as ExperimentsWebview
+    )) as BaseWebview<TableData>
 
     this.setWebview(webview)
 
@@ -126,7 +128,7 @@ export class Experiments {
     return webview
   }
 
-  public setWebview(view: ExperimentsWebview) {
+  public setWebview(view: BaseWebview<TableData>) {
     this.webview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
 

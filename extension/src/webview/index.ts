@@ -3,31 +3,24 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
 import {
+  GenericMessageToWebview,
+  WebviewState,
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebviewType,
-  WindowWithWebviewData,
   WebviewColorTheme,
-  MessageToWebview,
-  WebviewState
+  WebviewData,
+  WindowWithWebviewData,
+  GenericWebviewState
 } from './contract'
+import { EventNames } from './factory'
 import { Logger } from '../common/logger'
 import { setContextValue } from '../vscode/context'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { sendTelemetryEvent } from '../telemetry'
-import { IEventNamePropertyMapping } from '../telemetry/constants'
 import { messenger, MessengerEvents } from '../util/messaging'
-import { PlotsData } from '../plots/webview/contract'
-import { TableData } from '../experiments/webview/contract'
 
-type EventName = keyof IEventNamePropertyMapping
-type EventNames = {
-  createdEvent: EventName
-  closedEvent: EventName
-  focusChangedEvent: EventName
-}
-
-export class BaseWebview<T extends TableData | PlotsData> {
+export class BaseWebview<T extends WebviewData> {
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
@@ -48,7 +41,7 @@ export class BaseWebview<T extends TableData | PlotsData> {
   protected constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: WebviewState<T>,
+    state: GenericWebviewState<T>,
     eventsNames: EventNames,
     contextKey: string,
     scripts: string[] = []
@@ -112,6 +105,24 @@ export class BaseWebview<T extends TableData | PlotsData> {
     this.setupTelemetryEvents(webviewPanel, eventsNames)
   }
 
+  public static create(
+    webviewPanel: WebviewPanel,
+    internalCommands: InternalCommands,
+    state: WebviewState,
+    eventsNames: EventNames,
+    contextKey: string,
+    scripts: string[] = []
+  ) {
+    return new BaseWebview<WebviewData>(
+      webviewPanel,
+      internalCommands,
+      state,
+      eventsNames,
+      contextKey,
+      scripts
+    )
+  }
+
   public dispose(): void {
     this.webviewPanel.dispose()
   }
@@ -144,7 +155,7 @@ export class BaseWebview<T extends TableData | PlotsData> {
     return this
   }
 
-  protected sendMessage(message: MessageToWebview<T>) {
+  protected sendMessage(message: GenericMessageToWebview<T>) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'
