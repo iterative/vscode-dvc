@@ -113,7 +113,7 @@ export class Experiments {
       return this.webview.reveal()
     }
 
-    const webview = (await createWebview(
+    const webview = await createWebview(
       ViewKey.EXPERIMENTS,
       this.internalCommands,
       {
@@ -121,7 +121,7 @@ export class Experiments {
         dvcRoot: this.dvcRoot
       },
       this.resourceLocator.dvcIcon
-    )) as ExperimentsWebview
+    )
 
     this.setWebview(webview)
 
