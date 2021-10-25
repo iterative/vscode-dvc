@@ -1,8 +1,6 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import {
-  Experiment,
-  MessageFromWebviewType
-} from 'dvc/src/experiments/webview/contract'
+import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import cx from 'classnames'

@@ -9,15 +9,19 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { ExperimentsWebview } from './webview'
+import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { createWebview } from '../webview/factory'
+import { BaseWebview } from '../webview'
+import { ViewKey } from '../webview/constants'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
+
+export type ExperimentsWebview = BaseWebview<TableData>
 
 export class Experiments {
   public readonly dispose = Disposable.fn()
@@ -110,11 +114,11 @@ export class Experiments {
     }
 
     const webview = await createWebview(
-      ExperimentsWebview,
+      ViewKey.EXPERIMENTS,
       this.internalCommands,
       {
-        dvcRoot: this.dvcRoot,
-        tableData: this.getTableData()
+        data: this.getTableData(),
+        dvcRoot: this.dvcRoot
       },
       this.resourceLocator.dvcIcon
     )
@@ -221,8 +225,8 @@ export class Experiments {
 
   private sendData() {
     if (this.webview) {
-      this.webview.showExperiments({
-        tableData: this.getTableData()
+      this.webview.show({
+        data: this.getTableData()
       })
     }
   }

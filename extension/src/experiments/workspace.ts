@@ -1,7 +1,6 @@
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { Experiments } from '.'
-import { ExperimentsWebview } from './webview'
+import { Experiments, ExperimentsWebview } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'

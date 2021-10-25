@@ -2,30 +2,24 @@ import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
-import { WebviewState } from './factory'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
-  WindowWithWebviewData,
-  WebviewColorTheme
-} from '../experiments/webview/contract'
+  WebviewColorTheme,
+  WebviewData,
+  WebviewState,
+  WindowWithWebviewData
+} from './contract'
+import { EventNames } from './constants'
 import { Logger } from '../common/logger'
 import { setContextValue } from '../vscode/context'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { sendTelemetryEvent } from '../telemetry'
-import { IEventNamePropertyMapping } from '../telemetry/constants'
 import { messenger, MessengerEvents } from '../util/messaging'
 
-type EventName = keyof IEventNamePropertyMapping
-type EventNames = {
-  createdEvent: EventName
-  closedEvent: EventName
-  focusChangedEvent: EventName
-}
-
-export class BaseWebview {
+export class BaseWebview<T extends WebviewData> {
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
@@ -43,13 +37,13 @@ export class BaseWebview {
   private readonly internalCommands: InternalCommands
   private readonly contextKey: string
 
-  protected constructor(
+  constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: WebviewState,
-    eventsNames: EventNames,
+    state: WebviewState<T>,
     contextKey: string,
-    scripts: string[] = []
+    eventsNames: EventNames,
+    scripts: readonly string[]
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
@@ -96,6 +90,14 @@ export class BaseWebview {
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.setDvcRoot
         })
+
+        const data = state.data
+        if (data) {
+          this.sendMessage({
+            data,
+            type: MessageToWebviewType.setData
+          })
+        }
       })
     })
 
@@ -118,12 +120,20 @@ export class BaseWebview {
     return this.webviewPanel.visible
   }
 
-  public reveal = () => {
+  public async show(payload: { data: T; errors?: Error[] }): Promise<boolean> {
+    await this.isReady()
+    return this.sendMessage({
+      type: MessageToWebviewType.setData,
+      ...payload
+    })
+  }
+
+  public reveal() {
     this.webviewPanel.reveal()
     return this
   }
 
-  protected sendMessage(message: MessageToWebview) {
+  protected sendMessage(message: MessageToWebview<T>) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'
@@ -139,7 +149,7 @@ export class BaseWebview {
     this.isFocusedChanged.fire(active)
   }
 
-  private async getHtml(scripts: string[]): Promise<string> {
+  private async getHtml(scripts: readonly string[]): Promise<string> {
     const webviewScriptTags = scripts
       .map(
         script =>

@@ -43,7 +43,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experiments.isReady()
       const experimentsWebview = await experiments.showWebview()
-      const messageSpy = spy(experimentsWebview, 'showExperiments')
+      const messageSpy = spy(experimentsWebview, 'show')
 
       const accuracyPath = joinParamOrMetricPath(
         'metrics',
@@ -106,7 +106,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       ]
 
       expect(messageSpy).to.be.calledWith({
-        tableData: {
+        data: {
           changes: complexChangesData,
           columns: complexColumnData,
           columnsOrder: [],
@@ -139,7 +139,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith({
-        tableData: expectedTableData
+        data: expectedTableData
       })
     })
 
