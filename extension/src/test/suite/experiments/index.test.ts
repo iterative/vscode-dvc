@@ -100,7 +100,7 @@ suite('Experiments Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith({ tableData: expectedTableData })
+      expect(messageSpy).to.be.calledWith({ webviewData: expectedTableData })
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
@@ -179,7 +179,7 @@ suite('Experiments Test Suite', () => {
       await experiments.isReady()
       await experiments.showWebview()
 
-      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+      expect(messageSpy.lastCall.args[0].webviewData.rows).deep.equals([
         {
           displayName: 'workspace',
           id: 'workspace',
@@ -209,7 +209,7 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
+      expect(messageSpy.lastCall.args[0].webviewData.sorts).deep.equals([])
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
@@ -232,7 +232,7 @@ suite('Experiments Test Suite', () => {
       await pickPromise
       await tableChangePromise
 
-      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+      expect(messageSpy.lastCall.args[0].webviewData.rows).deep.equals([
         {
           displayName: 'workspace',
           id: 'workspace',
@@ -262,7 +262,7 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
+      expect(messageSpy.lastCall.args[0].webviewData.sorts).deep.equals([
         { descending: false, path: sortPath }
       ])
     }).timeout(5000)

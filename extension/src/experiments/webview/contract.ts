@@ -1,4 +1,8 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
+import {
+  MessageToWebview as GenericMessageToWebview,
+  WebviewState as GenericWebviewState
+} from '../../webview/contract'
 import { SortDefinition } from '../model/sortBy'
 
 export interface ParamsOrMetrics {
@@ -33,50 +37,6 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
 
 export const WebviewType = 'Experiments'
 
-export interface WindowWithWebviewData {
-  webviewData: {
-    theme: WebviewColorTheme
-  }
-}
-
-export enum WebviewColorTheme {
-  light = 'light',
-  dark = 'dark'
-}
-
-export type MessageFromWebview = {
-  type: MessageFromWebviewType
-  payload?: Object
-}
-
-export enum MessageFromWebviewType {
-  initialized = 'initialized',
-  columnReordered = 'column-reordered'
-}
-
-export type MessageToWebview = {
-  errors?: Error[]
-} & (
-  | {
-      type: MessageToWebviewType.setDvcRoot
-      dvcRoot: string
-    }
-  | {
-      type: MessageToWebviewType.setTheme
-      theme: WebviewColorTheme
-    }
-  | {
-      type: MessageToWebviewType.setData
-      tableData: TableData
-    }
-)
-
-export enum MessageToWebviewType {
-  setDvcRoot = 'setDvcRoot',
-  setTheme = 'setTheme',
-  setData = 'setData'
-}
-
 export interface TableData {
   rows: RowData[]
   columns: ParamOrMetric[]
@@ -85,7 +45,6 @@ export interface TableData {
   columnsOrder: string[]
 }
 
-export interface ExperimentsWebviewState {
-  dvcRoot: string
-  tableData?: TableData
-}
+export type MessageToWebview = GenericMessageToWebview<TableData>
+
+export type WebviewState = GenericWebviewState<TableData>

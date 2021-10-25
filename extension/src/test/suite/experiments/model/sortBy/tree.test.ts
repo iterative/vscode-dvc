@@ -145,7 +145,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy
           .getCall(-1)
-          .firstArg.tableData.rows[1].subRows?.map((exp: Experiment) =>
+          .firstArg.webviewData.rows[1].subRows?.map((exp: Experiment) =>
             get(exp, selector)
           )
 

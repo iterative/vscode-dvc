@@ -1,21 +1,36 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
+import { WebviewState } from './contract'
 import { InternalCommands } from '../commands/internal'
-import {
-  ExperimentsWebviewState,
-  WebviewType
-} from '../experiments/webview/contract'
 import { ExperimentsWebview } from '../experiments/webview'
 import { Resource } from '../resourceLocator'
+import { PlotsWebview } from '../plots/webview'
 
-export type WebviewState = ExperimentsWebviewState
-type WebviewType = typeof ExperimentsWebview
+type WebviewType = typeof ExperimentsWebview | typeof PlotsWebview
 
-export const createWebview = async (
+const isExperimentsWebview = (
+  webviewType: typeof ExperimentsWebview | typeof PlotsWebview
+): webviewType is typeof ExperimentsWebview =>
+  typeof webviewType === typeof ExperimentsWebview
+
+const create = (
   webviewType: WebviewType,
+  webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
-  state: WebviewState,
+  state: WebviewState<unknown>
+): ExperimentsWebview | PlotsWebview => {
+  if (isExperimentsWebview(webviewType)) {
+    return ExperimentsWebview.create(webviewPanel, internalCommands, state)
+  }
+
+  return PlotsWebview.create(webviewPanel, internalCommands, state)
+}
+
+export const createWebview = async <T extends WebviewType>(
+  webviewType: T,
+  internalCommands: InternalCommands,
+  state: WebviewState<unknown>,
   iconPath: Resource
-): Promise<ExperimentsWebview> => {
+): Promise<ExperimentsWebview | PlotsWebview> => {
   const webviewPanel = window.createWebviewPanel(
     webviewType.viewKey,
     webviewType.title,
@@ -29,20 +44,20 @@ export const createWebview = async (
 
   webviewPanel.iconPath = iconPath
 
-  const view = webviewType.create(webviewPanel, internalCommands, state)
+  const view = create(webviewType, webviewPanel, internalCommands, state)
   await view.isReady()
   return view
 }
 
-export const restoreWebview = (
-  webviewType: WebviewType,
+export const restoreWebview = <T extends WebviewType>(
+  webviewType: T,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
-  state: WebviewState
-): Promise<ExperimentsWebview> => {
+  state: WebviewState<unknown>
+): Promise<PlotsWebview | ExperimentsWebview> => {
   return new Promise((resolve, reject) => {
     try {
-      resolve(webviewType.create(webviewPanel, internalCommands, state))
+      resolve(create(webviewType, webviewPanel, internalCommands, state))
     } catch (e: unknown) {
       reject(e)
     }

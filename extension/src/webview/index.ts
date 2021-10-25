@@ -2,21 +2,23 @@ import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
-import { WebviewState } from './factory'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
-  MessageToWebview,
   MessageToWebviewType,
   WindowWithWebviewData,
-  WebviewColorTheme
-} from '../experiments/webview/contract'
+  WebviewColorTheme,
+  MessageToWebview,
+  WebviewState
+} from './contract'
 import { Logger } from '../common/logger'
 import { setContextValue } from '../vscode/context'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { sendTelemetryEvent } from '../telemetry'
 import { IEventNamePropertyMapping } from '../telemetry/constants'
 import { messenger, MessengerEvents } from '../util/messaging'
+import { PlotsData } from '../plots/webview/contract'
+import { TableData } from '../experiments/webview/contract'
 
 type EventName = keyof IEventNamePropertyMapping
 type EventNames = {
@@ -25,7 +27,7 @@ type EventNames = {
   focusChangedEvent: EventName
 }
 
-export class BaseWebview {
+export class BaseWebview<T extends TableData | PlotsData> {
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
@@ -46,7 +48,7 @@ export class BaseWebview {
   protected constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: WebviewState,
+    state: WebviewState<T>,
     eventsNames: EventNames,
     contextKey: string,
     scripts: string[] = []
@@ -96,6 +98,14 @@ export class BaseWebview {
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.setDvcRoot
         })
+
+        const webviewData = state.webviewData
+        if (webviewData) {
+          this.sendMessage<MessageToWebview<T>>({
+            type: MessageToWebviewType.setData,
+            webviewData
+          })
+        }
       })
     })
 
@@ -123,7 +133,7 @@ export class BaseWebview {
     return this
   }
 
-  protected sendMessage(message: MessageToWebview) {
+  protected sendMessage<T = never>(message: T) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'

@@ -17,7 +17,7 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType,
   WebviewColorTheme
-} from 'dvc/src/experiments/webview/contract'
+} from 'dvc/src/webview/contract'
 import { App } from './App'
 import { getVsCodeApi } from '../model/vsCodeApi'
 
@@ -74,12 +74,12 @@ describe('App', () => {
   describe('Given a message to add experiments to the state', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
-        tableData: {
+        type: MessageToWebviewType.setData,
+        webviewData: {
           columns: complexColumnData,
           rows: complexRowData,
           sorts: []
-        },
-        type: MessageToWebviewType.setData
+        }
       }
     })
 

@@ -109,15 +109,15 @@ export class Experiments {
       return this.webview.reveal()
     }
 
-    const webview = await createWebview(
+    const webview = (await createWebview(
       ExperimentsWebview,
       this.internalCommands,
       {
         dvcRoot: this.dvcRoot,
-        tableData: this.getTableData()
+        webviewData: this.getTableData()
       },
       this.resourceLocator.dvcIcon
-    )
+    )) as ExperimentsWebview
 
     this.setWebview(webview)
 
@@ -222,7 +222,7 @@ export class Experiments {
   private sendData() {
     if (this.webview) {
       this.webview.showExperiments({
-        tableData: this.getTableData()
+        webviewData: this.getTableData()
       })
     }
   }

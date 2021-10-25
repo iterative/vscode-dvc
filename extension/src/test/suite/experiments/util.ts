@@ -12,7 +12,7 @@ import { OutputChannel } from '../../../vscode/outputChannel'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
-import { WebviewColorTheme } from '../../../experiments/webview/contract'
+import { WebviewColorTheme } from '../../../webview/contract'
 
 const buildDependencies = (
   disposer: Disposer,

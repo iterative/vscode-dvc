@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { restoreWebview } from './factory'
 import { ExperimentsWebview } from '../experiments/webview'
 import { WorkspaceExperiments } from '../experiments/workspace'
-import { ExperimentsWebviewState } from '../experiments/webview/contract'
+import { WebviewState } from '../experiments/webview/contract'
 import { InternalCommands } from '../commands/internal'
 
 export class WebviewSerializer {
@@ -17,7 +17,7 @@ export class WebviewSerializer {
       window.registerWebviewPanelSerializer(ExperimentsWebview.viewKey, {
         deserializeWebviewPanel: async (
           panel: WebviewPanel,
-          state: ExperimentsWebviewState
+          state: WebviewState
         ) => {
           const dvcRoot = state?.dvcRoot
           const experimentsWebview = await restoreWebview(
@@ -27,7 +27,10 @@ export class WebviewSerializer {
             state
           )
           await experiments.isReady()
-          experiments.setWebview(dvcRoot, experimentsWebview)
+          experiments.setWebview(
+            dvcRoot,
+            experimentsWebview as ExperimentsWebview
+          )
         }
       })
     )

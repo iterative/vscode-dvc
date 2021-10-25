@@ -1,26 +1,36 @@
 import { distPath, main } from 'dvc-vscode-webview'
 import { WebviewPanel } from 'vscode'
-import { autorun } from 'mobx'
-
 import {
-  ExperimentsWebviewState,
-  MessageToWebviewType,
-  TableData
+  MessageToWebview,
+  TableData,
+  WebviewState,
+  WebviewType
 } from './contract'
 import { InternalCommands } from '../../commands/internal'
 import { EventName } from '../../telemetry/constants'
 import { BaseWebview } from '../../webview'
+import {
+  WebviewState as GenericWebviewState,
+  MessageToWebviewType
+} from '../../webview/contract'
 
-export class ExperimentsWebview extends BaseWebview {
+const isExperimentsWebviewState = (
+  state: GenericWebviewState<unknown>
+): state is WebviewState => {
+  const tableData = state.webviewData as TableData
+  return !tableData || !!(tableData.rows && tableData.columns)
+}
+
+export class ExperimentsWebview extends BaseWebview<TableData> {
   public static distPath = distPath
-  public static title = 'Experiments'
+  public static title = WebviewType
   public static viewKey = 'dvc-experiments'
   public static contextKey = 'dvc.experiments.webviewActive'
 
   constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
+    state: WebviewState
   ) {
     super(
       webviewPanel,
@@ -34,35 +44,28 @@ export class ExperimentsWebview extends BaseWebview {
       ExperimentsWebview.contextKey,
       [main]
     )
-
-    this.disposer.track({
-      dispose: autorun(async () => {
-        await this.isReady() // Read all mobx dependencies before await
-        const tableData = state.tableData
-        if (tableData) {
-          this.sendMessage({
-            tableData,
-            type: MessageToWebviewType.setData
-          })
-        }
-      })
-    })
   }
 
   public static create(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: ExperimentsWebviewState
+    state: GenericWebviewState<unknown>
   ): ExperimentsWebview {
+    if (!isExperimentsWebviewState(state)) {
+      throw new Error(
+        'trying to create an experiments webview with the wrong state'
+      )
+    }
+
     return new ExperimentsWebview(webviewPanel, internalCommands, state)
   }
 
   public async showExperiments(payload: {
-    tableData: TableData
+    webviewData: TableData
     errors?: Error[]
   }): Promise<boolean> {
     await this.isReady()
-    return this.sendMessage({
+    return this.sendMessage<MessageToWebview>({
       type: MessageToWebviewType.setData,
       ...payload
     })

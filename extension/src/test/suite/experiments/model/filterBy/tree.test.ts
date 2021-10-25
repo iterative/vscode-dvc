@@ -106,7 +106,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       ]
 
       expect(messageSpy).to.be.calledWith({
-        tableData: {
+        webviewData: {
           changes: complexChangesData,
           columns: complexColumnData,
           columnsOrder: [],
@@ -139,7 +139,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith({
-        tableData: expectedTableData
+        webviewData: expectedTableData
       })
     })
 

@@ -1,11 +1,13 @@
 import {
   MessageFromWebview,
   MessageFromWebviewType,
-  MessageToWebview,
   MessageToWebviewType,
-  TableData,
   WebviewColorTheme,
   WindowWithWebviewData
+} from 'dvc/src/webview/contract'
+import {
+  MessageToWebview,
+  TableData
 } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
@@ -24,7 +26,7 @@ declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  tableData?: TableData | null
+  webviewData?: TableData | null
   dvcRoot?: string
 }
 
@@ -35,7 +37,7 @@ export class Model {
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
-  public tableData?: TableData | null = null // do not remove = null or webview will not load data
+  public webviewData?: TableData | null = null // do not remove = null or webview will not load data
 
   @observable
   public dvcRoot?: string
@@ -88,13 +90,13 @@ export class Model {
   private getState(): PersistedModelState {
     return {
       dvcRoot: this.dvcRoot,
-      tableData: this.tableData
+      webviewData: this.webviewData
     }
   }
 
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
-    this.tableData = state.tableData
+    this.webviewData = state.webviewData
   }
 
   private handleMessage(message: MessageToWebview): void {
@@ -107,7 +109,7 @@ export class Model {
         return
       case MessageToWebviewType.setData:
         runInAction(() => {
-          this.tableData = message.tableData
+          this.webviewData = message.webviewData
         })
         return
       case MessageToWebviewType.setDvcRoot:
