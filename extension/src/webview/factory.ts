@@ -69,7 +69,7 @@ const isValidState = (
   (viewKey === ViewKey.EXPERIMENTS && isExperimentsWebviewState(state)) ||
   (viewKey === ViewKey.PLOTS && isPlotsWebviewState(state))
 
-const create = async (
+const create = (
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
   internalCommands: InternalCommands,
@@ -82,7 +82,7 @@ const create = async (
 
   const { contextKey, eventNames } = WebviewDetails[viewKey]
 
-  const view = BaseWebview.create(
+  return BaseWebview.create(
     webviewPanel,
     internalCommands,
     state,
@@ -90,11 +90,9 @@ const create = async (
     contextKey,
     [main]
   )
-  await view.isReady()
-  return view
 }
 
-export const createWebview = (
+export const createWebview = async (
   viewKey: ViewKey,
   internalCommands: InternalCommands,
   state: GenericWebviewState<unknown>,
@@ -115,7 +113,9 @@ export const createWebview = (
 
   webviewPanel.iconPath = iconPath
 
-  return create(viewKey, webviewPanel, internalCommands, state)
+  const view = create(viewKey, webviewPanel, internalCommands, state)
+  await view.isReady()
+  return view
 }
 
 export const restoreWebview = <T extends TableData | PlotsData>(

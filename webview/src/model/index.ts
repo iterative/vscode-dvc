@@ -2,18 +2,18 @@ import {
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebviewType,
+  GenericMessageToWebview,
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webview/contract'
-import {
-  MessageToWebview,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
 import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './vsCodeApi'
+
+type MessageToWebview = GenericMessageToWebview<TableData>
 
 export type VsCodeApi = BaseVsCodeApi<
   PersistedModelState,

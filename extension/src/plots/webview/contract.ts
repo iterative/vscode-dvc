@@ -1,4 +1,3 @@
-import { GenericWebviewState } from '../../webview/contract'
 import { ParamOrMetric } from '../../experiments/webview/contract'
 
 export interface PlotsData {
@@ -11,5 +10,3 @@ export interface PlotsData {
   metrics: ParamOrMetric[]
   params: ParamOrMetric[]
 }
-
-export type WebviewState = GenericWebviewState<PlotsData>

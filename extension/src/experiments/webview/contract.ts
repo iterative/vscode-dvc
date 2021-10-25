@@ -1,8 +1,4 @@
 import { BaseExperimentFields, ValueTree } from '../../cli/reader'
-import {
-  GenericMessageToWebview,
-  GenericWebviewState
-} from '../../webview/contract'
 import { SortDefinition } from '../model/sortBy'
 
 export interface ParamsOrMetrics {
@@ -42,7 +38,3 @@ export interface TableData {
   changes: string[]
   columnsOrder: string[]
 }
-
-export type MessageToWebview = GenericMessageToWebview<TableData>
-
-export type WebviewState = GenericWebviewState<TableData>
