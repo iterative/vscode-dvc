@@ -31,7 +31,7 @@ export enum WebviewColorTheme {
 
 export interface setData<T extends WebviewData> {
   type: MessageToWebviewType.setData
-  webviewData: T
+  data: T
 }
 
 export type MessageToWebview<T extends WebviewData> = {
@@ -56,7 +56,7 @@ export enum MessageToWebviewType {
 
 export interface WebviewState<T extends WebviewData | unknown> {
   dvcRoot: string
-  webviewData?: T
+  data?: T
 }
 
 export type UnknownWebviewState = WebviewState<unknown>

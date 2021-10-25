@@ -26,7 +26,7 @@ declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  webviewData?: TableData | null
+  data?: TableData | null
   dvcRoot?: string
 }
 
@@ -37,7 +37,7 @@ export class Model {
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
-  public webviewData?: TableData | null = null // do not remove = null or webview will not load data
+  public data?: TableData | null = null // do not remove = null or webview will not load data
 
   @observable
   public dvcRoot?: string
@@ -89,14 +89,14 @@ export class Model {
 
   private getState(): PersistedModelState {
     return {
-      dvcRoot: this.dvcRoot,
-      webviewData: this.webviewData
+      data: this.data,
+      dvcRoot: this.dvcRoot
     }
   }
 
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
-    this.webviewData = state.webviewData
+    this.data = state.data
   }
 
   private handleMessage(message: MessageToWebview): void {
@@ -109,7 +109,7 @@ export class Model {
         return
       case MessageToWebviewType.setData:
         runInAction(() => {
-          this.webviewData = message.webviewData
+          this.data = message.data
         })
         return
       case MessageToWebviewType.setDvcRoot:

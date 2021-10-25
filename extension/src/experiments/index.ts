@@ -117,8 +117,8 @@ export class Experiments {
       ViewKey.EXPERIMENTS,
       this.internalCommands,
       {
-        dvcRoot: this.dvcRoot,
-        webviewData: this.getTableData()
+        data: this.getTableData(),
+        dvcRoot: this.dvcRoot
       },
       this.resourceLocator.dvcIcon
     )) as ExperimentsWebview
@@ -226,7 +226,7 @@ export class Experiments {
   private sendData() {
     if (this.webview) {
       this.webview.show({
-        webviewData: this.getTableData()
+        data: this.getTableData()
       })
     }
   }

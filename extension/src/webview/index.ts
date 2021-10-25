@@ -91,11 +91,11 @@ export class BaseWebview<T extends WebviewData> {
           type: MessageToWebviewType.setDvcRoot
         })
 
-        const webviewData = state.webviewData
-        if (webviewData) {
+        const data = state.data
+        if (data) {
           this.sendMessage({
-            type: MessageToWebviewType.setData,
-            webviewData
+            data,
+            type: MessageToWebviewType.setData
           })
         }
       })
@@ -120,10 +120,7 @@ export class BaseWebview<T extends WebviewData> {
     return this.webviewPanel.visible
   }
 
-  public async show(payload: {
-    webviewData: T
-    errors?: Error[]
-  }): Promise<boolean> {
+  public async show(payload: { data: T; errors?: Error[] }): Promise<boolean> {
     await this.isReady()
     return this.sendMessage({
       type: MessageToWebviewType.setData,

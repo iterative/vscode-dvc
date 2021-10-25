@@ -54,12 +54,12 @@ const WebviewDetails: {
 } as const
 
 const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
-  const tableData = state.webviewData as TableData
+  const tableData = state.data as TableData
   return !tableData || !!(tableData.rows && tableData.columns)
 }
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
-  const tableData = state.webviewData as PlotsData
+  const tableData = state.data as PlotsData
   return !tableData || !!tableData.metrics
 }
 
