@@ -3,13 +3,13 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { autorun } from 'mobx'
 import {
-  MessageToWebview,
-  WebviewState,
   MessageFromWebview,
   MessageFromWebviewType,
+  MessageToWebview,
   MessageToWebviewType,
   WebviewColorTheme,
   WebviewData,
+  WebviewState,
   WindowWithWebviewData
 } from './contract'
 import { EventNames } from './constants'
