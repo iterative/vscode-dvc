@@ -1,57 +1,11 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
-import { distPath, main } from 'dvc-vscode-webview'
 import { BaseWebview } from '.'
-import {
-  WebviewState,
-  UnknownWebviewState,
-  ViewKey,
-  WebviewData
-} from './contract'
+import { ViewKey, WebviewDetails } from './constants'
+import { WebviewState, UnknownWebviewState, WebviewData } from './contract'
 import { InternalCommands } from '../commands/internal'
 import { Resource } from '../resourceLocator'
 import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
-import { EventName, IEventNamePropertyMapping } from '../telemetry/constants'
-
-type Name = keyof IEventNamePropertyMapping
-export type EventNames = {
-  createdEvent: Name
-  closedEvent: Name
-  focusChangedEvent: Name
-}
-
-const WebviewDetails: {
-  [key in ViewKey]: {
-    contextKey: string
-    distPath: string
-    eventNames: EventNames
-    title: string
-    viewKey: ViewKey
-  }
-} = {
-  'dvc-experiments': {
-    contextKey: 'dvc.experiments.webviewActive',
-    distPath,
-    eventNames: {
-      closedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CLOSED,
-      createdEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
-      focusChangedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED
-    },
-    title: 'Experiments',
-    viewKey: ViewKey.EXPERIMENTS
-  },
-  'dvc-plots': {
-    contextKey: 'dvc.plots.webviewActive',
-    distPath,
-    eventNames: {
-      closedEvent: EventName.VIEWS_PLOTS_CLOSED,
-      createdEvent: EventName.VIEWS_PLOTS_CREATED,
-      focusChangedEvent: EventName.VIEWS_PLOTS_FOCUS_CHANGED
-    },
-    title: 'Plots',
-    viewKey: ViewKey.PLOTS
-  }
-} as const
 
 const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
   const tableData = state.data as TableData
@@ -80,15 +34,15 @@ const create = (
     throw new Error(`trying to set invalid state into ${viewKey}`)
   }
 
-  const { contextKey, eventNames } = WebviewDetails[viewKey]
+  const { contextKey, eventNames, scripts } = WebviewDetails[viewKey]
 
   return new BaseWebview(
     webviewPanel,
     internalCommands,
     state,
-    eventNames,
     contextKey,
-    [main]
+    eventNames,
+    scripts
   )
 }
 

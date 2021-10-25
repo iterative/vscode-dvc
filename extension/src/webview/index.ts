@@ -12,7 +12,7 @@ import {
   WebviewData,
   WindowWithWebviewData
 } from './contract'
-import { EventNames } from './factory'
+import { EventNames } from './constants'
 import { Logger } from '../common/logger'
 import { setContextValue } from '../vscode/context'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
@@ -41,9 +41,9 @@ export class BaseWebview<T extends WebviewData> {
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: WebviewState<T>,
-    eventsNames: EventNames,
     contextKey: string,
-    scripts: string[] = []
+    eventsNames: EventNames,
+    scripts: readonly string[]
   ) {
     this.webviewPanel = webviewPanel
     this.onDidDispose = this.webviewPanel.onDidDispose
@@ -149,7 +149,7 @@ export class BaseWebview<T extends WebviewData> {
     this.isFocusedChanged.fire(active)
   }
 
-  private async getHtml(scripts: string[]): Promise<string> {
+  private async getHtml(scripts: readonly string[]): Promise<string> {
     const webviewScriptTags = scripts
       .map(
         script =>

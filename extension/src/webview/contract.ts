@@ -3,11 +3,6 @@ import { PlotsData } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
 
-export enum ViewKey {
-  EXPERIMENTS = 'dvc-experiments',
-  PLOTS = 'dvc-plots'
-}
-
 export type MessageFromWebview = {
   type: MessageFromWebviewType
   payload?: Object

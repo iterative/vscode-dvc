@@ -1,6 +1,7 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { ViewKey, WebviewState } from './contract'
+import { ViewKey } from './constants'
+import { WebviewState } from './contract'
 import { restoreWebview } from './factory'
 import { WorkspaceExperiments } from '../experiments/workspace'
 import { InternalCommands } from '../commands/internal'

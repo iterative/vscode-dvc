@@ -15,7 +15,7 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { createWebview } from '../webview/factory'
 import { BaseWebview } from '../webview'
-import { ViewKey } from '../webview/contract'
+import { ViewKey } from '../webview/constants'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
