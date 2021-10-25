@@ -88,7 +88,7 @@ suite('Experiments Test Suite', () => {
         complexExperimentsOutput
       )
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'show')
 
       const webview = await experiments.showWebview()
 
@@ -147,7 +147,7 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+      const messageSpy = spy(ExperimentsWebview.prototype, 'show')
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )

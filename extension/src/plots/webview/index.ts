@@ -4,13 +4,9 @@ import { PlotsData, WebviewState } from './contract'
 import { InternalCommands } from '../../commands/internal'
 import { EventName } from '../../telemetry/constants'
 import { BaseWebview } from '../../webview'
-import {
-  MessageToWebview,
-  MessageToWebviewType,
-  WebviewState as GenericWebviewState
-} from '../../webview/contract'
+import { WebviewState as GenericWebviewState } from '../../webview/contract'
 
-const isPlotsWebviewState = (
+export const isPlotsWebviewState = (
   state: GenericWebviewState<unknown>
 ): state is WebviewState => {
   const tableData = state.webviewData as PlotsData
@@ -23,7 +19,7 @@ export class PlotsWebview extends BaseWebview<PlotsData> {
   public static viewKey = 'dvc-plots'
   public static contextKey = 'dvc.plots.webviewActive'
 
-  constructor(
+  private constructor(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
     state: WebviewState
@@ -45,23 +41,8 @@ export class PlotsWebview extends BaseWebview<PlotsData> {
   public static create(
     webviewPanel: WebviewPanel,
     internalCommands: InternalCommands,
-    state: GenericWebviewState<unknown>
+    state: WebviewState
   ): PlotsWebview {
-    if (!isPlotsWebviewState(state)) {
-      throw new Error('trying to create a plots webview with the wrong state')
-    }
-
     return new PlotsWebview(webviewPanel, internalCommands, state)
-  }
-
-  public async showPlots(payload: {
-    webviewData: PlotsData
-    errors?: Error[]
-  }): Promise<boolean> {
-    await this.isReady()
-    return this.sendMessage<MessageToWebview<PlotsData>>({
-      type: MessageToWebviewType.setData,
-      ...payload
-    })
   }
 }

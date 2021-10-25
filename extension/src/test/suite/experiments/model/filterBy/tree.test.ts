@@ -43,7 +43,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await experiments.isReady()
       const experimentsWebview = await experiments.showWebview()
-      const messageSpy = spy(experimentsWebview, 'showExperiments')
+      const messageSpy = spy(experimentsWebview, 'show')
 
       const accuracyPath = joinParamOrMetricPath(
         'metrics',

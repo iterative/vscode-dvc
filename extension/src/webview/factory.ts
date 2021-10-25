@@ -1,9 +1,12 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
 import { WebviewState } from './contract'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsWebview } from '../experiments/webview'
+import {
+  ExperimentsWebview,
+  isExperimentsWebviewState
+} from '../experiments/webview'
 import { Resource } from '../resourceLocator'
-import { PlotsWebview } from '../plots/webview'
+import { isPlotsWebviewState, PlotsWebview } from '../plots/webview'
 
 type WebviewType = typeof ExperimentsWebview | typeof PlotsWebview
 
@@ -19,14 +22,24 @@ const create = (
   state: WebviewState<unknown>
 ): ExperimentsWebview | PlotsWebview => {
   if (isExperimentsWebview(webviewType)) {
+    if (!isExperimentsWebviewState(state)) {
+      throw new Error(
+        'trying to create an experiments webview with the wrong state'
+      )
+    }
+
     return ExperimentsWebview.create(webviewPanel, internalCommands, state)
+  }
+
+  if (!isPlotsWebviewState(state)) {
+    throw new Error('trying to create a plots webview with the wrong state')
   }
 
   return PlotsWebview.create(webviewPanel, internalCommands, state)
 }
 
-export const createWebview = async <T extends WebviewType>(
-  webviewType: T,
+export const createWebview = async (
+  webviewType: WebviewType,
   internalCommands: InternalCommands,
   state: WebviewState<unknown>,
   iconPath: Resource

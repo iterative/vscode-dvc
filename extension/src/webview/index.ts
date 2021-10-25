@@ -101,7 +101,7 @@ export class BaseWebview<T extends TableData | PlotsData> {
 
         const webviewData = state.webviewData
         if (webviewData) {
-          this.sendMessage<MessageToWebview<T>>({
+          this.sendMessage({
             type: MessageToWebviewType.setData,
             webviewData
           })
@@ -128,12 +128,23 @@ export class BaseWebview<T extends TableData | PlotsData> {
     return this.webviewPanel.visible
   }
 
-  public reveal = () => {
+  public async show(payload: {
+    webviewData: T
+    errors?: Error[]
+  }): Promise<boolean> {
+    await this.isReady()
+    return this.sendMessage({
+      type: MessageToWebviewType.setData,
+      ...payload
+    })
+  }
+
+  public reveal() {
     this.webviewPanel.reveal()
     return this
   }
 
-  protected sendMessage<T = never>(message: T) {
+  protected sendMessage(message: MessageToWebview<T>) {
     if (this.deferred.state !== 'resolved') {
       throw new Error(
         'Cannot send message when webview is not initialized yet!'

@@ -20,17 +20,14 @@ export class WebviewSerializer {
           state: WebviewState
         ) => {
           const dvcRoot = state?.dvcRoot
-          const experimentsWebview = await restoreWebview(
+          const experimentsWebview = (await restoreWebview(
             ExperimentsWebview,
             panel,
             internalCommands,
             state
-          )
+          )) as ExperimentsWebview
           await experiments.isReady()
-          experiments.setWebview(
-            dvcRoot,
-            experimentsWebview as ExperimentsWebview
-          )
+          experiments.setWebview(dvcRoot, experimentsWebview)
         }
       })
     )

@@ -221,7 +221,7 @@ export class Experiments {
 
   private sendData() {
     if (this.webview) {
-      this.webview.showExperiments({
+      this.webview.show({
         webviewData: this.getTableData()
       })
     }
