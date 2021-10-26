@@ -14,9 +14,9 @@ export const MergedHeaderGroup: React.FC<{
 }> = ({ headerGroup, sorts, columns }) => {
   return (
     <Droppable droppableId="droppable" direction="horizontal">
-      {droppableProvided => (
+      {provided => (
         <div
-          ref={droppableProvided.innerRef}
+          ref={provided.innerRef}
           {...headerGroup.getHeaderGroupProps({
             className: cx(styles.tr, styles.headerRow)
           })}
@@ -30,6 +30,7 @@ export const MergedHeaderGroup: React.FC<{
               index={i}
             />
           ))}
+          <div className={styles.dndPlaceholder}>{provided.placeholder}</div>
         </div>
       )}
     </Droppable>

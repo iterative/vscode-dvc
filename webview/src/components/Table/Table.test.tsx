@@ -2,17 +2,19 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom/extend-expect'
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor
-} from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
+import {
+  mockGetComputedSpacing,
+  mockDndElSpacing,
+  makeDnd,
+  DND_DRAGGABLE_DATA_ATTR,
+  DND_DIRECTION_LEFT,
+  DND_DIRECTION_RIGHT
+} from 'react-beautiful-dnd-test-utils'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import * as Messaging from '../../util/useMessaging'
@@ -274,7 +276,7 @@ describe('Table', () => {
   })
 
   describe('Columns order', () => {
-    it('should move a column from its current position to its new position', async () => {
+    const renderExperimentsTable = () => {
       const basicProps = {
         group: 'params',
         hasChildren: false,
@@ -307,8 +309,24 @@ describe('Table', () => {
         rows: [],
         sorts: []
       }
-      const defaultCols = ['Experiment', 'Timestamp']
-      render(<ExperimentsTable tableData={tableData} />)
+      const table = render(<ExperimentsTable tableData={tableData} />)
+
+      mockDndElSpacing(table)
+
+      const makeGetDragEl = (text: string) => () =>
+        table.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
+
+      return { makeGetDragEl, ...table }
+    }
+
+    const defaultCols = ['Experiment', 'Timestamp']
+
+    beforeEach(() => {
+      mockGetComputedSpacing()
+    })
+
+    it('should move a column from its current position to its new position', async () => {
+      const { getByText, makeGetDragEl } = renderExperimentsTable()
 
       let headers = await waitFor(() =>
         screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
@@ -316,18 +334,29 @@ describe('Table', () => {
 
       expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
 
-      fireEvent(
-        screen.getByTestId('move-params:B-right'),
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      await makeDnd({
+        direction: DND_DIRECTION_LEFT,
+        getByText,
+        getDragEl: makeGetDragEl('C'),
+        positions: 1
+      })
 
       headers = await waitFor(() =>
         screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
       )
       expect(headers).toEqual([...defaultCols, 'A', 'C', 'B'])
+
+      await makeDnd({
+        direction: DND_DIRECTION_RIGHT,
+        getByText,
+        getDragEl: makeGetDragEl('A'),
+        positions: 2
+      })
+
+      headers = await waitFor(() =>
+        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      )
+      expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
     })
   })
 })

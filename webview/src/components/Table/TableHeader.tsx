@@ -3,7 +3,7 @@ import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
-import { Draggable, DraggingStyle, NotDraggingStyle } from 'react-beautiful-dnd'
+import { Draggable } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
 import { getPlaceholder, isFirstLevelHeader } from '../../util/columns'
 
@@ -13,18 +13,6 @@ interface TableHeaderProps {
   sorts: SortDefinition[]
   index: number
 }
-
-const getItemStyle = (
-  isDragging: boolean,
-  isDropAnimating: boolean,
-  draggableStyle?: DraggingStyle | NotDraggingStyle
-) => ({
-  ...draggableStyle,
-  opacity: isDragging ? 0.7 : 1,
-
-  ...(!isDragging && { transform: 'translate(0,0)' }),
-  ...(isDropAnimating && { transitionDuration: '0.001s' })
-})
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
@@ -75,13 +63,12 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             data-testid="rendered-header"
-            style={{
-              ...getItemStyle(
-                snapshot.isDragging,
-                snapshot.isDropAnimating,
-                provided.draggableProps.style
-              )
-            }}
+            style={provided.draggableProps.style}
+            className={cx({
+              [styles.draggingColumn]: snapshot.isDragging,
+              [styles.staticColumn]: !snapshot.isDragging,
+              [styles.isDroppedColumn]: snapshot.isDropAnimating
+            })}
           >
             {column.render('Header')}
           </div>

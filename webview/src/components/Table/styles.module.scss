@@ -429,3 +429,19 @@ $spinner-color-light: #000;
   @extend %arrow;
   right: -2px;
 }
+
+.draggingColumn {
+  opacity: 0.7;
+}
+
+.staticColumn {
+  transform: translate(0,0) !important;
+}
+
+.isDroppedColumn {
+  transition-duration: 100;
+}
+
+.dndPlaceholder {
+  display: none;
+}
