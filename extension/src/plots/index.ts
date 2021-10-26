@@ -30,13 +30,7 @@ export class Experiments extends BaseRepository<PlotsData> {
 
     this.plots = this.dispose.track(new PlotsModel())
 
-    const waitForInitialData = this.dispose.track(
-      this.onDidChangePlots(() => {
-        this.deferred.resolve()
-        this.dispose.untrack(waitForInitialData)
-        waitForInitialData.dispose()
-      })
-    )
+    this.deferred.resolve()
   }
 
   public setState(data: ExperimentsRepoJSONOutput) {
