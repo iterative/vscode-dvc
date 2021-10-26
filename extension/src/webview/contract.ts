@@ -51,7 +51,7 @@ export enum MessageToWebviewType {
 
 export interface WebviewState<T extends WebviewData | unknown> {
   dvcRoot: string
-  data?: T
+  data: T
 }
 
 export type UnknownWebviewState = WebviewState<unknown>

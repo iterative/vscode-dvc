@@ -9,12 +9,12 @@ import { PlotsData } from '../plots/webview/contract'
 
 const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as TableData
-  return !data || !!(data.rows && data.columns)
+  return !!(data?.rows && data?.columns)
 }
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as PlotsData
-  return !data || !!(data?.[0]?.title && data?.[0]?.values)
+  return !!(data?.[0]?.title && data?.[0]?.values)
 }
 
 const isValidState = (
