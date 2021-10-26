@@ -115,6 +115,17 @@ module.exports = {
     ],
     'no-console': 'error',
     'no-restricted-globals': ['error', 'name', 'length', 'event'],
+    'no-restricted-syntax': [
+      'error',
+      {
+        message: 'Property getters are not allowed',
+        selector: "MethodDefinition[kind='get']"
+      },
+      {
+        message: 'Property setters are not allowed',
+        selector: "MethodDefinition[kind='set']"
+      }
+    ],
     // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
     'no-use-before-define': 'off',
     'react-hooks/exhaustive-deps': 'error',

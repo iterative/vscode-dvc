@@ -1,4 +1,4 @@
-import { MessageFromWebview } from 'dvc/src/experiments/webview/contract'
+import { MessageFromWebview } from 'dvc/src/webview/contract'
 import { isStorybook } from './storybook'
 import { Model } from '../model'
 
