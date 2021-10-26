@@ -2,7 +2,6 @@ import omit from 'lodash.omit'
 import { PlotData } from './webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput,
   Value,
   ValueTree
@@ -12,7 +11,7 @@ import { joinParamOrMetricPath } from '../experiments/paramsAndMetrics/paths'
 import { ParamsOrMetrics } from '../experiments/webview/contract'
 import { addToMapArray, addToMapCount } from '../util/map'
 
-const collectPlotData = (
+const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
   displayName: string,
   iteration: number,
@@ -20,22 +19,25 @@ const collectPlotData = (
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
-  const currentAncestors = [...ancestors, key].filter(Boolean) as string[]
+  if (key) {
+    ancestors.push(key)
+  }
+
   if (typeof value === 'object') {
     Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
-      return collectPlotData(
+      return collectFromMetricsFile(
         acc,
         displayName,
         iteration,
         childKey,
         childValue,
-        currentAncestors
+        ancestors
       )
     })
     return
   }
 
-  const path = joinParamOrMetricPath(...currentAncestors)
+  const path = joinParamOrMetricPath(...ancestors)
 
   addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
 }
@@ -69,17 +71,21 @@ const isValidCheckpoint = (
 ): data is ValidCheckpointData =>
   !!(data?.metrics && data?.checkpoint_tip && data?.checkpoint_tip !== sha)
 
-const collectPlotsData = (
+const collectFromMetrics = (
   acc: LivePlotAccumulator,
   experimentName: string,
   iteration: number,
   metrics: ParamsOrMetrics
 ) => {
   Object.keys(metrics).forEach(file =>
-    collectPlotData(acc, experimentName, iteration, undefined, metrics[file], [
-      'metrics',
-      file
-    ])
+    collectFromMetricsFile(
+      acc,
+      experimentName,
+      iteration,
+      undefined,
+      metrics[file],
+      ['metrics', file]
+    )
   )
 }
 
@@ -104,16 +110,19 @@ const collectFromExperimentsObject = (
       continue
     }
 
-    collectPlotsData(acc, experimentName, iteration, metrics)
+    collectFromMetrics(acc, experimentName, iteration, metrics)
   }
 }
 
-const collectFromBranchesObject = (
-  acc: LivePlotAccumulator,
-  branchesObject: { [name: string]: ExperimentsBranchJSONOutput }
-) => {
+export type LivePlotAccumulator = Map<string, PlotData>
+
+export const collectLivePlotsData = (
+  data: ExperimentsRepoJSONOutput
+): LivePlotAccumulator => {
+  const acc = new Map<string, PlotData>()
+
   for (const { baseline, ...experimentsObject } of Object.values(
-    branchesObject
+    omit(data, 'workspace')
   )) {
     const branch = transformExperimentData(baseline)
 
@@ -121,18 +130,6 @@ const collectFromBranchesObject = (
       collectFromExperimentsObject(acc, experimentsObject)
     }
   }
-}
-
-export type LivePlotAccumulator = Map<string, PlotData>
-
-export const collectLivePlots = (
-  data: ExperimentsRepoJSONOutput
-): LivePlotAccumulator => {
-  const branchesObject = omit(data, 'workspace')
-
-  const acc = new Map<string, PlotData>()
-
-  collectFromBranchesObject(acc, branchesObject)
 
   return acc
 }

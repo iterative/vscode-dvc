@@ -1,5 +1,5 @@
 import { Disposable } from '@hediet/std/disposable'
-import { collectLivePlots, LivePlotAccumulator } from './collect'
+import { collectLivePlotsData, LivePlotAccumulator } from './collect'
 import { PlotsData } from './webview/contract'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
@@ -9,7 +9,7 @@ export class PlotsModel {
   private data?: LivePlotAccumulator
 
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
-    this.data = collectLivePlots(data)
+    this.data = collectLivePlotsData(data)
   }
 
   public getData() {

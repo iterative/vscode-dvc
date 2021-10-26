@@ -1,9 +1,9 @@
-import { collectLivePlots } from './collect'
+import { collectLivePlotsData } from './collect'
 import complexExperimentsOutput from '../test/fixtures/complex-output-example'
 
-describe('collectLivePlots', () => {
+describe('collectLivePlotsData', () => {
   it('should return the expected data from the test fixture', () => {
-    const data = collectLivePlots(complexExperimentsOutput)
+    const data = collectLivePlotsData(complexExperimentsOutput)
     expect(data.get('metrics:summary.json:loss')).toEqual([
       { group: 'exp-83425', x: 1, y: 1.9896177053451538 },
       { group: 'exp-83425', x: 2, y: 1.9329891204833984 },
