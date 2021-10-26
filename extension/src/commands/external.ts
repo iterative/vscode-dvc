@@ -34,7 +34,6 @@ export enum RegisteredCommands {
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
-  PLOTS_SHOW = 'dvc.showPlots',
 
   EXTENSION_GET_STARTED = 'dvc.getStarted',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',

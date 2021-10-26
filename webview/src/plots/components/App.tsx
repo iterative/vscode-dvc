@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
+import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import {
   MessageFromWebviewType,
-  MessageToWebviewType,
-  ParamOrMetric
-} from 'dvc/src/experiments/webview/contract'
+  MessageToWebviewType
+} from 'dvc/src/webview/contract'
 
 import { ValueTreeRoot } from 'dvc/src/cli/reader'
 import Plots from './Plots'
@@ -42,7 +42,7 @@ const App = () => {
     signalInitialized()
     window.addEventListener('message', ({ data }) => {
       switch (data.type) {
-        case MessageToWebviewType.showExperiments: {
+        case MessageToWebviewType.setData: {
           setPlotsData(parseTableData(data.tableData))
           break
         }

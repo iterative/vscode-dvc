@@ -127,6 +127,7 @@ suite('Workspace Experiments Test Suite', () => {
         resourceLocator
       )
 
+      experiments.setState(complexExperimentsOutput)
       await workspaceExperiments.isReady()
 
       const focused = onDidChangeIsWebviewFocused(experiments)

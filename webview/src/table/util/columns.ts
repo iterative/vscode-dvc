@@ -6,3 +6,5 @@ export const getPlaceholder = (
   columns: HeaderGroup<Experiment>[]
 ): HeaderGroup<Experiment> | undefined =>
   columns.find(c => c.placeholderOf?.id === column.id)
+
+export const isFirstLevelHeader = (id: string) => id.split(':').length - 1 === 1

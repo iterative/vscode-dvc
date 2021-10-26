@@ -1,4 +1,4 @@
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Deferred } from '@hediet/std/synchronization'
 import { Disposable } from '@hediet/std/disposable'
@@ -9,19 +9,19 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { WorkspaceParamsAndMetrics } from './paramsAndMetrics/workspace'
-import { TableWebview } from './webview/table'
-import { PlotsWebview } from './webview/plots'
+import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
-import { createNecessaryFileSystemWatcher } from '../fileSystem/watcher'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ProcessManager } from '../processManager'
+import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { getGitRepositoryRoot } from '../git'
+import { createWebview } from '../webview/factory'
+import { BaseWebview } from '../webview'
+import { ViewKey } from '../webview/constants'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
+
+export type ExperimentsWebview = BaseWebview<TableData>
 
 export class Experiments {
   public readonly dispose = Disposable.fn()
@@ -38,8 +38,7 @@ export class Experiments {
   private readonly internalCommands: InternalCommands
   private readonly resourceLocator: ResourceLocator
 
-  private tableWebview?: TableWebview
-  private plotsWebview?: PlotsWebview
+  private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
@@ -48,8 +47,6 @@ export class Experiments {
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
-
-  private processManager: ProcessManager
 
   constructor(
     dvcRoot: string,
@@ -73,43 +70,26 @@ export class Experiments {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    this.processManager = this.dispose.track(
-      new ProcessManager({ name: 'refresh', process: () => this.updateData() })
+    const waitForInitialData = this.dispose.track(
+      this.onDidChangeExperiments(() => {
+        this.deferred.resolve()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+      })
     )
-
-    this.updateData().then(() => {
-      this.dispose.track(
-        new WorkspaceParamsAndMetrics(dvcRoot, this.paramsAndMetrics, () =>
-          this.refresh()
-        )
-      )
-      this.deferred.resolve()
-      this.notifyChanged()
-    })
   }
 
   public isReady() {
     return this.initialized
   }
 
-  public async onDidChangeData(): Promise<void> {
-    const gitRoot = await getGitRepositoryRoot(this.dvcRoot)
-    const dotGitGlob = resolve(gitRoot, DOT_GIT, '**')
-    this.dispose.track(
-      createNecessaryFileSystemWatcher(dotGitGlob, (path: string) => {
-        if (
-          path.includes('HEAD') ||
-          path.includes(EXPERIMENTS_GIT_REFS) ||
-          path.includes(join(GIT_REFS, 'heads'))
-        ) {
-          return this.refresh()
-        }
-      })
-    )
-  }
+  public async setState(data: ExperimentsRepoJSONOutput) {
+    await Promise.all([
+      this.paramsAndMetrics.transformAndSet(data),
+      this.experiments.transformAndSet(data)
+    ])
 
-  public refresh() {
-    return this.processManager.run('refresh')
+    return this.notifyChanged()
   }
 
   public getChildParamsOrMetrics(path?: string) {
@@ -128,71 +108,35 @@ export class Experiments {
     return this.paramsAndMetrics.getTerminalNodeStatuses()
   }
 
-  public async showTableWebview() {
-    if (this.tableWebview) {
-      return this.tableWebview.reveal()
+  public showWebview = async () => {
+    if (this.webview) {
+      return this.webview.reveal()
     }
 
-    const webview = await TableWebview.create(
+    const webview = await createWebview(
+      ViewKey.EXPERIMENTS,
       this.internalCommands,
       {
-        dvcRoot: this.dvcRoot,
-        tableData: this.getTableData()
+        data: this.getTableData(),
+        dvcRoot: this.dvcRoot
       },
-      this.resourceLocator
+      this.resourceLocator.dvcIcon
     )
 
-    this.setTableWebview(webview)
+    this.setWebview(webview)
 
     this.isWebviewFocusedChanged.fire(this.dvcRoot)
 
     return webview
   }
 
-  public async showPlotsWebview() {
-    if (this.plotsWebview) {
-      return this.plotsWebview.reveal()
-    }
-
-    const webview = await PlotsWebview.create(
-      this.internalCommands,
-      {
-        dvcRoot: this.dvcRoot,
-        tableData: this.getTableData()
-      },
-      this.resourceLocator
-    )
-
-    this.setPlotsWebview(webview)
-
-    this.isWebviewFocusedChanged.fire(this.dvcRoot)
-
-    return webview
-  }
-
-  public setTableWebview(view: TableWebview) {
-    this.tableWebview = this.dispose.track(view)
+  public setWebview(view: ExperimentsWebview) {
+    this.webview = this.dispose.track(view)
     view.isReady().then(() => this.sendData())
 
     this.dispose.track(
       view.onDidDispose(() => {
-        this.resetTableWebview()
-      })
-    )
-    this.dispose.track(
-      view.onDidChangeIsFocused(dvcRoot => {
-        this.isWebviewFocusedChanged.fire(dvcRoot)
-      })
-    )
-  }
-
-  public setPlotsWebview(view: PlotsWebview) {
-    this.plotsWebview = this.dispose.track(view)
-    view.isReady().then(() => this.sendData())
-
-    this.dispose.track(
-      view.onDidDispose(() => {
-        this.resetPlotsWebview()
+        this.resetWebview()
       })
     )
     this.dispose.track(
@@ -269,21 +213,6 @@ export class Experiments {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  private async updateData(): Promise<void> {
-    const data =
-      await this.internalCommands.executeCommand<ExperimentsRepoJSONOutput>(
-        AvailableCommands.EXPERIMENT_SHOW,
-        this.dvcRoot
-      )
-
-    await Promise.all([
-      this.paramsAndMetrics.transformAndSet(data),
-      this.experiments.transformAndSet(data)
-    ])
-
-    return this.notifyChanged()
-  }
-
   private notifyChanged() {
     this.experimentsChanged.fire()
     this.notifyParamsOrMetricsChanged()
@@ -295,15 +224,9 @@ export class Experiments {
   }
 
   private sendData() {
-    const tableData = this.getTableData()
-    if (this.tableWebview) {
-      this.tableWebview.showExperiments({
-        tableData
-      })
-    }
-    if (this.plotsWebview) {
-      this.plotsWebview.showExperiments({
-        tableData
+    if (this.webview) {
+      this.webview.show({
+        data: this.getTableData()
       })
     }
   }
@@ -312,20 +235,15 @@ export class Experiments {
     return {
       changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
+      columnsOrder: this.paramsAndMetrics.getColumnsOrder(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }
   }
 
-  private resetTableWebview = () => {
+  private resetWebview = () => {
     this.isWebviewFocusedChanged.fire(undefined)
-    this.dispose.untrack(this.tableWebview)
-    this.tableWebview = undefined
-  }
-
-  private resetPlotsWebview = () => {
-    this.isWebviewFocusedChanged.fire(undefined)
-    this.dispose.untrack(this.plotsWebview)
-    this.plotsWebview = undefined
+    this.dispose.untrack(this.webview)
+    this.webview = undefined
   }
 }

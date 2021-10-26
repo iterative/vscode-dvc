@@ -17,13 +17,13 @@ import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
+import { WorkspaceData } from './data/workspace'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
 import { ExperimentsFilterByTree } from './experiments/model/filterBy/tree'
 import { setContextValue } from './vscode/context'
 import { OutputChannel } from './vscode/outputChannel'
-import { WebviewSerializer } from './vscode/webviewSerializer'
 import {
   getWorkspaceFolderCount,
   getWorkspaceFolders
@@ -42,6 +42,7 @@ import {
 } from './vscode/walkthrough'
 import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
+import { WebviewSerializer } from './webview/serializer'
 
 export { Disposable, Disposer }
 
@@ -56,6 +57,7 @@ export class Extension implements IExtension {
   private dvcRoots: string[] = []
   private repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
+  private readonly data: WorkspaceData
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
@@ -117,6 +119,14 @@ export class Extension implements IExtension {
       new WorkspaceRepositories(this.internalCommands)
     )
 
+    this.data = this.dispose.track(new WorkspaceData(this.internalCommands))
+
+    this.dispose.track(
+      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+        this.data.update(cwd)
+      })
+    )
+
     this.dispose.track(
       new ExperimentsParamsAndMetricsTree(
         this.experiments,
@@ -134,12 +144,6 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(new ExperimentsTree(this.experiments))
-
-    this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        this.experiments.refreshData(cwd)
-      })
-    )
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
@@ -288,11 +292,15 @@ export class Extension implements IExtension {
   }
 
   public async initialize() {
+    this.resetMembers()
+
     await Promise.all([
-      this.initializeRepositories(),
+      this.repositories.create(this.dvcRoots, this.trackedExplorerTree),
       this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.initializeExperiments()
+      this.experiments.create(this.dvcRoots, this.resourceLocator)
     ])
+
+    this.data.create(this.dvcRoots, this.experiments)
 
     return Promise.all([
       this.repositories.isReady(),
@@ -305,10 +313,15 @@ export class Extension implements IExtension {
   }
 
   public reset() {
+    this.resetMembers()
+    return this.setAvailable(false)
+  }
+
+  private resetMembers() {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
-    return this.setAvailable(false)
+    this.data.reset()
   }
 
   private setAvailable(available: boolean) {
@@ -325,16 +338,6 @@ export class Extension implements IExtension {
   private setProjectAvailability() {
     const available = this.hasRoots()
     setContextValue('dvc.project.available', available)
-  }
-
-  private initializeRepositories = () => {
-    this.repositories.reset()
-    this.repositories.create(this.dvcRoots, this.trackedExplorerTree)
-  }
-
-  private initializeExperiments = () => {
-    this.experiments.reset()
-    this.experiments.create(this.dvcRoots, this.resourceLocator)
   }
 
   private findDvcRoots = async (cwd: string): Promise<string[]> => {

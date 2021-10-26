@@ -6,6 +6,7 @@ import { TableData } from 'dvc/src/experiments/webview/contract'
 const complexTableData: TableData = {
   changes: complexChangesData,
   columns: complexColumnData,
+  columnsOrder: [],
   rows: complexRowData,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },

@@ -15,6 +15,7 @@ import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
+import { TableData } from '../../../../../experiments/webview/contract'
 
 suite('Experiments Filter By Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -41,8 +42,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
       const { experiments } = buildExperiments(disposable)
 
       await experiments.isReady()
-      const experimentsWebview = await experiments.showTableWebview()
-      const messageSpy = spy(experimentsWebview, 'showExperiments')
+      const experimentsWebview = await experiments.showWebview()
+      const messageSpy = spy(experimentsWebview, 'show')
 
       const accuracyPath = joinParamOrMetricPath(
         'metrics',
@@ -105,9 +106,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       ]
 
       expect(messageSpy).to.be.calledWith({
-        tableData: {
+        data: {
           changes: complexChangesData,
           columns: complexColumnData,
+          columnsOrder: [],
           rows: filteredRows,
           sorts: []
         }
@@ -128,13 +130,16 @@ suite('Experiments Filter By Tree Test Suite', () => {
       )
       await tableFilterRemoved
 
+      const expectedTableData: TableData = {
+        changes: complexChangesData,
+        columns: complexColumnData,
+        columnsOrder: [],
+        rows: complexRowData,
+        sorts: []
+      }
+
       expect(messageSpy).to.be.calledWith({
-        tableData: {
-          changes: complexChangesData,
-          columns: complexColumnData,
-          rows: complexRowData,
-          sorts: []
-        }
+        data: expectedTableData
       })
     })
 

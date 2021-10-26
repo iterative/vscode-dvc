@@ -1,11 +1,9 @@
 import { EventEmitter, Memento } from 'vscode'
 import { makeObservable, observable } from 'mobx'
-import { Experiments } from '.'
-import { TableWebview } from './webview/table'
+import { Experiments, ExperimentsWebview } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
-import { PlotsWebview } from './webview/plots'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -15,6 +13,7 @@ import {
   InternalCommands
 } from '../commands/internal'
 import { BaseWorkspace, IWorkspace } from '../workspace'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export class WorkspaceExperiments
   extends BaseWorkspace<Experiments>
@@ -41,6 +40,11 @@ export class WorkspaceExperiments
     if (experiments) {
       this.repositories = experiments
     }
+  }
+
+  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
+    const experiments = this.getRepository(dvcRoot)
+    experiments.setState(data)
   }
 
   public getFocusedTable(): Experiments | undefined {
@@ -194,16 +198,7 @@ export class WorkspaceExperiments
       return
     }
 
-    return this.showTableWebview(dvcRoot)
-  }
-
-  public async showPlots() {
-    const dvcRoot = await this.getOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showPlotsWebview(dvcRoot)
+    return this.showExperimentsWebview(dvcRoot)
   }
 
   public showExperimentsTableThenRun = async (commandId: CommandId) => {
@@ -212,7 +207,7 @@ export class WorkspaceExperiments
       return
     }
 
-    const experiments = await this.showTableWebview(dvcRoot)
+    const experiments = await this.showExperimentsWebview(dvcRoot)
     if (!experiments) {
       return
     }
@@ -236,27 +231,13 @@ export class WorkspaceExperiments
     return experiments
   }
 
-  public refreshData(dvcRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments?.refresh()
-  }
-
-  public setTableWebview(dvcRoot: string, experimentsWebview: TableWebview) {
+  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
     const experiments = this.getRepository(dvcRoot)
     if (!experiments) {
       experimentsWebview.dispose()
     }
 
-    experiments.setTableWebview(experimentsWebview)
-  }
-
-  public setPlotsWebview(dvcRoot: string, experimentsWebview: PlotsWebview) {
-    const experiments = this.getRepository(dvcRoot)
-    if (!experiments) {
-      experimentsWebview.dispose()
-    }
-
-    experiments.setPlotsWebview(experimentsWebview)
+    experiments.setWebview(experimentsWebview)
   }
 
   private async getDvcRoot(overrideRoot?: string) {
@@ -276,15 +257,9 @@ export class WorkspaceExperiments
     )
   }
 
-  private async showTableWebview(dvcRoot: string): Promise<Experiments> {
+  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
     const experiments = this.getRepository(dvcRoot)
-    await experiments.showTableWebview()
-    return experiments
-  }
-
-  private async showPlotsWebview(dvcRoot: string): Promise<Experiments> {
-    const experiments = this.getRepository(dvcRoot)
-    await experiments.showPlotsWebview()
+    await experiments.showWebview()
     return experiments
   }
 
@@ -299,8 +274,6 @@ export class WorkspaceExperiments
     )
 
     this.setRepository(dvcRoot, experiments)
-
-    experiments.onDidChangeData()
 
     experiments.dispose.track(
       experiments.onDidChangeIsWebviewFocused(

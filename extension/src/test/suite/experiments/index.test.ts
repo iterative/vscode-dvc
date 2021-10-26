@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
-import { buildExperiments } from './util'
+import { buildExperiments, getMockInternalCommands } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -13,10 +13,9 @@ import complexChangesData from '../../fixtures/complex-changes-example'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import { AvailableCommands, InternalCommands } from '../../../commands/internal'
-import { ExperimentsWebview } from '../../../experiments/webview'
+import { InternalCommands } from '../../../commands/internal'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
-import { ParamOrMetric } from '../../../experiments/webview/contract'
+import { ParamOrMetric, TableData } from '../../../experiments/webview/contract'
 import {
   closeAllEditors,
   dvcDemoPath,
@@ -30,6 +29,7 @@ import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
+import { BaseWebview } from '../../../webview'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -41,26 +41,6 @@ suite('Experiments Test Suite', () => {
   afterEach(() => {
     disposable.dispose()
     return closeAllEditors()
-  })
-
-  describe('refresh', () => {
-    it('should debounce all calls to refresh that are made within 200ms', async () => {
-      const { experiments, mockExperimentShow } = buildExperiments(disposable)
-
-      await experiments.isReady()
-      mockExperimentShow.resetHistory()
-
-      await Promise.all([
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh(),
-        experiments.refresh()
-      ])
-
-      expect(mockExperimentShow).to.be.calledOnce
-    })
   })
 
   describe('getExperiments', () => {
@@ -101,57 +81,33 @@ suite('Experiments Test Suite', () => {
     })
   })
 
-  describe('showPlotsWebview', () => {
-    it('should be able to make the experiment plots webview visible', async () => {
+  describe('showWebview', () => {
+    it('should be able to make the experiment webview visible', async () => {
       const { experiments } = buildExperiments(
         disposable,
         complexExperimentsOutput
       )
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
+      const messageSpy = spy(BaseWebview.prototype, 'show')
 
-      const webview = await experiments.showPlotsWebview()
+      const webview = await experiments.showWebview()
 
-      expect(messageSpy).to.be.calledWith({
-        tableData: {
-          changes: complexChangesData,
-          columns: complexColumnData,
-          rows: complexRowData,
-          sorts: []
-        }
-      })
+      const expectedTableData: TableData = {
+        changes: complexChangesData,
+        columns: complexColumnData,
+        columnsOrder: [],
+        rows: complexRowData,
+        sorts: []
+      }
 
-      expect(webview.isActive()).to.be.true
-      expect(webview.isVisible()).to.be.true
-    }).timeout(5000)
-  })
-
-  describe('showTableWebview', () => {
-    it('should be able to make the experiment table webview visible', async () => {
-      const { experiments } = buildExperiments(
-        disposable,
-        complexExperimentsOutput
-      )
-
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
-
-      const webview = await experiments.showTableWebview()
-
-      expect(messageSpy).to.be.calledWith({
-        tableData: {
-          changes: complexChangesData,
-          columns: complexColumnData,
-          rows: complexRowData,
-          sorts: []
-        }
-      })
+      expect(messageSpy).to.be.calledWith({ data: expectedTableData })
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
     }).timeout(5000)
 
     it('should only be able to open a single experiments webview', async () => {
-      const { experiments, mockExperimentShow } = buildExperiments(disposable)
+      const { experiments } = buildExperiments(disposable)
 
       const windowSpy = spy(window, 'createWebviewPanel')
       const uri = Uri.file(resolve(dvcDemoPath, 'train.py'))
@@ -161,23 +117,20 @@ suite('Experiments Test Suite', () => {
 
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const webview = await experiments.showTableWebview()
+      const webview = await experiments.showWebview()
 
       expect(windowSpy).to.have.been.calledOnce
-      expect(mockExperimentShow).to.have.been.calledOnce
 
       windowSpy.resetHistory()
-      mockExperimentShow.resetHistory()
 
       await commands.executeCommand('workbench.action.previousEditor')
       expect(window.activeTextEditor?.document).to.deep.equal(document)
 
-      const sameWebview = await experiments.showTableWebview()
+      const sameWebview = await experiments.showWebview()
 
       expect(webview === sameWebview).to.be.true
 
       expect(windowSpy).not.to.have.been.called
-      expect(mockExperimentShow).not.to.have.been.called
     }).timeout(5000)
 
     it('should be able to sort', async () => {
@@ -193,20 +146,8 @@ suite('Experiments Test Suite', () => {
           }
         }
       })
-      stub(cliReader, 'experimentShow').resolves({
-        testBranch: {
-          baseline: { data: buildTestExperiment(10) },
-          testExp1: { data: buildTestExperiment(2) },
-          testExp2: { data: buildTestExperiment(1) },
-          testExp3: { data: buildTestExperiment(3) }
-        },
-        workspace: {
-          baseline: { data: buildTestExperiment(10) }
-        }
-      })
 
-      const messageSpy = spy(ExperimentsWebview.prototype, 'showExperiments')
-
+      const messageSpy = spy(BaseWebview.prototype, 'show')
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
@@ -222,10 +163,23 @@ suite('Experiments Test Suite', () => {
           buildMockMemento()
         )
       )
-      await experiments.isReady()
-      await experiments.showTableWebview()
 
-      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+      experiments.setState({
+        testBranch: {
+          baseline: { data: buildTestExperiment(10) },
+          testExp1: { data: buildTestExperiment(2) },
+          testExp2: { data: buildTestExperiment(1) },
+          testExp3: { data: buildTestExperiment(3) }
+        },
+        workspace: {
+          baseline: { data: buildTestExperiment(10) }
+        }
+      })
+
+      await experiments.isReady()
+      await experiments.showWebview()
+
+      expect(messageSpy.lastCall.args[0].data.rows).deep.equals([
         {
           displayName: 'workspace',
           id: 'workspace',
@@ -255,7 +209,7 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([])
+      expect(messageSpy.lastCall.args[0].data.sorts).deep.equals([])
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
@@ -278,7 +232,7 @@ suite('Experiments Test Suite', () => {
       await pickPromise
       await tableChangePromise
 
-      expect(messageSpy.lastCall.args[0].tableData.rows).deep.equals([
+      expect(messageSpy.lastCall.args[0].data.rows).deep.equals([
         {
           displayName: 'workspace',
           id: 'workspace',
@@ -308,7 +262,7 @@ suite('Experiments Test Suite', () => {
         }
       ])
 
-      expect(messageSpy.lastCall.args[0].tableData.sorts).deep.equals([
+      expect(messageSpy.lastCall.args[0].data.sorts).deep.equals([
         { descending: false, path: sortPath }
       ])
     }).timeout(5000)
@@ -358,24 +312,18 @@ suite('Experiments Test Suite', () => {
     ]
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
-    const mockedInternalCommands = new InternalCommands(
-      {} as Config,
-      {} as unknown as OutputChannel
-    )
-    mockedInternalCommands.registerCommand(
-      AvailableCommands.EXPERIMENT_SHOW,
-      () => Promise.resolve(complexExperimentsOutput)
-    )
-
     it('should initialize given no persisted state and update persistence given any change', async () => {
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
-      const testRepository = new Experiments(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
+      const testRepository = disposable.track(
+        new Experiments(
+          'test',
+          getMockInternalCommands(disposable),
+          {} as ResourceLocator,
+          mockMemento
+        )
       )
+      testRepository.setState(complexExperimentsOutput)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -475,12 +423,15 @@ suite('Experiments Test Suite', () => {
       })
 
       const mementoSpy = spy(mockMemento, 'get')
-      const testRepository = new Experiments(
-        'test',
-        mockedInternalCommands,
-        {} as ResourceLocator,
-        mockMemento
+      const testRepository = disposable.track(
+        new Experiments(
+          'test',
+          getMockInternalCommands(disposable),
+          {} as ResourceLocator,
+          mockMemento
+        )
       )
+      testRepository.setState(complexExperimentsOutput)
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])

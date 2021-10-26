@@ -1,17 +1,19 @@
 import {
   MessageFromWebview,
   MessageFromWebviewType,
-  MessageToWebview,
   MessageToWebviewType,
-  TableData,
+  MessageToWebview as GenericMessageToWebview,
   WebviewColorTheme,
   WindowWithWebviewData
-} from 'dvc/src/experiments/webview/contract'
+} from 'dvc/src/webview/contract'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
 import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './vsCodeApi'
+
+type MessageToWebview = GenericMessageToWebview<TableData>
 
 export type VsCodeApi = BaseVsCodeApi<
   PersistedModelState,
@@ -24,7 +26,7 @@ declare const window: Window & WindowWithWebviewData
 declare let __webpack_public_path__: string
 
 interface PersistedModelState {
-  tableData?: TableData | null
+  data?: TableData | null
   dvcRoot?: string
 }
 
@@ -35,7 +37,7 @@ export class Model {
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
   @observable
-  public tableData?: TableData | null = null // do not remove = null or webview will not load data
+  public data?: TableData | null = null // do not remove = null or webview will not load data
 
   @observable
   public dvcRoot?: string
@@ -81,20 +83,20 @@ export class Model {
     return Model.instance
   }
 
+  public sendMessage(message: MessageFromWebview): void {
+    this.vsCodeApi.postMessage(message)
+  }
+
   private getState(): PersistedModelState {
     return {
-      dvcRoot: this.dvcRoot,
-      tableData: this.tableData
+      data: this.data,
+      dvcRoot: this.dvcRoot
     }
   }
 
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
-    this.tableData = state.tableData
-  }
-
-  private sendMessage(message: MessageFromWebview): void {
-    this.vsCodeApi.postMessage(message)
+    this.data = state.data
   }
 
   private handleMessage(message: MessageToWebview): void {
@@ -105,9 +107,9 @@ export class Model {
           this.theme = message.theme
         })
         return
-      case MessageToWebviewType.showExperiments:
+      case MessageToWebviewType.setData:
         runInAction(() => {
-          this.tableData = message.tableData
+          this.data = message.data
         })
         return
       case MessageToWebviewType.setDvcRoot:

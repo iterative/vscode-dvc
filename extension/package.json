@@ -268,11 +268,6 @@
         "category": "DVC"
       },
       {
-        "title": "%command.showPlots%",
-        "command": "dvc.showPlots",
-        "category": "DVC"
-      },
-      {
         "title": "%command.showOutput%",
         "command": "dvc.showOutput",
         "category": "DVC"
@@ -477,10 +472,6 @@
         },
         {
           "command": "dvc.showExperiments",
-          "when": "dvc.commands.available && dvc.project.available"
-        },
-        {
-          "command": "dvc.showPlots",
           "when": "dvc.commands.available && dvc.project.available"
         },
         {

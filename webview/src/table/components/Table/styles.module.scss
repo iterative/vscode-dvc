@@ -357,6 +357,7 @@ $spinner-color-light: #000;
     white-space: nowrap;
     text-align: left;
     min-width: 0;
+    position: relative;
   }
   .td {
     padding: 0 0.25rem;
@@ -409,4 +410,22 @@ $spinner-color-light: #000;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+%arrow {
+  background: none;
+  border: none;
+  color: $header-fg-color;
+  position: absolute;
+  top: 5px;
+}
+
+.arrowLeft {
+  @extend %arrow;
+  left: -2px;
+}
+
+.arrowRight {
+  @extend %arrow;
+  right: -2px;
 }

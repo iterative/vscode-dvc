@@ -12,6 +12,7 @@ import { OutputChannel } from '../../../vscode/outputChannel'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
+import { WebviewColorTheme } from '../../../webview/contract'
 
 const buildDependencies = (
   disposer: Disposer,
@@ -58,6 +59,9 @@ export const buildExperiments = (
       buildMockMemento()
     )
   )
+
+  experiments.setState(experimentShowData)
+
   return {
     config,
     experiments,
@@ -84,6 +88,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     [dvcDemoPath],
     resourceLocator
   )
+  experiments.setState(complexExperimentsOutput)
   return { experiments, workspaceExperiments }
 }
 
@@ -94,15 +99,22 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   const workspaceExperiments = disposer.track(
     new WorkspaceExperiments(internalCommands, buildMockMemento())
   )
-  workspaceExperiments.create([dvcDemoPath], resourceLocator)
+  const [experiments] = workspaceExperiments.create(
+    [dvcDemoPath],
+    resourceLocator
+  )
+
+  experiments.setState(complexExperimentsOutput)
 
   return { workspaceExperiments }
 }
 
-export const mockInternalCommands = () => {
-  const mockedInternalCommands = new InternalCommands(
-    {} as unknown as Config,
-    {} as unknown as OutputChannel
+export const getMockInternalCommands = (disposer: Disposer) => {
+  const mockedInternalCommands = disposer.track(
+    new InternalCommands(
+      { getTheme: () => WebviewColorTheme.dark } as unknown as Config,
+      {} as unknown as OutputChannel
+    )
   )
   mockedInternalCommands.registerCommand(
     AvailableCommands.EXPERIMENT_SHOW,
