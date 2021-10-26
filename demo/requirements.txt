@@ -1,4 +1,4 @@
-dvc[s3]==2.7.4
+dvc[s3]>=2.8.2
 dvclive
 torch
 torchvision
