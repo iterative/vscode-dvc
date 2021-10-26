@@ -7,20 +7,7 @@ import {
   ExperimentsBranchJSONOutput,
   ExperimentsRepoJSONOutput
 } from '../../cli/reader'
-
-const addToMapArray = <K = string, V = unknown>(
-  map: Map<K, V[]>,
-  key: K,
-  value: V
-): void => {
-  const existingArray = map.get(key)
-  if (existingArray) {
-    existingArray.push(value)
-  } else {
-    const newArray = [value]
-    map.set(key, newArray)
-  }
-}
+import { addToMapArray } from '../../util/map'
 
 const collectExperimentOrCheckpoint = (
   acc: ExperimentsAccumulator,
