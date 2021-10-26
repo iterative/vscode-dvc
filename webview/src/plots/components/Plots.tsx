@@ -33,11 +33,11 @@ const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
       {
         encoding: {
           opacity: {
-            condition: { empty: false, param: 'hover', value: 0.3 },
+            condition: { empty: false, param: 'hover', value: 0.8 },
             value: 0
           }
         },
-        mark: { tooltip: true, type: 'rule' },
+        mark: { tooltip: { content: 'data' }, type: 'rule' },
         params: [
           {
             name: 'hover',
@@ -67,7 +67,13 @@ const config: Config = {
     titleColor: foregroundColor
   },
   background: backgroundColor,
+  mark: {
+    stroke: foregroundColor
+  },
   padding: 10,
+  rule: {
+    stroke: foregroundColor
+  },
   style: {
     cell: {
       stroke: foregroundColor
