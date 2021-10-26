@@ -1,7 +1,5 @@
 import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
-import { Deferred } from '@hediet/std/synchronization'
-import { Disposable } from '@hediet/std/disposable'
 import { ExperimentsModel } from './model'
 import {
   pickFilterToAdd,
@@ -13,9 +11,9 @@ import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { createWebview } from '../webview/factory'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
+import { BaseRepository } from '../webview/repository'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
@@ -23,27 +21,14 @@ export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
 
 export type ExperimentsWebview = BaseWebview<TableData>
 
-export class Experiments {
-  public readonly dispose = Disposable.fn()
-
-  public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
+export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
 
-  protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
-    this.dispose.track(new EventEmitter())
+  public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private readonly dvcRoot: string
-
-  private readonly internalCommands: InternalCommands
-  private readonly resourceLocator: ResourceLocator
-
-  private webview?: ExperimentsWebview
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
-
-  private readonly deferred = new Deferred()
-  private readonly initialized = this.deferred.promise
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
@@ -54,11 +39,8 @@ export class Experiments {
     resourceLocator: ResourceLocator,
     workspaceState: Memento
   ) {
-    this.dvcRoot = dvcRoot
-    this.internalCommands = internalCommands
-    this.resourceLocator = resourceLocator
+    super(dvcRoot, internalCommands, resourceLocator)
 
-    this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
 
@@ -77,10 +59,6 @@ export class Experiments {
         waitForInitialData.dispose()
       })
     )
-  }
-
-  public isReady() {
-    return this.initialized
   }
 
   public async setState(data: ExperimentsRepoJSONOutput) {
@@ -106,44 +84,6 @@ export class Experiments {
 
   public getParamsAndMetricsStatuses() {
     return this.paramsAndMetrics.getTerminalNodeStatuses()
-  }
-
-  public showWebview = async () => {
-    if (this.webview) {
-      return this.webview.reveal()
-    }
-
-    const webview = await createWebview(
-      ViewKey.EXPERIMENTS,
-      this.internalCommands,
-      {
-        data: this.getTableData(),
-        dvcRoot: this.dvcRoot
-      },
-      this.resourceLocator.dvcIcon
-    )
-
-    this.setWebview(webview)
-
-    this.isWebviewFocusedChanged.fire(this.dvcRoot)
-
-    return webview
-  }
-
-  public setWebview(view: ExperimentsWebview) {
-    this.webview = this.dispose.track(view)
-    view.isReady().then(() => this.sendData())
-
-    this.dispose.track(
-      view.onDidDispose(() => {
-        this.resetWebview()
-      })
-    )
-    this.dispose.track(
-      view.onDidChangeIsFocused(dvcRoot => {
-        this.isWebviewFocusedChanged.fire(dvcRoot)
-      })
-    )
   }
 
   public getSorts() {
@@ -213,25 +153,7 @@ export class Experiments {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  private notifyChanged() {
-    this.experimentsChanged.fire()
-    this.notifyParamsOrMetricsChanged()
-  }
-
-  private notifyParamsOrMetricsChanged() {
-    this.paramsOrMetricsChanged.fire()
-    return this.sendData()
-  }
-
-  private sendData() {
-    if (this.webview) {
-      this.webview.show({
-        data: this.getTableData()
-      })
-    }
-  }
-
-  private getTableData() {
+  public getData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
@@ -241,9 +163,13 @@ export class Experiments {
     }
   }
 
-  private resetWebview = () => {
-    this.isWebviewFocusedChanged.fire(undefined)
-    this.dispose.untrack(this.webview)
-    this.webview = undefined
+  private notifyChanged() {
+    this.experimentsChanged.fire()
+    this.notifyParamsOrMetricsChanged()
+  }
+
+  private notifyParamsOrMetricsChanged() {
+    this.paramsOrMetricsChanged.fire()
+    return this.sendData()
   }
 }
