@@ -1,12 +1,6 @@
-import { ParamOrMetric } from '../../experiments/webview/contract'
+export type PlotData = { group: string; x: number; y: number }[]
 
-export interface PlotsData {
-  branchDisplayName: string
-  branchId: string
-  displayName: string
-  experimentDisplayName: string
-  experimentId: string
-  iteration: number
-  metrics: ParamOrMetric[]
-  params: ParamOrMetric[]
-}
+export type PlotsData = {
+  title: string
+  values: PlotData
+}[]
