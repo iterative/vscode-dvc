@@ -1,3 +1,4 @@
+import omit from 'lodash.omit'
 import { PlotData } from './webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -19,7 +20,7 @@ const collectPlotData = (
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
-  const newAncestors = [...ancestors, key].filter(Boolean) as string[]
+  const currentAncestors = [...ancestors, key].filter(Boolean) as string[]
   if (typeof value === 'object') {
     Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
       return collectPlotData(
@@ -28,20 +29,27 @@ const collectPlotData = (
         iteration,
         childKey,
         childValue,
-        newAncestors
+        currentAncestors
       )
     })
     return
   }
 
-  const path = joinParamOrMetricPath(...newAncestors)
+  const path = joinParamOrMetricPath(...currentAncestors)
 
   addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
 }
 
+type MetricsAndTipOrUndefined =
+  | {
+      checkpoint_tip: string | undefined
+      metrics: ParamsOrMetrics | undefined
+    }
+  | undefined
+
 const transformExperimentData = (
   experimentFieldsOrError: ExperimentFieldsOrError
-) => {
+): MetricsAndTipOrUndefined => {
   const experimentFields = experimentFieldsOrError.data
   if (!experimentFields) {
     return
@@ -53,15 +61,12 @@ const transformExperimentData = (
   return { checkpoint_tip, metrics }
 }
 
+type ValidCheckpointData = { checkpoint_tip: string; metrics: ParamsOrMetrics }
+
 const isValidCheckpoint = (
-  data:
-    | {
-        checkpoint_tip: string | undefined
-        metrics: ParamsOrMetrics | undefined
-      }
-    | undefined,
+  data: MetricsAndTipOrUndefined,
   sha: string
-): data is { checkpoint_tip: string; metrics: ParamsOrMetrics } =>
+): data is ValidCheckpointData =>
   !!(data?.metrics && data?.checkpoint_tip && data?.checkpoint_tip !== sha)
 
 const collectPlotsData = (
@@ -123,7 +128,7 @@ export type LivePlotAccumulator = Map<string, PlotData>
 export const collectLivePlots = (
   data: ExperimentsRepoJSONOutput
 ): LivePlotAccumulator => {
-  const { workspace, ...branchesObject } = data
+  const branchesObject = omit(data, 'workspace')
 
   const acc = new Map<string, PlotData>()
 
