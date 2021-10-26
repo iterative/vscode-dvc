@@ -9,20 +9,7 @@ import {
 import { reduceParamsAndMetrics } from '../experiments/paramsAndMetrics/reduce'
 import { joinParamOrMetricPath } from '../experiments/paramsAndMetrics/paths'
 import { ParamsOrMetrics } from '../experiments/webview/contract'
-
-const addToMapArray = <K = string, V = unknown>(
-  map: Map<K, V[]>,
-  key: K,
-  value: V
-): void => {
-  const existingArray = map.get(key)
-  if (existingArray) {
-    existingArray.push(value)
-  } else {
-    const newArray = [value]
-    map.set(key, newArray)
-  }
-}
+import { addToMapArray, addToMapCount } from '../util/map'
 
 const collectPlotData = (
   acc: LivePlotAccumulator,
@@ -66,16 +53,6 @@ const transformExperimentData = (
   return { checkpoint_tip, metrics }
 }
 
-const getIteration = (
-  checkpointTip: string,
-  checkpointCount: Map<string, number>
-): number => {
-  let iteration = checkpointCount.get(checkpointTip) || 0
-  iteration++
-  checkpointCount.set(checkpointTip, iteration)
-  return iteration
-}
-
 const isValidCheckpoint = (
   data:
     | {
@@ -115,7 +92,7 @@ const collectFromExperimentsObject = (
       continue
     }
     const { checkpoint_tip, metrics } = data
-    const iteration = getIteration(checkpoint_tip, checkpointCount)
+    const iteration = addToMapCount(checkpoint_tip, checkpointCount)
 
     const experimentName = experimentsObject[checkpoint_tip].data?.name
     if (!experimentName) {
