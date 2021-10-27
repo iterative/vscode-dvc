@@ -30,6 +30,7 @@ import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { BaseWebview } from '../../../webview'
+import { ExperimentsWatcher } from '../../../experiments/watcher'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -160,7 +161,11 @@ suite('Experiments Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          buildMockMemento()
+          buildMockMemento(),
+          {
+            dispose: stub(),
+            onDidChangeData: stub()
+          } as unknown as ExperimentsWatcher
         )
       )
 

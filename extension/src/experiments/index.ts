@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import {
@@ -7,6 +6,7 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
+import { ExperimentsWatcher } from './watcher'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
@@ -14,15 +14,13 @@ import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 
-const DOT_GIT = '.git'
-const GIT_REFS = join(DOT_GIT, 'refs')
-export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
-
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
+
+  private watcher: ExperimentsWatcher
 
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
@@ -34,7 +32,8 @@ export class Experiments extends BaseRepository<TableData> {
     dvcRoot: string,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator,
-    workspaceState: Memento
+    workspaceState: Memento,
+    watcher?: ExperimentsWatcher
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
@@ -48,6 +47,12 @@ export class Experiments extends BaseRepository<TableData> {
     this.paramsAndMetrics = this.dispose.track(
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
+
+    this.watcher = this.dispose.track(
+      watcher || new ExperimentsWatcher(dvcRoot, internalCommands)
+    )
+
+    this.watcher.onDidChangeData(data => this.setState(data))
 
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
