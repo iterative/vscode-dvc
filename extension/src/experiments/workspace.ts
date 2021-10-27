@@ -1,5 +1,5 @@
 import { EventEmitter, Memento } from 'vscode'
-import { Experiments, ExperimentsWebview } from '.'
+import { Experiments } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
@@ -198,15 +198,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
 
     this.internalCommands.executeCommand(commandId, dvcRoot)
     return experiments
-  }
-
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experiments = this.getRepository(dvcRoot)
-    if (!experiments) {
-      experimentsWebview.dispose()
-    }
-
-    experiments.setWebview(experimentsWebview)
   }
 
   public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {

@@ -11,15 +11,12 @@ import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 
 const DOT_GIT = '.git'
 const GIT_REFS = join(DOT_GIT, 'refs')
 export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
-
-export type ExperimentsWebview = BaseWebview<TableData>
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
