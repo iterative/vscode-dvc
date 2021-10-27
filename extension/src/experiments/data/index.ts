@@ -16,7 +16,7 @@ import { sameContents, uniqueValues } from '../../util/array'
 
 export class ExperimentsData {
   public readonly dispose = Disposable.fn()
-  public readonly onDidChangeData: Event<ExperimentsRepoJSONOutput>
+  public readonly onDidUpdate: Event<ExperimentsRepoJSONOutput>
 
   private readonly dvcRoot: string
   private files: string[] = []
@@ -27,7 +27,7 @@ export class ExperimentsData {
   private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
 
-  private readonly dataChanged: EventEmitter<ExperimentsRepoJSONOutput> =
+  private readonly updated: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
   private readonly paramsAndMetricsFilesChanged = new EventEmitter<void>()
@@ -44,7 +44,7 @@ export class ExperimentsData {
     })
 
     this.internalCommands = internalCommands
-    this.onDidChangeData = this.dataChanged.event
+    this.onDidUpdate = this.updated.event
 
     this.initialize()
     this.watchExpGitRefs()
@@ -60,7 +60,7 @@ export class ExperimentsData {
 
   private initialize() {
     const waitForInitialData = this.dispose.track(
-      this.onDidChangeData(() => {
+      this.onDidUpdate(() => {
         this.watcher = this.watchParamsAndMetricsFiles()
 
         this.dispose.track(
@@ -119,7 +119,7 @@ export class ExperimentsData {
   }
 
   private notifyChanged(data: ExperimentsRepoJSONOutput) {
-    this.dataChanged.fire(data)
+    this.updated.fire(data)
   }
 
   private watchParamsAndMetricsFiles() {

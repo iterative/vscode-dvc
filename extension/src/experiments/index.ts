@@ -20,7 +20,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private watcher: ExperimentsData
+  private data: ExperimentsData
 
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
@@ -33,7 +33,7 @@ export class Experiments extends BaseRepository<TableData> {
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    watcher?: ExperimentsData
+    data?: ExperimentsData
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
@@ -48,11 +48,11 @@ export class Experiments extends BaseRepository<TableData> {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    this.watcher = this.dispose.track(
-      watcher || new ExperimentsData(dvcRoot, internalCommands)
+    this.data = this.dispose.track(
+      data || new ExperimentsData(dvcRoot, internalCommands)
     )
 
-    this.watcher.onDidChangeData(data => this.setState(data))
+    this.data.onDidUpdate(data => this.setState(data))
 
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
@@ -64,7 +64,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    this.watcher.update()
+    this.data.update()
   }
 
   public async setState(data: ExperimentsRepoJSONOutput) {
