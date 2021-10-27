@@ -6,7 +6,7 @@ import { window, commands, workspace, Uri } from 'vscode'
 import {
   buildExperiments,
   buildMockInternalCommands,
-  buildMockWatcher
+  buildMockData
 } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -165,7 +165,7 @@ suite('Experiments Test Suite', () => {
           internalCommands,
           resourceLocator,
           buildMockMemento(),
-          buildMockWatcher()
+          buildMockData()
         )
       )
 
@@ -326,7 +326,7 @@ suite('Experiments Test Suite', () => {
           buildMockInternalCommands(disposable),
           {} as ResourceLocator,
           mockMemento,
-          buildMockWatcher()
+          buildMockData()
         )
       )
       testRepository.setState(complexExperimentsOutput)
@@ -435,7 +435,7 @@ suite('Experiments Test Suite', () => {
           buildMockInternalCommands(disposable),
           {} as ResourceLocator,
           mockMemento,
-          buildMockWatcher()
+          buildMockData()
         )
       )
       testRepository.setState(complexExperimentsOutput)
