@@ -8,9 +8,9 @@ import { InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
-export type ExperimentsWebview = BaseWebview<PlotsData>
+export type PlotsWebview = BaseWebview<PlotsData>
 
-export class Experiments extends BaseRepository<PlotsData> {
+export class Plots extends BaseRepository<PlotsData> {
   public readonly onDidChangePlots: Event<void>
 
   public readonly viewKey = ViewKey.PLOTS
