@@ -1,15 +1,15 @@
-import { EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
 import { TableData } from './webview/contract'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import {
   CommandId,
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -22,8 +22,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
+  public readonly onDidUpdateData: Event<{
+    dvcRoot: string
+    data: ExperimentsRepoJSONOutput
+  }>
+
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
+
+  private readonly dataUpdated = new EventEmitter<{
+    dvcRoot: string
+    data: ExperimentsRepoJSONOutput
+  }>()
 
   constructor(
     internalCommands: InternalCommands,
@@ -33,11 +43,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     super(internalCommands, experiments)
 
     this.workspaceState = workspaceState
+    this.onDidUpdateData = this.dataUpdated.event
   }
 
-  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
+  public update(dvcRoot: string) {
     const experiments = this.getRepository(dvcRoot)
-    experiments.setState(data)
+    experiments.update()
   }
 
   public getFocusedWebview(): Experiments | undefined {
@@ -218,13 +229,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       )
     )
     experiments.dispose.track(
-      experiments.onDidChangeExperiments(() => this.experimentsChanged.fire())
+      experiments.onDidChangeExperiments(() => {
+        this.experimentsChanged.fire()
+      })
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeParamsOrMetrics(() =>
+      experiments.onDidChangeParamsOrMetrics(() => {
         this.paramsOrMetricsChanged.fire()
-      )
+      })
+    )
+
+    experiments.dispose.track(
+      experiments.onDidUpdateData(data => {
+        this.dataUpdated.fire({ data, dvcRoot })
+      })
     )
     return experiments
   }

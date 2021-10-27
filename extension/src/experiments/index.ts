@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import {
@@ -7,6 +6,7 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
+import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
@@ -14,32 +14,34 @@ import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 
-const DOT_GIT = '.git'
-const GIT_REFS = join(DOT_GIT, 'refs')
-export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
-
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
+  public readonly onDidUpdateData: Event<ExperimentsRepoJSONOutput>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
+
+  private data: ExperimentsData
 
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
+  private readonly dataUpdated = new EventEmitter<ExperimentsRepoJSONOutput>()
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator,
-    workspaceState: Memento
+    workspaceState: Memento,
+    data?: ExperimentsData
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
+    this.onDidUpdateData = this.dataUpdated.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -49,6 +51,14 @@ export class Experiments extends BaseRepository<TableData> {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
+    this.data = this.dispose.track(
+      data || new ExperimentsData(dvcRoot, internalCommands)
+    )
+
+    this.data.onDidUpdate(data => {
+      Promise.all([this.setState(data), this.dataUpdated.fire(data)])
+    })
+
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
         this.deferred.resolve()
@@ -56,6 +66,10 @@ export class Experiments extends BaseRepository<TableData> {
         waitForInitialData.dispose()
       })
     )
+  }
+
+  public update() {
+    this.data.update()
   }
 
   public async setState(data: ExperimentsRepoJSONOutput) {
