@@ -1,8 +1,7 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { pickExperimentName } from './quickPick'
 import { TableData } from './webview/contract'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import {
   CommandId,
   AvailableCommands,
@@ -12,6 +11,7 @@ import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
+import { WorkspacePlots } from '../plots/workspace'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -25,20 +25,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly onDidUpdateData: Event<{
-    dvcRoot: string
-    data: ExperimentsRepoJSONOutput
-  }>
-
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
-
-  private readonly dataUpdated = this.dispose.track(
-    new EventEmitter<{
-      dvcRoot: string
-      data: ExperimentsRepoJSONOutput
-    }>()
-  )
 
   constructor(
     internalCommands: InternalCommands,
@@ -48,7 +36,16 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     super(internalCommands, experiments)
 
     this.workspaceState = workspaceState
-    this.onDidUpdateData = this.dataUpdated.event
+  }
+
+  public linkRepositories(workspacePlots: WorkspacePlots) {
+    Object.entries(this.repositories).forEach(([dvcRoot, repository]) => {
+      repository.dispose.track(
+        repository.onDidUpdateData(data =>
+          workspacePlots.getRepository(dvcRoot).setState(data)
+        )
+      )
+    })
   }
 
   public getFocusedWebview(): Experiments | undefined {
@@ -204,11 +201,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       })
     )
 
-    experiments.dispose.track(
-      experiments.onDidUpdateData(data => {
-        this.dataUpdated.fire({ data, dvcRoot })
-      })
-    )
     return experiments
   }
 

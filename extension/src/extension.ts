@@ -301,14 +301,7 @@ export class Extension implements IExtension {
       this.plots.create(this.dvcRoots, this.resourceLocator)
     ])
 
-    this.experiments.getDvcRoots().map(dvcRoot => {
-      const experiment = this.experiments.getRepository(dvcRoot)
-      experiment.dispose.track(
-        experiment.onDidUpdateData(data =>
-          this.plots.getRepository(dvcRoot).setState(data)
-        )
-      )
-    })
+    this.experiments.linkRepositories(this.plots)
 
     return Promise.all([
       this.repositories.isReady(),
