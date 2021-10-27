@@ -1,8 +1,6 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
-import { SortDefinition } from './model/sortBy'
 import { TableData } from './webview/contract'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import {
@@ -53,11 +51,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.onDidUpdateData = this.dataUpdated.event
   }
 
-  public update(dvcRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments.update()
-  }
-
   public getFocusedWebview(): Experiments | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
@@ -81,10 +74,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).removeFilters()
   }
 
-  public removeFilter(dvcRoot: string, id: string) {
-    return this.getRepository(dvcRoot).removeFilter(id)
-  }
-
   public async addSort(overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {
@@ -100,38 +89,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.getRepository(dvcRoot).removeSorts()
-  }
-
-  public removeSort(dvcRoot: string, pathToRemove: string) {
-    return this.getRepository(dvcRoot).removeSort(pathToRemove)
-  }
-
-  public getChildParamsOrMetrics(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getChildParamsOrMetrics(path)
-  }
-
-  public toggleParamOrMetricStatus(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
-  }
-
-  public getParamsAndMetricsStatuses(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
-  }
-
-  public getSorts(dvcRoot: string): SortDefinition[] {
-    return this.getRepository(dvcRoot).getSorts()
-  }
-
-  public getFilters(dvcRoot: string): FilterDefinition[] {
-    return this.getRepository(dvcRoot).getFilters()
-  }
-
-  public getExperiments(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getExperiments()
-  }
-
-  public getCheckpoints(dvcRoot: string, experimentId: string) {
-    return this.getRepository(dvcRoot).getCheckpoints(experimentId)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
