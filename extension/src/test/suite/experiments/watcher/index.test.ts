@@ -3,17 +3,17 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore, spy, useFakeTimers } from 'sinon'
-import { Disposable } from '../../../extension'
-import { CliReader } from '../../../cli/reader'
-import complexExperimentsOutput from '../../fixtures/complex-output-example'
-import { Config } from '../../../config'
-import { dvcDemoPath, getFirstArgOfCall } from '../util'
-import { OutputChannel } from '../../../vscode/outputChannel'
-import { Data } from '../../../data'
-import { InternalCommands } from '../../../commands/internal'
-import * as Watcher from '../../../fileSystem/watcher'
+import { Disposable } from '../../../../extension'
+import { CliReader } from '../../../../cli/reader'
+import complexExperimentsOutput from '../../../fixtures/complex-output-example'
+import { Config } from '../../../../config'
+import { dvcDemoPath, getFirstArgOfCall } from '../../util'
+import { OutputChannel } from '../../../../vscode/outputChannel'
+import { ExperimentsWatcher } from '../../../../experiments/watcher'
+import { InternalCommands } from '../../../../commands/internal'
+import * as Watcher from '../../../../fileSystem/watcher'
 
-suite('Data Test Suite', () => {
+suite('Experiments Watcher Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -24,7 +24,7 @@ suite('Data Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('Data', () => {
+  describe('ExperimentsWatcher', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -40,15 +40,17 @@ suite('Data Test Suite', () => {
         new InternalCommands(config, outputChannel, cliReader)
       )
 
-      const data = disposable.track(new Data(dvcDemoPath, internalCommands))
+      const watcher = disposable.track(
+        new ExperimentsWatcher(dvcDemoPath, internalCommands)
+      )
 
       await Promise.all([
-        data.update(),
-        data.update(),
-        data.update(),
-        data.update(),
-        data.update(),
-        data.update()
+        watcher.update(),
+        watcher.update(),
+        watcher.update(),
+        watcher.update(),
+        watcher.update(),
+        watcher.update()
       ])
 
       expect(mockExperimentShow).to.be.calledOnce
@@ -70,9 +72,9 @@ suite('Data Test Suite', () => {
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
-      const data = new Data(dvcDemoPath, internalCommands)
+      const watcher = new ExperimentsWatcher(dvcDemoPath, internalCommands)
 
-      await data.isReady()
+      await watcher.isReady()
 
       expect(mockExperimentShow).to.be.calledOnce
       expect(createFileSystemWatcherSpy).to.be.calledOnce
@@ -111,7 +113,7 @@ suite('Data Test Suite', () => {
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
-      const data = new Data(dvcDemoPath, internalCommands)
+      const data = new ExperimentsWatcher(dvcDemoPath, internalCommands)
 
       await data.isReady()
       clock.tick(200000000)
@@ -145,7 +147,7 @@ suite('Data Test Suite', () => {
       )
 
       const dataUpdatedEvent = new Promise(resolve =>
-        data.onDidChangeExperimentsData(data => resolve(data))
+        data.onDidChangeData(data => resolve(data))
       )
 
       data.update()

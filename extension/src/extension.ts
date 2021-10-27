@@ -305,7 +305,7 @@ export class Extension implements IExtension {
       this.plots.create(this.dvcRoots, this.resourceLocator)
     ])
 
-    this.data.create(this.dvcRoots, this.experiments, this.plots)
+    this.data.create(this.dvcRoots, this.plots)
 
     return Promise.all([
       this.repositories.isReady(),
