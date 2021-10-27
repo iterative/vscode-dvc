@@ -17,6 +17,7 @@ import { BaseRepository } from '../webview/repository'
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
+  public readonly onDidUpdateData: Event<ExperimentsRepoJSONOutput>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -27,6 +28,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   private readonly experimentsChanged = new EventEmitter<void>()
   private readonly paramsOrMetricsChanged = new EventEmitter<void>()
+  private readonly dataUpdated = new EventEmitter<ExperimentsRepoJSONOutput>()
 
   constructor(
     dvcRoot: string,
@@ -39,6 +41,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
+    this.onDidUpdateData = this.dataUpdated.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -52,7 +55,9 @@ export class Experiments extends BaseRepository<TableData> {
       data || new ExperimentsData(dvcRoot, internalCommands)
     )
 
-    this.data.onDidUpdate(data => this.setState(data))
+    this.data.onDidUpdate(data => {
+      Promise.all([this.setState(data), this.dataUpdated.fire(data)])
+    })
 
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {

@@ -229,13 +229,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       )
     )
     experiments.dispose.track(
-      experiments.onDidChangeExperiments(() => this.experimentsChanged.fire())
+      experiments.onDidChangeExperiments(() => {
+        this.experimentsChanged.fire()
+      })
     )
 
     experiments.dispose.track(
-      experiments.onDidChangeParamsOrMetrics(() =>
+      experiments.onDidChangeParamsOrMetrics(() => {
         this.paramsOrMetricsChanged.fire()
-      )
+      })
+    )
+
+    experiments.dispose.track(
+      experiments.onDidUpdateData(data => {
+        this.dataUpdated.fire({ data, dvcRoot })
+      })
     )
     return experiments
   }
