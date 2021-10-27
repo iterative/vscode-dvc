@@ -13,13 +13,13 @@ import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
-import { ExperimentsWatcher } from '../../../experiments/watcher'
+import { ExperimentsData } from '../../../experiments/data'
 
 export const buildMockWatcher = () =>
   ({
     dispose: stub(),
     onDidChangeData: stub()
-  } as unknown as ExperimentsWatcher)
+  } as unknown as ExperimentsData)
 
 const buildDependencies = (
   disposer: Disposer,

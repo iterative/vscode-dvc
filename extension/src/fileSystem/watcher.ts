@@ -6,7 +6,7 @@ import { isAnyDvcYaml, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
-import { EXPERIMENTS_GIT_REFS } from '../experiments/watcher/constants'
+import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
 
 export const fireWatcher = (path: string): Promise<void> => {
   const now = new Date().getTime() / 1000

@@ -9,11 +9,11 @@ import complexExperimentsOutput from '../../../fixtures/complex-output-example'
 import { Config } from '../../../../config'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 import { OutputChannel } from '../../../../vscode/outputChannel'
-import { ExperimentsWatcher } from '../../../../experiments/watcher'
+import { ExperimentsData } from '../../../../experiments/data'
 import { InternalCommands } from '../../../../commands/internal'
 import * as Watcher from '../../../../fileSystem/watcher'
 
-suite('Experiments Watcher Test Suite', () => {
+suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
@@ -24,7 +24,7 @@ suite('Experiments Watcher Test Suite', () => {
     disposable.dispose()
   })
 
-  describe('ExperimentsWatcher', () => {
+  describe('ExperimentsData', () => {
     it('should debounce all calls to update that are made within 200ms', async () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
@@ -40,17 +40,17 @@ suite('Experiments Watcher Test Suite', () => {
         new InternalCommands(config, outputChannel, cliReader)
       )
 
-      const watcher = disposable.track(
-        new ExperimentsWatcher(dvcDemoPath, internalCommands)
+      const data = disposable.track(
+        new ExperimentsData(dvcDemoPath, internalCommands)
       )
 
       await Promise.all([
-        watcher.update(),
-        watcher.update(),
-        watcher.update(),
-        watcher.update(),
-        watcher.update(),
-        watcher.update()
+        data.update(),
+        data.update(),
+        data.update(),
+        data.update(),
+        data.update(),
+        data.update()
       ])
 
       expect(mockExperimentShow).to.be.calledOnce
@@ -72,9 +72,9 @@ suite('Experiments Watcher Test Suite', () => {
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
-      const watcher = new ExperimentsWatcher(dvcDemoPath, internalCommands)
+      const data = new ExperimentsData(dvcDemoPath, internalCommands)
 
-      await watcher.isReady()
+      await data.isReady()
 
       expect(mockExperimentShow).to.be.calledOnce
       expect(createFileSystemWatcherSpy).to.be.calledOnce
@@ -113,7 +113,7 @@ suite('Experiments Watcher Test Suite', () => {
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
-      const data = new ExperimentsWatcher(dvcDemoPath, internalCommands)
+      const data = new ExperimentsData(dvcDemoPath, internalCommands)
 
       await data.isReady()
       clock.tick(200000000)
