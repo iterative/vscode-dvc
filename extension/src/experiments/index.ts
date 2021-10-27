@@ -63,6 +63,10 @@ export class Experiments extends BaseRepository<TableData> {
     )
   }
 
+  public update() {
+    this.watcher.update()
+  }
+
   public async setState(data: ExperimentsRepoJSONOutput) {
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),

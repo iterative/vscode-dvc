@@ -9,7 +9,6 @@ import {
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
@@ -35,9 +34,9 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     this.workspaceState = workspaceState
   }
 
-  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
+  public update(dvcRoot: string) {
     const experiments = this.getRepository(dvcRoot)
-    experiments.setState(data)
+    experiments.update()
   }
 
   public getFocusedWebview(): Experiments | undefined {
