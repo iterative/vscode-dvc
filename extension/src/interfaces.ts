@@ -3,6 +3,6 @@ export interface IExtension {
   hasRoots: () => boolean
 
   setRoots: () => Promise<void>
-  initialize: () => Promise<void>
+  initialize: () => Promise<void[]>
   reset: () => void
 }
