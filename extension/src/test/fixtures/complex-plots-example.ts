@@ -2,7 +2,7 @@ import { PlotsData } from '../../plots/webview/contract'
 
 const data: PlotsData = [
   {
-    title: 'metrics:summary.json:loss',
+    title: 'summary.json:loss',
     values: [
       { group: 'exp-83425', x: 1, y: 1.9896177053451538 },
       { group: 'exp-83425', x: 2, y: 1.9329891204833984 },
@@ -16,7 +16,7 @@ const data: PlotsData = [
     ]
   },
   {
-    title: 'metrics:summary.json:accuracy',
+    title: 'summary.json:accuracy',
     values: [
       { group: 'exp-83425', x: 1, y: 0.40904998779296875 },
       { group: 'exp-83425', x: 2, y: 0.46094998717308044 },
@@ -30,7 +30,7 @@ const data: PlotsData = [
     ]
   },
   {
-    title: 'metrics:summary.json:val_loss',
+    title: 'summary.json:val_loss',
     values: [
       { group: 'exp-83425', x: 1, y: 1.9391471147537231 },
       { group: 'exp-83425', x: 2, y: 1.8825950622558594 },
@@ -44,7 +44,7 @@ const data: PlotsData = [
     ]
   },
   {
-    title: 'metrics:summary.json:val_accuracy',
+    title: 'summary.json:val_accuracy',
     values: [
       { group: 'exp-83425', x: 1, y: 0.49399998784065247 },
       { group: 'exp-83425', x: 2, y: 0.5550000071525574 },
