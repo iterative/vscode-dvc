@@ -1,45 +1,38 @@
 import { EventEmitter, Memento } from 'vscode'
-import { makeObservable, observable } from 'mobx'
-import { Experiments, ExperimentsWebview } from '.'
+import { Experiments } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
-import { ResourceLocator } from '../resourceLocator'
-import { reportOutput } from '../vscode/reporting'
-import { getInput } from '../vscode/inputBox'
+import { TableData } from './webview/contract'
 import {
   CommandId,
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { BaseWorkspace, IWorkspace } from '../workspace'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { ResourceLocator } from '../resourceLocator'
+import { reportOutput } from '../vscode/reporting'
+import { getInput } from '../vscode/inputBox'
+import { BaseWorkspaceWebviews } from '../webview/workspace'
 
-export class WorkspaceExperiments
-  extends BaseWorkspace<Experiments>
-  implements IWorkspace<Experiments, ResourceLocator>
-{
-  @observable
-  private focusedWebviewDvcRoot: string | undefined
-
+export class WorkspaceExperiments extends BaseWorkspaceWebviews<
+  Experiments,
+  TableData
+> {
   public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
   private readonly workspaceState: Memento
+  private focusedWebviewDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
     workspaceState: Memento,
     experiments?: Record<string, Experiments>
   ) {
-    super(internalCommands)
-    makeObservable(this)
+    super(internalCommands, experiments)
 
     this.workspaceState = workspaceState
-
-    if (experiments) {
-      this.repositories = experiments
-    }
   }
 
   public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
@@ -47,7 +40,7 @@ export class WorkspaceExperiments
     experiments.setState(data)
   }
 
-  public getFocusedTable(): Experiments | undefined {
+  public getFocusedWebview(): Experiments | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
@@ -192,15 +185,6 @@ export class WorkspaceExperiments
     }
   }
 
-  public async showExperimentsTable() {
-    const dvcRoot = await this.getOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
   public showExperimentsTableThenRun = async (commandId: CommandId) => {
     const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
     if (!dvcRoot) {
@@ -216,54 +200,7 @@ export class WorkspaceExperiments
     return experiments
   }
 
-  public create(
-    dvcRoots: string[],
-    resourceLocator: ResourceLocator
-  ): Experiments[] {
-    const experiments = dvcRoots.map(dvcRoot =>
-      this.createExperiments(dvcRoot, resourceLocator)
-    )
-
-    Promise.all(experiments.map(experiments => experiments.isReady())).then(
-      () => this.deferred.resolve()
-    )
-
-    return experiments
-  }
-
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experiments = this.getRepository(dvcRoot)
-    if (!experiments) {
-      experimentsWebview.dispose()
-    }
-
-    experiments.setWebview(experimentsWebview)
-  }
-
-  private async getDvcRoot(overrideRoot?: string) {
-    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
-  }
-
-  private getFocusedOrOnlyOrPickProject() {
-    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
-  }
-
-  private pickExperimentName(cwd: string) {
-    return pickExperimentName(
-      this.internalCommands.executeCommand(
-        AvailableCommands.EXPERIMENT_LIST_CURRENT,
-        cwd
-      )
-    )
-  }
-
-  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
-    const experiments = this.getRepository(dvcRoot)
-    await experiments.showWebview()
-    return experiments
-  }
-
-  private createExperiments(dvcRoot: string, resourceLocator: ResourceLocator) {
+  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
     const experiments = this.dispose.track(
       new Experiments(
         dvcRoot,
@@ -289,6 +226,29 @@ export class WorkspaceExperiments
         this.paramsOrMetricsChanged.fire()
       )
     )
+    return experiments
+  }
+
+  private async getDvcRoot(overrideRoot?: string) {
+    return overrideRoot || (await this.getFocusedOrOnlyOrPickProject())
+  }
+
+  private getFocusedOrOnlyOrPickProject() {
+    return this.focusedWebviewDvcRoot || this.getOnlyOrPickProject()
+  }
+
+  private pickExperimentName(cwd: string) {
+    return pickExperimentName(
+      this.internalCommands.executeCommand(
+        AvailableCommands.EXPERIMENT_LIST_CURRENT,
+        cwd
+      )
+    )
+  }
+
+  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
+    const experiments = this.getRepository(dvcRoot)
+    await experiments.showWebview()
     return experiments
   }
 }
