@@ -15,7 +15,7 @@ import { dvcDemoPath, resourcePath } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
 
-export const buildMockWatcher = () =>
+export const buildMockData = () =>
   ({
     dispose: stub(),
     onDidUpdate: stub()
@@ -64,7 +64,7 @@ export const buildExperiments = (
       internalCommands,
       resourceLocator,
       buildMockMemento(),
-      buildMockWatcher()
+      buildMockData()
     )
   )
 
