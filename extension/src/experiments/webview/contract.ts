@@ -31,61 +31,10 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   types?: string[]
 }
 
-export const WebviewType = 'Experiments'
-
-export interface WindowWithWebviewData {
-  webviewData: {
-    theme: WebviewColorTheme
-  }
-}
-
-export enum WebviewColorTheme {
-  light = 'light',
-  dark = 'dark'
-}
-
-export type MessageFromWebview = {
-  type: MessageFromWebviewType
-  payload?: Object
-}
-
-export enum MessageFromWebviewType {
-  initialized = 'initialized',
-  columnReordered = 'column-reordered'
-}
-
-export type MessageToWebview = {
-  errors?: Error[]
-} & (
-  | {
-      type: MessageToWebviewType.setDvcRoot
-      dvcRoot: string
-    }
-  | {
-      type: MessageToWebviewType.setTheme
-      theme: WebviewColorTheme
-    }
-  | {
-      type: MessageToWebviewType.showExperiments
-      tableData: TableData
-    }
-)
-
-export enum MessageToWebviewType {
-  setDvcRoot = 'setDvcRoot',
-  setTheme = 'setTheme',
-  showExperiments = 'showExperiments'
-}
-
 export interface TableData {
   rows: RowData[]
   columns: ParamOrMetric[]
   sorts: SortDefinition[]
   changes: string[]
   columnsOrder: string[]
-}
-
-export interface ExperimentsWebviewState {
-  dvcRoot: string
-  tableData?: TableData
 }

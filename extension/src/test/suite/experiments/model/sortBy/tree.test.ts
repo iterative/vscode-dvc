@@ -107,7 +107,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
 
       await experiments.isReady()
       const experimentsWebview = await experiments.showWebview()
-      const messageSpy = spy(experimentsWebview, 'showExperiments')
+      const messageSpy = spy(experimentsWebview, 'show')
 
       const mockSortQuickPicks = (paramPath: string, descending: boolean) => {
         mockShowQuickPick.onFirstCall().resolves({
@@ -145,7 +145,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       const getParamsArray = (selector = testParamPathArray) =>
         messageSpy
           .getCall(-1)
-          .firstArg.tableData.rows[1].subRows?.map((exp: Experiment) =>
+          .firstArg.data.rows[1].subRows?.map((exp: Experiment) =>
             get(exp, selector)
           )
 
