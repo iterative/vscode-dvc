@@ -22,11 +22,11 @@ export class Plots extends BaseRepository<PlotsData> {
     super(dvcRoot, internalCommands, resourceLocator)
 
     this.plots = this.dispose.track(new PlotsModel())
+    this.deferred.resolve()
   }
 
   public setState(data: ExperimentsRepoJSONOutput) {
     this.plots.transformAndSet(data)
-    this.deferred.resolve()
 
     return this.sendData()
   }
