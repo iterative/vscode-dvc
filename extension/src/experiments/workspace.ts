@@ -1,9 +1,10 @@
-import { EventEmitter, Memento } from 'vscode'
+import { Event, EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
 import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
 import { SortDefinition } from './model/sortBy'
 import { TableData } from './webview/contract'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import {
   CommandId,
   AvailableCommands,
@@ -21,8 +22,18 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public readonly experimentsChanged = new EventEmitter<void>()
   public readonly paramsOrMetricsChanged = new EventEmitter<void>()
 
+  public readonly onDidUpdateData: Event<{
+    dvcRoot: string
+    data: ExperimentsRepoJSONOutput
+  }>
+
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
+
+  private readonly dataUpdated = new EventEmitter<{
+    dvcRoot: string
+    data: ExperimentsRepoJSONOutput
+  }>()
 
   constructor(
     internalCommands: InternalCommands,
@@ -32,6 +43,7 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     super(internalCommands, experiments)
 
     this.workspaceState = workspaceState
+    this.onDidUpdateData = this.dataUpdated.event
   }
 
   public update(dvcRoot: string) {
