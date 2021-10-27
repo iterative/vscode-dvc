@@ -14,7 +14,7 @@ import { AvailableCommands, InternalCommands } from '../../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 import { sameContents, uniqueValues } from '../../util/array'
 
-export class ExperimentsWatcher {
+export class ExperimentsData {
   public readonly dispose = Disposable.fn()
   public readonly onDidChangeData: Event<ExperimentsRepoJSONOutput>
 

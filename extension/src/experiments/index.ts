@@ -6,7 +6,7 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
-import { ExperimentsWatcher } from './watcher'
+import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
@@ -20,7 +20,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private watcher: ExperimentsWatcher
+  private watcher: ExperimentsData
 
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
@@ -33,7 +33,7 @@ export class Experiments extends BaseRepository<TableData> {
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    watcher?: ExperimentsWatcher
+    watcher?: ExperimentsData
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
@@ -49,7 +49,7 @@ export class Experiments extends BaseRepository<TableData> {
     )
 
     this.watcher = this.dispose.track(
-      watcher || new ExperimentsWatcher(dvcRoot, internalCommands)
+      watcher || new ExperimentsData(dvcRoot, internalCommands)
     )
 
     this.watcher.onDidChangeData(data => this.setState(data))

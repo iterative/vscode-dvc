@@ -1,12 +1,12 @@
-import { ExperimentsWatcher } from '../experiments/watcher'
+import { ExperimentsData } from '../experiments/data'
 import { WorkspacePlots } from '../plots/workspace'
 import { BaseWorkspace } from '../workspace'
 
-export class WorkspaceData extends BaseWorkspace<ExperimentsWatcher> {
+export class WorkspaceData extends BaseWorkspace<ExperimentsData> {
   public create(dvcRoots: string[], workspacePlots: WorkspacePlots) {
     dvcRoots.forEach(dvcRoot => {
       const experimentsWatcher = this.dispose.track(
-        new ExperimentsWatcher(dvcRoot, this.internalCommands)
+        new ExperimentsData(dvcRoot, this.internalCommands)
       )
 
       this.dispose.track(
