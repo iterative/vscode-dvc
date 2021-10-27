@@ -1,3 +1,4 @@
+import { EventEmitter } from 'vscode'
 import { PlotsModel } from './model'
 import { PlotsData } from './webview/contract'
 import { BaseWebview } from '../webview'
@@ -14,6 +15,9 @@ export class Plots extends BaseRepository<PlotsData> {
 
   private plots: PlotsModel
 
+  private readonly dataUpdated = new EventEmitter<void>()
+  private readonly onDidUpdateData = this.dataUpdated.event
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -22,16 +26,28 @@ export class Plots extends BaseRepository<PlotsData> {
     super(dvcRoot, internalCommands, resourceLocator)
 
     this.plots = this.dispose.track(new PlotsModel())
-    this.deferred.resolve()
+
+    const waitForInitialData = this.dispose.track(
+      this.onDidUpdateData(() => {
+        this.deferred.resolve()
+        this.dispose.untrack(waitForInitialData)
+        waitForInitialData.dispose()
+      })
+    )
   }
 
   public setState(data: ExperimentsRepoJSONOutput) {
     this.plots.transformAndSet(data)
 
-    return this.sendData()
+    return this.notifyChanged()
   }
 
   public getData() {
     return this.plots.getData()
+  }
+
+  private notifyChanged() {
+    this.dataUpdated.fire()
+    return this.sendData()
   }
 }
