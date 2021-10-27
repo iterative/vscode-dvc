@@ -17,7 +17,6 @@ import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
-import { WorkspaceData } from './data/workspace'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
@@ -59,7 +58,6 @@ export class Extension implements IExtension {
   private repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
-  private readonly data: WorkspaceData
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
@@ -119,11 +117,15 @@ export class Extension implements IExtension {
 
     this.plots = this.dispose.track(new WorkspacePlots(this.internalCommands))
 
+    this.dispose.track(
+      this.experiments.onDidUpdateData(({ dvcRoot, data }) =>
+        this.plots.update(dvcRoot, data)
+      )
+    )
+
     this.repositories = this.dispose.track(
       new WorkspaceRepositories(this.internalCommands)
     )
-
-    this.data = this.dispose.track(new WorkspaceData(this.internalCommands))
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
@@ -305,11 +307,10 @@ export class Extension implements IExtension {
       this.plots.create(this.dvcRoots, this.resourceLocator)
     ])
 
-    this.data.create(this.dvcRoots, this.plots)
-
     return Promise.all([
       this.repositories.isReady(),
-      this.experiments.isReady()
+      this.experiments.isReady(),
+      this.plots.isReady()
     ])
   }
 
@@ -327,7 +328,6 @@ export class Extension implements IExtension {
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
     this.plots.reset()
-    this.data.reset()
   }
 
   private setAvailable(available: boolean) {
