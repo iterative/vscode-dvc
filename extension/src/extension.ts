@@ -117,12 +117,6 @@ export class Extension implements IExtension {
 
     this.plots = this.dispose.track(new WorkspacePlots(this.internalCommands))
 
-    this.dispose.track(
-      this.experiments.onDidUpdateData(({ dvcRoot, data }) =>
-        this.plots.update(dvcRoot, data)
-      )
-    )
-
     this.repositories = this.dispose.track(
       new WorkspaceRepositories(this.internalCommands)
     )
@@ -309,9 +303,18 @@ export class Extension implements IExtension {
 
     return Promise.all([
       this.repositories.isReady(),
-      this.experiments.isReady(),
-      this.plots.isReady()
-    ])
+      this.experiments.isReady()
+    ]).then(() => {
+      this.experiments.getDvcRoots().map(dvcRoot => {
+        const experiment = this.experiments.getRepository(dvcRoot)
+        experiment.dispose.track(
+          experiment.onDidUpdateData(data =>
+            this.plots.getRepository(dvcRoot).setState(data)
+          )
+        )
+        return this.plots.isReady()
+      })
+    })
   }
 
   public hasRoots() {
