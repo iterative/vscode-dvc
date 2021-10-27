@@ -32,18 +32,22 @@ export const TableHead: React.FC<TableHeadProps> = ({
       return
     }
     const { draggableId, destination } = column
-    const colOrder = [...currentColOrder.current]
-    const oldIndex = colOrder.indexOf(draggableId)
+    if (destination.index > 1) {
+      const colOrder = [...currentColOrder.current]
+      const oldIndex = colOrder.indexOf(draggableId)
 
-    colOrder.splice(oldIndex, 1)
-    colOrder.splice(destination.index, 0, draggableId)
-    setColumnOrder(colOrder)
+      colOrder.splice(oldIndex, 1)
+      colOrder.splice(destination.index, 0, draggableId)
+      setColumnOrder(colOrder)
+    }
+  }
+
+  const onDragEnd = () => {
     sendMessage({
-      payload: colOrder,
+      payload: currentColOrder.current,
       type: MessageFromWebviewType.columnReordered
     })
   }
-  const doNothing = () => {}
 
   React.useEffect(() => {
     setColumnOrder(columnsOrder)
@@ -55,9 +59,8 @@ export const TableHead: React.FC<TableHeadProps> = ({
     <div className={styles.thead}>
       {headerGroups.map((headerGroup, i) => (
         <DragDropContext
-          onDragStart={doNothing}
           onDragUpdate={onDragUpdate}
-          onDragEnd={doNothing}
+          onDragEnd={onDragEnd}
           key={`header-group-${headerGroup.id}-${i}`}
         >
           <MergedHeaderGroup

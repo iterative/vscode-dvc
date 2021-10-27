@@ -4,7 +4,7 @@
 import '@testing-library/jest-dom/extend-expect'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import {
@@ -276,40 +276,41 @@ describe('Table', () => {
   })
 
   describe('Columns order', () => {
-    const renderExperimentsTable = () => {
-      const basicProps = {
-        group: 'params',
-        hasChildren: false,
-        parentPath: 'params'
+    const basicProps = {
+      group: 'params',
+      hasChildren: false,
+      parentPath: 'params'
+    }
+    const columns = [
+      {
+        ...basicProps,
+        id: 'A',
+        name: 'A',
+        path: 'params:A'
+      },
+      {
+        ...basicProps,
+        id: 'B',
+        name: 'B',
+        path: 'params:B'
+      },
+      {
+        ...basicProps,
+        id: 'C',
+        name: 'C',
+        path: 'params:C'
       }
-      const columns = [
-        {
-          ...basicProps,
-          id: 'A',
-          name: 'A',
-          path: 'params:A'
-        },
-        {
-          ...basicProps,
-          id: 'B',
-          name: 'B',
-          path: 'params:B'
-        },
-        {
-          ...basicProps,
-          id: 'C',
-          name: 'C',
-          path: 'params:C'
-        }
-      ]
-      const tableData = {
-        changes: [],
-        columns,
-        columnsOrder: [],
-        rows: [],
-        sorts: []
-      }
-      const table = render(<ExperimentsTable tableData={tableData} />)
+    ]
+    const tableData = {
+      changes: [],
+      columns,
+      columnsOrder: [],
+      rows: [],
+      sorts: []
+    }
+
+    const renderExperimentsTable = (data: TableData = tableData) => {
+      const table = render(<ExperimentsTable tableData={data} />)
 
       mockDndElSpacing(table)
 
@@ -356,6 +357,44 @@ describe('Table', () => {
       headers = await waitFor(() =>
         screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
       )
+      expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
+    })
+
+    it('should not move a column before the dafault columns', async () => {
+      const { getByText, makeGetDragEl } = renderExperimentsTable()
+
+      const headers = await waitFor(() =>
+        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      )
+
+      await makeDnd({
+        direction: DND_DIRECTION_LEFT,
+        getByText,
+        getDragEl: makeGetDragEl('B'),
+        positions: 3
+      })
+
+      expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
+    })
+
+    it('should order the columns with the columnsOrder from the data', async () => {
+      const columnsOrder = [
+        'id',
+        'timestamp',
+        'params:C',
+        'params:B',
+        'params:A'
+      ]
+      const tableDataWithCustomColOrder = {
+        ...tableData,
+        columnsOrder
+      }
+      renderExperimentsTable(tableDataWithCustomColOrder)
+
+      const headers = await waitFor(() =>
+        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      )
+
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
     })
   })

@@ -25,7 +25,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     sort.path === column.placeholderOf?.id ||
     (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
   const isDraggable =
-    !column.placeholderOf && column.id !== 'id' && !column.columns
+    !column.placeholderOf &&
+    !['id', 'timestamp'].includes(column.id) &&
+    !column.columns
 
   return (
     <Draggable
