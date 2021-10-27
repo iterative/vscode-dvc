@@ -18,7 +18,7 @@ import { ExperimentsData } from '../../../experiments/data'
 export const buildMockWatcher = () =>
   ({
     dispose: stub(),
-    onDidChangeData: stub()
+    onDidUpdate: stub()
   } as unknown as ExperimentsData)
 
 const buildDependencies = (
