@@ -147,7 +147,7 @@ suite('Experiments Data Test Suite', () => {
       )
 
       const dataUpdatedEvent = new Promise(resolve =>
-        data.onDidChangeData(data => resolve(data))
+        data.onDidUpdate(data => resolve(data))
       )
 
       data.update()

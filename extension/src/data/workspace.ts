@@ -5,16 +5,16 @@ import { BaseWorkspace } from '../workspace'
 export class WorkspaceData extends BaseWorkspace<ExperimentsData> {
   public create(dvcRoots: string[], workspacePlots: WorkspacePlots) {
     dvcRoots.forEach(dvcRoot => {
-      const experimentsWatcher = this.dispose.track(
+      const experimentsData = this.dispose.track(
         new ExperimentsData(dvcRoot, this.internalCommands)
       )
 
       this.dispose.track(
-        experimentsWatcher.onDidChangeData(data =>
+        experimentsData.onDidUpdate(data =>
           workspacePlots.update(dvcRoot, data)
         )
       )
-      this.setRepository(dvcRoot, experimentsWatcher)
+      this.setRepository(dvcRoot, experimentsData)
     })
   }
 
