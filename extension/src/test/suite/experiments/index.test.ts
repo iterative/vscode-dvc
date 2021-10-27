@@ -3,7 +3,11 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
-import { buildExperiments, getMockInternalCommands } from './util'
+import {
+  buildExperiments,
+  buildMockInternalCommands,
+  buildMockWatcher
+} from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -30,7 +34,6 @@ import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { BaseWebview } from '../../../webview'
-import { ExperimentsWatcher } from '../../../experiments/watcher'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -162,10 +165,7 @@ suite('Experiments Test Suite', () => {
           internalCommands,
           resourceLocator,
           buildMockMemento(),
-          {
-            dispose: stub(),
-            onDidChangeData: stub()
-          } as unknown as ExperimentsWatcher
+          buildMockWatcher()
         )
       )
 
@@ -323,9 +323,10 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          getMockInternalCommands(disposable),
+          buildMockInternalCommands(disposable),
           {} as ResourceLocator,
-          mockMemento
+          mockMemento,
+          buildMockWatcher()
         )
       )
       testRepository.setState(complexExperimentsOutput)
@@ -431,9 +432,10 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          getMockInternalCommands(disposable),
+          buildMockInternalCommands(disposable),
           {} as ResourceLocator,
-          mockMemento
+          mockMemento,
+          buildMockWatcher()
         )
       )
       testRepository.setState(complexExperimentsOutput)

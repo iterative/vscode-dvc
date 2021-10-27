@@ -13,6 +13,13 @@ import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
+import { ExperimentsWatcher } from '../../../experiments/watcher'
+
+export const buildMockWatcher = () =>
+  ({
+    dispose: stub(),
+    onDidChangeData: stub()
+  } as unknown as ExperimentsWatcher)
 
 const buildDependencies = (
   disposer: Disposer,
@@ -56,7 +63,8 @@ export const buildExperiments = (
       dvcRoot,
       internalCommands,
       resourceLocator,
-      buildMockMemento()
+      buildMockMemento(),
+      buildMockWatcher()
     )
   )
 
@@ -109,7 +117,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   return { workspaceExperiments }
 }
 
-export const getMockInternalCommands = (disposer: Disposer) => {
+export const buildMockInternalCommands = (disposer: Disposer) => {
   const mockedInternalCommands = disposer.track(
     new InternalCommands(
       { getTheme: () => WebviewColorTheme.dark } as unknown as Config,
