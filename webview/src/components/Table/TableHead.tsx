@@ -41,10 +41,12 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   const onDragEnd = () => {
-    sendMessage({
-      payload: currentColOrder.current,
-      type: MessageFromWebviewType.columnReordered
-    })
+    if (currentColOrder.current !== columnsOrder) {
+      sendMessage({
+        payload: currentColOrder.current,
+        type: MessageFromWebviewType.columnReordered
+      })
+    }
   }
 
   React.useEffect(() => {
