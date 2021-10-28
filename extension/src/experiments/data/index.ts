@@ -30,7 +30,10 @@ export class ExperimentsData {
   private readonly updated: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
-  private readonly paramsAndMetricsFilesChanged = new EventEmitter<void>()
+  private readonly paramsAndMetricsFilesChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
   private readonly onDidChangeParamsAndMetricsFiles: Event<void> =
     this.paramsAndMetricsFilesChanged.event
 
