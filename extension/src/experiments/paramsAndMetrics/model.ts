@@ -4,7 +4,6 @@ import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import { messenger, MessengerEvents } from '../../util/messaging'
 
 export enum Status {
   selected = 2,
@@ -38,10 +37,6 @@ export class ParamsAndMetricsModel {
       MementoPrefixes.columnsOrder + dvcRoot,
       []
     )
-
-    messenger.on(MessengerEvents.columnReordered, (columnsOrder: string[]) => {
-      this.setColumnsOrder(columnsOrder)
-    })
   }
 
   public getColumnsOrder(): string[] {
@@ -112,6 +107,14 @@ export class ParamsAndMetricsModel {
     )
 
     return flatten<Status>(nestedStatuses)
+  }
+
+  public setColumnsOrder(columnsOrder: string[]) {
+    this.columnsOrderState = columnsOrder
+    this.workspaceState.update(
+      MementoPrefixes.columnsOrder + this.dvcRoot,
+      this.getColumnsOrder()
+    )
   }
 
   private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
@@ -188,14 +191,6 @@ export class ParamsAndMetricsModel {
     return this.workspaceState.update(
       MementoPrefixes.status + this.dvcRoot,
       this.status
-    )
-  }
-
-  private setColumnsOrder(columnsOrder: string[]) {
-    this.columnsOrderState = columnsOrder
-    this.workspaceState.update(
-      MementoPrefixes.columnsOrder + this.dvcRoot,
-      this.getColumnsOrder()
     )
   }
 }

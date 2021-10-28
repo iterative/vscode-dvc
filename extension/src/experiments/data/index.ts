@@ -30,7 +30,10 @@ export class ExperimentsData {
   private readonly updated: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
-  private readonly paramsAndMetricsFilesChanged = new EventEmitter<void>()
+  private readonly paramsAndMetricsFilesChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
   private readonly onDidChangeParamsAndMetricsFiles: Event<void> =
     this.paramsAndMetricsFilesChanged.event
 
@@ -38,10 +41,12 @@ export class ExperimentsData {
 
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     this.dvcRoot = dvcRoot
-    this.processManager = new ProcessManager({
-      name: 'update',
-      process: () => this.updateData()
-    })
+    this.processManager = this.dispose.track(
+      new ProcessManager({
+        name: 'update',
+        process: () => this.updateData()
+      })
+    )
 
     this.internalCommands = internalCommands
     this.onDidUpdate = this.updated.event

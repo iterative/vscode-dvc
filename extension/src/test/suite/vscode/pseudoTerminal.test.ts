@@ -31,10 +31,12 @@ suite('Pseudo Terminal Test Suite', () => {
     it('should be able to open a terminal', async () => {
       const terminalName = 'Open Test Terminal'
 
-      const pseudoTerminal = new PseudoTerminal(
-        disposable.track(new EventEmitter<string>()),
-        disposable.track(new EventEmitter<void>()),
-        terminalName
+      const pseudoTerminal = disposable.track(
+        new PseudoTerminal(
+          disposable.track(new EventEmitter<string>()),
+          disposable.track(new EventEmitter<void>()),
+          terminalName
+        )
       )
 
       pseudoTerminal.openCurrentInstance()
@@ -79,10 +81,12 @@ suite('Pseudo Terminal Test Suite', () => {
         })
       }
 
-      const pseudoTerminal = new PseudoTerminal(
-        outputEventEmitter,
-        disposable.track(new EventEmitter<void>()),
-        'Output Test Terminal'
+      const pseudoTerminal = disposable.track(
+        new PseudoTerminal(
+          outputEventEmitter,
+          disposable.track(new EventEmitter<void>()),
+          'Output Test Terminal'
+        )
       )
 
       await pseudoTerminal.openCurrentInstance()

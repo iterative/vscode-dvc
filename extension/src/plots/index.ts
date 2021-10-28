@@ -15,7 +15,7 @@ export class Plots extends BaseRepository<PlotsData> {
 
   private plots: PlotsModel
 
-  private readonly dataUpdated = new EventEmitter<void>()
+  private readonly dataUpdated = this.dispose.track(new EventEmitter<void>())
   private readonly onDidUpdateData = this.dataUpdated.event
 
   constructor(

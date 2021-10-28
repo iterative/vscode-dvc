@@ -26,7 +26,7 @@ export const AvailableCommands = Object.assign(
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
 export class InternalCommands {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   private readonly commands = new Map<string, Command>()
   private readonly outputChannel: OutputChannel

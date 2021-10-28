@@ -19,8 +19,13 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
   TableData
 > {
-  public readonly experimentsChanged = new EventEmitter<void>()
-  public readonly paramsOrMetricsChanged = new EventEmitter<void>()
+  public readonly experimentsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  public readonly paramsOrMetricsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
 
   public readonly onDidUpdateData: Event<{
     dvcRoot: string
@@ -30,10 +35,12 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
 
-  private readonly dataUpdated = new EventEmitter<{
-    dvcRoot: string
-    data: ExperimentsRepoJSONOutput
-  }>()
+  private readonly dataUpdated = this.dispose.track(
+    new EventEmitter<{
+      dvcRoot: string
+      data: ExperimentsRepoJSONOutput
+    }>()
+  )
 
   constructor(
     internalCommands: InternalCommands,
