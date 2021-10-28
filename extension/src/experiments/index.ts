@@ -69,7 +69,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.onDidChangeExperiments(() => {
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
-        waitForInitialData.dispose().then(() => this.dataUpdated.fire())
+        waitForInitialData.dispose()
       })
     )
   }
