@@ -7,6 +7,7 @@ import { CliReader } from './cli/reader'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
+import { registerPlotsCommands } from './plots/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
 import { TrackedExplorerTree } from './fileSystem/tree'
 import { IExtension } from './interfaces'
@@ -207,6 +208,7 @@ export class Extension implements IExtension {
     this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments, this.internalCommands)
+    registerPlotsCommands(this.plots)
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
