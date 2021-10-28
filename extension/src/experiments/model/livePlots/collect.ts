@@ -11,6 +11,8 @@ import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { ParamsOrMetrics } from '../../webview/contract'
 import { addToMapArray, addToMapCount } from '../../../util/map'
 
+type LivePlotAccumulator = Map<string, PlotData>
+
 const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
   displayName: string,
@@ -111,8 +113,6 @@ const collectFromExperimentsObject = (
     collectFromMetrics(acc, experimentName, iteration, metrics)
   }
 }
-
-type LivePlotAccumulator = Map<string, PlotData>
 
 export const collectLivePlotsData = (
   data: ExperimentsRepoJSONOutput
