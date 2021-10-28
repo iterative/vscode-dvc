@@ -2,7 +2,7 @@ import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
-import { window, commands, workspace, Uri } from 'vscode'
+import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import {
   buildExperiments,
   buildMockInternalCommands,
@@ -34,6 +34,12 @@ import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import { BaseWebview } from '../../../webview'
+import { ParamsAndMetricsModel } from '../../../experiments/paramsAndMetrics/model'
+import * as Factory from '../../../webview/factory'
+import {
+  MessageFromWebview,
+  MessageFromWebviewType
+} from '../../../webview/contract'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -136,6 +142,59 @@ suite('Experiments Test Suite', () => {
 
       expect(windowSpy).not.to.have.been.called
     }).timeout(5000)
+
+    it('should handle column reordering messages from the webview', async () => {
+      const { experiments } = buildExperiments(
+        disposable,
+        complexExperimentsOutput
+      )
+
+      const mockMessageReceived = disposable.track(
+        new EventEmitter<MessageFromWebview>()
+      )
+
+      const onDidReceiveMessage = mockMessageReceived.event
+
+      stub(Factory, 'createWebview').resolves({
+        dispose: stub(),
+        isReady: () => Promise.resolve(),
+        onDidChangeIsFocused: stub(),
+        onDidDispose: stub(),
+        onDidReceiveMessage,
+        show: stub()
+      } as unknown as BaseWebview<TableData>)
+
+      await experiments.showWebview()
+
+      const columnOrder = [
+        'id',
+        'timestamp',
+        'params:params.yaml:lr',
+        'metrics:logs.json:step',
+        'params:params.yaml:weight_decay',
+        'metrics:logs.json:loss',
+        'params:params.yaml:seed',
+        'metrics:logs.json:acc'
+      ]
+
+      const mockSetColumnReordered = stub(
+        ParamsAndMetricsModel.prototype,
+        'setColumnsOrder'
+      )
+
+      const columnOrderSet = new Promise(resolve =>
+        mockSetColumnReordered.callsFake(() => resolve(undefined))
+      )
+
+      mockMessageReceived.fire({
+        payload: columnOrder,
+        type: MessageFromWebviewType.columnReordered
+      })
+
+      await columnOrderSet
+
+      expect(mockSetColumnReordered).to.be.calledWith(columnOrder)
+    })
 
     it('should be able to sort', async () => {
       const config = disposable.track(new Config())
