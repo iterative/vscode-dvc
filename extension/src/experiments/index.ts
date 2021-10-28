@@ -19,7 +19,7 @@ import { Logger } from '../common/logger'
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
-  public readonly onDidUpdateData: Event<void>
+  public readonly onDidUpdateLivePlots: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -49,7 +49,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
-    this.onDidUpdateData = this.dataUpdated.event
+    this.onDidUpdateLivePlots = this.dataUpdated.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
