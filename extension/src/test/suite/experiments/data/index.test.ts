@@ -72,7 +72,9 @@ suite('Experiments Data Test Suite', () => {
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
-      const data = new ExperimentsData(dvcDemoPath, internalCommands)
+      const data = disposable.track(
+        new ExperimentsData(dvcDemoPath, internalCommands)
+      )
 
       await data.isReady()
 
@@ -113,7 +115,9 @@ suite('Experiments Data Test Suite', () => {
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
-      const data = new ExperimentsData(dvcDemoPath, internalCommands)
+      const data = disposable.track(
+        new ExperimentsData(dvcDemoPath, internalCommands)
+      )
 
       await data.isReady()
       clock.tick(200000000)
