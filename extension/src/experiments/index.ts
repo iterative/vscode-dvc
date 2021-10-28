@@ -13,6 +13,8 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
+import { MessageFromWebviewType } from '../webview/contract'
+import { Logger } from '../common/logger'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
@@ -26,9 +28,17 @@ export class Experiments extends BaseRepository<TableData> {
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
-  private readonly experimentsChanged = new EventEmitter<void>()
-  private readonly paramsOrMetricsChanged = new EventEmitter<void>()
-  private readonly dataUpdated = new EventEmitter<ExperimentsRepoJSONOutput>()
+  private readonly experimentsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly paramsOrMetricsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly dataUpdated = this.dispose.track(
+    new EventEmitter<ExperimentsRepoJSONOutput>()
+  )
 
   constructor(
     dvcRoot: string,
@@ -58,6 +68,19 @@ export class Experiments extends BaseRepository<TableData> {
     this.data.onDidUpdate(data => {
       Promise.all([this.setState(data), this.dataUpdated.fire(data)])
     })
+
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message => {
+        if (
+          message.type === MessageFromWebviewType.columnReordered &&
+          message.payload
+        ) {
+          return this.paramsAndMetrics.setColumnsOrder(message.payload)
+        }
+
+        Logger.error(`Unexpected message: ${message}`)
+      })
+    )
 
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
