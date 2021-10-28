@@ -153,10 +153,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
         dvcDemoPath
       ])
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (WorkspaceExperiments as any).prototype,
@@ -262,8 +259,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
       ])
 
       const getRepositorySpy = spy(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (WorkspaceExperiments as any).prototype,
+        WorkspaceExperiments.prototype,
         'getRepository'
       )
 

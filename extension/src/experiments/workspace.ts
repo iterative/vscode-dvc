@@ -1,10 +1,7 @@
-import { Event, EventEmitter, Memento } from 'vscode'
+import { EventEmitter, Memento } from 'vscode'
 import { Experiments } from '.'
-import { FilterDefinition } from './model/filterBy'
 import { pickExperimentName } from './quickPick'
-import { SortDefinition } from './model/sortBy'
 import { TableData } from './webview/contract'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import {
   CommandId,
   AvailableCommands,
@@ -14,6 +11,7 @@ import { ResourceLocator } from '../resourceLocator'
 import { reportOutput } from '../vscode/reporting'
 import { getInput } from '../vscode/inputBox'
 import { BaseWorkspaceWebviews } from '../webview/workspace'
+import { WorkspacePlots } from '../plots/workspace'
 
 export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   Experiments,
@@ -27,20 +25,8 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     new EventEmitter<void>()
   )
 
-  public readonly onDidUpdateData: Event<{
-    dvcRoot: string
-    data: ExperimentsRepoJSONOutput
-  }>
-
   private readonly workspaceState: Memento
   private focusedWebviewDvcRoot: string | undefined
-
-  private readonly dataUpdated = this.dispose.track(
-    new EventEmitter<{
-      dvcRoot: string
-      data: ExperimentsRepoJSONOutput
-    }>()
-  )
 
   constructor(
     internalCommands: InternalCommands,
@@ -50,12 +36,20 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     super(internalCommands, experiments)
 
     this.workspaceState = workspaceState
-    this.onDidUpdateData = this.dataUpdated.event
   }
 
-  public update(dvcRoot: string) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments.update()
+  public linkRepositories(workspacePlots: WorkspacePlots) {
+    Object.entries(this.repositories).forEach(async ([dvcRoot, repository]) => {
+      await repository.isReady()
+      const plots = workspacePlots.getRepository(dvcRoot)
+      repository.dispose.track(
+        repository.onDidUpdateData(() => {
+          const data = repository.getRawData()
+          workspacePlots.getRepository(dvcRoot).setState(data)
+        })
+      )
+      plots.setState(repository.getRawData())
+    })
   }
 
   public getFocusedWebview(): Experiments | undefined {
@@ -81,10 +75,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).removeFilters()
   }
 
-  public removeFilter(dvcRoot: string, id: string) {
-    return this.getRepository(dvcRoot).removeFilter(id)
-  }
-
   public async addSort(overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {
@@ -100,38 +90,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
 
     return this.getRepository(dvcRoot).removeSorts()
-  }
-
-  public removeSort(dvcRoot: string, pathToRemove: string) {
-    return this.getRepository(dvcRoot).removeSort(pathToRemove)
-  }
-
-  public getChildParamsOrMetrics(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getChildParamsOrMetrics(path)
-  }
-
-  public toggleParamOrMetricStatus(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
-  }
-
-  public getParamsAndMetricsStatuses(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
-  }
-
-  public getSorts(dvcRoot: string): SortDefinition[] {
-    return this.getRepository(dvcRoot).getSorts()
-  }
-
-  public getFilters(dvcRoot: string): FilterDefinition[] {
-    return this.getRepository(dvcRoot).getFilters()
-  }
-
-  public getExperiments(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getExperiments()
-  }
-
-  public getCheckpoints(dvcRoot: string, experimentId: string) {
-    return this.getRepository(dvcRoot).getCheckpoints(experimentId)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -247,11 +205,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       })
     )
 
-    experiments.dispose.track(
-      experiments.onDidUpdateData(data => {
-        this.dataUpdated.fire({ data, dvcRoot })
-      })
-    )
     return experiments
   }
 

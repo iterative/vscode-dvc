@@ -51,7 +51,7 @@ export class BaseWorkspace<T extends Disposable> {
     )
   }
 
-  protected getRepository(dvcRoot: string) {
+  public getRepository(dvcRoot: string) {
     return this.repositories[dvcRoot]
   }
 

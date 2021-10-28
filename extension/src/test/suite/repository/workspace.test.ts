@@ -37,8 +37,7 @@ suite('Workspace Repositories Test Suite', () => {
         dvcDemoPath
       )
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(WorkspaceRepositories.prototype as any, 'getRepository').returns({
+      stub(WorkspaceRepositories.prototype, 'getRepository').returns({
         hasChanges: () => true
       } as Repository)
 

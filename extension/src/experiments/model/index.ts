@@ -20,6 +20,7 @@ const enum MementoPrefixes {
 export class ExperimentsModel {
   public readonly dispose = Disposable.fn()
 
+  private rawData = {} as ExperimentsRepoJSONOutput
   private workspace = {} as Experiment
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
@@ -41,7 +42,12 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
+  public getRawData() {
+    return this.rawData
+  }
+
   public transformAndSet(data: ExperimentsRepoJSONOutput) {
+    this.rawData = data
     const { workspace, branches, experimentsByBranch, checkpointsByTip } =
       collectExperiments(data)
 

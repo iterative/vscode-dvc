@@ -43,7 +43,7 @@ export class ExperimentsSortByTree
     internalCommands.registerExternalCommand<SortItem>(
       RegisteredCommands.EXPERIMENT_SORT_REMOVE,
       ({ dvcRoot, sort: { path } }: SortItem) =>
-        this.experiments.removeSort(dvcRoot, path)
+        this.experiments.getRepository(dvcRoot).removeSort(path)
     )
 
     internalCommands.registerExternalCommand(
@@ -70,7 +70,10 @@ export class ExperimentsSortByTree
       return this.getRootItems()
     }
 
-    return this.experiments.getSorts(dvcRoot).map(sort => ({ dvcRoot, sort }))
+    return this.experiments
+      .getRepository(dvcRoot)
+      .getSorts()
+      .map(sort => ({ dvcRoot, sort }))
   }
 
   private async getRootItems() {
@@ -92,7 +95,9 @@ export class ExperimentsSortByTree
       return this.getChildren(dvcRoots[0])
     }
     if (
-      dvcRoots.find(dvcRoot => this.experiments.getSorts(dvcRoot).length > 0)
+      dvcRoots.find(
+        dvcRoot => this.experiments.getRepository(dvcRoot).getSorts().length > 0
+      )
     ) {
       return dvcRoots.sort((a, b) => a.localeCompare(b))
     } else {
@@ -132,7 +137,7 @@ export class ExperimentsSortByTree
 
     const sorts = (await this.getChildren(element)) as SortItem[]
     sorts.map(({ dvcRoot, sort }) =>
-      this.experiments.removeSort(dvcRoot, sort.path)
+      this.experiments.getRepository(dvcRoot).removeSort(sort.path)
     )
   }
 }
