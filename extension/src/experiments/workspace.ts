@@ -41,9 +41,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
   public linkRepositories(workspacePlots: WorkspacePlots) {
     Object.entries(this.repositories).forEach(([dvcRoot, repository]) => {
       repository.dispose.track(
-        repository.onDidUpdateData(data =>
+        repository.onDidUpdateData(() => {
+          const data = repository.getRawData()
           workspacePlots.getRepository(dvcRoot).setState(data)
-        )
+        })
       )
     })
   }

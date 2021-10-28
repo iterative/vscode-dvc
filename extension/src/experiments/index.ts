@@ -19,7 +19,7 @@ import { Logger } from '../common/logger'
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
-  public readonly onDidUpdateData: Event<ExperimentsRepoJSONOutput>
+  public readonly onDidUpdateData: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -36,9 +36,7 @@ export class Experiments extends BaseRepository<TableData> {
     new EventEmitter<void>()
   )
 
-  private readonly dataUpdated = this.dispose.track(
-    new EventEmitter<ExperimentsRepoJSONOutput>()
-  )
+  private readonly dataUpdated = this.dispose.track(new EventEmitter<void>())
 
   constructor(
     dvcRoot: string,
@@ -63,9 +61,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.data = this.dispose.track(data)
 
-    this.data.onDidUpdate(data => {
-      Promise.all([this.setState(data), this.dataUpdated.fire(data)])
-    })
+    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
 
     this.handleMessageFromWebview()
 
@@ -73,7 +69,7 @@ export class Experiments extends BaseRepository<TableData> {
       this.onDidChangeExperiments(() => {
         this.deferred.resolve()
         this.dispose.untrack(waitForInitialData)
-        waitForInitialData.dispose()
+        waitForInitialData.dispose().then(() => this.dataUpdated.fire())
       })
     )
   }
@@ -174,6 +170,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
+  public getRawData() {
+    return this.experiments.getRawData()
+  }
+
   public getData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
@@ -185,6 +185,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private notifyChanged() {
+    this.dataUpdated.fire()
     this.experimentsChanged.fire()
     this.notifyParamsOrMetricsChanged()
   }
