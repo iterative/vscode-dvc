@@ -61,7 +61,6 @@ export class ExperimentsModel {
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
-
     this.livePlots = livePlots
   }
 
