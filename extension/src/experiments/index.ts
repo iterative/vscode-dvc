@@ -45,7 +45,7 @@ export class Experiments extends BaseRepository<TableData> {
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator,
     workspaceState: Memento,
-    data?: ExperimentsData
+    data = new ExperimentsData(dvcRoot, internalCommands)
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
@@ -61,26 +61,13 @@ export class Experiments extends BaseRepository<TableData> {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
-    this.data = this.dispose.track(
-      data || new ExperimentsData(dvcRoot, internalCommands)
-    )
+    this.data = this.dispose.track(data)
 
     this.data.onDidUpdate(data => {
       Promise.all([this.setState(data), this.dataUpdated.fire(data)])
     })
 
-    this.dispose.track(
-      this.onDidReceivedWebviewMessage(message => {
-        if (
-          message.type === MessageFromWebviewType.columnReordered &&
-          message.payload
-        ) {
-          return this.paramsAndMetrics.setColumnsOrder(message.payload)
-        }
-
-        Logger.error(`Unexpected message: ${message}`)
-      })
-    )
+    this.handleMessageFromWebview()
 
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
@@ -205,5 +192,20 @@ export class Experiments extends BaseRepository<TableData> {
   private notifyParamsOrMetricsChanged() {
     this.paramsOrMetricsChanged.fire()
     return this.sendData()
+  }
+
+  private handleMessageFromWebview() {
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message => {
+        if (
+          message.type === MessageFromWebviewType.columnReordered &&
+          message.payload
+        ) {
+          return this.paramsAndMetrics.setColumnsOrder(message.payload)
+        }
+
+        Logger.error(`Unexpected message: ${message}`)
+      })
+    )
   }
 }
