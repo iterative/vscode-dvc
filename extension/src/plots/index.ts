@@ -17,7 +17,7 @@ export class Plots extends BaseRepository<PlotsData> {
     await this.experiments.isReady()
 
     this.dispose.track(
-      experiments.onDidUpdateLivePlots(() => {
+      experiments.onDidChangeLivePlots(() => {
         this.notifyChanged()
       })
     )
