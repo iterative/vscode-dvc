@@ -44,11 +44,10 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
       const plots = workspacePlots.getRepository(dvcRoot)
       repository.dispose.track(
         repository.onDidUpdateData(() => {
-          const data = repository.getRawData()
-          workspacePlots.getRepository(dvcRoot).setState(data)
+          workspacePlots.getRepository(dvcRoot).dataUpdated.fire()
         })
       )
-      plots.setState(repository.getRawData())
+      plots.setExperiments(repository)
     })
   }
 

@@ -170,8 +170,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  public getRawData() {
-    return this.experiments.getRawData()
+  public getLivePlots() {
+    return this.experiments.getLivePlots()
   }
 
   public getData() {

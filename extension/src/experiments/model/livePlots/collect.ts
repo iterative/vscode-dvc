@@ -1,15 +1,15 @@
 import omit from 'lodash.omit'
-import { PlotData } from './webview/contract'
+import { PlotData, PlotsData } from '../../../plots/webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentsRepoJSONOutput,
   Value,
   ValueTree
-} from '../cli/reader'
-import { reduceParamsAndMetrics } from '../experiments/paramsAndMetrics/reduce'
-import { joinParamOrMetricPath } from '../experiments/paramsAndMetrics/paths'
-import { ParamsOrMetrics } from '../experiments/webview/contract'
-import { addToMapArray, addToMapCount } from '../util/map'
+} from '../../../cli/reader'
+import { reduceParamsAndMetrics } from '../../paramsAndMetrics/reduce'
+import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
+import { ParamsOrMetrics } from '../../webview/contract'
+import { addToMapArray, addToMapCount } from '../../../util/map'
 
 const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
@@ -19,9 +19,7 @@ const collectFromMetricsFile = (
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
-  if (key) {
-    ancestors.push(key)
-  }
+  const pathArray = [...ancestors, key].filter(Boolean) as string[]
 
   if (typeof value === 'object') {
     Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
@@ -31,13 +29,13 @@ const collectFromMetricsFile = (
         iteration,
         childKey,
         childValue,
-        ancestors
+        pathArray
       )
     })
     return
   }
 
-  const path = joinParamOrMetricPath(...ancestors)
+  const path = joinParamOrMetricPath(...pathArray)
 
   addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
 }
@@ -114,11 +112,11 @@ const collectFromExperimentsObject = (
   }
 }
 
-export type LivePlotAccumulator = Map<string, PlotData>
+type LivePlotAccumulator = Map<string, PlotData>
 
 export const collectLivePlotsData = (
   data: ExperimentsRepoJSONOutput
-): LivePlotAccumulator => {
+): PlotsData => {
   const acc = new Map<string, PlotData>()
 
   for (const { baseline, ...experimentsObject } of Object.values(
@@ -131,5 +129,11 @@ export const collectLivePlotsData = (
     }
   }
 
-  return acc
+  const plotsData: PlotsData = []
+
+  acc.forEach((value, key) => {
+    plotsData.push({ title: key, values: value })
+  })
+
+  return plotsData
 }

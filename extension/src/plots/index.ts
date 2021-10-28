@@ -1,22 +1,20 @@
 import { EventEmitter } from 'vscode'
-import { PlotsModel } from './model'
 import { PlotsData } from './webview/contract'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { Experiments } from '../experiments'
 
 export type PlotsWebview = BaseWebview<PlotsData>
 
 export class Plots extends BaseRepository<PlotsData> {
   public readonly viewKey = ViewKey.PLOTS
+  public readonly dataUpdated = this.dispose.track(new EventEmitter<void>())
 
-  private plots: PlotsModel
-
-  private readonly dataUpdated = this.dispose.track(new EventEmitter<void>())
   private readonly onDidUpdateData = this.dataUpdated.event
+  private experiments?: Experiments
 
   constructor(
     dvcRoot: string,
@@ -25,25 +23,21 @@ export class Plots extends BaseRepository<PlotsData> {
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
-    this.plots = this.dispose.track(new PlotsModel())
-
-    const waitForInitialData = this.dispose.track(
+    this.dispose.track(
       this.onDidUpdateData(() => {
-        this.deferred.resolve()
-        this.dispose.untrack(waitForInitialData)
-        waitForInitialData.dispose()
+        this.notifyChanged()
       })
     )
   }
 
-  public setState(data: ExperimentsRepoJSONOutput) {
-    this.plots.transformAndSet(data)
-
+  public setExperiments(experiments: Experiments) {
+    this.experiments = experiments
+    this.deferred.resolve()
     return this.notifyChanged()
   }
 
   public getData() {
-    return this.plots.getData()
+    return this.experiments?.getLivePlots() || []
   }
 
   private notifyChanged() {
