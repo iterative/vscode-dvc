@@ -176,7 +176,7 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getLivePlots()
   }
 
-  public getData() {
+  public getWebviewData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
@@ -194,7 +194,7 @@ export class Experiments extends BaseRepository<TableData> {
 
   private notifyParamsOrMetricsChanged() {
     this.paramsOrMetricsChanged.fire()
-    return this.sendData()
+    return this.sendWebviewData()
   }
 
   private handleMessageFromWebview() {
