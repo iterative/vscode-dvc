@@ -19,16 +19,16 @@ export class WebviewSerializer {
     experiments: WorkspaceExperiments,
     plots: WorkspacePlots
   ) {
-    this.addSerializer<TableData>(
+    this.registerSerializer<TableData>(
       ViewKey.EXPERIMENTS,
       internalCommands,
       experiments
     )
 
-    this.addSerializer<PlotsData>(ViewKey.PLOTS, internalCommands, plots)
+    this.registerSerializer<PlotsData>(ViewKey.PLOTS, internalCommands, plots)
   }
 
-  private addSerializer<T extends WebviewData>(
+  private registerSerializer<T extends WebviewData>(
     viewKey: ViewKey,
     internalCommands: InternalCommands,
     workspace: BaseWorkspaceWebviews<BaseRepository<T>, T>
