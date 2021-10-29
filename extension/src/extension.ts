@@ -53,7 +53,6 @@ export class Extension implements IExtension {
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
@@ -194,11 +193,9 @@ export class Extension implements IExtension {
       })
     )
 
-    this.webviewSerializer = this.dispose.track(
+    this.dispose.track(
       new WebviewSerializer(this.internalCommands, this.experiments, this.plots)
     )
-
-    this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments, this.internalCommands)
 
