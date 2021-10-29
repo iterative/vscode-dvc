@@ -12,7 +12,8 @@ export abstract class BaseRepository<T extends WebviewData> {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
-  public readonly onDidReceivedWebviewMessage: Event<MessageFromWebview>
+
+  protected readonly onDidReceivedWebviewMessage: Event<MessageFromWebview>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -59,7 +60,7 @@ export abstract class BaseRepository<T extends WebviewData> {
       this.viewKey,
       this.internalCommands,
       {
-        data: this.getData(),
+        data: this.getWebviewData(),
         dvcRoot: this.dvcRoot
       },
       this.resourceLocator.dvcIcon
@@ -74,7 +75,7 @@ export abstract class BaseRepository<T extends WebviewData> {
 
   public setWebview(view: BaseWebview<T>) {
     this.webview = this.dispose.track(view)
-    view.isReady().then(() => this.sendData())
+    view.isReady().then(() => this.sendWebviewData())
 
     const listener = this.dispose.track(
       view.onDidReceiveMessage(message =>
@@ -96,10 +97,10 @@ export abstract class BaseRepository<T extends WebviewData> {
     )
   }
 
-  protected sendData() {
+  protected sendWebviewData() {
     if (this.webview) {
       this.webview.show({
-        data: this.getData()
+        data: this.getWebviewData()
       })
     }
   }
@@ -110,5 +111,5 @@ export abstract class BaseRepository<T extends WebviewData> {
     this.webview = undefined
   }
 
-  abstract getData(): T
+  abstract getWebviewData(): T
 }

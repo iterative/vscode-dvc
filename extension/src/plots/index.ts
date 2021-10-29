@@ -26,11 +26,11 @@ export class Plots extends BaseRepository<PlotsData> {
     return this.notifyChanged()
   }
 
-  public getData() {
+  public getWebviewData() {
     return this.experiments?.getLivePlots() || []
   }
 
   private notifyChanged() {
-    return this.sendData()
+    return this.sendWebviewData()
   }
 }
