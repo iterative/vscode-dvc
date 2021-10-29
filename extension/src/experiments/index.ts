@@ -19,7 +19,7 @@ import { Logger } from '../common/logger'
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
-  public readonly onDidUpdateData: Event<void>
+  public readonly onDidChangeLivePlots: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
@@ -36,7 +36,9 @@ export class Experiments extends BaseRepository<TableData> {
     new EventEmitter<void>()
   )
 
-  private readonly dataUpdated = this.dispose.track(new EventEmitter<void>())
+  private readonly livePlotsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
 
   constructor(
     dvcRoot: string,
@@ -49,7 +51,7 @@ export class Experiments extends BaseRepository<TableData> {
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
-    this.onDidUpdateData = this.dataUpdated.event
+    this.onDidChangeLivePlots = this.livePlotsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -170,8 +172,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  public getRawData() {
-    return this.experiments.getRawData()
+  public getLivePlots() {
+    return this.experiments.getLivePlots()
   }
 
   public getData() {
@@ -185,7 +187,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private notifyChanged() {
-    this.dataUpdated.fire()
+    this.livePlotsChanged.fire()
     this.experimentsChanged.fire()
     this.notifyParamsOrMetricsChanged()
   }
