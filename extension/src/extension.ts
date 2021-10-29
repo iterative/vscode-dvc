@@ -195,7 +195,7 @@ export class Extension implements IExtension {
     )
 
     this.webviewSerializer = this.dispose.track(
-      new WebviewSerializer(this.internalCommands, this.experiments)
+      new WebviewSerializer(this.internalCommands, this.experiments, this.plots)
     )
 
     this.dispose.track(this.webviewSerializer)

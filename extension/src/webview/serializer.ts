@@ -6,13 +6,16 @@ import { restoreWebview } from './factory'
 import { WorkspaceExperiments } from '../experiments/workspace'
 import { InternalCommands } from '../commands/internal'
 import { TableData } from '../experiments/webview/contract'
+import { WorkspacePlots } from '../plots/workspace'
+import { PlotsData } from '../plots/webview/contract'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
 
   constructor(
     internalCommands: InternalCommands,
-    experiments: WorkspaceExperiments
+    experiments: WorkspaceExperiments,
+    plots: WorkspacePlots
   ) {
     this.dispose.track(
       window.registerWebviewPanelSerializer(ViewKey.EXPERIMENTS, {
@@ -29,6 +32,25 @@ export class WebviewSerializer {
           )
           await experiments.isReady()
           experiments.setWebview(dvcRoot, experimentsWebview)
+        }
+      })
+    )
+
+    this.dispose.track(
+      window.registerWebviewPanelSerializer(ViewKey.PLOTS, {
+        deserializeWebviewPanel: async (
+          panel: WebviewPanel,
+          state: WebviewState<PlotsData>
+        ) => {
+          const dvcRoot = state?.dvcRoot
+          const webview = await restoreWebview(
+            ViewKey.PLOTS,
+            panel,
+            internalCommands,
+            state
+          )
+          await plots.isReady()
+          plots.setWebview(dvcRoot, webview)
         }
       })
     )
