@@ -1,34 +1,53 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ViewKey } from './constants'
-import { WebviewState } from './contract'
+import { WebviewData, WebviewState } from './contract'
 import { restoreWebview } from './factory'
-import { WorkspaceExperiments } from '../experiments/workspace'
+import { BaseRepository } from './repository'
+import { BaseWorkspaceWebviews } from './workspace'
 import { InternalCommands } from '../commands/internal'
+import { WorkspaceExperiments } from '../experiments/workspace'
 import { TableData } from '../experiments/webview/contract'
+import { WorkspacePlots } from '../plots/workspace'
+import { PlotsData } from '../plots/webview/contract'
 
 export class WebviewSerializer {
   public readonly dispose = Disposable.fn()
 
   constructor(
     internalCommands: InternalCommands,
-    experiments: WorkspaceExperiments
+    experiments: WorkspaceExperiments,
+    plots: WorkspacePlots
+  ) {
+    this.registerSerializer<TableData>(
+      ViewKey.EXPERIMENTS,
+      internalCommands,
+      experiments
+    )
+
+    this.registerSerializer<PlotsData>(ViewKey.PLOTS, internalCommands, plots)
+  }
+
+  private registerSerializer<T extends WebviewData>(
+    viewKey: ViewKey,
+    internalCommands: InternalCommands,
+    workspace: BaseWorkspaceWebviews<BaseRepository<T>, T>
   ) {
     this.dispose.track(
-      window.registerWebviewPanelSerializer(ViewKey.EXPERIMENTS, {
+      window.registerWebviewPanelSerializer(viewKey, {
         deserializeWebviewPanel: async (
           panel: WebviewPanel,
-          state: WebviewState<TableData>
+          state: WebviewState<T>
         ) => {
           const dvcRoot = state?.dvcRoot
-          const experimentsWebview = await restoreWebview(
-            ViewKey.EXPERIMENTS,
+          const webview = await restoreWebview(
+            viewKey,
             panel,
             internalCommands,
             state
           )
-          await experiments.isReady()
-          experiments.setWebview(dvcRoot, experimentsWebview)
+          await workspace.isReady()
+          workspace.setWebview(dvcRoot, webview)
         }
       })
     )
