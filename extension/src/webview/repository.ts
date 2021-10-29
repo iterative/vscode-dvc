@@ -12,7 +12,8 @@ export abstract class BaseRepository<T extends WebviewData> {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
-  public readonly onDidReceivedWebviewMessage: Event<MessageFromWebview>
+
+  protected readonly onDidReceivedWebviewMessage: Event<MessageFromWebview>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
