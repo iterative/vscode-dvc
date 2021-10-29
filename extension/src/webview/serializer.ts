@@ -1,10 +1,12 @@
 import { window, WebviewPanel } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { ViewKey } from './constants'
-import { WebviewState } from './contract'
+import { WebviewData, WebviewState } from './contract'
 import { restoreWebview } from './factory'
-import { WorkspaceExperiments } from '../experiments/workspace'
+import { BaseRepository } from './repository'
+import { BaseWorkspaceWebviews } from './workspace'
 import { InternalCommands } from '../commands/internal'
+import { WorkspaceExperiments } from '../experiments/workspace'
 import { TableData } from '../experiments/webview/contract'
 import { WorkspacePlots } from '../plots/workspace'
 import { PlotsData } from '../plots/webview/contract'
@@ -17,40 +19,35 @@ export class WebviewSerializer {
     experiments: WorkspaceExperiments,
     plots: WorkspacePlots
   ) {
-    this.dispose.track(
-      window.registerWebviewPanelSerializer(ViewKey.EXPERIMENTS, {
-        deserializeWebviewPanel: async (
-          panel: WebviewPanel,
-          state: WebviewState<TableData>
-        ) => {
-          const dvcRoot = state?.dvcRoot
-          const experimentsWebview = await restoreWebview(
-            ViewKey.EXPERIMENTS,
-            panel,
-            internalCommands,
-            state
-          )
-          await experiments.isReady()
-          experiments.setWebview(dvcRoot, experimentsWebview)
-        }
-      })
+    this.addSerializer<TableData>(
+      ViewKey.EXPERIMENTS,
+      internalCommands,
+      experiments
     )
 
+    this.addSerializer<PlotsData>(ViewKey.PLOTS, internalCommands, plots)
+  }
+
+  private addSerializer<T extends WebviewData>(
+    viewKey: ViewKey,
+    internalCommands: InternalCommands,
+    workspace: BaseWorkspaceWebviews<BaseRepository<T>, T>
+  ) {
     this.dispose.track(
-      window.registerWebviewPanelSerializer(ViewKey.PLOTS, {
+      window.registerWebviewPanelSerializer(viewKey, {
         deserializeWebviewPanel: async (
           panel: WebviewPanel,
-          state: WebviewState<PlotsData>
+          state: WebviewState<T>
         ) => {
           const dvcRoot = state?.dvcRoot
           const webview = await restoreWebview(
-            ViewKey.PLOTS,
+            viewKey,
             panel,
             internalCommands,
             state
           )
-          await plots.isReady()
-          plots.setWebview(dvcRoot, webview)
+          await workspace.isReady()
+          workspace.setWebview(dvcRoot, webview)
         }
       })
     )
