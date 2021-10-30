@@ -14,7 +14,6 @@ import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
-import { Plots } from '../../../plots'
 
 export const buildMockData = () =>
   ({
@@ -47,30 +46,6 @@ const buildDependencies = (
     config,
     internalCommands,
     mockExperimentShow,
-    resourceLocator
-  }
-}
-
-export const buildPlots = (
-  disposer: Disposer,
-  experimentShowData = complexExperimentsOutput,
-  dvcRoot = dvcDemoPath
-) => {
-  const { config, internalCommands, resourceLocator } = buildDependencies(
-    disposer,
-    experimentShowData
-  )
-
-  const plots = disposer.track(
-    new Plots(dvcRoot, internalCommands, resourceLocator)
-  )
-
-  plots.setState(experimentShowData)
-
-  return {
-    config,
-    internalCommands,
-    plots,
     resourceLocator
   }
 }

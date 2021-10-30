@@ -80,12 +80,15 @@ export class ExperimentsFilterByTree
     }
 
     return Promise.resolve(
-      this.experiments.getFilters(element).map(filter => ({
-        description: [filter.operator, filter.value].join(' '),
-        dvcRoot: element,
-        id: getFilterId(filter),
-        label: filter.path
-      }))
+      this.experiments
+        .getRepository(element)
+        .getFilters()
+        .map(filter => ({
+          description: [filter.operator, filter.value].join(' '),
+          dvcRoot: element,
+          id: getFilterId(filter),
+          label: filter.path
+        }))
     )
   }
 
@@ -102,7 +105,9 @@ export class ExperimentsFilterByTree
     }
 
     const filters = flatten(
-      dvcRoots.map(dvcRoot => this.experiments.getFilters(dvcRoot))
+      dvcRoots.map(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getFilters()
+      )
     )
     if (definedAndNonEmpty(filters)) {
       if (dvcRoots.length === 1) {
@@ -128,7 +133,7 @@ export class ExperimentsFilterByTree
   }
 
   private removeFilter(filter: FilterItem) {
-    this.experiments.removeFilter(filter.dvcRoot, filter.id)
+    this.experiments.getRepository(filter.dvcRoot).removeFilter(filter.id)
   }
 
   private isRoot(element: string | FilterItem): element is string {

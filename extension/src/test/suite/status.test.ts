@@ -31,10 +31,12 @@ suite('Status Test Suite', () => {
 
     it('should show the correct status of the cli', () => {
       const cwd = __dirname
-      const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<CliStarted>()
+      const processCompleted = disposable.track(new EventEmitter<CliResult>())
+      const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
-      const cli = new Cli({} as Config, { processCompleted, processStarted })
+      const cli = disposable.track(
+        new Cli({} as Config, { processCompleted, processStarted })
+      )
       const mockStatusBarItem = {
         command: undefined,
         dispose: fake(),
@@ -108,12 +110,14 @@ suite('Status Test Suite', () => {
     })
 
     it('should floor the number of workers at 0', () => {
-      const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<CliStarted>()
+      const processCompleted = disposable.track(new EventEmitter<CliResult>())
+      const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
       const cwd = __dirname
 
-      const cli = new Cli({} as Config, { processCompleted, processStarted })
+      const cli = disposable.track(
+        new Cli({} as Config, { processCompleted, processStarted })
+      )
       const mockStatusBarItem = {
         dispose: fake(),
         show: fake(),

@@ -68,10 +68,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       } as unknown as QuickPickItem)
       mockShowInputBox.resolves(accuracyFilter.value)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (WorkspaceExperiments as any).prototype,
@@ -164,10 +161,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         .resolves({ value: '<' } as unknown as QuickPickItem)
       mockShowInputBox.resolves('2')
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
       stub(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (WorkspaceExperiments as any).prototype,
@@ -240,8 +234,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
     ])
 
     const getRepositorySpy = spy(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (WorkspaceExperiments as any).prototype,
+      WorkspaceExperiments.prototype,
       'getRepository'
     )
 

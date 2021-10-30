@@ -39,10 +39,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const isUnselected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
@@ -82,10 +79,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const selectedChildren = experiments.getChildParamsOrMetrics(path) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
@@ -141,10 +135,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
@@ -211,10 +202,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       const selectedGrandChildren =
         experiments.getChildParamsOrMetrics(parentPath) || []
@@ -285,10 +273,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((WorkspaceExperiments as any).prototype, 'getRepository').returns(
-        experiments
-      )
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
 
       await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,

@@ -14,7 +14,7 @@ export interface IWorkspace<T, U> {
 }
 
 export class BaseWorkspace<T extends Disposable> {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   protected repositories: Disposables<T> = {}
   protected internalCommands: InternalCommands
@@ -51,7 +51,7 @@ export class BaseWorkspace<T extends Disposable> {
     )
   }
 
-  protected getRepository(dvcRoot: string) {
+  public getRepository(dvcRoot: string) {
     return this.repositories[dvcRoot]
   }
 

@@ -54,7 +54,6 @@ export class Extension implements IExtension {
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
@@ -118,19 +117,13 @@ export class Extension implements IExtension {
 
     this.plots = this.dispose.track(new WorkspacePlots(this.internalCommands))
 
-    this.dispose.track(
-      this.experiments.onDidUpdateData(({ dvcRoot, data }) =>
-        this.plots.update(dvcRoot, data)
-      )
-    )
-
     this.repositories = this.dispose.track(
       new WorkspaceRepositories(this.internalCommands)
     )
 
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        this.experiments.update(cwd)
+        this.experiments.getRepository(cwd).update()
       })
     )
 
@@ -201,11 +194,9 @@ export class Extension implements IExtension {
       })
     )
 
-    this.webviewSerializer = this.dispose.track(
-      new WebviewSerializer(this.internalCommands, this.experiments)
+    this.dispose.track(
+      new WebviewSerializer(this.internalCommands, this.experiments, this.plots)
     )
-
-    this.dispose.track(this.webviewSerializer)
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots)
@@ -308,6 +299,8 @@ export class Extension implements IExtension {
       this.experiments.create(this.dvcRoots, this.resourceLocator),
       this.plots.create(this.dvcRoots, this.resourceLocator)
     ])
+
+    this.experiments.linkRepositories(this.plots)
 
     return Promise.all([
       this.repositories.isReady(),

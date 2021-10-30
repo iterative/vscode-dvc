@@ -1,7 +1,6 @@
 import { BaseWebview } from '.'
 import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
 import { InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
 import { BaseWorkspace, IWorkspace } from '../workspace'
@@ -60,6 +59,4 @@ export abstract class BaseWorkspaceWebviews<
     dvcRoot: string,
     resourceLocator: ResourceLocator
   ): T
-
-  abstract update(dvcRoot: string, data: ExperimentsRepoJSONOutput): void
 }
