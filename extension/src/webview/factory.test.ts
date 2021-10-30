@@ -20,4 +20,12 @@ describe('isValidState', () => {
       })
     ).toBe(true)
   })
+  it('Does not validate when given an object as data', () => {
+    expect(
+      isValidState(ViewKey.PLOTS, {
+        data: {},
+        dvcRoot
+      })
+    ).toBe(false)
+  })
 })
