@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { Config } from 'vega'
@@ -111,11 +111,9 @@ const Plot = ({
 }
 
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  const data = useMemo(() => plotsData, [plotsData])
-
   return (
     <>
-      {data?.map(plotData => (
+      {plotsData?.map(plotData => (
         <Plot
           values={plotData.values}
           title={plotData.title}

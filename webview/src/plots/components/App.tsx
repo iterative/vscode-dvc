@@ -35,8 +35,8 @@ const App = () => {
   }, [])
   useEffect(() => {
     vsCodeApi.setState({
-      dvcRoot,
-      plotsData
+      data: plotsData,
+      dvcRoot
     })
   }, [plotsData, dvcRoot])
   return <Plots plotsData={plotsData} />
