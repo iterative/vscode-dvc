@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 import complexTableData from './complex-table-data'
-import Experiments from '../table/components/Experiments'
+import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../table/style.scss'
