@@ -13,6 +13,14 @@ import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, resourcePath } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
+import { ExperimentsData } from '../../../experiments/data'
+import { Plots } from '../../../plots'
+
+export const buildMockData = () =>
+  ({
+    dispose: stub(),
+    onDidUpdate: stub()
+  } as unknown as ExperimentsData)
 
 const buildDependencies = (
   disposer: Disposer,
@@ -43,6 +51,30 @@ const buildDependencies = (
   }
 }
 
+export const buildPlots = (
+  disposer: Disposer,
+  experimentShowData = complexExperimentsOutput,
+  dvcRoot = dvcDemoPath
+) => {
+  const { config, internalCommands, resourceLocator } = buildDependencies(
+    disposer,
+    experimentShowData
+  )
+
+  const plots = disposer.track(
+    new Plots(dvcRoot, internalCommands, resourceLocator)
+  )
+
+  plots.setState(experimentShowData)
+
+  return {
+    config,
+    internalCommands,
+    plots,
+    resourceLocator
+  }
+}
+
 export const buildExperiments = (
   disposer: Disposer,
   experimentShowData = complexExperimentsOutput,
@@ -56,7 +88,8 @@ export const buildExperiments = (
       dvcRoot,
       internalCommands,
       resourceLocator,
-      buildMockMemento()
+      buildMockMemento(),
+      buildMockData()
     )
   )
 
@@ -109,7 +142,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   return { workspaceExperiments }
 }
 
-export const getMockInternalCommands = (disposer: Disposer) => {
+export const buildMockInternalCommands = (disposer: Disposer) => {
   const mockedInternalCommands = disposer.track(
     new InternalCommands(
       { getTheme: () => WebviewColorTheme.dark } as unknown as Config,

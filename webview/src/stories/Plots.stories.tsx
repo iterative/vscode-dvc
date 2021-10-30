@@ -1,22 +1,19 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { TableData } from 'dvc/src/experiments/webview/contract'
-import complexTableData from './complex-table-data'
+import { PlotsData } from 'dvc/src/plots/webview/contract'
+import complexPlotsData from 'dvc/src/test/fixtures/complex-plots-example'
 import Plots from '../plots/components/Plots'
-import parseTableData from '../plots/parse-table-data'
-
 import './test-vscode-styles.scss'
 
 export default {
   args: {
-    tableData: complexTableData
+    plotsData: complexPlotsData
   },
   component: Plots,
   title: 'Plots'
 } as Meta
 
-export const WithData: Story<{ tableData: TableData }> = ({ tableData }) => {
-  const plotsData = parseTableData(tableData)
+export const WithData: Story<{ plotsData: PlotsData }> = ({ plotsData }) => {
   return <Plots plotsData={plotsData} />
 }
 

@@ -16,7 +16,7 @@ export class PlotsModel {
     const plotsData: PlotsData = []
 
     this.data?.forEach((value, key) => {
-      plotsData.push({ title: key, values: value })
+      plotsData.push({ title: key.replace(/^metrics:/, ''), values: value })
     })
 
     return plotsData

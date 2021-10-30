@@ -1,26 +1,19 @@
 import React, { useMemo } from 'react'
-import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
+import { PlotsData } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
-import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
 import { Config } from 'vega'
-import { PlotsData, PlotItem } from './App'
 
-const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
-  const yField = splitParamOrMetricPath(path)
-    .map(segment => segment.replace(/\./g, '\\$&'))
-    .join('.')
-  const xField = 'iteration'
-  const colorField = 'experimentDisplayName'
+const createSpec = (title: string): VisualizationSpec => {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { name: 'items' },
-    encoding: { x: { field: xField, type: 'nominal' } },
+    data: { name: 'values' },
+    encoding: { x: { field: 'x', title: 'iteration', type: 'nominal' } },
     height: 300,
     layer: [
       {
         encoding: {
-          color: { field: colorField, legend: null, type: 'nominal' },
-          y: { field: yField, title: name, type: 'quantitative' }
+          color: { field: 'group', legend: null, type: 'nominal' },
+          y: { field: 'y', title, type: 'quantitative' }
         },
         layer: [
           { mark: 'line' },
@@ -43,14 +36,14 @@ const createSpec = ({ path, name }: ParamOrMetric): VisualizationSpec => {
             name: 'hover',
             select: {
               clear: 'mouseout',
-              fields: [xField],
+              fields: ['x'],
               nearest: true,
               on: 'mouseover',
               type: 'point'
             }
           }
         ],
-        transform: [{ groupby: [xField], pivot: colorField, value: yField }]
+        transform: [{ groupby: ['x'], pivot: 'group', value: 'y' }]
       }
     ],
     width: 400
@@ -98,54 +91,35 @@ const config: Config = {
 }
 
 const Plot = ({
-  items,
-  yMetric
+  values,
+  title
 }: {
-  items: PlotItem[]
-  yMetric: ParamOrMetric
+  values: { x: number; y: number; group: string }[]
+  title: string
 }) => {
-  const spec = createSpec(yMetric)
+  const spec = createSpec(title)
 
   return (
     <VegaLite
       actions={false}
       config={config}
       spec={spec}
-      data={{ items }}
+      data={{ values }}
       renderer="svg"
     />
   )
 }
 
-const collectLeafMetrics = (columns?: ParamOrMetric[]): ParamOrMetric[] => {
-  const leafMetrics: ParamOrMetric[] = []
-  columns?.forEach(column => {
-    if (column.group === 'metrics' && !column.hasChildren) {
-      leafMetrics.push(column)
-    }
-  })
-  return leafMetrics
-}
-
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  const leafMetrics = useMemo(
-    () => collectLeafMetrics(plotsData?.columns),
-    [plotsData]
-  )
-
-  if (!plotsData) {
-    return null
-  }
-
-  const { items } = plotsData
+  const data = useMemo(() => plotsData, [plotsData])
 
   return (
     <>
-      {leafMetrics.map(leafMetric => (
+      {data?.map(plotData => (
         <Plot
-          items={items}
-          yMetric={leafMetric}
-          key={`plot-${leafMetric.path}`}
+          values={plotData.values}
+          title={plotData.title}
+          key={`plot-${plotData.title}`}
         />
       ))}
     </>
