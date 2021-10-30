@@ -19,7 +19,9 @@ const collectFromMetricsFile = (
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
-  const ancestorsWithKey = [...ancestors, key].filter(Boolean) as string[]
+  if (key) {
+    ancestors.push(key)
+  }
 
   if (typeof value === 'object') {
     Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
@@ -29,13 +31,13 @@ const collectFromMetricsFile = (
         iteration,
         childKey,
         childValue,
-        ancestorsWithKey
+        ancestors
       )
     })
     return
   }
 
-  const path = joinParamOrMetricPath(...ancestorsWithKey)
+  const path = joinParamOrMetricPath(...ancestors)
 
   addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
 }

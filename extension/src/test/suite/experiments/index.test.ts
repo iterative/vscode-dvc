@@ -3,11 +3,7 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
-import {
-  buildExperiments,
-  buildMockInternalCommands,
-  buildMockData
-} from './util'
+import { buildExperiments, getMockInternalCommands } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
@@ -164,8 +160,7 @@ suite('Experiments Test Suite', () => {
           dvcDemoPath,
           internalCommands,
           resourceLocator,
-          buildMockMemento(),
-          buildMockData()
+          buildMockMemento()
         )
       )
 
@@ -323,10 +318,9 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          buildMockInternalCommands(disposable),
+          getMockInternalCommands(disposable),
           {} as ResourceLocator,
-          mockMemento,
-          buildMockData()
+          mockMemento
         )
       )
       testRepository.setState(complexExperimentsOutput)
@@ -432,10 +426,9 @@ suite('Experiments Test Suite', () => {
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          buildMockInternalCommands(disposable),
+          getMockInternalCommands(disposable),
           {} as ResourceLocator,
-          mockMemento,
-          buildMockData()
+          mockMemento
         )
       )
       testRepository.setState(complexExperimentsOutput)

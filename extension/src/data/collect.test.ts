@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import complexExperimentsOutput from '../test/fixtures/complex-output-example'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {

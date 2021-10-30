@@ -59,15 +59,16 @@ suite('Workspace Experiments Test Suite', () => {
 
       const focused = onDidChangeIsWebviewFocused(experiments)
 
-      await workspaceExperiments.showWebview()
+      await workspaceExperiments.showExperimentsTable()
 
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
-      expect(workspaceExperiments.getFocusedWebview()).to.equal(experiments)
+      expect(workspaceExperiments.getFocusedTable()).to.equal(experiments)
 
       mockQuickPickOne.resetHistory()
 
-      const focusedExperiments = await workspaceExperiments.showWebview()
+      const focusedExperiments =
+        await workspaceExperiments.showExperimentsTable()
 
       expect(focusedExperiments).to.equal(experiments)
       expect(mockQuickPickOne).to.be.calledOnce
@@ -81,7 +82,7 @@ suite('Workspace Experiments Test Suite', () => {
       const { workspaceExperiments } = buildSingleRepoExperiments(disposable)
       await workspaceExperiments.isReady()
 
-      await workspaceExperiments.showWebview()
+      await workspaceExperiments.showExperimentsTable()
 
       expect(mockQuickPickOne).to.not.be.called
     })
@@ -138,7 +139,7 @@ suite('Workspace Experiments Test Suite', () => {
       expect(await focused).to.equal(dvcDemoPath)
       expect(mockQuickPickOne).to.be.calledOnce
       expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
-      expect(workspaceExperiments.getFocusedWebview()).to.equal(experiments)
+      expect(workspaceExperiments.getFocusedTable()).to.equal(experiments)
 
       mockQuickPickOne.resetHistory()
 
@@ -157,7 +158,7 @@ suite('Workspace Experiments Test Suite', () => {
       await window.showTextDocument(document)
 
       expect(await unfocused).to.be.undefined
-      expect(workspaceExperiments.getFocusedWebview()).to.be.undefined
+      expect(workspaceExperiments.getFocusedTable()).to.be.undefined
 
       const focusedAgain = onDidChangeIsWebviewFocused(experiments)
       await commands.executeCommand('workbench.action.previousEditor')

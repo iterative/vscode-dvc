@@ -49,15 +49,13 @@ export abstract class BaseRepository<T extends WebviewData> {
       return this.webview.reveal()
     }
 
-    const state = {
-      data: this.getData(),
-      dvcRoot: this.dvcRoot
-    }
-
     const webview = await createWebview(
       this.viewKey,
       this.internalCommands,
-      state,
+      {
+        data: this.getData(),
+        dvcRoot: this.dvcRoot
+      },
       this.resourceLocator.dvcIcon
     )
 

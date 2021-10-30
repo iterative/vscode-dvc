@@ -3,20 +3,23 @@ import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { collectFiles } from './collect'
-import { DOT_GIT, EXPERIMENTS_GIT_REFS, GIT_REFS } from './constants'
 import {
   createFileSystemWatcher,
   createNecessaryFileSystemWatcher
-} from '../../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../../git'
-import { ProcessManager } from '../../processManager'
-import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import { sameContents, uniqueValues } from '../../util/array'
+} from '../fileSystem/watcher'
+import { getGitRepositoryRoot } from '../git'
+import { ProcessManager } from '../processManager'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { sameContents, uniqueValues } from '../util/array'
 
-export class ExperimentsData {
+const DOT_GIT = '.git'
+const GIT_REFS = join(DOT_GIT, 'refs')
+export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
+
+export class Data {
   public readonly dispose = Disposable.fn()
-  public readonly onDidUpdate: Event<ExperimentsRepoJSONOutput>
+  public readonly onDidChangeExperimentsData: Event<ExperimentsRepoJSONOutput>
 
   private readonly dvcRoot: string
   private files: string[] = []
@@ -27,7 +30,7 @@ export class ExperimentsData {
   private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
 
-  private readonly updated: EventEmitter<ExperimentsRepoJSONOutput> =
+  private readonly experimentsDataChanged: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
   private readonly paramsAndMetricsFilesChanged = new EventEmitter<void>()
@@ -44,7 +47,7 @@ export class ExperimentsData {
     })
 
     this.internalCommands = internalCommands
-    this.onDidUpdate = this.updated.event
+    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
 
     this.initialize()
     this.watchExpGitRefs()
@@ -60,7 +63,7 @@ export class ExperimentsData {
 
   private initialize() {
     const waitForInitialData = this.dispose.track(
-      this.onDidUpdate(() => {
+      this.onDidChangeExperimentsData(() => {
         this.watcher = this.watchParamsAndMetricsFiles()
 
         this.dispose.track(
@@ -119,7 +122,7 @@ export class ExperimentsData {
   }
 
   private notifyChanged(data: ExperimentsRepoJSONOutput) {
-    this.updated.fire(data)
+    this.experimentsDataChanged.fire(data)
   }
 
   private watchParamsAndMetricsFiles() {

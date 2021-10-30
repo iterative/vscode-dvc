@@ -89,8 +89,6 @@ export interface IEventNamePropertyMapping {
   [EventName.QUEUE_EXPERIMENT]: undefined
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
-  [EventName.PLOTS_SHOW]: undefined
-
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined
   [EventName.CHECKOUT]: undefined

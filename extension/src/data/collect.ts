@@ -1,4 +1,4 @@
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsRepoJSONOutput } from '../cli/reader'
 
 export const collectFiles = (data: ExperimentsRepoJSONOutput): string[] => {
   const files = new Set<string>(
