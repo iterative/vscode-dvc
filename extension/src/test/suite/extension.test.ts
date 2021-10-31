@@ -146,9 +146,6 @@ suite('Extension Test Suite', () => {
     })
 
     it('should initialize the extension when the cli is usable', async () => {
-      // eslint-disable-next-line no-console
-      console.error('timeout:', osTimeout)
-
       const mockCanRunCli = stub(CliReader.prototype, 'help')
         .onFirstCall()
         .resolves('ok, initialize everything')
