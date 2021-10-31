@@ -21,6 +21,8 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 
 suite('Extension Test Suite', () => {
+  const osTimeout = process.platform === 'win32' ? 20000 : 12000
+
   const dvcPathOption = 'dvc.dvcPath'
   const pythonPathOption = 'dvc.pythonPath'
 
@@ -144,6 +146,9 @@ suite('Extension Test Suite', () => {
     })
 
     it('should initialize the extension when the cli is usable', async () => {
+      // eslint-disable-next-line no-console
+      console.error('timeout:', osTimeout)
+
       const mockCanRunCli = stub(CliReader.prototype, 'help')
         .onFirstCall()
         .resolves('ok, initialize everything')
@@ -296,7 +301,7 @@ suite('Extension Test Suite', () => {
         mockDisposer,
         'should dispose of the current repositories and experiments if the cli can no longer be found'
       ).to.have.been.called
-    }).timeout(12000)
+    }).timeout(osTimeout)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
       const clock = useFakeTimers()
