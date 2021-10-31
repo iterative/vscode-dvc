@@ -21,7 +21,7 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 
 suite('Extension Test Suite', () => {
-  const osTimeout = process.platform === 'win32' ? 20000 : 12000
+  const osTimeout = process.platform === 'win32' ? 25000 : 12000
 
   const dvcPathOption = 'dvc.dvcPath'
   const pythonPathOption = 'dvc.pythonPath'
