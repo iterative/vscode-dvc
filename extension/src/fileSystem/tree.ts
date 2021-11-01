@@ -28,12 +28,11 @@ import { getInput } from '../vscode/inputBox'
 import { pickResources } from '../vscode/resourcePicker'
 import { getWarningResponse } from '../vscode/modal'
 import { Response } from '../vscode/response'
+import { Resource } from '../repository/commands'
 
-type PathItem = {
-  dvcRoot: string
+export type PathItem = Resource & {
   isDirectory: boolean
   isOut: boolean
-  resourceUri: Uri
 }
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
@@ -239,14 +238,14 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       }
     )
 
-    this.internalCommands.registerExternalCommand<string>(
+    this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.DELETE_TARGET,
-      path => deleteTarget(path)
+      pathItem => deleteTarget(pathItem.resourceUri.fsPath)
     )
 
-    this.internalCommands.registerExternalCommand(
+    this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.MOVE_TARGETS,
-      async (destination: string) => {
+      async ({ resourceUri }) => {
         const paths = await pickResources(
           'pick resources to add to the dataset'
         )
@@ -258,6 +257,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
           if (response !== Response.MOVE) {
             return
           }
+          const destination = resourceUri.fsPath
 
           await moveTargets(paths, destination)
           return fireWatcher(this.getDataPlaceholder(destination))
@@ -265,12 +265,12 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       }
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.REMOVE_TARGET,
-      path => {
+      ({ dvcRoot, resourceUri }) => {
+        const path = resourceUri.fsPath
         deleteTarget(path)
         this.treeDataChanged.fire()
-        const { dvcRoot } = this.getPathItem(path)
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
@@ -280,11 +280,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       }
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.RENAME_TARGET,
-      async path => {
-        const { dvcRoot } = this.getPathItem(path)
-        const relPath = relative(dvcRoot, path)
+      async ({ dvcRoot, resourceUri }) => {
+        const relPath = relative(dvcRoot, resourceUri.fsPath)
         const relDestination = await getInput(
           'enter a destination relative to the root',
           relPath
@@ -302,24 +301,26 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       }
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.PULL_TARGET,
-      path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
+      resource => this.tryThenMaybeForce(AvailableCommands.PULL, resource)
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.PUSH_TARGET,
-      path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
+      resource => this.tryThenMaybeForce(AvailableCommands.PUSH, resource)
     )
   }
 
-  private tryThenMaybeForce(commandId: CommandId, path: string) {
-    const { dvcRoot } = this.getPathItem(path)
+  private tryThenMaybeForce(
+    commandId: CommandId,
+    { dvcRoot, resourceUri }: Resource
+  ) {
     return tryThenMaybeForce(
       this.internalCommands,
       commandId,
       dvcRoot,
-      relative(dvcRoot, path)
+      relative(dvcRoot, resourceUri.path)
     )
   }
 }
