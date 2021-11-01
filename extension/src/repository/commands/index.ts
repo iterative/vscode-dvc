@@ -1,4 +1,3 @@
-import { relative } from 'path'
 import { commands, Uri } from 'vscode'
 import { tryThenMaybeForce } from '../../cli/actions'
 import { Flag } from '../../cli/args'
@@ -7,6 +6,7 @@ import {
   CommandId,
   InternalCommands
 } from '../../commands/internal'
+import { relativeWithUri } from '../../fileSystem'
 import { gitReset, gitResetWorkspace, gitStageAll } from '../../git'
 import { getWarningResponse } from '../../vscode/modal'
 import { Response } from '../../vscode/response'
@@ -25,7 +25,7 @@ type ResourceCommand = ({
 export const getResourceCommand =
   (internalCommands: InternalCommands, commandId: CommandId): ResourceCommand =>
   ({ dvcRoot, resourceUri }) => {
-    const relPath = relative(dvcRoot, resourceUri.fsPath)
+    const relPath = relativeWithUri(dvcRoot, resourceUri)
 
     return tryThenMaybeForce(internalCommands, commandId, dvcRoot, relPath)
   }
@@ -33,7 +33,7 @@ export const getResourceCommand =
 export const getSimpleResourceCommand =
   (internalCommands: InternalCommands, commandId: CommandId): ResourceCommand =>
   ({ dvcRoot, resourceUri }) => {
-    const relPath = relative(dvcRoot, resourceUri.fsPath)
+    const relPath = relativeWithUri(dvcRoot, resourceUri)
 
     return internalCommands.executeCommand(commandId, dvcRoot, relPath)
   }
