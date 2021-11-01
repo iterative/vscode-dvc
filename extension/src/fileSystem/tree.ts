@@ -97,7 +97,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public async getChildren(pathItem?: PathItem): Promise<PathItem[]> {
     if (pathItem) {
       const contents = await this.readDirectory(pathItem)
-      return this.sortDirectory(contents).map(path => this.getPathItem(path))
+      return this.sortDirectory(contents)
     }
 
     if (definedAndNonEmpty(this.dvcRoots)) {
@@ -134,11 +134,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
   private getPathItem(path: string) {
     return this.pathItems[path]
-  }
-
-  private isDirectory(path: string) {
-    const { isDirectory } = this.getPathItem(path)
-    return isDirectory
   }
 
   private getRootElements() {
@@ -191,7 +186,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return baseContext
   }
 
-  private async readDirectory(pathItem: PathItem): Promise<string[]> {
+  private async readDirectory(pathItem: PathItem): Promise<PathItem[]> {
     const { dvcRoot, resourceUri } = pathItem
     if (!dvcRoot) {
       return []
@@ -205,7 +200,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     return listOutput.map(relative => {
       const absolutePath = join(resourceUri.fsPath, relative.path)
-      this.pathItems[absolutePath] = {
+      const pathItem = {
         dvcRoot,
         // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
         isDirectory: exists(absolutePath)
@@ -214,15 +209,16 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
         isOut: relative.isout,
         resourceUri: Uri.file(absolutePath)
       }
-      return absolutePath
+      this.pathItems[absolutePath] = pathItem
+      return pathItem
     })
   }
 
-  private sortDirectory(contents: string[]) {
+  private sortDirectory(contents: PathItem[]) {
     return contents.sort((a, b) => {
-      const aIsDirectory = this.isDirectory(a)
-      if (aIsDirectory === this.isDirectory(b)) {
-        return a.localeCompare(b)
+      const aIsDirectory = a.isDirectory
+      if (aIsDirectory === b.isDirectory) {
+        return a.resourceUri.path.localeCompare(b.resourceUri.path)
       }
       return aIsDirectory ? -1 : 1
     })
