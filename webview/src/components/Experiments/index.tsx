@@ -11,7 +11,8 @@ import {
   useGroupBy,
   useExpanded,
   useFlexLayout,
-  useColumnOrder
+  useColumnOrder,
+  useResizeColumns
 } from 'react-table'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
@@ -62,7 +63,7 @@ export const ExperimentsTable: React.FC<{
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {
-      width: 120
+      minWidth: 120
     }
     return [initialState, defaultColumn]
   }, [])
@@ -97,6 +98,7 @@ export const ExperimentsTable: React.FC<{
     useColumnOrder,
     useGroupBy,
     useExpanded,
+    useResizeColumns,
     hooks => {
       hooks.useInstance.push(instance => {
         const { rows } = instance

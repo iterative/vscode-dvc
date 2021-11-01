@@ -29,7 +29,8 @@ export default {
       sorts: [
         { descending: true, path: 'params:params.yaml:epochs' },
         { descending: false, path: 'params:params.yaml:log_file' }
-      ]
+      ],
+      columnsOrder: []
     },
     vsCodeApi: dummyVsCodeApi
   },

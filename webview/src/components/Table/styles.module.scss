@@ -445,3 +445,25 @@ $spinner-color-light: #000;
 .dndPlaceholder {
   display: none;
 }
+
+.columnResizer {
+  right: -5px;
+  width: 10px;
+  height: 500%;
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  touch-action: none;
+  cursor: col-resize;
+
+  &:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background-color: $header-fg-color;
+    opacity: 0.5
+  }
+}
