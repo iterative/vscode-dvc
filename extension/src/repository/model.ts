@@ -180,7 +180,7 @@ export class RepositoryModel
     ])
   }
 
-  private setModified(
+  private setModifiedAndNotInCache(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
@@ -224,7 +224,7 @@ export class RepositoryModel
         .filter(path => this.state.tracked.has(path))
     )
 
-    this.setModified(diffOutput, statusOutput)
+    this.setModifiedAndNotInCache(diffOutput, statusOutput)
   }
 
   private updateTracked(listOutput: ListOutput[]): void {
