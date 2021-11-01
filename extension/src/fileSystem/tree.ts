@@ -9,7 +9,7 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { exists, isDirectory } from '.'
+import { exists, isDirectory, relativeWithUri } from '.'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
@@ -110,7 +110,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     )
 
     treeItem.contextValue = this.getContextValue(
-      resourceUri.fsPath,
+      resourceUri,
       isDirectory,
       isOut
     )
@@ -147,26 +147,22 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return this.dvcRoots.map(dvcRoot => this.getPathItem(dvcRoot))
   }
 
-  private getDataPlaceholder(path: string): string {
-    return path.trim() + '.dvc'
-  }
-
-  private hasDataPlaceholder(path: string): boolean {
-    return exists(this.getDataPlaceholder(path))
+  private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
+    return fsPath.trim() + '.dvc'
   }
 
   private getContextValue(
-    path: string,
+    { fsPath }: Uri,
     isDirectory: boolean,
     isOut: boolean
   ): string {
-    if (!exists(path)) {
+    if (!exists(fsPath)) {
       return 'virtual'
     }
 
     const baseContext = isDirectory ? 'dir' : 'file'
 
-    if (this.hasDataPlaceholder(path)) {
+    if (exists(this.getDataPlaceholder({ fsPath }))) {
       return baseContext + 'Data'
     }
     if (isOut || !isDirectory) {
@@ -185,7 +181,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY,
       dvcRoot,
-      relative(dvcRoot, resourceUri.fsPath)
+      relativeWithUri(dvcRoot, resourceUri)
     )
 
     return listOutput.map(relative => {
@@ -251,7 +247,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
           }
 
           await moveTargets(targets, destination)
-          return fireWatcher(this.getDataPlaceholder(destination.fsPath))
+          return fireWatcher(this.getDataPlaceholder(destination))
         }
       }
     )
@@ -261,9 +257,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       ({ dvcRoot, resourceUri }) => {
         deleteTarget(resourceUri)
         this.treeDataChanged.fire()
-        const relPath = this.getDataPlaceholder(
-          relative(dvcRoot, resourceUri.fsPath)
-        )
+        const relPath = relative(dvcRoot, this.getDataPlaceholder(resourceUri))
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
           dvcRoot,
@@ -275,7 +269,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.RENAME_TARGET,
       async ({ dvcRoot, resourceUri }) => {
-        const relPath = relative(dvcRoot, resourceUri.fsPath)
+        const relPath = relativeWithUri(dvcRoot, resourceUri)
         const relDestination = await getInput(
           'enter a destination relative to the root',
           relPath
