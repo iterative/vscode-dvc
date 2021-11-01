@@ -237,7 +237,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.DELETE_TARGET,
-      pathItem => deleteTarget(pathItem.resourceUri.fsPath)
+      ({ resourceUri }) => deleteTarget(resourceUri)
     )
 
     this.internalCommands.registerExternalCommand<Resource>(
@@ -264,10 +264,11 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.REMOVE_TARGET,
       ({ dvcRoot, resourceUri }) => {
-        const path = resourceUri.fsPath
-        deleteTarget(path)
+        deleteTarget(resourceUri)
         this.treeDataChanged.fire()
-        const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
+        const relPath = this.getDataPlaceholder(
+          relative(dvcRoot, resourceUri.fsPath)
+        )
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
           dvcRoot,

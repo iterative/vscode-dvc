@@ -4,9 +4,9 @@ import { isSameOrChild } from '.'
 import { definedAndNonEmpty } from '../util/array'
 import { getWorkspaceFolders } from '../vscode/workspaceFolders'
 
-export const deleteTarget = (path: string) => {
+export const deleteTarget = (uri: Uri) => {
   const edit = new WorkspaceEdit()
-  edit.deleteFile(Uri.file(path), { ignoreIfNotExists: true, recursive: true })
+  edit.deleteFile(uri, { ignoreIfNotExists: true, recursive: true })
   return workspace.applyEdit(edit)
 }
 

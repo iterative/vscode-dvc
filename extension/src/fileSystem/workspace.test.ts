@@ -25,7 +25,7 @@ describe('deleteTarget', () => {
     })
     mockedWorkspace.applyEdit = mockedApplyEdit.mockResolvedValueOnce(true)
 
-    const path = join('test', 'path')
+    const path = Uri.file(join('test', 'path'))
     const deleted = await deleteTarget(path)
 
     expect(mockedWorkspaceEdit).toBeCalledTimes(1)
