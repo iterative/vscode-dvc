@@ -1,4 +1,4 @@
-import { dirname, join, relative } from 'path'
+import { dirname, relative } from 'path'
 import {
   Event,
   EventEmitter,
@@ -198,7 +198,8 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     )
 
     return listOutput.map(relative => {
-      const absolutePath = join(resourceUri.fsPath, relative.path)
+      const uri = Uri.joinPath(resourceUri, relative.path)
+      const absolutePath = uri.fsPath
       const pathItem = {
         dvcRoot,
         // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
@@ -206,7 +207,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
           ? isDirectory(absolutePath)
           : relative.isdir,
         isOut: relative.isout,
-        resourceUri: Uri.file(absolutePath)
+        resourceUri: uri
       }
       this.pathItems[absolutePath] = pathItem
       return pathItem

@@ -104,6 +104,7 @@ describe('TrackedTreeView', () => {
 
     it('should get the children for the provided element', async () => {
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
+      const dataUri = Uri.file(join(dvcDemoPath, 'data'))
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
@@ -118,19 +119,25 @@ describe('TrackedTreeView', () => {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: false,
-          resourceUri: Uri.file(join(dvcDemoPath, 'data'))
+          resourceUri: expect.objectContaining({
+            fsPath: dataUri.fsPath
+          })
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: true,
-          resourceUri: Uri.file(join(dvcDemoPath, 'logs'))
+          resourceUri: expect.objectContaining({
+            fsPath: join(dvcDemoPath, 'logs')
+          })
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: false,
           isOut: true,
-          resourceUri: Uri.file(join(dvcDemoPath, 'model.pt'))
+          resourceUri: expect.objectContaining({
+            fsPath: join(dvcDemoPath, 'model.pt')
+          })
         }
       ])
 
@@ -142,14 +149,16 @@ describe('TrackedTreeView', () => {
         dvcRoot: dvcDemoPath,
         isDirectory: true,
         isOut: false,
-        resourceUri: Uri.file(join(dvcDemoPath, 'data'))
+        resourceUri: dataUri
       })
       expect(child).toEqual([
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: false,
-          resourceUri: Uri.file(join(dvcDemoPath, 'data', 'MNIST'))
+          resourceUri: expect.objectContaining({
+            fsPath: join(dvcDemoPath, 'data', 'MNIST')
+          })
         }
       ])
     })
