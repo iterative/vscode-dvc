@@ -1,5 +1,6 @@
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { EventEmitter } from 'vscode'
+import { EventEmitter, Uri } from 'vscode'
 import { Experiments } from '../../../experiments'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Process } from '../../../processExecution'
@@ -65,3 +66,8 @@ export const buildMockedExperiments = () => {
     mockedParamsOrMetricsChanged
   }
 }
+
+export const testUri = (...paths: string[]) =>
+  expect.objectContaining({
+    fsPath: Uri.file(join(...paths)).fsPath
+  })
