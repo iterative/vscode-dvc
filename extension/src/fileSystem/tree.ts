@@ -14,12 +14,7 @@ import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
-import { tryThenMaybeForce } from '../cli/actions'
-import {
-  CommandId,
-  AvailableCommands,
-  InternalCommands
-} from '../commands/internal'
+import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../telemetry'
@@ -296,28 +291,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
           relDestination
         )
       }
-    )
-
-    this.internalCommands.registerExternalCliCommand<Resource>(
-      RegisteredCliCommands.PULL_TARGET,
-      resource => this.tryThenMaybeForce(AvailableCommands.PULL, resource)
-    )
-
-    this.internalCommands.registerExternalCliCommand<Resource>(
-      RegisteredCliCommands.PUSH_TARGET,
-      resource => this.tryThenMaybeForce(AvailableCommands.PUSH, resource)
-    )
-  }
-
-  private tryThenMaybeForce(
-    commandId: CommandId,
-    { dvcRoot, resourceUri }: Resource
-  ) {
-    return tryThenMaybeForce(
-      this.internalCommands,
-      commandId,
-      dvcRoot,
-      relative(dvcRoot, resourceUri.path)
     )
   }
 }
