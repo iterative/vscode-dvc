@@ -28,9 +28,7 @@ export class SourceControlManagement {
   private readonly dvcRoot: string
 
   private changedResourceGroup: SourceControlResourceGroup
-
   private gitCommitReadyResourceGroup: SourceControlResourceGroup
-
   private notInCacheResourceGroup: SourceControlResourceGroup
 
   constructor(dvcRoot: string, state: SourceControlManagementState) {
