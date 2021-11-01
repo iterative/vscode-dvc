@@ -160,10 +160,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return exists(this.getDataPlaceholder(path))
   }
 
-  private hasRemote(isDirectory: boolean, isOut: boolean): boolean {
-    return isOut || !isDirectory
-  }
-
   private getContextValue(
     path: string,
     isDirectory: boolean,
@@ -178,7 +174,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     if (this.hasDataPlaceholder(path)) {
       return baseContext + 'Data'
     }
-    if (this.hasRemote(isDirectory, isOut)) {
+    if (isOut || !isDirectory) {
       return baseContext + 'HasRemote'
     }
 
