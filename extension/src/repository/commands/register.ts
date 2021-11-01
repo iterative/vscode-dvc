@@ -31,6 +31,16 @@ const registerResourceCommands = (internalCommands: InternalCommands): void => {
     RegisteredCliCommands.COMMIT_TARGET,
     getResourceCommand(internalCommands, AvailableCommands.COMMIT)
   )
+
+  internalCommands.registerExternalCliCommand<Resource>(
+    RegisteredCliCommands.PULL_TARGET,
+    getResourceCommand(internalCommands, AvailableCommands.PULL)
+  )
+
+  internalCommands.registerExternalCliCommand<Resource>(
+    RegisteredCliCommands.PUSH_TARGET,
+    getResourceCommand(internalCommands, AvailableCommands.PUSH)
+  )
 }
 
 const registerResourceGroupCommands = (
