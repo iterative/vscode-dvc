@@ -138,7 +138,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       expect(messageSpy).to.be.calledWith({
         data: expectedTableData
       })
-    })
+    }).timeout(6000)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
