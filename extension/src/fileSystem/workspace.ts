@@ -1,4 +1,4 @@
-import { basename, join } from 'path'
+import { basename } from 'path'
 import { Uri, workspace, WorkspaceEdit } from 'vscode'
 import { isSameOrChild } from '.'
 import { definedAndNonEmpty } from '../util/array'
@@ -10,10 +10,10 @@ export const deleteTarget = (path: string) => {
   return workspace.applyEdit(edit)
 }
 
-export const moveTargets = (paths: string[], destination: string) => {
+export const moveTargets = (targets: Uri[], destination: Uri) => {
   const edit = new WorkspaceEdit()
-  paths.forEach(path =>
-    edit.renameFile(Uri.file(path), Uri.file(join(destination, basename(path))))
+  targets.forEach(uri =>
+    edit.renameFile(uri, Uri.joinPath(destination, basename(uri.fsPath)))
   )
   return workspace.applyEdit(edit)
 }

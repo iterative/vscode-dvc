@@ -242,11 +242,11 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.MOVE_TARGETS,
-      async ({ resourceUri }) => {
-        const paths = await pickResources(
+      async ({ resourceUri: destination }) => {
+        const targets = await pickResources(
           'pick resources to add to the dataset'
         )
-        if (paths) {
+        if (targets) {
           const response = await getWarningResponse(
             'Are you sure you want to move the selected data into this dataset?',
             Response.MOVE
@@ -254,10 +254,9 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
           if (response !== Response.MOVE) {
             return
           }
-          const destination = resourceUri.fsPath
 
-          await moveTargets(paths, destination)
-          return fireWatcher(this.getDataPlaceholder(destination))
+          await moveTargets(targets, destination)
+          return fireWatcher(this.getDataPlaceholder(destination.fsPath))
         }
       }
     )
