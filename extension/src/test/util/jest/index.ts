@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
 import { EventEmitter, Uri } from 'vscode'
 import { Experiments } from '../../../experiments'
@@ -66,7 +67,7 @@ export const buildMockedExperiments = () => {
   }
 }
 
-export const testUri = (path: string) =>
+export const testUri = (...paths: string[]) =>
   expect.objectContaining({
-    fsPath: Uri.file(path).fsPath
+    fsPath: Uri.file(join(...paths)).fsPath
   })

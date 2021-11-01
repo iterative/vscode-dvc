@@ -127,13 +127,13 @@ describe('TrackedTreeView', () => {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: true,
-          resourceUri: testUri(join(dvcDemoPath, 'logs'))
+          resourceUri: testUri(dvcDemoPath, 'logs')
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: false,
           isOut: true,
-          resourceUri: testUri(join(dvcDemoPath, 'model.pt'))
+          resourceUri: testUri(dvcDemoPath, 'model.pt')
         }
       ])
 
@@ -152,7 +152,7 @@ describe('TrackedTreeView', () => {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: false,
-          resourceUri: testUri(join(dvcDemoPath, 'data', 'MNIST'))
+          resourceUri: testUri(dvcDemoPath, 'data', 'MNIST')
         }
       ])
     })
