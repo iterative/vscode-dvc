@@ -22,7 +22,7 @@ type OutputData = {
   untracked: Set<string>
 }
 
-type ReducedStatusOutput = {
+type ModifiedAndNotInCache = {
   [Status.MODIFIED]: Set<string>
   [Status.NOT_IN_CACHE]: Set<string>
 }
@@ -99,40 +99,40 @@ export class RepositoryModel
       .filter(value => value) as PathStatus[]
   }
 
-  private reduceStatus(
-    filteredStatusOutput: StatusOutput
-  ): ReducedStatusOutput {
+  private collectStatuses(
+    entry: PathStatus,
+    reducedStatus: ModifiedAndNotInCache
+  ) {
+    Object.entries(entry)
+      .filter(([, status]) =>
+        [Status.NOT_IN_CACHE, Status.MODIFIED].includes(status)
+      )
+      .map(([relativePath, status]) => {
+        const absolutePath = this.getAbsolutePath(relativePath)
+
+        if (!this.state.tracked.has(absolutePath)) {
+          return
+        }
+
+        reducedStatus[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(
+          absolutePath
+        )
+      })
+  }
+
+  private reduceStatus(statusOutput: StatusOutput): ModifiedAndNotInCache {
     const statusReducer = (
-      reducedStatus: {
-        [Status.MODIFIED]: Set<string>
-        [Status.NOT_IN_CACHE]: Set<string>
-      },
+      modifiedAndNotInCache: ModifiedAndNotInCache,
       entry: StatusesOrAlwaysChanged[]
-    ): ReducedStatusOutput => {
+    ): ModifiedAndNotInCache => {
       const statuses = this.getChangedOutsStatuses(entry)
 
-      statuses.map(entry =>
-        Object.entries(entry)
-          .filter(([, status]) =>
-            [Status.NOT_IN_CACHE, Status.MODIFIED].includes(status)
-          )
-          .map(([relativePath, status]) => {
-            const absolutePath = this.getAbsolutePath(relativePath)
+      statuses.map(entry => this.collectStatuses(entry, modifiedAndNotInCache))
 
-            if (!this.state.tracked.has(absolutePath)) {
-              return
-            }
-
-            reducedStatus[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(
-              absolutePath
-            )
-          })
-      )
-
-      return reducedStatus
+      return modifiedAndNotInCache
     }
 
-    return Object.values(filteredStatusOutput).reduce(statusReducer, {
+    return Object.values(statusOutput).reduce(statusReducer, {
       [Status.MODIFIED]: new Set(),
       [Status.NOT_IN_CACHE]: new Set()
     })
@@ -203,6 +203,13 @@ export class RepositoryModel
       modifiedAgainstHead,
       modifiedAgainstCache
     )
+
+    this.state.notInCache = new Set([
+      ...this.getStateFromDiff(diffOutput[Status.NOT_IN_CACHE]),
+      ...this.splitModifiedAgainstHead(modifiedAgainstHead, path =>
+        this.pathInSet(path, notInCache)
+      )
+    ])
   }
 
   private updateStatus(
@@ -215,10 +222,6 @@ export class RepositoryModel
       diffOutput.renamed
         ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
         .filter(path => this.state.tracked.has(path))
-    )
-
-    this.state.notInCache = this.getStateFromDiff(
-      diffOutput[Status.NOT_IN_CACHE]
     )
 
     this.setModified(diffOutput, statusOutput)

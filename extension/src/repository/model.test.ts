@@ -194,30 +194,21 @@ describe('RepositoryState', () => {
       })
     })
 
-    it('should handle not in cache as expected', () => {
+    it("should display a dataset as not in cache if some of it's data is missing", () => {
       const diff = {
-        added: [
-          {
-            path: 'logs/acc.tsv'
-          },
-          {
-            path: 'logs/loss.tsv'
-          }
-        ],
+        added: [],
         deleted: [],
-        modified: [],
-        'not in cache': [
+        modified: [
           {
             path: 'data/MNIST/raw/'
-          },
+          }
+        ],
+        'not in cache': [
           {
             path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
           },
           {
             path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
-          },
-          {
-            path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
           },
           {
             path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
@@ -340,10 +331,7 @@ describe('RepositoryState', () => {
       })
 
       expect(model.getState()).toEqual({
-        added: new Set([
-          join(dvcRoot, 'logs/acc.tsv'),
-          join(dvcRoot, 'logs/loss.tsv')
-        ]),
+        added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
         modified: emptySet,
@@ -351,7 +339,6 @@ describe('RepositoryState', () => {
           join(dvcRoot, 'data/MNIST/raw'),
           join(dvcRoot, 'data/MNIST/raw/t10k-images-idx3-ubyte'),
           join(dvcRoot, 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-labels-idx1-ubyte'),
           join(dvcRoot, 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'),
           join(dvcRoot, 'data/MNIST/raw/train-images-idx3-ubyte'),
           join(dvcRoot, 'data/MNIST/raw/train-images-idx3-ubyte.gz'),
