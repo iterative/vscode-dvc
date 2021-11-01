@@ -25,7 +25,7 @@ describe('deleteTarget', () => {
     })
     mockedWorkspace.applyEdit = mockedApplyEdit.mockResolvedValueOnce(true)
 
-    const path = join('test', 'path')
+    const path = Uri.file(join('test', 'path'))
     const deleted = await deleteTarget(path)
 
     expect(mockedWorkspaceEdit).toBeCalledTimes(1)
@@ -44,14 +44,14 @@ describe('moveTargets', () => {
     mockedWorkspace.applyEdit = mockedApplyEdit.mockResolvedValueOnce(true)
 
     const filename = 'fun.txt'
-    const path = join('test', filename)
-    const destination = join('other', 'folder')
+    const path = Uri.file(join('test', filename))
+    const destination = Uri.file(join('other', 'folder'))
     const moved = await moveTargets([path], destination)
 
     expect(mockedWorkspaceEdit).toBeCalledTimes(1)
     expect(mockedRenameFile).toBeCalledWith(
-      Uri.file(path),
-      Uri.file(join(destination, filename))
+      path,
+      Uri.joinPath(destination, filename)
     )
     expect(mockedApplyEdit).toBeCalledWith({ renameFile: mockedRenameFile })
     expect(moved).toBe(true)
