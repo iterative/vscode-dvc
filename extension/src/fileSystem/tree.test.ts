@@ -4,6 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
+import { testUri } from '../test/util/jest'
 import { Config } from '../config'
 import { InternalCommands } from '../commands/internal'
 import { RegisteredCommands } from '../commands/external'
@@ -104,7 +105,8 @@ describe('TrackedTreeView', () => {
 
     it('should get the children for the provided element', async () => {
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
-      const dataUri = Uri.file(join(dvcDemoPath, 'data'))
+      const data = join(dvcDemoPath, 'data')
+      const dataUri = Uri.file(data)
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
@@ -119,25 +121,19 @@ describe('TrackedTreeView', () => {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: false,
-          resourceUri: expect.objectContaining({
-            fsPath: dataUri.fsPath
-          })
+          resourceUri: testUri(data)
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: true,
-          resourceUri: expect.objectContaining({
-            fsPath: join(dvcDemoPath, 'logs')
-          })
+          resourceUri: testUri(join(dvcDemoPath, 'logs'))
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: false,
           isOut: true,
-          resourceUri: expect.objectContaining({
-            fsPath: join(dvcDemoPath, 'model.pt')
-          })
+          resourceUri: testUri(join(dvcDemoPath, 'model.pt'))
         }
       ])
 
@@ -156,9 +152,7 @@ describe('TrackedTreeView', () => {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
           isOut: false,
-          resourceUri: expect.objectContaining({
-            fsPath: join(dvcDemoPath, 'data', 'MNIST')
-          })
+          resourceUri: testUri(join(dvcDemoPath, 'data', 'MNIST'))
         }
       ])
     })

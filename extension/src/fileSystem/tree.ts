@@ -214,7 +214,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return contents.sort((a, b) => {
       const aIsDirectory = a.isDirectory
       if (aIsDirectory === b.isDirectory) {
-        return a.resourceUri.path.localeCompare(b.resourceUri.path)
+        return a.resourceUri.fsPath.localeCompare(b.resourceUri.fsPath)
       }
       return aIsDirectory ? -1 : 1
     })
