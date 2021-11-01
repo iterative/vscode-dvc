@@ -1,4 +1,4 @@
-import { dirname, join, relative } from 'path'
+import { dirname, relative } from 'path'
 import {
   Event,
   EventEmitter,
@@ -28,16 +28,20 @@ import { getInput } from '../vscode/inputBox'
 import { pickResources } from '../vscode/resourcePicker'
 import { getWarningResponse } from '../vscode/modal'
 import { Response } from '../vscode/response'
+import { Resource } from '../repository/commands'
 
-type PathItem = { dvcRoot: string; isDirectory: boolean; isOut: boolean }
+export type PathItem = Resource & {
+  isDirectory: boolean
+  isOut: boolean
+}
 
-export class TrackedExplorerTree implements TreeDataProvider<string> {
+export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public dispose = Disposable.fn()
 
-  public readonly onDidChangeTreeData: Event<string | void>
+  public readonly onDidChangeTreeData: Event<PathItem | void>
 
   private readonly internalCommands: InternalCommands
-  private readonly treeDataChanged: EventEmitter<string | void>
+  private readonly treeDataChanged: EventEmitter<PathItem | void>
 
   private dvcRoots: string[] = []
 
@@ -48,7 +52,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
   constructor(
     internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
-    treeDataChanged?: EventEmitter<string | void>
+    treeDataChanged?: EventEmitter<PathItem | void>
   ) {
     this.internalCommands = internalCommands
 
@@ -66,7 +70,8 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
   public refresh(path?: string): void {
     if (path) {
-      this.treeDataChanged.fire(dirname(path))
+      const pathItem = this.getPathItem(dirname(path))
+      this.treeDataChanged.fire(pathItem)
     }
   }
 
@@ -78,14 +83,19 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     this.dvcRoots = dvcRoots
     dvcRoots.forEach(
       dvcRoot =>
-        (this.pathItems[dvcRoot] = { dvcRoot, isDirectory: true, isOut: false })
+        (this.pathItems[dvcRoot] = {
+          dvcRoot,
+          isDirectory: true,
+          isOut: false,
+          resourceUri: Uri.file(dvcRoot)
+        })
     )
     this.reset()
   }
 
-  public async getChildren(path?: string): Promise<string[]> {
-    if (path) {
-      const contents = await this.readDirectory(path)
+  public async getChildren(pathItem?: PathItem): Promise<PathItem[]> {
+    if (pathItem) {
+      const contents = await this.readDirectory(pathItem)
       return this.sortDirectory(contents)
     }
 
@@ -96,9 +106,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return []
   }
 
-  public getTreeItem(path: string): TreeItem {
-    const resourceUri = Uri.file(path)
-    const isDirectory = this.isDirectory(path)
+  public getTreeItem({ isDirectory, isOut, resourceUri }: PathItem): TreeItem {
     const treeItem = new TreeItem(
       resourceUri,
       isDirectory
@@ -106,7 +114,11 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
         : TreeItemCollapsibleState.None
     )
 
-    treeItem.contextValue = this.getContextValue(path)
+    treeItem.contextValue = this.getContextValue(
+      resourceUri.fsPath,
+      isDirectory,
+      isOut
+    )
 
     if (!isDirectory && treeItem.contextValue !== 'virtual') {
       treeItem.command = {
@@ -123,11 +135,6 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return this.pathItems[path]
   }
 
-  private isDirectory(path: string) {
-    const { isDirectory } = this.getPathItem(path)
-    return isDirectory
-  }
-
   private getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
@@ -139,10 +146,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
 
     if (this.dvcRoots.length === 1) {
       const [onlyRoot] = this.dvcRoots
-      return this.getChildren(onlyRoot)
+      return this.getChildren(this.getPathItem(onlyRoot))
     }
 
-    return this.dvcRoots
+    return this.dvcRoots.map(dvcRoot => this.getPathItem(dvcRoot))
   }
 
   private getDataPlaceholder(path: string): string {
@@ -153,30 +160,29 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     return exists(this.getDataPlaceholder(path))
   }
 
-  private hasRemote(path: string): boolean {
-    const { isOut, isDirectory } = this.getPathItem(path)
-    return isOut || !isDirectory
-  }
-
-  private getContextValue(path: string): string {
+  private getContextValue(
+    path: string,
+    isDirectory: boolean,
+    isOut: boolean
+  ): string {
     if (!exists(path)) {
       return 'virtual'
     }
 
-    const baseContext = this.isDirectory(path) ? 'dir' : 'file'
+    const baseContext = isDirectory ? 'dir' : 'file'
 
     if (this.hasDataPlaceholder(path)) {
       return baseContext + 'Data'
     }
-    if (this.hasRemote(path)) {
+    if (isOut || !isDirectory) {
       return baseContext + 'HasRemote'
     }
 
     return baseContext
   }
 
-  private async readDirectory(path: string): Promise<string[]> {
-    const { dvcRoot } = this.getPathItem(path)
+  private async readDirectory(pathItem: PathItem): Promise<PathItem[]> {
+    const { dvcRoot, resourceUri } = pathItem
     if (!dvcRoot) {
       return []
     }
@@ -184,28 +190,31 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY,
       dvcRoot,
-      relative(dvcRoot, path)
+      relative(dvcRoot, resourceUri.fsPath)
     )
 
     return listOutput.map(relative => {
-      const absolutePath = join(path, relative.path)
-      this.pathItems[absolutePath] = {
+      const uri = Uri.joinPath(resourceUri, relative.path)
+      const absolutePath = uri.fsPath
+      const pathItem = {
         dvcRoot,
         // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
         isDirectory: exists(absolutePath)
           ? isDirectory(absolutePath)
           : relative.isdir,
-        isOut: relative.isout
+        isOut: relative.isout,
+        resourceUri: uri
       }
-      return absolutePath
+      this.pathItems[absolutePath] = pathItem
+      return pathItem
     })
   }
 
-  private sortDirectory(contents: string[]) {
+  private sortDirectory(contents: PathItem[]) {
     return contents.sort((a, b) => {
-      const aIsDirectory = this.isDirectory(a)
-      if (aIsDirectory === this.isDirectory(b)) {
-        return a.localeCompare(b)
+      const aIsDirectory = a.isDirectory
+      if (aIsDirectory === b.isDirectory) {
+        return a.resourceUri.fsPath.localeCompare(b.resourceUri.fsPath)
       }
       return aIsDirectory ? -1 : 1
     })
@@ -226,14 +235,14 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     )
 
-    this.internalCommands.registerExternalCommand<string>(
+    this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.DELETE_TARGET,
-      path => deleteTarget(path)
+      pathItem => deleteTarget(pathItem.resourceUri.fsPath)
     )
 
-    this.internalCommands.registerExternalCommand(
+    this.internalCommands.registerExternalCommand<Resource>(
       RegisteredCommands.MOVE_TARGETS,
-      async (destination: string) => {
+      async ({ resourceUri }) => {
         const paths = await pickResources(
           'pick resources to add to the dataset'
         )
@@ -245,6 +254,7 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
           if (response !== Response.MOVE) {
             return
           }
+          const destination = resourceUri.fsPath
 
           await moveTargets(paths, destination)
           return fireWatcher(this.getDataPlaceholder(destination))
@@ -252,12 +262,12 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.REMOVE_TARGET,
-      path => {
+      ({ dvcRoot, resourceUri }) => {
+        const path = resourceUri.fsPath
         deleteTarget(path)
         this.treeDataChanged.fire()
-        const { dvcRoot } = this.getPathItem(path)
         const relPath = this.getDataPlaceholder(relative(dvcRoot, path))
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
@@ -267,11 +277,10 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.RENAME_TARGET,
-      async path => {
-        const { dvcRoot } = this.getPathItem(path)
-        const relPath = relative(dvcRoot, path)
+      async ({ dvcRoot, resourceUri }) => {
+        const relPath = relative(dvcRoot, resourceUri.fsPath)
         const relDestination = await getInput(
           'enter a destination relative to the root',
           relPath
@@ -289,24 +298,26 @@ export class TrackedExplorerTree implements TreeDataProvider<string> {
       }
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.PULL_TARGET,
-      path => this.tryThenMaybeForce(AvailableCommands.PULL, path)
+      resource => this.tryThenMaybeForce(AvailableCommands.PULL, resource)
     )
 
-    this.internalCommands.registerExternalCliCommand<string>(
+    this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.PUSH_TARGET,
-      path => this.tryThenMaybeForce(AvailableCommands.PUSH, path)
+      resource => this.tryThenMaybeForce(AvailableCommands.PUSH, resource)
     )
   }
 
-  private tryThenMaybeForce(commandId: CommandId, path: string) {
-    const { dvcRoot } = this.getPathItem(path)
+  private tryThenMaybeForce(
+    commandId: CommandId,
+    { dvcRoot, resourceUri }: Resource
+  ) {
     return tryThenMaybeForce(
       this.internalCommands,
       commandId,
       dvcRoot,
-      relative(dvcRoot, path)
+      relative(dvcRoot, resourceUri.path)
     )
   }
 }

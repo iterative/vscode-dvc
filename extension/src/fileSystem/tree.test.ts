@@ -4,6 +4,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
+import { testUri } from '../test/util/jest'
 import { Config } from '../config'
 import { InternalCommands } from '../commands/internal'
 import { RegisteredCommands } from '../commands/external'
@@ -91,12 +92,21 @@ describe('TrackedTreeView', () => {
 
       const rootElements = await trackedTreeView.getChildren()
 
-      expect(rootElements).toEqual(mockedDvcRoots)
+      expect(rootElements).toEqual(
+        mockedDvcRoots.map(dvcRoot => ({
+          dvcRoot,
+          isDirectory: true,
+          isOut: false,
+          resourceUri: Uri.file(dvcRoot)
+        }))
+      )
       expect(mockedListDvcOnly).not.toBeCalled()
     })
 
     it('should get the children for the provided element', async () => {
       mockedListDvcOnly.mockResolvedValueOnce(demoRootList)
+      const data = join(dvcDemoPath, 'data')
+      const dataUri = Uri.file(data)
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
@@ -107,17 +117,44 @@ describe('TrackedTreeView', () => {
 
       const rootElements = await trackedTreeView.getChildren()
       expect(rootElements).toEqual([
-        join(dvcDemoPath, 'data'),
-        join(dvcDemoPath, 'logs'),
-        join(dvcDemoPath, 'model.pt')
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isOut: false,
+          resourceUri: testUri(data)
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isOut: true,
+          resourceUri: testUri(dvcDemoPath, 'logs')
+        },
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: false,
+          isOut: true,
+          resourceUri: testUri(dvcDemoPath, 'model.pt')
+        }
       ])
 
       mockedListDvcOnly.mockResolvedValueOnce([
         { isdir: true, isexec: false, isout: false, path: 'MNIST' }
       ])
 
-      const child = await trackedTreeView.getChildren(join(dvcDemoPath, 'data'))
-      expect(child).toEqual([join(dvcDemoPath, 'data', 'MNIST')])
+      const child = await trackedTreeView.getChildren({
+        dvcRoot: dvcDemoPath,
+        isDirectory: true,
+        isOut: false,
+        resourceUri: dataUri
+      })
+      expect(child).toEqual([
+        {
+          dvcRoot: dvcDemoPath,
+          isDirectory: true,
+          isOut: false,
+          resourceUri: testUri(dvcDemoPath, 'data', 'MNIST')
+        }
+      ])
     })
   })
 
@@ -141,7 +178,12 @@ describe('TrackedTreeView', () => {
       trackedTreeView.initialize([dvcDemoPath])
 
       await trackedTreeView.getChildren()
-      const treeItem = trackedTreeView.getTreeItem(join(dvcDemoPath, 'data'))
+      const treeItem = trackedTreeView.getTreeItem({
+        dvcRoot: dvcDemoPath,
+        isDirectory: true,
+        isOut: false,
+        resourceUri: Uri.file(join(dvcDemoPath, 'data'))
+      })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
@@ -152,7 +194,7 @@ describe('TrackedTreeView', () => {
 
     it('should return the correct tree item for a virtual file', () => {
       let mockedItem = {}
-      const log = join(dvcDemoPath, 'logs', 'acc.tsv')
+      const log = Uri.file(join(dvcDemoPath, 'logs', 'acc.tsv'))
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         mockedItem = { collapsibleState, uri }
         return mockedItem
@@ -164,19 +206,15 @@ describe('TrackedTreeView', () => {
         mockedTreeDataChanged
       )
       mockedExists.mockReturnValueOnce(false)
-      const getPathItemSpy = jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(trackedTreeView as any, 'getPathItem')
-        .mockReturnValue({
-          dvcRoot: dvcDemoPath,
-          isDirectory: false,
-          isOut: false
-        })
 
-      const treeItem = trackedTreeView.getTreeItem(log)
+      const treeItem = trackedTreeView.getTreeItem({
+        dvcRoot: dvcDemoPath,
+        isDirectory: false,
+        isOut: false,
+        resourceUri: log
+      })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(getPathItemSpy).toBeCalledWith(log)
       expect(treeItem).toEqual({
         ...mockedItem,
         contextValue: 'virtual'
@@ -210,7 +248,12 @@ describe('TrackedTreeView', () => {
 
       await trackedTreeView.getChildren()
 
-      const treeItem = trackedTreeView.getTreeItem(join(dvcDemoPath, 'data'))
+      const treeItem = trackedTreeView.getTreeItem({
+        dvcRoot: dvcDemoPath,
+        isDirectory: true,
+        isOut: false,
+        resourceUri: Uri.file(join(dvcDemoPath, 'data'))
+      })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
       expect(treeItem).toEqual({
@@ -221,11 +264,10 @@ describe('TrackedTreeView', () => {
 
     it('should return the correct tree item for a file', () => {
       let mockedItem = {}
-      const log = join(dvcDemoPath, 'logs', 'acc.tsv')
-      const mockedUri = Uri.file(log)
+      const log = Uri.file(join(dvcDemoPath, 'logs', 'acc.tsv'))
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(0)
-        expect(uri).toEqual(mockedUri)
+        expect(uri).toEqual(log)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -236,23 +278,19 @@ describe('TrackedTreeView', () => {
         mockedTreeDataChanged
       )
       mockedExists.mockReturnValueOnce(true)
-      const getPathItemSpy = jest
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .spyOn(trackedTreeView as any, 'getPathItem')
-        .mockReturnValue({
-          dvcRoot: dvcDemoPath,
-          isDirectory: false,
-          isOut: false
-        })
 
-      const treeItem = trackedTreeView.getTreeItem(log)
+      const treeItem = trackedTreeView.getTreeItem({
+        dvcRoot: dvcDemoPath,
+        isDirectory: false,
+        isOut: false,
+        resourceUri: log
+      })
 
       expect(mockedTreeItem).toBeCalledTimes(1)
-      expect(getPathItemSpy).toBeCalledWith(log)
       expect(treeItem).toEqual({
         ...mockedItem,
         command: {
-          arguments: [mockedUri],
+          arguments: [log],
           command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
           title: 'Open File'
         },
