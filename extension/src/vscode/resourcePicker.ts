@@ -1,4 +1,4 @@
-import { window } from 'vscode'
+import { Uri, window } from 'vscode'
 
 export const pickFile = async (title: string): Promise<string | undefined> => {
   const uris = await window.showOpenDialog({
@@ -13,18 +13,12 @@ export const pickFile = async (title: string): Promise<string | undefined> => {
   }
 }
 
-export const pickResources = async (
-  title: string
-): Promise<string[] | undefined> => {
-  const uris = await window.showOpenDialog({
+export const pickResources = (title: string): Thenable<Uri[] | undefined> => {
+  return window.showOpenDialog({
     canSelectFiles: true,
     canSelectFolders: true,
     canSelectMany: true,
     openLabel: 'Select',
     title
   })
-
-  if (uris) {
-    return uris.map(uri => uri.fsPath)
-  }
 }
