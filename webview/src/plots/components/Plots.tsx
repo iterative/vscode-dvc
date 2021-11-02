@@ -50,7 +50,7 @@ const createSpec = (title: string): VisualizationSpec => {
   }
 }
 
-const foregroundColor = `var(--vscode-foreground)`
+const foregroundColor = 'var(--vscode-foreground)'
 const backgroundColor = 'var(--vscode-editor-background)'
 const config: Config = {
   axis: {
