@@ -85,47 +85,6 @@ export class Model {
     return Model.instance
   }
 
-  private sendMessage(message: MessageFromWebview): void {
-    this.vsCodeApi.postMessage(message)
-  }
-
-  private getState(): PersistedModelState {
-    return {
-      data: this.data,
-      dvcRoot: this.dvcRoot
-    }
-  }
-
-  private setState(state: PersistedModelState) {
-    this.dvcRoot = state.dvcRoot
-    this.data = state.data
-    this.createColumnsOrderRepresentation()
-  }
-
-  private handleMessage(message: MessageToWebview): void {
-    this.errors = message.errors || undefined
-    switch (message.type) {
-      case MessageToWebviewType.setTheme:
-        runInAction(() => {
-          this.theme = message.theme
-        })
-        return
-      case MessageToWebviewType.setData:
-        runInAction(() => {
-          this.data = message.data
-          this.createColumnsOrderRepresentation()
-        })
-        return
-      case MessageToWebviewType.setDvcRoot:
-        runInAction(() => {
-          this.dvcRoot = message.dvcRoot
-        })
-        return
-      default:
-        Logger.error(`Unexpected message: ${message}`)
-    }
-  }
-
   public createColumnsOrderRepresentation(newOrder?: string[]) {
     if (newOrder) {
       this.sendMessage({
@@ -176,5 +135,46 @@ export class Model {
       }
     })
     this.columnsOrderRepresentation = orderedData as ParamOrMetric[]
+  }
+
+  private sendMessage(message: MessageFromWebview): void {
+    this.vsCodeApi.postMessage(message)
+  }
+
+  private getState(): PersistedModelState {
+    return {
+      data: this.data,
+      dvcRoot: this.dvcRoot
+    }
+  }
+
+  private setState(state: PersistedModelState) {
+    this.dvcRoot = state.dvcRoot
+    this.data = state.data
+    this.createColumnsOrderRepresentation()
+  }
+
+  private handleMessage(message: MessageToWebview): void {
+    this.errors = message.errors || undefined
+    switch (message.type) {
+      case MessageToWebviewType.setTheme:
+        runInAction(() => {
+          this.theme = message.theme
+        })
+        return
+      case MessageToWebviewType.setData:
+        runInAction(() => {
+          this.data = message.data
+          this.createColumnsOrderRepresentation()
+        })
+        return
+      case MessageToWebviewType.setDvcRoot:
+        runInAction(() => {
+          this.dvcRoot = message.dvcRoot
+        })
+        return
+      default:
+        Logger.error(`Unexpected message: ${message}`)
+    }
   }
 }

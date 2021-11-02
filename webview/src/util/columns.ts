@@ -1,6 +1,5 @@
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
-import { isStorybook } from './storybook'
 import { Model } from '../model'
 
 interface HeaderGroupWithOriginalId extends HeaderGroup<Experiment> {
@@ -21,6 +20,8 @@ export const getPlaceholders = (
     )
   })
 
+const cleanPath = (path: string): string => path.split('/').slice(1).join('/')
+
 export const countUpperLevels = (
   column: HeaderGroup<Experiment>,
   columns: HeaderGroup<Experiment>[],
@@ -39,24 +40,19 @@ export const countUpperLevels = (
       nbLevels = countUpperLevels(parentPlaceholder, columns, nbLevels + 1)
     })
   } else {
-    const orederedColumnsrep = !isStorybook
-      ? Model.getInstance().columnsOrderRepresentation
-      : []
+    const orederedColumnsrep = Model.getInstance().columnsOrderRepresentation
     const nodeRep = orederedColumnsrep.find(
-      node => node.path.split('/')[1] === column.id
+      node => cleanPath(node.path) === column.id
     )
     const siblings = orederedColumnsrep.filter(
       node => node.parentPath === nodeRep?.parentPath
     )
-    const lastId = !isStorybook
-      ? siblings?.length && siblings[siblings.length - 1].path.split('/')[1]
-      : parent.columns?.length && parent.columns[parent.columns.length - 1].id
-    if (lastId === id) {
-      const parentNode = columns.find(column =>
-        column.headers?.map(header => header.id).includes(id)
-      )
+    const lastId =
+      siblings?.length && cleanPath(siblings[siblings.length - 1].path)
+
+    if (lastId === id || parent.placeholderOf) {
       nbLevels = countUpperLevels(
-        { ...parentNode, id: parent.id } as HeaderGroup<Experiment>,
+        parent as HeaderGroup<Experiment>,
         columns,
         nbLevels + 1
       )

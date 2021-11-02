@@ -22,7 +22,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
   const currentColOrder = React.useRef<string[]>(columnsOrder)
-  const [_, setColumnOrderRepresentation] = useColumnOrder()
+  const [, setColumnOrderRepresentation] = useColumnOrder()
 
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
