@@ -1,4 +1,4 @@
-import { distPath, main } from 'dvc-vscode-webview'
+import { distPath, react, experiments, plots } from 'dvc-vscode-webview'
 import { EventName, IEventNamePropertyMapping } from '../telemetry/constants'
 
 export enum ViewKey {
@@ -31,7 +31,7 @@ export const WebviewDetails: {
       createdEvent: EventName.VIEWS_EXPERIMENTS_TABLE_CREATED,
       focusChangedEvent: EventName.VIEWS_EXPERIMENTS_TABLE_FOCUS_CHANGED
     },
-    scripts: [main],
+    scripts: [react, experiments],
     title: 'Experiments',
     viewKey: ViewKey.EXPERIMENTS
   },
@@ -43,7 +43,7 @@ export const WebviewDetails: {
       createdEvent: EventName.VIEWS_PLOTS_CREATED,
       focusChangedEvent: EventName.VIEWS_PLOTS_FOCUS_CHANGED
     },
-    scripts: [main],
+    scripts: [react, plots],
     title: 'Plots',
     viewKey: ViewKey.PLOTS
   }

@@ -1,7 +1,6 @@
 import { resolve } from 'path'
 import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import HtmlWebpackPlugin = require('html-webpack-plugin')
 import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
 const r = (file: string) => resolve(__dirname, file)
@@ -21,7 +20,11 @@ module.exports = {
     hot: true
   },
   devtool: 'source-map',
-  entry: [r('src/index.tsx')],
+  entry: {
+    experiments: { dependOn: 'react', import: r('src/experiments/index.tsx') },
+    plots: { dependOn: 'react', import: r('src/plots/index.tsx') },
+    react: ['react', 'react-dom']
+  },
   module: {
     rules: [
       {
@@ -82,13 +85,7 @@ module.exports = {
     path: r('dist')
   },
   plugins: (() => {
-    return [
-      new HtmlWebpackPlugin({
-        title: 'Experiments'
-      }),
-      new ForkTsCheckerWebpackPlugin(),
-      new CleanWebpackPlugin()
-    ]
+    return [new ForkTsCheckerWebpackPlugin(), new CleanWebpackPlugin()]
   })(),
   resolve: {
     extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
