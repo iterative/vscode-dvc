@@ -542,6 +542,11 @@
           "command": "dvc.commitTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == notInCache && dvc.commands.available"
         }
       ],
       "scm/resourceGroup/context": [

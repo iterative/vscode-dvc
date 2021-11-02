@@ -111,12 +111,12 @@ export class Repository {
   private async getResetData(): Promise<
     [DiffOutput, StatusOutput, Set<string>, ListOutput[]]
   > {
-    const [diffOutput, statusOutput, gitOutput] = await this.getUpdateData()
-
     const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
       this.dvcRoot
     )
+
+    const [diffOutput, statusOutput, gitOutput] = await this.getUpdateData()
 
     return [diffOutput, statusOutput, gitOutput, listOutput]
   }

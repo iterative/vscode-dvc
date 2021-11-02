@@ -1,7 +1,6 @@
 import { basename, extname } from 'path'
 import { Disposable } from '@hediet/std/disposable'
-import { scm, SourceControlResourceGroup, Uri } from 'vscode'
-import { makeObservable, observable } from 'mobx'
+import { scm, SourceControl, SourceControlResourceGroup, Uri } from 'vscode'
 
 export type SourceControlManagementState = Record<Status, Set<string>>
 
@@ -24,19 +23,15 @@ const gitCommitReady = [Status.ADDED, Status.GIT_MODIFIED, Status.RENAMED]
 type ResourceState = { resourceUri: Uri; contextValue: Status; dvcRoot: string }
 
 export class SourceControlManagement {
-  @observable
-  private changedResourceGroup: SourceControlResourceGroup
-
-  @observable
-  private gitCommitReadyResourceGroup: SourceControlResourceGroup
-
   public readonly dispose = Disposable.fn()
 
   private readonly dvcRoot: string
 
-  constructor(dvcRoot: string, state: SourceControlManagementState) {
-    makeObservable(this)
+  private changedResourceGroup: SourceControlResourceGroup
+  private gitCommitReadyResourceGroup: SourceControlResourceGroup
+  private notInCacheResourceGroup: SourceControlResourceGroup
 
+  constructor(dvcRoot: string, state: SourceControlManagementState) {
     this.dvcRoot = dvcRoot
 
     const scmView = this.dispose.track(
@@ -45,21 +40,26 @@ export class SourceControlManagement {
 
     scmView.inputBox.visible = false
 
-    this.changedResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('changes', 'Changes')
+    this.changedResourceGroup = this.createResourceGroup(
+      dvcRoot,
+      scmView,
+      'changes',
+      'Changes'
     )
 
-    this.gitCommitReadyResourceGroup = this.dispose.track(
-      scmView.createResourceGroup('gitCommitReady', 'Ready For Git Commit')
+    this.gitCommitReadyResourceGroup = this.createResourceGroup(
+      dvcRoot,
+      scmView,
+      'gitCommitReady',
+      'Ready For Git Commit'
     )
 
-    this.changedResourceGroup.hideWhenEmpty = true
-    this.gitCommitReadyResourceGroup.hideWhenEmpty = true
-
-    Object.assign(this.changedResourceGroup, { rootUri: Uri.file(dvcRoot) })
-    Object.assign(this.gitCommitReadyResourceGroup, {
-      rootUri: Uri.file(dvcRoot)
-    })
+    this.notInCacheResourceGroup = this.createResourceGroup(
+      dvcRoot,
+      scmView,
+      'notInCache',
+      'Not In Cache'
+    )
 
     this.setState(state)
   }
@@ -67,7 +67,9 @@ export class SourceControlManagement {
   public setState(state: SourceControlManagementState) {
     this.changedResourceGroup.resourceStates = Object.entries(state).reduce(
       this.getResourceStatesReducer(
-        Object.values(Status).filter(status => !gitCommitReady.includes(status))
+        Object.values(Status).filter(
+          status => ![...gitCommitReady, Status.NOT_IN_CACHE].includes(status)
+        )
       ),
       []
     )
@@ -75,13 +77,35 @@ export class SourceControlManagement {
     this.gitCommitReadyResourceGroup.resourceStates = Object.entries(
       state
     ).reduce(this.getResourceStatesReducer(gitCommitReady), [])
+
+    this.notInCacheResourceGroup.resourceStates = Object.entries(state).reduce(
+      this.getResourceStatesReducer([Status.NOT_IN_CACHE]),
+      []
+    )
   }
 
   public getState() {
     return {
       changes: this.changedResourceGroup.resourceStates,
-      gitCommitReady: this.gitCommitReadyResourceGroup.resourceStates
+      gitCommitReady: this.gitCommitReadyResourceGroup.resourceStates,
+      notInCache: this.notInCacheResourceGroup.resourceStates
     }
+  }
+
+  private createResourceGroup(
+    dvcRoot: string,
+    scmView: SourceControl,
+    id: string,
+    title: string
+  ) {
+    const resourceGroup = this.dispose.track(
+      scmView.createResourceGroup(id, title)
+    )
+
+    resourceGroup.hideWhenEmpty = true
+
+    Object.assign(resourceGroup, { rootUri: Uri.file(dvcRoot) })
+    return resourceGroup
   }
 
   private getResourceStatesReducer(validStatuses: Status[]) {

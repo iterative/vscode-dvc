@@ -19,7 +19,7 @@ beforeEach(() => {
 })
 
 describe('RepositoryState', () => {
-  const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+  const dvcRoot = resolve(__dirname, '..', '..', '..', 'demo')
   const emptySet = new Set()
 
   describe('updateStatus', () => {
@@ -67,7 +67,7 @@ describe('RepositoryState', () => {
           },
           'always changed'
         ]
-      } as unknown as StatusOutput
+      } as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
@@ -142,7 +142,7 @@ describe('RepositoryState', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as unknown as StatusOutput
+      } as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
@@ -173,7 +173,7 @@ describe('RepositoryState', () => {
         'data/MNIST/raw.dvc': [
           { 'changed outs': { 'data/MNIST/raw': 'modified' } }
         ]
-      } as unknown as StatusOutput
+      } as StatusOutput
 
       const model = new RepositoryModel(dvcRoot)
       model.setState({
@@ -190,6 +190,162 @@ describe('RepositoryState', () => {
         notInCache: emptySet,
         renamed: emptySet,
         tracked: emptySet,
+        untracked: emptySet
+      })
+    })
+
+    it('should display a dataset as not in cache if some of the data is missing', () => {
+      const diff = {
+        added: [],
+        deleted: [],
+        modified: [
+          {
+            path: 'data/MNIST/raw/'
+          }
+        ],
+        'not in cache': [
+          {
+            path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+          },
+          {
+            path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
+          },
+          {
+            path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
+          },
+          {
+            path: 'data/MNIST/raw/train-images-idx3-ubyte'
+          },
+          {
+            path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
+          },
+          {
+            path: 'data/MNIST/raw/train-labels-idx1-ubyte'
+          },
+          {
+            path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
+          }
+        ],
+        renamed: []
+      }
+
+      const status = {
+        'data/MNIST/raw.dvc': [
+          {
+            'changed outs': {
+              'data/MNIST/raw': 'not in cache'
+            }
+          }
+        ],
+        train: [
+          {
+            'changed deps': {
+              'data/MNIST': 'modified',
+              'train.py': 'modified'
+            }
+          },
+          {
+            'changed outs': {
+              logs: 'not in cache',
+              'model.pt': 'not in cache'
+            }
+          },
+          'always changed'
+        ]
+      } as StatusOutput
+
+      const list = [
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-images-idx3-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-labels-idx1-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'logs/acc.tsv'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'logs/loss.tsv'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'model.pt'
+        }
+      ]
+
+      const model = new RepositoryModel(dvcRoot)
+      model.setState({
+        diffFromCache: status,
+        diffFromHead: diff,
+        tracked: list,
+        untracked: new Set<string>()
+      })
+
+      expect(model.getState()).toEqual({
+        added: emptySet,
+        deleted: emptySet,
+        gitModified: emptySet,
+        modified: emptySet,
+        notInCache: new Set([
+          ...diff['not in cache'].map(({ path }) => resolve(dvcRoot, path)),
+          ...diff.modified.map(({ path }) => resolve(dvcRoot, path))
+        ]),
+        renamed: emptySet,
+        tracked: new Set([
+          ...list.map(({ path }) => resolve(dvcRoot, path)),
+          resolve(dvcRoot, 'data', 'MNIST', 'raw'),
+          resolve(dvcRoot, 'logs')
+        ]),
         untracked: emptySet
       })
     })
