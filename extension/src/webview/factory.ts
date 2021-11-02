@@ -14,10 +14,13 @@ const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as PlotsData
-  return !!(data?.[0]?.title && data?.[0]?.values)
+  return Boolean(
+    Array.isArray(data) &&
+      (data.length === 0 || (data[0].title && data[0].values))
+  )
 }
 
-const isValidState = (
+export const isValidState = (
   viewKey: ViewKey,
   state: UnknownWebviewState
 ): state is WebviewState<WebviewData> =>
