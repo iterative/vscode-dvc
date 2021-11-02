@@ -1,7 +1,7 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
-import complexPlotsData from 'dvc/src/test/fixtures/complex-plots-example'
+import complexPlotsData from 'dvc/src/test/fixtures/complex-live-plots-example'
 import Plots from '../plots/components/Plots'
 import './test-vscode-styles.scss'
 

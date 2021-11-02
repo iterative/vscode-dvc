@@ -1,6 +1,6 @@
 import { ViewKey } from './constants'
 import { isValidState } from './factory'
-import complexPlotsData from '../test/fixtures/complex-plots-example'
+import complexPlotsData from '../test/fixtures/complex-live-plots-example'
 
 describe('isValidState', () => {
   const dvcRoot = 'test'
