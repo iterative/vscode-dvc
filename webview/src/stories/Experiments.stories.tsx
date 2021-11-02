@@ -25,12 +25,12 @@ export default {
     tableData: {
       changes: complexChangesData,
       columns: complexColumnData,
+      columnsOrder: [],
       rows: complexRowData,
       sorts: [
         { descending: true, path: 'params:params.yaml:epochs' },
         { descending: false, path: 'params:params.yaml:log_file' }
-      ],
-      columnsOrder: []
+      ]
     },
     vsCodeApi: dummyVsCodeApi
   },

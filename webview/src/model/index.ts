@@ -6,7 +6,7 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webview/contract'
-import { TableData } from 'dvc/src/experiments/webview/contract'
+import { ParamOrMetric, TableData } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
@@ -52,6 +52,8 @@ export class Model {
 
   public errors?: Array<Error | string> = undefined
 
+  public columnsOrderRepresentation: ParamOrMetric[] = []
+
   private constructor() {
     makeObservable(this)
     const data = window.webviewData
@@ -83,7 +85,7 @@ export class Model {
     return Model.instance
   }
 
-  public sendMessage(message: MessageFromWebview): void {
+  private sendMessage(message: MessageFromWebview): void {
     this.vsCodeApi.postMessage(message)
   }
 
@@ -97,6 +99,7 @@ export class Model {
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
     this.data = state.data
+    this.createColumnsOrderRepresentation()
   }
 
   private handleMessage(message: MessageToWebview): void {
@@ -110,6 +113,7 @@ export class Model {
       case MessageToWebviewType.setData:
         runInAction(() => {
           this.data = message.data
+          this.createColumnsOrderRepresentation()
         })
         return
       case MessageToWebviewType.setDvcRoot:
@@ -120,5 +124,57 @@ export class Model {
       default:
         Logger.error(`Unexpected message: ${message}`)
     }
+  }
+
+  public createColumnsOrderRepresentation(newOrder?: string[]) {
+    if (newOrder) {
+      this.sendMessage({
+        payload: newOrder,
+        type: MessageFromWebviewType.columnReordered
+      })
+    }
+    const orderedPaths: string[] =
+      newOrder ||
+      (this.data?.columnsOrder?.length && this.data.columnsOrder.slice(2)) ||
+      []
+
+    const previousGroups: string[] = []
+    const orderedData = [
+      ...orderedPaths
+        .map(path => ({
+          ...this.data?.columns.find(column => column.path === path)
+        }))
+        .filter(Boolean)
+    ]
+
+    if (!orderedData.length) {
+      return
+    }
+
+    let previousGroup = orderedData[0].parentPath || ''
+
+    orderedData.forEach(node => {
+      const { parentPath, path } = node
+
+      if (parentPath !== previousGroup) {
+        previousGroups.push(previousGroup)
+        previousGroup = parentPath || ''
+      }
+
+      const groupNumberPrefix = `${previousGroups.length}/`
+
+      node.path = groupNumberPrefix + path
+      node.parentPath = groupNumberPrefix + parentPath
+
+      const parentNode = {
+        ...this.data?.columns.find(column => column.path === parentPath)
+      }
+      parentNode.path = groupNumberPrefix + parentPath
+
+      if (!orderedData.find(column => column.path === parentNode.path)) {
+        orderedData.push(parentNode)
+      }
+    })
+    this.columnsOrderRepresentation = orderedData as ParamOrMetric[]
   }
 }

@@ -1,12 +1,11 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
-import { useMessaging } from '../../util/useMessaging'
+import { useColumnOrder } from '../../util/useColumnsOrder'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -23,7 +22,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
 
   const currentColOrder = React.useRef<string[]>(columnsOrder)
-  const sendMessage = useMessaging()
+  const [_, setColumnOrderRepresentation] = useColumnOrder()
 
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
@@ -42,10 +41,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
   const onDragEnd = () => {
     if (currentColOrder.current !== columnsOrder) {
-      sendMessage({
-        payload: currentColOrder.current,
-        type: MessageFromWebviewType.columnReordered
-      })
+      setColumnOrderRepresentation(currentColOrder.current)
     }
   }
 

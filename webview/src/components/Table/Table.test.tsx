@@ -17,8 +17,8 @@ import {
 } from 'react-beautiful-dnd-test-utils'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
-import * as Messaging from '../../util/useMessaging'
 import { ExperimentsTable } from '../Experiments'
+import * as ColumnOrder from '../../util/useColumnsOrder'
 
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
@@ -103,7 +103,9 @@ describe('Table', () => {
     )
 
   beforeAll(() => {
-    jest.spyOn(Messaging, 'useMessaging').mockImplementation(() => () => {})
+    jest
+      .spyOn(ColumnOrder, 'useColumnOrder')
+      .mockImplementation(() => [[], () => {}])
   })
 
   afterEach(() => {
