@@ -1,4 +1,4 @@
-import path, { resolve } from 'path'
+import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
@@ -185,8 +185,9 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should be able to open a file', async () => {
-      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
-      const uri = Uri.file(__filename)
+      const fileToOpen = join(dvcDemoPath, 'logs.html')
+      expect(getActiveTextEditorFilename()).not.to.equal(fileToOpen)
+      const uri = Uri.file(fileToOpen)
 
       const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
@@ -196,26 +197,27 @@ suite('Tracked Explorer Tree Test Suite', () => {
       )
       await activeEditorChanged
 
-      expect(getActiveTextEditorFilename()).to.equal(__filename)
+      expect(getActiveTextEditorFilename()).to.equal(fileToOpen)
     }).timeout(5000)
 
     it('should be able to open a file to the side', async () => {
-      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
+      const fileToOpen = join(dvcDemoPath, 'logs.json')
+      expect(getActiveTextEditorFilename()).not.to.equal(fileToOpen)
 
       const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
-        { resourceUri: Uri.file(__filename) }
+        { resourceUri: Uri.file(fileToOpen) }
       )
       await activeEditorChanged
 
-      expect(getActiveTextEditorFilename()).to.equal(__filename)
+      expect(getActiveTextEditorFilename()).to.equal(fileToOpen)
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
     it('should be able to search in a folder', async () => {
-      const searchDir = Uri.file(__dirname)
+      const searchDir = Uri.file(join(dvcDemoPath, 'data'))
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
@@ -230,10 +232,8 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should be able to compare two files', async () => {
-      const baseline = Uri.file(__filename)
-      const comparison = Uri.file(
-        resolve(__dirname, '..', '..', '..', 'extension.js')
-      )
+      const baseline = Uri.file(join(dvcDemoPath, 'logs.json'))
+      const comparison = Uri.file(join(dvcDemoPath, 'logs.html'))
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
