@@ -1,5 +1,4 @@
 import { stub } from 'sinon'
-import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
@@ -11,7 +10,7 @@ import { ResourceLocator } from '../../../resourceLocator'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { buildMockMemento } from '../../util'
-import { dvcDemoPath, resourcePath } from '../util'
+import { dvcDemoPath, extensionUri } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
 
@@ -34,9 +33,7 @@ const buildDependencies = (
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '2', 'experiments test suite')
   )
-  const resourceLocator = disposer.track(
-    new ResourceLocator(Uri.file(resourcePath))
-  )
+  const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
 
   const internalCommands = disposer.track(
     new InternalCommands(config, outputChannel, cliReader)

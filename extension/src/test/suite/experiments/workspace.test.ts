@@ -16,7 +16,7 @@ import * as QuickPick from '../../../vscode/quickPick'
 import { CliRunner } from '../../../cli/runner'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, dvcDemoPath, resourcePath } from '../util'
+import { closeAllEditors, dvcDemoPath, extensionUri } from '../util'
 import { buildMockMemento } from '../../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
@@ -108,7 +108,7 @@ suite('Workspace Experiments Test Suite', () => {
       )
 
       const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
+        new ResourceLocator(extensionUri)
       )
       const mockExperiments = {
         'other/dvc/root': { cliReader } as unknown as Experiments

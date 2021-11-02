@@ -24,7 +24,7 @@ import {
   closeAllEditors,
   dvcDemoPath,
   experimentsUpdatedEvent,
-  resourcePath
+  extensionUri
 } from '../util'
 import { buildMockMemento } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
@@ -215,7 +215,7 @@ suite('Experiments Test Suite', () => {
         new InternalCommands(config, outputChannel, cliReader)
       )
       const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
+        new ResourceLocator(extensionUri)
       )
 
       const experiments = disposable.track(

@@ -15,9 +15,8 @@ import { definedAndNonEmpty } from '../../util/array'
 export const dvcDemoPath = Uri.file(
   resolve(__dirname, '..', '..', '..', '..', 'demo')
 ).fsPath
-export const resourcePath = Uri.file(
-  resolve(__dirname, '..', '..', '..', 'resources')
-).fsPath
+
+export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
 export const configurationChangeEvent = (
   option: string,
