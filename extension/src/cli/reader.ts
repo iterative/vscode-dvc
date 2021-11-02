@@ -41,7 +41,7 @@ export enum ChangedType {
 
 export type PathStatus = Record<string, Status>
 
-export type StageOrFileStatuses = Record<ChangedType, PathStatus>
+export type StageOrFileStatuses = Partial<Record<ChangedType, PathStatus>>
 
 export type StatusesOrAlwaysChanged = StageOrFileStatuses | 'always changed'
 
