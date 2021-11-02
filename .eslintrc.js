@@ -128,6 +128,7 @@ module.exports = {
     ],
     // https://github.com/typescript-eslint/typescript-eslint/issues/2540#issuecomment-692505191
     'no-use-before-define': 'off',
+    quotes: ['error', 'single', { avoidEscape: true }],
     'react-hooks/exhaustive-deps': 'error',
     'react-hooks/rules-of-hooks': 'error',
     // This project doesn't use prop types

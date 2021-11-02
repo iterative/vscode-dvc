@@ -7,17 +7,17 @@ describe('trim', () => {
   })
   it('should return the same stdout it was given if no trim is necessary', () => {
     const stdout =
-      `100% Add|████████████████████████████████████████████████` +
-      `█████████████████████████████████████████████████████████` +
-      `█████████████████████████████████████████████████████████` +
-      `██████████████████████████████████████████|1/1 [00:00,  2` +
-      `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
-      `\n\rgit add /dvc/file/path .gitignore`
+      '100% Add|████████████████████████████████████████████████' +
+      '█████████████████████████████████████████████████████████' +
+      '█████████████████████████████████████████████████████████' +
+      '██████████████████████████████████████████|1/1 [00:00,  2' +
+      '.20file/s]\n\r\n\rTo track the changes with git, run:\n\r' +
+      '\n\rgit add /dvc/file/path .gitignore'
     expect(trim(stdout)).toEqual(stdout)
   })
 
   it('should trim all unnecessary whitespace and return characters', () => {
-    const stdout = `                    \n abc \n            \n`
+    const stdout = '                    \n abc \n            \n'
     expect(trim(stdout)).toEqual('abc')
   })
 })

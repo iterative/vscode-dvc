@@ -113,7 +113,7 @@ export class InternalCommands {
     cli.autoRegisteredCommands.forEach((commandId: string) => {
       if (!this.confirmedId(commandId)) {
         throw new Error(
-          `This should be an impossible error. ` +
+          'This should be an impossible error. ' +
             'If you are a user and see this message then you win a prize.'
         )
       }
