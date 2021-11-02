@@ -19,7 +19,7 @@ beforeEach(() => {
 })
 
 describe('RepositoryState', () => {
-  const dvcRoot = resolve(__dirname, '..', '..', 'demo')
+  const dvcRoot = resolve(__dirname, '..', '..', '..', 'demo')
   const emptySet = new Set()
 
   describe('updateStatus', () => {
@@ -194,7 +194,7 @@ describe('RepositoryState', () => {
       })
     })
 
-    it("should display a dataset as not in cache if some of it's data is missing", () => {
+    it('should display a dataset as not in cache if some of the data is missing', () => {
       const diff = {
         added: [],
         deleted: [],
@@ -254,79 +254,80 @@ describe('RepositoryState', () => {
         ]
       } as StatusOutput
 
+      const list = [
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-images-idx3-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-labels-idx1-ubyte'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'logs/acc.tsv'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: false,
+          path: 'logs/loss.tsv'
+        },
+        {
+          isdir: false,
+          isexec: false,
+          isout: true,
+          path: 'model.pt'
+        }
+      ]
+
       const model = new RepositoryModel(dvcRoot)
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
-        tracked: [
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/t10k-images-idx3-ubyte'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/t10k-labels-idx1-ubyte'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/train-images-idx3-ubyte'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/train-images-idx3-ubyte.gz'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/train-labels-idx1-ubyte'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'data/MNIST/raw/train-labels-idx1-ubyte.gz'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'logs/acc.tsv'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: false,
-            path: 'logs/loss.tsv'
-          },
-          {
-            isdir: false,
-            isexec: false,
-            isout: true,
-            path: 'model.pt'
-          }
-        ],
-
+        tracked: list,
         untracked: new Set<string>()
       })
 
@@ -336,30 +337,14 @@ describe('RepositoryState', () => {
         gitModified: emptySet,
         modified: emptySet,
         notInCache: new Set([
-          join(dvcRoot, 'data/MNIST/raw'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-images-idx3-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/train-images-idx3-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/train-images-idx3-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/train-labels-idx1-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/train-labels-idx1-ubyte.gz')
+          ...diff['not in cache'].map(({ path }) => resolve(dvcRoot, path)),
+          ...diff.modified.map(({ path }) => resolve(dvcRoot, path))
         ]),
         renamed: emptySet,
         tracked: new Set([
-          join(dvcRoot, 'data/MNIST/raw/t10k-images-idx3-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-images-idx3-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-labels-idx1-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/t10k-labels-idx1-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/train-images-idx3-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/train-images-idx3-ubyte.gz'),
-          join(dvcRoot, 'data/MNIST/raw/train-labels-idx1-ubyte'),
-          join(dvcRoot, 'data/MNIST/raw/train-labels-idx1-ubyte.gz'),
-          join(dvcRoot, 'logs/acc.tsv'),
-          join(dvcRoot, 'logs/loss.tsv'),
-          join(dvcRoot, 'model.pt'),
-          join(dvcRoot, 'data/MNIST/raw'),
-          join(dvcRoot, 'logs')
+          ...list.map(({ path }) => resolve(dvcRoot, path)),
+          resolve(dvcRoot, 'data', 'MNIST', 'raw'),
+          resolve(dvcRoot, 'logs')
         ]),
         untracked: emptySet
       })
