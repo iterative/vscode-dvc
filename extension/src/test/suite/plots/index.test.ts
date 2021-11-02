@@ -30,7 +30,7 @@ suite('Plots Test Suite', () => {
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
       const plots = disposable.track(
-        new Plots(dvcDemoPath, internalCommands, resourceLocator)
+        new Plots(dvcDemoPath, internalCommands, resourceLocator.dvcIcon)
       )
       plots.setExperiments(experiments)
       await plots.isReady()
