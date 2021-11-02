@@ -92,25 +92,36 @@ export class Model {
         type: MessageFromWebviewType.columnReordered
       })
     }
-    const orderedPaths: string[] =
-      newOrder ||
-      (this.data?.columnsOrder?.length && this.data.columnsOrder.slice(2)) ||
-      []
 
-    const previousGroups: string[] = []
-    const orderedData = [
-      ...orderedPaths
-        .map(path => ({
-          ...this.data?.columns.find(column => column.path === path)
-        }))
-        .filter(Boolean)
-    ]
+    this.columnsOrderRepresentation = this.getOrderedDataWithGroups(newOrder)
+  }
 
-    if (!orderedData.length) {
-      return
+  private getOrderedPaths(newOrder?: string[]): string[] {
+    if (newOrder) {
+      return newOrder
     }
 
-    let previousGroup = orderedData[0].parentPath || ''
+    return (
+      this.data?.columnsOrder?.filter(
+        column => !['experiment', 'timestamp'].includes(column)
+      ) || []
+    )
+  }
+
+  private getOrderedData(newOrder?: string[]): ParamOrMetric[] {
+    const orderedPaths = this.getOrderedPaths(newOrder)
+    return orderedPaths
+      .map(path => ({
+        ...this.data?.columns.find(column => column.path === path)
+      }))
+      .filter(Boolean) as ParamOrMetric[]
+  }
+
+  private getOrderedDataWithGroups(newOrder?: string[]): ParamOrMetric[] {
+    const orderedData = [...this.getOrderedData(newOrder)]
+    const previousGroups: string[] = []
+
+    let previousGroup = (orderedData?.length && orderedData[0].parentPath) || ''
 
     orderedData.forEach(node => {
       const { parentPath, path } = node
@@ -131,10 +142,10 @@ export class Model {
       parentNode.path = groupNumberPrefix + parentPath
 
       if (!orderedData.find(column => column.path === parentNode.path)) {
-        orderedData.push(parentNode)
+        orderedData.push(parentNode as ParamOrMetric)
       }
     })
-    this.columnsOrderRepresentation = orderedData as ParamOrMetric[]
+    return orderedData
   }
 
   private sendMessage(message: MessageFromWebview): void {
