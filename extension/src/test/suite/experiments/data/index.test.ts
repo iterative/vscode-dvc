@@ -176,7 +176,7 @@ suite('Experiments Data Test Suite', () => {
       expect(getFirstArgOfCall(mockCreateFileSystemWatcher, 0)).to.equal(
         join(
           dvcDemoPath,
-          `**`,
+          '**',
           `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,summary.json}`
         )
       )
