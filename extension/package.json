@@ -900,10 +900,10 @@
           },
           {
             "id": "dvc.viewContainer",
-            "title": "Experiments views container",
-            "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
+            "title": "DVC view container",
+            "description": "Open the DVC view container.\n[Show views](command:workbench.view.extension.dvc-views)",
             "media": {
-              "markdown": "resources/walkthrough/experiments-views.md"
+              "markdown": "resources/walkthrough/view-container.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
