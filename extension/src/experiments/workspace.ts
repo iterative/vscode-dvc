@@ -84,13 +84,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).removeSorts()
   }
 
-  public getCwdThenRun = async (commandId: CommandId) => {
+  public async getCwdThenRun(commandId: CommandId) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
 
-    return reportOutput(this.internalCommands.executeCommand(commandId, cwd))
+    return this.internalCommands.executeCommand(commandId, cwd)
+  }
+
+  public getCwdThenReport(commandId: CommandId) {
+    const stdout = this.getCwdThenRun(commandId)
+    if (!stdout) {
+      return
+    }
+    return reportOutput(stdout)
   }
 
   public getExpNameThenRun = async (commandId: CommandId) => {
@@ -153,21 +161,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public showExperimentsTableThenRun = async (commandId: CommandId) => {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    const experiments = await this.showExperimentsWebview(dvcRoot)
-    if (!experiments) {
-      return
-    }
-
-    this.internalCommands.executeCommand(commandId, dvcRoot)
-    return experiments
-  }
-
   public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
     const experiments = this.dispose.track(
       new Experiments(
@@ -215,11 +208,5 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         cwd
       )
     )
-  }
-
-  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
-    const experiments = this.getRepository(dvcRoot)
-    await experiments.showWebview()
-    return experiments
   }
 }
