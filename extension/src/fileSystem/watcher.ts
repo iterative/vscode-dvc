@@ -17,7 +17,10 @@ export const ignoredDotDirectories = /.*[\\|/]\.(dvc|(v)?env)[\\|/].*/
 
 const isExcluded = (dvcRoot: string, path: string) =>
   !path ||
-  !(path.includes(dvcRoot) || path.includes('.git')) ||
+  !(
+    path.includes(dvcRoot) ||
+    (path.includes('.git') && (path.includes('HEAD') || path.includes('index')))
+  ) ||
   path.includes(EXPERIMENTS_GIT_REFS) ||
   ignoredDotDirectories.test(path)
 
