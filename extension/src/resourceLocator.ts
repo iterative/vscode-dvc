@@ -7,9 +7,11 @@ export class ResourceLocator {
   public dispose = Disposable.fn()
 
   public readonly dvcIcon: Resource
+  public readonly beaker: Resource
   public readonly checkedCheckbox: Resource
   public readonly emptyCheckbox: Resource
   public readonly indeterminateCheckbox: Resource
+  public readonly scatterGraph: Resource
 
   private extensionUri: Uri
 
@@ -17,6 +19,8 @@ export class ResourceLocator {
     this.extensionUri = extensionUri
 
     this.dvcIcon = this.getResourceLocations('dvc-color.svg')
+    this.beaker = this.getResourceLocations('beaker.svg')
+    this.scatterGraph = this.getResourceLocations('scatter-graph.svg')
     this.checkedCheckbox = this.getResourceLocations('checkbox-checked.svg')
     this.emptyCheckbox = this.getResourceLocations('checkbox-empty.svg')
     this.indeterminateCheckbox = this.getResourceLocations(

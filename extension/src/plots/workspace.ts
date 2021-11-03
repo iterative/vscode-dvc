@@ -6,7 +6,7 @@ import { BaseWorkspaceWebviews } from '../webview/workspace'
 export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
   public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
     const plots = this.dispose.track(
-      new Plots(dvcRoot, this.internalCommands, resourceLocator)
+      new Plots(dvcRoot, this.internalCommands, resourceLocator.scatterGraph)
     )
 
     this.setRepository(dvcRoot, plots)
