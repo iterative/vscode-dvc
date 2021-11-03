@@ -923,6 +923,18 @@
             "when": "dvc.commands.available && dvc.project.available"
           },
           {
+            "id": "dvc.plots",
+            "title": "Plots",
+            "description": "Open plots.\n[Show plots](command:dvc.showPlots)",
+            "media": {
+              "markdown": "resources/walkthrough/plots.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showPlots"
+            ],
+            "when": "dvc.commands.available && dvc.project.available"
+          },
+          {
             "id": "dvc.learnMore",
             "title": "Explore more resources",
             "description": "Take a look into our [documentation](https://dvc.org/doc) to learn more about DVC. \n[Learn more](https://dvc.org/doc)",

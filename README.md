@@ -54,7 +54,7 @@ any reason you need to revisit the walkthrough it can be accessed via
 - [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
 - [DVC View Container](extension/resources/walkthrough/view-container.md)
 - [Experiments Table](extension/resources/walkthrough/experiments-table.md)
-- Plots
+- [Plots](extension/resources/walkthrough/plots.md)
 
 ### Debugging
 
