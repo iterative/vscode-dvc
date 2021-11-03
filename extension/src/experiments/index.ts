@@ -47,7 +47,7 @@ export class Experiments extends BaseRepository<TableData> {
     workspaceState: Memento,
     data = new ExperimentsData(dvcRoot, internalCommands)
   ) {
-    super(dvcRoot, internalCommands, resourceLocator)
+    super(dvcRoot, internalCommands, resourceLocator.beaker)
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
