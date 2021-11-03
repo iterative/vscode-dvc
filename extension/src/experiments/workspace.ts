@@ -84,13 +84,21 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     return this.getRepository(dvcRoot).removeSorts()
   }
 
-  public getCwdThenRun = async (commandId: CommandId) => {
+  public async getCwdThenRun(commandId: CommandId) {
     const cwd = await this.getFocusedOrOnlyOrPickProject()
     if (!cwd) {
       return
     }
 
-    return reportOutput(this.internalCommands.executeCommand(commandId, cwd))
+    return this.internalCommands.executeCommand(commandId, cwd)
+  }
+
+  public getCwdThenReport(commandId: CommandId) {
+    const stdout = this.getCwdThenRun(commandId)
+    if (!stdout) {
+      return
+    }
+    return reportOutput(stdout)
   }
 
   public getExpNameThenRun = async (commandId: CommandId) => {

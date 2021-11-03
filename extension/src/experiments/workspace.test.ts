@@ -77,11 +77,11 @@ describe('Experiments', () => {
     }
   )
 
-  describe('getCwdThenRun', () => {
+  describe('getCwdThenReport', () => {
     it('should call the correct function with the correct parameters if a project is picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+      await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).toBeCalledTimes(1)
@@ -91,7 +91,7 @@ describe('Experiments', () => {
     it('should not call the function if a project is not picked', async () => {
       mockedQuickPickOne.mockResolvedValueOnce(undefined)
 
-      await workspaceExperiments.getCwdThenRun(mockedCommandId)
+      await workspaceExperiments.getCwdThenReport(mockedCommandId)
 
       expect(mockedQuickPickOne).toBeCalledTimes(1)
       expect(mockedExpFunc).not.toBeCalled()
