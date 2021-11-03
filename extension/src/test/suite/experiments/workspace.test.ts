@@ -12,6 +12,7 @@ import { CliExecutor } from '../../../cli/executor'
 import { closeAllEditors, dvcDemoPath } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
+import { CliRunner } from '../../../cli/runner'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -159,6 +160,66 @@ suite('Workspace Experiments Test Suite', () => {
         .calledOnce
 
       clock.restore()
+    })
+  })
+
+  describe('dvc.runExperiment', () => {
+    it('should be able to run an experiment', async () => {
+      const mockRunExperiment = stub(
+        CliRunner.prototype,
+        'runExperiment'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN)
+
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
+    })
+  })
+
+  describe('dvc.runResetExperiment', () => {
+    it('should be able to reset existing checkpoints and restart the experiment', async () => {
+      const mockRunExperimentReset = stub(
+        CliRunner.prototype,
+        'runExperimentReset'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_RESET)
+
+      expect(mockRunExperimentReset).to.be.calledOnce
+      expect(mockRunExperimentReset).to.be.calledWith(dvcDemoPath)
+    })
+  })
+
+  describe('dvc.runQueuedExperiments', () => {
+    it('should be able to execute all experiments in the run queue', async () => {
+      const mockRunExperimentQueue = stub(
+        CliRunner.prototype,
+        'runExperimentQueue'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_QUEUED)
+
+      expect(mockRunExperimentQueue).to.be.calledOnce
+      expect(mockRunExperimentQueue).to.be.calledWith(dvcDemoPath)
     })
   })
 
