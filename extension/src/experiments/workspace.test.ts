@@ -217,18 +217,4 @@ describe('Experiments', () => {
       expect(mockedExpFunc).not.toBeCalled()
     })
   })
-
-  describe('showExperimentsTableThenRun', () => {
-    it('should call the runner with the correct args when run experiment is provided', async () => {
-      mockedQuickPickOne.mockResolvedValueOnce(mockedDvcRoot)
-
-      await workspaceExperiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN
-      )
-
-      expect(mockedQuickPickOne).toBeCalledTimes(1)
-      expect(mockedShowWebview).toBeCalledTimes(1)
-      expect(mockedRun).toBeCalledWith(mockedDvcRoot)
-    })
-  })
 })

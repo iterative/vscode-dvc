@@ -153,21 +153,6 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
     }
   }
 
-  public showExperimentsTableThenRun = async (commandId: CommandId) => {
-    const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    const experiments = await this.showExperimentsWebview(dvcRoot)
-    if (!experiments) {
-      return
-    }
-
-    this.internalCommands.executeCommand(commandId, dvcRoot)
-    return experiments
-  }
-
   public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
     const experiments = this.dispose.track(
       new Experiments(
@@ -215,11 +200,5 @@ export class WorkspaceExperiments extends BaseWorkspaceWebviews<
         cwd
       )
     )
-  }
-
-  private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
-    const experiments = this.getRepository(dvcRoot)
-    await experiments.showWebview()
-    return experiments
   }
 }
