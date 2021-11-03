@@ -52,8 +52,8 @@ any reason you need to revisit the walkthrough it can be accessed via
 - [Command Palette](extension/resources/walkthrough/command-palette.md)
 - [Source Control Management](extension/resources/walkthrough/source-control-management.md)
 - [Tracked Resources](extension/resources/walkthrough/tracked-explorer.md)
+- [DVC View Container](extension/resources/walkthrough/view-container.md)
 - [Experiments Table](extension/resources/walkthrough/experiments-table.md)
-- [Experiments Views](extension/resources/walkthrough/experiments-views.md)
 - Plots
 
 ### Debugging
