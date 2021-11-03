@@ -1,5 +1,7 @@
+import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { EventEmitter } from 'vscode'
+import { EventEmitter, Uri } from 'vscode'
+import { Experiments } from '../../../experiments'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Process } from '../../../processExecution'
 
@@ -37,13 +39,16 @@ export const buildMockedExperiments = () => {
   const mockedGetSorts = jest.fn()
   const mockedExperiments = {
     experimentsChanged: mockedExperimentsChanged,
-    getCheckpoints: mockedGetCheckpoints,
-    getChildParamsOrMetrics: mockedGetChildParamsOrMetrics,
     getDvcRoots: mockedGetDvcRoots,
-    getExperiments: mockedGetExperiments,
-    getFilter: mockedGetFilter,
-    getFilters: mockedGetFilters,
-    getSorts: mockedGetSorts,
+    getRepository: () =>
+      ({
+        getCheckpoints: mockedGetCheckpoints,
+        getChildParamsOrMetrics: mockedGetChildParamsOrMetrics,
+        getExperiments: mockedGetExperiments,
+        getFilter: mockedGetFilter,
+        getFilters: mockedGetFilters,
+        getSorts: mockedGetSorts
+      } as unknown as Experiments),
     isReady: () => true,
     paramsOrMetricsChanged: mockedParamsOrMetricsChanged
   } as unknown as WorkspaceExperiments
@@ -61,3 +66,8 @@ export const buildMockedExperiments = () => {
     mockedParamsOrMetricsChanged
   }
 }
+
+export const testUri = (...paths: string[]) =>
+  expect.objectContaining({
+    fsPath: Uri.file(join(...paths)).fsPath
+  })

@@ -5,7 +5,7 @@ export type WebviewData = TableData | PlotsData
 
 export type MessageFromWebview = {
   type: MessageFromWebviewType
-  payload?: Object
+  payload?: string[]
 }
 
 export enum MessageFromWebviewType {

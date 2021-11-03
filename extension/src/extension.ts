@@ -7,6 +7,7 @@ import { CliReader } from './cli/reader'
 import { isPythonExtensionInstalled } from './extensions/python'
 import { WorkspaceExperiments } from './experiments/workspace'
 import { registerExperimentCommands } from './experiments/commands/register'
+import { registerPlotsCommands } from './plots/commands/register'
 import { findAbsoluteDvcRootPath, findDvcRootPaths } from './fileSystem'
 import { TrackedExplorerTree } from './fileSystem/tree'
 import { IExtension } from './interfaces'
@@ -17,7 +18,6 @@ import { setup, setupWorkspace } from './setup'
 import { Status } from './status'
 import { reRegisterVsCodeCommands } from './vscode/commands'
 import { InternalCommands } from './commands/internal'
-import { WorkspaceData } from './data/workspace'
 import { ExperimentsParamsAndMetricsTree } from './experiments/paramsAndMetrics/tree'
 import { ExperimentsSortByTree } from './experiments/model/sortBy/tree'
 import { ExperimentsTree } from './experiments/model/tree'
@@ -43,6 +43,7 @@ import {
 import { WorkspaceRepositories } from './repository/workspace'
 import { recommendRedHatExtensionOnce } from './vscode/recommend'
 import { WebviewSerializer } from './webview/serializer'
+import { WorkspacePlots } from './plots/workspace'
 
 export { Disposable, Disposer }
 
@@ -53,11 +54,10 @@ export class Extension implements IExtension {
 
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
-  private readonly webviewSerializer: WebviewSerializer
   private dvcRoots: string[] = []
   private repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
-  private readonly data: WorkspaceData
+  private readonly plots: WorkspacePlots
   private readonly trackedExplorerTree: TrackedExplorerTree
   private readonly cliExecutor: CliExecutor
   private readonly cliReader: CliReader
@@ -115,15 +115,15 @@ export class Extension implements IExtension {
       new WorkspaceExperiments(this.internalCommands, context.workspaceState)
     )
 
+    this.plots = this.dispose.track(new WorkspacePlots(this.internalCommands))
+
     this.repositories = this.dispose.track(
       new WorkspaceRepositories(this.internalCommands)
     )
 
-    this.data = this.dispose.track(new WorkspaceData(this.internalCommands))
-
     this.dispose.track(
       this.cliRunner.onDidCompleteProcess(({ cwd }) => {
-        this.data.update(cwd)
+        this.experiments.getRepository(cwd).update()
       })
     )
 
@@ -194,13 +194,12 @@ export class Extension implements IExtension {
       })
     )
 
-    this.webviewSerializer = this.dispose.track(
-      new WebviewSerializer(this.internalCommands, this.experiments)
+    this.dispose.track(
+      new WebviewSerializer(this.internalCommands, this.experiments, this.plots)
     )
 
-    this.dispose.track(this.webviewSerializer)
-
     registerExperimentCommands(this.experiments, this.internalCommands)
+    registerPlotsCommands(this.plots)
 
     this.dispose.track(
       commands.registerCommand(RegisteredCommands.STOP_EXPERIMENT, async () => {
@@ -297,14 +296,16 @@ export class Extension implements IExtension {
     await Promise.all([
       this.repositories.create(this.dvcRoots, this.trackedExplorerTree),
       this.trackedExplorerTree.initialize(this.dvcRoots),
-      this.experiments.create(this.dvcRoots, this.resourceLocator)
+      this.experiments.create(this.dvcRoots, this.resourceLocator),
+      this.plots.create(this.dvcRoots, this.resourceLocator)
     ])
 
-    this.data.create(this.dvcRoots, this.experiments)
+    this.experiments.linkRepositories(this.plots)
 
     return Promise.all([
       this.repositories.isReady(),
-      this.experiments.isReady()
+      this.experiments.isReady(),
+      this.plots.isReady()
     ])
   }
 
@@ -321,7 +322,7 @@ export class Extension implements IExtension {
     this.repositories.reset()
     this.trackedExplorerTree.initialize([])
     this.experiments.reset()
-    this.data.reset()
+    this.plots.reset()
   }
 
   private setAvailable(available: boolean) {

@@ -1,4 +1,3 @@
-import { join } from 'path'
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
 import {
@@ -7,42 +6,52 @@ import {
 } from './model/filterBy/quickPick'
 import { pickSortsToRemove, pickSortToAdd } from './model/sortBy/quickPick'
 import { ParamsAndMetricsModel } from './paramsAndMetrics/model'
+import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-
-const DOT_GIT = '.git'
-const GIT_REFS = join(DOT_GIT, 'refs')
-export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
-
-export type ExperimentsWebview = BaseWebview<TableData>
+import { MessageFromWebviewType } from '../webview/contract'
+import { Logger } from '../common/logger'
 
 export class Experiments extends BaseRepository<TableData> {
   public readonly onDidChangeExperiments: Event<void>
   public readonly onDidChangeParamsOrMetrics: Event<void>
+  public readonly onDidChangeLivePlots: Event<void>
 
   public readonly viewKey = ViewKey.EXPERIMENTS
+
+  private data: ExperimentsData
 
   private experiments: ExperimentsModel
   private paramsAndMetrics: ParamsAndMetricsModel
 
-  private readonly experimentsChanged = new EventEmitter<void>()
-  private readonly paramsOrMetricsChanged = new EventEmitter<void>()
+  private readonly experimentsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly paramsOrMetricsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
+  private readonly livePlotsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator,
-    workspaceState: Memento
+    workspaceState: Memento,
+    data = new ExperimentsData(dvcRoot, internalCommands)
   ) {
     super(dvcRoot, internalCommands, resourceLocator)
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
+    this.onDidChangeLivePlots = this.livePlotsChanged.event
 
     this.experiments = this.dispose.track(
       new ExperimentsModel(dvcRoot, workspaceState)
@@ -52,6 +61,12 @@ export class Experiments extends BaseRepository<TableData> {
       new ParamsAndMetricsModel(dvcRoot, workspaceState)
     )
 
+    this.data = this.dispose.track(data)
+
+    this.dispose.track(this.data.onDidUpdate(data => this.setState(data)))
+
+    this.handleMessageFromWebview()
+
     const waitForInitialData = this.dispose.track(
       this.onDidChangeExperiments(() => {
         this.deferred.resolve()
@@ -59,6 +74,10 @@ export class Experiments extends BaseRepository<TableData> {
         waitForInitialData.dispose()
       })
     )
+  }
+
+  public update() {
+    this.data.update()
   }
 
   public async setState(data: ExperimentsRepoJSONOutput) {
@@ -153,7 +172,11 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  public getData() {
+  public getLivePlots() {
+    return this.experiments.getLivePlots()
+  }
+
+  public getWebviewData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
       columns: this.paramsAndMetrics.getSelected(),
@@ -164,12 +187,28 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   private notifyChanged() {
+    this.livePlotsChanged.fire()
     this.experimentsChanged.fire()
     this.notifyParamsOrMetricsChanged()
   }
 
   private notifyParamsOrMetricsChanged() {
     this.paramsOrMetricsChanged.fire()
-    return this.sendData()
+    return this.sendWebviewData()
+  }
+
+  private handleMessageFromWebview() {
+    this.dispose.track(
+      this.onDidReceivedWebviewMessage(message => {
+        if (
+          message.type === MessageFromWebviewType.columnReordered &&
+          message.payload
+        ) {
+          return this.paramsAndMetrics.setColumnsOrder(message.payload)
+        }
+
+        Logger.error(`Unexpected message: ${message}`)
+      })
+    )
   }
 }

@@ -105,7 +105,7 @@ const registerExperimentRunCommands = (
 
   internalCommands.registerExternalCommand(
     RegisteredCommands.EXPERIMENT_SHOW,
-    () => experiments.showExperimentsTable()
+    () => experiments.showWebview()
   )
 }
 

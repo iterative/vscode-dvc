@@ -13,16 +13,15 @@ import {
   WindowWithWebviewData
 } from './contract'
 import { EventNames } from './constants'
-import { Logger } from '../common/logger'
 import { setContextValue } from '../vscode/context'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { sendTelemetryEvent } from '../telemetry'
-import { messenger, MessengerEvents } from '../util/messaging'
 
 export class BaseWebview<T extends WebviewData> {
   public readonly onDidDispose: Event<void>
 
   public readonly onDidChangeIsFocused: Event<string | undefined>
+  public readonly onDidReceiveMessage: Event<MessageFromWebview>
 
   protected readonly initialized: Promise<void>
   protected readonly disposer = Disposable.fn()
@@ -36,6 +35,10 @@ export class BaseWebview<T extends WebviewData> {
   private readonly webviewPanel: WebviewPanel
   private readonly internalCommands: InternalCommands
   private readonly contextKey: string
+
+  private readonly messageReceived = this.disposer.track(
+    new EventEmitter<MessageFromWebview>()
+  )
 
   constructor(
     webviewPanel: WebviewPanel,
@@ -52,6 +55,8 @@ export class BaseWebview<T extends WebviewData> {
     this.initialized = this.deferred.promise
 
     this.onDidChangeIsFocused = this.isFocusedChanged.event
+
+    this.onDidReceiveMessage = this.messageReceived.event
 
     this.internalCommands = internalCommands
     this.dvcRoot = state.dvcRoot
@@ -192,16 +197,10 @@ export class BaseWebview<T extends WebviewData> {
   }
 
   private handleMessage(message: MessageFromWebview) {
-    switch (message.type) {
-      case MessageFromWebviewType.initialized:
-        this.deferred.resolve()
-        break
-      case MessageFromWebviewType.columnReordered:
-        messenger.emit(MessengerEvents.columnReordered, message.payload)
-        break
-      default:
-        Logger.error(`Unexpected message: ${message}`)
+    if (message.type === MessageFromWebviewType.initialized) {
+      return this.deferred.resolve()
     }
+    this.messageReceived.fire(message)
   }
 
   private setPanelActiveContext(state: boolean) {

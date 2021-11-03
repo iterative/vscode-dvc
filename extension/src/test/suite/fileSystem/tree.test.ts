@@ -1,4 +1,4 @@
-import path, { resolve } from 'path'
+import path from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, spy } from 'sinon'
@@ -27,17 +27,22 @@ import {
   RegisteredCliCommands,
   RegisteredCommands
 } from '../../../commands/external'
-import { TrackedExplorerTree } from '../../../fileSystem/tree'
 
 suite('Tracked Explorer Tree Test Suite', () => {
   const { join } = path
+
+  const getPathItem = (relPath: string) => ({
+    dvcRoot: dvcDemoPath,
+    resourceUri: Uri.file(join(dvcDemoPath, relPath))
+  })
 
   const disposable = Disposable.fn()
   beforeEach(() => {
     restore()
   })
 
-  afterEach(() => {
+  afterEach(function () {
+    this.timeout(5000)
     disposable.dispose()
     return closeAllEditors()
   })
@@ -52,7 +57,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
     it('should be able to run dvc.copyFilePath and copy a path to the clipboard', async () => {
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_COPY_FILE_PATH,
-        dvcDemoPath
+        { resourceUri: Uri.file(dvcDemoPath) }
       )
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
@@ -67,7 +72,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       const relPath = 'logs'
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_COPY_REL_FILE_PATH,
-        join(dvcDemoPath, relPath)
+        getPathItem(relPath)
       )
 
       await commands.executeCommand('workbench.action.files.newUntitledFile')
@@ -77,11 +82,12 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should be able to run dvc.deleteTarget without error', async () => {
-      const path = join(dvcDemoPath, 'deletable.txt')
-
       const mockApplyEdit = stub(workspace, 'applyEdit').resolves(undefined)
 
-      await commands.executeCommand(RegisteredCommands.DELETE_TARGET, path)
+      await commands.executeCommand(
+        RegisteredCommands.DELETE_TARGET,
+        getPathItem('deletable.txt')
+      )
 
       expect(mockApplyEdit).to.be.calledOnce
     })
@@ -92,12 +98,16 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'more-extra-data.txt',
         'even-more-extra-data.txt'
       ]
-      const mockDestination = join(dvcDemoPath, 'data', 'MNIST', 'raw')
-      ensureFileSync(mockDestination + '.dvc')
+
+      const mockDestination = getPathItem(join('data', 'MNIST', 'raw'))
+
+      const mockDestinationPath = mockDestination.resourceUri.fsPath
+
+      ensureFileSync(mockDestinationPath + '.dvc')
 
       const expectedTargets = mockData.map(file => join(dvcDemoPath, file))
       const expectedDestinations = mockData.map(file =>
-        join(mockDestination, file)
+        join(mockDestinationPath, file)
       )
 
       const mockUris = expectedTargets.map(file => Uri.file(file))
@@ -128,7 +138,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should not add data to a tracked data directory if the user changes their mind', async () => {
       const mockData = ['data-i-will-not-move.txt']
-      const mockDestination = join(dvcDemoPath, 'data', 'MNIST', 'raw')
+      const mockDestination = getPathItem(join('data', 'MNIST', 'raw'))
 
       const mockUris = mockData.map(file => Uri.file(join(dvcDemoPath, file)))
 
@@ -176,8 +186,9 @@ suite('Tracked Explorer Tree Test Suite', () => {
     })
 
     it('should be able to open a file', async () => {
-      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
-      const uri = Uri.file(__filename)
+      const fileToOpen = join(dvcDemoPath, 'logs.html')
+      expect(getActiveTextEditorFilename()).not.to.equal(fileToOpen)
+      const uri = Uri.file(fileToOpen)
 
       const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
@@ -187,75 +198,70 @@ suite('Tracked Explorer Tree Test Suite', () => {
       )
       await activeEditorChanged
 
-      expect(getActiveTextEditorFilename()).to.equal(__filename)
+      expect(getActiveTextEditorFilename()).to.equal(fileToOpen)
     }).timeout(5000)
 
     it('should be able to open a file to the side', async () => {
-      expect(getActiveTextEditorFilename()).not.to.equal(__filename)
+      const fileToOpen = join(dvcDemoPath, 'logs.json')
+      expect(getActiveTextEditorFilename()).not.to.equal(fileToOpen)
 
       const activeEditorChanged = activeTextEditorChangedEvent(disposable)
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_OPEN_TO_THE_SIDE,
-        __filename
+        { resourceUri: Uri.file(fileToOpen) }
       )
       await activeEditorChanged
 
-      expect(getActiveTextEditorFilename()).to.equal(__filename)
+      expect(getActiveTextEditorFilename()).to.equal(fileToOpen)
       expect(window.activeTextEditor?.viewColumn).not.to.equal(ViewColumn.One)
     })
 
     it('should be able to search in a folder', async () => {
-      const searchDir = __dirname
+      const searchDir = Uri.file(join(dvcDemoPath, 'data'))
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_FIND_IN_FOLDER,
-        searchDir
+        { resourceUri: searchDir }
       )
 
       expect(executeCommandSpy).to.be.calledWith(
         'filesExplorer.findInFolder',
-        Uri.file(searchDir)
+        searchDir
       )
     })
 
     it('should be able to compare two files', async () => {
-      const baseline = __filename
-      const comparison = resolve(__dirname, '..', '..', '..', 'extension.js')
+      const baseline = Uri.file(join(dvcDemoPath, 'logs.json'))
+      const comparison = Uri.file(join(dvcDemoPath, 'logs.html'))
       const executeCommandSpy = spy(commands, 'executeCommand')
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_SELECT_FOR_COMPARE,
-        baseline
+        { resourceUri: baseline }
       )
 
       expect(
         executeCommandSpy,
         'should call executeCommand with the args required to select a file to compare against'
-      ).to.be.calledWith('selectForCompare', Uri.file(baseline))
+      ).to.be.calledWith('selectForCompare', baseline)
       executeCommandSpy.resetHistory()
 
       await commands.executeCommand(
         RegisteredCommands.TRACKED_EXPLORER_COMPARE_SELECTED,
-        comparison
+        { resourceUri: comparison }
       )
 
       expect(
         executeCommandSpy,
         'should call executeCommand with the args required to compare the files'
-      ).to.be.calledWith('compareFiles', Uri.file(comparison))
+      ).to.be.calledWith('compareFiles', comparison)
     })
 
     it('should be able to run dvc.removeTarget without error', async () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
-      const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
-        dvcRoot: dvcDemoPath
-      })
 
       const mockDeleteTarget = stub(Workspace, 'deleteTarget').resolves(true)
       const mockRemove = stub(CliExecutor.prototype, 'remove').resolves(
@@ -264,7 +270,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       await commands.executeCommand(
         RegisteredCliCommands.REMOVE_TARGET,
-        absPath
+        getPathItem(relPath)
       )
       expect(mockDeleteTarget).to.be.calledOnce
       expect(mockRemove).to.be.calledOnce
@@ -272,13 +278,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.renameTarget without error', async () => {
       const relPath = join('mock', 'data', 'MNIST', 'raw')
-      const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
-        dvcRoot: dvcDemoPath
-      })
 
       const mockMove = stub(CliExecutor.prototype, 'move').resolves(
         'target moved to new destination'
@@ -290,7 +290,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
       await commands.executeCommand(
         RegisteredCliCommands.RENAME_TARGET,
-        absPath
+        getPathItem(relPath)
       )
       expect(mockMove).to.be.calledOnce
       expect(mockInputBox).to.be.calledOnce
@@ -302,32 +302,24 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.pullTarget without error', async () => {
       const relPath = 'data'
-      const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
-        dvcRoot: dvcDemoPath
-      })
 
       const mockPull = stub(CliExecutor.prototype, 'pull').resolves(
         'target pulled'
       )
 
-      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET, absPath)
+      await commands.executeCommand(
+        RegisteredCliCommands.PULL_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockPull).to.be.calledOnce
     })
 
     it('should prompt to force if dvc.pullTarget fails', async () => {
       const relPath = join('data', 'MNIST')
-      const absPath = join(dvcDemoPath, relPath)
-      stub(path, 'relative').returns(relPath)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
-        dvcRoot: dvcDemoPath
-      })
+      stub(path, 'relative').returns(relPath)
 
       const mockPull = stub(CliExecutor.prototype, 'pull')
         .onFirstCall()
@@ -341,7 +333,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand(RegisteredCliCommands.PULL_TARGET, absPath)
+      await commands.executeCommand(
+        RegisteredCliCommands.PULL_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockShowWarningMessage).to.be.calledOnce
       expect(mockPull).to.be.calledTwice
@@ -351,32 +346,23 @@ suite('Tracked Explorer Tree Test Suite', () => {
 
     it('should be able to run dvc.pushTarget without error', async () => {
       const relPath = join('data', 'MNIST')
-      const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
-        dvcRoot: dvcDemoPath
-      })
 
       const mockPush = stub(CliExecutor.prototype, 'push').resolves(
         'target pushed'
       )
 
-      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET, absPath)
+      await commands.executeCommand(
+        RegisteredCliCommands.PUSH_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockPush).to.be.calledOnce
     })
 
     it('should prompt to force if dvc.pushTarget fails', async () => {
       const relPath = join('data', 'MNIST')
-      const absPath = join(dvcDemoPath, relPath)
       stub(path, 'relative').returns(relPath)
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub((TrackedExplorerTree as any).prototype, 'getPathItem').returns({
-        dvcRoot: dvcDemoPath
-      })
 
       const mockPush = stub(CliExecutor.prototype, 'push')
         .onFirstCall()
@@ -390,7 +376,10 @@ suite('Tracked Explorer Tree Test Suite', () => {
         'showWarningMessage'
       ).resolves('Force' as unknown as MessageItem)
 
-      await commands.executeCommand(RegisteredCliCommands.PUSH_TARGET, absPath)
+      await commands.executeCommand(
+        RegisteredCliCommands.PUSH_TARGET,
+        getPathItem(relPath)
+      )
 
       expect(mockShowWarningMessage).to.be.calledWith(
         'I AM AN ERROR. \n\nWould you like to force this action?',

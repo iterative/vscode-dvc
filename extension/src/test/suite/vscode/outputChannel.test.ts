@@ -23,10 +23,12 @@ suite('Output Channel Test Suite', () => {
     const version = '1.0.0'
 
     it('should handle a process completing without error', () => {
-      const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<CliStarted>()
+      const processCompleted = disposable.track(new EventEmitter<CliResult>())
+      const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
-      const cli = new Cli({} as Config, { processCompleted, processStarted })
+      const cli = disposable.track(
+        new Cli({} as Config, { processCompleted, processStarted })
+      )
       const mockAppend = fake()
       const mockOutputChannel = stub(window, 'createOutputChannel').returns({
         append: mockAppend,
@@ -59,10 +61,12 @@ suite('Output Channel Test Suite', () => {
     })
 
     it('should handle a process throwing an error', () => {
-      const processCompleted = new EventEmitter<CliResult>()
-      const processStarted = new EventEmitter<CliStarted>()
+      const processCompleted = disposable.track(new EventEmitter<CliResult>())
+      const processStarted = disposable.track(new EventEmitter<CliStarted>())
 
-      const cli = new Cli({} as Config, { processCompleted, processStarted })
+      const cli = disposable.track(
+        new Cli({} as Config, { processCompleted, processStarted })
+      )
       const mockAppend = fake()
       const mockOutputChannel = stub(window, 'createOutputChannel').returns({
         append: mockAppend,

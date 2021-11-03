@@ -31,14 +31,15 @@ jest.mock('./quickPick')
 
 beforeEach(() => {
   jest.resetAllMocks()
-  mockedDisposable.fn.mockReturnValueOnce({
+})
+
+describe('Experiments', () => {
+  mockedDisposable.fn.mockReturnValue({
     track: function <T>(disposable: T): T {
       return disposable
     }
   } as unknown as (() => void) & Disposer)
-})
 
-describe('Experiments', () => {
   const mockedInternalCommands = new InternalCommands(
     {} as Config,
     {

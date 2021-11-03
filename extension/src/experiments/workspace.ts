@@ -1,53 +1,50 @@
 import { EventEmitter, Memento } from 'vscode'
-import { makeObservable, observable } from 'mobx'
-import { Experiments, ExperimentsWebview } from '.'
-import { FilterDefinition } from './model/filterBy'
+import { Experiments } from '.'
 import { pickExperimentName } from './quickPick'
-import { SortDefinition } from './model/sortBy'
-import { ResourceLocator } from '../resourceLocator'
-import { reportOutput } from '../vscode/reporting'
-import { getInput } from '../vscode/inputBox'
+import { TableData } from './webview/contract'
 import {
   CommandId,
   AvailableCommands,
   InternalCommands
 } from '../commands/internal'
-import { BaseWorkspace, IWorkspace } from '../workspace'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { ResourceLocator } from '../resourceLocator'
+import { reportOutput } from '../vscode/reporting'
+import { getInput } from '../vscode/inputBox'
+import { BaseWorkspaceWebviews } from '../webview/workspace'
+import { WorkspacePlots } from '../plots/workspace'
 
-export class WorkspaceExperiments
-  extends BaseWorkspace<Experiments>
-  implements IWorkspace<Experiments, ResourceLocator>
-{
-  @observable
-  private focusedWebviewDvcRoot: string | undefined
+export class WorkspaceExperiments extends BaseWorkspaceWebviews<
+  Experiments,
+  TableData
+> {
+  public readonly experimentsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
 
-  public readonly experimentsChanged = new EventEmitter<void>()
-  public readonly paramsOrMetricsChanged = new EventEmitter<void>()
+  public readonly paramsOrMetricsChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
 
   private readonly workspaceState: Memento
+  private focusedWebviewDvcRoot: string | undefined
 
   constructor(
     internalCommands: InternalCommands,
     workspaceState: Memento,
     experiments?: Record<string, Experiments>
   ) {
-    super(internalCommands)
-    makeObservable(this)
+    super(internalCommands, experiments)
 
     this.workspaceState = workspaceState
-
-    if (experiments) {
-      this.repositories = experiments
-    }
   }
 
-  public update(dvcRoot: string, data: ExperimentsRepoJSONOutput) {
-    const experiments = this.getRepository(dvcRoot)
-    experiments.setState(data)
+  public linkRepositories(workspacePlots: WorkspacePlots) {
+    Object.entries(this.repositories).forEach(([dvcRoot, repository]) =>
+      workspacePlots.getRepository(dvcRoot).setExperiments(repository)
+    )
   }
 
-  public getFocusedTable(): Experiments | undefined {
+  public getFocusedWebview(): Experiments | undefined {
     if (!this.focusedWebviewDvcRoot) {
       return undefined
     }
@@ -70,10 +67,6 @@ export class WorkspaceExperiments
     return this.getRepository(dvcRoot).removeFilters()
   }
 
-  public removeFilter(dvcRoot: string, id: string) {
-    return this.getRepository(dvcRoot).removeFilter(id)
-  }
-
   public async addSort(overrideRoot?: string) {
     const dvcRoot = await this.getDvcRoot(overrideRoot)
     if (!dvcRoot) {
@@ -89,38 +82,6 @@ export class WorkspaceExperiments
     }
 
     return this.getRepository(dvcRoot).removeSorts()
-  }
-
-  public removeSort(dvcRoot: string, pathToRemove: string) {
-    return this.getRepository(dvcRoot).removeSort(pathToRemove)
-  }
-
-  public getChildParamsOrMetrics(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).getChildParamsOrMetrics(path)
-  }
-
-  public toggleParamOrMetricStatus(dvcRoot: string, path: string) {
-    return this.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
-  }
-
-  public getParamsAndMetricsStatuses(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getParamsAndMetricsStatuses()
-  }
-
-  public getSorts(dvcRoot: string): SortDefinition[] {
-    return this.getRepository(dvcRoot).getSorts()
-  }
-
-  public getFilters(dvcRoot: string): FilterDefinition[] {
-    return this.getRepository(dvcRoot).getFilters()
-  }
-
-  public getExperiments(dvcRoot: string) {
-    return this.getRepository(dvcRoot).getExperiments()
-  }
-
-  public getCheckpoints(dvcRoot: string, experimentId: string) {
-    return this.getRepository(dvcRoot).getCheckpoints(experimentId)
   }
 
   public getCwdThenRun = async (commandId: CommandId) => {
@@ -192,15 +153,6 @@ export class WorkspaceExperiments
     }
   }
 
-  public async showExperimentsTable() {
-    const dvcRoot = await this.getOnlyOrPickProject()
-    if (!dvcRoot) {
-      return
-    }
-
-    return this.showExperimentsWebview(dvcRoot)
-  }
-
   public showExperimentsTableThenRun = async (commandId: CommandId) => {
     const dvcRoot = await this.getFocusedOrOnlyOrPickProject()
     if (!dvcRoot) {
@@ -216,28 +168,36 @@ export class WorkspaceExperiments
     return experiments
   }
 
-  public create(
-    dvcRoots: string[],
-    resourceLocator: ResourceLocator
-  ): Experiments[] {
-    const experiments = dvcRoots.map(dvcRoot =>
-      this.createExperiments(dvcRoot, resourceLocator)
+  public createRepository(dvcRoot: string, resourceLocator: ResourceLocator) {
+    const experiments = this.dispose.track(
+      new Experiments(
+        dvcRoot,
+        this.internalCommands,
+        resourceLocator,
+        this.workspaceState
+      )
     )
 
-    Promise.all(experiments.map(experiments => experiments.isReady())).then(
-      () => this.deferred.resolve()
+    this.setRepository(dvcRoot, experiments)
+
+    experiments.dispose.track(
+      experiments.onDidChangeIsWebviewFocused(
+        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
+      )
+    )
+    experiments.dispose.track(
+      experiments.onDidChangeExperiments(() => {
+        this.experimentsChanged.fire()
+      })
+    )
+
+    experiments.dispose.track(
+      experiments.onDidChangeParamsOrMetrics(() => {
+        this.paramsOrMetricsChanged.fire()
+      })
     )
 
     return experiments
-  }
-
-  public setWebview(dvcRoot: string, experimentsWebview: ExperimentsWebview) {
-    const experiments = this.getRepository(dvcRoot)
-    if (!experiments) {
-      experimentsWebview.dispose()
-    }
-
-    experiments.setWebview(experimentsWebview)
   }
 
   private async getDvcRoot(overrideRoot?: string) {
@@ -260,35 +220,6 @@ export class WorkspaceExperiments
   private async showExperimentsWebview(dvcRoot: string): Promise<Experiments> {
     const experiments = this.getRepository(dvcRoot)
     await experiments.showWebview()
-    return experiments
-  }
-
-  private createExperiments(dvcRoot: string, resourceLocator: ResourceLocator) {
-    const experiments = this.dispose.track(
-      new Experiments(
-        dvcRoot,
-        this.internalCommands,
-        resourceLocator,
-        this.workspaceState
-      )
-    )
-
-    this.setRepository(dvcRoot, experiments)
-
-    experiments.dispose.track(
-      experiments.onDidChangeIsWebviewFocused(
-        dvcRoot => (this.focusedWebviewDvcRoot = dvcRoot)
-      )
-    )
-    experiments.dispose.track(
-      experiments.onDidChangeExperiments(() => this.experimentsChanged.fire())
-    )
-
-    experiments.dispose.track(
-      experiments.onDidChangeParamsOrMetrics(() =>
-        this.paramsOrMetricsChanged.fire()
-      )
-    )
     return experiments
   }
 }

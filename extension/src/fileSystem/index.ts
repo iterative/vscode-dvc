@@ -1,5 +1,6 @@
 import { basename, extname, join, relative, resolve } from 'path'
 import { existsSync, lstatSync, readdir } from 'fs-extra'
+import { Uri } from 'vscode'
 import { definedAndNonEmpty } from '../util/array'
 
 export const exists = (path: string): boolean => existsSync(path)
@@ -58,3 +59,6 @@ export const isAnyDvcYaml = (path?: string) =>
   (extname(path) === '.dvc' ||
     basename(path) === 'dvc.lock' ||
     basename(path) === 'dvc.yaml')
+
+export const relativeWithUri = (dvcRoot: string, uri: Uri) =>
+  relative(dvcRoot, uri.fsPath)

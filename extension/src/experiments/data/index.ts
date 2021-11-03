@@ -3,23 +3,20 @@ import { EventEmitter, Event } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { collectFiles } from './collect'
+import { DOT_GIT, EXPERIMENTS_GIT_REFS, GIT_REFS } from './constants'
 import {
   createFileSystemWatcher,
   createNecessaryFileSystemWatcher
-} from '../fileSystem/watcher'
-import { getGitRepositoryRoot } from '../git'
-import { ProcessManager } from '../processManager'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
-import { sameContents, uniqueValues } from '../util/array'
+} from '../../fileSystem/watcher'
+import { getGitRepositoryRoot } from '../../git'
+import { ProcessManager } from '../../processManager'
+import { AvailableCommands, InternalCommands } from '../../commands/internal'
+import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { sameContents, uniqueValues } from '../../util/array'
 
-const DOT_GIT = '.git'
-const GIT_REFS = join(DOT_GIT, 'refs')
-export const EXPERIMENTS_GIT_REFS = join(GIT_REFS, 'exps')
-
-export class Data {
+export class ExperimentsData {
   public readonly dispose = Disposable.fn()
-  public readonly onDidChangeExperimentsData: Event<ExperimentsRepoJSONOutput>
+  public readonly onDidUpdate: Event<ExperimentsRepoJSONOutput>
 
   private readonly dvcRoot: string
   private files: string[] = []
@@ -30,10 +27,13 @@ export class Data {
   private readonly processManager: ProcessManager
   private readonly internalCommands: InternalCommands
 
-  private readonly experimentsDataChanged: EventEmitter<ExperimentsRepoJSONOutput> =
+  private readonly updated: EventEmitter<ExperimentsRepoJSONOutput> =
     this.dispose.track(new EventEmitter())
 
-  private readonly paramsAndMetricsFilesChanged = new EventEmitter<void>()
+  private readonly paramsAndMetricsFilesChanged = this.dispose.track(
+    new EventEmitter<void>()
+  )
+
   private readonly onDidChangeParamsAndMetricsFiles: Event<void> =
     this.paramsAndMetricsFilesChanged.event
 
@@ -41,13 +41,15 @@ export class Data {
 
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     this.dvcRoot = dvcRoot
-    this.processManager = new ProcessManager({
-      name: 'update',
-      process: () => this.updateData()
-    })
+    this.processManager = this.dispose.track(
+      new ProcessManager({
+        name: 'update',
+        process: () => this.updateData()
+      })
+    )
 
     this.internalCommands = internalCommands
-    this.onDidChangeExperimentsData = this.experimentsDataChanged.event
+    this.onDidUpdate = this.updated.event
 
     this.initialize()
     this.watchExpGitRefs()
@@ -63,7 +65,7 @@ export class Data {
 
   private initialize() {
     const waitForInitialData = this.dispose.track(
-      this.onDidChangeExperimentsData(() => {
+      this.onDidUpdate(() => {
         this.watcher = this.watchParamsAndMetricsFiles()
 
         this.dispose.track(
@@ -122,7 +124,7 @@ export class Data {
   }
 
   private notifyChanged(data: ExperimentsRepoJSONOutput) {
-    this.experimentsDataChanged.fire(data)
+    this.updated.fire(data)
   }
 
   private watchParamsAndMetricsFiles() {

@@ -55,7 +55,7 @@ describe('pickResources', () => {
     })
   })
 
-  it('should return an array of paths if any are selected', async () => {
+  it('should return an array of uris if any are selected', async () => {
     const mockedUri = Uri.file(resolve('mock', 'multiple', 'resource', 'fun'))
     const mockedPickedUri = [mockedUri]
     const mockedTitle = 'this is even more fun'
@@ -63,6 +63,6 @@ describe('pickResources', () => {
 
     const pickedResources = await pickResources(mockedTitle)
 
-    expect(pickedResources).toEqual([mockedUri.fsPath])
+    expect(pickedResources).toEqual([mockedUri])
   })
 })

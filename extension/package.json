@@ -273,6 +273,11 @@
         "category": "DVC"
       },
       {
+        "title": "%command.showPlots%",
+        "command": "dvc.showPlots",
+        "category": "DVC"
+      },
+      {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
         "category": "DVC",
@@ -475,6 +480,10 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.showPlots",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.stopRunningExperiment",
           "when": "dvc.commands.available && dvc.project.available && dvc.runner.running"
         },
@@ -542,6 +551,11 @@
           "command": "dvc.commitTarget",
           "group": "inline",
           "when": "scmProvider == dvc && scmResourceGroup == changes && scmResourceState != untracked && scmResourceState != deleted && dvc.commands.available"
+        },
+        {
+          "command": "dvc.pullTarget",
+          "group": "inline",
+          "when": "scmProvider == dvc && scmResourceGroup == notInCache && dvc.commands.available"
         }
       ],
       "scm/resourceGroup/context": [

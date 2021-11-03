@@ -4,11 +4,11 @@ import { action } from '@storybook/addon-actions'
 import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
 import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
 import complexChangesData from 'dvc/src/test/fixtures/complex-changes-example'
-import Experiments from '../components/Experiments'
+import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
-import '../style.scss'
-import { Model } from '../model'
+import '../experiments/style.scss'
+import { Model } from '../experiments/model'
 
 declare global {
   interface Window {
@@ -45,11 +45,15 @@ export default {
     vsCodeApi: dummyVsCodeApi
   },
   component: Experiments,
-  title: 'Experiments/Table'
+  title: 'Table'
 } as Meta
 
 Model.getInstance().data = tableData
 
-export const ComplexTable: Story = ({ tableData, vsCodeApi }) => {
+export const WithData: Story = ({ tableData, vsCodeApi }) => {
   return <Experiments tableData={tableData} vsCodeApi={vsCodeApi} />
+}
+
+export const WithoutData: Story = ({ vsCodeApi }) => {
+  return <Experiments tableData={undefined} vsCodeApi={vsCodeApi} />
 }

@@ -60,7 +60,7 @@ export class ExperimentsParamsAndMetricsTree
     internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
       RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
       ({ dvcRoot, path }) =>
-        this.experiments.toggleParamOrMetricStatus(dvcRoot, path)
+        this.experiments.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
     )
 
     this.updateDescriptionOnChange()
@@ -108,7 +108,9 @@ export class ExperimentsParamsAndMetricsTree
         const dvcRoots = this.experiments.getDvcRoots()
         const statuses = flatten<Status>(
           dvcRoots.map(dvcRoot =>
-            this.experiments.getParamsAndMetricsStatuses(dvcRoot)
+            this.experiments
+              .getRepository(dvcRoot)
+              .getParamsAndMetricsStatuses()
           )
         )
         this.view.description = this.getDescription(statuses, ' of ')
@@ -146,7 +148,8 @@ export class ExperimentsParamsAndMetricsTree
     const [dvcRoot, path] = this.getDetails(element)
 
     return this.experiments
-      .getChildParamsOrMetrics(dvcRoot, path)
+      .getRepository(dvcRoot)
+      .getChildParamsOrMetrics(path)
       .map(paramOrMetric => {
         const { descendantStatuses, hasChildren, path, status } = paramOrMetric
 

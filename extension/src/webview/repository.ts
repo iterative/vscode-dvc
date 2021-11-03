@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { BaseWebview } from '.'
 import { ViewKey } from './constants'
-import { WebviewData } from './contract'
+import { MessageFromWebview, WebviewData } from './contract'
 import { createWebview } from './factory'
 import { InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
@@ -12,6 +12,8 @@ export abstract class BaseRepository<T extends WebviewData> {
   public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeIsWebviewFocused: Event<string | undefined>
+
+  protected readonly onDidReceivedWebviewMessage: Event<MessageFromWebview>
 
   protected readonly isWebviewFocusedChanged: EventEmitter<string | undefined> =
     this.dispose.track(new EventEmitter())
@@ -26,6 +28,10 @@ export abstract class BaseRepository<T extends WebviewData> {
   protected readonly deferred = new Deferred()
   protected readonly initialized = this.deferred.promise
 
+  private receivedWebviewMessage = this.dispose.track(
+    new EventEmitter<MessageFromWebview>()
+  )
+
   abstract viewKey: ViewKey
 
   constructor(
@@ -38,6 +44,7 @@ export abstract class BaseRepository<T extends WebviewData> {
     this.resourceLocator = resourceLocator
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
+    this.onDidReceivedWebviewMessage = this.receivedWebviewMessage.event
   }
 
   public isReady() {
@@ -53,7 +60,7 @@ export abstract class BaseRepository<T extends WebviewData> {
       this.viewKey,
       this.internalCommands,
       {
-        data: this.getData(),
+        data: this.getWebviewData(),
         dvcRoot: this.dvcRoot
       },
       this.resourceLocator.dvcIcon
@@ -68,11 +75,19 @@ export abstract class BaseRepository<T extends WebviewData> {
 
   public setWebview(view: BaseWebview<T>) {
     this.webview = this.dispose.track(view)
-    view.isReady().then(() => this.sendData())
+    view.isReady().then(() => this.sendWebviewData())
+
+    const listener = this.dispose.track(
+      view.onDidReceiveMessage(message =>
+        this.receivedWebviewMessage.fire(message)
+      )
+    )
 
     this.dispose.track(
       view.onDidDispose(() => {
         this.resetWebview()
+        this.dispose.untrack(listener)
+        listener.dispose()
       })
     )
     this.dispose.track(
@@ -82,10 +97,10 @@ export abstract class BaseRepository<T extends WebviewData> {
     )
   }
 
-  protected sendData() {
+  protected sendWebviewData() {
     if (this.webview) {
       this.webview.show({
-        data: this.getData()
+        data: this.getWebviewData()
       })
     }
   }
@@ -96,5 +111,5 @@ export abstract class BaseRepository<T extends WebviewData> {
     this.webview = undefined
   }
 
-  abstract getData(): T
+  abstract getWebviewData(): T
 }

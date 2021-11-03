@@ -26,7 +26,7 @@ export const AvailableCommands = Object.assign(
 export type CommandId = typeof AvailableCommands[keyof typeof AvailableCommands]
 
 export class InternalCommands {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   private readonly commands = new Map<string, Command>()
   private readonly outputChannel: OutputChannel
@@ -113,7 +113,7 @@ export class InternalCommands {
     cli.autoRegisteredCommands.forEach((commandId: string) => {
       if (!this.confirmedId(commandId)) {
         throw new Error(
-          `This should be an impossible error. ` +
+          'This should be an impossible error. ' +
             'If you are a user and see this message then you win a prize.'
         )
       }

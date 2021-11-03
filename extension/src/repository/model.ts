@@ -9,6 +9,7 @@ import {
   PathOutput,
   PathStatus,
   StageOrFileStatuses,
+  Status,
   StatusesOrAlwaysChanged,
   StatusOutput
 } from '../cli/reader'
@@ -19,6 +20,11 @@ type OutputData = {
   diffFromHead: DiffOutput
   tracked?: ListOutput[]
   untracked: Set<string>
+}
+
+type ModifiedAndNotInCache = {
+  [Status.MODIFIED]: Set<string>
+  [Status.NOT_IN_CACHE]: Set<string>
 }
 
 export class RepositoryModel
@@ -90,36 +96,46 @@ export class RepositoryModel
   ): PathStatus[] {
     return fileOrStage
       .map(entry => (entry as StageOrFileStatuses)?.[ChangedType.CHANGED_OUTS])
-      .filter(value => value)
+      .filter(value => value) as PathStatus[]
   }
 
-  private reduceModified(reducedStatus: Set<string>, statuses: PathStatus[]) {
-    return statuses.map(entry =>
-      Object.entries(entry)
-        .filter(([, status]) => status === 'modified')
-        .map(([relativePath]) => {
-          const absolutePath = this.getAbsolutePath(relativePath)
-          const existingPaths = reducedStatus
-          if (this.state.tracked.has(absolutePath)) {
-            reducedStatus = existingPaths.add(absolutePath)
-          }
-        })
-    )
+  private collectStatuses(
+    entry: PathStatus,
+    reducedStatus: ModifiedAndNotInCache
+  ) {
+    Object.entries(entry)
+      .filter(([, status]) =>
+        [Status.NOT_IN_CACHE, Status.MODIFIED].includes(status)
+      )
+      .map(([relativePath, status]) => {
+        const absolutePath = this.getAbsolutePath(relativePath)
+
+        if (!this.state.tracked.has(absolutePath)) {
+          return
+        }
+
+        reducedStatus[status as Status.NOT_IN_CACHE | Status.MODIFIED].add(
+          absolutePath
+        )
+      })
   }
 
-  private reduceToModified(filteredStatusOutput: StatusOutput): Set<string> {
+  private reduceStatus(statusOutput: StatusOutput): ModifiedAndNotInCache {
     const statusReducer = (
-      reducedStatus: Set<string>,
+      modifiedAndNotInCache: ModifiedAndNotInCache,
       entry: StatusesOrAlwaysChanged[]
-    ): Set<string> => {
+    ): ModifiedAndNotInCache => {
       const statuses = this.getChangedOutsStatuses(entry)
 
-      this.reduceModified(reducedStatus, statuses)
+      statuses.map(entry => this.collectStatuses(entry, modifiedAndNotInCache))
 
-      return reducedStatus
+      return modifiedAndNotInCache
     }
 
-    return Object.values(filteredStatusOutput).reduce(statusReducer, new Set())
+    return Object.values(statusOutput).reduce(statusReducer, {
+      [Status.MODIFIED]: new Set(),
+      [Status.NOT_IN_CACHE]: new Set()
+    })
   }
 
   private mapToTrackedPaths(diff: PathOutput[] = []): string[] {
@@ -164,22 +180,36 @@ export class RepositoryModel
     ])
   }
 
-  private setModified(
+  private setModifiedAndNotInCache(
     diffOutput: DiffOutput,
     statusOutput: StatusOutput
   ): void {
-    const modifiedAgainstCache = this.reduceToModified(statusOutput)
     const modifiedAgainstHead = this.mapToTrackedPaths(diffOutput.modified)
+    const {
+      [Status.MODIFIED]: modifiedAgainstCache,
+      [Status.NOT_IN_CACHE]: notInCache
+    } = this.reduceStatus(statusOutput)
 
     this.state.gitModified = this.splitModifiedAgainstHead(
       modifiedAgainstHead,
-      path => this.pathNotInSet(path, modifiedAgainstCache)
+      path =>
+        this.pathNotInSet(
+          path,
+          new Set([...notInCache, ...modifiedAgainstCache])
+        )
     )
 
     this.state.modified = this.getAllModifiedAgainstCache(
       modifiedAgainstHead,
       modifiedAgainstCache
     )
+
+    this.state.notInCache = new Set([
+      ...this.getStateFromDiff(diffOutput[Status.NOT_IN_CACHE]),
+      ...this.splitModifiedAgainstHead(modifiedAgainstHead, path =>
+        this.pathInSet(path, notInCache)
+      )
+    ])
   }
 
   private updateStatus(
@@ -193,9 +223,8 @@ export class RepositoryModel
         ?.map(renamed => this.getAbsolutePath(renamed?.path?.new))
         .filter(path => this.state.tracked.has(path))
     )
-    this.state.notInCache = this.getStateFromDiff(diffOutput['not in cache'])
 
-    this.setModified(diffOutput, statusOutput)
+    this.setModifiedAndNotInCache(diffOutput, statusOutput)
   }
 
   private updateTracked(listOutput: ListOutput[]): void {

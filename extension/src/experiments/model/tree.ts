@@ -90,7 +90,9 @@ export class ExperimentsTree
     }
 
     const experimentNames = flatten(
-      dvcRoots.map(dvcRoot => this.experiments.getExperiments(dvcRoot))
+      dvcRoots.map(dvcRoot =>
+        this.experiments.getRepository(dvcRoot).getExperiments()
+      )
     )
     if (definedAndNonEmpty(experimentNames)) {
       if (dvcRoots.length === 1) {
@@ -104,15 +106,18 @@ export class ExperimentsTree
   }
 
   private getExperiments(dvcRoot: string): ExperimentItem[] {
-    return this.experiments.getExperiments(dvcRoot).map(experiment => ({
-      collapsibleState: experiment.hasChildren
-        ? TreeItemCollapsibleState.Collapsed
-        : TreeItemCollapsibleState.None,
-      dvcRoot,
-      iconPath: this.getExperimentThemeIcon(experiment),
-      id: experiment.id,
-      label: experiment.displayName
-    }))
+    return this.experiments
+      .getRepository(dvcRoot)
+      .getExperiments()
+      .map(experiment => ({
+        collapsibleState: experiment.hasChildren
+          ? TreeItemCollapsibleState.Collapsed
+          : TreeItemCollapsibleState.None,
+        dvcRoot,
+        iconPath: this.getExperimentThemeIcon(experiment),
+        id: experiment.id,
+        label: experiment.displayName
+      }))
   }
 
   private getExperimentThemeIcon({
@@ -136,15 +141,15 @@ export class ExperimentsTree
   }
 
   private getCheckpoints(dvcRoot: string, experimentId: string) {
-    return (this.experiments.getCheckpoints(dvcRoot, experimentId) || []).map(
-      checkpoint => ({
-        collapsibleState: TreeItemCollapsibleState.None,
-        dvcRoot,
-        iconPath: new ThemeIcon('debug-stackframe-dot'),
-        id: checkpoint.id,
-        label: checkpoint.displayName
-      })
-    )
+    return (
+      this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
+    ).map(checkpoint => ({
+      collapsibleState: TreeItemCollapsibleState.None,
+      dvcRoot,
+      iconPath: new ThemeIcon('debug-stackframe-dot'),
+      id: checkpoint.id,
+      label: checkpoint.displayName
+    }))
   }
 
   private updateDescriptionOnChange() {
@@ -162,7 +167,8 @@ export class ExperimentsTree
     return flatten<Status>(
       dvcRoots.map(dvcRoot =>
         this.experiments
-          .getExperiments(dvcRoot)
+          .getRepository(dvcRoot)
+          .getExperiments()
           .filter(experiment => experiment.running || experiment.queued)
           .map(experiment =>
             experiment.running ? Status.RUNNING : Status.QUEUED

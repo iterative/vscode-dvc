@@ -64,11 +64,11 @@ describe('CliExecutor', () => {
       const cwd = __dirname
       const relPath = join('data', 'MNIST', 'raw')
       const stdout =
-        `100% Add|████████████████████████████████████████████████` +
-        `█████████████████████████████████████████████████████████` +
-        `█████████████████████████████████████████████████████████` +
-        `██████████████████████████████████████████|1/1 [00:00,  2` +
-        `.20file/s]\n\r\n\rTo track the changes with git, run:\n\r` +
+        '100% Add|████████████████████████████████████████████████' +
+        '█████████████████████████████████████████████████████████' +
+        '█████████████████████████████████████████████████████████' +
+        '██████████████████████████████████████████|1/1 [00:00,  2' +
+        '.20file/s]\n\r\n\rTo track the changes with git, run:\n\r' +
         `\n\rgit add ${relPath} .gitignore`
 
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
@@ -88,7 +88,7 @@ describe('CliExecutor', () => {
   describe('checkout', () => {
     it('should call createProcess with the correct parameters to checkout a repository', async () => {
       const fsPath = __dirname
-      const stdout = `M       model.pt\nM       logs/\n`
+      const stdout = 'M       model.pt\nM       logs/\n'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(fsPath)
@@ -104,7 +104,7 @@ describe('CliExecutor', () => {
 
     it('should call createProcess with the correct parameters to force checkout a repository', async () => {
       const fsPath = __dirname
-      const stdout = `M       model.pt\nM       logs/\n`
+      const stdout = 'M       model.pt\nM       logs/\n'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.checkout(fsPath, Flag.FORCE)
@@ -257,9 +257,9 @@ describe('CliExecutor', () => {
     it('should call createProcess with the correct parameters to create a new branch from an existing experiment', async () => {
       const cwd = __dirname
       const stdout =
-        `Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n` +
-        `To switch to the new branch run:\n\n` +
-        `\t\tgit checkout some-branch`
+        "Git branch 'some-branch' has been created from experiment 'exp-0898f'.\n" +
+        'To switch to the new branch run:\n\n' +
+        '\t\tgit checkout some-branch'
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentBranch(
@@ -282,9 +282,9 @@ describe('CliExecutor', () => {
     it('should call createProcess with the correct parameters to garbage collect experiments', async () => {
       const cwd = __dirname
       const stdout =
-        `WARNING: This will remove all experiments except those derived from the workspace of the current repo. ` +
-        `Run queued experiments will be preserved. Run queued experiments will be removed.\n` +
-        `Removed 45 experiments. To remove unused cache files use 'dvc gc'. `
+        'WARNING: This will remove all experiments except those derived from the workspace of the current repo. ' +
+        'Run queued experiments will be preserved. Run queued experiments will be removed.\n' +
+        "Removed 45 experiments. To remove unused cache files use 'dvc gc'. "
       mockedCreateProcess.mockReturnValueOnce(getMockedProcess(stdout))
 
       const output = await cliExecutor.experimentGarbageCollect(

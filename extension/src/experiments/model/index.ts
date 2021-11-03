@@ -8,9 +8,11 @@ import {
   getFilterId
 } from './filterBy'
 import { collectExperiments } from './collect'
+import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { PlotsData } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
   sortBy = 'sortBy:',
@@ -24,6 +26,7 @@ export class ExperimentsModel {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
+  private livePlots: PlotsData = []
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -41,14 +44,24 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
-  public transformAndSet(data: ExperimentsRepoJSONOutput) {
-    const { workspace, branches, experimentsByBranch, checkpointsByTip } =
-      collectExperiments(data)
+  public getLivePlots() {
+    return this.livePlots
+  }
+
+  public async transformAndSet(data: ExperimentsRepoJSONOutput) {
+    const [
+      { workspace, branches, experimentsByBranch, checkpointsByTip },
+      livePlots
+    ] = await Promise.all([
+      collectExperiments(data),
+      collectLivePlotsData(data)
+    ])
 
     this.workspace = workspace
     this.branches = branches
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
+    this.livePlots = livePlots
   }
 
   public getSorts(): SortDefinition[] {

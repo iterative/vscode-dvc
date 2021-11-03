@@ -29,6 +29,7 @@ describe('SourceControlManagement', () => {
         createResourceGroup: jest
           .fn()
           .mockReturnValueOnce({})
+          .mockReturnValueOnce({})
           .mockReturnValueOnce({}),
         inputBox: { visible: true }
       })
@@ -42,13 +43,15 @@ describe('SourceControlManagement', () => {
       expect(mockedCreateSourceControl).toBeCalledTimes(1)
       expect(sourceControlManagement.getState()).toEqual({
         changes: [],
-        gitCommitReady: []
+        gitCommitReady: [],
+        notInCache: []
       })
 
       const updatedState = {
         added: new Set(['/some/new/path']),
         deleted: new Set(['/some/deleted/path', '/some/other/deleted/path']),
         dispose: () => undefined,
+        notInCache: new Set(['/some/missing/path', '/some/other/missing/path']),
         tracked: new Set(['/some/excluded/tracked/path'])
       } as unknown as SourceControlManagementState
 
@@ -73,13 +76,26 @@ describe('SourceControlManagement', () => {
             dvcRoot,
             resourceUri: Uri.file('/some/new/path')
           }
+        ],
+        notInCache: [
+          {
+            contextValue: 'notInCache',
+            dvcRoot,
+            resourceUri: Uri.file('/some/missing/path')
+          },
+          {
+            contextValue: 'notInCache',
+            dvcRoot,
+            resourceUri: Uri.file('/some/other/missing/path')
+          }
         ]
       })
 
       sourceControlManagement.setState(initialState)
       expect(sourceControlManagement.getState()).toEqual({
         changes: [],
-        gitCommitReady: []
+        gitCommitReady: [],
+        notInCache: []
       })
     })
   })

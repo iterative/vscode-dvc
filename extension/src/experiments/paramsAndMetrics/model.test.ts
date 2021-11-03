@@ -2,7 +2,6 @@ import { EventEmitter } from 'vscode'
 import { MementoPrefixes, ParamsAndMetricsModel, Status } from './model'
 import { joinParamOrMetricPath } from './paths'
 import { buildMockMemento } from '../../test/util'
-import { messenger, MessengerEvents } from '../../util/messaging'
 
 jest.mock('vscode', () => ({
   EventEmitter: function (this: EventEmitter<void>) {
@@ -92,7 +91,7 @@ describe('ParamsAndMetricsModel', () => {
       expect(model.getColumnsOrder()).toEqual(persistedState)
     })
 
-    it('should re-order the columns after a columnReordered message is sent', () => {
+    it('should re-order the columns if a new columnOrder is set', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
@@ -100,7 +99,7 @@ describe('ParamsAndMetricsModel', () => {
         })
       )
       const newState = ['C', 'B', 'A']
-      messenger.emit(MessengerEvents.columnReordered, newState)
+      model.setColumnsOrder(newState)
       expect(model.getColumnsOrder()).toEqual(newState)
     })
   })

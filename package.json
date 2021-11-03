@@ -7,7 +7,7 @@
   "scripts": {
     "format": "prettier --write '**/*.{js,ts,jsx,tsx,md,json,yml,yaml}'",
     "lint:prettier": "prettier -c '**/*.{md,json}'",
-    "lint:eslint": "eslint --cache --fix '**/*.{js,ts,jsx,tsx}'",
+    "lint:eslint": "eslint --cache '**/*.{js,ts,jsx,tsx}'",
     "lint:tsc": "tsc --noEmit",
     "lint": "run-p 'lint:*'",
     "test-build-extension": "yarn workspace dvc run test-vscode-build",
