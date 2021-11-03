@@ -900,10 +900,10 @@
           },
           {
             "id": "dvc.viewContainer",
-            "title": "Experiments views container",
-            "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
+            "title": "DVC view container",
+            "description": "Open the DVC view container.\n[Show views](command:workbench.view.extension.dvc-views)",
             "media": {
-              "markdown": "resources/walkthrough/experiments-views.md"
+              "markdown": "resources/walkthrough/view-container.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
@@ -919,6 +919,18 @@
             },
             "completionEvents": [
               "onCommand:dvc.showExperiments"
+            ],
+            "when": "dvc.commands.available && dvc.project.available"
+          },
+          {
+            "id": "dvc.plots",
+            "title": "Plots",
+            "description": "Open plots.\n[Show plots](command:dvc.showPlots)",
+            "media": {
+              "markdown": "resources/walkthrough/plots.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showPlots"
             ],
             "when": "dvc.commands.available && dvc.project.available"
           },
