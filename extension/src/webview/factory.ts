@@ -14,10 +14,7 @@ const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as PlotsData
-  return Boolean(
-    Array.isArray(data) &&
-      (data.length === 0 || (data[0].title && data[0].values))
-  )
+  return !!(data?.live && data?.static)
 }
 
 export const isValidState = (

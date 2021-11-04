@@ -1,8 +1,12 @@
 import { PlotsData } from './webview/contract'
+import { PlotsData as Data } from './data'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
+import { Resource } from '../resourceLocator'
+import { InternalCommands } from '../commands/internal'
+import { PlotsOutput } from '../cli/reader'
 
 export type PlotsWebview = BaseWebview<PlotsData>
 
@@ -10,6 +14,21 @@ export class Plots extends BaseRepository<PlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
   private experiments?: Experiments
+
+  private data: Data
+  private staticPlots: PlotsOutput = {}
+
+  constructor(
+    dvcRoot: string,
+    internalCommands: InternalCommands,
+    webviewIcon: Resource
+  ) {
+    super(dvcRoot, internalCommands, webviewIcon)
+
+    this.data = this.dispose.track(new Data(dvcRoot, internalCommands))
+
+    this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
+  }
 
   public async setExperiments(experiments: Experiments) {
     this.experiments = experiments
@@ -27,10 +46,17 @@ export class Plots extends BaseRepository<PlotsData> {
   }
 
   public getWebviewData() {
-    return this.experiments?.getLivePlots() || []
+    return {
+      live: this.experiments?.getLivePlots() || [],
+      static: this.staticPlots
+    }
   }
 
   private notifyChanged() {
     return this.sendWebviewData()
+  }
+
+  private setStaticPlots(data: PlotsOutput) {
+    this.staticPlots = data
   }
 }

@@ -1,6 +1,10 @@
-export type PlotData = { group: string; x: number; y: number }[]
+import { PlotsOutput } from '../../cli/reader'
 
-export type PlotsData = {
+export type LivePlotValues = { group: string; x: number; y: number }[]
+
+export type LivePlotData = {
   title: string
-  values: PlotData
-}[]
+  values: LivePlotValues
+}
+
+export type PlotsData = { live: LivePlotData[]; static: PlotsOutput }
