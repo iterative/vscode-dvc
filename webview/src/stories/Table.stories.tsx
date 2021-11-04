@@ -2,7 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
-import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import Experiments from '../experiments/components/Experiments'
 
@@ -24,7 +24,7 @@ export default {
   args: {
     tableData: {
       changes: workspaceChangesFixture,
-      columns: complexColumnData,
+      columns: columnsFixture,
       columnsOrder: [],
       rows: complexRowData,
       sorts: [

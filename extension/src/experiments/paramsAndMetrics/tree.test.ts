@@ -4,7 +4,7 @@ import { mocked } from 'ts-jest/utils'
 import { commands, TreeItem, TreeItemCollapsibleState, window } from 'vscode'
 import { ExperimentsParamsAndMetricsTree } from './tree'
 import { joinParamOrMetricPath } from './paths'
-import complexColumnData from '../../test/fixtures/complex-column-example'
+import columnsFixture from '../../test/fixtures/expShow/columns'
 import { Resource, ResourceLocator } from '../../resourceLocator'
 import { Status } from '../paramsAndMetrics/model'
 import { RegisteredCommands } from '../../commands/external'
@@ -60,7 +60,7 @@ beforeEach(() => {
 })
 
 describe('ExperimentsParamsAndMetricsTree', () => {
-  const rootParamsAndMetrics = complexColumnData
+  const rootParamsAndMetrics = columnsFixture
     .filter(paramOrMetric =>
       ['metrics', 'params'].includes(paramOrMetric.parentPath)
     )
@@ -182,7 +182,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       ])
 
       mockedGetChildParamsOrMetrics.mockReturnValueOnce(
-        complexColumnData
+        columnsFixture
           .filter(paramOrMetric => paramsPath === paramOrMetric.parentPath)
           .map(param => {
             if (param.path === processPath) {
@@ -250,7 +250,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       ])
 
       mockedGetChildParamsOrMetrics.mockReturnValueOnce(
-        complexColumnData
+        columnsFixture
           .filter(paramOrMetric => processPath === paramOrMetric.parentPath)
           .map(param => ({
             ...param,

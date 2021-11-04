@@ -12,7 +12,7 @@ import {
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
 import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
-import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import {
   MessageFromWebviewType,
   MessageToWebviewType,
@@ -75,7 +75,7 @@ describe('App', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
         data: {
-          columns: complexColumnData,
+          columns: columnsFixture,
           rows: complexRowData,
           sorts: []
         },

@@ -12,7 +12,7 @@ import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import expShowFixture from '../../fixtures/expShow/output'
 import complexRowData from '../../fixtures/complex-row-example'
-import complexColumnData from '../../fixtures/complex-column-example'
+import columnsFixture from '../../fixtures/expShow/columns'
 import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
@@ -101,7 +101,7 @@ suite('Experiments Test Suite', () => {
 
       const expectedTableData: TableData = {
         changes: workspaceChangesFixture,
-        columns: complexColumnData,
+        columns: columnsFixture,
         columnsOrder: [],
         rows: complexRowData,
         sorts: []
