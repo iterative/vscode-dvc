@@ -33,7 +33,7 @@ export abstract class BaseData<
     new EventEmitter<void>()
   )
 
-  private readonly onDidChangeFiles: Event<void> =
+  private readonly onDidChangeCollectedFiles: Event<void> =
     this.collectedFilesChanged.event
 
   private watcher?: Disposable
@@ -76,7 +76,7 @@ export abstract class BaseData<
         this.watcher = this.watchFiles()
 
         this.dispose.track(
-          this.onDidChangeFiles(() => {
+          this.onDidChangeCollectedFiles(() => {
             const watcher = this.watchFiles()
             this.dispose.untrack(this.watcher)
             this.watcher?.dispose()
@@ -99,12 +99,12 @@ export abstract class BaseData<
 
     const files = this.collectFiles(data)
 
-    this.checkFilesUpdated(files)
+    this.compareFiles(files)
 
     return this.notifyChanged(data)
   }
 
-  private checkFilesUpdated(files: string[]) {
+  private compareFiles(files: string[]) {
     if (sameContents(this.collectedFiles, files)) {
       return
     }
