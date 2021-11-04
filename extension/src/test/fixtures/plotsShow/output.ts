@@ -1,3 +1,5 @@
+import { VisualizationSpec } from 'react-vega'
+
 const data = {
   'logs/loss.tsv': {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -173,7 +175,7 @@ const data = {
         ]
       }
     ]
-  },
+  } as VisualizationSpec,
   'logs/acc.tsv': {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: {
@@ -348,7 +350,7 @@ const data = {
         ]
       }
     ]
-  },
+  } as VisualizationSpec,
   'predictions.json': {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: {
@@ -50447,7 +50449,7 @@ const data = {
         }
       ]
     }
-  }
+  } as VisualizationSpec
 }
 
 export default data
