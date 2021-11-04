@@ -1,13 +1,13 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
-import complexPlotsData from 'dvc/src/test/fixtures/complex-live-plots-example'
+import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import Plots from '../plots/components/Plots'
 import './test-vscode-styles.scss'
 
 export default {
   args: {
-    plotsData: complexPlotsData
+    plotsData: livePlotsFixture
   },
   component: Plots,
   title: 'Plots'

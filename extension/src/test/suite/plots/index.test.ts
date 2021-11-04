@@ -4,7 +4,7 @@ import { spy, restore } from 'sinon'
 import { buildExperiments } from '../experiments/util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
-import complexLivePlotsData from '../../fixtures/complex-live-plots-example'
+import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import { closeAllEditors, dvcDemoPath } from '../util'
 import { BaseWebview } from '../../../webview'
 import { PlotsData } from '../../../plots/webview/contract'
@@ -37,7 +37,7 @@ suite('Plots Test Suite', () => {
 
       const webview = await plots.showWebview()
 
-      const expectedPlotsData: PlotsData = complexLivePlotsData
+      const expectedPlotsData: PlotsData = livePlotsFixture
 
       expect(messageSpy).to.be.calledWith({ data: expectedPlotsData })
 
