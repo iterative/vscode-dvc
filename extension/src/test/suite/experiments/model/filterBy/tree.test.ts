@@ -5,7 +5,7 @@ import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import complexColumnData from '../../../../fixtures/complex-column-example'
 import complexRowData from '../../../../fixtures/complex-row-example'
-import complexChangesData from '../../../../fixtures/complex-changes-example'
+import workspaceChangesFixture from '../../../../fixtures/expShow/workspaceChanges'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
@@ -104,7 +104,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         data: {
-          changes: complexChangesData,
+          changes: workspaceChangesFixture,
           columns: complexColumnData,
           columnsOrder: [],
           rows: filteredRows,
@@ -128,7 +128,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await tableFilterRemoved
 
       const expectedTableData: TableData = {
-        changes: complexChangesData,
+        changes: workspaceChangesFixture,
         columns: complexColumnData,
         columnsOrder: [],
         rows: complexRowData,

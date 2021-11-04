@@ -3,7 +3,7 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 import { action } from '@storybook/addon-actions'
 import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
 import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
-import complexChangesData from 'dvc/src/test/fixtures/complex-changes-example'
+import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
@@ -23,7 +23,7 @@ export default {
   },
   args: {
     tableData: {
-      changes: complexChangesData,
+      changes: workspaceChangesFixture,
       columns: complexColumnData,
       columnsOrder: [],
       rows: complexRowData,

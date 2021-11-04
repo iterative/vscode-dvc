@@ -13,7 +13,7 @@ import { CliReader } from '../../../cli/reader'
 import expShowFixture from '../../fixtures/expShow/output'
 import complexRowData from '../../fixtures/complex-row-example'
 import complexColumnData from '../../fixtures/complex-column-example'
-import complexChangesData from '../../fixtures/complex-changes-example'
+import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -100,7 +100,7 @@ suite('Experiments Test Suite', () => {
       const webview = await experiments.showWebview()
 
       const expectedTableData: TableData = {
-        changes: complexChangesData,
+        changes: workspaceChangesFixture,
         columns: complexColumnData,
         columnsOrder: [],
         rows: complexRowData,
