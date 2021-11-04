@@ -1,4 +1,3 @@
-import omit from 'lodash.omit'
 import { PlotData, PlotsData } from '../../../plots/webview/contract'
 import {
   ExperimentFieldsOrError,
@@ -13,6 +12,22 @@ import { addToMapArray, addToMapCount } from '../../../util/map'
 
 type LivePlotAccumulator = Map<string, PlotData>
 
+const walkValueTree = (
+  treeOrValue: ValueTree | Value,
+  onValue: (value: Value, path: string[]) => void,
+  ancestors: string[] = []
+): void => {
+  if (typeof treeOrValue === 'object') {
+    Object.entries(treeOrValue as ValueTree).forEach(
+      ([childKey, childValue]) => {
+        return walkValueTree(childValue, onValue, [...ancestors, childKey])
+      }
+    )
+  } else {
+    onValue(treeOrValue as Value, ancestors)
+  }
+}
+
 const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
   displayName: string,
@@ -21,25 +36,15 @@ const collectFromMetricsFile = (
   value: Value | ValueTree,
   ancestors: string[] = []
 ) => {
-  const pathArray = [...ancestors, key].filter(Boolean) as string[]
+  return walkValueTree(
+    value,
+    (value, pathArray) => {
+      const path = joinParamOrMetricPath(...pathArray)
 
-  if (typeof value === 'object') {
-    Object.entries(value as ValueTree).forEach(([childKey, childValue]) => {
-      return collectFromMetricsFile(
-        acc,
-        displayName,
-        iteration,
-        childKey,
-        childValue,
-        pathArray
-      )
-    })
-    return
-  }
-
-  const path = joinParamOrMetricPath(...pathArray)
-
-  addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
+      addToMapArray(acc, path, { group: displayName, x: iteration, y: value })
+    },
+    [...ancestors, key].filter(Boolean) as string[]
+  )
 }
 
 type MetricsAndTipOrUndefined =
@@ -114,14 +119,37 @@ const collectFromExperimentsObject = (
   }
 }
 
+const collectFromWorkspace = (
+  acc: LivePlotAccumulator,
+  workspace: { baseline: ExperimentFieldsOrError }
+) => {
+  const workspaceMetrics = workspace.baseline.data?.metrics
+  if (workspaceMetrics) {
+    Object.entries(workspaceMetrics).forEach(([filename, { data }]) => {
+      if (data) {
+        walkValueTree(
+          data,
+          (_value, path) => {
+            const id = joinParamOrMetricPath(...path)
+            acc.set(id, [])
+          },
+          ['metrics', filename]
+        )
+      }
+    })
+  }
+}
+
 export const collectLivePlotsData = (
   data: ExperimentsRepoJSONOutput
 ): PlotsData => {
-  const acc = new Map<string, PlotData>()
+  const acc: LivePlotAccumulator = new Map<string, PlotData>()
 
-  for (const { baseline, ...experimentsObject } of Object.values(
-    omit(data, 'workspace')
-  )) {
+  const { workspace, ...rest } = data
+
+  collectFromWorkspace(acc, workspace)
+
+  for (const { baseline, ...experimentsObject } of Object.values(rest)) {
     const branch = transformExperimentData(baseline)
 
     if (branch) {
