@@ -11,7 +11,7 @@ import {
 } from './util'
 import { Disposable } from '../../extension'
 import { CliReader, ListOutput, StatusOutput } from '../../cli/reader'
-import complexExperimentsOutput from '../fixtures/complex-output-example'
+import expShowFixture from '../fixtures/expShow/output'
 import * as Disposer from '../../util/disposable'
 import { RegisteredCommands } from '../../commands/external'
 import * as Setup from '../../setup'
@@ -191,7 +191,7 @@ suite('Extension Test Suite', () => {
       const mockExperimentShow = stub(
         CliReader.prototype,
         'experimentShow'
-      ).resolves(complexExperimentsOutput)
+      ).resolves(expShowFixture)
 
       stub(CliReader.prototype, 'listDvcOnlyRecursive').resolves([
         { path: join('data', 'MNIST', 'raw', 't10k-images-idx3-ubyte') },

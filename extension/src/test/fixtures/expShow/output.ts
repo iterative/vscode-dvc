@@ -1,5 +1,5 @@
-import { join } from '../util/path'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { join } from '../../util/path'
+import { ExperimentsRepoJSONOutput } from '../../../cli/reader'
 
 const data: ExperimentsRepoJSONOutput = {
   workspace: {

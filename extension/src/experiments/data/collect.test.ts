@@ -1,11 +1,11 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
+import expShowFixture from '../../test/fixtures/expShow/output'
 
 describe('collectFiles', () => {
   it('should collect all of the available files from the test fixture', () => {
-    expect(collectFiles(complexExperimentsOutput)).toEqual([
+    expect(collectFiles(expShowFixture)).toEqual([
       'params.yaml',
       join('nested', 'params.yaml'),
       'summary.json'

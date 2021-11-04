@@ -10,7 +10,7 @@ import {
 } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
-import complexExperimentsOutput from '../../fixtures/complex-output-example'
+import expShowFixture from '../../fixtures/expShow/output'
 import complexRowData from '../../fixtures/complex-row-example'
 import complexColumnData from '../../fixtures/complex-column-example'
 import complexChangesData from '../../fixtures/complex-changes-example'
@@ -93,10 +93,7 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { experiments } = buildExperiments(
-        disposable,
-        complexExperimentsOutput
-      )
+      const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
@@ -144,10 +141,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(5000)
 
     it('should handle column reordering messages from the webview', async () => {
-      const { experiments } = buildExperiments(
-        disposable,
-        complexExperimentsOutput
-      )
+      const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const mockMessageReceived = disposable.track(
         new EventEmitter<MessageFromWebview>()
@@ -388,7 +382,7 @@ suite('Experiments Test Suite', () => {
           buildMockData()
         )
       )
-      testRepository.setState(complexExperimentsOutput)
+      testRepository.setState(expShowFixture)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -497,7 +491,7 @@ suite('Experiments Test Suite', () => {
           buildMockData()
         )
       )
-      testRepository.setState(complexExperimentsOutput)
+      testRepository.setState(expShowFixture)
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])

@@ -3,7 +3,7 @@ import { expect } from 'chai'
 import { spy, restore } from 'sinon'
 import { buildExperiments } from '../experiments/util'
 import { Disposable } from '../../../extension'
-import complexExperimentsOutput from '../../fixtures/complex-output-example'
+import expShowFixture from '../../fixtures/expShow/output'
 import complexLivePlotsData from '../../fixtures/complex-live-plots-example'
 import { closeAllEditors, dvcDemoPath } from '../util'
 import { BaseWebview } from '../../../webview'
@@ -25,7 +25,7 @@ suite('Plots Test Suite', () => {
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
       const { experiments, internalCommands, resourceLocator } =
-        buildExperiments(disposable, complexExperimentsOutput)
+        buildExperiments(disposable, expShowFixture)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
