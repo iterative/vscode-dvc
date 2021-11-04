@@ -129,10 +129,9 @@ export class CliReader extends Cli {
   }
 
   public experimentShow(cwd: string): Promise<ExperimentsRepoJSONOutput> {
-    return this.readProcessJson<ExperimentsRepoJSONOutput>(
+    return this.readShowProcessJson<ExperimentsRepoJSONOutput>(
       cwd,
-      Command.EXPERIMENT,
-      SubCommand.SHOW
+      Command.EXPERIMENT
     )
   }
 
@@ -165,11 +164,7 @@ export class CliReader extends Cli {
   }
 
   public plotsShow(cwd: string): Promise<PlotsOutput> {
-    return this.readProcessJson<PlotsOutput>(
-      cwd,
-      Command.PLOTS,
-      SubCommand.SHOW
-    )
+    return this.readShowProcessJson<PlotsOutput>(cwd, Command.PLOTS)
   }
 
   public async root(cwd: string): Promise<string | undefined> {
@@ -210,5 +205,9 @@ export class CliReader extends Cli {
       ...args,
       Flag.SHOW_JSON
     )
+  }
+
+  private readShowProcessJson<T>(cwd: string, command: Command): Promise<T> {
+    return this.readProcessJson<T>(cwd, command, SubCommand.SHOW)
   }
 }
