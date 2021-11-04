@@ -3408,6 +3408,13 @@
   dependencies:
     "@types/react" "*"
 
+"@types/react-vega@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@types/react-vega/-/react-vega-7.0.0.tgz#36e266d0c4841fc3ab8fb277a38d26d0d05cfceb"
+  integrity sha512-ZW+Sol0KQBi/t2tjoaEOvvKwAQF2u+ChBAfEEL6V/NXgd672XbVJ6x0pKm1fnL+YuZIG/jAZLYOfSEtaVDgs3A==
+  dependencies:
+    react-vega "*"
+
 "@types/react@*":
   version "17.0.20"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.20.tgz#a4284b184d47975c71658cd69e759b6bd37c3b8c"
@@ -12555,7 +12562,7 @@ react-textarea-autosize@^8.3.0:
     use-composed-ref "^1.0.0"
     use-latest "^1.0.0"
 
-react-vega@^7.4.4:
+react-vega@*, react-vega@^7.4.4:
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/react-vega/-/react-vega-7.4.4.tgz#098bca8761e8f9b9e7ab300beef434ca18dbb843"
   integrity sha512-zIQo5+iz82z0+tSHzhT0U32MkMtbzWJG4SVMEJoJlduQJvkeJCQ7qaqfjUaatOhiO8eqjE5oM81BadUAXZ5Njw==
