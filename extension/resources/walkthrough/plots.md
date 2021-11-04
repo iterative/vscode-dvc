@@ -1,6 +1,6 @@
 # Plots
 
-The extension will show three different categories of plots:
+The extension will show:
 
 - Live plots - based on selected experiments.
 - Static plots - equivalent of `dvc plots show`.
