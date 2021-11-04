@@ -1,5 +1,5 @@
 import React from 'react'
-import { PlotsData } from 'dvc/src/plots/webview/contract'
+import { LivePlotData, PlotsData } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { Config } from 'vega'
 
@@ -110,10 +110,10 @@ const Plot = ({
   )
 }
 
-const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
+const LivePlots = ({ plots }: { plots: LivePlotData[] }) => {
   return (
     <>
-      {plotsData?.live?.map(plotData => (
+      {plots.map(plotData => (
         <Plot
           values={plotData.values}
           title={plotData.title}
@@ -122,5 +122,76 @@ const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
       ))}
     </>
   )
+}
+
+const StaticPlots = ({
+  plots
+}: {
+  plots: Record<string, VisualizationSpec>
+}) => {
+  return (
+    <>
+      {Object.entries(plots || {})?.map(([path, spec]) => (
+        <VegaLite
+          actions={false}
+          config={config}
+          spec={spec}
+          renderer="svg"
+          key={`plot-${path}`}
+        />
+      ))}
+    </>
+  )
+}
+
+const PlotContainer = ({
+  component,
+  title
+}: {
+  component: JSX.Element
+  title: string
+}) => {
+  return (
+    <div>
+      <div
+        style={{
+          alignItems: 'center',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}
+      >
+        <h1>{title}</h1>
+      </div>
+      <div
+        style={{
+          alignItems: 'center',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}
+      >
+        {component}
+      </div>
+    </div>
+  )
+}
+
+const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
+  if (plotsData) {
+    return (
+      <>
+        <PlotContainer
+          component={<LivePlots plots={plotsData.live} />}
+          title="Live Experiments Plots"
+        />
+        <PlotContainer
+          component={<StaticPlots plots={plotsData.static} />}
+          title="Static Plots"
+        />
+      </>
+    )
+  }
+  return <></>
 }
 export default Plots
