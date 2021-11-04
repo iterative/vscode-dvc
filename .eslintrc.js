@@ -35,7 +35,6 @@ module.exports = {
         'sonarjs/no-duplicate-string': 'off'
       }
     },
-
     {
       // Webpack dependencies are meant to be devDependencies
       files: ['**/*/webpack.config.[tj]s'],
