@@ -111,7 +111,10 @@ const Plot = ({
 }
 
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  return (
+  if (!plotsData) {
+    return <p>Loading plots data...</p>
+  }
+  return plotsData.length > 0 ? (
     <>
       {plotsData?.map(plotData => (
         <Plot
@@ -120,6 +123,13 @@ const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
           key={`plot-${plotData.title}`}
         />
       ))}
+    </>
+  ) : (
+    <>
+      <p>There are no experiments to make plots from.</p>
+      <p>
+        <a href="command:dvc.runExperiment">Run an Experiment</a> to add some!
+      </p>
     </>
   )
 }

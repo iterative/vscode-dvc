@@ -62,6 +62,7 @@ export const createWebview = async (
     title,
     ViewColumn.Active,
     {
+      enableCommandUris: true,
       enableScripts: true,
       localResourceRoots: [Uri.file(distPath)],
       retainContextWhenHidden: true

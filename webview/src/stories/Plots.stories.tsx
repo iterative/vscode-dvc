@@ -20,3 +20,7 @@ export const WithData: Story<{ plotsData: PlotsData }> = ({ plotsData }) => {
 export const WithoutData: Story = () => {
   return <Plots plotsData={undefined} />
 }
+
+export const WithoutExperiments: Story = () => {
+  return <Plots plotsData={[]} />
+}
