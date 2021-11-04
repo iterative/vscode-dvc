@@ -108,6 +108,7 @@ export const autoRegisteredCommands = {
   EXPERIMENT_SHOW: 'experimentShow',
   LIST_DVC_ONLY: 'listDvcOnly',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
+  PLOTS_SHOW: 'plotsShow',
   STATUS: 'status'
 } as const
 
