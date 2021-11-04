@@ -4,7 +4,7 @@ import { stub, spy, restore } from 'sinon'
 import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
 import columnsFixture from '../../../../fixtures/expShow/columns'
-import complexRowData from '../../../../fixtures/complex-row-example'
+import rowsFixture from '../../../../fixtures/expShow/rows'
 import workspaceChangesFixture from '../../../../fixtures/expShow/workspaceChanges'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
@@ -81,7 +81,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const [workspace, master] = complexRowData
+      const [workspace, master] = rowsFixture
 
       const filteredRows = [
         workspace,
@@ -131,7 +131,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         changes: workspaceChangesFixture,
         columns: columnsFixture,
         columnsOrder: [],
-        rows: complexRowData,
+        rows: rowsFixture,
         sorts: []
       }
 

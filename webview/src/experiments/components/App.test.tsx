@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
-import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
+import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import {
   MessageFromWebviewType,
@@ -76,7 +76,7 @@ describe('App', () => {
       data: {
         data: {
           columns: columnsFixture,
-          rows: complexRowData,
+          rows: rowsFixture,
           sorts: []
         },
         type: MessageToWebviewType.setData

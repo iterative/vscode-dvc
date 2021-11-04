@@ -11,7 +11,7 @@ import {
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
 import expShowFixture from '../../fixtures/expShow/output'
-import complexRowData from '../../fixtures/complex-row-example'
+import rowsFixture from '../../fixtures/expShow/rows'
 import columnsFixture from '../../fixtures/expShow/columns'
 import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
@@ -103,7 +103,7 @@ suite('Experiments Test Suite', () => {
         changes: workspaceChangesFixture,
         columns: columnsFixture,
         columnsOrder: [],
-        rows: complexRowData,
+        rows: rowsFixture,
         sorts: []
       }
 
