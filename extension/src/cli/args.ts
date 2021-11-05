@@ -7,6 +7,7 @@ export enum Command {
   INITIALIZE = 'init',
   LIST = 'list',
   MOVE = 'move',
+  PLOTS = 'plots',
   PULL = 'pull',
   PUSH = 'push',
   REMOVE = 'remove',
@@ -14,6 +15,10 @@ export enum Command {
   STATUS = 'status',
   PARAMS = 'params',
   METRICS = 'metrics'
+}
+
+export enum SubCommand {
+  SHOW = 'show'
 }
 
 export enum Flag {
@@ -29,7 +34,6 @@ export enum ExperimentSubCommand {
   BRANCH = 'branch',
   GARBAGE_COLLECT = 'gc',
   LIST = 'list',
-  SHOW = 'show',
   REMOVE = 'remove',
   RUN = 'run'
 }

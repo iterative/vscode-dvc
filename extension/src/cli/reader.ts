@@ -1,3 +1,5 @@
+import isEqual from 'lodash.isequal'
+import { VisualizationSpec } from 'react-vega'
 import { Cli, typeCheckCommands } from '.'
 import {
   Args,
@@ -5,10 +7,12 @@ import {
   ExperimentFlag,
   ExperimentSubCommand,
   Flag,
-  ListFlag
+  ListFlag,
+  SubCommand
 } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
+import plotsShowFixture from '../test/fixtures/plotsShow/output'
 
 export type PathOutput = { path: string }
 
@@ -96,12 +100,15 @@ export interface ExperimentsRepoJSONOutput {
   }
 }
 
+export type PlotsOutput = Record<string, VisualizationSpec>
+
 export const autoRegisteredCommands = {
   DIFF: 'diff',
   EXPERIMENT_LIST_CURRENT: 'experimentListCurrent',
   EXPERIMENT_SHOW: 'experimentShow',
   LIST_DVC_ONLY: 'listDvcOnly',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
+  PLOTS_SHOW: 'plotsShow',
   STATUS: 'status'
 } as const
 
@@ -122,10 +129,9 @@ export class CliReader extends Cli {
   }
 
   public experimentShow(cwd: string): Promise<ExperimentsRepoJSONOutput> {
-    return this.readProcessJson<ExperimentsRepoJSONOutput>(
+    return this.readShowProcessJson<ExperimentsRepoJSONOutput>(
       cwd,
-      Command.EXPERIMENT,
-      ExperimentSubCommand.SHOW
+      Command.EXPERIMENT
     )
   }
 
@@ -157,6 +163,10 @@ export class CliReader extends Cli {
     )
   }
 
+  public plotsShow(cwd: string): Promise<PlotsOutput> {
+    return this.readShowProcessJson<PlotsOutput>(cwd, Command.PLOTS)
+  }
+
   public async root(cwd: string): Promise<string | undefined> {
     try {
       return await this.executeProcess(cwd, Command.ROOT)
@@ -172,6 +182,11 @@ export class CliReader extends Cli {
     formatter: typeof trimAndSplit | typeof JSON.parse,
     ...args: Args
   ): Promise<T> {
+    // Stubbed until DVC ready
+    if (isEqual(args, ['plots', 'show', '--show-json'])) {
+      return Promise.resolve(formatter(JSON.stringify(plotsShowFixture)))
+    }
+
     const output = await retry(
       () => this.executeProcess(cwd, ...args),
       args.join(' ')
@@ -190,5 +205,9 @@ export class CliReader extends Cli {
       ...args,
       Flag.SHOW_JSON
     )
+  }
+
+  private readShowProcessJson<T>(cwd: string, command: Command): Promise<T> {
+    return this.readProcessJson<T>(cwd, command, SubCommand.SHOW)
   }
 }
