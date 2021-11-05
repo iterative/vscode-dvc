@@ -4,7 +4,9 @@ import { PlotsData } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
 import plotsShowFixture from 'dvc/src/test/fixtures/plotsShow/output'
 import Plots from '../plots/components/Plots'
+
 import './test-vscode-styles.scss'
+import '../shared/style.scss'
 
 export default {
   args: {
