@@ -92,60 +92,6 @@ const config: Config = {
   }
 }
 
-const Plot = ({
-  values,
-  title
-}: {
-  values: { x: number; y: number; group: string }[]
-  title: string
-}) => {
-  const spec = createSpec(title)
-
-  return (
-    <VegaLite
-      actions={false}
-      config={config}
-      spec={spec}
-      data={{ values }}
-      renderer="svg"
-    />
-  )
-}
-
-const LivePlots = ({ plots }: { plots: LivePlotData[] }) => {
-  return (
-    <>
-      {plots.map(plotData => (
-        <Plot
-          values={plotData.values}
-          title={plotData.title}
-          key={`plot-${plotData.title}`}
-        />
-      ))}
-    </>
-  )
-}
-
-const StaticPlots = ({
-  plots
-}: {
-  plots: Record<string, VisualizationSpec>
-}) => {
-  return (
-    <>
-      {Object.entries(plots || {})?.map(([path, spec]) => (
-        <VegaLite
-          actions={false}
-          config={config}
-          spec={spec}
-          renderer="svg"
-          key={`plot-${path}`}
-        />
-      ))}
-    </>
-  )
-}
-
 const PlotContainer = ({
   component,
   title
@@ -179,24 +125,100 @@ const PlotContainer = ({
   )
 }
 
-const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  if (!plotsData || (isEmpty(plotsData?.live) && isEmpty(plotsData?.static))) {
-    return (
-      <div className={styles.box}>
-        <p className={styles.emptyText}>No Plots to Display</p>
-      </div>
-    )
+const Plot = ({
+  values,
+  title
+}: {
+  values: { x: number; y: number; group: string }[]
+  title: string
+}) => {
+  const spec = createSpec(title)
+
+  return (
+    <VegaLite
+      actions={false}
+      config={config}
+      spec={spec}
+      data={{ values }}
+      renderer="svg"
+    />
+  )
+}
+
+const LivePlots = ({ plots }: { plots: LivePlotData[] }) => {
+  if (!plots.length) {
+    return <></>
   }
+
+  return (
+    <PlotContainer
+      title="Live Experiments Plots"
+      component={
+        <>
+          {plots.map(plotData => (
+            <Plot
+              values={plotData.values}
+              title={plotData.title}
+              key={`plot-${plotData.title}`}
+            />
+          ))}
+        </>
+      }
+    />
+  )
+}
+
+const StaticPlots = ({
+  plots
+}: {
+  plots: Record<string, VisualizationSpec>
+}) => {
+  const entries = Object.entries(plots || {})
+  if (!entries.length) {
+    return <></>
+  }
+
+  return (
+    <PlotContainer
+      component={
+        <>
+          {Object.entries(plots || {})?.map(([path, spec]) => (
+            <VegaLite
+              actions={false}
+              config={config}
+              spec={spec}
+              renderer="svg"
+              key={`plot-${path}`}
+            />
+          ))}
+        </>
+      }
+      title="Static Plots"
+    />
+  )
+}
+
+const EmptyState = (text: string) => {
+  return (
+    <div className={styles.box}>
+      <p className={styles.emptyText}>{text}</p>
+    </div>
+  )
+}
+
+const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
+  if (!plotsData) {
+    return EmptyState('Plots Loading...')
+  }
+
+  if (isEmpty(plotsData?.live) && isEmpty(plotsData?.static)) {
+    return EmptyState('No Plots to Display')
+  }
+
   return (
     <>
-      <PlotContainer
-        component={<LivePlots plots={plotsData.live} />}
-        title="Live Experiments Plots"
-      />
-      <PlotContainer
-        component={<StaticPlots plots={plotsData.static} />}
-        title="Static Plots"
-      />
+      <LivePlots plots={plotsData.live} />
+      <StaticPlots plots={plotsData.static} />
     </>
   )
 }

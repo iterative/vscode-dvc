@@ -18,6 +18,18 @@ export const WithData: Story<{ plotsData: PlotsData }> = ({ plotsData }) => {
   return <Plots plotsData={plotsData} />
 }
 
+export const WithLiveOnly: Story = () => {
+  return <Plots plotsData={{ live: livePlotsFixture, static: {} }} />
+}
+
+export const WithStaticOnly: Story = () => {
+  return <Plots plotsData={{ live: [], static: plotsShowFixture }} />
+}
+
+export const WithoutPlots: Story = () => {
+  return <Plots plotsData={{ live: [], static: {} }} />
+}
+
 export const WithoutData: Story = () => {
   return <Plots plotsData={undefined} />
 }
