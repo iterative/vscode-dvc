@@ -1,5 +1,5 @@
-import { PlotsData } from './webview/contract'
-import { PlotsData as Data } from './data'
+import { PlotsData as TPlotsData } from './webview/contract'
+import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
@@ -8,14 +8,14 @@ import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
 import { PlotsOutput } from '../cli/reader'
 
-export type PlotsWebview = BaseWebview<PlotsData>
+export type PlotsWebview = BaseWebview<TPlotsData>
 
-export class Plots extends BaseRepository<PlotsData> {
+export class Plots extends BaseRepository<TPlotsData> {
   public readonly viewKey = ViewKey.PLOTS
 
   private experiments?: Experiments
 
-  private data: Data
+  private data: PlotsData
   private staticPlots: PlotsOutput = {}
 
   constructor(
@@ -25,7 +25,7 @@ export class Plots extends BaseRepository<PlotsData> {
   ) {
     super(dvcRoot, internalCommands, webviewIcon)
 
-    this.data = this.dispose.track(new Data(dvcRoot, internalCommands))
+    this.data = this.dispose.track(new PlotsData(dvcRoot, internalCommands))
 
     this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
   }
