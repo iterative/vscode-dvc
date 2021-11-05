@@ -1,4 +1,4 @@
-const complexChangesData = [
+const data = [
   'metrics:summary.json:accuracy',
   'metrics:summary.json:loss',
   'metrics:summary.json:val_accuracy',
@@ -7,4 +7,4 @@ const complexChangesData = [
   'params:params.yaml:learning_rate'
 ]
 
-export default complexChangesData
+export default data

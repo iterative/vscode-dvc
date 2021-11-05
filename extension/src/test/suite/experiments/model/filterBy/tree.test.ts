@@ -3,9 +3,9 @@ import { expect } from 'chai'
 import { stub, spy, restore } from 'sinon'
 import { window, commands, QuickPickItem } from 'vscode'
 import { Disposable } from '../../../../../extension'
-import complexColumnData from '../../../../fixtures/complex-column-example'
-import complexRowData from '../../../../fixtures/complex-row-example'
-import complexChangesData from '../../../../fixtures/complex-changes-example'
+import columnsFixture from '../../../../fixtures/expShow/columns'
+import rowsFixture from '../../../../fixtures/expShow/rows'
+import workspaceChangesFixture from '../../../../fixtures/expShow/workspaceChanges'
 import { WorkspaceExperiments } from '../../../../../experiments/workspace'
 import {
   getFilterId,
@@ -57,7 +57,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         value: '0.45'
       }
 
-      const accuracy = complexColumnData.find(
+      const accuracy = columnsFixture.find(
         paramOrMetric => paramOrMetric.path === accuracyPath
       )
       mockShowQuickPick
@@ -81,7 +81,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const [workspace, master] = complexRowData
+      const [workspace, master] = rowsFixture
 
       const filteredRows = [
         workspace,
@@ -104,8 +104,8 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(messageSpy).to.be.calledWith({
         data: {
-          changes: complexChangesData,
-          columns: complexColumnData,
+          changes: workspaceChangesFixture,
+          columns: columnsFixture,
           columnsOrder: [],
           rows: filteredRows,
           sorts: []
@@ -128,10 +128,10 @@ suite('Experiments Filter By Tree Test Suite', () => {
       await tableFilterRemoved
 
       const expectedTableData: TableData = {
-        changes: complexChangesData,
-        columns: complexColumnData,
+        changes: workspaceChangesFixture,
+        columns: columnsFixture,
         columnsOrder: [],
-        rows: complexRowData,
+        rows: rowsFixture,
         sorts: []
       }
 
@@ -150,7 +150,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       const lossPath = joinParamOrMetricPath('metrics', 'summary.json', 'loss')
 
-      const loss = complexColumnData.find(
+      const loss = columnsFixture.find(
         paramOrMetric => paramOrMetric.path === lossPath
       )
       mockShowQuickPick

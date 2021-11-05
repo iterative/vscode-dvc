@@ -2,7 +2,7 @@ import { join } from 'path'
 import { collectChanges, collectParamsAndMetrics } from './collect'
 import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
-import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
+import expShowFixture from '../../test/fixtures/expShow/output'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
 
 describe('collectParamsAndMetrics', () => {
@@ -363,7 +363,7 @@ describe('collectParamsAndMetrics', () => {
 
   it('should collect all params and metrics from the test fixture', () => {
     expect(
-      collectParamsAndMetrics(complexExperimentsOutput).map(({ path }) => path)
+      collectParamsAndMetrics(expShowFixture).map(({ path }) => path)
     ).toEqual([
       joinParamOrMetricPath('params', 'params.yaml', 'epochs'),
       joinParamOrMetricPath('params', 'params.yaml', 'learning_rate'),

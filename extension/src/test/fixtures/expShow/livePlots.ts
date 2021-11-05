@@ -1,4 +1,4 @@
-import { PlotsData } from '../../plots/webview/contract'
+import { PlotsData } from '../../../plots/webview/contract'
 
 const data: PlotsData = [
   {
