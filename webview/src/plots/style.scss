@@ -1,0 +1,25 @@
+* {
+  // box-sizing: border-box;
+  outline: none;
+  font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html,
+body,
+.react-root {
+  height: 100%;
+}
+
+.react-root {
+  display: inline-block;
+  max-width: fit-content;
+  width: inherit;
+}
+body {
+  margin: 0px;
+  padding: 0px;
+  border: 0px;
+
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+}

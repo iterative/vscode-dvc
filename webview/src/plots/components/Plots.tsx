@@ -1,7 +1,9 @@
 import React from 'react'
 import { LivePlotData, PlotsData } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
+import { isEmpty } from 'lodash'
 import { Config } from 'vega'
+import styles from './styles.module.scss'
 
 const createSpec = (title: string): VisualizationSpec => {
   return {
@@ -178,20 +180,25 @@ const PlotContainer = ({
 }
 
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  if (plotsData) {
+  if (!plotsData || (isEmpty(plotsData?.live) && isEmpty(plotsData?.static))) {
     return (
-      <>
-        <PlotContainer
-          component={<LivePlots plots={plotsData.live} />}
-          title="Live Experiments Plots"
-        />
-        <PlotContainer
-          component={<StaticPlots plots={plotsData.static} />}
-          title="Static Plots"
-        />
-      </>
+      <div className={styles.box}>
+        <p className={styles.emptyText}>No Plots to Display</p>
+      </div>
     )
   }
-  return <></>
+  return (
+    <>
+      <PlotContainer
+        component={<LivePlots plots={plotsData.live} />}
+        title="Live Experiments Plots"
+      />
+      <PlotContainer
+        component={<StaticPlots plots={plotsData.static} />}
+        title="Static Plots"
+      />
+    </>
+  )
 }
+
 export default Plots

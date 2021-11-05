@@ -1,0 +1,19 @@
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+.emptyText {
+  white-space: nowrap;
+  text-align: center;
+  overflow: hidden;
+  opacity: 0.8;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+// color: rgba(0,0,0,.68); - light
