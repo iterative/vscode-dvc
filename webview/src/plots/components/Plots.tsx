@@ -102,10 +102,10 @@ const PlotContainer = ({
 }) => {
   return (
     <div>
-      <div className={styles.box}>
+      <div className={styles.centered}>
         <h1>{title}</h1>
       </div>
-      <div className={styles.box}>{component}</div>
+      <div className={styles.centered}>{component}</div>
     </div>
   )
 }
@@ -185,7 +185,7 @@ const StaticPlots = ({
 
 const EmptyState = (text: string) => {
   return (
-    <div className={cx(styles.box, styles.fullScreen)}>
+    <div className={cx(styles.centered, styles.fullScreen)}>
       <p className={styles.emptyStateText}>{text}</p>
     </div>
   )
