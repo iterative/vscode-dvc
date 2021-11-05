@@ -7,7 +7,7 @@ import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChan
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
-import '../experiments/style.scss'
+import '../shared/style.scss'
 
 const dummyVsCodeApi = {
   postMessage: action('postMessage')
