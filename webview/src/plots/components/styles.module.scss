@@ -11,11 +11,15 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
   align-items: center;
   justify-content: center;
   margin: none;
+  flex-wrap: wrap;
+}
+
+.fullScreen {
   width: 100vw;
   height: 100vh;
 }
 
-.emptyText {
+.emptyStateText {
   white-space: nowrap;
   text-align: center;
   overflow: hidden;

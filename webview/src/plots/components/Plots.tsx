@@ -1,4 +1,5 @@
 import React from 'react'
+import cx from 'classnames'
 import { LivePlotData, PlotsData } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { isEmpty } from 'lodash'
@@ -101,26 +102,10 @@ const PlotContainer = ({
 }) => {
   return (
     <div>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center'
-        }}
-      >
+      <div className={styles.box}>
         <h1>{title}</h1>
       </div>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center'
-        }}
-      >
-        {component}
-      </div>
+      <div className={styles.box}>{component}</div>
     </div>
   )
 }
@@ -200,8 +185,8 @@ const StaticPlots = ({
 
 const EmptyState = (text: string) => {
   return (
-    <div className={styles.box}>
-      <p className={styles.emptyText}>{text}</p>
+    <div className={cx(styles.box, styles.fullScreen)}>
+      <p className={styles.emptyStateText}>{text}</p>
     </div>
   )
 }
