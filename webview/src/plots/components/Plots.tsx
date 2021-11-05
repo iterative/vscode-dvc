@@ -193,7 +193,7 @@ const EmptyState = (text: string) => {
 
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
   if (!plotsData) {
-    return EmptyState('Plots Loading...')
+    return EmptyState('Loading Plots...')
   }
 
   if (isEmpty(plotsData?.live) && isEmpty(plotsData?.static)) {
