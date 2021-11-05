@@ -19,6 +19,7 @@ import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import * as Messaging from '../../util/useMessaging'
 import { ExperimentsTable } from '../Experiments'
+jest.mock('../../../shared/api')
 
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })

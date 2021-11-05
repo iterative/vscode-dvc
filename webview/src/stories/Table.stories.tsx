@@ -14,13 +14,6 @@ const dummyVsCodeApi = {
 }
 
 export default {
-  argTypes: {
-    vsCodeApi: {
-      table: {
-        disable: true
-      }
-    }
-  },
   args: {
     tableData: {
       changes: workspaceChangesFixture,
@@ -38,10 +31,10 @@ export default {
   title: 'Table'
 } as Meta
 
-export const WithData: Story = ({ tableData, vsCodeApi }) => {
-  return <Experiments tableData={tableData} vsCodeApi={vsCodeApi} />
+export const WithData: Story = ({ tableData }) => {
+  return <Experiments tableData={tableData} />
 }
 
-export const WithoutData: Story = ({ vsCodeApi }) => {
-  return <Experiments tableData={undefined} vsCodeApi={vsCodeApi} />
+export const WithoutData: Story = () => {
+  return <Experiments tableData={undefined} />
 }
