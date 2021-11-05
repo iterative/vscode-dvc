@@ -8,6 +8,7 @@ module.exports = {
     '\\.(scss|css|less)$': 'identity-obj-proxy'
   },
   preset: 'ts-jest',
+  setupFiles: ['jest-canvas-mock'],
   testEnvironment: 'node',
   testTimeout: 10000
 }

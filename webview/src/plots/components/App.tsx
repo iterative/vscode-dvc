@@ -2,26 +2,24 @@ import React, { useEffect, useState } from 'react'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
+  MessageToWebview,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import Plots from './Plots'
-import { InternalVsCodeApi } from '../../shared/api'
-
-declare global {
-  function acquireVsCodeApi(): InternalVsCodeApi
-}
-
-const vsCodeApi = acquireVsCodeApi()
+import { vsCodeApi } from '../util/vscode'
 
 const signalInitialized = () =>
   vsCodeApi.postMessage({ type: MessageFromWebviewType.initialized })
 
-const App = () => {
+export const App = () => {
   const [plotsData, setPlotsData] = useState<PlotsData>()
-  const [dvcRoot, setDvcRoot] = useState()
+  const [dvcRoot, setDvcRoot] = useState<string>()
   useEffect(() => {
-    signalInitialized()
-    window.addEventListener('message', ({ data }) => {
+    const messageListener = ({
+      data
+    }: {
+      data: MessageToWebview<PlotsData>
+    }) => {
       switch (data.type) {
         case MessageToWebviewType.setData: {
           setPlotsData(data.data)
@@ -31,7 +29,10 @@ const App = () => {
           setDvcRoot(data.dvcRoot)
         }
       }
-    })
+    }
+    window.addEventListener('message', messageListener)
+    signalInitialized()
+    return () => window.removeEventListener('message', messageListener)
   }, [])
   useEffect(() => {
     vsCodeApi.setState({
@@ -41,5 +42,3 @@ const App = () => {
   }, [plotsData, dvcRoot])
   return <Plots plotsData={plotsData} />
 }
-
-export default App

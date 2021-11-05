@@ -1,7 +1,10 @@
 import React from 'react'
-import { PlotsData } from 'dvc/src/plots/webview/contract'
+import cx from 'classnames'
+import { LivePlotData, PlotsData } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
+import { isEmpty } from 'lodash'
 import { Config } from 'vega'
+import styles from './styles.module.scss'
 
 const createSpec = (title: string): VisualizationSpec => {
   return {
@@ -90,6 +93,23 @@ const config: Config = {
   }
 }
 
+const PlotContainer = ({
+  component,
+  title
+}: {
+  component: JSX.Element
+  title: string
+}) => {
+  return (
+    <div>
+      <div className={styles.centered}>
+        <h1>{title}</h1>
+      </div>
+      <div className={styles.centered}>{component}</div>
+    </div>
+  )
+}
+
 const Plot = ({
   values,
   title
@@ -110,17 +130,82 @@ const Plot = ({
   )
 }
 
+const LivePlots = ({ plots }: { plots: LivePlotData[] }) => {
+  if (!plots.length) {
+    return <></>
+  }
+
+  return (
+    <PlotContainer
+      title="Live Experiments Plots"
+      component={
+        <>
+          {plots.map(plotData => (
+            <Plot
+              values={plotData.values}
+              title={plotData.title}
+              key={`plot-${plotData.title}`}
+            />
+          ))}
+        </>
+      }
+    />
+  )
+}
+
+const StaticPlots = ({
+  plots
+}: {
+  plots: Record<string, VisualizationSpec>
+}) => {
+  const entries = Object.entries(plots || {})
+  if (!entries.length) {
+    return <></>
+  }
+
+  return (
+    <PlotContainer
+      component={
+        <>
+          {Object.entries(plots || {})?.map(([path, spec]) => (
+            <VegaLite
+              actions={false}
+              config={config}
+              spec={spec}
+              renderer="svg"
+              key={`plot-${path}`}
+            />
+          ))}
+        </>
+      }
+      title="Static Plots"
+    />
+  )
+}
+
+const EmptyState = (text: string) => {
+  return (
+    <div className={cx(styles.centered, styles.fullScreen)}>
+      <p className={styles.emptyStateText}>{text}</p>
+    </div>
+  )
+}
+
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
+  if (!plotsData) {
+    return EmptyState('Loading Plots...')
+  }
+
+  if (isEmpty(plotsData?.live) && isEmpty(plotsData?.static)) {
+    return EmptyState('No Plots to Display')
+  }
+
   return (
     <>
-      {plotsData?.live?.map(plotData => (
-        <Plot
-          values={plotData.values}
-          title={plotData.title}
-          key={`plot-${plotData.title}`}
-        />
-      ))}
+      <LivePlots plots={plotsData.live} />
+      <StaticPlots plots={plotsData.static} />
     </>
   )
 }
+
 export default Plots

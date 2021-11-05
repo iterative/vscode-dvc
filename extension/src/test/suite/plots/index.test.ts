@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { spy, restore } from 'sinon'
+import { spy, stub, restore } from 'sinon'
 import { buildExperiments } from '../experiments/util'
 import { Disposable } from '../../../extension'
+import { CliReader } from '../../../cli/reader'
 import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
@@ -29,6 +30,9 @@ suite('Plots Test Suite', () => {
         buildExperiments(disposable, expShowFixture)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
+      const mockPlotsShow = stub(CliReader.prototype, 'plotsShow').resolves(
+        plotsShowFixture
+      )
 
       const plots = disposable.track(
         new Plots(dvcDemoPath, internalCommands, resourceLocator.scatterGraph)
@@ -44,6 +48,7 @@ suite('Plots Test Suite', () => {
       }
 
       expect(messageSpy).to.be.calledWith({ data: expectedPlotsData })
+      expect(mockPlotsShow).to.be.called
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true

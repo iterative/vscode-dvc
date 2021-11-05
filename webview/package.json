@@ -61,6 +61,7 @@
     "fork-ts-checker-webpack-plugin": "^6.2.12",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^27.0.5",
+    "jest-canvas-mock": "^2.3.1",
     "lint-staged": "^11.0.0",
     "raw-loader": "^4.0.2",
     "react-beautiful-dnd-test-utils": "^3.2.2",
