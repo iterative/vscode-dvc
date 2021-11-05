@@ -16,7 +16,7 @@ describe('isValidState', () => {
   it('Successfully validates an empty plots state', () => {
     expect(
       isValidState(ViewKey.PLOTS, {
-        data: { live: [], static: {} },
+        data: { live: undefined, static: {} },
         dvcRoot
       })
     ).toBe(true)

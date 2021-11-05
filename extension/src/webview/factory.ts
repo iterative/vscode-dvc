@@ -6,6 +6,7 @@ import { InternalCommands } from '../commands/internal'
 import { Resource } from '../resourceLocator'
 import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
+import { hasKey } from '../util/object'
 
 const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as TableData
@@ -14,7 +15,7 @@ const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as PlotsData
-  return !!(data?.live && data?.static)
+  return !!(hasKey(data, 'live') && hasKey(data, 'static'))
 }
 
 export const isValidState = (
