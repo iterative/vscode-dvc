@@ -12,7 +12,6 @@ import {
 } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
-import plotsShowFixture from '../test/fixtures/plotsShow/output'
 
 export type PathOutput = { path: string }
 
@@ -184,7 +183,7 @@ export class CliReader extends Cli {
   ): Promise<T> {
     // Stubbed until DVC ready
     if (isEqual(args, ['plots', 'show', '--show-json'])) {
-      return Promise.resolve(formatter(JSON.stringify(plotsShowFixture)))
+      return Promise.resolve({} as T)
     }
 
     const output = await retry(
