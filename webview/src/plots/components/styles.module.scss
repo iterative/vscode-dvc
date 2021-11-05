@@ -1,3 +1,11 @@
+// Dark
+
+$watermark-color: rgba(255, 255, 255, 0.6);
+
+// Light
+
+$watermark-color-light: rgba(0, 0, 0, 0.68);
+
 .box {
   display: flex;
   align-items: center;
@@ -13,7 +21,11 @@
   overflow: hidden;
   opacity: 0.8;
   letter-spacing: 0.04em;
-  color: rgba(255, 255, 255, 0.6);
-}
+  color: $watermark-color;
 
-// color: rgba(0,0,0,.68); - light
+  @at-root {
+    :global(.vscode-light) & {
+      color: $watermark-color-light;
+    }
+  }
+}
