@@ -1,6 +1,6 @@
-import { PlotsData } from '../../../plots/webview/contract'
+import { LivePlotData } from '../../../plots/webview/contract'
 
-const data: PlotsData = [
+const data: LivePlotData[] = [
   {
     title: 'metrics:summary.json:loss',
     values: [

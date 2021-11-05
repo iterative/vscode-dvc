@@ -5,6 +5,7 @@ import { buildExperiments } from '../experiments/util'
 import { Disposable } from '../../../extension'
 import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
+import plotsShowFixture from '../../fixtures/plotsShow/output'
 import { closeAllEditors, dvcDemoPath } from '../util'
 import { BaseWebview } from '../../../webview'
 import { PlotsData } from '../../../plots/webview/contract'
@@ -37,7 +38,10 @@ suite('Plots Test Suite', () => {
 
       const webview = await plots.showWebview()
 
-      const expectedPlotsData: PlotsData = livePlotsFixture
+      const expectedPlotsData: PlotsData = {
+        live: livePlotsFixture,
+        static: plotsShowFixture
+      }
 
       expect(messageSpy).to.be.calledWith({ data: expectedPlotsData })
 

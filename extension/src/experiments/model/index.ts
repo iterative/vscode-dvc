@@ -12,7 +12,7 @@ import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import { PlotsData } from '../../plots/webview/contract'
+import { LivePlotData } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
   sortBy = 'sortBy:',
@@ -26,7 +26,7 @@ export class ExperimentsModel {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private livePlots: PlotsData = []
+  private livePlots: LivePlotData[] = []
 
   private filters: Map<string, FilterDefinition> = new Map()
 

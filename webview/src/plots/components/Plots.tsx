@@ -113,7 +113,7 @@ const Plot = ({
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
   return (
     <>
-      {plotsData?.map(plotData => (
+      {plotsData?.live?.map(plotData => (
         <Plot
           values={plotData.values}
           title={plotData.title}
