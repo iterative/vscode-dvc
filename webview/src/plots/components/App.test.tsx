@@ -11,7 +11,6 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import plotsShowFixture from 'dvc/src/test/fixtures/plotsShow/output'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -68,7 +67,7 @@ describe('App', () => {
 
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
-        data: { live: livePlotsFixture, static: plotsShowFixture },
+        data: { live: livePlotsFixture, static: {} },
         type: MessageToWebviewType.setData
       }
     })
