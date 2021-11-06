@@ -27,7 +27,7 @@ module.exports = {
     config.plugins.push(
       new webpack.NormalModuleReplacementPlugin(
         /src\/shared\/api/,
-        './__mocks__/webpackApi.ts'
+        './__mocks__/storybookApi.ts'
       )
     )
     return config
