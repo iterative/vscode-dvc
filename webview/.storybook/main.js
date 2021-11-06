@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 module.exports = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
@@ -20,5 +22,14 @@ module.exports = {
   },
   typescript: {
     reactDocgen: false
+  },
+  webpackFinal: config => {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /src\/shared\/api/,
+        './__mocks__/webpackApi.ts'
+      )
+    )
+    return config
   }
 }
