@@ -222,36 +222,38 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       expect(mockShowInputBox).not.to.be.called
     })
-  })
 
-  it('should handle the user exiting from the choose repository quick pick', async () => {
-    const mockShowQuickPick = stub(window, 'showQuickPick')
+    it('should handle the user exiting from the choose repository quick pick', async () => {
+      const mockShowQuickPick = stub(window, 'showQuickPick')
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
-      dvcDemoPath,
-      'mockRoot'
-    ])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub((WorkspaceExperiments as any).prototype, 'getDvcRoots').returns([
+        dvcDemoPath,
+        'mockRoot'
+      ])
 
-    const getRepositorySpy = spy(
-      WorkspaceExperiments.prototype,
-      'getRepository'
-    )
+      const getRepositorySpy = spy(
+        WorkspaceExperiments.prototype,
+        'getRepository'
+      )
 
-    mockShowQuickPick.resolves(undefined)
+      mockShowQuickPick.resolves(undefined)
 
-    await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTER_ADD)
 
-    expect(
-      getRepositorySpy,
-      'should not call get repository in addFilter without a root'
-    ).not.to.be.called
+      expect(
+        getRepositorySpy,
+        'should not call get repository in addFilter without a root'
+      ).not.to.be.called
 
-    await commands.executeCommand(RegisteredCommands.EXPERIMENT_FILTERS_REMOVE)
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_FILTERS_REMOVE
+      )
 
-    expect(
-      getRepositorySpy,
-      'should not call get repository in removeFilters without a root'
-    ).not.to.be.called
+      expect(
+        getRepositorySpy,
+        'should not call get repository in removeFilters without a root'
+      ).not.to.be.called
+    })
   })
 })
