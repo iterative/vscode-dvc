@@ -53,9 +53,10 @@ const getFirstCellProps = (
   })
 }
 
-export const FirstCell: React.FC<{
+const FirstCell: React.FC<{
   cell: Cell<Experiment, unknown>
-}> = ({ cell }) => {
+  bulletColor?: string
+}> = ({ cell, bulletColor }) => {
   const { row } = cell
 
   const firstCellProps = getFirstCellProps(cell, row)
@@ -73,7 +74,7 @@ export const FirstCell: React.FC<{
           />
         )}
       </span>
-      <span className={styles.bullet} />
+      <span className={styles.bullet} style={{ color: bulletColor }} />
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
@@ -142,7 +143,7 @@ export const RowContent: React.FC<
       })}
       data-testid={isWorkspace && 'workspace-row'}
     >
-      <FirstCell cell={firstCell} />
+      <FirstCell cell={firstCell} bulletColor={original.displayColor} />
       {getCells(cells, isWorkspace ? changes : undefined)}
     </div>
   )
