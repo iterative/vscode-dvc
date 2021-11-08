@@ -19,12 +19,11 @@ import {
   WebviewColorTheme
 } from 'dvc/src/webview/contract'
 import { App } from './App'
-import { getVsCodeApi } from '../model/vsCodeApi'
+import { vsCodeApi } from '../../shared/api'
 
-jest.mock('../model/vsCodeApi')
+jest.mock('../../shared/api')
 
-const { postMessage, getState } = getVsCodeApi()
-const mockGetVsCodeApi = mocked(getVsCodeApi)
+const { postMessage, getState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 
@@ -53,7 +52,6 @@ describe('App', () => {
     describe('When we render the App', () => {
       it('Then a message should be sent to the extension on the first render', () => {
         render(<App />)
-        expect(mockGetVsCodeApi).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
           type: MessageFromWebviewType.initialized
         })

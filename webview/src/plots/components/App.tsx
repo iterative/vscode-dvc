@@ -6,7 +6,7 @@ import {
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import Plots from './Plots'
-import { vsCodeApi } from '../util/vscode'
+import { vsCodeApi } from '../../shared/api'
 
 const signalInitialized = () =>
   vsCodeApi.postMessage({ type: MessageFromWebviewType.initialized })
