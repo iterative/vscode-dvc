@@ -20,9 +20,12 @@ const includeDependency = (location: string) => {
   })
 }
 
-const includeREADME = () =>
+const includeFiles = () =>
   new CopyWebpackPlugin({
-    patterns: [{ from: r('../README.md'), to: r('README.md') }]
+    patterns: ['README.md', 'LICENSE'].map(file => ({
+      from: r(`../${file}`),
+      to: r('.')
+    }))
   })
 
 module.exports = {
@@ -58,7 +61,7 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     includeDependency(r('../webview/')),
-    includeREADME()
+    includeFiles()
   ],
   resolve: {
     extensions: ['.ts', '.js'],

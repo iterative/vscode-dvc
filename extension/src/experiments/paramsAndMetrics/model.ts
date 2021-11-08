@@ -3,7 +3,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { collectChanges, collectParamsAndMetrics } from './collect'
 import { ParamOrMetric } from '../webview/contract'
 import { flatten } from '../../util/array'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/reader'
 
 export enum Status {
   selected = 2,
@@ -51,7 +51,7 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  public transformAndSet(data: ExperimentsRepoJSONOutput) {
+  public transformAndSet(data: ExperimentsOutput) {
     return Promise.all([
       this.transformAndSetParamsAndMetrics(data),
       this.transformAndSetChanges(data)
@@ -117,7 +117,7 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  private transformAndSetParamsAndMetrics(data: ExperimentsRepoJSONOutput) {
+  private transformAndSetParamsAndMetrics(data: ExperimentsOutput) {
     const paramsAndMetrics = collectParamsAndMetrics(data)
 
     paramsAndMetrics.forEach(paramOrMetric => {
@@ -129,7 +129,7 @@ export class ParamsAndMetricsModel {
     this.data = paramsAndMetrics
   }
 
-  private transformAndSetChanges(data: ExperimentsRepoJSONOutput) {
+  private transformAndSetChanges(data: ExperimentsOutput) {
     this.paramsAndMetricsChanges = collectChanges(data)
   }
 

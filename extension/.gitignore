@@ -1,3 +1,4 @@
 *.vsix
 .vscode-test
 README.md
+LICENSE

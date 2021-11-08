@@ -2,7 +2,7 @@ import omit from 'lodash.omit'
 import { LivePlotValues, LivePlotData } from '../../../plots/webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentsRepoJSONOutput,
+  ExperimentsOutput,
   Value,
   ValueTree
 } from '../../../cli/reader'
@@ -115,7 +115,7 @@ const collectFromExperimentsObject = (
 }
 
 export const collectLivePlotsData = (
-  data: ExperimentsRepoJSONOutput
+  data: ExperimentsOutput
 ): LivePlotData[] => {
   const acc = new Map<string, LivePlotValues>()
 

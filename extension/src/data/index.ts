@@ -5,12 +5,10 @@ import { Deferred } from '@hediet/std/synchronization'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { CommandId, InternalCommands } from '../commands/internal'
-import { ExperimentsRepoJSONOutput, PlotsOutput } from '../cli/reader'
+import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
 import { sameContents, uniqueValues } from '../util/array'
 
-export abstract class BaseData<
-  T extends PlotsOutput | ExperimentsRepoJSONOutput
-> {
+export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   public readonly dispose = Disposable.fn()
   public readonly onDidUpdate: Event<T>
 
