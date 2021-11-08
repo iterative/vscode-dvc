@@ -1,7 +1,7 @@
 import { join } from '../../util/path'
-import { ExperimentsRepoJSONOutput } from '../../../cli/reader'
+import { ExperimentsOutput } from '../../../cli/reader'
 
-const data: ExperimentsRepoJSONOutput = {
+const data: ExperimentsOutput = {
   workspace: {
     baseline: {
       data: {

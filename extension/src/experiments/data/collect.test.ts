@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { collectFiles } from './collect'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/reader'
 import expShowFixture from '../../test/fixtures/expShow/output'
 
 describe('collectFiles', () => {
@@ -74,7 +74,7 @@ describe('collectFiles', () => {
           }
         }
       }
-    } as ExperimentsRepoJSONOutput
+    } as ExperimentsOutput
 
     expect(collectFiles(workspace).sort()).toEqual([
       'further/nested/params.yaml',

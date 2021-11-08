@@ -9,8 +9,8 @@ import {
 import {
   ExperimentFields,
   ExperimentFieldsOrError,
-  ExperimentsBranchJSONOutput,
-  ExperimentsRepoJSONOutput,
+  ExperimentsBranchOutput,
+  ExperimentsOutput,
   Value,
   ValueTree
 } from '../../cli/reader'
@@ -167,7 +167,7 @@ const collectFromExperimentsObject = (
 
 const collectFromBranchesObject = (
   acc: Accumulator,
-  branchesObject: { [name: string]: ExperimentsBranchJSONOutput }
+  branchesObject: { [name: string]: ExperimentsBranchOutput }
 ) => {
   for (const { baseline, ...experiments } of Object.values(branchesObject)) {
     const branch = extractExperimentFields(baseline)
@@ -232,7 +232,7 @@ const transformAndCollect = (
 }
 
 export const collectParamsAndMetrics = (
-  data: ExperimentsRepoJSONOutput
+  data: ExperimentsOutput
 ): ParamOrMetric[] => {
   const { workspace, ...branchesObject } = data
   const workspaceBaseline = extractExperimentFields(workspace.baseline)
@@ -304,7 +304,7 @@ const collectParamsAndMetricsChanges = (
 const getData = (value: { baseline: ExperimentFieldsOrError }) =>
   value.baseline.data || {}
 
-export const collectChanges = (data: ExperimentsRepoJSONOutput): string[] => {
+export const collectChanges = (data: ExperimentsOutput): string[] => {
   const changes: string[] = []
 
   const { workspace, currentCommit } = Object.entries(data).reduce(

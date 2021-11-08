@@ -11,7 +11,7 @@ import { collectExperiments } from './collect'
 import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/reader'
 import { LivePlotData } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
@@ -48,7 +48,7 @@ export class ExperimentsModel {
     return this.livePlots
   }
 
-  public async transformAndSet(data: ExperimentsRepoJSONOutput) {
+  public async transformAndSet(data: ExperimentsOutput) {
     const [
       { workspace, branches, experimentsByBranch, checkpointsByTip },
       livePlots
