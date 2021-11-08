@@ -12,17 +12,19 @@ import styles from './styles.module.scss'
 
 const createSpec = (
   title: string,
-  scale: LivePlotsColors
+  scale?: LivePlotsColors
 ): VisualizationSpec => {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     encoding: {
-      color: {
-        field: 'symbol',
-        scale,
-        type: 'nominal'
-      },
+      color: scale
+        ? {
+            field: 'symbol',
+            scale,
+            type: 'nominal'
+          }
+        : undefined,
       x: { field: 'x', title: 'iteration', type: 'nominal' }
     },
     height: 300,
@@ -131,7 +133,7 @@ const Plot = ({
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
-  scale: LivePlotsColors
+  scale?: LivePlotsColors
 }) => {
   const spec = createSpec(title, scale)
 
@@ -151,7 +153,7 @@ const LivePlots = ({
   colors
 }: {
   plots: LivePlotData[]
-  colors: LivePlotsColors
+  colors?: LivePlotsColors
 }) => {
   if (!plots.length) {
     return <></>
@@ -225,10 +227,7 @@ const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
 
   return (
     <>
-      <LivePlots
-        plots={plotsData.live.plots}
-        colors={plotsData.live?.colors || { domain: [], range: [] }}
-      />
+      <LivePlots plots={plotsData.live.plots} colors={plotsData.live.colors} />
       <StaticPlots plots={plotsData.static} />
     </>
   )
