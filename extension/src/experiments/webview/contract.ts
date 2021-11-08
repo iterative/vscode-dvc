@@ -10,6 +10,7 @@ export interface Experiment extends BaseExperimentFields {
   displayName: string
   params?: ParamsOrMetrics
   metrics?: ParamsOrMetrics
+  displayColor?: string
 }
 
 export interface RowData extends Experiment {
