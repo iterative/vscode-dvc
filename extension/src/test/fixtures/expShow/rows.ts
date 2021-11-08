@@ -1,6 +1,15 @@
 import { join } from '../../util/path'
 import { RowData } from '../../../experiments/webview/contract'
 
+const vsCodeChartsColors = {
+  chartsRed: { dark: '#F14C4C', light: '#E51400' },
+  chartsBlue: { dark: '#3794FF', light: '#1a85ff' },
+  chartsYellow: { dark: '#CCA700', light: '#BF8803' },
+  chartsOrange: { light: '#d18616', dark: '#d18616' },
+  chartsGreen: { dark: '#89D185', light: '#388A34' },
+  chartsPurple: { dark: '#B180D7', light: '#652D90' }
+}
+
 const data: RowData[] = [
   {
     timestamp: null,
@@ -91,6 +100,7 @@ const data: RowData[] = [
         name: 'exp-e7a67',
         checkpoint_parent: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9',
         displayName: 'exp-e7a67',
+        displayColor: vsCodeChartsColors.chartsRed.dark,
         id: '4fb124aebddb2adf1545030907687fa9a4c80e70',
         subRows: [
           {
@@ -122,6 +132,7 @@ const data: RowData[] = [
             },
             checkpoint_parent: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53',
             displayName: 'd1343a8',
+            displayColor: vsCodeChartsColors.chartsRed.dark,
             id: 'd1343a87c6ee4a2e82d19525964d2fb2cb6756c9'
           },
           {
@@ -152,6 +163,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+            displayColor: vsCodeChartsColors.chartsRed.dark,
             displayName: '1ee5f2e',
             id: '1ee5f2ecb0fa4d83cbf614386536344cf894dd53'
           }
@@ -186,6 +198,7 @@ const data: RowData[] = [
         },
         name: 'test-branch',
         checkpoint_parent: '217312476f8854dda1865450b737eb6bc7a3ba1b',
+        displayColor: vsCodeChartsColors.chartsBlue.dark,
         displayName: 'test-branch',
         id: '42b8736b08170529903cd203a1f40382a4b4a8cd',
         subRows: [
@@ -217,6 +230,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '9523bde67538cf31230efaff2dbc47d38a944ab5',
+            displayColor: vsCodeChartsColors.chartsBlue.dark,
             displayName: '2173124',
             id: '217312476f8854dda1865450b737eb6bc7a3ba1b'
           },
@@ -248,6 +262,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+            displayColor: vsCodeChartsColors.chartsBlue.dark,
             displayName: '9523bde',
             id: '9523bde67538cf31230efaff2dbc47d38a944ab5'
           }
@@ -282,6 +297,7 @@ const data: RowData[] = [
         },
         name: 'exp-83425',
         checkpoint_parent: '22e40e1fa3c916ac567f69b85969e3066a91dda4',
+        displayColor: vsCodeChartsColors.chartsYellow.dark,
         displayName: 'exp-83425',
         id: '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
         subRows: [
@@ -313,6 +329,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15',
+            displayColor: vsCodeChartsColors.chartsYellow.dark,
             displayName: '22e40e1',
             id: '22e40e1fa3c916ac567f69b85969e3066a91dda4'
           },
@@ -344,6 +361,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361',
+            displayColor: vsCodeChartsColors.chartsYellow.dark,
             displayName: '91116c1',
             id: '91116c1eae4b79cb1f5ab0312dfd9b3e43608e15'
           },
@@ -375,6 +393,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880',
+            displayColor: vsCodeChartsColors.chartsYellow.dark,
             displayName: 'e821416',
             id: 'e821416bfafb4bc28b3e0a8ddb322505b0ad2361'
           },
@@ -406,6 +425,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '23250b33e3d6dd0e136262d1d26a2face031cb03',
+            displayColor: vsCodeChartsColors.chartsYellow.dark,
             displayName: 'c658f8b',
             id: 'c658f8b14ac819ac2a5ea0449da6c15dbe8eb880'
           },
@@ -437,6 +457,7 @@ const data: RowData[] = [
               }
             },
             checkpoint_parent: '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77',
+            displayColor: vsCodeChartsColors.chartsYellow.dark,
             displayName: '23250b3',
             id: '23250b33e3d6dd0e136262d1d26a2face031cb03'
           }
@@ -458,6 +479,7 @@ const data: RowData[] = [
           }
         },
         queued: true,
+        displayColor: vsCodeChartsColors.chartsYellow.dark,
         displayName: '90aea7f',
         id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
       }
