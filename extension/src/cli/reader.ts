@@ -87,13 +87,13 @@ export interface ExperimentFieldsOrError {
   error?: { type: string; msg: string }
 }
 
-export interface ExperimentsBranchJSONOutput {
+export interface ExperimentsBranchOutput {
   [sha: string]: ExperimentFieldsOrError
   baseline: ExperimentFieldsOrError
 }
 
-export interface ExperimentsRepoJSONOutput {
-  [name: string]: ExperimentsBranchJSONOutput
+export interface ExperimentsOutput {
+  [name: string]: ExperimentsBranchOutput
   workspace: {
     baseline: ExperimentFieldsOrError
   }
@@ -127,11 +127,8 @@ export class CliReader extends Cli {
     )
   }
 
-  public experimentShow(cwd: string): Promise<ExperimentsRepoJSONOutput> {
-    return this.readShowProcessJson<ExperimentsRepoJSONOutput>(
-      cwd,
-      Command.EXPERIMENT
-    )
+  public experimentShow(cwd: string): Promise<ExperimentsOutput> {
+    return this.readShowProcessJson<ExperimentsOutput>(cwd, Command.EXPERIMENT)
   }
 
   public diff(cwd: string): Promise<DiffOutput> {
