@@ -1,4 +1,4 @@
-const webpack = require('webpack')
+import webpack from 'webpack'
 
 module.exports = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
@@ -22,14 +22,5 @@ module.exports = {
   },
   typescript: {
     reactDocgen: false
-  },
-  webpackFinal: config => {
-    config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(
-        /src\/shared\/api/,
-        './__mocks__/storybookApi.ts'
-      )
-    )
-    return config
   }
 }
