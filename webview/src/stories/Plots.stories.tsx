@@ -10,7 +10,16 @@ import '../shared/style.scss'
 
 export default {
   args: {
-    plotsData: { live: livePlotsFixture, static: plotsShowFixture }
+    plotsData: {
+      live: {
+        colors: {
+          domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
+          range: ['#CCA700', '#3794FF', '#F14C4C']
+        },
+        plots: livePlotsFixture
+      },
+      static: plotsShowFixture
+    }
   },
   component: Plots,
   title: 'Plots'
@@ -21,15 +30,28 @@ export const WithData: Story<{ plotsData: PlotsData }> = ({ plotsData }) => {
 }
 
 export const WithLiveOnly: Story = () => {
-  return <Plots plotsData={{ live: livePlotsFixture, static: {} }} />
+  return (
+    <Plots
+      plotsData={{
+        live: {
+          colors: {
+            domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
+            range: ['#CCA700', '#3794FF', '#F14C4C']
+          },
+          plots: livePlotsFixture
+        },
+        static: {}
+      }}
+    />
+  )
 }
 
 export const WithStaticOnly: Story = () => {
-  return <Plots plotsData={{ live: [], static: plotsShowFixture }} />
+  return <Plots plotsData={{ live: { plots: [] }, static: plotsShowFixture }} />
 }
 
 export const WithoutPlots: Story = () => {
-  return <Plots plotsData={{ live: [], static: {} }} />
+  return <Plots plotsData={{ live: { plots: [] }, static: {} }} />
 }
 
 export const WithoutData: Story = () => {

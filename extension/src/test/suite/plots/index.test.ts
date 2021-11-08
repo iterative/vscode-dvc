@@ -43,7 +43,7 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
 
       const expectedPlotsData: PlotsData = {
-        live: livePlotsFixture,
+        live: { plots: livePlotsFixture },
         static: plotsShowFixture
       }
 
