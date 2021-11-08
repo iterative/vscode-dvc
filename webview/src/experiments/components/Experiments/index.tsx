@@ -17,7 +17,6 @@ import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
-import { VsCodeApi } from '../../model'
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -125,7 +124,6 @@ export const ExperimentsTable: React.FC<{
 }
 
 const Experiments: React.FC<{
-  vsCodeApi: VsCodeApi
   tableData?: TableData | null
 }> = ({ tableData }) => {
   return (

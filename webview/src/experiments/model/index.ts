@@ -11,19 +11,12 @@ import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
 
-import { getVsCodeApi, VsCodeApi as BaseVsCodeApi } from './vsCodeApi'
+import { addMessageHandler } from './window'
+import { vsCodeApi } from '../../shared/api'
 
 type MessageToWebview = GenericMessageToWebview<TableData>
 
-export type VsCodeApi = BaseVsCodeApi<
-  PersistedModelState,
-  MessageFromWebview,
-  MessageToWebview
->
-
 declare const window: Window & WindowWithWebviewData
-/* eslint-disable @typescript-eslint/no-unused-vars */
-declare let __webpack_public_path__: string
 
 interface PersistedModelState {
   data?: TableData | null
@@ -44,12 +37,6 @@ export class Model {
 
   public readonly dispose = Disposable.fn()
 
-  public readonly vsCodeApi = getVsCodeApi<
-    PersistedModelState,
-    MessageFromWebview,
-    MessageToWebview
-  >()
-
   public errors?: Array<Error | string> = undefined
 
   private constructor() {
@@ -58,10 +45,12 @@ export class Model {
     this.theme = data.theme
 
     this.dispose.track(
-      this.vsCodeApi.addMessageHandler(message => this.handleMessage(message))
+      addMessageHandler<MessageToWebview>(message =>
+        this.handleMessage(message)
+      )
     )
 
-    const state = this.vsCodeApi.getState()
+    const state = vsCodeApi.getState<PersistedModelState>()
 
     if (state) {
       this.setState(state)
@@ -71,7 +60,7 @@ export class Model {
 
     this.dispose.track({
       dispose: autorun(() => {
-        this.vsCodeApi.setState(this.getState())
+        vsCodeApi.setState(this.getState())
       })
     })
   }
@@ -84,7 +73,7 @@ export class Model {
   }
 
   public sendMessage(message: MessageFromWebview): void {
-    this.vsCodeApi.postMessage(message)
+    vsCodeApi.postMessage(message)
   }
 
   private getState(): PersistedModelState {

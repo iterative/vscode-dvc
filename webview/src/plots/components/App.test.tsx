@@ -17,9 +17,9 @@ import {
 } from 'dvc/src/webview/contract'
 import { App } from './App'
 
-import { vsCodeApi } from '../util/vscode'
+import { vsCodeApi } from '../../shared/api'
 
-jest.mock('../util/vscode')
+jest.mock('../../shared/api')
 
 const { postMessage: mockPostMessage } = vsCodeApi
 beforeEach(() => {
