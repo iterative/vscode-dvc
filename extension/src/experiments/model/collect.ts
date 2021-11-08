@@ -4,8 +4,8 @@ import { Experiment } from '../webview/contract'
 import {
   ExperimentFieldsOrError,
   ExperimentFields,
-  ExperimentsBranchJSONOutput,
-  ExperimentsRepoJSONOutput
+  ExperimentsBranchOutput,
+  ExperimentsOutput
 } from '../../cli/reader'
 import { addToMapArray } from '../../util/map'
 
@@ -74,7 +74,7 @@ const collectFromExperimentsObject = (
 
 const collectFromBranchesObject = (
   acc: ExperimentsAccumulator,
-  branchesObject: { [name: string]: ExperimentsBranchJSONOutput }
+  branchesObject: { [name: string]: ExperimentsBranchOutput }
 ) => {
   for (const [branchSha, { baseline, ...experimentsObject }] of Object.entries(
     branchesObject
@@ -90,7 +90,7 @@ const collectFromBranchesObject = (
 }
 
 export const collectExperiments = (
-  data: ExperimentsRepoJSONOutput
+  data: ExperimentsOutput
 ): ExperimentsAccumulator => {
   const { workspace, ...branchesObject } = data
   const workspaceBaseline = transformExperimentData(

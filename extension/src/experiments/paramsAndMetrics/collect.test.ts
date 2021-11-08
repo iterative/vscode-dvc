@@ -3,7 +3,7 @@ import { collectChanges, collectParamsAndMetrics } from './collect'
 import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
 import expShowFixture from '../../test/fixtures/expShow/output'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/reader'
 
 describe('collectParamsAndMetrics', () => {
   it('should output both params and metrics when both are present', () => {
@@ -404,7 +404,7 @@ describe('collectChanges', () => {
   }
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
-    const data: ExperimentsRepoJSONOutput = {
+    const data: ExperimentsOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData,
       workspace: mockedExperimentData
     }
@@ -413,7 +413,7 @@ describe('collectChanges', () => {
   })
 
   it('should collect the changes between the current commit and the workspace', () => {
-    const data: ExperimentsRepoJSONOutput = {
+    const data: ExperimentsOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
         baseline: {
           data: {}
@@ -477,7 +477,7 @@ describe('collectChanges', () => {
       { ...mockedWorkspaceDropoutData }
     )
 
-    const data: ExperimentsRepoJSONOutput = {
+    const data: ExperimentsOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedCommitData,
       workspace: mockedWorkspaceData
     }

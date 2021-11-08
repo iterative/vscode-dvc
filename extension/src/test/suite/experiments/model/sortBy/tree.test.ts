@@ -14,7 +14,7 @@ import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
 import { buildExperiments } from '../../util'
-import { ExperimentsRepoJSONOutput } from '../../../../../cli/reader'
+import { ExperimentsOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {
   const testData = {
@@ -79,7 +79,7 @@ suite('Experiments Sort By Tree Test Suite', () => {
         }
       }
     }
-  } as unknown as ExperimentsRepoJSONOutput
+  } as unknown as ExperimentsOutput
 
   const disposable = Disposable.fn()
 

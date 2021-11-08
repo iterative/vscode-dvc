@@ -4,10 +4,10 @@ import { DOT_GIT, EXPERIMENTS_GIT_REFS, GIT_REFS } from './constants'
 import { createNecessaryFileSystemWatcher } from '../../fileSystem/watcher'
 import { getGitRepositoryRoot } from '../../git'
 import { AvailableCommands, InternalCommands } from '../../commands/internal'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/reader'
 import { BaseData } from '../../data'
 
-export class ExperimentsData extends BaseData<ExperimentsRepoJSONOutput> {
+export class ExperimentsData extends BaseData<ExperimentsOutput> {
   constructor(dvcRoot: string, internalCommands: InternalCommands) {
     super(dvcRoot, internalCommands, AvailableCommands.EXPERIMENT_SHOW, [
       'dvc.lock',
@@ -18,7 +18,7 @@ export class ExperimentsData extends BaseData<ExperimentsRepoJSONOutput> {
     this.watchExpGitRefs()
   }
 
-  public collectFiles(data: ExperimentsRepoJSONOutput) {
+  public collectFiles(data: ExperimentsOutput) {
     return collectFiles(data)
   }
 
