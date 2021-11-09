@@ -29,7 +29,7 @@ export class ExperimentsModel {
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots: LivePlotData[] = []
-  private assignedColors: Record<string, string> = {}
+  private assignedColors: Map<string, string> = new Map()
   private unassignedColors = colorsList
 
   private filters: Map<string, FilterDefinition> = new Map()
@@ -49,15 +49,18 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
+    const colors: LivePlotsColors = {
+      domain: [],
+      range: []
+    }
+
+    this.getAssignedColors().forEach((color: string, name: string) => {
+      colors.domain.push(name)
+      colors.range.push(color)
+    })
+
     return {
-      colors: Object.entries(this.getAssignedColors()).reduce(
-        (acc, [name, color]) => {
-          acc.domain.push(name)
-          acc.range.push(color)
-          return acc
-        },
-        { domain: [], range: [] } as LivePlotsColors
-      ),
+      colors,
       plots: this.livePlots
     }
   }
@@ -235,7 +238,9 @@ export class ExperimentsModel {
 
   private addDisplayColor(experiment: Experiment, displayName?: string) {
     const assignedColors = this.getAssignedColors()
-    const displayColor = assignedColors[displayName || experiment.displayName]
+    const displayColor = assignedColors.get(
+      displayName || experiment.displayName
+    )
 
     return displayColor
       ? {

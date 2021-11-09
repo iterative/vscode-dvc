@@ -1,51 +1,53 @@
 import { colorsList as originalColorsList } from '.'
 
+type Colors = {
+  assignedColors: Map<string, string>
+  unassignedColors: string[]
+}
+
 const unassignColors = (
   experimentNames: string[],
-  currentColors: Record<string, string>,
+  currentColors: Map<string, string>,
   unassignedColors: string[]
 ) =>
-  Object.entries(currentColors).forEach(([name, color]) => {
-    if (!experimentNames.includes(name)) {
-      unassignedColors.unshift(color)
-    }
-  })
+  Object.entries(currentColors)
+    .reverse()
+    .forEach(([name, color]) => {
+      if (!experimentNames.includes(name)) {
+        unassignedColors.unshift(color)
+      }
+    })
 
 const assignColors = (
   experimentNames: string[],
-  currentColors: Record<string, string>,
+  currentColors: Map<string, string>,
   unassignedColors: string[]
-): Record<string, string> => {
-  const assignedColors = {} as Record<string, string>
+): Colors => {
+  const assignedColors = new Map()
 
   experimentNames.forEach(name => {
     if (unassignedColors.length === 0) {
-      unassignedColors = originalColorsList
+      unassignedColors = [...originalColorsList]
     }
-    const existingColor = currentColors[name]
+    const existingColor = currentColors.get(name)
 
     if (existingColor) {
-      assignedColors[name] = existingColor
+      assignedColors.set(name, existingColor)
       return
     }
 
-    assignedColors[name] = unassignedColors.shift() as string
+    const nextColor = unassignedColors.shift() as string
+    assignedColors.set(name, nextColor)
   })
-  return assignedColors
+  return { assignedColors, unassignedColors }
 }
 
 export const collectColors = (
   experimentNames: string[],
-  currentColors: Record<string, string>,
-  unassignedColors = originalColorsList
-): { assignedColors: Record<string, string>; unassignedColors: string[] } => {
+  currentColors: Map<string, string>,
+  unassignedColors = [...originalColorsList]
+): Colors => {
   unassignColors(experimentNames, currentColors, unassignedColors)
 
-  const assignedColors = assignColors(
-    experimentNames,
-    currentColors,
-    unassignedColors
-  )
-
-  return { assignedColors, unassignedColors }
+  return assignColors(experimentNames, currentColors, unassignedColors)
 }

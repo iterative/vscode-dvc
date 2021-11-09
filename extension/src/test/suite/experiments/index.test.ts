@@ -208,7 +208,9 @@ suite('Experiments Test Suite', () => {
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns({})
+      stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
+        new Map()
+      )
 
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
