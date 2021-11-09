@@ -52,6 +52,10 @@ export class ExperimentsModel {
     return this.livePlots
   }
 
+  public getColors() {
+    return this.assignedColors
+  }
+
   public async transformAndSet(data: ExperimentsOutput) {
     const [
       { workspace, branches, experimentsByBranch, checkpointsByTip },

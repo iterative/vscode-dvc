@@ -43,7 +43,13 @@ suite('Plots Test Suite', () => {
       const webview = await plots.showWebview()
 
       const expectedPlotsData: PlotsData = {
-        live: { plots: livePlotsFixture },
+        live: {
+          colors: {
+            domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+            range: ['#F14C4C', '#3794FF', '#CCA700']
+          },
+          plots: livePlotsFixture
+        },
         static: plotsShowFixture
       }
 
@@ -52,6 +58,6 @@ suite('Plots Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(5000)
+    }).timeout(6000)
   })
 })

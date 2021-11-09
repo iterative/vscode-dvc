@@ -176,6 +176,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getLivePlots()
   }
 
+  public getColors() {
+    return this.experiments.getColors()
+  }
+
   public getWebviewData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),

@@ -1,4 +1,4 @@
-import { PlotsData as TPlotsData } from './webview/contract'
+import { LivePlotsColors, PlotsData as TPlotsData } from './webview/contract'
 import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -47,7 +47,10 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public getWebviewData() {
     return {
-      live: { plots: this.experiments?.getLivePlots() || [] },
+      live: {
+        colors: this.getColors(),
+        plots: this.experiments?.getLivePlots() || []
+      },
       static: this.staticPlots
     }
   }
@@ -58,5 +61,16 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   private setStaticPlots(data: PlotsOutput) {
     this.staticPlots = data
+  }
+
+  private getColors() {
+    return Object.entries(this.experiments?.getColors() || {}).reduce(
+      (acc, [name, color]) => {
+        acc.domain.push(name)
+        acc.range.push(color)
+        return acc
+      },
+      { domain: [], range: [] } as LivePlotsColors
+    )
   }
 }
