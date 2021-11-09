@@ -145,25 +145,27 @@ export class ExperimentsModel {
         }
         return {
           ...branch,
-          subRows: experiments
-            .map(experiment => {
-              const checkpoints = this.getFilteredCheckpointsByTip(
-                experiment.id
-              )
-              if (!checkpoints) {
-                return this.addDisplayColor(experiment)
-              }
-              return {
-                ...this.addDisplayColor(experiment),
-                subRows: checkpoints.map(checkpoint =>
-                  this.addDisplayColor(checkpoint, experiment.displayName)
-                )
-              }
-            })
-            .filter((row: RowData) => this.filterTableRow(row))
+          subRows: this.getSubRows(experiments)
         }
       })
     ]
+  }
+
+  private getSubRows(experiments: Experiment[]) {
+    return experiments
+      .map(experiment => {
+        const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
+        if (!checkpoints) {
+          return this.addDisplayColor(experiment)
+        }
+        return {
+          ...this.addDisplayColor(experiment),
+          subRows: checkpoints.map(checkpoint =>
+            this.addDisplayColor(checkpoint, experiment.displayName)
+          )
+        }
+      })
+      .filter((row: RowData) => this.filterTableRow(row))
   }
 
   private findIndexByPath(pathToRemove: string) {
