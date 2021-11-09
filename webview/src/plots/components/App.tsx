@@ -11,10 +11,22 @@ import { vsCodeApi } from '../../shared/api'
 const signalInitialized = () =>
   vsCodeApi.postMessage({ type: MessageFromWebviewType.initialized })
 
+interface VsCodeApiState {
+  data?: PlotsData
+  dvcRoot?: string
+}
+
 export const App = () => {
   const [plotsData, setPlotsData] = useState<PlotsData>()
   const [dvcRoot, setDvcRoot] = useState<string>()
+
   useEffect(() => {
+    const existingState = vsCodeApi.getState<VsCodeApiState>()
+    if (existingState) {
+      const { data, dvcRoot } = existingState
+      setPlotsData(data)
+      setDvcRoot(dvcRoot)
+    }
     const messageListener = ({
       data
     }: {
@@ -35,7 +47,7 @@ export const App = () => {
     return () => window.removeEventListener('message', messageListener)
   }, [])
   useEffect(() => {
-    vsCodeApi.setState({
+    vsCodeApi.setState<VsCodeApiState>({
       data: plotsData,
       dvcRoot
     })
