@@ -56,6 +56,35 @@ describe('App', () => {
     expect(mockSetState).toBeCalledWith(mockState)
   })
 
+  it('Sets dvcRoot when the setDvcRoot message comes in', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          dvcRoot: 'root',
+          type: MessageToWebviewType.setDvcRoot
+        }
+      })
+    )
+    expect(mockSetState).toBeCalledWith({ dvcRoot: 'root' })
+    expect(mockSetState).toBeCalledTimes(2)
+  })
+
+  it('Does not update state when given an invalid message type', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          dvcRoot: 'root',
+          type: 'this is a bad message'
+        }
+      })
+    )
+    expect(mockSetState).toBeCalledTimes(1)
+  })
+
   it('Renders the loading state when given no data', async () => {
     render(<App />)
     const loadingState = await waitFor(() =>
