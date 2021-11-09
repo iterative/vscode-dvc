@@ -2,6 +2,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
+import { TableData } from 'dvc/src/experiments/webview/contract'
 import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import Experiments from '../experiments/components/Experiments'
 
@@ -25,10 +26,11 @@ export default {
   title: 'Table'
 } as Meta
 
-export const WithData: Story = ({ tableData }) => {
+const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
   return <Experiments tableData={tableData} />
 }
 
-export const WithoutData: Story = () => {
-  return <Experiments tableData={undefined} />
-}
+export const WithData = Template.bind({})
+
+export const WithoutData = Template.bind({})
+WithoutData.args = { tableData: undefined }
