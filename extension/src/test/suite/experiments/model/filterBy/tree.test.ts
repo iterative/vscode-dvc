@@ -14,7 +14,7 @@ import {
 import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperiments, removeDisplayColorFromFixture } from '../../util'
+import { buildExperiments } from '../../util'
 import { TableData } from '../../../../../experiments/webview/contract'
 
 suite('Experiments Filter By Tree Test Suite', () => {
@@ -81,7 +81,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const [workspace, master] = removeDisplayColorFromFixture(rowsFixture)
+      const [workspace, master] = rowsFixture
 
       const filteredRows = [
         workspace,

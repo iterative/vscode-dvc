@@ -6,8 +6,7 @@ import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import {
   buildExperiments,
   buildMockInternalCommands,
-  buildMockData,
-  removeDisplayColorFromFixture
+  buildMockData
 } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
@@ -41,6 +40,7 @@ import {
   MessageFromWebview,
   MessageFromWebviewType
 } from '../../../webview/contract'
+import { ExperimentsModel } from '../../../experiments/model'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -104,7 +104,7 @@ suite('Experiments Test Suite', () => {
         changes: workspaceChangesFixture,
         columns: columnsFixture,
         columnsOrder: [],
-        rows: removeDisplayColorFromFixture(rowsFixture),
+        rows: rowsFixture,
         sorts: []
       }
 
@@ -112,7 +112,7 @@ suite('Experiments Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(5000)
+    }).timeout(6000)
 
     it('should only be able to open a single experiments webview', async () => {
       const { experiments } = buildExperiments(disposable)
@@ -206,6 +206,12 @@ suite('Experiments Test Suite', () => {
       })
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(ExperimentsModel.prototype as any, 'getAssignedColor').returns(
+        '#000000'
+      )
+
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
@@ -250,16 +256,19 @@ suite('Experiments Test Suite', () => {
           params: { 'params.yaml': { test: 10 } },
           subRows: [
             {
+              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp1',
               params: { 'params.yaml': { test: 2 } }
             },
             {
+              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp2',
               params: { 'params.yaml': { test: 1 } }
             },
             {
+              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp3',
               params: { 'params.yaml': { test: 3 } }
@@ -303,16 +312,19 @@ suite('Experiments Test Suite', () => {
           params: { 'params.yaml': { test: 10 } },
           subRows: [
             {
+              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp2',
               params: { 'params.yaml': { test: 1 } }
             },
             {
+              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp1',
               params: { 'params.yaml': { test: 2 } }
             },
             {
+              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp3',
               params: { 'params.yaml': { test: 3 } }
