@@ -45,8 +45,8 @@ suite('Plots Test Suite', () => {
       const expectedPlotsData: PlotsData = {
         live: {
           colors: {
-            domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
-            range: ['#F14C4C', '#3794FF', '#CCA700']
+            domain: ['exp-83425', 'exp-e7a67', 'test-branch'],
+            range: ['#CCA700', '#F14C4C', '#3794FF']
           },
           plots: livePlotsFixture
         },

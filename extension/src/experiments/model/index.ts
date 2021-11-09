@@ -50,7 +50,7 @@ export class ExperimentsModel {
 
   public getLivePlots() {
     return {
-      colors: Object.entries(this.assignedColors).reduce(
+      colors: Object.entries(this.getAssignedColors()).reduce(
         (acc, [name, color]) => {
           acc.domain.push(name)
           acc.range.push(color)
@@ -79,7 +79,7 @@ export class ExperimentsModel {
 
     const { assignedColors, unassignedColors } = collectColors(
       this.getCurrentExperimentNames(),
-      this.assignedColors,
+      this.getAssignedColors(),
       this.unassignedColors
     )
 
@@ -241,6 +241,10 @@ export class ExperimentsModel {
   }
 
   private getAssignedColor(displayName: string) {
-    return this.assignedColors[displayName]
+    return this.getAssignedColors()[displayName]
+  }
+
+  private getAssignedColors() {
+    return this.assignedColors
   }
 }
