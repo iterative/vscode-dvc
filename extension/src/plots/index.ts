@@ -47,7 +47,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public getWebviewData() {
     return {
-      live: this.experiments?.getLivePlots() || [],
+      live: { plots: this.experiments?.getLivePlots() || [] },
       static: this.staticPlots
     }
   }

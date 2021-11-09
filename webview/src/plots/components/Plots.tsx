@@ -1,16 +1,32 @@
 import React from 'react'
 import cx from 'classnames'
-import { LivePlotData, PlotsData } from 'dvc/src/plots/webview/contract'
+import {
+  LivePlotsColors,
+  LivePlotData,
+  PlotsData
+} from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { isEmpty } from 'lodash'
 import { Config } from 'vega'
 import styles from './styles.module.scss'
 
-const createSpec = (title: string): VisualizationSpec => {
+const createSpec = (
+  title: string,
+  scale?: LivePlotsColors
+): VisualizationSpec => {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
-    encoding: { x: { field: 'x', title: 'iteration', type: 'nominal' } },
+    encoding: {
+      color: scale
+        ? {
+            field: 'symbol',
+            scale,
+            type: 'nominal'
+          }
+        : undefined,
+      x: { field: 'x', title: 'iteration', type: 'nominal' }
+    },
     height: 300,
     layer: [
       {
@@ -112,12 +128,14 @@ const PlotContainer = ({
 
 const Plot = ({
   values,
-  title
+  title,
+  scale
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
+  scale?: LivePlotsColors
 }) => {
-  const spec = createSpec(title)
+  const spec = createSpec(title, scale)
 
   return (
     <VegaLite
@@ -130,7 +148,13 @@ const Plot = ({
   )
 }
 
-const LivePlots = ({ plots }: { plots: LivePlotData[] }) => {
+const LivePlots = ({
+  plots,
+  colors
+}: {
+  plots: LivePlotData[]
+  colors?: LivePlotsColors
+}) => {
   if (!plots.length) {
     return <></>
   }
@@ -144,6 +168,7 @@ const LivePlots = ({ plots }: { plots: LivePlotData[] }) => {
             <Plot
               values={plotData.values}
               title={plotData.title}
+              scale={colors}
               key={`plot-${plotData.title}`}
             />
           ))}
@@ -196,13 +221,13 @@ const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
     return EmptyState('Loading Plots...')
   }
 
-  if (isEmpty(plotsData?.live) && isEmpty(plotsData?.static)) {
+  if (isEmpty(plotsData?.live.plots) && isEmpty(plotsData?.static)) {
     return EmptyState('No Plots to Display')
   }
 
   return (
     <>
-      <LivePlots plots={plotsData.live} />
+      <LivePlots plots={plotsData.live.plots} colors={plotsData.live.colors} />
       <StaticPlots plots={plotsData.static} />
     </>
   )

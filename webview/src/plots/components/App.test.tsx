@@ -50,7 +50,7 @@ describe('App', () => {
   it('Renders the empty state when given data with no experiments', async () => {
     const dataMessageWithoutPlots = new MessageEvent('message', {
       data: {
-        data: { live: [], static: {} },
+        data: { live: { plots: [] }, static: {} },
         type: MessageToWebviewType.setData
       }
     })
@@ -67,7 +67,7 @@ describe('App', () => {
 
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
-        data: { live: livePlotsFixture, static: {} },
+        data: { live: { plots: livePlotsFixture }, static: {} },
         type: MessageToWebviewType.setData
       }
     })
