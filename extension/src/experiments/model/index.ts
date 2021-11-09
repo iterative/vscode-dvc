@@ -234,14 +234,15 @@ export class ExperimentsModel {
   }
 
   private addDisplayColor(experiment: Experiment, displayName?: string) {
-    return {
-      ...experiment,
-      displayColor: this.getAssignedColor(displayName || experiment.displayName)
-    }
-  }
+    const assignedColors = this.getAssignedColors()
+    const displayColor = assignedColors[displayName || experiment.displayName]
 
-  private getAssignedColor(displayName: string) {
-    return this.getAssignedColors()[displayName]
+    return displayColor
+      ? {
+          ...experiment,
+          displayColor
+        }
+      : experiment
   }
 
   private getAssignedColors() {
