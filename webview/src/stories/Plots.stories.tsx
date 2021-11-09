@@ -47,11 +47,19 @@ WithLiveOnly.args = {
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
-  plotsData: { live: { plots: [] }, static: plotsShowFixture }
+  plotsData: {
+    live: { colors: { domain: [], range: [] }, plots: [] },
+    static: plotsShowFixture
+  }
 }
 
 export const WithoutPlots = Template.bind({})
-WithoutPlots.args = { plotsData: { live: { plots: [] }, static: {} } }
+WithoutPlots.args = {
+  plotsData: {
+    live: { colors: { domain: [], range: [] }, plots: [] },
+    static: {}
+  }
+}
 
 export const WithoutData = Template.bind({})
 WithoutData.args = {

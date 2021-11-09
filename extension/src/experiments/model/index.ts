@@ -14,7 +14,7 @@ import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { LivePlotData } from '../../plots/webview/contract'
+import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
   sortBy = 'sortBy:',
@@ -49,11 +49,17 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
-    return this.livePlots
-  }
-
-  public getColors() {
-    return this.assignedColors
+    return {
+      colors: Object.entries(this.assignedColors).reduce(
+        (acc, [name, color]) => {
+          acc.domain.push(name)
+          acc.range.push(color)
+          return acc
+        },
+        { domain: [], range: [] } as LivePlotsColors
+      ),
+      plots: this.livePlots
+    }
   }
 
   public async transformAndSet(data: ExperimentsOutput) {

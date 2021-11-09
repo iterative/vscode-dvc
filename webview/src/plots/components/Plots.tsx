@@ -152,10 +152,10 @@ const LivePlots = ({
   plots,
   colors
 }: {
-  plots: LivePlotData[]
+  plots?: LivePlotData[]
   colors?: LivePlotsColors
 }) => {
-  if (!plots.length) {
+  if (!plots?.length) {
     return <></>
   }
 
@@ -181,7 +181,7 @@ const LivePlots = ({
 const StaticPlots = ({
   plots
 }: {
-  plots: Record<string, VisualizationSpec>
+  plots?: Record<string, VisualizationSpec>
 }) => {
   const entries = Object.entries(plots || {})
   if (!entries.length) {
@@ -221,13 +221,16 @@ const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
     return EmptyState('Loading Plots...')
   }
 
-  if (isEmpty(plotsData?.live.plots) && isEmpty(plotsData?.static)) {
+  if (isEmpty(plotsData?.live?.plots) && isEmpty(plotsData?.static)) {
     return EmptyState('No Plots to Display')
   }
 
   return (
     <>
-      <LivePlots plots={plotsData.live.plots} colors={plotsData.live.colors} />
+      <LivePlots
+        plots={plotsData.live?.plots}
+        colors={plotsData.live?.colors}
+      />
       <StaticPlots plots={plotsData.static} />
     </>
   )
