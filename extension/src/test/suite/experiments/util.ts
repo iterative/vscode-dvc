@@ -13,8 +13,7 @@ import { buildMockMemento } from '../../util'
 import { dvcDemoPath, extensionUri } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
-import { RowData } from '../../../experiments/webview/contract'
-import { definedAndNonEmpty } from '../../../util/array'
+import { ExperimentsModel } from '../../../experiments/model'
 
 export const buildMockData = () =>
   ({
@@ -56,6 +55,18 @@ export const buildExperiments = (
 ) => {
   const { config, internalCommands, mockExperimentShow, resourceLocator } =
     buildDependencies(disposer, experimentShowData)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  stub(ExperimentsModel.prototype as any, 'getAssignedColor').callsFake(
+    (name: 'exp-83425' | 'exp-e7a67' | 'test-branch') => {
+      const expectedColors = {
+        'exp-83425': '#CCA700',
+        'exp-e7a67': '#F14C4C',
+        'test-branch': '#3794FF'
+      }
+      return expectedColors[name]
+    }
+  )
 
   const experiments = disposer.track(
     new Experiments(
@@ -130,26 +141,3 @@ export const buildMockInternalCommands = (disposer: Disposer) => {
 
   return mockedInternalCommands
 }
-
-// temp - while we build out the components for #712
-export const removeDisplayColorFromFixture = (rowsFixture: RowData[]) =>
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  rowsFixture.map(branch => {
-    const b = { ...branch }
-    delete b.displayColor
-    if (definedAndNonEmpty(b.subRows)) {
-      b.subRows = (b.subRows || []).map(experiment => {
-        const e = { ...experiment }
-        delete e.displayColor
-        if (definedAndNonEmpty(e.subRows)) {
-          e.subRows = (e.subRows || []).map(checkpoint => {
-            const c = { ...checkpoint }
-            delete c.displayColor
-            return c
-          })
-        }
-        return e
-      })
-    }
-    return b
-  })

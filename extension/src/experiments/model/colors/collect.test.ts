@@ -1,11 +1,12 @@
 import { colorsList as originalColorsList } from '.'
 import { collectColors } from './collect'
-import expShowFixture from '../../../test/fixtures/expShow/output'
-import { ExperimentsOutput } from '../../../cli/reader'
 
 describe('collectColors', () => {
   it('should assign the correct colors to the correct experiments', () => {
-    const { assignedColors } = collectColors(expShowFixture, {})
+    const { assignedColors } = collectColors(
+      ['exp-e7a67', 'test-branch', 'exp-83425'],
+      {}
+    )
     expect(assignedColors).toEqual({
       'exp-83425': '#CCA700',
       'exp-e7a67': '#F14C4C',
@@ -14,20 +15,17 @@ describe('collectColors', () => {
   })
 
   it('should return the original list of colors if no experiment names are found', () => {
-    const { unusedColors } = collectColors({} as ExperimentsOutput, {})
-    expect(unusedColors).toEqual(originalColorsList)
+    const { unassignedColors } = collectColors([], {})
+    expect(unassignedColors).toEqual(originalColorsList)
   })
 
   it('should add the colors of experiments which are no longer found back into the color list', () => {
-    const { assignedColors, unusedColors } = collectColors(
-      {} as ExperimentsOutput,
-      {
-        'exp-83425': '#CCA700',
-        'exp-e7a67': '#F14C4C',
-        'test-branch': '#3794FF'
-      }
-    )
+    const { assignedColors, unassignedColors } = collectColors([], {
+      'exp-83425': '#CCA700',
+      'exp-e7a67': '#F14C4C',
+      'test-branch': '#3794FF'
+    })
     expect(assignedColors).toEqual({})
-    expect(unusedColors).toEqual(originalColorsList)
+    expect(unassignedColors).toEqual(originalColorsList)
   })
 })

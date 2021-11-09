@@ -8,6 +8,8 @@ import {
   getFilterId
 } from './filterBy'
 import { collectExperiments } from './collect'
+import { colorsList } from './colors'
+import { collectColors } from './colors/collect'
 import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -27,6 +29,8 @@ export class ExperimentsModel {
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots: LivePlotData[] = []
+  private assignedColors: Record<string, string> = {}
+  private unassignedColors = colorsList
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -62,6 +66,15 @@ export class ExperimentsModel {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
+
+    const { assignedColors, unassignedColors } = collectColors(
+      this.getExperimentNames(),
+      this.assignedColors,
+      this.unassignedColors
+    )
+
+    this.assignedColors = assignedColors
+    this.unassignedColors = unassignedColors
   }
 
   public getSorts(): SortDefinition[] {
@@ -138,9 +151,14 @@ export class ExperimentsModel {
                 experiment.id
               )
               if (!checkpoints) {
-                return experiment
+                return this.addDisplayColor(experiment)
               }
-              return { ...experiment, subRows: checkpoints }
+              return {
+                ...this.addDisplayColor(experiment),
+                subRows: checkpoints.map(checkpoint =>
+                  this.addDisplayColor(checkpoint, experiment.displayName)
+                )
+              }
             })
             .filter((row: RowData) => this.filterTableRow(row))
         }
@@ -194,5 +212,23 @@ export class ExperimentsModel {
     return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
       ...this.filters
     ])
+  }
+
+  private getExperimentNames() {
+    return this.flattenExperiments()
+      .filter(exp => !exp.queued)
+      .map(exp => exp.displayName)
+      .filter(Boolean) as string[]
+  }
+
+  private addDisplayColor(experiment: Experiment, displayName?: string) {
+    return {
+      ...experiment,
+      displayColor: this.getAssignedColor(displayName || experiment.displayName)
+    }
+  }
+
+  private getAssignedColor(displayName: string) {
+    return this.assignedColors[displayName]
   }
 }

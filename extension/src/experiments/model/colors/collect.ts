@@ -1,59 +1,39 @@
-import omit from 'lodash.omit'
 import { colorsList as originalColorsList } from '.'
-import { ExperimentsOutput } from '../../../cli/reader'
-
-const collectExperimentNames = (data: ExperimentsOutput): string[] => {
-  const experimentNames: string[] = []
-
-  for (const experimentsObject of Object.values(omit(data, 'workspace'))) {
-    Object.entries(experimentsObject).forEach(([sha, fieldsOrError]) => {
-      if (
-        fieldsOrError.data?.checkpoint_tip === sha &&
-        fieldsOrError.data?.name
-      ) {
-        experimentNames.push(fieldsOrError.data?.name)
-      }
-    })
-  }
-  return experimentNames
-}
 
 const unassignColors = (
   experimentNames: string[],
   currentColors: Record<string, string>,
-  unusedColors: string[]
+  unassignedColors: string[]
 ) =>
   Object.entries(currentColors).forEach(([name, color]) => {
     if (!experimentNames.includes(name)) {
-      unusedColors.unshift(color)
+      unassignedColors.unshift(color)
     }
   })
 
 const assignColors = (
   experimentNames: string[],
-  unusedColors: string[]
+  unassignedColors: string[]
 ): Record<string, string> => {
   const assignedColors = {} as Record<string, string>
 
   experimentNames.forEach(name => {
-    if (unusedColors.length === 0) {
-      unusedColors = originalColorsList
+    if (unassignedColors.length === 0) {
+      unassignedColors = originalColorsList
     }
-    assignedColors[name] = unusedColors.shift() as string
+    assignedColors[name] = unassignedColors.shift() as string
   })
   return assignedColors
 }
 
 export const collectColors = (
-  data: ExperimentsOutput,
+  experimentNames: string[],
   currentColors: Record<string, string>,
-  unusedColors = originalColorsList
-): { assignedColors: Record<string, string>; unusedColors: string[] } => {
-  const experimentNames = collectExperimentNames(data)
+  unassignedColors = originalColorsList
+): { assignedColors: Record<string, string>; unassignedColors: string[] } => {
+  unassignColors(experimentNames, currentColors, unassignedColors)
 
-  unassignColors(experimentNames, currentColors, unusedColors)
+  const assignedColors = assignColors(experimentNames, unassignedColors)
 
-  const assignedColors = assignColors(experimentNames, unusedColors)
-
-  return { assignedColors, unusedColors }
+  return { assignedColors, unassignedColors }
 }
