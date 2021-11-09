@@ -9,12 +9,12 @@ export type LivePlotData = {
   values: LivePlotValues
 }
 
+export type LivePlotsData = {
+  plots: LivePlotData[]
+  colors: LivePlotsColors
+}
+
 export type PlotsData = {
-  live:
-    | {
-        plots: LivePlotData[]
-        colors: LivePlotsColors
-      }
-    | undefined
+  live: LivePlotsData | undefined
   static: PlotsOutput | undefined
 }

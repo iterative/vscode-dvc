@@ -16,7 +16,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private experiments?: Experiments
 
   private data: PlotsData
-  private staticPlots: PlotsOutput = {}
+  private staticPlots: PlotsOutput | undefined
 
   constructor(
     dvcRoot: string,
