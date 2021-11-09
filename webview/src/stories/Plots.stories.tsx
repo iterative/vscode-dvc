@@ -25,15 +25,13 @@ export default {
   title: 'Plots'
 } as Meta
 
-const PlotsStoryTemplate: Story<{ plotsData?: PlotsData }> = ({
-  plotsData
-}) => {
+const Template: Story<{ plotsData?: PlotsData }> = ({ plotsData }) => {
   return <Plots plotsData={plotsData} />
 }
 
-export const WithData = PlotsStoryTemplate.bind({})
+export const WithData = Template.bind({})
 
-export const WithLiveOnly = PlotsStoryTemplate.bind({})
+export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   plotsData: {
     live: {
@@ -47,15 +45,15 @@ WithLiveOnly.args = {
   }
 }
 
-export const WithStaticOnly = PlotsStoryTemplate.bind({})
+export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   plotsData: { live: { plots: [] }, static: plotsShowFixture }
 }
 
-export const WithoutPlots = PlotsStoryTemplate.bind({})
+export const WithoutPlots = Template.bind({})
 WithoutPlots.args = { plotsData: { live: { plots: [] }, static: {} } }
 
-export const WithoutData = PlotsStoryTemplate.bind({})
+export const WithoutData = Template.bind({})
 WithoutData.args = {
   plotsData: undefined
 }
