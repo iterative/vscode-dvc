@@ -9,7 +9,7 @@ import {
 } from './filterBy'
 import { collectExperiments } from './collect'
 import { colorsList } from './colors'
-import { collectColors } from './colors/collect'
+import { collectColors, Colors } from './colors/collect'
 import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -29,8 +29,7 @@ export class ExperimentsModel {
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots: LivePlotData[] = []
-  private assignedColors: Map<string, string> = new Map()
-  private unassignedColors = colorsList
+  private colors: Colors = { assigned: new Map(), available: colorsList }
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -80,14 +79,11 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
 
-    const { assignedColors, unassignedColors } = collectColors(
+    this.colors = collectColors(
       this.getCurrentExperimentNames(),
       this.getAssignedColors(),
-      this.unassignedColors
+      this.colors.available
     )
-
-    this.assignedColors = assignedColors
-    this.unassignedColors = unassignedColors
   }
 
   public getSorts(): SortDefinition[] {
@@ -251,6 +247,6 @@ export class ExperimentsModel {
   }
 
   private getAssignedColors() {
-    return this.assignedColors
+    return this.colors.assigned
   }
 }

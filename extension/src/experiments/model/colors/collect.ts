@@ -1,8 +1,9 @@
 import { colorsList as originalColorsList } from '.'
+import { definedAndNonEmpty } from '../../../util/array'
 
-type Colors = {
-  assignedColors: Map<string, string>
-  unassignedColors: string[]
+export type Colors = {
+  assigned: Map<string, string>
+  available: string[]
 }
 
 const getOrderedColorsToUnassign = (
@@ -20,46 +21,48 @@ const getOrderedColorsToUnassign = (
 
 const unassignColors = (
   experimentNames: string[],
-  currentColors: Map<string, string>,
-  unassignedColors: string[]
-) => {
-  const colorsToUnassign = getOrderedColorsToUnassign(
-    experimentNames,
-    currentColors
-  )
-  colorsToUnassign.forEach(color => unassignedColors.unshift(color))
+  current: Map<string, string>,
+  unassigned: string[]
+): string[] => {
+  if (!definedAndNonEmpty(experimentNames)) {
+    return [...originalColorsList]
+  }
+
+  const colorsToUnassign = getOrderedColorsToUnassign(experimentNames, current)
+  colorsToUnassign.forEach(color => unassigned.unshift(color))
+  return unassigned
 }
 
 const assignColors = (
   experimentNames: string[],
-  currentColors: Map<string, string>,
-  unassignedColors: string[]
+  current: Map<string, string>,
+  available: string[]
 ): Colors => {
-  const assignedColors = new Map()
+  const assigned = new Map()
 
   experimentNames.forEach(name => {
-    if (unassignedColors.length === 0) {
-      unassignedColors = [...originalColorsList]
+    if (available.length === 0) {
+      available = [...originalColorsList]
     }
-    const existingColor = currentColors.get(name)
+    const existingColor = current.get(name)
 
     if (existingColor) {
-      assignedColors.set(name, existingColor)
+      assigned.set(name, existingColor)
       return
     }
 
-    const nextColor = unassignedColors.shift() as string
-    assignedColors.set(name, nextColor)
+    const nextColor = available.shift() as string
+    assigned.set(name, nextColor)
   })
-  return { assignedColors, unassignedColors }
+  return { assigned, available }
 }
 
 export const collectColors = (
   experimentNames: string[],
-  currentColors: Map<string, string>,
-  unassignedColors = [...originalColorsList]
+  current: Map<string, string>,
+  unassigned = [...originalColorsList]
 ): Colors => {
-  unassignColors(experimentNames, currentColors, unassignedColors)
+  const available = unassignColors(experimentNames, current, unassigned)
 
-  return assignColors(experimentNames, currentColors, unassignedColors)
+  return assignColors(experimentNames, current, available)
 }
