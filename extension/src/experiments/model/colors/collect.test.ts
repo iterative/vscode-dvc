@@ -25,10 +25,11 @@ describe('collectColors', () => {
     const { assignedColors, unassignedColors } = collectColors(
       [],
       new Map([
-        ['exp-83425', '#CCA700'],
         ['exp-e7a67', '#F14C4C'],
-        ['test-branch', '#3794FF']
-      ])
+        ['test-branch', '#3794FF'],
+        ['exp-83425', '#CCA700']
+      ]),
+      originalColorsList.slice(3)
     )
     expect(assignedColors).toEqual(new Map())
     expect(unassignedColors).toEqual(originalColorsList)
