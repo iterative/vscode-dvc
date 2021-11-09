@@ -68,7 +68,7 @@ export class ExperimentsModel {
     this.livePlots = livePlots
 
     const { assignedColors, unassignedColors } = collectColors(
-      this.getExperimentNames(),
+      this.getCurrentExperimentNames(),
       this.assignedColors,
       this.unassignedColors
     )
@@ -216,7 +216,7 @@ export class ExperimentsModel {
     ])
   }
 
-  private getExperimentNames() {
+  private getCurrentExperimentNames() {
     return this.flattenExperiments()
       .filter(exp => !exp.queued)
       .map(exp => exp.displayName)
