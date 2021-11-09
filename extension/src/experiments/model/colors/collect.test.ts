@@ -28,4 +28,22 @@ describe('collectColors', () => {
     expect(assignedColors).toEqual({})
     expect(unassignedColors).toEqual(originalColorsList)
   })
+
+  it('should return the original assigned and unassigned colors given the same info', () => {
+    const originalAssignedColors = {
+      'exp-83425': '#CCA700',
+      'exp-e7a67': '#F14C4C',
+      'test-branch': '#3794FF'
+    }
+
+    const originalUnassignedColors = originalColorsList.slice(2)
+
+    const { assignedColors, unassignedColors } = collectColors(
+      ['exp-83425', 'exp-e7a67', 'test-branch'],
+      originalAssignedColors,
+      originalUnassignedColors
+    )
+    expect(assignedColors).toEqual(originalAssignedColors)
+    expect(unassignedColors).toEqual(originalUnassignedColors)
+  })
 })

@@ -13,6 +13,7 @@ const unassignColors = (
 
 const assignColors = (
   experimentNames: string[],
+  currentColors: Record<string, string>,
   unassignedColors: string[]
 ): Record<string, string> => {
   const assignedColors = {} as Record<string, string>
@@ -21,6 +22,13 @@ const assignColors = (
     if (unassignedColors.length === 0) {
       unassignedColors = originalColorsList
     }
+    const existingColor = currentColors[name]
+
+    if (existingColor) {
+      assignedColors[name] = existingColor
+      return
+    }
+
     assignedColors[name] = unassignedColors.shift() as string
   })
   return assignedColors
@@ -33,7 +41,11 @@ export const collectColors = (
 ): { assignedColors: Record<string, string>; unassignedColors: string[] } => {
   unassignColors(experimentNames, currentColors, unassignedColors)
 
-  const assignedColors = assignColors(experimentNames, unassignedColors)
+  const assignedColors = assignColors(
+    experimentNames,
+    currentColors,
+    unassignedColors
+  )
 
   return { assignedColors, unassignedColors }
 }
