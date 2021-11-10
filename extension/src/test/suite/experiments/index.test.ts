@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore } from 'sinon'
+import { stub, spy, restore, match } from 'sinon'
 import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import {
   buildExperiments,
@@ -41,6 +41,7 @@ import {
   MessageFromWebviewType
 } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
+import { copyOriginalColors } from '../../../experiments/model/colors'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -399,14 +400,29 @@ suite('Experiments Test Suite', () => {
         mementoSpy,
         'workspaceContext is called for filter initialization'
       ).to.be.calledWith('filterBy:test', [])
+      expect(
+        mementoSpy,
+        'workspaceContext is called for color initialization'
+      ).to.be.calledWith('colors:test', match.has('assigned'))
 
       expect(
         testRepository.getSorts(),
         'Experiments starts with no sorts'
       ).to.deep.equal([])
-      expect(mockMemento.keys(), 'Memento starts with no keys').to.deep.equal(
-        []
+      expect(mockMemento.keys(), 'Memento starts with color key').to.deep.equal(
+        ['colors:test']
       )
+      expect(
+        mockMemento.get('colors:test'),
+        'The correct colors are persisted'
+      ).to.deep.equal({
+        assigned: [
+          ['exp-e7a67', '#F14C4C'],
+          ['test-branch', '#3794FF'],
+          ['exp-83425', '#CCA700']
+        ],
+        available: copyOriginalColors().slice(3)
+      })
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
 
@@ -483,7 +499,18 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
+      const assigned: [string, string][] = [
+        ['exp-e7a67', '#1e5a52'],
+        ['test-branch', '#96958f'],
+        ['exp-83425', '#5f5856']
+      ]
+      const available = ['#000000', '#FFFFFF', '#ABCDEF']
+
       const mockMemento = buildMockMemento({
+        'colors:test': {
+          assigned,
+          available
+        },
         'filterBy:test': filterMapEntries,
         'sortBy:test': sortDefinitions
       })
@@ -507,6 +534,11 @@ suite('Experiments Test Suite', () => {
         firstFilterDefinition,
         secondFilterDefinition
       ])
+      const { colors } = testRepository.getLivePlots()
+      expect(colors).to.deep.equal({
+        domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+        range: ['#1e5a52', '#96958f', '#5f5856']
+      })
     })
   })
 })
