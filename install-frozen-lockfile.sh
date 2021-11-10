@@ -8,7 +8,7 @@ yarn install
 CKSUM_AFTER=$(cksum yarn.lock)
 
 
-if [[ $CKSUM_BEFORE != $CKSUM_AFTER ]]; then
+if [[ "$CKSUM_BEFORE" != "$CKSUM_AFTER" ]]; then
   echo "Changes were detected in yarn.lock file after running 'yarn install', which is not expected - terminating."
 	echo "Please ensure that the correct version of the yarn.lock file has been committed."
   exit 1
