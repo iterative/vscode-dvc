@@ -19,12 +19,12 @@ describe('collectColors', () => {
     )
   })
 
-  it('should return the original list of colors if no experiment names are found', () => {
+  it('should return the original list of colors if no experiment names are provided', () => {
     const { available } = collectColors([], new Map())
     expect(available).toEqual(copyOriginalColors())
   })
 
-  it('should return the original colors list if no experiments names are provided', () => {
+  it('should return the original colors list if all existing experiments are removed', () => {
     const { assigned, available } = collectColors(
       [],
       new Map([
@@ -54,7 +54,7 @@ describe('collectColors', () => {
     expect(available).toEqual(originalColorsList)
   })
 
-  it('should return the original assigned and unassigned colors given the same info', () => {
+  it('should return the original assigned and available colors given the same info', () => {
     const originalColorsList = copyOriginalColors()
     const originalAssigned = new Map([
       ['exp-83425', '#CCA700'],
@@ -91,7 +91,7 @@ describe('collectColors', () => {
     expect(available).toEqual(originalColorsList.slice(1))
   })
 
-  it('should not make colors available more than once in the list', () => {
+  it('should not duplicate available colors', () => {
     const originalColorsList = copyOriginalColors()
     const experimentNames = generateExperimentNameList(51)
 
