@@ -9,7 +9,7 @@ export type Colors = {
 const getOrderedColorsToUnassign = (
   experimentNames: string[],
   currentColors: Map<string, string>
-) => {
+): string[] => {
   const colorsToUnassign: string[] = []
   currentColors.forEach((color: string, name: string) => {
     if (!experimentNames.includes(name)) {
