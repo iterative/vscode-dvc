@@ -15,13 +15,18 @@ import {
   MessageFromWebviewType,
   MessageToWebviewType
 } from 'dvc/src/webview/contract'
+import { mocked } from 'ts-jest/utils'
 import { App } from './App'
 
 import { vsCodeApi } from '../../shared/api'
 
 jest.mock('../../shared/api')
 
-const { postMessage: mockPostMessage } = vsCodeApi
+const { postMessage, getState, setState } = vsCodeApi
+const mockPostMessage = mocked(postMessage)
+const mockGetState = mocked(getState)
+const mockSetState = mocked(setState)
+
 beforeEach(() => {
   jest.clearAllMocks()
 })
@@ -37,6 +42,47 @@ describe('App', () => {
       type: MessageFromWebviewType.initialized
     })
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
+  })
+
+  it('Recalls state from VSCode on first render', () => {
+    const mockState = {
+      data: { live: { plots: [] }, static: {} },
+      dvcRoot: 'root'
+    }
+    mockGetState.mockReturnValueOnce(mockState)
+    render(<App />)
+    expect(mockGetState).toBeCalledTimes(1)
+    expect(mockSetState).toBeCalledTimes(1)
+    expect(mockSetState).toBeCalledWith(mockState)
+  })
+
+  it('Sets dvcRoot when the setDvcRoot message comes in', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          dvcRoot: 'root',
+          type: MessageToWebviewType.setDvcRoot
+        }
+      })
+    )
+    expect(mockSetState).toBeCalledWith({ dvcRoot: 'root' })
+    expect(mockSetState).toBeCalledTimes(2)
+  })
+
+  it('Does not update state when given an invalid message type', () => {
+    render(<App />)
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          dvcRoot: 'root',
+          type: 'this is a bad message'
+        }
+      })
+    )
+    expect(mockSetState).toBeCalledTimes(1)
   })
 
   it('Renders the loading state when given no data', async () => {
