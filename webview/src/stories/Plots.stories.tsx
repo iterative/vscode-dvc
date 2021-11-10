@@ -12,6 +12,7 @@ import {
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import '../plots/components/styles.module.scss'
 
 export default {
   args: {

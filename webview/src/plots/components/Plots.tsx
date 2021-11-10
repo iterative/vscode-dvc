@@ -112,7 +112,7 @@ const config: Config = {
   }
 }
 
-const PlotContainer: React.FC<{
+const PlotsContainer: React.FC<{
   collapsedSections: CollapsibleSectionsState
   sectionKey: CollapsibleSectionsKeys
   dispatch: Dispatch<PlotsReducerAction>
@@ -120,7 +120,7 @@ const PlotContainer: React.FC<{
 }> = ({ collapsedSections, sectionKey, dispatch, title, children }) => {
   const open = !collapsedSections[sectionKey]
   return (
-    <details open={open}>
+    <details open={open} className={styles.plotsContainer}>
       <summary
         onClick={e => {
           e.preventDefault()
@@ -130,7 +130,7 @@ const PlotContainer: React.FC<{
           })
         }}
       >
-        <b>{title}</b>
+        {title}
       </summary>
       <div className={styles.centered}>{open && children}</div>
     </details>
@@ -236,22 +236,22 @@ const Plots = ({
 
   return (
     <>
-      <PlotContainer
+      <PlotsContainer
         title="Live Experiments Plots"
         collapsedSections={collapsedSections}
         dispatch={dispatch}
         sectionKey={CollapsibleSectionsKeys.LIVE_PLOTS}
       >
         <LivePlots plots={data.live.plots} colors={data.live.colors} />
-      </PlotContainer>
-      <PlotContainer
+      </PlotsContainer>
+      <PlotsContainer
         title="Static Plots"
         collapsedSections={collapsedSections}
         dispatch={dispatch}
         sectionKey={CollapsibleSectionsKeys.STATIC_PLOTS}
       >
         <StaticPlots plots={data.static} />
-      </PlotContainer>
+      </PlotsContainer>
     </>
   )
 }
