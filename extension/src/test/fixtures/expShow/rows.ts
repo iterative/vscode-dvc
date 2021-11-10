@@ -1,6 +1,8 @@
 import { join } from '../../util/path'
 import { RowData } from '../../../experiments/webview/contract'
-import { colorsList } from '../../../experiments/model/colors'
+import { copyOriginalColors } from '../../../experiments/model/colors'
+
+const colorsList = copyOriginalColors()
 
 const data: RowData[] = [
   {
@@ -471,7 +473,6 @@ const data: RowData[] = [
           }
         },
         queued: true,
-        displayColor: undefined,
         displayName: '90aea7f',
         id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
       }
