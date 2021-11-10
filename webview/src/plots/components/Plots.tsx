@@ -163,51 +163,38 @@ const LivePlots = ({
   plots,
   colors
 }: {
-  plots?: LivePlotData[]
+  plots: LivePlotData[]
   colors?: LivePlotsColors
-}) => {
-  if (!plots?.length) {
-    return <></>
-  }
-
-  return (
-    <>
-      {plots.map(plotData => (
-        <Plot
-          values={plotData.values}
-          title={plotData.title}
-          scale={colors}
-          key={`plot-${plotData.title}`}
-        />
-      ))}
-    </>
-  )
-}
+}) => (
+  <>
+    {plots.map(plotData => (
+      <Plot
+        values={plotData.values}
+        title={plotData.title}
+        scale={colors}
+        key={`plot-${plotData.title}`}
+      />
+    ))}
+  </>
+)
 
 const StaticPlots = ({
   plots
 }: {
-  plots?: Record<string, VisualizationSpec>
-}) => {
-  const entries = Object.entries(plots || {})
-  if (!entries.length) {
-    return <></>
-  }
-
-  return (
-    <>
-      {Object.entries(plots || {})?.map(([path, spec]) => (
-        <VegaLite
-          actions={false}
-          config={config}
-          spec={spec}
-          renderer="svg"
-          key={`plot-${path}`}
-        />
-      ))}
-    </>
-  )
-}
+  plots: Record<string, VisualizationSpec>
+}) => (
+  <>
+    {Object.entries(plots).map(([path, spec]) => (
+      <VegaLite
+        actions={false}
+        config={config}
+        spec={spec}
+        renderer="svg"
+        key={`plot-${path}`}
+      />
+    ))}
+  </>
+)
 
 const EmptyState = (text: string) => {
   return (
@@ -234,24 +221,31 @@ const Plots = ({
     return EmptyState('No Plots to Display')
   }
 
+  const livePlots = data.live?.plots
+  const staticPlots = data.static
+
   return (
     <>
-      <PlotsContainer
-        title="Live Experiments Plots"
-        collapsedSections={collapsedSections}
-        dispatch={dispatch}
-        sectionKey={CollapsibleSectionsKeys.LIVE_PLOTS}
-      >
-        <LivePlots plots={data.live?.plots} colors={data.live?.colors} />
-      </PlotsContainer>
-      <PlotsContainer
-        title="Static Plots"
-        collapsedSections={collapsedSections}
-        dispatch={dispatch}
-        sectionKey={CollapsibleSectionsKeys.STATIC_PLOTS}
-      >
-        <StaticPlots plots={data.static} />
-      </PlotsContainer>
+      {livePlots && (
+        <PlotsContainer
+          title="Live Experiments Plots"
+          sectionKey={CollapsibleSectionsKeys.LIVE_PLOTS}
+          collapsedSections={collapsedSections}
+          dispatch={dispatch}
+        >
+          <LivePlots plots={livePlots} colors={data.live?.colors} />
+        </PlotsContainer>
+      )}
+      {staticPlots && (
+        <PlotsContainer
+          title="Static Plots"
+          sectionKey={CollapsibleSectionsKeys.STATIC_PLOTS}
+          collapsedSections={collapsedSections}
+          dispatch={dispatch}
+        >
+          <StaticPlots plots={staticPlots} />
+        </PlotsContainer>
+      )}
     </>
   )
 }

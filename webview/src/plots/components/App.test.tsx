@@ -119,7 +119,7 @@ describe('App', () => {
 
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
-        data: { live: { plots: livePlotsFixture }, static: {} },
+        data: { live: livePlotsFixture },
         type: MessageToWebviewType.setData
       }
     })
@@ -129,7 +129,7 @@ describe('App', () => {
     const loadingEmptyState = screen.queryByText('Loading Plots...')
     expect(loadingEmptyState).not.toBeInTheDocument()
 
-    const noPlotsEmptyState = screen.queryByText('No Plots to Display')
-    expect(noPlotsEmptyState).not.toBeInTheDocument()
+    const livePlotsDisplayedState = screen.queryByText('Live Experiments Plots')
+    expect(livePlotsDisplayedState).toBeInTheDocument()
   })
 })
