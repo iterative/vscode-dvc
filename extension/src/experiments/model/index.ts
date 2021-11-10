@@ -14,7 +14,7 @@ import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { LivePlotData } from '../../plots/webview/contract'
+import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
   sortBy = 'sortBy:',
@@ -49,7 +49,17 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
-    return this.livePlots
+    return {
+      colors: Object.entries(this.getAssignedColors()).reduce(
+        (acc, [name, color]) => {
+          acc.domain.push(name)
+          acc.range.push(color)
+          return acc
+        },
+        { domain: [], range: [] } as LivePlotsColors
+      ),
+      plots: this.livePlots
+    }
   }
 
   public async transformAndSet(data: ExperimentsOutput) {
@@ -69,7 +79,7 @@ export class ExperimentsModel {
 
     const { assignedColors, unassignedColors } = collectColors(
       this.getCurrentExperimentNames(),
-      this.assignedColors,
+      this.getAssignedColors(),
       this.unassignedColors
     )
 
@@ -224,13 +234,18 @@ export class ExperimentsModel {
   }
 
   private addDisplayColor(experiment: Experiment, displayName?: string) {
-    return {
-      ...experiment,
-      displayColor: this.getAssignedColor(displayName || experiment.displayName)
-    }
+    const assignedColors = this.getAssignedColors()
+    const displayColor = assignedColors[displayName || experiment.displayName]
+
+    return displayColor
+      ? {
+          ...experiment,
+          displayColor
+        }
+      : experiment
   }
 
-  private getAssignedColor(displayName: string) {
-    return this.assignedColors[displayName]
+  private getAssignedColors() {
+    return this.assignedColors
   }
 }

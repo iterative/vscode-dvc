@@ -471,7 +471,6 @@ const data: RowData[] = [
           }
         },
         queued: true,
-        displayColor: undefined,
         displayName: '90aea7f',
         id: '90aea7f2482117a55dfcadcdb901aaa6610fbbc9'
       }
