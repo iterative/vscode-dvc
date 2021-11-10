@@ -24,6 +24,7 @@ import { pickResources } from '../vscode/resourcePicker'
 import { getWarningResponse } from '../vscode/modal'
 import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
+import { ProcessManager } from '../processManager'
 
 export type PathItem = Resource & {
   isDirectory: boolean
@@ -37,6 +38,8 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
   private readonly internalCommands: InternalCommands
   private readonly treeDataChanged: EventEmitter<PathItem | void>
+
+  private readonly processManager: ProcessManager
 
   private dvcRoots: string[] = []
 
@@ -60,6 +63,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     this.dispose.track(
       window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)
+    )
+
+    this.processManager = this.dispose.track(
+      new ProcessManager({ name: 'reset', process: () => this.resetData() })
     )
   }
 
@@ -86,8 +93,8 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     }
   }
 
-  public reset(): void {
-    this.treeDataChanged.fire()
+  public reset(): Promise<void> {
+    return this.processManager.run('reset')
   }
 
   public initialize(dvcRoots: string[]) {
@@ -140,6 +147,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     }
 
     return treeItem
+  }
+
+  private resetData() {
+    return Promise.resolve(this.treeDataChanged.fire())
   }
 
   private getPathItem(path: string) {
