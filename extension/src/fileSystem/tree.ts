@@ -63,15 +63,26 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     )
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   public refresh(path?: string, eventType?: string): void {
     if (path) {
-      const pathItem = this.getPathItem(dirname(path))
+      const pathItem = this.getPathItem(path)
+      const parentItem = this.getPathItem(dirname(path))
 
-      if (eventType === 'change' || !pathItem) {
+      if (
+        !pathItem ||
+        eventType === 'change' ||
+        (eventType?.includes('add') && pathItem)
+      ) {
         return
       }
 
-      this.treeDataChanged.fire(pathItem)
+      if (pathItem?.isDirectory) {
+        this.treeDataChanged.fire(pathItem)
+        return
+      }
+
+      this.treeDataChanged.fire(parentItem)
     }
   }
 
