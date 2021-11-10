@@ -24,13 +24,22 @@ const isExcluded = (dvcRoot: string, path: string) =>
   path.includes(EXPERIMENTS_GIT_REFS) ||
   ignoredDotDirectories.test(path)
 
+export type WatcherEventName =
+  | 'add'
+  | 'addDir'
+  | 'change'
+  | 'unlink'
+  | 'unlinkDir'
+
+type Listener = (path: string, eventName?: WatcherEventName) => void
+
 export const getRepositoryListener =
   (
     repository: Repository,
     trackedExplorerTree: TrackedExplorerTree,
     dvcRoot: string
-  ): ((path: string, eventType?: string) => void) =>
-  (path: string, eventType?: string) => {
+  ): Listener =>
+  (path: string, eventName?: WatcherEventName) => {
     if (isExcluded(dvcRoot, path)) {
       return
     }
@@ -41,12 +50,12 @@ export const getRepositoryListener =
       return
     }
     repository.update()
-    trackedExplorerTree.refresh(path, eventType)
+    trackedExplorerTree.refresh(path, eventName)
   }
 
 export const createFileSystemWatcher = (
   glob: string,
-  listener: (path: string, eventType?: string) => void
+  listener: Listener
 ): Disposable => {
   if (isDirectory(glob)) {
     throw new Error(
@@ -63,10 +72,10 @@ export const createFileSystemWatcher = (
 
 const createExternalToWorkspaceWatcher = (
   glob: string,
-  listener: (path: string, eventType?: string) => void
+  listener: Listener
 ): Disposable => {
   const fsWatcher = watch(glob, { ignoreInitial: true })
-  fsWatcher.on('all', (eventType, path) => listener(path, eventType))
+  fsWatcher.on('all', (eventName, path) => listener(path, eventName))
   return { dispose: () => fsWatcher.close() }
 }
 

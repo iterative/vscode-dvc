@@ -10,7 +10,7 @@ import {
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { exists, isDirectory, relativeWithUri } from '.'
-import { fireWatcher } from './watcher'
+import { fireWatcher, WatcherEventName } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
 import { definedAndNonEmpty } from '../util/array'
 import { ListOutput } from '../cli/reader'
@@ -71,15 +71,15 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   }
 
   // eslint-disable-next-line sonarjs/cognitive-complexity
-  public refresh(path?: string, eventType?: string): void {
+  public refresh(path?: string, eventName?: WatcherEventName): void {
     if (path) {
       const pathItem = this.getPathItem(path)
       const parentItem = this.getPathItem(dirname(path))
 
       if (
         !pathItem ||
-        eventType === 'change' ||
-        (eventType?.includes('add') && pathItem)
+        eventName === 'change' ||
+        (eventName?.includes('add') && pathItem)
       ) {
         return
       }
