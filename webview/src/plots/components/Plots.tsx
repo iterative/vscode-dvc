@@ -25,20 +25,13 @@ const createSpec = (
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
     encoding: {
-      color: scale
-        ? {
-            field: 'symbol',
-            scale,
-            type: 'nominal'
-          }
-        : undefined,
       x: { field: 'x', title: 'iteration', type: 'nominal' }
     },
     height: 300,
     layer: [
       {
         encoding: {
-          color: { field: 'group', legend: null, type: 'nominal' },
+          color: { field: 'group', legend: null, scale, type: 'nominal' },
           y: { field: 'y', title, type: 'quantitative' }
         },
         layer: [
