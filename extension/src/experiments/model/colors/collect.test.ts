@@ -1,4 +1,4 @@
-import { colorsList as originalColorsList } from '.'
+import { copyOriginalColors } from '.'
 import { collectColors } from './collect'
 
 describe('collectColors', () => {
@@ -18,7 +18,7 @@ describe('collectColors', () => {
 
   it('should return the original list of colors if no experiment names are found', () => {
     const { available } = collectColors([], new Map())
-    expect(available).toEqual(originalColorsList)
+    expect(available).toEqual(copyOriginalColors())
   })
 
   it('should return the original colors list if no experiments names are provided', () => {
@@ -32,10 +32,12 @@ describe('collectColors', () => {
       []
     )
     expect(assigned).toEqual(new Map())
-    expect(available).toEqual(originalColorsList)
+    expect(available).toEqual(copyOriginalColors())
   })
 
   it('should add the colors of experiments which are no longer found back into the color list', () => {
+    const originalColorsList = copyOriginalColors()
+
     const { assigned, available } = collectColors(
       [],
       new Map([
@@ -50,6 +52,7 @@ describe('collectColors', () => {
   })
 
   it('should return the original assigned and unassigned colors given the same info', () => {
+    const originalColorsList = copyOriginalColors()
     const originalAssigned = new Map([
       ['exp-83425', '#CCA700'],
       ['exp-e7a67', '#F14C4C'],
@@ -68,6 +71,7 @@ describe('collectColors', () => {
   })
 
   it('should return the correct colors after exhausting the first 50', () => {
+    const originalColorsList = copyOriginalColors()
     const experimentNames = Array.from(
       { length: 151 },
       (_, i) => `exp-${i + 1}`

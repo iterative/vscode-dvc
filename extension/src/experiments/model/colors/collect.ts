@@ -1,4 +1,4 @@
-import { colorsList as originalColorsList } from '.'
+import { copyOriginalColors } from '.'
 import { definedAndNonEmpty } from '../../../util/array'
 
 export type Colors = {
@@ -25,7 +25,7 @@ const unassignColors = (
   unassigned: string[]
 ): string[] => {
   if (!definedAndNonEmpty(experimentNames)) {
-    return [...originalColorsList]
+    return copyOriginalColors()
   }
 
   const colorsToUnassign = getOrderedColorsToUnassign(experimentNames, current)
@@ -42,7 +42,7 @@ const assignColors = (
 
   experimentNames.forEach(name => {
     if (available.length === 0) {
-      available = [...originalColorsList]
+      available = copyOriginalColors()
     }
     const existingColor = current.get(name)
 
@@ -60,7 +60,7 @@ const assignColors = (
 export const collectColors = (
   experimentNames: string[],
   current: Map<string, string>,
-  unassigned = [...originalColorsList]
+  unassigned = copyOriginalColors()
 ): Colors => {
   const available = unassignColors(experimentNames, current, unassigned)
 

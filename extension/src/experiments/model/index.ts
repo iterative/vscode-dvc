@@ -8,7 +8,7 @@ import {
   getFilterId
 } from './filterBy'
 import { collectExperiments } from './collect'
-import { colorsList } from './colors'
+import { copyOriginalColors } from './colors'
 import { collectColors, Colors } from './colors/collect'
 import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
@@ -29,7 +29,10 @@ export class ExperimentsModel {
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots: LivePlotData[] = []
-  private colors: Colors = { assigned: new Map(), available: colorsList }
+  private colors: Colors = {
+    assigned: new Map(),
+    available: copyOriginalColors()
+  }
 
   private filters: Map<string, FilterDefinition> = new Map()
 
