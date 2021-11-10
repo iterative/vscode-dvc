@@ -1,6 +1,10 @@
 import React, { Dispatch } from 'react'
 import cx from 'classnames'
-import { LivePlotsColors, LivePlotData } from 'dvc/src/plots/webview/contract'
+import {
+  LivePlotsColors,
+  LivePlotData,
+  PlotsData
+} from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { isEmpty } from 'lodash'
 import { Config } from 'vega'
@@ -178,13 +182,9 @@ const LivePlots = ({
   </>
 )
 
-const StaticPlots = ({
-  plots
-}: {
-  plots: Record<string, VisualizationSpec>
-}) => (
+const StaticPlots = ({ plots }: { plots: [string, VisualizationSpec][] }) => (
   <>
-    {Object.entries(plots).map(([path, spec]) => (
+    {plots.map(([path, spec]) => (
       <VegaLite
         actions={false}
         config={config}
@@ -204,6 +204,20 @@ const EmptyState = (text: string) => {
   )
 }
 
+const getPlotsFromData = (
+  data: PlotsData
+): {
+  livePlots: LivePlotData[] | undefined
+  staticPlots: [string, VisualizationSpec][] | undefined
+} => {
+  const livePlots = data.live?.plots
+  const staticPlots = data.static && Object.entries(data.static)
+  return {
+    livePlots: isEmpty(livePlots) ? undefined : livePlots,
+    staticPlots: isEmpty(staticPlots) ? undefined : staticPlots
+  }
+}
+
 const Plots = ({
   state,
   dispatch
@@ -217,12 +231,11 @@ const Plots = ({
     return EmptyState('Loading Plots...')
   }
 
-  if (isEmpty(data?.live?.plots) && isEmpty(data?.static)) {
+  const { livePlots, staticPlots } = getPlotsFromData(data)
+
+  if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
   }
-
-  const livePlots = data.live?.plots
-  const staticPlots = data.static
 
   return (
     <>
