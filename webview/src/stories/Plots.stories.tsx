@@ -25,35 +25,35 @@ export default {
   title: 'Plots'
 } as Meta
 
-export const WithData: Story<{ plotsData: PlotsData }> = ({ plotsData }) => {
+const Template: Story<{ plotsData?: PlotsData }> = ({ plotsData }) => {
   return <Plots plotsData={plotsData} />
 }
 
-export const WithLiveOnly: Story = () => {
-  return (
-    <Plots
-      plotsData={{
-        live: {
-          colors: {
-            domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
-            range: ['#CCA700', '#3794FF', '#F14C4C']
-          },
-          plots: livePlotsFixture
-        },
-        static: {}
-      }}
-    />
-  )
+export const WithData = Template.bind({})
+
+export const WithLiveOnly = Template.bind({})
+WithLiveOnly.args = {
+  plotsData: {
+    live: {
+      colors: {
+        domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
+        range: ['#CCA700', '#3794FF', '#F14C4C']
+      },
+      plots: livePlotsFixture
+    },
+    static: {}
+  }
 }
 
-export const WithStaticOnly: Story = () => {
-  return <Plots plotsData={{ live: { plots: [] }, static: plotsShowFixture }} />
+export const WithStaticOnly = Template.bind({})
+WithStaticOnly.args = {
+  plotsData: { live: { plots: [] }, static: plotsShowFixture }
 }
 
-export const WithoutPlots: Story = () => {
-  return <Plots plotsData={{ live: { plots: [] }, static: {} }} />
-}
+export const WithoutPlots = Template.bind({})
+WithoutPlots.args = { plotsData: { live: { plots: [] }, static: {} } }
 
-export const WithoutData: Story = () => {
-  return <Plots plotsData={undefined} />
+export const WithoutData = Template.bind({})
+WithoutData.args = {
+  plotsData: undefined
 }
