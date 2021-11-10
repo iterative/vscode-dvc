@@ -29,7 +29,11 @@ const unassignColors = (
   }
 
   const colorsToUnassign = getOrderedColorsToUnassign(experimentNames, current)
-  colorsToUnassign.forEach(color => unassigned.unshift(color))
+  colorsToUnassign.forEach(color => {
+    if (!unassigned.includes(color)) {
+      unassigned.unshift(color)
+    }
+  })
   return unassigned
 }
 
