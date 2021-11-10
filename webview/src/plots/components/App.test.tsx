@@ -20,6 +20,8 @@ import { App } from './App'
 
 import { vsCodeApi } from '../../shared/api'
 
+import { defaultCollapsibleSectionsState } from '../hooks/useAppReducer'
+
 jest.mock('../../shared/api')
 
 const { postMessage, getState, setState } = vsCodeApi
@@ -46,6 +48,7 @@ describe('App', () => {
 
   it('Recalls state from VSCode on first render', () => {
     const mockState = {
+      collapsedSections: defaultCollapsibleSectionsState,
       data: { live: { plots: [] }, static: {} },
       dvcRoot: 'root'
     }
@@ -67,7 +70,10 @@ describe('App', () => {
         }
       })
     )
-    expect(mockSetState).toBeCalledWith({ dvcRoot: 'root' })
+    expect(mockSetState).toBeCalledWith({
+      collapsedSections: defaultCollapsibleSectionsState,
+      dvcRoot: 'root'
+    })
     expect(mockSetState).toBeCalledTimes(2)
   })
 
