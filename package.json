@@ -31,6 +31,7 @@
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "build-extension": "yarn workspace dvc build",
     "extension-dev-server": "yarn workspace dvc dev",
+    "install-frozen-lockfile": "sh ./install-frozen-lockfile.sh",
     "webview-dev-server": "yarn workspace dvc-vscode-webview dev",
     "dev-server": "run-p extension-dev-server webview-dev-server",
     "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true VSC_DEBUG=true code --extensionDevelopmentPath $PWD/extension",
