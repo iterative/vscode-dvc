@@ -163,10 +163,10 @@ const LivePlots = ({
   plots,
   colors
 }: {
-  plots: LivePlotData[]
+  plots?: LivePlotData[]
   colors?: LivePlotsColors
 }) => {
-  if (!plots.length) {
+  if (!plots?.length) {
     return <></>
   }
 
@@ -187,7 +187,7 @@ const LivePlots = ({
 const StaticPlots = ({
   plots
 }: {
-  plots: Record<string, VisualizationSpec>
+  plots?: Record<string, VisualizationSpec>
 }) => {
   const entries = Object.entries(plots || {})
   if (!entries.length) {
@@ -230,7 +230,7 @@ const Plots = ({
     return EmptyState('Loading Plots...')
   }
 
-  if (isEmpty(data?.live.plots) && isEmpty(data?.static)) {
+  if (isEmpty(data?.live?.plots) && isEmpty(data?.static)) {
     return EmptyState('No Plots to Display')
   }
 
@@ -242,7 +242,7 @@ const Plots = ({
         dispatch={dispatch}
         sectionKey={CollapsibleSectionsKeys.LIVE_PLOTS}
       >
-        <LivePlots plots={data.live.plots} colors={data.live.colors} />
+        <LivePlots plots={data.live?.plots} colors={data.live?.colors} />
       </PlotsContainer>
       <PlotsContainer
         title="Static Plots"

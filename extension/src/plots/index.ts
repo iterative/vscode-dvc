@@ -16,7 +16,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private experiments?: Experiments
 
   private data: PlotsData
-  private staticPlots: PlotsOutput = {}
+  private staticPlots: PlotsOutput | undefined
 
   constructor(
     dvcRoot: string,
@@ -47,7 +47,7 @@ export class Plots extends BaseRepository<TPlotsData> {
 
   public getWebviewData() {
     return {
-      live: { plots: this.experiments?.getLivePlots() || [] },
+      live: this.experiments?.getLivePlots(),
       static: this.staticPlots
     }
   }

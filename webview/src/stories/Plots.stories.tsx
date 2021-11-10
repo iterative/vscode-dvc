@@ -18,13 +18,7 @@ export default {
   args: {
     collapsedSections: defaultCollapsibleSectionsState,
     data: {
-      live: {
-        colors: {
-          domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
-          range: ['#CCA700', '#3794FF', '#F14C4C']
-        },
-        plots: livePlotsFixture
-      },
+      live: livePlotsFixture,
       static: plotsShowFixture
     }
   },
@@ -45,24 +39,26 @@ export const WithData = Template.bind({})
 export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
-    live: {
-      colors: {
-        domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
-        range: ['#CCA700', '#3794FF', '#F14C4C']
-      },
-      plots: livePlotsFixture
-    },
-    static: {}
+    live: livePlotsFixture,
+    static: undefined
   }
 }
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
-  data: { live: { plots: [] }, static: plotsShowFixture }
+  data: {
+    live: undefined,
+    static: plotsShowFixture
+  }
 }
 
 export const WithoutPlots = Template.bind({})
-WithoutPlots.args = { data: { live: { plots: [] }, static: {} } }
+WithoutPlots.args = {
+  data: {
+    live: undefined,
+    static: undefined
+  }
+}
 
 export const WithoutData = Template.bind({})
 WithoutData.args = {
