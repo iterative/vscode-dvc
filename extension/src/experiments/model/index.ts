@@ -18,7 +18,8 @@ import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
   sortBy = 'sortBy:',
-  filterBy = 'filterBy:'
+  filterBy = 'filterBy:',
+  colors = 'colors:'
 }
 
 export class ExperimentsModel {
@@ -29,10 +30,7 @@ export class ExperimentsModel {
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots: LivePlotData[] = []
-  private colors: Colors = {
-    assigned: new Map(),
-    available: copyOriginalColors()
-  }
+  private colors: Colors
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -46,7 +44,17 @@ export class ExperimentsModel {
     this.filters = new Map(
       workspaceState.get(MementoPrefixes.filterBy + dvcRoot, [])
     )
+    const colors = workspaceState.get(MementoPrefixes.colors + dvcRoot, {
+      assigned: [],
+      available: copyOriginalColors()
+    })
+    this.colors = {
+      assigned: new Map(colors.assigned),
+      available: colors.available
+    }
+
     this.dvcRoot = dvcRoot
+
     this.workspaceState = workspaceState
   }
 
@@ -87,6 +95,7 @@ export class ExperimentsModel {
       this.getAssignedColors(),
       this.colors.available
     )
+    this.persistColors()
   }
 
   public getSorts(): SortDefinition[] {
@@ -226,6 +235,13 @@ export class ExperimentsModel {
     return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
       ...this.filters
     ])
+  }
+
+  private persistColors() {
+    return this.workspaceState.update(MementoPrefixes.colors + this.dvcRoot, {
+      assigned: [...this.colors.assigned],
+      available: this.colors.available
+    })
   }
 
   private getCurrentExperimentNames() {
