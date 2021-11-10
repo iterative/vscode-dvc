@@ -29,8 +29,8 @@ export const getRepositoryListener =
     repository: Repository,
     trackedExplorerTree: TrackedExplorerTree,
     dvcRoot: string
-  ): ((path: string) => void) =>
-  (path: string) => {
+  ): ((path: string, eventType?: string) => void) =>
+  (path: string, eventType?: string) => {
     if (isExcluded(dvcRoot, path)) {
       return
     }
@@ -41,12 +41,12 @@ export const getRepositoryListener =
       return
     }
     repository.update()
-    trackedExplorerTree.refresh(path)
+    trackedExplorerTree.refresh(path, eventType)
   }
 
 export const createFileSystemWatcher = (
   glob: string,
-  listener: (path: string) => void
+  listener: (path: string, eventType?: string) => void
 ): Disposable => {
   if (isDirectory(glob)) {
     throw new Error(
@@ -54,19 +54,19 @@ export const createFileSystemWatcher = (
     )
   }
   const fileSystemWatcher = workspace.createFileSystemWatcher(glob)
-  fileSystemWatcher.onDidCreate(uri => listener(uri.fsPath))
-  fileSystemWatcher.onDidChange(uri => listener(uri.fsPath))
-  fileSystemWatcher.onDidDelete(uri => listener(uri.fsPath))
+  fileSystemWatcher.onDidCreate(uri => listener(uri.fsPath, 'add'))
+  fileSystemWatcher.onDidChange(uri => listener(uri.fsPath, 'change'))
+  fileSystemWatcher.onDidDelete(uri => listener(uri.fsPath, 'unlink'))
 
   return fileSystemWatcher
 }
 
 const createExternalToWorkspaceWatcher = (
   glob: string,
-  listener: (path: string) => void
+  listener: (path: string, eventType?: string) => void
 ): Disposable => {
   const fsWatcher = watch(glob, { ignoreInitial: true })
-  fsWatcher.on('all', (_, path) => listener(path))
+  fsWatcher.on('all', (eventType, path) => listener(path, eventType))
   return { dispose: () => fsWatcher.close() }
 }
 

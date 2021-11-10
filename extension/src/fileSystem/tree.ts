@@ -63,9 +63,14 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     )
   }
 
-  public refresh(path?: string): void {
+  public refresh(path?: string, eventType?: string): void {
     if (path) {
       const pathItem = this.getPathItem(dirname(path))
+
+      if (eventType === 'change' || !pathItem) {
+        return
+      }
+
       this.treeDataChanged.fire(pathItem)
     }
   }
