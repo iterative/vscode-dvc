@@ -1,4 +1,4 @@
-export const colorsList = [
+const colorsList = [
   '#F14C4C',
   '#3794FF',
   '#CCA700',
@@ -50,3 +50,5 @@ export const colorsList = [
   '#96958f',
   '#5f5856'
 ]
+
+export const copyOriginalColors = (): string[] => [...colorsList]

@@ -8,8 +8,8 @@ import {
   getFilterId
 } from './filterBy'
 import { collectExperiments } from './collect'
-import { colorsList } from './colors'
-import { collectColors } from './colors/collect'
+import { copyOriginalColors } from './colors'
+import { collectColors, Colors } from './colors/collect'
 import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
@@ -29,8 +29,10 @@ export class ExperimentsModel {
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots: LivePlotData[] = []
-  private assignedColors: Record<string, string> = {}
-  private unassignedColors = colorsList
+  private colors: Colors = {
+    assigned: new Map(),
+    available: copyOriginalColors()
+  }
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -49,15 +51,18 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
+    const colors: LivePlotsColors = {
+      domain: [],
+      range: []
+    }
+
+    this.getAssignedColors().forEach((color: string, name: string) => {
+      colors.domain.push(name)
+      colors.range.push(color)
+    })
+
     return {
-      colors: Object.entries(this.getAssignedColors()).reduce(
-        (acc, [name, color]) => {
-          acc.domain.push(name)
-          acc.range.push(color)
-          return acc
-        },
-        { domain: [], range: [] } as LivePlotsColors
-      ),
+      colors,
       plots: this.livePlots
     }
   }
@@ -77,14 +82,11 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
 
-    const { assignedColors, unassignedColors } = collectColors(
+    this.colors = collectColors(
       this.getCurrentExperimentNames(),
       this.getAssignedColors(),
-      this.unassignedColors
+      this.colors.available
     )
-
-    this.assignedColors = assignedColors
-    this.unassignedColors = unassignedColors
   }
 
   public getSorts(): SortDefinition[] {
@@ -235,7 +237,9 @@ export class ExperimentsModel {
 
   private addDisplayColor(experiment: Experiment, displayName?: string) {
     const assignedColors = this.getAssignedColors()
-    const displayColor = assignedColors[displayName || experiment.displayName]
+    const displayColor = assignedColors.get(
+      displayName || experiment.displayName
+    )
 
     return displayColor
       ? {
@@ -246,6 +250,6 @@ export class ExperimentsModel {
   }
 
   private getAssignedColors() {
-    return this.assignedColors
+    return this.colors.assigned
   }
 }

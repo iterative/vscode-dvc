@@ -57,11 +57,13 @@ export const buildExperiments = (
     buildDependencies(disposer, experimentShowData)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns({
-    'exp-83425': '#CCA700',
-    'exp-e7a67': '#F14C4C',
-    'test-branch': '#3794FF'
-  })
+  stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
+    new Map([
+      ['exp-e7a67', '#F14C4C'],
+      ['test-branch', '#3794FF'],
+      ['exp-83425', '#CCA700']
+    ])
+  )
 
   const experiments = disposer.track(
     new Experiments(
