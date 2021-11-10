@@ -11,13 +11,7 @@ import '../shared/style.scss'
 export default {
   args: {
     plotsData: {
-      live: {
-        colors: {
-          domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
-          range: ['#CCA700', '#3794FF', '#F14C4C']
-        },
-        plots: livePlotsFixture
-      },
+      live: livePlotsFixture,
       static: plotsShowFixture
     }
   },
@@ -34,24 +28,26 @@ export const WithData = Template.bind({})
 export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   plotsData: {
-    live: {
-      colors: {
-        domain: ['exp-83425', 'test-branch', 'exp-e7a67'],
-        range: ['#CCA700', '#3794FF', '#F14C4C']
-      },
-      plots: livePlotsFixture
-    },
-    static: {}
+    live: livePlotsFixture,
+    static: undefined
   }
 }
 
 export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
-  plotsData: { live: { plots: [] }, static: plotsShowFixture }
+  plotsData: {
+    live: undefined,
+    static: plotsShowFixture
+  }
 }
 
 export const WithoutPlots = Template.bind({})
-WithoutPlots.args = { plotsData: { live: { plots: [] }, static: {} } }
+WithoutPlots.args = {
+  plotsData: {
+    live: undefined,
+    static: undefined
+  }
+}
 
 export const WithoutData = Template.bind({})
 WithoutData.args = {

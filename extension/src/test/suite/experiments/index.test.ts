@@ -208,9 +208,7 @@ suite('Experiments Test Suite', () => {
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      stub(ExperimentsModel.prototype as any, 'getAssignedColor').returns(
-        '#000000'
-      )
+      stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns({})
 
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
@@ -256,19 +254,16 @@ suite('Experiments Test Suite', () => {
           params: { 'params.yaml': { test: 10 } },
           subRows: [
             {
-              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp1',
               params: { 'params.yaml': { test: 2 } }
             },
             {
-              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp2',
               params: { 'params.yaml': { test: 1 } }
             },
             {
-              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp3',
               params: { 'params.yaml': { test: 3 } }
@@ -312,19 +307,16 @@ suite('Experiments Test Suite', () => {
           params: { 'params.yaml': { test: 10 } },
           subRows: [
             {
-              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp2',
               params: { 'params.yaml': { test: 1 } }
             },
             {
-              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp1',
               params: { 'params.yaml': { test: 2 } }
             },
             {
-              displayColor: '#000000',
               displayName: 'testExp',
               id: 'testExp3',
               params: { 'params.yaml': { test: 3 } }
