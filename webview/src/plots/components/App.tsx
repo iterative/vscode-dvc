@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { Reducer, useEffect, useReducer } from 'react'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import {
   MessageFromWebviewType,
@@ -11,34 +11,51 @@ import { vsCodeApi } from '../../shared/api'
 const signalInitialized = () =>
   vsCodeApi.postMessage({ type: MessageFromWebviewType.initialized })
 
+interface PlotsWebviewState {
+  data?: PlotsData
+  dvcRoot?: string
+}
+
+const plotsAppReducer: Reducer<
+  PlotsWebviewState,
+  MessageToWebview<PlotsData>
+> = (state, action) => {
+  if (action.type === MessageToWebviewType.setData) {
+    return {
+      ...state,
+      data: action.data
+    }
+  }
+  if (action.type === MessageToWebviewType.setDvcRoot) {
+    return {
+      ...state,
+      dvcRoot: action.dvcRoot
+    }
+  }
+  return state
+}
+
 export const App = () => {
-  const [plotsData, setPlotsData] = useState<PlotsData>()
-  const [dvcRoot, setDvcRoot] = useState<string>()
+  const [state, dispatch] = useReducer(
+    plotsAppReducer,
+    vsCodeApi.getState<PlotsWebviewState>() || {}
+  )
+  const { data } = state
+
   useEffect(() => {
     const messageListener = ({
       data
     }: {
       data: MessageToWebview<PlotsData>
     }) => {
-      switch (data.type) {
-        case MessageToWebviewType.setData: {
-          setPlotsData(data.data)
-          break
-        }
-        case MessageToWebviewType.setDvcRoot: {
-          setDvcRoot(data.dvcRoot)
-        }
-      }
+      dispatch(data)
     }
     window.addEventListener('message', messageListener)
     signalInitialized()
     return () => window.removeEventListener('message', messageListener)
   }, [])
   useEffect(() => {
-    vsCodeApi.setState({
-      data: plotsData,
-      dvcRoot
-    })
-  }, [plotsData, dvcRoot])
-  return <Plots plotsData={plotsData} />
+    vsCodeApi.setState<PlotsWebviewState>(state)
+  }, [state])
+  return <Plots plotsData={data} />
 }
