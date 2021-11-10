@@ -40,18 +40,13 @@ export class ExperimentsModel {
   private workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    this.currentSorts = workspaceState.get(MementoPrefixes.sortBy + dvcRoot, [])
-    this.filters = new Map(
-      workspaceState.get(MementoPrefixes.filterBy + dvcRoot, [])
+    const { colors, currentSorts, filters } = this.revive(
+      dvcRoot,
+      workspaceState
     )
-    const colors = workspaceState.get(MementoPrefixes.colors + dvcRoot, {
-      assigned: [],
-      available: copyOriginalColors()
-    })
-    this.colors = {
-      assigned: new Map(colors.assigned),
-      available: colors.available
-    }
+    this.colors = colors
+    this.currentSorts = currentSorts
+    this.filters = filters
 
     this.dvcRoot = dvcRoot
 
@@ -242,6 +237,42 @@ export class ExperimentsModel {
       assigned: [...this.colors.assigned],
       available: this.colors.available
     })
+  }
+
+  private revive(
+    dvcRoot: string,
+    workspaceState: Memento
+  ): {
+    colors: Colors
+    filters: Map<string, FilterDefinition>
+    currentSorts: SortDefinition[]
+  } {
+    const currentSorts = workspaceState.get<SortDefinition[]>(
+      MementoPrefixes.sortBy + dvcRoot,
+      []
+    )
+
+    const filters = new Map(
+      workspaceState.get<[string, FilterDefinition][]>(
+        MementoPrefixes.filterBy + dvcRoot,
+        []
+      )
+    )
+
+    const { assigned, available } = workspaceState.get<{
+      assigned: [string, string][]
+      available: string[]
+    }>(MementoPrefixes.colors + dvcRoot, {
+      assigned: [],
+      available: copyOriginalColors()
+    })
+
+    const colors = {
+      assigned: new Map(assigned),
+      available: available
+    }
+
+    return { colors, currentSorts, filters }
   }
 
   private getCurrentExperimentNames() {

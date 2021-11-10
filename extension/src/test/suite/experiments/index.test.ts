@@ -504,15 +504,13 @@ suite('Experiments Test Suite', () => {
         ['test-branch', '#96958f'],
         ['exp-83425', '#5f5856']
       ]
-      const available = copyOriginalColors().slice(0, -3)
-
-      const mockColors = {
-        assigned,
-        available
-      }
+      const available = ['#000000', '#FFFFFF', '#ABCDEF']
 
       const mockMemento = buildMockMemento({
-        'colors:test': mockColors,
+        'colors:test': {
+          assigned,
+          available
+        },
         'filterBy:test': filterMapEntries,
         'sortBy:test': sortDefinitions
       })
@@ -536,7 +534,8 @@ suite('Experiments Test Suite', () => {
         firstFilterDefinition,
         secondFilterDefinition
       ])
-      expect(testRepository.getLivePlots().colors).to.deep.equal({
+      const { colors } = testRepository.getLivePlots()
+      expect(colors).to.deep.equal({
         domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
         range: ['#1e5a52', '#96958f', '#5f5856']
       })
