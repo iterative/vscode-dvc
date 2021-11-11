@@ -64,7 +64,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
   public getChildren(pathItem?: PathItem): PathItem[] {
     if (pathItem) {
-      const contents = this.readDirectory(pathItem)
+      const contents = this.getPathItemChildren(pathItem)
       return this.sortDirectory(contents)
     }
 
@@ -111,14 +111,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     if (this.dvcRoots.length === 1) {
       const [onlyRoot] = this.dvcRoots
-      return this.repositories.getRepository(onlyRoot).getChildren(onlyRoot)
+      return this.getRepoChildren(onlyRoot)
     }
 
-    return flatten(
-      this.dvcRoots.map(dvcRoot =>
-        this.repositories.getRepository(dvcRoot).getChildren(dvcRoot)
-      )
-    )
+    return flatten(this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot)))
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
@@ -139,15 +135,13 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return baseContext
   }
 
-  private readDirectory(pathItem: PathItem): PathItem[] {
+  private getPathItemChildren(pathItem: PathItem): PathItem[] {
     const { dvcRoot, resourceUri } = pathItem
     if (!dvcRoot) {
       return []
     }
 
-    return this.repositories
-      .getRepository(dvcRoot)
-      .getChildren(resourceUri.fsPath)
+    return this.getRepoChildren(dvcRoot, resourceUri.fsPath)
   }
 
   private sortDirectory(contents: PathItem[]) {
@@ -158,6 +152,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       }
       return aIsDirectory ? -1 : 1
     })
+  }
+
+  private getRepoChildren(dvcRoot: string, path?: string) {
+    return this.repositories.getRepository(dvcRoot).getChildren(path || dvcRoot)
   }
 
   private registerCommands(workspaceChanged: EventEmitter<void>) {
