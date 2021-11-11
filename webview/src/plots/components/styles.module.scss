@@ -36,8 +36,9 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
 
 .plotsContainer {
   summary {
+    font-family: var(--vscode-font-family);
     margin: 14px 10px;
-    font-weight: 900;
+    font-weight: bold;
     font-size: 1.25rem;
   }
 }
