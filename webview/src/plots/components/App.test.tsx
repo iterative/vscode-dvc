@@ -11,6 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
+import plotsShowFixture from 'dvc/src/test/fixtures/plotsShow/output'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -117,9 +118,8 @@ describe('App', () => {
     expect(emptyState).toBeInTheDocument()
   })
 
-  it('should render plots when given a message with plots data', () => {
+  it('should render only live plots when given a message with only live plots data', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
-
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
         data: { live: livePlotsFixture },
@@ -129,11 +129,25 @@ describe('App', () => {
     render(<App />)
     fireEvent(window, dataMessageWithPlots)
 
-    const loadingEmptyState = screen.queryByText('Loading Plots...')
-    expect(loadingEmptyState).not.toBeInTheDocument()
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.queryByText('Live Experiments Plots')).toBeInTheDocument()
+    expect(screen.queryByText('Static Plots')).not.toBeInTheDocument()
+  })
 
-    const livePlotsDisplayedState = screen.queryByText('Live Experiments Plots')
-    expect(livePlotsDisplayedState).toBeInTheDocument()
+  it('should render live and static plots when given a message with both types of plots data', () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const dataMessageWithPlots = new MessageEvent('message', {
+      data: {
+        data: { live: livePlotsFixture, static: plotsShowFixture },
+        type: MessageToWebviewType.setData
+      }
+    })
+    render(<App />)
+    fireEvent(window, dataMessageWithPlots)
+
+    expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
+    expect(screen.queryByText('Live Experiments Plots')).toBeInTheDocument()
+    expect(screen.queryByText('Static Plots')).toBeInTheDocument()
   })
 
   it('should toggle the live plots section in state when its header is clicked', async () => {
