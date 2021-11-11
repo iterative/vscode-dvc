@@ -11,7 +11,7 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import plotsShowFixture from 'dvc/src/test/fixtures/plotsShow/output'
+import minimalPlotsShowFixture from 'dvc/src/test/fixtures/plotsShow/minimalOutput'
 import {
   MessageFromWebviewType,
   MessageToWebviewType
@@ -32,10 +32,6 @@ const { postMessage, getState, setState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
-
-const minimalPlotsShowFixture = {
-  'logs/loss.tsv': plotsShowFixture['logs/loss.tsv']
-}
 
 beforeEach(() => {
   jest.clearAllMocks()
