@@ -27,7 +27,6 @@ import { Resource } from '../repository/commands'
 
 export type PathItem = Resource & {
   isDirectory: boolean
-  isOut: boolean
 }
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
@@ -81,7 +80,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
         (this.pathItems[dvcRoot] = {
           dvcRoot,
           isDirectory: true,
-          isOut: false,
           resourceUri: Uri.file(dvcRoot)
         })
     )
@@ -101,7 +99,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return []
   }
 
-  public getTreeItem({ isDirectory, isOut, resourceUri }: PathItem): TreeItem {
+  public getTreeItem({ isDirectory, resourceUri }: PathItem): TreeItem {
     const treeItem = new TreeItem(
       resourceUri,
       isDirectory
@@ -109,11 +107,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
         : TreeItemCollapsibleState.None
     )
 
-    treeItem.contextValue = this.getContextValue(
-      resourceUri,
-      isDirectory,
-      isOut
-    )
+    treeItem.contextValue = this.getContextValue(resourceUri, isDirectory)
 
     if (!isDirectory && treeItem.contextValue !== 'virtual') {
       treeItem.command = {
@@ -151,11 +145,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return fsPath.trim() + '.dvc'
   }
 
-  private getContextValue(
-    { fsPath }: Uri,
-    isDirectory: boolean,
-    isOut: boolean
-  ): string {
+  private getContextValue({ fsPath }: Uri, isDirectory: boolean): string {
     if (!exists(fsPath)) {
       return 'virtual'
     }
@@ -164,9 +154,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     if (exists(this.getDataPlaceholder({ fsPath }))) {
       return baseContext + 'Data'
-    }
-    if (isOut || !isDirectory) {
-      return baseContext + 'HasRemote'
     }
 
     return baseContext
@@ -193,7 +180,6 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
         isDirectory: exists(absolutePath)
           ? isDirectory(absolutePath)
           : relative.isdir,
-        isOut: relative.isout,
         resourceUri: uri
       }
       this.pathItems[absolutePath] = pathItem
