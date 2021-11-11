@@ -22,7 +22,7 @@ import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
 
 import {
-  CollapsibleSectionsKeys,
+  PlotsSectionKeys,
   defaultCollapsibleSectionsState
 } from '../hooks/useAppReducer'
 
@@ -171,7 +171,7 @@ describe('App', () => {
       ...initialState,
       collapsedSections: {
         ...defaultCollapsibleSectionsState,
-        [CollapsibleSectionsKeys.LIVE_PLOTS]: true
+        [PlotsSectionKeys.LIVE_PLOTS]: true
       }
     })
   })

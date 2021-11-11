@@ -11,7 +11,7 @@ import { Config } from 'vega'
 import styles from './styles.module.scss'
 import {
   CollapsibleSectionsActions,
-  CollapsibleSectionsKeys,
+  PlotsSectionKeys,
   CollapsibleSectionsState,
   PlotsReducerAction,
   PlotsWebviewState
@@ -111,7 +111,7 @@ const config: Config = {
 
 const PlotsContainer: React.FC<{
   collapsedSections: CollapsibleSectionsState
-  sectionKey: CollapsibleSectionsKeys
+  sectionKey: PlotsSectionKeys
   dispatch: Dispatch<PlotsReducerAction>
   title: string
 }> = ({ collapsedSections, sectionKey, dispatch, title, children }) => {
@@ -235,7 +235,7 @@ const Plots = ({
       {livePlots && (
         <PlotsContainer
           title="Live Experiments Plots"
-          sectionKey={CollapsibleSectionsKeys.LIVE_PLOTS}
+          sectionKey={PlotsSectionKeys.LIVE_PLOTS}
           collapsedSections={collapsedSections}
           dispatch={dispatch}
         >
@@ -245,7 +245,7 @@ const Plots = ({
       {staticPlots && (
         <PlotsContainer
           title="Static Plots"
-          sectionKey={CollapsibleSectionsKeys.STATIC_PLOTS}
+          sectionKey={PlotsSectionKeys.STATIC_PLOTS}
           collapsedSections={collapsedSections}
           dispatch={dispatch}
         >

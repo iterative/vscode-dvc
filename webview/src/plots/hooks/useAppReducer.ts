@@ -5,14 +5,14 @@ import {
 } from 'dvc/src/webview/contract'
 import { Reducer, useReducer } from 'react'
 
-export enum CollapsibleSectionsKeys {
-  LIVE_PLOTS,
-  STATIC_PLOTS
+export enum PlotsSectionKeys {
+  LIVE_PLOTS = 'live-plots',
+  STATIC_PLOTS = 'static-plots'
 }
-export type CollapsibleSectionsState = Record<CollapsibleSectionsKeys, boolean>
+export type CollapsibleSectionsState = Record<PlotsSectionKeys, boolean>
 export const defaultCollapsibleSectionsState = {
-  [CollapsibleSectionsKeys.LIVE_PLOTS]: false,
-  [CollapsibleSectionsKeys.STATIC_PLOTS]: false
+  [PlotsSectionKeys.LIVE_PLOTS]: false,
+  [PlotsSectionKeys.STATIC_PLOTS]: false
 }
 
 export interface PlotsWebviewState {
@@ -29,7 +29,7 @@ export type PlotsReducerAction =
   | MessageToWebview<PlotsData>
   | {
       type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
-      sectionKey: CollapsibleSectionsKeys
+      sectionKey: PlotsSectionKeys
     }
 
 const plotsAppReducer: Reducer<PlotsWebviewState, PlotsReducerAction> = (
