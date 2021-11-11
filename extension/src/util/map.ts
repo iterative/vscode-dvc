@@ -12,6 +12,20 @@ export const addToMapArray = <K = string, V = unknown>(
   }
 }
 
+export const addToMapSet = <K = string, V = unknown>(
+  map: Map<K, Set<V>>,
+  key: K,
+  value: V
+): void => {
+  const existingSet = map.get(key)
+  if (existingSet) {
+    existingSet.add(value)
+  } else {
+    const newSet = new Set([value])
+    map.set(key, newSet)
+  }
+}
+
 export const addToMapCount = (
   key: string,
   map: Map<string, number>
