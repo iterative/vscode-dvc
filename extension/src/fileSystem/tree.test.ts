@@ -112,8 +112,7 @@ describe('TrackedTreeView', () => {
     })
 
     it('should get the children for the provided element', async () => {
-      const data = join(dvcDemoPath, 'data')
-      const dataUri = Uri.file(data)
+      const data = Uri.file(join(dvcDemoPath, 'data'))
 
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
@@ -126,7 +125,7 @@ describe('TrackedTreeView', () => {
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
-          resourceUri: dataUri
+          resourceUri: data
         },
         {
           dvcRoot: dvcDemoPath,
@@ -165,12 +164,12 @@ describe('TrackedTreeView', () => {
       const child = trackedTreeView.getChildren({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
-        resourceUri: dataUri
+        resourceUri: data
       })
 
       expect(mockedGetRepository).toBeCalledTimes(1)
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
-      expect(mockedGetChildren).toBeCalledWith(data)
+      expect(mockedGetChildren).toBeCalledWith(data.fsPath)
       expect(child).toEqual(mockedDirItems)
     })
   })
