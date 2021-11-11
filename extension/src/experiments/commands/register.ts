@@ -12,7 +12,7 @@ const registerExperimentCwdCommands = (
 ): void =>
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.QUEUE_EXPERIMENT,
-    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_QUEUE)
+    () => experiments.getCwdThenReport(AvailableCommands.EXPERIMENT_QUEUE)
   )
 
 const registerExperimentNameCommands = (
@@ -83,24 +83,17 @@ const registerExperimentRunCommands = (
 ): void => {
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RUN,
-    () =>
-      experiments.showExperimentsTableThenRun(AvailableCommands.EXPERIMENT_RUN)
+    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RUN_RESET,
-    () =>
-      experiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN_RESET
-      )
+    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_RESET)
   )
 
   internalCommands.registerExternalCliCommand(
     RegisteredCliCommands.EXPERIMENT_RUN_QUEUED,
-    () =>
-      experiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN_QUEUED
-      )
+    () => experiments.getCwdThenRun(AvailableCommands.EXPERIMENT_RUN_QUEUED)
   )
 
   internalCommands.registerExternalCommand(

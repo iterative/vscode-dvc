@@ -1,18 +1,30 @@
 import React from 'react'
-import { PlotsData } from 'dvc/src/plots/webview/contract'
+import cx from 'classnames'
+import {
+  LivePlotsColors,
+  LivePlotData,
+  PlotsData
+} from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
+import { isEmpty } from 'lodash'
 import { Config } from 'vega'
+import styles from './styles.module.scss'
 
-const createSpec = (title: string): VisualizationSpec => {
+const createSpec = (
+  title: string,
+  scale?: LivePlotsColors
+): VisualizationSpec => {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
     data: { name: 'values' },
-    encoding: { x: { field: 'x', title: 'iteration', type: 'nominal' } },
+    encoding: {
+      x: { field: 'x', title: 'iteration', type: 'nominal' }
+    },
     height: 300,
     layer: [
       {
         encoding: {
-          color: { field: 'group', legend: null, type: 'nominal' },
+          color: { field: 'group', legend: null, scale, type: 'nominal' },
           y: { field: 'y', title, type: 'quantitative' }
         },
         layer: [
@@ -90,14 +102,33 @@ const config: Config = {
   }
 }
 
+const PlotContainer = ({
+  component,
+  title
+}: {
+  component: JSX.Element
+  title: string
+}) => {
+  return (
+    <div>
+      <div className={styles.centered}>
+        <h1>{title}</h1>
+      </div>
+      <div className={styles.centered}>{component}</div>
+    </div>
+  )
+}
+
 const Plot = ({
   values,
-  title
+  title,
+  scale
 }: {
   values: { x: number; y: number; group: string }[]
   title: string
+  scale?: LivePlotsColors
 }) => {
-  const spec = createSpec(title)
+  const spec = createSpec(title, scale)
 
   return (
     <VegaLite
@@ -110,17 +141,92 @@ const Plot = ({
   )
 }
 
+const LivePlots = ({
+  plots,
+  colors
+}: {
+  plots?: LivePlotData[]
+  colors?: LivePlotsColors
+}) => {
+  if (!plots?.length) {
+    return <></>
+  }
+
+  return (
+    <PlotContainer
+      title="Live Experiments Plots"
+      component={
+        <>
+          {plots.map(plotData => (
+            <Plot
+              values={plotData.values}
+              title={plotData.title}
+              scale={colors}
+              key={`plot-${plotData.title}`}
+            />
+          ))}
+        </>
+      }
+    />
+  )
+}
+
+const StaticPlots = ({
+  plots
+}: {
+  plots?: Record<string, VisualizationSpec>
+}) => {
+  const entries = Object.entries(plots || {})
+  if (!entries.length) {
+    return <></>
+  }
+
+  return (
+    <PlotContainer
+      component={
+        <>
+          {Object.entries(plots || {})?.map(([path, spec]) => (
+            <VegaLite
+              actions={false}
+              config={config}
+              spec={spec}
+              renderer="svg"
+              key={`plot-${path}`}
+            />
+          ))}
+        </>
+      }
+      title="Static Plots"
+    />
+  )
+}
+
+const EmptyState = (text: string) => {
+  return (
+    <div className={cx(styles.centered, styles.fullScreen)}>
+      <p className={styles.emptyStateText}>{text}</p>
+    </div>
+  )
+}
+
 const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
+  if (!plotsData) {
+    return EmptyState('Loading Plots...')
+  }
+
+  if (isEmpty(plotsData?.live?.plots) && isEmpty(plotsData?.static)) {
+    return EmptyState('No Plots to Display')
+  }
+
   return (
     <>
-      {plotsData?.map(plotData => (
-        <Plot
-          values={plotData.values}
-          title={plotData.title}
-          key={`plot-${plotData.title}`}
-        />
-      ))}
+      <LivePlots
+        plots={plotsData.live?.plots}
+        colors={plotsData.live?.colors}
+      />
+      <StaticPlots plots={plotsData.static} />
     </>
   )
 }
+
 export default Plots

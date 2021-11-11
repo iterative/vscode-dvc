@@ -9,17 +9,17 @@ $border-color: grey;
 
 $row-bg-alt-color: rgba(60, 60, 60, 0.7);
 $header-bg-color: #303031;
-$meta-cell-color: #A0A0A0;
+$meta-cell-color: #a0a0a0;
 $toggle-color: rgba(255, 255, 255, 0.21);
 $spinner-color: rgb(255, 255, 255);
-$metrics-color: #FBD38D;
-$params-color: #90CDF4;
+$metrics-color: #fbd38d;
+$params-color: #90cdf4;
 
 // Light theme
 
 $row-bg-alt-color-light: rgba(195, 195, 195, 0.7);
 $header-bg-color-light: #e1e1e1;
-$border-color-light: #7F7F7F;
+$border-color-light: #7f7f7f;
 $metrics-color-light: #ce9f4c;
 $params-color-light: #76add1;
 $toggle-color-light: rgba(0, 0, 0, 0.21);
@@ -51,15 +51,13 @@ $spinner-color-light: #000;
 // Concrete selectors
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
   100% {
     transform: rotate(360deg);
   }
 }
 
 .bullet {
+  color: var(--vscode-editor-foreground);
   display: inline-block;
   width: 24px;
   flex: 0 0 24px;
@@ -78,7 +76,7 @@ $spinner-color-light: #000;
 
     .normalExperiment & {
       line-height: 0;
-      background: var(--vscode-editor-foreground);
+      background: currentColor;
       border-radius: 100%;
     }
     .queuedExperiment & {
@@ -93,12 +91,12 @@ $spinner-color-light: #000;
       @at-root {
         :global(.vscode-light) & {
           background: conic-gradient(
-          from 180deg at 50% 50%,
-          rgba($spinner-color-light, 0.5) 0deg,
-          rgba($spinner-color-light, 0) 180.31deg,
-          rgba($spinner-color-light, 0) 360deg
-        );
-        border-color: $spinner-color-light;
+            from 180deg at 50% 50%,
+            rgba($spinner-color-light, 0.5) 0deg,
+            rgba($spinner-color-light, 0) 180.31deg,
+            rgba($spinner-color-light, 0) 360deg
+          );
+          border-color: $spinner-color-light;
         }
       }
     }
@@ -108,9 +106,9 @@ $spinner-color-light: #000;
       vertical-align: middle;
       border: 1.5px solid $row-bg-color;
       border-radius: 100%;
-      border-right: 1.5px solid $spinner-color;
-      border-top: 1.5px solid $spinner-color;
-      animation: spin 1s ease-in-out infinite;
+      border-right: 1.5px solid currentColor;
+      border-top: 1.5px solid currentColor;
+      animation: spin 1s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
       background-color: $bg-color;
 
       @at-root {
@@ -246,13 +244,15 @@ $spinner-color-light: #000;
 
   .headerRow {
     font-size: 0.7rem;
-    
+
     .headerCell div {
       opacity: 0.6;
     }
 
-    &:last-child, .firstLevelHeader {
-      .paramHeaderCell, &.paramHeaderCell {
+    &:last-child,
+    .firstLevelHeader {
+      .paramHeaderCell,
+      &.paramHeaderCell {
         color: $params-color;
 
         :global(.vscode-light) & {
@@ -260,7 +260,8 @@ $spinner-color-light: #000;
         }
       }
 
-      .metricHeaderCell, &.metricHeaderCell {
+      .metricHeaderCell,
+      &.metricHeaderCell {
         color: $metrics-color;
 
         :global(.vscode-light) & {
@@ -316,7 +317,7 @@ $spinner-color-light: #000;
           border-right: 1px solid $border-color;
         }
       }
-  
+
       &:last-child {
         border-right: 1px solid $border-color;
 
@@ -435,7 +436,7 @@ $spinner-color-light: #000;
 }
 
 .staticColumn {
-  transform: translate(0,0) !important;
+  transform: translate(0, 0) !important;
 }
 
 .isDroppedColumn {

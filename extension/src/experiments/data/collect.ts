@@ -1,6 +1,6 @@
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import { ExperimentsOutput } from '../../cli/reader'
 
-export const collectFiles = (data: ExperimentsRepoJSONOutput): string[] => {
+export const collectFiles = (data: ExperimentsOutput): string[] => {
   const files = new Set<string>(
     Object.keys({
       ...data?.workspace.baseline?.data?.params,

@@ -23,7 +23,7 @@ export const WebviewDetails: {
     viewKey: ViewKey
   }
 } = {
-  'dvc-experiments': {
+  [ViewKey.EXPERIMENTS]: {
     contextKey: 'dvc.experiments.webviewActive',
     distPath,
     eventNames: {
@@ -35,7 +35,7 @@ export const WebviewDetails: {
     title: 'Experiments',
     viewKey: ViewKey.EXPERIMENTS
   },
-  'dvc-plots': {
+  [ViewKey.PLOTS]: {
     contextKey: 'dvc.plots.webviewActive',
     distPath,
     eventNames: {

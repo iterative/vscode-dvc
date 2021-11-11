@@ -31,7 +31,7 @@ suite('CLI Runner Test Suite', () => {
       await cliRunner.run(cwd, '1000')
 
       expect(windowErrorMessageSpy).to.be.calledOnce
-    })
+    }).timeout(5000)
 
     it('should be able to stop a started command', async () => {
       const cliRunner = disposable.track(new CliRunner({} as Config, 'sleep'))

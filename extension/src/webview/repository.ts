@@ -6,7 +6,7 @@ import { ViewKey } from './constants'
 import { MessageFromWebview, WebviewData } from './contract'
 import { createWebview } from './factory'
 import { InternalCommands } from '../commands/internal'
-import { ResourceLocator } from '../resourceLocator'
+import { Resource } from '../resourceLocator'
 
 export abstract class BaseRepository<T extends WebviewData> {
   public readonly dispose = Disposable.fn()
@@ -21,7 +21,6 @@ export abstract class BaseRepository<T extends WebviewData> {
   protected readonly dvcRoot: string
 
   protected readonly internalCommands: InternalCommands
-  protected readonly resourceLocator: ResourceLocator
 
   protected webview?: BaseWebview<T>
 
@@ -32,16 +31,18 @@ export abstract class BaseRepository<T extends WebviewData> {
     new EventEmitter<MessageFromWebview>()
   )
 
+  private webviewIcon: Resource
+
   abstract viewKey: ViewKey
 
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    resourceLocator: ResourceLocator
+    webviewIcon: Resource
   ) {
     this.dvcRoot = dvcRoot
     this.internalCommands = internalCommands
-    this.resourceLocator = resourceLocator
+    this.webviewIcon = webviewIcon
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
     this.onDidReceivedWebviewMessage = this.receivedWebviewMessage.event
@@ -63,7 +64,7 @@ export abstract class BaseRepository<T extends WebviewData> {
         data: this.getWebviewData(),
         dvcRoot: this.dvcRoot
       },
-      this.resourceLocator.dvcIcon
+      this.webviewIcon
     )
 
     this.setWebview(webview)

@@ -1,8 +1,8 @@
 import omit from 'lodash.omit'
-import { PlotData, PlotsData } from '../../../plots/webview/contract'
+import { LivePlotValues, LivePlotData } from '../../../plots/webview/contract'
 import {
   ExperimentFieldsOrError,
-  ExperimentsRepoJSONOutput,
+  ExperimentsOutput,
   Value,
   ValueTree
 } from '../../../cli/reader'
@@ -11,7 +11,7 @@ import { joinParamOrMetricPath } from '../../paramsAndMetrics/paths'
 import { ParamsOrMetrics } from '../../webview/contract'
 import { addToMapArray, addToMapCount } from '../../../util/map'
 
-type LivePlotAccumulator = Map<string, PlotData>
+type LivePlotAccumulator = Map<string, LivePlotValues>
 
 const collectFromMetricsFile = (
   acc: LivePlotAccumulator,
@@ -115,9 +115,9 @@ const collectFromExperimentsObject = (
 }
 
 export const collectLivePlotsData = (
-  data: ExperimentsRepoJSONOutput
-): PlotsData => {
-  const acc = new Map<string, PlotData>()
+  data: ExperimentsOutput
+): LivePlotData[] => {
+  const acc = new Map<string, LivePlotValues>()
 
   for (const { baseline, ...experimentsObject } of Object.values(
     omit(data, 'workspace')
@@ -129,7 +129,7 @@ export const collectLivePlotsData = (
     }
   }
 
-  const plotsData: PlotsData = []
+  const plotsData: LivePlotData[] = []
 
   acc.forEach((value, key) => {
     plotsData.push({ title: key, values: value })

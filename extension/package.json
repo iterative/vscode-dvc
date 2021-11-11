@@ -8,7 +8,7 @@
   "extensionDependencies": [
     "vscode.git"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "Apache-2.0",
   "readme": "./README.md",
   "repository": {
@@ -33,11 +33,12 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.61.0-insiders",
+    "vscode": "^1.62.0-insiders",
     "node": ">=10.2.0"
   },
   "activationEvents": [
-    "*"
+    "onStartupFinished",
+    "workspaceContains:**/*dvc*"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -900,10 +901,10 @@
           },
           {
             "id": "dvc.viewContainer",
-            "title": "Experiments views container",
-            "description": "Open the experiments views container.\n[Show views](command:workbench.view.extension.dvc-views)",
+            "title": "DVC view container",
+            "description": "Open the DVC view container.\n[Show views](command:workbench.view.extension.dvc-views)",
             "media": {
-              "markdown": "resources/walkthrough/experiments-views.md"
+              "markdown": "resources/walkthrough/view-container.md"
             },
             "completionEvents": [
               "onCommand:workbench.view.extension.dvc-views"
@@ -919,6 +920,18 @@
             },
             "completionEvents": [
               "onCommand:dvc.showExperiments"
+            ],
+            "when": "dvc.commands.available && dvc.project.available"
+          },
+          {
+            "id": "dvc.plots",
+            "title": "Plots",
+            "description": "Open plots.\n[Show plots](command:dvc.showPlots)",
+            "media": {
+              "markdown": "resources/walkthrough/plots.md"
+            },
+            "completionEvents": [
+              "onCommand:dvc.showPlots"
             ],
             "when": "dvc.commands.available && dvc.project.available"
           },
@@ -974,8 +987,9 @@
     "@types/lodash.omit": "^4.5.6",
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
+    "@types/react-vega": "^7.0.0",
     "@types/sinon-chai": "^3.2.5",
-    "@types/vscode": "^1.61.0",
+    "@types/vscode": "^1.62.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "clean-webpack-plugin": "^3.0.0",
@@ -988,7 +1002,7 @@
     "sinon-chai": "^3.5.0",
     "ts-jest": "^27.0.3",
     "ts-loader": "^9.2.3",
-    "vsce": "^1.100.1",
+    "vsce": "^2.2.0",
     "vscode-test": "^1.6.1",
     "vscode-uri": "^3.0.2",
     "webpack": "^5.40.0",

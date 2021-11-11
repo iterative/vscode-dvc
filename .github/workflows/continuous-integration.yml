@@ -48,7 +48,7 @@ jobs:
           path: extension/.vscode-test
           key: vscode-test
 
-      - run: yarn install
+      - run: yarn run install-frozen-lockfile
 
       - run: yarn run lint
 

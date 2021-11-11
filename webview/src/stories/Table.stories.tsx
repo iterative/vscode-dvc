@@ -1,14 +1,13 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { action } from '@storybook/addon-actions'
-import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
-import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
-import complexChangesData from 'dvc/src/test/fixtures/complex-changes-example'
+import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
+import { TableData } from 'dvc/src/experiments/webview/contract'
+import workspaceChangesFixture from 'dvc/src/test/fixtures/expShow/workspaceChanges'
 import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
-import '../experiments/style.scss'
-import { Model } from '../experiments/model'
+import '../shared/style.scss'
 
 declare global {
   interface Window {
@@ -18,14 +17,11 @@ declare global {
 
 window.webviewData = { theme: 'dark' }
 
-const dummyVsCodeApi = {
-  postMessage: action('postMessage')
-}
 const tableData = {
-  changes: complexChangesData,
-  columns: complexColumnData,
+  changes: workspaceChangesFixture,
+  columns: columnsFixture,
   columnsOrder: [],
-  rows: complexRowData,
+  rows: rowsFixture,
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }
@@ -33,27 +29,18 @@ const tableData = {
 }
 
 export default {
-  argTypes: {
-    vsCodeApi: {
-      table: {
-        disable: true
-      }
-    }
-  },
   args: {
-    tableData,
-    vsCodeApi: dummyVsCodeApi
+    tableData
   },
   component: Experiments,
   title: 'Table'
 } as Meta
 
-Model.getInstance().data = tableData
-
-export const WithData: Story = ({ tableData, vsCodeApi }) => {
-  return <Experiments tableData={tableData} vsCodeApi={vsCodeApi} />
+const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
+  return <Experiments tableData={tableData} />
 }
 
-export const WithoutData: Story = ({ vsCodeApi }) => {
-  return <Experiments tableData={undefined} vsCodeApi={vsCodeApi} />
-}
+export const WithData = Template.bind({})
+
+export const WithoutData = Template.bind({})
+WithoutData.args = { tableData: undefined }

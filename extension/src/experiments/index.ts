@@ -10,7 +10,7 @@ import { ExperimentsData } from './data'
 import { TableData } from './webview/contract'
 import { ResourceLocator } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { ExperimentsRepoJSONOutput } from '../cli/reader'
+import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
 import { MessageFromWebviewType } from '../webview/contract'
@@ -47,7 +47,7 @@ export class Experiments extends BaseRepository<TableData> {
     workspaceState: Memento,
     data = new ExperimentsData(dvcRoot, internalCommands)
   ) {
-    super(dvcRoot, internalCommands, resourceLocator)
+    super(dvcRoot, internalCommands, resourceLocator.beaker)
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
@@ -80,7 +80,7 @@ export class Experiments extends BaseRepository<TableData> {
     this.data.update()
   }
 
-  public async setState(data: ExperimentsRepoJSONOutput) {
+  public async setState(data: ExperimentsOutput) {
     await Promise.all([
       this.paramsAndMetrics.transformAndSet(data),
       this.experiments.transformAndSet(data)

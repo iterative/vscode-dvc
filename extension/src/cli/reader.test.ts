@@ -7,7 +7,8 @@ import { CliReader } from './reader'
 import { createProcess } from '../processExecution'
 import { getFailingMockedProcess, getMockedProcess } from '../test/util/jest'
 import { getProcessEnv } from '../env'
-import complexExperimentsOutput from '../test/fixtures/complex-output-example'
+import expShowFixture from '../test/fixtures/expShow/output'
+import plotsShowFixture from '../test/fixtures/plotsShow/output'
 import { Config } from '../config'
 
 jest.mock('vscode')
@@ -82,11 +83,11 @@ describe('CliReader', () => {
     it('should match the expected output', async () => {
       const cwd = __dirname
       mockedCreateProcess.mockReturnValueOnce(
-        getMockedProcess(JSON.stringify(complexExperimentsOutput))
+        getMockedProcess(JSON.stringify(expShowFixture))
       )
 
       const experiments = await cliReader.experimentShow(cwd)
-      expect(experiments).toEqual(complexExperimentsOutput)
+      expect(experiments).toEqual(expShowFixture)
       expect(mockedCreateProcess).toBeCalledWith({
         args: ['exp', 'show', SHOW_JSON],
         cwd,
@@ -300,6 +301,26 @@ describe('CliReader', () => {
           cwd,
           env: mockedEnv,
           executable: 'dvc'
+        })
+      })
+
+      describe('plotsShow', () => {
+        it('should match the expected output', async () => {
+          const cwd = __dirname
+
+          mockedCreateProcess.mockReturnValueOnce(
+            getMockedProcess(JSON.stringify(plotsShowFixture))
+          )
+
+          const plots = await cliReader.plotsShow(cwd)
+          expect(plots).toEqual({})
+          expect(mockedCreateProcess).not.toBeCalled()
+          // expect(mockedCreateProcess).toBeCalledWith({
+          //   args: ['plots', 'show', SHOW_JSON],
+          //   cwd,
+          //   env: mockedEnv,
+          //   executable: 'dvc'
+          // })
         })
       })
 

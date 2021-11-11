@@ -1,26 +1,18 @@
-import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, restore, useFakeTimers } from 'sinon'
-import { window, commands, workspace, Uri, QuickPickItem } from 'vscode'
+import { window, commands, QuickPickItem } from 'vscode'
 import { buildMultiRepoExperiments, buildSingleRepoExperiments } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
-import complexExperimentsOutput from '../../fixtures/complex-output-example'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
-import { Config } from '../../../config'
-import * as Git from '../../../git'
-import { ResourceLocator } from '../../../resourceLocator'
 import * as QuickPick from '../../../vscode/quickPick'
-import { CliRunner } from '../../../cli/runner'
-import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, dvcDemoPath, resourcePath } from '../util'
-import { buildMockMemento } from '../../util'
+import { closeAllEditors, dvcDemoPath } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
-import { OutputChannel } from '../../../vscode/outputChannel'
+import { CliRunner } from '../../../cli/runner'
 
 suite('Workspace Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -84,84 +76,6 @@ suite('Workspace Experiments Test Suite', () => {
       await workspaceExperiments.showWebview()
 
       expect(mockQuickPickOne).to.not.be.called
-    })
-  })
-
-  describe('showExperimentsTableThenRun', () => {
-    it('should run against an experiments table if webview is focused', async () => {
-      stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
-      const mockQuickPickOne = stub(QuickPick, 'quickPickOne').resolves(
-        dvcDemoPath
-      )
-
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      stub(cliReader, 'experimentShow').resolves(complexExperimentsOutput)
-      const cliRunner = disposable.track(new CliRunner(config))
-      const mockRun = stub(cliRunner, 'run').resolves()
-      const outputChannel = disposable.track(
-        new OutputChannel([cliReader], '5', 'experiments runner test')
-      )
-
-      const internalCommands = disposable.track(
-        new InternalCommands(config, outputChannel, cliReader, cliRunner)
-      )
-
-      const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
-      )
-      const mockExperiments = {
-        'other/dvc/root': { cliReader } as unknown as Experiments
-      } as Record<string, Experiments>
-
-      const workspaceExperiments = disposable.track(
-        new WorkspaceExperiments(
-          internalCommands,
-          buildMockMemento(),
-          mockExperiments
-        )
-      )
-      const [experiments] = workspaceExperiments.create(
-        [dvcDemoPath],
-        resourceLocator
-      )
-
-      experiments.setState(complexExperimentsOutput)
-      await workspaceExperiments.isReady()
-
-      const focused = onDidChangeIsWebviewFocused(experiments)
-
-      await workspaceExperiments.showExperimentsTableThenRun(
-        AvailableCommands.EXPERIMENT_RUN_QUEUED
-      )
-
-      expect(await focused).to.equal(dvcDemoPath)
-      expect(mockQuickPickOne).to.be.calledOnce
-      expect(mockRun).to.be.calledWith(dvcDemoPath, 'exp', 'run', '--run-all')
-      expect(workspaceExperiments.getFocusedWebview()).to.equal(experiments)
-
-      mockQuickPickOne.resetHistory()
-
-      const focusedExperiments =
-        await workspaceExperiments.showExperimentsTableThenRun(
-          AvailableCommands.EXPERIMENT_RUN_QUEUED
-        )
-
-      expect(focusedExperiments).to.equal(experiments)
-      expect(mockQuickPickOne).not.to.be.called
-
-      const unfocused = onDidChangeIsWebviewFocused(experiments)
-      const uri = Uri.file(resolve(dvcDemoPath, 'params.yaml'))
-
-      const document = await workspace.openTextDocument(uri)
-      await window.showTextDocument(document)
-
-      expect(await unfocused).to.be.undefined
-      expect(workspaceExperiments.getFocusedWebview()).to.be.undefined
-
-      const focusedAgain = onDidChangeIsWebviewFocused(experiments)
-      await commands.executeCommand('workbench.action.previousEditor')
-      expect(await focusedAgain).to.equal(dvcDemoPath)
     })
   })
 
@@ -246,6 +160,66 @@ suite('Workspace Experiments Test Suite', () => {
         .calledOnce
 
       clock.restore()
+    })
+  })
+
+  describe('dvc.runExperiment', () => {
+    it('should be able to run an experiment', async () => {
+      const mockRunExperiment = stub(
+        CliRunner.prototype,
+        'runExperiment'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN)
+
+      expect(mockRunExperiment).to.be.calledOnce
+      expect(mockRunExperiment).to.be.calledWith(dvcDemoPath)
+    })
+  })
+
+  describe('dvc.runResetExperiment', () => {
+    it('should be able to reset existing checkpoints and restart the experiment', async () => {
+      const mockRunExperimentReset = stub(
+        CliRunner.prototype,
+        'runExperimentReset'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_RESET)
+
+      expect(mockRunExperimentReset).to.be.calledOnce
+      expect(mockRunExperimentReset).to.be.calledWith(dvcDemoPath)
+    })
+  })
+
+  describe('dvc.runQueuedExperiments', () => {
+    it('should be able to execute all experiments in the run queue', async () => {
+      const mockRunExperimentQueue = stub(
+        CliRunner.prototype,
+        'runExperimentQueue'
+      ).resolves(undefined)
+
+      stub(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (WorkspaceExperiments as any).prototype,
+        'getOnlyOrPickProject'
+      ).returns(dvcDemoPath)
+
+      await commands.executeCommand(RegisteredCliCommands.EXPERIMENT_RUN_QUEUED)
+
+      expect(mockRunExperimentQueue).to.be.calledOnce
+      expect(mockRunExperimentQueue).to.be.calledWith(dvcDemoPath)
     })
   })
 

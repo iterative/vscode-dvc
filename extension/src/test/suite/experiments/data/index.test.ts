@@ -5,7 +5,7 @@ import { expect } from 'chai'
 import { stub, restore, useFakeTimers } from 'sinon'
 import { Disposable } from '../../../../extension'
 import { CliReader } from '../../../../cli/reader'
-import complexExperimentsOutput from '../../../fixtures/complex-output-example'
+import expShowFixture from '../../../fixtures/expShow/output'
 import { Config } from '../../../../config'
 import { dvcDemoPath, getFirstArgOfCall } from '../../util'
 import { OutputChannel } from '../../../../vscode/outputChannel'
@@ -35,7 +35,7 @@ suite('Experiments Data Test Suite', () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
+        expShowFixture
       )
 
       const outputChannel = disposable.track(
@@ -68,7 +68,7 @@ suite('Experiments Data Test Suite', () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
+        expShowFixture
       )
 
       const mockCreateFileSystemWatcher = stub(
@@ -108,7 +108,7 @@ suite('Experiments Data Test Suite', () => {
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
-        complexExperimentsOutput
+        expShowFixture
       )
 
       const mockDispose = stub()
@@ -137,21 +137,19 @@ suite('Experiments Data Test Suite', () => {
 
       mockExperimentShow.resolves(
         Object.assign(
-          { ...complexExperimentsOutput },
+          { ...expShowFixture },
           {
             workspace: {
               baseline: {
                 data: {
                   metrics: {
-                    ...(complexExperimentsOutput.workspace.baseline.data
-                      ?.metrics || {}),
+                    ...(expShowFixture.workspace.baseline.data?.metrics || {}),
                     'new_summary.json': {
                       data: { auc: 0, loss: 1 }
                     }
                   },
                   params: {
-                    ...(complexExperimentsOutput.workspace.baseline.data
-                      ?.params || {}),
+                    ...(expShowFixture.workspace.baseline.data?.params || {}),
                     'new_params.yml': {
                       data: { new_seed: 10000, new_weight_decay: 0 }
                     }

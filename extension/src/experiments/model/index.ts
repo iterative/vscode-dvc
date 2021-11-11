@@ -8,15 +8,18 @@ import {
   getFilterId
 } from './filterBy'
 import { collectExperiments } from './collect'
+import { copyOriginalColors } from './colors'
+import { collectColors, Colors } from './colors/collect'
 import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
-import { PlotsData } from '../../plots/webview/contract'
+import { ExperimentsOutput } from '../../cli/reader'
+import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
   sortBy = 'sortBy:',
-  filterBy = 'filterBy:'
+  filterBy = 'filterBy:',
+  colors = 'colors:'
 }
 
 export class ExperimentsModel {
@@ -26,7 +29,8 @@ export class ExperimentsModel {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private livePlots: PlotsData = []
+  private livePlots: LivePlotData[] = []
+  private colors: Colors
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -36,19 +40,37 @@ export class ExperimentsModel {
   private workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    this.currentSorts = workspaceState.get(MementoPrefixes.sortBy + dvcRoot, [])
-    this.filters = new Map(
-      workspaceState.get(MementoPrefixes.filterBy + dvcRoot, [])
+    const { colors, currentSorts, filters } = this.revive(
+      dvcRoot,
+      workspaceState
     )
+    this.colors = colors
+    this.currentSorts = currentSorts
+    this.filters = filters
+
     this.dvcRoot = dvcRoot
+
     this.workspaceState = workspaceState
   }
 
   public getLivePlots() {
-    return this.livePlots
+    const colors: LivePlotsColors = {
+      domain: [],
+      range: []
+    }
+
+    this.getAssignedColors().forEach((color: string, name: string) => {
+      colors.domain.push(name)
+      colors.range.push(color)
+    })
+
+    return {
+      colors,
+      plots: this.livePlots
+    }
   }
 
-  public async transformAndSet(data: ExperimentsRepoJSONOutput) {
+  public async transformAndSet(data: ExperimentsOutput) {
     const [
       { workspace, branches, experimentsByBranch, checkpointsByTip },
       livePlots
@@ -62,6 +84,13 @@ export class ExperimentsModel {
     this.experimentsByBranch = experimentsByBranch
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
+
+    this.colors = collectColors(
+      this.getCurrentExperimentNames(),
+      this.getAssignedColors(),
+      this.colors.available
+    )
+    this.persistColors()
   }
 
   public getSorts(): SortDefinition[] {
@@ -132,20 +161,27 @@ export class ExperimentsModel {
         }
         return {
           ...branch,
-          subRows: experiments
-            .map(experiment => {
-              const checkpoints = this.getFilteredCheckpointsByTip(
-                experiment.id
-              )
-              if (!checkpoints) {
-                return experiment
-              }
-              return { ...experiment, subRows: checkpoints }
-            })
-            .filter((row: RowData) => this.filterTableRow(row))
+          subRows: this.getSubRows(experiments)
         }
       })
     ]
+  }
+
+  private getSubRows(experiments: Experiment[]) {
+    return experiments
+      .map(experiment => {
+        const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
+        if (!checkpoints) {
+          return this.addDisplayColor(experiment)
+        }
+        return {
+          ...this.addDisplayColor(experiment),
+          subRows: checkpoints.map(checkpoint =>
+            this.addDisplayColor(checkpoint, experiment.displayName)
+          )
+        }
+      })
+      .filter((row: RowData) => this.filterTableRow(row))
   }
 
   private findIndexByPath(pathToRemove: string) {
@@ -194,5 +230,73 @@ export class ExperimentsModel {
     return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
       ...this.filters
     ])
+  }
+
+  private persistColors() {
+    return this.workspaceState.update(MementoPrefixes.colors + this.dvcRoot, {
+      assigned: [...this.colors.assigned],
+      available: this.colors.available
+    })
+  }
+
+  private revive(
+    dvcRoot: string,
+    workspaceState: Memento
+  ): {
+    colors: Colors
+    filters: Map<string, FilterDefinition>
+    currentSorts: SortDefinition[]
+  } {
+    const currentSorts = workspaceState.get<SortDefinition[]>(
+      MementoPrefixes.sortBy + dvcRoot,
+      []
+    )
+
+    const filters = new Map(
+      workspaceState.get<[string, FilterDefinition][]>(
+        MementoPrefixes.filterBy + dvcRoot,
+        []
+      )
+    )
+
+    const { assigned, available } = workspaceState.get<{
+      assigned: [string, string][]
+      available: string[]
+    }>(MementoPrefixes.colors + dvcRoot, {
+      assigned: [],
+      available: copyOriginalColors()
+    })
+
+    const colors = {
+      assigned: new Map(assigned),
+      available: available
+    }
+
+    return { colors, currentSorts, filters }
+  }
+
+  private getCurrentExperimentNames() {
+    return this.flattenExperiments()
+      .filter(exp => !exp.queued)
+      .map(exp => exp.displayName)
+      .filter(Boolean) as string[]
+  }
+
+  private addDisplayColor(experiment: Experiment, displayName?: string) {
+    const assignedColors = this.getAssignedColors()
+    const displayColor = assignedColors.get(
+      displayName || experiment.displayName
+    )
+
+    return displayColor
+      ? {
+          ...experiment,
+          displayColor
+        }
+      : experiment
+  }
+
+  private getAssignedColors() {
+    return this.colors.assigned
   }
 }

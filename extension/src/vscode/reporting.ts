@@ -10,7 +10,9 @@ export const reportError = (message: string): Promise<undefined> => {
   return Promise.resolve(undefined)
 }
 
-export const reportOutput = async (stdout: Promise<string>): Promise<void> => {
+export const reportOutput = async (
+  stdout: Promise<string | undefined>
+): Promise<void> => {
   const output = (await stdout) || 'Operation successful.'
   window.showInformationMessage(output)
 }

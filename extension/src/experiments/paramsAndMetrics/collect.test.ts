@@ -2,8 +2,8 @@ import { join } from 'path'
 import { collectChanges, collectParamsAndMetrics } from './collect'
 import { joinParamOrMetricPath } from './paths'
 import { ParamOrMetric } from '../webview/contract'
-import complexExperimentsOutput from '../../test/fixtures/complex-output-example'
-import { ExperimentsRepoJSONOutput } from '../../cli/reader'
+import expShowFixture from '../../test/fixtures/expShow/output'
+import { ExperimentsOutput } from '../../cli/reader'
 
 describe('collectParamsAndMetrics', () => {
   it('should output both params and metrics when both are present', () => {
@@ -363,7 +363,7 @@ describe('collectParamsAndMetrics', () => {
 
   it('should collect all params and metrics from the test fixture', () => {
     expect(
-      collectParamsAndMetrics(complexExperimentsOutput).map(({ path }) => path)
+      collectParamsAndMetrics(expShowFixture).map(({ path }) => path)
     ).toEqual([
       joinParamOrMetricPath('params', 'params.yaml', 'epochs'),
       joinParamOrMetricPath('params', 'params.yaml', 'learning_rate'),
@@ -404,7 +404,7 @@ describe('collectChanges', () => {
   }
 
   it('should return an empty array if there are no changes from the current commit and the workspace', () => {
-    const data: ExperimentsRepoJSONOutput = {
+    const data: ExperimentsOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedExperimentData,
       workspace: mockedExperimentData
     }
@@ -413,7 +413,7 @@ describe('collectChanges', () => {
   })
 
   it('should collect the changes between the current commit and the workspace', () => {
-    const data: ExperimentsRepoJSONOutput = {
+    const data: ExperimentsOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: {
         baseline: {
           data: {}
@@ -477,7 +477,7 @@ describe('collectChanges', () => {
       { ...mockedWorkspaceDropoutData }
     )
 
-    const data: ExperimentsRepoJSONOutput = {
+    const data: ExperimentsOutput = {
       f8a6ee1997b193ebc774837a284081ff9e8dc2d5: mockedCommitData,
       workspace: mockedWorkspaceData
     }

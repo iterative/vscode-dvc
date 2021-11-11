@@ -1,7 +1,7 @@
 import { resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, spy, restore } from 'sinon'
+import { stub, spy, restore, match } from 'sinon'
 import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
 import {
   buildExperiments,
@@ -10,10 +10,10 @@ import {
 } from './util'
 import { Disposable } from '../../../extension'
 import { CliReader } from '../../../cli/reader'
-import complexExperimentsOutput from '../../fixtures/complex-output-example'
-import complexRowData from '../../fixtures/complex-row-example'
-import complexColumnData from '../../fixtures/complex-column-example'
-import complexChangesData from '../../fixtures/complex-changes-example'
+import expShowFixture from '../../fixtures/expShow/output'
+import rowsFixture from '../../fixtures/expShow/rows'
+import columnsFixture from '../../fixtures/expShow/columns'
+import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
 import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
@@ -24,7 +24,7 @@ import {
   closeAllEditors,
   dvcDemoPath,
   experimentsUpdatedEvent,
-  resourcePath
+  extensionUri
 } from '../util'
 import { buildMockMemento } from '../../util'
 import { SortDefinition } from '../../../experiments/model/sortBy'
@@ -40,6 +40,8 @@ import {
   MessageFromWebview,
   MessageFromWebviewType
 } from '../../../webview/contract'
+import { ExperimentsModel } from '../../../experiments/model'
+import { copyOriginalColors } from '../../../experiments/model/colors'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -93,20 +95,17 @@ suite('Experiments Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the experiment webview visible', async () => {
-      const { experiments } = buildExperiments(
-        disposable,
-        complexExperimentsOutput
-      )
+      const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
 
       const webview = await experiments.showWebview()
 
       const expectedTableData: TableData = {
-        changes: complexChangesData,
-        columns: complexColumnData,
+        changes: workspaceChangesFixture,
+        columns: columnsFixture,
         columnsOrder: [],
-        rows: complexRowData,
+        rows: rowsFixture,
         sorts: []
       }
 
@@ -114,7 +113,7 @@ suite('Experiments Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(5000)
+    }).timeout(6000)
 
     it('should only be able to open a single experiments webview', async () => {
       const { experiments } = buildExperiments(disposable)
@@ -144,10 +143,7 @@ suite('Experiments Test Suite', () => {
     }).timeout(5000)
 
     it('should handle column reordering messages from the webview', async () => {
-      const { experiments } = buildExperiments(
-        disposable,
-        complexExperimentsOutput
-      )
+      const { experiments } = buildExperiments(disposable, expShowFixture)
 
       const mockMessageReceived = disposable.track(
         new EventEmitter<MessageFromWebview>()
@@ -211,11 +207,17 @@ suite('Experiments Test Suite', () => {
       })
 
       const messageSpy = spy(BaseWebview.prototype, 'show')
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
+        new Map()
+      )
+
       const internalCommands = disposable.track(
         new InternalCommands(config, outputChannel, cliReader)
       )
       const resourceLocator = disposable.track(
-        new ResourceLocator(Uri.file(resourcePath))
+        new ResourceLocator(extensionUri)
       )
 
       const experiments = disposable.track(
@@ -388,7 +390,7 @@ suite('Experiments Test Suite', () => {
           buildMockData()
         )
       )
-      testRepository.setState(complexExperimentsOutput)
+      testRepository.setState(expShowFixture)
       await testRepository.isReady()
       expect(
         mementoSpy,
@@ -398,14 +400,29 @@ suite('Experiments Test Suite', () => {
         mementoSpy,
         'workspaceContext is called for filter initialization'
       ).to.be.calledWith('filterBy:test', [])
+      expect(
+        mementoSpy,
+        'workspaceContext is called for color initialization'
+      ).to.be.calledWith('colors:test', match.has('assigned'))
 
       expect(
         testRepository.getSorts(),
         'Experiments starts with no sorts'
       ).to.deep.equal([])
-      expect(mockMemento.keys(), 'Memento starts with no keys').to.deep.equal(
-        []
+      expect(mockMemento.keys(), 'Memento starts with color key').to.deep.equal(
+        ['colors:test']
       )
+      expect(
+        mockMemento.get('colors:test'),
+        'The correct colors are persisted'
+      ).to.deep.equal({
+        assigned: [
+          ['exp-e7a67', '#F14C4C'],
+          ['test-branch', '#3794FF'],
+          ['exp-83425', '#CCA700']
+        ],
+        available: copyOriginalColors().slice(3)
+      })
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
 
@@ -482,7 +499,18 @@ suite('Experiments Test Suite', () => {
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
+      const assigned: [string, string][] = [
+        ['exp-e7a67', '#1e5a52'],
+        ['test-branch', '#96958f'],
+        ['exp-83425', '#5f5856']
+      ]
+      const available = ['#000000', '#FFFFFF', '#ABCDEF']
+
       const mockMemento = buildMockMemento({
+        'colors:test': {
+          assigned,
+          available
+        },
         'filterBy:test': filterMapEntries,
         'sortBy:test': sortDefinitions
       })
@@ -497,7 +525,7 @@ suite('Experiments Test Suite', () => {
           buildMockData()
         )
       )
-      testRepository.setState(complexExperimentsOutput)
+      testRepository.setState(expShowFixture)
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])
@@ -506,6 +534,11 @@ suite('Experiments Test Suite', () => {
         firstFilterDefinition,
         secondFilterDefinition
       ])
+      const { colors } = testRepository.getLivePlots()
+      expect(colors).to.deep.equal({
+        domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+        range: ['#1e5a52', '#96958f', '#5f5856']
+      })
     })
   })
 })

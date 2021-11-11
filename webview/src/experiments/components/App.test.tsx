@@ -11,20 +11,19 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { mocked } from 'ts-jest/utils'
-import complexRowData from 'dvc/src/test/fixtures/complex-row-example'
-import complexColumnData from 'dvc/src/test/fixtures/complex-column-example'
+import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
+import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import {
   MessageFromWebviewType,
   MessageToWebviewType,
   WebviewColorTheme
 } from 'dvc/src/webview/contract'
 import { App } from './App'
-import { getVsCodeApi } from '../model/vsCodeApi'
+import { vsCodeApi } from '../../shared/api'
 
-jest.mock('../model/vsCodeApi')
+jest.mock('../../shared/api')
 
-const { postMessage, getState } = getVsCodeApi()
-const mockGetVsCodeApi = mocked(getVsCodeApi)
+const { postMessage, getState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 
@@ -53,7 +52,6 @@ describe('App', () => {
     describe('When we render the App', () => {
       it('Then a message should be sent to the extension on the first render', () => {
         render(<App />)
-        expect(mockGetVsCodeApi).toHaveBeenCalledTimes(1)
         expect(mockPostMessage).toHaveBeenCalledWith({
           type: MessageFromWebviewType.initialized
         })
@@ -75,8 +73,8 @@ describe('App', () => {
     const messageToChangeState = new MessageEvent('message', {
       data: {
         data: {
-          columns: complexColumnData,
-          rows: complexRowData,
+          columns: columnsFixture,
+          rows: rowsFixture,
           sorts: []
         },
         type: MessageToWebviewType.setData

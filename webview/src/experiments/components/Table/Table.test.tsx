@@ -19,6 +19,7 @@ import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../util/useColumnsOrder'
+jest.mock('../../../shared/api')
 
 describe('Table', () => {
   const getProps = (props: React.ReactPropTypes) => ({ ...props })

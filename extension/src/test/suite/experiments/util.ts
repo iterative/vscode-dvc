@@ -1,5 +1,4 @@
 import { stub } from 'sinon'
-import { Uri } from 'vscode'
 import { CliReader } from '../../../cli/reader'
 import { AvailableCommands, InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'
@@ -9,11 +8,12 @@ import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
 import { OutputChannel } from '../../../vscode/outputChannel'
-import complexExperimentsOutput from '../../fixtures/complex-output-example'
+import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento } from '../../util'
-import { dvcDemoPath, resourcePath } from '../util'
+import { dvcDemoPath, extensionUri } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
+import { ExperimentsModel } from '../../../experiments/model'
 
 export const buildMockData = () =>
   ({
@@ -23,7 +23,7 @@ export const buildMockData = () =>
 
 const buildDependencies = (
   disposer: Disposer,
-  experimentShowData = complexExperimentsOutput
+  experimentShowData = expShowFixture
 ) => {
   const config = disposer.track(new Config())
   const cliReader = disposer.track(new CliReader(config))
@@ -34,9 +34,7 @@ const buildDependencies = (
   const outputChannel = disposer.track(
     new OutputChannel([cliReader], '2', 'experiments test suite')
   )
-  const resourceLocator = disposer.track(
-    new ResourceLocator(Uri.file(resourcePath))
-  )
+  const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
 
   const internalCommands = disposer.track(
     new InternalCommands(config, outputChannel, cliReader)
@@ -52,11 +50,20 @@ const buildDependencies = (
 
 export const buildExperiments = (
   disposer: Disposer,
-  experimentShowData = complexExperimentsOutput,
+  experimentShowData = expShowFixture,
   dvcRoot = dvcDemoPath
 ) => {
   const { config, internalCommands, mockExperimentShow, resourceLocator } =
     buildDependencies(disposer, experimentShowData)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
+    new Map([
+      ['exp-e7a67', '#F14C4C'],
+      ['test-branch', '#3794FF'],
+      ['exp-83425', '#CCA700']
+    ])
+  )
 
   const experiments = disposer.track(
     new Experiments(
@@ -84,7 +91,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     internalCommands,
     experiments: mockExperiments,
     resourceLocator
-  } = buildExperiments(disposer, complexExperimentsOutput, 'other/dvc/root')
+  } = buildExperiments(disposer, expShowFixture, 'other/dvc/root')
 
   stub(Git, 'getGitRepositoryRoot').resolves(dvcDemoPath)
   const workspaceExperiments = disposer.track(
@@ -96,7 +103,7 @@ export const buildMultiRepoExperiments = (disposer: Disposer) => {
     [dvcDemoPath],
     resourceLocator
   )
-  experiments.setState(complexExperimentsOutput)
+  experiments.setState(expShowFixture)
   return { experiments, workspaceExperiments }
 }
 
@@ -112,7 +119,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
     resourceLocator
   )
 
-  experiments.setState(complexExperimentsOutput)
+  experiments.setState(expShowFixture)
 
   return { workspaceExperiments }
 }
@@ -126,7 +133,7 @@ export const buildMockInternalCommands = (disposer: Disposer) => {
   )
   mockedInternalCommands.registerCommand(
     AvailableCommands.EXPERIMENT_SHOW,
-    () => Promise.resolve(complexExperimentsOutput)
+    () => Promise.resolve(expShowFixture)
   )
 
   return mockedInternalCommands
