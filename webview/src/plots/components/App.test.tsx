@@ -33,6 +33,10 @@ const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
 
+const minimalPlotsShowFixture = {
+  'predictions.json': plotsShowFixture['predictions.json']
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
 })
@@ -138,7 +142,7 @@ describe('App', () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {})
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
-        data: { live: livePlotsFixture, static: plotsShowFixture },
+        data: { live: livePlotsFixture, static: minimalPlotsShowFixture },
         type: MessageToWebviewType.setData
       }
     })
