@@ -11,12 +11,12 @@ import { ProcessManager } from '../processManager'
 
 export class Repository {
   public readonly dispose = Disposable.fn()
-  public readonly treeDataChanged: EventEmitter<void>
   public readonly onDidChangeTreeData: Event<void>
 
   private model: RepositoryModel
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
+  private readonly treeDataChanged: EventEmitter<void>
 
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
