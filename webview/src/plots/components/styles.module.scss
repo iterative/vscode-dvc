@@ -33,3 +33,13 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
     }
   }
 }
+
+.plotsContainer {
+  summary {
+    cursor: pointer;
+    font-family: var(--vscode-font-family);
+    margin: 14px 10px;
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+}
