@@ -29,7 +29,7 @@ import { PathItem } from '../repository/collect'
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public dispose = Disposable.fn()
 
-  public readonly onDidChangeTreeData: Event<PathItem | void>
+  public readonly onDidChangeTreeData: Event<void>
 
   private readonly internalCommands: InternalCommands
   private readonly repositories: WorkspaceRepositories

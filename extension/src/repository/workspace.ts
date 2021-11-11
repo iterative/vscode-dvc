@@ -1,7 +1,6 @@
 import { join } from 'path'
 import { EventEmitter, Uri } from 'vscode'
 import { Repository } from '.'
-import { PathItem } from './collect'
 import {
   createNecessaryFileSystemWatcher,
   getRepositoryListener
@@ -13,7 +12,7 @@ export class WorkspaceRepositories
   extends BaseWorkspace<Repository>
   implements IWorkspace<Repository, undefined>
 {
-  public treeDataChanged = new EventEmitter<PathItem | void>()
+  public treeDataChanged = this.dispose.track(new EventEmitter<void>())
 
   public getCwd(overrideUri?: Uri): string | Promise<string | undefined> {
     return overrideUri?.fsPath || this.getOnlyOrPickProject()
@@ -56,13 +55,7 @@ export class WorkspaceRepositories
       )
     )
     repository.dispose.track(
-      repository.onDidChangeTreeData(() =>
-        this.treeDataChanged.fire({
-          dvcRoot,
-          isDirectory: true,
-          resourceUri: Uri.file(dvcRoot)
-        })
-      )
+      repository.onDidChangeTreeData(() => this.treeDataChanged.fire())
     )
 
     this.setRepository(dvcRoot, repository)
