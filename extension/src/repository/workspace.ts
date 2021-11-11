@@ -55,12 +55,14 @@ export class WorkspaceRepositories
         )
       )
     )
-    repository.onDidChangeTreeData(() =>
-      this.treeDataChanged.fire({
-        dvcRoot,
-        isDirectory: true,
-        resourceUri: Uri.file(dvcRoot)
-      })
+    repository.dispose.track(
+      repository.onDidChangeTreeData(() =>
+        this.treeDataChanged.fire({
+          dvcRoot,
+          isDirectory: true,
+          resourceUri: Uri.file(dvcRoot)
+        })
+      )
     )
 
     this.setRepository(dvcRoot, repository)
