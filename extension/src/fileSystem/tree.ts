@@ -201,15 +201,14 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     this.internalCommands.registerExternalCliCommand<Resource>(
       RegisteredCliCommands.REMOVE_TARGET,
-      ({ dvcRoot, resourceUri }) => {
-        deleteTarget(resourceUri)
-        this.reset()
+      async ({ dvcRoot, resourceUri }) => {
         const relPath = relative(dvcRoot, this.getDataPlaceholder(resourceUri))
-        return this.internalCommands.executeCommand(
+        await this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,
           dvcRoot,
           relPath
         )
+        return deleteTarget(resourceUri)
       }
     )
 
