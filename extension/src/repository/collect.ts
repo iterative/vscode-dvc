@@ -1,6 +1,11 @@
 import { join, sep } from 'path'
 import { Uri } from 'vscode'
+import { Resource } from './commands'
 import { addToMapSet } from '../util/map'
+
+export type PathItem = Resource & {
+  isDirectory: boolean
+}
 
 const getPath = (pathArray: string[], idx: number) =>
   pathArray.slice(0, idx).join(sep)
@@ -11,13 +16,17 @@ const getDirectChild = (pathArray: string[], idx: number) =>
 const transform = (
   dvcRoot: string,
   acc: Map<string, Set<string>>
-): Map<string, Uri[]> => {
-  const treeMap = new Map<string, Uri[]>()
+): Map<string, PathItem[]> => {
+  const treeMap = new Map<string, PathItem[]>()
 
   acc.forEach((paths, path) => {
-    const uris = [...paths].map(path => Uri.file(join(dvcRoot, path)))
-    const absPath = join(dvcRoot, path)
-    treeMap.set(absPath, uris)
+    const items = [...paths].map(path => ({
+      dvcRoot,
+      isDirectory: !!acc.get(path),
+      resourceUri: Uri.file(join(dvcRoot, path))
+    }))
+    const absPath = Uri.file(join(dvcRoot, path)).fsPath
+    treeMap.set(absPath, items)
   })
 
   return treeMap
@@ -26,7 +35,7 @@ const transform = (
 export const collectTree = (
   dvcRoot: string,
   paths: string[]
-): Map<string, Uri[]> => {
+): Map<string, PathItem[]> => {
   const acc = new Map<string, Set<string>>()
 
   paths.forEach(path => {
