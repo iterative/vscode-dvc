@@ -409,7 +409,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull'],
+        args: ['pull', '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -426,7 +426,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', '-f'],
+        args: ['pull', '-f', '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -444,7 +444,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', relPath],
+        args: ['pull', relPath, '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -462,7 +462,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['pull', relPath, '-f'],
+        args: ['pull', relPath, '-f', '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -481,7 +481,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push'],
+        args: ['push', '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -497,7 +497,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', '-f'],
+        args: ['push', '-f', '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -515,7 +515,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', relPath],
+        args: ['push', relPath, '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
@@ -533,7 +533,7 @@ describe('CliExecutor', () => {
       expect(output).toEqual(stdout)
 
       expect(mockedCreateProcess).toBeCalledWith({
-        args: ['push', relPath, '-f'],
+        args: ['push', relPath, '-f', '-R'],
         cwd,
         env: mockedEnv,
         executable: 'dvc'
