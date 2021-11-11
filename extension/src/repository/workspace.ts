@@ -1,7 +1,7 @@
 import { join } from 'path'
-import { Uri } from 'vscode'
+import { EventEmitter, Uri } from 'vscode'
 import { Repository } from '.'
-import { TrackedExplorerTree } from '../fileSystem/tree'
+import { PathItem } from './collect'
 import {
   createNecessaryFileSystemWatcher,
   getRepositoryListener
@@ -11,8 +11,10 @@ import { BaseWorkspace, IWorkspace } from '../workspace'
 
 export class WorkspaceRepositories
   extends BaseWorkspace<Repository>
-  implements IWorkspace<Repository, TrackedExplorerTree>
+  implements IWorkspace<Repository, undefined>
 {
+  public treeDataChanged = new EventEmitter<PathItem | void>()
+
   public getCwd(overrideUri?: Uri): string | Promise<string | undefined> {
     return overrideUri?.fsPath || this.getOnlyOrPickProject()
   }
@@ -31,13 +33,8 @@ export class WorkspaceRepositories
     return cwd
   }
 
-  public create(
-    dvcRoots: string[],
-    trackedExplorerTree: TrackedExplorerTree
-  ): Repository[] {
-    const repositories = dvcRoots.map(dvcRoot =>
-      this.createRepository(dvcRoot, trackedExplorerTree)
-    )
+  public create(dvcRoots: string[]): Repository[] {
+    const repositories = dvcRoots.map(dvcRoot => this.createRepository(dvcRoot))
 
     Promise.all(repositories.map(repository => repository.isReady())).then(() =>
       this.deferred.resolve()
@@ -46,10 +43,7 @@ export class WorkspaceRepositories
     return repositories
   }
 
-  private createRepository(
-    dvcRoot: string,
-    trackedExplorerTree: TrackedExplorerTree
-  ): Repository {
+  private createRepository(dvcRoot: string): Repository {
     const repository = this.dispose.track(
       new Repository(dvcRoot, this.internalCommands)
     )
@@ -57,9 +51,16 @@ export class WorkspaceRepositories
       repository.dispose.track(
         createNecessaryFileSystemWatcher(
           join(gitRoot, '**'),
-          getRepositoryListener(repository, trackedExplorerTree, dvcRoot)
+          getRepositoryListener(repository, dvcRoot)
         )
       )
+    )
+    repository.onDidChangeTreeData(() =>
+      this.treeDataChanged.fire({
+        dvcRoot,
+        isDirectory: true,
+        resourceUri: Uri.file(dvcRoot)
+      })
     )
 
     this.setRepository(dvcRoot, repository)

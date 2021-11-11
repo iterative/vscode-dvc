@@ -10,7 +10,9 @@ import { getAllUntracked } from '../git'
 import { InternalCommands } from '../commands/internal'
 import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
+import { buildMockedEventEmitter } from '../test/util/jest'
 
+jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 jest.mock('./sourceControlManagement')
 jest.mock('./decorationProvider')
@@ -31,6 +33,8 @@ const mockedSetScmState = jest.fn()
 const mockedDecorationProvider = mocked(new DecorationProvider())
 const mockedSetDecorationState = jest.fn()
 mockedDecorationProvider.setState = mockedSetDecorationState
+
+const mockedTreeDataChanged = buildMockedEventEmitter()
 
 const mockedDisposable = mocked(Disposable)
 
@@ -120,7 +124,8 @@ describe('Repository', () => {
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        mockedDecorationProvider
+        mockedDecorationProvider,
+        mockedTreeDataChanged
       )
       await repository.isReady()
 
@@ -164,7 +169,8 @@ describe('Repository', () => {
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        mockedDecorationProvider
+        mockedDecorationProvider,
+        mockedTreeDataChanged
       )
       await repository.isReady()
 
@@ -242,7 +248,8 @@ describe('Repository', () => {
       const repository = new Repository(
         dvcRoot,
         mockedInternalCommands,
-        mockedDecorationProvider
+        mockedDecorationProvider,
+        mockedTreeDataChanged
       )
       await repository.isReady()
 

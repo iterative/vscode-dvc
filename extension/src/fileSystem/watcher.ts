@@ -3,7 +3,6 @@ import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
 import { isAnyDvcYaml, isDirectory } from '.'
-import { TrackedExplorerTree } from './tree'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
@@ -25,11 +24,7 @@ const isExcluded = (dvcRoot: string, path: string) =>
   ignoredDotDirectories.test(path)
 
 export const getRepositoryListener =
-  (
-    repository: Repository,
-    trackedExplorerTree: TrackedExplorerTree,
-    dvcRoot: string
-  ): ((path: string) => void) =>
+  (repository: Repository, dvcRoot: string): ((path: string) => void) =>
   (path: string) => {
     if (isExcluded(dvcRoot, path)) {
       return
@@ -37,11 +32,9 @@ export const getRepositoryListener =
 
     if (isAnyDvcYaml(path)) {
       repository.reset()
-      trackedExplorerTree.reset()
       return
     }
     repository.update()
-    trackedExplorerTree.refresh(path)
   }
 
 export const createFileSystemWatcher = (

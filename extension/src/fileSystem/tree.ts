@@ -1,4 +1,4 @@
-import { dirname, relative } from 'path'
+import { relative } from 'path'
 import {
   Event,
   EventEmitter,
@@ -9,11 +9,10 @@ import {
   window
 } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
-import { exists, isDirectory, relativeWithUri } from '.'
+import { exists, relativeWithUri } from '.'
 import { fireWatcher } from './watcher'
 import { deleteTarget, moveTargets } from './workspace'
-import { definedAndNonEmpty } from '../util/array'
-import { ListOutput } from '../cli/reader'
+import { definedAndNonEmpty, flatten } from '../util/array'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { getFirstWorkspaceFolder } from '../vscode/workspaceFolders'
 import { RegisteredCliCommands, RegisteredCommands } from '../commands/external'
@@ -24,10 +23,8 @@ import { pickResources } from '../vscode/resourcePicker'
 import { getWarningResponse } from '../vscode/modal'
 import { Response } from '../vscode/response'
 import { Resource } from '../repository/commands'
-
-export type PathItem = Resource & {
-  isDirectory: boolean
-}
+import { WorkspaceRepositories } from '../repository/workspace'
+import { PathItem } from '../repository/collect'
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public dispose = Disposable.fn()
@@ -35,60 +32,39 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
   public readonly onDidChangeTreeData: Event<PathItem | void>
 
   private readonly internalCommands: InternalCommands
-  private readonly treeDataChanged: EventEmitter<PathItem | void>
+  private readonly repositories: WorkspaceRepositories
 
   private dvcRoots: string[] = []
-
-  private pathItems: Record<string, PathItem> = {}
 
   private viewed = false
 
   constructor(
     internalCommands: InternalCommands,
     workspaceChanged: EventEmitter<void>,
-    treeDataChanged?: EventEmitter<PathItem | void>
+    repositories: WorkspaceRepositories
   ) {
     this.internalCommands = internalCommands
 
     this.registerCommands(workspaceChanged)
 
-    this.treeDataChanged = this.dispose.track(
-      treeDataChanged || new EventEmitter()
-    )
-    this.onDidChangeTreeData = this.treeDataChanged.event
+    this.repositories = repositories
+
+    this.onDidChangeTreeData = repositories.treeDataChanged.event
 
     this.dispose.track(
       window.registerTreeDataProvider('dvc.views.trackedExplorerTree', this)
     )
   }
 
-  public refresh(path?: string): void {
-    if (path) {
-      const pathItem = this.getPathItem(dirname(path))
-      this.treeDataChanged.fire(pathItem)
-    }
-  }
-
-  public reset(): void {
-    this.treeDataChanged.fire()
-  }
-
-  public initialize(dvcRoots: string[]) {
+  public async initialize(dvcRoots: string[]) {
     this.dvcRoots = dvcRoots
-    dvcRoots.forEach(
-      dvcRoot =>
-        (this.pathItems[dvcRoot] = {
-          dvcRoot,
-          isDirectory: true,
-          resourceUri: Uri.file(dvcRoot)
-        })
-    )
+    await this.repositories.isReady()
     this.reset()
   }
 
-  public async getChildren(pathItem?: PathItem): Promise<PathItem[]> {
+  public getChildren(pathItem?: PathItem): PathItem[] {
     if (pathItem) {
-      const contents = await this.readDirectory(pathItem)
+      const contents = this.readDirectory(pathItem)
       return this.sortDirectory(contents)
     }
 
@@ -120,8 +96,8 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return treeItem
   }
 
-  private getPathItem(path: string) {
-    return this.pathItems[path]
+  private reset(): void {
+    this.repositories.treeDataChanged.fire()
   }
 
   private getRootElements() {
@@ -135,10 +111,14 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
 
     if (this.dvcRoots.length === 1) {
       const [onlyRoot] = this.dvcRoots
-      return this.getChildren(this.getPathItem(onlyRoot))
+      return this.repositories.getRepository(onlyRoot).getChildren(onlyRoot)
     }
 
-    return this.dvcRoots.map(dvcRoot => this.getPathItem(dvcRoot))
+    return flatten(
+      this.dvcRoots.map(dvcRoot =>
+        this.repositories.getRepository(dvcRoot).getChildren(dvcRoot)
+      )
+    )
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
@@ -159,32 +139,15 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return baseContext
   }
 
-  private async readDirectory(pathItem: PathItem): Promise<PathItem[]> {
+  private readDirectory(pathItem: PathItem): PathItem[] {
     const { dvcRoot, resourceUri } = pathItem
     if (!dvcRoot) {
       return []
     }
 
-    const listOutput = await this.internalCommands.executeCommand<ListOutput[]>(
-      AvailableCommands.LIST_DVC_ONLY,
-      dvcRoot,
-      relativeWithUri(dvcRoot, resourceUri)
-    )
-
-    return listOutput.map(relative => {
-      const uri = Uri.joinPath(resourceUri, relative.path)
-      const absolutePath = uri.fsPath
-      const pathItem = {
-        dvcRoot,
-        // TODO: revert after https://github.com/iterative/dvc/issues/6094 is fixed
-        isDirectory: exists(absolutePath)
-          ? isDirectory(absolutePath)
-          : relative.isdir,
-        resourceUri: uri
-      }
-      this.pathItems[absolutePath] = pathItem
-      return pathItem
-    })
+    return this.repositories
+      .getRepository(dvcRoot)
+      .getChildren(resourceUri.fsPath)
   }
 
   private sortDirectory(contents: PathItem[]) {
@@ -242,7 +205,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       RegisteredCliCommands.REMOVE_TARGET,
       ({ dvcRoot, resourceUri }) => {
         deleteTarget(resourceUri)
-        this.treeDataChanged.fire()
+        this.reset()
         const relPath = relative(dvcRoot, this.getDataPlaceholder(resourceUri))
         return this.internalCommands.executeCommand(
           AvailableCommands.REMOVE,

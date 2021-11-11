@@ -1,5 +1,7 @@
 import { dirname, resolve } from 'path'
+import isEqual from 'lodash.isequal'
 import { Disposable } from '@hediet/std/disposable'
+import { collectTree, PathItem } from './collect'
 import { SourceControlManagementModel } from './sourceControlManagement'
 import { DecorationModel } from './decorationProvider'
 import {
@@ -45,12 +47,18 @@ export class RepositoryModel
     untracked: new Set<string>()
   }
 
+  private tree = new Map<string, PathItem[]>()
+
   constructor(dvcRoot: string) {
     this.dvcRoot = dvcRoot
   }
 
   public getState() {
     return this.state
+  }
+
+  public getChildren(path: string): PathItem[] {
+    return this.tree.get(path) || []
   }
 
   public setState({
@@ -232,9 +240,15 @@ export class RepositoryModel
 
     const absoluteTrackedPaths = this.getAbsolutePaths(trackedPaths)
 
-    this.state.tracked = new Set([
+    const tracked = new Set([
       ...absoluteTrackedPaths,
       ...this.getAbsoluteParentPath(trackedPaths)
     ])
+
+    if (!isEqual(tracked, this.state.tracked)) {
+      this.tree = collectTree(this.dvcRoot, trackedPaths)
+    }
+
+    this.state.tracked = tracked
   }
 }
