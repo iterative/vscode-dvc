@@ -96,7 +96,6 @@ describe('TrackedTreeView', () => {
         mockedDvcRoots.map(dvcRoot => ({
           dvcRoot,
           isDirectory: true,
-          isOut: false,
           resourceUri: Uri.file(dvcRoot)
         }))
       )
@@ -120,19 +119,16 @@ describe('TrackedTreeView', () => {
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
-          isOut: false,
           resourceUri: testUri(data)
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
-          isOut: true,
           resourceUri: testUri(dvcDemoPath, 'logs')
         },
         {
           dvcRoot: dvcDemoPath,
           isDirectory: false,
-          isOut: true,
           resourceUri: testUri(dvcDemoPath, 'model.pt')
         }
       ])
@@ -144,14 +140,12 @@ describe('TrackedTreeView', () => {
       const child = await trackedTreeView.getChildren({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
-        isOut: false,
         resourceUri: dataUri
       })
       expect(child).toEqual([
         {
           dvcRoot: dvcDemoPath,
           isDirectory: true,
-          isOut: false,
           resourceUri: testUri(dvcDemoPath, 'data', 'MNIST')
         }
       ])
@@ -181,7 +175,6 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
-        isOut: false,
         resourceUri: Uri.file(join(dvcDemoPath, 'data'))
       })
 
@@ -210,7 +203,6 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: false,
-        isOut: false,
         resourceUri: log
       })
 
@@ -251,7 +243,6 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
-        isOut: false,
         resourceUri: Uri.file(join(dvcDemoPath, 'data'))
       })
 
@@ -282,7 +273,6 @@ describe('TrackedTreeView', () => {
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
         isDirectory: false,
-        isOut: false,
         resourceUri: log
       })
 
@@ -294,7 +284,7 @@ describe('TrackedTreeView', () => {
           command: RegisteredCommands.TRACKED_EXPLORER_OPEN_FILE,
           title: 'Open File'
         },
-        contextValue: 'fileHasRemote'
+        contextValue: 'file'
       })
     })
   })
