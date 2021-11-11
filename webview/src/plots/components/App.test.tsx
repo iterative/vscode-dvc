@@ -34,7 +34,7 @@ const mockGetState = mocked(getState)
 const mockSetState = mocked(setState)
 
 const minimalPlotsShowFixture = {
-  'predictions.json': plotsShowFixture['predictions.json']
+  'logs/loss.tsv': plotsShowFixture['logs/loss.tsv']
 }
 
 beforeEach(() => {
