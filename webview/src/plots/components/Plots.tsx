@@ -1,12 +1,8 @@
 import React, { Dispatch } from 'react'
 import cx from 'classnames'
-import {
-  LivePlotsColors,
-  LivePlotData,
-  PlotsData
-} from 'dvc/src/plots/webview/contract'
+import { LivePlotsColors, LivePlotData } from 'dvc/src/plots/webview/contract'
+import { PlotsOutput } from 'dvc/src/cli/reader'
 import { VegaLite, VisualizationSpec } from 'react-vega'
-import { isEmpty } from 'lodash'
 import { Config } from 'vega'
 import styles from './styles.module.scss'
 import {
@@ -161,7 +157,7 @@ const LivePlots = ({
   colors
 }: {
   plots: LivePlotData[]
-  colors?: LivePlotsColors
+  colors: LivePlotsColors
 }) => (
   <>
     {plots.map(plotData => (
@@ -175,9 +171,9 @@ const LivePlots = ({
   </>
 )
 
-const StaticPlots = ({ plots }: { plots: [string, VisualizationSpec][] }) => (
+const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
-    {plots.map(([path, spec]) => (
+    {Object.entries(plots).map(([path, spec]) => (
       <VegaLite
         actions={false}
         config={config}
@@ -197,20 +193,6 @@ const EmptyState = (text: string) => {
   )
 }
 
-const getPlotsFromData = (
-  data: PlotsData
-): {
-  livePlots: LivePlotData[] | undefined
-  staticPlots: [string, VisualizationSpec][] | undefined
-} => {
-  const livePlots = data.live?.plots
-  const staticPlots = data.static && Object.entries(data.static)
-  return {
-    livePlots: isEmpty(livePlots) ? undefined : livePlots,
-    staticPlots: isEmpty(staticPlots) ? undefined : staticPlots
-  }
-}
-
 const Plots = ({
   state,
   dispatch
@@ -224,7 +206,7 @@ const Plots = ({
     return EmptyState('Loading Plots...')
   }
 
-  const { livePlots, staticPlots } = getPlotsFromData(data)
+  const { live: livePlots, static: staticPlots } = data
 
   if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
@@ -239,7 +221,7 @@ const Plots = ({
           collapsedSections={collapsedSections}
           dispatch={dispatch}
         >
-          <LivePlots plots={livePlots} colors={data.live?.colors} />
+          <LivePlots plots={livePlots.plots} colors={livePlots.colors} />
         </PlotsContainer>
       )}
       {staticPlots && (
