@@ -106,7 +106,7 @@ describe('App', () => {
   it('should render the empty state when given data with no experiments', async () => {
     const dataMessageWithoutPlots = new MessageEvent('message', {
       data: {
-        data: { live: { plots: [] }, static: {} },
+        data: { live: undefined, static: undefined },
         type: MessageToWebviewType.setData
       }
     })
