@@ -1,6 +1,5 @@
-import { join } from 'path'
 import { mocked } from 'ts-jest/utils'
-import { EventEmitter, Uri } from 'vscode'
+import { EventEmitter } from 'vscode'
 import { Experiments } from '../../../experiments'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Process } from '../../../processExecution'
@@ -18,7 +17,7 @@ export const getFailingMockedProcess = (stderr: string): Process =>
     stdout: new Promise((_, reject) => reject(new Error(stderr)))
   } as unknown as Process)
 
-const buildMockedEventEmitter = () => {
+export const buildMockedEventEmitter = () => {
   const mockedEmitter = mocked(new EventEmitter<void>())
   const mockedEmitterChangedFire = jest.fn()
   const mockedEmitterChangedEvent = jest.fn()
@@ -66,8 +65,3 @@ export const buildMockedExperiments = () => {
     mockedParamsOrMetricsChanged
   }
 }
-
-export const testUri = (...paths: string[]) =>
-  expect.objectContaining({
-    fsPath: Uri.file(join(...paths)).fsPath
-  })

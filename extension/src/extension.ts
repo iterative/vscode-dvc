@@ -146,7 +146,11 @@ export class Extension implements IExtension {
     this.dispose.track(new ExperimentsTree(this.experiments))
 
     this.trackedExplorerTree = this.dispose.track(
-      new TrackedExplorerTree(this.internalCommands, this.workspaceChanged)
+      new TrackedExplorerTree(
+        this.internalCommands,
+        this.workspaceChanged,
+        this.repositories
+      )
     )
 
     setup(this)
@@ -294,7 +298,7 @@ export class Extension implements IExtension {
     this.resetMembers()
 
     await Promise.all([
-      this.repositories.create(this.dvcRoots, this.trackedExplorerTree),
+      this.repositories.create(this.dvcRoots),
       this.trackedExplorerTree.initialize(this.dvcRoots),
       this.experiments.create(this.dvcRoots, this.resourceLocator),
       this.plots.create(this.dvcRoots, this.resourceLocator)

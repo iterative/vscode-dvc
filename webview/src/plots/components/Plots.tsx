@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { Dispatch } from 'react'
 import cx from 'classnames'
-import {
-  LivePlotsColors,
-  LivePlotData,
-  PlotsData
-} from 'dvc/src/plots/webview/contract'
+import { LivePlotsColors, LivePlotData } from 'dvc/src/plots/webview/contract'
+import { PlotsOutput } from 'dvc/src/cli/reader'
 import { VegaLite, VisualizationSpec } from 'react-vega'
-import { isEmpty } from 'lodash'
 import { Config } from 'vega'
 import styles from './styles.module.scss'
+import {
+  CollapsibleSectionsActions,
+  PlotsSectionKeys,
+  CollapsibleSectionsState,
+  PlotsReducerAction,
+  PlotsWebviewState
+} from '../hooks/useAppReducer'
 
 const createSpec = (
   title: string,
@@ -102,20 +105,28 @@ const config: Config = {
   }
 }
 
-const PlotContainer = ({
-  component,
-  title
-}: {
-  component: JSX.Element
+const PlotsContainer: React.FC<{
+  collapsedSections: CollapsibleSectionsState
+  sectionKey: PlotsSectionKeys
+  dispatch: Dispatch<PlotsReducerAction>
   title: string
-}) => {
+}> = ({ collapsedSections, sectionKey, dispatch, title, children }) => {
+  const open = !collapsedSections[sectionKey]
   return (
-    <div>
-      <div className={styles.centered}>
-        <h1>{title}</h1>
-      </div>
-      <div className={styles.centered}>{component}</div>
-    </div>
+    <details open={open} className={styles.plotsContainer}>
+      <summary
+        onClick={e => {
+          e.preventDefault()
+          dispatch({
+            sectionKey,
+            type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
+          })
+        }}
+      >
+        {title}
+      </summary>
+      <div className={styles.centered}>{open && children}</div>
+    </details>
   )
 }
 
@@ -145,61 +156,34 @@ const LivePlots = ({
   plots,
   colors
 }: {
-  plots?: LivePlotData[]
-  colors?: LivePlotsColors
-}) => {
-  if (!plots?.length) {
-    return <></>
-  }
+  plots: LivePlotData[]
+  colors: LivePlotsColors
+}) => (
+  <>
+    {plots.map(plotData => (
+      <Plot
+        values={plotData.values}
+        title={plotData.title}
+        scale={colors}
+        key={`plot-${plotData.title}`}
+      />
+    ))}
+  </>
+)
 
-  return (
-    <PlotContainer
-      title="Live Experiments Plots"
-      component={
-        <>
-          {plots.map(plotData => (
-            <Plot
-              values={plotData.values}
-              title={plotData.title}
-              scale={colors}
-              key={`plot-${plotData.title}`}
-            />
-          ))}
-        </>
-      }
-    />
-  )
-}
-
-const StaticPlots = ({
-  plots
-}: {
-  plots?: Record<string, VisualizationSpec>
-}) => {
-  const entries = Object.entries(plots || {})
-  if (!entries.length) {
-    return <></>
-  }
-
-  return (
-    <PlotContainer
-      component={
-        <>
-          {Object.entries(plots || {})?.map(([path, spec]) => (
-            <VegaLite
-              actions={false}
-              config={config}
-              spec={spec}
-              renderer="svg"
-              key={`plot-${path}`}
-            />
-          ))}
-        </>
-      }
-      title="Static Plots"
-    />
-  )
-}
+const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
+  <>
+    {Object.entries(plots).map(([path, spec]) => (
+      <VegaLite
+        actions={false}
+        config={config}
+        spec={spec}
+        renderer="svg"
+        key={`plot-${path}`}
+      />
+    ))}
+  </>
+)
 
 const EmptyState = (text: string) => {
   return (
@@ -209,22 +193,47 @@ const EmptyState = (text: string) => {
   )
 }
 
-const Plots = ({ plotsData }: { plotsData?: PlotsData }) => {
-  if (!plotsData) {
+const Plots = ({
+  state,
+  dispatch
+}: {
+  state: PlotsWebviewState
+  dispatch: Dispatch<PlotsReducerAction>
+}) => {
+  const { data, collapsedSections } = state
+
+  if (!data) {
     return EmptyState('Loading Plots...')
   }
 
-  if (isEmpty(plotsData?.live?.plots) && isEmpty(plotsData?.static)) {
+  const { live: livePlots, static: staticPlots } = data
+
+  if (!livePlots && !staticPlots) {
     return EmptyState('No Plots to Display')
   }
 
   return (
     <>
-      <LivePlots
-        plots={plotsData.live?.plots}
-        colors={plotsData.live?.colors}
-      />
-      <StaticPlots plots={plotsData.static} />
+      {livePlots && (
+        <PlotsContainer
+          title="Live Experiments Plots"
+          sectionKey={PlotsSectionKeys.LIVE_PLOTS}
+          collapsedSections={collapsedSections}
+          dispatch={dispatch}
+        >
+          <LivePlots plots={livePlots.plots} colors={livePlots.colors} />
+        </PlotsContainer>
+      )}
+      {staticPlots && (
+        <PlotsContainer
+          title="Static Plots"
+          sectionKey={PlotsSectionKeys.STATIC_PLOTS}
+          collapsedSections={collapsedSections}
+          dispatch={dispatch}
+        >
+          <StaticPlots plots={staticPlots} />
+        </PlotsContainer>
+      )}
     </>
   )
 }

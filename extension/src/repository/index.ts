@@ -1,6 +1,6 @@
+import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { observable, makeObservable } from 'mobx'
 import { SourceControlManagement } from './sourceControlManagement'
 import { DecorationProvider } from './decorationProvider'
 import { RepositoryModel } from './model'
@@ -8,14 +8,15 @@ import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
+
 export class Repository {
-  @observable
-  private model: RepositoryModel
-
   public readonly dispose = Disposable.fn()
+  public readonly onDidChangeTreeData: Event<void>
 
+  private model: RepositoryModel
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
+  private readonly treeDataChanged: EventEmitter<void>
 
   private readonly dvcRoot: string
   private readonly internalCommands: InternalCommands
@@ -27,9 +28,9 @@ export class Repository {
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
-    decorationProvider = new DecorationProvider()
+    decorationProvider = new DecorationProvider(),
+    treeDataChanged = new EventEmitter<void>()
   ) {
-    makeObservable(this)
     this.internalCommands = internalCommands
     this.decorationProvider = this.dispose.track(decorationProvider)
     this.dvcRoot = dvcRoot
@@ -46,6 +47,9 @@ export class Repository {
       )
     )
 
+    this.treeDataChanged = this.dispose.track(treeDataChanged)
+    this.onDidChangeTreeData = this.treeDataChanged.event
+
     this.setup()
   }
 
@@ -55,6 +59,10 @@ export class Repository {
 
   public getState() {
     return this.model.getState()
+  }
+
+  public getChildren(path: string) {
+    return this.model.getChildren(path)
   }
 
   public reset(): Promise<void> {
@@ -80,6 +88,7 @@ export class Repository {
     this.model.setState({ diffFromCache, diffFromHead, tracked, untracked })
 
     this.setState()
+    this.treeDataChanged.fire()
   }
 
   private async updateState() {
