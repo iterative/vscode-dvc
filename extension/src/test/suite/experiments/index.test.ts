@@ -163,14 +163,14 @@ suite('Experiments Test Suite', () => {
       await experiments.showWebview()
 
       const columnOrder = [
-        'id',
-        'timestamp',
-        'params:params.yaml:lr',
-        'metrics:logs.json:step',
-        'params:params.yaml:weight_decay',
-        'metrics:logs.json:loss',
-        'params:params.yaml:seed',
-        'metrics:logs.json:acc'
+        { path: 'id', width: 150 },
+        { path: 'timestamp', width: 150 },
+        { path: 'params:params.yaml:lr', width: 150 },
+        { path: 'metrics:logs.json:step', width: 150 },
+        { path: 'params:params.yaml:weight_decay', width: 150 },
+        { path: 'metrics:logs.json:loss', width: 150 },
+        { path: 'params:params.yaml:seed', width: 150 },
+        { path: 'metrics:logs.json:acc', width: 150 }
       ]
 
       const mockSetColumnReordered = stub(

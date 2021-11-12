@@ -6,7 +6,11 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webview/contract'
-import { ParamOrMetric, TableData } from 'dvc/src/experiments/webview/contract'
+import {
+  ColumnOrder,
+  ParamOrMetric,
+  TableData
+} from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
@@ -78,15 +82,40 @@ export class Model {
     vsCodeApi.postMessage(message)
   }
 
+  public getColumnsWithWidth(): ColumnOrder[] {
+    return this.data?.columnsOrder || []
+  }
+
+  public setColumnWidth(id: string, width: number) {
+    const column = this.data?.columnsOrder.find(column => column.path === id)
+    if (column) {
+      column.width = width
+      this.sendMessage({
+        payload: { id, width },
+        type: MessageFromWebviewType.columnResized
+      })
+    }
+  }
+
   public createColumnsOrderRepresentation(newOrder?: string[]) {
     if (newOrder) {
       this.sendMessage({
-        payload: newOrder,
+        payload: this.getOrderFromPaths(newOrder),
         type: MessageFromWebviewType.columnReordered
       })
     }
 
     this.columnsOrderRepresentation = this.getOrderedDataWithGroups(newOrder)
+  }
+
+  private getOrderFromPaths(paths: string[]): ColumnOrder[] {
+    return this.data?.columnsOrder?.length
+      ? (paths
+          .map(path =>
+            this.data?.columnsOrder.find(column => column.path === path)
+          )
+          .filter(Boolean) as ColumnOrder[])
+      : paths.map(path => ({ path, width: 0 }))
   }
 
   private getOrderedPaths(newOrder?: string[]): string[] {
@@ -95,9 +124,11 @@ export class Model {
     }
 
     return (
-      this.data?.columnsOrder?.filter(
-        column => !['experiment', 'timestamp'].includes(column)
-      ) || []
+      (this.data?.columnsOrder &&
+        this.data.columnsOrder
+          .map(column => column.path)
+          .filter(column => !['experiment', 'timestamp'].includes(column))) ||
+      []
     )
   }
 

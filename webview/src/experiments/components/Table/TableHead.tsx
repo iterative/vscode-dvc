@@ -5,7 +5,7 @@ import { HeaderGroup, TableInstance } from 'react-table'
 import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
-import { useColumnOrder } from '../../util/useColumnsOrder'
+import { useColumnOrder } from '../../hooks/useColumnsOrder'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
@@ -20,7 +20,6 @@ export const TableHead: React.FC<TableHeadProps> = ({
 }) => {
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
-
   const currentColOrder = React.useRef<string[]>(columnsOrder)
   const [, setColumnOrderRepresentation] = useColumnOrder()
 
@@ -46,7 +45,11 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   React.useEffect(() => {
-    setColumnOrder(columnsOrder)
+    if (
+      JSON.stringify(columnsOrder) !== JSON.stringify(currentColOrder.current)
+    ) {
+      setColumnOrder(columnsOrder)
+    }
   }, [columnsOrder, setColumnOrder])
 
   currentColOrder.current = allColumns?.map(o => o.id)

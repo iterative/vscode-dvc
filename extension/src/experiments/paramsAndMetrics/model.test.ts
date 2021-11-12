@@ -98,7 +98,11 @@ describe('ParamsAndMetricsModel', () => {
           [MementoPrefixes.columnsOrder + exampleDvcRoot]: ['A', 'B', 'C']
         })
       )
-      const newState = ['C', 'B', 'A']
+      const newState = [
+        { path: 'C', width: 11 },
+        { path: 'B', width: 33 },
+        { path: 'A', width: 42 }
+      ]
       model.setColumnsOrder(newState)
       expect(model.getColumnsOrder()).toEqual(newState)
     })

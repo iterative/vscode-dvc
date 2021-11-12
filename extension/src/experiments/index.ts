@@ -13,7 +13,11 @@ import { InternalCommands } from '../commands/internal'
 import { ExperimentsOutput } from '../cli/reader'
 import { ViewKey } from '../webview/constants'
 import { BaseRepository } from '../webview/repository'
-import { MessageFromWebviewType } from '../webview/contract'
+import {
+  ColumnReorderPayload,
+  ColumnResizePayload,
+  MessageFromWebviewType
+} from '../webview/contract'
 import { Logger } from '../common/logger'
 
 export class Experiments extends BaseRepository<TableData> {
@@ -200,14 +204,23 @@ export class Experiments extends BaseRepository<TableData> {
   private handleMessageFromWebview() {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
-        if (
-          message.type === MessageFromWebviewType.columnReordered &&
-          message.payload
-        ) {
-          return this.paramsAndMetrics.setColumnsOrder(message.payload)
+        switch (message.type) {
+          case MessageFromWebviewType.columnReordered:
+            return (
+              message.payload &&
+              this.paramsAndMetrics.setColumnsOrder(
+                message.payload as ColumnReorderPayload
+              )
+            )
+          case MessageFromWebviewType.columnResized: {
+            const { id, width } = message.payload as ColumnResizePayload
+            return (
+              message.payload && this.paramsAndMetrics.setColumnWidth(id, width)
+            )
+          }
+          default:
+            Logger.error(`Unexpected message: ${message}`)
         }
-
-        Logger.error(`Unexpected message: ${message}`)
       })
     )
   }

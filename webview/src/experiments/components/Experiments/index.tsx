@@ -18,6 +18,9 @@ import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
+import { useColumnResize } from '../../hooks/useColumnResize'
+
+const DEFAULT_COLUMN_WIDTH = 120
 
 const countRowsAndAddIndexes: (
   rows: Row<Experiment>[],
@@ -59,10 +62,11 @@ const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
 export const ExperimentsTable: React.FC<{
   tableData: TableData
 }> = ({ tableData }) => {
+  const [columnsWidth, setColumnWidth] = useColumnResize()
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {
-      minWidth: 120
+      minWidth: DEFAULT_COLUMN_WIDTH
     }
     return [initialState, defaultColumn]
   }, [])
@@ -91,6 +95,11 @@ export const ExperimentsTable: React.FC<{
             ungrouped: action.setting || !state.ungrouped
           }
         }
+        if (action.type === 'columnDoneResizing') {
+          const columnId = Object.keys(state.columnResizing.columnWidths)[0]
+          const columnWidth = state.columnResizing.columnWidths[columnId]
+          setColumnWidth(columnId, columnWidth)
+        }
         return state
       })
     },
@@ -100,10 +109,15 @@ export const ExperimentsTable: React.FC<{
     useResizeColumns,
     hooks => {
       hooks.useInstance.push(instance => {
-        const { rows } = instance
+        const { rows, allColumns } = instance
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
           expandedRowCount
+        })
+        allColumns.forEach(column => {
+          column.width =
+            columnsWidth.find(c => c.path === column.id)?.width ||
+            DEFAULT_COLUMN_WIDTH
         })
       })
     }
@@ -120,7 +134,7 @@ export const ExperimentsTable: React.FC<{
       instance={instance}
       sorts={tableData.sorts}
       changes={tableData.changes}
-      columnsOrder={tableData.columnsOrder}
+      columnsOrder={tableData.columnsOrder?.map(column => column.path)}
     />
   )
 }

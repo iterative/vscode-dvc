@@ -1,8 +1,7 @@
-export const A = 'A'
-/* import { ColumnOrder } from 'dvc/src/experiments/webview/contract'
+import { ColumnOrder } from 'dvc/src/experiments/webview/contract'
 import { Model } from '../model'
 
-export const useColumnResize= (): [
+export const useColumnResize = (): [
   ColumnOrder[],
   (columnId: string, width: number) => void
 ] => {
@@ -11,4 +10,4 @@ export const useColumnResize= (): [
   const setColumnWidth = (columnId: string, width: number) =>
     modelInstance.setColumnWidth(columnId, width)
   return [columnWidth, setColumnWidth]
-} */
+}

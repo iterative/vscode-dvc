@@ -32,10 +32,15 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   types?: string[]
 }
 
+export interface ColumnOrder {
+  path: string
+  width: number
+}
+
 export interface TableData {
   rows: RowData[]
   columns: ParamOrMetric[]
   sorts: SortDefinition[]
   changes: string[]
-  columnsOrder: string[]
+  columnsOrder: ColumnOrder[]
 }
