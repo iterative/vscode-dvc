@@ -29,7 +29,7 @@ export class ExperimentsModel {
   private branches: Experiment[] = []
   private experimentsByBranch: Map<string, Experiment[]> = new Map()
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
-  private livePlots: LivePlotData[] = []
+  private livePlots?: LivePlotData[]
   private colors: Colors
 
   private filters: Map<string, FilterDefinition> = new Map()
@@ -54,6 +54,10 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
+    if (!this.livePlots) {
+      return
+    }
+
     const colors: LivePlotsColors = {
       domain: [],
       range: []

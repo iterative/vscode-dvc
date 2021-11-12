@@ -116,7 +116,7 @@ const collectFromExperimentsObject = (
 
 export const collectLivePlotsData = (
   data: ExperimentsOutput
-): LivePlotData[] => {
+): LivePlotData[] | undefined => {
   const acc = new Map<string, LivePlotValues>()
 
   for (const { baseline, ...experimentsObject } of Object.values(
@@ -127,6 +127,10 @@ export const collectLivePlotsData = (
     if (branch) {
       collectFromExperimentsObject(acc, experimentsObject)
     }
+  }
+
+  if (!acc.size) {
+    return
   }
 
   const plotsData: LivePlotData[] = []

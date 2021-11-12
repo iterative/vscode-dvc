@@ -1,3 +1,4 @@
+import isEmpty from 'lodash.isempty'
 import { PlotsData as TPlotsData } from './webview/contract'
 import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
@@ -16,7 +17,7 @@ export class Plots extends BaseRepository<TPlotsData> {
   private experiments?: Experiments
 
   private data: PlotsData
-  private staticPlots: PlotsOutput | undefined
+  private staticPlots?: PlotsOutput
 
   constructor(
     dvcRoot: string,
@@ -57,6 +58,11 @@ export class Plots extends BaseRepository<TPlotsData> {
   }
 
   private setStaticPlots(data: PlotsOutput) {
+    if (isEmpty(data)) {
+      this.staticPlots = undefined
+      return
+    }
+
     this.staticPlots = data
   }
 }
