@@ -105,7 +105,6 @@ export const autoRegisteredCommands = {
   DIFF: 'diff',
   EXPERIMENT_LIST_CURRENT: 'experimentListCurrent',
   EXPERIMENT_SHOW: 'experimentShow',
-  LIST_DVC_ONLY: 'listDvcOnly',
   LIST_DVC_ONLY_RECURSIVE: 'listDvcOnlyRecursive',
   PLOTS_SHOW: 'plotsShow',
   STATUS: 'status'
@@ -137,16 +136,6 @@ export class CliReader extends Cli {
 
   public help(cwd: string): Promise<string> {
     return this.executeProcess(cwd, Flag.HELP)
-  }
-
-  public listDvcOnly(cwd: string, relativePath: string): Promise<ListOutput[]> {
-    return this.readProcessJson<ListOutput[]>(
-      cwd,
-      Command.LIST,
-      ListFlag.LOCAL_REPO,
-      relativePath,
-      ListFlag.DVC_ONLY
-    )
   }
 
   public listDvcOnlyRecursive(cwd: string): Promise<ListOutput[]> {

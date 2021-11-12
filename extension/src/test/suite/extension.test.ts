@@ -207,12 +207,6 @@ suite('Extension Test Suite', () => {
         { path: 'model.pt' }
       ] as ListOutput[])
 
-      stub(CliReader.prototype, 'listDvcOnly').resolves([
-        { isdir: true, isexec: false, isout: false, path: 'data' },
-        { isdir: true, isexec: false, isout: true, path: 'logs' },
-        { isdir: false, isexec: false, isout: true, path: 'model.pt' }
-      ])
-
       stub(CliReader.prototype, 'root').resolves('.')
 
       const mockDiff = stub(CliReader.prototype, 'diff').resolves({
