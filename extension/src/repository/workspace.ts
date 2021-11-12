@@ -6,12 +6,9 @@ import {
   getRepositoryListener
 } from '../fileSystem/watcher'
 import { getGitRepositoryRoot } from '../git'
-import { BaseWorkspace, IWorkspace } from '../workspace'
+import { BaseWorkspace } from '../workspace'
 
-export class WorkspaceRepositories
-  extends BaseWorkspace<Repository>
-  implements IWorkspace<Repository, undefined>
-{
+export class WorkspaceRepositories extends BaseWorkspace<Repository> {
   public treeDataChanged = this.dispose.track(new EventEmitter<void>())
 
   public getCwd(overrideUri?: Uri): string | Promise<string | undefined> {
@@ -32,17 +29,7 @@ export class WorkspaceRepositories
     return cwd
   }
 
-  public create(dvcRoots: string[]): Repository[] {
-    const repositories = dvcRoots.map(dvcRoot => this.createRepository(dvcRoot))
-
-    Promise.all(repositories.map(repository => repository.isReady())).then(() =>
-      this.deferred.resolve()
-    )
-
-    return repositories
-  }
-
-  private createRepository(dvcRoot: string): Repository {
+  public createRepository(dvcRoot: string): Repository {
     const repository = this.dispose.track(
       new Repository(dvcRoot, this.internalCommands)
     )

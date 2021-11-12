@@ -3,15 +3,12 @@ import { BaseRepository } from './repository'
 import { WebviewData } from './contract'
 import { InternalCommands } from '../commands/internal'
 import { ResourceLocator } from '../resourceLocator'
-import { BaseWorkspace, IWorkspace } from '../workspace'
+import { BaseWorkspace } from '../workspace'
 
 export abstract class BaseWorkspaceWebviews<
-    T extends BaseRepository<U>,
-    U extends WebviewData
-  >
-  extends BaseWorkspace<T>
-  implements IWorkspace<T, ResourceLocator>
-{
+  T extends BaseRepository<U>,
+  U extends WebviewData
+> extends BaseWorkspace<T, ResourceLocator> {
   constructor(
     internalCommands: InternalCommands,
     repositories?: Record<string, T>
@@ -34,18 +31,6 @@ export abstract class BaseWorkspaceWebviews<
     return repository
   }
 
-  public create(dvcRoots: string[], resourceLocator: ResourceLocator): T[] {
-    const repositories = dvcRoots.map(dvcRoot =>
-      this.createRepository(dvcRoot, resourceLocator)
-    )
-
-    Promise.all(repositories.map(repository => repository.isReady())).then(() =>
-      this.deferred.resolve()
-    )
-
-    return repositories
-  }
-
   public setWebview(dvcRoot: string, webview: BaseWebview<U>) {
     const repository = this.getRepository(dvcRoot)
     if (!repository) {
@@ -54,9 +39,4 @@ export abstract class BaseWorkspaceWebviews<
 
     repository.setWebview(webview)
   }
-
-  abstract createRepository(
-    dvcRoot: string,
-    resourceLocator: ResourceLocator
-  ): T
 }

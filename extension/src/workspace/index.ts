@@ -1,19 +1,14 @@
-import { Disposable, Disposer } from '@hediet/std/disposable'
+import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { InternalCommands } from '../commands/internal'
+import { ResourceLocator } from '../resourceLocator'
 import { Disposables, reset } from '../util/disposable'
 import { quickPickOne } from '../vscode/quickPick'
 
-export interface IWorkspace<T, U> {
-  create: (dvcRoots: string[], arg: U) => T[]
-  dispose: (() => void) & Disposer
-  getDvcRoots: () => string[]
-  getOnlyOrPickProject: () => Promise<string | undefined>
-  isReady: () => Promise<void>
-  reset: () => void
-}
-
-export class BaseWorkspace<T extends Disposable> {
+export abstract class BaseWorkspace<
+  T extends Disposable & { isReady: () => Promise<void> },
+  U extends ResourceLocator | undefined = undefined
+> {
   public readonly dispose = Disposable.fn()
 
   protected repositories: Disposables<T> = {}
@@ -28,6 +23,18 @@ export class BaseWorkspace<T extends Disposable> {
 
   public isReady() {
     return this.initialized
+  }
+
+  public create(dvcRoots: string[], optional?: U): T[] {
+    const repositories = dvcRoots.map(dvcRoot =>
+      this.createRepository(dvcRoot, optional)
+    )
+
+    Promise.all(repositories.map(repository => repository.isReady())).then(() =>
+      this.deferred.resolve()
+    )
+
+    return repositories
   }
 
   public getDvcRoots() {
@@ -58,4 +65,6 @@ export class BaseWorkspace<T extends Disposable> {
   protected setRepository(dvcRoot: string, repository: T) {
     this.repositories[dvcRoot] = repository
   }
+
+  abstract createRepository(dvcRoot: string, arg?: U): T
 }
