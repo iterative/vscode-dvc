@@ -69,7 +69,12 @@ export class ExperimentsParamsAndMetricsTree
   public getTreeItem(element: string | ParamsAndMetricsItem): TreeItem {
     if (this.isRoot(element)) {
       const resourceUri = Uri.file(element)
-      return new TreeItem(resourceUri, TreeItemCollapsibleState.Collapsed)
+      const treeItem = new TreeItem(
+        resourceUri,
+        TreeItemCollapsibleState.Collapsed
+      )
+      treeItem.contextValue = 'root'
+      return treeItem
     }
 
     const { dvcRoot, path, collapsibleState, description, iconPath } = element
@@ -77,6 +82,8 @@ export class ExperimentsParamsAndMetricsTree
     const splitPath = splitParamOrMetricPath(path)
     const finalPathSegment = splitPath[splitPath.length - 1]
     const treeItem = new TreeItem(finalPathSegment, collapsibleState)
+
+    treeItem.contextValue = splitPath[0]
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],

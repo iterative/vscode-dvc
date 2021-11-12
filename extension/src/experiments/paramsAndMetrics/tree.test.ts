@@ -359,6 +359,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
         title: 'toggle'
       },
+      contextValue: 'params',
       description: '3/4',
       iconPath: mockedSelectedCheckbox,
       uri: filename
@@ -399,6 +400,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
         command: RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
         title: 'toggle'
       },
+      contextValue: 'params',
       iconPath: mockedEmptyCheckbox,
       uri: filename
     })
