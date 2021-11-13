@@ -279,6 +279,24 @@
         "category": "DVC"
       },
       {
+        "title": "%command.hidePlotsMetric%",
+        "command": "dvc.hidePlotsMetric",
+        "category": "DVC",
+        "icon": "$(eye)"
+      },
+      {
+        "title": "%command.unhidePlotsMetric%",
+        "command": "dvc.unhidePlotsMetric",
+        "category": "DVC",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "title": "%command.unhideAllPlotsMetrics%",
+        "command": "dvc.unhideAllPlotsMetrics",
+        "category": "DVC",
+        "icon": "$(eye)"
+      },
+      {
         "title": "%command.stopRunningExperiment%",
         "command": "dvc.stopRunningExperiment",
         "category": "DVC",
@@ -719,6 +737,21 @@
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.hidePlotsMetric",
+          "when": "view == dvc.views.experimentsParamsAndMetricsTree && viewItem == metrics:visible",
+          "group": "inline"
+        },
+        {
+          "command": "dvc.unhidePlotsMetric",
+          "when": "view == dvc.views.experimentsParamsAndMetricsTree && viewItem == metrics:hidden",
+          "group": "inline"
+        },
+        {
+          "command": "dvc.unhideAllPlotsMetrics",
+          "when": "view == dvc.views.experimentsParamsAndMetricsTree && viewItem == root",
+          "group": "inline"
         }
       ],
       "view/title": [

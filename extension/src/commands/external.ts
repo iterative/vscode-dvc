@@ -36,6 +36,9 @@ export enum RegisteredCommands {
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   PLOTS_SHOW = 'dvc.showPlots',
+  PLOTS_HIDE_METRIC = 'dvc.hidePlotsMetric',
+  PLOTS_UNHIDE_METRIC = 'dvc.unhidePlotsMetric',
+  PLOTS_UNHIDE_ALL_METRICS = 'dvc.unhideAllPlotsMetrics',
 
   EXTENSION_GET_STARTED = 'dvc.getStarted',
   EXTENSION_SETUP_WORKSPACE = 'dvc.setupWorkspace',

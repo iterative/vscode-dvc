@@ -534,7 +534,7 @@ suite('Experiments Test Suite', () => {
         firstFilterDefinition,
         secondFilterDefinition
       ])
-      const livePlots = testRepository.getLivePlots()
+      const livePlots = testRepository.getLivePlots(new Set())
       expect(livePlots?.colors).to.deep.equal({
         domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
         range: ['#1e5a52', '#96958f', '#5f5856']

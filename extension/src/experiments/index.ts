@@ -93,6 +93,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.paramsAndMetrics.getChildren(path)
   }
 
+  public updateParamsAndMetricsTree() {
+    this.paramsOrMetricsChanged.fire()
+  }
+
   public toggleParamOrMetricStatus(path: string) {
     const status = this.paramsAndMetrics.toggleStatus(path)
 
@@ -172,8 +176,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.experiments.getCheckpoints(experimentId)
   }
 
-  public getLivePlots() {
-    return this.experiments.getLivePlots()
+  public getLivePlots(hiddenMetrics: Set<string>) {
+    return this.experiments.getLivePlots(hiddenMetrics)
   }
 
   public getWebviewData() {

@@ -17,8 +17,9 @@ import { RegisteredCommands } from '../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { InternalCommands } from '../../commands/internal'
+import { WorkspacePlots } from '../../plots/workspace'
 
-type ParamsAndMetricsItem = {
+export type ParamsAndMetricsItem = {
   description: string | undefined
   dvcRoot: string
   collapsibleState: TreeItemCollapsibleState
@@ -34,6 +35,7 @@ export class ExperimentsParamsAndMetricsTree
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
+  private readonly plots: WorkspacePlots
   private readonly resourceLocator: ResourceLocator
 
   private view: TreeView<string | ParamsAndMetricsItem>
@@ -41,6 +43,7 @@ export class ExperimentsParamsAndMetricsTree
 
   constructor(
     experiments: WorkspaceExperiments,
+    plots: WorkspacePlots,
     internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
@@ -56,11 +59,30 @@ export class ExperimentsParamsAndMetricsTree
     )
 
     this.experiments = experiments
+    this.plots = plots
 
     internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
       RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
       ({ dvcRoot, path }) =>
         this.experiments.getRepository(dvcRoot).toggleParamOrMetricStatus(path)
+    )
+    internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
+      RegisteredCommands.PLOTS_HIDE_METRIC,
+      ({ dvcRoot, path }) => {
+        this.plots.hideMetric(dvcRoot, path)
+      }
+    )
+    internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
+      RegisteredCommands.PLOTS_UNHIDE_METRIC,
+      ({ dvcRoot, path }) => {
+        this.plots.unhideMetric(dvcRoot, path)
+      }
+    )
+    internalCommands.registerExternalCommand<ParamsAndMetricsItem>(
+      RegisteredCommands.PLOTS_UNHIDE_ALL_METRICS,
+      ({ dvcRoot }) => {
+        this.plots.clearHiddenMetrics(dvcRoot)
+      }
     )
 
     this.updateDescriptionOnChange()
@@ -83,7 +105,7 @@ export class ExperimentsParamsAndMetricsTree
     const finalPathSegment = splitPath[splitPath.length - 1]
     const treeItem = new TreeItem(finalPathSegment, collapsibleState)
 
-    treeItem.contextValue = splitPath[0]
+    treeItem.contextValue = this.getContextValue(splitPath[0], dvcRoot, path)
 
     treeItem.command = {
       arguments: [{ dvcRoot, path }],
@@ -107,6 +129,22 @@ export class ExperimentsParamsAndMetricsTree
     }
 
     return this.getRootElements()
+  }
+
+  private getContextValue(
+    firstPathSegment: string,
+    dvcRoot: string,
+    path: string
+  ) {
+    if (firstPathSegment === 'metrics') {
+      return (
+        firstPathSegment +
+        ':' +
+        (this.plots.metricIsHidden(dvcRoot, path) ? 'hidden' : 'visible')
+      )
+    } else {
+      return firstPathSegment
+    }
   }
 
   private updateDescriptionOnChange() {

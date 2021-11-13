@@ -130,6 +130,7 @@ export class Extension implements IExtension {
     this.dispose.track(
       new ExperimentsParamsAndMetricsTree(
         this.experiments,
+        this.plots,
         this.internalCommands,
         this.resourceLocator
       )

@@ -10,6 +10,11 @@ import { Status } from '../paramsAndMetrics/model'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 import { buildMockedExperiments } from '../../test/util/jest'
+import { WorkspacePlots } from '../../plots/workspace'
+
+const fakePlots = {
+  isMetricHidden: () => false
+} as unknown as WorkspacePlots
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -75,6 +80,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          fakePlots,
           mockedInternalCommands,
           mockedResourceLocator
         )
@@ -94,6 +100,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          fakePlots,
           mockedInternalCommands,
           mockedResourceLocator
         )
@@ -133,6 +140,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          fakePlots,
           mockedInternalCommands,
           mockedResourceLocator
         )
@@ -309,6 +317,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
       const experimentsParamsAndMetricsTree =
         new ExperimentsParamsAndMetricsTree(
           mockedExperiments,
+          fakePlots,
           mockedInternalCommands,
           mockedResourceLocator
         )
@@ -333,6 +342,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
     const experimentsParamsAndMetricsTree = new ExperimentsParamsAndMetricsTree(
       mockedExperiments,
+      fakePlots,
       mockedInternalCommands,
       mockedResourceLocator
     )
@@ -374,6 +384,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
 
     const experimentsParamsAndMetricsTree = new ExperimentsParamsAndMetricsTree(
       mockedExperiments,
+      fakePlots,
       mockedInternalCommands,
       mockedResourceLocator
     )

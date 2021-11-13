@@ -19,6 +19,8 @@ export class Plots extends BaseRepository<TPlotsData> {
   private data: PlotsData
   private staticPlots?: PlotsOutput
 
+  private hiddenMetrics: Set<string> = new Set()
+
   constructor(
     dvcRoot: string,
     internalCommands: InternalCommands,
@@ -29,6 +31,10 @@ export class Plots extends BaseRepository<TPlotsData> {
     this.data = this.dispose.track(new PlotsData(dvcRoot, internalCommands))
 
     this.dispose.track(this.data.onDidUpdate(data => this.setStaticPlots(data)))
+  }
+
+  public isMetricHidden(metricId: string) {
+    return this.hiddenMetrics.has(metricId)
   }
 
   public async setExperiments(experiments: Experiments) {
@@ -46,9 +52,27 @@ export class Plots extends BaseRepository<TPlotsData> {
     return this.notifyChanged()
   }
 
+  public hideMetric(metricId: string) {
+    this.hiddenMetrics.add(metricId)
+    this.notifyChanged()
+    this.experiments?.updateParamsAndMetricsTree()
+  }
+
+  public unhideMetric(metricId: string) {
+    this.hiddenMetrics.delete(metricId)
+    this.notifyChanged()
+    this.experiments?.updateParamsAndMetricsTree()
+  }
+
+  public clearHiddenMetrics() {
+    this.hiddenMetrics.clear()
+    this.notifyChanged()
+    this.experiments?.updateParamsAndMetricsTree()
+  }
+
   public getWebviewData() {
     return {
-      live: this.experiments?.getLivePlots(),
+      live: this.experiments?.getLivePlots(this.hiddenMetrics),
       static: this.staticPlots
     }
   }

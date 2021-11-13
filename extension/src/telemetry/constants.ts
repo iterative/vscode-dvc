@@ -90,6 +90,9 @@ export interface IEventNamePropertyMapping {
   [EventName.STOP_EXPERIMENT]: { stopped: boolean; wasRunning: boolean }
 
   [EventName.PLOTS_SHOW]: undefined
+  [EventName.PLOTS_HIDE_METRIC]: undefined
+  [EventName.PLOTS_UNHIDE_METRIC]: undefined
+  [EventName.PLOTS_UNHIDE_ALL_METRICS]: undefined
 
   [EventName.ADD_TARGET]: undefined
   [EventName.CHECKOUT_TARGET]: undefined

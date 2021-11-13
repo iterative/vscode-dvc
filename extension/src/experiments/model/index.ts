@@ -53,7 +53,7 @@ export class ExperimentsModel {
     this.workspaceState = workspaceState
   }
 
-  public getLivePlots() {
+  public getLivePlots(hiddenMetrics: Set<string>) {
     if (!this.livePlots) {
       return
     }
@@ -70,7 +70,9 @@ export class ExperimentsModel {
 
     return {
       colors,
-      plots: this.livePlots
+      plots: this.livePlots.filter(
+        metricPlot => !hiddenMetrics.has(metricPlot.title)
+      )
     }
   }
 

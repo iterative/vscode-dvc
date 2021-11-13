@@ -13,4 +13,20 @@ export class WorkspacePlots extends BaseWorkspaceWebviews<Plots, PlotsData> {
 
     return plots
   }
+
+  public hideMetric(dvcRoot: string, metricId: string) {
+    return this.getRepository(dvcRoot).hideMetric(metricId)
+  }
+
+  public unhideMetric(dvcRoot: string, metricId: string) {
+    return this.getRepository(dvcRoot).unhideMetric(metricId)
+  }
+
+  public clearHiddenMetrics(dvcRoot: string) {
+    return this.getRepository(dvcRoot).clearHiddenMetrics()
+  }
+
+  public metricIsHidden(dvcRoot: string, metricId: string) {
+    return this.getRepository(dvcRoot).isMetricHidden(metricId)
+  }
 }
