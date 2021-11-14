@@ -59,9 +59,9 @@ export const buildExperiments = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
     new Map([
-      ['exp-e7a67', '#F14C4C'],
-      ['test-branch', '#3794FF'],
-      ['exp-83425', '#CCA700']
+      ['exp-e7a67', '#f14c4c'],
+      ['test-branch', '#3794ff'],
+      ['exp-83425', '#cca700']
     ])
   )
 

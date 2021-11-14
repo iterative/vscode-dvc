@@ -12,9 +12,9 @@ describe('collectColors', () => {
     )
     expect(assigned).toEqual(
       new Map([
-        ['exp-83425', '#CCA700'],
-        ['exp-e7a67', '#F14C4C'],
-        ['test-branch', '#3794FF']
+        ['exp-83425', '#cca700'],
+        ['exp-e7a67', '#f14c4c'],
+        ['test-branch', '#3794ff']
       ])
     )
   })
@@ -28,9 +28,9 @@ describe('collectColors', () => {
     const { assigned, available } = collectColors(
       [],
       new Map([
-        ['exp-e7a67', '#F14C4C'],
-        ['test-branch', '#3794FF'],
-        ['exp-83425', '#CCA700']
+        ['exp-e7a67', '#f14c4c'],
+        ['test-branch', '#3794ff'],
+        ['exp-83425', '#cca700']
       ]),
       []
     )
@@ -44,9 +44,9 @@ describe('collectColors', () => {
     const { assigned, available } = collectColors(
       [],
       new Map([
-        ['exp-e7a67', '#F14C4C'],
-        ['test-branch', '#3794FF'],
-        ['exp-83425', '#CCA700']
+        ['exp-e7a67', '#f14c4c'],
+        ['test-branch', '#3794ff'],
+        ['exp-83425', '#cca700']
       ]),
       originalColorsList.slice(3)
     )
@@ -57,9 +57,9 @@ describe('collectColors', () => {
   it('should return the original assigned and available colors given the same info', () => {
     const originalColorsList = copyOriginalColors()
     const originalAssigned = new Map([
-      ['exp-83425', '#CCA700'],
-      ['exp-e7a67', '#F14C4C'],
-      ['test-branch', '#3794FF']
+      ['exp-83425', '#cca700'],
+      ['exp-e7a67', '#f14c4c'],
+      ['test-branch', '#3794ff']
     ])
 
     const originalAvailable = originalColorsList.slice(2)
