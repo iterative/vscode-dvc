@@ -1,4 +1,5 @@
 import { Uri, ViewColumn, WebviewPanel, window } from 'vscode'
+import isEqual from 'lodash.isequal'
 import { BaseWebview } from '.'
 import { ViewKey, WebviewDetails } from './constants'
 import { WebviewState, UnknownWebviewState, WebviewData } from './contract'
@@ -15,7 +16,7 @@ const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
 
 const isPlotsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as PlotsData
-  return !!(hasKey(data, 'live') && hasKey(data, 'static'))
+  return !!(isEqual(data, {}) || hasKey(data, 'live') || hasKey(data, 'static'))
 }
 
 export const isValidState = (
