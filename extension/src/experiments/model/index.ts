@@ -284,18 +284,6 @@ export class ExperimentsModel {
     filters: Map<string, FilterDefinition>
     status: Record<string, Status>
   } {
-    const currentSorts = workspaceState.get<SortDefinition[]>(
-      MementoPrefixes.sortBy + dvcRoot,
-      []
-    )
-
-    const filters = new Map(
-      workspaceState.get<[string, FilterDefinition][]>(
-        MementoPrefixes.filterBy + dvcRoot,
-        []
-      )
-    )
-
     const { assigned, available } = workspaceState.get<{
       assigned: [string, string][]
       available: string[]
@@ -304,17 +292,26 @@ export class ExperimentsModel {
       available: copyOriginalColors()
     })
 
-    const colors = {
-      assigned: new Map(assigned),
-      available: available
+    return {
+      colors: {
+        assigned: new Map(assigned),
+        available: available
+      },
+      currentSorts: workspaceState.get<SortDefinition[]>(
+        MementoPrefixes.sortBy + dvcRoot,
+        []
+      ),
+      filters: new Map(
+        workspaceState.get<[string, FilterDefinition][]>(
+          MementoPrefixes.filterBy + dvcRoot,
+          []
+        )
+      ),
+      status: workspaceState.get<Record<string, Status>>(
+        MementoPrefixes.status + dvcRoot,
+        {}
+      )
     }
-
-    const status = workspaceState.get<Record<string, Status>>(
-      MementoPrefixes.status + dvcRoot,
-      {}
-    )
-
-    return { colors, currentSorts, filters, status }
   }
 
   private getSelectedExperimentIds() {
