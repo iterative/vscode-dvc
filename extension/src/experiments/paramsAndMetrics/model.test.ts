@@ -113,4 +113,39 @@ describe('ParamsAndMetricsModel', () => {
       )
     })
   })
+
+  describe('columns width', () => {
+    it('should return the columns width from the persisted state', () => {
+      const persistedState = [
+        { path: 'A', width: 10 },
+        { path: 'C', width: 42 },
+        { path: 'B', width: 150 }
+      ]
+      const model = new ParamsAndMetricsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
+        })
+      )
+      expect(model.getColumnsOrder()).toEqual(persistedState)
+    })
+
+    it('should set the width to a column when calling setColumnWidth', () => {
+      const persistedState = [
+        { path: 'A', width: 10 },
+        { path: 'C', width: 42 },
+        { path: 'B', width: 150 }
+      ]
+      const model = new ParamsAndMetricsModel(
+        exampleDvcRoot,
+        buildMockMemento({
+          [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
+        })
+      )
+      const expectedWidth = 77
+      model.setColumnWidth('C', expectedWidth)
+
+      expect(model.getColumnsOrder()[1].width).toBe(expectedWidth)
+    })
+  })
 })
