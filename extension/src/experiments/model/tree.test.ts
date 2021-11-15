@@ -2,7 +2,7 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
-import { ExperimentsTree } from './tree'
+import { ExperimentsTree, Type } from './tree'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { InternalCommands } from '../../commands/internal'
@@ -144,7 +144,7 @@ describe('ExperimentsTree', () => {
           iconPath: getMockedUri('circle-filled', '#b180d7'),
           id: '90aea7f',
           label: '90aea7f',
-          type: 'experiment'
+          type: Type.EXPERIMENT
         },
         {
           collapsibleState: 0,
@@ -152,7 +152,7 @@ describe('ExperimentsTree', () => {
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'f0778b3',
           label: 'f0778b3',
-          type: 'experiment'
+          type: Type.EXPERIMENT
         },
         {
           collapsibleState: 0,
@@ -160,7 +160,7 @@ describe('ExperimentsTree', () => {
           iconPath: new ThemeIcon('watch'),
           id: 'f81f1b5',
           label: 'f81f1b5',
-          type: 'experiment'
+          type: Type.QUEUED
         }
       ])
     })
@@ -188,7 +188,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('loading~spin'),
         id: 'ebbd66f',
         label: 'ebbd66f',
-        type: 'experiment'
+        type: Type.EXPERIMENT
       })
 
       expect(children).toEqual([
@@ -259,7 +259,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('watch'),
         id: 'f0778b3',
         label: 'f0778b3',
-        type: 'experiment'
+        type: Type.EXPERIMENT
       })
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
     })
@@ -288,7 +288,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
         label: 'workspace',
-        type: 'experiment'
+        type: Type.EXPERIMENT
       })
 
       expect(treeItem).toEqual({
@@ -320,7 +320,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
         label: 'f0778b3',
-        type: 'experiment'
+        type: Type.EXPERIMENT
       })
 
       expect(treeItem).toEqual({
@@ -352,7 +352,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('debug-stackframe-dot'),
         id: 'f0778b3',
         label: 'f0778b3',
-        type: 'experiment'
+        type: Type.EXPERIMENT
       })
       expect(treeItem).toEqual({
         ...mockedItem,
@@ -383,7 +383,7 @@ describe('ExperimentsTree', () => {
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',
         label: 'f0998a3',
-        type: 'experiment'
+        type: Type.EXPERIMENT
       })
 
       expect(treeItem).toEqual({

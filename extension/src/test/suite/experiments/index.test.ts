@@ -404,7 +404,11 @@ suite('Experiments Test Suite', () => {
         mementoSpy,
         'workspaceContext is called for color initialization'
       ).to.be.calledWith('colors:test', match.has('assigned'))
-      expect(mementoSpy).to.be.calledWith('excluded:test', [])
+      expect(mementoSpy).to.be.calledWith('status:test', {
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
+        '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
+        '4fb124aebddb2adf1545030907687fa9a4c80e70': 1
+      })
 
       expect(
         testRepository.getSorts(),
@@ -502,9 +506,13 @@ suite('Experiments Test Suite', () => {
         '4fb124aebddb2adf1545030907687fa9a4c80e70'
       )
       expect(
-        mockMemento.get('excluded:test'),
+        mockMemento.get('status:test'),
         'the correct experiment has been excluded in the memento'
-      ).to.deep.equal(['4fb124aebddb2adf1545030907687fa9a4c80e70'])
+      ).to.deep.equal({
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
+        '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
+        '4fb124aebddb2adf1545030907687fa9a4c80e70': 0
+      })
       expect(
         mockMemento.get('colors:test'),
         'the correct colors are persisted'
@@ -530,9 +538,13 @@ suite('Experiments Test Suite', () => {
           assigned,
           available
         },
-        'excluded:test': ['4fb124aebddb2adf1545030907687fa9a4c80e70'],
         'filterBy:test': filterMapEntries,
-        'sortBy:test': sortDefinitions
+        'sortBy:test': sortDefinitions,
+        'status:test': {
+          '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
+          '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
+          '4fb124aebddb2adf1545030907687fa9a4c80e70': 0
+        }
       })
 
       const mementoSpy = spy(mockMemento, 'get')
@@ -549,7 +561,7 @@ suite('Experiments Test Suite', () => {
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])
-      expect(mementoSpy).to.be.calledWith('excluded:test', [])
+      expect(mementoSpy).to.be.calledWith('status:test', {})
       expect(testRepository.getSorts()).to.deep.equal(sortDefinitions)
       expect(testRepository.getFilters()).to.deep.equal([
         firstFilterDefinition,

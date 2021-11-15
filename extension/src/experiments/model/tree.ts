@@ -22,13 +22,19 @@ enum Status {
   QUEUED = 2
 }
 
+export enum Type {
+  CHECKPOINT = 'checkpoint',
+  EXPERIMENT = 'experiment',
+  QUEUED = 'queued'
+}
+
 type ExperimentItem = {
   dvcRoot: string
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
   iconPath: ThemeIcon | Uri
-  type: 'experiment' | 'checkpoint'
+  type: Type
 }
 
 export class ExperimentsTree
@@ -140,7 +146,7 @@ export class ExperimentsTree
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
         label: experiment.displayName,
-        type: 'experiment'
+        type: experiment.queued ? Type.QUEUED : Type.EXPERIMENT
       }))
   }
 
@@ -181,7 +187,7 @@ export class ExperimentsTree
       ),
       id: checkpoint.id,
       label: checkpoint.displayName,
-      type: 'checkpoint'
+      type: Type.CHECKPOINT
     }))
   }
 

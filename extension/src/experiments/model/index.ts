@@ -15,12 +15,18 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
+import { hasKey } from '../../util/object'
+
+export enum Status {
+  selected = 1,
+  unselected = 0
+}
 
 const enum MementoPrefixes {
   colors = 'colors:',
-  excluded = 'excluded:',
   filterBy = 'filterBy:',
-  sortBy = 'sortBy:'
+  sortBy = 'sortBy:',
+  status = 'status:'
 }
 
 export class ExperimentsModel {
@@ -32,7 +38,7 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots?: LivePlotData[]
   private colors: Colors
-  private excluded: string[]
+  private status: Record<string, Status>
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -42,13 +48,13 @@ export class ExperimentsModel {
   private workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    const { colors, currentSorts, excluded, filters } = this.revive(
+    const { colors, currentSorts, filters, status } = this.revive(
       dvcRoot,
       workspaceState
     )
     this.colors = colors
     this.currentSorts = currentSorts
-    this.excluded = excluded
+    this.status = status
     this.filters = filters
 
     this.dvcRoot = dvcRoot
@@ -96,12 +102,12 @@ export class ExperimentsModel {
   }
 
   public toggleExperiment(experimentId: string) {
-    if (this.excluded.includes(experimentId)) {
-      this.excluded = this.excluded.filter(id => id !== experimentId)
-    } else {
-      this.excluded.push(experimentId)
-    }
-    this.persistExcluded()
+    const nextStatus = this.status[experimentId]
+      ? Status.unselected
+      : Status.selected
+    this.status[experimentId] = nextStatus
+
+    this.persistStatus()
 
     this.collectColors()
   }
@@ -236,7 +242,7 @@ export class ExperimentsModel {
 
   private collectColors() {
     this.colors = collectColors(
-      this.getCurrentExperimentIds(),
+      this.getSelectedExperimentIds(),
       this.getAssignedColors(),
       this.colors.available
     )
@@ -263,10 +269,10 @@ export class ExperimentsModel {
     })
   }
 
-  private persistExcluded() {
+  private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefixes.excluded + this.dvcRoot,
-      this.excluded
+      MementoPrefixes.status + this.dvcRoot,
+      this.status
     )
   }
 
@@ -276,8 +282,8 @@ export class ExperimentsModel {
   ): {
     colors: Colors
     currentSorts: SortDefinition[]
-    excluded: string[]
     filters: Map<string, FilterDefinition>
+    status: Record<string, Status>
   } {
     const currentSorts = workspaceState.get<SortDefinition[]>(
       MementoPrefixes.sortBy + dvcRoot,
@@ -304,17 +310,25 @@ export class ExperimentsModel {
       available: available
     }
 
-    const excluded = workspaceState.get<string[]>(
-      MementoPrefixes.excluded + dvcRoot,
-      []
+    const status = workspaceState.get<Record<string, Status>>(
+      MementoPrefixes.status + dvcRoot,
+      {}
     )
 
-    return { colors, currentSorts, excluded, filters }
+    return { colors, currentSorts, filters, status }
   }
 
-  private getCurrentExperimentIds() {
-    return this.flattenExperiments()
-      .filter(exp => !exp.queued && !this.excluded.includes(exp.id))
+  private getSelectedExperimentIds() {
+    const experiments = this.flattenExperiments()
+
+    experiments.map(exp => {
+      if (!hasKey(this.status, exp.id) && !exp.queued) {
+        this.status[exp.id] = Status.selected
+      }
+    })
+
+    return experiments
+      .filter(exp => this.status[exp.id])
       .map(exp => exp.id)
       .filter(Boolean) as string[]
   }
