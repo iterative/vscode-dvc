@@ -23,6 +23,7 @@ export enum RegisteredCliCommands {
 }
 
 export enum RegisteredCommands {
+  EXPERIMENT_TOGGLE = 'dvc.views.experimentsTree.toggleStatus',
   EXPERIMENT_FILTER_ADD = 'dvc.addExperimentsTableFilter',
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',

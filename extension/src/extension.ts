@@ -144,7 +144,11 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      new ExperimentsTree(this.experiments, this.resourceLocator)
+      new ExperimentsTree(
+        this.experiments,
+        this.internalCommands,
+        this.resourceLocator
+      )
     )
 
     this.trackedExplorerTree = this.dispose.track(

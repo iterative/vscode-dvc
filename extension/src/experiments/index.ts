@@ -109,6 +109,11 @@ export class Experiments extends BaseRepository<TableData> {
     return this.paramsAndMetrics.getTerminalNodeStatuses()
   }
 
+  public toggleExperiment(experimentId: string) {
+    this.experiments.toggleExperiment(experimentId)
+    this.notifyChanged()
+  }
+
   public getSorts() {
     return this.experiments.getSorts()
   }

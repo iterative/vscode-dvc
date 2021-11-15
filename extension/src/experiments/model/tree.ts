@@ -14,6 +14,8 @@ import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
 import { ResourceLocator } from '../../resourceLocator'
+import { RegisteredCommands } from '../../commands/external'
+import { InternalCommands } from '../../commands/internal'
 
 enum Status {
   RUNNING = 1,
@@ -26,6 +28,7 @@ type ExperimentItem = {
   label: string
   collapsibleState: TreeItemCollapsibleState
   iconPath: ThemeIcon | Uri
+  type: 'experiment' | 'checkpoint'
 }
 
 export class ExperimentsTree
@@ -43,6 +46,7 @@ export class ExperimentsTree
 
   constructor(
     experiments: WorkspaceExperiments,
+    internalCommands: InternalCommands,
     resourceLocator: ResourceLocator
   ) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
@@ -54,6 +58,12 @@ export class ExperimentsTree
     this.experiments = experiments
     this.resourceLocator = resourceLocator
 
+    internalCommands.registerExternalCommand<ExperimentItem>(
+      RegisteredCommands.EXPERIMENT_TOGGLE,
+      ({ dvcRoot, id }) =>
+        this.experiments.getRepository(dvcRoot).toggleExperiment(id)
+    )
+
     this.updateDescriptionOnChange()
   }
 
@@ -62,9 +72,16 @@ export class ExperimentsTree
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    const { label, collapsibleState, iconPath } = element
+    const { label, collapsibleState, iconPath, id, dvcRoot, type } = element
     const item = new TreeItem(label, collapsibleState)
     item.iconPath = iconPath
+    if (type === 'experiment') {
+      item.command = {
+        arguments: [{ dvcRoot, id }],
+        command: RegisteredCommands.EXPERIMENT_TOGGLE,
+        title: 'toggle'
+      }
+    }
     return item
   }
 
@@ -80,7 +97,7 @@ export class ExperimentsTree
     }
 
     const { dvcRoot, id } = element
-    return Promise.resolve(this.getCheckpoints(dvcRoot, id) || [])
+    return Promise.resolve(this.getCheckpoints(dvcRoot, id))
   }
 
   private async getRootElements() {
@@ -122,7 +139,8 @@ export class ExperimentsTree
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
-        label: experiment.displayName
+        label: experiment.displayName,
+        type: 'experiment'
       }))
   }
 
@@ -148,7 +166,10 @@ export class ExperimentsTree
     return this.getUriOrIcon(displayColor, 'circle-filled')
   }
 
-  private getCheckpoints(dvcRoot: string, experimentId: string) {
+  private getCheckpoints(
+    dvcRoot: string,
+    experimentId: string
+  ): ExperimentItem[] {
     return (
       this.experiments.getRepository(dvcRoot).getCheckpoints(experimentId) || []
     ).map(checkpoint => ({
@@ -159,7 +180,8 @@ export class ExperimentsTree
         'debug-stackframe-dot'
       ),
       id: checkpoint.id,
-      label: checkpoint.displayName
+      label: checkpoint.displayName,
+      type: 'checkpoint'
     }))
   }
 

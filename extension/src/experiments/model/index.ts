@@ -31,6 +31,7 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots?: LivePlotData[]
   private colors: Colors
+  private excluded: string[] = []
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -54,7 +55,7 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
-    if (!this.livePlots) {
+    if (!this.livePlots || !this.colors.assigned.size) {
       return
     }
 
@@ -89,12 +90,17 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
 
-    this.colors = collectColors(
-      this.getCurrentExperimentIds(),
-      this.getAssignedColors(),
-      this.colors.available
-    )
-    this.persistColors()
+    this.collectColors()
+  }
+
+  public toggleExperiment(experimentId: string) {
+    if (this.excluded.includes(experimentId)) {
+      this.excluded = this.excluded.filter(id => id !== experimentId)
+    } else {
+      this.excluded.push(experimentId)
+    }
+
+    this.collectColors()
   }
 
   public getSorts(): SortDefinition[] {
@@ -225,6 +231,15 @@ export class ExperimentsModel {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 
+  private collectColors() {
+    this.colors = collectColors(
+      this.getCurrentExperimentIds(),
+      this.getAssignedColors(),
+      this.colors.available
+    )
+    this.persistColors()
+  }
+
   private persistSorts() {
     return this.workspaceState.update(
       MementoPrefixes.sortBy + this.dvcRoot,
@@ -283,7 +298,7 @@ export class ExperimentsModel {
 
   private getCurrentExperimentIds() {
     return this.flattenExperiments()
-      .filter(exp => !exp.queued)
+      .filter(exp => !exp.queued && !this.excluded.includes(exp.id))
       .map(exp => exp.id)
       .filter(Boolean) as string[]
   }

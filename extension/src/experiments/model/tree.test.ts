@@ -5,6 +5,7 @@ import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
 import { ExperimentsTree } from './tree'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
+import { InternalCommands } from '../../commands/internal'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -27,6 +28,10 @@ const mockedResourceLocator = {
   getExperimentsResource: mockedGetExperimentsResource
 } as unknown as ResourceLocator
 
+const mockedInternalCommands = {
+  registerExternalCommand: jest.fn()
+} as unknown as InternalCommands
+
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
 
@@ -45,6 +50,7 @@ describe('ExperimentsTree', () => {
     it('should return an empty array when no experiments exist for any of the multiple repositories', async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'second/repo'])
@@ -59,6 +65,7 @@ describe('ExperimentsTree', () => {
     it('should return an empty array when no experiments exist for the single repository', async () => {
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
@@ -73,6 +80,7 @@ describe('ExperimentsTree', () => {
       const dvcRoots = ['demo', 'and/mock', 'other/repo']
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(dvcRoots)
@@ -118,6 +126,7 @@ describe('ExperimentsTree', () => {
       ]
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetExperiments
@@ -134,21 +143,24 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-filled', '#b180d7'),
           id: '90aea7f',
-          label: '90aea7f'
+          label: '90aea7f',
+          type: 'experiment'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'f0778b3',
-          label: 'f0778b3'
+          label: 'f0778b3',
+          type: 'experiment'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('watch'),
           id: 'f81f1b5',
-          label: 'f81f1b5'
+          label: 'f81f1b5',
+          type: 'experiment'
         }
       ])
     })
@@ -160,6 +172,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -174,7 +187,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'repo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'ebbd66f',
-        label: 'ebbd66f'
+        label: 'ebbd66f',
+        type: 'experiment'
       })
 
       expect(children).toEqual([
@@ -183,14 +197,16 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('debug-stackframe-dot'),
           id: 'aaaaaaaaaaaaaaaaa',
-          label: 'aaaaaaa'
+          label: 'aaaaaaa',
+          type: 'checkpoint'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('debug-stackframe-dot'),
           id: 'bbbbbbbbbbbbbbbbb',
-          label: 'bbbbbbb'
+          label: 'bbbbbbb',
+          type: 'checkpoint'
         }
       ])
     })
@@ -207,6 +223,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo', 'other'])
@@ -232,6 +249,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -240,7 +258,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('watch'),
         id: 'f0778b3',
-        label: 'f0778b3'
+        label: 'f0778b3',
+        type: 'experiment'
       })
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
     })
@@ -259,6 +278,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -267,7 +287,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
-        label: 'workspace'
+        label: 'workspace',
+        type: 'experiment'
       })
 
       expect(treeItem).toEqual({
@@ -289,6 +310,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -297,7 +319,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
-        label: 'f0778b3'
+        label: 'f0778b3',
+        type: 'experiment'
       })
 
       expect(treeItem).toEqual({
@@ -319,6 +342,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
 
@@ -327,7 +351,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('debug-stackframe-dot'),
         id: 'f0778b3',
-        label: 'f0778b3'
+        label: 'f0778b3',
+        type: 'experiment'
       })
       expect(treeItem).toEqual({
         ...mockedItem,
@@ -347,6 +372,7 @@ describe('ExperimentsTree', () => {
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
+        mockedInternalCommands,
         mockedResourceLocator
       )
       mockedGetDvcRoots.mockReturnValueOnce(['demo'])
@@ -356,7 +382,8 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',
-        label: 'f0998a3'
+        label: 'f0998a3',
+        type: 'experiment'
       })
 
       expect(treeItem).toEqual({
