@@ -7,19 +7,23 @@ const generateExperimentNameList = (n: number): string[] =>
 describe('collectColors', () => {
   it('should assign the correct colors to the correct experiments', () => {
     const { assigned } = collectColors(
-      ['exp-e7a67', 'test-branch', 'exp-83425'],
+      [
+        '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        '42b8736b08170529903cd203a1f40382a4b4a8cd',
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
+      ],
       new Map()
     )
     expect(assigned).toEqual(
       new Map([
-        ['exp-83425', '#cca700'],
-        ['exp-e7a67', '#f14c4c'],
-        ['test-branch', '#3794ff']
+        ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700'],
+        ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
+        ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff']
       ])
     )
   })
 
-  it('should return the original list of colors if no experiment names are provided', () => {
+  it('should return the original list of colors if no experiment ids are provided', () => {
     const { available } = collectColors([], new Map())
     expect(available).toEqual(copyOriginalColors())
   })
@@ -28,9 +32,9 @@ describe('collectColors', () => {
     const { assigned, available } = collectColors(
       [],
       new Map([
-        ['exp-e7a67', '#f14c4c'],
-        ['test-branch', '#3794ff'],
-        ['exp-83425', '#cca700']
+        ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
+        ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
+        ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
       ]),
       []
     )
@@ -44,9 +48,9 @@ describe('collectColors', () => {
     const { assigned, available } = collectColors(
       [],
       new Map([
-        ['exp-e7a67', '#f14c4c'],
-        ['test-branch', '#3794ff'],
-        ['exp-83425', '#cca700']
+        ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
+        ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
+        ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
       ]),
       originalColorsList.slice(3)
     )
@@ -57,15 +61,19 @@ describe('collectColors', () => {
   it('should return the original assigned and available colors given the same info', () => {
     const originalColorsList = copyOriginalColors()
     const originalAssigned = new Map([
-      ['exp-83425', '#cca700'],
-      ['exp-e7a67', '#f14c4c'],
-      ['test-branch', '#3794ff']
+      ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700'],
+      ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
+      ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff']
     ])
 
     const originalAvailable = originalColorsList.slice(2)
 
     const { assigned, available } = collectColors(
-      ['exp-83425', 'exp-e7a67', 'test-branch'],
+      [
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d',
+        '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        '42b8736b08170529903cd203a1f40382a4b4a8cd'
+      ],
       originalAssigned,
       originalAvailable
     )

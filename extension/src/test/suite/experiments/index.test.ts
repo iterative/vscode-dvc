@@ -417,9 +417,9 @@ suite('Experiments Test Suite', () => {
         'The correct colors are persisted'
       ).to.deep.equal({
         assigned: [
-          ['exp-e7a67', '#f14c4c'],
-          ['test-branch', '#3794ff'],
-          ['exp-83425', '#cca700']
+          ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
+          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
+          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
         ],
         available: copyOriginalColors().slice(3)
       })
@@ -500,9 +500,9 @@ suite('Experiments Test Suite', () => {
 
     it('should initialize with state reflected from the given Memento', async () => {
       const assigned: [string, string][] = [
-        ['exp-e7a67', '#1e5a52'],
-        ['test-branch', '#96958f'],
-        ['exp-83425', '#5f5856']
+        ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#1e5a52'],
+        ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#96958f'],
+        ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#5f5856']
       ]
       const available = ['#000000', '#FFFFFF', '#ABCDEF']
 
@@ -536,7 +536,11 @@ suite('Experiments Test Suite', () => {
       ])
       const livePlots = testRepository.getLivePlots()
       expect(livePlots?.colors).to.deep.equal({
-        domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
+        domain: [
+          '4fb124aebddb2adf1545030907687fa9a4c80e70',
+          '42b8736b08170529903cd203a1f40382a4b4a8cd',
+          '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
+        ],
         range: ['#1e5a52', '#96958f', '#5f5856']
       })
     })

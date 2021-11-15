@@ -90,7 +90,7 @@ export class ExperimentsModel {
     this.livePlots = livePlots
 
     this.colors = collectColors(
-      this.getCurrentExperimentNames(),
+      this.getCurrentExperimentIds(),
       this.getAssignedColors(),
       this.colors.available
     )
@@ -181,7 +181,7 @@ export class ExperimentsModel {
         return {
           ...this.addDisplayColor(experiment),
           subRows: checkpoints.map(checkpoint =>
-            this.addDisplayColor(checkpoint, experiment.displayName)
+            this.addDisplayColor(checkpoint, experiment.id)
           )
         }
       })
@@ -279,18 +279,16 @@ export class ExperimentsModel {
     return { colors, currentSorts, filters }
   }
 
-  private getCurrentExperimentNames() {
+  private getCurrentExperimentIds() {
     return this.flattenExperiments()
       .filter(exp => !exp.queued)
-      .map(exp => exp.displayName)
+      .map(exp => exp.id)
       .filter(Boolean) as string[]
   }
 
-  private addDisplayColor(experiment: Experiment, displayName?: string) {
+  private addDisplayColor(experiment: Experiment, id?: string) {
     const assignedColors = this.getAssignedColors()
-    const displayColor = assignedColors.get(
-      displayName || experiment.displayName
-    )
+    const displayColor = assignedColors.get(id || experiment.id)
 
     return displayColor
       ? {
