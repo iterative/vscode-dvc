@@ -100,7 +100,7 @@ export class Model {
   public createColumnsOrderRepresentation(newOrder?: string[]) {
     if (newOrder) {
       this.sendMessage({
-        payload: this.getOrderFromPaths(newOrder),
+        payload: newOrder,
         type: MessageFromWebviewType.columnReordered
       })
     }
@@ -108,21 +108,10 @@ export class Model {
     this.columnsOrderRepresentation = this.getOrderedDataWithGroups(newOrder)
   }
 
-  private getOrderFromPaths(paths: string[]): ColumnOrder[] {
-    return this.data?.columnsOrder?.length
-      ? (paths
-          .map(path =>
-            this.data?.columnsOrder.find(column => column.path === path)
-          )
-          .filter(Boolean) as ColumnOrder[])
-      : paths.map(path => ({ path, width: 0 }))
-  }
-
   private getOrderedPaths(newOrder?: string[]): string[] {
     if (newOrder) {
       return newOrder
     }
-
     return (
       (this.data?.columnsOrder &&
         this.data.columnsOrder

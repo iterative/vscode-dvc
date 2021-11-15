@@ -1,9 +1,9 @@
-import { ColumnOrder, TableData } from '../experiments/webview/contract'
+import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
 
-export type ColumnReorderPayload = ColumnOrder[]
+export type ColumnReorderPayload = string[]
 export type ColumnResizePayload = {
   id: string
   width: number

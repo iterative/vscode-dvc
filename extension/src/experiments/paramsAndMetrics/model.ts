@@ -109,8 +109,14 @@ export class ParamsAndMetricsModel {
     return flatten<Status>(nestedStatuses)
   }
 
-  public setColumnsOrder(columnsOrder: ColumnOrder[]) {
-    this.columnsOrderState = columnsOrder
+  public setColumnsOrder(columnsOrder: string[]) {
+    this.columnsOrderState = columnsOrder.map(
+      column =>
+        this.columnsOrderState.find(c => c.path === column) || {
+          path: column,
+          width: 0
+        }
+    )
     this.saveColumnOrder()
   }
 

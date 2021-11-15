@@ -330,12 +330,15 @@ describe('Table', () => {
 
     let customWindow: CustomWindow
 
-    beforeEach(() => {
-      mockGetComputedSpacing()
+    beforeAll(() => {
       customWindow = window as unknown as CustomWindow
       customWindow.webviewData = {
         theme: WebviewColorTheme.dark
       }
+    })
+
+    beforeEach(() => {
+      mockGetComputedSpacing()
     })
 
     it('should move a column from its current position to its new position', async () => {

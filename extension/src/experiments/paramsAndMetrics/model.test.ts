@@ -81,7 +81,11 @@ describe('ParamsAndMetricsModel', () => {
 
   describe('columns order', () => {
     it('should return the columns order from the persisted state', () => {
-      const persistedState = ['A', 'C', 'B']
+      const persistedState = [
+        { path: 'A', width: 0 },
+        { path: 'C', width: 0 },
+        { path: 'B', width: 0 }
+      ]
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
@@ -95,16 +99,18 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.columnsOrder + exampleDvcRoot]: ['A', 'B', 'C']
+          [MementoPrefixes.columnsOrder + exampleDvcRoot]: [
+            { path: 'A', width: 0 },
+            { path: 'B', width: 0 },
+            { path: 'C', width: 0 }
+          ]
         })
       )
-      const newState = [
-        { path: 'C', width: 11 },
-        { path: 'B', width: 33 },
-        { path: 'A', width: 42 }
-      ]
+      const newState = ['C', 'B', 'A']
       model.setColumnsOrder(newState)
-      expect(model.getColumnsOrder()).toEqual(newState)
+      expect(model.getColumnsOrder().map(column => column.path)).toEqual(
+        newState
+      )
     })
   })
 })

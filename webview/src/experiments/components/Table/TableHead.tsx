@@ -45,12 +45,9 @@ export const TableHead: React.FC<TableHeadProps> = ({
   }
 
   React.useEffect(() => {
-    if (
-      JSON.stringify(columnsOrder) !== JSON.stringify(currentColOrder.current)
-    ) {
-      setColumnOrder(columnsOrder)
-    }
-  }, [columnsOrder, setColumnOrder])
+    setColumnOrder(columnsOrder)
+    // eslint-disable-next-line
+  }, [])
 
   currentColOrder.current = allColumns?.map(o => o.id)
 
