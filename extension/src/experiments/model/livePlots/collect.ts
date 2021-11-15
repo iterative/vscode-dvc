@@ -105,12 +105,12 @@ const collectFromExperimentsObject = (
     const { checkpoint_tip, metrics } = data
     const iteration = addToMapCount(checkpoint_tip, checkpointCount)
 
-    const experimentName = experimentsObject[checkpoint_tip].data?.name
-    if (!experimentName) {
+    const experiment = experimentsObject[checkpoint_tip]
+    if (!experiment) {
       continue
     }
 
-    collectFromMetrics(acc, experimentName, iteration, metrics)
+    collectFromMetrics(acc, checkpoint_tip, iteration, metrics)
   }
 }
 
