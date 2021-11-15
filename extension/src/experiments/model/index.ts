@@ -145,13 +145,15 @@ export class ExperimentsModel {
   public getExperiments(): (Experiment & { hasChildren: boolean })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
     return [...workspace, ...this.flattenExperiments()].map(experiment => ({
-      ...experiment,
+      ...this.addDisplayColor(experiment),
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
     }))
   }
 
   public getCheckpoints(experimentId: string): Experiment[] | undefined {
-    return this.checkpointsByTip.get(experimentId)
+    return this.checkpointsByTip
+      .get(experimentId)
+      ?.map(checkpoint => this.addDisplayColor(checkpoint, experimentId))
   }
 
   public getRowData() {

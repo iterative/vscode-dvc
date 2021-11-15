@@ -13,6 +13,7 @@ import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
+import { ResourceLocator } from '../../resourceLocator'
 
 enum Status {
   RUNNING = 1,
@@ -24,7 +25,7 @@ type ExperimentItem = {
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
-  iconPath: ThemeIcon
+  iconPath: ThemeIcon | Uri
 }
 
 export class ExperimentsTree
@@ -35,11 +36,15 @@ export class ExperimentsTree
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
+  private readonly resourceLocator: ResourceLocator
 
   private view: TreeView<string | ExperimentItem>
   private viewed = false
 
-  constructor(experiments: WorkspaceExperiments) {
+  constructor(
+    experiments: WorkspaceExperiments,
+    resourceLocator: ResourceLocator
+  ) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
@@ -47,6 +52,7 @@ export class ExperimentsTree
     )
 
     this.experiments = experiments
+    this.resourceLocator = resourceLocator
 
     this.updateDescriptionOnChange()
   }
@@ -123,20 +129,42 @@ export class ExperimentsTree
   private getExperimentThemeIcon({
     displayName,
     running,
-    queued
+    queued,
+    displayColor
   }: {
     displayName: string
     running?: boolean
     queued?: boolean
-  }): ThemeIcon {
+    displayColor?: string
+  }): ThemeIcon | Uri {
     if (displayName === 'workspace' || running) {
-      return new ThemeIcon('loading~spin')
+      return this.getSpinner(displayColor)
     }
 
     if (queued) {
       return new ThemeIcon('watch')
     }
 
+    return this.getCircle(displayColor)
+  }
+
+  private getSpinner(displayColor?: string) {
+    if (displayColor) {
+      return this.resourceLocator.getExperimentsResource(
+        'loading-spin',
+        displayColor
+      )
+    }
+    return new ThemeIcon('loading~spin')
+  }
+
+  private getCircle(displayColor?: string) {
+    if (displayColor) {
+      return this.resourceLocator.getExperimentsResource(
+        'circle-filled',
+        displayColor
+      )
+    }
     return new ThemeIcon('primitive-dot')
   }
 
@@ -146,7 +174,12 @@ export class ExperimentsTree
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
       dvcRoot,
-      iconPath: new ThemeIcon('debug-stackframe-dot'),
+      iconPath: checkpoint.displayColor
+        ? this.resourceLocator.getExperimentsResource(
+            'debug-stackframe-dot',
+            checkpoint.displayColor
+          )
+        : new ThemeIcon('debug-stackframe-dot'),
       id: checkpoint.id,
       label: checkpoint.displayName
     }))

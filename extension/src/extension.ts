@@ -143,7 +143,9 @@ export class Extension implements IExtension {
       new ExperimentsFilterByTree(this.experiments, this.internalCommands)
     )
 
-    this.dispose.track(new ExperimentsTree(this.experiments))
+    this.dispose.track(
+      new ExperimentsTree(this.experiments, this.resourceLocator)
+    )
 
     this.trackedExplorerTree = this.dispose.track(
       new TrackedExplorerTree(
