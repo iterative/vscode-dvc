@@ -318,18 +318,21 @@ export class ExperimentsModel {
   }
 
   private getSelectedExperimentIds() {
-    const experiments = this.flattenExperiments()
-
-    experiments.map(exp => {
-      if (!hasKey(this.status, exp.id) && !exp.queued) {
-        this.status[exp.id] = Status.selected
+    return this.flattenExperiments().reduce((acc, exp) => {
+      const { id, queued } = exp
+      if (!id) {
+        return acc
       }
-    })
 
-    return experiments
-      .filter(exp => this.status[exp.id])
-      .map(exp => exp.id)
-      .filter(Boolean) as string[]
+      if (!hasKey(this.status, id) && !queued) {
+        this.status[id] = Status.selected
+      }
+      if (this.status[id]) {
+        acc.push(id)
+      }
+
+      return acc
+    }, [] as string[])
   }
 
   private addDisplayColor(experiment: Experiment, id?: string) {
