@@ -107,9 +107,8 @@ export class ExperimentsModel {
       : Status.selected
     this.status[experimentId] = nextStatus
 
-    this.persistStatus()
-
     this.collectColors()
+    this.persistStatus()
   }
 
   public getSorts(): SortDefinition[] {
