@@ -2,7 +2,8 @@ const path = require('path')
 const webpack = require('webpack')
 
 module.exports = {
-  webpackFinal: config => {
+  // eslint-disable-next-line
+  webpackFinal: (config: any) => {
     config.plugins.push(
       new webpack.NormalModuleReplacementPlugin(
         /vsCodeApi.ts$/,
