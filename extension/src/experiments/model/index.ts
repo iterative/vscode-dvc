@@ -17,9 +17,10 @@ import { ExperimentsOutput } from '../../cli/reader'
 import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
 
 const enum MementoPrefixes {
-  sortBy = 'sortBy:',
+  colors = 'colors:',
+  excluded = 'excluded:',
   filterBy = 'filterBy:',
-  colors = 'colors:'
+  sortBy = 'sortBy:'
 }
 
 export class ExperimentsModel {
@@ -31,7 +32,7 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots?: LivePlotData[]
   private colors: Colors
-  private excluded: string[] = []
+  private excluded: string[]
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -41,12 +42,13 @@ export class ExperimentsModel {
   private workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    const { colors, currentSorts, filters } = this.revive(
+    const { colors, currentSorts, excluded, filters } = this.revive(
       dvcRoot,
       workspaceState
     )
     this.colors = colors
     this.currentSorts = currentSorts
+    this.excluded = excluded
     this.filters = filters
 
     this.dvcRoot = dvcRoot
@@ -99,6 +101,7 @@ export class ExperimentsModel {
     } else {
       this.excluded.push(experimentId)
     }
+    this.persistExcluded()
 
     this.collectColors()
   }
@@ -260,13 +263,21 @@ export class ExperimentsModel {
     })
   }
 
+  private persistExcluded() {
+    return this.workspaceState.update(
+      MementoPrefixes.excluded + this.dvcRoot,
+      this.excluded
+    )
+  }
+
   private revive(
     dvcRoot: string,
     workspaceState: Memento
   ): {
     colors: Colors
-    filters: Map<string, FilterDefinition>
     currentSorts: SortDefinition[]
+    excluded: string[]
+    filters: Map<string, FilterDefinition>
   } {
     const currentSorts = workspaceState.get<SortDefinition[]>(
       MementoPrefixes.sortBy + dvcRoot,
@@ -293,7 +304,12 @@ export class ExperimentsModel {
       available: available
     }
 
-    return { colors, currentSorts, filters }
+    const excluded = workspaceState.get<string[]>(
+      MementoPrefixes.excluded + dvcRoot,
+      []
+    )
+
+    return { colors, currentSorts, excluded, filters }
   }
 
   private getCurrentExperimentIds() {

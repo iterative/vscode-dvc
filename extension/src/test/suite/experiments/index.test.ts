@@ -404,6 +404,7 @@ suite('Experiments Test Suite', () => {
         mementoSpy,
         'workspaceContext is called for color initialization'
       ).to.be.calledWith('colors:test', match.has('assigned'))
+      expect(mementoSpy).to.be.calledWith('excluded:test', [])
 
       expect(
         testRepository.getSorts(),
@@ -414,7 +415,7 @@ suite('Experiments Test Suite', () => {
       )
       expect(
         mockMemento.get('colors:test'),
-        'The correct colors are persisted'
+        'the correct colors are persisted'
       ).to.deep.equal({
         assigned: [
           ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
@@ -496,6 +497,24 @@ suite('Experiments Test Suite', () => {
         mockMemento.get('filterBy:test'),
         'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
+
+      testRepository.toggleExperiment(
+        '4fb124aebddb2adf1545030907687fa9a4c80e70'
+      )
+      expect(
+        mockMemento.get('excluded:test'),
+        'the correct experiment has been excluded in the memento'
+      ).to.deep.equal(['4fb124aebddb2adf1545030907687fa9a4c80e70'])
+      expect(
+        mockMemento.get('colors:test'),
+        'the correct colors are persisted'
+      ).to.deep.equal({
+        assigned: [
+          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
+          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
+        ],
+        available: ['#f14c4c', ...copyOriginalColors().slice(3)]
+      })
     })
 
     it('should initialize with state reflected from the given Memento', async () => {
@@ -511,6 +530,7 @@ suite('Experiments Test Suite', () => {
           assigned,
           available
         },
+        'excluded:test': ['4fb124aebddb2adf1545030907687fa9a4c80e70'],
         'filterBy:test': filterMapEntries,
         'sortBy:test': sortDefinitions
       })
@@ -529,6 +549,7 @@ suite('Experiments Test Suite', () => {
       await testRepository.isReady()
       expect(mementoSpy).to.be.calledWith('sortBy:test', [])
       expect(mementoSpy).to.be.calledWith('filterBy:test', [])
+      expect(mementoSpy).to.be.calledWith('excluded:test', [])
       expect(testRepository.getSorts()).to.deep.equal(sortDefinitions)
       expect(testRepository.getFilters()).to.deep.equal([
         firstFilterDefinition,
@@ -537,11 +558,10 @@ suite('Experiments Test Suite', () => {
       const livePlots = testRepository.getLivePlots()
       expect(livePlots?.colors).to.deep.equal({
         domain: [
-          '4fb124aebddb2adf1545030907687fa9a4c80e70',
           '42b8736b08170529903cd203a1f40382a4b4a8cd',
           '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
         ],
-        range: ['#1e5a52', '#96958f', '#5f5856']
+        range: ['#96958f', '#5f5856']
       })
     })
   })
