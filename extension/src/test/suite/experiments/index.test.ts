@@ -502,7 +502,7 @@ suite('Experiments Test Suite', () => {
         'both filters should be removed from memento after removeFilters is run against them'
       ).to.deep.equal([])
 
-      testRepository.toggleExperiment(
+      testRepository.toggleExperimentStatus(
         '4fb124aebddb2adf1545030907687fa9a4c80e70'
       )
       expect(

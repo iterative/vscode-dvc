@@ -109,8 +109,8 @@ export class Experiments extends BaseRepository<TableData> {
     return this.paramsAndMetrics.getTerminalNodeStatuses()
   }
 
-  public toggleExperiment(experimentId: string) {
-    this.experiments.toggleExperiment(experimentId)
+  public toggleExperimentStatus(experimentId: string) {
+    this.experiments.toggleStatus(experimentId)
     this.notifyChanged()
   }
 

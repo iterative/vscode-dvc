@@ -67,7 +67,7 @@ export class ExperimentsTree
     internalCommands.registerExternalCommand<ExperimentItem>(
       RegisteredCommands.EXPERIMENT_TOGGLE,
       ({ dvcRoot, id }) =>
-        this.experiments.getRepository(dvcRoot).toggleExperiment(id)
+        this.experiments.getRepository(dvcRoot).toggleExperimentStatus(id)
     )
 
     this.updateDescriptionOnChange()

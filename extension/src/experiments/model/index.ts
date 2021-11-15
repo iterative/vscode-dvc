@@ -101,7 +101,7 @@ export class ExperimentsModel {
     this.collectColors()
   }
 
-  public toggleExperiment(experimentId: string) {
+  public toggleStatus(experimentId: string) {
     const nextStatus = this.status[experimentId]
       ? Status.unselected
       : Status.selected
