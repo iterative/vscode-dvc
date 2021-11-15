@@ -1,2 +1,3 @@
-export const hasKey = (obj: Object, key: string): boolean =>
-  Object.prototype.hasOwnProperty.call(obj, key)
+export const hasKey = (maybeObject: unknown, key: string): boolean =>
+  typeof maybeObject === 'object' &&
+  Object.prototype.hasOwnProperty.call(maybeObject, key)
