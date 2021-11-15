@@ -22,19 +22,17 @@ enum Status {
   QUEUED = 2
 }
 
-export enum Type {
-  CHECKPOINT = 'checkpoint',
-  EXPERIMENT = 'experiment',
-  QUEUED = 'queued'
-}
-
 type ExperimentItem = {
+  command?: {
+    arguments: [{ dvcRoot: string; id: string }]
+    command: RegisteredCommands
+    title: string
+  }
   dvcRoot: string
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
   iconPath: ThemeIcon | Uri
-  type: Type
 }
 
 export class ExperimentsTree
@@ -78,15 +76,11 @@ export class ExperimentsTree
       return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
     }
 
-    const { label, collapsibleState, iconPath, id, dvcRoot, type } = element
+    const { label, collapsibleState, iconPath, command } = element
     const item = new TreeItem(label, collapsibleState)
     item.iconPath = iconPath
-    if (type === 'experiment') {
-      item.command = {
-        arguments: [{ dvcRoot, id }],
-        command: RegisteredCommands.EXPERIMENT_TOGGLE,
-        title: 'toggle'
-      }
+    if (command) {
+      item.command = command
     }
     return item
   }
@@ -142,11 +136,17 @@ export class ExperimentsTree
         collapsibleState: experiment.hasChildren
           ? TreeItemCollapsibleState.Collapsed
           : TreeItemCollapsibleState.None,
+        command: experiment.queued
+          ? undefined
+          : {
+              arguments: [{ dvcRoot, id: experiment.id }],
+              command: RegisteredCommands.EXPERIMENT_TOGGLE,
+              title: 'toggle'
+            },
         dvcRoot,
         iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
-        label: experiment.displayName,
-        type: experiment.queued ? Type.QUEUED : Type.EXPERIMENT
+        label: experiment.displayName
       }))
   }
 
@@ -186,8 +186,7 @@ export class ExperimentsTree
         'debug-stackframe-dot'
       ),
       id: checkpoint.id,
-      label: checkpoint.displayName,
-      type: Type.CHECKPOINT
+      label: checkpoint.displayName
     }))
   }
 

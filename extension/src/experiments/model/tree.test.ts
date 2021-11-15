@@ -2,10 +2,11 @@ import { join } from 'path'
 import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { commands, ThemeIcon, TreeItem, Uri, window } from 'vscode'
-import { ExperimentsTree, Type } from './tree'
+import { ExperimentsTree } from './tree'
 import { buildMockedExperiments } from '../../test/util/jest'
 import { ResourceLocator } from '../../resourceLocator'
 import { InternalCommands } from '../../commands/internal'
+import { RegisteredCommands } from '../../commands/external'
 
 const mockedCommands = mocked(commands)
 mockedCommands.registerCommand = jest.fn()
@@ -140,27 +141,35 @@ describe('ExperimentsTree', () => {
       expect(children).toEqual([
         {
           collapsibleState: 1,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: '90aea7f' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
           dvcRoot: 'repo',
           iconPath: getMockedUri('circle-filled', '#b180d7'),
           id: '90aea7f',
-          label: '90aea7f',
-          type: Type.EXPERIMENT
+          label: '90aea7f'
         },
         {
           collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'f0778b3' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
           dvcRoot: 'repo',
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'f0778b3',
-          label: 'f0778b3',
-          type: Type.EXPERIMENT
+          label: 'f0778b3'
         },
         {
           collapsibleState: 0,
+          command: undefined,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('watch'),
           id: 'f81f1b5',
-          label: 'f81f1b5',
-          type: Type.QUEUED
+          label: 'f81f1b5'
         }
       ])
     })
@@ -187,8 +196,7 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'repo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'ebbd66f',
-        label: 'ebbd66f',
-        type: Type.EXPERIMENT
+        label: 'ebbd66f'
       })
 
       expect(children).toEqual([
@@ -197,16 +205,14 @@ describe('ExperimentsTree', () => {
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('debug-stackframe-dot'),
           id: 'aaaaaaaaaaaaaaaaa',
-          label: 'aaaaaaa',
-          type: 'checkpoint'
+          label: 'aaaaaaa'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('debug-stackframe-dot'),
           id: 'bbbbbbbbbbbbbbbbb',
-          label: 'bbbbbbb',
-          type: 'checkpoint'
+          label: 'bbbbbbb'
         }
       ])
     })
@@ -258,8 +264,7 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('watch'),
         id: 'f0778b3',
-        label: 'f0778b3',
-        type: Type.EXPERIMENT
+        label: 'f0778b3'
       })
       expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
     })
@@ -287,8 +292,7 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'workspace',
-        label: 'workspace',
-        type: Type.EXPERIMENT
+        label: 'workspace'
       })
 
       expect(treeItem).toEqual({
@@ -319,8 +323,7 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('loading~spin'),
         id: 'f0778b3',
-        label: 'f0778b3',
-        type: Type.EXPERIMENT
+        label: 'f0778b3'
       })
 
       expect(treeItem).toEqual({
@@ -351,8 +354,7 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('debug-stackframe-dot'),
         id: 'f0778b3',
-        label: 'f0778b3',
-        type: Type.EXPERIMENT
+        label: 'f0778b3'
       })
       expect(treeItem).toEqual({
         ...mockedItem,
@@ -382,8 +384,7 @@ describe('ExperimentsTree', () => {
         dvcRoot: 'demo',
         iconPath: new ThemeIcon('circle-filled'),
         id: 'f0998a3',
-        label: 'f0998a3',
-        type: Type.EXPERIMENT
+        label: 'f0998a3'
       })
 
       expect(treeItem).toEqual({
