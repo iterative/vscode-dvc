@@ -17,7 +17,7 @@
     "test:jest": "yarn workspaces run test",
     "test": "run-p test:*",
     "cover:clean": "rm -rf ./coverage/combined && rm -rf ./extension/coverage rm -rf ./webview/coverage",
-    "cover:integration": "yarn run build-ui && node ./coverIntegrationTests.js",
+    "cover:integration": "yarn run build-ui && node ./scripts/coverIntegrationTests.js",
     "cover:merge:dvc-vscode-webview": "nyc merge ./webview/coverage ./coverage/combined/dvc-vscode-webview-coverage-final.json",
     "cover:merge:integration": "nyc merge ./extension/coverage/integration coverage/combined/integration-coverage-final.json",
     "cover:merge:unit": "nyc merge ./extension/coverage/unit coverage/unit-coverage-final.json",
@@ -31,7 +31,7 @@
     "build-ui": "yarn workspace dvc-vscode-webview build",
     "build-extension": "yarn workspace dvc build",
     "extension-dev-server": "yarn workspace dvc dev",
-    "install-frozen-lockfile": "./install-frozen-lockfile.sh",
+    "install-frozen-lockfile": "./scripts/install-frozen-lockfile.sh",
     "webview-dev-server": "yarn workspace dvc-vscode-webview dev",
     "dev-server": "run-p extension-dev-server webview-dev-server",
     "dev-ui": "HOT_RELOAD=true USE_DEV_UI=true VSC_DEBUG=true code --extensionDevelopmentPath $PWD/extension",
@@ -40,7 +40,7 @@
     "storybook": "yarn workspace dvc-vscode-webview storybook",
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
-    "setup:venv": "sh ./virtualenv-install.sh",
+    "setup:venv": "sh ./scripts/virtualenv-install.sh",
     "create-svgs": "ts-node ./scripts/create-svgs.ts"
   },
   "devDependencies": {
