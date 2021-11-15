@@ -3,7 +3,7 @@ import { LivePlotsData } from '../../../plots/webview/contract'
 const data: LivePlotsData = {
   colors: {
     domain: ['exp-e7a67', 'test-branch', 'exp-83425'],
-    range: ['#F14C4C', '#3794FF', '#CCA700']
+    range: ['#f14c4c', '#3794ff', '#cca700']
   },
   plots: [
     {
