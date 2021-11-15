@@ -120,52 +120,32 @@ export class ExperimentsTree
           ? TreeItemCollapsibleState.Collapsed
           : TreeItemCollapsibleState.None,
         dvcRoot,
-        iconPath: this.getExperimentThemeIcon(experiment),
+        iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
         label: experiment.displayName
       }))
   }
 
-  private getExperimentThemeIcon({
+  private getExperimentIcon({
     displayName,
     running,
     queued,
     displayColor
   }: {
+    displayColor?: string
     displayName: string
     running?: boolean
     queued?: boolean
-    displayColor?: string
   }): ThemeIcon | Uri {
     if (displayName === 'workspace' || running) {
-      return this.getSpinner(displayColor)
+      return this.getUriOrIcon(displayColor, 'loading-spin')
     }
 
     if (queued) {
       return new ThemeIcon('watch')
     }
 
-    return this.getCircle(displayColor)
-  }
-
-  private getSpinner(displayColor?: string) {
-    if (displayColor) {
-      return this.resourceLocator.getExperimentsResource(
-        'loading-spin',
-        displayColor
-      )
-    }
-    return new ThemeIcon('loading~spin')
-  }
-
-  private getCircle(displayColor?: string) {
-    if (displayColor) {
-      return this.resourceLocator.getExperimentsResource(
-        'circle-filled',
-        displayColor
-      )
-    }
-    return new ThemeIcon('primitive-dot')
+    return this.getUriOrIcon(displayColor, 'circle-filled')
   }
 
   private getCheckpoints(dvcRoot: string, experimentId: string) {
@@ -174,15 +154,23 @@ export class ExperimentsTree
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
       dvcRoot,
-      iconPath: checkpoint.displayColor
-        ? this.resourceLocator.getExperimentsResource(
-            'debug-stackframe-dot',
-            checkpoint.displayColor
-          )
-        : new ThemeIcon('debug-stackframe-dot'),
+      iconPath: this.getUriOrIcon(
+        checkpoint.displayColor,
+        'debug-stackframe-dot'
+      ),
       id: checkpoint.id,
       label: checkpoint.displayName
     }))
+  }
+
+  private getUriOrIcon(
+    displayColor: string | undefined,
+    iconName: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin'
+  ) {
+    if (displayColor) {
+      return this.resourceLocator.getExperimentsResource(iconName, displayColor)
+    }
+    return new ThemeIcon(iconName.replace('-spin', '~spin'))
   }
 
   private updateDescriptionOnChange() {
