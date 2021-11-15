@@ -16,4 +16,33 @@ describe('ResourceLocator', () => {
       light
     })
   })
+
+  it('should be able to find any experiments resource', () => {
+    const mockPath = Uri.file('some/path')
+    const resourceLocator = new ResourceLocator(mockPath)
+
+    const redCircleFilled = Uri.file(
+      'some/path/resources/experiments/circle-filled-#f14c4c.svg'
+    )
+
+    expect(
+      resourceLocator.getExperimentsResource('circle-filled', '#f14c4c')
+    ).toEqual(redCircleFilled)
+
+    const blueSpinner = Uri.file(
+      'some/path/resources/experiments/loading-spin-#3794ff.svg'
+    )
+
+    expect(
+      resourceLocator.getExperimentsResource('loading-spin', '#3794ff')
+    ).toEqual(blueSpinner)
+
+    const yellowDot = Uri.file(
+      'some/path/resources/experiments/debug-stackframe-dot-#cca700.svg'
+    )
+
+    expect(
+      resourceLocator.getExperimentsResource('debug-stackframe-dot', '#cca700')
+    ).toEqual(yellowDot)
+  })
 })

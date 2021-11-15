@@ -6,9 +6,8 @@ const execa = require('execa')
 
 let activationEvents = []
 let failed
-const packageJsonPath = resolve(__dirname, 'extension', 'package.json')
-
-const cwd = join(__dirname, 'extension')
+const cwd = resolve(__dirname, '..', 'extension')
+const packageJsonPath = join(cwd, 'package.json')
 
 const pipe = childProcess => {
   childProcess.stdout.pipe(process.stdout)
@@ -20,7 +19,7 @@ activationEvents = packageJson.activationEvents
 packageJson.activationEvents = ['onStartupFinished']
 writeFileSync(packageJsonPath, JSON.stringify(packageJson))
 
-const tsc = execa('tsc', ['-p', './'], {
+const tsc = execa('tsc', ['-p', '.'], {
   cwd
 })
 

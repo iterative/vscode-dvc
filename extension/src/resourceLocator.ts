@@ -28,6 +28,18 @@ export class ResourceLocator {
     )
   }
 
+  public getExperimentsResource(
+    name: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin',
+    color: string
+  ): Uri {
+    return Uri.joinPath(
+      this.extensionUri,
+      'resources',
+      'experiments',
+      `${name}-${color}.svg`
+    )
+  }
+
   private getResourceLocations(...path: string[]): { dark: Uri; light: Uri } {
     return {
       dark: this.getResourceLocation('dark', ...path),

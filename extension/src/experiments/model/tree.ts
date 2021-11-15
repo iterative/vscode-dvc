@@ -13,6 +13,7 @@ import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView } from '../../vscode/tree'
+import { ResourceLocator } from '../../resourceLocator'
 
 enum Status {
   RUNNING = 1,
@@ -24,7 +25,7 @@ type ExperimentItem = {
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
-  iconPath: ThemeIcon
+  iconPath: ThemeIcon | Uri
 }
 
 export class ExperimentsTree
@@ -35,11 +36,15 @@ export class ExperimentsTree
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
+  private readonly resourceLocator: ResourceLocator
 
   private view: TreeView<string | ExperimentItem>
   private viewed = false
 
-  constructor(experiments: WorkspaceExperiments) {
+  constructor(
+    experiments: WorkspaceExperiments,
+    resourceLocator: ResourceLocator
+  ) {
     this.onDidChangeTreeData = experiments.experimentsChanged.event
 
     this.view = this.dispose.track(
@@ -47,6 +52,7 @@ export class ExperimentsTree
     )
 
     this.experiments = experiments
+    this.resourceLocator = resourceLocator
 
     this.updateDescriptionOnChange()
   }
@@ -114,30 +120,32 @@ export class ExperimentsTree
           ? TreeItemCollapsibleState.Collapsed
           : TreeItemCollapsibleState.None,
         dvcRoot,
-        iconPath: this.getExperimentThemeIcon(experiment),
+        iconPath: this.getExperimentIcon(experiment),
         id: experiment.id,
         label: experiment.displayName
       }))
   }
 
-  private getExperimentThemeIcon({
+  private getExperimentIcon({
     displayName,
     running,
-    queued
+    queued,
+    displayColor
   }: {
+    displayColor?: string
     displayName: string
     running?: boolean
     queued?: boolean
-  }): ThemeIcon {
+  }): ThemeIcon | Uri {
     if (displayName === 'workspace' || running) {
-      return new ThemeIcon('loading~spin')
+      return this.getUriOrIcon(displayColor, 'loading-spin')
     }
 
     if (queued) {
       return new ThemeIcon('watch')
     }
 
-    return new ThemeIcon('primitive-dot')
+    return this.getUriOrIcon(displayColor, 'circle-filled')
   }
 
   private getCheckpoints(dvcRoot: string, experimentId: string) {
@@ -146,10 +154,23 @@ export class ExperimentsTree
     ).map(checkpoint => ({
       collapsibleState: TreeItemCollapsibleState.None,
       dvcRoot,
-      iconPath: new ThemeIcon('debug-stackframe-dot'),
+      iconPath: this.getUriOrIcon(
+        checkpoint.displayColor,
+        'debug-stackframe-dot'
+      ),
       id: checkpoint.id,
       label: checkpoint.displayName
     }))
+  }
+
+  private getUriOrIcon(
+    displayColor: string | undefined,
+    iconName: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin'
+  ) {
+    if (displayColor) {
+      return this.resourceLocator.getExperimentsResource(iconName, displayColor)
+    }
+    return new ThemeIcon(iconName.replace('-spin', '~spin'))
   }
 
   private updateDescriptionOnChange() {
