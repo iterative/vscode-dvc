@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { collectChanges, collectParamsAndMetrics } from './collect'
-import { ColumnOrder, ParamOrMetric } from '../webview/contract'
+import { ColumnDetail, ParamOrMetric } from '../webview/contract'
 import { flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 
@@ -26,7 +26,7 @@ export class ParamsAndMetricsModel {
   private dvcRoot: string
   private workspaceState: Memento
 
-  private columnsOrderState: ColumnOrder[] = []
+  private columnsOrderState: ColumnDetail[] = []
   private paramsAndMetricsChanges: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
@@ -39,7 +39,7 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  public getColumnsOrder(): ColumnOrder[] {
+  public getColumnsOrder(): ColumnDetail[] {
     return this.columnsOrderState
   }
 
@@ -117,7 +117,7 @@ export class ParamsAndMetricsModel {
           width: 0
         }
     )
-    this.saveColumnOrder()
+    this.persistColumnOrder()
   }
 
   public setColumnWidth(id: string, width: number) {
@@ -126,11 +126,11 @@ export class ParamsAndMetricsModel {
     )
     if (columnToResize) {
       columnToResize.width = width
-      this.saveColumnOrder()
+      this.persistColumnOrder()
     }
   }
 
-  private saveColumnOrder() {
+  private persistColumnOrder() {
     this.workspaceState.update(
       MementoPrefixes.columnsOrder + this.dvcRoot,
       this.getColumnsOrder()

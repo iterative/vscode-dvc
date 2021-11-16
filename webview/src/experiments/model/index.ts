@@ -7,7 +7,7 @@ import {
   WindowWithWebviewData
 } from 'dvc/src/webview/contract'
 import {
-  ColumnOrder,
+  ColumnDetail,
   ParamOrMetric,
   TableData
 } from 'dvc/src/experiments/webview/contract'
@@ -82,7 +82,7 @@ export class Model {
     vsCodeApi.postMessage(message)
   }
 
-  public getColumnsWithWidth(): ColumnOrder[] {
+  public getColumnsWithWidth(): ColumnDetail[] {
     return this.data?.columnsOrder || []
   }
 

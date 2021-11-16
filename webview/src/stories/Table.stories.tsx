@@ -9,14 +9,6 @@ import Experiments from '../experiments/components/Experiments'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 
-declare global {
-  interface Window {
-    webviewData: unknown
-  }
-}
-
-window.webviewData = { theme: 'dark' }
-
 const tableData = {
   changes: workspaceChangesFixture,
   columns: columnsFixture,

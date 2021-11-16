@@ -1,17 +1,4 @@
-const path = require('path')
-const webpack = require('webpack')
-
 module.exports = {
-  // eslint-disable-next-line
-  webpackFinal: (config: any) => {
-    config.plugins.push(
-      new webpack.NormalModuleReplacementPlugin(
-        /vsCodeApi.ts$/,
-        path.resolve(__dirname, '../src/model/__mocks__/vsCodeApi.storybook.ts')
-      )
-    )
-    return config
-  },
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',

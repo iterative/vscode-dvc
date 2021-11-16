@@ -8,7 +8,7 @@ declare global {
   }
 }
 
-window.webviewData = {}
+window.webviewData = { theme: 'dark' }
 window.acquireVsCodeApi = () =>
   ({
     getState: action('getState'),

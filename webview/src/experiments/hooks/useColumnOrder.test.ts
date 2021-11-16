@@ -1,18 +1,12 @@
-import { WebviewColorTheme } from 'dvc/src/webview/contract'
 import { useColumnOrder } from './useColumnsOrder'
 import { Model } from '../model'
+import { createCustomWindow } from '../../test/util'
 
 jest.mock('../../shared/api')
 
 describe('useColumnsOrder', () => {
   beforeAll(() => {
-    const customWindow = {
-      addEventListener: jest.fn,
-      webviewData: {
-        theme: WebviewColorTheme.dark
-      }
-    }
-    Object.defineProperty(global, 'window', { value: customWindow })
+    createCustomWindow()
   })
 
   it('should return the columnOrderRepresentation', () => {

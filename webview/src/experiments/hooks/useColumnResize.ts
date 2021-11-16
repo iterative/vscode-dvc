@@ -1,8 +1,8 @@
-import { ColumnOrder } from 'dvc/src/experiments/webview/contract'
+import { ColumnDetail } from 'dvc/src/experiments/webview/contract'
 import { Model } from '../model'
 
 export const useColumnResize = (): [
-  ColumnOrder[],
+  ColumnDetail[],
   (columnId: string, width: number) => void
 ] => {
   const modelInstance = Model.getInstance()

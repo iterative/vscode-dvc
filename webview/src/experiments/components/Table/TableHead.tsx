@@ -1,6 +1,6 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
-import React from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
 import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
@@ -22,6 +22,10 @@ export const TableHead: React.FC<TableHeadProps> = ({
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
   const currentColOrder = React.useRef<string[]>(columnsOrder)
   const [, setColumnOrderRepresentation] = useColumnOrder()
+  const memoizedSetColumnOrder = useCallback(
+    (colsOrder: string[]) => setColumnOrder(colsOrder),
+    [setColumnOrder]
+  )
 
   const onDragUpdate = (column: DragUpdate) => {
     if (!column.destination) {
@@ -34,7 +38,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
 
       colOrder.splice(oldIndex, 1)
       colOrder.splice(destination.index, 0, draggableId)
-      setColumnOrder(colOrder)
+      memoizedSetColumnOrder(colOrder)
     }
   }
 
@@ -44,10 +48,10 @@ export const TableHead: React.FC<TableHeadProps> = ({
     }
   }
 
-  React.useEffect(() => {
-    setColumnOrder(columnsOrder)
-    // eslint-disable-next-line
-  }, [])
+  useEffect(() => {
+    memoizedSetColumnOrder(columnsOrder)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [memoizedSetColumnOrder])
 
   currentColOrder.current = allColumns?.map(o => o.id)
 
