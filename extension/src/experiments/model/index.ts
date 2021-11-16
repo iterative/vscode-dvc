@@ -108,7 +108,7 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
 
-    this.collectExperimentInfo()
+    Promise.all([this.setStatus(), this.setDisplayNames()])
     this.collectColors()
   }
 
@@ -251,27 +251,24 @@ export class ExperimentsModel {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 
-  private collectExperimentInfo() {
-    const { displayName, status } = this.flattenExperiments().reduce(
-      (acc, exp) => {
-        const { id, displayName, queued } = exp
-        if (!queued) {
-          acc.status[id] = hasKey(this.status, id)
-            ? this.status[id]
-            : Status.selected
-        }
-        acc.displayName[id] = displayName
-        return acc
-      },
-      { displayName: {}, status: {} } as {
-        displayName: Record<string, string>
-        status: Record<string, Status>
+  private setStatus() {
+    this.status = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, queued } = exp
+      if (!queued) {
+        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.selected
       }
-    )
+      return acc
+    }, {} as Record<string, Status>)
 
-    this.status = status
-    this.displayName = displayName
     this.persistStatus()
+  }
+
+  private setDisplayNames() {
+    this.displayName = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, displayName } = exp
+      acc[id] = displayName
+      return acc
+    }, {} as Record<string, string>)
   }
 
   private collectColors() {
