@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore } from 'sinon'
+import { spy, stub, restore } from 'sinon'
 import { commands } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
@@ -13,6 +13,7 @@ import { BaseWebview } from '../../../../webview'
 import { CliReader } from '../../../../cli/reader'
 import { Plots } from '../../../../plots'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
+import { LivePlotsData } from '../../../../plots/webview/contract'
 
 suite('Experiments Params And Metrics Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -38,17 +39,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockShow = stub(BaseWebview.prototype, 'show')
-
-      const messageEvent = () =>
-        new Promise(resolve => {
-          mockShow.resetBehavior()
-          mockShow.resetHistory()
-          mockShow.callsFake((...args) => {
-            resolve(undefined)
-            return mockShow.wrappedMethod(...args)
-          })
-        })
+      const mockShow = spy(BaseWebview.prototype, 'show')
 
       stub(CliReader.prototype, 'plotsShow').resolves({})
 
@@ -63,7 +54,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       const { plots: plotsData, colors } = livePlotsFixture
       const { domain, range } = colors
-      const mutableFixture = {
+      const expectedLivePlots: LivePlotsData = {
         colors: {
           domain: [...domain],
           range: [...range]
@@ -71,20 +62,21 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         plots: plotsData
       }
 
-      const initialEvent = messageEvent()
       await plots.showWebview()
-      await initialEvent
 
-      while (mutableFixture.colors.domain.length) {
-        expect(mockShow).to.be.calledWith({
+      while (expectedLivePlots.colors.domain.length) {
+        expect(
+          mockShow,
+          'a message is sent with colors for the currently selected experiments'
+        ).to.be.calledWith({
           data: {
-            live: mutableFixture,
+            live: expectedLivePlots,
             static: undefined
           }
         })
-        const messageReceived = messageEvent()
-        const id = mutableFixture.colors.domain.pop()
-        mutableFixture.colors.range.pop()
+
+        const id = expectedLivePlots.colors.domain.pop()
+        expectedLivePlots.colors.range.pop()
 
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
@@ -95,16 +87,46 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         )
 
         expect(unSelected).to.equal(Status.unselected)
-
-        await messageReceived
       }
 
-      expect(mockShow).to.be.calledWith({
+      expect(
+        mockShow,
+        'when there are no experiments selected we send undefined (show empty state)'
+      ).to.be.calledWith({
         data: {
           live: undefined,
           static: undefined
         }
       })
-    }).timeout(10000)
+
+      const id = domain[0]
+
+      const expectedNonEmptyPlots: LivePlotsData = {
+        colors: {
+          domain: [id],
+          range: [range[0]]
+        },
+        plots: plotsData
+      }
+
+      const selected = await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_TOGGLE,
+        {
+          dvcRoot: dvcDemoPath,
+          id
+        }
+      )
+
+      expect(selected, 'the experiment is now selected').to.equal(
+        Status.selected
+      )
+
+      expect(mockShow, 'we no longer send undefined').to.be.calledWith({
+        data: {
+          live: expectedNonEmptyPlots,
+          static: undefined
+        }
+      })
+    }).timeout(6000)
   })
 })
