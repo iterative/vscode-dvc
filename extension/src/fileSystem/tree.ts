@@ -56,15 +56,14 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     )
   }
 
-  public async initialize(dvcRoots: string[]) {
+  public initialize(dvcRoots: string[]) {
     this.dvcRoots = dvcRoots
-    await this.repositories.isReady()
     this.reset()
   }
 
-  public getChildren(pathItem?: PathItem): PathItem[] {
+  public async getChildren(pathItem?: PathItem): Promise<PathItem[]> {
     if (pathItem) {
-      const contents = this.getPathItemChildren(pathItem)
+      const contents = await this.getPathItemChildren(pathItem)
       return this.sortDirectory(contents)
     }
 
@@ -100,7 +99,7 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     this.repositories.treeDataChanged.fire()
   }
 
-  private getRootElements() {
+  private async getRootElements() {
     if (!this.viewed) {
       sendViewOpenedTelemetryEvent(
         EventName.VIEWS_TRACKED_EXPLORER_TREE_OPENED,
@@ -114,7 +113,11 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
       return this.getRepoChildren(onlyRoot)
     }
 
-    return flatten(this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot)))
+    return flatten(
+      await Promise.all(
+        this.dvcRoots.map(dvcRoot => this.getRepoChildren(dvcRoot))
+      )
+    )
   }
 
   private getDataPlaceholder({ fsPath }: { fsPath: string }): string {
@@ -135,10 +138,10 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     return baseContext
   }
 
-  private getPathItemChildren(pathItem: PathItem): PathItem[] {
+  private getPathItemChildren(pathItem: PathItem): Promise<PathItem[]> {
     const { dvcRoot, resourceUri } = pathItem
     if (!dvcRoot) {
-      return []
+      return Promise.resolve([])
     }
 
     return this.getRepoChildren(dvcRoot, resourceUri.fsPath)
@@ -154,7 +157,8 @@ export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
     })
   }
 
-  private getRepoChildren(dvcRoot: string, path?: string) {
+  private async getRepoChildren(dvcRoot: string, path?: string) {
+    await this.repositories.isReady()
     return this.repositories.getRepository(dvcRoot).getChildren(path || dvcRoot)
   }
 
