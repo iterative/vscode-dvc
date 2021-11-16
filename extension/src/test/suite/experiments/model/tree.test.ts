@@ -84,10 +84,8 @@ suite('Experiments Tree Test Suite', () => {
           messageSpy,
           'a message is sent with colors for the currently selected experiments'
         ).to.be.calledWith({
-          data: {
-            live: getExpectedLivePlots(),
-            static: undefined
-          }
+          live: getExpectedLivePlots(),
+          static: undefined
         })
         messageSpy.resetHistory()
 
@@ -110,10 +108,8 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'when there are no experiments selected we send undefined (show empty state)'
       ).to.be.calledWith({
-        data: {
-          live: undefined,
-          static: undefined
-        }
+        live: undefined,
+        static: undefined
       })
       messageSpy.resetHistory()
 
@@ -133,10 +129,8 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(messageSpy, 'we no longer send undefined').to.be.calledWith({
-        data: {
-          live: getExpectedLivePlots(),
-          static: undefined
-        }
+        live: getExpectedLivePlots(),
+        static: undefined
       })
     }).timeout(6000)
   })
