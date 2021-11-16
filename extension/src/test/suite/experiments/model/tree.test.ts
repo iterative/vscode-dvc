@@ -53,9 +53,16 @@ suite('Experiments Tree Test Suite', () => {
       stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
       const { plots: plotsData, colors } = livePlotsFixture
+      const ids = [
+        '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        '42b8736b08170529903cd203a1f40382a4b4a8cd',
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
+      ]
+
       const { domain, range } = colors
       const expectedDomain = [...domain]
       const expectedRange = [...range]
+      const expectedIds = [...ids]
 
       const getExpectedLivePlots = (): LivePlotsData => ({
         colors: {
@@ -84,7 +91,8 @@ suite('Experiments Tree Test Suite', () => {
         })
         messageSpy.resetHistory()
 
-        const id = expectedDomain.pop()
+        const id = expectedIds.pop()
+        expectedDomain.pop()
         expectedRange.pop()
 
         const unSelected = await commands.executeCommand(
@@ -109,15 +117,14 @@ suite('Experiments Tree Test Suite', () => {
       })
       messageSpy.resetHistory()
 
-      const id = domain[0]
-      expectedDomain.push(id)
+      expectedDomain.push(domain[0])
       expectedRange.push(range[0])
 
       const selected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_TOGGLE,
         {
           dvcRoot: dvcDemoPath,
-          id
+          id: ids[0]
         }
       )
 

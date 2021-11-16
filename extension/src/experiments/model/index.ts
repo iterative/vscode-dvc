@@ -39,6 +39,7 @@ export class ExperimentsModel {
   private livePlots?: LivePlotData[]
   private colors: Colors
   private status: Record<string, Status>
+  private displayName: Record<string, string> = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -72,19 +73,21 @@ export class ExperimentsModel {
       range: []
     }
 
-    this.getAssignedColors().forEach((color: string, name: string) => {
-      colors.domain.push(name)
-      colors.range.push(color)
+    this.getAssignedColors().forEach((color: string, id: string) => {
+      const displayName = this.displayName[id]
+      if (displayName) {
+        colors.domain.push(displayName)
+        colors.range.push(color)
+      }
     })
 
     return {
       colors,
       plots: this.livePlots.map(plot => {
         const { title, values } = plot
-
         return {
           title,
-          values: values.filter(value => this.status[value.group])
+          values: values.filter(value => colors.domain.includes(value.group))
         }
       })
     }
@@ -105,6 +108,7 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
 
+    Promise.all([this.setStatus(), this.setDisplayNames()])
     this.collectColors()
   }
 
@@ -247,6 +251,26 @@ export class ExperimentsModel {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 
+  private setStatus() {
+    this.status = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, queued } = exp
+      if (!queued) {
+        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.selected
+      }
+      return acc
+    }, {} as Record<string, Status>)
+
+    this.persistStatus()
+  }
+
+  private setDisplayNames() {
+    this.displayName = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, displayName } = exp
+      acc[id] = displayName
+      return acc
+    }, {} as Record<string, string>)
+  }
+
   private collectColors() {
     this.colors = collectColors(
       this.getSelectedExperimentIds(),
@@ -323,16 +347,8 @@ export class ExperimentsModel {
   }
 
   private getSelectedExperimentIds() {
-    return this.flattenExperiments().reduce((acc, exp) => {
-      const { id, queued } = exp
-      if (!id) {
-        return acc
-      }
-
-      if (!hasKey(this.status, id) && !queued) {
-        this.status[id] = Status.selected
-      }
-      if (this.status[id]) {
+    return Object.entries(this.status).reduce((acc, [id, status]) => {
+      if (status) {
         acc.push(id)
       }
 
