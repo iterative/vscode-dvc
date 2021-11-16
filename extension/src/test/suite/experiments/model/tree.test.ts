@@ -39,7 +39,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       await experiments.isReady()
 
-      const mockShow = spy(BaseWebview.prototype, 'show')
+      const messageSpy = spy(BaseWebview.prototype, 'show')
 
       stub(CliReader.prototype, 'plotsShow').resolves({})
 
@@ -66,7 +66,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       while (expectedLivePlots.colors.domain.length) {
         expect(
-          mockShow,
+          messageSpy,
           'a message is sent with colors for the currently selected experiments'
         ).to.be.calledWith({
           data: {
@@ -90,7 +90,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       }
 
       expect(
-        mockShow,
+        messageSpy,
         'when there are no experiments selected we send undefined (show empty state)'
       ).to.be.calledWith({
         data: {
@@ -121,7 +121,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         Status.selected
       )
 
-      expect(mockShow, 'we no longer send undefined').to.be.calledWith({
+      expect(messageSpy, 'we no longer send undefined').to.be.calledWith({
         data: {
           live: expectedNonEmptyPlots,
           static: undefined
