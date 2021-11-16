@@ -15,10 +15,13 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
+import { WebviewColorTheme } from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
-import * as Messaging from '../../util/useMessaging'
 import { ExperimentsTable } from '../Experiments'
+import * as ColumnOrder from '../../hooks/useColumnsOrder'
+import { CustomWindow } from '../../../test/util'
+
 jest.mock('../../../shared/api')
 
 describe('Table', () => {
@@ -104,7 +107,9 @@ describe('Table', () => {
     )
 
   beforeAll(() => {
-    jest.spyOn(Messaging, 'useMessaging').mockImplementation(() => () => {})
+    jest
+      .spyOn(ColumnOrder, 'useColumnOrder')
+      .mockImplementation(() => [[], () => {}])
   })
 
   afterEach(() => {
@@ -323,6 +328,15 @@ describe('Table', () => {
 
     const defaultCols = ['Experiment', 'Timestamp']
 
+    let customWindow: CustomWindow
+
+    beforeAll(() => {
+      customWindow = window as unknown as CustomWindow
+      customWindow.webviewData = {
+        theme: WebviewColorTheme.dark
+      }
+    })
+
     beforeEach(() => {
       mockGetComputedSpacing()
     })
@@ -361,7 +375,7 @@ describe('Table', () => {
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
     })
 
-    it('should not move a column before the dafault columns', async () => {
+    it('should not move a column before the default columns', async () => {
       const { getByText, makeGetDragEl } = renderExperimentsTable()
 
       const headers = await waitFor(() =>
@@ -380,11 +394,11 @@ describe('Table', () => {
 
     it('should order the columns with the columnsOrder from the data', async () => {
       const columnsOrder = [
-        'id',
-        'timestamp',
-        'params:C',
-        'params:B',
-        'params:A'
+        { path: 'id', width: 150 },
+        { path: 'timestamp', width: 150 },
+        { path: 'params:C', width: 150 },
+        { path: 'params:B', width: 150 },
+        { path: 'params:A', width: 150 }
       ]
       const tableDataWithCustomColOrder = {
         ...tableData,

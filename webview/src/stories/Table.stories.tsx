@@ -9,18 +9,20 @@ import Experiments from '../experiments/components/Experiments'
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
 
+const tableData = {
+  changes: workspaceChangesFixture,
+  columns: columnsFixture,
+  columnsOrder: [],
+  rows: rowsFixture,
+  sorts: [
+    { descending: true, path: 'params:params.yaml:epochs' },
+    { descending: false, path: 'params:params.yaml:log_file' }
+  ]
+}
+
 export default {
   args: {
-    tableData: {
-      changes: workspaceChangesFixture,
-      columns: columnsFixture,
-      columnsOrder: [],
-      rows: rowsFixture,
-      sorts: [
-        { descending: true, path: 'params:params.yaml:epochs' },
-        { descending: false, path: 'params:params.yaml:log_file' }
-      ]
-    }
+    tableData
   },
   component: Experiments,
   title: 'Table'

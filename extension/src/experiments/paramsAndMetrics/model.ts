@@ -1,7 +1,7 @@
 import { Memento } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { collectChanges, collectParamsAndMetrics } from './collect'
-import { ParamOrMetric } from '../webview/contract'
+import { ColumnDetail, ParamOrMetric } from '../webview/contract'
 import { flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 
@@ -26,7 +26,7 @@ export class ParamsAndMetricsModel {
   private dvcRoot: string
   private workspaceState: Memento
 
-  private columnsOrderState: string[] = []
+  private columnsOrderState: ColumnDetail[] = []
   private paramsAndMetricsChanges: string[] = []
 
   constructor(dvcRoot: string, workspaceState: Memento) {
@@ -39,7 +39,7 @@ export class ParamsAndMetricsModel {
     )
   }
 
-  public getColumnsOrder(): string[] {
+  public getColumnsOrder(): ColumnDetail[] {
     return this.columnsOrderState
   }
 
@@ -110,7 +110,27 @@ export class ParamsAndMetricsModel {
   }
 
   public setColumnsOrder(columnsOrder: string[]) {
-    this.columnsOrderState = columnsOrder
+    this.columnsOrderState = columnsOrder.map(
+      column =>
+        this.columnsOrderState.find(c => c.path === column) || {
+          path: column,
+          width: 0
+        }
+    )
+    this.persistColumnOrder()
+  }
+
+  public setColumnWidth(id: string, width: number) {
+    const columnToResize = this.columnsOrderState.find(
+      column => column.path === id
+    )
+    if (columnToResize) {
+      columnToResize.width = width
+      this.persistColumnOrder()
+    }
+  }
+
+  private persistColumnOrder() {
     this.workspaceState.update(
       MementoPrefixes.columnsOrder + this.dvcRoot,
       this.getColumnsOrder()

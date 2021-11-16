@@ -5,7 +5,11 @@ import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
 import { Draggable } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
-import { getPlaceholder, isFirstLevelHeader } from '../../util/columns'
+import {
+  countUpperLevels,
+  getPlaceholders,
+  isFirstLevelHeader
+} from '../../util/columns'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
@@ -20,7 +24,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
   sorts,
   index
 }) => {
-  const hasPlaceholder = getPlaceholder(column, columns)
+  const nbPlaceholder = getPlaceholders(column, columns).length
+  const hasPlaceholder = nbPlaceholder > 0
   const isSortedWithPlaceholder = (sort: SortDefinition) =>
     sort.path === column.placeholderOf?.id ||
     (!column.placeholderOf && !hasPlaceholder && sort.path === column.id)
@@ -28,6 +33,10 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     !column.placeholderOf &&
     !['id', 'timestamp'].includes(column.id) &&
     !column.columns
+  const canResize = column.canResize && !column.placeholderOf
+  const nbUpperLevels =
+    (!column.placeholderOf && countUpperLevels(column, columns, 0)) || 0
+  const resizerHeight = 100 + nbUpperLevels * 92 + '%'
 
   return (
     <Draggable
@@ -74,6 +83,13 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           >
             {column.render('Header')}
           </div>
+          {canResize && (
+            <div
+              {...column.getResizerProps()}
+              className={styles.columnResizer}
+              style={{ height: resizerHeight }}
+            />
+          )}
         </div>
       )}
     </Draggable>

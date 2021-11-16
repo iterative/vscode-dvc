@@ -20,18 +20,13 @@ import {
 } from 'dvc/src/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
+import { CustomWindow } from '../../test/util'
 
 jest.mock('../../shared/api')
 
 const { postMessage, getState } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
 const mockGetState = mocked(getState)
-
-interface CustomWindow extends Window {
-  webviewData: {
-    theme: WebviewColorTheme
-  }
-}
 
 let customWindow: CustomWindow
 beforeEach(() => {

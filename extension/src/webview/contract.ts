@@ -3,14 +3,21 @@ import { PlotsData } from '../plots/webview/contract'
 
 export type WebviewData = TableData | PlotsData
 
+export type ColumnReorderPayload = string[]
+export type ColumnResizePayload = {
+  id: string
+  width: number
+}
+
 export type MessageFromWebview = {
   type: MessageFromWebviewType
-  payload?: string[]
+  payload?: ColumnReorderPayload | ColumnResizePayload
 }
 
 export enum MessageFromWebviewType {
   initialized = 'initialized',
-  columnReordered = 'column-reordered'
+  columnReordered = 'column-reordered',
+  columnResized = 'column-resized'
 }
 
 export interface WindowWithWebviewData {
