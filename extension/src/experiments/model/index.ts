@@ -350,13 +350,8 @@ export class ExperimentsModel {
   }
 
   private getSelectedExperimentIds() {
-    return this.flattenExperiments().reduce((acc, exp) => {
-      const { id } = exp
-      if (!id) {
-        return acc
-      }
-
-      if (this.status[id]) {
+    return Object.entries(this.status).reduce((acc, [id, status]) => {
+      if (status) {
         acc.push(id)
       }
 
