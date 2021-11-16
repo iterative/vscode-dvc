@@ -99,11 +99,7 @@ export abstract class BaseRepository<T extends WebviewData> {
   }
 
   protected sendWebviewData() {
-    if (this.webview) {
-      this.webview.show({
-        data: this.getWebviewData()
-      })
-    }
+    this.webview?.show(this.getWebviewData())
   }
 
   private resetWebview() {

@@ -47,7 +47,7 @@ suite('Plots Test Suite', () => {
         static: plotsShowFixture
       }
 
-      expect(messageSpy).to.be.calledWith({ data: expectedPlotsData })
+      expect(messageSpy).to.be.calledWith(expectedPlotsData)
       expect(mockPlotsShow).to.be.called
 
       expect(webview.isActive()).to.be.true
