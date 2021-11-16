@@ -70,13 +70,13 @@ describe('TrackedTreeView', () => {
   const dvcDemoPath = join(__dirname, '..', '..', '..', 'demo')
 
   describe('initialize', () => {
-    it('should fire the event emitter to reset the data in the view', async () => {
+    it('should fire the event emitter to reset the data in the view', () => {
       const trackedTreeView = new TrackedExplorerTree(
         mockedInternalCommands,
         mockedWorkspaceChanged,
         mockedRepositories
       )
-      await trackedTreeView.initialize([dvcDemoPath])
+      trackedTreeView.initialize([dvcDemoPath])
 
       expect(mockedTreeDataChangedFire).toBeCalledTimes(1)
     })
@@ -92,7 +92,7 @@ describe('TrackedTreeView', () => {
         mockedWorkspaceChanged,
         mockedRepositories
       )
-      await trackedTreeView.initialize(mockedDvcRoots)
+      trackedTreeView.initialize(mockedDvcRoots)
 
       const getRootPathItem = (dvcRoot: string) => ({
         dvcRoot,
@@ -102,7 +102,7 @@ describe('TrackedTreeView', () => {
 
       mockedGetChildren.mockImplementation(getRootPathItem)
 
-      const rootElements = trackedTreeView.getChildren()
+      const rootElements = await trackedTreeView.getChildren()
 
       expect(rootElements).toEqual(mockedDvcRoots.map(getRootPathItem))
       expect(mockedGetRepository).toBeCalledTimes(2)
@@ -119,7 +119,7 @@ describe('TrackedTreeView', () => {
         mockedWorkspaceChanged,
         mockedRepositories
       )
-      await trackedTreeView.initialize([dvcDemoPath])
+      trackedTreeView.initialize([dvcDemoPath])
 
       const mockedRootItems = [
         {
@@ -141,7 +141,7 @@ describe('TrackedTreeView', () => {
 
       mockedGetChildren.mockReturnValueOnce(mockedRootItems)
 
-      const rootElements = trackedTreeView.getChildren()
+      const rootElements = await trackedTreeView.getChildren()
 
       expect(mockedGetRepository).toBeCalledTimes(1)
       expect(mockedGetRepository).toBeCalledWith(dvcDemoPath)
@@ -161,7 +161,7 @@ describe('TrackedTreeView', () => {
 
       mockedGetChildren.mockReturnValueOnce(mockedDirItems)
 
-      const child = trackedTreeView.getChildren({
+      const child = await trackedTreeView.getChildren({
         dvcRoot: dvcDemoPath,
         isDirectory: true,
         resourceUri: data
@@ -175,7 +175,7 @@ describe('TrackedTreeView', () => {
   })
 
   describe('getTreeItem', () => {
-    it('should return the correct tree item for a virtual directory', async () => {
+    it('should return the correct tree item for a virtual directory', () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
         expect(collapsibleState).toEqual(1)
@@ -189,7 +189,7 @@ describe('TrackedTreeView', () => {
         mockedWorkspaceChanged,
         mockedRepositories
       )
-      await trackedTreeView.initialize([dvcDemoPath])
+      trackedTreeView.initialize([dvcDemoPath])
 
       const treeItem = trackedTreeView.getTreeItem({
         dvcRoot: dvcDemoPath,
