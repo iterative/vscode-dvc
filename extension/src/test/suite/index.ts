@@ -34,9 +34,11 @@ function setupNyc() {
 
 export async function run() {
   const nyc = setupNyc()
-  // Create the mocha test
+
   const mocha = new Mocha({
+    checkLeaks: true,
     color: true,
+    timeout: 4000,
     ui: 'tdd'
   })
 
