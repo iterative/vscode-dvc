@@ -102,13 +102,14 @@ export class ExperimentsModel {
   }
 
   public toggleStatus(experimentId: string) {
-    const nextStatus = this.status[experimentId]
+    const status = this.status[experimentId]
       ? Status.unselected
       : Status.selected
-    this.status[experimentId] = nextStatus
+    this.status[experimentId] = status
 
     this.collectColors()
     this.persistStatus()
+    return status
   }
 
   public getSorts(): SortDefinition[] {

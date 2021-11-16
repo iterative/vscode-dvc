@@ -110,8 +110,9 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public toggleExperimentStatus(experimentId: string) {
-    this.experiments.toggleStatus(experimentId)
+    const status = this.experiments.toggleStatus(experimentId)
     this.notifyChanged()
+    return status
   }
 
   public getSorts() {

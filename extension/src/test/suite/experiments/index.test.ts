@@ -507,7 +507,7 @@ suite('Experiments Test Suite', () => {
       )
       expect(
         mockMemento.get('status:test'),
-        'the correct experiment has been excluded in the memento'
+        'the correct statuses have been recorded in the memento'
       ).to.deep.equal({
         '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
         '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
