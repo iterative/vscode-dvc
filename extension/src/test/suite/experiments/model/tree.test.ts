@@ -54,29 +54,38 @@ suite('Experiments Tree Test Suite', () => {
 
       const { plots: plotsData, colors } = livePlotsFixture
       const { domain, range } = colors
-      const expectedLivePlots: LivePlotsData = {
+      const expectedDomain = [...domain]
+      const expectedRange = [...range]
+
+      const getExpectedLivePlots = (): LivePlotsData => ({
         colors: {
-          domain: [...domain],
-          range: [...range]
+          domain: expectedDomain,
+          range: expectedRange
         },
-        plots: plotsData
-      }
+        plots: plotsData.map(plot => ({
+          title: plot.title,
+          values: plot.values.filter(values =>
+            expectedDomain.includes(values.group)
+          )
+        }))
+      })
 
       await plots.showWebview()
 
-      while (expectedLivePlots.colors.domain.length) {
+      while (expectedDomain.length) {
         expect(
           messageSpy,
           'a message is sent with colors for the currently selected experiments'
         ).to.be.calledWith({
           data: {
-            live: expectedLivePlots,
+            live: getExpectedLivePlots(),
             static: undefined
           }
         })
+        messageSpy.resetHistory()
 
-        const id = expectedLivePlots.colors.domain.pop()
-        expectedLivePlots.colors.range.pop()
+        const id = expectedDomain.pop()
+        expectedRange.pop()
 
         const unSelected = await commands.executeCommand(
           RegisteredCommands.EXPERIMENT_TOGGLE,
@@ -98,16 +107,11 @@ suite('Experiments Tree Test Suite', () => {
           static: undefined
         }
       })
+      messageSpy.resetHistory()
 
       const id = domain[0]
-
-      const expectedNonEmptyPlots: LivePlotsData = {
-        colors: {
-          domain: [id],
-          range: [range[0]]
-        },
-        plots: plotsData
-      }
+      expectedDomain.push(id)
+      expectedRange.push(range[0])
 
       const selected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_TOGGLE,
@@ -123,7 +127,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(messageSpy, 'we no longer send undefined').to.be.calledWith({
         data: {
-          live: expectedNonEmptyPlots,
+          live: getExpectedLivePlots(),
           static: undefined
         }
       })
