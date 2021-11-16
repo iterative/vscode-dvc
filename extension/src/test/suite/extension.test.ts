@@ -21,8 +21,6 @@ import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceExperiments } from '../../experiments/workspace'
 
 suite('Extension Test Suite', () => {
-  const osTimeout = process.platform === 'win32' ? 25000 : 12000
-
   const dvcPathOption = 'dvc.dvcPath'
   const pythonPathOption = 'dvc.pythonPath'
 
@@ -293,7 +291,7 @@ suite('Extension Test Suite', () => {
         mockDisposer,
         'should dispose of the current repositories and experiments if the cli can no longer be found'
       ).to.have.been.called
-    }).timeout(osTimeout)
+    }).timeout(25000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
       const clock = useFakeTimers()
