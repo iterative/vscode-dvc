@@ -417,9 +417,9 @@ suite('Experiments Test Suite', () => {
         'The correct colors are persisted'
       ).to.deep.equal({
         assigned: [
-          ['exp-e7a67', '#F14C4C'],
-          ['test-branch', '#3794FF'],
-          ['exp-83425', '#CCA700']
+          ['exp-e7a67', '#f14c4c'],
+          ['test-branch', '#3794ff'],
+          ['exp-83425', '#cca700']
         ],
         available: copyOriginalColors().slice(3)
       })
