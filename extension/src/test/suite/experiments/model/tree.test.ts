@@ -15,7 +15,7 @@ import { Plots } from '../../../../plots'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
 import { LivePlotsData } from '../../../../plots/webview/contract'
 
-suite('Experiments Params And Metrics Tree Test Suite', () => {
+suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
 
   beforeEach(() => {
