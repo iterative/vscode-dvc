@@ -2,6 +2,7 @@ import {
   MessageFromWebviewType,
   WebviewColorTheme
 } from 'dvc/src/webview/contract'
+import { runInAction } from 'mobx'
 import { Model } from '.'
 import { createCustomWindow } from '../../test/util'
 
@@ -27,27 +28,29 @@ describe('Model', () => {
     jest.resetAllMocks()
     model = Model.getInstance()
     modelAsAny = model
-    modelAsAny.data = {
-      columns: [
-        {
-          parentPath: 'a',
-          path: 'a:a'
-        },
-        {
-          parentPath: 'a',
-          path: 'a:b'
-        },
-        {
-          parentPath: 'a',
-          path: 'a:c'
-        },
-        {
-          parentPath: 'b',
-          path: 'b:a'
-        }
-      ],
-      columnsOrder
-    }
+    runInAction(() => {
+      modelAsAny.data = {
+        columns: [
+          {
+            parentPath: 'a',
+            path: 'a:a'
+          },
+          {
+            parentPath: 'a',
+            path: 'a:b'
+          },
+          {
+            parentPath: 'a',
+            path: 'a:c'
+          },
+          {
+            parentPath: 'b',
+            path: 'b:a'
+          }
+        ],
+        columnsOrder
+      }
+    })
   })
 
   describe('getColumnsWithWidth', () => {
@@ -56,12 +59,17 @@ describe('Model', () => {
     })
 
     it('should return an empty array if there is no data', () => {
-      model.data = undefined
+      runInAction(() => {
+        model.data = undefined
+      })
+
       expect(model.getColumnsWithWidth()).toEqual([])
     })
 
     it('should return an empty array if there is no columnsOrder on the data', () => {
-      modelAsAny.data = { theme: WebviewColorTheme.dark }
+      runInAction(() => {
+        modelAsAny.data = { theme: WebviewColorTheme.dark }
+      })
       expect(model.getColumnsWithWidth()).toEqual([])
     })
   })
