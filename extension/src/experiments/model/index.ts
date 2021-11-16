@@ -15,11 +15,18 @@ import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
+import { hasKey } from '../../util/object'
+
+export enum Status {
+  selected = 1,
+  unselected = 0
+}
 
 const enum MementoPrefixes {
-  sortBy = 'sortBy:',
+  colors = 'colors:',
   filterBy = 'filterBy:',
-  colors = 'colors:'
+  sortBy = 'sortBy:',
+  status = 'status:'
 }
 
 export class ExperimentsModel {
@@ -31,6 +38,8 @@ export class ExperimentsModel {
   private checkpointsByTip: Map<string, Experiment[]> = new Map()
   private livePlots?: LivePlotData[]
   private colors: Colors
+  private status: Record<string, Status>
+  private displayName: Record<string, string> = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
 
@@ -40,12 +49,13 @@ export class ExperimentsModel {
   private workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
-    const { colors, currentSorts, filters } = this.revive(
+    const { colors, currentSorts, filters, status } = this.revive(
       dvcRoot,
       workspaceState
     )
     this.colors = colors
     this.currentSorts = currentSorts
+    this.status = status
     this.filters = filters
 
     this.dvcRoot = dvcRoot
@@ -54,7 +64,7 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
-    if (!this.livePlots) {
+    if (!this.livePlots || !this.colors.assigned.size) {
       return
     }
 
@@ -63,14 +73,23 @@ export class ExperimentsModel {
       range: []
     }
 
-    this.getAssignedColors().forEach((color: string, name: string) => {
-      colors.domain.push(name)
-      colors.range.push(color)
+    this.getAssignedColors().forEach((color: string, id: string) => {
+      const displayName = this.displayName[id]
+      if (displayName) {
+        colors.domain.push(displayName)
+        colors.range.push(color)
+      }
     })
 
     return {
       colors,
-      plots: this.livePlots
+      plots: this.livePlots.map(plot => {
+        const { title, values } = plot
+        return {
+          title,
+          values: values.filter(value => colors.domain.includes(value.group))
+        }
+      })
     }
   }
 
@@ -89,12 +108,19 @@ export class ExperimentsModel {
     this.checkpointsByTip = checkpointsByTip
     this.livePlots = livePlots
 
-    this.colors = collectColors(
-      this.getCurrentExperimentIds(),
-      this.getAssignedColors(),
-      this.colors.available
-    )
-    this.persistColors()
+    Promise.all([this.setStatus(), this.setDisplayNames()])
+    this.collectColors()
+  }
+
+  public toggleStatus(experimentId: string) {
+    const status = this.status[experimentId]
+      ? Status.unselected
+      : Status.selected
+    this.status[experimentId] = status
+
+    this.collectColors()
+    this.persistStatus()
+    return status
   }
 
   public getSorts(): SortDefinition[] {
@@ -225,6 +251,35 @@ export class ExperimentsModel {
     return flatten<Experiment>([...this.experimentsByBranch.values()])
   }
 
+  private setStatus() {
+    this.status = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, queued } = exp
+      if (!queued) {
+        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.selected
+      }
+      return acc
+    }, {} as Record<string, Status>)
+
+    this.persistStatus()
+  }
+
+  private setDisplayNames() {
+    this.displayName = this.flattenExperiments().reduce((acc, exp) => {
+      const { id, displayName } = exp
+      acc[id] = displayName
+      return acc
+    }, {} as Record<string, string>)
+  }
+
+  private collectColors() {
+    this.colors = collectColors(
+      this.getSelectedExperimentIds(),
+      this.getAssignedColors(),
+      this.colors.available
+    )
+    this.persistColors()
+  }
+
   private persistSorts() {
     return this.workspaceState.update(
       MementoPrefixes.sortBy + this.dvcRoot,
@@ -245,26 +300,22 @@ export class ExperimentsModel {
     })
   }
 
+  private persistStatus() {
+    return this.workspaceState.update(
+      MementoPrefixes.status + this.dvcRoot,
+      this.status
+    )
+  }
+
   private revive(
     dvcRoot: string,
     workspaceState: Memento
   ): {
     colors: Colors
-    filters: Map<string, FilterDefinition>
     currentSorts: SortDefinition[]
+    filters: Map<string, FilterDefinition>
+    status: Record<string, Status>
   } {
-    const currentSorts = workspaceState.get<SortDefinition[]>(
-      MementoPrefixes.sortBy + dvcRoot,
-      []
-    )
-
-    const filters = new Map(
-      workspaceState.get<[string, FilterDefinition][]>(
-        MementoPrefixes.filterBy + dvcRoot,
-        []
-      )
-    )
-
     const { assigned, available } = workspaceState.get<{
       assigned: [string, string][]
       available: string[]
@@ -273,19 +324,36 @@ export class ExperimentsModel {
       available: copyOriginalColors()
     })
 
-    const colors = {
-      assigned: new Map(assigned),
-      available: available
+    return {
+      colors: {
+        assigned: new Map(assigned),
+        available: available
+      },
+      currentSorts: workspaceState.get<SortDefinition[]>(
+        MementoPrefixes.sortBy + dvcRoot,
+        []
+      ),
+      filters: new Map(
+        workspaceState.get<[string, FilterDefinition][]>(
+          MementoPrefixes.filterBy + dvcRoot,
+          []
+        )
+      ),
+      status: workspaceState.get<Record<string, Status>>(
+        MementoPrefixes.status + dvcRoot,
+        {}
+      )
     }
-
-    return { colors, currentSorts, filters }
   }
 
-  private getCurrentExperimentIds() {
-    return this.flattenExperiments()
-      .filter(exp => !exp.queued)
-      .map(exp => exp.id)
-      .filter(Boolean) as string[]
+  private getSelectedExperimentIds() {
+    return Object.entries(this.status).reduce((acc, [id, status]) => {
+      if (status) {
+        acc.push(id)
+      }
+
+      return acc
+    }, [] as string[])
   }
 
   private addDisplayColor(experiment: Experiment, id?: string) {

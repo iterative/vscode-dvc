@@ -13,7 +13,6 @@ import { buildMockMemento } from '../../util'
 import { dvcDemoPath, extensionUri } from '../util'
 import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
-import { ExperimentsModel } from '../../../experiments/model'
 
 export const buildMockData = () =>
   ({
@@ -55,15 +54,6 @@ export const buildExperiments = (
 ) => {
   const { config, internalCommands, mockExperimentShow, resourceLocator } =
     buildDependencies(disposer, experimentShowData)
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  stub(ExperimentsModel.prototype as any, 'getAssignedColors').returns(
-    new Map([
-      ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
-      ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
-      ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
-    ])
-  )
 
   const experiments = disposer.track(
     new Experiments(
