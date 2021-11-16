@@ -36,9 +36,7 @@ export interface setData<T extends WebviewData> {
   data: T
 }
 
-export type MessageToWebview<T extends WebviewData> = {
-  errors?: Error[]
-} & (
+export type MessageToWebview<T extends WebviewData> =
   | {
       type: MessageToWebviewType.setDvcRoot
       dvcRoot: string
@@ -48,7 +46,6 @@ export type MessageToWebview<T extends WebviewData> = {
       theme: WebviewColorTheme
     }
   | setData<T>
-)
 
 export enum MessageToWebviewType {
   setDvcRoot = 'setDvcRoot',

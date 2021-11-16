@@ -125,11 +125,11 @@ export class BaseWebview<T extends WebviewData> {
     return this.webviewPanel.visible
   }
 
-  public async show(payload: { data: T; errors?: Error[] }): Promise<boolean> {
+  public async show(data: T): Promise<boolean> {
     await this.isReady()
     return this.sendMessage({
-      type: MessageToWebviewType.setData,
-      ...payload
+      data,
+      type: MessageToWebviewType.setData
     })
   }
 

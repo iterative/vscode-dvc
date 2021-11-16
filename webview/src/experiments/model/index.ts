@@ -41,8 +41,6 @@ export class Model {
 
   public readonly dispose = Disposable.fn()
 
-  public errors?: Array<Error | string> = undefined
-
   public columnsOrderRepresentation: ParamOrMetric[] = []
 
   private constructor() {
@@ -175,7 +173,6 @@ export class Model {
   }
 
   private handleMessage(message: MessageToWebview): void {
-    this.errors = message.errors || undefined
     switch (message.type) {
       case MessageToWebviewType.setTheme:
         runInAction(() => {
