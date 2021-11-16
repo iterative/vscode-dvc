@@ -404,19 +404,16 @@ suite('Experiments Test Suite', () => {
         mementoSpy,
         'workspaceContext is called for color initialization'
       ).to.be.calledWith('colors:test', match.has('assigned'))
-      expect(mementoSpy).to.be.calledWith('status:test', {
-        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
-        '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
-        '4fb124aebddb2adf1545030907687fa9a4c80e70': 1
-      })
+      expect(mementoSpy).to.be.calledWith('status:test', {})
 
       expect(
         testRepository.getSorts(),
         'Experiments starts with no sorts'
       ).to.deep.equal([])
-      expect(mockMemento.keys(), 'Memento starts with color key').to.deep.equal(
-        ['colors:test']
-      )
+      expect(
+        mockMemento.keys(),
+        'Memento starts with the colors and status keys'
+      ).to.deep.equal(['status:test', 'colors:test'])
       expect(
         mockMemento.get('colors:test'),
         'the correct colors are persisted'
@@ -427,6 +424,14 @@ suite('Experiments Test Suite', () => {
           ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
         ],
         available: copyOriginalColors().slice(3)
+      })
+      expect(
+        mockMemento.get('status:test'),
+        'the correct statuses are persisted'
+      ).to.deep.equal({
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d': 1,
+        '42b8736b08170529903cd203a1f40382a4b4a8cd': 1,
+        '4fb124aebddb2adf1545030907687fa9a4c80e70': 1
       })
 
       const mockPickSort = stub(SortQuickPicks, 'pickSortToAdd')
@@ -569,10 +574,7 @@ suite('Experiments Test Suite', () => {
       ])
       const livePlots = testRepository.getLivePlots()
       expect(livePlots?.colors).to.deep.equal({
-        domain: [
-          '42b8736b08170529903cd203a1f40382a4b4a8cd',
-          '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
-        ],
+        domain: ['test-branch', 'exp-83425'],
         range: ['#96958f', '#5f5856']
       })
     })
