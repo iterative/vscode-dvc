@@ -103,13 +103,11 @@ suite('Experiments Filter By Tree Test Suite', () => {
       ]
 
       expect(messageSpy).to.be.calledWith({
-        data: {
-          changes: workspaceChangesFixture,
-          columns: columnsFixture,
-          columnsOrder: [],
-          rows: filteredRows,
-          sorts: []
-        }
+        changes: workspaceChangesFixture,
+        columns: columnsFixture,
+        columnsOrder: [],
+        rows: filteredRows,
+        sorts: []
       })
 
       const tableFilterRemoved = experimentsUpdatedEvent(experiments)
@@ -135,9 +133,7 @@ suite('Experiments Filter By Tree Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith({
-        data: expectedTableData
-      })
+      expect(messageSpy).to.be.calledWith(expectedTableData)
     }).timeout(6000)
 
     it('should be able to remove all filters with dvc.views.experimentsFilterByTree.removeAllFilters', async () => {

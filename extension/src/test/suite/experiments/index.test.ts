@@ -109,7 +109,7 @@ suite('Experiments Test Suite', () => {
         sorts: []
       }
 
-      expect(messageSpy).to.be.calledWith({ data: expectedTableData })
+      expect(messageSpy).to.be.calledWith(expectedTableData)
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
@@ -242,40 +242,43 @@ suite('Experiments Test Suite', () => {
         }
       })
 
+      messageSpy.resetHistory()
+
       await experiments.isReady()
       await experiments.showWebview()
 
-      expect(messageSpy.lastCall.args[0].data.rows).deep.equals([
-        {
-          displayName: 'workspace',
-          id: 'workspace',
-          params: { 'params.yaml': { test: 10 } }
-        },
-        {
-          displayName: 'testBra',
-          id: 'testBranch',
-          params: { 'params.yaml': { test: 10 } },
-          subRows: [
-            {
-              displayName: 'testExp',
-              id: 'testExp1',
-              params: { 'params.yaml': { test: 2 } }
-            },
-            {
-              displayName: 'testExp',
-              id: 'testExp2',
-              params: { 'params.yaml': { test: 1 } }
-            },
-            {
-              displayName: 'testExp',
-              id: 'testExp3',
-              params: { 'params.yaml': { test: 3 } }
-            }
-          ]
-        }
-      ])
-
-      expect(messageSpy.lastCall.args[0].data.sorts).deep.equals([])
+      expect(messageSpy).to.be.calledWithMatch({
+        rows: [
+          {
+            displayName: 'workspace',
+            id: 'workspace',
+            params: { 'params.yaml': { test: 10 } }
+          },
+          {
+            displayName: 'testBra',
+            id: 'testBranch',
+            params: { 'params.yaml': { test: 10 } },
+            subRows: [
+              {
+                displayName: 'testExp',
+                id: 'testExp1',
+                params: { 'params.yaml': { test: 2 } }
+              },
+              {
+                displayName: 'testExp',
+                id: 'testExp2',
+                params: { 'params.yaml': { test: 1 } }
+              },
+              {
+                displayName: 'testExp',
+                id: 'testExp3',
+                params: { 'params.yaml': { test: 3 } }
+              }
+            ]
+          }
+        ],
+        sorts: []
+      })
 
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const sortPath = joinParamOrMetricPath('params', 'params.yaml', 'test')
@@ -294,43 +297,44 @@ suite('Experiments Test Suite', () => {
 
       const tableChangePromise = experimentsUpdatedEvent(experiments)
 
+      messageSpy.resetHistory()
+
       const pickPromise = experiments.addSort()
       await pickPromise
       await tableChangePromise
 
-      expect(messageSpy.lastCall.args[0].data.rows).deep.equals([
-        {
-          displayName: 'workspace',
-          id: 'workspace',
-          params: { 'params.yaml': { test: 10 } }
-        },
-        {
-          displayName: 'testBra',
-          id: 'testBranch',
-          params: { 'params.yaml': { test: 10 } },
-          subRows: [
-            {
-              displayName: 'testExp',
-              id: 'testExp2',
-              params: { 'params.yaml': { test: 1 } }
-            },
-            {
-              displayName: 'testExp',
-              id: 'testExp1',
-              params: { 'params.yaml': { test: 2 } }
-            },
-            {
-              displayName: 'testExp',
-              id: 'testExp3',
-              params: { 'params.yaml': { test: 3 } }
-            }
-          ]
-        }
-      ])
-
-      expect(messageSpy.lastCall.args[0].data.sorts).deep.equals([
-        { descending: false, path: sortPath }
-      ])
+      expect(messageSpy).to.be.calledWithMatch({
+        rows: [
+          {
+            displayName: 'workspace',
+            id: 'workspace',
+            params: { 'params.yaml': { test: 10 } }
+          },
+          {
+            displayName: 'testBra',
+            id: 'testBranch',
+            params: { 'params.yaml': { test: 10 } },
+            subRows: [
+              {
+                displayName: 'testExp',
+                id: 'testExp2',
+                params: { 'params.yaml': { test: 1 } }
+              },
+              {
+                displayName: 'testExp',
+                id: 'testExp1',
+                params: { 'params.yaml': { test: 2 } }
+              },
+              {
+                displayName: 'testExp',
+                id: 'testExp3',
+                params: { 'params.yaml': { test: 3 } }
+              }
+            ]
+          }
+        ],
+        sorts: [{ descending: false, path: sortPath }]
+      })
     }).timeout(5000)
   })
 
