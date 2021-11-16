@@ -79,7 +79,14 @@ export class ExperimentsModel {
 
     return {
       colors,
-      plots: this.livePlots
+      plots: this.livePlots.map(plot => {
+        const { title, values } = plot
+
+        return {
+          title,
+          values: values.filter(value => this.status[value.group])
+        }
+      })
     }
   }
 
