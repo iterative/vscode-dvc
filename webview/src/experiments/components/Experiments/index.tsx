@@ -19,6 +19,7 @@ import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
 import { useColumnResize } from '../../hooks/useColumnResize'
+import { Model } from '../../model'
 
 const DEFAULT_COLUMN_WIDTH = 120
 
@@ -61,8 +62,9 @@ const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
 
 export const ExperimentsTable: React.FC<{
   tableData: TableData
-}> = ({ tableData }) => {
-  const [columnsWidth, setColumnWidth] = useColumnResize()
+  model: Model
+}> = ({ tableData, model }) => {
+  const [columnsWidth, setColumnWidth] = useColumnResize(model)
   const [initialState, defaultColumn] = React.useMemo(() => {
     const initialState = {}
     const defaultColumn: Partial<Column<Experiment>> = {
@@ -131,6 +133,7 @@ export const ExperimentsTable: React.FC<{
 
   return (
     <Table
+      model={model}
       instance={instance}
       sorts={tableData.sorts}
       changes={tableData.changes}
@@ -141,11 +144,12 @@ export const ExperimentsTable: React.FC<{
 
 const Experiments: React.FC<{
   tableData?: TableData | null
-}> = ({ tableData }) => {
+  model: Model
+}> = ({ tableData, model }) => {
   return (
     <div className={styles.experiments}>
       {tableData ? (
-        <ExperimentsTable tableData={tableData} />
+        <ExperimentsTable tableData={tableData} model={model} />
       ) : (
         <p>Loading experiments...</p>
       )}

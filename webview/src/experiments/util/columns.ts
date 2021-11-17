@@ -22,8 +22,8 @@ export const getPlaceholders = (
 
 const cleanPath = (path: string): string => path.split('/').slice(1).join('/')
 
-export const getNodeSiblings = (id: string) => {
-  const orderedColumnsrep = Model.getInstance().columnsOrderRepresentation
+export const getNodeSiblings = (model: Model, id: string) => {
+  const orderedColumnsrep = model.columnsOrderRepresentation
   const nodeRep = orderedColumnsrep.find(node => cleanPath(node.path) === id)
   return orderedColumnsrep.filter(
     node => node.parentPath === nodeRep?.parentPath
@@ -31,6 +31,7 @@ export const getNodeSiblings = (id: string) => {
 }
 
 export const countUpperLevels = (
+  model: Model,
   column: HeaderGroup<Experiment>,
   columns: HeaderGroup<Experiment>[],
   previousLevel = 0
@@ -45,16 +46,22 @@ export const countUpperLevels = (
       columns
     )
     parentPlaceholders.forEach(parentPlaceholder => {
-      nbLevels = countUpperLevels(parentPlaceholder, columns, nbLevels + 1)
+      nbLevels = countUpperLevels(
+        model,
+        parentPlaceholder,
+        columns,
+        nbLevels + 1
+      )
     })
     return nbLevels
   }
-  const siblings = getNodeSiblings(column.id)
+  const siblings = getNodeSiblings(model, column.id)
   const lastId =
     siblings?.length && cleanPath(siblings[siblings.length - 1].path)
 
   if (lastId === id || parent.placeholderOf) {
     nbLevels = countUpperLevels(
+      model,
       parent as HeaderGroup<Experiment>,
       columns,
       nbLevels + 1

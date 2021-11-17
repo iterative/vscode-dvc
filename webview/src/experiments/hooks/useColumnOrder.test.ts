@@ -10,6 +10,7 @@ describe('useColumnsOrder', () => {
   })
 
   it('should return the columnOrderRepresentation', () => {
+    const model = Model.getInstance()
     const expectedColumnsRepresentation = [
       {
         group: 'group1',
@@ -37,15 +38,16 @@ describe('useColumnsOrder', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .spyOn(Model.prototype as any, 'getOrderedDataWithGroups')
       .mockImplementation(() => expectedColumnsRepresentation)
-    Model.getInstance().createColumnsOrderRepresentation([])
-    const [columnOrderRepresentation] = useColumnOrder()
+    model.createColumnsOrderRepresentation([])
+    const [columnOrderRepresentation] = useColumnOrder(model)
 
     expect(columnOrderRepresentation).toEqual(expectedColumnsRepresentation)
   })
 
   it('should return a method that calls createColumnsOrderRepresentation on the model', () => {
+    const model = Model.getInstance()
     const expectedOrder = ['A', 'C', 'B', 'Z']
-    const [, setColumnOrderRepresentation] = useColumnOrder()
+    const [, setColumnOrderRepresentation] = useColumnOrder(model)
     const createColumnsOrderRepresentationSpy = jest.spyOn(
       Model.prototype,
       'createColumnsOrderRepresentation'

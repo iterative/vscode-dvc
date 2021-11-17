@@ -5,23 +5,26 @@ import { HeaderGroup, TableInstance } from 'react-table'
 import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
+import { Model } from '../../model'
 import { useColumnOrder } from '../../hooks/useColumnsOrder'
 
 interface TableHeadProps {
   instance: TableInstance<Experiment>
   sorts: SortDefinition[]
   columnsOrder: string[]
+  model: Model
 }
 
 export const TableHead: React.FC<TableHeadProps> = ({
   instance: { headerGroups, setColumnOrder, allColumns },
   sorts,
-  columnsOrder
+  columnsOrder,
+  model
 }) => {
+  const [, setColumnOrderRepresentation] = useColumnOrder(model)
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
   const currentColOrder = React.useRef<string[]>(columnsOrder)
-  const [, setColumnOrderRepresentation] = useColumnOrder()
   const memoizedSetColumnOrder = useCallback(
     (colsOrder: string[]) => setColumnOrder(colsOrder),
     [setColumnOrder]
@@ -64,6 +67,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
           key={`header-group-${headerGroup.id}-${i}`}
         >
           <MergedHeaderGroup
+            model={model}
             headerGroup={headerGroup}
             columns={allHeaders}
             sorts={sorts}

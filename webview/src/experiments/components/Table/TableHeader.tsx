@@ -10,19 +10,22 @@ import {
   getPlaceholders,
   isFirstLevelHeader
 } from '../../util/columns'
+import { Model } from '../../model'
 
 interface TableHeaderProps {
   column: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
   index: number
+  model: Model
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
   sorts,
-  index
+  index,
+  model
 }) => {
   const nbPlaceholder = getPlaceholders(column, columns).length
   const hasPlaceholder = nbPlaceholder > 0
@@ -35,7 +38,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     !column.columns
   const canResize = column.canResize && !column.placeholderOf
   const nbUpperLevels =
-    (!column.placeholderOf && countUpperLevels(column, columns, 0)) || 0
+    (!column.placeholderOf && countUpperLevels(model, column, columns, 0)) || 0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
 
   return (

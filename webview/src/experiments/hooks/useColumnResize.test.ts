@@ -10,6 +10,7 @@ describe('useColumnResize', () => {
   })
 
   it('should return the columns width', () => {
+    const model = Model.getInstance()
     const expectedColumnsWidth = [
       { path: 'A', width: 1 },
       { path: 'B', width: 33 },
@@ -18,16 +19,17 @@ describe('useColumnResize', () => {
     const getColumnsWithWidthSpy = jest
       .spyOn(Model.prototype, 'getColumnsWithWidth')
       .mockImplementation(() => expectedColumnsWidth)
-    const [columnsWidth] = useColumnResize()
+    const [columnsWidth] = useColumnResize(model)
 
     expect(getColumnsWithWidthSpy).toHaveBeenCalledTimes(1)
     expect(columnsWidth).toEqual(expectedColumnsWidth)
   })
 
   it('should return a method that calls setColumnWidth on the model', () => {
+    const model = Model.getInstance()
     const expectedId = 'my-id'
     const expectedWidth = 999
-    const [, setColumnWidth] = useColumnResize()
+    const [, setColumnWidth] = useColumnResize(model)
     const setColumnWidthSpy = jest.spyOn(Model.prototype, 'setColumnWidth')
 
     setColumnWidth(expectedId, expectedWidth)

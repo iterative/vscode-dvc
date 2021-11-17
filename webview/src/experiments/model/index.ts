@@ -46,7 +46,7 @@ export class Model {
   private constructor() {
     makeObservable(this)
     const data = window.webviewData
-    this.theme = data.theme
+    this.theme = data?.theme
 
     this.dispose.track(
       addMessageHandler<MessageToWebview>(message =>

@@ -6,12 +6,14 @@ import { HeaderGroup } from 'react-table'
 import { Droppable } from 'react-beautiful-dnd'
 import { TableHeader } from './TableHeader'
 import styles from './styles.module.scss'
+import { Model } from '../../model'
 
 export const MergedHeaderGroup: React.FC<{
   headerGroup: HeaderGroup<Experiment>
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
-}> = ({ headerGroup, sorts, columns }) => {
+  model: Model
+}> = ({ headerGroup, sorts, columns, model }) => {
   return (
     <Droppable droppableId="droppable" direction="horizontal">
       {provided => (
@@ -23,6 +25,7 @@ export const MergedHeaderGroup: React.FC<{
         >
           {headerGroup.headers.map((column: HeaderGroup<Experiment>, i) => (
             <TableHeader
+              model={model}
               key={column.id}
               column={column}
               columns={columns}
