@@ -161,7 +161,7 @@ export class ExperimentsTree
     displayName: string
     running?: boolean
     queued?: boolean
-    selected: boolean
+    selected?: boolean
   }): ThemeIcon | Uri {
     if (displayName === 'workspace' || running) {
       return this.getUriOrIcon(displayColor, 'loading-spin')
@@ -171,7 +171,7 @@ export class ExperimentsTree
       return new ThemeIcon('watch')
     }
 
-    const iconName = selected ? 'circle-filled' : 'circle-outline'
+    const iconName = selected === false ? 'circle-outline' : 'circle-filled'
 
     return this.getUriOrIcon(displayColor, iconName)
   }

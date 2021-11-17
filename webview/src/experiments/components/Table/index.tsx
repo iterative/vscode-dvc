@@ -104,13 +104,17 @@ const getCells = (cells: Cell<Experiment, unknown>[], changes?: string[]) =>
     </div>
   ))
 
-const getExperimentTypeClass = ({ running, queued }: Experiment) => {
+const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
     return styles.runningExperiment
   }
   if (queued) {
     return styles.queuedExperiment
   }
+  if (selected === false) {
+    return styles.unselectedExperiment
+  }
+
   return styles.normalExperiment
 }
 

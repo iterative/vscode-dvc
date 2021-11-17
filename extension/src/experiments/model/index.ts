@@ -73,7 +73,7 @@ export class ExperimentsModel {
 
     this.getAssignedColors().forEach((color: string, id: string) => {
       const displayName = this.displayName[id]
-      const selected = this.status[id]
+      const selected = !!this.status[id]
       if (displayName && selected) {
         selectedExperiments.push(displayName)
         range.push(color)
@@ -174,20 +174,19 @@ export class ExperimentsModel {
 
   public getExperiments(): (Experiment & {
     hasChildren: boolean
-    selected: boolean
+    selected?: boolean
   })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
     return [...workspace, ...this.flattenExperiments()].map(experiment => ({
-      ...this.addDisplayColor(experiment),
-      hasChildren: !!this.checkpointsByTip.get(experiment.id),
-      selected: !!this.status[experiment.id]
+      ...this.addDetails(experiment),
+      hasChildren: !!this.checkpointsByTip.get(experiment.id)
     }))
   }
 
   public getCheckpoints(experimentId: string): Experiment[] | undefined {
     return this.checkpointsByTip
       .get(experimentId)
-      ?.map(checkpoint => this.addDisplayColor(checkpoint, experimentId))
+      ?.map(checkpoint => this.addDetails(checkpoint, experimentId))
   }
 
   public getRowData() {
@@ -212,13 +211,13 @@ export class ExperimentsModel {
       .map(experiment => {
         const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
         if (!checkpoints) {
-          return this.addDisplayColor(experiment)
+          return this.addDetails(experiment)
         }
         return {
-          ...this.addDisplayColor(experiment),
-          subRows: checkpoints.map(checkpoint =>
-            this.addDisplayColor(checkpoint, experiment.id)
-          )
+          ...this.addDetails(experiment),
+          subRows: checkpoints.map(checkpoint => ({
+            ...this.addDetails(checkpoint, experiment.id)
+          }))
         }
       })
       .filter((row: RowData) => this.filterTableRow(row))
@@ -364,14 +363,17 @@ export class ExperimentsModel {
     }, [] as string[])
   }
 
-  private addDisplayColor(experiment: Experiment, id?: string) {
+  private addDetails(experiment: Experiment, id?: string) {
     const assignedColors = this.getAssignedColors()
     const displayColor = assignedColors.get(id || experiment.id)
+    const status = this.status[id || experiment.id]
+    const selected = status !== undefined ? !!status : undefined
 
     return displayColor
       ? {
           ...experiment,
-          displayColor
+          displayColor,
+          selected
         }
       : experiment
   }
