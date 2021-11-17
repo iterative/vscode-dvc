@@ -19,7 +19,8 @@ suite('Plots Test Suite', () => {
     restore()
   })
 
-  afterEach(() => {
+  afterEach(function () {
+    this.timeout(5000)
     disposable.dispose()
     return closeAllEditors()
   })
