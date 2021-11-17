@@ -29,6 +29,14 @@ describe('ResourceLocator', () => {
       resourceLocator.getExperimentsResource('circle-filled', '#f14c4c')
     ).toEqual(redCircleFilled)
 
+    const redCircleOutline = Uri.file(
+      'some/path/resources/experiments/circle-outline-#f14c4c.svg'
+    )
+
+    expect(
+      resourceLocator.getExperimentsResource('circle-outline', '#f14c4c')
+    ).toEqual(redCircleOutline)
+
     const blueSpinner = Uri.file(
       'some/path/resources/experiments/loading-spin-#3794ff.svg'
     )

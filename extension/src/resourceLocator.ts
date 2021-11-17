@@ -29,7 +29,11 @@ export class ResourceLocator {
   }
 
   public getExperimentsResource(
-    name: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin',
+    name:
+      | 'circle-filled'
+      | 'circle-outline'
+      | 'debug-stackframe-dot'
+      | 'loading-spin',
     color: string
   ): Uri {
     return Uri.joinPath(
