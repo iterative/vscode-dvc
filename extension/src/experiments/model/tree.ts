@@ -188,7 +188,9 @@ export class ExperimentsTree
       dvcRoot,
       iconPath: this.getUriOrIcon(
         checkpoint.displayColor,
-        IconName.DEBUG_STACKFRAME_DOT
+        checkpoint.selected === false
+          ? IconName.CIRCLE_OUTLINE
+          : IconName.CIRCLE_FILLED
       ),
       id: checkpoint.id,
       label: checkpoint.displayName
