@@ -151,15 +151,17 @@ export class ExperimentsTree
   }
 
   private getExperimentIcon({
+    displayColor,
     displayName,
     running,
     queued,
-    displayColor
+    selected
   }: {
     displayColor?: string
     displayName: string
     running?: boolean
     queued?: boolean
+    selected: boolean
   }): ThemeIcon | Uri {
     if (displayName === 'workspace' || running) {
       return this.getUriOrIcon(displayColor, 'loading-spin')
@@ -169,7 +171,9 @@ export class ExperimentsTree
       return new ThemeIcon('watch')
     }
 
-    return this.getUriOrIcon(displayColor, 'circle-filled')
+    const iconName = selected ? 'circle-filled' : 'circle-outline'
+
+    return this.getUriOrIcon(displayColor, iconName)
   }
 
   private getCheckpoints(
@@ -192,7 +196,11 @@ export class ExperimentsTree
 
   private getUriOrIcon(
     displayColor: string | undefined,
-    iconName: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin'
+    iconName:
+      | 'circle-filled'
+      | 'circle-outline'
+      | 'debug-stackframe-dot'
+      | 'loading-spin'
   ) {
     if (displayColor) {
       return this.resourceLocator.getExperimentsResource(iconName, displayColor)

@@ -109,14 +109,16 @@ describe('ExperimentsTree', () => {
           displayColor: '#b180d7',
           displayName: '90aea7f',
           hasChildren: true,
-          id: '90aea7f'
+          id: '90aea7f',
+          selected: true
         },
         {
           displayColor: '#1a1c19',
           displayName: 'f0778b3',
           hasChildren: false,
           id: 'f0778b3',
-          running: true
+          running: true,
+          selected: true
         },
         {
           displayName: 'f81f1b5',

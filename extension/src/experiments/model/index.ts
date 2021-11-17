@@ -14,7 +14,7 @@ import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
+import { LivePlotData } from '../../plots/webview/contract'
 import { hasKey } from '../../util/object'
 
 export enum Status {
@@ -64,30 +64,35 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
-    if (!this.livePlots || !this.colors.assigned.size) {
+    if (!this.livePlots) {
       return
     }
 
-    const colors: LivePlotsColors = {
-      domain: [],
-      range: []
-    }
+    const selectedExperiments: string[] = []
+    const range: string[] = []
 
     this.getAssignedColors().forEach((color: string, id: string) => {
       const displayName = this.displayName[id]
-      if (displayName) {
-        colors.domain.push(displayName)
-        colors.range.push(color)
+      const selected = this.status[id]
+      if (displayName && selected) {
+        selectedExperiments.push(displayName)
+        range.push(color)
       }
     })
 
+    if (!definedAndNonEmpty(selectedExperiments)) {
+      return
+    }
+
     return {
-      colors,
+      colors: { domain: selectedExperiments, range },
       plots: this.livePlots.map(plot => {
         const { title, values } = plot
         return {
           title,
-          values: values.filter(value => colors.domain.includes(value.group))
+          values: values.filter(value =>
+            selectedExperiments.includes(value.group)
+          )
         }
       })
     }
@@ -118,7 +123,6 @@ export class ExperimentsModel {
       : Status.selected
     this.status[experimentId] = status
 
-    this.collectColors()
     this.persistStatus()
     return status
   }
@@ -168,11 +172,15 @@ export class ExperimentsModel {
     return result
   }
 
-  public getExperiments(): (Experiment & { hasChildren: boolean })[] {
+  public getExperiments(): (Experiment & {
+    hasChildren: boolean
+    selected: boolean
+  })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
     return [...workspace, ...this.flattenExperiments()].map(experiment => ({
       ...this.addDisplayColor(experiment),
-      hasChildren: !!this.checkpointsByTip.get(experiment.id)
+      hasChildren: !!this.checkpointsByTip.get(experiment.id),
+      selected: !!this.status[experiment.id]
     }))
   }
 
@@ -273,7 +281,7 @@ export class ExperimentsModel {
 
   private collectColors() {
     this.colors = collectColors(
-      this.getSelectedExperimentIds(),
+      this.getExperimentIds(),
       this.getAssignedColors(),
       this.colors.available
     )
@@ -346,9 +354,9 @@ export class ExperimentsModel {
     }
   }
 
-  private getSelectedExperimentIds() {
-    return Object.entries(this.status).reduce((acc, [id, status]) => {
-      if (status) {
+  private getExperimentIds() {
+    return this.flattenExperiments().reduce((acc, { id, queued }) => {
+      if (!queued) {
         acc.push(id)
       }
 
