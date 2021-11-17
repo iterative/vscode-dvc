@@ -109,14 +109,24 @@ describe('ExperimentsTree', () => {
           displayColor: '#b180d7',
           displayName: '90aea7f',
           hasChildren: true,
-          id: '90aea7f'
+          id: '90aea7f',
+          selected: true
         },
         {
           displayColor: '#1a1c19',
           displayName: 'f0778b3',
           hasChildren: false,
           id: 'f0778b3',
-          running: true
+          running: true,
+          selected: true
+        },
+        {
+          displayColor: '#4063e2',
+          displayName: 'e350702',
+          hasChildren: false,
+          id: 'e350702',
+          running: false,
+          selected: false
         },
         {
           displayName: 'f81f1b5',
@@ -162,6 +172,18 @@ describe('ExperimentsTree', () => {
           iconPath: getMockedUri('loading-spin', '#1a1c19'),
           id: 'f0778b3',
           label: 'f0778b3'
+        },
+        {
+          collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'e350702' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          dvcRoot: 'repo',
+          iconPath: getMockedUri('circle-outline', '#4063e2'),
+          id: 'e350702',
+          label: 'e350702'
         },
         {
           collapsibleState: 0,

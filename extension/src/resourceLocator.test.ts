@@ -1,5 +1,5 @@
 import { Uri } from 'vscode'
-import { ResourceLocator } from './resourceLocator'
+import { IconName, ResourceLocator } from './resourceLocator'
 
 jest.mock('vscode')
 
@@ -26,7 +26,7 @@ describe('ResourceLocator', () => {
     )
 
     expect(
-      resourceLocator.getExperimentsResource('circle-filled', '#f14c4c')
+      resourceLocator.getExperimentsResource(IconName.CIRCLE_FILLED, '#f14c4c')
     ).toEqual(redCircleFilled)
 
     const redCircleOutline = Uri.file(
@@ -34,7 +34,7 @@ describe('ResourceLocator', () => {
     )
 
     expect(
-      resourceLocator.getExperimentsResource('circle-outline', '#f14c4c')
+      resourceLocator.getExperimentsResource(IconName.CIRCLE_OUTLINE, '#f14c4c')
     ).toEqual(redCircleOutline)
 
     const blueSpinner = Uri.file(
@@ -42,7 +42,7 @@ describe('ResourceLocator', () => {
     )
 
     expect(
-      resourceLocator.getExperimentsResource('loading-spin', '#3794ff')
+      resourceLocator.getExperimentsResource(IconName.LOADING_SPIN, '#3794ff')
     ).toEqual(blueSpinner)
 
     const yellowDot = Uri.file(
@@ -50,7 +50,10 @@ describe('ResourceLocator', () => {
     )
 
     expect(
-      resourceLocator.getExperimentsResource('debug-stackframe-dot', '#cca700')
+      resourceLocator.getExperimentsResource(
+        IconName.DEBUG_STACKFRAME_DOT,
+        '#cca700'
+      )
     ).toEqual(yellowDot)
   })
 })

@@ -79,6 +79,12 @@ $spinner-color-light: #000;
       background: currentColor;
       border-radius: 100%;
     }
+    .unselectedExperiment & {
+      width: 4px;
+      height: 4px;
+      vertical-align: middle;
+      border: 1.5px solid currentColor;
+    }
     .queuedExperiment & {
       background: conic-gradient(
         from 180deg at 50% 50%,
@@ -465,6 +471,6 @@ $spinner-color-light: #000;
     width: 2px;
     height: 100%;
     background-color: $header-fg-color;
-    opacity: 0.5
+    opacity: 0.5;
   }
 }
