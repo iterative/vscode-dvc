@@ -171,8 +171,7 @@ export class ExperimentsTree
       return new ThemeIcon('watch')
     }
 
-    const iconName =
-      selected === false ? IconName.CIRCLE_OUTLINE : IconName.CIRCLE_FILLED
+    const iconName = this.getIconName(selected)
 
     return this.getUriOrIcon(displayColor, iconName)
   }
@@ -188,9 +187,7 @@ export class ExperimentsTree
       dvcRoot,
       iconPath: this.getUriOrIcon(
         checkpoint.displayColor,
-        checkpoint.selected === false
-          ? IconName.CIRCLE_OUTLINE
-          : IconName.CIRCLE_FILLED
+        this.getIconName(checkpoint.selected)
       ),
       id: checkpoint.id,
       label: checkpoint.displayName
@@ -202,6 +199,10 @@ export class ExperimentsTree
       return this.resourceLocator.getExperimentsResource(iconName, displayColor)
     }
     return new ThemeIcon(iconName.replace('-spin', '~spin'))
+  }
+
+  private getIconName(selected?: boolean) {
+    return selected === false ? IconName.CIRCLE_OUTLINE : IconName.CIRCLE_FILLED
   }
 
   private updateDescriptionOnChange() {
