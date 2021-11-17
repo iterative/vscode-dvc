@@ -13,7 +13,17 @@ const tableData = {
   changes: workspaceChangesFixture,
   columns: columnsFixture,
   columnsOrder: [],
-  rows: rowsFixture,
+  rows: rowsFixture.map(row => ({
+    ...row,
+    subRows: row.subRows?.map(experiment => ({
+      ...experiment,
+      selected: experiment.displayName !== 'test-branch',
+      subRows: experiment.subRows?.map(checkpoint => ({
+        ...checkpoint,
+        selected: experiment.displayName !== 'test-branch'
+      }))
+    }))
+  })),
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }
