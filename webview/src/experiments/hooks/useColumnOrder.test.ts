@@ -10,7 +10,7 @@ describe('useColumnsOrder', () => {
   })
 
   it('should return the columnOrderRepresentation', () => {
-    const model = Model.getInstance()
+    const model = new Model()
     const expectedColumnsRepresentation = [
       {
         group: 'group1',
@@ -45,7 +45,7 @@ describe('useColumnsOrder', () => {
   })
 
   it('should return a method that calls createColumnsOrderRepresentation on the model', () => {
-    const model = Model.getInstance()
+    const model = new Model()
     const expectedOrder = ['A', 'C', 'B', 'Z']
     const [, setColumnOrderRepresentation] = useColumnOrder(model)
     const createColumnsOrderRepresentationSpy = jest.spyOn(

@@ -26,7 +26,7 @@ import { Model } from '../../model'
 jest.mock('../../../shared/api')
 
 describe('Table', () => {
-  const model = Model.getInstance()
+  const model = new Model()
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const headerGroupBasicProps = {
     getHeaderGroupProps: getProps

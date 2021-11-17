@@ -10,7 +10,7 @@ describe('useColumnResize', () => {
   })
 
   it('should return the columns width', () => {
-    const model = Model.getInstance()
+    const model = new Model()
     const expectedColumnsWidth = [
       { path: 'A', width: 1 },
       { path: 'B', width: 33 },
@@ -26,7 +26,7 @@ describe('useColumnResize', () => {
   })
 
   it('should return a method that calls setColumnWidth on the model', () => {
-    const model = Model.getInstance()
+    const model = new Model()
     const expectedId = 'my-id'
     const expectedWidth = 999
     const [, setColumnWidth] = useColumnResize(model)

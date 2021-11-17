@@ -26,7 +26,7 @@ describe('Model', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    model = Model.getInstance()
+    model = new Model()
     modelAsAny = model
     runInAction(() => {
       modelAsAny.data = {
@@ -98,6 +98,8 @@ describe('Model', () => {
   describe('createColumnsOrderRepresentation', () => {
     it('should send a message to notify of the changes if there is a new order set', () => {
       const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
+      sendMessageSpy.mockReset()
+
       const expectedOrder = columnsOrder.map(column => column.path)
 
       model.createColumnsOrderRepresentation(expectedOrder)
@@ -111,6 +113,7 @@ describe('Model', () => {
 
     it('should not send a message to notify of the changes if there is not a new order set', () => {
       const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
+      sendMessageSpy.mockReset()
 
       model.createColumnsOrderRepresentation()
 

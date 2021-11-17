@@ -28,8 +28,6 @@ interface PersistedModelState {
 }
 
 export class Model {
-  private static instance: Model
-
   @observable
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
@@ -43,7 +41,7 @@ export class Model {
 
   public columnsOrderRepresentation: ParamOrMetric[] = []
 
-  private constructor() {
+  constructor() {
     makeObservable(this)
     const data = window.webviewData
     this.theme = data?.theme
@@ -67,13 +65,6 @@ export class Model {
         vsCodeApi.setState(this.getState())
       })
     })
-  }
-
-  public static getInstance(): Model {
-    if (!Model.instance) {
-      Model.instance = new Model()
-    }
-    return Model.instance
   }
 
   public sendMessage(message: MessageFromWebview): void {
