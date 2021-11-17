@@ -225,14 +225,14 @@ describe('ExperimentsTree', () => {
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
-          iconPath: new ThemeIcon('debug-stackframe-dot'),
+          iconPath: new ThemeIcon('circle-filled'),
           id: 'aaaaaaaaaaaaaaaaa',
           label: 'aaaaaaa'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
-          iconPath: new ThemeIcon('debug-stackframe-dot'),
+          iconPath: new ThemeIcon('circle-filled'),
           id: 'bbbbbbbbbbbbbbbbb',
           label: 'bbbbbbb'
         }
