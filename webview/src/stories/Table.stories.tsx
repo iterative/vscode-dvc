@@ -31,21 +31,16 @@ const tableData = {
   ]
 }
 
-const model = {} as Model
-
 export default {
   args: {
-    model,
     tableData
   },
   component: Experiments,
   title: 'Table'
 } as Meta
 
-const Template: Story<{ tableData: TableData; model: Model }> = ({
-  tableData
-}) => {
-  return <Experiments tableData={tableData} model={model} />
+const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
+  return <Experiments tableData={tableData} model={new Model()} />
 }
 
 export const WithData = Template.bind({})
