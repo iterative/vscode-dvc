@@ -75,6 +75,11 @@ const registerExperimentQuickPickCommands = (
     RegisteredCommands.EXPERIMENT_SORTS_REMOVE,
     () => experiments.removeSorts()
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_SELECT,
+    (dvcRoot?: string) => experiments.selectExperiments(dvcRoot)
+  )
 }
 
 const registerExperimentRunCommands = (

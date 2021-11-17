@@ -310,6 +310,12 @@
         "command": "dvc.views.experimentsSortByTree.removeSort",
         "category": "DVC",
         "icon": "$(close)"
+      },
+      {
+        "title": "%command.views.experimentsTree.selectExperiments%",
+        "command": "dvc.views.experimentsTree.selectExperiments",
+        "category": "DVC",
+        "icon": "$(list-selection)"
       }
     ],
     "configuration": {
