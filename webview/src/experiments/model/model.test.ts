@@ -102,38 +102,13 @@ describe('Model', () => {
 
       const expectedOrder = columnsOrder.map(column => column.path)
 
-      model.createColumnsOrderRepresentation(expectedOrder)
+      model.sendColumnsOrder(expectedOrder)
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
         payload: expectedOrder,
         type: MessageFromWebviewType.columnReordered
       })
-    })
-
-    it('should not send a message to notify of the changes if there is not a new order set', () => {
-      const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
-      sendMessageSpy.mockReset()
-
-      model.createColumnsOrderRepresentation()
-
-      expect(sendMessageSpy).not.toHaveBeenCalled()
-    })
-
-    it('should change the columnsOrderRepresentation to match the new order', () => {
-      const order = ['a:a', 'b:a', 'a:c', 'a:b']
-
-      model.createColumnsOrderRepresentation(order)
-
-      expect(model.columnsOrderRepresentation).toEqual([
-        { parentPath: '0/a', path: '0/a:a' },
-        { parentPath: '1/b', path: '1/b:a' },
-        { parentPath: '2/a', path: '2/a:c' },
-        { parentPath: '2/a', path: '2/a:b' },
-        { path: '0/a' },
-        { path: '1/b' },
-        { path: '2/a' }
-      ])
     })
   })
 })
