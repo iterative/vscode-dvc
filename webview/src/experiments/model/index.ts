@@ -6,11 +6,7 @@ import {
   WebviewColorTheme,
   WindowWithWebviewData
 } from 'dvc/src/webview/contract'
-import {
-  ColumnDetail,
-  ParamOrMetric,
-  TableData
-} from 'dvc/src/experiments/webview/contract'
+import { ColumnDetail, TableData } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
 import { autorun, makeObservable, observable, runInAction } from 'mobx'
 import { Disposable } from '@hediet/std/disposable'
@@ -28,8 +24,6 @@ interface PersistedModelState {
 }
 
 export class Model {
-  private static instance: Model
-
   @observable
   public theme: WebviewColorTheme = WebviewColorTheme.light
 
@@ -41,12 +35,12 @@ export class Model {
 
   public readonly dispose = Disposable.fn()
 
-  public columnsOrderRepresentation: ParamOrMetric[] = []
-
-  private constructor() {
+  constructor(
+    initialState: PersistedModelState = vsCodeApi.getState<PersistedModelState>()
+  ) {
     makeObservable(this)
     const data = window.webviewData
-    this.theme = data.theme
+    this.theme = data?.theme
 
     this.dispose.track(
       addMessageHandler<MessageToWebview>(message =>
@@ -54,10 +48,8 @@ export class Model {
       )
     )
 
-    const state = vsCodeApi.getState<PersistedModelState>()
-
-    if (state) {
-      this.setState(state)
+    if (initialState) {
+      this.setState(initialState)
     }
 
     this.sendMessage({ type: MessageFromWebviewType.initialized })
@@ -67,13 +59,6 @@ export class Model {
         vsCodeApi.setState(this.getState())
       })
     })
-  }
-
-  public static getInstance(): Model {
-    if (!Model.instance) {
-      Model.instance = new Model()
-    }
-    return Model.instance
   }
 
   public sendMessage(message: MessageFromWebview): void {
@@ -95,68 +80,11 @@ export class Model {
     }
   }
 
-  public createColumnsOrderRepresentation(newOrder?: string[]) {
-    if (newOrder) {
-      this.sendMessage({
-        payload: newOrder,
-        type: MessageFromWebviewType.columnReordered
-      })
-    }
-
-    this.columnsOrderRepresentation = this.getOrderedDataWithGroups(newOrder)
-  }
-
-  private getOrderedPaths(newOrder?: string[]): string[] {
-    if (newOrder) {
-      return newOrder
-    }
-    return (
-      (this.data?.columnsOrder &&
-        this.data.columnsOrder
-          .map(column => column.path)
-          .filter(column => !['experiment', 'timestamp'].includes(column))) ||
-      []
-    )
-  }
-
-  private getOrderedData(newOrder?: string[]): ParamOrMetric[] {
-    const orderedPaths = this.getOrderedPaths(newOrder)
-    return orderedPaths
-      .map(path => ({
-        ...this.data?.columns.find(column => column.path === path)
-      }))
-      .filter(Boolean) as ParamOrMetric[]
-  }
-
-  private getOrderedDataWithGroups(newOrder?: string[]): ParamOrMetric[] {
-    const orderedData = [...this.getOrderedData(newOrder)]
-    const previousGroups: string[] = []
-
-    let previousGroup = (orderedData?.length && orderedData[0].parentPath) || ''
-
-    orderedData.forEach(node => {
-      const { parentPath, path } = node
-
-      if (parentPath !== previousGroup) {
-        previousGroups.push(previousGroup)
-        previousGroup = parentPath || ''
-      }
-
-      const groupNumberPrefix = `${previousGroups.length}/`
-
-      node.path = groupNumberPrefix + path
-      node.parentPath = groupNumberPrefix + parentPath
-
-      const parentNode = {
-        ...this.data?.columns.find(column => column.path === parentPath)
-      }
-      parentNode.path = groupNumberPrefix + parentPath
-
-      if (!orderedData.find(column => column.path === parentNode.path)) {
-        orderedData.push(parentNode as ParamOrMetric)
-      }
+  public sendColumnsOrder(newOrder: string[]): void {
+    this.sendMessage({
+      payload: newOrder,
+      type: MessageFromWebviewType.columnReordered
     })
-    return orderedData
   }
 
   private getState(): PersistedModelState {
@@ -169,7 +97,6 @@ export class Model {
   private setState(state: PersistedModelState) {
     this.dvcRoot = state.dvcRoot
     this.data = state.data
-    this.createColumnsOrderRepresentation()
   }
 
   private handleMessage(message: MessageToWebview): void {
@@ -182,7 +109,6 @@ export class Model {
       case MessageToWebviewType.setData:
         runInAction(() => {
           this.data = message.data
-          this.createColumnsOrderRepresentation()
         })
         return
       case MessageToWebviewType.setDvcRoot:

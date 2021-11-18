@@ -8,6 +8,7 @@ import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import { Model } from '../experiments/model'
 
 const tableData = {
   changes: workspaceChangesFixture,
@@ -39,7 +40,7 @@ export default {
 } as Meta
 
 const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
-  return <Experiments tableData={tableData} />
+  return <Experiments tableData={tableData} model={new Model()} />
 }
 
 export const WithData = Template.bind({})
