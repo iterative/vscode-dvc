@@ -374,13 +374,13 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
         dvcRoot: 'demo',
-        iconPath: new ThemeIcon('debug-stackframe-dot'),
+        iconPath: new ThemeIcon('circle-filled'),
         id: 'f0778b3',
         label: 'f0778b3'
       })
       expect(treeItem).toEqual({
         ...mockedItem,
-        iconPath: { id: 'debug-stackframe-dot' }
+        iconPath: { id: 'circle-filled' }
       })
     })
 

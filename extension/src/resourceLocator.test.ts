@@ -44,16 +44,5 @@ describe('ResourceLocator', () => {
     expect(
       resourceLocator.getExperimentsResource(IconName.LOADING_SPIN, '#3794ff')
     ).toEqual(blueSpinner)
-
-    const yellowDot = Uri.file(
-      'some/path/resources/experiments/debug-stackframe-dot-#cca700.svg'
-    )
-
-    expect(
-      resourceLocator.getExperimentsResource(
-        IconName.DEBUG_STACKFRAME_DOT,
-        '#cca700'
-      )
-    ).toEqual(yellowDot)
   })
 })
