@@ -73,7 +73,12 @@ export class ExperimentsTree
 
   public getTreeItem(element: string | ExperimentItem): TreeItem {
     if (this.isRoot(element)) {
-      return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
+      const item = new TreeItem(
+        Uri.file(element),
+        TreeItemCollapsibleState.Collapsed
+      )
+      item.contextValue = 'dvcRoot'
+      return item
     }
 
     const { label, collapsibleState, iconPath, command } = element

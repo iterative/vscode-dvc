@@ -725,6 +725,11 @@
           "command": "dvc.views.experimentsFilterByTree.removeAllFilters",
           "group": "inline",
           "when": "view == dvc.views.experimentsFilterByTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.experimentsTree.selectExperiments",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
