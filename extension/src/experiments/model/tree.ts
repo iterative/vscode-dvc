@@ -77,6 +77,7 @@ export class ExperimentsTree
         Uri.file(element),
         TreeItemCollapsibleState.Collapsed
       )
+      item.id = element
       item.contextValue = 'dvcRoot'
       return item
     }
