@@ -744,6 +744,11 @@
           "group": "navigation@3"
         },
         {
+          "command": "dvc.views.experimentsTree.selectExperiments",
+          "when": "view == dvc.views.experimentsTree",
+          "group": "navigation@4"
+        },
+        {
           "command": "dvc.addExperimentsTableSort",
           "when": "view == dvc.views.experimentsSortByTree",
           "group": "navigation@1"
