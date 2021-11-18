@@ -13,7 +13,7 @@ describe('useColumnsOrder', () => {
     createCustomWindow()
   })
 
-  it('should return re-sorted columns with groups', () => {
+  it('should return re-sorted columns with groups and generated parents', () => {
     const columns = [
       {
         group: 'group1',
