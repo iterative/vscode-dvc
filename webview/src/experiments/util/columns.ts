@@ -1,6 +1,5 @@
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { HeaderGroup } from 'react-table'
-import { Model } from '../model'
 
 interface HeaderGroupWithOriginalId extends HeaderGroup<Experiment> {
   originalId: string
@@ -22,16 +21,16 @@ export const getPlaceholders = (
 
 const cleanPath = (path: string): string => path.split('/').slice(1).join('/')
 
-export const getNodeSiblings = (model: Model, id: string) => {
-  const orderedColumnsrep = model.columnsOrderRepresentation
-  const nodeRep = orderedColumnsrep.find(node => cleanPath(node.path) === id)
-  return orderedColumnsrep.filter(
-    node => node.parentPath === nodeRep?.parentPath
-  )
+export const getNodeSiblings = (
+  orderedColumns: ParamOrMetric[],
+  id: string
+) => {
+  const nodeRep = orderedColumns.find(node => cleanPath(node.path) === id)
+  return orderedColumns.filter(node => node.parentPath === nodeRep?.parentPath)
 }
 
 export const countUpperLevels = (
-  model: Model,
+  orderedColumns: ParamOrMetric[],
   column: HeaderGroup<Experiment>,
   columns: HeaderGroup<Experiment>[],
   previousLevel = 0
@@ -47,7 +46,7 @@ export const countUpperLevels = (
     )
     parentPlaceholders.forEach(parentPlaceholder => {
       nbLevels = countUpperLevels(
-        model,
+        orderedColumns,
         parentPlaceholder,
         columns,
         nbLevels + 1
@@ -55,13 +54,13 @@ export const countUpperLevels = (
     })
     return nbLevels
   }
-  const siblings = getNodeSiblings(model, column.id)
+  const siblings = getNodeSiblings(orderedColumns, column.id)
   const lastId =
     siblings?.length && cleanPath(siblings[siblings.length - 1].path)
 
   if (lastId === id || parent.placeholderOf) {
     nbLevels = countUpperLevels(
-      model,
+      orderedColumns,
       parent as HeaderGroup<Experiment>,
       columns,
       nbLevels + 1

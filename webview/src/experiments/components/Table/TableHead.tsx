@@ -21,7 +21,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
   columnsOrder,
   model
 }) => {
-  const [, setColumnOrderRepresentation] = useColumnOrder(model)
+  const [orderedColumns, setColumnOrderRepresentation] = useColumnOrder(model)
   const allHeaders: HeaderGroup<Experiment>[] = []
   headerGroups.forEach(headerGroup => allHeaders.push(...headerGroup.headers))
   const currentColOrder = React.useRef<string[]>(columnsOrder)
@@ -67,7 +67,7 @@ export const TableHead: React.FC<TableHeadProps> = ({
           key={`header-group-${headerGroup.id}-${i}`}
         >
           <MergedHeaderGroup
-            model={model}
+            orderedColumns={orderedColumns}
             headerGroup={headerGroup}
             columns={allHeaders}
             sorts={sorts}
