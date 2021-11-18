@@ -3,6 +3,9 @@ import { useColumnOrder } from './useColumnsOrder'
 import { Model } from '../model'
 import { createCustomWindow } from '../../test/util'
 
+jest.mock('react', () => ({
+  useMemo: (fn: (...args: unknown[]) => unknown) => fn()
+}))
 jest.mock('../../shared/api')
 
 describe('useColumnsOrder', () => {

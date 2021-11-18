@@ -2,6 +2,7 @@ import {
   ColumnDetail,
   ParamOrMetric
 } from 'dvc/src/experiments/webview/contract'
+import { useMemo } from 'react'
 import { Model } from '../model'
 
 function getColumnsByPath(
@@ -69,21 +70,18 @@ function getOrderedDataWithGroups(
   return orderedData
 }
 
-function getOrderedDataWithGroupsFromModel(model: Model): ParamOrMetric[] {
-  if (model.data) {
-    const { columns, columnsOrder } = model.data
-    if (columns && columnsOrder) {
-      return getOrderedDataWithGroups(columns, columnsOrder)
-    }
-  }
-  return []
-}
-
 export const useColumnOrder = (
   modelInstance: Model
 ): [ParamOrMetric[], (newOrder: string[]) => void] => {
-  const columnOrderRepresentation =
-    getOrderedDataWithGroupsFromModel(modelInstance)
+  const { data } = modelInstance
+  const { columns, columnsOrder } = data || {}
+  const columnOrderRepresentation = useMemo(() => {
+    if (columns && columnsOrder) {
+      return getOrderedDataWithGroups(columns, columnsOrder)
+    }
+    return []
+  }, [columns, columnsOrder])
+
   const setColumnOrderRepresentation = (newOrder: string[]) =>
     modelInstance.sendColumnsOrder(newOrder)
   return [columnOrderRepresentation, setColumnOrderRepresentation]
