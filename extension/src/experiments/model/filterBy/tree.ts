@@ -4,8 +4,7 @@ import {
   ThemeIcon,
   TreeDataProvider,
   TreeItem,
-  TreeItemCollapsibleState,
-  Uri
+  TreeItemCollapsibleState
 } from 'vscode'
 import { getFilterId } from '.'
 import { WorkspaceExperiments } from '../../workspace'
@@ -14,7 +13,7 @@ import { InternalCommands } from '../../../commands/internal'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
 import { definedAndNonEmpty, flatten } from '../../../util/array'
-import { createTreeView } from '../../../vscode/tree'
+import { createTreeView, getRootItem } from '../../../vscode/tree'
 
 type FilterItem = {
   description: string
@@ -58,12 +57,7 @@ export class ExperimentsFilterByTree
 
   public getTreeItem(element: string | FilterItem): TreeItem {
     if (this.isRoot(element)) {
-      const item = new TreeItem(
-        Uri.file(element),
-        TreeItemCollapsibleState.Expanded
-      )
-      item.contextValue = 'dvcRoot'
-      return item
+      return getRootItem(element)
     }
 
     const item = new TreeItem(element.label, TreeItemCollapsibleState.None)

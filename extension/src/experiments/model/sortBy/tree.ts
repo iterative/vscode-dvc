@@ -1,15 +1,8 @@
 import { Disposable } from '@hediet/std/disposable'
-import {
-  Event,
-  ThemeIcon,
-  TreeDataProvider,
-  TreeItem,
-  TreeItemCollapsibleState,
-  Uri
-} from 'vscode'
+import { Event, ThemeIcon, TreeDataProvider, TreeItem } from 'vscode'
 import { SortDefinition } from './'
 import { WorkspaceExperiments } from '../../workspace'
-import { createTreeView } from '../../../vscode/tree'
+import { createTreeView, getRootItem } from '../../../vscode/tree'
 import { RegisteredCommands } from '../../../commands/external'
 import { sendViewOpenedTelemetryEvent } from '../../../telemetry'
 import { EventName } from '../../../telemetry/constants'
@@ -58,7 +51,7 @@ export class ExperimentsSortByTree
 
   public getTreeItem(element: string | SortItem): TreeItem {
     if (typeof element === 'string') {
-      return this.getTreeItemFromDvcRoot(element)
+      return getRootItem(element)
     }
     return this.getTreeItemFromSortDefinition(element)
   }
@@ -103,18 +96,6 @@ export class ExperimentsSortByTree
     } else {
       return []
     }
-  }
-
-  private getTreeItemFromDvcRoot(rootPath: string) {
-    const projectTreeItem = new TreeItem(
-      Uri.file(rootPath),
-      TreeItemCollapsibleState.Expanded
-    )
-
-    projectTreeItem.id = rootPath
-    projectTreeItem.contextValue = 'dvcRoot'
-
-    return projectTreeItem
   }
 
   private getTreeItemFromSortDefinition(sortWithParent: SortItem) {

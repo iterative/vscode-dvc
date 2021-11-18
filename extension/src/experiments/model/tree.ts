@@ -12,7 +12,7 @@ import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
-import { createTreeView } from '../../vscode/tree'
+import { createTreeView, getRootItem } from '../../vscode/tree'
 import { IconName, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
@@ -73,13 +73,7 @@ export class ExperimentsTree
 
   public getTreeItem(element: string | ExperimentItem): TreeItem {
     if (this.isRoot(element)) {
-      const item = new TreeItem(
-        Uri.file(element),
-        TreeItemCollapsibleState.Collapsed
-      )
-      item.id = element
-      item.contextValue = 'dvcRoot'
-      return item
+      return getRootItem(element)
     }
 
     const { label, collapsibleState, iconPath, command } = element
