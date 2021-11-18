@@ -1,4 +1,11 @@
-import { TreeDataProvider, TreeView, window } from 'vscode'
+import {
+  TreeDataProvider,
+  TreeItem,
+  TreeItemCollapsibleState,
+  TreeView,
+  Uri,
+  window
+} from 'vscode'
 
 export const createTreeView = <T>(
   name: string,
@@ -9,3 +16,10 @@ export const createTreeView = <T>(
     showCollapseAll: true,
     treeDataProvider
   })
+
+export const getRootItem = (path: string): TreeItem => {
+  const item = new TreeItem(Uri.file(path), TreeItemCollapsibleState.Expanded)
+  item.id = path
+  item.contextValue = 'dvcRoot'
+  return item
+}

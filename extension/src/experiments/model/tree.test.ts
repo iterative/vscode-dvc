@@ -244,7 +244,7 @@ describe('ExperimentsTree', () => {
     it('should return a tree item for a root element', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(1)
+        expect(collapsibleState).toEqual(2)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
