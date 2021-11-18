@@ -1,16 +1,12 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { spy, stub, restore } from 'sinon'
-import { buildExperiments } from '../experiments/util'
+import { restore } from 'sinon'
+import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
-import { CliReader } from '../../../cli/reader'
-import expShowFixture from '../../fixtures/expShow/output'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
-import { closeAllEditors, dvcDemoPath } from '../util'
-import { BaseWebview } from '../../../webview'
+import { closeAllEditors } from '../util'
 import { PlotsData } from '../../../plots/webview/contract'
-import { Plots } from '../../../plots'
 
 suite('Plots Test Suite', () => {
   const disposable = Disposable.fn()
@@ -27,19 +23,10 @@ suite('Plots Test Suite', () => {
 
   describe('showWebview', () => {
     it('should be able to make the plots webview visible', async () => {
-      const { experiments, internalCommands, resourceLocator } =
-        buildExperiments(disposable, expShowFixture)
-
-      const messageSpy = spy(BaseWebview.prototype, 'show')
-      const mockPlotsShow = stub(CliReader.prototype, 'plotsShow').resolves(
+      const { plots, mockPlotsShow, messageSpy } = await buildPlots(
+        disposable,
         plotsShowFixture
       )
-
-      const plots = disposable.track(
-        new Plots(dvcDemoPath, internalCommands, resourceLocator.scatterGraph)
-      )
-      plots.setExperiments(experiments)
-      await plots.isReady()
 
       const webview = await plots.showWebview()
 
