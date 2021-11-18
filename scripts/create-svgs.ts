@@ -20,25 +20,21 @@ const writeSpinner = (loadingIcon: string, color: string) => {
   )
 }
 
-;['loading', 'circle-filled', 'circle-outline', 'debug-stackframe-dot'].map(
-  iconName => {
-    const icon = readFileSync(
-      `./node_modules/@vscode/codicons/src/icons/${iconName}.svg`
+;['loading', 'circle-filled', 'circle-outline'].map(iconName => {
+  const icon = readFileSync(
+    `./node_modules/@vscode/codicons/src/icons/${iconName}.svg`
+  )
+
+  colors.map(color => {
+    const newIcon = icon.toString().replace(/(?<=d=".*?")/, ` fill="${color}"`)
+
+    if (iconName === 'loading') {
+      return writeSpinner(newIcon, color)
+    }
+
+    writeFileSync(
+      `./extension/resources/experiments/${iconName}-${color}.svg`,
+      newIcon
     )
-
-    colors.map(color => {
-      const newIcon = icon
-        .toString()
-        .replace(/(?<=d=".*?")/, ` fill="${color}"`)
-
-      if (iconName === 'loading') {
-        return writeSpinner(newIcon, color)
-      }
-
-      writeFileSync(
-        `./extension/resources/experiments/${iconName}-${color}.svg`,
-        newIcon
-      )
-    })
-  }
-)
+  })
+})

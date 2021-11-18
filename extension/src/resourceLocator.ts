@@ -6,7 +6,6 @@ export type Resource = { dark: Uri; light: Uri }
 export enum IconName {
   CIRCLE_FILLED = 'circle-filled',
   CIRCLE_OUTLINE = 'circle-outline',
-  DEBUG_STACKFRAME_DOT = 'debug-stackframe-dot',
   LOADING_SPIN = 'loading-spin'
 }
 
