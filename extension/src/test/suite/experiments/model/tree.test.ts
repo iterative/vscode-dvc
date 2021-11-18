@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { spy, stub, restore } from 'sinon'
-import { commands } from 'vscode'
+import { spy, stub, restore, SinonStub } from 'sinon'
+import { commands, QuickPickItem, QuickPickOptions, window } from 'vscode'
 import { Disposable } from '../../../../extension'
 import { WorkspaceExperiments } from '../../../../experiments/workspace'
 import { Status } from '../../../../experiments/model'
@@ -130,6 +130,98 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(messageSpy, 'we no longer send undefined').to.be.calledWith({
         live: getExpectedLivePlots(),
+        static: undefined
+      })
+    }).timeout(6000)
+
+    it('should be able to select / de-select experiments using dvc.views.experimentsTree.selectExperiments', async () => {
+      const { experiments, internalCommands, resourceLocator } =
+        buildExperiments(disposable)
+
+      await experiments.isReady()
+
+      const messageSpy = spy(BaseWebview.prototype, 'show')
+
+      stub(CliReader.prototype, 'plotsShow').resolves({})
+
+      const plots = disposable.track(
+        new Plots(dvcDemoPath, internalCommands, resourceLocator.scatterGraph)
+      )
+      plots.setExperiments(experiments)
+      await plots.isReady()
+
+      stub(WorkspaceExperiments.prototype, 'getDvcRoots').returns([dvcDemoPath])
+      stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
+      stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
+
+      const { plots: plotsData, colors } = livePlotsFixture
+      const ids = [
+        '4fb124aebddb2adf1545030907687fa9a4c80e70',
+        '42b8736b08170529903cd203a1f40382a4b4a8cd',
+        '1ba7bcd6ce6154e72e18b155475663ecbbd1f49d'
+      ]
+
+      const selectedId = ids[0]
+      const { domain, range } = colors
+      const selectedDisplayName = domain[0]
+      const selectedColor = range[0]
+      const selectedItem = {
+        label: selectedDisplayName,
+        picked: true,
+        value: selectedId
+      }
+
+      await plots.showWebview()
+
+      const mockShowQuickPick = stub(window, 'showQuickPick') as SinonStub<
+        [
+          items: readonly QuickPickItem[],
+          options: QuickPickOptions & { canPickMany: true }
+        ],
+        Thenable<QuickPickItem[] | undefined>
+      >
+      mockShowQuickPick.resolves([selectedItem])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_SELECT)
+
+      expect(mockShowQuickPick).to.be.calledOnce
+      expect(mockShowQuickPick).to.be.calledWith(
+        [
+          {
+            label: selectedDisplayName,
+            picked: true,
+            value: selectedId
+          },
+          {
+            label: domain[1],
+            picked: true,
+            value: ids[1]
+          },
+          {
+            label: domain[2],
+            picked: true,
+            value: ids[2]
+          }
+        ],
+        { canPickMany: true, title: 'Select experiments' }
+      )
+
+      expect(
+        messageSpy,
+        'a message is sent with colors for the currently selected experiments'
+      ).to.be.calledWith({
+        live: {
+          colors: {
+            domain: [selectedDisplayName],
+            range: [selectedColor]
+          },
+          plots: plotsData.map(plot => ({
+            title: plot.title,
+            values: plot.values.filter(
+              values => values.group === selectedDisplayName
+            )
+          }))
+        },
         static: undefined
       })
     }).timeout(6000)

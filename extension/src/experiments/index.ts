@@ -1,5 +1,6 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
+import { pickExperiments } from './model/quickPicks'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
@@ -171,6 +172,18 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
     this.experiments.removeFilters(filtersToRemove)
+    return this.notifyChanged()
+  }
+
+  public async selectExperiments() {
+    const experiments = this.experiments.getSelectable()
+
+    const selected = await pickExperiments(experiments)
+    if (!selected) {
+      return
+    }
+
+    this.experiments.setSelected(selected)
     return this.notifyChanged()
   }
 

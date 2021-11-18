@@ -172,6 +172,14 @@ export class ExperimentsModel {
     return result
   }
 
+  public setSelected(ids: string[]) {
+    this.status = Object.keys(this.status).reduce((acc, id) => {
+      const status = ids.includes(id) ? Status.selected : Status.unselected
+      acc[id] = status
+      return acc
+    }, {} as Record<string, Status>)
+  }
+
   public getExperiments(): (Experiment & {
     hasChildren: boolean
     selected?: boolean
@@ -181,6 +189,12 @@ export class ExperimentsModel {
       ...this.addDetails(experiment),
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
     }))
+  }
+
+  public getSelectable() {
+    return this.getExperiments().filter(
+      exp => exp.displayName !== 'workspace' && !exp.queued
+    )
   }
 
   public getCheckpoints(experimentId: string): Experiment[] | undefined {
