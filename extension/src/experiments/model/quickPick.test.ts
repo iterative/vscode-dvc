@@ -18,7 +18,7 @@ describe('pickExperiments', () => {
     expect(mockedQuickPickManyValues).not.toBeCalled()
   })
 
-  it('should return the selected experiments', async () => {
+  it('should return the selected experiment ids', async () => {
     const selectedId = '7c366f6'
     const mockedExperiments = [
       { displayName: 'exp-123', id: '73de3fe', selected: false },
