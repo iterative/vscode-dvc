@@ -180,6 +180,16 @@ export class ExperimentsModel {
     }, {} as Record<string, Status>)
   }
 
+  public setSelectedToFilters() {
+    const filtered = this.getSelectable().reduce((acc, exp) => {
+      if (filterExperiment(this.getFilters(), exp)) {
+        acc.push(exp.id)
+      }
+      return acc
+    }, [] as string[])
+    this.setSelected(filtered)
+  }
+
   public getExperiments(): (Experiment & {
     hasChildren: boolean
     selected?: boolean

@@ -116,4 +116,9 @@ export const registerExperimentCommands = (
   registerExperimentInputCommands(experiments, internalCommands)
   registerExperimentQuickPickCommands(experiments, internalCommands)
   registerExperimentRunCommands(experiments, internalCommands)
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_APPLY_FILTERS,
+    (dvcRoot?: string) => experiments.applyFilters(dvcRoot)
+  )
 }
