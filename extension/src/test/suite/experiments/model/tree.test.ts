@@ -187,6 +187,7 @@ suite('Experiments Tree Test Suite', () => {
       ).to.be.calledWith(
         getExpectedData([selectedDisplayName], [selectedColor])
       )
+      messageSpy.resetHistory()
 
       mockGetFilters.resetBehavior()
       mockGetFilters.returns([
@@ -203,7 +204,7 @@ suite('Experiments Tree Test Suite', () => {
         messageSpy,
         'the filter is applied and no experiments remains because every record has a loss'
       ).to.be.calledWith({ live: undefined, static: undefined })
-
+      messageSpy.resetHistory()
       mockGetFilters.restore()
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
