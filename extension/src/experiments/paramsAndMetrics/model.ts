@@ -6,14 +6,14 @@ import { flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 
 export enum Status {
-  selected = 2,
-  indeterminate = 1,
-  unselected = 0
+  SELECTED = 2,
+  INDETERMINATE = 1,
+  UNSELECTED = 0
 }
 
 export const enum MementoPrefixes {
-  status = 'paramsAndMetricsStatus:',
-  columnsOrder = 'paramsAndMetricsColumnsOrder:'
+  STATUS = 'paramsAndMetricsStatus:',
+  COLUMNS_ORDER = 'paramsAndMetricsColumnsOrder:'
 }
 
 export class ParamsAndMetricsModel {
@@ -32,9 +32,9 @@ export class ParamsAndMetricsModel {
   constructor(dvcRoot: string, workspaceState: Memento) {
     this.dvcRoot = dvcRoot
     this.workspaceState = workspaceState
-    this.status = workspaceState.get(MementoPrefixes.status + dvcRoot, {})
+    this.status = workspaceState.get(MementoPrefixes.STATUS + dvcRoot, {})
     this.columnsOrderState = workspaceState.get(
-      MementoPrefixes.columnsOrder + dvcRoot,
+      MementoPrefixes.COLUMNS_ORDER + dvcRoot,
       []
     )
   }
@@ -46,7 +46,7 @@ export class ParamsAndMetricsModel {
   public getSelected() {
     return (
       this.data.filter(
-        paramOrMetric => this.status[paramOrMetric.path] !== Status.unselected
+        paramOrMetric => this.status[paramOrMetric.path] !== Status.UNSELECTED
       ) || []
     )
   }
@@ -132,7 +132,7 @@ export class ParamsAndMetricsModel {
 
   private persistColumnOrder() {
     this.workspaceState.update(
-      MementoPrefixes.columnsOrder + this.dvcRoot,
+      MementoPrefixes.COLUMNS_ORDER + this.dvcRoot,
       this.getColumnsOrder()
     )
   }
@@ -142,7 +142,7 @@ export class ParamsAndMetricsModel {
 
     paramsAndMetrics.forEach(paramOrMetric => {
       if (this.status[paramOrMetric.path] === undefined) {
-        this.status[paramOrMetric.path] = Status.selected
+        this.status[paramOrMetric.path] = Status.SELECTED
       }
     })
 
@@ -185,31 +185,31 @@ export class ParamsAndMetricsModel {
   private getStatus(parentPath: string) {
     const statuses = this.getTerminalNodeStatuses(parentPath)
 
-    const isAnyChildSelected = statuses.includes(Status.selected)
-    const isAnyChildUnselected = statuses.includes(Status.unselected)
+    const isAnyChildSelected = statuses.includes(Status.SELECTED)
+    const isAnyChildUnselected = statuses.includes(Status.UNSELECTED)
 
     if (isAnyChildSelected && isAnyChildUnselected) {
-      return Status.indeterminate
+      return Status.INDETERMINATE
     }
 
     if (!isAnyChildUnselected) {
-      return Status.selected
+      return Status.SELECTED
     }
 
-    return Status.unselected
+    return Status.UNSELECTED
   }
 
   private getNextStatus(path: string) {
     const status = this.status[path]
-    if (status === Status.selected) {
-      return Status.unselected
+    if (status === Status.SELECTED) {
+      return Status.UNSELECTED
     }
-    return Status.selected
+    return Status.SELECTED
   }
 
   private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefixes.status + this.dvcRoot,
+      MementoPrefixes.STATUS + this.dvcRoot,
       this.status
     )
   }

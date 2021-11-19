@@ -10,7 +10,7 @@ export const createCustomWindow = () => {
   const customWindow = {
     addEventListener: jest.fn,
     webviewData: {
-      theme: WebviewColorTheme.dark
+      theme: WebviewColorTheme.DARK
     }
   }
   Object.defineProperty(global, 'window', { value: customWindow })

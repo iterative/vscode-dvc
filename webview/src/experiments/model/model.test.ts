@@ -68,7 +68,7 @@ describe('Model', () => {
 
     it('should return an empty array if there is no columnsOrder on the data', () => {
       runInAction(() => {
-        modelAsAny.data = { theme: WebviewColorTheme.dark }
+        modelAsAny.data = { theme: WebviewColorTheme.DARK }
       })
       expect(model.getColumnsWithWidth()).toEqual([])
     })
@@ -90,7 +90,7 @@ describe('Model', () => {
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
         payload: { id: 'D', width: expectedWidth },
-        type: MessageFromWebviewType.columnResized
+        type: MessageFromWebviewType.COLUMN_RESIZED
       })
     })
   })
@@ -107,7 +107,7 @@ describe('Model', () => {
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
         payload: expectedOrder,
-        type: MessageFromWebviewType.columnReordered
+        type: MessageFromWebviewType.COLUMN_REORDERED
       })
     })
   })

@@ -184,7 +184,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: columnOrder,
-        type: MessageFromWebviewType.columnReordered
+        type: MessageFromWebviewType.COLUMN_REORDERED
       })
 
       await columnOrderSet

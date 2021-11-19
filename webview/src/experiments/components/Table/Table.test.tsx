@@ -336,7 +336,7 @@ describe('Table', () => {
     beforeAll(() => {
       customWindow = window as unknown as CustomWindow
       customWindow.webviewData = {
-        theme: WebviewColorTheme.dark
+        theme: WebviewColorTheme.DARK
       }
     })
 

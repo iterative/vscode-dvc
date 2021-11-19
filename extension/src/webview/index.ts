@@ -89,18 +89,18 @@ export class BaseWebview<T extends WebviewData> {
           )
         this.sendMessage({
           theme,
-          type: MessageToWebviewType.setTheme
+          type: MessageToWebviewType.SET_THEME
         })
         this.sendMessage({
           dvcRoot: this.dvcRoot,
-          type: MessageToWebviewType.setDvcRoot
+          type: MessageToWebviewType.SET_DVC_ROOT
         })
 
         const data = state.data
         if (data) {
           this.sendMessage({
             data,
-            type: MessageToWebviewType.setData
+            type: MessageToWebviewType.SET_DATA
           })
         }
       })
@@ -129,7 +129,7 @@ export class BaseWebview<T extends WebviewData> {
     await this.isReady()
     return this.sendMessage({
       data,
-      type: MessageToWebviewType.setData
+      type: MessageToWebviewType.SET_DATA
     })
   }
 
@@ -197,7 +197,7 @@ export class BaseWebview<T extends WebviewData> {
   }
 
   private handleMessage(message: MessageFromWebview) {
-    if (message.type === MessageFromWebviewType.initialized) {
+    if (message.type === MessageFromWebviewType.INITIALIZED) {
       return this.deferred.resolve()
     }
     this.messageReceived.fire(message)

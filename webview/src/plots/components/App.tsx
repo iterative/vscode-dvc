@@ -9,7 +9,7 @@ import { vsCodeApi } from '../../shared/api'
 import { PlotsWebviewState, useAppReducer } from '../hooks/useAppReducer'
 
 const signalInitialized = () =>
-  vsCodeApi.postMessage({ type: MessageFromWebviewType.initialized })
+  vsCodeApi.postMessage({ type: MessageFromWebviewType.INITIALIZED })
 
 export const App = () => {
   const [state, dispatch] = useAppReducer(

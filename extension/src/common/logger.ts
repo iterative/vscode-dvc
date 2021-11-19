@@ -1,15 +1,15 @@
 enum Level {
-  error = 'error',
-  warn = 'warn',
-  info = 'info',
-  log = 'log'
+  ERROR = 'error',
+  WARN = 'warn',
+  INFO = 'info',
+  LOG = 'log'
 }
 
 export class Logger {
-  static error = (message: string) => Logger.write(message, Level.error)
-  static warn = (message: string) => Logger.write(message, Level.warn)
-  static info = (message: string) => Logger.write(message, Level.info)
-  static log = (message: string) => Logger.write(message, Level.log)
+  static error = (message: string) => Logger.write(message, Level.ERROR)
+  static warn = (message: string) => Logger.write(message, Level.WARN)
+  static info = (message: string) => Logger.write(message, Level.INFO)
+  static log = (message: string) => Logger.write(message, Level.LOG)
 
   private static write = (message: string, level: Level): void => {
     // eslint-disable-next-line no-console

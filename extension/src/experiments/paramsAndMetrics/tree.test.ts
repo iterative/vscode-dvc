@@ -67,7 +67,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
     .map(paramOrMetric => ({
       ...paramOrMetric,
       descendantStatuses: [],
-      status: Status.selected
+      status: Status.SELECTED
     }))
 
   describe('getChildren', () => {
@@ -188,16 +188,16 @@ describe('ExperimentsParamsAndMetricsTree', () => {
             if (param.path === processPath) {
               return {
                 ...param,
-                descendantStatuses: [Status.unselected, Status.selected],
+                descendantStatuses: [Status.UNSELECTED, Status.SELECTED],
                 hasChildren: true,
-                status: Status.indeterminate
+                status: Status.INDETERMINATE
               }
             }
             return {
               ...param,
               descendantStatuses: undefined,
               hasChildren: false,
-              status: Status.selected
+              status: Status.SELECTED
             }
           })
       )
@@ -256,7 +256,7 @@ describe('ExperimentsParamsAndMetricsTree', () => {
             ...param,
             descendantStatuses: undefined,
             hasChildren: false,
-            status: Status.selected
+            status: Status.SELECTED
           }))
       )
       const greatGrandChildren =
