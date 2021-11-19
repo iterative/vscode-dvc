@@ -145,6 +145,11 @@ suite('Extension Test Suite', () => {
     })
 
     it('should initialize the extension when the cli is usable', async () => {
+      const createFileSystemWatcherSpy = spy(
+        workspace,
+        'createFileSystemWatcher'
+      )
+
       const mockCanRunCli = stub(CliReader.prototype, 'help')
         .onFirstCall()
         .resolves('ok, initialize everything')
@@ -291,6 +296,8 @@ suite('Extension Test Suite', () => {
         mockDisposer,
         'should dispose of the current repositories and experiments if the cli can no longer be found'
       ).to.have.been.called
+
+      expect(createFileSystemWatcherSpy).not.to.be.calledWithMatch('{}')
     }).timeout(25000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
