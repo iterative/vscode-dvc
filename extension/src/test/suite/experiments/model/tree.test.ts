@@ -63,7 +63,7 @@ suite('Experiments Tree Test Suite', () => {
           }
         )
 
-        expect(unSelected).to.equal(Status.unselected)
+        expect(unSelected).to.equal(Status.UNSELECTED)
       }
 
       expect(
@@ -87,7 +87,7 @@ suite('Experiments Tree Test Suite', () => {
       )
 
       expect(selected, 'the experiment is now selected').to.equal(
-        Status.selected
+        Status.SELECTED
       )
 
       expect(messageSpy, 'we no longer send undefined').to.be.calledWith(

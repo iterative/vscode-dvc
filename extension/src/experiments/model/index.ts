@@ -18,15 +18,15 @@ import { LivePlotData } from '../../plots/webview/contract'
 import { hasKey } from '../../util/object'
 
 export enum Status {
-  selected = 1,
-  unselected = 0
+  SELECTED = 1,
+  UNSELECTED = 0
 }
 
 const enum MementoPrefixes {
-  colors = 'colors:',
-  filterBy = 'filterBy:',
-  sortBy = 'sortBy:',
-  status = 'status:'
+  COLORS = 'colors:',
+  FILTER_BY = 'filterBy:',
+  SORT_BY = 'sortBy:',
+  STATUS = 'status:'
 }
 
 export class ExperimentsModel {
@@ -119,8 +119,8 @@ export class ExperimentsModel {
 
   public toggleStatus(experimentId: string) {
     const status = this.status[experimentId]
-      ? Status.unselected
-      : Status.selected
+      ? Status.UNSELECTED
+      : Status.SELECTED
     this.status[experimentId] = status
 
     this.persistStatus()
@@ -174,7 +174,7 @@ export class ExperimentsModel {
 
   public setSelected(ids: string[]) {
     this.status = Object.keys(this.status).reduce((acc, id) => {
-      const status = ids.includes(id) ? Status.selected : Status.unselected
+      const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED
       acc[id] = status
       return acc
     }, {} as Record<string, Status>)
@@ -276,7 +276,7 @@ export class ExperimentsModel {
     this.status = this.flattenExperiments().reduce((acc, exp) => {
       const { id, queued } = exp
       if (!queued) {
-        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.selected
+        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.SELECTED
       }
       return acc
     }, {} as Record<string, Status>)
@@ -303,19 +303,20 @@ export class ExperimentsModel {
 
   private persistSorts() {
     return this.workspaceState.update(
-      MementoPrefixes.sortBy + this.dvcRoot,
+      MementoPrefixes.SORT_BY + this.dvcRoot,
       this.currentSorts
     )
   }
 
   private persistFilters() {
-    return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
-      ...this.filters
-    ])
+    return this.workspaceState.update(
+      MementoPrefixes.FILTER_BY + this.dvcRoot,
+      [...this.filters]
+    )
   }
 
   private persistColors() {
-    return this.workspaceState.update(MementoPrefixes.colors + this.dvcRoot, {
+    return this.workspaceState.update(MementoPrefixes.COLORS + this.dvcRoot, {
       assigned: [...this.colors.assigned],
       available: this.colors.available
     })
@@ -323,7 +324,7 @@ export class ExperimentsModel {
 
   private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefixes.status + this.dvcRoot,
+      MementoPrefixes.STATUS + this.dvcRoot,
       this.status
     )
   }
@@ -340,7 +341,7 @@ export class ExperimentsModel {
     const { assigned, available } = workspaceState.get<{
       assigned: [string, string][]
       available: string[]
-    }>(MementoPrefixes.colors + dvcRoot, {
+    }>(MementoPrefixes.COLORS + dvcRoot, {
       assigned: [],
       available: copyOriginalColors()
     })
@@ -351,17 +352,17 @@ export class ExperimentsModel {
         available: available
       },
       currentSorts: workspaceState.get<SortDefinition[]>(
-        MementoPrefixes.sortBy + dvcRoot,
+        MementoPrefixes.SORT_BY + dvcRoot,
         []
       ),
       filters: new Map(
         workspaceState.get<[string, FilterDefinition][]>(
-          MementoPrefixes.filterBy + dvcRoot,
+          MementoPrefixes.FILTER_BY + dvcRoot,
           []
         )
       ),
       status: workspaceState.get<Record<string, Status>>(
-        MementoPrefixes.status + dvcRoot,
+        MementoPrefixes.STATUS + dvcRoot,
         {}
       )
     }

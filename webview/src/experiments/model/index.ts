@@ -25,7 +25,7 @@ interface PersistedModelState {
 
 export class Model {
   @observable
-  public theme: WebviewColorTheme = WebviewColorTheme.light
+  public theme: WebviewColorTheme = WebviewColorTheme.LIGHT
 
   @observable
   public data?: TableData | null = null // do not remove = null or webview will not load data
@@ -52,7 +52,7 @@ export class Model {
       this.setState(initialState)
     }
 
-    this.sendMessage({ type: MessageFromWebviewType.initialized })
+    this.sendMessage({ type: MessageFromWebviewType.INITIALIZED })
 
     this.dispose.track({
       dispose: autorun(() => {
@@ -75,7 +75,7 @@ export class Model {
       column.width = width
       this.sendMessage({
         payload: { id, width },
-        type: MessageFromWebviewType.columnResized
+        type: MessageFromWebviewType.COLUMN_RESIZED
       })
     }
   }
@@ -83,7 +83,7 @@ export class Model {
   public sendColumnsOrder(newOrder: string[]): void {
     this.sendMessage({
       payload: newOrder,
-      type: MessageFromWebviewType.columnReordered
+      type: MessageFromWebviewType.COLUMN_REORDERED
     })
   }
 
@@ -101,17 +101,17 @@ export class Model {
 
   private handleMessage(message: MessageToWebview): void {
     switch (message.type) {
-      case MessageToWebviewType.setTheme:
+      case MessageToWebviewType.SET_THEME:
         runInAction(() => {
           this.theme = message.theme
         })
         return
-      case MessageToWebviewType.setData:
+      case MessageToWebviewType.SET_DATA:
         runInAction(() => {
           this.data = message.data
         })
         return
-      case MessageToWebviewType.setDvcRoot:
+      case MessageToWebviewType.SET_DVC_ROOT:
         runInAction(() => {
           this.dvcRoot = message.dvcRoot
         })

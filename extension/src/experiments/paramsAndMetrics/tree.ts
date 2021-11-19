@@ -172,10 +172,10 @@ export class ExperimentsParamsAndMetricsTree
   }
 
   private getIconPath(status?: Status) {
-    if (status === Status.selected) {
+    if (status === Status.SELECTED) {
       return this.resourceLocator.checkedCheckbox
     }
-    if (status === Status.indeterminate) {
+    if (status === Status.INDETERMINATE) {
       return this.resourceLocator.indeterminateCheckbox
     }
     return this.resourceLocator.emptyCheckbox
@@ -187,7 +187,7 @@ export class ExperimentsParamsAndMetricsTree
     }
     return `${
       statuses.filter(status =>
-        [Status.selected, Status.indeterminate].includes(status)
+        [Status.SELECTED, Status.INDETERMINATE].includes(status)
       ).length
     }${separator}${statuses.length}`
   }
