@@ -70,6 +70,7 @@ export interface IEventNamePropertyMapping {
   }
 
   [EventName.EXPERIMENT_APPLY]: undefined
+  [EventName.EXPERIMENT_APPLY_FILTERS]: undefined
   [EventName.EXPERIMENT_BRANCH]: undefined
   [EventName.EXPERIMENT_FILTER_ADD]: undefined
   [EventName.EXPERIMENT_FILTER_REMOVE]: undefined
@@ -81,6 +82,7 @@ export interface IEventNamePropertyMapping {
   [EventName.EXPERIMENT_RUN]: undefined
   [EventName.EXPERIMENT_RUN_QUEUED]: undefined
   [EventName.EXPERIMENT_RUN_RESET]: undefined
+  [EventName.EXPERIMENT_SELECT]: undefined
   [EventName.EXPERIMENT_SHOW]: undefined
   [EventName.EXPERIMENT_SORT_ADD]: undefined
   [EventName.EXPERIMENT_SORT_REMOVE]: undefined

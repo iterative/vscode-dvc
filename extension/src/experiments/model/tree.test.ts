@@ -109,14 +109,24 @@ describe('ExperimentsTree', () => {
           displayColor: '#b180d7',
           displayName: '90aea7f',
           hasChildren: true,
-          id: '90aea7f'
+          id: '90aea7f',
+          selected: true
         },
         {
           displayColor: '#1a1c19',
           displayName: 'f0778b3',
           hasChildren: false,
           id: 'f0778b3',
-          running: true
+          running: true,
+          selected: true
+        },
+        {
+          displayColor: '#4063e2',
+          displayName: 'e350702',
+          hasChildren: false,
+          id: 'e350702',
+          running: false,
+          selected: false
         },
         {
           displayName: 'f81f1b5',
@@ -165,6 +175,18 @@ describe('ExperimentsTree', () => {
         },
         {
           collapsibleState: 0,
+          command: {
+            arguments: [{ dvcRoot: 'repo', id: 'e350702' }],
+            command: RegisteredCommands.EXPERIMENT_TOGGLE,
+            title: 'toggle'
+          },
+          dvcRoot: 'repo',
+          iconPath: getMockedUri('circle-outline', '#4063e2'),
+          id: 'e350702',
+          label: 'e350702'
+        },
+        {
+          collapsibleState: 0,
           command: undefined,
           dvcRoot: 'repo',
           iconPath: new ThemeIcon('watch'),
@@ -203,14 +225,14 @@ describe('ExperimentsTree', () => {
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
-          iconPath: new ThemeIcon('debug-stackframe-dot'),
+          iconPath: new ThemeIcon('circle-filled'),
           id: 'aaaaaaaaaaaaaaaaa',
           label: 'aaaaaaa'
         },
         {
           collapsibleState: 0,
           dvcRoot: 'repo',
-          iconPath: new ThemeIcon('debug-stackframe-dot'),
+          iconPath: new ThemeIcon('circle-filled'),
           id: 'bbbbbbbbbbbbbbbbb',
           label: 'bbbbbbb'
         }
@@ -222,7 +244,7 @@ describe('ExperimentsTree', () => {
     it('should return a tree item for a root element', async () => {
       let mockedItem = {}
       mockedTreeItem.mockImplementationOnce(function (uri, collapsibleState) {
-        expect(collapsibleState).toEqual(1)
+        expect(collapsibleState).toEqual(2)
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
@@ -352,13 +374,13 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
         dvcRoot: 'demo',
-        iconPath: new ThemeIcon('debug-stackframe-dot'),
+        iconPath: new ThemeIcon('circle-filled'),
         id: 'f0778b3',
         label: 'f0778b3'
       })
       expect(treeItem).toEqual({
         ...mockedItem,
-        iconPath: { id: 'debug-stackframe-dot' }
+        iconPath: { id: 'circle-filled' }
       })
     })
 

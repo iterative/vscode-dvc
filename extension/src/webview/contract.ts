@@ -15,9 +15,9 @@ export type MessageFromWebview = {
 }
 
 export enum MessageFromWebviewType {
-  initialized = 'initialized',
-  columnReordered = 'column-reordered',
-  columnResized = 'column-resized'
+  INITIALIZED = 'initialized',
+  COLUMN_REORDERED = 'column-reordered',
+  COLUMN_RESIZED = 'column-resized'
 }
 
 export interface WindowWithWebviewData {
@@ -27,30 +27,30 @@ export interface WindowWithWebviewData {
 }
 
 export enum WebviewColorTheme {
-  light = 'light',
-  dark = 'dark'
+  LIGHT = 'light',
+  DARK = 'dark'
 }
 
 export interface setData<T extends WebviewData> {
-  type: MessageToWebviewType.setData
+  type: MessageToWebviewType.SET_DATA
   data: T
 }
 
 export type MessageToWebview<T extends WebviewData> =
   | {
-      type: MessageToWebviewType.setDvcRoot
+      type: MessageToWebviewType.SET_DVC_ROOT
       dvcRoot: string
     }
   | {
-      type: MessageToWebviewType.setTheme
+      type: MessageToWebviewType.SET_THEME
       theme: WebviewColorTheme
     }
   | setData<T>
 
 export enum MessageToWebviewType {
-  setDvcRoot = 'setDvcRoot',
-  setTheme = 'setTheme',
-  setData = 'setData'
+  SET_DVC_ROOT = 'setDvcRoot',
+  SET_THEME = 'setTheme',
+  SET_DATA = 'setData'
 }
 
 export interface WebviewState<T extends WebviewData | unknown> {

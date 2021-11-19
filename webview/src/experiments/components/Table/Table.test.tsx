@@ -21,10 +21,12 @@ import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnsOrder'
 import { CustomWindow } from '../../../test/util'
+import { Model } from '../../model'
 
 jest.mock('../../../shared/api')
 
 describe('Table', () => {
+  const model = new Model()
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const headerGroupBasicProps = {
     getHeaderGroupProps: getProps
@@ -99,6 +101,7 @@ describe('Table', () => {
   ) =>
     render(
       <Table
+        model={model}
         instance={tableInstance}
         sorts={sorts}
         changes={changes}
@@ -316,7 +319,7 @@ describe('Table', () => {
     }
 
     const renderExperimentsTable = (data: TableData = tableData) => {
-      const table = render(<ExperimentsTable tableData={data} />)
+      const table = render(<ExperimentsTable tableData={data} model={model} />)
 
       mockDndElSpacing(table)
 
@@ -333,7 +336,7 @@ describe('Table', () => {
     beforeAll(() => {
       customWindow = window as unknown as CustomWindow
       customWindow.webviewData = {
-        theme: WebviewColorTheme.dark
+        theme: WebviewColorTheme.DARK
       }
     })
 

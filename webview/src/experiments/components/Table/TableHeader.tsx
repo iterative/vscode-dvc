@@ -1,5 +1,5 @@
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
-import { Experiment } from 'dvc/src/experiments/webview/contract'
+import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup } from 'react-table'
 import cx from 'classnames'
@@ -16,13 +16,15 @@ interface TableHeaderProps {
   columns: HeaderGroup<Experiment>[]
   sorts: SortDefinition[]
   index: number
+  orderedColumns: ParamOrMetric[]
 }
 
 export const TableHeader: React.FC<TableHeaderProps> = ({
   column,
   columns,
   sorts,
-  index
+  index,
+  orderedColumns
 }) => {
   const nbPlaceholder = getPlaceholders(column, columns).length
   const hasPlaceholder = nbPlaceholder > 0
@@ -35,7 +37,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
     !column.columns
   const canResize = column.canResize && !column.placeholderOf
   const nbUpperLevels =
-    (!column.placeholderOf && countUpperLevels(column, columns, 0)) || 0
+    (!column.placeholderOf &&
+      countUpperLevels(orderedColumns, column, columns, 0)) ||
+    0
   const resizerHeight = 100 + nbUpperLevels * 92 + '%'
 
   return (

@@ -3,6 +3,12 @@ import { Uri } from 'vscode'
 
 export type Resource = { dark: Uri; light: Uri }
 
+export enum IconName {
+  CIRCLE_FILLED = 'circle-filled',
+  CIRCLE_OUTLINE = 'circle-outline',
+  LOADING_SPIN = 'loading-spin'
+}
+
 export class ResourceLocator {
   public dispose = Disposable.fn()
 
@@ -28,10 +34,7 @@ export class ResourceLocator {
     )
   }
 
-  public getExperimentsResource(
-    name: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin',
-    color: string
-  ): Uri {
+  public getExperimentsResource(name: IconName, color: string): Uri {
     return Uri.joinPath(
       this.extensionUri,
       'resources',

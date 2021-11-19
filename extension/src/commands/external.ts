@@ -23,17 +23,19 @@ export enum RegisteredCliCommands {
 }
 
 export enum RegisteredCommands {
-  EXPERIMENT_TOGGLE = 'dvc.views.experimentsTree.toggleStatus',
+  EXPERIMENT_APPLY_FILTERS = 'dvc.views.experimentsTree.applyFilters',
   EXPERIMENT_FILTER_ADD = 'dvc.addExperimentsTableFilter',
   EXPERIMENT_FILTER_REMOVE = 'dvc.views.experimentsFilterByTree.removeFilter',
   EXPERIMENT_FILTERS_REMOVE = 'dvc.removeExperimentsTableFilters',
   EXPERIMENT_FILTERS_REMOVE_ALL = 'dvc.views.experimentsFilterByTree.removeAllFilters',
   EXPERIMENT_PARAMS_AND_METRICS_TOGGLE = 'dvc.views.experimentsParamsAndMetricsTree.toggleStatus',
+  EXPERIMENT_SELECT = 'dvc.views.experimentsTree.selectExperiments',
   EXPERIMENT_SHOW = 'dvc.showExperiments',
   EXPERIMENT_SORT_ADD = 'dvc.addExperimentsTableSort',
   EXPERIMENT_SORT_REMOVE = 'dvc.views.experimentsSortByTree.removeSort',
   EXPERIMENT_SORTS_REMOVE = 'dvc.removeExperimentsTableSorts',
   EXPERIMENT_SORTS_REMOVE_ALL = 'dvc.views.experimentsSortByTree.removeAllSorts',
+  EXPERIMENT_TOGGLE = 'dvc.views.experimentsTree.toggleStatus',
   STOP_EXPERIMENT = 'dvc.stopRunningExperiment',
 
   PLOTS_SHOW = 'dvc.showPlots',

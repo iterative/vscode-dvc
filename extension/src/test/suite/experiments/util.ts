@@ -117,7 +117,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 export const buildMockInternalCommands = (disposer: Disposer) => {
   const mockedInternalCommands = disposer.track(
     new InternalCommands(
-      { getTheme: () => WebviewColorTheme.dark } as unknown as Config,
+      { getTheme: () => WebviewColorTheme.DARK } as unknown as Config,
       {} as unknown as OutputChannel
     )
   )

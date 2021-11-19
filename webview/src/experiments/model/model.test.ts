@@ -26,7 +26,7 @@ describe('Model', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    model = Model.getInstance()
+    model = new Model()
     modelAsAny = model
     runInAction(() => {
       modelAsAny.data = {
@@ -68,7 +68,7 @@ describe('Model', () => {
 
     it('should return an empty array if there is no columnsOrder on the data', () => {
       runInAction(() => {
-        modelAsAny.data = { theme: WebviewColorTheme.dark }
+        modelAsAny.data = { theme: WebviewColorTheme.DARK }
       })
       expect(model.getColumnsWithWidth()).toEqual([])
     })
@@ -90,7 +90,7 @@ describe('Model', () => {
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
         payload: { id: 'D', width: expectedWidth },
-        type: MessageFromWebviewType.columnResized
+        type: MessageFromWebviewType.COLUMN_RESIZED
       })
     })
   })
@@ -98,39 +98,17 @@ describe('Model', () => {
   describe('createColumnsOrderRepresentation', () => {
     it('should send a message to notify of the changes if there is a new order set', () => {
       const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
+      sendMessageSpy.mockReset()
+
       const expectedOrder = columnsOrder.map(column => column.path)
 
-      model.createColumnsOrderRepresentation(expectedOrder)
+      model.sendColumnsOrder(expectedOrder)
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
         payload: expectedOrder,
-        type: MessageFromWebviewType.columnReordered
+        type: MessageFromWebviewType.COLUMN_REORDERED
       })
-    })
-
-    it('should not send a message to notify of the changes if there is not a new order set', () => {
-      const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
-
-      model.createColumnsOrderRepresentation()
-
-      expect(sendMessageSpy).not.toHaveBeenCalled()
-    })
-
-    it('should change the columnsOrderRepresentation to match the new order', () => {
-      const order = ['a:a', 'b:a', 'a:c', 'a:b']
-
-      model.createColumnsOrderRepresentation(order)
-
-      expect(model.columnsOrderRepresentation).toEqual([
-        { parentPath: '0/a', path: '0/a:a' },
-        { parentPath: '1/b', path: '1/b:a' },
-        { parentPath: '2/a', path: '2/a:c' },
-        { parentPath: '2/a', path: '2/a:b' },
-        { path: '0/a' },
-        { path: '1/b' },
-        { path: '2/a' }
-      ])
     })
   })
 })

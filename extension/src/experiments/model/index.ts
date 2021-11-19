@@ -14,19 +14,19 @@ import { collectLivePlotsData } from './livePlots/collect'
 import { Experiment, RowData } from '../webview/contract'
 import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
-import { LivePlotData, LivePlotsColors } from '../../plots/webview/contract'
+import { LivePlotData } from '../../plots/webview/contract'
 import { hasKey } from '../../util/object'
 
 export enum Status {
-  selected = 1,
-  unselected = 0
+  SELECTED = 1,
+  UNSELECTED = 0
 }
 
 const enum MementoPrefixes {
-  colors = 'colors:',
-  filterBy = 'filterBy:',
-  sortBy = 'sortBy:',
-  status = 'status:'
+  COLORS = 'colors:',
+  FILTER_BY = 'filterBy:',
+  SORT_BY = 'sortBy:',
+  STATUS = 'status:'
 }
 
 export class ExperimentsModel {
@@ -64,30 +64,35 @@ export class ExperimentsModel {
   }
 
   public getLivePlots() {
-    if (!this.livePlots || !this.colors.assigned.size) {
+    if (!this.livePlots) {
       return
     }
 
-    const colors: LivePlotsColors = {
-      domain: [],
-      range: []
-    }
+    const selectedExperiments: string[] = []
+    const range: string[] = []
 
     this.getAssignedColors().forEach((color: string, id: string) => {
       const displayName = this.displayName[id]
-      if (displayName) {
-        colors.domain.push(displayName)
-        colors.range.push(color)
+      const selected = !!this.status[id]
+      if (displayName && selected) {
+        selectedExperiments.push(displayName)
+        range.push(color)
       }
     })
 
+    if (!definedAndNonEmpty(selectedExperiments)) {
+      return
+    }
+
     return {
-      colors,
+      colors: { domain: selectedExperiments, range },
       plots: this.livePlots.map(plot => {
         const { title, values } = plot
         return {
           title,
-          values: values.filter(value => colors.domain.includes(value.group))
+          values: values.filter(value =>
+            selectedExperiments.includes(value.group)
+          )
         }
       })
     }
@@ -114,11 +119,10 @@ export class ExperimentsModel {
 
   public toggleStatus(experimentId: string) {
     const status = this.status[experimentId]
-      ? Status.unselected
-      : Status.selected
+      ? Status.UNSELECTED
+      : Status.SELECTED
     this.status[experimentId] = status
 
-    this.collectColors()
     this.persistStatus()
     return status
   }
@@ -168,18 +172,40 @@ export class ExperimentsModel {
     return result
   }
 
-  public getExperiments(): (Experiment & { hasChildren: boolean })[] {
+  public setSelected(ids: string[]) {
+    this.status = Object.keys(this.status).reduce((acc, id) => {
+      const status = ids.includes(id) ? Status.SELECTED : Status.UNSELECTED
+      acc[id] = status
+      return acc
+    }, {} as Record<string, Status>)
+  }
+
+  public setSelectedToFilters() {
+    const filtered = this.getSubRows(this.getSelectable()).map(exp => exp.id)
+    this.setSelected(filtered)
+  }
+
+  public getExperiments(): (Experiment & {
+    hasChildren: boolean
+    selected?: boolean
+  })[] {
     const workspace = this.workspace.running ? [this.workspace] : []
     return [...workspace, ...this.flattenExperiments()].map(experiment => ({
-      ...this.addDisplayColor(experiment),
+      ...this.addDetails(experiment),
       hasChildren: !!this.checkpointsByTip.get(experiment.id)
     }))
+  }
+
+  public getSelectable() {
+    return this.getExperiments().filter(
+      exp => exp.displayName !== 'workspace' && !exp.queued
+    )
   }
 
   public getCheckpoints(experimentId: string): Experiment[] | undefined {
     return this.checkpointsByTip
       .get(experimentId)
-      ?.map(checkpoint => this.addDisplayColor(checkpoint, experimentId))
+      ?.map(checkpoint => this.addDetails(checkpoint, experimentId))
   }
 
   public getRowData() {
@@ -204,13 +230,13 @@ export class ExperimentsModel {
       .map(experiment => {
         const checkpoints = this.getFilteredCheckpointsByTip(experiment.id)
         if (!checkpoints) {
-          return this.addDisplayColor(experiment)
+          return this.addDetails(experiment)
         }
         return {
-          ...this.addDisplayColor(experiment),
-          subRows: checkpoints.map(checkpoint =>
-            this.addDisplayColor(checkpoint, experiment.id)
-          )
+          ...this.addDetails(experiment),
+          subRows: checkpoints.map(checkpoint => ({
+            ...this.addDetails(checkpoint, experiment.id)
+          }))
         }
       })
       .filter((row: RowData) => this.filterTableRow(row))
@@ -255,7 +281,7 @@ export class ExperimentsModel {
     this.status = this.flattenExperiments().reduce((acc, exp) => {
       const { id, queued } = exp
       if (!queued) {
-        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.selected
+        acc[id] = hasKey(this.status, id) ? this.status[id] : Status.SELECTED
       }
       return acc
     }, {} as Record<string, Status>)
@@ -273,7 +299,7 @@ export class ExperimentsModel {
 
   private collectColors() {
     this.colors = collectColors(
-      this.getSelectedExperimentIds(),
+      this.getExperimentIds(),
       this.getAssignedColors(),
       this.colors.available
     )
@@ -282,19 +308,20 @@ export class ExperimentsModel {
 
   private persistSorts() {
     return this.workspaceState.update(
-      MementoPrefixes.sortBy + this.dvcRoot,
+      MementoPrefixes.SORT_BY + this.dvcRoot,
       this.currentSorts
     )
   }
 
   private persistFilters() {
-    return this.workspaceState.update(MementoPrefixes.filterBy + this.dvcRoot, [
-      ...this.filters
-    ])
+    return this.workspaceState.update(
+      MementoPrefixes.FILTER_BY + this.dvcRoot,
+      [...this.filters]
+    )
   }
 
   private persistColors() {
-    return this.workspaceState.update(MementoPrefixes.colors + this.dvcRoot, {
+    return this.workspaceState.update(MementoPrefixes.COLORS + this.dvcRoot, {
       assigned: [...this.colors.assigned],
       available: this.colors.available
     })
@@ -302,7 +329,7 @@ export class ExperimentsModel {
 
   private persistStatus() {
     return this.workspaceState.update(
-      MementoPrefixes.status + this.dvcRoot,
+      MementoPrefixes.STATUS + this.dvcRoot,
       this.status
     )
   }
@@ -319,7 +346,7 @@ export class ExperimentsModel {
     const { assigned, available } = workspaceState.get<{
       assigned: [string, string][]
       available: string[]
-    }>(MementoPrefixes.colors + dvcRoot, {
+    }>(MementoPrefixes.COLORS + dvcRoot, {
       assigned: [],
       available: copyOriginalColors()
     })
@@ -330,25 +357,25 @@ export class ExperimentsModel {
         available: available
       },
       currentSorts: workspaceState.get<SortDefinition[]>(
-        MementoPrefixes.sortBy + dvcRoot,
+        MementoPrefixes.SORT_BY + dvcRoot,
         []
       ),
       filters: new Map(
         workspaceState.get<[string, FilterDefinition][]>(
-          MementoPrefixes.filterBy + dvcRoot,
+          MementoPrefixes.FILTER_BY + dvcRoot,
           []
         )
       ),
       status: workspaceState.get<Record<string, Status>>(
-        MementoPrefixes.status + dvcRoot,
+        MementoPrefixes.STATUS + dvcRoot,
         {}
       )
     }
   }
 
-  private getSelectedExperimentIds() {
-    return Object.entries(this.status).reduce((acc, [id, status]) => {
-      if (status) {
+  private getExperimentIds() {
+    return this.flattenExperiments().reduce((acc, { id, queued }) => {
+      if (!queued) {
         acc.push(id)
       }
 
@@ -356,14 +383,17 @@ export class ExperimentsModel {
     }, [] as string[])
   }
 
-  private addDisplayColor(experiment: Experiment, id?: string) {
+  private addDetails(experiment: Experiment, id?: string) {
     const assignedColors = this.getAssignedColors()
     const displayColor = assignedColors.get(id || experiment.id)
+    const status = this.status[id || experiment.id]
+    const selected = status !== undefined ? !!status : undefined
 
     return displayColor
       ? {
           ...experiment,
-          displayColor
+          displayColor,
+          selected
         }
       : experiment
   }

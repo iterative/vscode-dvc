@@ -12,8 +12,8 @@ import { WorkspaceExperiments } from '../workspace'
 import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
-import { createTreeView } from '../../vscode/tree'
-import { ResourceLocator } from '../../resourceLocator'
+import { createTreeView, getRootItem } from '../../vscode/tree'
+import { IconName, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 
@@ -73,7 +73,7 @@ export class ExperimentsTree
 
   public getTreeItem(element: string | ExperimentItem): TreeItem {
     if (this.isRoot(element)) {
-      return new TreeItem(Uri.file(element), TreeItemCollapsibleState.Collapsed)
+      return getRootItem(element)
     }
 
     const { label, collapsibleState, iconPath, command } = element
@@ -151,25 +151,29 @@ export class ExperimentsTree
   }
 
   private getExperimentIcon({
+    displayColor,
     displayName,
     running,
     queued,
-    displayColor
+    selected
   }: {
     displayColor?: string
     displayName: string
     running?: boolean
     queued?: boolean
+    selected?: boolean
   }): ThemeIcon | Uri {
     if (displayName === 'workspace' || running) {
-      return this.getUriOrIcon(displayColor, 'loading-spin')
+      return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
 
     if (queued) {
       return new ThemeIcon('watch')
     }
 
-    return this.getUriOrIcon(displayColor, 'circle-filled')
+    const iconName = this.getIconName(selected)
+
+    return this.getUriOrIcon(displayColor, iconName)
   }
 
   private getCheckpoints(
@@ -183,21 +187,22 @@ export class ExperimentsTree
       dvcRoot,
       iconPath: this.getUriOrIcon(
         checkpoint.displayColor,
-        'debug-stackframe-dot'
+        this.getIconName(checkpoint.selected)
       ),
       id: checkpoint.id,
       label: checkpoint.displayName
     }))
   }
 
-  private getUriOrIcon(
-    displayColor: string | undefined,
-    iconName: 'circle-filled' | 'debug-stackframe-dot' | 'loading-spin'
-  ) {
+  private getUriOrIcon(displayColor: string | undefined, iconName: IconName) {
     if (displayColor) {
       return this.resourceLocator.getExperimentsResource(iconName, displayColor)
     }
     return new ThemeIcon(iconName.replace('-spin', '~spin'))
+  }
+
+  private getIconName(selected?: boolean) {
+    return selected === false ? IconName.CIRCLE_OUTLINE : IconName.CIRCLE_FILLED
   }
 
   private updateDescriptionOnChange() {

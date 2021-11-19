@@ -5,6 +5,7 @@ import { RowData as Experiment } from 'dvc/src/experiments/webview/contract'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
+import { Model } from '../../model'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -12,6 +13,7 @@ export interface InstanceProp {
 export interface TableProps extends InstanceProp {
   sorts: SortDefinition[]
   columnsOrder: string[]
+  model: Model
 }
 
 export interface WithChanges {
@@ -104,13 +106,17 @@ const getCells = (cells: Cell<Experiment, unknown>[], changes?: string[]) =>
     </div>
   ))
 
-const getExperimentTypeClass = ({ running, queued }: Experiment) => {
+const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
     return styles.runningExperiment
   }
   if (queued) {
     return styles.queuedExperiment
   }
+  if (selected === false) {
+    return styles.unselectedExperiment
+  }
+
   return styles.normalExperiment
 }
 
@@ -210,6 +216,7 @@ export const TableBody: React.FC<RowProp & InstanceProp & WithChanges> = ({
 }
 
 export const Table: React.FC<TableProps & WithChanges> = ({
+  model,
   instance,
   sorts,
   changes,
@@ -223,6 +230,7 @@ export const Table: React.FC<TableProps & WithChanges> = ({
           instance={instance}
           sorts={sorts}
           columnsOrder={columnsOrder}
+          model={model}
         />
         {rows.map(row => (
           <TableBody

@@ -1,5 +1,6 @@
 import { Event, EventEmitter, Memento } from 'vscode'
 import { ExperimentsModel } from './model'
+import { pickExperiments } from './model/quickPicks'
 import {
   pickFilterToAdd,
   pickFiltersToRemove
@@ -174,6 +175,23 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public async selectExperiments() {
+    const experiments = this.experiments.getSelectable()
+
+    const selected = await pickExperiments(experiments)
+    if (!selected) {
+      return
+    }
+
+    this.experiments.setSelected(selected)
+    return this.notifyChanged()
+  }
+
+  public applyFilters() {
+    this.experiments.setSelectedToFilters()
+    return this.notifyChanged()
+  }
+
   public getExperiments() {
     return this.experiments.getExperiments()
   }
@@ -211,14 +229,14 @@ export class Experiments extends BaseRepository<TableData> {
     this.dispose.track(
       this.onDidReceivedWebviewMessage(message => {
         switch (message.type) {
-          case MessageFromWebviewType.columnReordered:
+          case MessageFromWebviewType.COLUMN_REORDERED:
             return (
               message.payload &&
               this.paramsAndMetrics.setColumnsOrder(
                 message.payload as ColumnReorderPayload
               )
             )
-          case MessageFromWebviewType.columnResized: {
+          case MessageFromWebviewType.COLUMN_RESIZED: {
             const { id, width } = message.payload as ColumnResizePayload
             return (
               message.payload && this.paramsAndMetrics.setColumnWidth(id, width)

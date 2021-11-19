@@ -184,7 +184,7 @@ suite('Experiments Test Suite', () => {
 
       mockMessageReceived.fire({
         payload: columnOrder,
-        type: MessageFromWebviewType.columnReordered
+        type: MessageFromWebviewType.COLUMN_REORDERED
       })
 
       await columnOrderSet
@@ -383,6 +383,14 @@ suite('Experiments Test Suite', () => {
     const filterMapEntries = [firstFilterMapEntry, secondFilterMapEntry]
 
     it('should initialize given no persisted state and update persistence given any change', async () => {
+      const expectedColors = {
+        assigned: [
+          ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
+          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
+          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
+        ],
+        available: copyOriginalColors().slice(3)
+      }
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
       const testRepository = disposable.track(
@@ -421,14 +429,7 @@ suite('Experiments Test Suite', () => {
       expect(
         mockMemento.get('colors:test'),
         'the correct colors are persisted'
-      ).to.deep.equal({
-        assigned: [
-          ['4fb124aebddb2adf1545030907687fa9a4c80e70', '#f14c4c'],
-          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
-          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
-        ],
-        available: copyOriginalColors().slice(3)
-      })
+      ).to.deep.equal(expectedColors)
       expect(
         mockMemento.get('status:test'),
         'the correct statuses are persisted'
@@ -525,13 +526,7 @@ suite('Experiments Test Suite', () => {
       expect(
         mockMemento.get('colors:test'),
         'the correct colors are persisted'
-      ).to.deep.equal({
-        assigned: [
-          ['42b8736b08170529903cd203a1f40382a4b4a8cd', '#3794ff'],
-          ['1ba7bcd6ce6154e72e18b155475663ecbbd1f49d', '#cca700']
-        ],
-        available: ['#f14c4c', ...copyOriginalColors().slice(3)]
-      })
+      ).to.deep.equal(expectedColors)
     })
 
     it('should initialize with state reflected from the given Memento', async () => {

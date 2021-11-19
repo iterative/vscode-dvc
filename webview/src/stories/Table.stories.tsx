@@ -8,12 +8,23 @@ import Experiments from '../experiments/components/Experiments'
 
 import './test-vscode-styles.scss'
 import '../shared/style.scss'
+import { Model } from '../experiments/model'
 
 const tableData = {
   changes: workspaceChangesFixture,
   columns: columnsFixture,
   columnsOrder: [],
-  rows: rowsFixture,
+  rows: rowsFixture.map(row => ({
+    ...row,
+    subRows: row.subRows?.map(experiment => ({
+      ...experiment,
+      selected: experiment.displayName !== 'test-branch',
+      subRows: experiment.subRows?.map(checkpoint => ({
+        ...checkpoint,
+        selected: experiment.displayName !== 'test-branch'
+      }))
+    }))
+  })),
   sorts: [
     { descending: true, path: 'params:params.yaml:epochs' },
     { descending: false, path: 'params:params.yaml:log_file' }
@@ -29,7 +40,7 @@ export default {
 } as Meta
 
 const Template: Story<{ tableData: TableData }> = ({ tableData }) => {
-  return <Experiments tableData={tableData} />
+  return <Experiments tableData={tableData} model={new Model()} />
 }
 
 export const WithData = Template.bind({})

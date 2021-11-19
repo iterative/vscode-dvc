@@ -75,6 +75,11 @@ const registerExperimentQuickPickCommands = (
     RegisteredCommands.EXPERIMENT_SORTS_REMOVE,
     () => experiments.removeSorts()
   )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_SELECT,
+    (dvcRoot?: string) => experiments.selectExperiments(dvcRoot)
+  )
 }
 
 const registerExperimentRunCommands = (
@@ -111,4 +116,9 @@ export const registerExperimentCommands = (
   registerExperimentInputCommands(experiments, internalCommands)
   registerExperimentQuickPickCommands(experiments, internalCommands)
   registerExperimentRunCommands(experiments, internalCommands)
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_APPLY_FILTERS,
+    (dvcRoot?: string) => experiments.applyFilters(dvcRoot)
+  )
 }

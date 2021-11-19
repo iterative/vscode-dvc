@@ -6,7 +6,7 @@ import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { CommandId, InternalCommands } from '../commands/internal'
 import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
-import { sameContents, uniqueValues } from '../util/array'
+import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 
 export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   public readonly dispose = Disposable.fn()
@@ -116,15 +116,14 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
   }
 
   private watchFiles() {
+    const files = uniqueValues([...this.staticFiles, ...this.collectedFiles])
+    if (!definedAndNonEmpty(files)) {
+      return
+    }
+
     return this.dispose.track(
       createFileSystemWatcher(
-        join(
-          this.dvcRoot,
-          '**',
-          `{${uniqueValues([...this.staticFiles, ...this.collectedFiles]).join(
-            ','
-          )}}`
-        ),
+        join(this.dvcRoot, '**', `{${files.join(',')}}`),
         () => this.update()
       )
     )

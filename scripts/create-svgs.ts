@@ -20,7 +20,7 @@ const writeSpinner = (loadingIcon: string, color: string) => {
   )
 }
 
-;['loading', 'circle-filled', 'debug-stackframe-dot'].map(iconName => {
+;['loading', 'circle-filled', 'circle-outline'].map(iconName => {
   const icon = readFileSync(
     `./node_modules/@vscode/codicons/src/icons/${iconName}.svg`
   )
