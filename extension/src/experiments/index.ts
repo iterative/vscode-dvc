@@ -187,6 +187,11 @@ export class Experiments extends BaseRepository<TableData> {
     return this.notifyChanged()
   }
 
+  public applyFilters() {
+    this.experiments.setSelectedToFilters()
+    return this.notifyChanged()
+  }
+
   public getExperiments() {
     return this.experiments.getExperiments()
   }

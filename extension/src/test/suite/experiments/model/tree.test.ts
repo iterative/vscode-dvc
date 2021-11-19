@@ -3,11 +3,14 @@ import { expect } from 'chai'
 import { stub, restore, SinonStub } from 'sinon'
 import { commands, QuickPickItem, QuickPickOptions, window } from 'vscode'
 import { Disposable } from '../../../../extension'
-import { Status } from '../../../../experiments/model'
+import { ExperimentsModel, Status } from '../../../../experiments/model'
 import { dvcDemoPath } from '../../util'
 import { RegisteredCommands } from '../../../../commands/external'
 import { buildPlots, getExpectedData } from '../../plots/util'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
+import expShowFixture from '../../../fixtures/expShow/output'
+import { Operator } from '../../../../experiments/model/filterBy'
+import { joinParamOrMetricPath } from '../../../../experiments/paramsAndMetrics/paths'
 
 suite('Experiments Tree Test Suite', () => {
   const disposable = Disposable.fn()
@@ -150,5 +153,66 @@ suite('Experiments Tree Test Suite', () => {
         getExpectedData([selectedDisplayName], [selectedColor])
       )
     }).timeout(6000)
+
+    it('should be able to apply filters using dvc.views.experimentsTree.applyFilters', async () => {
+      const { plots, messageSpy } = await buildPlots(disposable)
+
+      const unfilteredCheckpointValue = expShowFixture[
+        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
+      ].d1343a87c6ee4a2e82d19525964d2fb2cb6756c9.data?.metrics?.['summary.json']
+        .data?.loss as number
+
+      const selectedDisplayName = domain[0]
+      const selectedColor = range[0]
+
+      await plots.showWebview()
+      messageSpy.resetHistory()
+
+      const mockGetFilters = stub(
+        ExperimentsModel.prototype,
+        'getFilters'
+      ).returns([
+        {
+          operator: Operator.EQUAL,
+          path: joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
+          value: unfilteredCheckpointValue
+        }
+      ])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+
+      expect(
+        messageSpy,
+        'the filter is applied and one experiment remains because of a single checkpoint'
+      ).to.be.calledWith(
+        getExpectedData([selectedDisplayName], [selectedColor])
+      )
+      messageSpy.resetHistory()
+
+      mockGetFilters.resetBehavior()
+      mockGetFilters.returns([
+        {
+          operator: Operator.EQUAL,
+          path: joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
+          value: 0
+        }
+      ])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+
+      expect(
+        messageSpy,
+        'the filter is applied and no experiments remains because every record has a loss'
+      ).to.be.calledWith({ live: undefined, static: undefined })
+      messageSpy.resetHistory()
+      mockGetFilters.restore()
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+
+      expect(
+        messageSpy,
+        'there are no filters so all data is sent again'
+      ).to.be.calledWith(getExpectedData(domain, range))
+    })
   })
 })
