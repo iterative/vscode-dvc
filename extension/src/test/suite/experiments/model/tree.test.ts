@@ -157,10 +157,16 @@ suite('Experiments Tree Test Suite', () => {
     it('should be able to apply filters using dvc.views.experimentsTree.applyFilters', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
 
-      const selectedId = ids[0]
+      const unfilteredCheckpointValue = expShowFixture[
+        '53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'
+      ].d1343a87c6ee4a2e82d19525964d2fb2cb6756c9.data?.metrics?.['summary.json']
+        .data?.loss as number
 
       const selectedDisplayName = domain[0]
       const selectedColor = range[0]
+
+      await plots.showWebview()
+      messageSpy.resetHistory()
 
       const mockGetFilters = stub(
         ExperimentsModel.prototype,
@@ -169,23 +175,34 @@ suite('Experiments Tree Test Suite', () => {
         {
           operator: Operator.EQUAL,
           path: joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
-          value: expShowFixture['53c3851f46955fa3e2b8f6e1c52999acc8c9ea77'][
-            selectedId
-          ].data?.metrics?.['summary.json'].data?.loss as number
+          value: unfilteredCheckpointValue
         }
       ])
-
-      await plots.showWebview()
-      messageSpy.resetHistory()
 
       await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
 
       expect(
         messageSpy,
-        'the filter is applied and no experiments remain'
+        'the filter is applied and one experiment remains because of a single checkpoint'
       ).to.be.calledWith(
         getExpectedData([selectedDisplayName], [selectedColor])
       )
+
+      mockGetFilters.resetBehavior()
+      mockGetFilters.returns([
+        {
+          operator: Operator.EQUAL,
+          path: joinParamOrMetricPath('metrics', 'summary.json', 'loss'),
+          value: 0
+        }
+      ])
+
+      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+
+      expect(
+        messageSpy,
+        'the filter is applied and no experiments remains because every record has a loss'
+      ).to.be.calledWith({ live: undefined, static: undefined })
 
       mockGetFilters.restore()
 

@@ -181,12 +181,7 @@ export class ExperimentsModel {
   }
 
   public setSelectedToFilters() {
-    const filtered = this.getSelectable().reduce((acc, exp) => {
-      if (filterExperiment(this.getFilters(), exp)) {
-        acc.push(exp.id)
-      }
-      return acc
-    }, [] as string[])
+    const filtered = this.getSubRows(this.getSelectable()).map(exp => exp.id)
     this.setSelected(filtered)
   }
 
