@@ -180,6 +180,11 @@ export class ExperimentsModel {
     }, {} as Record<string, Status>)
   }
 
+  public setSelectedToFilters() {
+    const filtered = this.getSubRows(this.getSelectable()).map(exp => exp.id)
+    this.setSelected(filtered)
+  }
+
   public getExperiments(): (Experiment & {
     hasChildren: boolean
     selected?: boolean
