@@ -45,7 +45,7 @@ describe('App', () => {
   it('should send the initialized message on first render', () => {
     render(<App />)
     expect(mockPostMessage).toHaveBeenCalledWith({
-      type: MessageFromWebviewType.initialized
+      type: MessageFromWebviewType.INITIALIZED
     })
     expect(mockPostMessage).toHaveBeenCalledTimes(1)
   })
@@ -70,7 +70,7 @@ describe('App', () => {
       new MessageEvent('message', {
         data: {
           dvcRoot: 'root',
-          type: MessageToWebviewType.setDvcRoot
+          type: MessageToWebviewType.SET_DVC_ROOT
         }
       })
     )
@@ -107,7 +107,7 @@ describe('App', () => {
     const dataMessageWithoutPlots = new MessageEvent('message', {
       data: {
         data: { live: undefined, static: undefined },
-        type: MessageToWebviewType.setData
+        type: MessageToWebviewType.SET_DATA
       }
     })
     render(<App />)
@@ -123,7 +123,7 @@ describe('App', () => {
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
         data: { live: livePlotsFixture },
-        type: MessageToWebviewType.setData
+        type: MessageToWebviewType.SET_DATA
       }
     })
     render(<App />)
@@ -139,7 +139,7 @@ describe('App', () => {
     const dataMessageWithPlots = new MessageEvent('message', {
       data: {
         data: { live: livePlotsFixture, static: minimalPlotsShowFixture },
-        type: MessageToWebviewType.setData
+        type: MessageToWebviewType.SET_DATA
       }
     })
     render(<App />)

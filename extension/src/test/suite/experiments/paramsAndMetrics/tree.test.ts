@@ -49,7 +49,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      expect(isUnselected).to.equal(Status.unselected)
+      expect(isUnselected).to.equal(Status.UNSELECTED)
 
       const isSelected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
@@ -59,7 +59,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      expect(isSelected).to.equal(Status.selected)
+      expect(isSelected).to.equal(Status.SELECTED)
 
       const isUnselectedAgain = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
@@ -69,7 +69,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      expect(isUnselectedAgain).to.equal(Status.unselected)
+      expect(isUnselectedAgain).to.equal(Status.UNSELECTED)
     })
 
     it('should be able to toggle a parent and change the selected status of all of the children with dvc.views.experimentsParamsAndMetricsTree.toggleStatus', async () => {
@@ -96,7 +96,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       ]
 
       allSelectedChildren.map(paramOrMetric =>
-        expect(paramOrMetric.status).to.equal(Status.selected)
+        expect(paramOrMetric.status).to.equal(Status.SELECTED)
       )
 
       const isUnselected = await commands.executeCommand(
@@ -107,7 +107,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      expect(isUnselected).to.equal(Status.unselected)
+      expect(isUnselected).to.equal(Status.UNSELECTED)
 
       const unselectedChildren = experiments.getChildParamsOrMetrics(path) || []
       expect(selectedChildren).to.have.lengthOf.greaterThan(1)
@@ -123,7 +123,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       ]
 
       allUnselectedChildren.map(paramOrMetric =>
-        expect(paramOrMetric.status).to.equal(Status.unselected)
+        expect(paramOrMetric.status).to.equal(Status.UNSELECTED)
       )
     })
 
@@ -156,7 +156,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const allUnselected = [...unselectedChildren, ...unselectedGrandChildren]
 
       allUnselected.map(paramOrMetric =>
-        expect(paramOrMetric?.status).to.equal(Status.unselected)
+        expect(paramOrMetric?.status).to.equal(Status.UNSELECTED)
       )
 
       const [firstGrandChild] = unselectedGrandChildren
@@ -169,14 +169,14 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      expect(isSelected).to.equal(Status.selected)
+      expect(isSelected).to.equal(Status.SELECTED)
 
       const indeterminateChildren =
         experiments.getChildParamsOrMetrics(parentPath) || []
 
       expect(
         indeterminateChildren.map(paramOrMetric => paramOrMetric.status)
-      ).to.deep.equal([Status.selected, Status.unselected])
+      ).to.deep.equal([Status.SELECTED, Status.UNSELECTED])
 
       const unselectedOrIndeterminateParams =
         experiments.getChildParamsOrMetrics(grandParentPath) || []
@@ -185,12 +185,12 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         unselectedOrIndeterminateParams.find(
           paramOrMetric => paramOrMetric.path === parentPath
         )?.status
-      ).to.equal(Status.indeterminate)
+      ).to.equal(Status.INDETERMINATE)
 
       unselectedOrIndeterminateParams
         .filter(paramOrMetric => paramOrMetric.path !== parentPath)
         .map(paramOrMetric =>
-          expect(paramOrMetric.status).to.equal(Status.unselected)
+          expect(paramOrMetric.status).to.equal(Status.UNSELECTED)
         )
     })
 
@@ -221,7 +221,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const [firstGrandChild] = selectedGrandChildren
 
       selectedGrandChildren.map(paramOrMetric =>
-        expect(paramOrMetric.status).to.equal(Status.selected)
+        expect(paramOrMetric.status).to.equal(Status.SELECTED)
       )
 
       await commands.executeCommand(
@@ -238,7 +238,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
 
       expect(
         indeterminateGrandChildren.map(paramOrMetric => paramOrMetric.status)
-      ).to.deep.equal([Status.selected, Status.unselected])
+      ).to.deep.equal([Status.SELECTED, Status.UNSELECTED])
 
       const lastSelectedIsUnselected = await commands.executeCommand(
         RegisteredCommands.EXPERIMENT_PARAMS_AND_METRICS_TOGGLE,
@@ -248,20 +248,20 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         }
       )
 
-      expect(lastSelectedIsUnselected).to.equal(Status.unselected)
+      expect(lastSelectedIsUnselected).to.equal(Status.UNSELECTED)
 
       const unselectedChildren =
         experiments.getChildParamsOrMetrics(parentPath) || []
 
       unselectedChildren.map(paramOrMetric =>
-        expect(paramOrMetric.status).to.equal(Status.unselected)
+        expect(paramOrMetric.status).to.equal(Status.UNSELECTED)
       )
 
       const unselectedParents =
         experiments.getChildParamsOrMetrics(grandParentPath) || []
 
       unselectedParents.map(paramOrMetric =>
-        expect(paramOrMetric.status).to.equal(Status.unselected)
+        expect(paramOrMetric.status).to.equal(Status.UNSELECTED)
       )
     })
 
@@ -286,7 +286,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       const selected = experiments
         .getChildParamsOrMetrics(grandParentPath)
         .filter(paramOrMetric =>
-          paramOrMetric.descendantStatuses.includes(Status.selected)
+          paramOrMetric.descendantStatuses.includes(Status.SELECTED)
         )
 
       expect(selected, 'all of the entries are unselected').to.have.lengthOf(0)
@@ -300,7 +300,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       )
 
       expect(selectedParent, 'the parent is now selected').to.equal(
-        Status.selected
+        Status.SELECTED
       )
 
       const selectedGrandChildren =
@@ -319,7 +319,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       )
 
       expect(unselectedParent, 'the parent is now unselected').to.equal(
-        Status.unselected
+        Status.UNSELECTED
       )
 
       const unselectedChildren =
@@ -329,7 +329,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
         expect(
           paramOrMetric.status,
           "each of it's children are now unselected"
-        ).to.equal(Status.unselected)
+        ).to.equal(Status.UNSELECTED)
       )
 
       const unselectedGrandParent = experiments
@@ -339,7 +339,7 @@ suite('Experiments Params And Metrics Tree Test Suite', () => {
       expect(
         unselectedGrandParent?.status,
         'the grandparent is now unselected'
-      ).to.equal(Status.unselected)
+      ).to.equal(Status.UNSELECTED)
     })
   })
 })

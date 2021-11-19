@@ -316,6 +316,12 @@
         "command": "dvc.views.experimentsTree.selectExperiments",
         "category": "DVC",
         "icon": "$(list-selection)"
+      },
+      {
+        "title": "%command.views.experimentsTree.applyFilters%",
+        "command": "dvc.views.experimentsTree.applyFilters",
+        "category": "DVC",
+        "icon": "$(filter)"
       }
     ],
     "configuration": {
@@ -730,6 +736,11 @@
           "command": "dvc.views.experimentsTree.selectExperiments",
           "group": "inline",
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.experimentsTree.applyFilters",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -752,6 +763,11 @@
           "command": "dvc.views.experimentsTree.selectExperiments",
           "when": "view == dvc.views.experimentsTree",
           "group": "navigation@4"
+        },
+        {
+          "command": "dvc.views.experimentsTree.applyFilters",
+          "when": "view == dvc.views.experimentsTree",
+          "group": "navigation@5"
         },
         {
           "command": "dvc.addExperimentsTableSort",

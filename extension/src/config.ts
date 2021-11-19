@@ -65,9 +65,9 @@ export class Config {
 
   public getTheme(): WebviewColorTheme {
     if (this.vsCodeTheme.kind === ColorThemeKind.Dark) {
-      return WebviewColorTheme.dark
+      return WebviewColorTheme.DARK
     }
-    return WebviewColorTheme.light
+    return WebviewColorTheme.LIGHT
   }
 
   public getCliPath(): string {

@@ -60,9 +60,9 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.status + exampleDvcRoot]: {
-            [paramsDotYamlPath]: Status.indeterminate,
-            [testParamPath]: Status.unselected
+          [MementoPrefixes.STATUS + exampleDvcRoot]: {
+            [paramsDotYamlPath]: Status.INDETERMINATE,
+            [testParamPath]: Status.UNSELECTED
           }
         })
       )
@@ -89,7 +89,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
         })
       )
       expect(model.getColumnsOrder()).toEqual(persistedState)
@@ -99,7 +99,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.columnsOrder + exampleDvcRoot]: [
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: [
             { path: 'A', width: 0 },
             { path: 'B', width: 0 },
             { path: 'C', width: 0 }
@@ -124,7 +124,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
         })
       )
       expect(model.getColumnsOrder()).toEqual(persistedState)
@@ -139,7 +139,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.columnsOrder + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
         })
       )
       const expectedWidth = 77

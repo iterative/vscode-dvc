@@ -34,7 +34,7 @@ beforeEach(() => {
   mockGetState.mockReturnValueOnce({})
   customWindow = window as unknown as CustomWindow
   customWindow.webviewData = {
-    theme: WebviewColorTheme.dark
+    theme: WebviewColorTheme.DARK
   }
 })
 
@@ -48,7 +48,7 @@ describe('App', () => {
       it('Then a message should be sent to the extension on the first render', () => {
         render(<App />)
         expect(mockPostMessage).toHaveBeenCalledWith({
-          type: MessageFromWebviewType.initialized
+          type: MessageFromWebviewType.INITIALIZED
         })
 
         expect(mockPostMessage).toHaveBeenCalledTimes(1)
@@ -72,7 +72,7 @@ describe('App', () => {
           rows: rowsFixture,
           sorts: []
         },
-        type: MessageToWebviewType.setData
+        type: MessageToWebviewType.SET_DATA
       }
     })
 
