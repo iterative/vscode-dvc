@@ -82,7 +82,7 @@ const FirstCell: React.FC<{
   )
 }
 
-const Cell: React.FC<{
+const CellWrapper: React.FC<{
   cell: Cell<Experiment, unknown>
   changes?: string[]
   cellId: string
@@ -156,7 +156,7 @@ export const RowContent: React.FC<
       {cells.map(cell => {
         const cellId = `${cell.column.id}___${cell.row.id}`
         return (
-          <Cell
+          <CellWrapper
             cell={cell}
             changes={changesIfWorkspace}
             key={cellId}
