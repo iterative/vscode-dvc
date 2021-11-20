@@ -2,6 +2,7 @@
 
 $bg-color: var(--vscode-editor-background);
 $row-bg-color: $bg-color;
+$fg-color: var(--vscode-editor-foreground);
 $header-fg-color: var(--vscode-editor-foreground);
 $border-color: grey;
 
@@ -57,7 +58,7 @@ $spinner-color-light: #000;
 }
 
 .bullet {
-  color: var(--vscode-editor-foreground);
+  color: $fg-color;
   display: inline-block;
   width: 24px;
   flex: 0 0 24px;
@@ -155,7 +156,7 @@ $spinner-color-light: #000;
   transform: rotate(45deg);
   right: 1px;
   bottom: 2px;
-  border-color: var(--vscode-editor-foreground);
+  border-color: $fg-color;
 }
 
 .contractedRowArrow {
@@ -168,7 +169,7 @@ $spinner-color-light: #000;
 .errorMessage {
   padding: 0.5rem;
   background-color: var(--vscode-editor-background);
-  border: 1px solid var(--vscode-editor-foreground);
+  border: 1px solid $fg-color;
 }
 
 .experiments {
@@ -472,5 +473,28 @@ $spinner-color-light: #000;
     height: 100%;
     background-color: $header-fg-color;
     opacity: 0.5;
+  }
+}
+
+.copyButton {
+  font-size: 1.5em;
+  display: none;
+  border: none;
+  background: none;
+  color: $fg-color;
+  cursor: pointer;
+}
+
+.td {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  .cellContents {
+    flex: 1;
+  }
+  &:hover {
+    & .copyButton {
+      display: block;
+    }
   }
 }

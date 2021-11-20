@@ -4,6 +4,8 @@ import { Column, Accessor } from 'react-table'
 import { splitParamOrMetricPath } from 'dvc/src/experiments/paramsAndMetrics/paths'
 import { Experiment, ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import { formatFloat } from './numberFormatting'
+import styles from '../components/Table/styles.module.scss'
+import { CopyButton } from '../components/CopyButton'
 
 type Value = string | number
 type FullColumn = Column<Experiment> & {
@@ -21,10 +23,17 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
     return UndefinedCell
   }
 
-  if (typeof value === 'number' && !Number.isInteger(value)) {
-    return <>{formatFloat(value as number)}</>
-  }
-  return <>{String(value)}</>
+  const displayValue =
+    typeof value === 'number' && !Number.isInteger(value)
+      ? formatFloat(value as number)
+      : String(value)
+
+  return (
+    <>
+      <span className={styles.cellContents}>{displayValue}</span>{' '}
+      <CopyButton value={displayValue} />
+    </>
+  )
 }
 
 const getCellComponent = (): React.FC<{ value: Value }> => Cell

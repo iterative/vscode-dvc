@@ -28,6 +28,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.svg$/,
+        use: '@svgr/webpack'
+      },
+      {
         test: /\.less$/,
         use: [
           { loader: styleLoader },
