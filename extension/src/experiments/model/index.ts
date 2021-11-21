@@ -16,6 +16,7 @@ import { definedAndNonEmpty, flatten } from '../../util/array'
 import { ExperimentsOutput } from '../../cli/reader'
 import { LivePlotData } from '../../plots/webview/contract'
 import { hasKey } from '../../util/object'
+import { setContextValue } from '../../vscode/context'
 
 export enum Status {
   SELECTED = 1,
@@ -42,6 +43,7 @@ export class ExperimentsModel {
   private displayName: Record<string, string> = {}
 
   private filters: Map<string, FilterDefinition> = new Map()
+  private useFiltersForSelection = false
 
   private currentSorts: SortDefinition[]
 
@@ -123,6 +125,7 @@ export class ExperimentsModel {
       : Status.SELECTED
     this.status[experimentId] = status
 
+    this.setSelectionMode(false)
     this.persistStatus()
     return status
   }
@@ -159,7 +162,7 @@ export class ExperimentsModel {
 
   public addFilter(filter: FilterDefinition) {
     this.filters.set(getFilterId(filter), filter)
-    this.persistFilters()
+    this.applyAndPersistFilters()
   }
 
   public removeFilters(filters: FilterDefinition[]) {
@@ -168,7 +171,7 @@ export class ExperimentsModel {
 
   public removeFilter(id: string) {
     const result = this.filters.delete(id)
-    this.persistFilters()
+    this.applyAndPersistFilters()
     return result
   }
 
@@ -181,6 +184,7 @@ export class ExperimentsModel {
   }
 
   public setSelectedToFilters() {
+    this.setSelectionMode(true)
     const filtered = this.getSubRows(this.getSelectable()).map(exp => exp.id)
     this.setSelected(filtered)
   }
@@ -313,7 +317,10 @@ export class ExperimentsModel {
     )
   }
 
-  private persistFilters() {
+  private applyAndPersistFilters() {
+    if (this.useFiltersForSelection) {
+      this.setSelectedToFilters()
+    }
     return this.workspaceState.update(
       MementoPrefixes.FILTER_BY + this.dvcRoot,
       [...this.filters]
@@ -400,5 +407,10 @@ export class ExperimentsModel {
 
   private getAssignedColors() {
     return this.colors.assigned
+  }
+
+  private setSelectionMode(useFilters: boolean) {
+    setContextValue('dvc.experiments.filters.applied', useFilters)
+    this.useFiltersForSelection = useFilters
   }
 }

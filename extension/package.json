@@ -790,7 +790,7 @@
         },
         {
           "command": "dvc.views.experimentsTree.applyFilters",
-          "when": "view == dvc.views.experimentsTree",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.filters.applied",
           "group": "navigation@5"
         },
         {
