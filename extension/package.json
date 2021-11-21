@@ -539,8 +539,12 @@
           "when": "false"
         },
         {
-          "command": "dvc.views.experimentsTree.applyFilters",
-          "when": "dvc.commands.available && dvc.project.available"
+          "command": "dvc.views.experimentsTree.autoApplyFilters",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiments.filters.applied"
+        },
+        {
+          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+          "when": "dvc.commands.available && dvc.project.available && dvc.experiments.filters.applied"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
