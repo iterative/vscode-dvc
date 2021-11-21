@@ -318,10 +318,16 @@
         "icon": "$(list-selection)"
       },
       {
-        "title": "%command.views.experimentsTree.applyFilters%",
-        "command": "dvc.views.experimentsTree.applyFilters",
+        "title": "%command.views.experimentsTree.autoApplyFilters%",
+        "command": "dvc.views.experimentsTree.autoApplyFilters",
         "category": "DVC",
         "icon": "$(filter)"
+      },
+      {
+        "title": "%command.views.experimentsTree.disableAutoApplyFilters%",
+        "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+        "category": "DVC",
+        "icon": "$(close)"
       }
     ],
     "configuration": {
@@ -762,9 +768,14 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
-          "command": "dvc.views.experimentsTree.applyFilters",
+          "command": "dvc.views.experimentsTree.autoApplyFilters",
           "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && !dvc.experiments.filters.applied && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filters.applied && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -789,8 +800,13 @@
           "group": "navigation@4"
         },
         {
-          "command": "dvc.views.experimentsTree.applyFilters",
+          "command": "dvc.views.experimentsTree.autoApplyFilters",
           "when": "view == dvc.views.experimentsTree && !dvc.experiments.filters.applied",
+          "group": "navigation@5"
+        },
+        {
+          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+          "when": "view == dvc.views.experimentsTree && dvc.experiments.filters.applied",
           "group": "navigation@5"
         },
         {

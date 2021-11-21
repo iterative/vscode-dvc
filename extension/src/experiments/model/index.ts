@@ -183,8 +183,12 @@ export class ExperimentsModel {
     }, {} as Record<string, Status>)
   }
 
+  public setSelectionMode(useFilters: boolean) {
+    setContextValue('dvc.experiments.filters.applied', useFilters)
+    this.useFiltersForSelection = useFilters
+  }
+
   public setSelectedToFilters() {
-    this.setSelectionMode(true)
     const filtered = this.getSubRows(this.getSelectable()).map(exp => exp.id)
     this.setSelected(filtered)
   }
@@ -407,10 +411,5 @@ export class ExperimentsModel {
 
   private getAssignedColors() {
     return this.colors.assigned
-  }
-
-  private setSelectionMode(useFilters: boolean) {
-    setContextValue('dvc.experiments.filters.applied', useFilters)
-    this.useFiltersForSelection = useFilters
   }
 }

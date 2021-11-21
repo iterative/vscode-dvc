@@ -154,7 +154,7 @@ suite('Experiments Tree Test Suite', () => {
       )
     }).timeout(6000)
 
-    it('should be able to apply filters using dvc.views.experimentsTree.applyFilters', async () => {
+    it('should be able to apply filters using dvc.views.experimentsTree.autoApplyFilters', async () => {
       const { plots, messageSpy } = await buildPlots(disposable)
 
       const unfilteredCheckpointValue = expShowFixture[
@@ -179,7 +179,9 @@ suite('Experiments Tree Test Suite', () => {
         }
       ])
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
 
       expect(
         messageSpy,
@@ -198,7 +200,9 @@ suite('Experiments Tree Test Suite', () => {
         }
       ])
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
 
       expect(
         messageSpy,
@@ -207,7 +211,9 @@ suite('Experiments Tree Test Suite', () => {
       messageSpy.resetHistory()
       mockGetFilters.restore()
 
-      await commands.executeCommand(RegisteredCommands.EXPERIMENT_APPLY_FILTERS)
+      await commands.executeCommand(
+        RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS
+      )
 
       expect(
         messageSpy,
