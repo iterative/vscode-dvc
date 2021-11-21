@@ -23,7 +23,8 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
 }) => {
   const memoizedOnClick = useCallback(() => onClick(id), [id, onClick])
   const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => e.key === 'Enter' && memoizedOnClick(),
+    (e: React.KeyboardEvent<HTMLDivElement>) =>
+      e.key === 'Enter' && memoizedOnClick(),
     [memoizedOnClick]
   )
   return (
