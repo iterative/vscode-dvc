@@ -184,7 +184,7 @@ export class ExperimentsModel {
   }
 
   public setSelectionMode(useFilters: boolean) {
-    setContextValue('dvc.experiments.filters.applied', useFilters)
+    setContextValue('dvc.experiments.filter.selected', useFilters)
     this.useFiltersForSelection = useFilters
   }
 

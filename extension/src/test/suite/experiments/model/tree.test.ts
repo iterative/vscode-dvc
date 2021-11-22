@@ -219,7 +219,7 @@ suite('Experiments Tree Test Suite', () => {
       messageSpy.resetHistory()
     })
 
-    it('should apply filters to experiments selection if dvc.views.experimentsTree.autoApplyFilters has been used', async () => {
+    it('should automatically apply filters to experiments selection if dvc.experiments.filter.selected has been set via dvc.views.experimentsTree.autoApplyFilters', async () => {
       const mockShowQuickPick = stub(window, 'showQuickPick')
       const mockShowInputBox = stub(window, 'showInputBox')
       const { experiments, plots, messageSpy } = await buildPlots(disposable)
@@ -266,7 +266,7 @@ suite('Experiments Tree Test Suite', () => {
 
       expect(
         messageSpy,
-        'the filter is automatically applied and no experiments remains because every record has a loss'
+        'the filter is automatically applied and no experiment remains because every record has a loss'
       ).to.be.calledWith(expectedMessage)
       messageSpy.resetHistory()
 

@@ -540,11 +540,11 @@
         },
         {
           "command": "dvc.views.experimentsTree.autoApplyFilters",
-          "when": "dvc.commands.available && dvc.project.available && !dvc.experiments.filters.applied"
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiments.filter.selected"
         },
         {
           "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
-          "when": "dvc.commands.available && dvc.project.available && dvc.experiments.filters.applied"
+          "when": "dvc.commands.available && dvc.project.available && dvc.experiments.filter.selected"
         },
         {
           "command": "dvc.views.experimentsTree.selectExperiments",
@@ -774,12 +774,12 @@
         {
           "command": "dvc.views.experimentsTree.autoApplyFilters",
           "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && !dvc.experiments.filters.applied && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && !dvc.experiments.filter.selected && viewItem == dvcRoot"
         },
         {
           "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
           "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filters.applied && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filter.selected && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -805,12 +805,12 @@
         },
         {
           "command": "dvc.views.experimentsTree.autoApplyFilters",
-          "when": "view == dvc.views.experimentsTree && !dvc.experiments.filters.applied",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.filter.selected",
           "group": "navigation@5"
         },
         {
           "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
-          "when": "view == dvc.views.experimentsTree && dvc.experiments.filters.applied",
+          "when": "view == dvc.views.experimentsTree && dvc.experiments.filter.selected",
           "group": "navigation@5"
         },
         {
