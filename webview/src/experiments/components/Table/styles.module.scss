@@ -83,17 +83,17 @@ $spinner-color-light: #000;
       width: 4px;
       height: 4px;
       vertical-align: middle;
-      border: 1.5px solid currentColor;
+      border: 1px solid currentColor;
     }
     .queuedExperiment & {
       width: 8px;
       height: 8px;
-      background-image: url('../../../../../extension/resources/dark/clock.svg');
+      background-image: url('dvc/resources/dark/clock.svg');
       background-size: contain;
 
       @at-root {
         :global(.vscode-light) & {
-          background-image: url('../../../../../extension/resources/light/clock.svg');
+          background-image: url('dvc/resources/light/clock.svg');
         }
       }
     }
