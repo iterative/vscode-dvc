@@ -87,3 +87,5 @@ package-lock.json
 
 .vscode-test/
 storybook-static
+
+.DS_Store

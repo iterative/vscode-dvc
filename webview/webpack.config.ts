@@ -29,6 +29,7 @@ module.exports = {
     rules: [
       {
         test: /\.svg$/,
+        type: 'asset/inline',
         use: '@svgr/webpack'
       },
       {
@@ -66,7 +67,7 @@ module.exports = {
       },
       {
         loader: 'file-loader',
-        test: /\.(jpe?g|png|gif|eot|svg|woff|woff2|md)$/i
+        test: /\.(jpe?g|png|gif|eot|woff|woff2|md)$/i
       },
       {
         loader: 'ts-loader',
