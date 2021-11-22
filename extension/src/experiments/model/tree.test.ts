@@ -24,8 +24,14 @@ const {
   mockedGetCheckpoints
 } = buildMockedExperiments()
 
+const mockedClockResource = {
+  dark: Uri.file(join('some', 'light', 'clock')),
+  light: Uri.file(join('some', 'dark', 'clock'))
+}
+
 const mockedGetExperimentsResource = jest.fn()
 const mockedResourceLocator = {
+  clock: mockedClockResource,
   getExperimentsResource: mockedGetExperimentsResource
 } as unknown as ResourceLocator
 
@@ -189,7 +195,7 @@ describe('ExperimentsTree', () => {
           collapsibleState: 0,
           command: undefined,
           dvcRoot: 'repo',
-          iconPath: new ThemeIcon('watch'),
+          iconPath: mockedClockResource,
           id: 'f81f1b5',
           label: 'f81f1b5'
         }
@@ -271,9 +277,6 @@ describe('ExperimentsTree', () => {
         mockedItem = { collapsibleState, uri }
         return mockedItem
       })
-      mockedThemeIcon.mockImplementationOnce(function (id) {
-        return { id }
-      })
 
       const experimentsTree = new ExperimentsTree(
         mockedExperiments,
@@ -284,11 +287,11 @@ describe('ExperimentsTree', () => {
       const treeItem = experimentsTree.getTreeItem({
         collapsibleState: 0,
         dvcRoot: 'demo',
-        iconPath: new ThemeIcon('watch'),
+        iconPath: mockedClockResource,
         id: 'f0778b3',
         label: 'f0778b3'
       })
-      expect(treeItem).toEqual({ ...mockedItem, iconPath: { id: 'watch' } })
+      expect(treeItem).toEqual(mockedItem)
     })
 
     it('should return a tree item for the workspace (running experiment)', () => {

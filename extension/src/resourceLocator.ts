@@ -18,6 +18,7 @@ export class ResourceLocator {
   public readonly emptyCheckbox: Resource
   public readonly indeterminateCheckbox: Resource
   public readonly scatterGraph: Resource
+  public readonly clock: Resource
 
   private extensionUri: Uri
 
@@ -32,6 +33,7 @@ export class ResourceLocator {
     this.indeterminateCheckbox = this.getResourceLocations(
       'checkbox-indeterminate.svg'
     )
+    this.clock = this.getResourceLocations('clock.svg')
   }
 
   public getExperimentsResource(name: IconName, color: string): Uri {
