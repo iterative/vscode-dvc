@@ -183,14 +183,15 @@ export class Experiments extends BaseRepository<TableData> {
       return
     }
 
+    this.experiments.setSelectionMode(false)
     this.experiments.setSelected(selected)
     return this.notifyChanged()
   }
 
-  public autoApplyFilters(enable: boolean) {
-    this.experiments.setSelectionMode(enable)
+  public autoApplyFilters(useFilters: boolean) {
+    this.experiments.setSelectionMode(useFilters)
 
-    if (enable) {
+    if (useFilters) {
       this.experiments.setSelectedToFilters()
       return this.notifyChanged()
     }
