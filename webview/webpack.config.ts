@@ -28,9 +28,16 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.svg$/,
-        type: 'asset/inline',
-        use: '@svgr/webpack'
+        oneOf: [
+          {
+            resourceQuery: /svgr/,
+            use: '@svgr/webpack'
+          },
+          {
+            type: 'asset/inline'
+          }
+        ],
+        test: /\.svg$/
       },
       {
         test: /\.less$/,
