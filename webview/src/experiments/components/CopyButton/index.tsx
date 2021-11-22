@@ -8,8 +8,16 @@ const enum CopyButtonState {
   FAILURE
 }
 
-const SuccessIcon = () => <span className={styles.copySuccess}>&#10004;</span>
-const FailureIcon = () => <span className={styles.copyFailed}>&#10005;</span>
+const SuccessIcon = () => (
+  <span className={styles.copySuccess} title="Copy successful">
+    &#10004;
+  </span>
+)
+const FailureIcon = () => (
+  <span className={styles.copyFailed} title="Copy failed">
+    &#10005;
+  </span>
+)
 
 const copyIconComponents: Partial<Record<CopyButtonState, FC>> = {
   [CopyButtonState.DEFAULT]: CopyIcon,
@@ -23,6 +31,7 @@ export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   const IconComponent = copyIconComponents[state] || CopyIcon
   return (
     <button
+      title="Copy cell contents"
       className={styles.copyButton}
       onClick={() => {
         navigator.clipboard

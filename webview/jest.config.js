@@ -5,7 +5,8 @@ module.exports = {
     __webpack_public_path__: true
   },
   moduleNameMapper: {
-    '\\.(scss|css|less|svg)$': 'identity-obj-proxy'
+    '\\.(scss|css|less)$': 'identity-obj-proxy',
+    '\\.svg$': '<rootDir>/__mocks__/svgrMock.ts'
   },
   preset: 'ts-jest',
   setupFiles: ['jest-canvas-mock'],
