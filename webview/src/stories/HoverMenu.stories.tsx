@@ -42,7 +42,7 @@ const Template: Story<{
   onClick: (id: string) => void
   selectedImage: string
 }> = ({ options, onClick, selectedImage }) => (
-  <HoverMenu>
+  <HoverMenu show>
     {options ? (
       <SelectMenu
         options={options}
