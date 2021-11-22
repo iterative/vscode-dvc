@@ -14,7 +14,7 @@ describe('HoverMenu', () => {
     const insideText = 'I am inside the menu'
     const childrenId = 'children'
     const children = <div data-testid={childrenId}>{insideText}</div>
-    render(<HoverMenu>{children}</HoverMenu>)
+    render(<HoverMenu show>{children}</HoverMenu>)
 
     expect(screen.getByTestId(childrenId).innerHTML).toBe(insideText)
   })
