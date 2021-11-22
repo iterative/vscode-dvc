@@ -31,7 +31,7 @@ export const buildPlots = async (disposer: Disposer, plotsShow = {}) => {
   stub(WorkspaceExperiments.prototype, 'getRepository').returns(experiments)
   stub(WorkspacePlots.prototype, 'getRepository').returns(plots)
 
-  return { messageSpy, mockPlotsShow, plots }
+  return { experiments, messageSpy, mockPlotsShow, plots }
 }
 
 export const getExpectedData = (domain: string[], range: string[]) => {
