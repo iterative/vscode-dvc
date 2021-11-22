@@ -28,6 +28,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.svg$/,
+        type: 'asset/inline'
+      },
+      {
         test: /\.less$/,
         use: [
           { loader: styleLoader },
@@ -62,7 +66,7 @@ module.exports = {
       },
       {
         loader: 'file-loader',
-        test: /\.(jpe?g|png|gif|eot|svg|woff|woff2|md)$/i
+        test: /\.(jpe?g|png|gif|eot|woff|woff2|md)$/i
       },
       {
         loader: 'ts-loader',
