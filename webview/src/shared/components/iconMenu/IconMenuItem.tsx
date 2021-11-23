@@ -9,7 +9,7 @@ export interface IconMenuItemProps {
   tooltip: string
 }
 
-interface IconMenuItemAllProps extends IconMenuItemProps {
+export interface IconMenuItemAllProps extends IconMenuItemProps {
   canShowOnClickNode?: boolean
   index: number
   onMouseOver: (id: string) => void
@@ -62,8 +62,14 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
         onKeyDown={onKeyDown}
+        data-testid="icon-menu-item"
       >
-        <img className={styles.icon} src={icon} alt={tooltip} />
+        <img
+          className={styles.icon}
+          src={icon}
+          alt={tooltip}
+          data-testid="icon-menu-item-icon"
+        />
         <div className={styles.hoverMenu}>
           <HoverMenu show={showTooltip && !showOnClickNode}>
             {tooltip}

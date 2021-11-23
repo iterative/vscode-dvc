@@ -29,5 +29,12 @@ export const HoverMenu: React.FC<HoverMenuProps> = ({
     return () => clearTimeout(timer)
   }, [show, hideWithDelay, isRemoved])
 
-  return (!isRemoved && <div className={classes}>{children}</div>) || null
+  return (
+    (!isRemoved && (
+      <div className={classes} data-testid="hover-menu">
+        {children}
+      </div>
+    )) ||
+    null
+  )
 }
