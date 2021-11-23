@@ -30,7 +30,7 @@ const Cell: React.FC<{ value: Value }> = ({ value }) => {
 
   return (
     <>
-      <span className={styles.cellContents}>{displayValue}</span>{' '}
+      <span className={styles.cellContents}>{displayValue}</span>
       <CopyButton value={displayValue} />
     </>
   )
