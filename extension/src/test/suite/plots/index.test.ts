@@ -40,6 +40,6 @@ suite('Plots Test Suite', () => {
 
       expect(webview.isActive()).to.be.true
       expect(webview.isVisible()).to.be.true
-    }).timeout(6000)
+    }).timeout(8000)
   })
 })
