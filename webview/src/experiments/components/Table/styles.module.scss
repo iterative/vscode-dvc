@@ -159,7 +159,7 @@ $spinner-color-light: #000;
 
 .errorMessage {
   padding: 0.5rem;
-  background-color: var(--vscode-editor-background);
+  background-color: $bg-color;
   border: 1px solid $fg-color;
 }
 
