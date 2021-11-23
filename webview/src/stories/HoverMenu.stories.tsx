@@ -1,10 +1,10 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
+import check from 'dvc/resources/check.svg'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 import { SelectMenuOptionProps } from '../shared/components/selectMenu/SelectMenuOption'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
-import check from '../../../extension/resources/check.svg'
 import { HoverMenu } from '../shared/components/hoverMenu/HoverMenu'
 
 const options: SelectMenuOptionProps[] = [

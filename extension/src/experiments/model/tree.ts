@@ -13,7 +13,7 @@ import { sendViewOpenedTelemetryEvent } from '../../telemetry'
 import { EventName } from '../../telemetry/constants'
 import { definedAndNonEmpty, flatten, joinTruthyItems } from '../../util/array'
 import { createTreeView, getRootItem } from '../../vscode/tree'
-import { IconName, ResourceLocator } from '../../resourceLocator'
+import { IconName, Resource, ResourceLocator } from '../../resourceLocator'
 import { RegisteredCommands } from '../../commands/external'
 import { InternalCommands } from '../../commands/internal'
 
@@ -32,7 +32,7 @@ type ExperimentItem = {
   id: string
   label: string
   collapsibleState: TreeItemCollapsibleState
-  iconPath: ThemeIcon | Uri
+  iconPath: ThemeIcon | Uri | Resource
 }
 
 export class ExperimentsTree
@@ -162,13 +162,13 @@ export class ExperimentsTree
     running?: boolean
     queued?: boolean
     selected?: boolean
-  }): ThemeIcon | Uri {
+  }): ThemeIcon | Uri | Resource {
     if (displayName === 'workspace' || running) {
       return this.getUriOrIcon(displayColor, IconName.LOADING_SPIN)
     }
 
     if (queued) {
-      return new ThemeIcon('watch')
+      return this.resourceLocator.clock
     }
 
     const iconName = this.getIconName(selected)

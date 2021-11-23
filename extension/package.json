@@ -318,10 +318,16 @@
         "icon": "$(list-selection)"
       },
       {
-        "title": "%command.views.experimentsTree.applyFilters%",
-        "command": "dvc.views.experimentsTree.applyFilters",
+        "title": "%command.views.experimentsTree.autoApplyFilters%",
+        "command": "dvc.views.experimentsTree.autoApplyFilters",
         "category": "DVC",
         "icon": "$(filter)"
+      },
+      {
+        "title": "%command.views.experimentsTree.disableAutoApplyFilters%",
+        "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+        "category": "DVC",
+        "icon": "$(close)"
       }
     ],
     "configuration": {
@@ -360,6 +366,14 @@
     ],
     "menus": {
       "commandPalette": [
+        {
+          "command": "dvc.addExperimentsTableFilter",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.addExperimentsTableSort",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
         {
           "command": "dvc.addTarget",
           "when": "false"
@@ -457,6 +471,14 @@
           "when": "dvc.commands.available && dvc.project.available"
         },
         {
+          "command": "dvc.removeExperimentsTableFilters",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
+          "command": "dvc.removeExperimentsTableSorts",
+          "when": "dvc.commands.available && dvc.project.available"
+        },
+        {
           "command": "dvc.removeTarget",
           "when": "false"
         },
@@ -515,6 +537,18 @@
         {
           "command": "dvc.views.experimentsSortByTree.removeSort",
           "when": "false"
+        },
+        {
+          "command": "dvc.views.experimentsTree.autoApplyFilters",
+          "when": "dvc.commands.available && dvc.project.available && !dvc.experiments.filter.selected"
+        },
+        {
+          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+          "when": "dvc.commands.available && dvc.project.available && dvc.experiments.filter.selected"
+        },
+        {
+          "command": "dvc.views.experimentsTree.selectExperiments",
+          "when": "dvc.commands.available && dvc.project.available"
         }
       ],
       "scm/title": [
@@ -738,9 +772,14 @@
           "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
         },
         {
-          "command": "dvc.views.experimentsTree.applyFilters",
+          "command": "dvc.views.experimentsTree.autoApplyFilters",
           "group": "inline",
-          "when": "view == dvc.views.experimentsTree && dvc.commands.available && viewItem == dvcRoot"
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && !dvc.experiments.filter.selected && viewItem == dvcRoot"
+        },
+        {
+          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+          "group": "inline",
+          "when": "view == dvc.views.experimentsTree && dvc.commands.available && dvc.experiments.filter.selected && viewItem == dvcRoot"
         }
       ],
       "view/title": [
@@ -765,8 +804,13 @@
           "group": "navigation@4"
         },
         {
-          "command": "dvc.views.experimentsTree.applyFilters",
-          "when": "view == dvc.views.experimentsTree",
+          "command": "dvc.views.experimentsTree.autoApplyFilters",
+          "when": "view == dvc.views.experimentsTree && !dvc.experiments.filter.selected",
+          "group": "navigation@5"
+        },
+        {
+          "command": "dvc.views.experimentsTree.disableAutoApplyFilters",
+          "when": "view == dvc.views.experimentsTree && dvc.experiments.filter.selected",
           "group": "navigation@5"
         },
         {

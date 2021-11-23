@@ -82,29 +82,31 @@ const FirstCell: React.FC<{
   )
 }
 
-const getCells = (cells: Cell<Experiment, unknown>[], changes?: string[]) =>
-  cells.map(cell => (
-    <div
-      {...cell.getCellProps({
-        className: cx(
-          styles.td,
-          cell.isPlaceholder && styles.groupPlaceholder,
-          cell.column.isGrouped && styles.groupedColumnCell,
-          cell.isGrouped && styles.groupedCell,
-          {
-            [styles.metaCell]: ['timestamp', 'epochs'].includes(
-              cell.column.id.split(':').reverse()[0]
-            ),
-            [styles.workspaceChange]: changes?.includes(cell.column.id)
-          }
-        )
-      })}
-      key={`${cell.column.id}___${cell.row.id}`}
-      data-testid={`${cell.column.id}___${cell.row.id}`}
-    >
-      {cell.isPlaceholder ? null : cell.render('Cell')}
-    </div>
-  ))
+const CellWrapper: React.FC<{
+  cell: Cell<Experiment, unknown>
+  changes?: string[]
+  cellId: string
+}> = ({ cell, cellId, changes }) => (
+  <div
+    {...cell.getCellProps({
+      className: cx(
+        styles.td,
+        cell.isPlaceholder && styles.groupPlaceholder,
+        cell.column.isGrouped && styles.groupedColumnCell,
+        cell.isGrouped && styles.groupedCell,
+        {
+          [styles.metaCell]: ['timestamp', 'epochs'].includes(
+            cell.column.id.split(':').reverse()[0]
+          ),
+          [styles.workspaceChange]: changes?.includes(cell.column.id)
+        }
+      )
+    })}
+    data-testid={cellId}
+  >
+    {cell.isPlaceholder ? null : cell.render('Cell')}
+  </div>
+)
 
 const getExperimentTypeClass = ({ running, queued, selected }: Experiment) => {
   if (running) {
@@ -134,6 +136,7 @@ export const RowContent: React.FC<
   changes
 }): JSX.Element => {
   const isWorkspace = id === 'workspace'
+  const changesIfWorkspace = isWorkspace ? changes : undefined
   return (
     <div
       {...getRowProps({
@@ -150,7 +153,17 @@ export const RowContent: React.FC<
       data-testid={isWorkspace && 'workspace-row'}
     >
       <FirstCell cell={firstCell} bulletColor={original.displayColor} />
-      {getCells(cells, isWorkspace ? changes : undefined)}
+      {cells.map(cell => {
+        const cellId = `${cell.column.id}___${cell.row.id}`
+        return (
+          <CellWrapper
+            cell={cell}
+            changes={changesIfWorkspace}
+            key={cellId}
+            cellId={cellId}
+          />
+        )
+      })}
     </div>
   )
 }

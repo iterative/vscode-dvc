@@ -83,26 +83,17 @@ $spinner-color-light: #000;
       width: 4px;
       height: 4px;
       vertical-align: middle;
-      border: 1.5px solid currentColor;
+      border: 1px solid currentColor;
     }
     .queuedExperiment & {
-      background: conic-gradient(
-        from 180deg at 50% 50%,
-        rgba(255, 255, 255, 0.5) 0deg,
-        rgba(255, 255, 255, 0) 180.31deg,
-        rgba(255, 255, 255, 0) 360deg
-      );
-      border: 1px solid $spinner-color;
+      width: 12px;
+      height: 12px;
+      background-image: url('dvc/resources/dark/clock.svg');
+      background-size: contain;
 
       @at-root {
         :global(.vscode-light) & {
-          background: conic-gradient(
-            from 180deg at 50% 50%,
-            rgba($spinner-color-light, 0.5) 0deg,
-            rgba($spinner-color-light, 0) 180.31deg,
-            rgba($spinner-color-light, 0) 360deg
-          );
-          border-color: $spinner-color-light;
+          background-image: url('dvc/resources/light/clock.svg');
         }
       }
     }

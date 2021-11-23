@@ -118,7 +118,12 @@ export const registerExperimentCommands = (
   registerExperimentRunCommands(experiments, internalCommands)
 
   internalCommands.registerExternalCommand(
-    RegisteredCommands.EXPERIMENT_APPLY_FILTERS,
-    (dvcRoot?: string) => experiments.applyFilters(dvcRoot)
+    RegisteredCommands.EXPERIMENT_AUTO_APPLY_FILTERS,
+    (dvcRoot?: string) => experiments.autoApplyFilters(true, dvcRoot)
+  )
+
+  internalCommands.registerExternalCommand(
+    RegisteredCommands.EXPERIMENT_DISABLE_AUTO_APPLY_FILTERS,
+    (dvcRoot?: string) => experiments.autoApplyFilters(false, dvcRoot)
   )
 }
