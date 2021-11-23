@@ -199,7 +199,7 @@ suite('Tracked Explorer Tree Test Suite', () => {
       await activeEditorChanged
 
       expect(getActiveTextEditorFilename()).to.equal(fileToOpen)
-    }).timeout(5000)
+    }).timeout(8000)
 
     it('should be able to open a file to the side', async () => {
       const fileToOpen = join(dvcDemoPath, 'logs.json')
