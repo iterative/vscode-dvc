@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
-import CopyIcon from '../Table/copy.svg?svgr'
+import CopyIcon from '../Table/copy.svg'
 import styles from '../Table/styles.module.scss'
 
 const enum CopyButtonState {
