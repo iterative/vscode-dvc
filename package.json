@@ -41,7 +41,8 @@
     "build-storybook": "yarn workspace dvc-vscode-webview build-storybook",
     "chromatic": "yarn workspace dvc-vscode-webview chromatic",
     "setup:venv": "sh ./scripts/virtualenv-install.sh",
-    "create-svgs": "ts-node ./scripts/create-svgs.ts"
+    "create-svgs": "ts-node ./scripts/create-svgs.ts",
+    "svgr": "yarn workspace dvc-vscode-webview svgr"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",
