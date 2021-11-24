@@ -5,7 +5,6 @@
     "**/*.stories.*",
     "extension/src/test/**",
     "extension/src/vscode.proposed.d.ts",
-    "webview/src/react-table-config.d.ts",
-    "webview/.storybook/**"
+    "webview/src/react-table-config.d.ts"
   ]
 }
