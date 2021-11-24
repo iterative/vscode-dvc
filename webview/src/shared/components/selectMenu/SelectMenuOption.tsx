@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import styles from './styles.module.scss'
+import { AllIcons, Icon } from '../icon/Icon'
 
 export interface SelectMenuOptionProps {
   id: string
@@ -9,7 +10,6 @@ export interface SelectMenuOptionProps {
 
 interface SelectMenuOptionAllProps extends SelectMenuOptionProps {
   onClick: (id: string) => void
-  selectedImage: string
   index: number
 }
 
@@ -18,7 +18,6 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
   label,
   isSelected,
   onClick,
-  selectedImage,
   index
 }) => {
   const memoizedOnClick = useCallback(() => onClick(id), [id, onClick])
@@ -41,10 +40,10 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
         {label}
       </div>
       {isSelected && (
-        <img
+        <Icon
+          name={AllIcons.CHECK}
+          width={13}
           data-testid="select-menu-option-check"
-          src={selectedImage}
-          alt="selected"
         />
       )}
     </div>

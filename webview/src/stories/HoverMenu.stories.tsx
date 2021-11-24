@@ -1,6 +1,5 @@
 import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
-import check from 'dvc/resources/check.svg'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 import { SelectMenuOptionProps } from '../shared/components/selectMenu/SelectMenuOption'
 import '../shared/style.scss'
@@ -40,15 +39,10 @@ const Template: Story<{
   children: React.ReactNode
   options?: SelectMenuOptionProps[]
   onClick: (id: string) => void
-  selectedImage: string
-}> = ({ options, onClick, selectedImage }) => (
-  <HoverMenu show>
+}> = ({ options, onClick }) => (
+  <HoverMenu>
     {options ? (
-      <SelectMenu
-        options={options}
-        onClick={onClick}
-        selectedImage={selectedImage}
-      />
+      <SelectMenu options={options} onClick={onClick} />
     ) : (
       <div>Tooltip</div>
     )}
@@ -59,8 +53,7 @@ export const Tooltip = Template.bind({})
 
 export const MultiSelect = Template.bind({})
 MultiSelect.args = {
-  options,
-  selectedImage: check
+  options
 }
 MultiSelect.argTypes = {
   onClick: { action: 'clicked' }

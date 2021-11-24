@@ -10,7 +10,8 @@
     "test-staged": "lint-staged",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "chromatic": "npx chromatic --project-token fexq6zfy6"
+    "chromatic": "npx chromatic --project-token fexq6zfy6",
+    "svgr": "svgr -d src/shared/components/icons icons/"
   },
   "main": "./index.js",
   "peerDependencies": {
@@ -41,6 +42,7 @@
     "@storybook/manager-webpack5": "^6.3.12",
     "@storybook/preset-scss": "^1.0.3",
     "@storybook/react": "^6.3.12",
+    "@svgr/cli": "^5.5.0",
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",
     "@types/classnames": "^2.2.9",
@@ -76,5 +78,10 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "jest --bail --findRelatedTests"
+  },
+  "svgr": {
+    "typescript": true,
+    "dimensions": false,
+    "ignoreExisting": true
   }
 }
