@@ -30,11 +30,14 @@ export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   const timer = useRef<number>()
   const [state, setState] = useState<CopyButtonState>(CopyButtonState.DEFAULT)
   const IconComponent = copyIconComponents[state]
-  useEffect(() => () => {
-    if (timer.current) {
-      window.clearTimeout(timer.current)
-    }
-  })
+  useEffect(
+    () => () => {
+      if (timer.current) {
+        window.clearTimeout(timer.current)
+      }
+    },
+    []
+  )
   return (
     <button
       title="Copy cell contents"
