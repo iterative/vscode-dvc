@@ -13,13 +13,14 @@ const SuccessIcon = () => (
     &#10004;
   </span>
 )
+
 const FailureIcon = () => (
   <span className={styles.copyFailed} title="Copy failed">
     &#10005;
   </span>
 )
 
-const copyIconComponents: Partial<Record<CopyButtonState, FC>> = {
+const copyIconComponents: Record<CopyButtonState, FC> = {
   [CopyButtonState.DEFAULT]: CopyIcon,
   [CopyButtonState.SUCCESS]: SuccessIcon,
   [CopyButtonState.FAILURE]: FailureIcon
@@ -28,7 +29,7 @@ const copyIconComponents: Partial<Record<CopyButtonState, FC>> = {
 export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   const timer = useRef<number>()
   const [state, setState] = useState<CopyButtonState>(CopyButtonState.DEFAULT)
-  const IconComponent = copyIconComponents[state] || CopyIcon
+  const IconComponent = copyIconComponents[state]
   useEffect(() => () => {
     if (timer.current) {
       window.clearTimeout(timer.current)
