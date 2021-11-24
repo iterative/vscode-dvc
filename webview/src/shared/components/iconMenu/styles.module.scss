@@ -15,6 +15,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
+  cursor: pointer;
 
   &:hover {
     background-color: rgba(#fff, 0.1);
@@ -31,4 +32,5 @@
   top: 25px;
   left: 10px;
   width: max-content;
+  cursor: initial;
 }
