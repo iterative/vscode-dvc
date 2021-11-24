@@ -6,7 +6,6 @@ import pencil from 'dvc/resources/pencil.svg'
 import downArrow from 'dvc/resources/down-arrow.svg'
 import upArrow from 'dvc/resources/up-arrow.svg'
 import lines from 'dvc/resources/lines.svg'
-import check from 'dvc/resources/check.svg'
 import dots from 'dvc/resources/dots.svg'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 
@@ -51,7 +50,6 @@ const items: IconMenuItemProps[] = [
           }
         ]}
         onClick={(id: string) => alert('selected ' + id)}
-        selectedImage={check}
       />
     ),
     tooltip: 'Choose metrics'
@@ -78,7 +76,6 @@ const items: IconMenuItemProps[] = [
           }
         ]}
         onClick={(id: string) => alert('selected ' + id)}
-        selectedImage={check}
       />
     ),
     tooltip: 'View'
