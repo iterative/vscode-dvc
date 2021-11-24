@@ -9,9 +9,9 @@ import {
   getByTitle,
   act,
   waitFor,
-  findByTitle
+  findByTitle,
+  fireEvent
 } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { CopyButton } from '.'
 
 const mockWriteText = jest.fn()
@@ -38,7 +38,13 @@ describe('CopyButton', () => {
     const { container } = render(<CopyButton value={exampleCopyText} />)
     const copyButtonElement = getByTitle(container, defaultStateTitle)
     await act(async () => {
-      userEvent.click(copyButtonElement)
+      fireEvent(
+        copyButtonElement,
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true
+        })
+      )
       await waitFor(() => findByTitle(container, successStateTitle))
     })
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
@@ -55,7 +61,13 @@ describe('CopyButton', () => {
     const { container } = render(<CopyButton value={exampleCopyText} />)
     const copyButtonElement = getByTitle(container, defaultStateTitle)
     await act(async () => {
-      userEvent.click(copyButtonElement)
+      fireEvent(
+        copyButtonElement,
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true
+        })
+      )
       await waitFor(() => findByTitle(container, failureStateTitle))
     })
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
@@ -74,7 +86,13 @@ describe('CopyButton', () => {
 
     // Click once
     await act(async () => {
-      userEvent.click(copyButtonElement)
+      fireEvent(
+        copyButtonElement,
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true
+        })
+      )
       await waitFor(() => findByTitle(container, successStateTitle))
     })
     jest.advanceTimersByTime(500)
@@ -82,7 +100,13 @@ describe('CopyButton', () => {
     // Click again while still in success state
     mockWriteText.mockResolvedValueOnce(undefined)
     await act(async () => {
-      userEvent.click(copyButtonElement)
+      fireEvent(
+        copyButtonElement,
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true
+        })
+      )
       await waitFor(() => findByTitle(container, successStateTitle))
     })
 

@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "@hediet/std": "^0.6.0",
-    "@testing-library/user-event": "^13.5.0",
     "classnames": "^2.2.6",
     "dayjs": "^1.9.6",
     "mobx": "^6.3.7",
