@@ -1,4 +1,4 @@
-import React, { FC, useRef, useState } from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import CopyIcon from '../Table/copy.svg?svgr'
 import styles from '../Table/styles.module.scss'
 
@@ -29,6 +29,11 @@ export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   const timer = useRef<number>()
   const [state, setState] = useState<CopyButtonState>(CopyButtonState.DEFAULT)
   const IconComponent = copyIconComponents[state] || CopyIcon
+  useEffect(() => () => {
+    if (timer.current) {
+      window.clearTimeout(timer.current)
+    }
+  })
   return (
     <button
       title="Copy cell contents"
