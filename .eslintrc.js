@@ -19,7 +19,6 @@ module.exports = {
     '**/dist/**',
     'webview/storybook-static/**',
     'extension/vscode-test/**',
-    'extension/src/vscode.proposed.d.ts',
     'extension/src/test/fixtures/**'
   ],
   overrides: [

@@ -1026,7 +1026,6 @@
       }
     ]
   },
-  "enableProposedApi": true,
   "scripts": {
     "dev": "shx rm -rf dist && tsc -watch -p ./",
     "build": "yarn build-webpack && yarn package",
