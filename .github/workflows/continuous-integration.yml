@@ -27,27 +27,6 @@ jobs:
           node-version: '14'
           cache: 'yarn'
 
-      - uses: actions/cache@v2
-        name: Restore NYC cache
-        id: nyc-cache
-        with:
-          path: extension/.cache/nyc
-          key: nyc
-
-      - uses: actions/cache@v2
-        name: Restore ESLint cache
-        id: eslint-cache
-        with:
-          path: .eslintcache
-          key: eslint-cache
-
-      - uses: actions/cache@v2
-        name: Restore .vscode-test cache
-        id: vscode-cache
-        with:
-          path: extension/.vscode-test
-          key: vscode-test
-
       - run: yarn run install-frozen-lockfile
 
       - run: yarn run lint
