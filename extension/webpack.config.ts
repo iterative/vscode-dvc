@@ -1,8 +1,7 @@
 import { join, resolve } from 'path'
-import * as webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { readFileSync } from 'fs-extra'
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 
 const r = (file: string) => resolve(__dirname, file)
 
@@ -28,7 +27,7 @@ const includeFiles = () =>
     }))
   })
 
-module.exports = {
+export default {
   devtool: 'source-map',
   entry: r('./src/extension'),
   externals: {
@@ -69,4 +68,4 @@ module.exports = {
     symlinks: false
   },
   target: 'node'
-} as webpack.Configuration
+}
