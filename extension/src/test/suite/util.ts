@@ -82,7 +82,7 @@ export const closeAllEditors = async () => {
   }
 }
 
-export class FakeTimersDisposable {
+class FakeTimersDisposable {
   clock = useFakeTimers({
     now: new Date(),
     toFake: ['setTimeout', 'Date']
@@ -90,6 +90,7 @@ export class FakeTimersDisposable {
 
   public advance(ms: number) {
     this.clock.tick(ms)
+    this.clock.runAll()
   }
 
   public dispose() {
@@ -97,3 +98,8 @@ export class FakeTimersDisposable {
     this.clock.restore()
   }
 }
+
+export const mockTime = (disposer: Disposer): FakeTimersDisposable =>
+  disposer.track(new FakeTimersDisposable())
+
+export type FakeTimers = InstanceType<typeof FakeTimersDisposable>
