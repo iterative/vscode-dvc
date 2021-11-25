@@ -40,7 +40,7 @@ const Template: Story<{
   options?: SelectMenuOptionProps[]
   onClick: (id: string) => void
 }> = ({ options, onClick }) => (
-  <HoverMenu>
+  <HoverMenu show>
     {options ? (
       <SelectMenu options={options} onClick={onClick} />
     ) : (

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, useFakeTimers } from 'sinon'
+import { stub, restore } from 'sinon'
 import { window, commands, QuickPickItem } from 'vscode'
 import { buildMultiRepoExperiments, buildSingleRepoExperiments } from './util'
 import { Disposable } from '../../../extension'
@@ -9,7 +9,7 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, dvcDemoPath } from '../util'
+import { closeAllEditors, dvcDemoPath, FakeTimersDisposable } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
@@ -99,13 +99,10 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const clock = useFakeTimers()
+      const fakeTimers = disposable.track(new FakeTimersDisposable())
       const duration = 54321
 
-      stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
-        clock.tick(duration)
-        return Promise.resolve('true')
-      })
+      stub(CliExecutor.prototype, 'experimentRunQueue').resolves('true')
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
@@ -115,19 +112,22 @@ suite('Workspace Experiments Test Suite', () => {
         'getOnlyOrPickProject'
       ).returns(dvcDemoPath)
 
-      await commands.executeCommand(RegisteredCliCommands.QUEUE_EXPERIMENT)
+      const queueExperiment = commands.executeCommand(
+        RegisteredCliCommands.QUEUE_EXPERIMENT
+      )
+      fakeTimers.advance(duration)
+
+      await queueExperiment
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
         RegisteredCliCommands.QUEUE_EXPERIMENT,
         undefined,
         { duration }
       )
-
-      clock.restore()
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      const clock = useFakeTimers()
+      const fakeTimers = disposable.track(new FakeTimersDisposable())
       const duration = 77777
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'
@@ -137,7 +137,7 @@ suite('Workspace Experiments Test Suite', () => {
       )
 
       stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
-        clock.tick(duration)
+        fakeTimers.advance(duration)
         throw new Error(mockErrorMessage)
       })
 
@@ -158,8 +158,6 @@ suite('Workspace Experiments Test Suite', () => {
       )
       expect(mockGenericError, 'the generic error should be shown').to.be
         .calledOnce
-
-      clock.restore()
     })
   })
 
