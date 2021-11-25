@@ -90,6 +90,7 @@ export class FakeTimersDisposable {
 
   public advance(ms: number) {
     this.clock.tick(ms)
+    this.clock.runAll()
   }
 
   public dispose() {
