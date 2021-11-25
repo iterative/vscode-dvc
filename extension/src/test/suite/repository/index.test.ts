@@ -130,6 +130,6 @@ suite('Repository Test Suite', () => {
       expect(mockList).to.be.calledOnce
       expect(mockDiff).to.be.calledTwice
       expect(mockStatus).to.be.calledTwice
-    }).timeout(8000)
+    })
   })
 })
