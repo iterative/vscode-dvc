@@ -9,7 +9,7 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, dvcDemoPath, FakeTimersDisposable } from '../util'
+import { closeAllEditors, dvcDemoPath, mockTime } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
@@ -99,7 +99,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const fakeTimers = disposable.track(new FakeTimersDisposable())
+      const fakeTimers = mockTime(disposable)
       const duration = 54321
 
       stub(CliExecutor.prototype, 'experimentRunQueue').resolves('true')
@@ -127,7 +127,7 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      const fakeTimers = disposable.track(new FakeTimersDisposable())
+      const fakeTimers = mockTime(disposable)
       const duration = 77777
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'

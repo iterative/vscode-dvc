@@ -6,16 +6,16 @@ import { CliReader } from '../../../cli/reader'
 import { Config } from '../../../config'
 import { InternalCommands } from '../../../commands/internal'
 import { Repository } from '../../../repository'
-import { dvcDemoPath, FakeTimersDisposable } from '../util'
+import { dvcDemoPath, FakeTimers, mockTime } from '../util'
 import { OutputChannel } from '../../../vscode/outputChannel'
 
 suite('Repository Test Suite', () => {
   const disposable = Disposable.fn()
-  let fakeTimers: FakeTimersDisposable
+  let fakeTimers: FakeTimers
 
   beforeEach(() => {
     restore()
-    fakeTimers = disposable.track(new FakeTimersDisposable())
+    fakeTimers = mockTime(disposable)
   })
 
   afterEach(() => {
@@ -130,6 +130,6 @@ suite('Repository Test Suite', () => {
       expect(mockList).to.be.calledOnce
       expect(mockDiff).to.be.calledTwice
       expect(mockStatus).to.be.calledTwice
-    }).timeout(8000)
+    })
   })
 })

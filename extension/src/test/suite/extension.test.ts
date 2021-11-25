@@ -6,7 +6,7 @@ import { window, commands, workspace, Uri } from 'vscode'
 import {
   closeAllEditors,
   configurationChangeEvent,
-  FakeTimersDisposable,
+  mockTime,
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
@@ -302,7 +302,7 @@ suite('Extension Test Suite', () => {
     }).timeout(25000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
-      disposable.track(new FakeTimersDisposable())
+      mockTime(disposable)
       const mockErrorMessage = 'NOPE'
       stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
@@ -321,7 +321,7 @@ suite('Extension Test Suite', () => {
 
   describe('dvc.stopRunningExperiment', () => {
     it('should send a telemetry event containing properties relating to the event', async () => {
-      const fakeTimers = disposable.track(new FakeTimersDisposable())
+      const fakeTimers = mockTime(disposable)
       const duration = 1234
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 

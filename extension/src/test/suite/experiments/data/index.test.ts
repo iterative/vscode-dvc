@@ -7,11 +7,7 @@ import { Disposable } from '../../../../extension'
 import { CliReader } from '../../../../cli/reader'
 import expShowFixture from '../../../fixtures/expShow/output'
 import { Config } from '../../../../config'
-import {
-  dvcDemoPath,
-  FakeTimersDisposable,
-  getFirstArgOfCall
-} from '../../util'
+import { dvcDemoPath, getFirstArgOfCall, mockTime } from '../../util'
 import { OutputChannel } from '../../../../vscode/outputChannel'
 import { ExperimentsData } from '../../../../experiments/data'
 import { InternalCommands } from '../../../../commands/internal'
@@ -108,7 +104,7 @@ suite('Experiments Data Test Suite', () => {
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
 
-      const fakeTimers = disposable.track(new FakeTimersDisposable())
+      const fakeTimers = mockTime(disposable)
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
