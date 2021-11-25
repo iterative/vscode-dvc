@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { SinonSpy, SinonStub } from 'sinon'
+import { SinonSpy, SinonStub, useFakeTimers } from 'sinon'
 import {
   commands,
   ConfigurationChangeEvent,
@@ -79,5 +79,21 @@ export const getActiveTextEditorFilename = (): string | undefined =>
 export const closeAllEditors = async () => {
   if (definedAndNonEmpty(window.visibleTextEditors)) {
     await commands.executeCommand('workbench.action.closeAllEditors')
+  }
+}
+
+export class FakeTimersDisposable {
+  clock = useFakeTimers({
+    now: new Date(),
+    toFake: ['setTimeout', 'Date']
+  })
+
+  public advance(ms: number) {
+    this.clock.tick(ms)
+  }
+
+  public dispose() {
+    this.clock.runAll()
+    this.clock.restore()
   }
 }
