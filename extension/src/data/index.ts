@@ -124,7 +124,12 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     return this.dispose.track(
       createFileSystemWatcher(
         join(this.dvcRoot, '**', `{${files.join(',')}}`),
-        () => this.update()
+        path => {
+          if (!path) {
+            return
+          }
+          this.update()
+        }
       )
     )
   }
