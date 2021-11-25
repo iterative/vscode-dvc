@@ -3,8 +3,9 @@
  */
 import React from 'react'
 import {
-  render,
+  act,
   cleanup,
+  render,
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
@@ -53,7 +54,9 @@ describe('HoverMenu', () => {
 
     expect(screen.queryAllByTestId('hover-menu').length).toBe(1)
 
-    jest.runOnlyPendingTimers()
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
 
     expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
   })
