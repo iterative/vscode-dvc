@@ -25,7 +25,6 @@ export default {
     reactDocgen: false
   },
   webpackFinal: (config: Configuration) => {
-    console.log(config.module)
     return {
       ...config,
       module: webpackConfig.module
