@@ -3,10 +3,11 @@
  */
 import React from 'react'
 import {
-  render,
+  act,
   cleanup,
-  screen,
   fireEvent,
+  render,
+  screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
@@ -151,7 +152,9 @@ describe('IconMenuItem', () => {
 
     fireEvent.blur(screen.getByTestId('icon-menu-item'))
 
-    jest.advanceTimersByTime(1500)
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
 
     expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
   })
