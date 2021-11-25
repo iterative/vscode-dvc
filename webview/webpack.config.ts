@@ -1,6 +1,6 @@
 import { resolve } from 'path'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 
 const r = (file: string) => resolve(__dirname, file)
 
