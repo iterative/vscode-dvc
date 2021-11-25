@@ -2,6 +2,8 @@ $background: var(--vscode-editor-background);
 
 .item {
   display: flex;
+  cursor: pointer;
+  height: 20px;
 }
 
 .itemLabel {
