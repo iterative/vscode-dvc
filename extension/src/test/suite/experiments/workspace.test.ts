@@ -9,7 +9,7 @@ import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import * as QuickPick from '../../../vscode/quickPick'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, dvcDemoPath, mockTime } from '../util'
+import { closeAllEditors, dvcDemoPath, mockDuration } from '../util'
 import { RegisteredCliCommands } from '../../../commands/external'
 import * as Telemetry from '../../../telemetry'
 import { CliRunner } from '../../../cli/runner'
@@ -99,8 +99,8 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing a duration when an experiment is queued', async () => {
-      const fakeTimers = mockTime(disposable)
       const duration = 54321
+      mockDuration(duration)
 
       stub(CliExecutor.prototype, 'experimentRunQueue').resolves('true')
 
@@ -115,7 +115,6 @@ suite('Workspace Experiments Test Suite', () => {
       const queueExperiment = commands.executeCommand(
         RegisteredCliCommands.QUEUE_EXPERIMENT
       )
-      fakeTimers.advance(duration)
 
       await queueExperiment
 
@@ -127,8 +126,9 @@ suite('Workspace Experiments Test Suite', () => {
     })
 
     it('should send a telemetry event containing an error message when an experiment fails to queue', async () => {
-      const fakeTimers = mockTime(disposable)
       const duration = 77777
+      mockDuration(duration)
+
       const mockErrorMessage =
         'ERROR: unexpected error - [Errno 2] No such file or directory'
 
@@ -137,7 +137,6 @@ suite('Workspace Experiments Test Suite', () => {
       )
 
       stub(CliExecutor.prototype, 'experimentRunQueue').callsFake(() => {
-        fakeTimers.advance(duration)
         throw new Error(mockErrorMessage)
       })
 

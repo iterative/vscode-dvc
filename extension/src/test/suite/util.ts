@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { SinonSpy, SinonStub, useFakeTimers } from 'sinon'
+import { SinonSpy, SinonStub, stub } from 'sinon'
 import {
   commands,
   ConfigurationChangeEvent,
@@ -11,6 +11,7 @@ import {
 import { Experiments } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
+import * as Time from '../../util/time'
 
 export const dvcDemoPath = Uri.file(
   resolve(__dirname, '..', '..', '..', '..', 'demo')
@@ -82,24 +83,9 @@ export const closeAllEditors = async () => {
   }
 }
 
-class FakeTimersDisposable {
-  clock = useFakeTimers({
-    now: new Date(),
-    toFake: ['setTimeout', 'Date']
-  })
-
-  public advance(ms: number) {
-    this.clock.tick(ms)
-    this.clock.runAll()
-  }
-
-  public dispose() {
-    this.clock.runAll()
-    this.clock.restore()
-  }
-}
-
-export const mockTime = (disposer: Disposer): FakeTimersDisposable =>
-  disposer.track(new FakeTimersDisposable())
-
-export type FakeTimers = InstanceType<typeof FakeTimersDisposable>
+export const mockDuration = (duration: number) =>
+  stub(Time, 'getCurrentEpoch')
+    .onFirstCall()
+    .returns(0)
+    .onSecondCall()
+    .returns(duration)
