@@ -327,9 +327,7 @@ suite('Extension Test Suite', () => {
 
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      const stop = commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
-
-      await stop
+      await commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
         RegisteredCommands.STOP_EXPERIMENT,
