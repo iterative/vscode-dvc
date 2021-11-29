@@ -61,7 +61,7 @@ describe('IconMenuItem', () => {
 
     fireEvent.mouseLeave(screen.getByTestId('icon-menu-item'))
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('hover-menu'))
+    await waitForElementToBeRemoved(() => screen.queryByTestId('hover-menu'))
 
     expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
