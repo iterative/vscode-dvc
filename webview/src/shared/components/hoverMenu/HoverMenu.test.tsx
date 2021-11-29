@@ -40,7 +40,7 @@ describe('HoverMenu', () => {
     )
     rerender(<HoverMenu>Bye!</HoverMenu>)
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('hover-menu'))
+    await waitForElementToBeRemoved(() => screen.queryByTestId('hover-menu'))
 
     expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })

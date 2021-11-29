@@ -22,6 +22,7 @@ module.exports = {
   ],
   overrides: [
     {
+      extends: ['plugin:testing-library/react'],
       // Jest tests rely on a lot of undefined globals
       files: ['**/*.test.*'],
       rules: {
@@ -59,10 +60,11 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'jest',
-    'react-hooks',
     'jsx-a11y',
+    'react-hooks',
     'sonarjs',
-    'sort-keys-fix'
+    'sort-keys-fix',
+    'testing-library'
   ],
   root: true,
   rules: {
