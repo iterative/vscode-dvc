@@ -2,6 +2,7 @@ import { join, resolve } from 'path'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { readFileSync } from 'fs-extra'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 
 const r = (file: string) => resolve(__dirname, file)
 
@@ -42,7 +43,10 @@ export default {
         test: /\.ts$/,
         use: [
           {
-            loader: 'ts-loader'
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
           }
         ]
       }
@@ -60,7 +64,8 @@ export default {
   plugins: [
     new CleanWebpackPlugin(),
     includeDependency(r('../webview/')),
-    includeFiles()
+    includeFiles(),
+    new ForkTsCheckerWebpackPlugin()
   ],
   resolve: {
     extensions: ['.ts', '.js'],
