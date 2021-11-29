@@ -1,8 +1,9 @@
 // Variables
 
+$fg-color: var(--vscode-editor-foreground);
 $bg-color: var(--vscode-editor-background);
 $row-bg-color: $bg-color;
-$header-fg-color: var(--vscode-editor-foreground);
+$header-fg-color: $fg-color;
 $border-color: grey;
 
 // Dark Theme
@@ -26,10 +27,6 @@ $toggle-color-light: rgba(0, 0, 0, 0.21);
 $spinner-color-light: #000;
 
 // Extendable Silent Rules
-
-%fullwidth {
-  @extend %fullwidth;
-}
 
 %expandableRowArrow {
   width: 8px;
@@ -57,7 +54,7 @@ $spinner-color-light: #000;
 }
 
 .bullet {
-  color: var(--vscode-editor-foreground);
+  color: $fg-color;
   display: inline-block;
   width: 24px;
   flex: 0 0 24px;
@@ -146,7 +143,7 @@ $spinner-color-light: #000;
   transform: rotate(45deg);
   right: 1px;
   bottom: 2px;
-  border-color: var(--vscode-editor-foreground);
+  border-color: $fg-color;
 }
 
 .contractedRowArrow {
@@ -156,14 +153,8 @@ $spinner-color-light: #000;
   bottom: 0;
 }
 
-.errorMessage {
-  padding: 0.5rem;
-  background-color: var(--vscode-editor-background);
-  border: 1px solid var(--vscode-editor-foreground);
-}
-
 .experiments {
-  @extend %fullwidth;
+  box-sizing: border-box;
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
@@ -206,12 +197,10 @@ $spinner-color-light: #000;
     padding-left: 1rem;
   }
   .tableContainer {
-    @extend %fullwidth;
     overflow: auto;
     flex: 1;
   }
   .table {
-    @extend %fullwidth;
     margin: 0.5rem 1rem;
     display: inline-block;
     border-collapse: collapse;
@@ -472,7 +461,7 @@ $spinner-color-light: #000;
   display: none;
   border: none;
   background: none;
-  color: var(--vscode-editor-foreground);
+  color: $fg-color;
   cursor: pointer;
   width: 0.8em;
   height: 0.8em;
