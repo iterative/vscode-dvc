@@ -10,6 +10,7 @@ import {
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 
 const item: IconMenuItemProps = {
@@ -39,13 +40,13 @@ describe('IconMenuItem', () => {
   it('should display the icon', () => {
     renderItem()
 
-    expect(screen.queryAllByTestId('icon-menu-item-icon').length).toBe(1)
+    expect(screen.getByTestId('icon-menu-item-icon')).toBeInTheDocument()
   })
 
   it('should not display any hover menu as a natural state', () => {
     renderItem()
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
   it('should display only the tooltip hover menu on mouse enter and hide it on mouse leave', async () => {
@@ -53,16 +54,16 @@ describe('IconMenuItem', () => {
 
     fireEvent.mouseEnter(screen.getByTestId('icon-menu-item'))
 
-    const hoverMenu = await screen.getByTestId('hover-menu')
+    const hoverMenu = screen.getByTestId('hover-menu')
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(1)
+    expect(screen.getByTestId('hover-menu')).toBeInTheDocument()
     expect(hoverMenu.innerHTML).toBe(item.tooltip)
 
     fireEvent.mouseLeave(screen.getByTestId('icon-menu-item'))
 
     await waitForElementToBeRemoved(() => screen.getByTestId('hover-menu'))
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
   it('should call the onMouseOver prop when the mouse enters the item', () => {
@@ -75,38 +76,51 @@ describe('IconMenuItem', () => {
   })
 
   it('should not show the tooltip hover menu if the icon has been clicked', () => {
-    renderItem()
-
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new MouseEvent('mouseEnter', {
-        bubbles: true,
-        cancelable: true
-      })
+    const onClickSpy = jest.fn()
+    renderItem(
+      {
+        ...item,
+        onClick: onClickSpy,
+        onClickNode: 'Something'
+      },
+      otherProps
     )
 
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-    )
+    fireEvent.mouseEnter(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true
+    })
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.getByTestId('hover-menu')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(onClickSpy).toBeCalledTimes(1)
+
+    const hoverMenu = screen.queryAllByTestId('hover-menu')
+
+    expect(hoverMenu.length).toBe(2)
+    const [hiddenItem, childItem] = hoverMenu
+
+    expect(hiddenItem.innerHTML).toBe('Item')
+    expect(hiddenItem.className).toContain('hidden')
+    expect(hiddenItem.className).toContain('removed')
+    expect(childItem.innerHTML).toBe('Something')
+    expect(childItem.className).not.toContain('hidden')
+    expect(childItem.className).not.toContain('removed')
   })
 
   it('should do nothing on click if there are no onClick or onClickNode props', () => {
     renderItem()
 
     expect(() =>
-      fireEvent(
-        screen.getByTestId('icon-menu-item'),
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      fireEvent.click(screen.getByTestId('icon-menu-item'), {
+        bubbles: true,
+        cancelable: true
+      })
     ).not.toThrow()
   })
 
@@ -114,27 +128,24 @@ describe('IconMenuItem', () => {
     const onClickSpy = jest.fn()
     renderItem({ ...item, onClick: onClickSpy })
 
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-    )
+    fireEvent.click(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true
+    })
 
     expect(onClickSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should show the onClickNode if it is present in the props', async () => {
+  it('should show the onClickNode if it is present in the props', () => {
     const onClickNode = 'Something'
     renderItem({ ...item, onClickNode })
 
     screen.getByTestId('icon-menu-item').focus()
     fireEvent.click(screen.getByTestId('icon-menu-item'))
 
-    const hoverMenu = await screen.getByTestId('hover-menu')
+    const hoverMenu = screen.getByTestId('hover-menu')
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(1)
+    expect(screen.getByTestId('hover-menu')).toBeInTheDocument()
     expect(hoverMenu.innerHTML).toBe(onClickNode)
   })
 
@@ -142,13 +153,10 @@ describe('IconMenuItem', () => {
     const onClickNode = 'Something'
     renderItem({ ...item, onClickNode })
 
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-    )
+    fireEvent.click(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true
+    })
 
     fireEvent.blur(screen.getByTestId('icon-menu-item'))
 
@@ -156,20 +164,17 @@ describe('IconMenuItem', () => {
       jest.advanceTimersByTime(1500)
     })
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
   it('should remove the onClickNode if the prop canShowOnClickNode is set to false', () => {
     const onClickNode = 'Something'
     const { rerender } = renderItem({ ...item, onClickNode })
 
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new MouseEvent('click', {
-        bubbles: true,
-        cancelable: true
-      })
-    )
+    fireEvent.click(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true
+    })
 
     rerender(
       <IconMenuItem {...item} {...otherProps} canShowOnClickNode={false} />
@@ -177,21 +182,18 @@ describe('IconMenuItem', () => {
 
     jest.runOnlyPendingTimers()
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
   it('should call the onClick prop on enter key down event', () => {
     const onClickSpy = jest.fn()
     renderItem({ ...item, onClick: onClickSpy })
 
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new KeyboardEvent('keydown', {
-        bubbles: true,
-        cancelable: true,
-        key: 'Enter'
-      })
-    )
+    fireEvent.keyDown(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true,
+      key: 'Enter'
+    })
 
     expect(onClickSpy).toHaveBeenCalledTimes(1)
   })
@@ -200,14 +202,11 @@ describe('IconMenuItem', () => {
     const onClickSpy = jest.fn()
     renderItem({ ...item, onClick: onClickSpy })
 
-    fireEvent(
-      screen.getByTestId('icon-menu-item'),
-      new KeyboardEvent('keydown', {
-        bubbles: true,
-        cancelable: true,
-        key: 'Escape'
-      })
-    )
+    fireEvent.keyDown(screen.getByTestId('icon-menu-item'), {
+      bubbles: true,
+      cancelable: true,
+      key: 'Escape'
+    })
 
     expect(onClickSpy).toHaveBeenCalledTimes(0)
   })
