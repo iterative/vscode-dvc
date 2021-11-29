@@ -6,6 +6,7 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { Model } from '../../model'
+import ClockIcon from '../../../shared/components/icons/Clock'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -76,7 +77,9 @@ const FirstCell: React.FC<{
           />
         )}
       </span>
-      <span className={styles.bullet} style={{ color: bulletColor }} />
+      <span className={styles.bullet} style={{ color: bulletColor }}>
+        {cell.row.original.queued && <ClockIcon />}
+      </span>
       {cell.isPlaceholder ? null : cell.render('Cell')}
     </div>
   )
