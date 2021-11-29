@@ -4,13 +4,12 @@
 /* eslint-disable sonarjs/no-identical-functions */
 import React from 'react'
 import {
-  render,
-  cleanup,
-  getByTitle,
   act,
-  waitFor,
-  findByTitle,
-  fireEvent
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { CopyButton } from '.'
@@ -36,71 +35,67 @@ describe('CopyButton', () => {
 
   it('should call writeText with the value prop and show the success icon for a second when writeText resolves', async () => {
     mockWriteText.mockResolvedValueOnce(undefined)
-    const { container } = render(<CopyButton value={exampleCopyText} />)
-    const copyButtonElement = getByTitle(container, defaultStateTitle)
-    await act(async () => {
-      fireEvent.click(copyButtonElement, {
-        bubbles: true,
-        cancelable: true
-      })
-      await waitFor(() => findByTitle(container, successStateTitle))
+    render(<CopyButton value={exampleCopyText} />)
+    const copyButtonElement = screen.getByTitle(defaultStateTitle)
+
+    fireEvent.click(copyButtonElement, {
+      bubbles: true,
+      cancelable: true
     })
+    await waitFor(() => screen.findByTitle(successStateTitle))
+
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
-    await act(async () => {
+    act(() => {
       jest.advanceTimersByTime(1000)
-      await waitFor(() =>
-        expect(getByTitle(container, defaultStateTitle)).toBeInTheDocument()
-      )
     })
+    expect(await screen.findByTitle(defaultStateTitle)).toBeInTheDocument()
   })
 
   it('should call writeText with the value prop and show the failure icon for a second when writeText rejects', async () => {
     mockWriteText.mockRejectedValueOnce(new Error('Copying is not allowed!'))
-    const { container } = render(<CopyButton value={exampleCopyText} />)
-    const copyButtonElement = getByTitle(container, defaultStateTitle)
-    await act(async () => {
-      fireEvent.click(copyButtonElement, {
-        bubbles: true,
-        cancelable: true
-      })
-      await waitFor(() => findByTitle(container, failureStateTitle))
+    render(<CopyButton value={exampleCopyText} />)
+    const copyButtonElement = screen.getByTitle(defaultStateTitle)
+
+    fireEvent.click(copyButtonElement, {
+      bubbles: true,
+      cancelable: true
     })
+
+    await screen.findByTitle(failureStateTitle)
+
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
-    await act(async () => {
+    act(() => {
       jest.advanceTimersByTime(1000)
-      await waitFor(() =>
-        expect(getByTitle(container, defaultStateTitle)).toBeInTheDocument()
-      )
     })
+
+    expect(await screen.findByTitle(defaultStateTitle)).toBeInTheDocument()
   })
 
   it('should restart the state reset timer if clicked while in the success state', async () => {
     mockWriteText.mockResolvedValueOnce(undefined)
-    const { container } = render(<CopyButton value={exampleCopyText} />)
-    const copyButtonElement = getByTitle(container, defaultStateTitle)
+    render(<CopyButton value={exampleCopyText} />)
+    const copyButtonElement = screen.getByTitle(defaultStateTitle)
 
     // Click once
-    await act(async () => {
-      fireEvent.click(copyButtonElement, {
-        bubbles: true,
-        cancelable: true
-      })
-      await waitFor(() => findByTitle(container, successStateTitle))
+    fireEvent.click(copyButtonElement, {
+      bubbles: true,
+      cancelable: true
     })
+    await screen.findByTitle(successStateTitle)
+
     jest.advanceTimersByTime(500)
 
     // Click again while still in success state
     mockWriteText.mockResolvedValueOnce(undefined)
-    await act(async () => {
-      fireEvent.click(copyButtonElement, {
-        bubbles: true,
-        cancelable: true
-      })
-      await waitFor(() => findByTitle(container, successStateTitle))
+
+    fireEvent.click(copyButtonElement, {
+      bubbles: true,
+      cancelable: true
     })
+    await screen.findByTitle(successStateTitle)
 
     // Ensure state hasn't returned to default after it would have from the first click
     jest.advanceTimersByTime(600)
-    expect(getByTitle(container, successStateTitle)).toBeInTheDocument()
+    expect(screen.getByTitle(successStateTitle)).toBeInTheDocument()
   })
 })
