@@ -9,6 +9,7 @@ import {
   screen,
   waitForElementToBeRemoved
 } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 import { HoverMenu } from './HoverMenu'
 
 beforeEach(() => jest.useFakeTimers())
@@ -30,7 +31,7 @@ describe('HoverMenu', () => {
   it('should display nothing if the prop show is not on the component', () => {
     render(<HoverMenu>Never seen</HoverMenu>)
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
   it('should hide a menu immediately if the prop hideWithDelay is set to false', async () => {
@@ -39,9 +40,9 @@ describe('HoverMenu', () => {
     )
     rerender(<HoverMenu>Bye!</HoverMenu>)
 
-    await waitForElementToBeRemoved(() => screen.getByTestId('hover-menu'))
+    await waitForElementToBeRemoved(() => screen.queryByTestId('hover-menu'))
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 
   it('should hide a menu with a delay if the prop hideWithDelay is set to true', () => {
@@ -52,12 +53,12 @@ describe('HoverMenu', () => {
     )
     rerender(<HoverMenu hideWithDelay>Not ready to leave yet</HoverMenu>)
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(1)
+    expect(screen.getByTestId('hover-menu')).toBeInTheDocument()
 
     act(() => {
       jest.runOnlyPendingTimers()
     })
 
-    expect(screen.queryAllByTestId('hover-menu').length).toBe(0)
+    expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument()
   })
 })
