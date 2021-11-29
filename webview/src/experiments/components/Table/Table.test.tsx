@@ -41,7 +41,11 @@ describe('Table', () => {
   const basicCellProps = {
     getCellProps: getProps,
     row: {
-      id: 'workspace'
+      id: 'workspace',
+      original: {
+        queued: false,
+        running: false
+      }
     }
   }
   const instance = {

@@ -60,6 +60,9 @@ $spinner-color-light: #000;
   flex: 0 0 24px;
   text-align: center;
   position: relative;
+  .queuedExperiment & svg {
+    height: 12px;
+  }
 
   &::before {
     display: inline-block;
@@ -83,16 +86,7 @@ $spinner-color-light: #000;
       border: 1px solid currentColor;
     }
     .queuedExperiment & {
-      width: 12px;
-      height: 12px;
-      background-image: url('dvc/resources/dark/clock.svg');
-      background-size: contain;
-
-      @at-root {
-        :global(.vscode-light) & {
-          background-image: url('dvc/resources/light/clock.svg');
-        }
-      }
+      display: none;
     }
     .runningExperiment & {
       width: 4px;
