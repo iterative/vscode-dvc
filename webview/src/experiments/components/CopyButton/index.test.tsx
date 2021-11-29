@@ -12,6 +12,7 @@ import {
   findByTitle,
   fireEvent
 } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 import { CopyButton } from '.'
 
 const mockWriteText = jest.fn()
@@ -38,20 +39,17 @@ describe('CopyButton', () => {
     const { container } = render(<CopyButton value={exampleCopyText} />)
     const copyButtonElement = getByTitle(container, defaultStateTitle)
     await act(async () => {
-      fireEvent(
-        copyButtonElement,
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      fireEvent.click(copyButtonElement, {
+        bubbles: true,
+        cancelable: true
+      })
       await waitFor(() => findByTitle(container, successStateTitle))
     })
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
     await act(async () => {
       jest.advanceTimersByTime(1000)
       await waitFor(() =>
-        expect(getByTitle(container, defaultStateTitle)).toBeDefined()
+        expect(getByTitle(container, defaultStateTitle)).toBeInTheDocument()
       )
     })
   })
@@ -61,20 +59,17 @@ describe('CopyButton', () => {
     const { container } = render(<CopyButton value={exampleCopyText} />)
     const copyButtonElement = getByTitle(container, defaultStateTitle)
     await act(async () => {
-      fireEvent(
-        copyButtonElement,
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      fireEvent.click(copyButtonElement, {
+        bubbles: true,
+        cancelable: true
+      })
       await waitFor(() => findByTitle(container, failureStateTitle))
     })
     expect(mockWriteText).toBeCalledWith(exampleCopyText)
     await act(async () => {
       jest.advanceTimersByTime(1000)
       await waitFor(() =>
-        expect(getByTitle(container, defaultStateTitle)).toBeDefined()
+        expect(getByTitle(container, defaultStateTitle)).toBeInTheDocument()
       )
     })
   })
@@ -86,13 +81,10 @@ describe('CopyButton', () => {
 
     // Click once
     await act(async () => {
-      fireEvent(
-        copyButtonElement,
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      fireEvent.click(copyButtonElement, {
+        bubbles: true,
+        cancelable: true
+      })
       await waitFor(() => findByTitle(container, successStateTitle))
     })
     jest.advanceTimersByTime(500)
@@ -100,18 +92,15 @@ describe('CopyButton', () => {
     // Click again while still in success state
     mockWriteText.mockResolvedValueOnce(undefined)
     await act(async () => {
-      fireEvent(
-        copyButtonElement,
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      fireEvent.click(copyButtonElement, {
+        bubbles: true,
+        cancelable: true
+      })
       await waitFor(() => findByTitle(container, successStateTitle))
     })
 
     // Ensure state hasn't returned to default after it would have from the first click
     jest.advanceTimersByTime(600)
-    expect(getByTitle(container, successStateTitle)).toBeDefined()
+    expect(getByTitle(container, successStateTitle)).toBeInTheDocument()
   })
 })
