@@ -75,7 +75,7 @@ describe('IconMenuItem', () => {
     expect(onMouseOverSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should not show the tooltip hover menu if the icon has been clicked', () => {
+  it('should not show the tooltip hover menu once the onClickNode is shown', () => {
     const onClickSpy = jest.fn()
     renderItem(
       {
@@ -103,14 +103,11 @@ describe('IconMenuItem', () => {
     const hoverMenu = screen.queryAllByTestId('hover-menu')
 
     expect(hoverMenu.length).toBe(2)
-    const [hiddenItem, childItem] = hoverMenu
+    const [hiddenItem] = hoverMenu
 
     expect(hiddenItem.innerHTML).toBe('Item')
     expect(hiddenItem.className).toContain('hidden')
     expect(hiddenItem.className).toContain('removed')
-    expect(childItem.innerHTML).toBe('Something')
-    expect(childItem.className).not.toContain('hidden')
-    expect(childItem.className).not.toContain('removed')
   })
 
   it('should do nothing on click if there are no onClick or onClickNode props', () => {
