@@ -18,7 +18,6 @@ module.exports = {
   ignorePatterns: [
     '**/dist/**',
     'webview/storybook-static/**',
-    'extension/vscode-test/**',
     'extension/src/test/fixtures/**'
   ],
   overrides: [
