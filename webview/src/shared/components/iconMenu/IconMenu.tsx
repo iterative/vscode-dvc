@@ -2,11 +2,19 @@ import React, { useState } from 'react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
 import styles from './styles.module.scss'
 
+export enum IconMenuDirection {
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT'
+}
 interface IconMenuProps {
   items: IconMenuItemProps[]
+  direction?: IconMenuDirection
 }
 
-export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
+export const IconMenu: React.FC<IconMenuProps> = ({
+  items,
+  direction = IconMenuDirection.RIGHT
+}) => {
   const [hoverKey, setHoverKey] = useState('')
 
   return (
@@ -17,6 +25,7 @@ export const IconMenu: React.FC<IconMenuProps> = ({ items }) => {
           {...item}
           canShowOnClickNode={item.tooltip === hoverKey}
           onMouseOver={setHoverKey}
+          last={i === items.length - 1 && direction === IconMenuDirection.RIGHT}
           index={i}
         />
       ))}

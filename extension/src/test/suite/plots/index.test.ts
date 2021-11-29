@@ -32,6 +32,7 @@ suite('Plots Test Suite', () => {
 
       const expectedPlotsData: PlotsData = {
         live: livePlotsFixture,
+        metrics: undefined,
         static: plotsShowFixture
       }
 

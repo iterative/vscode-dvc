@@ -10,9 +10,10 @@ import {
   waitForElementToBeRemoved
 } from '@testing-library/react'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
+import { AllIcons } from '../icon/Icon'
 
 const item: IconMenuItemProps = {
-  icon: '',
+  icon: AllIcons.PENCIL,
   tooltip: 'Item'
 }
 

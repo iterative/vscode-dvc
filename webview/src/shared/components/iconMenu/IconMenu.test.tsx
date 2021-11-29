@@ -5,20 +5,21 @@ import React from 'react'
 import { render, cleanup, screen } from '@testing-library/react'
 import { IconMenuItemProps } from './IconMenuItem'
 import { IconMenu } from './IconMenu'
+import { AllIcons } from '../icon/Icon'
 
 const items: IconMenuItemProps[] = [
   {
-    icon: 'pencil',
+    icon: AllIcons.PENCIL,
     onClick: jest.fn,
     tooltip: 'Rename'
   },
   {
-    icon: 'upArrow',
+    icon: AllIcons.UP_ARROW,
     onClick: jest.fn,
     tooltip: 'Move Up'
   },
   {
-    icon: 'lines',
+    icon: AllIcons.LINES,
     onClickNode: 'On Click Node',
     tooltip: 'Choose metrics'
   }

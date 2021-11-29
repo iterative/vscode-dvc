@@ -1,1 +1,6 @@
 export { default as Check } from './Check'
+export { default as Dots } from './Dots'
+export { default as DownArrow } from './DownArrow'
+export { default as Lines } from './Lines'
+export { default as Pencil } from './Pencil'
+export { default as UpArrow } from './UpArrow'

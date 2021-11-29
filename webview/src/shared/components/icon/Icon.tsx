@@ -1,15 +1,24 @@
 import React from 'react'
-import { Check } from '../icons'
+import { Check, Dots, DownArrow, Lines, Pencil, UpArrow } from '../icons'
 
 const Icons = {
   CHECK: Check,
-  OTHER: ''
+  DOTS: Dots,
+  DOWN_ARROW: DownArrow,
+  LINES: Lines,
+  PENCIL: Pencil,
+  UP_ARROW: UpArrow
 }
 
-type Icons = keyof typeof Icons
+export type Icons = keyof typeof Icons
 
 export enum AllIcons {
-  CHECK = 'CHECK'
+  CHECK = 'CHECK',
+  DOTS = 'DOTS',
+  DOWN_ARROW = 'DOWN_ARROW',
+  LINES = 'LINES',
+  PENCIL = 'PENCIL',
+  UP_ARROW = 'UP_ARROW'
 }
 
 interface IconProps {

@@ -62,6 +62,10 @@ export class ParamsAndMetricsModel {
     return this.data
   }
 
+  public getMetrics() {
+    return this.data.filter(paramOrMetric => paramOrMetric.group === 'metrics')
+  }
+
   public getTerminalNodes() {
     return this.data.filter(paramOrMetric => !paramOrMetric.hasChildren)
   }

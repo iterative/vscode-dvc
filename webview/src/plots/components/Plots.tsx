@@ -1,9 +1,10 @@
-import React, { Dispatch } from 'react'
+import React, { Dispatch, useState, useEffect } from 'react'
 import cx from 'classnames'
 import { LivePlotsColors, LivePlotData } from 'dvc/src/plots/webview/contract'
 import { PlotsOutput } from 'dvc/src/cli/reader'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { Config } from 'vega'
+import { ParamOrMetric } from 'dvc/src/experiments/webview/contract'
 import styles from './styles.module.scss'
 import {
   CollapsibleSectionsActions,
@@ -12,6 +13,10 @@ import {
   PlotsReducerAction,
   PlotsWebviewState
 } from '../hooks/useAppReducer'
+import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
+import { AllIcons } from '../../shared/components/icon/Icon'
+import { SelectMenu } from '../../shared/components/selectMenu/SelectMenu'
+import { SelectMenuOptionProps } from '../../shared/components/selectMenu/SelectMenuOption'
 
 const createSpec = (
   title: string,
@@ -105,28 +110,90 @@ const config: Config = {
   }
 }
 
+const MetricsPicker: React.FC<{
+  metrics: ParamOrMetric[]
+  selectedMetrics: string[]
+  setSelectedMetrics: (selectedMetrics: string[]) => void
+}> = ({ metrics, selectedMetrics, setSelectedMetrics }) => {
+  const [options, setOptions] = useState<SelectMenuOptionProps[]>(
+    metrics.map(metric => ({
+      id: metric.path,
+      isSelected: selectedMetrics.includes(metric.path),
+      label: metric.name
+    }))
+  )
+  const onClick = (id: string) => {
+    setOptions(
+      options.map(option =>
+        option.id === id
+          ? { ...option, isSelected: !option.isSelected }
+          : option
+      )
+    )
+  }
+  useEffect(() => {
+    setSelectedMetrics(
+      options.filter(option => option.isSelected).map(option => option.id)
+    )
+  }, [options, setSelectedMetrics])
+  return <SelectMenu options={options} onClick={onClick} />
+}
+
 const PlotsContainer: React.FC<{
   collapsedSections: CollapsibleSectionsState
   sectionKey: PlotsSectionKeys
   dispatch: Dispatch<PlotsReducerAction>
   title: string
-}> = ({ collapsedSections, sectionKey, dispatch, title, children }) => {
+  metrics?: ParamOrMetric[]
+  selectedMetrics?: string[]
+  setSelectedPlots?: (selectedPlots: string[]) => void
+}> = ({
+  collapsedSections,
+  sectionKey,
+  dispatch,
+  title,
+  children,
+  metrics,
+  selectedMetrics,
+  setSelectedPlots
+}) => {
   const open = !collapsedSections[sectionKey]
   return (
-    <details open={open} className={styles.plotsContainer}>
-      <summary
-        onClick={e => {
-          e.preventDefault()
-          dispatch({
-            sectionKey,
-            type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
-          })
-        }}
-      >
-        {title}
-      </summary>
-      <div className={styles.centered}>{open && children}</div>
-    </details>
+    <div className={styles.plotsContainerWrapper}>
+      <details open={open} className={styles.plotsContainer}>
+        <summary
+          onClick={e => {
+            e.preventDefault()
+            dispatch({
+              sectionKey,
+              type: CollapsibleSectionsActions.TOGGLE_COLLAPSED
+            })
+          }}
+        >
+          {title}
+        </summary>
+        <div className={styles.centered}>{open && children}</div>
+      </details>
+      {metrics && setSelectedPlots && selectedMetrics && (
+        <div className={styles.iconMenu}>
+          <IconMenu
+            items={[
+              {
+                icon: AllIcons.LINES,
+                onClickNode: (
+                  <MetricsPicker
+                    metrics={metrics}
+                    setSelectedMetrics={setSelectedPlots}
+                    selectedMetrics={selectedMetrics}
+                  />
+                ),
+                tooltip: 'Choose metrics'
+              }
+            ]}
+          />
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -201,6 +268,9 @@ const Plots = ({
   dispatch: Dispatch<PlotsReducerAction>
 }) => {
   const { data, collapsedSections } = state
+  const [selectedPlots, setSelectedPlots] = useState(
+    data?.metrics?.map(metric => metric.path)
+  )
 
   if (!data) {
     return EmptyState('Loading Plots...')
@@ -220,8 +290,16 @@ const Plots = ({
           sectionKey={PlotsSectionKeys.LIVE_PLOTS}
           collapsedSections={collapsedSections}
           dispatch={dispatch}
+          metrics={data.metrics?.filter(metric => !metric.hasChildren)}
+          selectedMetrics={selectedPlots}
+          setSelectedPlots={setSelectedPlots}
         >
-          <LivePlots plots={livePlots.plots} colors={livePlots.colors} />
+          <LivePlots
+            plots={livePlots.plots.filter(plot =>
+              selectedPlots?.includes(plot.title)
+            )}
+            colors={livePlots.colors}
+          />
         </PlotsContainer>
       )}
       {staticPlots && (

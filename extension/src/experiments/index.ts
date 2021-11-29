@@ -98,6 +98,10 @@ export class Experiments extends BaseRepository<TableData> {
     return this.paramsAndMetrics.getChildren(path)
   }
 
+  public getOnlyMetrics() {
+    return this.paramsAndMetrics.getMetrics()
+  }
+
   public toggleParamOrMetricStatus(path: string) {
     const status = this.paramsAndMetrics.toggleStatus(path)
 
