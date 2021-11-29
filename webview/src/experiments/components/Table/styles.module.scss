@@ -399,6 +399,7 @@ $spinner-color-light: #000;
 
   .metaCell {
     color: $meta-cell-color;
+    justify-content: center;
     text-align: center;
     font-size: 0.75rem;
   }
@@ -463,5 +464,32 @@ $spinner-color-light: #000;
     height: 100%;
     background-color: $header-fg-color;
     opacity: 0.5;
+  }
+}
+
+.copyButton {
+  font-size: 1.5em;
+  display: none;
+  border: none;
+  background: none;
+  color: var(--vscode-editor-foreground);
+  cursor: pointer;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+  padding: 0;
+}
+
+.td {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  .cellContents {
+    flex: 1;
+  }
+  &:hover {
+    & .copyButton {
+      display: block;
+    }
   }
 }

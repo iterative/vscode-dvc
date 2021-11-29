@@ -1,8 +1,8 @@
 import { join, resolve } from 'path'
-import * as webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import { readFileSync } from 'fs-extra'
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 
 const r = (file: string) => resolve(__dirname, file)
 
@@ -28,7 +28,7 @@ const includeFiles = () =>
     }))
   })
 
-module.exports = {
+export default {
   devtool: 'source-map',
   entry: r('./src/extension'),
   externals: {
@@ -43,7 +43,10 @@ module.exports = {
         test: /\.ts$/,
         use: [
           {
-            loader: 'ts-loader'
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
           }
         ]
       }
@@ -61,7 +64,8 @@ module.exports = {
   plugins: [
     new CleanWebpackPlugin(),
     includeDependency(r('../webview/')),
-    includeFiles()
+    includeFiles(),
+    new ForkTsCheckerWebpackPlugin()
   ],
   resolve: {
     extensions: ['.ts', '.js'],
@@ -69,4 +73,4 @@ module.exports = {
     symlinks: false
   },
   target: 'node'
-} as webpack.Configuration
+}

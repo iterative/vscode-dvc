@@ -2,7 +2,7 @@ import { join, sep } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
-import { stub, restore, useFakeTimers } from 'sinon'
+import { stub, restore } from 'sinon'
 import { Disposable } from '../../../../extension'
 import { CliReader } from '../../../../cli/reader'
 import expShowFixture from '../../../fixtures/expShow/output'
@@ -12,6 +12,7 @@ import { OutputChannel } from '../../../../vscode/outputChannel'
 import { ExperimentsData } from '../../../../experiments/data'
 import { InternalCommands } from '../../../../commands/internal'
 import * as Watcher from '../../../../fileSystem/watcher'
+import * as Time from '../../../../util/time'
 
 suite('Experiments Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -104,7 +105,8 @@ suite('Experiments Data Test Suite', () => {
     it('should dispose of the current watcher and instantiate a new one if the params files change', async () => {
       stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
 
-      const clock = useFakeTimers()
+      const now = stub(Time, 'getCurrentEpoch').returns(100)
+
       const config = disposable.track(new Config())
       const cliReader = disposable.track(new CliReader(config))
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
@@ -133,7 +135,8 @@ suite('Experiments Data Test Suite', () => {
       )
 
       await data.isReady()
-      clock.tick(200000000)
+      now.resetBehavior()
+      now.returns(20000000000)
 
       mockExperimentShow.resolves(
         Object.assign(
@@ -185,8 +188,6 @@ suite('Experiments Data Test Suite', () => {
           `{dvc.lock,dvc.yaml,params.yaml,nested${sep}params.yaml,new_params.yml,new_summary.json,summary.json}`
         )
       )
-
-      clock.restore()
     })
   })
 })

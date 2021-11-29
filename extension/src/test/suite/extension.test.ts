@@ -1,11 +1,12 @@
 import { join, resolve } from 'path'
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
-import { stub, restore, spy, useFakeTimers, match } from 'sinon'
+import { stub, restore, spy, match } from 'sinon'
 import { window, commands, workspace, Uri } from 'vscode'
 import {
   closeAllEditors,
   configurationChangeEvent,
+  mockDuration,
   quickPickInitialized,
   selectQuickPickItem
 } from './util'
@@ -301,7 +302,8 @@ suite('Extension Test Suite', () => {
     }).timeout(25000)
 
     it('should send an error telemetry event when setupWorkspace fails', async () => {
-      const clock = useFakeTimers()
+      mockDuration(0)
+
       const mockErrorMessage = 'NOPE'
       stub(Setup, 'setupWorkspace').rejects(new Error(mockErrorMessage))
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
@@ -315,20 +317,17 @@ suite('Extension Test Suite', () => {
         { error: mockErrorMessage },
         { duration: 0 }
       )
-
-      clock.restore()
     })
   })
 
   describe('dvc.stopRunningExperiment', () => {
     it('should send a telemetry event containing properties relating to the event', async () => {
-      const clock = useFakeTimers()
       const duration = 1234
+      mockDuration(duration)
+
       const mockSendTelemetryEvent = stub(Telemetry, 'sendTelemetryEvent')
 
-      const stop = commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
-      clock.tick(duration)
-      await stop
+      await commands.executeCommand(RegisteredCommands.STOP_EXPERIMENT)
 
       expect(mockSendTelemetryEvent).to.be.calledWith(
         RegisteredCommands.STOP_EXPERIMENT,
@@ -340,8 +339,6 @@ suite('Extension Test Suite', () => {
           duration
         }
       )
-
-      clock.restore()
     })
   })
 

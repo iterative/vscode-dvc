@@ -162,7 +162,10 @@ describe('App', () => {
     const summaryElement = await waitFor(() =>
       screen.getByText('Live Experiments Plots')
     )
-    summaryElement.click()
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
     await waitFor(() => expect(mockSetState).toBeCalledTimes(2))
     expect((summaryElement.parentElement as HTMLDetailsElement).open).toBe(
       false

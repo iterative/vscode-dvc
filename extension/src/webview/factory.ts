@@ -8,6 +8,7 @@ import { Resource } from '../resourceLocator'
 import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
 import { hasKey } from '../util/object'
+import { getWorkspaceRootUris } from '../vscode/workspaceFolders'
 
 const isExperimentsWebviewState = (state: UnknownWebviewState): boolean => {
   const data = state.data as TableData
@@ -62,7 +63,7 @@ export const createWebview = async (
     ViewColumn.Active,
     {
       enableScripts: true,
-      localResourceRoots: [Uri.file(distPath)],
+      localResourceRoots: [Uri.file(distPath), ...getWorkspaceRootUris()],
       retainContextWhenHidden: true
     }
   )

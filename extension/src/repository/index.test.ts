@@ -11,6 +11,7 @@ import { InternalCommands } from '../commands/internal'
 import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
 import { buildMockedEventEmitter } from '../test/util/jest'
+import { getCurrentEpoch } from '../util/time'
 
 jest.mock('vscode')
 jest.mock('@hediet/std/disposable')
@@ -26,6 +27,8 @@ const mockedListDvcOnlyRecursive = jest.fn()
 const mockedDiff = jest.fn()
 const mockedStatus = jest.fn()
 const mockedGetAllUntracked = mocked(getAllUntracked)
+
+const mockedGetCurrentEpoch = mocked(getCurrentEpoch)
 
 const mockedSourceControlManagement = mocked(SourceControlManagement)
 const mockedSetScmState = jest.fn()
@@ -54,7 +57,6 @@ mockedInternalCommands.registerCommand('status', (...args) =>
 
 beforeEach(() => {
   jest.resetAllMocks()
-
   mockedSourceControlManagement.mockImplementationOnce(function () {
     return {
       setState: mockedSetScmState
@@ -350,6 +352,139 @@ describe('Repository', () => {
       )
       expect(mockedSetScmState).toHaveBeenLastCalledWith(repository.getState())
       expect(repository.hasChanges()).toEqual(true)
+    })
+
+    it('should not queue a reset within 200ms of one starting', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValue([])
+      mockedDiff.mockResolvedValue({})
+      mockedStatus.mockResolvedValue({})
+      mockedGetCurrentEpoch.mockReturnValueOnce(100).mockReturnValue(150)
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedInternalCommands,
+        mockedDecorationProvider,
+        mockedTreeDataChanged
+      )
+
+      const isReady = repository.isReady()
+
+      await Promise.all([
+        isReady,
+        repository.reset(),
+        repository.reset(),
+        repository.reset(),
+        repository.reset(),
+        repository.reset()
+      ])
+
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
+      expect(mockedDiff).toBeCalledTimes(1)
+      expect(mockedStatus).toBeCalledTimes(1)
+    })
+
+    it('should debounce all calls made within 200ms of a reset', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValue([])
+      mockedDiff.mockResolvedValue({})
+      mockedStatus.mockResolvedValue({})
+      mockedGetCurrentEpoch.mockReturnValueOnce(100).mockReturnValue(150)
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedInternalCommands,
+        mockedDecorationProvider,
+        mockedTreeDataChanged
+      )
+
+      await Promise.all([
+        repository.isReady(),
+        repository.update(),
+        repository.reset(),
+        repository.update(),
+        repository.reset(),
+        repository.update()
+      ])
+
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
+      expect(mockedDiff).toBeCalledTimes(1)
+      expect(mockedStatus).toBeCalledTimes(1)
+    })
+  })
+
+  describe('update', () => {
+    it('should not queue an update within 200ms of one starting', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValue([])
+      mockedDiff.mockResolvedValue({})
+      mockedStatus.mockResolvedValue({})
+      mockedGetCurrentEpoch
+        .mockReturnValueOnce(100)
+        .mockReturnValueOnce(300)
+        .mockReturnValue(350)
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedInternalCommands,
+        mockedDecorationProvider,
+        mockedTreeDataChanged
+      )
+
+      await repository.isReady()
+      mockedListDvcOnlyRecursive.mockClear()
+      mockedDiff.mockClear()
+      mockedStatus.mockClear()
+
+      const firstUpdate = repository.update()
+
+      await Promise.all([
+        firstUpdate,
+        repository.update(),
+        repository.update(),
+        repository.update(),
+        repository.update()
+      ])
+
+      expect(mockedListDvcOnlyRecursive).not.toBeCalled()
+      expect(mockedDiff).toBeCalledTimes(1)
+      expect(mockedStatus).toBeCalledTimes(1)
+    })
+
+    it('should run update and queue reset (and send further calls to the reset queue) if they are called in that order', async () => {
+      mockedListDvcOnlyRecursive.mockResolvedValue([])
+      mockedDiff.mockResolvedValue({})
+      mockedStatus.mockResolvedValue({})
+      mockedGetCurrentEpoch
+        .mockReturnValueOnce(100)
+        .mockReturnValueOnce(300)
+        .mockReturnValueOnce(350)
+        .mockReturnValue(400)
+
+      const repository = new Repository(
+        dvcRoot,
+        mockedInternalCommands,
+        mockedDecorationProvider,
+        mockedTreeDataChanged
+      )
+
+      await repository.isReady()
+      mockedListDvcOnlyRecursive.mockClear()
+      mockedDiff.mockClear()
+      mockedStatus.mockClear()
+
+      const firstUpdate = repository.update()
+      const firstReset = repository.reset()
+
+      await Promise.all([
+        firstUpdate,
+        firstReset,
+        repository.update(),
+        repository.reset(),
+        repository.update(),
+        repository.reset()
+      ])
+
+      expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
+      expect(mockedDiff).toBeCalledTimes(2)
+      expect(mockedStatus).toBeCalledTimes(2)
     })
   })
 })

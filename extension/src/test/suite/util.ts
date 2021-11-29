@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { SinonSpy, SinonStub } from 'sinon'
+import { SinonSpy, SinonStub, stub } from 'sinon'
 import {
   commands,
   ConfigurationChangeEvent,
@@ -11,6 +11,7 @@ import {
 import { Experiments } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
+import * as Time from '../../util/time'
 
 export const dvcDemoPath = Uri.file(
   resolve(__dirname, '..', '..', '..', '..', 'demo')
@@ -81,3 +82,10 @@ export const closeAllEditors = async () => {
     await commands.executeCommand('workbench.action.closeAllEditors')
   }
 }
+
+export const mockDuration = (duration: number) =>
+  stub(Time, 'getCurrentEpoch')
+    .onFirstCall()
+    .returns(0)
+    .onSecondCall()
+    .returns(duration)

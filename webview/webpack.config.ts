@@ -1,14 +1,13 @@
 import { resolve } from 'path'
-import webpack from 'webpack'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
-import ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 
 const r = (file: string) => resolve(__dirname, file)
 
 const styleLoader = 'style-loader'
 const cssLoader = 'css-loader'
 
-module.exports = {
+export default {
   devServer: {
     disableHostCheck: true,
     headers: {
@@ -95,4 +94,4 @@ module.exports = {
     extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
     fallback: { fs: false }
   }
-} as webpack.Configuration
+}
