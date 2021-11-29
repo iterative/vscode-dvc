@@ -41,11 +41,9 @@ beforeEach(() => {
 })
 
 describe('getRepositoryListener', () => {
-  const mockedResetState = jest.fn()
-  const mockedUpdateState = jest.fn()
+  const mockedUpdate = jest.fn()
   const repository = {
-    reset: mockedResetState,
-    update: mockedUpdateState
+    update: mockedUpdate
   } as unknown as Repository
 
   it('should return a function that does nothing if an empty path is provided', () => {
@@ -54,8 +52,7 @@ describe('getRepositoryListener', () => {
 
     listener('')
 
-    expect(mockedResetState).not.toBeCalled()
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).not.toBeCalled()
   })
 
   it('should return a function that does nothing if an experiments git refs path is provided', () => {
@@ -64,19 +61,19 @@ describe('getRepositoryListener', () => {
 
     listener(join(mockedDvcRoot, '.git', 'refs', 'exps', '0F'))
 
-    expect(mockedResetState).not.toBeCalled()
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).not.toBeCalled()
   })
 
   it("should return a function that calls reset if it is called with on of the repo's .dvc data placeholders", () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const listener = getRepositoryListener(repository, mockedDvcRoot)
 
+    const path = join(mockedDvcRoot, 'data', 'placeholder.dvc')
+
     listener(join(mockedDvcRoot, 'data', 'placeholder.dvc'))
 
-    expect(mockedResetState).toBeCalledTimes(1)
-
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledWith(path)
   })
 
   it("should return a function that calls reset if it is called with the repo's dvc.yaml", () => {
@@ -86,23 +83,22 @@ describe('getRepositoryListener', () => {
 
       mockedDvcRoot
     )
+    const path = join(mockedDvcRoot, 'data', 'dvc.yaml')
+    listener(path)
 
-    listener(join(mockedDvcRoot, 'data', 'dvc.yaml'))
-
-    expect(mockedResetState).toBeCalledTimes(1)
-
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledWith(path)
   })
 
   it("should return a function that calls reset if it is called with one of the repo's dvc.lock", () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const listener = getRepositoryListener(repository, mockedDvcRoot)
 
-    listener(join(mockedDvcRoot, 'data', 'dvc.lock'))
+    const path = join(mockedDvcRoot, 'data', 'dvc.lock')
+    listener(path)
 
-    expect(mockedResetState).toBeCalledTimes(1)
-
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledWith(path)
   })
 
   it('should return a function that calls update if it is called with anything other path from inside the repo', () => {
@@ -110,29 +106,28 @@ describe('getRepositoryListener', () => {
 
     listener(__filename)
 
-    expect(mockedResetState).not.toBeCalled()
-
-    expect(mockedUpdateState).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledWith(__filename)
   })
 
   it('should return a function that calls update if it is called with .git/index (that is above the dvc root)', () => {
     const listener = getRepositoryListener(repository, __dirname)
 
-    listener(resolve(__dirname, '..', '..', '.git', 'index'))
+    const path = resolve(__dirname, '..', '..', '.git', 'index')
+    listener(path)
 
-    expect(mockedResetState).not.toBeCalled()
-
-    expect(mockedUpdateState).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledWith(path)
   })
 
   it('should return a function that calls update if it is called with .git/ORIG_HEAD (that is above the dvc root)', () => {
     const listener = getRepositoryListener(repository, __dirname)
 
-    listener(resolve(__dirname, '..', '..', '.git', 'ORIG_HEAD'))
+    const path = resolve(__dirname, '..', '..', '.git', 'ORIG_HEAD')
+    listener(path)
 
-    expect(mockedResetState).not.toBeCalled()
-
-    expect(mockedUpdateState).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledTimes(1)
+    expect(mockedUpdate).toBeCalledWith(path)
   })
 
   it('should return a function that does not call update if it is called with a file in the .git folder that does not contain index or HEAD', () => {
@@ -152,9 +147,7 @@ describe('getRepositoryListener', () => {
       )
     )
 
-    expect(mockedResetState).not.toBeCalled()
-
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).not.toBeCalled()
   })
 
   it('should return a function that returns early if called with a path that is above the dvc root that is not in the .git folder', () => {
@@ -162,9 +155,7 @@ describe('getRepositoryListener', () => {
 
     listener(resolve(__dirname, '..', '..', 'other', 'refs'))
 
-    expect(mockedResetState).not.toBeCalled()
-
-    expect(mockedUpdateState).not.toBeCalled()
+    expect(mockedUpdate).not.toBeCalled()
   })
 })
 

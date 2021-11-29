@@ -1,3 +1,4 @@
+import { basename, extname } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
@@ -8,6 +9,14 @@ import { ListOutput, DiffOutput, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { ProcessManager } from '../processManager'
+
+export const isAnyDvcYaml = (path?: string): boolean =>
+  !!(
+    path &&
+    (extname(path) === '.dvc' ||
+      basename(path) === 'dvc.lock' ||
+      basename(path) === 'dvc.yaml')
+  )
 
 export class Repository {
   public readonly dispose = Disposable.fn()
@@ -42,8 +51,8 @@ export class Repository {
 
     this.processManager = this.dispose.track(
       new ProcessManager(
-        { name: 'update', process: () => this.updateState() },
-        { name: 'reset', process: () => this.resetState() }
+        { name: 'update', process: () => this.updateData() },
+        { name: 'reset', process: () => this.resetData() }
       )
     )
 
@@ -65,13 +74,9 @@ export class Repository {
     return this.model.getChildren(path)
   }
 
-  public reset(): Promise<void> {
-    return this.processManager.run('reset')
-  }
-
-  public update(): Promise<void> {
-    if (this.processManager.isOngoingOrQueued('reset')) {
-      return this.processManager.queue('reset')
+  public update(path?: string): Promise<void> {
+    if (isAnyDvcYaml(path) || this.processManager.isOngoingOrQueued('reset')) {
+      return this.processManager.run('reset')
     }
 
     return this.processManager.run('update')
@@ -81,7 +86,7 @@ export class Repository {
     return this.model.hasChanges()
   }
 
-  private async resetState() {
+  private async resetData() {
     const [diffFromHead, diffFromCache, untracked, tracked] =
       await this.getResetData()
 
@@ -91,7 +96,7 @@ export class Repository {
     this.treeDataChanged.fire()
   }
 
-  private async updateState() {
+  private async updateData() {
     const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
 
     this.model.setState({ diffFromCache, diffFromHead, untracked })
@@ -136,7 +141,7 @@ export class Repository {
   }
 
   private async setup() {
-    await this.reset()
+    await this.processManager.run('reset')
     return this.deferred.resolve()
   }
 }

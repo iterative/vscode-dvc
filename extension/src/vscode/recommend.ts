@@ -4,7 +4,7 @@ import { getConfigValue, setUserConfigValue } from './config'
 import { getShowOrCloseOrNever } from './toast'
 import { Response } from './response'
 import { isInstalled, showExtension } from './extensions'
-import { isAnyDvcYaml } from '../fileSystem'
+import { isAnyDvcYaml } from '../repository'
 
 const DO_NOT_RECOMMEND_RED_HAT = 'dvc.doNotRecommendRedHatExtension'
 const RED_HAT_EXTENSION_ID = 'redhat.vscode-yaml'

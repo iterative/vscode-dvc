@@ -161,7 +161,7 @@ describe('Repository', () => {
     })
   })
 
-  describe('reset', () => {
+  describe('managedUpdate', () => {
     it('will not exclude changed outs from stages that are always changed', async () => {
       mockedDiff.mockResolvedValueOnce({})
       mockedListDvcOnlyRecursive.mockResolvedValueOnce([])
@@ -209,7 +209,7 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual(emptyState)
       expect(repository.hasChanges()).toEqual(false)
 
-      await repository.reset()
+      await repository.update(join(dvcRoot, 'dvc.lock'))
 
       const deleted = new Set([join(dvcRoot, model), join(dvcRoot, dataDir)])
 
@@ -313,7 +313,7 @@ describe('Repository', () => {
       expect(repository.getState()).toEqual(emptyState)
       expect(repository.hasChanges()).toEqual(false)
 
-      await repository.reset()
+      await repository.update(join(dvcRoot, 'dvc.lock'))
 
       const deleted = new Set([join(dvcRoot, model)])
       const modified = new Set([join(dvcRoot, 'data/features')])
@@ -371,11 +371,11 @@ describe('Repository', () => {
 
       await Promise.all([
         isReady,
-        repository.reset(),
-        repository.reset(),
-        repository.reset(),
-        repository.reset(),
-        repository.reset()
+        repository.update(join(dvcRoot, 'dvc.lock')),
+        repository.update(join(dvcRoot, dataDir) + '.dvc'),
+        repository.update(join(dvcRoot, 'dvc.yaml')),
+        repository.update(join(dvcRoot, 'dvc.lock')),
+        repository.update(join(dvcRoot, dataDir) + '.dvc')
       ])
 
       expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
@@ -399,9 +399,9 @@ describe('Repository', () => {
       await Promise.all([
         repository.isReady(),
         repository.update(),
-        repository.reset(),
+        repository.update(join(dvcRoot, 'dvc.lock')),
         repository.update(),
-        repository.reset(),
+        repository.update(join(dvcRoot, 'dvc.yaml')),
         repository.update()
       ])
 
@@ -471,15 +471,15 @@ describe('Repository', () => {
       mockedStatus.mockClear()
 
       const firstUpdate = repository.update()
-      const firstReset = repository.reset()
+      const firstReset = repository.update(join(dvcRoot, 'dvc.lock'))
 
       await Promise.all([
         firstUpdate,
         firstReset,
         repository.update(),
-        repository.reset(),
+        repository.update(join(dvcRoot, 'dvc.lock')),
         repository.update(),
-        repository.reset()
+        repository.update(join(dvcRoot, 'dvc.yaml'))
       ])
 
       expect(mockedListDvcOnlyRecursive).toBeCalledTimes(1)
