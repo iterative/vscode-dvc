@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useRef, useState } from 'react'
 import CopyIcon from '../../../shared/components/icons/Copy'
+import CheckIcon from '../../../shared/components/icons/Check'
 import styles from '../Table/styles.module.scss'
 
 const enum CopyButtonState {
@@ -8,22 +9,18 @@ const enum CopyButtonState {
   FAILURE
 }
 
-const SuccessIcon = () => (
-  <span className={styles.copySuccess} title="Copy successful">
-    &#10004;
-  </span>
-)
-
-const FailureIcon = () => (
-  <span className={styles.copyFailed} title="Copy failed">
-    &#10005;
-  </span>
-)
+const FailureIcon = () => <span>&#10005;</span>
 
 const copyIconComponents: Record<CopyButtonState, FC> = {
   [CopyButtonState.DEFAULT]: CopyIcon,
-  [CopyButtonState.SUCCESS]: SuccessIcon,
+  [CopyButtonState.SUCCESS]: CheckIcon,
   [CopyButtonState.FAILURE]: FailureIcon
+}
+
+const copyIconTitles: Record<CopyButtonState, string> = {
+  [CopyButtonState.DEFAULT]: 'Copy cell contents',
+  [CopyButtonState.SUCCESS]: 'Copy successful',
+  [CopyButtonState.FAILURE]: 'Copy failed'
 }
 
 export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
@@ -40,7 +37,7 @@ export const CopyButton: React.FC<{ value: string }> = ({ value }) => {
   )
   return (
     <button
-      title="Copy cell contents"
+      title={copyIconTitles[state]}
       className={styles.copyButton}
       onClick={() => {
         navigator.clipboard
