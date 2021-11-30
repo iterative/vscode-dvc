@@ -55,7 +55,7 @@ export class Extension implements IExtension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private dvcRoots: string[] = []
-  private repositories: WorkspaceRepositories
+  private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly trackedExplorerTree: TrackedExplorerTree

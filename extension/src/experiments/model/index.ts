@@ -47,8 +47,8 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
 
-  private dvcRoot: string
-  private workspaceState: Memento
+  private readonly dvcRoot: string
+  private readonly workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {
     const { colors, currentSorts, filters, status } = this.revive(

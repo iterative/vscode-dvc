@@ -24,8 +24,8 @@ export class Config {
   private readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise
 
-  private dvcPathOption = 'dvc.dvcPath'
-  private pythonPathOption = 'dvc.pythonPath'
+  private readonly dvcPathOption = 'dvc.dvcPath'
+  private readonly pythonPathOption = 'dvc.pythonPath'
 
   constructor() {
     makeObservable(this)

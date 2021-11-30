@@ -9,7 +9,7 @@ import { getGitRepositoryRoot } from '../git'
 import { BaseWorkspace } from '../workspace'
 
 export class WorkspaceRepositories extends BaseWorkspace<Repository> {
-  public treeDataChanged = this.dispose.track(new EventEmitter<void>())
+  public readonly treeDataChanged = this.dispose.track(new EventEmitter<void>())
 
   public getCwd(overrideUri?: Uri): string | Promise<string | undefined> {
     return overrideUri?.fsPath || this.getOnlyOrPickProject()

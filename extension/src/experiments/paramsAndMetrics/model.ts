@@ -17,14 +17,14 @@ export const enum MementoPrefixes {
 }
 
 export class ParamsAndMetricsModel {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   private status: Record<string, Status>
 
   private data: ParamOrMetric[] = []
 
-  private dvcRoot: string
-  private workspaceState: Memento
+  private readonly dvcRoot: string
+  private readonly workspaceState: Memento
 
   private columnsOrderState: ColumnDetail[] = []
   private paramsAndMetricsChanges: string[] = []

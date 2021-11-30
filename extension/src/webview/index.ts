@@ -23,7 +23,7 @@ export class BaseWebview<T extends WebviewData> {
   protected readonly disposer = Disposable.fn()
   private readonly deferred = new Deferred()
 
-  private dvcRoot: string
+  private readonly dvcRoot: string
 
   private readonly isFocusedChanged: EventEmitter<string | undefined> =
     this.disposer.track(new EventEmitter())

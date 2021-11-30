@@ -2,7 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { getCurrentEpoch } from './util/time'
 
 export class ProcessManager {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   private processes: Record<
     string,

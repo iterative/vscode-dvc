@@ -20,7 +20,7 @@ export class ResourceLocator {
   public readonly scatterGraph: Resource
   public readonly clock: Resource
 
-  private extensionUri: Uri
+  private readonly extensionUri: Uri
 
   constructor(extensionUri: Uri) {
     this.extensionUri = extensionUri

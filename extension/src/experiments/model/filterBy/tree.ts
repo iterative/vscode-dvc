@@ -25,7 +25,7 @@ type FilterItem = {
 export class ExperimentsFilterByTree
   implements TreeDataProvider<string | FilterItem>
 {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
 
