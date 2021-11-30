@@ -209,13 +209,15 @@ const Plot = ({
   const spec = createSpec(title, scale)
 
   return (
-    <VegaLite
-      actions={false}
-      config={config}
-      spec={spec}
-      data={{ values }}
-      renderer="svg"
-    />
+    <div data-testid={`plot-${title}`}>
+      <VegaLite
+        actions={false}
+        config={config}
+        spec={spec}
+        data={{ values }}
+        renderer="svg"
+      />
+    </div>
   )
 }
 
