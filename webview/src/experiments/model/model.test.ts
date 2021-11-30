@@ -1,7 +1,6 @@
 import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { runInAction } from 'mobx'
 import { Model } from '.'
-import { createCustomWindow } from '../../test/util'
 
 jest.mock('../../shared/api')
 
@@ -16,10 +15,6 @@ describe('Model', () => {
   let model: Model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let modelAsAny: any
-
-  beforeAll(() => {
-    createCustomWindow()
-  })
 
   beforeEach(() => {
     jest.resetAllMocks()
