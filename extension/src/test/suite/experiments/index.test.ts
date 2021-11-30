@@ -3,24 +3,18 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { stub, spy, restore, match } from 'sinon'
 import { EventEmitter, window, commands, workspace, Uri } from 'vscode'
-import {
-  buildExperiments,
-  buildMockInternalCommands,
-  buildMockData
-} from './util'
+import { buildExperiments, buildMockData } from './util'
 import { Disposable } from '../../../extension'
-import { CliReader } from '../../../cli/reader'
 import expShowFixture from '../../fixtures/expShow/output'
 import rowsFixture from '../../fixtures/expShow/rows'
 import columnsFixture from '../../fixtures/expShow/columns'
 import workspaceChangesFixture from '../../fixtures/expShow/workspaceChanges'
 import { Experiments } from '../../../experiments'
-import { Config } from '../../../config'
 import { ResourceLocator } from '../../../resourceLocator'
-import { InternalCommands } from '../../../commands/internal'
 import { QuickPickItemWithValue } from '../../../vscode/quickPick'
 import { ParamOrMetric, TableData } from '../../../experiments/webview/contract'
 import {
+  buildInternalCommands,
   closeAllEditors,
   dvcDemoPath,
   experimentsUpdatedEvent,
@@ -32,7 +26,6 @@ import { FilterDefinition, Operator } from '../../../experiments/model/filterBy'
 import * as FilterQuickPicks from '../../../experiments/model/filterBy/quickPick'
 import * as SortQuickPicks from '../../../experiments/model/sortBy/quickPick'
 import { joinParamOrMetricPath } from '../../../experiments/paramsAndMetrics/paths'
-import { OutputChannel } from '../../../vscode/outputChannel'
 import { BaseWebview } from '../../../webview'
 import { ParamsAndMetricsModel } from '../../../experiments/paramsAndMetrics/model'
 import * as Factory from '../../../webview/factory'
@@ -193,11 +186,8 @@ suite('Experiments Test Suite', () => {
     }).timeout(8000)
 
     it('should be able to sort', async () => {
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
-      const outputChannel = disposable.track(
-        new OutputChannel([cliReader], '3', 'sort test')
-      )
+      const { internalCommands } = buildInternalCommands(disposable)
+
       const buildTestExperiment = (testParam: number) => ({
         params: {
           'params.yaml': {
@@ -213,9 +203,6 @@ suite('Experiments Test Suite', () => {
         new Map()
       )
 
-      const internalCommands = disposable.track(
-        new InternalCommands(outputChannel, cliReader)
-      )
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)
       )
@@ -393,10 +380,11 @@ suite('Experiments Test Suite', () => {
       }
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
+      const { internalCommands } = buildInternalCommands(disposable)
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          buildMockInternalCommands(disposable),
+          internalCommands,
           {} as ResourceLocator,
           mockMemento,
           buildMockData()
@@ -551,11 +539,12 @@ suite('Experiments Test Suite', () => {
         }
       })
 
+      const { internalCommands } = buildInternalCommands(disposable)
       const mementoSpy = spy(mockMemento, 'get')
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          buildMockInternalCommands(disposable),
+          internalCommands,
           {} as ResourceLocator,
           mockMemento,
           buildMockData()
