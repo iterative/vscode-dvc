@@ -2,7 +2,7 @@ import { Disposable } from '@hediet/std/disposable'
 import { getCurrentEpoch } from './util/time'
 
 export class ProcessManager {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   private processes: Record<
     string,
@@ -43,7 +43,7 @@ export class ProcessManager {
     return this.isOngoing(name) || this.isQueued(name)
   }
 
-  public queue(name: string): Promise<void> {
+  private queue(name: string): Promise<void> {
     this.queued.add(name)
     return Promise.resolve()
   }

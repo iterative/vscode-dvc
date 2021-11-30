@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import '@testing-library/jest-dom/extend-expect'
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment, TableData } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
@@ -15,17 +15,19 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { WebviewColorTheme } from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnsOrder'
-import { CustomWindow } from '../../../test/util'
 import { Model } from '../../model'
 
 jest.mock('../../../shared/api')
 
 describe('Table', () => {
+  const getParentElement = async (text: string) =>
+    // eslint-disable-next-line testing-library/no-node-access
+    (await screen.findByText(text))?.parentElement
+
   const model = new Model()
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
   const headerGroupBasicProps = {
@@ -37,7 +39,11 @@ describe('Table', () => {
   const basicCellProps = {
     getCellProps: getProps,
     row: {
-      id: 'workspace'
+      id: 'workspace',
+      original: {
+        queued: false,
+        running: false
+      }
     }
   }
   const instance = {
@@ -149,9 +155,7 @@ describe('Table', () => {
 
     it('should not have any sorting classes if the sorts property is empty', async () => {
       renderTable()
-      const column = await waitFor(
-        () => screen.getByText('Timestamp')?.parentElement
-      )
+      const column = await getParentElement('Timestamp')
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         false
@@ -164,9 +168,7 @@ describe('Table', () => {
     it('should apply the sortingHeaderCellAsc on the timestamp column if it is not descending in the sorts property', async () => {
       renderTable([{ descending: false, path: 'timestamp' }])
 
-      const column = await waitFor(
-        () => screen.getByText('Timestamp')?.parentElement
-      )
+      const column = await getParentElement('Timestamp')
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         false
@@ -177,9 +179,7 @@ describe('Table', () => {
     it('should apply the sortingHeaderCellDesc on the timestamp column if it is descending in the sorts property', async () => {
       renderTable([{ descending: true, path: 'timestamp' }])
 
-      const column = await waitFor(
-        () => screen.getByText('Timestamp')?.parentElement
-      )
+      const column = await getParentElement('Timestamp')
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         true
@@ -192,9 +192,7 @@ describe('Table', () => {
     it('should apply the sorting class if the cell is a placeholder above the column header when the sort is ascending', async () => {
       renderTableWithPlaceholder(false)
 
-      const header = await waitFor(() =>
-        screen.getByTestId(`header-${placeholderId}`)
-      )
+      const header = await screen.findByTestId(`header-${placeholderId}`)
 
       expect(header?.className.includes(styles.sortingHeaderCellAsc)).toBe(true)
     })
@@ -202,9 +200,7 @@ describe('Table', () => {
     it('should not apply the sorting class if there is a placeholder above the column header when the sort is ascending', async () => {
       renderTableWithPlaceholder(false)
 
-      const column = await waitFor(
-        () => screen.getByText('Timestamp')?.parentElement
-      )
+      const column = await getParentElement('Timestamp')
 
       expect(column?.className.includes(styles.sortingHeaderCellAsc)).toBe(
         false
@@ -214,9 +210,7 @@ describe('Table', () => {
     it('should not apply the sorting class if the cell is a placeholder above the column header when the sort is descending', async () => {
       renderTableWithPlaceholder(true)
 
-      const header = await waitFor(() =>
-        screen.getByTestId(`header-${placeholderId}`)
-      )
+      const header = await screen.findByTestId(`header-${placeholderId}`)
 
       expect(header?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         false
@@ -226,9 +220,7 @@ describe('Table', () => {
     it('should apply the sorting class if there is a placeholder above the column header when the sort is descending', async () => {
       renderTableWithPlaceholder(true)
 
-      const column = await waitFor(
-        () => screen.getByText('Timestamp')?.parentElement
-      )
+      const column = await getParentElement('Timestamp')
 
       expect(column?.className.includes(styles.sortingHeaderCellDesc)).toBe(
         true
@@ -240,7 +232,7 @@ describe('Table', () => {
     it('should not have the workspaceWithChanges class on a row if there are no workspace changes', async () => {
       renderTable()
 
-      const row = await waitFor(() => screen.getByTestId('workspace-row'))
+      const row = await screen.findByTestId('workspace-row')
 
       expect(row?.className.includes(styles.workspaceWithChanges)).toBe(false)
     })
@@ -248,7 +240,7 @@ describe('Table', () => {
     it('should have the workspaceWithChanges class on a row if there are workspace changes', async () => {
       renderTable(undefined, undefined, ['something_changed'])
 
-      const row = await waitFor(() => screen.getByTestId('workspace-row'))
+      const row = await screen.findByTestId('workspace-row')
 
       expect(row?.className.includes(styles.workspaceWithChanges)).toBe(true)
     })
@@ -256,9 +248,7 @@ describe('Table', () => {
     it('should not have the workspaceChange class on a cell if there are no changes', async () => {
       renderTable()
 
-      const row = await waitFor(() =>
-        screen.getByTestId('timestamp___workspace')
-      )
+      const row = await screen.findByTestId('timestamp___workspace')
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
@@ -266,9 +256,7 @@ describe('Table', () => {
     it('should not have the workspaceChange class on a cell if there are changes to other columns but not this one', async () => {
       renderTable(undefined, undefined, ['a_change'])
 
-      const row = await waitFor(() =>
-        screen.getByTestId('timestamp___workspace')
-      )
+      const row = await screen.findByTestId('timestamp___workspace')
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(false)
     })
@@ -276,9 +264,7 @@ describe('Table', () => {
     it('should have the workspaceChange class on a cell if there are changes matching the column id', async () => {
       renderTable(undefined, undefined, ['timestamp'])
 
-      const row = await waitFor(() =>
-        screen.getByTestId('timestamp___workspace')
-      )
+      const row = await screen.findByTestId('timestamp___workspace')
 
       expect(row?.className.includes(styles.workspaceChange)).toBe(true)
     })
@@ -319,26 +305,18 @@ describe('Table', () => {
     }
 
     const renderExperimentsTable = (data: TableData = tableData) => {
-      const table = render(<ExperimentsTable tableData={data} model={model} />)
+      const view = render(<ExperimentsTable tableData={data} model={model} />)
 
-      mockDndElSpacing(table)
+      mockDndElSpacing(view)
 
       const makeGetDragEl = (text: string) => () =>
-        table.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
+        // eslint-disable-next-line testing-library/no-node-access
+        screen.getByText(text).closest(DND_DRAGGABLE_DATA_ATTR)
 
-      return { makeGetDragEl, ...table }
+      return { makeGetDragEl, ...view }
     }
 
     const defaultCols = ['Experiment', 'Timestamp']
-
-    let customWindow: CustomWindow
-
-    beforeAll(() => {
-      customWindow = window as unknown as CustomWindow
-      customWindow.webviewData = {
-        theme: WebviewColorTheme.DARK
-      }
-    })
 
     beforeEach(() => {
       mockGetComputedSpacing()
@@ -347,8 +325,8 @@ describe('Table', () => {
     it('should move a column from its current position to its new position', async () => {
       const { getByText, makeGetDragEl } = renderExperimentsTable()
 
-      let headers = await waitFor(() =>
-        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      let headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.innerHTML
       )
 
       expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
@@ -360,9 +338,10 @@ describe('Table', () => {
         positions: 1
       })
 
-      headers = await waitFor(() =>
-        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.innerHTML
       )
+
       expect(headers).toEqual([...defaultCols, 'A', 'C', 'B'])
 
       await makeDnd({
@@ -372,17 +351,18 @@ describe('Table', () => {
         positions: 2
       })
 
-      headers = await waitFor(() =>
-        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.innerHTML
       )
+
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])
     })
 
     it('should not move a column before the default columns', async () => {
       const { getByText, makeGetDragEl } = renderExperimentsTable()
 
-      const headers = await waitFor(() =>
-        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      const headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.innerHTML
       )
 
       await makeDnd({
@@ -409,8 +389,8 @@ describe('Table', () => {
       }
       renderExperimentsTable(tableDataWithCustomColOrder)
 
-      const headers = await waitFor(() =>
-        screen.getAllByTestId('rendered-header').map(header => header.innerHTML)
+      const headers = (await screen.findAllByTestId('rendered-header')).map(
+        header => header.innerHTML
       )
 
       expect(headers).toEqual([...defaultCols, 'C', 'B', 'A'])

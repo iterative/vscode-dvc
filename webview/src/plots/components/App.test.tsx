@@ -99,9 +99,8 @@ describe('App', () => {
 
   it('should render the loading state when given no data', async () => {
     render(<App />)
-    const loadingState = await waitFor(() =>
-      screen.getByText('Loading Plots...')
-    )
+    const loadingState = await screen.findByText('Loading Plots...')
+
     expect(loadingState).toBeInTheDocument()
   })
 
@@ -114,9 +113,8 @@ describe('App', () => {
     })
     render(<App />)
     fireEvent(window, dataMessageWithoutPlots)
-    const emptyState = await waitFor(() =>
-      screen.getByText('No Plots to Display')
-    )
+    const emptyState = await screen.findByText('No Plots to Display')
+
     expect(emptyState).toBeInTheDocument()
   })
 
@@ -132,7 +130,7 @@ describe('App', () => {
     fireEvent(window, dataMessageWithPlots)
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Live Experiments Plots')).toBeInTheDocument()
+    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
     expect(screen.queryByText('Static Plots')).not.toBeInTheDocument()
   })
 
@@ -148,30 +146,33 @@ describe('App', () => {
     fireEvent(window, dataMessageWithPlots)
 
     expect(screen.queryByText('Loading Plots...')).not.toBeInTheDocument()
-    expect(screen.queryByText('Live Experiments Plots')).toBeInTheDocument()
-    expect(screen.queryByText('Static Plots')).toBeInTheDocument()
+    expect(screen.getByText('Live Experiments Plots')).toBeInTheDocument()
+    expect(screen.getByText('Static Plots')).toBeInTheDocument()
   })
 
   it('should toggle the live plots section in state when its header is clicked', async () => {
     const initialState = {
       collapsedSections: defaultCollapsibleSectionsState,
       data: {
-        live: livePlotsFixture
+        live: livePlotsFixture,
+        metrics
       }
     }
     mockGetState.mockReturnValue(initialState)
     render(<App />)
-    const summaryElement = await waitFor(() =>
-      screen.getByText('Live Experiments Plots')
-    )
+    const summaryElement = await screen.findByText('Live Experiments Plots')
+    const [plot] = await screen.findAllByLabelText('Vega visualization')
+    expect(plot).toBeInTheDocument()
+
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
     })
     await waitFor(() => expect(mockSetState).toBeCalledTimes(2))
-    expect((summaryElement.parentElement as HTMLDetailsElement).open).toBe(
-      false
-    )
+
+    expect(
+      screen.queryByLabelText('Vega visualization')
+    ).not.toBeInTheDocument()
     expect(mockSetState).toBeCalledWith({
       ...initialState,
       collapsedSections: {
@@ -196,9 +197,7 @@ describe('App', () => {
       />
     )
 
-    const summaryElement = await waitFor(() =>
-      screen.getByText('Live Experiments Plots')
-    )
+    const summaryElement = await screen.findByText('Live Experiments Plots')
     fireEvent.click(summaryElement, {
       bubbles: true,
       cancelable: true
@@ -212,7 +211,7 @@ describe('App', () => {
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
-    const lossItem = await waitFor(() => screen.getByText('loss'))
+    const lossItem = await screen.findByText('loss')
 
     fireEvent.click(lossItem, {
       bubbles: true,

@@ -55,7 +55,7 @@ export class Extension implements IExtension {
   private readonly resourceLocator: ResourceLocator
   private readonly config: Config
   private dvcRoots: string[] = []
-  private repositories: WorkspaceRepositories
+  private readonly repositories: WorkspaceRepositories
   private readonly experiments: WorkspaceExperiments
   private readonly plots: WorkspacePlots
   private readonly trackedExplorerTree: TrackedExplorerTree
@@ -99,7 +99,6 @@ export class Extension implements IExtension {
 
     this.internalCommands = this.dispose.track(
       new InternalCommands(
-        this.config,
         outputChannel,
         this.cliExecutor,
         this.cliReader,
@@ -122,9 +121,9 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+      this.cliRunner.onDidCompleteProcess(({ cwd }) =>
         this.experiments.getRepository(cwd).update()
-      })
+      )
     )
 
     this.dispose.track(
@@ -204,9 +203,7 @@ export class Extension implements IExtension {
       })
     )
 
-    this.dispose.track(
-      new WebviewSerializer(this.internalCommands, this.experiments, this.plots)
-    )
+    this.dispose.track(new WebviewSerializer(this.experiments, this.plots))
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots)

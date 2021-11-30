@@ -16,7 +16,7 @@ export type SortItem = {
 export class ExperimentsSortByTree
   implements TreeDataProvider<string | SortItem>
 {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<void>
 

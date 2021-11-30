@@ -214,7 +214,7 @@ suite('Experiments Test Suite', () => {
       )
 
       const internalCommands = disposable.track(
-        new InternalCommands(config, outputChannel, cliReader)
+        new InternalCommands(outputChannel, cliReader)
       )
       const resourceLocator = disposable.track(
         new ResourceLocator(extensionUri)

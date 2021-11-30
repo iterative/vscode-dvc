@@ -1,20 +1,16 @@
 import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { autorun } from 'mobx'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebview,
   MessageToWebviewType,
-  WebviewColorTheme,
   WebviewData,
-  WebviewState,
-  WindowWithWebviewData
+  WebviewState
 } from './contract'
 import { EventNames } from './constants'
 import { setContextValue } from '../vscode/context'
-import { AvailableCommands, InternalCommands } from '../commands/internal'
 import { sendTelemetryEvent } from '../telemetry'
 
 export class BaseWebview<T extends WebviewData> {
@@ -27,13 +23,12 @@ export class BaseWebview<T extends WebviewData> {
   protected readonly disposer = Disposable.fn()
   private readonly deferred = new Deferred()
 
-  private dvcRoot: string
+  private readonly dvcRoot: string
 
   private readonly isFocusedChanged: EventEmitter<string | undefined> =
     this.disposer.track(new EventEmitter())
 
   private readonly webviewPanel: WebviewPanel
-  private readonly internalCommands: InternalCommands
   private readonly contextKey: string
 
   private readonly messageReceived = this.disposer.track(
@@ -42,7 +37,6 @@ export class BaseWebview<T extends WebviewData> {
 
   constructor(
     webviewPanel: WebviewPanel,
-    internalCommands: InternalCommands,
     state: WebviewState<T>,
     contextKey: string,
     eventsNames: EventNames,
@@ -58,7 +52,6 @@ export class BaseWebview<T extends WebviewData> {
 
     this.onDidReceiveMessage = this.messageReceived.event
 
-    this.internalCommands = internalCommands
     this.dvcRoot = state.dvcRoot
 
     webviewPanel.onDidDispose(() => {
@@ -70,7 +63,7 @@ export class BaseWebview<T extends WebviewData> {
       this.handleMessage(arg as MessageFromWebview)
     })
 
-    this.getHtml(scripts).then(html => (webviewPanel.webview.html = html))
+    webviewPanel.webview.html = this.getHtml(scripts)
 
     this.disposer.track(
       webviewPanel.onDidChangeViewState(({ webviewPanel }) => {
@@ -81,16 +74,8 @@ export class BaseWebview<T extends WebviewData> {
     this.notifyActiveStatus(webviewPanel)
 
     this.disposer.track({
-      dispose: autorun(async () => {
+      dispose: async () => {
         await this.isReady() // Read all mobx dependencies before await
-        const theme =
-          await this.internalCommands.executeCommand<WebviewColorTheme>(
-            AvailableCommands.GET_THEME
-          )
-        this.sendMessage({
-          theme,
-          type: MessageToWebviewType.SET_THEME
-        })
         this.sendMessage({
           dvcRoot: this.dvcRoot,
           type: MessageToWebviewType.SET_DVC_ROOT
@@ -103,7 +88,7 @@ export class BaseWebview<T extends WebviewData> {
             type: MessageToWebviewType.SET_DATA
           })
         }
-      })
+      }
     })
 
     this.setupTelemetryEvents(webviewPanel, eventsNames)
@@ -154,7 +139,7 @@ export class BaseWebview<T extends WebviewData> {
     this.isFocusedChanged.fire(active)
   }
 
-  private async getHtml(scripts: readonly string[]): Promise<string> {
+  private getHtml(scripts: readonly string[]): string {
     const webviewScriptTags = scripts
       .map(
         script =>
@@ -164,34 +149,18 @@ export class BaseWebview<T extends WebviewData> {
       )
       .join('')
 
-    const theme = await this.internalCommands.executeCommand<WebviewColorTheme>(
-      AvailableCommands.GET_THEME
-    )
-    const data: WindowWithWebviewData = {
-      webviewData: {
-        theme
-      }
-    }
-
     // TODO make CSP more strict!
     return `
 			  <html>
 				  <head>
 				  <meta charset="UTF-8">
-				  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src ${
-            this.webviewPanel.webview.cspSource
-          } * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src https: ${
-      this.webviewPanel.webview.cspSource
-    }; frame-src *; style-src * 'unsafe-inline'; worker-src * data: blob: data: 'unsafe-inline' 'unsafe-eval'; font-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:;">
+				  <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src ${this.webviewPanel.webview.cspSource} * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src https: ${this.webviewPanel.webview.cspSource}; frame-src *; style-src * 'unsafe-inline'; worker-src * data: blob: data: 'unsafe-inline' 'unsafe-eval'; font-src * 'unsafe-inline' 'unsafe-eval' 'self' data: blob:;">
 				  <style>
 					  html { height: 100%; width: 100%; padding: 0; margin: 0; }
 					  body { height: 100%; width: 100%; padding: 0; margin: 0; }
 				  </style>
 				  </head>
 				  <body>
-					  <script>
-						  Object.assign(window, ${JSON.stringify(data)});
-					  </script>
 					  ${webviewScriptTags}
 				  </body>
 			  </html>

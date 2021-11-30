@@ -1,14 +1,9 @@
 import { useColumnResize } from './useColumnResize'
 import { Model } from '../model'
-import { createCustomWindow } from '../../test/util'
 
 jest.mock('../../shared/api')
 
 describe('useColumnResize', () => {
-  beforeAll(() => {
-    createCustomWindow()
-  })
-
   it('should return the columns width', () => {
     const model = new Model()
     const expectedColumnsWidth = [

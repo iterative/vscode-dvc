@@ -32,9 +32,9 @@ type ModifiedAndNotInCache = {
 export class RepositoryModel
   implements DecorationModel, SourceControlManagementModel
 {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
-  private dvcRoot: string
+  private readonly dvcRoot: string
 
   private state = {
     added: new Set<string>(),

@@ -29,14 +29,14 @@ type ParamsAndMetricsItem = {
 export class ExperimentsParamsAndMetricsTree
   implements TreeDataProvider<string | ParamsAndMetricsItem>
 {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
   private readonly resourceLocator: ResourceLocator
 
-  private view: TreeView<string | ParamsAndMetricsItem>
+  private readonly view: TreeView<string | ParamsAndMetricsItem>
   private viewed = false
 
   constructor(

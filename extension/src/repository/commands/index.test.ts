@@ -4,7 +4,6 @@ import { mocked } from 'ts-jest/utils'
 import { getResourceCommand, getRootCommand, getSimpleResourceCommand } from '.'
 import { getWarningResponse } from '../../vscode/modal'
 import { CommandId, InternalCommands } from '../../commands/internal'
-import { Config } from '../../config'
 import { OutputChannel } from '../../vscode/outputChannel'
 import { WorkspaceRepositories } from '../workspace'
 
@@ -13,10 +12,9 @@ const mockedGetWarningResponse = mocked(getWarningResponse)
 const mockedDvcRoot = join('some', 'path')
 const mockedRelPath = join('with', 'a', 'target')
 const mockedTarget = join(mockedDvcRoot, mockedRelPath)
-const mockedInternalCommands = new InternalCommands(
-  {} as Config,
-  { show: jest.fn() } as unknown as OutputChannel
-)
+const mockedInternalCommands = new InternalCommands({
+  show: jest.fn()
+} as unknown as OutputChannel)
 
 const mockedGetCwd = jest.fn()
 const mockedRepositories = {

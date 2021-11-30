@@ -28,10 +28,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private data: ExperimentsData
+  private readonly data: ExperimentsData
 
-  private experiments: ExperimentsModel
-  private paramsAndMetrics: ParamsAndMetricsModel
+  private readonly experiments: ExperimentsModel
+  private readonly paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<void>()
@@ -52,7 +52,7 @@ export class Experiments extends BaseRepository<TableData> {
     workspaceState: Memento,
     data = new ExperimentsData(dvcRoot, internalCommands)
   ) {
-    super(dvcRoot, internalCommands, resourceLocator.beaker)
+    super(dvcRoot, resourceLocator.beaker)
 
     this.onDidChangeExperiments = this.experimentsChanged.event
     this.onDidChangeParamsOrMetrics = this.paramsOrMetricsChanged.event
@@ -82,7 +82,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    this.data.update()
+    return this.data.managedUpdate()
   }
 
   public async setState(data: ExperimentsOutput) {

@@ -3,7 +3,6 @@ import isEqual from 'lodash.isequal'
 import { BaseWebview } from '.'
 import { ViewKey, WebviewDetails } from './constants'
 import { WebviewState, UnknownWebviewState, WebviewData } from './contract'
-import { InternalCommands } from '../commands/internal'
 import { Resource } from '../resourceLocator'
 import { TableData } from '../experiments/webview/contract'
 import { PlotsData } from '../plots/webview/contract'
@@ -30,7 +29,6 @@ export const isValidState = (
 const create = (
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
-  internalCommands: InternalCommands,
   state: UnknownWebviewState
 ) => {
   if (!isValidState(viewKey, state)) {
@@ -39,19 +37,11 @@ const create = (
 
   const { contextKey, eventNames, scripts } = WebviewDetails[viewKey]
 
-  return new BaseWebview(
-    webviewPanel,
-    internalCommands,
-    state,
-    contextKey,
-    eventNames,
-    scripts
-  )
+  return new BaseWebview(webviewPanel, state, contextKey, eventNames, scripts)
 }
 
 export const createWebview = async (
   viewKey: ViewKey,
-  internalCommands: InternalCommands,
   state: UnknownWebviewState,
   iconPath: Resource
 ) => {
@@ -70,7 +60,7 @@ export const createWebview = async (
 
   webviewPanel.iconPath = iconPath
 
-  const view = create(viewKey, webviewPanel, internalCommands, state)
+  const view = create(viewKey, webviewPanel, state)
   await view.isReady()
   return view
 }
@@ -78,12 +68,11 @@ export const createWebview = async (
 export const restoreWebview = <T extends WebviewData>(
   viewKey: ViewKey,
   webviewPanel: WebviewPanel,
-  internalCommands: InternalCommands,
   state: UnknownWebviewState
 ): Promise<BaseWebview<T>> => {
   return new Promise((resolve, reject) => {
     try {
-      resolve(create(viewKey, webviewPanel, internalCommands, state))
+      resolve(create(viewKey, webviewPanel, state))
     } catch (e: unknown) {
       reject(e)
     }

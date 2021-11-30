@@ -1,9 +1,6 @@
 import { AvailableCommands, CommandId, InternalCommands } from './internal'
 import { ICli } from '../cli'
-import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
-
-const mockedConfig = {} as Config
 
 const mockedOutputChannel = {
   show: jest.fn()
@@ -14,10 +11,7 @@ beforeEach(() => {
 })
 
 describe('InternalCommands', () => {
-  const internalCommands = new InternalCommands(
-    mockedConfig,
-    mockedOutputChannel
-  )
+  const internalCommands = new InternalCommands(mockedOutputChannel)
 
   describe('executeCommand', () => {
     it('should throw an error if we try to run a non-registered command', () => {
@@ -29,9 +23,10 @@ describe('InternalCommands', () => {
 
   describe('registerCommand', () => {
     it('should throw an error if we try to re-register an existing command', () => {
-      expect(() =>
-        internalCommands.registerCommand(AvailableCommands.GET_THEME, jest.fn())
-      ).toThrow()
+      internalCommands.registerCommand(AvailableCommands.ADD, jest.fn())
+      expect(() => {
+        internalCommands.registerCommand(AvailableCommands.ADD, jest.fn())
+      }).toThrow()
     })
   })
 
@@ -43,7 +38,7 @@ describe('InternalCommands', () => {
       } as unknown as ICli
 
       expect(
-        () => new InternalCommands(mockedConfig, mockedOutputChannel, mockedCli)
+        () => new InternalCommands(mockedOutputChannel, mockedCli)
       ).toThrow()
     })
   })

@@ -27,7 +27,7 @@ import { WorkspaceRepositories } from '../repository/workspace'
 import { PathItem } from '../repository/collect'
 
 export class TrackedExplorerTree implements TreeDataProvider<PathItem> {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<void>
 

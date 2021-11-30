@@ -6,7 +6,6 @@ import { Args } from '../cli/args'
 import { autoRegisteredCommands as CliExecutorCommands } from '../cli/executor'
 import { autoRegisteredCommands as CliReaderCommands } from '../cli/reader'
 import { autoRegisteredCommands as CliRunnerCommands } from '../cli/runner'
-import { Config } from '../config'
 import { sendTelemetryEvent, sendTelemetryEventAndThrow } from '../telemetry'
 import { StopWatch } from '../util/time'
 import { OutputChannel } from '../vscode/outputChannel'
@@ -16,9 +15,7 @@ import { Response } from '../vscode/response'
 type Command = (...args: Args) => unknown | Promise<unknown>
 
 export const AvailableCommands = Object.assign(
-  {
-    GET_THEME: 'getTheme'
-  } as const,
+  {} as const,
   CliExecutorCommands,
   CliReaderCommands,
   CliRunnerCommands
@@ -31,15 +28,9 @@ export class InternalCommands {
   private readonly commands = new Map<string, Command>()
   private readonly outputChannel: OutputChannel
 
-  constructor(
-    config: Config,
-    outputChannel: OutputChannel,
-    ...cliInteractors: ICli[]
-  ) {
+  constructor(outputChannel: OutputChannel, ...cliInteractors: ICli[]) {
     cliInteractors.forEach(cli => this.autoRegisterCommands(cli))
     this.outputChannel = outputChannel
-
-    this.registerCommand(AvailableCommands.GET_THEME, () => config.getTheme())
   }
 
   public executeCommand<T = string>(

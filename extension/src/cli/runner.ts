@@ -37,11 +37,11 @@ export class CliRunner implements ICli {
   private readonly processTerminated: EventEmitter<void>
   private readonly onDidTerminateProcess: Event<void>
 
-  private executable: string | undefined
+  private readonly executable: string | undefined
 
-  private pseudoTerminal: PseudoTerminal
+  private readonly pseudoTerminal: PseudoTerminal
   private currentProcess: Process | undefined
-  private config: Config
+  private readonly config: Config
 
   constructor(
     config: Config,
