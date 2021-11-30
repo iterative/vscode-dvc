@@ -179,11 +179,13 @@ suite('Repository Test Suite', () => {
         } as unknown as StatusOutput)
       mockGetAllUntracked.resolves(emptySet)
 
-      const repository = new Repository(
-        dvcDemoPath,
-        internalCommands,
-        decorationProvider,
-        treeDataChanged
+      const repository = disposable.track(
+        new Repository(
+          dvcDemoPath,
+          internalCommands,
+          decorationProvider,
+          treeDataChanged
+        )
       )
       await repository.isReady()
 
@@ -315,11 +317,13 @@ suite('Repository Test Suite', () => {
         .onSecondCall()
         .resolves(untracked)
 
-      const repository = new Repository(
-        dvcDemoPath,
-        internalCommands,
-        decorationProvider,
-        treeDataChanged
+      const repository = disposable.track(
+        new Repository(
+          dvcDemoPath,
+          internalCommands,
+          decorationProvider,
+          treeDataChanged
+        )
       )
       await repository.isReady()
       mockNow.resetBehavior()

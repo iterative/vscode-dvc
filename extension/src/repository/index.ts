@@ -56,8 +56,8 @@ export class Repository {
     return this.model.getChildren(path)
   }
 
-  public update(path?: string): void {
-    this.data.managedUpdate(path)
+  public update(path?: string) {
+    return this.data.managedUpdate(path)
   }
 
   public hasChanges(): boolean {
