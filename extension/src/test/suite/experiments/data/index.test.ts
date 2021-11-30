@@ -44,7 +44,7 @@ suite('Experiments Data Test Suite', () => {
       )
 
       const internalCommands = disposable.track(
-        new InternalCommands(config, outputChannel, cliReader)
+        new InternalCommands(outputChannel, cliReader)
       )
 
       const data = disposable.track(
@@ -82,7 +82,7 @@ suite('Experiments Data Test Suite', () => {
       )
 
       const internalCommands = disposable.track(
-        new InternalCommands(config, outputChannel, cliReader)
+        new InternalCommands(outputChannel, cliReader)
       )
       const data = disposable.track(
         new ExperimentsData(dvcDemoPath, internalCommands)
@@ -128,7 +128,7 @@ suite('Experiments Data Test Suite', () => {
       )
 
       const internalCommands = disposable.track(
-        new InternalCommands(config, outputChannel, cliReader)
+        new InternalCommands(outputChannel, cliReader)
       )
       const data = disposable.track(
         new ExperimentsData(dvcDemoPath, internalCommands)

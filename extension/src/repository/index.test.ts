@@ -8,7 +8,6 @@ import { RepositoryModel } from './model'
 import { DiffOutput, ListOutput, Status, StatusOutput } from '../cli/reader'
 import { getAllUntracked } from '../git'
 import { InternalCommands } from '../commands/internal'
-import { Config } from '../config'
 import { OutputChannel } from '../vscode/outputChannel'
 import { buildMockedEventEmitter } from '../test/util/jest'
 import { getCurrentEpoch } from '../util/time'
@@ -41,12 +40,9 @@ const mockedTreeDataChanged = buildMockedEventEmitter()
 
 const mockedDisposable = mocked(Disposable)
 
-const mockedInternalCommands = new InternalCommands(
-  {} as Config,
-  {
-    show: jest.fn()
-  } as unknown as OutputChannel
-)
+const mockedInternalCommands = new InternalCommands({
+  show: jest.fn()
+} as unknown as OutputChannel)
 mockedInternalCommands.registerCommand('diff', (...args) => mockedDiff(...args))
 mockedInternalCommands.registerCommand('listDvcOnlyRecursive', (...args) =>
   mockedListDvcOnlyRecursive(...args)

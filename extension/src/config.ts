@@ -1,15 +1,7 @@
-import {
-  ColorTheme,
-  ColorThemeKind,
-  EventEmitter,
-  Event,
-  window,
-  workspace
-} from 'vscode'
+import { EventEmitter, Event, workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
 import { makeObservable, observable } from 'mobx'
-import { WebviewColorTheme } from './webview/contract'
 import {
   getOnDidChangePythonExecutionDetails,
   getPythonBinPath
@@ -19,9 +11,6 @@ import { getConfigValue } from './vscode/config'
 export class Config {
   @observable
   public pythonBinPath: string | undefined
-
-  @observable
-  private vsCodeTheme: ColorTheme
 
   @observable
   private dvcPath = this.getCliPath()
@@ -48,26 +37,11 @@ export class Config {
 
     this.onDidChangePythonExecutionDetails()
 
-    this.vsCodeTheme = window.activeColorTheme
-
-    this.dispose.track(
-      window.onDidChangeActiveColorTheme(() => {
-        this.vsCodeTheme = window.activeColorTheme
-      })
-    )
-
     this.onDidConfigurationChange()
   }
 
   public isReady() {
     return this.initialized
-  }
-
-  public getTheme(): WebviewColorTheme {
-    if (this.vsCodeTheme.kind === ColorThemeKind.Dark) {
-      return WebviewColorTheme.DARK
-    }
-    return WebviewColorTheme.LIGHT
   }
 
   public getCliPath(): string {

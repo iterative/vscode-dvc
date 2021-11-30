@@ -11,7 +11,6 @@ import { OutputChannel } from '../../../vscode/outputChannel'
 import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento } from '../../util'
 import { dvcDemoPath, extensionUri } from '../util'
-import { WebviewColorTheme } from '../../../webview/contract'
 import { ExperimentsData } from '../../../experiments/data'
 
 export const buildMockData = () =>
@@ -36,7 +35,7 @@ const buildDependencies = (
   const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
 
   const internalCommands = disposer.track(
-    new InternalCommands(config, outputChannel, cliReader)
+    new InternalCommands(outputChannel, cliReader)
   )
 
   return {
@@ -116,10 +115,7 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
 
 export const buildMockInternalCommands = (disposer: Disposer) => {
   const mockedInternalCommands = disposer.track(
-    new InternalCommands(
-      { getTheme: () => WebviewColorTheme.DARK } as unknown as Config,
-      {} as unknown as OutputChannel
-    )
+    new InternalCommands({} as unknown as OutputChannel)
   )
   mockedInternalCommands.registerCommand(
     AvailableCommands.EXPERIMENT_SHOW,

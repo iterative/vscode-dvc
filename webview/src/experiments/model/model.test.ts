@@ -1,7 +1,4 @@
-import {
-  MessageFromWebviewType,
-  WebviewColorTheme
-} from 'dvc/src/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { runInAction } from 'mobx'
 import { Model } from '.'
 import { createCustomWindow } from '../../test/util'
@@ -68,7 +65,7 @@ describe('Model', () => {
 
     it('should return an empty array if there is no columnsOrder on the data', () => {
       runInAction(() => {
-        modelAsAny.data = { theme: WebviewColorTheme.DARK }
+        modelAsAny.data = {}
       })
       expect(model.getColumnsWithWidth()).toEqual([])
     })
