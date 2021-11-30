@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { restore, spy } from 'sinon'
 import { buildDependencies } from './util'
 import { Disposable } from '../../../extension'
-import { closeAllEditors, dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../util'
 import { Repository } from '../../../repository'
 import { RepositoryModel } from '../../../repository/model'
 import {
@@ -24,7 +24,6 @@ suite('Repository Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return closeAllEditors()
   })
 
   const emptyState = disposable

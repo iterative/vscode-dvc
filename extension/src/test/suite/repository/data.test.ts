@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { restore } from 'sinon'
 import { buildRepositoryData } from './util'
 import { Disposable } from '../../../extension'
-import { closeAllEditors, dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../util'
 
 suite('Repository Data Test Suite', () => {
   const disposable = Disposable.fn()
@@ -15,7 +15,6 @@ suite('Repository Data Test Suite', () => {
 
   afterEach(() => {
     disposable.dispose()
-    return closeAllEditors()
   })
 
   describe('RepositoryData', () => {
