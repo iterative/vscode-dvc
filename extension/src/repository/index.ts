@@ -1,4 +1,3 @@
-import { basename, extname } from 'path'
 import { Event, EventEmitter } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
@@ -7,14 +6,6 @@ import { RepositoryData } from './data'
 import { RepositoryModel } from './model'
 import { SourceControlManagement } from './sourceControlManagement'
 import { InternalCommands } from '../commands/internal'
-
-export const isAnyDvcYaml = (path?: string): boolean =>
-  !!(
-    path &&
-    (extname(path) === '.dvc' ||
-      basename(path) === 'dvc.lock' ||
-      basename(path) === 'dvc.yaml')
-  )
 
 export class Repository {
   public readonly dispose = Disposable.fn()
