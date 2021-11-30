@@ -19,8 +19,7 @@ export class Repository {
   private readonly dvcRoot: string
   private decorationProvider: DecorationProvider
   private readonly sourceControlManagement: SourceControlManagement
-
-  private data: RepositoryData
+  private readonly data: RepositoryData
 
   constructor(
     dvcRoot: string,
