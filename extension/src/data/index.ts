@@ -64,7 +64,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     return this.initialized
   }
 
-  public update() {
+  public managedUpdate() {
     return this.processManager.run('update')
   }
 
@@ -86,7 +86,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
         this.deferred.resolve()
       })
     )
-    this.update()
+    this.managedUpdate()
   }
 
   private async updateData(): Promise<void> {
@@ -128,7 +128,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
           if (!path) {
             return
           }
-          this.update()
+          this.managedUpdate()
         }
       )
     )
