@@ -64,7 +64,7 @@ describe('getRepositoryListener', () => {
     expect(mockedUpdate).not.toBeCalled()
   })
 
-  it("should return a function that calls reset if it is called with on of the repo's .dvc data placeholders", () => {
+  it('should return a function that calls update with the provided path if it is inside the repo', () => {
     const mockedDvcRoot = resolve('some', 'dvc', 'repo')
     const listener = getRepositoryListener(repository, mockedDvcRoot)
 
@@ -74,40 +74,6 @@ describe('getRepositoryListener', () => {
 
     expect(mockedUpdate).toBeCalledTimes(1)
     expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it("should return a function that calls reset if it is called with the repo's dvc.yaml", () => {
-    const mockedDvcRoot = resolve('some', 'dvc', 'repo')
-    const listener = getRepositoryListener(
-      repository,
-
-      mockedDvcRoot
-    )
-    const path = join(mockedDvcRoot, 'data', 'dvc.yaml')
-    listener(path)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it("should return a function that calls reset if it is called with one of the repo's dvc.lock", () => {
-    const mockedDvcRoot = resolve('some', 'dvc', 'repo')
-    const listener = getRepositoryListener(repository, mockedDvcRoot)
-
-    const path = join(mockedDvcRoot, 'data', 'dvc.lock')
-    listener(path)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(path)
-  })
-
-  it('should return a function that calls update if it is called with anything other path from inside the repo', () => {
-    const listener = getRepositoryListener(repository, __dirname)
-
-    listener(__filename)
-
-    expect(mockedUpdate).toBeCalledTimes(1)
-    expect(mockedUpdate).toBeCalledWith(__filename)
   })
 
   it('should return a function that calls update if it is called with .git/index (that is above the dvc root)', () => {
