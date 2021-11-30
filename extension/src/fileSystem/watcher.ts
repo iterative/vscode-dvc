@@ -2,7 +2,7 @@ import { utimes } from 'fs-extra'
 import { workspace } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { watch } from 'chokidar'
-import { isAnyDvcYaml, isDirectory } from '.'
+import { isDirectory } from '.'
 import { isInWorkspace } from './workspace'
 import { Repository } from '../repository'
 import { EXPERIMENTS_GIT_REFS } from '../experiments/data/constants'
@@ -30,11 +30,7 @@ export const getRepositoryListener =
       return
     }
 
-    if (isAnyDvcYaml(path)) {
-      repository.reset()
-      return
-    }
-    repository.update()
+    repository.update(path)
   }
 
 export const createFileSystemWatcher = (
