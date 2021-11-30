@@ -35,6 +35,7 @@ import {
 } from '../../../webview/contract'
 import { ExperimentsModel } from '../../../experiments/model'
 import { copyOriginalColors } from '../../../experiments/model/colors'
+import { InternalCommands } from '../../../commands/internal'
 
 suite('Experiments Test Suite', () => {
   const disposable = Disposable.fn()
@@ -380,11 +381,11 @@ suite('Experiments Test Suite', () => {
       }
       const mockMemento = buildMockMemento()
       const mementoSpy = spy(mockMemento, 'get')
-      const { internalCommands } = buildInternalCommands(disposable)
+
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          internalCommands,
+          {} as InternalCommands,
           {} as ResourceLocator,
           mockMemento,
           buildMockData()
@@ -539,12 +540,11 @@ suite('Experiments Test Suite', () => {
         }
       })
 
-      const { internalCommands } = buildInternalCommands(disposable)
       const mementoSpy = spy(mockMemento, 'get')
       const testRepository = disposable.track(
         new Experiments(
           'test',
-          internalCommands,
+          {} as InternalCommands,
           {} as ResourceLocator,
           mockMemento,
           buildMockData()
