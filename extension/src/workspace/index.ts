@@ -12,7 +12,7 @@ export abstract class BaseWorkspace<
   public readonly dispose = Disposable.fn()
 
   protected repositories: Disposables<T> = {}
-  protected internalCommands: InternalCommands
+  protected readonly internalCommands: InternalCommands
 
   protected readonly deferred = new Deferred()
   private readonly initialized = this.deferred.promise

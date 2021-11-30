@@ -27,11 +27,11 @@ export abstract class BaseRepository<T extends WebviewData> {
   protected readonly deferred = new Deferred()
   protected readonly initialized = this.deferred.promise
 
-  private receivedWebviewMessage = this.dispose.track(
+  private readonly receivedWebviewMessage = this.dispose.track(
     new EventEmitter<MessageFromWebview>()
   )
 
-  private webviewIcon: Resource
+  private readonly webviewIcon: Resource
 
   abstract viewKey: ViewKey
 

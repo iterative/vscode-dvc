@@ -28,10 +28,10 @@ export class Experiments extends BaseRepository<TableData> {
 
   public readonly viewKey = ViewKey.EXPERIMENTS
 
-  private data: ExperimentsData
+  private readonly data: ExperimentsData
 
-  private experiments: ExperimentsModel
-  private paramsAndMetrics: ParamsAndMetricsModel
+  private readonly experiments: ExperimentsModel
+  private readonly paramsAndMetrics: ParamsAndMetricsModel
 
   private readonly experimentsChanged = this.dispose.track(
     new EventEmitter<void>()

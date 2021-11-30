@@ -38,14 +38,14 @@ type ExperimentItem = {
 export class ExperimentsTree
   implements TreeDataProvider<string | ExperimentItem>
 {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   public readonly onDidChangeTreeData: Event<string | void>
 
   private readonly experiments: WorkspaceExperiments
   private readonly resourceLocator: ResourceLocator
 
-  private view: TreeView<string | ExperimentItem>
+  private readonly view: TreeView<string | ExperimentItem>
   private viewed = false
 
   constructor(

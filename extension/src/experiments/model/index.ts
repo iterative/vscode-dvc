@@ -47,7 +47,7 @@ export class ExperimentsModel {
 
   private currentSorts: SortDefinition[]
 
-  private dvcRoot: string
+  private readonly dvcRoot: string
   private workspaceState: Memento
 
   constructor(dvcRoot: string, workspaceState: Memento) {

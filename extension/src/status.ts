@@ -4,9 +4,9 @@ import { ICli } from './cli'
 import { RegisteredCommands } from './commands/external'
 
 export class Status {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
-  private statusBarItem: StatusBarItem = this.dispose.track(
+  private readonly statusBarItem: StatusBarItem = this.dispose.track(
     window.createStatusBarItem()
   )
 

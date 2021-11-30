@@ -36,7 +36,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
 
   private watcher?: Disposable
 
-  private updateCommandId: CommandId
+  private readonly updateCommandId: CommandId
 
   constructor(
     dvcRoot: string,

@@ -4,9 +4,9 @@ import { sendTelemetryEvent } from '../telemetry'
 import { EventName } from '../telemetry/constants'
 
 export class PseudoTerminal {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
-  private termName: string
+  private readonly termName: string
   private instance: Terminal | undefined
 
   private blocked: boolean

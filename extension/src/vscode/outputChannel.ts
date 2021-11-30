@@ -9,7 +9,7 @@ enum ProcessStatus {
 }
 
 export class OutputChannel {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
   private readonly outputChannel: VSOutputChannel
   private readonly version: string
 

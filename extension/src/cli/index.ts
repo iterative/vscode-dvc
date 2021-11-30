@@ -46,7 +46,7 @@ export const typeCheckCommands = (
   })
 
 export class Cli implements ICli {
-  public dispose = Disposable.fn()
+  public readonly dispose = Disposable.fn()
 
   public autoRegisteredCommands: string[] = []
 
@@ -56,7 +56,7 @@ export class Cli implements ICli {
   public readonly processStarted: EventEmitter<CliStarted>
   public readonly onDidStartProcess: Event<CliStarted>
 
-  protected config: Config
+  protected readonly config: Config
 
   constructor(
     config: Config,
