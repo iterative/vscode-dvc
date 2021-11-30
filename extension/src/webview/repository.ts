@@ -5,7 +5,6 @@ import { BaseWebview } from '.'
 import { ViewKey } from './constants'
 import { MessageFromWebview, WebviewData } from './contract'
 import { createWebview } from './factory'
-import { InternalCommands } from '../commands/internal'
 import { Resource } from '../resourceLocator'
 
 export abstract class BaseRepository<T extends WebviewData> {
@@ -20,8 +19,6 @@ export abstract class BaseRepository<T extends WebviewData> {
 
   protected readonly dvcRoot: string
 
-  protected readonly internalCommands: InternalCommands
-
   protected webview?: BaseWebview<T>
 
   protected readonly deferred = new Deferred()
@@ -35,13 +32,8 @@ export abstract class BaseRepository<T extends WebviewData> {
 
   abstract readonly viewKey: ViewKey
 
-  constructor(
-    dvcRoot: string,
-    internalCommands: InternalCommands,
-    webviewIcon: Resource
-  ) {
+  constructor(dvcRoot: string, webviewIcon: Resource) {
     this.dvcRoot = dvcRoot
-    this.internalCommands = internalCommands
     this.webviewIcon = webviewIcon
 
     this.onDidChangeIsWebviewFocused = this.isWebviewFocusedChanged.event
@@ -59,7 +51,6 @@ export abstract class BaseRepository<T extends WebviewData> {
 
     const webview = await createWebview(
       this.viewKey,
-      this.internalCommands,
       {
         data: this.getWebviewData(),
         dvcRoot: this.dvcRoot

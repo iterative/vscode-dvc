@@ -24,7 +24,7 @@ export class Plots extends BaseRepository<TPlotsData> {
     internalCommands: InternalCommands,
     webviewIcon: Resource
   ) {
-    super(dvcRoot, internalCommands, webviewIcon)
+    super(dvcRoot, webviewIcon)
 
     this.data = this.dispose.track(new PlotsData(dvcRoot, internalCommands))
 
