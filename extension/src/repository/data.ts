@@ -34,8 +34,8 @@ export class RepositoryData {
     this.dvcRoot = dvcRoot
     this.processManager = this.dispose.track(
       new ProcessManager(
-        { name: 'update', process: () => this.updateData() },
-        { name: 'reset', process: () => this.resetData() }
+        { name: 'partialUpdate', process: () => this.partialUpdate() },
+        { name: 'fullUpdate', process: () => this.fullUpdate() }
       )
     )
 
@@ -51,11 +51,14 @@ export class RepositoryData {
 
   public async managedUpdate(path?: string) {
     await this.isReady()
-    if (isAnyDvcYaml(path) || this.processManager.isOngoingOrQueued('reset')) {
-      return this.processManager.run('reset')
+    if (
+      isAnyDvcYaml(path) ||
+      this.processManager.isOngoingOrQueued('fullUpdate')
+    ) {
+      return this.processManager.run('fullUpdate')
     }
 
-    return this.processManager.run('update')
+    return this.processManager.run('partialUpdate')
   }
 
   private initialize() {
@@ -66,16 +69,17 @@ export class RepositoryData {
         this.deferred.resolve()
       })
     )
-    return this.resetData()
+    return this.fullUpdate()
   }
 
-  private async resetData() {
+  private async fullUpdate() {
     const tracked = await this.internalCommands.executeCommand<ListOutput[]>(
       AvailableCommands.LIST_DVC_ONLY_RECURSIVE,
       this.dvcRoot
     )
 
-    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
+    const [diffFromHead, diffFromCache, untracked] =
+      await this.getPartialUpdateData()
 
     return this.notifyChanged({
       diffFromCache,
@@ -85,12 +89,13 @@ export class RepositoryData {
     })
   }
 
-  private async updateData() {
-    const [diffFromHead, diffFromCache, untracked] = await this.getUpdateData()
+  private async partialUpdate() {
+    const [diffFromHead, diffFromCache, untracked] =
+      await this.getPartialUpdateData()
     return this.notifyChanged({ diffFromCache, diffFromHead, untracked })
   }
 
-  private async getUpdateData(): Promise<
+  private async getPartialUpdateData(): Promise<
     [DiffOutput, StatusOutput, Set<string>]
   > {
     const diffFromCache =
