@@ -1,7 +1,6 @@
 import { Event, EventEmitter, WebviewPanel, Uri } from 'vscode'
 import { Disposable } from '@hediet/std/disposable'
 import { Deferred } from '@hediet/std/synchronization'
-import { autorun } from 'mobx'
 import {
   MessageFromWebview,
   MessageFromWebviewType,
@@ -75,7 +74,7 @@ export class BaseWebview<T extends WebviewData> {
     this.notifyActiveStatus(webviewPanel)
 
     this.disposer.track({
-      dispose: autorun(async () => {
+      dispose: async () => {
         await this.isReady() // Read all mobx dependencies before await
         this.sendMessage({
           dvcRoot: this.dvcRoot,
@@ -89,7 +88,7 @@ export class BaseWebview<T extends WebviewData> {
             type: MessageToWebviewType.SET_DATA
           })
         }
-      })
+      }
     })
 
     this.setupTelemetryEvents(webviewPanel, eventsNames)
