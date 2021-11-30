@@ -48,7 +48,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     this.processManager = this.dispose.track(
       new ProcessManager({
         name: 'update',
-        process: () => this.updateData()
+        process: () => this.update()
       })
     )
 
@@ -64,7 +64,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
     return this.initialized
   }
 
-  public update() {
+  public managedUpdate() {
     return this.processManager.run('update')
   }
 
@@ -86,10 +86,10 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
         this.deferred.resolve()
       })
     )
-    this.update()
+    this.managedUpdate()
   }
 
-  private async updateData(): Promise<void> {
+  private async update(): Promise<void> {
     const data = await this.internalCommands.executeCommand<T>(
       this.updateCommandId,
       this.dvcRoot
@@ -128,7 +128,7 @@ export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
           if (!path) {
             return
           }
-          this.update()
+          this.managedUpdate()
         }
       )
     )
