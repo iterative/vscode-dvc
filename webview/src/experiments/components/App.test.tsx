@@ -16,13 +16,11 @@ import { vsCodeApi } from '../../shared/api'
 
 jest.mock('../../shared/api')
 
-const { postMessage, getState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
-const mockGetState = mocked(getState)
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockGetState.mockReturnValueOnce({})
 })
 
 afterEach(() => {
