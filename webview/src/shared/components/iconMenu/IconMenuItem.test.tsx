@@ -107,7 +107,6 @@ describe('IconMenuItem', () => {
     const [hiddenItem] = hoverMenu
 
     expect(hiddenItem.innerHTML).toBe('Item')
-    expect(hiddenItem.className).toContain('hidden')
     expect(hiddenItem.className).toContain('removed')
   })
 

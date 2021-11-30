@@ -6,7 +6,7 @@ import { Disposable } from '../../../../extension'
 import { ExperimentsModel, Status } from '../../../../experiments/model'
 import { dvcDemoPath, experimentsUpdatedEvent } from '../../util'
 import { RegisteredCommands } from '../../../../commands/external'
-import { buildPlots, getExpectedData } from '../../plots/util'
+import { buildPlots, getExpectedData, plotsMetrics } from '../../plots/util'
 import livePlotsFixture from '../../../fixtures/expShow/livePlots'
 import expShowFixture from '../../../fixtures/expShow/output'
 import columnsFixture from '../../../fixtures/expShow/columns'
@@ -84,6 +84,7 @@ suite('Experiments Tree Test Suite', () => {
         'when there are no experiments selected we send undefined (show empty state)'
       ).to.be.calledWith({
         live: undefined,
+        metrics: plotsMetrics,
         static: undefined
       })
       messageSpy.resetHistory()
@@ -262,7 +263,11 @@ suite('Experiments Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const expectedMessage = { live: undefined, static: undefined }
+      const expectedMessage = {
+        live: undefined,
+        metrics: plotsMetrics,
+        static: undefined
+      }
 
       expect(
         messageSpy,
