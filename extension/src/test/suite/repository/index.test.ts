@@ -232,7 +232,7 @@ suite('Repository Test Suite', () => {
       expect(repository.hasChanges()).to.be.true
     })
 
-    it("should update the classes state and call it's dependents", async () => {
+    it('should update the state and call all dependents', async () => {
       const model = 'model.pkl'
       const dataDir = 'data'
       const features = join(dataDir, 'features')
