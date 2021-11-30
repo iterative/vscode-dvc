@@ -32,7 +32,7 @@ export class ExperimentsData extends BaseData<ExperimentsOutput> {
           path.includes(EXPERIMENTS_GIT_REFS) ||
           path.includes(join(GIT_REFS, 'heads'))
         ) {
-          return this.update()
+          return this.managedUpdate()
         }
       })
     )

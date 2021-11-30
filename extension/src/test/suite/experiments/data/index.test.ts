@@ -52,12 +52,12 @@ suite('Experiments Data Test Suite', () => {
       )
 
       await Promise.all([
-        data.update(),
-        data.update(),
-        data.update(),
-        data.update(),
-        data.update(),
-        data.update()
+        data.managedUpdate(),
+        data.managedUpdate(),
+        data.managedUpdate(),
+        data.managedUpdate(),
+        data.managedUpdate(),
+        data.managedUpdate()
       ])
 
       expect(mockExperimentShow).to.be.calledOnce
@@ -168,7 +168,7 @@ suite('Experiments Data Test Suite', () => {
         data.onDidUpdate(data => resolve(data))
       )
 
-      data.update()
+      data.managedUpdate()
 
       await dataUpdatedEvent
 

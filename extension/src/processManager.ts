@@ -43,7 +43,7 @@ export class ProcessManager {
     return this.isOngoing(name) || this.isQueued(name)
   }
 
-  public queue(name: string): Promise<void> {
+  private queue(name: string): Promise<void> {
     this.queued.add(name)
     return Promise.resolve()
   }
