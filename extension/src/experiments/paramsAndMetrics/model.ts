@@ -24,7 +24,7 @@ export class ParamsAndMetricsModel {
   private data: ParamOrMetric[] = []
 
   private readonly dvcRoot: string
-  private workspaceState: Memento
+  private readonly workspaceState: Memento
 
   private columnsOrderState: ColumnDetail[] = []
   private paramsAndMetricsChanges: string[] = []

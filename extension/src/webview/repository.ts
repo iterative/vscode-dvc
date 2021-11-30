@@ -33,7 +33,7 @@ export abstract class BaseRepository<T extends WebviewData> {
 
   private readonly webviewIcon: Resource
 
-  abstract viewKey: ViewKey
+  abstract readonly viewKey: ViewKey
 
   constructor(
     dvcRoot: string,
