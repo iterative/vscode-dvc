@@ -82,7 +82,7 @@ export class Experiments extends BaseRepository<TableData> {
   }
 
   public update() {
-    this.data.managedUpdate()
+    return this.data.managedUpdate()
   }
 
   public async setState(data: ExperimentsOutput) {

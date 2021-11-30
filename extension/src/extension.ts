@@ -122,9 +122,9 @@ export class Extension implements IExtension {
     )
 
     this.dispose.track(
-      this.cliRunner.onDidCompleteProcess(({ cwd }) => {
+      this.cliRunner.onDidCompleteProcess(({ cwd }) =>
         this.experiments.getRepository(cwd).update()
-      })
+      )
     )
 
     this.dispose.track(
