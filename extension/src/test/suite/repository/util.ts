@@ -24,7 +24,7 @@ export const buildDependencies = (disposer: Disposer) => {
     new OutputChannel([cliReader], '8', 'repository test suite')
   )
   const internalCommands = disposer.track(
-    new InternalCommands(config, outputChannel, cliReader)
+    new InternalCommands(outputChannel, cliReader)
   )
   const decorationProvider = disposer.track(new DecorationProvider())
   const treeDataChanged = disposer.track(new EventEmitter<void>())

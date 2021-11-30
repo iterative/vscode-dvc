@@ -20,17 +20,6 @@ export enum MessageFromWebviewType {
   COLUMN_RESIZED = 'column-resized'
 }
 
-export interface WindowWithWebviewData {
-  webviewData: {
-    theme: WebviewColorTheme
-  }
-}
-
-export enum WebviewColorTheme {
-  LIGHT = 'light',
-  DARK = 'dark'
-}
-
 export interface setData<T extends WebviewData> {
   type: MessageToWebviewType.SET_DATA
   data: T
@@ -41,15 +30,10 @@ export type MessageToWebview<T extends WebviewData> =
       type: MessageToWebviewType.SET_DVC_ROOT
       dvcRoot: string
     }
-  | {
-      type: MessageToWebviewType.SET_THEME
-      theme: WebviewColorTheme
-    }
   | setData<T>
 
 export enum MessageToWebviewType {
   SET_DVC_ROOT = 'setDvcRoot',
-  SET_THEME = 'setTheme',
   SET_DATA = 'setData'
 }
 

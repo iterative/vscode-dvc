@@ -15,12 +15,10 @@ import {
   DND_DIRECTION_LEFT,
   DND_DIRECTION_RIGHT
 } from 'react-beautiful-dnd-test-utils'
-import { WebviewColorTheme } from 'dvc/src/webview/contract'
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
 import * as ColumnOrder from '../../hooks/useColumnsOrder'
-import { CustomWindow } from '../../../test/util'
 import { Model } from '../../model'
 
 jest.mock('../../../shared/api')
@@ -319,15 +317,6 @@ describe('Table', () => {
     }
 
     const defaultCols = ['Experiment', 'Timestamp']
-
-    let customWindow: CustomWindow
-
-    beforeAll(() => {
-      customWindow = window as unknown as CustomWindow
-      customWindow.webviewData = {
-        theme: WebviewColorTheme.DARK
-      }
-    })
 
     beforeEach(() => {
       mockGetComputedSpacing()

@@ -4,7 +4,6 @@ import { Experiments } from '.'
 import { WorkspaceExperiments } from './workspace'
 import { pickExperimentName } from './quickPick'
 import { quickPickOne } from '../vscode/quickPick'
-import { Config } from '../config'
 import {
   CommandId,
   AvailableCommands,
@@ -40,12 +39,9 @@ describe('Experiments', () => {
     }
   } as unknown as (() => void) & Disposer)
 
-  const mockedInternalCommands = new InternalCommands(
-    {} as Config,
-    {
-      show: jest.fn()
-    } as unknown as OutputChannel
-  )
+  const mockedInternalCommands = new InternalCommands({
+    show: jest.fn()
+  } as unknown as OutputChannel)
 
   const mockedCommandId = 'mockedExpFunc' as CommandId
   mockedInternalCommands.registerCommand(mockedCommandId, (...args) =>

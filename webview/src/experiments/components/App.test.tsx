@@ -9,27 +9,18 @@ import rowsFixture from 'dvc/src/test/fixtures/expShow/rows'
 import columnsFixture from 'dvc/src/test/fixtures/expShow/columns'
 import {
   MessageFromWebviewType,
-  MessageToWebviewType,
-  WebviewColorTheme
+  MessageToWebviewType
 } from 'dvc/src/webview/contract'
 import { App } from './App'
 import { vsCodeApi } from '../../shared/api'
-import { CustomWindow } from '../../test/util'
 
 jest.mock('../../shared/api')
 
-const { postMessage, getState } = vsCodeApi
+const { postMessage } = vsCodeApi
 const mockPostMessage = mocked(postMessage)
-const mockGetState = mocked(getState)
 
-let customWindow: CustomWindow
 beforeEach(() => {
   jest.clearAllMocks()
-  mockGetState.mockReturnValueOnce({})
-  customWindow = window as unknown as CustomWindow
-  customWindow.webviewData = {
-    theme: WebviewColorTheme.DARK
-  }
 })
 
 afterEach(() => {
@@ -72,7 +63,7 @@ describe('App', () => {
     describe('When we render the App and send the message', () => {
       it('Then the experiments table should be shown', () => {
         render(<App />)
-        fireEvent(customWindow, messageToChangeState)
+        fireEvent(window, messageToChangeState)
 
         screen.queryAllByText('Experiment')
         const emptyState = screen.queryByText('Loading experiments...')

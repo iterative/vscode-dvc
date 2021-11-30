@@ -2,9 +2,7 @@ import {
   MessageFromWebview,
   MessageFromWebviewType,
   MessageToWebviewType,
-  MessageToWebview as GenericMessageToWebview,
-  WebviewColorTheme,
-  WindowWithWebviewData
+  MessageToWebview as GenericMessageToWebview
 } from 'dvc/src/webview/contract'
 import { ColumnDetail, TableData } from 'dvc/src/experiments/webview/contract'
 import { Logger } from 'dvc/src/common/logger'
@@ -16,17 +14,12 @@ import { vsCodeApi } from '../../shared/api'
 
 type MessageToWebview = GenericMessageToWebview<TableData>
 
-declare const window: Window & WindowWithWebviewData
-
 interface PersistedModelState {
   data?: TableData | null
   dvcRoot?: string
 }
 
 export class Model {
-  @observable
-  public theme: WebviewColorTheme = WebviewColorTheme.LIGHT
-
   @observable
   public data?: TableData | null = null // do not remove = null or webview will not load data
 
@@ -39,8 +32,6 @@ export class Model {
     initialState: PersistedModelState = vsCodeApi.getState<PersistedModelState>()
   ) {
     makeObservable(this)
-    const data = window.webviewData
-    this.theme = data?.theme
 
     this.dispose.track(
       addMessageHandler<MessageToWebview>(message =>
@@ -101,11 +92,6 @@ export class Model {
 
   private handleMessage(message: MessageToWebview): void {
     switch (message.type) {
-      case MessageToWebviewType.SET_THEME:
-        runInAction(() => {
-          this.theme = message.theme
-        })
-        return
       case MessageToWebviewType.SET_DATA:
         runInAction(() => {
           this.data = message.data

@@ -99,7 +99,6 @@ export class Extension implements IExtension {
 
     this.internalCommands = this.dispose.track(
       new InternalCommands(
-        this.config,
         outputChannel,
         this.cliExecutor,
         this.cliReader,
@@ -204,9 +203,7 @@ export class Extension implements IExtension {
       })
     )
 
-    this.dispose.track(
-      new WebviewSerializer(this.internalCommands, this.experiments, this.plots)
-    )
+    this.dispose.track(new WebviewSerializer(this.experiments, this.plots))
 
     registerExperimentCommands(this.experiments, this.internalCommands)
     registerPlotsCommands(this.plots)

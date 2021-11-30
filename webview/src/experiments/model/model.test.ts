@@ -1,10 +1,6 @@
-import {
-  MessageFromWebviewType,
-  WebviewColorTheme
-} from 'dvc/src/webview/contract'
+import { MessageFromWebviewType } from 'dvc/src/webview/contract'
 import { runInAction } from 'mobx'
 import { Model } from '.'
-import { createCustomWindow } from '../../test/util'
 
 jest.mock('../../shared/api')
 
@@ -19,10 +15,6 @@ describe('Model', () => {
   let model: Model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let modelAsAny: any
-
-  beforeAll(() => {
-    createCustomWindow()
-  })
 
   beforeEach(() => {
     jest.resetAllMocks()
@@ -68,7 +60,7 @@ describe('Model', () => {
 
     it('should return an empty array if there is no columnsOrder on the data', () => {
       runInAction(() => {
-        modelAsAny.data = { theme: WebviewColorTheme.DARK }
+        modelAsAny.data = {}
       })
       expect(model.getColumnsWithWidth()).toEqual([])
     })

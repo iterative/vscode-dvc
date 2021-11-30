@@ -4,7 +4,6 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { exists, isDirectory } from '.'
 import { TrackedExplorerTree } from './tree'
-import { Config } from '../config'
 import { InternalCommands } from '../commands/internal'
 import { RegisteredCommands } from '../commands/external'
 import { OutputChannel } from '../vscode/outputChannel'
@@ -42,12 +41,9 @@ const mockedDisposer = {
   }
 } as unknown as (() => void) & Disposer
 mockedDisposable.fn.mockReturnValueOnce(mockedDisposer)
-const mockedInternalCommands = new InternalCommands(
-  {} as Config,
-  {
-    show: jest.fn()
-  } as unknown as OutputChannel
-)
+const mockedInternalCommands = new InternalCommands({
+  show: jest.fn()
+} as unknown as OutputChannel)
 
 const mockedExists = mocked(exists)
 const mockedIsDirectory = mocked(isDirectory)
