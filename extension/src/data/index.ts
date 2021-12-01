@@ -5,7 +5,8 @@ import { Deferred } from '@hediet/std/synchronization'
 import { createFileSystemWatcher } from '../fileSystem/watcher'
 import { ProcessManager } from '../processManager'
 import { CommandId, InternalCommands } from '../commands/internal'
-import { ExperimentsOutput, PlotsOutput } from '../cli/reader'
+import { ExperimentsOutput } from '../cli/reader'
+import { PlotsOutput } from '../plots/webview/contract'
 import { definedAndNonEmpty, sameContents, uniqueValues } from '../util/array'
 
 export abstract class BaseData<T extends PlotsOutput | ExperimentsOutput> {
