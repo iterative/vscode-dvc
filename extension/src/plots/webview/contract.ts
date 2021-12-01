@@ -21,14 +21,14 @@ export enum PlotsType {
 
 export type StaticVegaPlot = {
   content: VisualizationSpec
-  type: PlotsType
   revs?: string[]
+  type: PlotsType
 }
 
 export type StaticImage = {
-  content: { url: string }
-  type: PlotsType
   rev?: string
+  type: PlotsType
+  url: string
 }
 
 export type StaticPlot = StaticVegaPlot | StaticImage
