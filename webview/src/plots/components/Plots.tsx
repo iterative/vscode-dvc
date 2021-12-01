@@ -1,11 +1,9 @@
 import React, { Dispatch, useState, useEffect } from 'react'
 import {
+  isVegaPlot,
   LivePlotsColors,
   LivePlotData,
-  PlotsOutput,
-  PlotsType,
-  StaticPlot,
-  VegaPlot
+  PlotsOutput
 } from 'dvc/src/plots/webview/contract'
 import { VegaLite } from 'react-vega'
 import styles from './styles.module.scss'
@@ -127,14 +125,11 @@ const LivePlots = ({
     EmptyState('No metrics selected')
   )
 
-const isVega = (plot: StaticPlot): plot is VegaPlot =>
-  plot.type === PlotsType.VEGA
-
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
     {Object.entries(plots).map(([path, plots]) =>
       plots.map(plot =>
-        isVega(plot) ? (
+        isVegaPlot(plot) ? (
           <VegaLite
             actions={false}
             config={config}

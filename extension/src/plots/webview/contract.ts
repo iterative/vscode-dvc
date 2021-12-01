@@ -19,6 +19,9 @@ export enum PlotsType {
   IMAGE = 'image'
 }
 
+export const isVegaPlot = (plot: StaticPlot): plot is VegaPlot =>
+  plot.type === PlotsType.VEGA
+
 export type VegaPlot = {
   content: VisualizationSpec
   revs?: string[]
@@ -30,6 +33,9 @@ export type ImagePlot = {
   type: PlotsType
   url: string
 }
+
+export const isImagePlot = (plot: StaticPlot): plot is ImagePlot =>
+  plot.type === PlotsType.IMAGE
 
 export type StaticPlot = VegaPlot | ImagePlot
 
