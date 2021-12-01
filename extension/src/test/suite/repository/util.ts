@@ -1,6 +1,6 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import { dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../../util'
 import { CliReader } from '../../../cli/reader'
 import { InternalCommands } from '../../../commands/internal'
 import { Config } from '../../../config'

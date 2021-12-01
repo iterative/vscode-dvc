@@ -9,8 +9,8 @@ import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
 import { OutputChannel } from '../../../vscode/outputChannel'
 import expShowFixture from '../../fixtures/expShow/output'
-import { buildMockMemento } from '../../util'
-import { dvcDemoPath, extensionUri } from '../util'
+import { buildMockMemento, dvcDemoPath } from '../../util'
+import { extensionUri } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
 
 export const buildMockData = () =>

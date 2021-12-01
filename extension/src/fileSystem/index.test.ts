@@ -1,6 +1,7 @@
 import { join, resolve } from 'path'
 import { ensureDirSync, remove } from 'fs-extra'
 import * as FileSystem from '.'
+import { dvcDemoPath } from '../test/util'
 
 const {
   exists,
@@ -15,8 +16,6 @@ jest.mock('../cli/reader')
 beforeEach(() => {
   jest.resetAllMocks()
 })
-
-const dvcDemoPath = resolve(__dirname, '..', '..', '..', 'demo')
 
 describe('findDvcRootPaths', () => {
   it('should find the dvc root if it exists in the given folder', async () => {

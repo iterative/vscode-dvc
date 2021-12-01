@@ -10,10 +10,11 @@ import {
   ParamOrMetric
 } from '../../../../../experiments/webview/contract'
 import { QuickPickItemWithValue } from '../../../../../vscode/quickPick'
-import { dvcDemoPath, experimentsUpdatedEvent } from '../../../util'
+import { buildExperiments } from '../../util'
+import { experimentsUpdatedEvent } from '../../../util'
+import { dvcDemoPath } from '../../../../util'
 import { joinParamOrMetricPath } from '../../../../../experiments/paramsAndMetrics/paths'
 import { RegisteredCommands } from '../../../../../commands/external'
-import { buildExperiments } from '../../util'
 import { ExperimentsOutput } from '../../../../../cli/reader'
 
 suite('Experiments Sort By Tree Test Suite', () => {

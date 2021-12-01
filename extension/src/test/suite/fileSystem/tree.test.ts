@@ -20,9 +20,9 @@ import * as Setup from '../../../setup'
 import {
   activeTextEditorChangedEvent,
   closeAllEditors,
-  dvcDemoPath,
   getActiveTextEditorFilename
 } from '../util'
+import { dvcDemoPath } from '../../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands

@@ -13,10 +13,6 @@ import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
 import * as Time from '../../util/time'
 
-export const dvcDemoPath = Uri.file(
-  resolve(__dirname, '..', '..', '..', '..', 'demo')
-).fsPath
-
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
 export const configurationChangeEvent = (
