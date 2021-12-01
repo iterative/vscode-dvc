@@ -8,10 +8,14 @@ import {
   window,
   workspace
 } from 'vscode'
+import { CliReader } from '../../cli/reader'
+import { InternalCommands } from '../../commands/internal'
+import { Config } from '../../config'
 import { Experiments } from '../../experiments'
 import { Disposable, Disposer } from '../../extension'
 import { definedAndNonEmpty } from '../../util/array'
 import * as Time from '../../util/time'
+import { OutputChannel } from '../../vscode/outputChannel'
 
 export const extensionUri = Uri.file(resolve(__dirname, '..', '..', '..'))
 
@@ -85,3 +89,18 @@ export const mockDuration = (duration: number) =>
     .returns(0)
     .onSecondCall()
     .returns(duration)
+
+export const buildInternalCommands = (disposer: Disposer) => {
+  const config = disposer.track(new Config())
+  const cliReader = disposer.track(new CliReader(config))
+
+  const outputChannel = disposer.track(
+    new OutputChannel([cliReader], '1', 'test output')
+  )
+
+  const internalCommands = disposer.track(
+    new InternalCommands(outputChannel, cliReader)
+  )
+
+  return { cliReader, internalCommands }
+}

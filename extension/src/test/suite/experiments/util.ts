@@ -1,16 +1,12 @@
 import { stub } from 'sinon'
-import { CliReader } from '../../../cli/reader'
-import { AvailableCommands, InternalCommands } from '../../../commands/internal'
-import { Config } from '../../../config'
 import { WorkspaceExperiments } from '../../../experiments/workspace'
 import { Experiments } from '../../../experiments'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
-import { OutputChannel } from '../../../vscode/outputChannel'
 import expShowFixture from '../../fixtures/expShow/output'
 import { buildMockMemento, dvcDemoPath } from '../../util'
-import { extensionUri } from '../util'
+import { buildInternalCommands, extensionUri } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
 
 export const buildMockData = () =>
@@ -23,23 +19,15 @@ const buildDependencies = (
   disposer: Disposer,
   experimentShowData = expShowFixture
 ) => {
-  const config = disposer.track(new Config())
-  const cliReader = disposer.track(new CliReader(config))
+  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+
   const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
     experimentShowData
   )
 
-  const outputChannel = disposer.track(
-    new OutputChannel([cliReader], '2', 'experiments test suite')
-  )
   const resourceLocator = disposer.track(new ResourceLocator(extensionUri))
 
-  const internalCommands = disposer.track(
-    new InternalCommands(outputChannel, cliReader)
-  )
-
   return {
-    config,
     internalCommands,
     mockExperimentShow,
     resourceLocator
@@ -51,7 +39,7 @@ export const buildExperiments = (
   experimentShowData = expShowFixture,
   dvcRoot = dvcDemoPath
 ) => {
-  const { config, internalCommands, mockExperimentShow, resourceLocator } =
+  const { internalCommands, mockExperimentShow, resourceLocator } =
     buildDependencies(disposer, experimentShowData)
 
   const experiments = disposer.track(
@@ -67,7 +55,6 @@ export const buildExperiments = (
   experiments.setState(experimentShowData)
 
   return {
-    config,
     experiments,
     internalCommands,
     mockExperimentShow,
@@ -111,16 +98,4 @@ export const buildSingleRepoExperiments = (disposer: Disposer) => {
   experiments.setState(expShowFixture)
 
   return { workspaceExperiments }
-}
-
-export const buildMockInternalCommands = (disposer: Disposer) => {
-  const mockedInternalCommands = disposer.track(
-    new InternalCommands({} as unknown as OutputChannel)
-  )
-  mockedInternalCommands.registerCommand(
-    AvailableCommands.EXPERIMENT_SHOW,
-    () => Promise.resolve(expShowFixture)
-  )
-
-  return mockedInternalCommands
 }

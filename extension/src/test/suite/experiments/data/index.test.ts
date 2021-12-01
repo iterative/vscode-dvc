@@ -4,14 +4,10 @@ import { FileSystemWatcher } from 'vscode'
 import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { Disposable } from '../../../../extension'
-import { CliReader } from '../../../../cli/reader'
 import expShowFixture from '../../../fixtures/expShow/output'
-import { Config } from '../../../../config'
+import { buildInternalCommands, getFirstArgOfCall } from '../../util'
 import { dvcDemoPath } from '../../../util'
-import { getFirstArgOfCall } from '../../util'
-import { OutputChannel } from '../../../../vscode/outputChannel'
 import { ExperimentsData } from '../../../../experiments/data'
-import { InternalCommands } from '../../../../commands/internal'
 import * as Watcher from '../../../../fileSystem/watcher'
 import * as Time from '../../../../util/time'
 
@@ -34,18 +30,9 @@ suite('Experiments Data Test Suite', () => {
       stub(Watcher, 'createFileSystemWatcher').resolves(mockWatcher)
       stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const { cliReader, internalCommands } = buildInternalCommands(disposable)
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
         expShowFixture
-      )
-
-      const outputChannel = disposable.track(
-        new OutputChannel([cliReader], '-1', 'data test suite')
-      )
-
-      const internalCommands = disposable.track(
-        new InternalCommands(outputChannel, cliReader)
       )
 
       const data = disposable.track(
@@ -67,8 +54,7 @@ suite('Experiments Data Test Suite', () => {
     it('should call the updater function on setup', async () => {
       stub(Watcher, 'createNecessaryFileSystemWatcher').returns(mockWatcher)
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const { cliReader, internalCommands } = buildInternalCommands(disposable)
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
         expShowFixture
       )
@@ -78,13 +64,6 @@ suite('Experiments Data Test Suite', () => {
         'createFileSystemWatcher'
       ).returns(mockWatcher)
 
-      const outputChannel = disposable.track(
-        new OutputChannel([cliReader], '-2', 'WWWEEEEEEEE')
-      )
-
-      const internalCommands = disposable.track(
-        new InternalCommands(outputChannel, cliReader)
-      )
       const data = disposable.track(
         new ExperimentsData(dvcDemoPath, internalCommands)
       )
@@ -108,8 +87,8 @@ suite('Experiments Data Test Suite', () => {
 
       const now = stub(Time, 'getCurrentEpoch').returns(100)
 
-      const config = disposable.track(new Config())
-      const cliReader = disposable.track(new CliReader(config))
+      const { cliReader, internalCommands } = buildInternalCommands(disposable)
+
       const mockExperimentShow = stub(cliReader, 'experimentShow').resolves(
         expShowFixture
       )
@@ -124,13 +103,6 @@ suite('Experiments Data Test Suite', () => {
         return { dispose: mockDispose } as unknown as FileSystemWatcher
       })
 
-      const outputChannel = disposable.track(
-        new OutputChannel([cliReader], '200', 'chunnel')
-      )
-
-      const internalCommands = disposable.track(
-        new InternalCommands(outputChannel, cliReader)
-      )
       const data = disposable.track(
         new ExperimentsData(dvcDemoPath, internalCommands)
       )
