@@ -1,31 +1,21 @@
 import { stub } from 'sinon'
 import { EventEmitter } from 'vscode'
-import { dvcDemoPath } from '../util'
-import { CliReader } from '../../../cli/reader'
-import { InternalCommands } from '../../../commands/internal'
-import { Config } from '../../../config'
+import { buildInternalCommands, dvcDemoPath } from '../util'
 import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { RepositoryData } from '../../../repository/data'
 import { DecorationProvider } from '../../../repository/decorationProvider'
 import * as Time from '../../../util/time'
-import { OutputChannel } from '../../../vscode/outputChannel'
 
 export const buildDependencies = (disposer: Disposer) => {
-  const config = disposer.track(new Config())
-  const cliReader = disposer.track(new CliReader(config))
+  const { cliReader, internalCommands } = buildInternalCommands(disposer)
+
   const mockListDvcOnlyRecursive = stub(cliReader, 'listDvcOnlyRecursive')
   const mockStatus = stub(cliReader, 'status')
   const mockDiff = stub(cliReader, 'diff')
   const mockGetAllUntracked = stub(Git, 'getAllUntracked')
   const mockNow = stub(Time, 'getCurrentEpoch')
 
-  const outputChannel = disposer.track(
-    new OutputChannel([cliReader], '8', 'repository test suite')
-  )
-  const internalCommands = disposer.track(
-    new InternalCommands(outputChannel, cliReader)
-  )
   const decorationProvider = disposer.track(new DecorationProvider())
   const treeDataChanged = disposer.track(new EventEmitter<void>())
   const onDidChangeTreeData = treeDataChanged.event
