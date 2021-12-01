@@ -1,5 +1,4 @@
 import { PlotsOutput } from '../../cli/reader'
-import { ParamOrMetric } from '../../experiments/webview/contract'
 
 export type LivePlotValues = { group: string; x: number; y: number }[]
 
@@ -18,5 +17,4 @@ export type LivePlotsData = {
 export type PlotsData = {
   live: LivePlotsData | undefined
   static: PlotsOutput | undefined
-  metrics: ParamOrMetric[] | undefined
 }

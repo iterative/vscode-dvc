@@ -7,6 +7,7 @@ import styles from './styles.module.scss'
 import { TableHead } from './TableHead'
 import { Model } from '../../model'
 import ClockIcon from '../../../shared/components/icons/Clock'
+import { getDisplayNameFromPath } from '../../../util/paths'
 export interface InstanceProp {
   instance: TableInstance<Experiment>
 }
@@ -99,7 +100,7 @@ const CellWrapper: React.FC<{
         cell.isGrouped && styles.groupedCell,
         {
           [styles.metaCell]: ['timestamp', 'epochs'].includes(
-            cell.column.id.split(':').reverse()[0]
+            getDisplayNameFromPath(cell.column.id)
           ),
           [styles.workspaceChange]: changes?.includes(cell.column.id)
         }

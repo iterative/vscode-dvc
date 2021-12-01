@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { restore } from 'sinon'
-import { buildPlots, plotsMetrics } from '../plots/util'
+import { buildPlots } from '../plots/util'
 import { Disposable } from '../../../extension'
 import livePlotsFixture from '../../fixtures/expShow/livePlots'
 import plotsShowFixture from '../../fixtures/plotsShow/output'
@@ -32,7 +32,6 @@ suite('Plots Test Suite', () => {
 
       const expectedPlotsData: PlotsData = {
         live: livePlotsFixture,
-        metrics: plotsMetrics,
         static: plotsShowFixture
       }
 

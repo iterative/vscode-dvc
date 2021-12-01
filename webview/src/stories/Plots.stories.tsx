@@ -2,7 +2,6 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { PlotsData } from 'dvc/src/plots/webview/contract'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import { metrics } from 'dvc/src/test/fixtures/expShow/metrics'
 import plotsShowFixture from 'dvc/src/test/fixtures/plotsShow/output'
 import Plots from '../plots/components/Plots'
 import {
@@ -20,7 +19,6 @@ export default {
     collapsedSections: defaultCollapsibleSectionsState,
     data: {
       live: livePlotsFixture,
-      metrics,
       static: plotsShowFixture
     }
   },
@@ -42,7 +40,6 @@ export const WithLiveOnly = Template.bind({})
 WithLiveOnly.args = {
   data: {
     live: livePlotsFixture,
-    metrics,
     static: undefined
   }
 }
@@ -51,7 +48,6 @@ export const WithStaticOnly = Template.bind({})
 WithStaticOnly.args = {
   data: {
     live: undefined,
-    metrics: undefined,
     static: plotsShowFixture
   }
 }
@@ -60,7 +56,6 @@ export const WithoutPlots = Template.bind({})
 WithoutPlots.args = {
   data: {
     live: undefined,
-    metrics: undefined,
     static: undefined
   }
 }

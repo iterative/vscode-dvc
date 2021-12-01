@@ -11,7 +11,6 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import livePlotsFixture from 'dvc/src/test/fixtures/expShow/livePlots'
-import { metrics } from 'dvc/src/test/fixtures/expShow/metrics'
 import minimalPlotsShowFixture from 'dvc/src/test/fixtures/plotsShow/minimalOutput'
 import {
   MessageFromWebviewType,
@@ -154,8 +153,7 @@ describe('App', () => {
     const initialState = {
       collapsedSections: defaultCollapsibleSectionsState,
       data: {
-        live: livePlotsFixture,
-        metrics
+        live: livePlotsFixture
       }
     }
     mockGetState.mockReturnValue(initialState)
@@ -189,7 +187,6 @@ describe('App', () => {
           collapsedSections: defaultCollapsibleSectionsState,
           data: {
             live: livePlotsFixture,
-            metrics,
             static: undefined
           }
         }}
