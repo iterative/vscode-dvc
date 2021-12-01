@@ -19,21 +19,21 @@ export enum PlotsType {
   IMAGE = 'image'
 }
 
-export type StaticVegaPlot = {
+export type VegaPlot = {
   content: VisualizationSpec
   revs?: string[]
   type: PlotsType
 }
 
-export type StaticImage = {
+export type ImagePlot = {
   rev?: string
   type: PlotsType
   url: string
 }
 
-export type StaticPlot = StaticVegaPlot | StaticImage
+export type StaticPlot = VegaPlot | ImagePlot
 
-export type PlotsOutput = Record<string, (StaticVegaPlot | StaticImage)[]>
+export type PlotsOutput = Record<string, StaticPlot[]>
 
 export type PlotsData = {
   live: LivePlotsData | undefined

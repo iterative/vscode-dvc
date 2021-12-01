@@ -6,7 +6,7 @@ import {
   PlotsOutput,
   PlotsType,
   StaticPlot,
-  StaticVegaPlot
+  VegaPlot
 } from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { Config } from 'vega'
@@ -176,7 +176,7 @@ const LivePlots = ({
     ))}
   </>
 )
-const isVega = (plot: StaticPlot): plot is StaticVegaPlot =>
+const isVega = (plot: StaticPlot): plot is VegaPlot =>
   plot.type === PlotsType.VEGA
 
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
