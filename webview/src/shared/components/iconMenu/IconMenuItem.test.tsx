@@ -12,9 +12,10 @@ import {
 } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { IconMenuItem, IconMenuItemProps } from './IconMenuItem'
+import { AllIcons } from '../icon/Icon'
 
 const item: IconMenuItemProps = {
-  icon: '',
+  icon: AllIcons.PENCIL,
   tooltip: 'Item'
 }
 
@@ -106,7 +107,6 @@ describe('IconMenuItem', () => {
     const [hiddenItem] = hoverMenu
 
     expect(hiddenItem.innerHTML).toBe('Item')
-    expect(hiddenItem.className).toContain('hidden')
     expect(hiddenItem.className).toContain('removed')
   })
 

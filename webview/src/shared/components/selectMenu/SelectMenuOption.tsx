@@ -39,13 +39,15 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
       <div className={styles.itemLabel} data-testid="select-menu-option-label">
         {label}
       </div>
-      {isSelected && (
-        <Icon
-          name={AllIcons.CHECK}
-          width={13}
-          data-testid="select-menu-option-check"
-        />
-      )}
+      <div className={styles.itemIcon}>
+        {isSelected && (
+          <Icon
+            icon={AllIcons.CHECK}
+            width={13}
+            data-testid="select-menu-option-check"
+          />
+        )}
+      </div>
     </div>
   )
 }

@@ -18,6 +18,7 @@ import {
 } from 'dvc/src/webview/contract'
 import { mocked } from 'ts-jest/utils'
 import { App } from './App'
+import Plots from './Plots'
 
 import { vsCodeApi } from '../../shared/api'
 
@@ -177,5 +178,55 @@ describe('App', () => {
         [PlotsSectionKeys.LIVE_PLOTS]: true
       }
     })
+  })
+
+  it('should toggle the visibility of plots when clicking the metrics in the metrics picker', async () => {
+    render(
+      <Plots
+        state={{
+          collapsedSections: defaultCollapsibleSectionsState,
+          data: {
+            live: livePlotsFixture,
+            static: undefined
+          }
+        }}
+        dispatch={jest.fn}
+      />
+    )
+
+    const summaryElement = await screen.findByText('Live Experiments Plots')
+    fireEvent.click(summaryElement, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(() =>
+      screen.getByTestId('plot-metrics:summary.json:loss')
+    ).not.toThrow()
+
+    const pickerButton = screen.getByTestId('icon-menu-item')
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    const lossItem = await screen.findByText('loss')
+
+    fireEvent.click(lossItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(() => screen.getByTestId('plot-metrics:summary.json:loss')).toThrow()
+
+    fireEvent.mouseEnter(pickerButton)
+    fireEvent.click(pickerButton)
+
+    fireEvent.click(lossItem, {
+      bubbles: true,
+      cancelable: true
+    })
+
+    expect(() =>
+      screen.getByTestId('plot-metrics:summary.json:loss')
+    ).not.toThrow()
   })
 })

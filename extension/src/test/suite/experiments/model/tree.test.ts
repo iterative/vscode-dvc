@@ -263,7 +263,10 @@ suite('Experiments Tree Test Suite', () => {
 
       await tableFilterAdded
 
-      const expectedMessage = { live: undefined, static: undefined }
+      const expectedMessage = {
+        live: undefined,
+        static: undefined
+      }
 
       expect(
         messageSpy,

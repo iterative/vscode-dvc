@@ -22,15 +22,16 @@
   }
 }
 
-.icon {
-  max-width: 75%;
-  max-height: 75%;
-}
-
 .hoverMenu {
   position: absolute;
   top: 25px;
   left: 10px;
   width: max-content;
   cursor: initial;
+  z-index: 1;
+
+  .last & {
+    left: auto;
+    right: 10px;
+  }
 }
