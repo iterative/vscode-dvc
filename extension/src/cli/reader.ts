@@ -1,5 +1,4 @@
 import isEqual from 'lodash.isequal'
-import { VisualizationSpec } from 'react-vega'
 import { Cli, typeCheckCommands } from '.'
 import {
   Args,
@@ -12,6 +11,7 @@ import {
 } from './args'
 import { retry } from './retry'
 import { trimAndSplit } from '../util/stdout'
+import { PlotsOutput } from '../plots/webview/contract'
 
 export type PathOutput = { path: string }
 
@@ -98,8 +98,6 @@ export interface ExperimentsOutput {
     baseline: ExperimentFieldsOrError
   }
 }
-
-export type PlotsOutput = Record<string, VisualizationSpec>
 
 export const autoRegisteredCommands = {
   DIFF: 'diff',
