@@ -54,14 +54,18 @@ export class BaseWebview<T extends WebviewData> {
 
     this.dvcRoot = state.dvcRoot
 
-    webviewPanel.onDidDispose(() => {
-      this.setPanelActiveContext(false)
-      this.disposer.dispose()
-    })
+    this.disposer.track(
+      webviewPanel.onDidDispose(() => {
+        this.setPanelActiveContext(false)
+        this.disposer.dispose()
+      })
+    )
 
-    webviewPanel.webview.onDidReceiveMessage(arg => {
-      this.handleMessage(arg as MessageFromWebview)
-    })
+    this.disposer.track(
+      webviewPanel.webview.onDidReceiveMessage(arg => {
+        this.handleMessage(arg as MessageFromWebview)
+      })
+    )
 
     webviewPanel.webview.html = this.getHtml(scripts)
 
@@ -73,21 +77,18 @@ export class BaseWebview<T extends WebviewData> {
 
     this.notifyActiveStatus(webviewPanel)
 
-    this.disposer.track({
-      dispose: async () => {
-        await this.isReady() // Read all mobx dependencies before await
-        this.sendMessage({
-          dvcRoot: this.dvcRoot,
-          type: MessageToWebviewType.SET_DVC_ROOT
-        })
+    this.isReady().then(() => {
+      this.sendMessage({
+        dvcRoot: this.dvcRoot,
+        type: MessageToWebviewType.SET_DVC_ROOT
+      })
 
-        const data = state.data
-        if (data) {
-          this.sendMessage({
-            data,
-            type: MessageToWebviewType.SET_DATA
-          })
-        }
+      const data = state.data
+      if (data) {
+        this.sendMessage({
+          data,
+          type: MessageToWebviewType.SET_DATA
+        })
       }
     })
 
@@ -184,20 +185,24 @@ export class BaseWebview<T extends WebviewData> {
   ) {
     sendTelemetryEvent(eventNames.createdEvent, undefined, undefined)
 
-    this.onDidDispose(() => {
-      sendTelemetryEvent(eventNames.closedEvent, undefined, undefined)
-    })
+    this.disposer.track(
+      this.onDidDispose(() => {
+        sendTelemetryEvent(eventNames.closedEvent, undefined, undefined)
+      })
+    )
 
-    this.onDidChangeIsFocused(() => {
-      sendTelemetryEvent(
-        eventNames.focusChangedEvent,
-        {
-          active: webviewPanel.active,
-          viewColumn: webviewPanel.viewColumn,
-          visible: webviewPanel.visible
-        },
-        undefined
-      )
-    })
+    this.disposer.track(
+      this.onDidChangeIsFocused(() => {
+        sendTelemetryEvent(
+          eventNames.focusChangedEvent,
+          {
+            active: webviewPanel.active,
+            viewColumn: webviewPanel.viewColumn,
+            visible: webviewPanel.visible
+          },
+          undefined
+        )
+      })
+    )
   }
 }
