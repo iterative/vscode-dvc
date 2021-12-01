@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import cx from 'classnames'
 import styles from './styles.module.scss'
 import { HoverMenu } from '../hoverMenu/HoverMenu'
-import { Icon, Icons } from '../icon/Icon'
+import { Icon, IconValues } from '../icon/Icon'
 
 export interface IconMenuItemProps {
-  icon: string
+  icon: IconValues
   onClick?: () => void
   onClickNode?: React.ReactNode
   tooltip: string
@@ -70,11 +70,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
         onKeyDown={onKeyDown}
         data-testid="icon-menu-item"
       >
-        <Icon
-          name={icon as Icons}
-          data-testid="icon-menu-item-icon"
-          width={15}
-        />
+        <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
         <div className={styles.hoverMenu}>
           <HoverMenu show={showTooltip && !showOnClickNode}>
             {tooltip}

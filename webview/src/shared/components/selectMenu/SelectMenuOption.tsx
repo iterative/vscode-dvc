@@ -42,7 +42,7 @@ export const SelectMenuOption: React.FC<SelectMenuOptionAllProps> = ({
       <div className={styles.itemIcon}>
         {isSelected && (
           <Icon
-            name={AllIcons.CHECK}
+            icon={AllIcons.CHECK}
             width={13}
             data-testid="select-menu-option-check"
           />
