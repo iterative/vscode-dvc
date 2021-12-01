@@ -16,19 +16,20 @@ interface VscodePython {
   settings: Settings
 }
 
-export const getPythonExtensionSettings: () => Thenable<Settings | undefined> =
-  async () => {
-    const api = await getExtensionAPI<VscodePython>(PYTHON_EXTENSION_ID)
-    if (!api) {
-      return
-    }
-    await api.ready
-    return api.settings
+export const getPythonExtensionSettings = async (): Promise<
+  Settings | undefined
+> => {
+  const api = await getExtensionAPI<VscodePython>(PYTHON_EXTENSION_ID)
+  if (!api) {
+    return
   }
+  await api.ready
+  return api.settings
+}
 
-export const getPythonExecutionDetails: () => Thenable<string[] | undefined> =
-  async () =>
-    (await getPythonExtensionSettings())?.getExecutionDetails().execCommand
+export const getPythonExecutionDetails = async (): Promise<
+  string[] | undefined
+> => (await getPythonExtensionSettings())?.getExecutionDetails().execCommand
 
 export const getPythonBinPath = async (): Promise<string | undefined> => {
   const pythonExecutionDetails = await getPythonExecutionDetails()
