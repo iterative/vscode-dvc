@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import cx from 'classnames'
 import styles from './styles.module.scss'
 import { HoverMenu } from '../hoverMenu/HoverMenu'
+import { Icon, IconValues } from '../icon/Icon'
 
 export interface IconMenuItemProps {
-  icon: string
+  icon: IconValues
   onClick?: () => void
   onClickNode?: React.ReactNode
   tooltip: string
@@ -13,6 +15,7 @@ export interface IconMenuItemAllProps extends IconMenuItemProps {
   canShowOnClickNode?: boolean
   index: number
   onMouseOver: (id: string) => void
+  last?: boolean
 }
 
 export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
@@ -22,7 +25,8 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   onClickNode,
   tooltip,
   onMouseOver,
-  canShowOnClickNode
+  canShowOnClickNode,
+  last
 }) => {
   const [showTooltip, setShowTooltip] = useState(false)
   const [showOnClickNode, setShowOnClickNode] = useState(false)
@@ -51,10 +55,12 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>
     e.key === 'Enter' && onClickItem()
 
+  const classes = cx(styles.item, { [styles.last]: last })
+
   return (
     <li>
       <div
-        className={styles.item}
+        className={classes}
         role="button"
         tabIndex={index}
         onClick={onClickItem}
@@ -64,12 +70,7 @@ export const IconMenuItem: React.FC<IconMenuItemAllProps> = ({
         onKeyDown={onKeyDown}
         data-testid="icon-menu-item"
       >
-        <img
-          className={styles.icon}
-          src={icon}
-          alt={tooltip}
-          data-testid="icon-menu-item-icon"
-        />
+        <Icon icon={icon} data-testid="icon-menu-item-icon" width={15} />
         <div className={styles.hoverMenu}>
           <HoverMenu show={showTooltip && !showOnClickNode}>
             {tooltip}

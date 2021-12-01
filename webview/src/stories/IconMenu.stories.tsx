@@ -2,34 +2,33 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import React from 'react'
 import '../shared/style.scss'
 import './test-vscode-styles.scss'
-import pencil from 'dvc/resources/pencil.svg'
-import downArrow from 'dvc/resources/down-arrow.svg'
-import upArrow from 'dvc/resources/up-arrow.svg'
-import lines from 'dvc/resources/lines.svg'
-import dots from 'dvc/resources/dots.svg'
 import { SelectMenu } from '../shared/components/selectMenu/SelectMenu'
 
-import { IconMenu } from '../shared/components/iconMenu/IconMenu'
+import {
+  IconMenu,
+  IconMenuDirection
+} from '../shared/components/iconMenu/IconMenu'
 import { IconMenuItemProps } from '../shared/components/iconMenu/IconMenuItem'
+import { AllIcons } from '../shared/components/icon/Icon'
 
 const items: IconMenuItemProps[] = [
   {
-    icon: pencil,
+    icon: AllIcons.PENCIL,
     onClick: () => alert('Rename'),
     tooltip: 'Rename'
   },
   {
-    icon: downArrow,
+    icon: AllIcons.DOWN_ARROW,
     onClick: () => alert('Move down'),
     tooltip: 'Move Down'
   },
   {
-    icon: upArrow,
+    icon: AllIcons.UP_ARROW,
     onClick: () => alert('Move up'),
     tooltip: 'Move Up'
   },
   {
-    icon: lines,
+    icon: AllIcons.LINES,
     onClickNode: (
       <SelectMenu
         options={[
@@ -55,7 +54,7 @@ const items: IconMenuItemProps[] = [
     tooltip: 'Choose metrics'
   },
   {
-    icon: dots,
+    icon: AllIcons.DOTS,
     onClickNode: (
       <SelectMenu
         options={[
@@ -92,6 +91,8 @@ export default {
 
 const Template: Story<{
   items: IconMenuItemProps[]
-}> = ({ items }) => <IconMenu items={items} />
+}> = ({ items }) => (
+  <IconMenu items={items} direction={IconMenuDirection.LEFT} />
+)
 
 export const MenuWithIcons = Template.bind({})

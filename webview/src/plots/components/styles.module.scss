@@ -35,6 +35,8 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
 }
 
 .plotsContainer {
+  width: 100vw;
+
   summary {
     cursor: pointer;
     font-family: var(--vscode-font-family);
@@ -42,4 +44,14 @@ $watermark-color-light: rgba(0, 0, 0, 0.68);
     font-weight: bold;
     font-size: 1.25rem;
   }
+}
+
+.plotsContainerWrapper {
+  position: relative;
+}
+
+.iconMenu {
+  position: absolute;
+  right: 5%;
+  top: -10px;
 }

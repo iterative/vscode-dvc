@@ -14,12 +14,11 @@ export const HoverMenu: React.FC<HoverMenuProps> = ({
 }) => {
   const [isRemoved, setIsRemoved] = useState(!show)
   const classes = cx(styles.menu, {
-    [styles.hiddenMenu]: !show && !isRemoved,
     [styles.removedMenu]: !hideWithDelay && !show
   })
 
   useEffect(() => {
-    const delay = hideWithDelay ? 1000 : 0
+    const delay = hideWithDelay ? 300 : 0
     let timer: number
     if (!isRemoved && !show) {
       timer = window.setTimeout(() => setIsRemoved(true), delay)

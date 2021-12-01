@@ -1,32 +1,33 @@
 import React from 'react'
-import { Check } from '../icons'
+import { Check, Dots, DownArrow, Lines, Pencil, UpArrow } from '../icons'
 
-const Icons = {
+export const AllIcons = {
   CHECK: Check,
-  OTHER: ''
+  DOTS: Dots,
+  DOWN_ARROW: DownArrow,
+  LINES: Lines,
+  PENCIL: Pencil,
+  UP_ARROW: UpArrow
 }
 
-type Icons = keyof typeof Icons
-
-export enum AllIcons {
-  CHECK = 'CHECK'
-}
+type IconKeys = keyof typeof AllIcons
+export type IconValues = typeof AllIcons[IconKeys]
 
 interface IconProps {
-  name: Icons
+  icon: IconValues
   color?: string
   width?: number
   height?: number
 }
 
 export const Icon: React.FC<IconProps> = ({
-  name,
+  icon,
   color,
   width,
   height,
   ...other
 }) => {
-  const I = Icons[name]
+  const I = icon
   const fill = color || '#252526' // Add theming later
   const w = width || 20
   const h = height || 20
