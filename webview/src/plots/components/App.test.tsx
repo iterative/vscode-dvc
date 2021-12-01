@@ -191,6 +191,7 @@ describe('App', () => {
           }
         }}
         dispatch={jest.fn}
+        sendMessage={jest.fn}
       />
     )
 

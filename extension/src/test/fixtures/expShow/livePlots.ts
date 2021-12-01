@@ -206,7 +206,8 @@ const data: LivePlotsData = {
         }
       ]
     }
-  ]
+  ],
+  selectedMetrics: undefined
 }
 
 export default data

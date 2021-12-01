@@ -7,6 +7,10 @@ import {
   StaticPlot,
   VegaPlot
 } from 'dvc/src/plots/webview/contract'
+import {
+  MessageFromWebview,
+  MessageFromWebviewType
+} from 'dvc/src/webview/contract'
 import { VegaLite } from 'react-vega'
 import styles from './styles.module.scss'
 import { config, createSpec } from './constants'
@@ -155,10 +159,12 @@ const getMetricsFromPlots = (plots?: LivePlotData[]): string[] =>
 
 const Plots = ({
   state,
-  dispatch
+  dispatch,
+  sendMessage
 }: {
   state: PlotsWebviewState
   dispatch: Dispatch<PlotsReducerAction>
+  sendMessage: (message: MessageFromWebview) => void
 }) => {
   const { data, collapsedSections } = state
   const [metrics, setMetrics] = useState<string[]>([])
@@ -167,7 +173,7 @@ const Plots = ({
   useEffect(() => {
     const newMetrics = getMetricsFromPlots(data?.live?.plots)
     setMetrics(newMetrics)
-    setSelectedPlots(newMetrics)
+    setSelectedPlots(data?.live?.selectedMetrics || newMetrics)
   }, [data, setSelectedPlots, setMetrics])
 
   if (!data) {
@@ -180,6 +186,14 @@ const Plots = ({
     return EmptyState('No Plots to Display')
   }
 
+  const setSelectedMetrics = (metrics: string[]) => {
+    setSelectedPlots(metrics)
+    sendMessage({
+      payload: metrics,
+      type: MessageFromWebviewType.METRIC_TOGGLED
+    })
+  }
+
   return (
     <>
       {livePlots && (
@@ -190,7 +204,7 @@ const Plots = ({
           dispatch={dispatch}
           metrics={metrics}
           selectedMetrics={selectedPlots}
-          setSelectedPlots={setSelectedPlots}
+          setSelectedPlots={setSelectedMetrics}
         >
           <LivePlots
             plots={livePlots.plots.filter(plot =>
