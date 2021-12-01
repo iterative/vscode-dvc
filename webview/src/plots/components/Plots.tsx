@@ -7,9 +7,9 @@ import {
   StaticPlot,
   VegaPlot
 } from 'dvc/src/plots/webview/contract'
-import { VegaLite, VisualizationSpec } from 'react-vega'
-import { Config } from 'vega'
+import { VegaLite } from 'react-vega'
 import styles from './styles.module.scss'
+import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { MetricsPicker } from './MetricsPicker'
 import {
@@ -22,98 +22,6 @@ import {
 import { IconMenu } from '../../shared/components/iconMenu/IconMenu'
 import { AllIcons } from '../../shared/components/icon/Icon'
 import { getDisplayNameFromPath } from '../../util/paths'
-
-const createSpec = (
-  title: string,
-  scale?: LivePlotsColors
-): VisualizationSpec => {
-  return {
-    $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-    data: { name: 'values' },
-    encoding: {
-      x: { field: 'x', title: 'iteration', type: 'nominal' }
-    },
-    height: 300,
-    layer: [
-      {
-        encoding: {
-          color: { field: 'group', legend: null, scale, type: 'nominal' },
-          y: { field: 'y', title, type: 'quantitative' }
-        },
-        layer: [
-          { mark: 'line' },
-          {
-            mark: 'point',
-            transform: [{ filter: { empty: false, param: 'hover' } }]
-          }
-        ]
-      },
-      {
-        encoding: {
-          opacity: {
-            condition: { empty: false, param: 'hover', value: 0.8 },
-            value: 0
-          }
-        },
-        mark: { tooltip: { content: 'data' }, type: 'rule' },
-        params: [
-          {
-            name: 'hover',
-            select: {
-              clear: 'mouseout',
-              fields: ['x'],
-              nearest: true,
-              on: 'mouseover',
-              type: 'point'
-            }
-          }
-        ],
-        transform: [{ groupby: ['x'], pivot: 'group', value: 'y' }]
-      }
-    ],
-    width: 400
-  }
-}
-
-const foregroundColor = 'var(--vscode-foreground)'
-const backgroundColor = 'var(--vscode-editor-background)'
-const config: Config = {
-  axis: {
-    domain: false,
-    gridOpacity: 0.25,
-    tickColor: foregroundColor,
-    titleColor: foregroundColor
-  },
-  background: backgroundColor,
-  mark: {
-    stroke: foregroundColor
-  },
-  padding: 10,
-  rule: {
-    stroke: foregroundColor
-  },
-  style: {
-    cell: {
-      stroke: foregroundColor
-    },
-    'group-title': {
-      fill: foregroundColor,
-      stroke: foregroundColor
-    },
-    'guide-label': {
-      fill: foregroundColor,
-      stroke: foregroundColor
-    },
-    'guide-title': {
-      fill: foregroundColor,
-      stroke: foregroundColor
-    },
-    rule: {
-      fill: foregroundColor,
-      stroke: foregroundColor
-    }
-  }
-}
 
 const PlotsContainer: React.FC<{
   collapsedSections: CollapsibleSectionsState
