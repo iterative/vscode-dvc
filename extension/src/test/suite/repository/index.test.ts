@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import { restore, spy } from 'sinon'
 import { buildDependencies } from './util'
 import { Disposable } from '../../../extension'
-import { dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../../util'
 import { Repository } from '../../../repository'
 import { RepositoryModel } from '../../../repository/model'
 import {

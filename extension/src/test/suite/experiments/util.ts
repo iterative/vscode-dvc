@@ -5,8 +5,8 @@ import { Disposer } from '../../../extension'
 import * as Git from '../../../git'
 import { ResourceLocator } from '../../../resourceLocator'
 import expShowFixture from '../../fixtures/expShow/output'
-import { buildMockMemento } from '../../util'
-import { buildInternalCommands, dvcDemoPath, extensionUri } from '../util'
+import { buildMockMemento, dvcDemoPath } from '../../util'
+import { buildInternalCommands, extensionUri } from '../util'
 import { ExperimentsData } from '../../../experiments/data'
 
 export const buildMockData = () =>

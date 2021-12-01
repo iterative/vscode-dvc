@@ -1,4 +1,9 @@
-import { Memento } from 'vscode'
+import { resolve } from 'path'
+import { Memento, Uri } from 'vscode'
+
+export const dvcDemoPath = Uri.file(
+  resolve(__dirname, '..', '..', '..', '..', 'demo')
+).fsPath
 
 export const buildMockMemento = (
   values: Record<string, unknown> = {}
