@@ -1,5 +1,5 @@
 import isEmpty from 'lodash.isempty'
-import { PlotsData as TPlotsData } from './webview/contract'
+import { PlotsData as TPlotsData, PlotsOutput } from './webview/contract'
 import { PlotsData } from './data'
 import { BaseWebview } from '../webview'
 import { ViewKey } from '../webview/constants'
@@ -7,7 +7,6 @@ import { BaseRepository } from '../webview/repository'
 import { Experiments } from '../experiments'
 import { Resource } from '../resourceLocator'
 import { InternalCommands } from '../commands/internal'
-import { PlotsOutput } from '../cli/reader'
 
 export type PlotsWebview = BaseWebview<TPlotsData>
 

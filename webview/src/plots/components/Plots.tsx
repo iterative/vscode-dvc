@@ -1,7 +1,13 @@
 import React, { Dispatch } from 'react'
 import cx from 'classnames'
-import { LivePlotsColors, LivePlotData } from 'dvc/src/plots/webview/contract'
-import { PlotsOutput } from 'dvc/src/cli/reader'
+import {
+  LivePlotsColors,
+  LivePlotData,
+  PlotsOutput,
+  PlotsType,
+  StaticPlot,
+  VegaPlot
+} from 'dvc/src/plots/webview/contract'
 import { VegaLite, VisualizationSpec } from 'react-vega'
 import { Config } from 'vega'
 import styles from './styles.module.scss'
@@ -170,18 +176,26 @@ const LivePlots = ({
     ))}
   </>
 )
+const isVega = (plot: StaticPlot): plot is VegaPlot =>
+  plot.type === PlotsType.VEGA
 
 const StaticPlots = ({ plots }: { plots: PlotsOutput }) => (
   <>
-    {Object.entries(plots).map(([path, spec]) => (
-      <VegaLite
-        actions={false}
-        config={config}
-        spec={spec}
-        renderer="svg"
-        key={`plot-${path}`}
-      />
-    ))}
+    {Object.entries(plots).map(([path, plots]) =>
+      plots.map(plot =>
+        isVega(plot) ? (
+          <VegaLite
+            actions={false}
+            config={config}
+            spec={plot.content}
+            renderer="svg"
+            key={`plot-${path}`}
+          />
+        ) : (
+          <></>
+        )
+      )
+    )}
   </>
 )
 
