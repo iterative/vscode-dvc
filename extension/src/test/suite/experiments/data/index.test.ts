@@ -5,11 +5,8 @@ import { expect } from 'chai'
 import { stub, restore } from 'sinon'
 import { Disposable } from '../../../../extension'
 import expShowFixture from '../../../fixtures/expShow/output'
-import {
-  buildInternalCommands,
-  dvcDemoPath,
-  getFirstArgOfCall
-} from '../../util'
+import { buildInternalCommands, getFirstArgOfCall } from '../../util'
+import { dvcDemoPath } from '../../../util'
 import { ExperimentsData } from '../../../../experiments/data'
 import * as Watcher from '../../../../fileSystem/watcher'
 import * as Time from '../../../../util/time'

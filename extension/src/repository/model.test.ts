@@ -3,6 +3,7 @@ import { Disposable, Disposer } from '@hediet/std/disposable'
 import { mocked } from 'ts-jest/utils'
 import { RepositoryModel } from './model'
 import { ListOutput, StatusOutput } from '../cli/reader'
+import { dvcDemoPath } from '../test/util'
 
 jest.mock('@hediet/std/disposable')
 
@@ -19,7 +20,6 @@ beforeEach(() => {
 })
 
 describe('RepositoryState', () => {
-  const dvcRoot = resolve(__dirname, '..', '..', '..', 'demo')
   const emptySet = new Set()
 
   describe('updateStatus', () => {
@@ -69,7 +69,7 @@ describe('RepositoryState', () => {
         ]
       } as StatusOutput
 
-      const model = new RepositoryModel(dvcRoot)
+      const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
@@ -79,20 +79,20 @@ describe('RepositoryState', () => {
 
       expect(model.getState()).toEqual({
         added: emptySet,
-        deleted: new Set([join(dvcRoot, deleted)]),
-        gitModified: new Set([join(dvcRoot, output)]),
+        deleted: new Set([join(dvcDemoPath, deleted)]),
+        gitModified: new Set([join(dvcDemoPath, output)]),
         modified: new Set([
-          join(dvcRoot, rawDataDir),
-          join(dvcRoot, logDir),
-          join(dvcRoot, logAcc),
-          join(dvcRoot, logLoss)
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, logDir),
+          join(dvcDemoPath, logAcc),
+          join(dvcDemoPath, logLoss)
         ]),
         notInCache: emptySet,
-        renamed: new Set([join(dvcRoot, renamed)]),
+        renamed: new Set([join(dvcDemoPath, renamed)]),
         tracked: new Set([
-          ...list.map(entry => join(dvcRoot, entry.path)),
-          join(dvcRoot, rawDataDir),
-          join(dvcRoot, logDir)
+          ...list.map(entry => join(dvcDemoPath, entry.path)),
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, logDir)
         ]),
         untracked: emptySet
       })
@@ -110,7 +110,7 @@ describe('RepositoryState', () => {
 
       const status = {}
 
-      const model = new RepositoryModel(dvcRoot)
+      const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
@@ -121,11 +121,17 @@ describe('RepositoryState', () => {
       expect(model.getState()).toEqual({
         added: emptySet,
         deleted: emptySet,
-        gitModified: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
+        gitModified: new Set([
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, data)
+        ]),
         modified: emptySet,
         notInCache: emptySet,
         renamed: emptySet,
-        tracked: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
+        tracked: new Set([
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, data)
+        ]),
         untracked: emptySet
       })
     })
@@ -144,7 +150,7 @@ describe('RepositoryState', () => {
         ]
       } as StatusOutput
 
-      const model = new RepositoryModel(dvcRoot)
+      const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
@@ -156,10 +162,13 @@ describe('RepositoryState', () => {
         added: emptySet,
         deleted: emptySet,
         gitModified: emptySet,
-        modified: new Set([join(dvcRoot, rawDataDir)]),
+        modified: new Set([join(dvcDemoPath, rawDataDir)]),
         notInCache: emptySet,
         renamed: emptySet,
-        tracked: new Set([join(dvcRoot, rawDataDir), join(dvcRoot, data)]),
+        tracked: new Set([
+          join(dvcDemoPath, rawDataDir),
+          join(dvcDemoPath, data)
+        ]),
         untracked: emptySet
       })
     })
@@ -175,7 +184,7 @@ describe('RepositoryState', () => {
         ]
       } as StatusOutput
 
-      const model = new RepositoryModel(dvcRoot)
+      const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
@@ -323,7 +332,7 @@ describe('RepositoryState', () => {
         }
       ]
 
-      const model = new RepositoryModel(dvcRoot)
+      const model = new RepositoryModel(dvcDemoPath)
       model.setState({
         diffFromCache: status,
         diffFromHead: diff,
@@ -337,14 +346,14 @@ describe('RepositoryState', () => {
         gitModified: emptySet,
         modified: emptySet,
         notInCache: new Set([
-          ...diff['not in cache'].map(({ path }) => resolve(dvcRoot, path)),
-          ...diff.modified.map(({ path }) => resolve(dvcRoot, path))
+          ...diff['not in cache'].map(({ path }) => resolve(dvcDemoPath, path)),
+          ...diff.modified.map(({ path }) => resolve(dvcDemoPath, path))
         ]),
         renamed: emptySet,
         tracked: new Set([
-          ...list.map(({ path }) => resolve(dvcRoot, path)),
-          resolve(dvcRoot, 'data', 'MNIST', 'raw'),
-          resolve(dvcRoot, 'logs')
+          ...list.map(({ path }) => resolve(dvcDemoPath, path)),
+          resolve(dvcDemoPath, 'data', 'MNIST', 'raw'),
+          resolve(dvcDemoPath, 'logs')
         ]),
         untracked: emptySet
       })

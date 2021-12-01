@@ -8,7 +8,8 @@ import { CliExecutor } from '../../../cli/executor'
 import { RegisteredCliCommands } from '../../../commands/external'
 import { WorkspaceRepositories } from '../../../repository/workspace'
 import * as QuickPick from '../../../vscode/quickPick'
-import { closeAllEditors, dvcDemoPath } from '../util'
+import { dvcDemoPath } from '../../util'
+import { closeAllEditors } from '../util'
 import { Repository } from '../../../repository'
 
 suite('Workspace Repositories Test Suite', () => {

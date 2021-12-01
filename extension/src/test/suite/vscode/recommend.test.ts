@@ -3,7 +3,8 @@ import { afterEach, beforeEach, describe, it, suite } from 'mocha'
 import { expect } from 'chai'
 import { MessageItem, Uri, window } from 'vscode'
 import { restore, stub } from 'sinon'
-import { closeAllEditors, dvcDemoPath } from '../util'
+import { closeAllEditors } from '../util'
+import { dvcDemoPath } from '../../util'
 import * as Extensions from '../../../vscode/extensions'
 
 suite('Recommend Test Suite', () => {

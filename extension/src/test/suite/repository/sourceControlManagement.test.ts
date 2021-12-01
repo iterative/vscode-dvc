@@ -5,7 +5,8 @@ import { stub, restore, spy } from 'sinon'
 import { window, commands, Uri, MessageItem } from 'vscode'
 import { Disposable } from '../../../extension'
 import { CliExecutor } from '../../../cli/executor'
-import { closeAllEditors, dvcDemoPath } from '../util'
+import { closeAllEditors } from '../util'
+import { dvcDemoPath } from '../../util'
 import {
   RegisteredCliCommands,
   RegisteredCommands
