@@ -2,7 +2,7 @@ import { SortDefinition } from 'dvc/src/experiments/model/sortBy'
 import { Experiment } from 'dvc/src/experiments/webview/contract'
 import React from 'react'
 import { HeaderGroup, TableInstance } from 'react-table'
-import { DragDropContext, DragUpdate } from 'react-beautiful-dnd'
+import { DragUpdate } from 'react-beautiful-dnd'
 import styles from './styles.module.scss'
 import { MergedHeaderGroup } from './MergeHeaderGroups'
 import { Model } from '../../model'
@@ -55,20 +55,16 @@ export const TableHead: React.FC<TableHeadProps> = ({
     <div className={styles.thead}>
       {headerGroups.map(headerGroup => (
         // eslint-disable-next-line react/jsx-key
-        <span {...headerGroup.getHeaderGroupProps()}>
-          <DragDropContext
-            onDragUpdate={onDragUpdate}
-            onDragEnd={onDragEnd}
-            onDragStart={onDragStart}
-          >
-            <MergedHeaderGroup
-              orderedColumns={orderedColumns}
-              headerGroup={headerGroup}
-              columns={allHeaders}
-              sorts={sorts}
-            />
-          </DragDropContext>
-        </span>
+        <MergedHeaderGroup
+          {...headerGroup.getHeaderGroupProps()}
+          orderedColumns={orderedColumns}
+          headerGroup={headerGroup}
+          columns={allHeaders}
+          sorts={sorts}
+          onDragStart={onDragStart}
+          onDragUpdate={onDragUpdate}
+          onDragEnd={onDragEnd}
+        />
       ))}
     </div>
   )
