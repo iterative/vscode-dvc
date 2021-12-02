@@ -12,6 +12,7 @@ import styles from './styles.module.scss'
 import { config, createSpec } from './constants'
 import { EmptyState } from './EmptyState'
 import { MetricsPicker } from './MetricsPicker'
+import { PlotSize, SizePicker } from './SizePicker'
 import {
   CollapsibleSectionsActions,
   PlotsSectionKeys,
@@ -72,6 +73,16 @@ const PlotsContainer: React.FC<{
                   />
                 ),
                 tooltip: 'Choose metrics'
+              },
+              {
+                icon: AllIcons.DOTS,
+                onClickNode: (
+                  <SizePicker
+                    currentSize={PlotSize.REGULAR}
+                    setSelectedSize={() => {}}
+                  />
+                ),
+                tooltip: 'Resize'
               }
             ]}
           />

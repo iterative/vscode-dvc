@@ -204,7 +204,7 @@ describe('App', () => {
       screen.getByTestId('plot-metrics:summary.json:loss')
     ).not.toThrow()
 
-    const pickerButton = screen.getByTestId('icon-menu-item')
+    const [pickerButton] = screen.queryAllByTestId('icon-menu-item')
     fireEvent.mouseEnter(pickerButton)
     fireEvent.click(pickerButton)
 
