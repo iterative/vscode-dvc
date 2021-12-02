@@ -23,7 +23,7 @@ export enum Status {
   UNSELECTED = 0
 }
 
-const enum MementoPrefixes {
+export const enum MementoPrefixes {
   COLORS = 'colors:',
   FILTER_BY = 'filterBy:',
   SORT_BY = 'sortBy:',
@@ -246,10 +246,14 @@ export class ExperimentsModel {
     this.persistSelectedMetrics()
   }
 
+  public getSelectedMetrics() {
+    return this.selectedMetrics
+  }
+
   private persistSelectedMetrics() {
     this.workspaceState.update(
       MementoPrefixes.SELECTED_METRICS + this.dvcRoot,
-      this.selectedMetrics
+      this.getSelectedMetrics()
     )
   }
 
