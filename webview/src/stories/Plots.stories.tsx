@@ -31,7 +31,7 @@ const Template: Story<{
   data?: PlotsData
 }> = ({ collapsedSections, data }) => {
   const [state, dispatch] = useAppReducer({ collapsedSections, data })
-  return <Plots state={state} dispatch={dispatch} />
+  return <Plots state={state} dispatch={dispatch} sendMessage={() => {}} />
 }
 
 export const WithData = Template.bind({})
