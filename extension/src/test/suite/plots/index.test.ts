@@ -35,12 +35,6 @@ suite('Plots Test Suite', () => {
         live: livePlotsFixture,
         static: staticPlotsFixture
       }
-      // eslint-disable-next-line no-console
-      console.error(JSON.stringify(expectedPlotsData.static?.['plots/acc.png']))
-      // eslint-disable-next-line no-console
-      console.error(
-        JSON.stringify(messageSpy.lastCall.args[0].static?.['plots/acc.png'])
-      )
 
       expect(messageSpy).to.be.calledWith(expectedPlotsData)
       expect(mockPlotsShow).to.be.called
