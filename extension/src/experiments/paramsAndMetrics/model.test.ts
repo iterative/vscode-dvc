@@ -82,7 +82,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
         })
       )
       expect(model.getColumnsOrder()).toEqual(persistedState)
@@ -92,7 +92,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: [
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: [
             { path: 'A', width: 0 },
             { path: 'B', width: 0 },
             { path: 'C', width: 0 }
@@ -115,7 +115,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
         })
       )
       expect(model.getColumnsOrder()).toEqual(persistedState)
@@ -130,7 +130,7 @@ describe('ParamsAndMetricsModel', () => {
       const model = new ParamsAndMetricsModel(
         exampleDvcRoot,
         buildMockMemento({
-          [MementoPrefixes.COLUMN_ORDER + exampleDvcRoot]: persistedState
+          [MementoPrefixes.COLUMNS_ORDER + exampleDvcRoot]: persistedState
         })
       )
       const changedColumnId = 'C'

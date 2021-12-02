@@ -72,7 +72,7 @@ export const ExperimentsTable: React.FC<{
   tableData: TableData
   model: Model
 }> = ({ tableData, model }) => {
-  const { data, columns, initialState, defaultColumn } = React.useMemo(() => {
+  const [columns, data, defaultColumn, initialState] = React.useMemo(() => {
     const { columnOrder } = tableData
     const initialState: Partial<TableState<Experiment>> = {
       columnOrder: tableData.columnOrder
@@ -85,7 +85,7 @@ export const ExperimentsTable: React.FC<{
     }
     const data = tableData.rows
     const columns = getColumns(tableData.columns)
-    return { columns, data, defaultColumn, initialState }
+    return [columns, data, defaultColumn, initialState]
   }, [tableData])
 
   const instance = useTable<Experiment>(
