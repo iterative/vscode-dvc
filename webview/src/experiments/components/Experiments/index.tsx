@@ -12,13 +12,13 @@ import {
   useExpanded,
   useFlexLayout,
   useColumnOrder,
-  useResizeColumns
+  useResizeColumns,
+  TableState
 } from 'react-table'
 import dayjs from '../../dayjs'
 import { Table } from '../Table'
 import styles from '../Table/styles.module.scss'
 import buildDynamicColumns from '../../util/buildDynamicColumns'
-import { useColumnResize } from '../../hooks/useColumnResize'
 import { Model } from '../../model'
 
 const DEFAULT_COLUMN_WIDTH = 120
@@ -60,23 +60,32 @@ const getColumns = (columns: ParamOrMetric[]): Column<Experiment>[] =>
     ...buildDynamicColumns(columns, 'metrics')
   ] as Column<Experiment>[]
 
+const reportResizedColumn = (state: TableState<Experiment>, model: Model) => {
+  const columnId = state.columnResizing.isResizingColumn
+  if (columnId) {
+    const columnWidth = state.columnResizing.columnWidths[columnId]
+    model.persistColumnWidth(columnId, columnWidth)
+  }
+}
+
 export const ExperimentsTable: React.FC<{
   tableData: TableData
   model: Model
 }> = ({ tableData, model }) => {
-  const [columnsWidth, setColumnWidth] = useColumnResize(model)
-  const [initialState, defaultColumn] = React.useMemo(() => {
-    const initialState = {}
+  const { data, columns, initialState, defaultColumn } = React.useMemo(() => {
+    const { columnOrder } = tableData
+    const initialState: Partial<TableState<Experiment>> = {
+      columnOrder: tableData.columnOrder
+    }
+    if (columnOrder) {
+      initialState.columnOrder = columnOrder
+    }
     const defaultColumn: Partial<Column<Experiment>> = {
       minWidth: DEFAULT_COLUMN_WIDTH
     }
-    return [initialState, defaultColumn]
-  }, [])
-
-  const [data, columns] = React.useMemo(() => {
     const data = tableData.rows
     const columns = getColumns(tableData.columns)
-    return [data, columns]
+    return { columns, data, defaultColumn, initialState }
   }, [tableData])
 
   const instance = useTable<Experiment>(
@@ -98,9 +107,7 @@ export const ExperimentsTable: React.FC<{
           }
         }
         if (action.type === 'columnDoneResizing') {
-          const columnId = Object.keys(state.columnResizing.columnWidths)[0]
-          const columnWidth = state.columnResizing.columnWidths[columnId]
-          setColumnWidth(columnId, columnWidth)
+          reportResizedColumn(state, model)
         }
         return state
       })
@@ -111,15 +118,27 @@ export const ExperimentsTable: React.FC<{
     useResizeColumns,
     hooks => {
       hooks.useInstance.push(instance => {
-        const { rows, allColumns } = instance
+        const { rows } = instance
         const expandedRowCount = countRowsAndAddIndexes(rows)
         Object.assign(instance, {
           expandedRowCount
         })
-        allColumns.forEach(column => {
-          column.width =
-            columnsWidth.find(c => c.path === column.id)?.width ||
-            DEFAULT_COLUMN_WIDTH
+      })
+      hooks.allColumns.push(allColumns => {
+        const { columnWidths } = tableData
+        if (columnWidths === undefined) {
+          return allColumns
+        }
+        return allColumns.map(column => {
+          const { id } = column
+          const width = columnWidths[id]
+          if (width !== undefined) {
+            return {
+              ...column,
+              width
+            }
+          }
+          return column
         })
       })
     }
@@ -137,7 +156,6 @@ export const ExperimentsTable: React.FC<{
       instance={instance}
       sorts={tableData.sorts}
       changes={tableData.changes}
-      columnsOrder={tableData.columnsOrder?.map(column => column.path)}
     />
   )
 }

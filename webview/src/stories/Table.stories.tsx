@@ -12,8 +12,8 @@ import { Model } from '../experiments/model'
 
 const tableData = {
   changes: workspaceChangesFixture,
+  columnOrder: [],
   columns: columnsFixture,
-  columnsOrder: [],
   rows: rowsFixture.map(row => ({
     ...row,
     subRows: row.subRows?.map(experiment => ({

@@ -97,8 +97,9 @@ suite('Experiments Test Suite', () => {
 
       const expectedTableData: TableData = {
         changes: workspaceChangesFixture,
+        columnOrder: [],
+        columnWidths: {},
         columns: columnsFixture,
-        columnsOrder: [],
         rows: rowsFixture,
         sorts: []
       }

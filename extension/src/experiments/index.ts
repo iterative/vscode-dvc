@@ -212,8 +212,9 @@ export class Experiments extends BaseRepository<TableData> {
   public getWebviewData() {
     return {
       changes: this.paramsAndMetrics.getChanges(),
+      columnOrder: this.paramsAndMetrics.getColumnsOrder(),
+      columnWidths: this.paramsAndMetrics.getColumnWidths(),
       columns: this.paramsAndMetrics.getSelected(),
-      columnsOrder: this.paramsAndMetrics.getColumnsOrder(),
       rows: this.experiments.getRowData(),
       sorts: this.experiments.getSorts()
     }

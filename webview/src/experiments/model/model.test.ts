@@ -5,12 +5,13 @@ import { Model } from '.'
 jest.mock('../../shared/api')
 
 describe('Model', () => {
-  const columnsOrder = [
-    { path: 'A', width: 100 },
-    { path: 'D', width: 130 },
-    { path: 'C', width: 120 },
-    { path: 'B', width: 170 }
-  ]
+  const columnOrder = ['A', 'D', 'C', 'B']
+  const columnWidths = {
+    A: 100,
+    B: 170,
+    C: 120,
+    D: 130
+  }
 
   let model: Model
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,6 +23,8 @@ describe('Model', () => {
     modelAsAny = model
     runInAction(() => {
       modelAsAny.data = {
+        columnOrder,
+        columnWidths,
         columns: [
           {
             parentPath: 'a',
@@ -39,45 +42,16 @@ describe('Model', () => {
             parentPath: 'b',
             path: 'b:a'
           }
-        ],
-        columnsOrder
+        ]
       }
     })
   })
 
-  describe('getColumnsWithWidth', () => {
-    it('should return the columns order', () => {
-      expect(model.getColumnsWithWidth()).toEqual(columnsOrder)
-    })
-
-    it('should return an empty array if there is no data', () => {
-      runInAction(() => {
-        model.data = undefined
-      })
-
-      expect(model.getColumnsWithWidth()).toEqual([])
-    })
-
-    it('should return an empty array if there is no columnsOrder on the data', () => {
-      runInAction(() => {
-        modelAsAny.data = {}
-      })
-      expect(model.getColumnsWithWidth()).toEqual([])
-    })
-  })
-
   describe('setColumnWidth', () => {
-    it('should change the width of the column in the columnsorder', () => {
-      const expectedWidth = 222
-      model.setColumnWidth('D', expectedWidth)
-
-      expect(modelAsAny.data.columnsOrder[1].width).toBe(expectedWidth)
-    })
-
     it('should send a message to notify of the change', () => {
       const expectedWidth = 4543
       const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
-      model.setColumnWidth('D', expectedWidth)
+      model.persistColumnWidth('D', expectedWidth)
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
@@ -92,13 +66,11 @@ describe('Model', () => {
       const sendMessageSpy = jest.spyOn(Model.prototype, 'sendMessage')
       sendMessageSpy.mockReset()
 
-      const expectedOrder = columnsOrder.map(column => column.path)
-
-      model.sendColumnsOrder(expectedOrder)
+      model.persistColumnsOrder(columnOrder)
 
       expect(sendMessageSpy).toHaveBeenCalledTimes(1)
       expect(sendMessageSpy).toHaveBeenCalledWith({
-        payload: expectedOrder,
+        payload: columnOrder,
         type: MessageFromWebviewType.COLUMN_REORDERED
       })
     })

@@ -18,7 +18,7 @@ import {
 import { Table } from '.'
 import styles from './Table/styles.module.scss'
 import { ExperimentsTable } from '../Experiments'
-import * as ColumnOrder from '../../hooks/useColumnsOrder'
+import * as ColumnOrder from '../../hooks/useColumnOrder'
 import { Model } from '../../model'
 
 jest.mock('../../../shared/api')
@@ -30,9 +30,7 @@ describe('Table', () => {
 
   const model = new Model()
   const getProps = (props: React.ReactPropTypes) => ({ ...props })
-  const headerGroupBasicProps = {
-    getHeaderGroupProps: getProps
-  }
+  const getHeaderGroupProps = (key: string) => () => ({ key })
   const headerBasicProps = {
     getHeaderProps: getProps
   }
@@ -51,7 +49,7 @@ describe('Table', () => {
     getTableProps: getProps,
     headerGroups: [
       {
-        ...headerGroupBasicProps,
+        getHeaderGroupProps: getHeaderGroupProps('headerGroup_1'),
         headers: [
           {
             ...headerBasicProps,
@@ -98,7 +96,10 @@ describe('Table', () => {
         }
       } as unknown as Experiment
     ],
-    setColumnOrder: jest.fn
+    setColumnOrder: jest.fn,
+    state: {
+      columnOrder: []
+    }
   } as unknown as TableInstance<Experiment>
   const renderTable = (
     sorts: SortDefinition[] = [],
@@ -111,14 +112,11 @@ describe('Table', () => {
         instance={tableInstance}
         sorts={sorts}
         changes={changes}
-        columnsOrder={[]}
       />
     )
 
   beforeAll(() => {
-    jest
-      .spyOn(ColumnOrder, 'useColumnOrder')
-      .mockImplementation(() => [[], () => {}])
+    jest.spyOn(ColumnOrder, 'useColumnOrder').mockImplementation(() => [])
   })
 
   afterEach(() => {
@@ -144,7 +142,7 @@ describe('Table', () => {
       }
       newInstance.headerGroups = [
         {
-          ...headerGroupBasicProps,
+          getHeaderGroupProps: getHeaderGroupProps('headerGroup_2'),
           headers: [placeHolderHeaderExp, placeholderHeaderTimestamp]
         } as unknown as HeaderGroup<Experiment>,
         ...newInstance.headerGroups
@@ -298,8 +296,9 @@ describe('Table', () => {
     ]
     const tableData = {
       changes: [],
+      columnOrder: [],
+      columnWidths: {},
       columns,
-      columnsOrder: [],
       rows: [],
       sorts: []
     }
@@ -375,17 +374,17 @@ describe('Table', () => {
       expect(headers).toEqual([...defaultCols, 'A', 'B', 'C'])
     })
 
-    it('should order the columns with the columnsOrder from the data', async () => {
-      const columnsOrder = [
-        { path: 'id', width: 150 },
-        { path: 'timestamp', width: 150 },
-        { path: 'params:C', width: 150 },
-        { path: 'params:B', width: 150 },
-        { path: 'params:A', width: 150 }
+    it('should order the columns with the columnOrder from the data', async () => {
+      const columnOrder = [
+        'id',
+        'timestamp',
+        'params:C',
+        'params:B',
+        'params:A'
       ]
       const tableDataWithCustomColOrder = {
         ...tableData,
-        columnsOrder
+        columnOrder
       }
       renderExperimentsTable(tableDataWithCustomColOrder)
 

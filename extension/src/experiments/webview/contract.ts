@@ -43,5 +43,6 @@ export interface TableData {
   columns: ParamOrMetric[]
   sorts: SortDefinition[]
   changes: string[]
-  columnsOrder: ColumnDetail[]
+  columnOrder: string[]
+  columnWidths: Record<string, number>
 }
