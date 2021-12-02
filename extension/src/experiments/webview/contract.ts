@@ -33,11 +33,6 @@ export interface ParamOrMetric extends ParamOrMetricAggregateData {
   types?: string[]
 }
 
-export interface ColumnDetail {
-  path: string
-  width: number
-}
-
 export interface TableData {
   rows: RowData[]
   columns: ParamOrMetric[]
