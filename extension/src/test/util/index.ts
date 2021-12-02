@@ -1,11 +1,9 @@
 import { join, resolve } from 'path'
 import { Memento, Uri } from 'vscode'
 
-export const dvcDemoPath = Uri.file(
-  resolve(__dirname, '..', '..', '..', '..', 'demo')
-).fsPath
-
-export const basePlotsUrl = join(dvcDemoPath, 'plots')
+const dvcRoot = resolve(__dirname, '..', '..', '..', '..', 'demo')
+export const dvcDemoPath = Uri.file(dvcRoot).fsPath
+export const basePlotsUrl = Uri.file(join(dvcRoot, 'plots')).fsPath
 
 export const buildMockMemento = (
   values: Record<string, unknown> = {}
